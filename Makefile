@@ -1,5 +1,3 @@
-EXAMPLE = string_contains
-
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text
 help: HELP_SCRIPT = \
@@ -16,7 +14,8 @@ help:
 .PHONY: build
 build: description = Build everything
 build:
-	tinygo build -o src/$(EXAMPLE).wasm -target wasi src/$(EXAMPLE).go
+	tinygo build -o src/match.wasm -target wasi src/match.go
+	tinygo build -o src/transform.wasm -target wasi src/transform.go
 
 
 .PHONY: setup/darwin

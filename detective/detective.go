@@ -22,7 +22,8 @@ var (
 )
 
 const (
-	StringContains    MatchType = "string_contains"
+	StringContainsAny MatchType = "string_contains_any"
+	StringContainsAll MatchType = "string_contains_all"
 	IpAddress         MatchType = "ip_address"
 	Regex             MatchType = "regex"
 	TimestampRFC3339  MatchType = "ts_rfc3339"
@@ -88,8 +89,10 @@ func (m *Matcher) matchString(fieldValue string, matchType MatchType, matchArgs 
 	switch matchType {
 	case IpAddress:
 		return pii.IP()(fieldValue), nil
-	case StringContains:
-		return matchString(fieldValue, matchArgs...), nil
+	case StringContainsAll:
+		return matchStringAll(fieldValue, matchArgs...), nil
+	case StringContainsAny:
+		return matchStringAny(fieldValue, matchArgs...), nil
 	case IsEmpty:
 		return strings.Trim(fieldValue, " ") == "", nil
 	case Regex:
@@ -178,7 +181,7 @@ func matchPII(fieldValue string) bool {
 	return match(fieldValue)
 }
 
-func matchString(fieldValue string, matchArgs ...string) bool {
+func matchStringAll(fieldValue string, matchArgs ...string) bool {
 	if len(matchArgs) < 1 {
 		return false
 	}
@@ -190,6 +193,20 @@ func matchString(fieldValue string, matchArgs ...string) bool {
 	}
 
 	return true
+}
+
+func matchStringAny(fieldValue string, matchArgs ...string) bool {
+	if len(matchArgs) < 1 {
+		return false
+	}
+
+	for _, arg := range matchArgs {
+		if strings.Contains(fieldValue, arg) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func matchTimestampUnixNano(fieldValue string) bool {

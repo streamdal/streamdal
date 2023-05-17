@@ -1,70 +1,37 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/wasmerio/wasmer-go/wasmer"
+	"github.com/pkg/errors"
+	"github.com/streamdal/detective-wasm/detective"
 
 	"github.com/streamdal/detective-wasm/common"
+	"github.com/wasmerio/wasmer-go/wasmer"
 )
 
-/*
-
-This is the "best" working example (using wasmer).
-
-This example uses alloc() and dealloc() which is the proper way to manage mem
-in WASM (and avoids potentially corrupting Go runtime's mem).
-
-This example also has a fully working bench.
-
-The bench perf can be *definitely* improved, especially when it comes to copying
-and clearing mem.
-
-Less if/else statements (and relying on implicit panics) would also lower the
-number of CPU instructions.
-
-Some other potential improvements: set a max size for input (1MB?), grow memory
-only when needed.
-
-
-*/
-
 func main() {
-	inst, store, err := setup("src/string_contains.wasm")
+	match()
+	transform()
+}
+
+func match() {
+	inst, err := setup("src/match.wasm")
 	if err != nil {
 		panic("unable to setup: " + err.Error())
 	}
 
-	f, err := inst.Exports.GetFunction("f")
-	if err != nil {
-		panic("unable to get func: " + err.Error())
-	}
-
-	alloc, err := inst.Exports.GetFunction("alloc")
-	if err != nil {
-		panic("unable to get alloc func: " + err.Error())
-	}
-
-	dealloc, err := inst.Exports.GetFunction("dealloc")
-	if err != nil {
-		panic("unable to get dealloc func: " + err.Error())
-	}
-
-	// TODO: expose allocate & deallocate
-
-	jsonData, err := os.ReadFile("json-examples/large.json")
+	jsonData, err := os.ReadFile("json-examples/small.json")
 	if err != nil {
 		panic("unable to read json: " + err.Error())
 	}
 
-	request := &common.Request{
-		Path: "firstname",
-		Data: jsonData,
-		Args: map[string]string{
-			"test": "hello",
-		},
+	request := &common.MatchRequest{
+		Path:      "firstname",
+		Data:      jsonData,
+		Args:      []string{"Rani", "Mark"},
+		MatchType: detective.StringContainsAny,
 	}
 
 	req, err := request.MarshalJSON()
@@ -72,19 +39,131 @@ func main() {
 		panic("unable to generate request: " + err.Error())
 	}
 
-	response, err := performRun(inst, store, f, alloc, dealloc, req)
+	response, err := performMatchRun(inst, req)
 	if err != nil {
-		panic("error during performRun: " + err.Error())
+		panic("error during performMatchRun: " + err.Error())
 	}
 
-	fmt.Printf("Valid: %t\n", response.Valid)
+	fmt.Printf("Is Match: %t\n", response.IsMatch)
 }
 
-func performRun(inst *wasmer.Instance, store *wasmer.Store, f wasmer.NativeFunction, alloc wasmer.NativeFunction, dealloc wasmer.NativeFunction, request []byte) (*common.Response, error) {
+func transform() {
+	inst, err := setup("src/transform.wasm")
+	if err != nil {
+		panic("unable to setup: " + err.Error())
+	}
+
+	jsonData, err := os.ReadFile("json-examples/small.json")
+	if err != nil {
+		panic("unable to read json: " + err.Error())
+	}
+
+	request := &common.TransformRequest{
+		Path:  "firstname",
+		Data:  jsonData,
+		Value: `"Mark Was Here"`,
+	}
+
+	req, err := request.MarshalJSON()
+	if err != nil {
+		panic("unable to generate request: " + err.Error())
+	}
+
+	response, err := performTransformRun(inst, req)
+	if err != nil {
+		panic("error during performTransformRun: " + err.Error())
+	}
+
+	println(string(response.Data))
+}
+
+func performTransformRun(inst *wasmer.Instance, request []byte) (*common.TransformResponse, error) {
+	f, err := inst.Exports.GetFunction("f")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get func")
+	}
+
+	alloc, err := inst.Exports.GetFunction("alloc")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get alloc func")
+	}
+
+	dealloc, err := inst.Exports.GetFunction("dealloc")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get dealloc func")
+	}
 
 	ptr, err := alloc(len(request))
 	if err != nil {
-		panic("unable to allocate memory: " + err.Error())
+		return nil, errors.Wrap(err, "unable to allocate memory")
+	}
+
+	ptrVal, ok := ptr.(int32)
+	if !ok {
+		return nil, errors.Wrap(err, "unable to convert ptr to int32")
+	}
+
+	mem, err := writeMemory(inst, request, ptrVal)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to write memory")
+	}
+
+	result, err := f(ptrVal, len(request))
+	if err != nil {
+		// Clear mem on error
+		if _, err := dealloc(ptrVal, int32(len(request))); err != nil {
+			return nil, errors.Wrap(err, "unable to deallocate memory")
+		}
+		return nil, errors.Wrap(err, "error during func call")
+	}
+
+	// Dealloc request memory
+	if _, err := dealloc(ptrVal, int32(len(request))); err != nil {
+		return nil, errors.Wrap(err, "unable to deallocate memory")
+	}
+
+	// Read memory starting from result ptr
+	returnData, err := ReadMemory(mem.Data(), result, -1)
+	if err != nil {
+		return nil, errors.Wrap(err, "error during ReadMemory")
+	}
+
+	resp := &common.TransformResponse{}
+
+	if err := resp.UnmarshalJSON(returnData); err != nil {
+		return nil, errors.Wrap(err, "error during tinyjson.Unmarshal")
+	}
+
+	rlen := int32(len(returnData))
+	//fmt.Printf("result ptr: %d\n", result)
+	//fmt.Printf("return data: %#v\n", resp)
+	//panic is here
+	if _, err := dealloc(result, rlen); err != nil {
+		return nil, errors.Wrap(err, "error during dealloc")
+	}
+
+	return resp, nil
+}
+
+func performMatchRun(inst *wasmer.Instance, request []byte) (*common.MatchResponse, error) {
+	f, err := inst.Exports.GetFunction("f")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get func")
+	}
+
+	alloc, err := inst.Exports.GetFunction("alloc")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get alloc func")
+	}
+
+	dealloc, err := inst.Exports.GetFunction("dealloc")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get dealloc func")
+	}
+
+	ptr, err := alloc(len(request))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to allocate memory")
 	}
 
 	ptrVal, ok := ptr.(int32)
@@ -94,41 +173,41 @@ func performRun(inst *wasmer.Instance, store *wasmer.Store, f wasmer.NativeFunct
 
 	mem, err := writeMemory(inst, request, ptrVal)
 	if err != nil {
-		panic("unable to write memory: " + err.Error())
+		return nil, errors.Wrap(err, "unable to write memory")
 	}
 
 	result, err := f(ptrVal, len(request))
 	if err != nil {
 		// Clear mem on error
 		if _, err := dealloc(ptrVal, int32(len(request))); err != nil {
-			panic("unable to deallocate memory: " + err.Error())
+			return nil, errors.Wrap(err, "unable to deallocate memory")
 		}
-		panic("error during func call: " + err.Error())
+		return nil, errors.Wrap(err, "error during func call")
 	}
 
 	// Dealloc request memory
 	if _, err := dealloc(ptrVal, int32(len(request))); err != nil {
-		panic("unable to deallocate memory: " + err.Error())
+		return nil, errors.Wrap(err, "unable to deallocate memory")
 	}
 
 	// Read memory starting from result ptr
 	returnData, err := ReadMemory(mem.Data(), result, -1)
 	if err != nil {
-		panic("error during ReadMemory: " + err.Error())
+		return nil, errors.Wrap(err, "error during ReadMemory")
 	}
 
-	resp := &common.Response{}
+	resp := &common.MatchResponse{}
 
 	if err := resp.UnmarshalJSON(returnData); err != nil {
-		panic("error during tinyjson.Unmarshal: " + err.Error())
+		return nil, errors.Wrap(err, "error during tinyjson.Unmarshal")
 	}
 
 	rlen := int32(len(returnData))
 	//fmt.Printf("result ptr: %d\n", result)
-	//fmt.Printf("return data: %s\n", returnData)
+	//fmt.Printf("return data: %#v\n", resp)
 	// panic is here
 	if _, err := dealloc(result, rlen); err != nil {
-		panic("error during dealloc: " + err.Error())
+		return nil, errors.Wrap(err, "error during dealloc")
 	}
 
 	return resp, nil
@@ -145,10 +224,10 @@ func writeMemory(inst *wasmer.Instance, data []byte, ptr int32) (*wasmer.Memory,
 	return mem, nil
 }
 
-func setup(file string) (*wasmer.Instance, *wasmer.Store, error) {
+func setup(file string) (*wasmer.Instance, error) {
 	wasmBytes, err := os.ReadFile(file)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read wasm file: %w", err)
+		return nil, fmt.Errorf("failed to read wasm file: %w", err)
 	}
 
 	store := wasmer.NewStore(wasmer.NewEngine())
@@ -156,7 +235,7 @@ func setup(file string) (*wasmer.Instance, *wasmer.Store, error) {
 	// Compiles the module
 	module, err := wasmer.NewModule(store, wasmBytes)
 	if err != nil {
-		panic(fmt.Sprintln("failed to compile module:", err))
+		return nil, errors.Wrap(err, "failed to compile module")
 	}
 
 	wasiEnv, err := wasmer.NewWasiStateBuilder("wasi-program").
@@ -166,53 +245,21 @@ func setup(file string) (*wasmer.Instance, *wasmer.Store, error) {
 		// MapDirectory("./", ".").
 		Finalize()
 	if err != nil {
-		panic(fmt.Sprintln("failed to generate wasi env:", err))
+		return nil, errors.Wrap(err, "failed to generate wasi env")
 	}
 
 	importObject, err := wasiEnv.GenerateImportObject(store, module)
 	if err != nil {
-		panic(fmt.Sprintln("failed to generate import object:", err))
+		return nil, errors.Wrap(err, "failed to generate import object")
 	}
 
 	// Instantiates the module
 	instance, err := wasmer.NewInstance(module, importObject)
 	if err != nil {
-		panic(fmt.Sprintln("failed to instantiate module:", err))
+		return nil, errors.Wrap(err, "failed to instantiate module")
 	}
 
-	return instance, store, nil
-
-	//engine := wasmtime.NewEngine()
-	//
-	//// Compiles the module
-	//mod, err := wasmtime.NewModule(engine, wasmBytes)
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("unable to compile module: %w", err)
-	//}
-	//
-	//linker := wasmtime.NewLinker(engine)
-	//
-	//if err := linker.DefineWasi(); err != nil {
-	//	return nil, nil, fmt.Errorf("unable to define wasi: %w", err)
-	//}
-	//
-	//store := wasmtime.NewStore(engine)
-	//
-	//wasiConfig := wasmtime.NewWasiConfig()
-	//
-	//store.SetWasi(wasiConfig)
-	//
-	//inst, err := linker.Instantiate(store, mod)
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("unable to instantiate module: %w", err)
-	//}
-	//
-	//mem := inst.GetExport(store, "memory").Memory()
-	//if _, err := mem.Grow(store, 5); err != nil {
-	//	panic("unable to grow memory: " + err.Error())
-	//}
-	//
-	//return inst, store, nil
+	return instance, nil
 }
 
 func ReadMemory(memory []byte, ptr interface{}, length int) ([]byte, error) {
@@ -232,9 +279,6 @@ func ReadMemory(memory []byte, ptr interface{}, length int) ([]byte, error) {
 	nullHits := 0
 
 	for i, v := range memory[ptrInt32:] {
-		//fmt.Println("Byte num: ", v)
-		//fmt.Println("Byte str:", string(v))
-
 		// Have length, can quit
 		if length != -1 {
 			if i == length {

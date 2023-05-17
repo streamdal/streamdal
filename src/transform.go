@@ -9,7 +9,6 @@ import (
 
 	"github.com/buger/jsonparser"
 	"github.com/streamdal/detective-wasm/common"
-	"github.com/streamdal/detective-wasm/detective"
 )
 
 // Tiny-go needs a main function to compile`
@@ -29,51 +28,20 @@ func f(ptr int32, length int32) int32 {
 		data = append(data, byteVal)
 	}
 
-	req := &common.Request{}
+	req := &common.TransformRequest{}
 
 	if err := req.UnmarshalJSON(data); err != nil {
 		err = errors.Wrap(err, "unable to unmarshal json")
-		return returnResponse(data, false, err)
+		return common.ReturnTransformResponse(data, err)
 	}
 
-	field, t, _, err := jsonparser.Get(req.Data, req.Path)
+	modified, err := jsonparser.Set(req.Data, []byte(req.Value), req.Path)
 	if err != nil {
-		err = errors.New("unable to get field from json")
-		return returnResponse(data, false, err)
+		err = errors.Wrap(err, "failed to run jsonparser.Set")
+		return common.ReturnTransformResponse(data, err)
 	}
 
-	matched, err := detective.NewMatcher().Match(field, t, detective.StringContains, "Sibello")
-	if err != nil {
-		err = errors.Wrap(err, "unable to match field")
-		return returnResponse(data, false, err)
-	}
-
-	return returnResponse(data, matched, nil)
-}
-
-func returnResponse(data []byte, valid bool, err error) int32 {
-	resp := &common.Response{
-		Data:  data,
-		Valid: valid,
-		Error: "",
-	}
-
-	if err != nil {
-		resp.Valid = false
-		resp.Error = err.Error()
-	}
-
-	// Serialize response
-	returnData, err := resp.MarshalJSON()
-	if err != nil {
-		errRet := []byte("")
-		return *(*int32)(unsafe.Pointer(&errRet))
-	}
-
-	// Add terminator sequence
-	returnData = append(returnData, 166, 166, 166)
-
-	return *(*int32)(unsafe.Pointer(&returnData))
+	return common.ReturnTransformResponse(modified, nil)
 }
 
 // potential terminator: \xa6\xa6\xa6 / (166, 166, 166) / ¦¦¦

@@ -6,6 +6,7 @@ import (
 	tinyjson "github.com/CosmWasm/tinyjson"
 	jlexer "github.com/CosmWasm/tinyjson/jlexer"
 	jwriter "github.com/CosmWasm/tinyjson/jwriter"
+	detective "github.com/streamdal/detective-wasm/detective"
 )
 
 // suppress unused package warning
@@ -15,7 +16,7 @@ var (
 	_ tinyjson.Marshaler
 )
 
-func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(in *jlexer.Lexer, out *Response) {
+func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(in *jlexer.Lexer, out *TransformResponse) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -41,8 +42,6 @@ func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(in *jlexer.Lexe
 			} else {
 				out.Data = in.Bytes()
 			}
-		case "Valid":
-			out.Valid = bool(in.Bool())
 		case "Error":
 			out.Error = string(in.String())
 		default:
@@ -55,7 +54,7 @@ func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(in *jlexer.Lexe
 		in.Consumed()
 	}
 }
-func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(out *jwriter.Writer, in Response) {
+func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(out *jwriter.Writer, in TransformResponse) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -63,11 +62,6 @@ func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(out *jwriter.Wr
 		const prefix string = ",\"Data\":"
 		out.RawString(prefix[1:])
 		out.Base64Bytes(in.Data)
-	}
-	{
-		const prefix string = ",\"Valid\":"
-		out.RawString(prefix)
-		out.Bool(bool(in.Valid))
 	}
 	{
 		const prefix string = ",\"Error\":"
@@ -78,29 +72,187 @@ func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(out *jwriter.Wr
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v Response) MarshalJSON() ([]byte, error) {
+func (v TransformResponse) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalTinyJSON supports tinyjson.Marshaler interface
-func (v Response) MarshalTinyJSON(w *jwriter.Writer) {
+func (v TransformResponse) MarshalTinyJSON(w *jwriter.Writer) {
 	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *Response) UnmarshalJSON(data []byte) error {
+func (v *TransformResponse) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(&r, v)
 	return r.Error()
 }
 
 // UnmarshalTinyJSON supports tinyjson.Unmarshaler interface
-func (v *Response) UnmarshalTinyJSON(l *jlexer.Lexer) {
+func (v *TransformResponse) UnmarshalTinyJSON(l *jlexer.Lexer) {
 	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon(l, v)
 }
-func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(in *jlexer.Lexer, out *Request) {
+func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(in *jlexer.Lexer, out *TransformRequest) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "data":
+			if in.IsNull() {
+				in.Skip()
+				out.Data = nil
+			} else {
+				out.Data = in.Bytes()
+			}
+		case "path":
+			out.Path = string(in.String())
+		case "value":
+			out.Value = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(out *jwriter.Writer, in TransformRequest) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"data\":"
+		out.RawString(prefix[1:])
+		out.Base64Bytes(in.Data)
+	}
+	{
+		const prefix string = ",\"path\":"
+		out.RawString(prefix)
+		out.String(string(in.Path))
+	}
+	{
+		const prefix string = ",\"value\":"
+		out.RawString(prefix)
+		out.String(string(in.Value))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v TransformRequest) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalTinyJSON supports tinyjson.Marshaler interface
+func (v TransformRequest) MarshalTinyJSON(w *jwriter.Writer) {
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *TransformRequest) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(&r, v)
+	return r.Error()
+}
+
+// UnmarshalTinyJSON supports tinyjson.Unmarshaler interface
+func (v *TransformRequest) UnmarshalTinyJSON(l *jlexer.Lexer) {
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(l, v)
+}
+func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon2(in *jlexer.Lexer, out *MatchResponse) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "IsMatch":
+			out.IsMatch = bool(in.Bool())
+		case "Error":
+			out.Error = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon2(out *jwriter.Writer, in MatchResponse) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"IsMatch\":"
+		out.RawString(prefix[1:])
+		out.Bool(bool(in.IsMatch))
+	}
+	{
+		const prefix string = ",\"Error\":"
+		out.RawString(prefix)
+		out.String(string(in.Error))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v MatchResponse) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon2(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalTinyJSON supports tinyjson.Marshaler interface
+func (v MatchResponse) MarshalTinyJSON(w *jwriter.Writer) {
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon2(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *MatchResponse) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon2(&r, v)
+	return r.Error()
+}
+
+// UnmarshalTinyJSON supports tinyjson.Unmarshaler interface
+func (v *MatchResponse) UnmarshalTinyJSON(l *jlexer.Lexer) {
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon2(l, v)
+}
+func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon3(in *jlexer.Lexer, out *MatchRequest) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -131,19 +283,28 @@ func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(in *jlexer.Lex
 		case "args":
 			if in.IsNull() {
 				in.Skip()
+				out.Args = nil
 			} else {
-				in.Delim('{')
-				out.Args = make(map[string]string)
-				for !in.IsDelim('}') {
-					key := string(in.String())
-					in.WantColon()
-					var v5 string
-					v5 = string(in.String())
-					(out.Args)[key] = v5
+				in.Delim('[')
+				if out.Args == nil {
+					if !in.IsDelim(']') {
+						out.Args = make([]string, 0, 4)
+					} else {
+						out.Args = []string{}
+					}
+				} else {
+					out.Args = (out.Args)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v8 string
+					v8 = string(in.String())
+					out.Args = append(out.Args, v8)
 					in.WantComma()
 				}
-				in.Delim('}')
+				in.Delim(']')
 			}
+		case "match_type":
+			out.MatchType = detective.MatchType(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -154,7 +315,7 @@ func tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(out *jwriter.Writer, in Request) {
+func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon3(out *jwriter.Writer, in MatchRequest) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -171,47 +332,47 @@ func tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(out *jwriter.W
 	{
 		const prefix string = ",\"args\":"
 		out.RawString(prefix)
-		if in.Args == nil && (out.Flags&jwriter.NilMapAsEmpty) == 0 {
-			out.RawString(`null`)
+		if in.Args == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
 		} else {
-			out.RawByte('{')
-			v8First := true
-			for v8Name, v8Value := range in.Args {
-				if v8First {
-					v8First = false
-				} else {
+			out.RawByte('[')
+			for v11, v12 := range in.Args {
+				if v11 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v8Name))
-				out.RawByte(':')
-				out.String(string(v8Value))
+				out.String(string(v12))
 			}
-			out.RawByte('}')
+			out.RawByte(']')
 		}
+	}
+	{
+		const prefix string = ",\"match_type\":"
+		out.RawString(prefix)
+		out.String(string(in.MatchType))
 	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v Request) MarshalJSON() ([]byte, error) {
+func (v MatchRequest) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(&w, v)
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalTinyJSON supports tinyjson.Marshaler interface
-func (v Request) MarshalTinyJSON(w *jwriter.Writer) {
-	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon1(w, v)
+func (v MatchRequest) MarshalTinyJSON(w *jwriter.Writer) {
+	tinyjsonFeb5d5a7EncodeGithubComStreamdalDetectiveWasmCommon3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *Request) UnmarshalJSON(data []byte) error {
+func (v *MatchRequest) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(&r, v)
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalTinyJSON supports tinyjson.Unmarshaler interface
-func (v *Request) UnmarshalTinyJSON(l *jlexer.Lexer) {
-	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon1(l, v)
+func (v *MatchRequest) UnmarshalTinyJSON(l *jlexer.Lexer) {
+	tinyjsonFeb5d5a7DecodeGithubComStreamdalDetectiveWasmCommon3(l, v)
 }

@@ -5,22 +5,18 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/pkg/errors"
+
 	"github.com/buger/jsonparser"
-
 	"github.com/streamdal/detective-wasm/common"
+	"github.com/streamdal/detective-wasm/detective"
 )
-
-/*
-
-
- */
 
 // Tiny-go needs a main function to compile`
 func main() {}
 
 //export f
 func f(ptr int32, length int32) int32 {
-	//fmt.Println("Execution occurred!")
 
 	data := make([]byte, 0, length)
 
@@ -33,33 +29,26 @@ func f(ptr int32, length int32) int32 {
 		data = append(data, byteVal)
 	}
 
-	req := &common.Request{}
+	req := &common.MatchRequest{}
 
 	if err := req.UnmarshalJSON(data); err != nil {
-		panic("error during tinyjson.Unmarshal: " + err.Error())
+		err = errors.Wrap(err, "unable to unmarshal json")
+		return common.ReturnMatchResponse(false, err)
 	}
 
-	modified, err := jsonparser.Set(req.Data, []byte(`"Batman"`), req.Path)
+	field, t, _, err := jsonparser.Get(req.Data, req.Path)
 	if err != nil {
-		panic("error during jsonparser.Set: " + err.Error())
+		err = errors.New("unable to get field from json")
+		return common.ReturnMatchResponse(false, err)
 	}
 
-	// write response data
-	resp := &common.Response{
-		Data:  modified,
-		Valid: true,
-	}
-
-	// Serialize resp
-	returnData, err := resp.MarshalJSON()
+	matched, err := detective.NewMatcher().Match(field, t, req.MatchType, req.Args...)
 	if err != nil {
-		panic("error during tinyjson.Marshal: " + err.Error())
+		err = errors.Wrap(err, "unable to match field")
+		return common.ReturnMatchResponse(false, err)
 	}
 
-	// Add terminator sequence
-	returnData = append(returnData, 166, 166, 166)
-
-	return *(*int32)(unsafe.Pointer(&returnData))
+	return common.ReturnMatchResponse(matched, nil)
 }
 
 // potential terminator: \xa6\xa6\xa6 / (166, 166, 166) / ¦¦¦
