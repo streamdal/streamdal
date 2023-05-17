@@ -1,0 +1,31 @@
+{
+  "name": "Embedded Streamdal Console",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "pretty": "prettier --write --ignore-unknown ./dist/index.html",
+    "serve": "npx serve dist",
+    "start": "concurrently \"npm:tailwind\" \"npm:serve\"",
+    "tailwind": "npx tailwindcss -i ./src/tailwind.css -o ./dist/style.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Jacob Heric",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "2.8.8",
+    "tailwindcss": "^3.3.2"
+  },
+  "dependencies": {
+    "concurrently": "^8.0.1",
+    "htmx.org": "^1.9.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "serve": "^14.2.0"
+  },
+  "lint-staged": {
+    "./dist/index.html": "prettier --write --ignore-unknown"
+  }
+}

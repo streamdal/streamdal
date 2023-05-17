@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Embedded Streamdal Console</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="/assets/favicon/favicon-32.png" />
+    <script src="htmx.min.js"></script>
+    <link href="./style.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <div class="flex flex-col w-full">
+      <div
+        class="flex flex-row justify-start h-16 bg-purple-dark w-full items-center"
+      >
+        <img src="/assets/images/logo-dark.png" class="w-44 h-fit ml-4" />
+      </div>
+      <div class="m-6">
+        <a data-hx-post="https://api.dev.streamdal.com/v1/logout">
+          <div
+            class="flex justify-center bg-purple-light border-purple-accent w-40 border rounded"
+          >
+            <h1 class="my-2 cursor-pointer">...coming soon...</h1>
+          </div>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
