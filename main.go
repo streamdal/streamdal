@@ -134,13 +134,7 @@ func performTransformRun(inst *wasmer.Instance, request []byte) (*common.Transfo
 		return nil, errors.Wrap(err, "error during tinyjson.Unmarshal")
 	}
 
-	rlen := int32(len(returnData))
-	//fmt.Printf("result ptr: %d\n", result)
-	//fmt.Printf("return data: %#v\n", resp)
-	//panic is here
-	if _, err := dealloc(result, rlen); err != nil {
-		return nil, errors.Wrap(err, "error during dealloc")
-	}
+	// No need to dealloc on result
 
 	return resp, nil
 }
@@ -168,7 +162,7 @@ func performMatchRun(inst *wasmer.Instance, request []byte) (*common.MatchRespon
 
 	ptrVal, ok := ptr.(int32)
 	if !ok {
-		panic("unable to convert ptr to int32")
+		return nil, errors.New("unable to convert ptr to int32")
 	}
 
 	mem, err := writeMemory(inst, request, ptrVal)
@@ -202,13 +196,7 @@ func performMatchRun(inst *wasmer.Instance, request []byte) (*common.MatchRespon
 		return nil, errors.Wrap(err, "error during tinyjson.Unmarshal")
 	}
 
-	rlen := int32(len(returnData))
-	//fmt.Printf("result ptr: %d\n", result)
-	//fmt.Printf("return data: %#v\n", resp)
-	// panic is here
-	if _, err := dealloc(result, rlen); err != nil {
-		return nil, errors.Wrap(err, "error during dealloc")
-	}
+	// No need to dealloc on result
 
 	return resp, nil
 }
