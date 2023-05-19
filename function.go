@@ -2,6 +2,7 @@ package dataqual
 
 import (
 	"context"
+
 	"github.com/pkg/errors"
 	"github.com/wasmerio/wasmer-go/wasmer"
 )

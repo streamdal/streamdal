@@ -4,11 +4,11 @@ import (
 	"os"
 	"sync"
 
-	"github.com/streamdal/dataqual/detective"
-
 	"github.com/pkg/errors"
-	"github.com/streamdal/dataqual/common"
 	"github.com/wasmerio/wasmer-go/wasmer"
+
+	"github.com/streamdal/dataqual/common"
+	"github.com/streamdal/dataqual/detective"
 )
 
 type Module string

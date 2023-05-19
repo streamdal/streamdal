@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"github.com/batchcorp/plumber-schemas/build/go/protos"
-	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
+	"time"
+
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"time"
+
+	"github.com/batchcorp/plumber-schemas/build/go/protos"
+	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
 // TODO: function to check for rule updates on an interval
