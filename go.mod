@@ -1,4 +1,4 @@
-module github.com/streamdal/detective-wasm
+module github.com/streamdal/dataqual
 
 go 1.20
 
