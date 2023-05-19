@@ -1,6 +1,7 @@
 package dataqual
 
 import (
+	"context"
 	"github.com/pkg/errors"
 	"github.com/wasmerio/wasmer-go/wasmer"
 )
@@ -65,8 +66,7 @@ func (d *DataQual) getFunction(m Module) (*function, error) {
 		return fc, nil
 	}
 
-	// function doesn't exist yet, load wasm data from either cache or plumber
-	wasmData, err := d.getWasm(m)
+	wasmData, err := d.plumber.GetWasmFile(context.Background(), string(m)+".wasm")
 	if err != nil {
 		return nil, err
 	}

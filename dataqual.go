@@ -1,6 +1,7 @@
 package dataqual
 
 import (
+	"os"
 	"sync"
 
 	"github.com/streamdal/dataqual/detective"
@@ -30,8 +31,7 @@ var (
 type DataQual struct {
 	functions    map[Module]*function
 	functionsMtx *sync.RWMutex
-	wasmData     map[Module][]byte
-	wasmDataMtx  *sync.RWMutex
+	plumber      *Plumber
 }
 
 type Config struct {
@@ -44,15 +44,29 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "invalid config")
 	}
 
+	plumberURL := getenv("PLUMBER_URL", "localhost:9090")
+	plumberToken := getenv("PLUMBER_TOKEN", "streamdal")
+
 	// TODO: predownload wasm modules somehow,
 	// TODO: or if we don't have rules at this point, download standard modules at least
+	plumber, err := newServer(plumberURL, plumberToken)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to connect to plumber")
+	}
 
 	return &DataQual{
 		functions:    make(map[Module]*function),
 		functionsMtx: &sync.RWMutex{},
-		wasmData:     map[Module][]byte{},
-		wasmDataMtx:  &sync.RWMutex{},
+		plumber:      plumber,
 	}, nil
+}
+
+func getenv(name, def string) string {
+	if val := os.Getenv(name); val != "" {
+		return val
+	}
+
+	return def
 }
 
 func validateConfig(cfg *Config) error {
@@ -65,37 +79,6 @@ func validateConfig(cfg *Config) error {
 	}
 
 	return nil
-}
-
-func (d *DataQual) getWasm(rt Module) ([]byte, error) {
-	// Check in-memory cache first
-	d.wasmDataMtx.RLock()
-	data, ok := d.wasmData[rt]
-	if ok {
-		d.wasmDataMtx.RUnlock()
-		return data, nil
-	}
-	d.wasmDataMtx.RUnlock()
-
-	// TODO: call out to plumber API
-
-	return data, nil
-}
-
-func (d *DataQual) setWasmCache(rt Module, data []byte) {
-	d.wasmDataMtx.Lock()
-	defer d.wasmDataMtx.Unlock()
-
-	d.wasmData[rt] = data
-}
-
-func (d *DataQual) getWasmFromCache(rt Module) ([]byte, bool) {
-	d.wasmDataMtx.RLock()
-	defer d.wasmDataMtx.RUnlock()
-
-	data, ok := d.wasmData[rt]
-
-	return data, ok
 }
 
 func createWASMInstance(wasmBytes []byte) (*wasmer.Instance, error) {
