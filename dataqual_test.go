@@ -49,10 +49,10 @@ func BenchmarkMatchLargeJSON(b *testing.B) {
 		panic("unable to read json: " + err.Error())
 	}
 
-	b.ResetTimer()
-
 	d := setup()
 
+	b.ResetTimer()
+	
 	for i := 0; i < b.N; i++ {
 		_, err := d.RunTransform("firstname", "Testing", jsonData)
 		if err != nil {
