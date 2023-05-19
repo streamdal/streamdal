@@ -44,8 +44,15 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "invalid config")
 	}
 
-	plumberURL := getenv("PLUMBER_URL", "localhost:9090")
-	plumberToken := getenv("PLUMBER_TOKEN", "streamdal")
+	plumberURL := os.Getenv("PLUMBER_URL")
+	plumberToken := os.Getenv("PLUMBER_TOKEN")
+
+	// We instantiate this library based on whether or not we have a plumber URL+token
+	// If these are not provided, the wrapper library will not perform rule checks and
+	// will act as normal
+	if plumberURL == "" || plumberToken == "" {
+		return nil, nil
+	}
 
 	// TODO: predownload wasm modules somehow,
 	// TODO: or if we don't have rules at this point, download standard modules at least
@@ -59,14 +66,6 @@ func New(cfg *Config) (*DataQual, error) {
 		functionsMtx: &sync.RWMutex{},
 		plumber:      plumber,
 	}, nil
-}
-
-func getenv(name, def string) string {
-	if val := os.Getenv(name); val != "" {
-		return val
-	}
-
-	return def
 }
 
 func validateConfig(cfg *Config) error {
