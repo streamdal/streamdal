@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/buger/jsonparser"
-	"github.com/streamdal/detective-wasm/common"
+	"github.com/streamdal/dataqual/common"
 )
 
 // Tiny-go needs a main function to compile`

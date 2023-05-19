@@ -3,7 +3,7 @@ package common
 import (
 	"unsafe"
 
-	"github.com/streamdal/detective-wasm/detective"
+	"github.com/streamdal/dataqual/detective"
 )
 
 //tinyjson:json

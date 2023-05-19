@@ -3,10 +3,10 @@ package dataqual
 import (
 	"sync"
 
-	"github.com/streamdal/detective-wasm/detective"
+	"github.com/streamdal/dataqual/detective"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/detective-wasm/common"
+	"github.com/streamdal/dataqual/common"
 	"github.com/wasmerio/wasmer-go/wasmer"
 )
 
