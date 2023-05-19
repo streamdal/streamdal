@@ -1,49 +1,60 @@
 package dataqual
 
 import (
+	"context"
+	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/wasmerio/wasmer-go/wasmer"
+
+	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 
 	"github.com/streamdal/dataqual/common"
 	"github.com/streamdal/dataqual/detective"
 )
 
 type Module string
+type Mode string
 
-type IDataQual interface {
-	RunMatch(mt detective.MatchType, path string, data []byte) (bool, error)
-	RunTransform(path, replace string, data []byte) ([]byte, error)
-}
+const (
+	Consumer Mode = "consumer"
+	Producer Mode = "producer"
 
-var (
 	Match     Module = "match"
 	Transform Module = "transform"
 )
 
 var (
-	ErrEmptyPlumberURL   = errors.New("PlumberURL cannot be empty")
-	ErrEmptyPlumberToken = errors.New("PlumberToken cannot be empty")
+	ErrEmptyBus           = errors.New("bus cannot be empty")
+	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
 )
 
+type IDataQual interface {
+	ApplyRules(mode Mode, key string, data []byte) ([]byte, error)
+}
+
 type DataQual struct {
+	*Config
 	functions    map[Module]*function
+	bus          string
+	rules        map[Mode][]*protos.RuleSet
 	functionsMtx *sync.RWMutex
+	rulesMtx     *sync.RWMutex
 	plumber      *Plumber
+	shutdownCtx  context.Context
 }
 
 type Config struct {
-	PlumberURL   string // http address to access plumber with
-	PlumberToken string // token to access plumber API with
+	//PlumberURL   string // http address to access plumber with
+	//PlumberToken string // token to access plumber API with
+	Bus         string
+	ShutdownCtx context.Context
 }
 
 func New(cfg *Config) (*DataQual, error) {
-	if err := validateConfig(cfg); err != nil {
-		return nil, errors.Wrap(err, "invalid config")
-	}
-
 	plumberURL := os.Getenv("PLUMBER_URL")
 	plumberToken := os.Getenv("PLUMBER_TOKEN")
 
@@ -54,27 +65,42 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, nil
 	}
 
-	// TODO: predownload wasm modules somehow,
-	// TODO: or if we don't have rules at this point, download standard modules at least
+	if err := validateConfig(cfg); err != nil {
+		return nil, errors.Wrap(err, "unable to validate config")
+	}
+
 	plumber, err := newServer(plumberURL, plumberToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to plumber")
 	}
 
-	return &DataQual{
+	// Get initial ruleset
+	rules, err := plumber.GetRules(context.Background(), cfg.Bus)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get initial ruleset")
+	}
+
+	dq := &DataQual{
 		functions:    make(map[Module]*function),
 		functionsMtx: &sync.RWMutex{},
 		plumber:      plumber,
-	}, nil
+		rules:        rules,
+		rulesMtx:     &sync.RWMutex{},
+		Config:       cfg,
+	}
+
+	dq.watchForRuleUpdates()
+
+	return dq, nil
 }
 
 func validateConfig(cfg *Config) error {
-	if cfg.PlumberURL == "" {
-		return ErrEmptyPlumberURL
+	if cfg.Bus == "" {
+		return ErrEmptyBus
 	}
 
-	if cfg.PlumberToken == "" {
-		return ErrEmptyPlumberToken
+	if cfg.ShutdownCtx == nil {
+		return ErrMissingShutdownCtx
 	}
 
 	return nil
@@ -182,4 +208,141 @@ func (d *DataQual) RunMatch(mt detective.MatchType, path string, data []byte) (b
 	}
 
 	return resp.IsMatch, nil
+}
+
+func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error) {
+	d.rulesMtx.RLock()
+	modeSets, ok := d.rules[mode]
+	d.rulesMtx.RUnlock()
+
+	// TODO: combine rulesets if mode == both
+
+	if !ok {
+		// No rules for this mode, nothing to do
+		return data, nil
+	}
+
+	for _, ruleSet := range modeSets {
+		// Check if we have rules for this key
+		// Key = kafka topic or rabbit routing/binding key
+		group, ok := ruleSet.Rules[key]
+		if !ok {
+			// No rules for this key, nothing to do
+			continue
+		}
+
+		for _, rule := range group.Rules {
+			switch rule.Type {
+			case protos.RuleType_RULE_TYPE_TRANSFORM:
+				cfg := rule.GetTransformConfig()
+				if cfg == nil {
+					return nil, errors.New("BUG: transform rule is missing transform config")
+				}
+
+				transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
+				if err != nil {
+					return nil, errors.Wrapf(err, "failed to run transform on field '%s'", cfg.Path)
+				}
+
+				return transformed, nil
+			case protos.RuleType_RULE_TYPE_MATCH:
+				cfg := rule.GetMatchConfig()
+				if cfg == nil {
+					return nil, errors.New("BUG: match rule is missing match config")
+				}
+
+				isMatch, err := d.RunMatch(detective.MatchType(cfg.Type), cfg.Path, data)
+				if err != nil {
+					return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
+				}
+
+				// Didn't hit, nothing further to do
+				if !isMatch {
+					continue
+				}
+
+				// Hit, apply failure rule
+				if rule.FailureMode == protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT {
+					// TODO: think this is sufficient enough for calling lib to know to reject
+					return nil, nil
+				}
+
+				return d.Fail(data, rule)
+			case protos.RuleType_RULE_TYPE_CUSTOM:
+				// TODO: implement eventually
+				return data, nil
+			default:
+				return nil, errors.Errorf("unknown rule type: %s", rule.Type)
+			}
+		}
+	}
+
+	return nil, nil
+}
+
+func (d *DataQual) Fail(data []byte, rule *protos.Rule) ([]byte, error) {
+	switch rule.FailureMode {
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+		return d.failTransform(data, rule.GetTransform())
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+		return d.failDLQ(data, rule.GetDlq())
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+		return d.failSlack(data, rule.GetAlertSlack())
+	default:
+		return nil, errors.Errorf("unknown failure mode: %s", rule.FailureMode)
+	}
+}
+
+func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+	transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to run transform on failure mode")
+	}
+
+	return transformed, nil
+}
+
+func (d *DataQual) failDLQ(data []byte, cfg *protos.FailureModeDLQ) ([]byte, error) {
+	// TODO: implement
+	return nil, nil
+}
+
+func (d *DataQual) failSlack(data []byte, cfg *protos.FailureModeAlertSlack) ([]byte, error) {
+	// TODO: implement
+	return nil, nil
+}
+
+func (d *DataQual) watchForRuleUpdates() {
+	// TODO: need some kind of shutdown context here probably
+	for {
+		select {
+		case <-d.shutdownCtx.Done():
+			return
+		default:
+			// NOOP
+		}
+
+		ruleSets, err := d.plumber.GetRules(context.Background(), d.bus)
+		if err != nil {
+			log.Println("failed to get rules:", err)
+		}
+
+		d.rulesMtx.Lock()
+
+		for _, ruleSet := range ruleSets {
+			var mode Mode
+			switch ruleSet.Mode {
+			case protos.RuleMode_RULE_MODE_PUBLISH:
+				mode = Producer
+			case protos.RuleMode_RULE_MODE_CONSUME:
+				mode = Consumer
+			}
+
+			d.rules[mode] = append(d.rules[mode], ruleSet)
+		}
+
+		d.rulesMtx.Unlock()
+
+		time.Sleep(time.Second * 30) // TODO: config?
+	}
 }

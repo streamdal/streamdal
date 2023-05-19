@@ -64,6 +64,22 @@ func (p *Plumber) GetWasmFile(ctx context.Context, wasmFile string) ([]byte, err
 	return decompressed, nil
 }
 
+func (p *Plumber) GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error) {
+	req := &protos.GetDataQualityRulesRequest{
+		Auth: &common.Auth{
+			Token: p.Token,
+		},
+		Bus: bus,
+	}
+
+	resp, err := p.Server.GetRules(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to fetch data quality rules")
+	}
+
+	return resp.RuleSets, nil
+}
+
 // Decompress data using gzip. Used after downloading WASM files from plumber server
 func decompress(data []byte) ([]byte, error) {
 	r, err := gzip.NewReader(bytes.NewBuffer(data))
