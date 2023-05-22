@@ -19,6 +19,8 @@ github.com/batchcorp/plumber-schemas v0.0.182-0.20230519181431-f677e9ae7475 h1:f
 github.com/batchcorp/plumber-schemas v0.0.182-0.20230519181431-f677e9ae7475/go.mod h1:0g9lX0S7Ec7JVa0kzAkJC3gWAFbwIUcK3/VJ0n68KhA=
 github.com/batchcorp/plumber-schemas v0.0.182-0.20230519181729-df566e581d02 h1:Bqe/bTrRYOnHAjJQa+Fu5Inu988i0PlZ/OL87zirncU=
 github.com/batchcorp/plumber-schemas v0.0.182-0.20230519181729-df566e581d02/go.mod h1:0g9lX0S7Ec7JVa0kzAkJC3gWAFbwIUcK3/VJ0n68KhA=
+github.com/batchcorp/plumber-schemas v0.0.182-0.20230522140654-437ebf49a4ca h1:dVeiL1HSeqGONu2IdCIoSWvN3QO/aZKXkVQWiuWVdk8=
+github.com/batchcorp/plumber-schemas v0.0.182-0.20230522140654-437ebf49a4ca/go.mod h1:0g9lX0S7Ec7JVa0kzAkJC3gWAFbwIUcK3/VJ0n68KhA=
 github.com/buger/jsonparser v1.1.1 h1:2PnMjfWD7wBILjqQbt530v576A/cAbQvEW9gGIpYMUs=
 github.com/buger/jsonparser v1.1.1/go.mod h1:6RYKKt7H4d4+iWqouImQ9R2FZql3VbhNgx27UK13J/0=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

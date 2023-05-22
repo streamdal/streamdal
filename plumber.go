@@ -15,6 +15,12 @@ import (
 
 // TODO: function to check for rule updates on an interval
 
+type IPlumberClient interface {
+	GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error)
+	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule) error
+	GetWasmFile(ctx context.Context, wasmFile string) ([]byte, error)
+}
+
 const (
 	dialTimeout = time.Second * 5
 )
@@ -78,6 +84,23 @@ func (p *Plumber) GetRules(ctx context.Context, bus string) ([]*common.RuleSet, 
 	}
 
 	return resp.RuleSets, nil
+}
+
+// SendRuleNotification sends the data and rule ID to Plumber which handles DLQ and slack notifications
+func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule) error {
+	req := &protos.SendRuleNotificationRequest{
+		Auth: &common.Auth{
+			Token: p.Token,
+		},
+		Data:   data,
+		RuleId: rule.Id,
+	}
+
+	if _, err := p.Server.SendRuleNotification(ctx, req); err != nil {
+		return errors.Wrap(err, "unable to send rule notification")
+	}
+
+	return nil
 }
 
 // Decompress data using gzip. Used after downloading WASM files from plumber server

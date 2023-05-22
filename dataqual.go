@@ -43,7 +43,7 @@ type DataQual struct {
 	rules        map[Mode][]*protos.RuleSet
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
-	plumber      *Plumber
+	plumber      IPlumberClient
 	shutdownCtx  context.Context
 }
 
@@ -261,13 +261,21 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 					continue
 				}
 
-				// Hit, apply failure rule
-				if rule.FailureMode == protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT {
+				switch rule.FailureMode {
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
 					// TODO: think this is sufficient enough for calling lib to know to reject
 					return nil, nil
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+					return d.failTransform(data, rule.GetTransform())
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+					fallthrough
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+					if err := d.plumber.SendRuleNotification(context.Background(), data, rule); err != nil {
+						return nil, errors.Wrap(err, "failed to send rule notification")
+					}
+				default:
+					return nil, errors.Errorf("unknown rule failure mode: %s", rule.FailureMode)
 				}
-
-				return d.Fail(data, rule)
 			case protos.RuleType_RULE_TYPE_CUSTOM:
 				// TODO: implement eventually
 				return data, nil
@@ -280,19 +288,6 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 	return nil, nil
 }
 
-func (d *DataQual) Fail(data []byte, rule *protos.Rule) ([]byte, error) {
-	switch rule.FailureMode {
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-		return d.failTransform(data, rule.GetTransform())
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-		return d.failDLQ(data, rule.GetDlq())
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-		return d.failSlack(data, rule.GetAlertSlack())
-	default:
-		return nil, errors.Errorf("unknown failure mode: %s", rule.FailureMode)
-	}
-}
-
 func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
 	if err != nil {
@@ -300,16 +295,6 @@ func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) 
 	}
 
 	return transformed, nil
-}
-
-func (d *DataQual) failDLQ(data []byte, cfg *protos.FailureModeDLQ) ([]byte, error) {
-	// TODO: implement
-	return nil, nil
-}
-
-func (d *DataQual) failSlack(data []byte, cfg *protos.FailureModeAlertSlack) ([]byte, error) {
-	// TODO: implement
-	return nil, nil
 }
 
 func (d *DataQual) watchForRuleUpdates() {
