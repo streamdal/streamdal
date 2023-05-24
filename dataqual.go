@@ -23,6 +23,9 @@ const (
 	Consumer Mode = "consumer"
 	Producer Mode = "producer"
 
+	// RuleUpdateInterval is how often to check for rule updates
+	RuleUpdateInterval = time.Second * 30
+
 	Match     Module = "match"
 	Transform Module = "transform"
 )
@@ -40,7 +43,9 @@ type DataQual struct {
 	*Config
 	functions    map[Module]*function
 	bus          string
-	rules        map[Mode][]*protos.RuleSet
+	rules        map[Mode]map[string][]*protos.Rule
+	ruleSetMap   map[string]string
+	ruleSetMtx   *sync.RWMutex
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
 	plumber      IPlumberClient
@@ -48,8 +53,6 @@ type DataQual struct {
 }
 
 type Config struct {
-	//PlumberURL   string // http address to access plumber with
-	//PlumberToken string // token to access plumber API with
 	Bus         string
 	ShutdownCtx context.Context
 }
@@ -74,22 +77,18 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "failed to connect to plumber")
 	}
 
-	// Get initial ruleset
-	rules, err := plumber.GetRules(context.Background(), cfg.Bus)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get initial ruleset")
-	}
-
 	dq := &DataQual{
 		functions:    make(map[Module]*function),
 		functionsMtx: &sync.RWMutex{},
 		plumber:      plumber,
-		rules:        rules,
+		rules:        make(map[Mode]map[string][]*protos.Rule),
 		rulesMtx:     &sync.RWMutex{},
+		ruleSetMap:   make(map[string]string),
+		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
 	}
 
-	dq.watchForRuleUpdates()
+	go dq.watchForRuleUpdates()
 
 	return dq, nil
 }
@@ -213,75 +212,71 @@ func (d *DataQual) RunMatch(mt detective.MatchType, path string, data []byte) (b
 func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error) {
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
-	d.rulesMtx.RUnlock()
-
-	// TODO: combine rulesets if mode == both
+	defer d.rulesMtx.RUnlock()
 
 	if !ok {
 		// No rules for this mode, nothing to do
 		return data, nil
 	}
 
-	for _, ruleSet := range modeSets {
-		// Check if we have rules for this key
-		// Key = kafka topic or rabbit routing/binding key
-		group, ok := ruleSet.Rules[key]
-		if !ok {
-			// No rules for this key, nothing to do
-			continue
-		}
+	// Check if we have rules for this key
+	// Key = kafka topic or rabbit routing/binding key
+	rules, ok := modeSets[key]
+	if !ok {
+		// No rules for this key, nothing to do
+		return data, nil
+	}
 
-		for _, rule := range group.Rules {
-			switch rule.Type {
-			case protos.RuleType_RULE_TYPE_TRANSFORM:
-				cfg := rule.GetTransformConfig()
-				if cfg == nil {
-					return nil, errors.New("BUG: transform rule is missing transform config")
-				}
-
-				transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
-				if err != nil {
-					return nil, errors.Wrapf(err, "failed to run transform on field '%s'", cfg.Path)
-				}
-
-				return transformed, nil
-			case protos.RuleType_RULE_TYPE_MATCH:
-				cfg := rule.GetMatchConfig()
-				if cfg == nil {
-					return nil, errors.New("BUG: match rule is missing match config")
-				}
-
-				isMatch, err := d.RunMatch(detective.MatchType(cfg.Type), cfg.Path, data)
-				if err != nil {
-					return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
-				}
-
-				// Didn't hit, nothing further to do
-				if !isMatch {
-					continue
-				}
-
-				switch rule.FailureMode {
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-					// TODO: think this is sufficient enough for calling lib to know to reject
-					return nil, nil
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-					return d.failTransform(data, rule.GetTransform())
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-					fallthrough
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-					if err := d.plumber.SendRuleNotification(context.Background(), data, rule); err != nil {
-						return nil, errors.Wrap(err, "failed to send rule notification")
-					}
-				default:
-					return nil, errors.Errorf("unknown rule failure mode: %s", rule.FailureMode)
-				}
-			case protos.RuleType_RULE_TYPE_CUSTOM:
-				// TODO: implement eventually
-				return data, nil
-			default:
-				return nil, errors.Errorf("unknown rule type: %s", rule.Type)
+	for _, rule := range rules {
+		switch rule.Type {
+		case protos.RuleType_RULE_TYPE_TRANSFORM:
+			cfg := rule.GetTransformConfig()
+			if cfg == nil {
+				return nil, errors.New("BUG: transform rule is missing transform config")
 			}
+
+			transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to run transform on field '%s'", cfg.Path)
+			}
+
+			return transformed, nil
+		case protos.RuleType_RULE_TYPE_MATCH:
+			cfg := rule.GetMatchConfig()
+			if cfg == nil {
+				return nil, errors.New("BUG: match rule is missing match config")
+			}
+
+			isMatch, err := d.RunMatch(detective.MatchType(cfg.Type), cfg.Path, data)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
+			}
+
+			// Didn't hit, nothing further to do
+			if !isMatch {
+				continue
+			}
+
+			switch rule.FailureMode {
+			case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
+				// TODO: think this is sufficient enough for calling lib to know to reject
+				return nil, nil
+			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+				return d.failTransform(data, rule.GetTransform())
+			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+				fallthrough
+			case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+				if err := d.plumber.SendRuleNotification(context.Background(), data, rule); err != nil {
+					return nil, errors.Wrap(err, "failed to send rule notification")
+				}
+			default:
+				return nil, errors.Errorf("unknown rule failure mode: %s", rule.FailureMode)
+			}
+		case protos.RuleType_RULE_TYPE_CUSTOM:
+			// TODO: implement eventually
+			return data, nil
+		default:
+			return nil, errors.Errorf("unknown rule type: %s", rule.Type)
 		}
 	}
 
@@ -307,27 +302,58 @@ func (d *DataQual) watchForRuleUpdates() {
 			// NOOP
 		}
 
-		ruleSets, err := d.plumber.GetRules(context.Background(), d.bus)
-		if err != nil {
-			log.Println("failed to get rules:", err)
+		if err := d.getRuleUpdates(); err != nil {
+			log.Println("failed to get rule updates:", err)
 		}
 
-		d.rulesMtx.Lock()
+		time.Sleep(RuleUpdateInterval)
+	}
+}
 
-		for _, ruleSet := range ruleSets {
-			var mode Mode
-			switch ruleSet.Mode {
-			case protos.RuleMode_RULE_MODE_PUBLISH:
-				mode = Producer
-			case protos.RuleMode_RULE_MODE_CONSUME:
-				mode = Consumer
+func (d *DataQual) getRuleUpdates() error {
+	ruleSets, err := d.plumber.GetRules(context.Background(), d.bus)
+	if err != nil {
+		return errors.Wrap(err, "failed to get rules")
+	}
+
+	// First key is mode: producer, consumer
+	// Second map key is rule key: kafka topic, rabbit routing/binding key
+	// We need a way to look these up O(1)
+	rules := make(map[Mode]map[string][]*protos.Rule)
+	ruleSetMap := make(map[string]string)
+
+	for _, set := range ruleSets {
+		if _, ok := rules[Mode(set.Mode)]; !ok {
+			rules[Mode(set.Mode)] = make(map[string][]*protos.Rule)
+		}
+
+		for key, rule := range set.Rules {
+			if _, ok := rules[Mode(set.Mode)][key]; !ok {
+				rules[Mode(set.Mode)][key] = make([]*protos.Rule, 0)
 			}
 
-			d.rules[mode] = append(d.rules[mode], ruleSet)
+			rules[Mode(set.Mode)][key] = append(rules[Mode(set.Mode)][key], rule)
+			ruleSetMap[rule.Id] = set.Id
 		}
-
-		d.rulesMtx.Unlock()
-
-		time.Sleep(time.Second * 30) // TODO: config?
 	}
+
+	d.rulesMtx.Lock()
+	d.rules = rules
+	d.rulesMtx.Unlock()
+
+	d.ruleSetMtx.Lock()
+	d.ruleSetMap = ruleSetMap
+	d.ruleSetMtx.Unlock()
+
+	return nil
+}
+
+// getRuleSetIDForRule gets the ruleset ID for a given rule ID.
+// This is needed when communicating rule failure alerts to plumber
+func (d *DataQual) getRuleSetIDForRule(ruleID string) (string, bool) {
+	d.ruleSetMtx.RLock()
+	defer d.ruleSetMtx.RUnlock()
+
+	ruleSetID, ok := d.ruleSetMap[ruleID]
+	return ruleSetID, ok
 }

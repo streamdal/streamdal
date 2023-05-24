@@ -52,7 +52,7 @@ func BenchmarkMatchLargeJSON(b *testing.B) {
 	d := setup()
 
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		_, err := d.RunTransform("firstname", "Testing", jsonData)
 		if err != nil {
@@ -65,8 +65,6 @@ func setup() *DataQual {
 	d := &DataQual{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
-		wasmData:     map[Module][]byte{},
-		wasmDataMtx:  &sync.RWMutex{},
 	}
 
 	data, err := os.ReadFile("src/transform.wasm")

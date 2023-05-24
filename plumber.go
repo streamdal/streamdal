@@ -13,8 +13,6 @@ import (
 	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
-// TODO: function to check for rule updates on an interval
-
 type IPlumberClient interface {
 	GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error)
 	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule) error
