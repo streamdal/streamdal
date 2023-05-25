@@ -1,0 +1,35 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Streamdal Embedded Console" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="flex flex-col w-full">
+      <div
+        class="flex flex-row justify-start h-16 bg-purple-dark w-full items-center"
+      >
+        <img src="/logo-dark.png" class="w-44 h-fit ml-4" />
+      </div>
+      <div class="m-6">
+        <slot />
+      </div>
+    </div>
+  </body>
+</html>

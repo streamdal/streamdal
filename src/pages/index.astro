@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Rule } from "../components/rules";
+---
+
+<Layout title="Streamdal Embedded Console">
+  <main>
+    <h1 class="mb-2">
+      Welcome to the <span class="italic text-purple-500">Streamdal</span> embedded
+      console.
+    </h1>
+    <Rule client:load />
+  </main>
+</Layout>
