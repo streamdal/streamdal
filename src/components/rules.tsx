@@ -2,7 +2,8 @@ import React from "react";
 
 export const Rule = () => {
   return (
-    <input type="button"
+    <input
+      type="button"
       className="flex justify-center btn-heimdal"
       onClick={async () => {
         const result = await fetch("/v1/ruleset");
@@ -10,6 +11,5 @@ export const Rule = () => {
       }}
       value="Get Rules"
     />
-
   );
 };
