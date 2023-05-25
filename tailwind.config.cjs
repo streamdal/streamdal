@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}'],
@@ -25,5 +27,23 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [
+		plugin(function({ addComponents }) {
+			addComponents({
+				".btn-heimdal": {
+					width: "137px",
+					height: "47px",
+					borderRadius: "4px",
+					fontWeight: "bold",
+					fontSize: "14px",
+					color: "#372D56",
+					background: "#FFD260",
+					cursor: "pointer",
+					'&:hover': {
+						background: "linear-gradient(96.41deg, #C1AAFD -16.36%, #FFD260 101.19%)",
+					},
+				},
+			})
+		})
+	],
 }
