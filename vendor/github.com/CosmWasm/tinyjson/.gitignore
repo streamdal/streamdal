@@ -1,6 +1,0 @@
-.root
-*_tinyjson.go
-*.iml
-.idea
-*.swp
-bin/*

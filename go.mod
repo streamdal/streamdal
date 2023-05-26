@@ -1,6 +1,6 @@
 module github.com/streamdal/dataqual
 
-go 1.20
+go 1.17
 
 require (
 	github.com/CosmWasm/tinyjson v0.9.0
