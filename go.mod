@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/CosmWasm/tinyjson v0.9.0
-	github.com/batchcorp/plumber-schemas v0.0.182-0.20230523192546-d8ad4211586f
+	github.com/batchcorp/plumber-schemas v0.0.182-0.20230526151230-afe57b94cf75
 	github.com/buger/jsonparser v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/streamdal/pii v0.0.3
