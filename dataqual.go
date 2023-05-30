@@ -280,7 +280,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 		}
 	}
 
-	return nil, nil
+	return data, nil
 }
 
 func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
