@@ -10,6 +10,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/wasmerio/wasmer-go/wasmer"
 
+	// Forcing import to allow running on M1
+	_ "github.com/wasmerio/wasmer-go/wasmer/packaged/lib/darwin-aarch64"
+
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 
 	"github.com/streamdal/dataqual/common"
