@@ -17,11 +17,11 @@ import (
 )
 
 type Module string
-type Mode string
+type Mode int
 
 const (
-	Consumer Mode = "consumer"
-	Producer Mode = "producer"
+	Publish Mode = 1 // Must match proto's mode
+	Consume Mode = 2 // Must match proto's mode
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
@@ -137,7 +137,7 @@ func createWASMInstance(wasmBytes []byte) (*wasmer.Instance, error) {
 	return instance, nil
 }
 
-func (d *DataQual) RunTransform(path, replace string, data []byte) ([]byte, error) {
+func (d *DataQual) runTransform(path, replace string, data []byte) ([]byte, error) {
 	// Get WASM module
 	f, err := d.getFunction(Transform)
 	if err != nil {
@@ -229,18 +229,6 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 
 	for _, rule := range rules {
 		switch rule.Type {
-		case protos.RuleType_RULE_TYPE_TRANSFORM:
-			cfg := rule.GetTransformConfig()
-			if cfg == nil {
-				return nil, errors.New("BUG: transform rule is missing transform config")
-			}
-
-			transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
-			if err != nil {
-				return nil, errors.Wrapf(err, "failed to run transform on field '%s'", cfg.Path)
-			}
-
-			return transformed, nil
 		case protos.RuleType_RULE_TYPE_MATCH:
 			cfg := rule.GetMatchConfig()
 			if cfg == nil {
@@ -259,7 +247,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 
 			switch rule.FailureMode {
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-				// TODO: think this is sufficient enough for calling lib to know to reject
+				// Downstream libraries will check if data == nil and not publish/consume the message
 				return nil, nil
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
 				return d.failTransform(data, rule.GetTransform())
@@ -284,7 +272,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 }
 
 func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	transformed, err := d.RunTransform(cfg.Path, cfg.Value, data)
+	transformed, err := d.runTransform(cfg.Path, cfg.Value, data)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run transform on failure mode")
 	}

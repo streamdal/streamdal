@@ -18,7 +18,7 @@ func BenchmarkMatchSmallJSON(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := d.RunTransform("firstname", "Testing", jsonData)
+		_, err := d.runTransform("firstname", "Testing", jsonData)
 		if err != nil {
 			panic("error during performMatchRun: " + err.Error())
 		}
@@ -36,7 +36,7 @@ func BenchmarkMatchMediumJSON(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := d.RunTransform("firstname", "Testing", jsonData)
+		_, err := d.runTransform("firstname", "Testing", jsonData)
 		if err != nil {
 			panic("error during performMatchRun: " + err.Error())
 		}
@@ -54,7 +54,7 @@ func BenchmarkMatchLargeJSON(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := d.RunTransform("firstname", "Testing", jsonData)
+		_, err := d.runTransform("firstname", "Testing", jsonData)
 		if err != nil {
 			panic("error during performMatchRun: " + err.Error())
 		}
