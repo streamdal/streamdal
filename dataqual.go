@@ -179,7 +179,7 @@ func (d *DataQual) runTransform(path, replace string, data []byte) ([]byte, erro
 	return resp.Data, nil
 }
 
-func (d *DataQual) RunMatch(mt detective.MatchType, path string, data []byte) (bool, error) {
+func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
 	// Get WASM module
 	f, err := d.getFunction(Match)
 	if err != nil {
@@ -190,6 +190,7 @@ func (d *DataQual) RunMatch(mt detective.MatchType, path string, data []byte) (b
 		MatchType: mt,
 		Path:      path,
 		Data:      data,
+		Args:      args,
 	}
 
 	req, err := request.MarshalJSON()
@@ -241,7 +242,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				return nil, errors.New("BUG: match rule is missing match config")
 			}
 
-			isMatch, err := d.RunMatch(detective.MatchType(cfg.Type), cfg.Path, data)
+			isMatch, err := d.runMatch(detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
 			}
