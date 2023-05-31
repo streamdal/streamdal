@@ -257,6 +257,9 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				if err := d.plumber.SendRuleNotification(context.Background(), data, rule); err != nil {
 					return nil, errors.Wrap(err, "failed to send rule notification")
 				}
+
+				// Return nil so downstream lib will not publish/consume the message
+				return nil, nil
 			default:
 				return nil, errors.Errorf("unknown rule failure mode: %s", rule.FailureMode)
 			}
