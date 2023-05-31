@@ -45,14 +45,12 @@ type IDataQual interface {
 type DataQual struct {
 	*Config
 	functions    map[Module]*function
-	bus          string
 	rules        map[Mode]map[string][]*protos.Rule
 	ruleSetMap   map[string]string
 	ruleSetMtx   *sync.RWMutex
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
 	plumber      IPlumberClient
-	shutdownCtx  context.Context
 }
 
 type Config struct {
@@ -89,6 +87,11 @@ func New(cfg *Config) (*DataQual, error) {
 		ruleSetMap:   make(map[string]string),
 		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
+	}
+
+	// Force rule pull on startup
+	if err := dq.getRuleUpdates(); err != nil {
+		return nil, errors.Wrap(err, "failed to get data quality rules")
 	}
 
 	go dq.watchForRuleUpdates()
@@ -289,8 +292,10 @@ func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) 
 func (d *DataQual) watchForRuleUpdates() {
 	// TODO: need some kind of shutdown context here probably
 	for {
+		time.Sleep(RuleUpdateInterval)
+
 		select {
-		case <-d.shutdownCtx.Done():
+		case <-d.ShutdownCtx.Done():
 			return
 		default:
 			// NOOP
@@ -299,13 +304,11 @@ func (d *DataQual) watchForRuleUpdates() {
 		if err := d.getRuleUpdates(); err != nil {
 			log.Println("failed to get rule updates:", err)
 		}
-
-		time.Sleep(RuleUpdateInterval)
 	}
 }
 
 func (d *DataQual) getRuleUpdates() error {
-	ruleSets, err := d.plumber.GetRules(context.Background(), d.bus)
+	ruleSets, err := d.plumber.GetRules(context.Background(), d.Bus)
 	if err != nil {
 		return errors.Wrap(err, "failed to get rules")
 	}
