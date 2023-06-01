@@ -15,7 +15,7 @@ import (
 
 type IPlumberClient interface {
 	GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error)
-	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule) error
+	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule, ruleSetID string) error
 	GetWasmFile(ctx context.Context, wasmFile string) ([]byte, error)
 }
 
@@ -85,13 +85,14 @@ func (p *Plumber) GetRules(ctx context.Context, bus string) ([]*common.RuleSet, 
 }
 
 // SendRuleNotification sends the data and rule ID to Plumber which handles DLQ and slack notifications
-func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule) error {
+func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule, ruleSetID string) error {
 	req := &protos.SendRuleNotificationRequest{
 		Auth: &common.Auth{
 			Token: p.Token,
 		},
-		Data:   data,
-		RuleId: rule.Id,
+		Data:      data,
+		RuleId:    rule.Id,
+		RulesetId: ruleSetID,
 	}
 
 	if _, err := p.Server.SendRuleNotification(ctx, req); err != nil {

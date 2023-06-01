@@ -2,6 +2,7 @@ package dataqual
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -261,7 +262,12 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
 				fallthrough
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-				if err := d.plumber.SendRuleNotification(context.Background(), data, rule); err != nil {
+				ruleSetID, ok := d.getRuleSetIDForRule(rule.Id)
+				if !ok {
+					return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
+				}
+
+				if err := d.plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
 					return nil, errors.Wrap(err, "failed to send rule notification")
 				}
 

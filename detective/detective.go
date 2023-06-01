@@ -11,8 +11,9 @@ import (
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
-	"github.com/streamdal/pii"
 	"github.com/tidwall/gjson"
+
+	"github.com/streamdal/pii"
 )
 
 type MatchType string
