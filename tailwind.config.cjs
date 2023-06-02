@@ -6,12 +6,16 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
+				error: "#FF4040",
+				web: "#372D56",
+				delete: "#FF7D68",
 				purple: {
 					dark: "#372D56",
 					light: "#c0aafe",
 					bright: "#ab6dee",
 					divider: "#c2aafd4d",
 					darkText: "#2B2343",
+					hover: "#F9F7FF",
 					background: {
 						light: "#1F1930",
 					},

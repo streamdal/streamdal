@@ -1,5 +1,9 @@
 # Streamdal Embedded Console
 
+*Optionally, for locally development, point to an external API*:
+* copy `example.env` to `.env`
+* set 
+
 ```
 npm install
 npm start
