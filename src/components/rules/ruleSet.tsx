@@ -41,11 +41,11 @@ export const RuleSet = () => {
   return (
     <div className="max-w-[1440px]">
       <div className="flex flex-row justify-between align-middle pb-4 border-b">
-        <div className="flex flex-row justify-start align-middle font-bold text-lg leading-5">
+        <div className="flex flex-row justify-start font-bold text-lg leading-5">
           <MonitorIcon className="mr-2 w-[14px]" />
           <span className="text-web">Rule set - {ruleSet?.name}</span>
         </div>
-        <div className="flex flex-row justify-end align-middle">
+        <div className="flex flex-row justify-end">
           <span className="text-web">{ruleSet?.bus}</span>
         </div>
       </div>
@@ -56,10 +56,10 @@ export const RuleSet = () => {
       ) : (
         <div className="pt-4 flex flex-col">
           {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
-            <>
+            <div key={`rule-detail-${i}`}>
               <div className="text-web mb-2">Rule Config: </div>
-              <div key={`rule-detail-${i}`}>{JSON.stringify(r)}</div>
-            </>
+              <div>{JSON.stringify(r)}</div>
+            </div>
           ))}
         </div>
       )}
