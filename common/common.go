@@ -16,9 +16,10 @@ type MatchRequest struct {
 
 //tinyjson:json
 type TransformRequest struct {
-	Data  []byte `json:"data"`
-	Path  string `json:"path"`
-	Value string `json:"value"`
+	Data   []byte `json:"data"`
+	Path   string `json:"path"`
+	Value  string `json:"value"`
+	Delete bool   `json:"delete"`
 }
 
 //tinyjson:json
