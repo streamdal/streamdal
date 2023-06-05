@@ -144,17 +144,28 @@ func createWASMInstance(wasmBytes []byte) (*wasmer.Instance, error) {
 	return instance, nil
 }
 
-func (d *DataQual) runTransform(path, replace string, data []byte) ([]byte, error) {
+func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	// Get WASM module
 	f, err := d.getFunction(Transform)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
 
+	var delete bool
+	switch cfg.Type {
+	case protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE:
+		delete = false
+	case protos.FailureModeTransform_TRANSFORM_TYPE_DELETE:
+		delete = true
+	default:
+		return nil, errors.Errorf("unknown transform type: %s", cfg.Type)
+	}
+
 	request := &common.TransformRequest{
-		Path:  path,
-		Value: replace,
-		Data:  data,
+		Path:   cfg.Path,
+		Value:  cfg.Value,
+		Data:   data,
+		Delete: delete,
 	}
 
 	req, err := request.MarshalJSON()
@@ -288,7 +299,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 }
 
 func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	transformed, err := d.runTransform(cfg.Path, cfg.Value, data)
+	transformed, err := d.runTransform(data, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run transform on failure mode")
 	}
