@@ -1,3 +1,16 @@
+// Package dataqual is a library that allows running of Plumber data rules against data
+// This package is designed to be included in golang message bus libraries. The only public
+// method is ApplyRules() which is used to run rules against data.
+//
+// Use of this package requires a running instance of Plumber.
+// Plumber can be downloaded at https://github.com/streamdal/plumber
+//
+// The following environment variables must be set:
+// - PLUMBER_ADDRESS: The address of the Plumber server
+// - PLUMBER_TOKEN: The token to use when connecting to the Plumber server
+//
+// Optional parameters:
+// - DATAQUAL_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
 package dataqual
 
 import (
@@ -20,21 +33,32 @@ import (
 	"github.com/streamdal/dataqual/detective"
 )
 
+// Module is a constant that represents which type of WASM module we will run the rules against
 type Module string
+
+// Mode is a constant that represents whether we are publishing or consuming,
+// it must match the protobuf enum of the rule
 type Mode int
 
 const (
-	Publish Mode = 1 // Must match proto's mode
-	Consume Mode = 2 // Must match proto's mode
+	// Publish tells ApplyRules to run the rules against the publish ruleset
+	Publish Mode = 1
+
+	// Consume tells ApplyRules to run the rules against the consume ruleset
+	Consume Mode = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
 
-	Match     Module = "match"
+	// Match is the name of the WASM module that contains the match function
+	Match Module = "match"
+
+	// Transform is the name of the WASM module that contains the transform function
 	Transform Module = "transform"
 )
 
 var (
+	ErrEmptyConfig        = errors.New("config cannot be empty")
 	ErrEmptyBus           = errors.New("bus cannot be empty")
 	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
 )
@@ -52,6 +76,7 @@ type DataQual struct {
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
 	plumber      IPlumberClient
+	dryRun       bool
 }
 
 type Config struct {
@@ -62,6 +87,7 @@ type Config struct {
 func New(cfg *Config) (*DataQual, error) {
 	plumberURL := os.Getenv("PLUMBER_URL")
 	plumberToken := os.Getenv("PLUMBER_TOKEN")
+	dryRun := os.Getenv("DATAQUAL_DRY_RUN") == "true"
 
 	// We instantiate this library based on whether or not we have a plumber URL+token
 	// If these are not provided, the wrapper library will not perform rule checks and
@@ -88,6 +114,11 @@ func New(cfg *Config) (*DataQual, error) {
 		ruleSetMap:   make(map[string]string),
 		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
+		dryRun:       dryRun,
+	}
+
+	if dryRun {
+		log.Println("Plumber data rules running in dry run mode")
 	}
 
 	// Force rule pull on startup
@@ -101,6 +132,10 @@ func New(cfg *Config) (*DataQual, error) {
 }
 
 func validateConfig(cfg *Config) error {
+	if cfg == nil {
+		return ErrEmptyConfig
+	}
+
 	if cfg.Bus == "" {
 		return ErrEmptyBus
 	}
@@ -264,6 +299,12 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				continue
 			}
 
+			// Dry run, do nothing but log and continue on to the next rule
+			if d.dryRun {
+				d.logDryRun(rule)
+				continue
+			}
+
 			switch rule.FailureMode {
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
 				// Downstream libraries will check if data == nil and not publish/consume the message
@@ -296,6 +337,22 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 	}
 
 	return data, nil
+}
+
+func (d *DataQual) logDryRun(rule *protos.Rule) {
+	cfg := rule.GetMatchConfig()
+	switch rule.FailureMode {
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
+		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have rejected the message", rule.Id, rule.Type, cfg.Path)
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have transformed the message", rule.Id, rule.Type, cfg.Path)
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent a slack alert", rule.Id, rule.Type, cfg.Path)
+	case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent the message to the DLQ", rule.Id, rule.Type, cfg.Path)
+	default:
+		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have done nothing", rule.Id, rule.Type, cfg.Path)
+	}
 }
 
 func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
