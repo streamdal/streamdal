@@ -14,7 +14,6 @@ export const RuleSetDelete = () => {
   const [error, setError] = useState<string>("");
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
-  const confirm = params.get("confirm");
 
   const getData = async () => {
     try {
@@ -44,10 +43,6 @@ export const RuleSetDelete = () => {
       return;
     }
 
-    if (confirm === "yes") {
-      deleteRuleset();
-      return;
-    }
     getData();
   }, []);
 
@@ -93,11 +88,13 @@ export const RuleSetDelete = () => {
               </div>
             </div>
             <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <a href={`/ruleset/delete/?id=${id}&confirm=yes`}>
-                <button type="button" className="ml-2 btn-delete">
-                  Delete
-                </button>
-              </a>
+              <button
+                type="button"
+                className="ml-2 btn-delete"
+                onClick={() => deleteRuleset()}
+              >
+                Delete
+              </button>
               <button
                 type="button"
                 className="btn-cancel"
