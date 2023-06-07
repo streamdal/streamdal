@@ -19,6 +19,7 @@ module.exports = {
 				sunset: "#F9F7FF",
 				stormCloud: "#7C7C86",
 				haze: "#D1D3D9",
+				cloud: "#FFFFFF",
 			},
 			fontFamily: {
 				sans: ["Inter"],
@@ -39,6 +40,31 @@ module.exports = {
 					cursor: "pointer",
 					'&:hover': {
 						background: "linear-gradient(96.41deg, #C1AAFD -16.36%, #FFD260 101.19%)",
+					},
+				},
+				".btn-delete": {
+					width: "137px",
+					height: "47px",
+					borderRadius: "4px",
+					fontWeight: "bold",
+					fontSize: "14px",
+					color: "#FFFFFF",
+					background: "#FF7D68",
+					cursor: "pointer",
+					'&:hover': {
+						background: "linear-gradient(96.41deg, #FF7D68 -16.36%, #FFB9AD 101.19%)",
+					},
+				},
+				".btn-cancel": {
+					width: "100px",
+					height: "47px",
+					borderRadius: "4px",
+					border: "none",
+					fontWeight: "bold",
+					fontSize: "14px",
+					color: "#372D56",
+					'&:hover': {
+						background: "#F9F7FF",
 					},
 				},
 			})
