@@ -69,14 +69,14 @@ func (p *Plumber) GetWasmFile(ctx context.Context, wasmFile string) ([]byte, err
 }
 
 func (p *Plumber) GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error) {
-	req := &protos.GetDataQualityRulesRequest{
+	req := &protos.GetDataQualityRuleSetsRequest{
 		Auth: &common.Auth{
 			Token: p.Token,
 		},
 		Bus: bus,
 	}
 
-	resp, err := p.Server.GetRules(ctx, req)
+	resp, err := p.Server.GetRuleSets(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to fetch data quality rules")
 	}
