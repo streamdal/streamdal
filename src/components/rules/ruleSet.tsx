@@ -3,6 +3,7 @@ import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
 import { Error } from "../errors/error";
 import { MonitorIcon } from "../icons/streamdal";
+import { DisplayConfig } from "./configDisplay";
 
 const RULESET_ERROR = "Ruleset not found!";
 
@@ -23,6 +24,7 @@ export const RuleSet = () => {
     try {
       const set = await getJson(`/v1/ruleset/${id}`);
       const rules = await getJson(`/v1/ruleset/${id}/rules`);
+
       setRuleSet({
         ...set,
         ...{ rules },
@@ -58,10 +60,13 @@ export const RuleSet = () => {
       </div>
       <div className="pt-4 flex flex-col">
         {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
-          <div key={`rule-detail-${i}`}>
-            <div className="text-web mb-2">Rule Config: </div>
-            <div>{JSON.stringify(r)}</div>
-          </div>
+          <DisplayConfig
+            key={`rule-detail-${i}`}
+            config={{
+              "Rule Config": r.RuleConfig,
+              "Failure Mode Config": r.FailureModeConfig,
+            }}
+          />
         ))}
       </div>
     </div>

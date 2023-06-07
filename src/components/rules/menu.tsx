@@ -9,10 +9,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
     <Menu as="div" className="text-right align-text-bottom pt-[6px] relative">
       <div>
         <Menu.Button>
-          <Kebab
-            className="hover:text-purple-light h-[20px]"
-            aria-hidden="true"
-          />
+          <Kebab className="hover:text-shadow h-[20px]" aria-hidden="true" />
         </Menu.Button>
       </div>
 
@@ -23,7 +20,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
               <a href={`/ruleset/?id=${id}`}>
                 <button
                   className={`${
-                    active ? "bg-purple-hover" : ""
+                    active ? "bg-sunset" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
                   <EyeIcon
@@ -41,7 +38,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
             {({ active }) => (
               <button
                 className={`${
-                  active ? "bg-purple-hover" : ""
+                  active ? "bg-sunset" : ""
                 } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
               >
                 <Edit className="mr-2 text-web" aria-hidden="true" />
@@ -55,7 +52,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
             {({ active }) => (
               <button
                 className={`${
-                  active ? "bg-delete text-white" : "text-delete"
+                  active ? "bg-eyelid text-white" : "text-eyelid"
                 } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
               >
                 <Delete

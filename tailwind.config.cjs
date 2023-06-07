@@ -6,25 +6,19 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				error: "#FF4040",
+				streamdalYellow: "#F2E205",
+				streamdalOrange: "#F8A577",
+				streamdalPurple: "#956CFF",
+				streamdalGreen: "#03CBA7",
+				streamdalBlue: "#3197FF",
+				streamdalRed: "#FF4040",
+				streamdalPink: "#F489B0",
 				web: "#372D56",
-				delete: "#FF7D68",
-				purple: {
-					dark: "#372D56",
-					light: "#c0aafe",
-					bright: "#ab6dee",
-					divider: "#c2aafd4d",
-					darkText: "#2B2343",
-					hover: "#F9F7FF",
-					background: {
-						light: "#1F1930",
-					},
-				},
-				yellow: {
-					accent: "#FFD260",
-					lightGradient: "#F1E5CB",
-					darkGradient: "#F2D068",
-				},
+				eyelid: "#FF7D68",
+				shadow: "#c0aafe",
+				sunset: "#F9F7FF",
+				stormCloud: "#7C7C86",
+				haze: "#D1D3D9",
 			},
 			fontFamily: {
 				sans: ["Inter"],
