@@ -4,13 +4,12 @@ import { getJson } from "../../lib/fetch";
 import { Error } from "../errors/error";
 import { MonitorIcon } from "../icons/streamdal";
 
-const ERROR = "Ruleset not found!";
+const RULESET_ERROR = "Ruleset not found!";
 
 export const RuleSet = () => {
   const [ruleSet, setRuleSet] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const ruleSets = null;
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
 
@@ -34,9 +33,7 @@ export const RuleSet = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
+  getData();
 
   return (
     <div className="max-w-[1440px]">
@@ -52,7 +49,7 @@ export const RuleSet = () => {
       {loading ? (
         <Loading />
       ) : error || !ruleSet ? (
-        <Error error="Rule set not found!" />
+        <Error error={RULESET_ERROR} />
       ) : (
         <div className="pt-4 flex flex-col">
           {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (

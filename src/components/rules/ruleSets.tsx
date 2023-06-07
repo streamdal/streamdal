@@ -3,10 +3,12 @@ import type { ReactNode } from "react";
 import { titleCase } from "../../lib/utils";
 import { RuleSetMenu } from "./menu";
 import { MonitorIcon } from "../icons/streamdal";
+import { useState } from "react";
+import { getJson } from "../../lib/fetch";
+import { Loading } from "../icons/nav";
+import { Error } from "../errors/error";
 
-const data = await fetch(
-  `${import.meta.env.PUBLIC_API_URL || ""}/v1/ruleset`
-).then((response) => response.json());
+const RULESETS_ERROR = "There was a problem loading Rulesets";
 
 export const TH = ({
   children,
@@ -39,6 +41,29 @@ export const TD = ({
 export const humanMode = (mode: string) => titleCase(mode.substring(10));
 
 export const RuleSets = () => {
+  const [ruleSets, setRuleSets] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  const getData = async () => {
+    try {
+      setRuleSets(await getJson(`/v1/ruleset`));
+    } catch {
+      setError(true);
+    }
+    setLoading(false);
+  };
+
+  getData();
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Error error={RULESETS_ERROR} />;
+  }
+
   return (
     <div className="max-w-[1440px]">
       <div className="flex flex-row justify-start align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">
@@ -58,7 +83,7 @@ export const RuleSets = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.values(data)?.map((r: any, i: number) => (
+          {Object.values(ruleSets)?.map((r: any, i: number) => (
             <tr key={`ruleset-table-${i}`}>
               <TD>
                 <a href={`/ruleset/?id=${r.id}`}>{r.name}</a>
