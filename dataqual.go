@@ -16,21 +16,20 @@ package dataqual
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/wasmerio/wasmer-go/wasmer"
-
-	// Forcing import to allow running on M1
-	_ "github.com/wasmerio/wasmer-go/wasmer/packaged/lib/darwin-aarch64"
-
-	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
-
 	"github.com/streamdal/dataqual/common"
 	"github.com/streamdal/dataqual/detective"
+	"github.com/tetratelabs/wazero"
+	"github.com/tetratelabs/wazero/api"
+	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+
+	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
 // Module is a constant that represents which type of WASM module we will run the rules against
@@ -147,36 +146,33 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func createWASMInstance(wasmBytes []byte) (*wasmer.Instance, error) {
+func createWASMInstance(wasmBytes []byte) (api.Module, error) {
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		fmt.Println("Recovered in f", r)
+	//	}
+	//}()
+
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
 	}
 
-	store := wasmer.NewStore(wasmer.NewEngine())
+	ctx := context.Background()
+	r := wazero.NewRuntime(ctx)
 
-	// Compiles the module
-	module, err := wasmer.NewModule(store, wasmBytes)
+	wasi_snapshot_preview1.MustInstantiate(ctx, r)
+
+	cfg := wazero.NewModuleConfig().
+		WithStdout(io.Discard).
+		WithStderr(io.Discard).
+		WithStartFunctions("") // We don't need _start() to be called for our purposes
+
+	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to compile module")
+		return nil, errors.Wrap(err, "failed to instantiate wasm module")
 	}
 
-	wasiEnv, err := wasmer.NewWasiStateBuilder("wasi-program").Finalize()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to generate wasi env")
-	}
-
-	importObject, err := wasiEnv.GenerateImportObject(store, module)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to generate import object")
-	}
-
-	// Instantiates the module
-	instance, err := wasmer.NewInstance(module, importObject)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate module")
-	}
-
-	return instance, nil
+	return mod, nil
 }
 
 func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
