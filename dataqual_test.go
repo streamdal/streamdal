@@ -1,10 +1,12 @@
 package dataqual
 
 import (
+	"context"
 	"os"
 	"path"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -19,7 +21,10 @@ func TestMatch(t *testing.T) {
 		t.Error(err)
 	}
 
-	isMatch, err := d.runMatch("string_contains_any", "type", jsonData, []string{"hello"})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	isMatch, err := d.runMatch(ctx, "string_contains_any", "type", jsonData, []string{"hello"})
 	if err != nil {
 		t.Error("error during runMatch: " + err.Error())
 	}
@@ -66,11 +71,16 @@ func matchBench(fileName string, b *testing.B) {
 
 	b.ResetTimer()
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	for i := 0; i < b.N; i++ {
-		_, err := d.runMatch("string_contains_any", "firstname", jsonData, []string{"Rani"})
+		_, err := d.runMatch(ctx, "string_contains_any", "firstname", jsonData, []string{"Rani"})
 		if err != nil {
+			cancel()
 			b.Fatal("error during runMatch: " + err.Error())
 		}
+		cancel()
 	}
 }
 
@@ -93,8 +103,11 @@ func transformBench(fileName string, b *testing.B) {
 		Value: "Testing",
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	for i := 0; i < b.N; i++ {
-		_, err := d.runTransform(jsonData, fm)
+		_, err := d.runTransform(ctx, jsonData, fm)
 		if err != nil {
 			b.Error("error during runTransform: " + err.Error())
 		}

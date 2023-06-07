@@ -63,7 +63,7 @@ var (
 )
 
 type IDataQual interface {
-	ApplyRules(mode Mode, key string, data []byte) ([]byte, error)
+	ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error)
 }
 
 type DataQual struct {
@@ -168,7 +168,7 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	return mod, nil
 }
 
-func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	// Get WASM module
 	f, err := d.getFunction(Transform)
 	if err != nil {
@@ -197,7 +197,7 @@ func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) (
 		return nil, errors.Wrap(err, "unable to generate request")
 	}
 
-	returnData, err := f.Exec(req)
+	returnData, err := f.Exec(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during wasm exec")
 	}
@@ -215,7 +215,7 @@ func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) (
 	return resp.Data, nil
 }
 
-func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
+func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
 	// Get WASM module
 	f, err := d.getFunction(Match)
 	if err != nil {
@@ -234,7 +234,7 @@ func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, ar
 		return false, fmt.Errorf("unable to generate request: %s", err.Error())
 	}
 
-	returnData, err := f.Exec(req)
+	returnData, err := f.Exec(ctx, req)
 	if err != nil {
 		return false, errors.Wrap(err, "error during wasm exec")
 	}
@@ -252,7 +252,7 @@ func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, ar
 	return resp.IsMatch, nil
 }
 
-func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error) {
+func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
 	defer d.rulesMtx.RUnlock()
@@ -278,7 +278,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				return nil, errors.New("BUG: match rule is missing match config")
 			}
 
-			isMatch, err := d.runMatch(detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
+			isMatch, err := d.runMatch(ctx, detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
 			}
@@ -299,7 +299,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				// Downstream libraries will check if data == nil and not publish/consume the message
 				return nil, nil
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-				return d.failTransform(data, rule.GetTransform())
+				return d.failTransform(ctx, data, rule.GetTransform())
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
 				fallthrough
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
@@ -344,8 +344,8 @@ func (d *DataQual) logDryRun(rule *protos.Rule) {
 	}
 }
 
-func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	transformed, err := d.runTransform(data, cfg)
+func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+	transformed, err := d.runTransform(ctx, data, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run transform on failure mode")
 	}

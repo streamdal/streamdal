@@ -16,9 +16,7 @@ type function struct {
 	dealloc api.Function
 }
 
-func (f *function) Exec(req []byte) ([]byte, error) {
-	ctx := context.Background()
-
+func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	ptrLen := uint64(len(req))
 
 	inputPtr, err := f.alloc.Call(ctx, ptrLen)
