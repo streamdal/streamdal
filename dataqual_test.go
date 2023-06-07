@@ -13,7 +13,7 @@ import (
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
-func TestMatch(t *testing.T) {
+func TestMatch_true(t *testing.T) {
 	jsonData := []byte(`{"type": "hello world"}`)
 
 	d, err := setup(Match)
@@ -21,16 +21,31 @@ func TestMatch(t *testing.T) {
 		t.Error(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	isMatch, err := d.runMatch(ctx, "string_contains_any", "type", jsonData, []string{"hello"})
+	isMatch, err := d.runMatch(context.Background(), "string_contains_any", "type", jsonData, []string{"hello"})
 	if err != nil {
 		t.Error("error during runMatch: " + err.Error())
 	}
 
 	if !isMatch {
 		t.Error("expected match")
+	}
+}
+
+func TestMatch_false(t *testing.T) {
+	jsonData := []byte(`{"type": "hello world"}`)
+
+	d, err := setup(Match)
+	if err != nil {
+		t.Error(err)
+	}
+
+	isMatch, err := d.runMatch(context.Background(), "string_contains_any", "type", jsonData, []string{"gmail"})
+	if err != nil {
+		t.Error("error during runMatch: " + err.Error())
+	}
+
+	if isMatch {
+		t.Error("expected no match")
 	}
 }
 
@@ -118,6 +133,7 @@ func setup(m Module) (*DataQual, error) {
 	d := &DataQual{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
+		wasmTimeout:  time.Nanosecond,
 	}
 
 	wasmFile := path.Join("src", string(m)+".wasm")
