@@ -39,7 +39,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
               <button
                 className={`${
                   active ? "bg-sunset" : ""
-                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                } group flex w-full items-center rounded-md px-2 py-2 text-sm cursor-not-allowed`}
               >
                 <Edit className="mr-2 text-web" aria-hidden="true" />
                 Edit
@@ -50,18 +50,20 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
         <div className="p-2 pt-1">
           <Menu.Item>
             {({ active }) => (
-              <button
-                className={`${
-                  active ? "bg-eyelid text-white" : "text-eyelid"
-                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-              >
-                <Delete
-                  className="mr-2"
-                  fill={active ? "white" : "#FF7D68"}
-                  aria-hidden="true"
-                />
-                Delete
-              </button>
+              <a href={`/ruleset/delete/?id=${id}`}>
+                <button
+                  className={`${
+                    active ? "bg-eyelid text-white" : "text-eyelid"
+                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                >
+                  <Delete
+                    className="mr-2"
+                    fill={active ? "white" : "#FF7D68"}
+                    aria-hidden="true"
+                  />
+                  Delete
+                </button>
+              </a>
             )}
           </Menu.Item>
         </div>
