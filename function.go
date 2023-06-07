@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tetratelabs/wazero/api"
-
 	"github.com/pkg/errors"
+	"github.com/tetratelabs/wazero/api"
 )
 
 type function struct {
