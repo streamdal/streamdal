@@ -2,7 +2,7 @@ package dataqual
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/tetratelabs/wazero/api"
 
@@ -33,8 +33,7 @@ func (f *function) Exec(req []byte) ([]byte, error) {
 	ptrVal := inputPtr[0]
 
 	if !f.Inst.Memory().Write(uint32(ptrVal), req) {
-		// TODO: no panics
-		log.Panicf("Memory.Write(%d, %d) out of range of memory size %d",
+		return nil, fmt.Errorf("Memory.Write(%d, %d) out of range of memory size %d",
 			ptrVal, len(req), f.Inst.Memory().Size())
 	}
 

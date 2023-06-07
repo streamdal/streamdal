@@ -147,12 +147,6 @@ func validateConfig(cfg *Config) error {
 }
 
 func createWASMInstance(wasmBytes []byte) (api.Module, error) {
-	//defer func() {
-	//	if r := recover(); r != nil {
-	//		fmt.Println("Recovered in f", r)
-	//	}
-	//}()
-
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
 	}
@@ -161,10 +155,9 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	r := wazero.NewRuntime(ctx)
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-
 	cfg := wazero.NewModuleConfig().
-		WithStdout(io.Discard).
 		WithStderr(io.Discard).
+		WithStdout(io.Discard).
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
 
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
@@ -238,7 +231,7 @@ func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, ar
 
 	req, err := request.MarshalJSON()
 	if err != nil {
-		panic("unable to generate request: " + err.Error())
+		return false, fmt.Errorf("unable to generate request: %s", err.Error())
 	}
 
 	returnData, err := f.Exec(req)

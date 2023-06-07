@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
+
+	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
 func TestMatch(t *testing.T) {
@@ -28,9 +30,33 @@ func TestMatch(t *testing.T) {
 }
 
 func BenchmarkMatchSmallJSON(b *testing.B) {
-	jsonData, err := os.ReadFile("json-examples/small.json")
+	matchBench("json-examples/small.json", b)
+}
+
+func BenchmarkMatchMediumJSON(b *testing.B) {
+	matchBench("json-examples/medium.json", b)
+}
+
+func BenchmarkMatchLargeJSON(b *testing.B) {
+	matchBench("json-examples/large.json", b)
+}
+
+func BenchmarkTransformSmallJSON(b *testing.B) {
+	transformBench("json-examples/small.json", b)
+}
+
+func BenchmarkTransformMediumJSON(b *testing.B) {
+	transformBench("json-examples/medium.json", b)
+}
+
+func BenchmarkTransformLargeJSON(b *testing.B) {
+	transformBench("json-examples/large.json", b)
+}
+
+func matchBench(fileName string, b *testing.B) {
+	jsonData, err := os.ReadFile(fileName)
 	if err != nil {
-		panic("unable to read json: " + err.Error())
+		b.Error("unable to read json: " + err.Error())
 	}
 
 	d, err := setup(Match)
@@ -43,46 +69,37 @@ func BenchmarkMatchSmallJSON(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := d.runMatch("string_contains_any", "firstname", jsonData, []string{"Rani"})
 		if err != nil {
-			panic("error during runMatch: " + err.Error())
+			b.Fatal("error during runMatch: " + err.Error())
 		}
 	}
 }
 
-//func BenchmarkMatchMediumJSON(b *testing.B) {
-//	jsonData, err := os.ReadFile("json-examples/medium.json")
-//	if err != nil {
-//		panic("unable to read json: " + err.Error())
-//	}
-//
-//	d := setup()
-//
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//		_, err := d.runTransform("firstname", "Testing", jsonData)
-//		if err != nil {
-//			panic("error during performMatchRun: " + err.Error())
-//		}
-//	}
-//}
-//
-//func BenchmarkMatchLargeJSON(b *testing.B) {
-//	jsonData, err := os.ReadFile("json-examples/large.json")
-//	if err != nil {
-//		panic("unable to read json: " + err.Error())
-//	}
-//
-//	d := setup()
-//
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//		_, err := d.runTransform("firstname", "Testing", jsonData)
-//		if err != nil {
-//			panic("error during performMatchRun: " + err.Error())
-//		}
-//	}
-//}
+func transformBench(fileName string, b *testing.B) {
+	jsonData, err := os.ReadFile(fileName)
+	if err != nil {
+		b.Error("unable to read json: " + err.Error())
+	}
+
+	d, err := setup(Transform)
+	if err != nil {
+		b.Error(err)
+	}
+
+	b.ResetTimer()
+
+	fm := &protos.FailureModeTransform{
+		Type:  protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
+		Path:  "firstname",
+		Value: "Testing",
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err := d.runTransform(jsonData, fm)
+		if err != nil {
+			b.Error("error during runTransform: " + err.Error())
+		}
+	}
+}
 
 func setup(m Module) (*DataQual, error) {
 	d := &DataQual{
