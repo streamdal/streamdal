@@ -7,7 +7,7 @@ require (
 	github.com/batchcorp/plumber-schemas v0.0.182-0.20230605192444-9508bc70b790
 	github.com/buger/jsonparser v1.1.1
 	github.com/pkg/errors v0.9.1
-	github.com/streamdal/pii v0.0.3
+	github.com/streamdal/pii v0.0.4-0.20230607180554-0d7a05797823
 	github.com/tetratelabs/wazero v1.2.0
 	github.com/tidwall/gjson v1.14.1
 	github.com/wasilibs/go-re2 v1.1.0
