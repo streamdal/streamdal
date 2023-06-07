@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { titleCase } from "../../lib/utils";
 import { RuleSetMenu } from "./menu";
 import { MonitorIcon } from "../icons/streamdal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getJson } from "../../lib/fetch";
 import { Loading } from "../icons/nav";
 import { Error } from "../errors/error";
@@ -54,7 +54,9 @@ export const RuleSets = () => {
     setLoading(false);
   };
 
-  getData();
+  useEffect(() => {
+    getData();
+  }, []);
 
   if (loading) {
     return <Loading />;

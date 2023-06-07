@@ -33,7 +33,17 @@ export const RuleSet = () => {
     setLoading(false);
   };
 
-  getData();
+  useEffect(() => {
+    getData();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Error error={RULESET_ERROR} />;
+  }
 
   return (
     <div className="max-w-[1440px]">
@@ -46,20 +56,14 @@ export const RuleSet = () => {
           <span className="text-web">{ruleSet?.bus}</span>
         </div>
       </div>
-      {loading ? (
-        <Loading />
-      ) : error || !ruleSet ? (
-        <Error error={RULESET_ERROR} />
-      ) : (
-        <div className="pt-4 flex flex-col">
-          {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
-            <div key={`rule-detail-${i}`}>
-              <div className="text-web mb-2">Rule Config: </div>
-              <div>{JSON.stringify(r)}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="pt-4 flex flex-col">
+        {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
+          <div key={`rule-detail-${i}`}>
+            <div className="text-web mb-2">Rule Config: </div>
+            <div>{JSON.stringify(r)}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
