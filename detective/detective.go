@@ -3,7 +3,7 @@ package detective
 import (
 	"fmt"
 	"math"
-	"regexp"
+
 	"strconv"
 	"strings"
 	"sync"
@@ -11,7 +11,7 @@ import (
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
+	regexp "github.com/wasilibs/go-re2"
 
 	"github.com/streamdal/pii"
 )
@@ -52,7 +52,7 @@ const (
 )
 
 type IMatcher interface {
-	Match(fieldValue *gjson.Result, matchType MatchType, matchArgs ...string) (bool, error)
+	Match(field []byte, dataType jsonparser.ValueType, matchType MatchType, matchArgs ...string) (bool, error)
 }
 
 type Matcher struct {

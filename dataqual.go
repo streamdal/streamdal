@@ -16,21 +16,20 @@ package dataqual
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/wasmerio/wasmer-go/wasmer"
-
-	// Forcing import to allow running on M1
-	_ "github.com/wasmerio/wasmer-go/wasmer/packaged/lib/darwin-aarch64"
-
-	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
-
 	"github.com/streamdal/dataqual/common"
 	"github.com/streamdal/dataqual/detective"
+	"github.com/tetratelabs/wazero"
+	"github.com/tetratelabs/wazero/api"
+	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+
+	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 )
 
 // Module is a constant that represents which type of WASM module we will run the rules against
@@ -64,7 +63,7 @@ var (
 )
 
 type IDataQual interface {
-	ApplyRules(mode Mode, key string, data []byte) ([]byte, error)
+	ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error)
 }
 
 type DataQual struct {
@@ -147,39 +146,29 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func createWASMInstance(wasmBytes []byte) (*wasmer.Instance, error) {
+func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
 	}
 
-	store := wasmer.NewStore(wasmer.NewEngine())
+	ctx := context.Background()
+	r := wazero.NewRuntime(ctx)
 
-	// Compiles the module
-	module, err := wasmer.NewModule(store, wasmBytes)
+	wasi_snapshot_preview1.MustInstantiate(ctx, r)
+	cfg := wazero.NewModuleConfig().
+		WithStderr(io.Discard).
+		WithStdout(io.Discard).
+		WithStartFunctions("") // We don't need _start() to be called for our purposes
+
+	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to compile module")
+		return nil, errors.Wrap(err, "failed to instantiate wasm module")
 	}
 
-	wasiEnv, err := wasmer.NewWasiStateBuilder("wasi-program").Finalize()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to generate wasi env")
-	}
-
-	importObject, err := wasiEnv.GenerateImportObject(store, module)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to generate import object")
-	}
-
-	// Instantiates the module
-	instance, err := wasmer.NewInstance(module, importObject)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate module")
-	}
-
-	return instance, nil
+	return mod, nil
 }
 
-func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	// Get WASM module
 	f, err := d.getFunction(Transform)
 	if err != nil {
@@ -208,7 +197,7 @@ func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) (
 		return nil, errors.Wrap(err, "unable to generate request")
 	}
 
-	returnData, err := f.Exec(req)
+	returnData, err := f.Exec(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during wasm exec")
 	}
@@ -226,7 +215,7 @@ func (d *DataQual) runTransform(data []byte, cfg *protos.FailureModeTransform) (
 	return resp.Data, nil
 }
 
-func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
+func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
 	// Get WASM module
 	f, err := d.getFunction(Match)
 	if err != nil {
@@ -242,10 +231,10 @@ func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, ar
 
 	req, err := request.MarshalJSON()
 	if err != nil {
-		panic("unable to generate request: " + err.Error())
+		return false, fmt.Errorf("unable to generate request: %s", err.Error())
 	}
 
-	returnData, err := f.Exec(req)
+	returnData, err := f.Exec(ctx, req)
 	if err != nil {
 		return false, errors.Wrap(err, "error during wasm exec")
 	}
@@ -263,7 +252,7 @@ func (d *DataQual) runMatch(mt detective.MatchType, path string, data []byte, ar
 	return resp.IsMatch, nil
 }
 
-func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error) {
+func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
 	defer d.rulesMtx.RUnlock()
@@ -289,7 +278,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				return nil, errors.New("BUG: match rule is missing match config")
 			}
 
-			isMatch, err := d.runMatch(detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
+			isMatch, err := d.runMatch(ctx, detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
 			}
@@ -310,7 +299,7 @@ func (d *DataQual) ApplyRules(mode Mode, key string, data []byte) ([]byte, error
 				// Downstream libraries will check if data == nil and not publish/consume the message
 				return nil, nil
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-				return d.failTransform(data, rule.GetTransform())
+				return d.failTransform(ctx, data, rule.GetTransform())
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
 				fallthrough
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
@@ -355,8 +344,8 @@ func (d *DataQual) logDryRun(rule *protos.Rule) {
 	}
 }
 
-func (d *DataQual) failTransform(data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	transformed, err := d.runTransform(data, cfg)
+func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+	transformed, err := d.runTransform(ctx, data, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run transform on failure mode")
 	}

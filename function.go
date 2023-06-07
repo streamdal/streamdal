@@ -2,55 +2,58 @@ package dataqual
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/wasmerio/wasmer-go/wasmer"
+	"github.com/tetratelabs/wazero/api"
 )
 
 type function struct {
-	Inst    *wasmer.Instance
-	f       wasmer.NativeFunction
-	alloc   wasmer.NativeFunction
-	dealloc wasmer.NativeFunction
+	Inst    api.Module
+	f       api.Function
+	alloc   api.Function
+	dealloc api.Function
 }
 
-func (f *function) Exec(req []byte) ([]byte, error) {
-	ptr, err := f.alloc(len(req))
+func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
+	ptrLen := uint64(len(req))
+
+	inputPtr, err := f.alloc.Call(ctx, ptrLen)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to allocate memory")
 	}
 
-	ptrVal, ok := ptr.(int32)
-	if !ok {
-		return nil, errors.Wrap(err, "unable to convert ptr to int32")
+	if len(inputPtr) == 0 {
+		return nil, errors.New("unable to allocate memory")
 	}
 
-	mem, err := writeMemory(f.Inst, req, ptrVal)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to write memory")
+	ptrVal := inputPtr[0]
+
+	if !f.Inst.Memory().Write(uint32(ptrVal), req) {
+		return nil, fmt.Errorf("Memory.Write(%d, %d) out of range of memory size %d",
+			ptrVal, len(req), f.Inst.Memory().Size())
 	}
 
-	result, err := f.f(ptrVal, len(req))
+	result, err := f.f.Call(ctx, ptrVal, ptrLen)
 	if err != nil {
 		// Clear mem on error
-		if _, err := f.dealloc(ptrVal, int32(len(req))); err != nil {
+		if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
 			return nil, errors.Wrap(err, "unable to deallocate memory")
 		}
 		return nil, errors.Wrap(err, "error during func call")
 	}
 
+	resultPtr := uint32(result[0])
+
 	// Dealloc request memory
-	if _, err := f.dealloc(ptrVal, int32(len(req))); err != nil {
+	if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
 		return nil, errors.Wrap(err, "unable to deallocate memory")
 	}
 
 	// Read memory starting from result ptr
-	returnData, err := readMemory(mem.Data(), result, -1)
-	if err != nil {
-		return nil, errors.Wrap(err, "error during readMemory")
-	}
+	bytes, err := f.ReadMemory(resultPtr, -1)
 
-	return returnData, nil
+	return bytes, nil
 }
 
 func (d *DataQual) setFunctionCache(m Module, f *function) {
@@ -94,25 +97,25 @@ func (d *DataQual) getFunctionFromCache(rt Module) (*function, bool) {
 func createFunction(wasmBytes []byte) (*function, error) {
 	inst, err := createWASMInstance(wasmBytes)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate WASM module")
+		return nil, err
 	}
 
 	// This is the actual function we'll be executing
-	f, err := inst.Exports.GetFunction("f")
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get func")
+	f := inst.ExportedFunction("f")
+	if f == nil {
+		return nil, errors.New("unable to get func")
 	}
 
 	// alloc allows us to pre-allocate memory in order to pass data to the WASM module
-	alloc, err := inst.Exports.GetFunction("alloc")
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get alloc func")
+	alloc := inst.ExportedFunction("alloc")
+	if alloc == nil {
+		return nil, errors.New("unable to get alloc func")
 	}
 
 	// dealloc allows us to free memory passed to the wasm module after we're done with it
-	dealloc, err := inst.Exports.GetFunction("dealloc")
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get dealloc func")
+	dealloc := inst.ExportedFunction("dealloc")
+	if dealloc == nil {
+		return nil, errors.New("unable to get dealloc func")
 	}
 
 	return &function{
