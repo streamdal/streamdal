@@ -54,6 +54,9 @@ const (
 
 	// Transform is the name of the WASM module that contains the transform function
 	Transform Module = "transform"
+
+	// DefaultMaxDataSize is the maximum size of data that can be sent to the WASM module
+	DefaultMaxDataSize = 1024 * 1024 // 1Mi
 )
 
 var (
@@ -270,6 +273,11 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 }
 
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
+	if len(data) > DefaultMaxDataSize {
+		log.Printf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
+		return data, nil
+	}
+
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
 	defer d.rulesMtx.RUnlock()
@@ -434,4 +442,15 @@ func (d *DataQual) getRuleSetIDForRule(ruleID string) (string, bool) {
 
 	ruleSetID, ok := d.ruleSetMap[ruleID]
 	return ruleSetID, ok
+}
+
+func (m Mode) String() string {
+	switch m {
+	case Publish:
+		return "publish"
+	case Consume:
+		return "consume"
+	default:
+		return "unknown"
+	}
 }
