@@ -54,6 +54,9 @@ const (
 
 	// Transform is the name of the WASM module that contains the transform function
 	Transform Module = "transform"
+
+	// DefaultMaxDataSize is the maximum size of data that can be sent to the WASM module
+	DefaultMaxDataSize = 1024 * 1024 // 1Mi
 )
 
 var (
@@ -76,6 +79,7 @@ type DataQual struct {
 	rulesMtx     *sync.RWMutex
 	plumber      IPlumberClient
 	dryRun       bool
+	wasmTimeout  time.Duration
 }
 
 type Config struct {
@@ -87,12 +91,21 @@ func New(cfg *Config) (*DataQual, error) {
 	plumberURL := os.Getenv("PLUMBER_URL")
 	plumberToken := os.Getenv("PLUMBER_TOKEN")
 	dryRun := os.Getenv("DATAQUAL_DRY_RUN") == "true"
+	wasmTimeout := os.Getenv("DATAQUAL_WASM_TIMEOUT")
 
 	// We instantiate this library based on whether or not we have a plumber URL+token
 	// If these are not provided, the wrapper library will not perform rule checks and
 	// will act as normal
 	if plumberURL == "" || plumberToken == "" {
 		return nil, nil
+	}
+
+	if wasmTimeout == "" {
+		wasmTimeout = "1s"
+	}
+	timeout, err := time.ParseDuration(wasmTimeout)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to parse DATAQUAL_WASM_TIMEOUT")
 	}
 
 	if err := validateConfig(cfg); err != nil {
@@ -114,6 +127,7 @@ func New(cfg *Config) (*DataQual, error) {
 		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
 		dryRun:       dryRun,
+		wasmTimeout:  timeout,
 	}
 
 	if dryRun {
@@ -169,6 +183,9 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 }
 
 func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, d.wasmTimeout)
+	defer cancel()
+
 	// Get WASM module
 	f, err := d.getFunction(Transform)
 	if err != nil {
@@ -197,7 +214,7 @@ func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.Fa
 		return nil, errors.Wrap(err, "unable to generate request")
 	}
 
-	returnData, err := f.Exec(ctx, req)
+	returnData, err := f.Exec(timeoutCtx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "error during wasm exec")
 	}
@@ -216,6 +233,9 @@ func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.Fa
 }
 
 func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, d.wasmTimeout)
+	defer cancel()
+
 	// Get WASM module
 	f, err := d.getFunction(Match)
 	if err != nil {
@@ -234,7 +254,7 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 		return false, fmt.Errorf("unable to generate request: %s", err.Error())
 	}
 
-	returnData, err := f.Exec(ctx, req)
+	returnData, err := f.Exec(timeoutCtx, req)
 	if err != nil {
 		return false, errors.Wrap(err, "error during wasm exec")
 	}
@@ -253,6 +273,11 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 }
 
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
+	if len(data) > DefaultMaxDataSize {
+		log.Printf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
+		return data, nil
+	}
+
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
 	defer d.rulesMtx.RUnlock()
@@ -417,4 +442,15 @@ func (d *DataQual) getRuleSetIDForRule(ruleID string) (string, bool) {
 
 	ruleSetID, ok := d.ruleSetMap[ruleID]
 	return ruleSetID, ok
+}
+
+func (m Mode) String() string {
+	switch m {
+	case Publish:
+		return "publish"
+	case Consume:
+		return "consume"
+	default:
+		return "unknown"
+	}
 }
