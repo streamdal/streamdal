@@ -70,7 +70,7 @@ func (d *DataQual) getFunction(m Module) (*function, error) {
 		return fc, nil
 	}
 
-	wasmData, err := d.plumber.GetWasmFile(context.Background(), string(m)+".wasm")
+	wasmData, err := d.Plumber.GetWasmFile(context.Background(), string(m)+".wasm")
 	if err != nil {
 		return nil, err
 	}
