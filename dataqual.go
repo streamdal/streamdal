@@ -63,6 +63,10 @@ var (
 	ErrEmptyConfig        = errors.New("config cannot be empty")
 	ErrEmptyBus           = errors.New("bus cannot be empty")
 	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
+
+	// ErrMessageDropped is returned when a message is dropped by the plumber data rules
+	// An end user may check for this error and handle it accordingly in their code
+	ErrMessageDropped = errors.New("message dropped by plumber data rules")
 )
 
 type IDataQual interface {
@@ -77,7 +81,7 @@ type DataQual struct {
 	ruleSetMtx   *sync.RWMutex
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
-	plumber      IPlumberClient
+	Plumber      IPlumberClient
 	dryRun       bool
 	wasmTimeout  time.Duration
 }
@@ -93,7 +97,7 @@ func New(cfg *Config) (*DataQual, error) {
 	dryRun := os.Getenv("DATAQUAL_DRY_RUN") == "true"
 	wasmTimeout := os.Getenv("DATAQUAL_WASM_TIMEOUT")
 
-	// We instantiate this library based on whether or not we have a plumber URL+token
+	// We instantiate this library based on whether or not we have a Plumber URL+token
 	// If these are not provided, the wrapper library will not perform rule checks and
 	// will act as normal
 	if plumberURL == "" || plumberToken == "" {
@@ -120,7 +124,7 @@ func New(cfg *Config) (*DataQual, error) {
 	dq := &DataQual{
 		functions:    make(map[Module]*function),
 		functionsMtx: &sync.RWMutex{},
-		plumber:      plumber,
+		Plumber:      plumber,
 		rules:        make(map[Mode]map[string][]*protos.Rule),
 		rulesMtx:     &sync.RWMutex{},
 		ruleSetMap:   make(map[string]string),
@@ -322,7 +326,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 			switch rule.FailureMode {
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
 				// Downstream libraries will check if data == nil and not publish/consume the message
-				return nil, nil
+				return nil, ErrMessageDropped
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
 				return d.failTransform(ctx, data, rule.GetTransform())
 			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
@@ -333,7 +337,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 					return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
 				}
 
-				if err := d.plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
+				if err := d.Plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
 					return nil, errors.Wrap(err, "failed to send rule notification")
 				}
 
@@ -397,7 +401,7 @@ func (d *DataQual) watchForRuleUpdates() {
 }
 
 func (d *DataQual) getRuleUpdates() error {
-	ruleSets, err := d.plumber.GetRules(context.Background(), d.Bus)
+	ruleSets, err := d.Plumber.GetRules(context.Background(), d.Bus)
 	if err != nil {
 		return errors.Wrap(err, "failed to get rules")
 	}
@@ -435,7 +439,7 @@ func (d *DataQual) getRuleUpdates() error {
 }
 
 // getRuleSetIDForRule gets the ruleset ID for a given rule ID.
-// This is needed when communicating rule failure alerts to plumber
+// This is needed when communicating rule failure alerts to Plumber
 func (d *DataQual) getRuleSetIDForRule(ruleID string) (string, bool) {
 	d.ruleSetMtx.RLock()
 	defer d.ruleSetMtx.RUnlock()
