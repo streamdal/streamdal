@@ -103,11 +103,13 @@ export const RuleSets = () => {
         </tbody>
       </table>
       <div className="w-full mt-4 flex justify-end">
-        <input
-          type="button"
-          className="flex justify-center btn-heimdal"
-          value="Add Rule Set"
-        />
+        <a href="/ruleset/add">
+          <input
+            type="button"
+            className="flex justify-center btn-heimdal"
+            value="Add Rule Set"
+          />
+        </a>
       </div>
     </div>
   );

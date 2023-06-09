@@ -5,7 +5,7 @@ import { Error } from "../errors/error";
 import { MonitorIcon } from "../icons/streamdal";
 import { DisplayConfig } from "./configDisplay";
 
-const RULESET_ERROR = "Ruleset not found!";
+export const RULESET_ERROR = "Ruleset not found!";
 
 export const RuleSet = () => {
   const [ruleSet, setRuleSet] = useState<any>(null);
