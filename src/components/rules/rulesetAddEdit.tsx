@@ -23,14 +23,14 @@ const baseSchema = z.object({
 });
 
 const rulesetSchema = z
-  .discriminatedUnion("bus", [
+  .discriminatedUnion("data_source", [
     baseSchema.extend({
-      bus: z.literal("kafka"),
+      data_source: z.literal("kafka"),
       key: z.string().min(1, { message: "Required" }),
       mode: RuleSetModeSchema,
     }),
     baseSchema.extend({
-      bus: z.literal("rabbitmq"),
+      data_source: z.literal("rabbitmq"),
       mode: RuleSetModeSchema,
       queue_name: z.string(),
       exchange_name: z.string(),
@@ -40,9 +40,9 @@ const rulesetSchema = z
   //
   // This kind of sucks but discriminated unions are deprecated so I don't
   // want to waste too much time figuring it out. There is a new switch api coming soon.
-  .superRefine(({ bus, mode, ...others }, ctx) => {
+  .superRefine(({ data_source, mode, ...others }, ctx) => {
     if (
-      bus === "rabbitmq" &&
+      data_source === "rabbitmq" &&
       mode === "RULE_MODE_CONSUME" &&
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -56,7 +56,7 @@ const rulesetSchema = z
       });
     }
 
-    if (bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH") {
+    if (data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH") {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       !others.exchange_name &&
@@ -82,7 +82,7 @@ const rulesetSchema = z
 export const RuleSetAddEdit = () => {
   const [ruleSet, setRuleSet] = useState<any>({
     name: "",
-    bus: "kafka",
+    data_source: "kafka",
     mode: "RULE_MODE_CONSUME",
     key: "",
     queue_name: "",
@@ -106,14 +106,14 @@ export const RuleSetAddEdit = () => {
     defaultValues: ruleSet,
   });
 
-  const bus = watch("bus");
+  const data_source = watch("data_source");
   const mode = watch("mode");
 
   const onSubmit = async (body: any) => {
     try {
       const response = await mutate({
-        method: "POST",
-        apiPath: "/v1/ruleset",
+        method: ruleSet?.id ? "PUT" : "POST",
+        apiPath: `/v1/ruleset/${ruleSet?.id || ""}`,
         body,
       });
       const id = response?.values?.id;
@@ -179,10 +179,10 @@ export const RuleSetAddEdit = () => {
             error={errors["name"]?.message || ""}
           />
           <FormSelect
-            name="bus"
-            label="Bus Type"
+            name="data_source"
+            label="Data Source"
             register={register}
-            error={errors["bus"]?.message || ""}
+            error={errors["data_source"]?.message || ""}
           >
             {BUSES.map((b: string, i: number) => (
               <option key={`bus-key-${i}`} value={b}>
@@ -202,7 +202,7 @@ export const RuleSetAddEdit = () => {
               </option>
             ))}
           </FormSelect>
-          {bus === "kafka" && (
+          {data_source === "kafka" && (
             <FormInput
               name="key"
               label="Message Topic"
@@ -211,7 +211,7 @@ export const RuleSetAddEdit = () => {
             />
           )}
 
-          {bus === "rabbitmq" && mode === "RULE_MODE_CONSUME" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_CONSUME" && (
             <FormInput
               name="queue_name"
               label="Queue Name"
@@ -219,7 +219,7 @@ export const RuleSetAddEdit = () => {
               error={errors["queue_name"]?.message || ""}
             />
           )}
-          {bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
             <FormInput
               name="exchange_name"
               label="Exchange Name"
@@ -227,7 +227,7 @@ export const RuleSetAddEdit = () => {
               error={errors["exchange_name"]?.message || ""}
             />
           )}
-          {bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
             <FormInput
               name="binding_key"
               label="Binding Key"

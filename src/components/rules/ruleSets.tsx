@@ -77,7 +77,7 @@ export const RuleSets = () => {
           <tr className="border-spacing-6">
             <TH>Name</TH>
             <TH>Mode</TH>
-            <TH>Bus</TH>
+            <TH>Data Source</TH>
             <TH>Key</TH>
             <TH className="text-center">Version</TH>
             <TH></TH>
@@ -90,7 +90,7 @@ export const RuleSets = () => {
                 <a href={`/ruleset/?id=${r.id}`}>{r.name}</a>
               </TD>
               <TD>{humanMode(r.mode)}</TD>
-              <TD>{r.bus}</TD>
+              <TD>{r.data_source}</TD>
               <TD>{r.key}</TD>
               <TD className="text-center">{r.version}</TD>
               <TD>
