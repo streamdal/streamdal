@@ -59,7 +59,7 @@ export const RuleSet = () => {
         </div>
       </div>
       <div className="pt-4 flex flex-col">
-        {Object.values(ruleSet?.rules).length
+        {ruleSet?.rules && Object.values(ruleSet?.rules)?.length
           ? Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
               <DisplayConfig
                 key={`rule-detail-${i}`}

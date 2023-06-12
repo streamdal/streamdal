@@ -32,9 +32,9 @@ const rulesetSchema = z
     baseSchema.extend({
       data_source: z.literal("rabbitmq"),
       mode: RuleSetModeSchema,
-      queue_name: z.string(),
-      exchange_name: z.string(),
-      binding_key: z.string(),
+      queue_name: z.string().optional(),
+      exchange_name: z.string().optional(),
+      binding_key: z.string().optional(),
     }),
   ])
   //
@@ -80,30 +80,30 @@ const rulesetSchema = z
   });
 
 export const RuleSetAddEdit = () => {
-  const [ruleSet, setRuleSet] = useState<any>({
-    name: "",
-    data_source: "kafka",
-    mode: "RULE_MODE_CONSUME",
-    key: "",
-    queue_name: "",
-    exchange_name: "",
-    binding_key: "",
-  });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [addError, setAddError] = useState<string>("");
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
-
   const {
     register,
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, defaultValues },
   } = useForm({
+    shouldUnregister: true,
     resolver: zodResolver(rulesetSchema),
-    defaultValues: ruleSet,
+    defaultValues: {
+      id: "",
+      name: "",
+      data_source: "kafka",
+      mode: "RULE_MODE_CONSUME",
+      key: "",
+      queue_name: "",
+      exchange_name: "",
+      binding_key: "",
+    },
   });
 
   const data_source = watch("data_source");
@@ -112,10 +112,11 @@ export const RuleSetAddEdit = () => {
   const onSubmit = async (body: any) => {
     try {
       const response = await mutate({
-        method: ruleSet?.id ? "PUT" : "POST",
-        apiPath: `/v1/ruleset/${ruleSet?.id || ""}`,
+        method: defaultValues?.id ? "PUT" : "POST",
+        apiPath: `/v1/ruleset/${defaultValues?.id || ""}`,
         body,
       });
+
       const id = response?.values?.id;
       window.location.href = id ? `/ruleset/?id=${id}` : "/";
     } catch (e: any) {
@@ -133,13 +134,10 @@ export const RuleSetAddEdit = () => {
       const set = await getJson(`/v1/ruleset/${id}`);
       const rules = await getJson(`/v1/ruleset/${id}/rules`);
 
-      const rSet = {
+      reset({
         ...set,
         ...{ rules },
-      };
-
-      setRuleSet(rSet);
-      reset(rSet);
+      });
     } catch {
       setError(RULESET_ERROR);
     }
@@ -165,7 +163,7 @@ export const RuleSetAddEdit = () => {
           <MonitorIcon className="mr-2 w-[14px]" />
           <span className="text-web">
             {id ? "Edit" : "Add"} Rule set{" "}
-            {ruleSet?.name ? ` - ${ruleSet.name}` : ""}
+            {defaultValues?.name ? ` - ${defaultValues?.name}` : ""}
           </span>
         </div>
       </div>
@@ -202,7 +200,7 @@ export const RuleSetAddEdit = () => {
               </option>
             ))}
           </FormSelect>
-          {data_source === "kafka" && (
+          {data_source !== "rabbitmq" && (
             <FormInput
               name="key"
               label="Message Topic"
@@ -235,13 +233,20 @@ export const RuleSetAddEdit = () => {
               error={errors["binding_key"]?.message || ""}
             />
           )}
+          <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
+            Rules
+          </span>
+          <div className="flex flex-col mb-4 rounded-sm border p-2">
+            ...coming soon...
+          </div>
+
           <input
             type="submit"
             disabled={isSubmitting}
             className={`flex justify-center btn-heimdal mt-2 ${
               isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
             }`}
-            value={ruleSet?.id ? "Edit Ruleset" : "Add Ruleset"}
+            value={defaultValues?.id ? "Edit Ruleset" : "Add Ruleset"}
           />
         </div>
       </form>
