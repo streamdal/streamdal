@@ -59,15 +59,26 @@ export const RuleSet = () => {
         </div>
       </div>
       <div className="pt-4 flex flex-col">
-        {Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
-          <DisplayConfig
-            key={`rule-detail-${i}`}
-            config={{
-              "Rule Config": r.RuleConfig,
-              "Failure Mode Config": r.FailureModeConfig,
-            }}
+        {Object.values(ruleSet?.rules).length
+          ? Object.values(ruleSet?.rules)?.map((r: any, i: number) => (
+              <DisplayConfig
+                key={`rule-detail-${i}`}
+                config={{
+                  "Rule Config": r.RuleConfig,
+                  "Failure Mode Config": r.FailureModeConfig,
+                }}
+              />
+            ))
+          : "No rules found - edit to add rules"}
+      </div>
+      <div className="w-full mt-4 flex justify-end">
+        <a href={`/ruleset/add?id=${ruleSet.id}`}>
+          <input
+            type="button"
+            className="flex justify-center btn-heimdal"
+            value="Edit Rule Set"
           />
-        ))}
+        </a>
       </div>
     </div>
   );

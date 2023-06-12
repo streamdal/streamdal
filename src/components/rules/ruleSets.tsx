@@ -79,7 +79,6 @@ export const RuleSets = () => {
             <TH>Mode</TH>
             <TH>Bus</TH>
             <TH>Key</TH>
-            <TH>Rules</TH>
             <TH className="text-center">Version</TH>
             <TH></TH>
           </tr>
@@ -93,7 +92,6 @@ export const RuleSets = () => {
               <TD>{humanMode(r.mode)}</TD>
               <TD>{r.bus}</TD>
               <TD>{r.key}</TD>
-              <TD>...coming soon...</TD>
               <TD className="text-center">{r.version}</TD>
               <TD>
                 <RuleSetMenu id={r.id} />

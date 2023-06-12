@@ -10,6 +10,7 @@ import * as z from "zod";
 import { FormInput } from "../form/formInput";
 import { FormSelect } from "../form/formSelect";
 import { titleCase } from "../../lib/utils";
+import { mutate } from "../../lib/mutation";
 
 export const MODES = ["RULE_MODE_CONSUME", "RULE_MODE_PUBLISH"] as const;
 const RuleSetModeSchema = z.enum(MODES);
@@ -25,7 +26,7 @@ const rulesetSchema = z
   .discriminatedUnion("bus", [
     baseSchema.extend({
       bus: z.literal("kafka"),
-      topic: z.string().min(1, { message: "Required" }),
+      key: z.string().min(1, { message: "Required" }),
       mode: RuleSetModeSchema,
     }),
     baseSchema.extend({
@@ -79,9 +80,18 @@ const rulesetSchema = z
   });
 
 export const RuleSetAddEdit = () => {
-  const [ruleSet, setRuleSet] = useState<any>(null);
+  const [ruleSet, setRuleSet] = useState<any>({
+    name: "",
+    bus: "kafka",
+    mode: "RULE_MODE_CONSUME",
+    key: "",
+    queue_name: "",
+    exchange_name: "",
+    binding_key: "",
+  });
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [addError, setAddError] = useState<string>("");
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
 
@@ -89,22 +99,29 @@ export const RuleSetAddEdit = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(rulesetSchema),
-    defaultValues: {
-      name: "",
-      bus: "kafka",
-      mode: "RULE_MODE_CONSUME",
-      topic: "",
-      queue_name: "",
-      exchange_name: "",
-      binding_key: "",
-    },
+    defaultValues: ruleSet,
   });
 
   const bus = watch("bus");
   const mode = watch("mode");
+
+  const onSubmit = async (body: any) => {
+    try {
+      const response = await mutate({
+        method: "POST",
+        apiPath: "/v1/ruleset",
+        body,
+      });
+      const id = response?.values?.id;
+      window.location.href = id ? `/ruleset/?id=${id}` : "/";
+    } catch (e: any) {
+      setAddError(e.toString());
+    }
+  };
 
   const getData = async () => {
     if (!id) {
@@ -116,12 +133,15 @@ export const RuleSetAddEdit = () => {
       const set = await getJson(`/v1/ruleset/${id}`);
       const rules = await getJson(`/v1/ruleset/${id}/rules`);
 
-      setRuleSet({
+      const rSet = {
         ...set,
         ...{ rules },
-      });
+      };
+
+      setRuleSet(rSet);
+      reset(rSet);
     } catch {
-      setError(true);
+      setError(RULESET_ERROR);
     }
     setLoading(false);
   };
@@ -135,7 +155,7 @@ export const RuleSetAddEdit = () => {
   }
 
   if (error) {
-    return <Error error={RULESET_ERROR} />;
+    return <Error error={error} />;
   }
 
   return (
@@ -149,7 +169,8 @@ export const RuleSetAddEdit = () => {
           </span>
         </div>
       </div>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {addError ? <Error error={addError} /> : null}
         <div className="pt-4 flex flex-col justify-start max-w-lg">
           <FormInput
             name="name"
@@ -183,10 +204,10 @@ export const RuleSetAddEdit = () => {
           </FormSelect>
           {bus === "kafka" && (
             <FormInput
-              name="topic"
+              name="key"
               label="Message Topic"
               register={register}
-              error={errors["topic"]?.message || ""}
+              error={errors["key"]?.message || ""}
             />
           )}
 
@@ -216,8 +237,11 @@ export const RuleSetAddEdit = () => {
           )}
           <input
             type="submit"
-            className="flex justify-center btn-heimdal mt-2"
-            value="Add"
+            disabled={isSubmitting}
+            className={`flex justify-center btn-heimdal mt-2 ${
+              isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            value={ruleSet?.id ? "Edit Ruleset" : "Add Ruleset"}
           />
         </div>
       </form>
