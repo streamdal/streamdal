@@ -10,6 +10,7 @@ import * as z from "zod";
 import { FormInput } from "../form/formInput";
 import { FormSelect } from "../form/formSelect";
 import { titleCase } from "../../lib/utils";
+import { mutate } from "../../lib/mutation";
 
 export const MODES = ["RULE_MODE_CONSUME", "RULE_MODE_PUBLISH"] as const;
 const RuleSetModeSchema = z.enum(MODES);
@@ -22,26 +23,26 @@ const baseSchema = z.object({
 });
 
 const rulesetSchema = z
-  .discriminatedUnion("bus", [
+  .discriminatedUnion("data_source", [
     baseSchema.extend({
-      bus: z.literal("kafka"),
-      topic: z.string().min(1, { message: "Required" }),
+      data_source: z.literal("kafka"),
+      key: z.string().min(1, { message: "Required" }),
       mode: RuleSetModeSchema,
     }),
     baseSchema.extend({
-      bus: z.literal("rabbitmq"),
+      data_source: z.literal("rabbitmq"),
       mode: RuleSetModeSchema,
-      queue_name: z.string(),
-      exchange_name: z.string(),
-      binding_key: z.string(),
+      queue_name: z.string().optional(),
+      exchange_name: z.string().optional(),
+      binding_key: z.string().optional(),
     }),
   ])
   //
   // This kind of sucks but discriminated unions are deprecated so I don't
   // want to waste too much time figuring it out. There is a new switch api coming soon.
-  .superRefine(({ bus, mode, ...others }, ctx) => {
+  .superRefine(({ data_source, mode, ...others }, ctx) => {
     if (
-      bus === "rabbitmq" &&
+      data_source === "rabbitmq" &&
       mode === "RULE_MODE_CONSUME" &&
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -55,7 +56,7 @@ const rulesetSchema = z
       });
     }
 
-    if (bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH") {
+    if (data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH") {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       !others.exchange_name &&
@@ -79,32 +80,49 @@ const rulesetSchema = z
   });
 
 export const RuleSetAddEdit = () => {
-  const [ruleSet, setRuleSet] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [addError, setAddError] = useState<string>("");
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
-
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting, defaultValues },
   } = useForm({
+    shouldUnregister: true,
     resolver: zodResolver(rulesetSchema),
     defaultValues: {
+      id: "",
       name: "",
-      bus: "kafka",
+      data_source: "kafka",
       mode: "RULE_MODE_CONSUME",
-      topic: "",
+      key: "",
       queue_name: "",
       exchange_name: "",
       binding_key: "",
     },
   });
 
-  const bus = watch("bus");
+  const data_source = watch("data_source");
   const mode = watch("mode");
+
+  const onSubmit = async (body: any) => {
+    try {
+      const response = await mutate({
+        method: defaultValues?.id ? "PUT" : "POST",
+        apiPath: `/v1/ruleset/${defaultValues?.id || ""}`,
+        body,
+      });
+
+      const id = response?.values?.id;
+      window.location.href = id ? `/ruleset/?id=${id}` : "/";
+    } catch (e: any) {
+      setAddError(e.toString());
+    }
+  };
 
   const getData = async () => {
     if (!id) {
@@ -116,12 +134,12 @@ export const RuleSetAddEdit = () => {
       const set = await getJson(`/v1/ruleset/${id}`);
       const rules = await getJson(`/v1/ruleset/${id}/rules`);
 
-      setRuleSet({
+      reset({
         ...set,
         ...{ rules },
       });
     } catch {
-      setError(true);
+      setError(RULESET_ERROR);
     }
     setLoading(false);
   };
@@ -135,7 +153,7 @@ export const RuleSetAddEdit = () => {
   }
 
   if (error) {
-    return <Error error={RULESET_ERROR} />;
+    return <Error error={error} />;
   }
 
   return (
@@ -145,11 +163,12 @@ export const RuleSetAddEdit = () => {
           <MonitorIcon className="mr-2 w-[14px]" />
           <span className="text-web">
             {id ? "Edit" : "Add"} Rule set{" "}
-            {ruleSet?.name ? ` - ${ruleSet.name}` : ""}
+            {defaultValues?.name ? ` - ${defaultValues?.name}` : ""}
           </span>
         </div>
       </div>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {addError ? <Error error={addError} /> : null}
         <div className="pt-4 flex flex-col justify-start max-w-lg">
           <FormInput
             name="name"
@@ -158,10 +177,10 @@ export const RuleSetAddEdit = () => {
             error={errors["name"]?.message || ""}
           />
           <FormSelect
-            name="bus"
-            label="Bus Type"
+            name="data_source"
+            label="Data Source"
             register={register}
-            error={errors["bus"]?.message || ""}
+            error={errors["data_source"]?.message || ""}
           >
             {BUSES.map((b: string, i: number) => (
               <option key={`bus-key-${i}`} value={b}>
@@ -181,16 +200,16 @@ export const RuleSetAddEdit = () => {
               </option>
             ))}
           </FormSelect>
-          {bus === "kafka" && (
+          {data_source !== "rabbitmq" && (
             <FormInput
-              name="topic"
+              name="key"
               label="Message Topic"
               register={register}
-              error={errors["topic"]?.message || ""}
+              error={errors["key"]?.message || ""}
             />
           )}
 
-          {bus === "rabbitmq" && mode === "RULE_MODE_CONSUME" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_CONSUME" && (
             <FormInput
               name="queue_name"
               label="Queue Name"
@@ -198,7 +217,7 @@ export const RuleSetAddEdit = () => {
               error={errors["queue_name"]?.message || ""}
             />
           )}
-          {bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
             <FormInput
               name="exchange_name"
               label="Exchange Name"
@@ -206,7 +225,7 @@ export const RuleSetAddEdit = () => {
               error={errors["exchange_name"]?.message || ""}
             />
           )}
-          {bus === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
+          {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
             <FormInput
               name="binding_key"
               label="Binding Key"
@@ -214,10 +233,20 @@ export const RuleSetAddEdit = () => {
               error={errors["binding_key"]?.message || ""}
             />
           )}
+          <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
+            Rules
+          </span>
+          <div className="flex flex-col mb-4 rounded-sm border p-2">
+            ...coming soon...
+          </div>
+
           <input
             type="submit"
-            className="flex justify-center btn-heimdal mt-2"
-            value="Add"
+            disabled={isSubmitting}
+            className={`flex justify-center btn-heimdal mt-2 ${
+              isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            value={defaultValues?.id ? "Edit Ruleset" : "Add Ruleset"}
           />
         </div>
       </form>

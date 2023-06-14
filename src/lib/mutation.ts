@@ -19,5 +19,18 @@ export const mutate = async ({
     return response.json();
   }
 
-  throw Error("operation failed");
+  let errorMessage = "Operation failed: ";
+
+  try {
+    const errorBody = await response.json();
+    errorMessage += errorBody?.message
+      ? errorBody.message
+      : "with unknown error";
+  } catch (e) {
+    errorMessage += "with unknown error";
+  }
+
+  console.error(`API mutation error for ${apiPath}`, errorMessage);
+
+  throw Error(errorMessage);
 };
