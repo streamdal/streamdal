@@ -146,7 +146,10 @@ export const RuleSetAddEdit = () => {
     }
 
     try {
-      const { rules: shit, ...set } = await getJson(`/v1/ruleset/${id}`);
+      //
+      // rules passes back on the ruleset don't match the shape of the
+      // rules call so I'm ignoring them
+      const { rules: ignore, ...set } = await getJson(`/v1/ruleset/${id}`);
       const rulesData = await getJson(`/v1/ruleset/${id}/rules`);
       const mappedRules = Object.values(rulesData)?.map((r: any) => ({
         id: r?.id,
