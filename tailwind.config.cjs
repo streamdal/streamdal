@@ -55,7 +55,7 @@ module.exports = {
 						background: "linear-gradient(96.41deg, #FF7D68 -16.36%, #FFB9AD 101.19%)",
 					},
 				},
-				".btn-cancel": {
+				".btn-secondary": {
 					width: "100px",
 					height: "47px",
 					borderRadius: "4px",

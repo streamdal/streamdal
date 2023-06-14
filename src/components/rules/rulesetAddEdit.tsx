@@ -10,6 +10,7 @@ import * as z from "zod";
 import { FormInput } from "../form/formInput";
 import { FormSelect } from "../form/formSelect";
 import { titleCase } from "../../lib/utils";
+import { RuleAddEdit } from "./rule/addEdit";
 import { mutate } from "../../lib/mutation";
 
 export const MODES = ["RULE_MODE_CONSUME", "RULE_MODE_PUBLISH"] as const;
@@ -20,6 +21,7 @@ export const BUSES = ["rabbitmq", "kafka"] as const;
 const baseSchema = z.object({
   name: z.string().min(1, { message: "Required" }),
   mode: RuleSetModeSchema,
+  rules: z.any(),
 });
 
 const rulesetSchema = z
@@ -79,10 +81,25 @@ const rulesetSchema = z
     }
   });
 
+//
+// react-hooks-form doesn't play great with inferred zod schema types, so just stubbing it out
+type RuleSetFormType = {
+  id?: string;
+  name: string;
+  mode: string;
+  data_source: string;
+  key?: string;
+  queue_name?: string;
+  exchange_name?: string;
+  binding_key?: string;
+  rules?: any;
+};
+
 export const RuleSetAddEdit = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [addError, setAddError] = useState<string>("");
+  const [rules, setRules] = useState<any>(null);
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
   const {
@@ -90,19 +107,17 @@ export const RuleSetAddEdit = () => {
     handleSubmit,
     watch,
     reset,
+    control,
     formState: { errors, isSubmitting, defaultValues },
-  } = useForm({
+  } = useForm<RuleSetFormType>({
+    reValidateMode: "onBlur",
     shouldUnregister: true,
     resolver: zodResolver(rulesetSchema),
     defaultValues: {
-      id: "",
       name: "",
       data_source: "kafka",
       mode: "RULE_MODE_CONSUME",
-      key: "",
-      queue_name: "",
-      exchange_name: "",
-      binding_key: "",
+      rules: [],
     },
   });
 
@@ -131,12 +146,34 @@ export const RuleSetAddEdit = () => {
     }
 
     try {
-      const set = await getJson(`/v1/ruleset/${id}`);
-      const rules = await getJson(`/v1/ruleset/${id}/rules`);
+      //
+      // rules passes back on the ruleset don't match the shape of the
+      // rules call so I'm ignoring them
+      const { rules: ignore, ...set } = await getJson(`/v1/ruleset/${id}`);
+      const rulesData = await getJson(`/v1/ruleset/${id}/rules`);
+      const mappedRules = Object.values(rulesData)?.map((r: any) => ({
+        id: r?.id,
+        failure_mode_configs: r?.failure_mode_configs,
+        match_config: r?.RuleConfig?.MatchConfig,
+      }));
+
+      //
+      setRules(
+        mappedRules?.map((r: any, i: number) => (
+          <RuleAddEdit
+            key={`rule-key-${i}`}
+            index={i}
+            control={control}
+            rule={r}
+            register={register}
+            errors={errors}
+          />
+        ))
+      );
 
       reset({
+        rules: mappedRules,
         ...set,
-        ...{ rules },
       });
     } catch {
       setError(RULESET_ERROR);
@@ -236,8 +273,35 @@ export const RuleSetAddEdit = () => {
           <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
             Rules
           </span>
-          <div className="flex flex-col mb-4 rounded-sm border p-2">
-            ...coming soon...
+          <div className="flex flex-col mb-4 rounded-sm border p-2 text-[14px] font-medium leading-[18px] ">
+            {rules?.length ? (
+              rules.map((r: any) => r)
+            ) : (
+              <div className="py-2 border-b">No rules found</div>
+            )}
+            <div className="w-full mt-2 flex justify-end">
+              <input
+                type="button"
+                className="flex justify-center btn-secondary h-10 cursor-pointer"
+                value="+ Add Rule"
+                onClick={() =>
+                  setRules([
+                    ...rules,
+                    <RuleAddEdit
+                      key={`rule-key-${rules.length}`}
+                      index={rules.length}
+                      control={control}
+                      rule={{
+                        failure_mode_configs: {},
+                        match_config: { type: "string_contains_any" },
+                      }}
+                      register={register}
+                      errors={errors}
+                    />,
+                  ])
+                }
+              />
+            </div>
           </div>
 
           <input
@@ -246,7 +310,7 @@ export const RuleSetAddEdit = () => {
             className={`flex justify-center btn-heimdal mt-2 ${
               isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
             }`}
-            value={defaultValues?.id ? "Edit Ruleset" : "Add Ruleset"}
+            value={defaultValues?.id ? "Save Ruleset" : "Add Ruleset"}
           />
         </div>
       </form>

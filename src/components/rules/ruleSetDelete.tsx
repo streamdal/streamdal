@@ -97,7 +97,7 @@ export const RuleSetDelete = () => {
               </button>
               <button
                 type="button"
-                className="btn-cancel"
+                className="btn-secondary"
                 onClick={() => window.history.back()}
               >
                 Cancel
