@@ -121,6 +121,22 @@ export const RuleSetAddEdit = () => {
     },
   });
 
+  const removeRule = (i: number) => () =>
+    setRules(rules?.filter((a: any, index: number) => i !== index));
+
+  const buildRule = (r: any, i: number) => (
+    <div className="border-b" key={`rule-key-${i}`}>
+      <RuleAddEdit
+        index={i}
+        control={control}
+        rule={r}
+        register={register}
+        errors={errors}
+        remove={removeRule(i)}
+      />
+    </div>
+  );
+
   const data_source = watch("data_source");
   const mode = watch("mode");
 
@@ -157,19 +173,7 @@ export const RuleSetAddEdit = () => {
         match_config: r?.RuleConfig?.MatchConfig,
       }));
 
-      //
-      setRules(
-        mappedRules?.map((r: any, i: number) => (
-          <RuleAddEdit
-            key={`rule-key-${i}`}
-            index={i}
-            control={control}
-            rule={r}
-            register={register}
-            errors={errors}
-          />
-        ))
-      );
+      setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
 
       reset({
         rules: mappedRules,
@@ -273,7 +277,7 @@ export const RuleSetAddEdit = () => {
           <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
             Rules
           </span>
-          <div className="flex flex-col mb-4 rounded-sm border p-2 text-[14px] font-medium leading-[18px] ">
+          <div className="flex flex-col mb-4 rounded-sm border px-2 pb-2 text-[14px] font-medium leading-[18px] ">
             {rules?.length ? (
               rules.map((r: any) => r)
             ) : (
@@ -286,18 +290,14 @@ export const RuleSetAddEdit = () => {
                 value="+ Add Rule"
                 onClick={() =>
                   setRules([
-                    ...rules,
-                    <RuleAddEdit
-                      key={`rule-key-${rules.length}`}
-                      index={rules.length}
-                      control={control}
-                      rule={{
+                    ...(rules ? rules : []),
+                    buildRule(
+                      {
                         failure_mode_configs: {},
                         match_config: { type: "string_contains_any" },
-                      }}
-                      register={register}
-                      errors={errors}
-                    />,
+                      },
+                      rules?.length || 0
+                    ),
                   ])
                 }
               />

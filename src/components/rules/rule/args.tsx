@@ -21,7 +21,7 @@ export const RuleArgs = ({
   ]);
 
   return (
-    <div className="flex flex-col mb-4">
+    <div className="flex flex-col">
       <div className="mb-2 text-stormCloud font-medium text-[14px] leading-[18px]">
         Args
       </div>
@@ -34,7 +34,7 @@ export const RuleArgs = ({
             {a}
             {args.length > 1 && (
               <XMarkIcon
-                className="ml-2 text-web w-[22px] cursor-pointer"
+                className="ml-2 text-stormCloud w-[20px] cursor-pointer"
                 onClick={() =>
                   setArgs(args.filter((a: any, index: number) => i !== index))
                 }
