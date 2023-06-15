@@ -44,23 +44,29 @@ export const FailureModes = ({
       <div className="text-stormCloud font-medium text-[14px] leading-[18px]">
         Failure Modes
       </div>
-      <div className="flex flex-col my-2 border rounded-sm px-2">
-        {modes?.map((m: any, i: number) => (
-          <div
-            className="flex flex-row justify-between items-start w-full border-b"
-            key={`failure-modes-key-${i}`}
-          >
-            {m}
-            {modes.length > 1 && (
-              <XMarkIcon
-                className="ml-2 mt-2 text-stormCloud w-[20px] cursor-pointer"
-                onClick={() =>
-                  setModes(modes.filter((a: any, index: number) => i !== index))
-                }
-              />
-            )}
-          </div>
-        ))}
+      <div className="flex flex-col my-2 border rounded-sm">
+        {modes?.length ? (
+          modes?.map((m: any, i: number) => (
+            <div className="border-b" key={`failure-modes-key-${i}`}>
+              <div className="flex flex-row justify-between text-stormCloud font-medium text-[14px] leading-[18px] bg-sunset p-2">
+                Failure Mode {i + 1}.
+                <XMarkIcon
+                  className="text-stormCloud w-[20px] cursor-pointer"
+                  onClick={() =>
+                    setModes(
+                      modes.filter((a: any, index: number) => i !== index)
+                    )
+                  }
+                />
+              </div>
+              <div className="flex flex-row justify-between items-start w-full px-2">
+                {m}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="p-2 border-b">No failure modes found</div>
+        )}
         <div className="w-full my-2 flex justify-end">
           <input
             type="button"

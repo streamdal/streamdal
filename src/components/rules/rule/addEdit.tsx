@@ -14,6 +14,16 @@ export const RULE_TYPE_MATCH: MATCH_TYPE = {
   ip_address: { display: "IP Address" },
   regex: { display: "Regex" },
   ts_rfc3339: { display: "Timestamp (RFC3339)" },
+  ts_unix_nano: { display: "Timestamp (Unix Nano)" },
+  ts_unix: { display: "Timestamp (Unix)" },
+  true: { display: "Is True" },
+  false: { display: "Is False" },
+  is_empty: { display: "Is Empty" },
+  pii: { display: "PII (all known types)" },
+  pii_creditcard: { display: "PII Credit Card" },
+  pii_ssn: { display: "PII Social Security Number" },
+  pii_email: { display: "PII Email" },
+  pii_phone: { display: "PII Phone" },
 };
 
 export type RULE_TYPE = {
@@ -48,15 +58,15 @@ export const RuleAddEdit = ({
   const type = watchType || rule?.match_config?.type;
 
   return (
-    <div className="flex flex-col justify-start align-top my-2 mx-1">
-      <div className="flex flex-row justify-between text-stormCloud font-medium text-[14px] leading-[18px]">
-        {index + 1}.
+    <div className="flex flex-col justify-start align-top">
+      <div className="flex flex-row justify-between text-stormCloud font-medium text-[14px] leading-[18px] bg-sunset p-2">
+        Rule {index + 1}.
         <XMarkIcon
           className="text-stormCloud w-[20px] cursor-pointer"
           onClick={remove}
         />
       </div>
-      <div className="pt-2 w-full">
+      <div className="p-2 w-full">
         {rule?.id && (
           <FormHidden
             name={`rules[${index}][id]`}

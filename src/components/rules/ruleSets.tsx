@@ -87,7 +87,7 @@ export const RuleSets = () => {
           {Object.values(ruleSets)?.map((r: any, i: number) => (
             <tr key={`ruleset-table-${i}`}>
               <TD>
-                <a href={`/ruleset/?id=${r.id}`}>{r.name}</a>
+                <a href={`/ruleset?id=${r.id}`}>{r.name}</a>
               </TD>
               <TD>{humanMode(r.mode)}</TD>
               <TD>{r.data_source}</TD>
@@ -101,7 +101,7 @@ export const RuleSets = () => {
         </tbody>
       </table>
       <div className="w-full mt-4 flex justify-end">
-        <a href="/ruleset/add">
+        <a href="/ruleset">
           <input
             type="button"
             className="flex justify-center btn-heimdal"
