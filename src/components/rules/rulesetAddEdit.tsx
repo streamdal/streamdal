@@ -125,7 +125,7 @@ export const RuleSetAddEdit = () => {
     setRules(rules?.filter((a: any, index: number) => i !== index));
 
   const buildRule = (r: any, i: number) => (
-    <div className="border-b" key={`rule-key-${i}`}>
+    <div className={`border-b`} key={`rule-key-${i}`}>
       <RuleAddEdit
         index={i}
         control={control}
@@ -162,17 +162,10 @@ export const RuleSetAddEdit = () => {
     }
 
     try {
+      const { rules: unmapped, ...set } = await getJson(`/v1/ruleset/${id}`);
       //
-      // rules passes back on the ruleset don't match the shape of the
-      // rules call so I'm ignoring them
-      const { rules: ignore, ...set } = await getJson(`/v1/ruleset/${id}`);
-      const rulesData = await getJson(`/v1/ruleset/${id}/rules`);
-      const mappedRules = Object.values(rulesData)?.map((r: any) => ({
-        id: r?.id,
-        failure_mode_configs: r?.failure_mode_configs,
-        match_config: r?.RuleConfig?.MatchConfig,
-      }));
-
+      // rules are passed back as an object, converting to array for convenience
+      const mappedRules = Object.values(unmapped);
       setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
 
       reset({
