@@ -5,7 +5,7 @@ import { FormInput } from "../../form/formInput";
 import { RuleArgs } from "./args";
 import { useWatch } from "react-hook-form";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-
+import { FailureModes } from "./failureModes";
 export type MATCH_TYPE = { [key in string]: { display: string } };
 
 export const RULE_TYPE_MATCH: MATCH_TYPE = {
@@ -92,6 +92,13 @@ export const RuleAddEdit = ({
         {["string_contains_any", "string_contains_all", "regex"].includes(
           type
         ) && <RuleArgs ruleIndex={index} register={register} errors={errors} />}
+        <FailureModes
+          rule={rule}
+          register={register}
+          control={control}
+          errors={errors}
+          ruleIndex={index}
+        />
       </div>
     </div>
   );

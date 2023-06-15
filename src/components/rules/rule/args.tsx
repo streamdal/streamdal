@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RuleArg } from "./arg";
-import { EyeIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export const RuleArgs = ({
   register,
@@ -21,9 +21,9 @@ export const RuleArgs = ({
   ]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mb-2">
       <div className="mb-2 text-stormCloud font-medium text-[14px] leading-[18px]">
-        Args
+        Field Match Args
       </div>
       <div className="flex flex-col mb-2 border rounded-sm px-2">
         {args.map((a, i) => (
