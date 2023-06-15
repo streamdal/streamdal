@@ -1,10 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { RuleSet } from "../../components/rules/ruleSet";
+import { RuleSetAddEdit } from "../../components/rules/rulesetAddEdit";
 ---
 
-<Layout title="Streamdal Embedded Console - Ruleset">
+<Layout title="Streamdal Embedded Console - Ruleset Add">
   <main>
-    <RuleSet client:load client:only />
+    <RuleSetAddEdit client:load client:only />
   </main>
 </Layout>

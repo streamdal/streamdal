@@ -4,8 +4,8 @@ import { getJson } from "../../lib/fetch";
 import { Error } from "../errors/error";
 import { Delete } from "../icons/crud";
 import { mutate } from "../../lib/mutation";
+import { RULESET_ERROR } from "./rulesetAddEdit";
 
-const RULESET_ERROR = "Ruleset not found!";
 const RULESET_DELETE_ERROR = "There was a problem deleting the ruleset!";
 
 export const RuleSetDelete = () => {

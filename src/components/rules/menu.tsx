@@ -17,33 +17,16 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
         <div className="p-2 pb-1">
           <Menu.Item>
             {({ active }) => (
-              <a href={`/ruleset/?id=${id}`}>
+              <a href={`/ruleset?id=${id}`}>
                 <button
                   className={`${
                     active ? "bg-sunset" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  <EyeIcon
-                    className="mr-2 text-web w-[14px]"
-                    aria-hidden="true"
-                  />
-                  View
+                  <Edit className="mr-2 text-web" aria-hidden="true" />
+                  View/Edit
                 </button>
               </a>
-            )}
-          </Menu.Item>
-        </div>
-        <div className="p-2 pb-1">
-          <Menu.Item>
-            {({ active }) => (
-              <button
-                className={`${
-                  active ? "bg-sunset" : ""
-                } group flex w-full items-center rounded-md px-2 py-2 text-sm cursor-not-allowed`}
-              >
-                <Edit className="mr-2 text-web" aria-hidden="true" />
-                Edit
-              </button>
             )}
           </Menu.Item>
         </div>

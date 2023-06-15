@@ -3,7 +3,6 @@ import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
 import { Error } from "../errors/error";
 import { MonitorIcon } from "../icons/streamdal";
-import { RULESET_ERROR } from "./ruleSet";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,6 +11,9 @@ import { FormSelect } from "../form/formSelect";
 import { titleCase } from "../../lib/utils";
 import { RuleAddEdit } from "./rule/addEdit";
 import { mutate } from "../../lib/mutation";
+import { v4 as uuidv4 } from "uuid";
+
+export const RULESET_ERROR = "Ruleset not found!";
 
 export const MODES = ["RULE_MODE_CONSUME", "RULE_MODE_PUBLISH"] as const;
 const RuleSetModeSchema = z.enum(MODES);
@@ -141,11 +143,40 @@ export const RuleSetAddEdit = () => {
   const mode = watch("mode");
 
   const onSubmit = async (body: any) => {
+    //
+    // Extract all the parts we need to transform to make the API happy
+    const {
+      rules: rawRules,
+      exchange_name,
+      binding_key,
+      queue_name,
+      ...set
+    } = body;
+
+    const rules = rawRules.reduce((ruleObj: any, rule: any) => {
+      ruleObj[rule.id ? rule.id : uuidv4()] = {
+        ...rule,
+        failure_mode_configs: rule.failure_mode_configs.map((f: any) => ({
+          ...f,
+          ...(f.mode === "RULE_FAILURE_MODE_REJECT" ? { reject: {} } : {}),
+        })),
+      };
+      return ruleObj;
+    }, {});
+
+    const mapped = {
+      ...set,
+      rules,
+      ...(queue_name && { key: queue_name }),
+      ...(exchange_name &&
+        binding_key && { key: `${exchange_name}|${binding_key}` }),
+    };
+
     try {
       const response = await mutate({
         method: defaultValues?.id ? "PUT" : "POST",
         apiPath: `/v1/ruleset/${defaultValues?.id || ""}`,
-        body,
+        body: mapped,
       });
 
       const id = response?.values?.id;
@@ -162,17 +193,35 @@ export const RuleSetAddEdit = () => {
     }
 
     try {
-      const { rules: unmapped, ...set } = await getJson(`/v1/ruleset/${id}`);
+      const {
+        rules: unmapped,
+        key,
+        ...set
+      } = await getJson(`/v1/ruleset/${id}`);
+
       //
       // rules are passed back as an object, converting to array for convenience
       const mappedRules = Object.values(unmapped);
       setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
 
       reset({
-        rules: mappedRules,
         ...set,
+        rules: mappedRules,
+        ...(key &&
+        set.data_source === "rabbitmq" &&
+        set.mode === "RULE_MODE_PUBLISH"
+          ? {
+              exchange_name: key.substring(0, key.indexOf("|")),
+              binding_key: key.substring(key.indexOf("|") + 1),
+            }
+          : key &&
+            set.data_source === "rabbitmq" &&
+            set.mode === "RULE_MODE_CONSUME"
+          ? { queue_name: key }
+          : { key }),
       });
-    } catch {
+    } catch (e: any) {
+      console.error("Error loading ruleset", e);
       setError(RULESET_ERROR);
     }
     setLoading(false);
@@ -270,11 +319,11 @@ export const RuleSetAddEdit = () => {
           <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
             Rules
           </span>
-          <div className="flex flex-col mb-4 rounded-sm border px-2 pb-2 text-[14px] font-medium leading-[18px] ">
+          <div className="flex flex-col mb-4 rounded-sm border pb-2 text-[14px] font-medium leading-[18px] ">
             {rules?.length ? (
               rules.map((r: any) => r)
             ) : (
-              <div className="py-2 border-b">No rules found</div>
+              <div className="p-2 border-b">No rules found</div>
             )}
             <div className="w-full mt-2 flex justify-end">
               <input
