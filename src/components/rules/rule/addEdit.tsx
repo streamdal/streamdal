@@ -4,6 +4,7 @@ import { FormHidden } from "../../form/formHidden";
 import { FormInput } from "../../form/formInput";
 import { RuleArgs } from "./args";
 import { useWatch } from "react-hook-form";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export type MATCH_TYPE = { [key in string]: { display: string } };
 
@@ -27,12 +28,14 @@ export const RuleAddEdit = ({
   register,
   errors,
   index,
+  remove,
 }: {
   control: any;
   rule: any;
   register: any;
   errors: any;
   index: number;
+  remove: any;
 }) => {
   const watchType = useWatch({
     control,
@@ -45,9 +48,13 @@ export const RuleAddEdit = ({
   const type = watchType || rule?.match_config?.type;
 
   return (
-    <div className="flex flex-row justify-start align-top border-b">
-      <div className="p-2 text-stormCloud font-medium text-[14px] leading-[18px]">
+    <div className="flex flex-col justify-start align-top my-2 mx-1">
+      <div className="flex flex-row justify-between text-stormCloud font-medium text-[14px] leading-[18px]">
         {index + 1}.
+        <XMarkIcon
+          className="text-stormCloud w-[20px] cursor-pointer"
+          onClick={remove}
+        />
       </div>
       <div className="pt-2 w-full">
         {rule?.id && (
