@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SlackIntegration } from "../components/slack/slack";
+---
+
+<Layout title="Streamdal Embedded Console - Slack Integration">
+  <main>
+    <SlackIntegration client:load client:only />
+  </main>
+</Layout>

@@ -1,8 +1,9 @@
 import type { MATCH_TYPE } from "./addEdit";
 import { FormSelect } from "../../form/formSelect";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { FormInput } from "../../form/formInput";
+import { getJson } from "../../../lib/fetch";
 
 export const FAILURE_MODE_TYPE: MATCH_TYPE = {
   RULE_FAILURE_MODE_UNSET: { display: "Unset" },
@@ -32,11 +33,24 @@ export const FailureMode = ({
   errors: any;
   index: number;
 }) => {
+  const [slackConfigured, setSlackConfigured] = useState(false);
   const watchMode = useWatch({
     control,
     name: `rules[${ruleIndex}].failure_mode_configs[${index}].mode]`,
   });
 
+  const checkSlack = async () => {
+    try {
+      const response = await getJson(`/v1/slack`);
+      setSlackConfigured(!!response?.values?.token);
+    } catch {
+      setSlackConfigured(false);
+    }
+  };
+
+  useEffect(() => {
+    checkSlack();
+  }, []);
   //
   // Shenanigans: I don't know how to make react-hooks-form watch initial value on
   // dynamic fields
@@ -57,15 +71,26 @@ export const FailureMode = ({
         ))}
       </FormSelect>
       {mode === "RULE_FAILURE_MODE_ALERT_SLACK" && (
-        <FormInput
-          name={`rules[${ruleIndex}].failure_mode_configs[${index}].alert_slack[slack_channel]]`}
-          label="Slack Channel"
-          register={register}
-          error={
-            errors["failure_mode_configs.alert_slack.slack_channel"]?.message ||
-            ""
-          }
-        />
+        <div className="flex flex-col">
+          <FormInput
+            name={`rules[${ruleIndex}].failure_mode_configs[${index}].alert_slack[slack_channel]]`}
+            label="Slack Channel"
+            register={register}
+            error={
+              errors["failure_mode_configs.alert_slack.slack_channel"]
+                ?.message || ""
+            }
+          />
+          {slackConfigured ? null : (
+            <div className="mb-4">
+              In order to receive Slack Alerts, you must configure Slack{" "}
+              <a href="/slack" className="underline underline-offset-1">
+                here
+              </a>
+              .
+            </div>
+          )}
+        </div>
       )}
       {mode === "RULE_FAILURE_MODE_DLQ" && (
         <FormInput
