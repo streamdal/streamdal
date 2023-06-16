@@ -6,7 +6,7 @@ import { MonitorIcon } from "../icons/streamdal";
 import { useEffect, useState } from "react";
 import { getJson } from "../../lib/fetch";
 import { Loading } from "../icons/nav";
-import { Error } from "../errors/error";
+import { Error } from "../status/error";
 
 const RULESETS_ERROR = "There was a problem loading Rulesets";
 

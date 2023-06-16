@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
-import { Error } from "../errors/error";
+import { Error } from "../status/error";
 import { MonitorIcon } from "../icons/streamdal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,7 @@ import { titleCase } from "../../lib/utils";
 import { RuleAddEdit } from "./rule/addEdit";
 import { mutate } from "../../lib/mutation";
 import { v4 as uuidv4 } from "uuid";
+import { Success } from "../status/success";
 
 export const RULESET_ERROR = "Ruleset not found!";
 
@@ -100,6 +101,7 @@ type RuleSetFormType = {
 export const RuleSetAddEdit = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [success, setSucces] = useState<boolean>(false);
   const [addError, setAddError] = useState<string>("");
   const [rules, setRules] = useState<any>(null);
   const params = new URLSearchParams(document.location.search);
@@ -153,7 +155,7 @@ export const RuleSetAddEdit = () => {
       ...set
     } = body;
 
-    const rules = rawRules.reduce((ruleObj: any, rule: any) => {
+    const rules = rawRules?.reduce((ruleObj: any, rule: any) => {
       ruleObj[rule.id ? rule.id : uuidv4()] = {
         ...rule,
         failure_mode_configs: rule.failure_mode_configs.map((f: any) => ({
@@ -179,8 +181,12 @@ export const RuleSetAddEdit = () => {
         body: mapped,
       });
 
+      setSucces(true);
+
       const id = response?.values?.id;
-      window.location.href = id ? `/ruleset/?id=${id}` : "/";
+      if (id) {
+        window.location.href = `/ruleset?id=${id}`;
+      }
     } catch (e: any) {
       setAddError(e.toString());
     }
@@ -230,6 +236,15 @@ export const RuleSetAddEdit = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (success) {
+      const toRef = setTimeout(() => {
+        setSucces(false);
+        clearTimeout(toRef);
+      }, 4000);
+    }
+  }, [success]);
 
   if (loading) {
     return <Loading />;
@@ -346,14 +361,17 @@ export const RuleSetAddEdit = () => {
             </div>
           </div>
 
-          <input
-            type="submit"
-            disabled={isSubmitting}
-            className={`flex justify-center btn-heimdal mt-2 ${
-              isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
-            }`}
-            value={defaultValues?.id ? "Save Ruleset" : "Add Ruleset"}
-          />
+          <div className="flex flex-row justify-start align-middle">
+            <input
+              type="submit"
+              disabled={isSubmitting}
+              className={`flex justify-center btn-heimdal mr-4 ${
+                isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+              }`}
+              value={defaultValues?.id ? "Save Ruleset" : "Add Ruleset"}
+            />
+            {success ? <Success /> : null}
+          </div>
         </div>
       </form>
     </div>

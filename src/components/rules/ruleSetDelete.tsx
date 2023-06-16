@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
-import { Error } from "../errors/error";
+import { Error } from "../status/error";
 import { Delete } from "../icons/crud";
 import { mutate } from "../../lib/mutation";
 import { RULESET_ERROR } from "./rulesetAddEdit";
