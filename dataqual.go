@@ -66,7 +66,7 @@ const (
 
 var (
 	ErrEmptyConfig        = errors.New("config cannot be empty")
-	ErrEmptyBus           = errors.New("bus cannot be empty")
+	ErrEmptyDataSource    = errors.New("data source cannot be empty")
 	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
 
 	// ErrMessageDropped is returned when a message is dropped by the plumber data rules
@@ -155,7 +155,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.DataSource == "" {
-		return ErrEmptyBus
+		return ErrEmptyDataSource
 	}
 
 	if cfg.ShutdownCtx == nil {
@@ -382,10 +382,11 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 					}
 
 					if err := d.Plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
+						// TODO: counters here
 						return nil, errors.Wrap(err, "failed to send rule notification")
 					}
 
-					// TODO: should we drop message here? I would think send to DLQ would imply drop to the end user
+					shouldDrop = true
 				default:
 					return nil, errors.Errorf("unknown rule failure mode: %s", failCfg.Mode)
 				}

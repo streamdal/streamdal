@@ -1,6 +1,8 @@
 package logger
 
 // Logger is the common interface for user-provided loggers.
+//
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Logger
 type Logger interface {
 	// Debug sends out a debug message with the given arguments to the logger.
 	Debug(args ...interface{})

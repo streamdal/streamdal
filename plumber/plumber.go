@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IPlumberClient
 type IPlumberClient interface {
 
 	// GetRules returns a list of rules for the given message bus/data source from the Plumber server
