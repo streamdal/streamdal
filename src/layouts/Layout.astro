@@ -1,10 +1,13 @@
 ---
+import { NavMenu } from "../components/nav/menu";
 export interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
 import "../styles/global.css";
+import React from "react";
+import { RuleSetAddEdit } from "../components/rules/rulesetAddEdit";
 ---
 
 <!DOCTYPE html>
@@ -23,10 +26,13 @@ import "../styles/global.css";
   </head>
   <body>
     <div class="flex flex-col w-full text-web">
-      <div class="flex flex-row justify-start h-16 bg-web w-full items-center">
-        <a href="/"
-          ><img src="/images/logo-dark.png" class="w-44 h-fit ml-4" /></a
-        >
+      <div
+        class="sticky top-0 flex flex-row justify-between h-16 bg-web w-full items-center"
+      >
+        <a href="/">
+          <img src="/images/logo-dark.png" class="w-44 h-fit ml-4" />
+        </a>
+        <NavMenu client:load client:only />
       </div>
       <div class="m-6">
         <slot />

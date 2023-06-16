@@ -1,14 +1,15 @@
 import { Menu } from "@headlessui/react";
 import React from "react";
-import { Kebab } from "../icons/nav";
-import { Delete, Edit } from "../icons/crud";
+import { Slack } from "../icons/social";
+import { MonitorIcon } from "../icons/streamdal";
+import { Bars3Icon } from "@heroicons/react/20/solid";
 
-export const RuleSetMenu = ({ id }: { id: string }) => {
+export const NavMenu = () => {
   return (
     <Menu as="div" className="text-right align-text-bottom pt-[6px] relative">
       <div>
         <Menu.Button>
-          <Kebab className="hover:text-shadow h-[20px]" aria-hidden="true" />
+          <Bars3Icon className="mr-4 w-[20px] text-white cursor-pointer" />
         </Menu.Button>
       </div>
 
@@ -16,14 +17,14 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
         <div className="p-2 pb-1">
           <Menu.Item>
             {({ active }) => (
-              <a href={`/ruleset?id=${id}`}>
+              <a href={`/`}>
                 <button
                   className={`${
                     active ? "bg-sunset" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  <Edit className="mr-2 text-web" aria-hidden="true" />
-                  View/Edit
+                  <MonitorIcon className="w-[14px] mr-2" aria-hidden="true" />
+                  Rules
                 </button>
               </a>
             )}
@@ -32,18 +33,14 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
         <div className="p-2 pt-1">
           <Menu.Item>
             {({ active }) => (
-              <a href={`/ruleset/delete/?id=${id}`}>
+              <a href={`/slack`}>
                 <button
                   className={`${
-                    active ? "bg-eyelid text-white" : "text-eyelid"
+                    active ? "bg-sunset" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  <Delete
-                    className="mr-2"
-                    fill={active ? "white" : "#FF7D68"}
-                    aria-hidden="true"
-                  />
-                  Delete
+                  <Slack className="w-[18px] mr-2" aria-hidden="true" />
+                  Slack
                 </button>
               </a>
             )}

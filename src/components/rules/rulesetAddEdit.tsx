@@ -370,6 +370,13 @@ export const RuleSetAddEdit = () => {
               }`}
               value={defaultValues?.id ? "Save Ruleset" : "Add Ruleset"}
             />
+            <a href="/">
+              <input
+                type="button"
+                className="flex justify-center btn-secondary cursor-pointer"
+                value="Cancel"
+              />
+            </a>
             {success ? <Success /> : null}
           </div>
         </div>
