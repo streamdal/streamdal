@@ -17,19 +17,24 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/relistan/go-director"
+
+	"github.com/streamdal/dataqual/logger"
+
+	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
-	"github.com/streamdal/dataqual/common"
-	"github.com/streamdal/dataqual/detective"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
-	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
+	"github.com/streamdal/dataqual/common"
+	"github.com/streamdal/dataqual/detective"
+	"github.com/streamdal/dataqual/metrics"
+	"github.com/streamdal/dataqual/plumber"
 )
 
 // Module is a constant that represents which type of WASM module we will run the rules against
@@ -81,44 +86,40 @@ type DataQual struct {
 	ruleSetMtx   *sync.RWMutex
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
-	Plumber      IPlumberClient
-	dryRun       bool
-	wasmTimeout  time.Duration
+	Plumber      plumber.IPlumberClient
+	metrics      *metrics.Metrics
 }
 
 type Config struct {
-	Bus         string
-	ShutdownCtx context.Context
+	PlumberURL   string
+	PlumberToken string
+	WasmTimeout  time.Duration
+	DryRun       bool
+	DataSource   string
+	ShutdownCtx  context.Context
+	Logger       logger.Logger
 }
 
 func New(cfg *Config) (*DataQual, error) {
-	plumberURL := os.Getenv("PLUMBER_URL")
-	plumberToken := os.Getenv("PLUMBER_TOKEN")
-	dryRun := os.Getenv("DATAQUAL_DRY_RUN") == "true"
-	wasmTimeout := os.Getenv("DATAQUAL_WASM_TIMEOUT")
-
-	// We instantiate this library based on whether or not we have a Plumber URL+token
-	// If these are not provided, the wrapper library will not perform rule checks and
-	// will act as normal
-	if plumberURL == "" || plumberToken == "" {
-		return nil, nil
-	}
-
-	if wasmTimeout == "" {
-		wasmTimeout = "1s"
-	}
-	timeout, err := time.ParseDuration(wasmTimeout)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to parse DATAQUAL_WASM_TIMEOUT")
-	}
-
 	if err := validateConfig(cfg); err != nil {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
 
-	plumber, err := newServer(plumberURL, plumberToken)
+	// We instantiate this library based on whether or not we have a Plumber URL+token
+	// If these are not provided, the wrapper library will not perform rule checks and
+	// will act as normal
+	if cfg.PlumberURL == "" || cfg.PlumberToken == "" {
+		return nil, nil
+	}
+
+	plumber, err := plumber.New(cfg.PlumberURL, cfg.PlumberToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to plumber")
+	}
+
+	m, err := metrics.New(&metrics.Config{Plumber: plumber})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
 
 	dq := &DataQual{
@@ -130,12 +131,11 @@ func New(cfg *Config) (*DataQual, error) {
 		ruleSetMap:   make(map[string]string),
 		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
-		dryRun:       dryRun,
-		wasmTimeout:  timeout,
+		metrics:      m,
 	}
 
-	if dryRun {
-		log.Println("Plumber data rules running in dry run mode")
+	if cfg.DryRun {
+		cfg.Logger.Info("Plumber data rules running in dry run mode")
 	}
 
 	// Force rule pull on startup
@@ -143,7 +143,8 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "failed to get data quality rules")
 	}
 
-	go dq.watchForRuleUpdates()
+	ruleUpdateLooper := director.NewTimedLooper(director.FOREVER, RuleUpdateInterval, make(chan error, 1))
+	go dq.watchForRuleUpdates(ruleUpdateLooper)
 
 	return dq, nil
 }
@@ -153,12 +154,46 @@ func validateConfig(cfg *Config) error {
 		return ErrEmptyConfig
 	}
 
-	if cfg.Bus == "" {
+	if cfg.DataSource == "" {
 		return ErrEmptyBus
 	}
 
 	if cfg.ShutdownCtx == nil {
 		return ErrMissingShutdownCtx
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if cfg.PlumberURL == "" {
+		cfg.PlumberURL = os.Getenv("PLUMBER_URL")
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if cfg.PlumberToken == "" {
+		cfg.PlumberToken = os.Getenv("PLUMBER_TOKEN")
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if os.Getenv("DATAQUAL_DRY_RUN") == "true" {
+		cfg.DryRun = true
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if cfg.WasmTimeout == 0 {
+		to := os.Getenv("DATAQUAL_WASM_TIMEOUT")
+		if to == "" {
+			to = "1s"
+		}
+
+		timeout, err := time.ParseDuration(to)
+		if err != nil {
+			return errors.Wrap(err, "unable to parse DATAQUAL_WASM_TIMEOUT")
+		}
+		cfg.WasmTimeout = timeout
+	}
+
+	// Default to NOOP logger if none is provided
+	if cfg.Logger == nil {
+		cfg.Logger = &logger.NoOpLogger{}
 	}
 
 	return nil
@@ -186,8 +221,8 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	return mod, nil
 }
 
-func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	timeoutCtx, cancel := context.WithTimeout(ctx, d.wasmTimeout)
+func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
 
 	// Get WASM module
@@ -196,12 +231,12 @@ func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.Fa
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
 
-	var delete bool
+	var del bool
 	switch cfg.Type {
 	case protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE:
-		delete = false
+		del = false
 	case protos.FailureModeTransform_TRANSFORM_TYPE_DELETE:
-		delete = true
+		del = true
 	default:
 		return nil, errors.Errorf("unknown transform type: %s", cfg.Type)
 	}
@@ -210,7 +245,7 @@ func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.Fa
 		Path:   cfg.Path,
 		Value:  cfg.Value,
 		Data:   data,
-		Delete: delete,
+		Delete: del,
 	}
 
 	req, err := request.MarshalJSON()
@@ -237,7 +272,7 @@ func (d *DataQual) runTransform(ctx context.Context, data []byte, cfg *protos.Fa
 }
 
 func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
-	timeoutCtx, cancel := context.WithTimeout(ctx, d.wasmTimeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
 
 	// Get WASM module
@@ -278,7 +313,7 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	if len(data) > DefaultMaxDataSize {
-		log.Printf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
+		d.Logger.Warnf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
 		return data, nil
 	}
 
@@ -318,34 +353,50 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 			}
 
 			// Dry run, do nothing but log and continue on to the next rule
-			if d.dryRun {
+			if d.DryRun {
 				d.logDryRun(rule)
 				continue
 			}
 
-			switch rule.FailureMode {
-			case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-				// Downstream libraries will check if data == nil and not publish/consume the message
-				return nil, ErrMessageDropped
-			case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-				return d.failTransform(ctx, data, rule.GetTransform())
-			case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-				fallthrough
-			case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-				ruleSetID, ok := d.getRuleSetIDForRule(rule.Id)
-				if !ok {
-					return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
-				}
+			var shouldDrop bool
 
-				if err := d.Plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
-					return nil, errors.Wrap(err, "failed to send rule notification")
-				}
+			// There can me multiple failure modes per rule
+			//
+			for _, failCfg := range rule.GetFailureModeConfigs() {
+				switch failCfg.Mode {
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
+					shouldDrop = true
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+					transformed, err := d.failTransform(ctx, data, failCfg.GetTransform())
+					if err != nil {
+						return nil, errors.Wrap(err, "failed to run transform")
+					}
 
-				// Return nil so downstream lib will not publish/consume the message
-				return nil, nil
-			default:
-				return nil, errors.Errorf("unknown rule failure mode: %s", rule.FailureMode)
+					data = transformed
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+					fallthrough
+				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+					ruleSetID, ok := d.getRuleSetIDForRule(rule.Id)
+					if !ok {
+						return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
+					}
+
+					if err := d.Plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
+						return nil, errors.Wrap(err, "failed to send rule notification")
+					}
+
+					// TODO: should we drop message here? I would think send to DLQ would imply drop to the end user
+				default:
+					return nil, errors.Errorf("unknown rule failure mode: %s", failCfg.Mode)
+				}
 			}
+
+			if shouldDrop {
+				return nil, ErrMessageDropped
+			}
+
+			return data, nil
+
 		case protos.RuleType_RULE_TYPE_CUSTOM:
 			// TODO: implement eventually
 			return data, nil
@@ -359,49 +410,51 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 
 func (d *DataQual) logDryRun(rule *protos.Rule) {
 	cfg := rule.GetMatchConfig()
-	switch rule.FailureMode {
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have rejected the message", rule.Id, rule.Type, cfg.Path)
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have transformed the message", rule.Id, rule.Type, cfg.Path)
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent a slack alert", rule.Id, rule.Type, cfg.Path)
-	case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent the message to the DLQ", rule.Id, rule.Type, cfg.Path)
-	default:
-		log.Printf("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have done nothing", rule.Id, rule.Type, cfg.Path)
+	for _, failCfg := range rule.FailureModeConfigs {
+		switch failCfg.Mode {
+		case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
+			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have rejected the message", rule.Id, rule.Type, cfg.Path)
+		case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have transformed the message", rule.Id, rule.Type, cfg.Path)
+		case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent a slack alert", rule.Id, rule.Type, cfg.Path)
+		case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent the message to the DLQ", rule.Id, rule.Type, cfg.Path)
+		default:
+			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have done nothing", rule.Id, rule.Type, cfg.Path)
+		}
 	}
 }
 
-func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	transformed, err := d.runTransform(ctx, data, cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to run transform on failure mode")
-	}
+func (d *DataQual) watchForRuleUpdates(looper director.Looper) {
+	var quit bool
 
-	return transformed, nil
-}
-
-func (d *DataQual) watchForRuleUpdates() {
-	// TODO: need some kind of shutdown context here probably
-	for {
-		time.Sleep(RuleUpdateInterval)
+	looper.Loop(func() error {
+		if quit {
+			// Give looper time to exit
+			time.Sleep(time.Millisecond * 50)
+			return nil
+		}
 
 		select {
 		case <-d.ShutdownCtx.Done():
-			return
+			quit = true
+			looper.Quit()
+			return nil
 		default:
 			// NOOP
 		}
 
 		if err := d.getRuleUpdates(); err != nil {
-			log.Println("failed to get rule updates:", err)
+			d.Logger.Error("failed to get rule updates:", err)
 		}
-	}
+
+		return nil
+	})
 }
 
 func (d *DataQual) getRuleUpdates() error {
-	ruleSets, err := d.Plumber.GetRules(context.Background(), d.Bus)
+	ruleSets, err := d.Plumber.GetRules(context.Background(), d.DataSource)
 	if err != nil {
 		return errors.Wrap(err, "failed to get rules")
 	}

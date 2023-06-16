@@ -1,4 +1,6 @@
-package dataqual
+// Package plumber is a wrapper for the Plumber gRPC API.
+// It provides a simple interface to interact with and mock.
+package plumber
 
 import (
 	"bytes"
@@ -6,17 +8,26 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
-	"google.golang.org/grpc"
-
 	"github.com/batchcorp/plumber-schemas/build/go/protos"
 	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
 )
 
 type IPlumberClient interface {
-	GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error)
-	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule, ruleSetID string) error
+
+	// GetRules returns a list of rules for the given message bus/data source from the Plumber server
+	GetRules(ctx context.Context, dataSource string) ([]*common.RuleSet, error)
+
+	// GetWasmFile downloads a WASM file from the Plumber server
 	GetWasmFile(ctx context.Context, wasmFile string) ([]byte, error)
+
+	// SendMetrics dumps a metric value to the Plumber server
+	SendMetrics(ctx context.Context, counterName string, counterValue float64) error
+
+	// SendRuleNotification sends a notification to the Plumber server that a rule has been triggered
+	// Plumber will handle the notification based on the rule's configuration
+	SendRuleNotification(ctx context.Context, data []byte, rule *common.Rule, ruleSetID string) error
 }
 
 const (
@@ -29,8 +40,8 @@ type Plumber struct {
 	Server protos.PlumberServerClient
 }
 
-// newServer dials a plumber GRPC server and returns PlumberServer client
-func newServer(plumberAddress, plumberToken string) (*Plumber, error) {
+// New dials a plumber GRPC server and returns IPlumberClient
+func New(plumberAddress, plumberToken string) (*Plumber, error) {
 	dialCtx, dialCancel := context.WithTimeout(context.Background(), dialTimeout)
 	defer dialCancel()
 
@@ -68,12 +79,12 @@ func (p *Plumber) GetWasmFile(ctx context.Context, wasmFile string) ([]byte, err
 	return decompressed, nil
 }
 
-func (p *Plumber) GetRules(ctx context.Context, bus string) ([]*common.RuleSet, error) {
+func (p *Plumber) GetRules(ctx context.Context, dataSource string) ([]*common.RuleSet, error) {
 	req := &protos.GetDataQualityRuleSetsRequest{
 		Auth: &common.Auth{
 			Token: p.Token,
 		},
-		Bus: bus,
+		DataSource: dataSource,
 	}
 
 	resp, err := p.Server.GetRuleSets(ctx, req)
@@ -97,6 +108,22 @@ func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *c
 
 	if _, err := p.Server.SendRuleNotification(ctx, req); err != nil {
 		return errors.Wrap(err, "unable to send rule notification")
+	}
+
+	return nil
+}
+
+func (p *Plumber) SendMetrics(ctx context.Context, counterName string, counterValue float64) error {
+	req := &protos.PublishMetricsRequest{
+		Auth: &common.Auth{
+			Token: p.Token,
+		},
+		Counter: counterName,
+		Value:   counterValue,
+	}
+
+	if _, err := p.Server.PublishMetrics(ctx, req); err != nil {
+		return errors.Wrap(err, "unable to send metrics")
 	}
 
 	return nil

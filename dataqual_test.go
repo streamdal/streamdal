@@ -122,7 +122,7 @@ func transformBench(fileName string, b *testing.B) {
 	defer cancel()
 
 	for i := 0; i < b.N; i++ {
-		_, err := d.runTransform(ctx, jsonData, fm)
+		_, err := d.failTransform(ctx, jsonData, fm)
 		if err != nil {
 			b.Error("error during runTransform: " + err.Error())
 		}
@@ -133,7 +133,7 @@ func setup(m Module) (*DataQual, error) {
 	d := &DataQual{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
-		wasmTimeout:  time.Nanosecond,
+		Config:       &Config{WasmTimeout: time.Second},
 	}
 
 	wasmFile := path.Join("src", string(m)+".wasm")
