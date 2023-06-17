@@ -1,9 +1,10 @@
 import type { MATCH_TYPE } from "./addEdit";
 import { FormSelect } from "../../form/formSelect";
 import React, { useEffect, useState } from "react";
-import { useWatch } from "react-hook-form";
+import { useFormState, useWatch } from "react-hook-form";
 import { FormInput } from "../../form/formInput";
 import { getJson } from "../../../lib/fetch";
+import type { RulesetType } from "../rulesetAddEdit";
 
 export const FAILURE_MODE_TYPE: MATCH_TYPE = {
   RULE_FAILURE_MODE_UNSET: { display: "Unset" },
@@ -23,20 +24,22 @@ export const FailureMode = ({
   failureMode,
   register,
   control,
-  errors,
   index,
 }: {
   ruleIndex: number;
   failureMode: any;
   register: any;
   control: any;
-  errors: any;
   index: number;
 }) => {
   const [slackConfigured, setSlackConfigured] = useState(false);
   const watchMode = useWatch({
     control,
     name: `rules[${ruleIndex}].failure_mode_configs[${index}].mode]`,
+  });
+
+  const { errors } = useFormState<RulesetType>({
+    control,
   });
 
   const checkSlack = async () => {
@@ -62,7 +65,10 @@ export const FailureMode = ({
         name={`rules[${ruleIndex}].failure_mode_configs[${index}].mode]`}
         label="Failure Mode Type"
         register={register}
-        error={errors["failure_mode_configs.mode"]?.message || ""}
+        error={
+          errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.mode
+            ?.message || ""
+        }
       >
         {Object.keys(FAILURE_MODE_TYPE).map((k: string, i: number) => (
           <option key={`failure-mode-type-option-key-${i}`} value={k}>
@@ -77,8 +83,10 @@ export const FailureMode = ({
             label="Slack Channel"
             register={register}
             error={
-              errors["failure_mode_configs.alert_slack.slack_channel"]
-                ?.message || ""
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              // prettier-ignore
+              errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.alert_slack?.slack_channel?.message || ""
             }
           />
           {slackConfigured ? null : (
@@ -98,7 +106,10 @@ export const FailureMode = ({
           label="Streamdal Token"
           register={register}
           error={
-            errors["failure_mode_configs.dlq.streamdal_token"]?.message || ""
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            // prettier-ignore
+            errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.dlq?.streamdal_token?.message || ""
           }
         />
       )}
@@ -108,21 +119,34 @@ export const FailureMode = ({
             name={`rules[${ruleIndex}].failure_mode_configs[${index}].transform[path]]`}
             label="Path"
             register={register}
-            error={errors["failure_mode_configs.transform.path"]?.message || ""}
+            error={
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              // prettier-ignore
+              errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.transform?.path?.message || ""
+            }
           />
           <FormInput
             name={`rules[${ruleIndex}].failure_mode_configs[${index}].transform[value]]`}
             label="Value"
             register={register}
             error={
-              errors["failure_mode_configs.transform.value"]?.message || ""
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              // prettier-ignore
+              errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.transform?.value?.message || ""
             }
           />
           <FormSelect
             name={`rules[${ruleIndex}].failure_mode_configs[${index}].transform[type]]`}
             label="Transform Type"
             register={register}
-            error={errors["failure_mode_configs.transform.type"]?.message || ""}
+            error={
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              // prettier-ignore
+              errors?.rules?.[ruleIndex]?.failure_mode_configs?.[index]?.transform?.type?.message || ""
+            }
           >
             {Object.keys(TRANSFORM_TYPE).map((k: string, i: number) => (
               <option
