@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install deps
+        run: npm install
+
+      - name: Build dist
+        run: npm run build
+
       - name: Compress directory
         run: cd dist; zip -j release.zip ./*
 
