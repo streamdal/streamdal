@@ -289,7 +289,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 	if len(data) > DefaultMaxDataSize {
 		_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
 			Type:  fmt.Sprintf("dataqual_%s_%s_size_exceeded", mode.String(), d.DataSource),
-			Value: int64(len(data)),
+			Value: 1,
 		})
 
 		d.Logger.Warnf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
