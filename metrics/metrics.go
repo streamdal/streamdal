@@ -13,6 +13,11 @@ import (
 	"github.com/streamdal/dataqual/plumber"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics
+type IMetrics interface {
+	Incr(ctx context.Context, entry *CounterEntry) error
+}
+
 const (
 	DefaultCounterInterval       = time.Second
 	DefaultReaperCounterInterval = 10 * time.Second

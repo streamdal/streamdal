@@ -83,7 +83,7 @@ type DataQual struct {
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
 	Plumber      plumber.IPlumberClient
-	metrics      *metrics.Metrics
+	metrics      metrics.IMetrics
 }
 
 type Config struct {

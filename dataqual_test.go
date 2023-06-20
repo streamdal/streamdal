@@ -17,6 +17,7 @@ import (
 	"github.com/streamdal/dataqual/detective"
 	"github.com/streamdal/dataqual/logger"
 	"github.com/streamdal/dataqual/logger/loggerfakes"
+	"github.com/streamdal/dataqual/metrics/metricsfakes"
 	"github.com/streamdal/dataqual/plumber/plumberfakes"
 )
 
@@ -245,6 +246,7 @@ func TestApplyRules_MaxData(t *testing.T) {
 			DataSource: "kafka",
 			Logger:     fakeLogger,
 		},
+		metrics: &metricsfakes.FakeIMetrics{},
 	}
 
 	got, err := d.ApplyRules(context.Background(), Publish, "somekewy", make([]byte, DefaultMaxDataSize+1))
@@ -464,6 +466,7 @@ func setupForFailure(configs []*common.FailureMode) *DataQual {
 		ruleSetMtx:   &sync.RWMutex{},
 		Config:       &Config{DataSource: "kafka"},
 		ruleSetMap:   map[string]string{ruleID: rsID},
+		metrics:      &metricsfakes.FakeIMetrics{},
 		rules: map[Mode]map[string][]*protos.Rule{
 			Publish: {
 				"mytopic": {
