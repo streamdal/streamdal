@@ -1,22 +1,27 @@
 import React, { useState } from "react";
 import { RuleArg } from "./arg";
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import { useFormState } from "react-hook-form";
+import type { RulesetType } from "../rulesetAddEdit";
 
 export const RuleArgs = ({
   register,
-  errors,
+  control,
   ruleIndex,
 }: {
   register: any;
-  errors: any;
+  control: any;
   ruleIndex: number;
 }) => {
+  const { errors } = useFormState<RulesetType>({
+    control,
+  });
   const [args, setArgs] = useState([
     <RuleArg
       ruleIndex={ruleIndex}
       index={0}
       register={register}
-      errors={errors}
+      control={control}
     />,
   ]);
 
@@ -53,7 +58,7 @@ export const RuleArgs = ({
                 <RuleArg
                   ruleIndex={ruleIndex}
                   register={register}
-                  errors={errors}
+                  control={control}
                   index={args.length}
                 />,
               ])

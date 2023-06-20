@@ -3,9 +3,10 @@ import React from "react";
 import { FormHidden } from "../../form/formHidden";
 import { FormInput } from "../../form/formInput";
 import { RuleArgs } from "./args";
-import { useWatch } from "react-hook-form";
+import { useFormState, useWatch } from "react-hook-form";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { FailureModes } from "./failureModes";
+import type { RulesetType } from "../rulesetAddEdit";
 export type MATCH_TYPE = { [key in string]: { display: string } };
 
 export const RULE_TYPE_MATCH: MATCH_TYPE = {
@@ -26,27 +27,23 @@ export const RULE_TYPE_MATCH: MATCH_TYPE = {
   pii_phone: { display: "PII Phone" },
 };
 
-export type RULE_TYPE = {
-  id?: string;
-  failure_mode_config?: any;
-  match_config: any;
-};
-
 export const RuleAddEdit = ({
   control,
   rule,
   register,
-  errors,
   index,
   remove,
 }: {
   control: any;
   rule: any;
   register: any;
-  errors: any;
   index: number;
   remove: any;
 }) => {
+  const { errors } = useFormState<RulesetType>({
+    control,
+  });
+
   const watchType = useWatch({
     control,
     name: `rules[${index}][match_config.type]`,
@@ -84,14 +81,16 @@ export const RuleAddEdit = ({
           name={`rules[${index}][match_config.path]`}
           label="Field Path"
           register={register}
-          error={errors["match_config.path"]?.message || ""}
+          error={errors?.rules?.[index]?.match_config?.path?.message || ""}
           placeholder="ex: payload.address"
         />
         <FormSelect
           name={`rules[${index}][match_config.type]`}
           label="Field Match Type"
           register={register}
-          error={errors["match_config.type"]?.message || ""}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          error={errors?.rules?.[index]?.match_config?.type?.message || ""}
         >
           {Object.keys(RULE_TYPE_MATCH).map((k: string, i: number) => (
             <option key={`rule-type-match-key-${i}`} value={k}>
@@ -101,12 +100,13 @@ export const RuleAddEdit = ({
         </FormSelect>
         {["string_contains_any", "string_contains_all", "regex"].includes(
           type
-        ) && <RuleArgs ruleIndex={index} register={register} errors={errors} />}
+        ) && (
+          <RuleArgs ruleIndex={index} register={register} control={control} />
+        )}
         <FailureModes
           rule={rule}
           register={register}
           control={control}
-          errors={errors}
           ruleIndex={index}
         />
       </div>

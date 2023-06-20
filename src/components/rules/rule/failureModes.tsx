@@ -7,13 +7,11 @@ export const FailureModes = ({
   rule,
   register,
   control,
-  errors,
 }: {
   ruleIndex: number;
   rule: any;
   register: any;
   control: any;
-  errors: any;
 }) => {
   const [modes, setModes] = useState(
     rule?.failure_mode_configs?.length
@@ -24,7 +22,6 @@ export const FailureModes = ({
             index={i}
             register={register}
             control={control}
-            errors={errors}
           />
         ))
       : [
@@ -34,7 +31,6 @@ export const FailureModes = ({
             index={0}
             register={register}
             control={control}
-            errors={errors}
           />,
         ]
   );
@@ -81,7 +77,6 @@ export const FailureModes = ({
                   index={modes?.length || 0}
                   register={register}
                   control={control}
-                  errors={errors}
                 />,
               ])
             }

@@ -9,10 +9,11 @@ import * as z from "zod";
 import { FormInput } from "../form/formInput";
 import { FormSelect } from "../form/formSelect";
 import { titleCase } from "../../lib/utils";
-import { RuleAddEdit } from "./rule/addEdit";
+import { RULE_TYPE_MATCH, RuleAddEdit } from "./rule/addEdit";
 import { mutate } from "../../lib/mutation";
 import { v4 as uuidv4 } from "uuid";
 import { Success } from "../status/success";
+import { FAILURE_MODE_TYPE } from "./rule/failureMode";
 
 export const RULESET_ERROR = "Ruleset not found!";
 
@@ -21,18 +22,93 @@ const RuleSetModeSchema = z.enum(MODES);
 
 export const BUSES = ["rabbitmq", "kafka"] as const;
 
+const failureModes: string[] = Object.keys(FAILURE_MODE_TYPE);
+const baseFailureModeSchema = z.object({
+  mode: z.enum(failureModes as any),
+});
+
+const failureModeSchema = z.discriminatedUnion("mode", [
+  baseFailureModeSchema.extend({
+    mode: z.literal("RULE_FAILURE_MODE_ALERT_SLACK"),
+    alert_slack: z.object({
+      slack_channel: z.string().min(1, { message: "Required" }),
+    }),
+  }),
+  baseFailureModeSchema.extend({
+    mode: z.literal("RULE_FAILURE_MODE_DLQ"),
+    dlq: z.object({
+      streamdal_token: z.string().min(1, { message: "Required" }),
+    }),
+  }),
+  baseFailureModeSchema.extend({
+    mode: z.literal("RULE_FAILURE_MODE_TRANSFORM"),
+    transform: z.object({
+      path: z.string().min(1, { message: "Required" }),
+      value: z.string().min(1, { message: "Required" }),
+      type: z.string().min(1, { message: "Required" }),
+    }),
+  }),
+  //
+  // These two have no further requirements but have
+  // to be specified to satisfy zod's discriminated union
+  baseFailureModeSchema.extend({
+    mode: z.literal("RULE_FAILURE_MODE_UNSET"),
+  }),
+  baseFailureModeSchema.extend({
+    mode: z.literal("RULE_FAILURE_MODE_REJECT"),
+  }),
+]);
+
+const matchTypes: string[] = Object.keys(RULE_TYPE_MATCH);
+const ruleMatchSchema = z
+  .object({
+    path: z.string().min(1, { message: "Required" }),
+    type: z.enum(matchTypes as any),
+    args: z.string().array(),
+  })
+  .superRefine(({ type, args }, ctx) => {
+    if (
+      !["string_contains_any", "string_contains_all", "regex"].includes(type)
+    ) {
+      return true;
+    }
+
+    args?.forEach((a, i) => {
+      if (a === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Required",
+          path: [`args[${i}]`],
+          fatal: true,
+        });
+      }
+    });
+  });
+
+const ruleSchema = z.object({
+  id: z.string().optional(),
+  type: z.literal("RULE_TYPE_MATCH"),
+  match_config: ruleMatchSchema,
+  failure_mode_configs: failureModeSchema
+    .array()
+    .min(1, { message: "At least one rule is required" }),
+});
+
 const baseSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
   mode: RuleSetModeSchema,
-  rules: z.any(),
+  rules: ruleSchema
+    .array()
+    .min(1, { message: "At least one rule is required" }),
 });
 
 const rulesetSchema = z
   .discriminatedUnion("data_source", [
     baseSchema.extend({
       data_source: z.literal("kafka"),
-      key: z.string().min(1, { message: "Required" }),
       mode: RuleSetModeSchema,
+      key: z.string().min(1, { message: "Required" }),
     }),
     baseSchema.extend({
       data_source: z.literal("rabbitmq"),
@@ -84,19 +160,7 @@ const rulesetSchema = z
     }
   });
 
-//
-// react-hooks-form doesn't play great with inferred zod schema types, so just stubbing it out
-type RuleSetFormType = {
-  id?: string;
-  name: string;
-  mode: string;
-  data_source: string;
-  key?: string;
-  queue_name?: string;
-  exchange_name?: string;
-  binding_key?: string;
-  rules?: any;
-};
+export type RulesetType = z.infer<typeof rulesetSchema>;
 
 export const RuleSetAddEdit = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -113,7 +177,7 @@ export const RuleSetAddEdit = () => {
     reset,
     control,
     formState: { errors, isSubmitting, defaultValues },
-  } = useForm<RuleSetFormType>({
+  } = useForm<RulesetType>({
     reValidateMode: "onBlur",
     shouldUnregister: true,
     resolver: zodResolver(rulesetSchema),
@@ -128,20 +192,21 @@ export const RuleSetAddEdit = () => {
   const removeRule = (i: number) => () =>
     setRules(rules?.filter((a: any, index: number) => i !== index));
 
-  const buildRule = (r: any, i: number) => (
-    <div className={`border-b`} key={`rule-key-${i}`}>
-      <RuleAddEdit
-        index={i}
-        control={control}
-        rule={r}
-        register={register}
-        errors={errors}
-        remove={removeRule(i)}
-      />
-    </div>
-  );
+  const buildRule = (r: any, i: number) => {
+    return (
+      <div className={`border-b`} key={`rule-key-${i}`}>
+        <RuleAddEdit
+          index={i}
+          control={control}
+          rule={r}
+          register={register}
+          remove={removeRule(i)}
+        />
+      </div>
+    );
+  };
 
-  const data_source = watch("data_source");
+  const data_source = watch("data_source") || "kafka";
   const mode = watch("mode");
 
   const onSubmit = async (body: any) => {
@@ -298,12 +363,12 @@ export const RuleSetAddEdit = () => {
               </option>
             ))}
           </FormSelect>
-          {data_source !== "rabbitmq" && (
+          {data_source === "kafka" && (
             <FormInput
               name="key"
               label="Message Topic"
               register={register}
-              error={errors["key"]?.message || ""}
+              error={("key" in errors && errors["key"]?.message) || ""}
             />
           )}
 
@@ -312,7 +377,9 @@ export const RuleSetAddEdit = () => {
               name="queue_name"
               label="Queue Name"
               register={register}
-              error={errors["queue_name"]?.message || ""}
+              error={
+                ("queue_name" in errors && errors["queue_name"]?.message) || ""
+              }
             />
           )}
           {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
@@ -320,7 +387,11 @@ export const RuleSetAddEdit = () => {
               name="exchange_name"
               label="Exchange Name"
               register={register}
-              error={errors["exchange_name"]?.message || ""}
+              error={
+                ("exchange_name" in errors &&
+                  errors["exchange_name"]?.message) ||
+                ""
+              }
             />
           )}
           {data_source === "rabbitmq" && mode === "RULE_MODE_PUBLISH" && (
@@ -328,7 +399,10 @@ export const RuleSetAddEdit = () => {
               name="binding_key"
               label="Binding Key"
               register={register}
-              error={errors["binding_key"]?.message || ""}
+              error={
+                ("binding_key" in errors && errors["binding_key"]?.message) ||
+                ""
+              }
             />
           )}
           <span className="text-stormCloud font-medium text-[14px] leading-[18px] mb-1">
@@ -338,7 +412,15 @@ export const RuleSetAddEdit = () => {
             {rules?.length ? (
               rules.map((r: any) => r)
             ) : (
-              <div className="p-2 border-b">No rules found</div>
+              <div className="p-2 border-b">
+                {errors["rules"]?.message ? (
+                  <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
+                    {errors["rules"]?.message?.toString()}
+                  </div>
+                ) : (
+                  "At least one rule is required"
+                )}
+              </div>
             )}
             <div className="w-full mt-2 flex justify-end">
               <input
