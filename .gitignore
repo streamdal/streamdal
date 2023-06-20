@@ -19,7 +19,7 @@ pnpm-debug.log*
 .idea
 .vscode
 
-.dist/
+dist/
 
 # Github CI
 release.zip
