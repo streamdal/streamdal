@@ -30,15 +30,13 @@ var (
 	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
 	ErrEmptyEntryID         = errors.New("ID must be set")
 	ErrEmptyEntryType       = errors.New("Type must be set")
+	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
 )
 
 type Metrics struct {
 	*Config
 
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     *sync.WaitGroup
-
+	wg                  *sync.WaitGroup
 	counterMapMutex     *sync.RWMutex
 	counterTickerLooper director.Looper
 	counterReaperLooper director.Looper
@@ -53,7 +51,8 @@ type Config struct {
 	ReaperCounterTTL      time.Duration
 	CounterWorkerPoolSize int
 	Plumber               plumber.IPlumberClient
-	log                   logger.Logger
+	ShutdownCtx           context.Context
+	Log                   logger.Logger
 }
 
 type CounterEntry struct {
@@ -74,6 +73,7 @@ func New(cfg *Config) (*Metrics, error) {
 		counterTickerLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterReaperLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterIncrCh:       make(chan *CounterEntry, 10000),
+		wg:                  &sync.WaitGroup{},
 	}
 
 	// Launch counter worker pool
@@ -117,6 +117,14 @@ func validateConfig(cfg *Config) error {
 
 	if cfg.CounterWorkerPoolSize == 0 {
 		cfg.CounterWorkerPoolSize = DefaultCounterWorkerPoolSize
+	}
+
+	if cfg.Log == nil {
+		cfg.Log = &logger.NoOpLogger{}
+	}
+
+	if cfg.ShutdownCtx == nil {
+		return ErrMissingShutdownCtx
 	}
 
 	return nil
@@ -230,10 +238,10 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		case entry := <-m.counterIncrCh: // Coming from user doing Incr() // buffered chan
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
-			m.log.Debugf("received publish for counter '%s', getValue: %d", entry.Type, entry.Value)
+			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Type, entry.Value)
 			err = m.publishCounter(context.Background(), entry)
-		case <-m.ctx.Done():
-			m.log.Debugf("received notice to shutdown")
+		case <-m.ShutdownCtx.Done():
+			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()
 			shutdown = true
 
@@ -241,19 +249,19 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		}
 
 		if err != nil {
-			m.log.Error("worker pool error: %s", err)
+			m.Log.Error("worker pool error: %s", err)
 		}
 
 		return nil
 	})
 
-	m.log.Debugf("exiting runCounterWorkerPool")
+	m.Log.Debugf("exiting runCounterWorkerPool")
 }
 
 func (m *Metrics) runCounterTicker() {
 	defer m.wg.Done()
 
-	m.log.Debugf("starting runCounterTicker()")
+	m.Log.Debugf("starting runCounterTicker()")
 
 	var shutdown bool
 
@@ -287,8 +295,8 @@ func (m *Metrics) runCounterTicker() {
 				// If this blocks, it indicates that worker pool is lagging behind
 				m.counterPublishCh <- &entry
 			}
-		case <-m.ctx.Done():
-			m.log.Debugf("received notice to shutdown")
+		case <-m.ShutdownCtx.Done():
+			m.Log.Debugf("received notice to shutdown")
 			m.counterTickerLooper.Quit()
 			shutdown = true
 		}
@@ -296,13 +304,13 @@ func (m *Metrics) runCounterTicker() {
 		return nil
 	})
 
-	m.log.Debugf("exiting runCounterTicker()")
+	m.Log.Debugf("exiting runCounterTicker()")
 }
 
 func (m *Metrics) runCounterReaper() {
 	defer m.wg.Done()
 
-	m.log.Debugf("starting runCounterReaper()")
+	m.Log.Debugf("starting runCounterReaper()")
 
 	var shutdown bool
 
@@ -321,23 +329,23 @@ func (m *Metrics) runCounterReaper() {
 			for counterID, counter := range counters {
 				// Do not reap active counters
 				if counter.getValue() != 0 {
-					m.log.Debugf("skipping reaping for zero counter '%s'", counter.entry)
+					m.Log.Debugf("skipping reaping for zero counter '%s'", counter.entry)
 					continue
 				}
 
 				if time.Now().Sub(counter.getLastUpdated()) < m.Config.ReaperCounterTTL {
-					m.log.Debugf("skipping reaping for non-stale counter '%s'", counter.entry)
+					m.Log.Debugf("skipping reaping for non-stale counter '%s'", counter.entry)
 					continue
 				}
 
-				m.log.Debugf("reaped stale counter '%s'", counter.entry)
+				m.Log.Debugf("reaped stale counter '%s'", counter.entry)
 
 				m.counterMapMutex.Lock()
 				delete(m.counterMap, counterID)
 				m.counterMapMutex.Unlock()
 			}
-		case <-m.ctx.Done():
-			m.log.Debugf("received notice to shutdown")
+		case <-m.ShutdownCtx.Done():
+			m.Log.Debugf("received notice to shutdown")
 			m.counterReaperLooper.Quit()
 			shutdown = true
 
@@ -347,7 +355,7 @@ func (m *Metrics) runCounterReaper() {
 		return nil
 	})
 
-	m.log.Debugf("exiting runCounterReaper()")
+	m.Log.Debugf("exiting runCounterReaper()")
 }
 
 func (m *Metrics) publishCounter(ctx context.Context, entry *CounterEntry) error {
