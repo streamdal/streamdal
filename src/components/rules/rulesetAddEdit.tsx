@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
 import { Error } from "../status/error";
@@ -64,7 +64,7 @@ const ruleMatchSchema = z
   .object({
     path: z.string().min(1, { message: "Required" }),
     type: z.enum(matchTypes as any),
-    args: z.string().array(),
+    args: z.string().array().optional(),
   })
   .superRefine(({ type, args }, ctx) => {
     if (
@@ -163,13 +163,16 @@ const rulesetSchema = z
 export type RulesetType = z.infer<typeof rulesetSchema>;
 
 export const RuleSetAddEdit = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-  const [success, setSucces] = useState<boolean>(false);
-  const [addError, setAddError] = useState<string>("");
-  const [rules, setRules] = useState<any>(null);
   const params = new URLSearchParams(document.location.search);
   const id = params.get("id");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [success, setSucces] = useState<boolean>(
+    params.get("success") === "true"
+  );
+
+  const [addError, setAddError] = useState<string>("");
+  const [rules, setRules] = useState<any>(null);
   const {
     register,
     handleSubmit,
@@ -250,7 +253,7 @@ export const RuleSetAddEdit = () => {
 
       const id = response?.values?.id;
       if (id) {
-        window.location.href = `/ruleset?id=${id}`;
+        window.location.href = `/ruleset?id=${id}&success=true`;
       }
     } catch (e: any) {
       setAddError(e.toString());
