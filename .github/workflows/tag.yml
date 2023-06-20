@@ -18,7 +18,7 @@ jobs:
         run: npm run build
 
       - name: Compress directory
-        run: cd dist; zip -j release.zip ./*
+        run: cd dist; zip -j ../release.zip ./*
 
       - name: Create artifact
         uses: actions/upload-artifact@v2
