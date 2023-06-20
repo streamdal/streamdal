@@ -52,6 +52,7 @@ type Config struct {
 }
 
 type CounterEntry struct {
+	ID    string // uuid of the rule
 	Type  string // "errors", "messages", "bytes"
 	Value int64
 }
@@ -158,19 +159,19 @@ func (m *Metrics) newCounter(e *CounterEntry) *counter {
 	m.counterMapMutex.Lock()
 	defer m.counterMapMutex.Unlock()
 
-	m.counterMap[e.Type] = &counter{
+	m.counterMap[CompositeID(e)] = &counter{
 		entry:      e,
 		countMutex: &sync.RWMutex{},
 	}
 
-	return m.counterMap[e.Type]
+	return m.counterMap[CompositeID(e)]
 }
 
 func (m *Metrics) getCounter(e *CounterEntry) (*counter, bool) {
 	m.counterMapMutex.RLock()
 	defer m.counterMapMutex.RUnlock()
 
-	if counter, ok := m.counterMap[e.Type]; ok {
+	if counter, ok := m.counterMap[CompositeID(e)]; ok {
 		return counter, true
 	}
 

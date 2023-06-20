@@ -42,6 +42,16 @@ func (c *counter) getEntry() CounterEntry {
 	return *e
 }
 
+func CompositeID(e *CounterEntry) string {
+	// Global counter
+	if e.ID == "" {
+		return e.Type
+	}
+
+	// Rule specific counter
+	return e.Type + "-" + e.ID
+}
+
 func (c *counter) reset() {
 	c.countMutex.Lock()
 	defer c.countMutex.Unlock()

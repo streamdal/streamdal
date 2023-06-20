@@ -16,7 +16,6 @@ package dataqual
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"sync"
 	"time"
@@ -27,9 +26,6 @@ import (
 
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
 	"github.com/streamdal/dataqual/common"
 	"github.com/streamdal/dataqual/detective"
@@ -199,28 +195,6 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func createWASMInstance(wasmBytes []byte) (api.Module, error) {
-	if len(wasmBytes) == 0 {
-		return nil, errors.New("wasm data is empty")
-	}
-
-	ctx := context.Background()
-	r := wazero.NewRuntime(ctx)
-
-	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-	cfg := wazero.NewModuleConfig().
-		WithStderr(io.Discard).
-		WithStdout(io.Discard).
-		WithStartFunctions("") // We don't need _start() to be called for our purposes
-
-	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate wasm module")
-	}
-
-	return mod, nil
-}
-
 func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
@@ -313,9 +287,26 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	if len(data) > DefaultMaxDataSize {
+		_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+			Type:  fmt.Sprintf("dataqual_%s_%s_size_exceeded", mode.String(), d.DataSource),
+			Value: int64(len(data)),
+		})
+
 		d.Logger.Warnf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
 		return data, nil
 	}
+
+	// Counter for data source/mode calls total
+	_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+		Type:  fmt.Sprintf("dataqual_%s_%s_events", mode.String(), d.DataSource),
+		Value: 1,
+	})
+
+	// Counter for data source/mode bytes total
+	_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+		Type:  fmt.Sprintf("dataqual_%s_%s_bytes", mode.String(), d.DataSource),
+		Value: int64(len(data)),
+	})
 
 	d.rulesMtx.RLock()
 	modeSets, ok := d.rules[mode]
@@ -361,8 +352,21 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 			var shouldDrop bool
 
 			// There can me multiple failure modes per rule
-			//
 			for _, failCfg := range rule.GetFailureModeConfigs() {
+				// Count of failures per rule
+				_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+					ID:    rule.Id,
+					Type:  "rule_failure_count",
+					Value: 1,
+				})
+
+				// Count of data that failed per rule
+				_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+					ID:    rule.Id,
+					Type:  "rule_failure_bytes",
+					Value: int64(len(data)),
+				})
+
 				switch failCfg.Mode {
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
 					shouldDrop = true
@@ -381,8 +385,21 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 						return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
 					}
 
-					if err := d.Plumber.SendRuleNotification(context.Background(), data, rule, ruleSetID); err != nil {
-						// TODO: counters here
+					if err := d.Plumber.SendRuleNotification(ctx, data, rule, ruleSetID); err != nil {
+						// Count of failures per rule
+						_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+							ID:    rule.Id,
+							Type:  "dataqual_rule_failure_count",
+							Value: 1,
+						})
+
+						// Count of data that failed per rule
+						_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
+							ID:    rule.Id,
+							Type:  "dataqual_rule_failure_bytes",
+							Value: int64(len(data)),
+						})
+
 						return nil, errors.Wrap(err, "failed to send rule notification")
 					}
 
