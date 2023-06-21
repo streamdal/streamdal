@@ -148,9 +148,8 @@ func TestGetRuleUpdates(t *testing.T) {
 	}
 
 	d := &DataQual{
-		Plumber:    fakePlumber,
-		ruleSetMtx: &sync.RWMutex{},
-		rulesMtx:   &sync.RWMutex{},
+		Plumber:  fakePlumber,
+		rulesMtx: &sync.RWMutex{},
 		Config: &Config{
 			DataSource: "kafka",
 		},
@@ -159,15 +158,6 @@ func TestGetRuleUpdates(t *testing.T) {
 	// Ensure method doesn't error
 	if err := d.getRuleUpdates(); err != nil {
 		t.Error("unexpected error: " + err.Error())
-	}
-
-	// Ensure we set ruleID -> ruleSetID association
-	v, ok := d.ruleSetMap[ruleID]
-	if !ok {
-		t.Error("expected rule to be in ruleSetMap")
-	}
-	if v != rsID {
-		t.Errorf("expected rule set id %s, got %s", rsID, v)
 	}
 
 	// We should have gotten 1 rule
@@ -455,24 +445,20 @@ func setup(m Module) (*DataQual, error) {
 }
 
 func setupForFailure(configs []*common.FailureMode) *DataQual {
-	ruleID := uuid.New().String()
-	rsID := uuid.New().String()
-
 	return &DataQual{
 		Plumber:      getFakePlumber(),
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
 		rulesMtx:     &sync.RWMutex{},
-		ruleSetMtx:   &sync.RWMutex{},
 		Config:       &Config{DataSource: "kafka"},
-		ruleSetMap:   map[string]string{ruleID: rsID},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		rules: map[Mode]map[string][]*protos.Rule{
 			Publish: {
 				"mytopic": {
 					{
-						Id:   ruleID,
-						Type: common.RuleType_RULE_TYPE_MATCH,
+						Id:         uuid.New().String(),
+						XRulesetId: uuid.New().String(),
+						Type:       common.RuleType_RULE_TYPE_MATCH,
 						RuleConfig: &common.Rule_MatchConfig{
 							MatchConfig: &common.RuleConfigMatch{
 								Path: "type",

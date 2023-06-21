@@ -6,14 +6,15 @@ import (
 	"sync"
 
 	"github.com/streamdal/dataqual/metrics"
+	"github.com/streamdal/dataqual/types"
 )
 
 type FakeIMetrics struct {
-	IncrStub        func(context.Context, *metrics.CounterEntry) error
+	IncrStub        func(context.Context, *types.CounterEntry) error
 	incrMutex       sync.RWMutex
 	incrArgsForCall []struct {
 		arg1 context.Context
-		arg2 *metrics.CounterEntry
+		arg2 *types.CounterEntry
 	}
 	incrReturns struct {
 		result1 error
@@ -25,12 +26,12 @@ type FakeIMetrics struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIMetrics) Incr(arg1 context.Context, arg2 *metrics.CounterEntry) error {
+func (fake *FakeIMetrics) Incr(arg1 context.Context, arg2 *types.CounterEntry) error {
 	fake.incrMutex.Lock()
 	ret, specificReturn := fake.incrReturnsOnCall[len(fake.incrArgsForCall)]
 	fake.incrArgsForCall = append(fake.incrArgsForCall, struct {
 		arg1 context.Context
-		arg2 *metrics.CounterEntry
+		arg2 *types.CounterEntry
 	}{arg1, arg2})
 	stub := fake.IncrStub
 	fakeReturns := fake.incrReturns
@@ -51,13 +52,13 @@ func (fake *FakeIMetrics) IncrCallCount() int {
 	return len(fake.incrArgsForCall)
 }
 
-func (fake *FakeIMetrics) IncrCalls(stub func(context.Context, *metrics.CounterEntry) error) {
+func (fake *FakeIMetrics) IncrCalls(stub func(context.Context, *types.CounterEntry) error) {
 	fake.incrMutex.Lock()
 	defer fake.incrMutex.Unlock()
 	fake.IncrStub = stub
 }
 
-func (fake *FakeIMetrics) IncrArgsForCall(i int) (context.Context, *metrics.CounterEntry) {
+func (fake *FakeIMetrics) IncrArgsForCall(i int) (context.Context, *types.CounterEntry) {
 	fake.incrMutex.RLock()
 	defer fake.incrMutex.RUnlock()
 	argsForCall := fake.incrArgsForCall[i]
