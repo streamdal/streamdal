@@ -7,6 +7,7 @@ import (
 
 	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/streamdal/dataqual/plumber"
+	"github.com/streamdal/dataqual/types"
 )
 
 type FakeIPlumberClient struct {
@@ -38,12 +39,11 @@ type FakeIPlumberClient struct {
 		result1 []byte
 		result2 error
 	}
-	SendMetricsStub        func(context.Context, string, float64) error
+	SendMetricsStub        func(context.Context, *types.CounterEntry) error
 	sendMetricsMutex       sync.RWMutex
 	sendMetricsArgsForCall []struct {
 		arg1 context.Context
-		arg2 string
-		arg3 float64
+		arg2 *types.CounterEntry
 	}
 	sendMetricsReturns struct {
 		result1 error
@@ -199,20 +199,19 @@ func (fake *FakeIPlumberClient) GetWasmFileReturnsOnCall(i int, result1 []byte, 
 	}{result1, result2}
 }
 
-func (fake *FakeIPlumberClient) SendMetrics(arg1 context.Context, arg2 string, arg3 float64) error {
+func (fake *FakeIPlumberClient) SendMetrics(arg1 context.Context, arg2 *types.CounterEntry) error {
 	fake.sendMetricsMutex.Lock()
 	ret, specificReturn := fake.sendMetricsReturnsOnCall[len(fake.sendMetricsArgsForCall)]
 	fake.sendMetricsArgsForCall = append(fake.sendMetricsArgsForCall, struct {
 		arg1 context.Context
-		arg2 string
-		arg3 float64
-	}{arg1, arg2, arg3})
+		arg2 *types.CounterEntry
+	}{arg1, arg2})
 	stub := fake.SendMetricsStub
 	fakeReturns := fake.sendMetricsReturns
-	fake.recordInvocation("SendMetrics", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("SendMetrics", []interface{}{arg1, arg2})
 	fake.sendMetricsMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
@@ -226,17 +225,17 @@ func (fake *FakeIPlumberClient) SendMetricsCallCount() int {
 	return len(fake.sendMetricsArgsForCall)
 }
 
-func (fake *FakeIPlumberClient) SendMetricsCalls(stub func(context.Context, string, float64) error) {
+func (fake *FakeIPlumberClient) SendMetricsCalls(stub func(context.Context, *types.CounterEntry) error) {
 	fake.sendMetricsMutex.Lock()
 	defer fake.sendMetricsMutex.Unlock()
 	fake.SendMetricsStub = stub
 }
 
-func (fake *FakeIPlumberClient) SendMetricsArgsForCall(i int) (context.Context, string, float64) {
+func (fake *FakeIPlumberClient) SendMetricsArgsForCall(i int) (context.Context, *types.CounterEntry) {
 	fake.sendMetricsMutex.RLock()
 	defer fake.sendMetricsMutex.RUnlock()
 	argsForCall := fake.sendMetricsArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeIPlumberClient) SendMetricsReturns(result1 error) {

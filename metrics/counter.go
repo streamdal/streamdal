@@ -1,19 +1,22 @@
 package metrics
 
 import (
+	"fmt"
 	"sync"
 	"time"
+
+	"github.com/streamdal/dataqual/types"
 )
 
 type counter struct {
-	entry       *CounterEntry
+	entry       *types.CounterEntry
 	count       int64
 	countMutex  *sync.RWMutex
 	lastUpdated time.Time
 }
 
 // getValue increases the total for a getValue counter
-func (c *counter) incr(entry *CounterEntry) {
+func (c *counter) incr(entry *types.CounterEntry) {
 	c.countMutex.Lock()
 	defer c.countMutex.Unlock()
 
@@ -36,20 +39,20 @@ func (c *counter) getValue() int64 {
 	return c.count
 }
 
-func (c *counter) getEntry() CounterEntry {
+func (c *counter) getEntry() types.CounterEntry {
 	e := c.entry
 	e.Value = c.getValue()
 	return *e
 }
 
-func CompositeID(e *CounterEntry) string {
+func CompositeID(e *types.CounterEntry) string {
 	// Global counter
-	if e.ID == "" {
-		return e.Type
+	if e.RuleID == "" {
+		return fmt.Sprintf("%s-%s", e.Name, e.Type)
 	}
 
 	// Rule specific counter
-	return e.Type + "-" + e.ID
+	return fmt.Sprintf("%s-%s-%s", e.Name, e.Type, e.RuleID)
 }
 
 func (c *counter) reset() {

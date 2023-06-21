@@ -77,21 +77,13 @@ func main() {
 
 ### Metrics
 
-The SDK ships metrics to Plumber which are then exposed via promethus endpoint at `http://<plumber>:9191/metrics`
 
-| Metric                                   | Description                                                                                  |
-|------------------------------------------|----------------------------------------------------------------------------------------------|
-| `dataqual_rule_failure_count_<RULE_ID>`  | Total number of times a rule triggered a failure mode                                        |
-| `dataqual_rule_failure_bytes_<RULE_ID>`  | Total number of bytes a rule triggered a failure mode                                        |
-| `dataqual_publish_kafka_events`          | Total number of kafka events processed by the SDK                                            |
-| `dataqual_publish_kafka_bytes`           | Total number of bytes processed by the SDK                                                   |
-| `dataqual_consume_kafka_events`          | Total number of kafka events consumed by the SDK                                             |
-| `dataqual_consume_kafka_bytes`           | Total number of kafka bytes consumed by the SDK                                              |
-| `dataqual_publish_rabbitmq_events`       | Total number of rabbitmq events processed by the SDK                                         |
-| `dataqual_publish_rabbitmq_bytes`        | Total number of rabbitmq bytes processed by the SDK                                          |
-| `dataqual_consume_rabbitmq_events`       | Total number of rabbitmq events consumed by the SDK                                          |
-| `dataqual_consume_rabbitmq_bytes`        | Total number of rabbitmq bytes consumed by the SDK                                           |
-| `dataqual_publish_kafka_size_exceeded`   | Total number of published kafka events ignored due to size exceeding the event size limit    |
-| `dataqual_consume_kafka_size_exceeded`   | Total number of consumed kafka events ignored due to size exceeding the event size limit     |
-| `dataqual_publish_rabbitmq_size_exceeded` | Total number of published rabbitmq events ignored due to size exceeding the event size limit |
-| `dataqual_consume_rabbitmq_size_exceeded` | Total number of consumed rabbitmq ignored due to size exceeding the event size limit         |
+| Metric                             | Description                                                    | Labels                                                                |
+|------------------------------------|----------------------------------------------------------------|-----------------------------------------------------------------------|
+| `plumber_dataqual_pubish`          | Total number of messages published                             | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
+| `plumber_dataqual_consume`         | Total number of messages consumed                              | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
+| `plumber_dataqual_size_exceeded`   | Total number of messages ignored due to exceeding size limit   | `data_source` = "kafka", "rabbitmq" ,etc                              |
+| `plumber_dataqual_rule`            | Number of events and bytes count for each rule ran             | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
+| `plumber_dataqual_failure_trigger` | Number of events and bytes count that triggered a failure mode | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
+
+The SDK ships metrics to Plumber which are then exposed via promethus endpoint at `http://<plumber>:9191/metrics`

@@ -20,17 +20,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/relistan/go-director"
-
-	"github.com/streamdal/dataqual/logger"
-
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
+	"github.com/relistan/go-director"
 
 	"github.com/streamdal/dataqual/common"
 	"github.com/streamdal/dataqual/detective"
+	"github.com/streamdal/dataqual/logger"
 	"github.com/streamdal/dataqual/metrics"
 	"github.com/streamdal/dataqual/plumber"
+	"github.com/streamdal/dataqual/types"
 )
 
 // Module is a constant that represents which type of WASM module we will run the rules against
@@ -78,8 +77,6 @@ type DataQual struct {
 	*Config
 	functions    map[Module]*function
 	rules        map[Mode]map[string][]*protos.Rule
-	ruleSetMap   map[string]string
-	ruleSetMtx   *sync.RWMutex
 	functionsMtx *sync.RWMutex
 	rulesMtx     *sync.RWMutex
 	Plumber      plumber.IPlumberClient
@@ -124,8 +121,6 @@ func New(cfg *Config) (*DataQual, error) {
 		Plumber:      plumber,
 		rules:        make(map[Mode]map[string][]*protos.Rule),
 		rulesMtx:     &sync.RWMutex{},
-		ruleSetMap:   make(map[string]string),
-		ruleSetMtx:   &sync.RWMutex{},
 		Config:       cfg,
 		metrics:      m,
 	}
@@ -287,25 +282,37 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	if len(data) > DefaultMaxDataSize {
-		_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-			Type:  fmt.Sprintf("dataqual_%s_%s_size_exceeded", mode.String(), d.DataSource),
-			Value: 1,
+		_ = d.metrics.Incr(ctx, &types.CounterEntry{
+			Name:   types.CounterSizeExceeded,
+			Type:   types.CounterTypeCount,
+			Labels: map[string]string{"data_source": d.DataSource, "mode": mode.String()},
+			Value:  1,
 		})
-
 		d.Logger.Warnf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
 		return data, nil
 	}
 
+	var counterName types.CounterName
+	if mode == Publish {
+		counterName = types.CounterPublish
+	} else {
+		counterName = types.CounterConsume
+	}
+
 	// Counter for data source/mode calls total
-	_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-		Type:  fmt.Sprintf("dataqual_%s_%s_events", mode.String(), d.DataSource),
-		Value: 1,
+	_ = d.metrics.Incr(ctx, &types.CounterEntry{
+		Name:   counterName,
+		Type:   types.CounterTypeCount,
+		Labels: map[string]string{"data_source": d.DataSource},
+		Value:  1,
 	})
 
 	// Counter for data source/mode bytes total
-	_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-		Type:  fmt.Sprintf("dataqual_%s_%s_bytes", mode.String(), d.DataSource),
-		Value: int64(len(data)),
+	_ = d.metrics.Incr(ctx, &types.CounterEntry{
+		Name:   counterName,
+		Type:   types.CounterTypeBytes,
+		Labels: map[string]string{"data_source": d.DataSource},
+		Value:  int64(len(data)),
 	})
 
 	d.rulesMtx.RLock()
@@ -326,6 +333,23 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 	}
 
 	for _, rule := range rules {
+		// Rule counter total
+		_ = d.metrics.Incr(ctx, &types.CounterEntry{
+			Name:   types.CounterRule,
+			Type:   types.CounterTypeCount,
+			Labels: map[string]string{"data_source": d.DataSource},
+			Value:  1,
+		})
+
+		// Rule counter bytes
+		_ = d.metrics.Incr(ctx, &types.CounterEntry{
+			Name:      types.CounterRule,
+			Type:      types.CounterTypeBytes,
+			RuleID:    rule.Id,
+			RuleSetID: rule.XRulesetId,
+			Value:     int64(len(data)),
+		})
+
 		switch rule.Type {
 		case protos.RuleType_RULE_TYPE_MATCH:
 			cfg := rule.GetMatchConfig()
@@ -351,22 +375,28 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 
 			var shouldDrop bool
 
+			// Count of failures per rule
+			_ = d.metrics.Incr(ctx, &types.CounterEntry{
+				Name:      types.CounterFailureTrigger,
+				RuleID:    rule.Id,
+				RuleSetID: rule.XRulesetId,
+				Type:      types.CounterTypeCount,
+				Value:     1,
+			})
+
+			// Count of data that failed per rule
+			_ = d.metrics.Incr(ctx, &types.CounterEntry{
+				Name:      types.CounterFailureTrigger,
+				RuleID:    rule.Id,
+				RuleSetID: rule.XRulesetId,
+				Type:      types.CounterTypeBytes,
+				Value:     int64(len(data)),
+			})
+
+			// TODO: count by failure mode
+
 			// There can me multiple failure modes per rule
 			for _, failCfg := range rule.GetFailureModeConfigs() {
-				// Count of failures per rule
-				_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-					ID:    rule.Id,
-					Type:  "rule_failure_count",
-					Value: 1,
-				})
-
-				// Count of data that failed per rule
-				_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-					ID:    rule.Id,
-					Type:  "rule_failure_bytes",
-					Value: int64(len(data)),
-				})
-
 				switch failCfg.Mode {
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
 					shouldDrop = true
@@ -380,26 +410,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
 					fallthrough
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-					ruleSetID, ok := d.getRuleSetIDForRule(rule.Id)
-					if !ok {
-						return nil, fmt.Errorf("BUG: failed to get rule set id for rule %s", rule.Id)
-					}
-
-					if err := d.Plumber.SendRuleNotification(ctx, data, rule, ruleSetID); err != nil {
-						// Count of failures per rule
-						_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-							ID:    rule.Id,
-							Type:  "dataqual_rule_failure_count",
-							Value: 1,
-						})
-
-						// Count of data that failed per rule
-						_ = d.metrics.Incr(ctx, &metrics.CounterEntry{
-							ID:    rule.Id,
-							Type:  "dataqual_rule_failure_bytes",
-							Value: int64(len(data)),
-						})
-
+					if err := d.Plumber.SendRuleNotification(ctx, data, rule, rule.XRulesetId); err != nil {
 						return nil, errors.Wrap(err, "failed to send rule notification")
 					}
 
@@ -481,7 +492,6 @@ func (d *DataQual) getRuleUpdates() error {
 	// Second map key is rule key: kafka topic, rabbit routing/binding key
 	// We need a way to look these up O(1)
 	rules := make(map[Mode]map[string][]*protos.Rule)
-	ruleSetMap := make(map[string]string)
 
 	for _, set := range ruleSets {
 		if _, ok := rules[Mode(set.Mode)]; !ok {
@@ -489,12 +499,13 @@ func (d *DataQual) getRuleUpdates() error {
 		}
 
 		for _, rule := range set.Rules {
+			rule.XRulesetId = set.Id // Needed for metrics and alerting
+
 			if _, ok := rules[Mode(set.Mode)][set.Key]; !ok {
 				rules[Mode(set.Mode)][set.Key] = make([]*protos.Rule, 0)
 			}
 
 			rules[Mode(set.Mode)][set.Key] = append(rules[Mode(set.Mode)][set.Key], rule)
-			ruleSetMap[rule.Id] = set.Id
 		}
 	}
 
@@ -502,21 +513,7 @@ func (d *DataQual) getRuleUpdates() error {
 	d.rules = rules
 	d.rulesMtx.Unlock()
 
-	d.ruleSetMtx.Lock()
-	d.ruleSetMap = ruleSetMap
-	d.ruleSetMtx.Unlock()
-
 	return nil
-}
-
-// getRuleSetIDForRule gets the ruleset ID for a given rule ID.
-// This is needed when communicating rule failure alerts to Plumber
-func (d *DataQual) getRuleSetIDForRule(ruleID string) (string, bool) {
-	d.ruleSetMtx.RLock()
-	defer d.ruleSetMtx.RUnlock()
-
-	ruleSetID, ok := d.ruleSetMap[ruleID]
-	return ruleSetID, ok
 }
 
 func (m Mode) String() string {

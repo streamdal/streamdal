@@ -11,11 +11,12 @@ import (
 
 	"github.com/streamdal/dataqual/logger"
 	"github.com/streamdal/dataqual/plumber"
+	"github.com/streamdal/dataqual/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics
 type IMetrics interface {
-	Incr(ctx context.Context, entry *CounterEntry) error
+	Incr(ctx context.Context, entry *types.CounterEntry) error
 }
 
 const (
@@ -41,8 +42,8 @@ type Metrics struct {
 	counterTickerLooper director.Looper
 	counterReaperLooper director.Looper
 	counterMap          map[string]*counter
-	counterIncrCh       chan *CounterEntry
-	counterPublishCh    chan *CounterEntry
+	counterIncrCh       chan *types.CounterEntry
+	counterPublishCh    chan *types.CounterEntry
 }
 
 type Config struct {
@@ -53,12 +54,6 @@ type Config struct {
 	Plumber               plumber.IPlumberClient
 	ShutdownCtx           context.Context
 	Log                   logger.Logger
-}
-
-type CounterEntry struct {
-	ID    string // uuid of the rule
-	Type  string // "errors", "messages", "bytes"
-	Value int64
 }
 
 func New(cfg *Config) (*Metrics, error) {
@@ -72,7 +67,7 @@ func New(cfg *Config) (*Metrics, error) {
 		counterMapMutex:     &sync.RWMutex{},
 		counterTickerLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterReaperLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
-		counterIncrCh:       make(chan *CounterEntry, 10000),
+		counterIncrCh:       make(chan *types.CounterEntry, 10000),
 		wg:                  &sync.WaitGroup{},
 	}
 
@@ -92,8 +87,6 @@ func New(cfg *Config) (*Metrics, error) {
 	// Launch counter reaper
 	m.wg.Add(1)
 	go m.runCounterReaper()
-
-	go m.startDumper()
 
 	return m, nil
 }
@@ -130,21 +123,7 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-// startDumper is a goroutine which periodically dumps metrics to Plumber
-func (m *Metrics) startDumper() {
-	m.counterMapMutex.Lock()
-	counters := m.counterMap
-	for k, _ := range m.counterMap {
-		m.counterMap[k].count = 0
-	}
-	m.counterMapMutex.Unlock()
-
-	for name, c := range counters {
-		m.Plumber.SendMetrics(context.Background(), name, float64(c.count))
-	}
-}
-
-func (m *Metrics) Incr(ctx context.Context, entry *CounterEntry) error {
+func (m *Metrics) Incr(ctx context.Context, entry *types.CounterEntry) error {
 	if err := m.validateCounterEntry(entry); err != nil {
 		return errors.Wrap(err, "unable to validate counter entry")
 	}
@@ -156,7 +135,7 @@ func (m *Metrics) Incr(ctx context.Context, entry *CounterEntry) error {
 	return nil
 }
 
-func (m *Metrics) validateCounterEntry(entry *CounterEntry) error {
+func (m *Metrics) validateCounterEntry(entry *types.CounterEntry) error {
 	if entry == nil {
 		return ErrMissingEntry
 	}
@@ -168,7 +147,7 @@ func (m *Metrics) validateCounterEntry(entry *CounterEntry) error {
 	return nil
 }
 
-func (m *Metrics) newCounter(e *CounterEntry) *counter {
+func (m *Metrics) newCounter(e *types.CounterEntry) *counter {
 	m.counterMapMutex.Lock()
 	defer m.counterMapMutex.Unlock()
 
@@ -180,7 +159,7 @@ func (m *Metrics) newCounter(e *CounterEntry) *counter {
 	return m.counterMap[CompositeID(e)]
 }
 
-func (m *Metrics) getCounter(e *CounterEntry) (*counter, bool) {
+func (m *Metrics) getCounter(e *types.CounterEntry) (*counter, bool) {
 	m.counterMapMutex.RLock()
 	defer m.counterMapMutex.RUnlock()
 
@@ -205,7 +184,7 @@ func (m *Metrics) getCounters() map[string]*counter {
 	return localCounters
 }
 
-func (m *Metrics) incr(_ context.Context, entry *CounterEntry) error {
+func (m *Metrics) incr(_ context.Context, entry *types.CounterEntry) error {
 	// No need to validate - no way to reach here without validation
 	c, ok := m.getCounter(entry)
 	if !ok {
@@ -239,7 +218,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
 			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Type, entry.Value)
-			err = m.publishCounter(context.Background(), entry)
+			err = m.Plumber.SendMetrics(context.Background(), entry)
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()
@@ -356,8 +335,4 @@ func (m *Metrics) runCounterReaper() {
 	})
 
 	m.Log.Debugf("exiting runCounterReaper()")
-}
-
-func (m *Metrics) publishCounter(ctx context.Context, entry *CounterEntry) error {
-	return m.Plumber.SendMetrics(ctx, entry.Type, float64(entry.Value))
 }

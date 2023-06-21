@@ -12,6 +12,8 @@ import (
 	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+
+	"github.com/streamdal/dataqual/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IPlumberClient
@@ -24,7 +26,7 @@ type IPlumberClient interface {
 	GetWasmFile(ctx context.Context, wasmFile string) ([]byte, error)
 
 	// SendMetrics dumps a metric value to the Plumber server
-	SendMetrics(ctx context.Context, counterName string, counterValue float64) error
+	SendMetrics(ctx context.Context, entry *types.CounterEntry) error
 
 	// SendRuleNotification sends a notification to the Plumber server that a rule has been triggered
 	// Plumber will handle the notification based on the rule's configuration
@@ -114,13 +116,23 @@ func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *c
 	return nil
 }
 
-func (p *Plumber) SendMetrics(ctx context.Context, counterName string, counterValue float64) error {
+func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) error {
+	labels := counter.Labels
+
+	// Only pass these labels if set.
+	// Prometheus is not able to handle variable labels.
+	if counter.RuleID != "" {
+		labels["rule_id"] = counter.RuleID
+		labels["ruleset_id"] = counter.RuleID
+	}
+
 	req := &protos.PublishMetricsRequest{
 		Auth: &common.Auth{
 			Token: p.Token,
 		},
-		Counter: counterName,
-		Value:   counterValue,
+		Counter: string(counter.Name),
+		Labels:  counter.Labels,
+		Value:   float64(counter.Value),
 	}
 
 	if _, err := p.Server.PublishMetrics(ctx, req); err != nil {
