@@ -118,6 +118,9 @@ func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *c
 
 func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) error {
 	labels := counter.Labels
+	if labels == nil {
+		labels = make(map[string]string)
+	}
 
 	// Only pass these labels if set.
 	// Prometheus is not able to handle variable labels.
@@ -125,6 +128,8 @@ func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) 
 		labels["rule_id"] = counter.RuleID
 		labels["ruleset_id"] = counter.RuleID
 	}
+
+	labels["type"] = string(counter.Type)
 
 	req := &protos.PublishMetricsRequest{
 		Auth: &common.Auth{
