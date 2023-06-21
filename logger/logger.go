@@ -1,5 +1,9 @@
 package logger
 
+import (
+	"log"
+)
+
 // Logger is the common interface for user-provided loggers.
 //
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Logger
@@ -29,32 +33,40 @@ type NoOpLogger struct {
 
 // Debug is no-op implementation of Logger's Debug.
 func (l *NoOpLogger) Debug(args ...interface{}) {
+	log.Println(args...)
 }
 
 // Debugf is no-op implementation of Logger's Debugf.
 func (l *NoOpLogger) Debugf(format string, args ...interface{}) {
+	log.Printf(format, args...)
 }
 
 // Info is no-op implementation of Logger's Info.
 func (l *NoOpLogger) Info(args ...interface{}) {
+	log.Println(args...)
 }
 
 // Infof is no-op implementation of Logger's Infof.
 func (l *NoOpLogger) Infof(format string, args ...interface{}) {
+	log.Printf(format, args...)
 }
 
 // Warn is no-op implementation of Logger's Warn.
 func (l *NoOpLogger) Warn(args ...interface{}) {
+	log.Println(args...)
 }
 
 // Warnf is no-op implementation of Logger's Warnf.
 func (l *NoOpLogger) Warnf(format string, args ...interface{}) {
+	log.Printf(format, args...)
 }
 
 // Error is no-op implementation of Logger's Error.
 func (l *NoOpLogger) Error(args ...interface{}) {
+	log.Println(args...)
 }
 
 // Errorf is no-op implementation of Logger's Errorf.
 func (l *NoOpLogger) Errorf(format string, args ...interface{}) {
+	log.Printf(format, args...)
 }
