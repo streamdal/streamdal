@@ -110,7 +110,7 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "failed to connect to plumber")
 	}
 
-	m, err := metrics.New(&metrics.Config{Plumber: plumber})
+	m, err := metrics.New(&metrics.Config{Plumber: plumber, ShutdownCtx: cfg.ShutdownCtx})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
