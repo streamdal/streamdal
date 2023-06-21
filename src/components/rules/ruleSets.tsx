@@ -1,12 +1,12 @@
-import type React from "react";
-import type { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { titleCase } from "../../lib/utils";
 import { RuleSetMenu } from "./menu";
 import { MonitorIcon } from "../icons/streamdal";
-import { useEffect, useState } from "react";
-import { getJson } from "../../lib/fetch";
+import { getJson, getText } from "../../lib/fetch";
 import { Loading } from "../icons/nav";
 import { Error } from "../status/error";
+import { parseMetrics } from "../../lib/metrics";
+import { Total } from "./metrics/total";
 
 const RULESETS_ERROR = "There was a problem loading Rulesets";
 
@@ -32,35 +32,51 @@ export const TD = ({
   className?: string;
 }) => (
   <td
-    className={`text-xs-[14px] font-medium leading-[18px] text-left pb-5 ${className}`}
+    className={`align-top text-xs-[14px] font-medium leading-[18px] text-left pb-5 ${className}`}
   >
     {children}
   </td>
 );
 
-export const humanMode = (mode: string) => titleCase(mode.substring(10));
+export const humanMode = (mode?: string) =>
+  mode ? titleCase(mode.substring(10)) : "";
 
 export const RuleSets = () => {
   const [ruleSets, setRuleSets] = useState<any>(null);
+  const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
+  //
+  // most updates are too fast for the use to notice
+  const doneLoading = () => {
+    const toRef = setTimeout(() => {
+      setLoading(false);
+      clearTimeout(toRef);
+    }, 500);
+  };
+
   const getData = async () => {
+    setLoading(true);
     try {
       setRuleSets(await getJson(`/v1/ruleset`));
-    } catch {
+      setMetrics(parseMetrics(await getText(`/metrics`)));
+    } catch (e) {
+      console.error("Error loading rule sets and metrics", e);
       setError(true);
     }
-    setLoading(false);
+    doneLoading();
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    const interval = setInterval(() => {
+      getData();
+    }, 2000);
 
-  if (loading) {
-    return <Loading />;
-  }
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   if (error) {
     return <Error error={RULESETS_ERROR} />;
@@ -68,9 +84,12 @@ export const RuleSets = () => {
 
   return (
     <div className="max-w-[1440px]">
-      <div className="flex flex-row justify-start align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">
-        <MonitorIcon className="mr-2 w-[14px]" />
-        <span className="text-web">Rule sets</span>
+      <div className="flex flex-row justify-between align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">
+        <div className="flex flex-row justify-start">
+          <MonitorIcon className="mr-2 w-[14px]" />
+          <span className="text-web">Rule sets</span>
+        </div>
+        {loading && <Loading />}
       </div>
       <table className="table-auto border-collapse w-full text-sm">
         <thead>
@@ -80,28 +99,83 @@ export const RuleSets = () => {
             <TH>Data Source</TH>
             <TH>Key</TH>
             <TH className="text-center">Version</TH>
+            <TH>Metrics</TH>
             <TH></TH>
           </tr>
         </thead>
         <tbody>
-          {Object.values(ruleSets)?.map((r: any, i: number) => (
-            <tr key={`ruleset-table-${i}`}>
-              <TD>
-                <a href={`/ruleset?id=${r.id}`}>{r.name}</a>
-              </TD>
-              <TD>{humanMode(r.mode)}</TD>
-              <TD>{r.data_source}</TD>
-              <TD>{r.key}</TD>
-              <TD className="text-center">{r.version}</TD>
-              <TD>
-                <RuleSetMenu id={r.id} />
-              </TD>
-            </tr>
-          ))}
+          {ruleSets &&
+            Object.values(ruleSets)?.map((r: any, i: number) => (
+              <tr key={`ruleset-table-${i}`}>
+                <TD>
+                  <a
+                    className="hover:underline underline-offset-2 font-bold"
+                    href={`/ruleset?id=${r.id}`}
+                  >
+                    {r.name}
+                  </a>
+                </TD>
+                <TD>{humanMode(r.mode)}</TD>
+                <TD>{r.data_source}</TD>
+                <TD>{r.key}</TD>
+                <TD className="text-center">{r.version}</TD>
+                <TD className="text-left">
+                  <div className="flex flex-col mr-4">
+                    <div>
+                      Data:{" "}
+                      <Total
+                        metrics={metrics}
+                        id={r.id}
+                        kind="plumber_dataqual_rule"
+                        type="bytes"
+                      />
+                    </div>
+                    <div>
+                      Events:{" "}
+                      <Total
+                        metrics={metrics}
+                        id={r.id}
+                        kind="plumber_dataqual_rule"
+                        type="count"
+                      />
+                    </div>
+                    <div>
+                      Failed Data:{" "}
+                      <Total
+                        metrics={metrics}
+                        id={r.id}
+                        kind="plumber_dataqual_failure_trigger"
+                        type="bytes"
+                      />
+                    </div>
+                    <div>
+                      Failed Events:{" "}
+                      <Total
+                        metrics={metrics}
+                        id={r.id}
+                        kind="plumber_dataqual_failure_trigger"
+                        type="count"
+                      />
+                    </div>
+                    <div className="cursor-pointer">
+                      <a
+                        className="hover:underline underline-offset-2 font-bold"
+                        href={`/ruleset?id=${r.id}`}
+                      >
+                        more&gt;
+                      </a>
+                    </div>
+                  </div>
+                </TD>
+                <TD>
+                  <RuleSetMenu id={r.id} />
+                </TD>
+              </tr>
+            ))}
         </tbody>
       </table>
       <div className="w-full mt-4 flex justify-end">
-        <a href="/ruleset">
+        <a href="/ruleset/edit">
           <input
             type="button"
             className="flex justify-center btn-heimdal"

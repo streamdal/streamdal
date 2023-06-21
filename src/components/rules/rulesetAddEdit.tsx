@@ -14,6 +14,7 @@ import { mutate } from "../../lib/mutation";
 import { v4 as uuidv4 } from "uuid";
 import { Success } from "../status/success";
 import { FAILURE_MODE_TYPE } from "./rule/failureMode";
+import { mapRuleSet } from "./rulesetView";
 
 export const RULESET_ERROR = "Ruleset not found!";
 
@@ -253,7 +254,7 @@ export const RuleSetAddEdit = () => {
 
       const id = response?.values?.id;
       if (id) {
-        window.location.href = `/ruleset?id=${id}&success=true`;
+        window.location.href = `/ruleset/edit?id=${id}&success=true`;
       }
     } catch (e: any) {
       setAddError(e.toString());
@@ -277,23 +278,7 @@ export const RuleSetAddEdit = () => {
       // rules are passed back as an object, converting to array for convenience
       const mappedRules = Object.values(unmapped);
       setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
-
-      reset({
-        ...set,
-        rules: mappedRules,
-        ...(key &&
-        set.data_source === "rabbitmq" &&
-        set.mode === "RULE_MODE_PUBLISH"
-          ? {
-              exchange_name: key.substring(0, key.indexOf("|")),
-              binding_key: key.substring(key.indexOf("|") + 1),
-            }
-          : key &&
-            set.data_source === "rabbitmq" &&
-            set.mode === "RULE_MODE_CONSUME"
-          ? { queue_name: key }
-          : { key }),
-      });
+      reset(mapRuleSet(set, key, mappedRules));
     } catch (e: any) {
       console.error("Error loading ruleset", e);
       setError(RULESET_ERROR);
