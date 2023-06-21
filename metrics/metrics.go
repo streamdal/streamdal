@@ -68,6 +68,7 @@ func New(cfg *Config) (*Metrics, error) {
 		counterTickerLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterReaperLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterIncrCh:       make(chan *types.CounterEntry, 10000),
+		counterPublishCh:    make(chan *types.CounterEntry, 10000),
 		wg:                  &sync.WaitGroup{},
 	}
 
@@ -217,7 +218,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		case entry := <-m.counterIncrCh: // Coming from user doing Incr() // buffered chan
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
-			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Type, entry.Value)
+			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Name, entry.Value)
 			err = m.Plumber.SendMetrics(context.Background(), entry)
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
@@ -228,7 +229,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		}
 
 		if err != nil {
-			m.Log.Error("worker pool error: %s", err)
+			m.Log.Errorf("worker pool error: %s", err)
 		}
 
 		return nil
