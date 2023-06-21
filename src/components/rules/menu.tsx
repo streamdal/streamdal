@@ -2,13 +2,14 @@ import { Menu } from "@headlessui/react";
 import React from "react";
 import { Kebab } from "../icons/nav";
 import { Delete, Edit } from "../icons/crud";
+import { EyeIcon } from "@heroicons/react/20/solid";
 
 export const RuleSetMenu = ({ id }: { id: string }) => {
   return (
     <Menu as="div" className="text-right align-text-bottom pt-[6px] relative">
       <div>
         <Menu.Button>
-          <Kebab className="hover:text-shadow h-[20px]" aria-hidden="true" />
+          <Kebab className="hover:text-web h-[20px]" aria-hidden="true" />
         </Menu.Button>
       </div>
 
@@ -22,8 +23,27 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
                     active ? "bg-sunset" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
+                  <EyeIcon
+                    className="w-[14px] mr-2 text-web"
+                    aria-hidden="true"
+                  />
+                  View
+                </button>
+              </a>
+            )}
+          </Menu.Item>
+        </div>
+        <div className="p-2 pb-1">
+          <Menu.Item>
+            {({ active }) => (
+              <a href={`/ruleset/edit?id=${id}`}>
+                <button
+                  className={`${
+                    active ? "bg-sunset" : ""
+                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                >
                   <Edit className="mr-2 text-web" aria-hidden="true" />
-                  View/Edit
+                  Edit
                 </button>
               </a>
             )}
