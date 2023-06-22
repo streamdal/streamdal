@@ -386,8 +386,6 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 
 			var shouldDrop bool
 
-			// TODO: count by failure mode
-
 			// There can me multiple failure modes per rule
 			for _, failCfg := range rule.GetFailureModeConfigs() {
 				var strMode string

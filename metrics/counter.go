@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -46,13 +47,19 @@ func (c *counter) getEntry() types.CounterEntry {
 }
 
 func CompositeID(e *types.CounterEntry) string {
+	labelVals := make([]string, 0)
+	for _, v := range e.Labels {
+		labelVals = append(labelVals, v)
+	}
+	labels := strings.Join(labelVals, "-")
+
 	// Global counter
 	if e.RuleID == "" {
-		return fmt.Sprintf("%s-%s", e.Name, e.Type)
+		return fmt.Sprintf("%s-%s-%s", e.Name, e.Type, labels)
 	}
 
 	// Rule specific counter
-	return fmt.Sprintf("%s-%s-%s", e.Name, e.Type, e.RuleID)
+	return fmt.Sprintf("%s-%s-%s-%s", e.Name, e.Type, e.RuleID, labels)
 }
 
 func (c *counter) reset() {
