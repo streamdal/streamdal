@@ -284,7 +284,31 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 	return resp.IsMatch, nil
 }
 
+func (d *DataQual) getRules(mode Mode, key string) []*protos.Rule {
+	d.rulesMtx.RLock()
+	defer d.rulesMtx.RUnlock()
+
+	// Main map will have 2 Mode keys: Publish and Consume
+	modeSets, ok := d.rules[mode]
+
+	// Check if we have rules for this key
+	// Key = kafka topic or rabbit routing/binding key
+	rules, ok := modeSets[key]
+	if !ok {
+		// No rules for this key, nothing to do
+		return make([]*protos.Rule, 0)
+	}
+
+	return rules
+}
+
 func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
+	rules := d.getRules(mode, key)
+	if len(rules) == 0 {
+		// No rules for this mode, nothing to do
+		return data, nil
+	}
+
 	if len(data) > DefaultMaxDataSize {
 		_ = d.metrics.Incr(ctx, &types.CounterEntry{
 			Name:   types.CounterSizeExceeded,
@@ -318,23 +342,6 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 		Labels: map[string]string{"data_source": d.DataSource},
 		Value:  int64(len(data)),
 	})
-
-	d.rulesMtx.RLock()
-	modeSets, ok := d.rules[mode]
-	defer d.rulesMtx.RUnlock()
-
-	if !ok {
-		// No rules for this mode, nothing to do
-		return data, nil
-	}
-
-	// Check if we have rules for this key
-	// Key = kafka topic or rabbit routing/binding key
-	rules, ok := modeSets[key]
-	if !ok {
-		// No rules for this key, nothing to do
-		return data, nil
-	}
 
 	for _, rule := range rules {
 		// Rule counter total
@@ -379,32 +386,17 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 
 			var shouldDrop bool
 
-			// Count of failures per rule
-			_ = d.metrics.Incr(ctx, &types.CounterEntry{
-				Name:      types.CounterFailureTrigger,
-				RuleID:    rule.Id,
-				RuleSetID: rule.XRulesetId,
-				Type:      types.CounterTypeCount,
-				Value:     1,
-			})
-
-			// Count of data that failed per rule
-			_ = d.metrics.Incr(ctx, &types.CounterEntry{
-				Name:      types.CounterFailureTrigger,
-				RuleID:    rule.Id,
-				RuleSetID: rule.XRulesetId,
-				Type:      types.CounterTypeBytes,
-				Value:     int64(len(data)),
-			})
-
 			// TODO: count by failure mode
 
 			// There can me multiple failure modes per rule
 			for _, failCfg := range rule.GetFailureModeConfigs() {
+				var strMode string
 				switch failCfg.Mode {
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
+					strMode = "reject"
 					shouldDrop = true
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
+					strMode = "transform"
 					transformed, err := d.failTransform(ctx, data, failCfg.GetTransform())
 					if err != nil {
 						return nil, errors.Wrap(err, "failed to run transform")
@@ -412,8 +404,10 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 
 					data = transformed
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
+					strMode = "alert_slack"
 					fallthrough
 				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
+					strMode = "dlq"
 					if err := d.Plumber.SendRuleNotification(ctx, data, rule, rule.XRulesetId); err != nil {
 						return nil, errors.Wrap(err, "failed to send rule notification")
 					}
@@ -422,6 +416,26 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 				default:
 					return nil, errors.Errorf("unknown rule failure mode: %s", failCfg.Mode)
 				}
+
+				// Count of failures per rule
+				_ = d.metrics.Incr(ctx, &types.CounterEntry{
+					Name:      types.CounterFailureTrigger,
+					RuleID:    rule.Id,
+					RuleSetID: rule.XRulesetId,
+					Type:      types.CounterTypeCount,
+					Value:     1,
+					Labels:    map[string]string{"failure_mode": strMode},
+				})
+
+				// Count of data that failed per rule
+				_ = d.metrics.Incr(ctx, &types.CounterEntry{
+					Name:      types.CounterFailureTrigger,
+					RuleID:    rule.Id,
+					RuleSetID: rule.XRulesetId,
+					Type:      types.CounterTypeBytes,
+					Value:     int64(len(data)),
+					Labels:    map[string]string{"failure_mode": strMode},
+				})
 			}
 
 			if shouldDrop {
@@ -480,7 +494,10 @@ func (d *DataQual) watchForRuleUpdates(looper director.Looper) {
 
 		if err := d.getRuleUpdates(); err != nil {
 			d.Logger.Error("failed to get rule updates:", err)
+			return nil
 		}
+
+		d.Logger.Debug("Pulled rule updates")
 
 		return nil
 	})

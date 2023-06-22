@@ -232,6 +232,14 @@ func TestApplyRules_MaxData(t *testing.T) {
 	d := &DataQual{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
+		rules: map[Mode]map[string][]*protos.Rule{
+			Publish: {
+				"somekey": []*protos.Rule{{
+					Id: "foo",
+				}},
+			},
+		},
+		rulesMtx: &sync.RWMutex{},
 		Config: &Config{
 			DataSource: "kafka",
 			Logger:     fakeLogger,
@@ -239,7 +247,7 @@ func TestApplyRules_MaxData(t *testing.T) {
 		metrics: &metricsfakes.FakeIMetrics{},
 	}
 
-	got, err := d.ApplyRules(context.Background(), Publish, "somekewy", make([]byte, DefaultMaxDataSize+1))
+	got, err := d.ApplyRules(context.Background(), Publish, "somekey", make([]byte, DefaultMaxDataSize+1))
 	if err != nil {
 		t.Error("unexpected error: " + err.Error())
 	}
