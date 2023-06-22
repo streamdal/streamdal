@@ -136,7 +136,7 @@ func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) 
 			Token: p.Token,
 		},
 		Counter: string(counter.Name),
-		Labels:  counter.Labels,
+		Labels:  labels,
 		Value:   float64(counter.Value),
 	}
 
