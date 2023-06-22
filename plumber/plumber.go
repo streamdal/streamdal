@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/batchcorp/plumber-schemas/build/go/protos"
@@ -139,10 +138,6 @@ func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) 
 		Counter: string(counter.Name),
 		Labels:  labels,
 		Value:   float64(counter.Value),
-	}
-
-	if counter.Name == types.CounterFailureTrigger {
-		fmt.Printf("Sending failure trigger: %#v\n", req)
 	}
 
 	if _, err := p.Server.PublishMetrics(ctx, req); err != nil {

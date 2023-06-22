@@ -518,8 +518,9 @@ func (d *DataQual) getRuleUpdates() error {
 			rules[Mode(set.Mode)] = make(map[string][]*protos.Rule)
 		}
 
-		for _, rule := range set.Rules {
+		for ruleID, rule := range set.Rules {
 			rule.XRulesetId = set.Id // Needed for metrics and alerting
+			rule.Id = ruleID
 
 			if _, ok := rules[Mode(set.Mode)][set.Key]; !ok {
 				rules[Mode(set.Mode)][set.Key] = make([]*protos.Rule, 0)
