@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/batchcorp/plumber-schemas/build/go/protos"
@@ -117,16 +118,16 @@ func (p *Plumber) SendRuleNotification(ctx context.Context, data []byte, rule *c
 }
 
 func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) error {
-	labels := counter.Labels
-	if labels == nil {
-		labels = make(map[string]string)
+	labels := make(map[string]string)
+	for k, v := range counter.Labels {
+		labels[k] = v
 	}
 
 	// Only pass these labels if set.
 	// Prometheus is not able to handle variable labels.
 	if counter.RuleID != "" {
 		labels["rule_id"] = counter.RuleID
-		labels["ruleset_id"] = counter.RuleID
+		labels["ruleset_id"] = counter.RuleSetID
 	}
 
 	labels["type"] = string(counter.Type)
@@ -138,6 +139,10 @@ func (p *Plumber) SendMetrics(ctx context.Context, counter *types.CounterEntry) 
 		Counter: string(counter.Name),
 		Labels:  labels,
 		Value:   float64(counter.Value),
+	}
+
+	if counter.Name == types.CounterFailureTrigger {
+		fmt.Printf("Sending failure trigger: %#v\n", req)
 	}
 
 	if _, err := p.Server.PublishMetrics(ctx, req); err != nil {
