@@ -346,10 +346,11 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 	for _, rule := range rules {
 		// Rule counter total
 		_ = d.metrics.Incr(ctx, &types.CounterEntry{
-			Name:   types.CounterRule,
-			Type:   types.CounterTypeCount,
-			Labels: map[string]string{"data_source": d.DataSource},
-			Value:  1,
+			Name:      types.CounterRule,
+			Type:      types.CounterTypeCount,
+			RuleID:    rule.Id,
+			RuleSetID: rule.XRulesetId,
+			Value:     1,
 		})
 
 		// Rule counter bytes

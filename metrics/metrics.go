@@ -241,8 +241,6 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 func (m *Metrics) runCounterTicker() {
 	defer m.wg.Done()
 
-	m.Log.Debugf("starting runCounterTicker()")
-
 	var shutdown bool
 
 	ticker := time.NewTicker(m.Config.CounterInterval)
@@ -289,8 +287,6 @@ func (m *Metrics) runCounterTicker() {
 
 func (m *Metrics) runCounterReaper() {
 	defer m.wg.Done()
-
-	m.Log.Debugf("starting runCounterReaper()")
 
 	var shutdown bool
 
