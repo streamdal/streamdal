@@ -3,13 +3,18 @@ import { Loading } from "../icons/nav";
 import { getJson, getText } from "../../lib/fetch";
 import { Error } from "../status/error";
 import { MonitorIcon } from "../icons/streamdal";
-import type { RulesetType } from "./rulesetAddEdit";
+import type { RulesetType, RulesType } from "./rulesetAddEdit";
 import { RULESET_ERROR } from "./rulesetAddEdit";
 import { humanMode, TD, TH } from "./ruleSets";
 import { Total } from "./metrics/total";
 import { parseMetrics } from "../../lib/metrics";
 import { RULE_TYPE_MATCH } from "./rule/addEdit";
 import { FAILURE_MODE_TYPE } from "./rule/failureMode";
+
+//
+// Convert the rules to an array for ease of use
+export const mapRules = (rules: RulesType[]) =>
+  Object.entries(rules).map(([k, v]) => ({ ...v, id: k }));
 
 export const mapRuleSet = (
   set: RulesetType,
@@ -59,11 +64,7 @@ export const RuleSetView = () => {
         ...set
       } = await getJson(`/v1/ruleset/${id}`);
 
-      //
-      // rules are passed back as an object, converting to array for convenience
-      const mappedRules = Object.values(unmapped);
-
-      setRuleSet(mapRuleSet(set, key, mappedRules));
+      setRuleSet(mapRuleSet(set, key, mapRules(unmapped)));
       setMetrics(parseMetrics(await getText(`/metrics`)));
     } catch (e: any) {
       console.error("Error loading ruleset", e);
@@ -80,7 +81,6 @@ export const RuleSetView = () => {
     return () => {
       clearInterval(interval);
     };
-    getData();
   }, []);
 
   if (error) {
@@ -89,7 +89,7 @@ export const RuleSetView = () => {
 
   return (
     <div className="max-w-[1440px]">
-      <div className="flex flex-row justify-between align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">
+      <div className="flex flex-row justify-between align-middle pb-4 mb-6 font-bold text-lg leading-5 border-b">
         <div className="flex flex-row justify-start">
           <MonitorIcon className="mr-2 w-[14px]" />
           <span className="text-web">Ruleset Details</span>
@@ -118,7 +118,7 @@ export const RuleSetView = () => {
           </tr>
         </tbody>
       </table>
-      <div className="flex flex-row justify-between align-middle border-b mb-2 mt-6">
+      <div className="flex flex-row justify-between align-middle border-b mb-2 mt-8">
         <div className="flex flex-row justify-start">
           <span className="text-web font-bold">Ruleset Metrics</span>
         </div>
@@ -161,7 +161,7 @@ export const RuleSetView = () => {
           />
         </div>
       </div>
-      <div className="flex flex-row justify-between border-b mb-2 mt-6">
+      <div className="flex flex-row justify-between border-b mb-2 mt-8">
         <div className="flex flex-row justify-start">
           <span className="text-web font-bold">Individual Rule Metrics</span>
         </div>

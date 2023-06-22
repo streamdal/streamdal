@@ -41,12 +41,17 @@ export const getRuleTotal = (
   id: string,
   kind: MetricsKind,
   type: MetricsType
-) =>
-  metrics
-    ?.filter(
-      (m: Metric) =>
-        (m.ruleset_id === id || m.rule_id === id) &&
-        m.kind === kind &&
-        m.type === type
-    )
-    .reduce((acc: number, m: Metric) => acc + m.value, 0);
+) => {
+  const filtered = metrics?.filter(
+    (m: Metric) =>
+      (m.ruleset_id === id || m.rule_id === id) &&
+      m.kind === kind &&
+      m.type === type
+  );
+
+  //
+  // distinguish between 0 and nothing
+  return filtered.length
+    ? filtered.reduce((acc: number, m: Metric) => acc + m.value, 0)
+    : null;
+};

@@ -15,6 +15,10 @@ export const metricColor = (kind: MetricsKind, value: number) => {
   }
 };
 
+export const dash = () => (
+  <span className={`text-stormCloud font-bold`}>-</span>
+);
+
 export const Total = ({
   metrics,
   id, // works for ruleSet id or rule id
@@ -27,10 +31,14 @@ export const Total = ({
   type: MetricsType;
 }) => {
   if (!metrics?.length || !id) {
-    return <span className={`text-stormCloud font-bold`}>-</span>;
+    return dash();
   }
 
   const total = getRuleTotal(metrics, id, kind, type);
+
+  if (total == null) {
+    return dash();
+  }
   const humanTotal =
     type === "count" ? formatNumber(total) : formatBytes(total);
   return (

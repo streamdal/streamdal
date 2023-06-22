@@ -14,7 +14,7 @@ import { mutate } from "../../lib/mutation";
 import { v4 as uuidv4 } from "uuid";
 import { Success } from "../status/success";
 import { FAILURE_MODE_TYPE } from "./rule/failureMode";
-import { mapRuleSet } from "./rulesetView";
+import { mapRules, mapRuleSet } from "./rulesetView";
 
 export const RULESET_ERROR = "Ruleset not found!";
 
@@ -94,6 +94,8 @@ const ruleSchema = z.object({
     .array()
     .min(1, { message: "At least one rule is required" }),
 });
+
+export type RulesType = z.infer<typeof ruleSchema>;
 
 const baseSchema = z.object({
   id: z.string().optional(),
@@ -274,9 +276,7 @@ export const RuleSetAddEdit = () => {
         ...set
       } = await getJson(`/v1/ruleset/${id}`);
 
-      //
-      // rules are passed back as an object, converting to array for convenience
-      const mappedRules = Object.values(unmapped);
+      const mappedRules = mapRules(unmapped);
       setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
       reset(mapRuleSet(set, key, mappedRules));
     } catch (e: any) {
