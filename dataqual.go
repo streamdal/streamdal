@@ -410,8 +410,6 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 					if err := d.Plumber.SendRuleNotification(ctx, data, rule, rule.XRulesetId); err != nil {
 						return nil, errors.Wrap(err, "failed to send rule notification")
 					}
-
-					shouldDrop = true
 				default:
 					return nil, errors.Errorf("unknown rule failure mode: %s", failCfg.Mode)
 				}
