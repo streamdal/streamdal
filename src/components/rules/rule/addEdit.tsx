@@ -60,7 +60,7 @@ export const RuleAddEdit = ({
         Rule {index + 1}.
         <XMarkIcon
           className="text-stormCloud w-[20px] cursor-pointer"
-          onClick={remove}
+          onClick={() => remove(index)}
         />
       </div>
       <div className="p-2 w-full">

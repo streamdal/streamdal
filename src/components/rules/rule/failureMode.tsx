@@ -7,7 +7,6 @@ import { getJson } from "../../../lib/fetch";
 import type { RulesetType } from "../rulesetAddEdit";
 
 export const FAILURE_MODE_TYPE: MATCH_TYPE = {
-  RULE_FAILURE_MODE_UNSET: { display: "Unset" },
   RULE_FAILURE_MODE_REJECT: { display: "Reject" },
   RULE_FAILURE_MODE_DLQ: { display: "Dead Letter" },
   RULE_FAILURE_MODE_TRANSFORM: { display: "Transform" },
@@ -57,7 +56,7 @@ export const FailureMode = ({
   //
   // Shenanigans: I don't know how to make react-hooks-form watch initial value on
   // dynamic fields
-  const mode = watchMode || failureMode?.mode || "RULE_FAILURE_MODE_UNSET";
+  const mode = watchMode || failureMode?.mode || "RULE_FAILURE_MODE_REJECT";
 
   return (
     <div className="mt-2 w-full">

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loading } from "../icons/nav";
 import { getJson } from "../../lib/fetch";
 import { Error } from "../status/error";
 import { MonitorIcon } from "../icons/streamdal";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { FormInput } from "../form/formInput";
@@ -17,6 +17,20 @@ import { FAILURE_MODE_TYPE } from "./rule/failureMode";
 import { mapRules, mapRuleSet } from "./rulesetView";
 
 export const RULESET_ERROR = "Ruleset not found!";
+
+export const NEW_RULE = {
+  type: "RULE_TYPE_MATCH" as const,
+  match_config: {
+    path: "",
+    type: "string_contains_any",
+    args: [""],
+  },
+  failure_mode_configs: [
+    {
+      mode: "RULE_FAILURE_MODE_REJECT" as const,
+    },
+  ],
+};
 
 export const MODES = ["RULE_MODE_CONSUME", "RULE_MODE_PUBLISH"] as const;
 const RuleSetModeSchema = z.enum(MODES);
@@ -175,42 +189,31 @@ export const RuleSetAddEdit = () => {
   );
 
   const [addError, setAddError] = useState<string>("");
-  const [rules, setRules] = useState<any>(null);
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     control,
+    reset,
     formState: { errors, isSubmitting, defaultValues },
   } = useForm<RulesetType>({
     reValidateMode: "onBlur",
     shouldUnregister: true,
-    resolver: zodResolver(rulesetSchema),
-    defaultValues: {
-      name: "",
-      data_source: "kafka",
-      mode: "RULE_MODE_CONSUME",
-      rules: [],
-    },
+    //
+    // hack in our updated rules, for some reason react hooks form is not doing this
+    resolver: async (data, context, options) =>
+      zodResolver(rulesetSchema)({ ...data, rules }, context, options),
   });
 
-  const removeRule = (i: number) => () =>
-    setRules(rules?.filter((a: any, index: number) => i !== index));
-
-  const buildRule = (r: any, i: number) => {
-    return (
-      <div className={`border-b`} key={`rule-key-${i}`}>
-        <RuleAddEdit
-          index={i}
-          control={control}
-          rule={r}
-          register={register}
-          remove={removeRule(i)}
-        />
-      </div>
-    );
-  };
+  const {
+    fields: rules,
+    append: addRule,
+    remove: removeRule,
+  } = useFieldArray({
+    shouldUnregister: true,
+    control,
+    name: "rules", // unique name for your Field Array
+  });
 
   const data_source = watch("data_source") || "kafka";
   const mode = watch("mode");
@@ -276,9 +279,7 @@ export const RuleSetAddEdit = () => {
         ...set
       } = await getJson(`/v1/ruleset/${id}`);
 
-      const mappedRules = mapRules(unmapped);
-      setRules(mappedRules?.map((r: any, i: number) => buildRule(r, i)));
-      reset(mapRuleSet(set, key, mappedRules));
+      reset(mapRuleSet(set, key, mapRules(unmapped)));
     } catch (e: any) {
       console.error("Error loading ruleset", e);
       setError(RULESET_ERROR);
@@ -398,7 +399,16 @@ export const RuleSetAddEdit = () => {
           </span>
           <div className="flex flex-col mb-4 rounded-sm border pb-2 text-[14px] font-medium leading-[18px] ">
             {rules?.length ? (
-              rules.map((r: any) => r)
+              rules.map((r: any, i: number) => (
+                <RuleAddEdit
+                  key={r.id}
+                  index={i}
+                  control={control}
+                  rule={r}
+                  register={register}
+                  remove={removeRule}
+                />
+              ))
             ) : (
               <div className="p-2 border-b">
                 {errors["rules"]?.message ? (
@@ -415,18 +425,7 @@ export const RuleSetAddEdit = () => {
                 type="button"
                 className="flex justify-center btn-secondary h-10 cursor-pointer"
                 value="+ Add Rule"
-                onClick={() =>
-                  setRules([
-                    ...(rules ? rules : []),
-                    buildRule(
-                      {
-                        failure_mode_configs: {},
-                        match_config: { type: "string_contains_any" },
-                      },
-                      rules?.length || 0
-                    ),
-                  ])
-                }
+                onClick={() => addRule(NEW_RULE)}
               />
             </div>
           </div>
