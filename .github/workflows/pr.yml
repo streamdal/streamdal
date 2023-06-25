@@ -1,0 +1,21 @@
+name: "Protobuf lint, compile & commit"
+on: pull_request
+
+jobs:
+  pr-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Protobuf Liting
+        uses: plexsystems/protolint-action@v0.4.0
+        with:
+          configDirectory: ./
+
+      - name: Compile protos
+        run: |
+          make generate/go
+          make generate/protoset
+
+#      - uses: stefanzweifel/git-auto-commit-action@v4
+#        with:
+#          commit_message: Automated protobuf compilation

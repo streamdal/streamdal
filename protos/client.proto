@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package protos;
+
+import "rules/match.proto";
+import "rules/transform.proto";
+
+option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos";
+
+message ClientRequestMetadata {
+  string id = 1;
+  string source = 2;
+  int64 timestamp_nano_utc = 3;
+}
+
+message ClientResponseMetadata {
+  string id = 1;
+  int64 timestamp_nano_utc = 2;
+}
+
+message ClientRequest {
+  ClientRequestMetadata metadata = 1;
+
+  oneof request_type {
+    rules.MatchRequest match = 100;
+    rules.TransformRequest transform = 101;
+  }
+}
+
+message ClientResponse {
+  ClientResponseMetadata metadata = 1;
+
+  oneof response_type {
+    rules.MatchResponse match = 100;
+    rules.TransformResponse transform = 101;
+  }
+}

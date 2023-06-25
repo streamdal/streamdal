@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package rules;
+
+option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos/rules";
+
+enum MatchType {
+  // 1000-1999 reserved for core match types
+  MATCH_TYPE_UNKNOWN = 0;
+  MATCH_TYPE_STRING_CONTAINS_ANY = 1000;
+  MATCH_TYPE_STRING_CONTAINS_ALL = 1001;
+  MATCH_TYPE_IP_ADDRESS = 1002;
+  MATCH_TYPE_REGEX = 1003;
+  MATCH_TYPE_TIMESTAMP_RFC3339 = 1004;
+  MATCH_TYPE_TIMESTAMP_UNIX_NANO = 1005;
+  MATCH_TYPE_TIMESTAMP_UNIX = 1006;
+  MATCH_TYPE_BOOLEAN_TRUE = 1007;
+  MATCH_TYPE_BOOLEAN_FALSE = 1008;
+  MATCH_TYPE_IS_EMPTY = 1009;
+
+  // TODO: Implement at a later date
+  MATCH_TYPE_HAS_FIELD = 1010;
+  MATCH_TYPE_VALUE_IS_TYPE = 1011;
+
+  // 2000-2999 PII will match any PII we are capable of detecting.
+  // The more specific types are included for convenience, in the event
+  // that the user wants to specifically match them.
+  //
+  // TODO: Additional PII types for the future: address, name, driver's license,
+  // passport ID, VIN number, MAC address, serial numbers, logins, passwords,
+  // vehicle registration number, taxpayer ID, patient ID, financial account ID
+  // (ie. bank account number), health plan ID, certificate/license number,
+  // device ID
+  MATCH_TYPE_PII = 2000;
+  MATCH_TYPE_PII_CREDIT_CARD = 2001;
+  MATCH_TYPE_PII_SSN = 2002;
+  MATCH_TYPE_PII_EMAIL = 2003;
+  MATCH_TYPE_PII_PHONE = 2004;
+
+  // Logical operators 3000-3999
+  // TODO: implement logical operators at some point
+  MATCH_TYPE_EQUAL_TO= 16;
+  MATCH_TYPE_GREATER_THAN = 17;
+  MATCH_TYPE_GREATER_EQUAL = 18;
+  MATCH_TYPE_LESS_THAN = 19;
+  MATCH_TYPE_LESS_EQUAL = 20;
+}
+
+message MatchRequest {
+  repeated bytes data = 1;
+  string path = 2;
+  repeated string args = 3; // args determined by match_type
+  bool negate = 4;
+  MatchType type = 5;
+}
+
+message MatchResponse {
+  bool is_match = 1;
+  string error = 2;
+}

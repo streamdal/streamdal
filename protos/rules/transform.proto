@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package rules;
+
+option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos/rules";
+
+message TransformRequest {
+  repeated bytes data = 1;
+  string path = 2;
+  string value = 3;
+  bool delete = 4;
+}
+
+message TransformResponse {
+  repeated bytes data = 1;
+  string error = 2;
+}
