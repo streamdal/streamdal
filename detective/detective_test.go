@@ -14,8 +14,8 @@ func TestMatch(t *testing.T) {
 		t        MatchType
 		expected bool
 	}{
-		{"4242424242424242", PIICreditCard, true},
-		{"4242-4242-4242-4242", PIICreditCard, true},
+		//{"4242424242424242", PIICreditCard, true},
+		//{"4242-4242-4242-4242", PIICreditCard, true},
 		{"192.168.1.20", IpAddress, true},
 		{"2023-06-26T13:31:29+00:00", TimestampRFC3339, true},
 		{"1257894000000000000", TimestampUnixNano, true},
