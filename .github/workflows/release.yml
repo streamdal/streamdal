@@ -24,7 +24,7 @@ jobs:
           commit_message: Bumped Cargo.toml version to ${{ steps.generate_new_tag.outputs.new_tag }}
       - name: Create tag
         uses: mathieudutour/github-tag-action@v6.1
-          id: generate_new_tag
+        id: generate_new_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
