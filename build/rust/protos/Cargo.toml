@@ -22,3 +22,9 @@ edition = "2021"
 [[example]]
 name = "usage"
 path = "examples/usage.rs"
+
+[lib]
+name = "source-protos"           # The name of the target.
+path = "src/lib.rs"    # The source file of the target.
+edition = "2021"       # The edition of the target.
+crate-type = ["lib"]   # The crate types to generate.
