@@ -1,30 +1,6 @@
 [package]
-authors = [
-    "Daniel Selans <daniel@streamdal.com>",
-]
-categories = [
-    "development-tools",
-]
-description = "Rust-based generated protobuf code for use with `snitch` components"
-documentation = "https://github.com/streamdal/snitch-protobuf"
-homepage = "https://streamdal.com"
-keywords = [
-    "protobuf",
-    "multi-language",
-]
-license = "MIT"
-name = "snitch-protos"
-readme = "README.md"
-repository = "https://github.com/streamdal/snitch-protobuf"
+name = "protos"
 version = "0.1.0"
 edition = "2021"
 
-[[example]]
-name = "usage"
-path = "examples/usage.rs"
-
-[lib]
-name = "source-protos"           # The name of the target.
-path = "src/lib.rs"    # The source file of the target.
-edition = "2021"       # The edition of the target.
-crate-type = ["lib"]   # The crate types to generate.
+[dependencies]
