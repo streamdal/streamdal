@@ -230,15 +230,17 @@ export const RuleSetView = () => {
           </div>
         ))}
 
-      <div className="w-full mt-6 flex justify-end">
-        <a href={`/ruleset/edit?id=${ruleSet?.id}`}>
-          <input
-            type="button"
-            className="flex justify-center btn-heimdal"
-            value="Edit Rule Set"
-          />
-        </a>
-      </div>
+      {ruleSet?.id && (
+        <div className="w-full mt-6 flex justify-end">
+          <a href={`/ruleset/edit?id=${ruleSet.id}`}>
+            <input
+              type="button"
+              className="flex justify-center btn-heimdal"
+              value="Edit Rule Set"
+            />
+          </a>
+        </div>
+      )}
     </div>
   );
 };
