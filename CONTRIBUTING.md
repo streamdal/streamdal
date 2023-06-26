@@ -12,4 +12,4 @@ new feature you'd like to see in this project, please create [a new issue](https
 
 **GitHub Pull requests**
 
-...coming soon,.
+...coming soon...
