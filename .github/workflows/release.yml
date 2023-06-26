@@ -17,8 +17,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
       - name: Update Cargo.toml version
-         run: |
-            sed -i "s/version = \".*\"/version = \"${{ steps.generate_new_tag.outputs.new_tag }}\"/" Cargo.toml
+        run: |
+          sed -i "s/version = \".*\"/version = \"${{ steps.generate_new_tag.outputs.new_tag }}\"/" Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bumped Cargo.toml version to ${{ steps.generate_new_tag.outputs.new_tag }}
