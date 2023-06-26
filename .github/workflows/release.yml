@@ -1,0 +1,36 @@
+name: Bump version
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.create_tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@main
+      - name: Bump version and push tag
+        uses: mathieudutour/github-tag-action@v4.5
+        id: create_tag
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Cargo.toml version
+         run: |
+            sed -i "s/version = \".*\"/version = \"${{ steps.create_tag.outputs.new_tag }}\"/" Cargo.toml
+      - name: Commit and push
+        run: |
+          git config --local user.email "
+          git config --local user.name "
+          git add Cargo.toml
+          git commit -m "Bump version to ${{ steps.create_tag.outputs.new_tag }}"
+          git push origin main
+      - name: Update tag to point to the new commit
+        run: |
+          git tag -f ${{ steps.create_tag.outputs.new_tag }}
+          git push origin ${{ steps.create_tag.outputs.new_tag }}
+      - name: Release on crates.io
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          token: ${{ secrets.CRATES_IO_TOKEN }}

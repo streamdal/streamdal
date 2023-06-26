@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package rules;
 
-option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos/rules";
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/rules";
 
 enum MatchType {
   // 1000-1999 reserved for core match types

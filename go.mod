@@ -1,4 +1,4 @@
-module github.com/streamdal/snitch-protobuf
+module github.com/streamdal/snitch-protos
 
 go 1.20
 

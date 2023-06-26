@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package rules;
 
-option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos/rules";
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/rules";
 
 message TransformRequest {
   repeated bytes data = 1;

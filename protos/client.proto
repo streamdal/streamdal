@@ -5,7 +5,7 @@ package protos;
 import "rules/matcher.proto";
 import "rules/transform.proto";
 
-option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos";
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
 message ClientRequestMetadata {
   string id = 1;
