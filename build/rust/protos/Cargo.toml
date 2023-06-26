@@ -5,3 +5,8 @@ edition = "2021"
 
 [dependencies]
 protobuf = "3.2.0"
+
+[lib]
+name = "protos"           # The name of the target.
+path = "src/mod.rs"    # The source file of the target.
+crate-type = ["lib"]   # The crate types to generate.
