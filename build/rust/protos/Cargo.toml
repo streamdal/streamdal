@@ -19,9 +19,6 @@ repository = "https://github.com/streamdal/snitch-protobuf"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-protobuf = "3.2.0"
-
 [[example]]
 name = "usage"
 path = "examples/usage.rs"
