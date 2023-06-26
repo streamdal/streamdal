@@ -1,0 +1,16 @@
+{
+  "version": "0.1",
+  "language": "en",
+  "words": [
+    "esbuild",
+    "rmrf",
+    "socio"
+  ],
+  "flagWords": [],
+  "ignorePaths": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "node_modules/**"
+  ]
+}
