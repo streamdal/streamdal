@@ -1,0 +1,11 @@
+[package]
+name = "snitch-detective"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+protos = { git = "https://github.com/streamdal/snitch-protobuf.git", branch = "main" }
+
+[[example]]
+name = "usage"
+path = "examples/usage.rs"
