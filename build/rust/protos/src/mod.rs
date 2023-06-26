@@ -1,5 +1,5 @@
 // @generated
 
 pub mod client;
-pub mod match;
+pub mod matcher;
 pub mod transform;

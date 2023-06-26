@@ -1,0 +1,27 @@
+[package]
+authors = [
+    "Daniel Selans <daniel@streamdal.com>",
+]
+categories = [
+    "development-tools",
+]
+description = "Rust-based generated protobuf code for use with `snitch` components"
+documentation = "https://github.com/streamdal/snitch-protobuf"
+homepage = "https://streamdal.com"
+keywords = [
+    "protobuf",
+    "multi-language",
+]
+license = "MIT"
+name = "snitch-protos"
+readme = "README.md"
+repository = "https://github.com/streamdal/snitch-protobuf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+protobuf = "3.2.0"
+
+[[example]]
+name = "usage"
+path = "examples/usage.rs"

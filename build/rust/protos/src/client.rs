@@ -349,10 +349,10 @@ impl ClientRequest {
 
     // .rules.MatchRequest match = 100;
 
-    pub fn match_(&self) -> &super::match_::MatchRequest {
+    pub fn match_(&self) -> &super::matcher::MatchRequest {
         match self.request_type {
             ::std::option::Option::Some(client_request::Request_type::Match(ref v)) => v,
-            _ => <super::match_::MatchRequest as ::protobuf::Message>::default_instance(),
+            _ => <super::matcher::MatchRequest as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -368,15 +368,15 @@ impl ClientRequest {
     }
 
     // Param is passed by value, moved
-    pub fn set_match(&mut self, v: super::match_::MatchRequest) {
+    pub fn set_match(&mut self, v: super::matcher::MatchRequest) {
         self.request_type = ::std::option::Option::Some(client_request::Request_type::Match(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_match(&mut self) -> &mut super::match_::MatchRequest {
+    pub fn mut_match(&mut self) -> &mut super::matcher::MatchRequest {
         if let ::std::option::Option::Some(client_request::Request_type::Match(_)) = self.request_type {
         } else {
-            self.request_type = ::std::option::Option::Some(client_request::Request_type::Match(super::match_::MatchRequest::new()));
+            self.request_type = ::std::option::Option::Some(client_request::Request_type::Match(super::matcher::MatchRequest::new()));
         }
         match self.request_type {
             ::std::option::Option::Some(client_request::Request_type::Match(ref mut v)) => v,
@@ -385,14 +385,14 @@ impl ClientRequest {
     }
 
     // Take field
-    pub fn take_match_(&mut self) -> super::match_::MatchRequest {
+    pub fn take_match_(&mut self) -> super::matcher::MatchRequest {
         if self.has_match() {
             match self.request_type.take() {
                 ::std::option::Option::Some(client_request::Request_type::Match(v)) => v,
                 _ => panic!(),
             }
         } else {
-            super::match_::MatchRequest::new()
+            super::matcher::MatchRequest::new()
         }
     }
 
@@ -453,7 +453,7 @@ impl ClientRequest {
             |m: &ClientRequest| { &m.metadata },
             |m: &mut ClientRequest| { &mut m.metadata },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::match_::MatchRequest>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::matcher::MatchRequest>(
             "match",
             ClientRequest::has_match,
             ClientRequest::match_,
@@ -600,7 +600,7 @@ pub mod client_request {
     // @@protoc_insertion_point(oneof:protos.ClientRequest.request_type)
     pub enum Request_type {
         // @@protoc_insertion_point(oneof_field:protos.ClientRequest.match)
-        Match(super::super::match_::MatchRequest),
+        Match(super::super::matcher::MatchRequest),
         // @@protoc_insertion_point(oneof_field:protos.ClientRequest.transform)
         Transform(super::super::transform::TransformRequest),
     }
@@ -648,10 +648,10 @@ impl ClientResponse {
 
     // .rules.MatchResponse match = 100;
 
-    pub fn match_(&self) -> &super::match_::MatchResponse {
+    pub fn match_(&self) -> &super::matcher::MatchResponse {
         match self.response_type {
             ::std::option::Option::Some(client_response::Response_type::Match(ref v)) => v,
-            _ => <super::match_::MatchResponse as ::protobuf::Message>::default_instance(),
+            _ => <super::matcher::MatchResponse as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -667,15 +667,15 @@ impl ClientResponse {
     }
 
     // Param is passed by value, moved
-    pub fn set_match(&mut self, v: super::match_::MatchResponse) {
+    pub fn set_match(&mut self, v: super::matcher::MatchResponse) {
         self.response_type = ::std::option::Option::Some(client_response::Response_type::Match(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_match(&mut self) -> &mut super::match_::MatchResponse {
+    pub fn mut_match(&mut self) -> &mut super::matcher::MatchResponse {
         if let ::std::option::Option::Some(client_response::Response_type::Match(_)) = self.response_type {
         } else {
-            self.response_type = ::std::option::Option::Some(client_response::Response_type::Match(super::match_::MatchResponse::new()));
+            self.response_type = ::std::option::Option::Some(client_response::Response_type::Match(super::matcher::MatchResponse::new()));
         }
         match self.response_type {
             ::std::option::Option::Some(client_response::Response_type::Match(ref mut v)) => v,
@@ -684,14 +684,14 @@ impl ClientResponse {
     }
 
     // Take field
-    pub fn take_match_(&mut self) -> super::match_::MatchResponse {
+    pub fn take_match_(&mut self) -> super::matcher::MatchResponse {
         if self.has_match() {
             match self.response_type.take() {
                 ::std::option::Option::Some(client_response::Response_type::Match(v)) => v,
                 _ => panic!(),
             }
         } else {
-            super::match_::MatchResponse::new()
+            super::matcher::MatchResponse::new()
         }
     }
 
@@ -752,7 +752,7 @@ impl ClientResponse {
             |m: &ClientResponse| { &m.metadata },
             |m: &mut ClientResponse| { &mut m.metadata },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::match_::MatchResponse>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::matcher::MatchResponse>(
             "match",
             ClientResponse::has_match,
             ClientResponse::match_,
@@ -899,7 +899,7 @@ pub mod client_response {
     // @@protoc_insertion_point(oneof:protos.ClientResponse.response_type)
     pub enum Response_type {
         // @@protoc_insertion_point(oneof_field:protos.ClientResponse.match)
-        Match(super::super::match_::MatchResponse),
+        Match(super::super::matcher::MatchResponse),
         // @@protoc_insertion_point(oneof_field:protos.ClientResponse.transform)
         Transform(super::super::transform::TransformResponse),
     }
@@ -922,10 +922,10 @@ pub mod client_response {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0cclient.proto\x12\x06protos\x1a\x11rules/match.proto\x1a\x15rules/t\
-    ransform.proto\"m\n\x15ClientRequestMetadata\x12\x0e\n\x02id\x18\x01\x20\
-    \x01(\tR\x02id\x12\x16\n\x06source\x18\x02\x20\x01(\tR\x06source\x12,\n\
-    \x12timestamp_nano_utc\x18\x03\x20\x01(\x03R\x10timestampNanoUtc\"V\n\
+    \n\x0cclient.proto\x12\x06protos\x1a\x13rules/matcher.proto\x1a\x15rules\
+    /transform.proto\"m\n\x15ClientRequestMetadata\x12\x0e\n\x02id\x18\x01\
+    \x20\x01(\tR\x02id\x12\x16\n\x06source\x18\x02\x20\x01(\tR\x06source\x12\
+    ,\n\x12timestamp_nano_utc\x18\x03\x20\x01(\x03R\x10timestampNanoUtc\"V\n\
     \x16ClientResponseMetadata\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\
     ,\n\x12timestamp_nano_utc\x18\x02\x20\x01(\x03R\x10timestampNanoUtc\"\
     \xc0\x01\n\rClientRequest\x129\n\x08metadata\x18\x01\x20\x01(\x0b2\x1d.p\
@@ -938,7 +938,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20\x01(\x0b2\x18.rules.TransformResponseH\0R\ttransformB\x0f\n\rrespon\
     se_typeB6Z4github.com/streamdal/snitch-protobuf/build/go/protosJ\xbc\x06\
     \n\x06\x12\x04\0\0$\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
-    \x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\
+    \x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1d\n\t\n\x02\x03\x01\
     \x12\x03\x05\0\x1f\n\x08\n\x01\x08\x12\x03\x07\0K\n\t\n\x02\x08\x0b\x12\
     \x03\x07\0K\n\n\n\x02\x04\0\x12\x04\t\0\r\x01\n\n\n\x03\x04\0\x01\x12\
     \x03\t\x08\x1d\n\x0b\n\x04\x04\0\x02\0\x12\x03\n\x02\x10\n\x0c\n\x05\x04\
@@ -995,7 +995,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(2);
-            deps.push(super::match_::file_descriptor().clone());
+            deps.push(super::matcher::file_descriptor().clone());
             deps.push(super::transform::file_descriptor().clone());
             let mut messages = ::std::vec::Vec::with_capacity(4);
             messages.push(ClientRequestMetadata::generated_message_descriptor_data());

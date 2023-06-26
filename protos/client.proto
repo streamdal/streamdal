@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos;
 
-import "rules/match.proto";
+import "rules/matcher.proto";
 import "rules/transform.proto";
 
 option go_package = "github.com/streamdal/snitch-protobuf/build/go/protos";
