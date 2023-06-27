@@ -20,8 +20,8 @@ jobs:
         run: |
           pwd
           ls -l
-          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
-          grep version build/rust/protos/Cargo.toml
+          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/snitch-protos/Cargo.toml
+          grep version build/rust/snitch-protos/Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bumped Cargo.toml version to ${{ steps.get_new_version.outputs.new_version }}
@@ -30,8 +30,8 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Release on crates.io
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+#      - name: Release on crates.io
+#        uses: actions-rs/cargo@v1
+#        with:
+#          command: publish
+#          args: --manifest-path build/rust/snitch-protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}

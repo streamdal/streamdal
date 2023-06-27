@@ -1,5 +1,5 @@
 [package]
-name = "protos"
+name = "snitch-protos"
 version = "0.0.4"
 edition = "2021"
 authors = ["Daniel Selans <daniel@streamdal.com>"]
@@ -16,6 +16,6 @@ readme = "README.md"
 protobuf = "3.2.0"
 
 [lib]
-name = "protos"           # The name of the target.
-path = "src/mod.rs"    # The source file of the target.
-crate-type = ["lib"]   # The crate types to generate.
+name = "snitch-protos"
+path = "src/mod.rs"
+crate-type = ["lib"]
