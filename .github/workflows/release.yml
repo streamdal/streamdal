@@ -34,4 +34,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          token: ${{ secrets.CRATES_IO_TOKEN }}
+          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
