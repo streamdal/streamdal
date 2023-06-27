@@ -35,8 +35,8 @@ pub struct TransformRequest {
     pub path: ::std::string::String,
     // @@protoc_insertion_point(field:rules.TransformRequest.value)
     pub value: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.TransformRequest.delete)
-    pub delete: bool,
+    // @@protoc_insertion_point(field:rules.TransformRequest.type)
+    pub type_: ::protobuf::EnumOrUnknown<TransformType>,
     // special fields
     // @@protoc_insertion_point(special_field:rules.TransformRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -72,9 +72,9 @@ impl TransformRequest {
             |m: &mut TransformRequest| { &mut m.value },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "delete",
-            |m: &TransformRequest| { &m.delete },
-            |m: &mut TransformRequest| { &mut m.delete },
+            "type",
+            |m: &TransformRequest| { &m.type_ },
+            |m: &mut TransformRequest| { &mut m.type_ },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformRequest>(
             "TransformRequest",
@@ -104,7 +104,7 @@ impl ::protobuf::Message for TransformRequest {
                     self.value = is.read_string()?;
                 },
                 32 => {
-                    self.delete = is.read_bool()?;
+                    self.type_ = is.read_enum_or_unknown()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -127,8 +127,8 @@ impl ::protobuf::Message for TransformRequest {
         if !self.value.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.value);
         }
-        if self.delete != false {
-            my_size += 1 + 1;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
+            my_size += ::protobuf::rt::int32_size(4, self.type_.value());
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -145,8 +145,8 @@ impl ::protobuf::Message for TransformRequest {
         if !self.value.is_empty() {
             os.write_string(3, &self.value)?;
         }
-        if self.delete != false {
-            os.write_bool(4, self.delete)?;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
+            os.write_enum(4, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -168,7 +168,7 @@ impl ::protobuf::Message for TransformRequest {
         self.data.clear();
         self.path.clear();
         self.value.clear();
-        self.delete = false;
+        self.type_ = ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN);
         self.special_fields.clear();
     }
 
@@ -177,7 +177,7 @@ impl ::protobuf::Message for TransformRequest {
             data: ::std::vec::Vec::new(),
             path: ::std::string::String::new(),
             value: ::std::string::String::new(),
-            delete: false,
+            type_: ::protobuf::EnumOrUnknown::from_i32(0),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -341,36 +341,110 @@ impl ::protobuf::reflect::ProtobufValue for TransformResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:rules.TransformType)
+pub enum TransformType {
+    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_UNKNOWN)
+    TRANSFORM_TYPE_UNKNOWN = 0,
+    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_REPLACE_VALUE)
+    TRANSFORM_TYPE_REPLACE_VALUE = 1,
+    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_DELETE_FIELD)
+    TRANSFORM_TYPE_DELETE_FIELD = 2,
+    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_OBFUSCATE_VALUE)
+    TRANSFORM_TYPE_OBFUSCATE_VALUE = 3,
+}
+
+impl ::protobuf::Enum for TransformType {
+    const NAME: &'static str = "TransformType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TransformType> {
+        match value {
+            0 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_UNKNOWN),
+            1 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_REPLACE_VALUE),
+            2 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_DELETE_FIELD),
+            3 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [TransformType] = &[
+        TransformType::TRANSFORM_TYPE_UNKNOWN,
+        TransformType::TRANSFORM_TYPE_REPLACE_VALUE,
+        TransformType::TRANSFORM_TYPE_DELETE_FIELD,
+        TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE,
+    ];
+}
+
+impl ::protobuf::EnumFull for TransformType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("TransformType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for TransformType {
+    fn default() -> Self {
+        TransformType::TRANSFORM_TYPE_UNKNOWN
+    }
+}
+
+impl TransformType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<TransformType>("TransformType")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x15rules/transform.proto\x12\x05rules\"h\n\x10TransformRequest\x12\
+    \n\x15rules/transform.proto\x12\x05rules\"z\n\x10TransformRequest\x12\
     \x12\n\x04data\x18\x01\x20\x03(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
     \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x03\x20\x01(\tR\x05value\x12\
-    \x16\n\x06delete\x18\x04\x20\x01(\x08R\x06delete\"=\n\x11TransformRespon\
-    se\x12\x12\n\x04data\x18\x01\x20\x03(\x0cR\x04data\x12\x14\n\x05error\
-    \x18\x02\x20\x01(\tR\x05errorB:Z8github.com/streamdal/snitch-protos/buil\
-    d/go/protos/rulesJ\xc7\x03\n\x06\x12\x04\0\0\x10\x01\n\x08\n\x01\x0c\x12\
-    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0e\n\x08\n\x01\x08\x12\x03\
-    \x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\x04\0\x12\x04\x06\0\
-    \x0b\x01\n\n\n\x03\x04\0\x01\x12\x03\x06\x08\x18\n\x0b\n\x04\x04\0\x02\0\
-    \x12\x03\x07\x02\x1a\n\x0c\n\x05\x04\0\x02\0\x04\x12\x03\x07\x02\n\n\x0c\
-    \n\x05\x04\0\x02\0\x05\x12\x03\x07\x0b\x10\n\x0c\n\x05\x04\0\x02\0\x01\
-    \x12\x03\x07\x11\x15\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x07\x18\x19\n\
-    \x0b\n\x04\x04\0\x02\x01\x12\x03\x08\x02\x12\n\x0c\n\x05\x04\0\x02\x01\
-    \x05\x12\x03\x08\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x08\t\r\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x08\x10\x11\n\x0b\n\x04\x04\0\x02\
-    \x02\x12\x03\t\x02\x13\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\t\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\t\t\x0e\n\x0c\n\x05\x04\0\x02\x02\
-    \x03\x12\x03\t\x11\x12\n\x0b\n\x04\x04\0\x02\x03\x12\x03\n\x02\x12\n\x0c\
-    \n\x05\x04\0\x02\x03\x05\x12\x03\n\x02\x06\n\x0c\n\x05\x04\0\x02\x03\x01\
-    \x12\x03\n\x07\r\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\n\x10\x11\n\n\n\
-    \x02\x04\x01\x12\x04\r\0\x10\x01\n\n\n\x03\x04\x01\x01\x12\x03\r\x08\x19\
-    \n\x0b\n\x04\x04\x01\x02\0\x12\x03\x0e\x02\x1a\n\x0c\n\x05\x04\x01\x02\0\
-    \x04\x12\x03\x0e\x02\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x0e\x0b\x10\
-    \n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x0e\x11\x15\n\x0c\n\x05\x04\x01\
-    \x02\0\x03\x12\x03\x0e\x18\x19\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x0f\
-    \x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\
-    \x04\x01\x02\x01\x01\x12\x03\x0f\t\x0e\n\x0c\n\x05\x04\x01\x02\x01\x03\
-    \x12\x03\x0f\x11\x12b\x06proto3\
+    (\n\x04type\x18\x04\x20\x01(\x0e2\x14.rules.TransformTypeR\x04type\"=\n\
+    \x11TransformResponse\x12\x12\n\x04data\x18\x01\x20\x03(\x0cR\x04data\
+    \x12\x14\n\x05error\x18\x02\x20\x01(\tR\x05error*\x92\x01\n\rTransformTy\
+    pe\x12\x1a\n\x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE\
+    _REPLACE_VALUE\x10\x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\
+    \x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_VALUE\x10\x03B:Z8github.com/streamd\
+    al/snitch-protos/build/go/protos/rulesJ\x83\x05\n\x06\x12\x04\0\0\x17\
+    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0e\n\
+    \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\
+    \x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\
+    \x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\
+    \x12\x03\x07\x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\
+    \x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\
+    \x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\
+    \n\x04\x05\0\x02\x02\x12\x03\t\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
+    \x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\
+    \x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\
+    \x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n#$\n\n\n\x02\x04\0\x12\
+    \x04\r\0\x12\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x18\n\x0b\n\x04\x04\0\
+    \x02\0\x12\x03\x0e\x02\x1a\n\x0c\n\x05\x04\0\x02\0\x04\x12\x03\x0e\x02\n\
+    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x0b\x10\n\x0c\n\x05\x04\0\x02\0\
+    \x01\x12\x03\x0e\x11\x15\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x18\x19\
+    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x04\0\x02\x01\
+    \x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0f\t\r\n\
+    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\x10\x11\n\x0b\n\x04\x04\0\x02\
+    \x02\x12\x03\x10\x02\x13\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x10\x02\
+    \x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x10\t\x0e\n\x0c\n\x05\x04\0\
+    \x02\x02\x03\x12\x03\x10\x11\x12\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x11\
+    \x02\x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x11\x02\x0f\n\x0c\n\x05\
+    \x04\0\x02\x03\x01\x12\x03\x11\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\
+    \x03\x11\x17\x18\n\n\n\x02\x04\x01\x12\x04\x14\0\x17\x01\n\n\n\x03\x04\
+    \x01\x01\x12\x03\x14\x08\x19\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x15\x02\
+    \x1a\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03\x15\x02\n\n\x0c\n\x05\x04\x01\
+    \x02\0\x05\x12\x03\x15\x0b\x10\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x15\
+    \x11\x15\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x15\x18\x19\n\x0b\n\x04\
+    \x04\x01\x02\x01\x12\x03\x16\x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
+    \x03\x16\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x16\t\x0e\n\x0c\
+    \n\x05\x04\x01\x02\x01\x03\x12\x03\x16\x11\x12b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -391,7 +465,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut messages = ::std::vec::Vec::with_capacity(2);
             messages.push(TransformRequest::generated_message_descriptor_data());
             messages.push(TransformResponse::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(0);
+            let mut enums = ::std::vec::Vec::with_capacity(1);
+            enums.push(TransformType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
