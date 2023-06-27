@@ -1,4 +1,4 @@
-# Streamdal's Node Data Quality SDK
+# Streamdal's Snitch Node Data Quality SDK
 
 ## Getting started
 ...coming soon...
