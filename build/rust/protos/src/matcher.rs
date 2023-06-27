@@ -359,6 +359,81 @@ impl ::protobuf::reflect::ProtobufValue for MatchResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+///  Used as an arg for IS_TYPE match type
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:rules.MatchValueTypes)
+pub enum MatchValueTypes {
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_UNKNOWN)
+    MATCH_VALUE_TYPE_UNKNOWN = 0,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_STRING)
+    MATCH_VALUE_TYPE_STRING = 1,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_INT)
+    MATCH_VALUE_TYPE_INT = 2,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_FLOAT)
+    MATCH_VALUE_TYPE_FLOAT = 3,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_BOOL)
+    MATCH_VALUE_TYPE_BOOL = 4,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_OBJECT)
+    MATCH_VALUE_TYPE_OBJECT = 5,
+    // @@protoc_insertion_point(enum_value:rules.MatchValueTypes.MATCH_VALUE_TYPE_ARRAY)
+    MATCH_VALUE_TYPE_ARRAY = 6,
+}
+
+impl ::protobuf::Enum for MatchValueTypes {
+    const NAME: &'static str = "MatchValueTypes";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<MatchValueTypes> {
+        match value {
+            0 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_UNKNOWN),
+            1 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_STRING),
+            2 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_INT),
+            3 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_FLOAT),
+            4 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_BOOL),
+            5 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_OBJECT),
+            6 => ::std::option::Option::Some(MatchValueTypes::MATCH_VALUE_TYPE_ARRAY),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [MatchValueTypes] = &[
+        MatchValueTypes::MATCH_VALUE_TYPE_UNKNOWN,
+        MatchValueTypes::MATCH_VALUE_TYPE_STRING,
+        MatchValueTypes::MATCH_VALUE_TYPE_INT,
+        MatchValueTypes::MATCH_VALUE_TYPE_FLOAT,
+        MatchValueTypes::MATCH_VALUE_TYPE_BOOL,
+        MatchValueTypes::MATCH_VALUE_TYPE_OBJECT,
+        MatchValueTypes::MATCH_VALUE_TYPE_ARRAY,
+    ];
+}
+
+impl ::protobuf::EnumFull for MatchValueTypes {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("MatchValueTypes").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for MatchValueTypes {
+    fn default() -> Self {
+        MatchValueTypes::MATCH_VALUE_TYPE_UNKNOWN
+    }
+}
+
+impl MatchValueTypes {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<MatchValueTypes>("MatchValueTypes")
+    }
+}
+
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:rules.MatchType)
 pub enum MatchType {
@@ -368,26 +443,28 @@ pub enum MatchType {
     MATCH_TYPE_STRING_CONTAINS_ANY = 1000,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_STRING_CONTAINS_ALL)
     MATCH_TYPE_STRING_CONTAINS_ALL = 1001,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_STRING_EQUAL)
+    MATCH_TYPE_STRING_EQUAL = 1002,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IP_ADDRESS)
-    MATCH_TYPE_IP_ADDRESS = 1002,
+    MATCH_TYPE_IP_ADDRESS = 1003,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_REGEX)
-    MATCH_TYPE_REGEX = 1003,
+    MATCH_TYPE_REGEX = 1004,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_RFC3339)
-    MATCH_TYPE_TIMESTAMP_RFC3339 = 1004,
+    MATCH_TYPE_TIMESTAMP_RFC3339 = 1005,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_UNIX_NANO)
-    MATCH_TYPE_TIMESTAMP_UNIX_NANO = 1005,
+    MATCH_TYPE_TIMESTAMP_UNIX_NANO = 1006,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_UNIX)
-    MATCH_TYPE_TIMESTAMP_UNIX = 1006,
+    MATCH_TYPE_TIMESTAMP_UNIX = 1007,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_BOOLEAN_TRUE)
-    MATCH_TYPE_BOOLEAN_TRUE = 1007,
+    MATCH_TYPE_BOOLEAN_TRUE = 1008,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_BOOLEAN_FALSE)
-    MATCH_TYPE_BOOLEAN_FALSE = 1008,
+    MATCH_TYPE_BOOLEAN_FALSE = 1009,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IS_EMPTY)
-    MATCH_TYPE_IS_EMPTY = 1009,
+    MATCH_TYPE_IS_EMPTY = 1010,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_HAS_FIELD)
-    MATCH_TYPE_HAS_FIELD = 1010,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_VALUE_IS_TYPE)
-    MATCH_TYPE_VALUE_IS_TYPE = 1011,
+    MATCH_TYPE_HAS_FIELD = 1011,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IS_TYPE)
+    MATCH_TYPE_IS_TYPE = 1012,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII)
     MATCH_TYPE_PII = 2000,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_CREDIT_CARD)
@@ -398,16 +475,16 @@ pub enum MatchType {
     MATCH_TYPE_PII_EMAIL = 2003,
     // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_PHONE)
     MATCH_TYPE_PII_PHONE = 2004,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_EQUAL_TO)
-    MATCH_TYPE_EQUAL_TO = 3000,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_GREATER_THAN)
-    MATCH_TYPE_GREATER_THAN = 3001,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_GREATER_EQUAL)
-    MATCH_TYPE_GREATER_EQUAL = 3002,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_LESS_THAN)
-    MATCH_TYPE_LESS_THAN = 3003,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_LESS_EQUAL)
-    MATCH_TYPE_LESS_EQUAL = 3004,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_EQUAL_TO)
+    MATCH_TYPE_NUMERIC_EQUAL_TO = 3000,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_GREATER_THAN)
+    MATCH_TYPE_NUMERIC_GREATER_THAN = 3001,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_GREATER_EQUAL)
+    MATCH_TYPE_NUMERIC_GREATER_EQUAL = 3002,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_LESS_THAN)
+    MATCH_TYPE_NUMERIC_LESS_THAN = 3003,
+    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_LESS_EQUAL)
+    MATCH_TYPE_NUMERIC_LESS_EQUAL = 3004,
 }
 
 impl ::protobuf::Enum for MatchType {
@@ -422,26 +499,27 @@ impl ::protobuf::Enum for MatchType {
             0 => ::std::option::Option::Some(MatchType::MATCH_TYPE_UNKNOWN),
             1000 => ::std::option::Option::Some(MatchType::MATCH_TYPE_STRING_CONTAINS_ANY),
             1001 => ::std::option::Option::Some(MatchType::MATCH_TYPE_STRING_CONTAINS_ALL),
-            1002 => ::std::option::Option::Some(MatchType::MATCH_TYPE_IP_ADDRESS),
-            1003 => ::std::option::Option::Some(MatchType::MATCH_TYPE_REGEX),
-            1004 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_RFC3339),
-            1005 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO),
-            1006 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_UNIX),
-            1007 => ::std::option::Option::Some(MatchType::MATCH_TYPE_BOOLEAN_TRUE),
-            1008 => ::std::option::Option::Some(MatchType::MATCH_TYPE_BOOLEAN_FALSE),
-            1009 => ::std::option::Option::Some(MatchType::MATCH_TYPE_IS_EMPTY),
-            1010 => ::std::option::Option::Some(MatchType::MATCH_TYPE_HAS_FIELD),
-            1011 => ::std::option::Option::Some(MatchType::MATCH_TYPE_VALUE_IS_TYPE),
+            1002 => ::std::option::Option::Some(MatchType::MATCH_TYPE_STRING_EQUAL),
+            1003 => ::std::option::Option::Some(MatchType::MATCH_TYPE_IP_ADDRESS),
+            1004 => ::std::option::Option::Some(MatchType::MATCH_TYPE_REGEX),
+            1005 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_RFC3339),
+            1006 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO),
+            1007 => ::std::option::Option::Some(MatchType::MATCH_TYPE_TIMESTAMP_UNIX),
+            1008 => ::std::option::Option::Some(MatchType::MATCH_TYPE_BOOLEAN_TRUE),
+            1009 => ::std::option::Option::Some(MatchType::MATCH_TYPE_BOOLEAN_FALSE),
+            1010 => ::std::option::Option::Some(MatchType::MATCH_TYPE_IS_EMPTY),
+            1011 => ::std::option::Option::Some(MatchType::MATCH_TYPE_HAS_FIELD),
+            1012 => ::std::option::Option::Some(MatchType::MATCH_TYPE_IS_TYPE),
             2000 => ::std::option::Option::Some(MatchType::MATCH_TYPE_PII),
             2001 => ::std::option::Option::Some(MatchType::MATCH_TYPE_PII_CREDIT_CARD),
             2002 => ::std::option::Option::Some(MatchType::MATCH_TYPE_PII_SSN),
             2003 => ::std::option::Option::Some(MatchType::MATCH_TYPE_PII_EMAIL),
             2004 => ::std::option::Option::Some(MatchType::MATCH_TYPE_PII_PHONE),
-            3000 => ::std::option::Option::Some(MatchType::MATCH_TYPE_EQUAL_TO),
-            3001 => ::std::option::Option::Some(MatchType::MATCH_TYPE_GREATER_THAN),
-            3002 => ::std::option::Option::Some(MatchType::MATCH_TYPE_GREATER_EQUAL),
-            3003 => ::std::option::Option::Some(MatchType::MATCH_TYPE_LESS_THAN),
-            3004 => ::std::option::Option::Some(MatchType::MATCH_TYPE_LESS_EQUAL),
+            3000 => ::std::option::Option::Some(MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO),
+            3001 => ::std::option::Option::Some(MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN),
+            3002 => ::std::option::Option::Some(MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL),
+            3003 => ::std::option::Option::Some(MatchType::MATCH_TYPE_NUMERIC_LESS_THAN),
+            3004 => ::std::option::Option::Some(MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL),
             _ => ::std::option::Option::None
         }
     }
@@ -450,6 +528,7 @@ impl ::protobuf::Enum for MatchType {
         MatchType::MATCH_TYPE_UNKNOWN,
         MatchType::MATCH_TYPE_STRING_CONTAINS_ANY,
         MatchType::MATCH_TYPE_STRING_CONTAINS_ALL,
+        MatchType::MATCH_TYPE_STRING_EQUAL,
         MatchType::MATCH_TYPE_IP_ADDRESS,
         MatchType::MATCH_TYPE_REGEX,
         MatchType::MATCH_TYPE_TIMESTAMP_RFC3339,
@@ -459,17 +538,17 @@ impl ::protobuf::Enum for MatchType {
         MatchType::MATCH_TYPE_BOOLEAN_FALSE,
         MatchType::MATCH_TYPE_IS_EMPTY,
         MatchType::MATCH_TYPE_HAS_FIELD,
-        MatchType::MATCH_TYPE_VALUE_IS_TYPE,
+        MatchType::MATCH_TYPE_IS_TYPE,
         MatchType::MATCH_TYPE_PII,
         MatchType::MATCH_TYPE_PII_CREDIT_CARD,
         MatchType::MATCH_TYPE_PII_SSN,
         MatchType::MATCH_TYPE_PII_EMAIL,
         MatchType::MATCH_TYPE_PII_PHONE,
-        MatchType::MATCH_TYPE_EQUAL_TO,
-        MatchType::MATCH_TYPE_GREATER_THAN,
-        MatchType::MATCH_TYPE_GREATER_EQUAL,
-        MatchType::MATCH_TYPE_LESS_THAN,
-        MatchType::MATCH_TYPE_LESS_EQUAL,
+        MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+        MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN,
+        MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL,
+        MatchType::MATCH_TYPE_NUMERIC_LESS_THAN,
+        MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL,
     ];
 }
 
@@ -484,26 +563,27 @@ impl ::protobuf::EnumFull for MatchType {
             MatchType::MATCH_TYPE_UNKNOWN => 0,
             MatchType::MATCH_TYPE_STRING_CONTAINS_ANY => 1,
             MatchType::MATCH_TYPE_STRING_CONTAINS_ALL => 2,
-            MatchType::MATCH_TYPE_IP_ADDRESS => 3,
-            MatchType::MATCH_TYPE_REGEX => 4,
-            MatchType::MATCH_TYPE_TIMESTAMP_RFC3339 => 5,
-            MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO => 6,
-            MatchType::MATCH_TYPE_TIMESTAMP_UNIX => 7,
-            MatchType::MATCH_TYPE_BOOLEAN_TRUE => 8,
-            MatchType::MATCH_TYPE_BOOLEAN_FALSE => 9,
-            MatchType::MATCH_TYPE_IS_EMPTY => 10,
-            MatchType::MATCH_TYPE_HAS_FIELD => 11,
-            MatchType::MATCH_TYPE_VALUE_IS_TYPE => 12,
-            MatchType::MATCH_TYPE_PII => 13,
-            MatchType::MATCH_TYPE_PII_CREDIT_CARD => 14,
-            MatchType::MATCH_TYPE_PII_SSN => 15,
-            MatchType::MATCH_TYPE_PII_EMAIL => 16,
-            MatchType::MATCH_TYPE_PII_PHONE => 17,
-            MatchType::MATCH_TYPE_EQUAL_TO => 18,
-            MatchType::MATCH_TYPE_GREATER_THAN => 19,
-            MatchType::MATCH_TYPE_GREATER_EQUAL => 20,
-            MatchType::MATCH_TYPE_LESS_THAN => 21,
-            MatchType::MATCH_TYPE_LESS_EQUAL => 22,
+            MatchType::MATCH_TYPE_STRING_EQUAL => 3,
+            MatchType::MATCH_TYPE_IP_ADDRESS => 4,
+            MatchType::MATCH_TYPE_REGEX => 5,
+            MatchType::MATCH_TYPE_TIMESTAMP_RFC3339 => 6,
+            MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO => 7,
+            MatchType::MATCH_TYPE_TIMESTAMP_UNIX => 8,
+            MatchType::MATCH_TYPE_BOOLEAN_TRUE => 9,
+            MatchType::MATCH_TYPE_BOOLEAN_FALSE => 10,
+            MatchType::MATCH_TYPE_IS_EMPTY => 11,
+            MatchType::MATCH_TYPE_HAS_FIELD => 12,
+            MatchType::MATCH_TYPE_IS_TYPE => 13,
+            MatchType::MATCH_TYPE_PII => 14,
+            MatchType::MATCH_TYPE_PII_CREDIT_CARD => 15,
+            MatchType::MATCH_TYPE_PII_SSN => 16,
+            MatchType::MATCH_TYPE_PII_EMAIL => 17,
+            MatchType::MATCH_TYPE_PII_PHONE => 18,
+            MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO => 19,
+            MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN => 20,
+            MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL => 21,
+            MatchType::MATCH_TYPE_NUMERIC_LESS_THAN => 22,
+            MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL => 23,
         };
         Self::enum_descriptor().value_by_index(index)
     }
@@ -528,107 +608,131 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x16\n\x06negate\x18\x04\x20\x01(\x08R\x06negate\x12$\n\x04type\x18\x05\
     \x20\x01(\x0e2\x10.rules.MatchTypeR\x04type\"@\n\rMatchResponse\x12\x19\
     \n\x08is_match\x18\x01\x20\x01(\x08R\x07isMatch\x12\x14\n\x05error\x18\
-    \x02\x20\x01(\tR\x05error*\xac\x05\n\tMatchType\x12\x16\n\x12MATCH_TYPE_\
-    UNKNOWN\x10\0\x12#\n\x1eMATCH_TYPE_STRING_CONTAINS_ANY\x10\xe8\x07\x12#\
-    \n\x1eMATCH_TYPE_STRING_CONTAINS_ALL\x10\xe9\x07\x12\x1a\n\x15MATCH_TYPE\
-    _IP_ADDRESS\x10\xea\x07\x12\x15\n\x10MATCH_TYPE_REGEX\x10\xeb\x07\x12!\n\
-    \x1cMATCH_TYPE_TIMESTAMP_RFC3339\x10\xec\x07\x12#\n\x1eMATCH_TYPE_TIMEST\
-    AMP_UNIX_NANO\x10\xed\x07\x12\x1e\n\x19MATCH_TYPE_TIMESTAMP_UNIX\x10\xee\
-    \x07\x12\x1c\n\x17MATCH_TYPE_BOOLEAN_TRUE\x10\xef\x07\x12\x1d\n\x18MATCH\
-    _TYPE_BOOLEAN_FALSE\x10\xf0\x07\x12\x18\n\x13MATCH_TYPE_IS_EMPTY\x10\xf1\
-    \x07\x12\x19\n\x14MATCH_TYPE_HAS_FIELD\x10\xf2\x07\x12\x1d\n\x18MATCH_TY\
-    PE_VALUE_IS_TYPE\x10\xf3\x07\x12\x13\n\x0eMATCH_TYPE_PII\x10\xd0\x0f\x12\
-    \x1f\n\x1aMATCH_TYPE_PII_CREDIT_CARD\x10\xd1\x0f\x12\x17\n\x12MATCH_TYPE\
-    _PII_SSN\x10\xd2\x0f\x12\x19\n\x14MATCH_TYPE_PII_EMAIL\x10\xd3\x0f\x12\
-    \x19\n\x14MATCH_TYPE_PII_PHONE\x10\xd4\x0f\x12\x18\n\x13MATCH_TYPE_EQUAL\
-    _TO\x10\xb8\x17\x12\x1c\n\x17MATCH_TYPE_GREATER_THAN\x10\xb9\x17\x12\x1d\
-    \n\x18MATCH_TYPE_GREATER_EQUAL\x10\xba\x17\x12\x19\n\x14MATCH_TYPE_LESS_\
-    THAN\x10\xbb\x17\x12\x1a\n\x15MATCH_TYPE_LESS_EQUAL\x10\xbc\x17B:Z8githu\
-    b.com/streamdal/snitch-protos/build/go/protos/rulesJ\xf3\x10\n\x06\x12\
-    \x04\0\0;\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0e\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\
-    \0O\n\n\n\x02\x05\0\x12\x04\x06\0.\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\
-    \x05\x0e\n6\n\x04\x05\0\x02\0\x12\x03\x08\x02\x19\x1a)\x201000-1999\x20r\
-    eserved\x20for\x20core\x20match\x20types\n\n\x0c\n\x05\x05\0\x02\0\x01\
-    \x12\x03\x08\x02\x14\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\x17\x18\n\
-    \x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02(\n\x0c\n\x05\x05\0\x02\x01\x01\
-    \x12\x03\t\x02\x20\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t#'\n\x0b\n\x04\
-    \x05\0\x02\x02\x12\x03\n\x02(\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\n\
-    \x02\x20\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n#'\n\x0b\n\x04\x05\0\x02\
-    \x03\x12\x03\x0b\x02\x1f\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x0b\x02\
-    \x17\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0b\x1a\x1e\n\x0b\n\x04\x05\0\
-    \x02\x04\x12\x03\x0c\x02\x1a\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x0c\
-    \x02\x12\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c\x15\x19\n\x0b\n\x04\
-    \x05\0\x02\x05\x12\x03\r\x02&\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\r\
-    \x02\x1e\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r!%\n\x0b\n\x04\x05\0\x02\
-    \x06\x12\x03\x0e\x02(\n\x0c\n\x05\x05\0\x02\x06\x01\x12\x03\x0e\x02\x20\
-    \n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\x0e#'\n\x0b\n\x04\x05\0\x02\x07\
-    \x12\x03\x0f\x02#\n\x0c\n\x05\x05\0\x02\x07\x01\x12\x03\x0f\x02\x1b\n\
-    \x0c\n\x05\x05\0\x02\x07\x02\x12\x03\x0f\x1e\"\n\x0b\n\x04\x05\0\x02\x08\
-    \x12\x03\x10\x02!\n\x0c\n\x05\x05\0\x02\x08\x01\x12\x03\x10\x02\x19\n\
-    \x0c\n\x05\x05\0\x02\x08\x02\x12\x03\x10\x1c\x20\n\x0b\n\x04\x05\0\x02\t\
-    \x12\x03\x11\x02\"\n\x0c\n\x05\x05\0\x02\t\x01\x12\x03\x11\x02\x1a\n\x0c\
-    \n\x05\x05\0\x02\t\x02\x12\x03\x11\x1d!\n\x0b\n\x04\x05\0\x02\n\x12\x03\
-    \x12\x02\x1d\n\x0c\n\x05\x05\0\x02\n\x01\x12\x03\x12\x02\x15\n\x0c\n\x05\
-    \x05\0\x02\n\x02\x12\x03\x12\x18\x1c\n.\n\x04\x05\0\x02\x0b\x12\x03\x15\
-    \x02\x1e\x1a!\x20TODO:\x20Implement\x20at\x20a\x20later\x20date\n\n\x0c\
-    \n\x05\x05\0\x02\x0b\x01\x12\x03\x15\x02\x16\n\x0c\n\x05\x05\0\x02\x0b\
-    \x02\x12\x03\x15\x19\x1d\n\x0b\n\x04\x05\0\x02\x0c\x12\x03\x16\x02\"\n\
-    \x0c\n\x05\x05\0\x02\x0c\x01\x12\x03\x16\x02\x1a\n\x0c\n\x05\x05\0\x02\
-    \x0c\x02\x12\x03\x16\x1d!\n\xf9\x03\n\x04\x05\0\x02\r\x12\x03!\x02\x18\
-    \x1a\xeb\x03\x202000-2999\x20PII\x20will\x20match\x20any\x20PII\x20we\
-    \x20are\x20capable\x20of\x20detecting.\n\x20The\x20more\x20specific\x20t\
-    ypes\x20are\x20included\x20for\x20convenience,\x20in\x20the\x20event\n\
-    \x20that\x20the\x20user\x20wants\x20to\x20specifically\x20match\x20them.\
-    \n\n\x20TODO:\x20Additional\x20PII\x20types\x20for\x20the\x20future:\x20\
-    address,\x20name,\x20driver's\x20license,\n\x20passport\x20ID,\x20VIN\
-    \x20number,\x20MAC\x20address,\x20serial\x20numbers,\x20logins,\x20passw\
-    ords,\n\x20vehicle\x20registration\x20number,\x20taxpayer\x20ID,\x20pati\
-    ent\x20ID,\x20financial\x20account\x20ID\n\x20(ie.\x20bank\x20account\
-    \x20number),\x20health\x20plan\x20ID,\x20certificate/license\x20number,\
-    \n\x20device\x20ID\n\n\x0c\n\x05\x05\0\x02\r\x01\x12\x03!\x02\x10\n\x0c\
-    \n\x05\x05\0\x02\r\x02\x12\x03!\x13\x17\n\x0b\n\x04\x05\0\x02\x0e\x12\
-    \x03\"\x02$\n\x0c\n\x05\x05\0\x02\x0e\x01\x12\x03\"\x02\x1c\n\x0c\n\x05\
-    \x05\0\x02\x0e\x02\x12\x03\"\x1f#\n\x0b\n\x04\x05\0\x02\x0f\x12\x03#\x02\
-    \x1c\n\x0c\n\x05\x05\0\x02\x0f\x01\x12\x03#\x02\x14\n\x0c\n\x05\x05\0\
-    \x02\x0f\x02\x12\x03#\x17\x1b\n\x0b\n\x04\x05\0\x02\x10\x12\x03$\x02\x1e\
-    \n\x0c\n\x05\x05\0\x02\x10\x01\x12\x03$\x02\x16\n\x0c\n\x05\x05\0\x02\
-    \x10\x02\x12\x03$\x19\x1d\n\x0b\n\x04\x05\0\x02\x11\x12\x03%\x02\x1e\n\
-    \x0c\n\x05\x05\0\x02\x11\x01\x12\x03%\x02\x16\n\x0c\n\x05\x05\0\x02\x11\
-    \x02\x12\x03%\x19\x1d\n[\n\x04\x05\0\x02\x12\x12\x03)\x02\x1c\x1aN\x20Lo\
-    gical\x20operators\x203000-3999\n\x20TODO:\x20implement\x20logical\x20op\
-    erators\x20at\x20some\x20point\n\n\x0c\n\x05\x05\0\x02\x12\x01\x12\x03)\
-    \x02\x15\n\x0c\n\x05\x05\0\x02\x12\x02\x12\x03)\x17\x1b\n\x0b\n\x04\x05\
-    \0\x02\x13\x12\x03*\x02!\n\x0c\n\x05\x05\0\x02\x13\x01\x12\x03*\x02\x19\
-    \n\x0c\n\x05\x05\0\x02\x13\x02\x12\x03*\x1c\x20\n\x0b\n\x04\x05\0\x02\
-    \x14\x12\x03+\x02\"\n\x0c\n\x05\x05\0\x02\x14\x01\x12\x03+\x02\x1a\n\x0c\
-    \n\x05\x05\0\x02\x14\x02\x12\x03+\x1d!\n\x0b\n\x04\x05\0\x02\x15\x12\x03\
-    ,\x02\x1e\n\x0c\n\x05\x05\0\x02\x15\x01\x12\x03,\x02\x16\n\x0c\n\x05\x05\
-    \0\x02\x15\x02\x12\x03,\x19\x1d\n\x0b\n\x04\x05\0\x02\x16\x12\x03-\x02\
-    \x1f\n\x0c\n\x05\x05\0\x02\x16\x01\x12\x03-\x02\x17\n\x0c\n\x05\x05\0\
-    \x02\x16\x02\x12\x03-\x1a\x1e\n\n\n\x02\x04\0\x12\x040\06\x01\n\n\n\x03\
-    \x04\0\x01\x12\x030\x08\x14\n\x0b\n\x04\x04\0\x02\0\x12\x031\x02\x1a\n\
-    \x0c\n\x05\x04\0\x02\0\x04\x12\x031\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\
-    \x12\x031\x0b\x10\n\x0c\n\x05\x04\0\x02\0\x01\x12\x031\x11\x15\n\x0c\n\
-    \x05\x04\0\x02\0\x03\x12\x031\x18\x19\n\x0b\n\x04\x04\0\x02\x01\x12\x032\
-    \x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x032\x02\x08\n\x0c\n\x05\x04\
-    \0\x02\x01\x01\x12\x032\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x032\x10\
-    \x11\n,\n\x04\x04\0\x02\x02\x12\x033\x02\x1b\"\x1f\x20args\x20determined\
-    \x20by\x20match_type\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x033\x02\n\n\
-    \x0c\n\x05\x04\0\x02\x02\x05\x12\x033\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\
-    \x01\x12\x033\x12\x16\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x033\x19\x1a\n\
-    \x0b\n\x04\x04\0\x02\x03\x12\x034\x02\x12\n\x0c\n\x05\x04\0\x02\x03\x05\
-    \x12\x034\x02\x06\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x034\x07\r\n\x0c\n\
-    \x05\x04\0\x02\x03\x03\x12\x034\x10\x11\n\x0b\n\x04\x04\0\x02\x04\x12\
-    \x035\x02\x15\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x035\x02\x0b\n\x0c\n\x05\
-    \x04\0\x02\x04\x01\x12\x035\x0c\x10\n\x0c\n\x05\x04\0\x02\x04\x03\x12\
-    \x035\x13\x14\n\n\n\x02\x04\x01\x12\x048\0;\x01\n\n\n\x03\x04\x01\x01\
-    \x12\x038\x08\x15\n\x0b\n\x04\x04\x01\x02\0\x12\x039\x02\x14\n\x0c\n\x05\
-    \x04\x01\x02\0\x05\x12\x039\x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\x12\
-    \x039\x07\x0f\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x039\x12\x13\n\x0b\n\x04\
-    \x04\x01\x02\x01\x12\x03:\x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
-    \x03:\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03:\t\x0e\n\x0c\n\x05\
-    \x04\x01\x02\x01\x03\x12\x03:\x11\x12b\x06proto3\
+    \x02\x20\x01(\tR\x05error*\xd6\x01\n\x0fMatchValueTypes\x12\x1c\n\x18MAT\
+    CH_VALUE_TYPE_UNKNOWN\x10\0\x12\x1b\n\x17MATCH_VALUE_TYPE_STRING\x10\x01\
+    \x12\x18\n\x14MATCH_VALUE_TYPE_INT\x10\x02\x12\x1a\n\x16MATCH_VALUE_TYPE\
+    _FLOAT\x10\x03\x12\x19\n\x15MATCH_VALUE_TYPE_BOOL\x10\x04\x12\x1b\n\x17M\
+    ATCH_VALUE_TYPE_OBJECT\x10\x05\x12\x1a\n\x16MATCH_VALUE_TYPE_ARRAY\x10\
+    \x06*\xec\x05\n\tMatchType\x12\x16\n\x12MATCH_TYPE_UNKNOWN\x10\0\x12#\n\
+    \x1eMATCH_TYPE_STRING_CONTAINS_ANY\x10\xe8\x07\x12#\n\x1eMATCH_TYPE_STRI\
+    NG_CONTAINS_ALL\x10\xe9\x07\x12\x1c\n\x17MATCH_TYPE_STRING_EQUAL\x10\xea\
+    \x07\x12\x1a\n\x15MATCH_TYPE_IP_ADDRESS\x10\xeb\x07\x12\x15\n\x10MATCH_T\
+    YPE_REGEX\x10\xec\x07\x12!\n\x1cMATCH_TYPE_TIMESTAMP_RFC3339\x10\xed\x07\
+    \x12#\n\x1eMATCH_TYPE_TIMESTAMP_UNIX_NANO\x10\xee\x07\x12\x1e\n\x19MATCH\
+    _TYPE_TIMESTAMP_UNIX\x10\xef\x07\x12\x1c\n\x17MATCH_TYPE_BOOLEAN_TRUE\
+    \x10\xf0\x07\x12\x1d\n\x18MATCH_TYPE_BOOLEAN_FALSE\x10\xf1\x07\x12\x18\n\
+    \x13MATCH_TYPE_IS_EMPTY\x10\xf2\x07\x12\x19\n\x14MATCH_TYPE_HAS_FIELD\
+    \x10\xf3\x07\x12\x17\n\x12MATCH_TYPE_IS_TYPE\x10\xf4\x07\x12\x13\n\x0eMA\
+    TCH_TYPE_PII\x10\xd0\x0f\x12\x1f\n\x1aMATCH_TYPE_PII_CREDIT_CARD\x10\xd1\
+    \x0f\x12\x17\n\x12MATCH_TYPE_PII_SSN\x10\xd2\x0f\x12\x19\n\x14MATCH_TYPE\
+    _PII_EMAIL\x10\xd3\x0f\x12\x19\n\x14MATCH_TYPE_PII_PHONE\x10\xd4\x0f\x12\
+    \x20\n\x1bMATCH_TYPE_NUMERIC_EQUAL_TO\x10\xb8\x17\x12$\n\x1fMATCH_TYPE_N\
+    UMERIC_GREATER_THAN\x10\xb9\x17\x12%\n\x20MATCH_TYPE_NUMERIC_GREATER_EQU\
+    AL\x10\xba\x17\x12!\n\x1cMATCH_TYPE_NUMERIC_LESS_THAN\x10\xbb\x17\x12\"\
+    \n\x1dMATCH_TYPE_NUMERIC_LESS_EQUAL\x10\xbc\x17B:Z8github.com/streamdal/\
+    snitch-protos/build/go/protos/rulesJ\xa8\x13\n\x06\x12\x04\0\0D\x01\n\
+    \x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0e\n\x08\n\
+    \x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n3\n\x02\x05\0\
+    \x12\x04\x07\0\x0f\x01\x1a'\x20Used\x20as\x20an\x20arg\x20for\x20IS_TYPE\
+    \x20match\x20type\n\n\n\n\x03\x05\0\x01\x12\x03\x07\x05\x14\n\x0b\n\x04\
+    \x05\0\x02\0\x12\x03\x08\x02\x1f\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x08\
+    \x02\x1a\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\x1d\x1e\n\x0b\n\x04\x05\
+    \0\x02\x01\x12\x03\t\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\t\x02\
+    \x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t\x1c\x1d\n\x0b\n\x04\x05\0\
+    \x02\x02\x12\x03\n\x02\x1b\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\n\x02\
+    \x16\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n\x19\x1a\n\x0b\n\x04\x05\0\
+    \x02\x03\x12\x03\x0b\x02\x1d\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x0b\
+    \x02\x18\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0b\x1b\x1c\n\x0b\n\x04\
+    \x05\0\x02\x04\x12\x03\x0c\x02\x1c\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\
+    \x0c\x02\x17\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c\x1a\x1b\n\x0b\n\
+    \x04\x05\0\x02\x05\x12\x03\r\x02\x1e\n\x0c\n\x05\x05\0\x02\x05\x01\x12\
+    \x03\r\x02\x19\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\x1c\x1d\n\x0b\n\
+    \x04\x05\0\x02\x06\x12\x03\x0e\x02\x1d\n\x0c\n\x05\x05\0\x02\x06\x01\x12\
+    \x03\x0e\x02\x18\n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\x0e\x1b\x1c\n\n\n\
+    \x02\x05\x01\x12\x04\x11\07\x01\n\n\n\x03\x05\x01\x01\x12\x03\x11\x05\
+    \x0e\n6\n\x04\x05\x01\x02\0\x12\x03\x13\x02\x19\x1a)\x201000-1999\x20res\
+    erved\x20for\x20core\x20match\x20types\n\n\x0c\n\x05\x05\x01\x02\0\x01\
+    \x12\x03\x13\x02\x14\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x13\x17\x18\n\
+    \x0b\n\x04\x05\x01\x02\x01\x12\x03\x14\x02(\n\x0c\n\x05\x05\x01\x02\x01\
+    \x01\x12\x03\x14\x02\x20\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x14#'\n\
+    \x0b\n\x04\x05\x01\x02\x02\x12\x03\x15\x02(\n\x0c\n\x05\x05\x01\x02\x02\
+    \x01\x12\x03\x15\x02\x20\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x15#'\n\
+    \x0b\n\x04\x05\x01\x02\x03\x12\x03\x16\x02!\n\x0c\n\x05\x05\x01\x02\x03\
+    \x01\x12\x03\x16\x02\x19\n\x0c\n\x05\x05\x01\x02\x03\x02\x12\x03\x16\x1c\
+    \x20\n\x0b\n\x04\x05\x01\x02\x04\x12\x03\x17\x02\x1f\n\x0c\n\x05\x05\x01\
+    \x02\x04\x01\x12\x03\x17\x02\x17\n\x0c\n\x05\x05\x01\x02\x04\x02\x12\x03\
+    \x17\x1a\x1e\n\x0b\n\x04\x05\x01\x02\x05\x12\x03\x18\x02\x1a\n\x0c\n\x05\
+    \x05\x01\x02\x05\x01\x12\x03\x18\x02\x12\n\x0c\n\x05\x05\x01\x02\x05\x02\
+    \x12\x03\x18\x15\x19\n\x0b\n\x04\x05\x01\x02\x06\x12\x03\x19\x02&\n\x0c\
+    \n\x05\x05\x01\x02\x06\x01\x12\x03\x19\x02\x1e\n\x0c\n\x05\x05\x01\x02\
+    \x06\x02\x12\x03\x19!%\n\x0b\n\x04\x05\x01\x02\x07\x12\x03\x1a\x02(\n\
+    \x0c\n\x05\x05\x01\x02\x07\x01\x12\x03\x1a\x02\x20\n\x0c\n\x05\x05\x01\
+    \x02\x07\x02\x12\x03\x1a#'\n\x0b\n\x04\x05\x01\x02\x08\x12\x03\x1b\x02#\
+    \n\x0c\n\x05\x05\x01\x02\x08\x01\x12\x03\x1b\x02\x1b\n\x0c\n\x05\x05\x01\
+    \x02\x08\x02\x12\x03\x1b\x1e\"\n\x0b\n\x04\x05\x01\x02\t\x12\x03\x1c\x02\
+    !\n\x0c\n\x05\x05\x01\x02\t\x01\x12\x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\
+    \x02\t\x02\x12\x03\x1c\x1c\x20\n\x0b\n\x04\x05\x01\x02\n\x12\x03\x1d\x02\
+    \"\n\x0c\n\x05\x05\x01\x02\n\x01\x12\x03\x1d\x02\x1a\n\x0c\n\x05\x05\x01\
+    \x02\n\x02\x12\x03\x1d\x1d!\n\x0b\n\x04\x05\x01\x02\x0b\x12\x03\x1e\x02\
+    \x1d\n\x0c\n\x05\x05\x01\x02\x0b\x01\x12\x03\x1e\x02\x15\n\x0c\n\x05\x05\
+    \x01\x02\x0b\x02\x12\x03\x1e\x18\x1c\n\x0b\n\x04\x05\x01\x02\x0c\x12\x03\
+    \x1f\x02\x1e\n\x0c\n\x05\x05\x01\x02\x0c\x01\x12\x03\x1f\x02\x16\n\x0c\n\
+    \x05\x05\x01\x02\x0c\x02\x12\x03\x1f\x19\x1d\n\x0b\n\x04\x05\x01\x02\r\
+    \x12\x03\x20\x02\x1c\n\x0c\n\x05\x05\x01\x02\r\x01\x12\x03\x20\x02\x14\n\
+    \x0c\n\x05\x05\x01\x02\r\x02\x12\x03\x20\x17\x1b\n\xf9\x03\n\x04\x05\x01\
+    \x02\x0e\x12\x03+\x02\x18\x1a\xeb\x03\x202000-2999\x20PII\x20will\x20mat\
+    ch\x20any\x20PII\x20we\x20are\x20capable\x20of\x20detecting.\n\x20The\
+    \x20more\x20specific\x20types\x20are\x20included\x20for\x20convenience,\
+    \x20in\x20the\x20event\n\x20that\x20the\x20user\x20wants\x20to\x20specif\
+    ically\x20match\x20them.\n\n\x20TODO:\x20Additional\x20PII\x20types\x20f\
+    or\x20the\x20future:\x20address,\x20name,\x20driver's\x20license,\n\x20p\
+    assport\x20ID,\x20VIN\x20number,\x20MAC\x20address,\x20serial\x20numbers\
+    ,\x20logins,\x20passwords,\n\x20vehicle\x20registration\x20number,\x20ta\
+    xpayer\x20ID,\x20patient\x20ID,\x20financial\x20account\x20ID\n\x20(ie.\
+    \x20bank\x20account\x20number),\x20health\x20plan\x20ID,\x20certificate/\
+    license\x20number,\n\x20device\x20ID\n\n\x0c\n\x05\x05\x01\x02\x0e\x01\
+    \x12\x03+\x02\x10\n\x0c\n\x05\x05\x01\x02\x0e\x02\x12\x03+\x13\x17\n\x0b\
+    \n\x04\x05\x01\x02\x0f\x12\x03,\x02$\n\x0c\n\x05\x05\x01\x02\x0f\x01\x12\
+    \x03,\x02\x1c\n\x0c\n\x05\x05\x01\x02\x0f\x02\x12\x03,\x1f#\n\x0b\n\x04\
+    \x05\x01\x02\x10\x12\x03-\x02\x1c\n\x0c\n\x05\x05\x01\x02\x10\x01\x12\
+    \x03-\x02\x14\n\x0c\n\x05\x05\x01\x02\x10\x02\x12\x03-\x17\x1b\n\x0b\n\
+    \x04\x05\x01\x02\x11\x12\x03.\x02\x1e\n\x0c\n\x05\x05\x01\x02\x11\x01\
+    \x12\x03.\x02\x16\n\x0c\n\x05\x05\x01\x02\x11\x02\x12\x03.\x19\x1d\n\x0b\
+    \n\x04\x05\x01\x02\x12\x12\x03/\x02\x1e\n\x0c\n\x05\x05\x01\x02\x12\x01\
+    \x12\x03/\x02\x16\n\x0c\n\x05\x05\x01\x02\x12\x02\x12\x03/\x19\x1d\n*\n\
+    \x04\x05\x01\x02\x13\x12\x032\x02$\x1a\x1d\x20Logical\x20operators\x2030\
+    00-3999\n\n\x0c\n\x05\x05\x01\x02\x13\x01\x12\x032\x02\x1d\n\x0c\n\x05\
+    \x05\x01\x02\x13\x02\x12\x032\x1f#\n\x0b\n\x04\x05\x01\x02\x14\x12\x033\
+    \x02)\n\x0c\n\x05\x05\x01\x02\x14\x01\x12\x033\x02!\n\x0c\n\x05\x05\x01\
+    \x02\x14\x02\x12\x033$(\n\x0b\n\x04\x05\x01\x02\x15\x12\x034\x02*\n\x0c\
+    \n\x05\x05\x01\x02\x15\x01\x12\x034\x02\"\n\x0c\n\x05\x05\x01\x02\x15\
+    \x02\x12\x034%)\n\x0b\n\x04\x05\x01\x02\x16\x12\x035\x02&\n\x0c\n\x05\
+    \x05\x01\x02\x16\x01\x12\x035\x02\x1e\n\x0c\n\x05\x05\x01\x02\x16\x02\
+    \x12\x035!%\n\x0b\n\x04\x05\x01\x02\x17\x12\x036\x02'\n\x0c\n\x05\x05\
+    \x01\x02\x17\x01\x12\x036\x02\x1f\n\x0c\n\x05\x05\x01\x02\x17\x02\x12\
+    \x036\"&\n\n\n\x02\x04\0\x12\x049\0?\x01\n\n\n\x03\x04\0\x01\x12\x039\
+    \x08\x14\n\x0b\n\x04\x04\0\x02\0\x12\x03:\x02\x1a\n\x0c\n\x05\x04\0\x02\
+    \0\x04\x12\x03:\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03:\x0b\x10\n\x0c\
+    \n\x05\x04\0\x02\0\x01\x12\x03:\x11\x15\n\x0c\n\x05\x04\0\x02\0\x03\x12\
+    \x03:\x18\x19\n\x0b\n\x04\x04\0\x02\x01\x12\x03;\x02\x12\n\x0c\n\x05\x04\
+    \0\x02\x01\x05\x12\x03;\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03;\t\
+    \r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03;\x10\x11\n,\n\x04\x04\0\x02\x02\
+    \x12\x03<\x02\x1b\"\x1f\x20args\x20determined\x20by\x20match_type\n\n\
+    \x0c\n\x05\x04\0\x02\x02\x04\x12\x03<\x02\n\n\x0c\n\x05\x04\0\x02\x02\
+    \x05\x12\x03<\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03<\x12\x16\n\
+    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03<\x19\x1a\n\x0b\n\x04\x04\0\x02\x03\
+    \x12\x03=\x02\x12\n\x0c\n\x05\x04\0\x02\x03\x05\x12\x03=\x02\x06\n\x0c\n\
+    \x05\x04\0\x02\x03\x01\x12\x03=\x07\r\n\x0c\n\x05\x04\0\x02\x03\x03\x12\
+    \x03=\x10\x11\n\x0b\n\x04\x04\0\x02\x04\x12\x03>\x02\x15\n\x0c\n\x05\x04\
+    \0\x02\x04\x06\x12\x03>\x02\x0b\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03>\
+    \x0c\x10\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03>\x13\x14\n\n\n\x02\x04\
+    \x01\x12\x04A\0D\x01\n\n\n\x03\x04\x01\x01\x12\x03A\x08\x15\n\x0b\n\x04\
+    \x04\x01\x02\0\x12\x03B\x02\x14\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03B\
+    \x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03B\x07\x0f\n\x0c\n\x05\x04\
+    \x01\x02\0\x03\x12\x03B\x12\x13\n\x0b\n\x04\x04\x01\x02\x01\x12\x03C\x02\
+    \x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03C\x02\x08\n\x0c\n\x05\x04\
+    \x01\x02\x01\x01\x12\x03C\t\x0e\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03C\
+    \x11\x12b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -649,7 +753,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut messages = ::std::vec::Vec::with_capacity(2);
             messages.push(MatchRequest::generated_message_descriptor_data());
             messages.push(MatchResponse::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(1);
+            let mut enums = ::std::vec::Vec::with_capacity(2);
+            enums.push(MatchValueTypes::generated_enum_descriptor_data());
             enums.push(MatchType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),

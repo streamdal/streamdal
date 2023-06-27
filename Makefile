@@ -78,6 +78,10 @@ generate/protoset:
 
 	@echo Successfully generated protoset
 
+.PHONY: generate/all
+generate/all: description = Run all generate/* targets
+generate/all: generate/go generate/rust generate/protoset
+
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
 clean/go:
