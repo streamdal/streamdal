@@ -56,7 +56,7 @@ enum MatchType {
 }
 
 message MatchRequest {
-  repeated bytes data = 1;
+  bytes data = 1;
   string path = 2;
   repeated string args = 3; // args determined by match_type
   bool negate = 4;
