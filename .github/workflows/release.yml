@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@main
       - name: Generate new tag (dry run)
         uses: mathieudutour/github-tag-action@v6.1
-        id: generate_new_tag
+        id: get_new_version
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
@@ -20,11 +20,11 @@ jobs:
         run: |
           pwd
           ls -l
-          sed -i "s/version = \".*\"/version = \"${{ steps.generate_new_tag.outputs.new_tag }}\"/" build/rust/protos/Cargo.toml
+          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
           grep version build/rust/protos/Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Bumped Cargo.toml version to ${{ steps.generate_new_tag.outputs.new_tag }}
+          commit_message: Bumped Cargo.toml version to ${{ steps.get_new_version.outputs.new_version }}
       - name: Create tag
         uses: mathieudutour/github-tag-action@v6.1
         id: create_tag
