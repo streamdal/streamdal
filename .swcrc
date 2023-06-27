@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/swcrc",
+  "jsc": {
+    "parser": {
+      "syntax": "typescript"
+    }
+  },
+  "module": {
+    "type": "es6",
+    "noInterop": false
+  },
+  "exclude": ["__tests__"],
+  "sourceMaps": true,
+  "minify": true
+}
