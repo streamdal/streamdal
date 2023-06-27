@@ -28,3 +28,15 @@ setup/darwin:
 generate: description = generate json marshal/unmarshal code
 generate:
 	tinyjson -all common/common.go
+
+.PHONY: test
+test: description = Run all tests
+test:
+	bash ./init_wasm.sh
+	go test ./...
+
+.PHONY: test/coverage
+test/coverage: description = Run all tests
+test/coverage:
+	bash ./init_wasm.sh
+	go test ./... -coverprofile c.out
