@@ -16,6 +16,6 @@ readme = "README.md"
 protobuf = "3.2.0"
 
 [lib]
-name = "snitch-protos"
+name = "protos"
 path = "src/mod.rs"
 crate-type = ["lib"]

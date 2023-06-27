@@ -55,11 +55,11 @@ generate/go:
 generate/rust: description = Compile protobuf schemas for Go
 generate/rust: clean/rust
 generate/rust:
-	mkdir -p build/rust/snitch-protos/src
+	mkdir -p build/rust/protos/src
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
- 		--rust_out=./build/rust/snitch-protos/src \
+ 		--rust_out=./build/rust/protos/src \
 		protos/*.proto protos/rules/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
@@ -86,7 +86,7 @@ clean/go:
 .PHONY: clean/rust
 clean/rust: description = Remove all Rust build artifacts
 clean/rust:
-	rm -rf ./build/rust/snitch-protos/src/*
+	rm -rf ./build/rust/protos/src/*
 
 .PHONY: clean/protoset
 clean/protoset: description = Remove protoset artifacts
