@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-protos = { git = "https://github.com/streamdal/snitch-protobuf.git", branch = "main" }
-
-[[example]]
-name = "usage"
-path = "examples/usage.rs"
+env_logger = "0.10.0"
+log = "0.4.19"
+protobuf = "3.2.0"
+protobuf-json-mapping = "3.2.0"
+snitch-protos = "0.0.7"
