@@ -12,13 +12,13 @@ enum TransformType {
 }
 
 message TransformRequest {
-  repeated bytes data = 1;
+  bytes data = 1;
   string path = 2;
   string value = 3;
   TransformType type = 4;
 }
 
 message TransformResponse {
-  repeated bytes data = 1;
+  bytes data = 1;
   string error = 2;
 }

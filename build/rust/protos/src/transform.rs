@@ -30,7 +30,7 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 pub struct TransformRequest {
     // message fields
     // @@protoc_insertion_point(field:rules.TransformRequest.data)
-    pub data: ::std::vec::Vec<::std::vec::Vec<u8>>,
+    pub data: ::std::vec::Vec<u8>,
     // @@protoc_insertion_point(field:rules.TransformRequest.path)
     pub path: ::std::string::String,
     // @@protoc_insertion_point(field:rules.TransformRequest.value)
@@ -56,7 +56,7 @@ impl TransformRequest {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(4);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "data",
             |m: &TransformRequest| { &m.data },
             |m: &mut TransformRequest| { &mut m.data },
@@ -95,7 +95,7 @@ impl ::protobuf::Message for TransformRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.data.push(is.read_bytes()?);
+                    self.data = is.read_bytes()?;
                 },
                 18 => {
                     self.path = is.read_string()?;
@@ -118,9 +118,9 @@ impl ::protobuf::Message for TransformRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        for value in &self.data {
-            my_size += ::protobuf::rt::bytes_size(1, &value);
-        };
+        if !self.data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.data);
+        }
         if !self.path.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.path);
         }
@@ -136,9 +136,9 @@ impl ::protobuf::Message for TransformRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        for v in &self.data {
-            os.write_bytes(1, &v)?;
-        };
+        if !self.data.is_empty() {
+            os.write_bytes(1, &self.data)?;
+        }
         if !self.path.is_empty() {
             os.write_string(2, &self.path)?;
         }
@@ -206,7 +206,7 @@ impl ::protobuf::reflect::ProtobufValue for TransformRequest {
 pub struct TransformResponse {
     // message fields
     // @@protoc_insertion_point(field:rules.TransformResponse.data)
-    pub data: ::std::vec::Vec<::std::vec::Vec<u8>>,
+    pub data: ::std::vec::Vec<u8>,
     // @@protoc_insertion_point(field:rules.TransformResponse.error)
     pub error: ::std::string::String,
     // special fields
@@ -228,7 +228,7 @@ impl TransformResponse {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "data",
             |m: &TransformResponse| { &m.data },
             |m: &mut TransformResponse| { &mut m.data },
@@ -257,7 +257,7 @@ impl ::protobuf::Message for TransformResponse {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.data.push(is.read_bytes()?);
+                    self.data = is.read_bytes()?;
                 },
                 18 => {
                     self.error = is.read_string()?;
@@ -274,9 +274,9 @@ impl ::protobuf::Message for TransformResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        for value in &self.data {
-            my_size += ::protobuf::rt::bytes_size(1, &value);
-        };
+        if !self.data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.data);
+        }
         if !self.error.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.error);
         }
@@ -286,9 +286,9 @@ impl ::protobuf::Message for TransformResponse {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        for v in &self.data {
-            os.write_bytes(1, &v)?;
-        };
+        if !self.data.is_empty() {
+            os.write_bytes(1, &self.data)?;
+        }
         if !self.error.is_empty() {
             os.write_string(2, &self.error)?;
         }
@@ -405,15 +405,15 @@ impl TransformType {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x15rules/transform.proto\x12\x05rules\"z\n\x10TransformRequest\x12\
-    \x12\n\x04data\x18\x01\x20\x03(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
+    \x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
     \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x03\x20\x01(\tR\x05value\x12\
     (\n\x04type\x18\x04\x20\x01(\x0e2\x14.rules.TransformTypeR\x04type\"=\n\
-    \x11TransformResponse\x12\x12\n\x04data\x18\x01\x20\x03(\x0cR\x04data\
+    \x11TransformResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\
     \x12\x14\n\x05error\x18\x02\x20\x01(\tR\x05error*\x92\x01\n\rTransformTy\
     pe\x12\x1a\n\x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE\
     _REPLACE_VALUE\x10\x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\
     \x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_VALUE\x10\x03B:Z8github.com/streamd\
-    al/snitch-protos/build/go/protos/rulesJ\x83\x05\n\x06\x12\x04\0\0\x17\
+    al/snitch-protos/build/go/protos/rulesJ\xe7\x04\n\x06\x12\x04\0\0\x17\
     \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0e\n\
     \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\
     \x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\
@@ -426,25 +426,24 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\
     \x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n#$\n\n\n\x02\x04\0\x12\
     \x04\r\0\x12\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x18\n\x0b\n\x04\x04\0\
-    \x02\0\x12\x03\x0e\x02\x1a\n\x0c\n\x05\x04\0\x02\0\x04\x12\x03\x0e\x02\n\
-    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x0b\x10\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\x0e\x11\x15\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x18\x19\
-    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x04\0\x02\x01\
-    \x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0f\t\r\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\x10\x11\n\x0b\n\x04\x04\0\x02\
-    \x02\x12\x03\x10\x02\x13\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x10\x02\
-    \x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x10\t\x0e\n\x0c\n\x05\x04\0\
-    \x02\x02\x03\x12\x03\x10\x11\x12\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x11\
-    \x02\x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x11\x02\x0f\n\x0c\n\x05\
-    \x04\0\x02\x03\x01\x12\x03\x11\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\
-    \x03\x11\x17\x18\n\n\n\x02\x04\x01\x12\x04\x14\0\x17\x01\n\n\n\x03\x04\
-    \x01\x01\x12\x03\x14\x08\x19\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x15\x02\
-    \x1a\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03\x15\x02\n\n\x0c\n\x05\x04\x01\
-    \x02\0\x05\x12\x03\x15\x0b\x10\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x15\
-    \x11\x15\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x15\x18\x19\n\x0b\n\x04\
-    \x04\x01\x02\x01\x12\x03\x16\x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
-    \x03\x16\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x16\t\x0e\n\x0c\
-    \n\x05\x04\x01\x02\x01\x03\x12\x03\x16\x11\x12b\x06proto3\
+    \x02\0\x12\x03\x0e\x02\x11\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x02\
+    \x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\x08\x0c\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x0e\x0f\x10\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\
+    \x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\
+    \x02\x01\x01\x12\x03\x0f\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\
+    \x10\x11\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x10\x02\x13\n\x0c\n\x05\x04\0\
+    \x02\x02\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    \x10\t\x0e\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x10\x11\x12\n\x0b\n\x04\
+    \x04\0\x02\x03\x12\x03\x11\x02\x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
+    \x11\x02\x0f\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x11\x10\x14\n\x0c\n\
+    \x05\x04\0\x02\x03\x03\x12\x03\x11\x17\x18\n\n\n\x02\x04\x01\x12\x04\x14\
+    \0\x17\x01\n\n\n\x03\x04\x01\x01\x12\x03\x14\x08\x19\n\x0b\n\x04\x04\x01\
+    \x02\0\x12\x03\x15\x02\x11\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x15\x02\
+    \x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x15\x08\x0c\n\x0c\n\x05\x04\
+    \x01\x02\0\x03\x12\x03\x15\x0f\x10\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\
+    \x16\x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x16\x02\x08\n\x0c\n\
+    \x05\x04\x01\x02\x01\x01\x12\x03\x16\t\x0e\n\x0c\n\x05\x04\x01\x02\x01\
+    \x03\x12\x03\x16\x11\x12b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
