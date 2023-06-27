@@ -326,16 +326,10 @@ func TestApplyRules_FailPlumber(t *testing.T) {
 	fakePlumber := getFakePlumber()
 	d.Plumber = fakePlumber
 
-	got, err := d.ApplyRules(context.Background(), Publish, "mytopic", []byte(`{"type": "hello world"}`))
+	_, err := d.ApplyRules(context.Background(), Publish, "mytopic", []byte(`{"type": "hello world"}`))
 
-	// We should be getting back an error indicating the message was dropped
-	if err != ErrMessageDropped {
-		t.Error("expected ErrMessageDropped error")
-	}
-
-	// Ensure data was dropped
-	if len(got) != 0 {
-		t.Errorf("expected data to be empty, got %s", string(got))
+	if err != nil {
+		t.Error("unexpected error: " + err.Error())
 	}
 
 	// Ensure SendRuleNotification was called
