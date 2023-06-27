@@ -1,7 +1,6 @@
 package detective
 
 import (
-	"fmt"
 	"math"
 
 	"strconv"
@@ -17,6 +16,7 @@ import (
 )
 
 type MatchType string
+type MatchOperator string
 
 var (
 	ErrNoRegexp = errors.New("No regular expression supplied")
@@ -30,6 +30,7 @@ const (
 	TimestampRFC3339  MatchType = "ts_rfc3339"
 	TimestampUnixNano MatchType = "ts_unix_nano"
 	TimestampUnix     MatchType = "ts_unix"
+	TimestampISO8601  MatchType = "ts_iso8601"
 	BooleanTrue       MatchType = "true"
 	BooleanFalse      MatchType = "false"
 	IsEmpty           MatchType = "is_empty"
@@ -44,15 +45,16 @@ const (
 	PIIPhone      MatchType = "pii_phone"
 
 	// TODO: implement logical operators at some point
-	EqualTo      MatchType = "equal"
-	GreaterThan  MatchType = "greater_than"
-	GreaterEqual MatchType = "greater_equal"
-	LessThan     MatchType = "less_than"
-	LessEqual    MatchType = "less_equal"
+	IsMatch      MatchOperator = "is_match"
+	EqualTo      MatchOperator = "equal"
+	GreaterThan  MatchOperator = "greater_than"
+	GreaterEqual MatchOperator = "greater_equal"
+	LessThan     MatchOperator = "less_than"
+	LessEqual    MatchOperator = "less_equal"
 )
 
 type IMatcher interface {
-	Match(field []byte, dataType jsonparser.ValueType, matchType MatchType, matchArgs ...string) (bool, error)
+	Match(val []byte, valT jsonparser.ValueType, matchT MatchType, op MatchOperator, args ...string) (bool, error)
 }
 
 type Matcher struct {
@@ -67,82 +69,71 @@ func NewMatcher() *Matcher {
 	}
 }
 
-func (m *Matcher) Match(field []byte, dataType jsonparser.ValueType, matchType MatchType, matchArgs ...string) (bool, error) {
-	switch matchType {
-	case GreaterThan:
-		fallthrough
-	case GreaterEqual:
-		fallthrough
-	case LessThan:
-		fallthrough
-	case LessEqual:
-		fallthrough
-	case EqualTo:
-		return matchNumeric(field, dataType, matchType, matchArgs...)
-	default:
-		return m.matchString(string(field), matchType, matchArgs...)
-	}
-}
+func (m *Matcher) Match(val []byte, valT jsonparser.ValueType, matchT MatchType, op MatchOperator, args ...string) (bool, error) {
+	// TODO: figure out integer matching
 
-func (m *Matcher) matchString(fieldValue string, matchType MatchType, matchArgs ...string) (bool, error) {
+	strVal := string(val)
+
 	// Accepting only a string for the field value to avoid having to type juggle all over the place
 	// gJSON provides us with a string value of a field easily by calling .String()
-	switch matchType {
+	switch matchT {
 	case IpAddress:
-		return pii.IP()(fieldValue), nil
+		return pii.IP()(strVal), nil
 	case StringContainsAll:
-		return matchStringAll(fieldValue, matchArgs...), nil
+		return matchStringAll(strVal, args...), nil
 	case StringContainsAny:
-		return matchStringAny(fieldValue, matchArgs...), nil
+		return matchStringAny(strVal, args...), nil
 	case IsEmpty:
-		return strings.Trim(fieldValue, " ") == "", nil
+		return strings.Trim(strVal, " ") == "", nil
 	case Regex:
-		matched, err := m.matchRegex(fieldValue, matchArgs...)
+		matched, err := m.matchRegex(strVal, args...)
 		if err != nil {
 			return false, err
 		}
 		return matched, nil
 	case TimestampRFC3339:
-		return matchTimestampRFC3339(fieldValue), nil
+		return matchTimestampRFC3339(strVal, op, args...)
+	case TimestampISO8601:
+		return matchTimestampISO8601(strVal, op, args...)
 	case TimestampUnixNano:
-		return matchTimestampUnixNano(fieldValue), nil
+		return matchTimestampUnixNano(strVal, op, args...)
 	case TimestampUnix:
-		return matchTimestampUnix(fieldValue), nil
+		return matchTimestampUnix(strVal, op, args...)
 	case BooleanTrue:
-		return fieldValue == "true", nil
+		return strVal == "true", nil
 	case BooleanFalse:
-		return fieldValue == "false", nil
+		return strVal == "false", nil
 	case PII:
-		return matchPII(fieldValue), nil
+		return matchPII(strVal), nil
 	case PIISSN:
-		return pii.SSN()(fieldValue), nil
+		return pii.SSN()(strVal), nil
 	case PIICreditCard:
-		return pii.CreditCard()(fieldValue), nil
+		return pii.CreditCard()(strVal), nil
 	case PIIEmail:
-		return pii.Email()(fieldValue), nil
+		return pii.Email()(strVal), nil
 	case PIIPhone:
-		return pii.Phone()(fieldValue), nil
+		return pii.Phone()(strVal), nil
 	}
 
 	return false, nil
 }
 
-func (m *Matcher) matchRegex(fieldValue string, matchArgs ...string) (bool, error) {
-	if len(matchArgs) < 1 {
+func (m *Matcher) matchRegex(val string, args ...string) (bool, error) {
+	if len(args) < 1 {
 		return false, ErrNoRegexp
 	}
 
 	var regex *regexp.Regexp
 	var ok bool
 
-	expr := matchArgs[0]
+	expr := args[0]
 
 	// Check cache first
 	m.RegexCacheMutex.RLock()
 	regex, ok = m.RegexCache[expr]
 	m.RegexCacheMutex.RUnlock()
 	if ok {
-		return regex.MatchString(fieldValue), nil
+		return regex.MatchString(val), nil
 	}
 
 	// Compile and store in cache
@@ -156,20 +147,108 @@ func (m *Matcher) matchRegex(fieldValue string, matchArgs ...string) (bool, erro
 	m.RegexCache[expr] = r
 	m.RegexCacheMutex.Unlock()
 
-	return r.MatchString(fieldValue), nil
+	return r.MatchString(val), nil
 }
 
-func matchTimestampRFC3339(fieldValue string) bool {
-	_, err := time.Parse(time.RFC3339, fieldValue)
-	return err == nil
+func matchTimestampRFC3339(val string, op MatchOperator, args ...string) (bool, error) {
+	if op != IsMatch && len(args) < 1 {
+		return false, errors.New("missing argument")
+	}
+
+	tsValue, err := time.Parse(time.RFC3339, val)
+	if err != nil {
+		// Un-parsable, not a match
+		return false, nil
+	}
+	if err == nil && op == IsMatch {
+		// Only matching on format, not value
+		return true, nil
+	}
+
+	tsArg, err := time.Parse(time.RFC3339, args[0])
+	if err != nil {
+		return false, errors.Wrap(err, "unable to parse argument into timestamp")
+	}
+
+	return compareTimestamps(tsValue, tsArg, op), nil
 }
 
-func matchTimestampUnix(fieldValue string) bool {
-	_, err := strconv.ParseInt(fieldValue, 10, 32)
-	return err == nil
+func matchTimestampISO8601(val string, op MatchOperator, args ...string) (bool, error) {
+	if op != IsMatch && len(args) < 1 {
+		return false, errors.New("missing argument")
+	}
+
+	formats := []string{
+		"2006-01-02T15:04:05-0700",
+		// TODO: this might need additional formats since ISO6801 covers a lot of ground:
+		// TODO: https://ijmacd.github.io/rfc3339-iso8601/
+	}
+
+	for _, format := range formats {
+		tsValue, err := time.Parse(format, val)
+		if err != nil {
+			// Not a match, try next format
+			continue
+		}
+		if err == nil && op == IsMatch {
+			// Only matching on format, not value
+			return true, nil
+		}
+
+		// Assume the arg timestamp will be in the same format
+		tsArg, err := time.Parse(format, args[0])
+		if err != nil {
+			return false, errors.Wrap(err, "unable to parse argument into timestamp")
+		}
+
+		// Matching on value
+		return compareTimestamps(tsValue, tsArg, op), nil
+	}
+
+	return false, nil
 }
 
-func matchPII(fieldValue string) bool {
+func matchTimestampUnix(val string, op MatchOperator, args ...string) (bool, error) {
+	if op != IsMatch && len(args) < 1 {
+		return false, errors.New("missing argument")
+	}
+
+	tsValue, err := strconv.ParseInt(val, 10, 32)
+	if err != nil {
+		// Un-parsable, not a match
+		return false, nil
+	}
+	if err == nil && op == IsMatch {
+		// Only matching on format, not value
+		return true, nil
+	}
+
+	tsArg, err := strconv.ParseInt(args[0], 10, 32)
+	if err != nil {
+		return false, errors.Wrap(err, "unable to parse argument into timestamp")
+	}
+
+	return compareTimestamps(time.Unix(tsValue, 0), time.Unix(tsArg, 0), op), nil
+}
+
+func compareTimestamps(val, argValue time.Time, op MatchOperator) bool {
+	switch op {
+	case GreaterThan:
+		return val.After(argValue)
+	case GreaterEqual:
+		return val.After(argValue) || val.Equal(argValue)
+	case LessThan:
+		return val.Before(argValue)
+	case LessEqual:
+		return val.Before(argValue) || val.Equal(argValue)
+	case EqualTo:
+		return val.Equal(argValue)
+	}
+
+	return false
+}
+
+func matchPII(val string) bool {
 	match := pii.Any(
 		pii.CreditCard(),
 		pii.Address(),
@@ -179,16 +258,16 @@ func matchPII(fieldValue string) bool {
 		pii.Phone(),
 		pii.SSN(),
 	)
-	return match(fieldValue)
+	return match(val)
 }
 
-func matchStringAll(fieldValue string, matchArgs ...string) bool {
+func matchStringAll(val string, matchArgs ...string) bool {
 	if len(matchArgs) < 1 {
 		return false
 	}
 
 	for _, arg := range matchArgs {
-		if !strings.Contains(fieldValue, arg) {
+		if !strings.Contains(val, arg) {
 			return false
 		}
 	}
@@ -196,13 +275,13 @@ func matchStringAll(fieldValue string, matchArgs ...string) bool {
 	return true
 }
 
-func matchStringAny(fieldValue string, matchArgs ...string) bool {
-	if len(matchArgs) < 1 {
+func matchStringAny(val string, args ...string) bool {
+	if len(args) < 1 {
 		return false
 	}
 
-	for _, arg := range matchArgs {
-		if strings.Contains(fieldValue, arg) {
+	for _, arg := range args {
+		if strings.Contains(val, arg) {
 			return true
 		}
 	}
@@ -210,21 +289,33 @@ func matchStringAny(fieldValue string, matchArgs ...string) bool {
 	return false
 }
 
-func matchTimestampUnixNano(fieldValue string) bool {
-	// Expecting a string for all args to make things simple
-	// Convert to int64
-	v, err := strconv.ParseInt(fieldValue, 10, 64)
+func matchTimestampUnixNano(val string, op MatchOperator, args ...string) (bool, error) {
+	if op != IsMatch && len(args) < 1 {
+		return false, errors.New("missing argument")
+	}
+
+	tsValue, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		return false
+		// Un-parsable, not a match
+		return false, nil
+	}
+	if err == nil && op == IsMatch {
+		// Not sure if this is the correct behavior, but I'm assuming the user
+		// would not want to mix up 32bit/64bit timestamps
+		if tsValue <= math.MaxInt32 {
+			return true, nil
+		}
+
+		// Only matching on format, not value
+		return true, nil
 	}
 
-	// Not sure if this is the correct behavior, but I'm assuming the user
-	// would not want to mix up 32bit/64bit timestamps
-	if v <= math.MaxInt32 {
-		return false
+	tsArg, err := strconv.ParseInt(args[0], 10, 64)
+	if err != nil {
+		return false, errors.Wrap(err, "unable to parse argument into timestamp")
 	}
 
-	return v == time.Unix(0, v).UnixNano()
+	return compareTimestamps(time.Unix(0, tsValue), time.Unix(0, tsArg), op), nil
 }
 
 func (m MatchType) String() string {
@@ -233,85 +324,85 @@ func (m MatchType) String() string {
 
 // IsPIIMatcher returns true if the match type is looking for PII
 // We use this to make sure _NOT_ to include the field's value in an alert message
-func (m *MatchType) IsPIIMatcher() bool {
+func (m MatchType) IsPIIMatcher() bool {
 	return strings.HasPrefix(m.String(), "pii")
 }
 
-func matchNumeric(field []byte, dataType jsonparser.ValueType, matchType MatchType, matchArgs ...string) (bool, error) {
-	strVal := string(field)
-
-	// gjson returns the following:
-	// Floating points: gjson.Result{Type:2, Raw:"3.14159", Str:"", Num:3.14159, Index:7, Indexes:[]int(nil)}
-	// Integers: gjson.Result{Type:2, Raw:"12345", Str:"", Num:12345, Index:22, Indexes:[]int(nil)}
-	if strings.Contains(string(field), ".") {
-		floatVal, err := strconv.ParseFloat(strVal, 64)
-		if err != nil {
-			return false, errors.Wrap(err, "unable to parse float")
-		}
-
-		// Assume floating point
-		return matchFloat(floatVal, matchType, matchArgs...)
-	}
-
-	intVal, err := strconv.ParseInt(strVal, 10, 64)
-	if err != nil {
-		return false, errors.Wrap(err, "unable to parse int")
-	}
-
-	return matchInteger(intVal, matchType, matchArgs...)
-}
-
-func matchInteger(fieldValue int64, matchType MatchType, matchArgs ...string) (bool, error) {
-	args, err := sliceStringToInt(matchArgs)
-	if err != nil {
-		return false, err
-	}
-	if len(args) < 1 {
-		return false, errors.New("invalid rule: no argument to match against")
-	}
-
-	// Only expecting one argument in this method
-	switch matchType {
-	case GreaterEqual:
-		return fieldValue >= args[0], nil
-	case GreaterThan:
-		return fieldValue > args[0], nil
-	case LessThan:
-		return fieldValue < args[0], nil
-	case LessEqual:
-		return fieldValue <= args[0], nil
-	case EqualTo:
-		return fieldValue == args[0], nil
-	}
-
-	return false, fmt.Errorf("unknown numeric matcher: %s", matchType)
-}
-
-func matchFloat(fieldValue float64, matchType MatchType, matchArgs ...string) (bool, error) {
-	args, err := sliceStringToFloat(matchArgs)
-	if err != nil {
-		return false, err
-	}
-	if len(args) < 1 {
-		return false, errors.New("invalid rule: no argument to match against")
-	}
-
-	// Only expecting one argument in this method
-	switch matchType {
-	case GreaterEqual:
-		return fieldValue >= args[0], nil
-	case GreaterThan:
-		return fieldValue > args[0], nil
-	case LessThan:
-		return fieldValue < args[0], nil
-	case LessEqual:
-		return fieldValue <= args[0], nil
-	case EqualTo:
-		return fieldValue == args[0], nil
-	}
-
-	return false, fmt.Errorf("unknown numeric matcher: %s", matchType)
-}
+//func matchNumeric(field []byte, dataType jsonparser.ValueType, matchType MatchType, matchArgs ...string) (bool, error) {
+//	strVal := string(field)
+//
+//	// gjson returns the following:
+//	// Floating points: gjson.Result{Type:2, Raw:"3.14159", Str:"", Num:3.14159, Index:7, Indexes:[]int(nil)}
+//	// Integers: gjson.Result{Type:2, Raw:"12345", Str:"", Num:12345, Index:22, Indexes:[]int(nil)}
+//	if strings.Contains(string(field), ".") {
+//		floatVal, err := strconv.ParseFloat(strVal, 64)
+//		if err != nil {
+//			return false, errors.Wrap(err, "unable to parse float")
+//		}
+//
+//		// Assume floating point
+//		return matchFloat(floatVal, matchType, matchArgs...)
+//	}
+//
+//	intVal, err := strconv.ParseInt(strVal, 10, 64)
+//	if err != nil {
+//		return false, errors.Wrap(err, "unable to parse int")
+//	}
+//
+//	return matchInteger(intVal, matchType, matchArgs...)
+//}
+//
+//func matchInteger(fieldValue int64, matchType MatchType, matchArgs ...string) (bool, error) {
+//	args, err := sliceStringToInt(matchArgs)
+//	if err != nil {
+//		return false, err
+//	}
+//	if len(args) < 1 {
+//		return false, errors.New("invalid rule: no argument to match against")
+//	}
+//
+//	// Only expecting one argument in this method
+//	switch matchType {
+//	case GreaterEqual:
+//		return fieldValue >= args[0], nil
+//	case GreaterThan:
+//		return fieldValue > args[0], nil
+//	case LessThan:
+//		return fieldValue < args[0], nil
+//	case LessEqual:
+//		return fieldValue <= args[0], nil
+//	case EqualTo:
+//		return fieldValue == args[0], nil
+//	}
+//
+//	return false, fmt.Errorf("unknown numeric matcher: %s", matchType)
+//}
+//
+//func matchFloat(fieldValue float64, matchType MatchType, matchArgs ...string) (bool, error) {
+//	args, err := sliceStringToFloat(matchArgs)
+//	if err != nil {
+//		return false, err
+//	}
+//	if len(args) < 1 {
+//		return false, errors.New("invalid rule: no argument to match against")
+//	}
+//
+//	// Only expecting one argument in this method
+//	switch matchType {
+//	case GreaterEqual:
+//		return fieldValue >= args[0], nil
+//	case GreaterThan:
+//		return fieldValue > args[0], nil
+//	case LessThan:
+//		return fieldValue < args[0], nil
+//	case LessEqual:
+//		return fieldValue <= args[0], nil
+//	case EqualTo:
+//		return fieldValue == args[0], nil
+//	}
+//
+//	return false, fmt.Errorf("unknown numeric matcher: %s", matchType)
+//}
 
 // sliceStringToFloat takes a slice of match arguments which will be strings, and converts
 // them to float64 for use with arithmetic comparisons
