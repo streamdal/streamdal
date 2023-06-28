@@ -312,6 +312,8 @@ func tinyjsonFeb5d5a7DecodeGithubComStreamdalDataqualCommon3(in *jlexer.Lexer, o
 			}
 		case "match_type":
 			out.MatchType = detective.MatchType(in.String())
+		case "match_operator":
+			out.MatchOperator = detective.MatchOperator(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -356,6 +358,11 @@ func tinyjsonFeb5d5a7EncodeGithubComStreamdalDataqualCommon3(out *jwriter.Writer
 		const prefix string = ",\"match_type\":"
 		out.RawString(prefix)
 		out.String(string(in.MatchType))
+	}
+	{
+		const prefix string = ",\"match_operator\":"
+		out.RawString(prefix)
+		out.String(string(in.MatchOperator))
 	}
 	out.RawByte('}')
 }

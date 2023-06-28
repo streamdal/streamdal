@@ -8,10 +8,11 @@ import (
 
 //tinyjson:json
 type MatchRequest struct {
-	Data      []byte              `json:"data"`
-	Path      string              `json:"path"`
-	Args      []string            `json:"args"`
-	MatchType detective.MatchType `json:"match_type"`
+	Data          []byte                  `json:"data"`
+	Path          string                  `json:"path"`
+	Args          []string                `json:"args"`
+	MatchType     detective.MatchType     `json:"match_type"`
+	MatchOperator detective.MatchOperator `json:"match_operator"`
 }
 
 //tinyjson:json
