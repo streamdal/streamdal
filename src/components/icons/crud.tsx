@@ -19,14 +19,14 @@ export const Edit = (props: any) => {
 };
 
 export const Delete = (props: any) => {
-  const fillColor = props?.fill || "#FF7D68";
+  const fillColor = "#372D56";
 
   return (
     <svg
       width="12"
       height="12"
       viewBox="0 0 12 12"
-      // fill="none"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
