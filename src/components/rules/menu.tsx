@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 import React from "react";
 import { Kebab } from "../icons/nav";
-import { Delete, Edit } from "../icons/crud";
+import { Delete, Edit, View } from "../icons/crud";
 import { EyeIcon } from "@heroicons/react/20/solid";
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
 
@@ -87,13 +87,18 @@ export const FlowbiteRuleSetMenu = ({ id }: { id: string }) => {
           arrowIcon={false}
         >
           <Navbar.Link href={`/ruleset?id=${id}`}>
-            <Dropdown.Item>View</Dropdown.Item>
+            <Dropdown.Item icon={View}>View</Dropdown.Item>
           </Navbar.Link>
           <Navbar.Link href={`/ruleset/edit?id=${id}`}>
-            <Dropdown.Item>Edit</Dropdown.Item>
+            <Dropdown.Item icon={Edit}>Edit</Dropdown.Item>
           </Navbar.Link>
           <Navbar.Link href={`/ruleset/delete/?id=${id}`}>
-            <Dropdown.Item>Delete</Dropdown.Item>
+            <Dropdown.Item
+              className="hover:bg-red-400 hover:text-white"
+              icon={Delete}
+            >
+              Delete
+            </Dropdown.Item>
           </Navbar.Link>
         </Dropdown>
         <Navbar.Toggle />
