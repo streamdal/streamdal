@@ -11,16 +11,16 @@ fn main() {
 
     let sample_json = r#"{
         "field1": {
-            "field2": "value"
+            "field2": "2"
         }
     }"#;
 
     let match_request = MatchRequest {
         data: sample_json.as_bytes().to_vec(),
         path: "field1.field2".to_string(),
-        args: vec![],
+        args: vec!["1".to_string()],
         negate: false,
-        type_: EnumOrUnknown::from(MatchType::MATCH_TYPE_BOOLEAN_FALSE),
+        type_: EnumOrUnknown::from(MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN),
         special_fields: Default::default(),
     };
 
@@ -44,7 +44,7 @@ fn main() {
     // println!("Stuff: {}", stuff);
 
     match det.matches(&match_request) {
-        Ok(_) => println!("Matched!"),
+        Ok(value) => println!("Result: {:#?}", value),
         Err(err) => println!("Error: {:#?}", err),
     }
 }
