@@ -1,4 +1,4 @@
-# Data Rules SDK
+# Snitch Go Client
 
 ---
 
@@ -19,7 +19,7 @@ To use these shims, you can specify the following environment variables, which w
 | `SNITCH_WASM_TIMEOUT` | No | Timeout for wasm execution in milliseconds | `1s` |
 
 When using these shims, message rules which cause a message to be dropped during publish or consumption will return
-the error `dataqual.ErrMessageDropped`. This should be handled by your code if necessary.
+the error `snitch.ErrMessageDropped`. This should be handled by your code if necessary.
 
 ### Golang Shims
 
@@ -63,7 +63,7 @@ func main() {
 
 	modifiedData, err := sc.ApplyRules(ctx, snitch.Publish, "my-kafka-topic", []byte(`{"payload": {...}}`))
 	if err != nil {
-		if err == sc.ErrMessageDropped {
+		if err == snitch.ErrMessageDropped {
 			// message was dropped, perform some logging
 		} else {
 			panic(err)
@@ -78,12 +78,12 @@ func main() {
 ### Metrics
 
 
-| Metric                             | Description                                                    | Labels                                                                |
-|------------------------------------|----------------------------------------------------------------|-----------------------------------------------------------------------|
-| `plumber_dataqual_pubish`          | Total number of messages published                             | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
-| `plumber_dataqual_consume`         | Total number of messages consumed                              | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
-| `plumber_dataqual_size_exceeded`   | Total number of messages ignored due to exceeding size limit   | `data_source` = "kafka", "rabbitmq" ,etc                              |
-| `plumber_dataqual_rule`            | Number of events and bytes count for each rule ran             | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
-| `plumber_dataqual_failure_trigger` | Number of events and bytes count that triggered a failure mode | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
+| Metric                           | Description                                                    | Labels                                                                |
+|----------------------------------|----------------------------------------------------------------|-----------------------------------------------------------------------|
+| `plumber_snitch_pubish`          | Total number of messages published                             | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
+| `plumber_snitch_consume`         | Total number of messages consumed                              | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
+| `plumber_snitch_size_exceeded`   | Total number of messages ignored due to exceeding size limit   | `data_source` = "kafka", "rabbitmq" ,etc                              |
+| `plumber_snitch_rule`            | Number of events and bytes count for each rule ran             | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
+| `plumber_snitch_failure_trigger` | Number of events and bytes count that triggered a failure mode | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
 
 The SDK ships metrics to Plumber which are then exposed via promethus endpoint at `http://<plumber>:9191/metrics`
