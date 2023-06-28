@@ -20,12 +20,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/streamdal/dataqual/detective"
+
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/dataqual/common"
-	"github.com/streamdal/dataqual/detective"
 	"github.com/streamdal/dataqual/logger"
 	"github.com/streamdal/dataqual/metrics"
 	"github.com/streamdal/dataqual/plumber"
@@ -244,7 +245,7 @@ func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.F
 	return resp.Data, nil
 }
 
-func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path string, data []byte, args []string) (bool, error) {
+func (d *DataQual) runMatch(ctx context.Context, data []byte, cfg *protos.RuleConfigMatch) (bool, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
 
@@ -255,10 +256,11 @@ func (d *DataQual) runMatch(ctx context.Context, mt detective.MatchType, path st
 	}
 
 	request := &common.MatchRequest{
-		MatchType: mt,
-		Path:      path,
-		Data:      data,
-		Args:      args,
+		MatchType:     detective.MatchType(cfg.Type),
+		MatchOperator: matchOperatorFromProto(cfg.Operator),
+		Path:          cfg.Path,
+		Data:          data,
+		Args:          cfg.Args,
 	}
 
 	req, err := request.MarshalJSON()
@@ -369,7 +371,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 				return nil, errors.New("BUG: match rule is missing match config")
 			}
 
-			isMatch, err := d.runMatch(ctx, detective.MatchType(cfg.Type), cfg.Path, data, cfg.Args)
+			isMatch, err := d.runMatch(ctx, data, cfg)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
 			}
@@ -543,5 +545,22 @@ func (m Mode) String() string {
 		return "consume"
 	default:
 		return "unknown"
+	}
+}
+
+func matchOperatorFromProto(m protos.MatchOperator) detective.MatchOperator {
+	switch m {
+	case protos.MatchOperator_MATCH_OPERATOR_EQUALS:
+		return detective.EqualTo
+	case protos.MatchOperator_MATCH_OPERATOR_GREATER_THAN:
+		return detective.GreaterThan
+	case protos.MatchOperator_MATCH_OPERATOR_LESS_THAN:
+		return detective.LessThan
+	case protos.MatchOperator_MATCH_OPERATOR_GREATER_THAN_OR_EQUAL:
+		return detective.GreaterEqual
+	case protos.MatchOperator_MATCH_OPERATOR_LESS_THAN_OR_EQUAL:
+		return detective.LessEqual
+	default:
+		return detective.IsMatch
 	}
 }
