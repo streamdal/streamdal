@@ -57,6 +57,10 @@ const (
 
 	// DefaultMaxDataSize is the maximum size of data that can be sent to the WASM module
 	DefaultMaxDataSize = 1024 * 1024 // 1Mi
+
+	// Default sources for use in shim libs, to keep things standardized
+	SourceKafka  = "kafka"
+	SourceRabbit = "rabbitmq"
 )
 
 var (
