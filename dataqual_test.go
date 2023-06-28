@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/dataqual/detective"
 	"github.com/streamdal/dataqual/logger"
 	"github.com/streamdal/dataqual/logger/loggerfakes"
 	"github.com/streamdal/dataqual/metrics/metricsfakes"
@@ -37,7 +36,14 @@ func TestMatch(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		isMatch, err := d.runMatch(context.Background(), "string_contains_any", "type", c.data, []string{c.search})
+		cfg := &protos.RuleConfigMatch{
+			Path:     "type",
+			Type:     "string_contains_any",
+			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
+			Args:     []string{c.search},
+		}
+
+		isMatch, err := d.runMatch(context.Background(), c.data, cfg)
 		if err != nil {
 			t.Error("error during runMatch: " + err.Error())
 		}
@@ -187,7 +193,14 @@ func TestRunMatch(t *testing.T) {
 
 	data := []byte(`{"type": "hello world"}`)
 
-	matched, err := d.runMatch(context.Background(), detective.StringContainsAny, "type", data, []string{"hello"})
+	cfg := &protos.RuleConfigMatch{
+		Path:     "type",
+		Type:     "string_contains_any",
+		Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
+		Args:     []string{"hello"},
+	}
+
+	matched, err := d.runMatch(context.Background(), data, cfg)
 	if err != nil {
 		t.Error("unexpected error: " + err.Error())
 	}
@@ -379,7 +392,13 @@ func matchBench(fileName string, b *testing.B) {
 	defer cancel()
 
 	for i := 0; i < b.N; i++ {
-		_, err := d.runMatch(ctx, "string_contains_any", "firstname", jsonData, []string{"Rani"})
+		cfg := &protos.RuleConfigMatch{
+			Path:     "firstname",
+			Type:     "string_contains_any",
+			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
+			Args:     []string{"Rani"},
+		}
+		_, err := d.runMatch(ctx, jsonData, cfg)
 		if err != nil {
 			cancel()
 			b.Fatal("error during runMatch: " + err.Error())

@@ -17,7 +17,7 @@ func TestMatch(t *testing.T) {
 		//{"4242424242424242", PIICreditCard, true},
 		//{"4242-4242-4242-4242", PIICreditCard, true},
 		{"192.168.1.20", IpAddress, true},
-		{"2023-06-26T13:31:29+00:00", TimestampRFC3339, true},
+		{"2023-06-26T13:31:29Z", TimestampRFC3339, true},
 		{"1257894000000000000", TimestampUnixNano, true},
 		{"1687786289", TimestampUnix, true},
 		{"true", BooleanTrue, true},
@@ -47,11 +47,13 @@ func TestMatch_TimestampRFC3339(t *testing.T) {
 		arg      string
 		expected bool
 	}{
-		{GreaterThan, "2023-06-26T13:31:29+00:00", "2023-06-25T13:31:29+00:00", true},
-		{GreaterEqual, "2023-06-26T13:31:29+00:00", "2023-06-26T13:31:29+00:00", true},
-		{LessThan, "2023-06-25T13:31:29+00:00", "2023-06-26T13:31:29+00:00", true},
-		{LessEqual, "2023-06-26T13:31:29+00:00", "2023-06-26T13:31:29+00:00", true},
-		{EqualTo, "2023-06-26T13:31:29+00:00", "2023-06-26T13:31:29+00:00", true},
+		{GreaterThan, "2023-06-26T13:31:29Z", "2023-06-25T13:31:29Z", true},
+		{GreaterThan, "2023-06-24T13:31:29Z", "2023-06-25T13:31:29Z", false},
+		{GreaterEqual, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
+		{GreaterEqual, "2023-06-24T13:31:29Z", "2023-06-26T13:31:29Z", false},
+		{LessThan, "2023-06-25T13:31:29Z", "2023-06-26T13:31:29Z", true},
+		{LessEqual, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
+		{EqualTo, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
 	}
 
 	m := NewMatcher()
