@@ -4,7 +4,7 @@ package loggerfakes
 import (
 	"sync"
 
-	"github.com/streamdal/dataqual/logger"
+	"github.com/streamdal/snitch-go-client/logger"
 )
 
 type FakeLogger struct {

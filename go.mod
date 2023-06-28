@@ -1,4 +1,4 @@
-module github.com/streamdal/dataqual
+module github.com/streamdal/snitch-go-client
 
 go 1.17
 

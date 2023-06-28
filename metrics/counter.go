@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/dataqual/types"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 type counter struct {

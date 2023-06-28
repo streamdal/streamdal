@@ -2,7 +2,7 @@
 
 ---
 
-[![Master build status](https://github.com/streamdal/dataqual/workflows/master/badge.svg)](https://github.com/streamdal/dataqual/actions/workflows/master-test.yaml)
+[![Master build status](https://github.com/streamdal/snitch-go-client/workflows/master/badge.svg)](https://github.com/streamdal/snitch-go-client/actions/workflows/master-test.yaml)
 
 ## Shim usage
 
@@ -11,12 +11,12 @@ are designed to allow usage if this SDK with minimal changes to your existing co
 
 To use these shims, you can specify the following environment variables, which will be read by the SDK at runtime
 
-| Envar | Required | Description | Default |
-| --- | --- | --- |----|
-| `PLUMBER_URL` | Yes | URL to a running plumber server instance in your infrastructure | `localhost:9090` |
-| `PLUMBER_TOKEN` | No | Token to use when authenticating with the plumber server, configured via plumber server | `streamdal` |
-| `DATAQUAL_DRY_RUN` | No | `true` or `false`. Dry run mode will simply log the rules that would have been applied to the message, but will not actually apply them | `false` |
-| `DATAQUAL_WASM_TIMEOUT` | No | Timeout for wasm execution in milliseconds | `1s` |
+| Envar                 | Required | Description | Default |
+|-----------------------| --- | --- |----|
+| `PLUMBER_URL`         | Yes | URL to a running plumber server instance in your infrastructure | `localhost:9090` |
+| `PLUMBER_TOKEN`       | No | Token to use when authenticating with the plumber server, configured via plumber server | `streamdal` |
+| `SNITCH_DRY_RUN`      | No | `true` or `false`. Dry run mode will simply log the rules that would have been applied to the message, but will not actually apply them | `false` |
+| `SNITCH_WASM_TIMEOUT` | No | Timeout for wasm execution in milliseconds | `1s` |
 
 When using these shims, message rules which cause a message to be dropped during publish or consumption will return
 the error `dataqual.ErrMessageDropped`. This should be handled by your code if necessary.
@@ -42,14 +42,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/streamdal/dataqual"
+	"github.com/streamdal/snitch-go-client"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	dq, err := dataqual.New(&dataqual.Config{
+	sc, err := snitch.New(&snitch.Config{
 		PlumberURL:   "localhost:9090",
 		PlumberToken: "streadmal",
 		WasmTimeout:  time.Millisecond * 200,
@@ -61,9 +61,9 @@ func main() {
 		panic(err)
 	}
 
-	modifiedData, err := dq.ApplyRules(ctx, dataqual.Publish, "my-kafka-topic", []byte(`{"payload": {...}}`))
+	modifiedData, err := sc.ApplyRules(ctx, snitch.Publish, "my-kafka-topic", []byte(`{"payload": {...}}`))
 	if err != nil {
-		if err == dataqual.ErrMessageDropped {
+		if err == sc.ErrMessageDropped {
 			// message was dropped, perform some logging
 		} else {
 			panic(err)

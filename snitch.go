@@ -10,8 +10,8 @@
 // - PLUMBER_TOKEN: The token to use when connecting to the Plumber server
 //
 // Optional parameters:
-// - DATAQUAL_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
-package dataqual
+// - SNITCH_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
+package snitch
 
 import (
 	"context"
@@ -20,17 +20,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/dataqual/detective"
-
 	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/dataqual/common"
-	"github.com/streamdal/dataqual/logger"
-	"github.com/streamdal/dataqual/metrics"
-	"github.com/streamdal/dataqual/plumber"
-	"github.com/streamdal/dataqual/types"
+	"github.com/streamdal/snitch-go-client/common"
+	"github.com/streamdal/snitch-go-client/detective"
+	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/metrics"
+	"github.com/streamdal/snitch-go-client/plumber"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 // Module is a constant that represents which type of WASM module we will run the rules against
@@ -70,11 +69,11 @@ var (
 	ErrMessageDropped = errors.New("message dropped by plumber data rules")
 )
 
-type IDataQual interface {
+type ISnitch interface {
 	ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error)
 }
 
-type DataQual struct {
+type Snitch struct {
 	*Config
 	functions    map[Module]*function
 	rules        map[Mode]map[string][]*protos.Rule
@@ -94,7 +93,7 @@ type Config struct {
 	Logger       logger.Logger
 }
 
-func New(cfg *Config) (*DataQual, error) {
+func New(cfg *Config) (*Snitch, error) {
 	if err := validateConfig(cfg); err != nil {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
@@ -120,7 +119,7 @@ func New(cfg *Config) (*DataQual, error) {
 		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
 
-	dq := &DataQual{
+	dq := &Snitch{
 		functions:    make(map[Module]*function),
 		functionsMtx: &sync.RWMutex{},
 		Plumber:      plumber,
@@ -169,20 +168,20 @@ func validateConfig(cfg *Config) error {
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if os.Getenv("DATAQUAL_DRY_RUN") == "true" {
+	if os.Getenv("SNITCH_DRY_RUN") == "true" {
 		cfg.DryRun = true
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
 	if cfg.WasmTimeout == 0 {
-		to := os.Getenv("DATAQUAL_WASM_TIMEOUT")
+		to := os.Getenv("SNITCH_WASM_TIMEOUT")
 		if to == "" {
 			to = "1s"
 		}
 
 		timeout, err := time.ParseDuration(to)
 		if err != nil {
-			return errors.Wrap(err, "unable to parse DATAQUAL_WASM_TIMEOUT")
+			return errors.Wrap(err, "unable to parse SNITCH_WASM_TIMEOUT")
 		}
 		cfg.WasmTimeout = timeout
 	}
@@ -195,7 +194,7 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
+func (d *Snitch) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
 
@@ -245,7 +244,7 @@ func (d *DataQual) failTransform(ctx context.Context, data []byte, cfg *protos.F
 	return resp.Data, nil
 }
 
-func (d *DataQual) runMatch(ctx context.Context, data []byte, cfg *protos.RuleConfigMatch) (bool, error) {
+func (d *Snitch) runMatch(ctx context.Context, data []byte, cfg *protos.RuleConfigMatch) (bool, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
 	defer cancel()
 
@@ -286,7 +285,7 @@ func (d *DataQual) runMatch(ctx context.Context, data []byte, cfg *protos.RuleCo
 	return resp.IsMatch, nil
 }
 
-func (d *DataQual) getRules(mode Mode, key string) []*protos.Rule {
+func (d *Snitch) getRules(mode Mode, key string) []*protos.Rule {
 	d.rulesMtx.RLock()
 	defer d.rulesMtx.RUnlock()
 
@@ -304,7 +303,7 @@ func (d *DataQual) getRules(mode Mode, key string) []*protos.Rule {
 	return rules
 }
 
-func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
+func (d *Snitch) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
 	rules := d.getRules(mode, key)
 	if len(rules) == 0 {
 		// No rules for this mode, nothing to do
@@ -454,7 +453,7 @@ func (d *DataQual) ApplyRules(ctx context.Context, mode Mode, key string, data [
 	return data, nil
 }
 
-func (d *DataQual) logDryRun(rule *protos.Rule) {
+func (d *Snitch) logDryRun(rule *protos.Rule) {
 	cfg := rule.GetMatchConfig()
 	for _, failCfg := range rule.FailureModeConfigs {
 		switch failCfg.Mode {
@@ -472,7 +471,7 @@ func (d *DataQual) logDryRun(rule *protos.Rule) {
 	}
 }
 
-func (d *DataQual) watchForRuleUpdates(looper director.Looper) {
+func (d *Snitch) watchForRuleUpdates(looper director.Looper) {
 	var quit bool
 
 	looper.Loop(func() error {
@@ -502,7 +501,7 @@ func (d *DataQual) watchForRuleUpdates(looper director.Looper) {
 	})
 }
 
-func (d *DataQual) getRuleUpdates() error {
+func (d *Snitch) getRuleUpdates() error {
 	ruleSets, err := d.Plumber.GetRules(context.Background(), d.DataSource)
 	if err != nil {
 		return errors.Wrap(err, "failed to get rules")

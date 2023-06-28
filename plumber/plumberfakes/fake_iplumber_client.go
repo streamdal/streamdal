@@ -6,8 +6,9 @@ import (
 	"sync"
 
 	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
-	"github.com/streamdal/dataqual/plumber"
-	"github.com/streamdal/dataqual/types"
+
+	"github.com/streamdal/snitch-go-client/plumber"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 type FakeIPlumberClient struct {

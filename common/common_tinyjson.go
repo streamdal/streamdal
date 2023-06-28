@@ -6,7 +6,8 @@ import (
 	tinyjson "github.com/CosmWasm/tinyjson"
 	jlexer "github.com/CosmWasm/tinyjson/jlexer"
 	jwriter "github.com/CosmWasm/tinyjson/jwriter"
-	detective "github.com/streamdal/dataqual/detective"
+
+	detective "github.com/streamdal/snitch-go-client/detective"
 )
 
 // suppress unused package warning

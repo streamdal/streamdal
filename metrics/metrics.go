@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/dataqual/logger"
-	"github.com/streamdal/dataqual/plumber"
-	"github.com/streamdal/dataqual/types"
+	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/plumber"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics

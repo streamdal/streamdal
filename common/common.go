@@ -3,7 +3,7 @@ package common
 import (
 	"unsafe"
 
-	"github.com/streamdal/dataqual/detective"
+	"github.com/streamdal/snitch-go-client/detective"
 )
 
 //tinyjson:json

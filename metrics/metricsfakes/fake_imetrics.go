@@ -5,8 +5,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/streamdal/dataqual/metrics"
-	"github.com/streamdal/dataqual/types"
+	"github.com/streamdal/snitch-go-client/metrics"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 type FakeIMetrics struct {

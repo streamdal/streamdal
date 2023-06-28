@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 
-	"github.com/streamdal/dataqual/types"
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IPlumberClient

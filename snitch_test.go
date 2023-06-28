@@ -1,4 +1,4 @@
-package dataqual
+package snitch
 
 import (
 	"context"
@@ -14,10 +14,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/dataqual/logger"
-	"github.com/streamdal/dataqual/logger/loggerfakes"
-	"github.com/streamdal/dataqual/metrics/metricsfakes"
-	"github.com/streamdal/dataqual/plumber/plumberfakes"
+	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
+	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
+	"github.com/streamdal/snitch-go-client/plumber/plumberfakes"
 )
 
 func TestMatch(t *testing.T) {
@@ -95,7 +95,7 @@ func TestValidateConfig(t *testing.T) {
 	})
 
 	t.Run("invalid wasm timeout duration", func(t *testing.T) {
-		os.Setenv("DATAQUAL_WASM_TIMEOUT", "foo")
+		os.Setenv("SNITCH_WASM_TIMEOUT", "foo")
 		cfg := &Config{
 			DataSource:   "kafka",
 			ShutdownCtx:  context.Background(),
@@ -105,10 +105,10 @@ func TestValidateConfig(t *testing.T) {
 			Logger:       &logger.NoOpLogger{},
 		}
 		err := validateConfig(cfg)
-		if err == nil || !strings.Contains(err.Error(), "unable to parse DATAQUAL_WASM_TIMEOUT") {
+		if err == nil || !strings.Contains(err.Error(), "unable to parse SNITCH_WASM_TIMEOUT") {
 			t.Error("expected time.ParseDuration error")
 		}
-		os.Unsetenv("DATAQUAL_WASM_TIMEOUT")
+		os.Unsetenv("SNITCH_WASM_TIMEOUT")
 	})
 }
 
@@ -153,7 +153,7 @@ func TestGetRuleUpdates(t *testing.T) {
 		}, nil
 	}
 
-	d := &DataQual{
+	d := &Snitch{
 		Plumber:  fakePlumber,
 		rulesMtx: &sync.RWMutex{},
 		Config: &Config{
@@ -182,7 +182,7 @@ func TestGetRuleUpdates(t *testing.T) {
 }
 
 func TestRunMatch(t *testing.T) {
-	d := &DataQual{
+	d := &Snitch{
 		Plumber:      getFakePlumber(),
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
@@ -211,7 +211,7 @@ func TestRunMatch(t *testing.T) {
 }
 
 func TestFailTransform(t *testing.T) {
-	d := &DataQual{
+	d := &Snitch{
 		Plumber:      getFakePlumber(),
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
@@ -242,7 +242,7 @@ func TestFailTransform(t *testing.T) {
 func TestApplyRules_MaxData(t *testing.T) {
 	fakeLogger := &loggerfakes.FakeLogger{}
 
-	d := &DataQual{
+	d := &Snitch{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
 		rules: map[Mode]map[string][]*protos.Rule{
@@ -437,8 +437,8 @@ func transformBench(fileName string, b *testing.B) {
 	}
 }
 
-func setup(m Module) (*DataQual, error) {
-	d := &DataQual{
+func setup(m Module) (*Snitch, error) {
+	d := &Snitch{
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},
 		Config:       &Config{WasmTimeout: time.Second},
@@ -465,8 +465,8 @@ func setup(m Module) (*DataQual, error) {
 	return d, nil
 }
 
-func setupForFailure(configs []*common.FailureMode) *DataQual {
-	return &DataQual{
+func setupForFailure(configs []*common.FailureMode) *Snitch {
+	return &Snitch{
 		Plumber:      getFakePlumber(),
 		functions:    map[Module]*function{},
 		functionsMtx: &sync.RWMutex{},

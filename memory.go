@@ -1,4 +1,4 @@
-package dataqual
+package snitch
 
 import "fmt"
 

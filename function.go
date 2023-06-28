@@ -1,4 +1,4 @@
-package dataqual
+package snitch
 
 import (
 	"context"
@@ -59,14 +59,14 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	return bytes, nil
 }
 
-func (d *DataQual) setFunctionCache(m Module, f *function) {
+func (d *Snitch) setFunctionCache(m Module, f *function) {
 	d.functionsMtx.Lock()
 	defer d.functionsMtx.Unlock()
 
 	d.functions[m] = f
 }
 
-func (d *DataQual) getFunction(m Module) (*function, error) {
+func (d *Snitch) getFunction(m Module) (*function, error) {
 	// check cache
 	fc, ok := d.getFunctionFromCache(m)
 	if ok {
@@ -89,7 +89,7 @@ func (d *DataQual) getFunction(m Module) (*function, error) {
 	return fi, nil
 }
 
-func (d *DataQual) getFunctionFromCache(rt Module) (*function, bool) {
+func (d *Snitch) getFunctionFromCache(rt Module) (*function, bool) {
 	d.functionsMtx.RLock()
 	defer d.functionsMtx.RUnlock()
 
