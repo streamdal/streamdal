@@ -3,6 +3,7 @@ import React from "react";
 import { Kebab } from "../icons/nav";
 import { Delete, Edit } from "../icons/crud";
 import { EyeIcon } from "@heroicons/react/20/solid";
+import { Avatar, Dropdown, Navbar } from "flowbite-react";
 
 export const RuleSetMenu = ({ id }: { id: string }) => {
   return (
@@ -71,5 +72,32 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
         </div>
       </Menu.Items>
     </Menu>
+  );
+};
+
+export const FlowbiteRuleSetMenu = ({ id }: { id: string }) => {
+  return (
+    <Navbar fluid rounded>
+      <div className="flex md:order-2">
+        <Dropdown
+          inline
+          label={
+            <Kebab className="hover:text-web h-[20px]" aria-hidden="true" />
+          }
+          arrowIcon={false}
+        >
+          <Navbar.Link href={`/ruleset?id=${id}`}>
+            <Dropdown.Item>View</Dropdown.Item>
+          </Navbar.Link>
+          <Navbar.Link href={`/ruleset/edit?id=${id}`}>
+            <Dropdown.Item>Edit</Dropdown.Item>
+          </Navbar.Link>
+          <Navbar.Link href={`/ruleset/delete/?id=${id}`}>
+            <Dropdown.Item>Delete</Dropdown.Item>
+          </Navbar.Link>
+        </Dropdown>
+        <Navbar.Toggle />
+      </div>
+    </Navbar>
   );
 };
