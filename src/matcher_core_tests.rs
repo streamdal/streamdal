@@ -280,3 +280,44 @@ fn is_type() {
 
     crate::test_utils::run_tests(&test_cases);
 }
+
+#[test]
+fn ipv4_address() {
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: crate::test_utils::generate_request(
+                MatchType::MATCH_TYPE_IP_ADDRESS,
+                &"object.ipv4_address".to_string(),
+                vec![], // No need for args
+                false,
+            ),
+            expected: true,
+            text: "field should contain an IPv4 address".to_string(),
+            should_error: false,
+        },
+        crate::test_utils::TestCase {
+            request: crate::test_utils::generate_request(
+                MatchType::MATCH_TYPE_IP_ADDRESS,
+                &"object.does_not_exist".to_string(),
+                vec![], // No need for args
+                false,
+            ),
+            expected: false,
+            text: "field does not exist should cause an error".to_string(),
+            should_error: true,
+        },
+        crate::test_utils::TestCase {
+            request: crate::test_utils::generate_request(
+                MatchType::MATCH_TYPE_IP_ADDRESS,
+                &"object.field".to_string(),
+                vec![], // No need for args
+                false,
+            ),
+            expected: false,
+            text: "field exists but does not contain an IP address".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}

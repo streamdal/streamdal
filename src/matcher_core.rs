@@ -1,16 +1,24 @@
 use lazy_static::lazy_static;
 use protos::matcher::MatchRequest;
+use regex::Regex;
 use std::str;
 
-// lazy_static! {
-//     static ref UUID_REGEX: HashMap<u32, &'static str> = {
-//         let mut m = HashMap::new();
-//         m.insert(0, "foo");
-//         m.insert(1, "bar");
-//         m.insert(2, "baz");
-//         m
-//     };
-// }
+lazy_static! {
+    static ref IPV4_ADDRESS_REGEX: Regex = Regex::new(
+        r"(?:\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}"
+    )
+    .unwrap();
+
+    static ref IPV6_ADDRESS_REGEX: Regex = Regex::new(
+        r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
+    )
+    .unwrap();
+
+    static ref UUID_REGEX: Regex = Regex::new(
+        r"^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"
+    )
+    .unwrap();
+}
 
 pub fn string_equal_to(request: &MatchRequest) -> Result<bool, String> {
     if request.args.len() != 1 {
@@ -55,7 +63,9 @@ pub fn string_contains_all(request: &MatchRequest) -> Result<bool, String> {
 }
 
 pub fn ipv4_address(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    Ok(IPV4_ADDRESS_REGEX.is_match(field.as_str()))
 }
 
 pub fn ipv6_address(request: &MatchRequest) -> Result<bool, String> {

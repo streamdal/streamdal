@@ -29,6 +29,7 @@ pub fn generate_request(
     "boolean_t": true,
     "boolean_f": false,
     "object": {
+        "ipv4_address": "127.0.0.1",
         "field": "value",
         "empty_string": "",
         "null_field": null,
