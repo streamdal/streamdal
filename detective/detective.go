@@ -45,12 +45,13 @@ const (
 	PIIPhone      MatchType = "pii_phone"
 
 	// TODO: implement logical operators at some point
-	IsMatch      MatchOperator = "is_match"
-	EqualTo      MatchOperator = "equal"
-	GreaterThan  MatchOperator = "greater_than"
-	GreaterEqual MatchOperator = "greater_equal"
-	LessThan     MatchOperator = "less_than"
-	LessEqual    MatchOperator = "less_equal"
+	IsMatch          MatchOperator = "is_match"
+	EqualTo          MatchOperator = "equal"
+	GreaterThan      MatchOperator = "greater_than"
+	GreaterEqual     MatchOperator = "greater_equal"
+	LessThan         MatchOperator = "less_than"
+	LessEqual        MatchOperator = "less_equal"
+	OlderThanSeconds MatchOperator = "older_than_seconds"
 )
 
 type IMatcher interface {
@@ -165,12 +166,15 @@ func matchTimestampRFC3339(val string, op MatchOperator, args ...string) (bool, 
 		return true, nil
 	}
 
-	tsArg, err := time.Parse(time.RFC3339, args[0])
+	// Argument is X number of seconds ago
+	tsArg, err := time.ParseDuration(args[0] + "s")
 	if err != nil {
 		return false, errors.Wrap(err, "unable to parse argument into timestamp")
 	}
 
-	return compareTimestamps(tsValue, tsArg, op), nil
+	isOlder := tsValue.UTC().Before(time.Now().UTC().Add(-tsArg))
+
+	return isOlder && op == OlderThanSeconds, nil
 }
 
 func matchTimestampISO8601(val string, op MatchOperator, args ...string) (bool, error) {
@@ -184,6 +188,12 @@ func matchTimestampISO8601(val string, op MatchOperator, args ...string) (bool, 
 		// TODO: https://ijmacd.github.io/rfc3339-iso8601/
 	}
 
+	// Argument is X number of seconds ago
+	tsArg, err := time.ParseDuration(args[0] + "s")
+	if err != nil {
+		return false, errors.Wrap(err, "unable to parse argument into timestamp")
+	}
+
 	for _, format := range formats {
 		tsValue, err := time.Parse(format, val)
 		if err != nil {
@@ -195,14 +205,9 @@ func matchTimestampISO8601(val string, op MatchOperator, args ...string) (bool, 
 			return true, nil
 		}
 
-		// Assume the arg timestamp will be in the same format
-		tsArg, err := time.Parse(format, args[0])
-		if err != nil {
-			return false, errors.Wrap(err, "unable to parse argument into timestamp")
+		if tsValue.UTC().Before(time.Now().UTC().Add(-tsArg)) && op == OlderThanSeconds {
+			return true, nil
 		}
-
-		// Matching on value
-		return compareTimestamps(tsValue, tsArg, op), nil
 	}
 
 	return false, nil
@@ -213,7 +218,7 @@ func matchTimestampUnix(val string, op MatchOperator, args ...string) (bool, err
 		return false, errors.New("missing argument")
 	}
 
-	tsValue, err := strconv.ParseInt(val, 10, 32)
+	intValue, err := strconv.ParseInt(val, 10, 32)
 	if err != nil {
 		// Un-parsable, not a match
 		return false, nil
@@ -223,29 +228,18 @@ func matchTimestampUnix(val string, op MatchOperator, args ...string) (bool, err
 		return true, nil
 	}
 
-	tsArg, err := strconv.ParseInt(args[0], 10, 32)
+	// Argument is X number of seconds ago
+	tsArg, err := time.ParseDuration(args[0] + "s")
 	if err != nil {
 		return false, errors.Wrap(err, "unable to parse argument into timestamp")
 	}
 
-	return compareTimestamps(time.Unix(tsValue, 0), time.Unix(tsArg, 0), op), nil
-}
+	tsValue := time.Unix(intValue, 0)
+	isOlder := tsValue.UTC().Before(time.Now().UTC().Add(-tsArg))
 
-func compareTimestamps(val, argValue time.Time, op MatchOperator) bool {
-	switch op {
-	case GreaterThan:
-		return val.After(argValue)
-	case GreaterEqual:
-		return val.After(argValue) || val.Equal(argValue)
-	case LessThan:
-		return val.Before(argValue)
-	case LessEqual:
-		return val.Before(argValue) || val.Equal(argValue)
-	case EqualTo:
-		return val.Equal(argValue)
-	}
-
-	return false
+	// Guard the op here in case we add more in the future for timestamps
+	// For now, return false if it is accidentally something else
+	return isOlder && op == OlderThanSeconds, nil
 }
 
 func matchPII(val string) bool {
@@ -294,7 +288,7 @@ func matchTimestampUnixNano(val string, op MatchOperator, args ...string) (bool,
 		return false, errors.New("missing argument")
 	}
 
-	tsValue, err := strconv.ParseInt(val, 10, 64)
+	intVal, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		// Un-parsable, not a match
 		return false, nil
@@ -302,7 +296,7 @@ func matchTimestampUnixNano(val string, op MatchOperator, args ...string) (bool,
 	if err == nil && op == IsMatch {
 		// Not sure if this is the correct behavior, but I'm assuming the user
 		// would not want to mix up 32bit/64bit timestamps
-		if tsValue <= math.MaxInt32 {
+		if intVal <= math.MaxInt32 {
 			return true, nil
 		}
 
@@ -310,12 +304,18 @@ func matchTimestampUnixNano(val string, op MatchOperator, args ...string) (bool,
 		return true, nil
 	}
 
-	tsArg, err := strconv.ParseInt(args[0], 10, 64)
+	// Argument is X number of seconds ago
+	tsArg, err := time.ParseDuration(args[0] + "s")
 	if err != nil {
 		return false, errors.Wrap(err, "unable to parse argument into timestamp")
 	}
 
-	return compareTimestamps(time.Unix(0, tsValue), time.Unix(0, tsArg), op), nil
+	tsValue := time.Unix(0, intVal)
+	isOlder := tsValue.UTC().Before(time.Now().UTC().Add(-tsArg))
+
+	// Guard the op here in case we add more in the future for timestamps
+	// For now, return false if it is accidentally something else
+	return isOlder && op == OlderThanSeconds, nil
 }
 
 func (m MatchType) String() string {

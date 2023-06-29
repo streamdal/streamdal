@@ -563,6 +563,8 @@ func matchOperatorFromProto(m protos.MatchOperator) detective.MatchOperator {
 		return detective.GreaterEqual
 	case protos.MatchOperator_MATCH_OPERATOR_LESS_THAN_OR_EQUAL:
 		return detective.LessEqual
+	case protos.MatchOperator_MATCH_OPERATOR_OLDER_THAN_SECONDS:
+		return detective.OlderThanSeconds
 	default:
 		return detective.IsMatch
 	}
