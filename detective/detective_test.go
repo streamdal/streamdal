@@ -106,7 +106,7 @@ func TestMatch_TimestampUnix(t *testing.T) {
 
 	for _, c := range cases {
 		val := fmt.Sprintf("%d", time.Now().UTC().Add(c.duration).Unix())
-		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnix, OlderThanSeconds, "5")
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnix, OlderThanSeconds, c.arg)
 		if err != nil {
 			t.Fatalf("Expected no error, got: '%s'", err)
 		}
@@ -130,7 +130,7 @@ func TestMatch_TimestampUnixNano(t *testing.T) {
 
 	for _, c := range cases {
 		val := fmt.Sprintf("%d", time.Now().UTC().Add(c.duration).UnixNano())
-		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnixNano, OlderThanSeconds, "5")
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnixNano, OlderThanSeconds, c.arg)
 		if err != nil {
 			t.Fatalf("Expected no error, got: '%s'", err)
 		}
