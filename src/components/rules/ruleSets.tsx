@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { titleCase } from "../../lib/utils";
-import { RuleSetMenu } from "./menu";
+import { NewRuleSetMenu, RuleSetMenu } from "./menu";
 import { MonitorIcon } from "../icons/streamdal";
 import { getJson, getText } from "../../lib/fetch";
 import { Loading } from "../icons/nav";
@@ -168,7 +168,8 @@ export const RuleSets = () => {
                   </div>
                 </TD>
                 <TD>
-                  <RuleSetMenu id={r.id} />
+                  {/*<RuleSetMenu id={r.id} />*/}
+                  <NewRuleSetMenu id={r.id} />
                 </TD>
               </tr>
             ))}

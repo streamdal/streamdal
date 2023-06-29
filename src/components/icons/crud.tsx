@@ -19,7 +19,7 @@ export const Edit = (props: any) => {
 };
 
 export const Delete = (props: any) => {
-  const fillColor = props?.fill || "#FF7D68";
+  const fillColor = "#372D56";
 
   return (
     <svg
@@ -47,6 +47,25 @@ export const Delete = (props: any) => {
         clipRule="evenodd"
         d="M4.8 0C3.80589 0 3 0.805887 3 1.8H1.2H0.6C0.268629 1.8 0 2.06863 0 2.4C0 2.73137 0.268629 3 0.6 3H1.2V10.2C1.2 11.1941 2.00589 12 3 12H9C9.99411 12 10.8 11.1941 10.8 10.2V3H11.4C11.7314 3 12 2.73137 12 2.4C12 2.06863 11.7314 1.8 11.4 1.8H10.8H9C9 0.805888 8.19411 0 7.2 0H4.8ZM7.8 1.8C7.8 1.46863 7.53137 1.2 7.2 1.2H4.8C4.46863 1.2 4.2 1.46863 4.2 1.8H7.8ZM3 3H2.4V10.2C2.4 10.5314 2.66863 10.8 3 10.8H9C9.33137 10.8 9.6 10.5314 9.6 10.2V3H9H3Z"
         fill={fillColor}
+      />
+    </svg>
+  );
+};
+
+export const View = (props: any) => {
+  const fillColor = props?.fill || "#372D56";
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill={fillColor}
+      className="w-4 h-4 mr-2 text-web"
+    >
+      <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+      <path
+        fill-rule="evenodd"
+        d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"
+        clip-rule="evenodd"
       />
     </svg>
   );
