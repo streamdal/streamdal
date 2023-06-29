@@ -9,7 +9,7 @@ import { FormHidden } from "../form/formHidden";
 
 export const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string({ required_error: "Password is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 export type LoginType = z.infer<typeof loginSchema>;
@@ -30,7 +30,6 @@ export const LoginForm = () => {
   return (
     <div className="p-2 max-w-lg h-full flex flex-col justify-center align-top">
       <form>
-        <FormHidden name={"email"} value={""} register={register} />
         <LoginFormInput
           name={"email"}
           label={"Email"}
