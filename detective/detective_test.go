@@ -1,7 +1,9 @@
 package detective
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/buger/jsonparser"
 )
@@ -42,114 +44,98 @@ func TestMatch(t *testing.T) {
 
 func TestMatch_TimestampRFC3339(t *testing.T) {
 	cases := []struct {
-		op       MatchOperator
-		input    string
 		arg      string
+		duration time.Duration
 		expected bool
 	}{
-		{GreaterThan, "2023-06-26T13:31:29Z", "2023-06-25T13:31:29Z", true},
-		{GreaterThan, "2023-06-24T13:31:29Z", "2023-06-25T13:31:29Z", false},
-		{GreaterEqual, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
-		{GreaterEqual, "2023-06-24T13:31:29Z", "2023-06-26T13:31:29Z", false},
-		{LessThan, "2023-06-25T13:31:29Z", "2023-06-26T13:31:29Z", true},
-		{LessEqual, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
-		{EqualTo, "2023-06-26T13:31:29Z", "2023-06-26T13:31:29Z", true},
+		{"5", -30 * time.Second, true},
+		{"5", 0, false},
 	}
 
 	m := NewMatcher()
 
 	for _, c := range cases {
-		v, err := m.Match([]byte(c.input), jsonparser.String, TimestampRFC3339, c.op, c.arg)
+		val := time.Now().UTC().Add(c.duration).Format(time.RFC3339)
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampRFC3339, OlderThanSeconds, "5")
 		if err != nil {
-			t.Fatalf("Expected no error, got: '%s' for match '%s'", err, TimestampRFC3339)
+			t.Fatalf("Expected no error, got: '%s'", err)
 		}
-
-		if v != c.expected {
-			t.Errorf("Expected %t, got: %t", c.expected, v)
+		if res != c.expected {
+			t.Errorf("Expected '%t', got: '%t'", c.expected, res)
 		}
 	}
 }
 
 func TestMatch_TimestampISO8601(t *testing.T) {
+	const FormatISO6801 = "2006-01-02T15:04:05-0700"
+
 	cases := []struct {
-		op       MatchOperator
-		input    string
 		arg      string
+		duration time.Duration
 		expected bool
 	}{
-		{GreaterThan, "2023-06-26T13:31:29+0000", "2023-06-25T13:31:29+0000", true},
-		{GreaterEqual, "2023-06-26T13:31:29+0000", "2023-06-26T13:31:29+0000", true},
-		{LessThan, "2023-06-25T13:31:29+0000", "2023-06-26T13:31:29+0000", true},
-		{LessEqual, "2023-06-26T13:31:29+0000", "2023-06-26T13:31:29+0000", true},
-		{EqualTo, "2023-06-26T13:31:29+0000", "2023-06-26T13:31:29+0000", true},
+		{"5", -30 * time.Second, true},
+		{"5", 0, false},
 	}
 
 	m := NewMatcher()
 
 	for _, c := range cases {
-		v, err := m.Match([]byte(c.input), jsonparser.String, TimestampISO8601, c.op, c.arg)
+		val := time.Now().UTC().Add(c.duration).Format(FormatISO6801)
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampISO8601, OlderThanSeconds, "5")
 		if err != nil {
-			t.Fatalf("Expected no error, got: '%s' for match '%s'", err, TimestampISO8601)
+			t.Fatalf("Expected no error, got: '%s'", err)
 		}
-
-		if v != c.expected {
-			t.Errorf("Expected %t, got: %t", c.expected, v)
+		if res != c.expected {
+			t.Errorf("Expected '%t', got: '%t'", c.expected, res)
 		}
 	}
 }
 
 func TestMatch_TimestampUnix(t *testing.T) {
 	cases := []struct {
-		op       MatchOperator
-		input    string
 		arg      string
+		duration time.Duration
 		expected bool
 	}{
-		{GreaterThan, "1257894000000000000", "1257893000000000000", true},
-		{GreaterEqual, "1257894000000000000", "1257894000000000000", true},
-		{LessThan, "1257893000000000000", "1257894000000000000", true},
-		{LessEqual, "1257894000000000000", "1257894000000000000", true},
-		{EqualTo, "1257894000000000000", "1257894000000000000", true},
+		{"5", -30 * time.Second, true},
+		{"5", 0, false},
 	}
 
 	m := NewMatcher()
 
 	for _, c := range cases {
-		v, err := m.Match([]byte(c.input), jsonparser.String, TimestampUnixNano, c.op, c.arg)
+		val := fmt.Sprintf("%d", time.Now().UTC().Add(c.duration).Unix())
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnix, OlderThanSeconds, "5")
 		if err != nil {
-			t.Fatalf("Expected no error, got: '%s' for match '%s'", err, TimestampUnixNano)
+			t.Fatalf("Expected no error, got: '%s'", err)
 		}
-
-		if v != c.expected {
-			t.Errorf("Expected %t, got: %t", c.expected, v)
+		if res != c.expected {
+			t.Errorf("Expected '%t', got: '%t'", c.expected, res)
 		}
 	}
 }
 
 func TestMatch_TimestampUnixNano(t *testing.T) {
 	cases := []struct {
-		op       MatchOperator
-		input    string
 		arg      string
+		duration time.Duration
 		expected bool
 	}{
-		{GreaterThan, "1687886766", "1687886755", true},
-		{GreaterEqual, "1687886766", "1687886766", true},
-		{LessThan, "1687886755", "1687886766", true},
-		{LessEqual, "1687886766", "1687886766", true},
-		{EqualTo, "1687886766", "1687886766", true},
+		{"5", -30 * time.Second, true},
+		{"5", 0, false},
 	}
 
 	m := NewMatcher()
 
 	for _, c := range cases {
-		v, err := m.Match([]byte(c.input), jsonparser.String, TimestampUnixNano, c.op, c.arg)
+		val := fmt.Sprintf("%d", time.Now().UTC().Add(c.duration).UnixNano())
+		res, err := m.Match([]byte(val), jsonparser.String, TimestampUnixNano, OlderThanSeconds, "5")
 		if err != nil {
-			t.Fatalf("Expected no error, got: '%s' for match '%s'", err, TimestampUnixNano)
+			t.Fatalf("Expected no error, got: '%s'", err)
 		}
-
-		if v != c.expected {
-			t.Errorf("Expected %t, got: %t", c.expected, v)
+		if res != c.expected {
+			t.Errorf("Expected '%t', got: '%t'", c.expected, res)
 		}
 	}
 }
