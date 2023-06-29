@@ -1,6 +1,7 @@
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
+use ajson::Value;
 use log::debug;
 use protos::matcher::{MatchRequest, MatchType};
 use std::str;
@@ -66,17 +67,14 @@ impl Detective {
     }
 }
 
-pub fn parse_field(data: &Vec<u8>, path: &String) -> Result<String, String> {
+pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>, String> {
     let data_as_str = match str::from_utf8(data) {
         Ok(v) => v,
-        Err(e) => return Err(format!("invalid UTF-8 sequence: {}", e)),
+        Err(e) => return Err(format!("unable to convert bytes to string: {}", e)),
     };
 
     match ajson::get(data_as_str, path) {
-        Ok(Some(value)) => {
-            debug!("Found value: {}", value);
-            Ok(value.to_string())
-        }
+        Ok(Some(value)) => Ok(value),
         Ok(None) => Err(format!("path '{}' not found in data", path)),
         Err(e) => Err(format!("error parsing field: {:?}", e)),
     }
