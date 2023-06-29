@@ -1,4 +1,5 @@
 # snitch-protos
+[![Build Status](https://github.com/streamdal/snitch-protos/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/snitch-protos/actions/workflows/release.yml)
 
 This repo contains the common protobuf definitions for all of the snitch-related
 components.
