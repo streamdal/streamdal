@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"github.com/tetratelabs/wazero/sys"
 )
 
 type function struct {
@@ -141,6 +143,8 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	cfg := wazero.NewModuleConfig().
 		WithStderr(io.Discard).
 		WithStdout(io.Discard).
+		WithNanotime(func() int64 { return time.Now().UTC().UnixNano() }, sys.ClockResolution(1000)).
+		WithSysWalltime().
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
 
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
