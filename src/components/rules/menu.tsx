@@ -75,7 +75,7 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
   );
 };
 
-export const FlowbiteRuleSetMenu = ({ id }: { id: string }) => {
+export const NewRuleSetMenu = ({ id }: { id: string }) => {
   return (
     <Navbar fluid rounded>
       <div className="flex md:order-2">
