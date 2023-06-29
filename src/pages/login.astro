@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { LoginForm } from "../components/auth/loginForm";
+---
+
+<Layout title="Streamdal Embedded Console - Login">
+  <main>
+    <LoginForm client:load client:only />
+  </main>
+</Layout>
