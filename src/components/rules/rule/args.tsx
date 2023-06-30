@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import { RuleArg } from "./arg";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { useFormState } from "react-hook-form";
-import type { RulesetType } from "../rulesetAddEdit";
 
 export const RuleArgs = ({
   register,
   control,
   ruleIndex,
+  allowMultiple = true,
 }: {
   register: any;
   control: any;
   ruleIndex: number;
+  allowMultiple?: boolean;
 }) => {
-  const { errors } = useFormState<RulesetType>({
-    control,
-  });
   const [args, setArgs] = useState([
     <RuleArg
       ruleIndex={ruleIndex}
@@ -47,24 +44,26 @@ export const RuleArgs = ({
             )}
           </div>
         ))}
-        <div className="w-full my-2 flex justify-end">
-          <input
-            type="button"
-            className="flex justify-center btn-secondary h-10 cursor-pointer"
-            value="+ Add Arg"
-            onClick={() =>
-              setArgs([
-                ...args,
-                <RuleArg
-                  ruleIndex={ruleIndex}
-                  register={register}
-                  control={control}
-                  index={args.length}
-                />,
-              ])
-            }
-          />
-        </div>
+        {allowMultiple && (
+          <div className="w-full my-2 flex justify-end">
+            <input
+              type="button"
+              className="flex justify-center btn-secondary h-10 cursor-pointer"
+              value="+ Add Arg"
+              onClick={() =>
+                setArgs([
+                  ...args,
+                  <RuleArg
+                    ruleIndex={ruleIndex}
+                    register={register}
+                    control={control}
+                    index={args.length}
+                  />,
+                ])
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );
