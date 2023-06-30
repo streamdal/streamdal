@@ -2,6 +2,11 @@
 name = "snitch-detective"
 version = "0.0.1"
 edition = "2021"
+license = "MIT"
+description = "Data matcher library used by snitch WASM functions"
+categories = ["parser-implementations", "wasm"]
+keywords = ["protobuf", "json", "match", "wasm"]
+repository = "https://github.com/streamdal/snitch-detective"
 
 [dependencies]
 ajson = "0.3.1"
