@@ -20,6 +20,6 @@ pub enum CustomError {
 
 impl From<ajson::Error> for CustomError {
     fn from(err: ajson::Error) -> Self {
-        Self::AJSONError(format!("ajson error: {:?}", err))
+        Self::AJSONError(format!("{:?}", err))
     }
 }
