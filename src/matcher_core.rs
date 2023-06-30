@@ -1,28 +1,11 @@
-use lazy_static::lazy_static;
+use chrono::TimeZone;
 use protos::matcher::MatchRequest;
 use regex::Regex;
 use std::str;
 
-lazy_static! {
-    static ref IPV4_ADDRESS_REGEX: Regex = Regex::new(
-        r"(?:\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}"
-    )
-    .unwrap();
-
-    static ref IPV6_ADDRESS_REGEX: Regex = Regex::new(
-        r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
-    )
-    .unwrap();
-
-    static ref UUID_REGEX: Regex = Regex::new(
-        r"^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"
-    )
-    .unwrap();
-}
-
 pub fn string_equal_to(request: &MatchRequest) -> Result<bool, String> {
     if request.args.len() != 1 {
-        return Err(format!("string_equal_to requires exactly 1 argument"));
+        return Err("string_equal_to requires exactly 1 argument".to_string());
     }
 
     let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
@@ -31,8 +14,8 @@ pub fn string_equal_to(request: &MatchRequest) -> Result<bool, String> {
 }
 
 pub fn string_contains_any(request: &MatchRequest) -> Result<bool, String> {
-    if request.args.len() < 1 {
-        return Err(format!("string_contains_any requires at least 1 argument"));
+    if request.args.is_empty() {
+        return Err("string_contains_any requires at least 1 argument".to_string());
     }
 
     let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
@@ -47,8 +30,8 @@ pub fn string_contains_any(request: &MatchRequest) -> Result<bool, String> {
 }
 
 pub fn string_contains_all(request: &MatchRequest) -> Result<bool, String> {
-    if request.args.len() < 1 {
-        return Err(format!("string_contains_any requires at least 1 argument"));
+    if request.args.is_empty() {
+        return Err("string_contains_any requires at least 1 argument".to_string());
     }
 
     let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
@@ -62,38 +45,88 @@ pub fn string_contains_all(request: &MatchRequest) -> Result<bool, String> {
     Ok(true)
 }
 
-pub fn ipv4_address(request: &MatchRequest) -> Result<bool, String> {
+pub fn ip_address(request: &MatchRequest) -> Result<bool, String> {
     let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
 
-    Ok(IPV4_ADDRESS_REGEX.is_match(field.as_str()))
-}
+    match request.type_.enum_value().unwrap() {
+        protos::matcher::MatchType::MATCH_TYPE_IPV4_ADDRESS => {
+            let re = Regex::new(
+                r"(?:\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}"
+            ).unwrap();
 
-pub fn ipv6_address(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+            Ok(re.is_match(field.as_str()))
+        }
+        protos::matcher::MatchType::MATCH_TYPE_IPV6_ADDRESS => {
+            let re = Regex::new(
+                r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
+            )
+                .unwrap();
+
+            Ok(re.is_match(field.as_str()))
+        }
+        _ => Err("unknown ip address match type".to_string()),
+    }
 }
 
 pub fn mac_address(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    let re = Regex::new(r"^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$").unwrap(); // TODO: Fix unwraps
+
+    Ok(re.is_match(field.as_str()))
 }
 
 pub fn uuid(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let re = Regex::new(
+        r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
+    )
+    .unwrap();
+
+    Ok(re.is_match(field.as_str()))
 }
 
 pub fn timestamp_rfc3339(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    Ok(chrono::DateTime::parse_from_rfc3339(field.as_str()).is_ok())
 }
 
 pub fn timestamp_unix_nano(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    if let Ok(ts) = field.parse::<i64>() {
+        if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts / 1_000_000_000, 0) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }
 
 pub fn timestamp_unix(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    let ts: i64 = match field.parse() {
+        Ok(ts) => ts,
+        Err(_) => return Ok(false),
+    };
+
+    if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts, 0) {
+        return Ok(true);
+    }
+
+    Ok(false)
 }
 
-pub fn is_boolean(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+pub fn boolean(request: &MatchRequest, expected: bool) -> Result<bool, String> {
+    let field = crate::detective::parse_field(&request.data, &request.path)?;
+
+    if let Some(b) = field.as_bool() {
+        return Ok(b == expected);
+    }
+
+    Ok(false)
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,
@@ -109,8 +142,6 @@ pub fn is_empty(request: &MatchRequest) -> Result<bool, String> {
     // Maybe it's an array with 0 elements
     if field.is_array() {
         if let Some(arr) = field.as_vec() {
-            println!("arr.len(): {}", arr.len());
-
             if arr.len() != 0 {
                 return Ok(false);
             }
@@ -157,9 +188,18 @@ pub fn is_type(request: &MatchRequest) -> Result<bool, String> {
     }
 }
 
-// There is a perf hit every time we run this func because we have to compile
-// the pattern every time. It will improve when the SDK's have K/V support so
-// we can cache compiled patterns in mem.
 pub fn regex(request: &MatchRequest) -> Result<bool, String> {
-    Err(format!("not implemented"))
+    if request.args.len() != 1 {
+        return Err(format!("regex requires exactly 1 argument"));
+    }
+
+    let re_pattern = request.args[0].as_str();
+    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+
+    let re = match Regex::new(re_pattern) {
+        Ok(re) => re,
+        Err(err) => return Err(format!("failed to compile regex: {}", err)),
+    };
+
+    Ok(re.is_match(field.as_str()))
 }

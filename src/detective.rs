@@ -2,11 +2,16 @@ use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use ajson::Value;
-use log::debug;
 use protos::matcher::{MatchRequest, MatchType};
 use std::str;
 
 pub struct Detective {}
+
+impl Default for Detective {
+    fn default() -> Self {
+        Detective::new()
+    }
+}
 
 impl Detective {
     pub fn new() -> Self {
@@ -30,39 +35,49 @@ impl Detective {
             MatchType::MATCH_TYPE_STRING_EQUAL => core::string_equal_to(request),
             MatchType::MATCH_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
             MatchType::MATCH_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
-            MatchType::MATCH_TYPE_IP_ADDRESS => core::ipv4_address(request),
+            MatchType::MATCH_TYPE_IPV4_ADDRESS | MatchType::MATCH_TYPE_IPV6_ADDRESS => {
+                core::ip_address(request)
+            }
             MatchType::MATCH_TYPE_REGEX => core::regex(request),
             MatchType::MATCH_TYPE_TIMESTAMP_RFC3339 => core::timestamp_rfc3339(request),
-            // MatchType::MATCH_TYPE_UUID => core::uuid(request),
-            // MatchType::MATCH_TYPE_IPV6_ADDRESS => core::ipv6_address(request),
-            // MatchType::MATCH_TYPE_MAC_ADDRESS => core::mac_address(request),
             MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO => core::timestamp_unix_nano(request),
             MatchType::MATCH_TYPE_TIMESTAMP_UNIX => core::timestamp_unix(request),
-            MatchType::MATCH_TYPE_BOOLEAN_FALSE | MatchType::MATCH_TYPE_BOOLEAN_TRUE => {
-                core::is_boolean(request)
-            }
+            MatchType::MATCH_TYPE_BOOLEAN_FALSE => core::boolean(request, false),
+            MatchType::MATCH_TYPE_BOOLEAN_TRUE => core::boolean(request, true),
             MatchType::MATCH_TYPE_IS_EMPTY => core::is_empty(request),
             MatchType::MATCH_TYPE_HAS_FIELD => core::has_field(request),
             MatchType::MATCH_TYPE_IS_TYPE => core::is_type(request),
+            MatchType::MATCH_TYPE_UUID => core::uuid(request),
+            MatchType::MATCH_TYPE_MAC_ADDRESS => core::mac_address(request),
 
             // PII matchers
-            MatchType::MATCH_TYPE_PII => pii::all(request),
+            MatchType::MATCH_TYPE_PII_ANY => pii::all(request),
             MatchType::MATCH_TYPE_PII_CREDIT_CARD => pii::credit_card(request),
             MatchType::MATCH_TYPE_PII_SSN => pii::ssn(request),
             MatchType::MATCH_TYPE_PII_EMAIL => pii::email(request),
             MatchType::MATCH_TYPE_PII_PHONE => pii::phone(request),
+            MatchType::MATCH_TYPE_PII_DRIVER_LICENSE => pii::drivers_license(request),
+            MatchType::MATCH_TYPE_PII_PASSPORT_ID => pii::passport_id(request),
+            MatchType::MATCH_TYPE_PII_VIN_NUMBER => pii::vin_number(request),
+            MatchType::MATCH_TYPE_PII_SERIAL_NUMBER => pii::serial_number(request),
+            MatchType::MATCH_TYPE_PII_LOGIN => pii::login(request),
+            MatchType::MATCH_TYPE_PII_TAXPAYER_ID => pii::taxpayer_id(request),
+            MatchType::MATCH_TYPE_PII_ADDRESS => pii::address(request),
+            MatchType::MATCH_TYPE_PII_SIGNATURE => pii::signature(request),
+            MatchType::MATCH_TYPE_PII_GEOLOCATION => pii::geolocation(request),
+            MatchType::MATCH_TYPE_PII_EDUCATION => pii::education(request),
+            MatchType::MATCH_TYPE_PII_FINANCIAL => pii::financial(request),
+            MatchType::MATCH_TYPE_PII_HEALTH => pii::health(request),
 
             // Error cases
             MatchType::MATCH_TYPE_UNKNOWN => return Err(format!("match type cannot be unknown")),
 
             // Unreachable unless a match is missed/commented out etc.
             #[allow(unreachable_patterns)]
-            unhandled_type => {
-                return Err(format!(
-                    "unhandled match request type: {:#?}",
-                    unhandled_type
-                ))
-            }
+            unhandled_type => Err(format!(
+                "unhandled match request type: {:#?}",
+                unhandled_type
+            )),
         }
     }
 }

@@ -16,6 +16,54 @@ pub fn email(request: &MatchRequest) -> Result<bool, String> {
     Err(format!("not implemented"))
 }
 
+pub fn drivers_license(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn passport_id(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn vin_number(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
 pub fn phone(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn serial_number(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn login(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn taxpayer_id(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn address(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn signature(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn geolocation(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn education(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn financial(request: &MatchRequest) -> Result<bool, String> {
+    Err(format!("not implemented"))
+}
+
+pub fn health(request: &MatchRequest) -> Result<bool, String> {
     Err(format!("not implemented"))
 }
