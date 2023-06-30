@@ -7,4 +7,19 @@ pub enum CustomError {
 
     #[error("match error: {0}")]
     MatchError(String),
+
+    #[error("regex error: {source}")]
+    RegexError {
+        #[from]
+        source: regex::Error,
+    },
+
+    #[error("ajson error: {0}")]
+    AJSONError(String),
+}
+
+impl From<ajson::Error> for CustomError {
+    fn from(err: ajson::Error) -> Self {
+        Self::AJSONError(format!("ajson error: {:?}", err))
+    }
 }

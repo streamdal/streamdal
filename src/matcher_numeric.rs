@@ -1,13 +1,16 @@
+use crate::error::CustomError;
+use crate::error::CustomError::{Error, MatchError};
 use protos::matcher::{MatchRequest, MatchType};
 
-pub fn common(request: &MatchRequest) -> Result<bool, String> {
+pub fn common(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err("numeric match must have exactly one arg".to_string());
+        return Err(Error("numeric match must have exactly one arg".to_string()));
     }
 
+    // TODO: This can be simplified with ?
     let field = match crate::detective::parse_field(&request.data, &request.path)?.as_f64() {
         Some(f) => f,
-        None => Err("field is not a number (f64)".to_string())?,
+        None => return Err(Error("field is not a number (f64)".to_string())),
     };
 
     let arg = parse_number(&request.args[0])?;
@@ -19,7 +22,7 @@ pub fn common(request: &MatchRequest) -> Result<bool, String> {
         MatchType::MATCH_TYPE_NUMERIC_LESS_THAN => field < arg,
         MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL => field <= arg,
 
-        _ => return Err("unknown numeric match type".to_string()),
+        _ => return Err(MatchError("unknown numeric match type".to_string())),
     };
 
     if request.negate {
@@ -29,9 +32,9 @@ pub fn common(request: &MatchRequest) -> Result<bool, String> {
     Ok(result)
 }
 
-fn parse_number(input: &String) -> Result<f64, String> {
+fn parse_number(input: &String) -> Result<f64, CustomError> {
     match input.parse() {
         Ok(number) => Ok(number),
-        Err(err) => Err(format!("failed to parse number: {}", err)),
+        Err(err) => Err(Error(format!("failed to parse number: {}", err))),
     }
 }

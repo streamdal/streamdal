@@ -22,10 +22,8 @@ impl Detective {
     }
 
     // Value can be int, float, string, bool
-    pub fn matches(&self, request: &MatchRequest) -> Result<bool, String> {
-        if let Err(e) = validate_match_request(request) {
-            return Err(e.to_string());
-        }
+    pub fn matches(&self, request: &MatchRequest) -> Result<bool, CustomError> {
+        validate_match_request(request)?;
 
         match request.type_.enum_value().unwrap() {
             // DONE: Numeric matchers
@@ -74,28 +72,30 @@ impl Detective {
             MatchType::MATCH_TYPE_PII_HEALTH => pii::health(request),
 
             // Error cases
-            MatchType::MATCH_TYPE_UNKNOWN => return Err(format!("match type cannot be unknown")),
+            MatchType::MATCH_TYPE_UNKNOWN => {
+                return Err(Error(format!("match type cannot be unknown")))
+            }
 
             // Unreachable unless a match is missed/commented out etc.
             #[allow(unreachable_patterns)]
-            unhandled_type => Err(format!(
+            unhandled_type => Err(Error(format!(
                 "unhandled match request type: {:#?}",
                 unhandled_type
-            )),
+            ))),
         }
     }
 }
 
-pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>, String> {
+pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>, CustomError> {
     let data_as_str = match str::from_utf8(data) {
         Ok(v) => v,
-        Err(e) => return Err(format!("unable to convert bytes to string: {}", e)),
+        Err(e) => return Err(Error(format!("unable to convert bytes to string: {}", e))),
     };
 
     match ajson::get(data_as_str, path) {
         Ok(Some(value)) => Ok(value),
-        Ok(None) => Err(format!("path '{}' not found in data", path)),
-        Err(e) => Err(format!("error parsing field: {:?}", e)),
+        Ok(None) => Err(Error(format!("path '{}' not found in data", path))),
+        Err(e) => Err(Error(format!("error parsing field: {:?}", e))),
     }
 }
 
