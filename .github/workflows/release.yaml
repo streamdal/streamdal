@@ -1,0 +1,37 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.create_tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@main
+      - name: Generate new tag (dry run)
+        uses: mathieudutour/github-tag-action@v6.1
+        id: get_new_version
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+      - name: Update Cargo.toml version
+        run: |
+          pwd
+          ls -l
+          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
+          grep version build/rust/protos/Cargo.toml
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bumped Cargo.toml version to ${{ steps.get_new_version.outputs.new_version }}
+      - name: Create tag
+        uses: mathieudutour/github-tag-action@v6.1
+        id: create_tag
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release on crates.io
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
