@@ -1,5 +1,6 @@
 snitch-detective
 ================
+[![Release](https://github.com/streamdal/snitch-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/snitch-detective/actions/workflows/release.yaml)
 [![Test](https://github.com/streamdal/snitch-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/snitch-detective/actions/workflows/pr.yaml)
 
 Rust helper lib for performing value matching in `snitch` WASM functions.
