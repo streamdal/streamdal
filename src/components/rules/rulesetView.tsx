@@ -129,7 +129,7 @@ export const RuleSetView = () => {
           <Total
             metrics={metrics}
             id={ruleSet?.id}
-            kind="plumber_dataqual_rule"
+            kind="streamdal_snitch_rule"
             type="bytes"
           />
         </div>
@@ -138,7 +138,7 @@ export const RuleSetView = () => {
           <Total
             metrics={metrics}
             id={ruleSet?.id}
-            kind="plumber_dataqual_rule"
+            kind="streamdal_snitch_rule"
             type="count"
           />
         </div>
@@ -147,7 +147,7 @@ export const RuleSetView = () => {
           <Total
             metrics={metrics}
             id={ruleSet?.id}
-            kind="plumber_dataqual_failure_trigger"
+            kind="streamdal_snitch_failure_trigger"
             type="bytes"
           />
         </div>
@@ -156,7 +156,7 @@ export const RuleSetView = () => {
           <Total
             metrics={metrics}
             id={ruleSet?.id}
-            kind="plumber_dataqual_failure_trigger"
+            kind="streamdal_snitch_failure_trigger"
             type="count"
           />
         </div>
@@ -195,7 +195,7 @@ export const RuleSetView = () => {
                 <Total
                   metrics={metrics}
                   id={r.id}
-                  kind="plumber_dataqual_rule"
+                  kind="streamdal_snitch_rule"
                   type="bytes"
                 />
               </div>
@@ -204,7 +204,7 @@ export const RuleSetView = () => {
                 <Total
                   metrics={metrics}
                   id={r.id}
-                  kind="plumber_dataqual_rule"
+                  kind="streamdal_snitch_rule"
                   type="count"
                 />
               </div>
@@ -213,7 +213,7 @@ export const RuleSetView = () => {
                 <Total
                   metrics={metrics}
                   id={r.id}
-                  kind="plumber_dataqual_failure_trigger"
+                  kind="streamdal_snitch_failure_trigger"
                   type="bytes"
                 />
               </div>
@@ -222,7 +222,7 @@ export const RuleSetView = () => {
                 <Total
                   metrics={metrics}
                   id={r.id}
-                  kind="plumber_dataqual_failure_trigger"
+                  kind="streamdal_snitch_failure_trigger"
                   type="count"
                 />
               </div>

@@ -27,6 +27,13 @@ export const RULE_TYPE_MATCH: MATCH_TYPE = {
   pii_phone: { display: "PII Phone" },
 };
 
+export const OPERATOR_MATCH_TYPE: MATCH_TYPE = {
+  MATCH_OPERATOR_ISMATCH: { display: "Match Timestamp Format" },
+  MATCH_OPERATOR_OLDER_THAN_SECONDS: {
+    display: "Match messages older than (in seconds)",
+  },
+};
+
 export const RuleAddEdit = ({
   control,
   rule,
@@ -49,10 +56,16 @@ export const RuleAddEdit = ({
     name: `rules[${index}][match_config.type]`,
   });
 
+  const watchOperator = useWatch({
+    control,
+    name: `rules[${index}][match_config.operator]`,
+  });
+
   //
   // Shenanigans: I don't know how to make react-hooks-form watch initial value on
   // dynamic fields
   const type = watchType || rule?.match_config?.type;
+  const operator = watchOperator || rule?.match_config?.operator;
 
   return (
     <div className="flex flex-col justify-start align-top">
@@ -98,10 +111,37 @@ export const RuleAddEdit = ({
             </option>
           ))}
         </FormSelect>
-        {["string_contains_any", "string_contains_all", "regex"].includes(
+        {["ts_rfc3339", "ts_unix_nano", "ts_unix_nano"].includes(type) && (
+          <FormSelect
+            name={`rules[${index}][match_config.operator]`}
+            label="Field Match Operator"
+            register={register}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            error={
+              errors?.rules?.[index]?.match_config?.operator?.message || ""
+            }
+          >
+            {Object.keys(OPERATOR_MATCH_TYPE).map((k: string, i: number) => (
+              <option key={`rule-operator-key-${i}`} value={k}>
+                {OPERATOR_MATCH_TYPE[k].display}
+              </option>
+            ))}
+          </FormSelect>
+        )}
+        {(["string_contains_any", "string_contains_all", "regex"].includes(
           type
-        ) && (
-          <RuleArgs ruleIndex={index} register={register} control={control} />
+        ) ||
+          (["ts_rfc3339", "ts_unix_nano", "ts_unix_nano"].includes(type) &&
+            ["MATCH_OPERATOR_OLDER_THAN_SECONDS"].includes(operator))) && (
+          <RuleArgs
+            ruleIndex={index}
+            register={register}
+            control={control}
+            allowMultiple={
+              !["MATCH_OPERATOR_OLDER_THAN_SECONDS"].includes(operator)
+            }
+          />
         )}
         <FailureModes
           rule={rule}

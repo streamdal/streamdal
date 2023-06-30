@@ -47,3 +47,7 @@ export const formatNumber = (number?: number | bigint) =>
     notation: "compact",
     maximumSignificantDigits: 2,
   }).format(number || 0);
+
+export const isNumeric = (num: any) =>
+  (typeof num === "number" || (typeof num === "string" && num.trim() !== "")) &&
+  !isNaN(num as number);

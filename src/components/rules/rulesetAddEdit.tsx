@@ -4,17 +4,21 @@ import { getJson } from "../../lib/fetch";
 import { Error } from "../status/error";
 import { MonitorIcon } from "../icons/streamdal";
 import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { FormInput } from "../form/formInput";
 import { FormSelect } from "../form/formSelect";
-import { titleCase } from "../../lib/utils";
-import { RULE_TYPE_MATCH, RuleAddEdit } from "./rule/addEdit";
+import { isNumeric, titleCase } from "../../lib/utils";
+import {
+  OPERATOR_MATCH_TYPE,
+  RULE_TYPE_MATCH,
+  RuleAddEdit,
+} from "./rule/addEdit";
 import { mutate } from "../../lib/mutation";
 import { v4 as uuidv4 } from "uuid";
 import { Success } from "../status/success";
 import { FAILURE_MODE_TYPE } from "./rule/failureMode";
 import { mapRules, mapRuleSet } from "./rulesetView";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const RULESET_ERROR = "Ruleset not found!";
 
@@ -75,13 +79,29 @@ const failureModeSchema = z.discriminatedUnion("mode", [
 ]);
 
 const matchTypes: string[] = Object.keys(RULE_TYPE_MATCH);
+const operatorTypes: string[] = Object.keys(OPERATOR_MATCH_TYPE);
 const ruleMatchSchema = z
   .object({
     path: z.string().min(1, { message: "Required" }),
     type: z.enum(matchTypes as any),
     args: z.string().array().optional(),
+    operator: z.enum(operatorTypes as any).optional(),
   })
-  .superRefine(({ type, args }, ctx) => {
+  .superRefine(({ type, operator, args }, ctx) => {
+    if (
+      ["ts_rfc3339", "ts_unix_nano", "ts_unix_nano"].includes(type) &&
+      ["MATCH_OPERATOR_OLDER_THAN_SECONDS"].includes(operator) &&
+      (!args || !isNumeric(args[0]))
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Argument must be a number of seconds",
+        path: ["args[0]"],
+        fatal: true,
+      });
+      return false;
+    }
+
     if (
       !["string_contains_any", "string_contains_all", "regex"].includes(type)
     ) {
@@ -197,12 +217,9 @@ export const RuleSetAddEdit = () => {
     reset,
     formState: { errors, isSubmitting, defaultValues },
   } = useForm<RulesetType>({
+    resolver: zodResolver(rulesetSchema),
     reValidateMode: "onBlur",
     shouldUnregister: true,
-    //
-    // hack in our updated rules, for some reason react hooks form is not doing this
-    resolver: async (data, context, options) =>
-      zodResolver(rulesetSchema)({ ...data, rules }, context, options),
   });
 
   const {
@@ -259,7 +276,7 @@ export const RuleSetAddEdit = () => {
 
       const id = response?.values?.id;
       if (id) {
-        window.location.href = `/ruleset/edit?id=${id}&success=true`;
+        //window.location.href = `/ruleset/edit?id=${id}&success=true`;
       }
     } catch (e: any) {
       setAddError(e.toString());

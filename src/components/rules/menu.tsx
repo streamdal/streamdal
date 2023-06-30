@@ -3,7 +3,7 @@ import React from "react";
 import { Kebab } from "../icons/nav";
 import { Delete, Edit, View } from "../icons/crud";
 import { EyeIcon } from "@heroicons/react/20/solid";
-import { Avatar, Dropdown, Navbar } from "flowbite-react";
+import { Dropdown, Navbar } from "flowbite-react";
 
 export const RuleSetMenu = ({ id }: { id: string }) => {
   return (
@@ -77,32 +77,26 @@ export const RuleSetMenu = ({ id }: { id: string }) => {
 
 export const NewRuleSetMenu = ({ id }: { id: string }) => {
   return (
-    <Navbar fluid rounded>
-      <div className="flex md:order-2">
-        <Dropdown
-          inline
-          label={
-            <Kebab className="hover:text-web h-[20px]" aria-hidden="true" />
-          }
-          arrowIcon={false}
-        >
-          <Navbar.Link href={`/ruleset?id=${id}`}>
-            <Dropdown.Item icon={View}>View</Dropdown.Item>
-          </Navbar.Link>
-          <Navbar.Link href={`/ruleset/edit?id=${id}`}>
-            <Dropdown.Item icon={Edit}>Edit</Dropdown.Item>
-          </Navbar.Link>
-          <Navbar.Link href={`/ruleset/delete/?id=${id}`}>
-            <Dropdown.Item
-              className="hover:bg-red-400 hover:text-white"
-              icon={Delete}
-            >
-              Delete
-            </Dropdown.Item>
-          </Navbar.Link>
-        </Dropdown>
-        <Navbar.Toggle />
-      </div>
-    </Navbar>
+    <Dropdown
+      inline
+      label={<Kebab className="hover:text-web h-[20px]" aria-hidden="true" />}
+      arrowIcon={false}
+      className="w-48"
+    >
+      <a href={`/ruleset?id=${id}`}>
+        <Dropdown.Item icon={View}>View</Dropdown.Item>
+      </a>
+      <a href={`/ruleset/edit?id=${id}`}>
+        <Dropdown.Item icon={Edit}>Edit</Dropdown.Item>
+      </a>
+      <a href={`/ruleset/delete/?id=${id}`}>
+        <Dropdown.Item className="hover:bg-red-400 hover:text-white fill-web hover:fill-white">
+          <div className="flex flex-row">
+            <Delete className="w-[17px] mr-1" />
+            Delete
+          </div>
+        </Dropdown.Item>
+      </a>
+    </Dropdown>
   );
 };
