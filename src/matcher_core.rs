@@ -177,7 +177,7 @@ pub fn has_field(request: &MatchRequest) -> Result<bool, CustomError> {
 
 pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err(Error(format!("is_type requires exactly 1 argument")));
+        return Err(Error("is_type requires exactly 1 argument".to_string()));
     }
 
     let field = crate::detective::parse_field(&request.data, &request.path)?;
@@ -196,7 +196,7 @@ pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
 
 pub fn regex(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err(Error(format!("regex requires exactly 1 argument")));
+        return Err(Error("regex requires exactly 1 argument".to_string()));
     }
 
     let re_pattern = request.args[0].as_str();

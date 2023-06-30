@@ -2,70 +2,70 @@ use crate::error::CustomError;
 use crate::error::CustomError::Error;
 use protos::matcher::MatchRequest;
 
-pub fn all(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn all(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn credit_card(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn credit_card(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn ssn(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn ssn(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn email(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn email(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn drivers_license(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn drivers_license(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn passport_id(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn passport_id(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn vin_number(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn vin_number(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn phone(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn phone(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn serial_number(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn serial_number(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn login(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn login(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn taxpayer_id(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn taxpayer_id(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn address(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn address(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn signature(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn signature(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn geolocation(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn geolocation(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn education(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn education(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn financial(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn financial(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
 
-pub fn health(request: &MatchRequest) -> Result<bool, CustomError> {
-    Err(Error(format!("not implemented")))
+pub fn health(_request: &MatchRequest) -> Result<bool, CustomError> {
+    Err(Error("not implemented".to_string()))
 }
