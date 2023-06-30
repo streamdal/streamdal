@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
@@ -21,7 +22,9 @@ impl Detective {
 
     // Value can be int, float, string, bool
     pub fn matches(&self, request: &MatchRequest) -> Result<bool, String> {
-        validate_match_request(request)?;
+        if let Err(e) = validate_match_request(request) {
+            return Err(e.to_string());
+        }
 
         match request.type_.enum_value().unwrap() {
             // DONE: Numeric matchers
@@ -95,24 +98,30 @@ pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>,
     }
 }
 
-fn validate_match_request(request: &MatchRequest) -> Result<(), String> {
+fn validate_match_request(request: &MatchRequest) -> Result<(), Error> {
     match request.type_.enum_value() {
         Ok(value) => {
             if value == MatchType::MATCH_TYPE_UNKNOWN {
-                return Err("match type cannot be unknown".to_string());
+                return Err(Error::MatchError(format!(
+                    "unknown match type: {:?}",
+                    value
+                )));
             }
         }
         Err(unexpected) => {
-            return Err(format!("unexpected match type '{:#?}'", unexpected));
+            return Err(Error::MatchError(format!(
+                "unexpected match type: {:?}",
+                unexpected
+            )));
         }
     }
 
     if request.path.is_empty() {
-        return Err("path cannot be empty".to_string());
+        return Err(Error::GenericError("path cannot be empty".to_string()));
     }
 
     if request.data.is_empty() {
-        return Err("data cannot be empty".to_string());
+        return Err(Error::GenericError("data cannot be empty".to_string()));
     }
 
     Ok(())
