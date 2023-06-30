@@ -1,10 +1,10 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum Error {
-    #[error("Error: {0}")]
-    GenericError(String),
+pub enum CustomError {
+    #[error("error: {0}")]
+    Error(String),
 
-    #[error("Match error: {0}")]
+    #[error("match error: {0}")]
     MatchError(String),
 }

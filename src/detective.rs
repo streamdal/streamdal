@@ -1,4 +1,5 @@
-use crate::error::Error;
+use crate::error::CustomError;
+use crate::error::CustomError::{Error, MatchError};
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
@@ -98,30 +99,24 @@ pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>,
     }
 }
 
-fn validate_match_request(request: &MatchRequest) -> Result<(), Error> {
+fn validate_match_request(request: &MatchRequest) -> Result<(), CustomError> {
     match request.type_.enum_value() {
         Ok(value) => {
             if value == MatchType::MATCH_TYPE_UNKNOWN {
-                return Err(Error::MatchError(format!(
-                    "unknown match type: {:?}",
-                    value
-                )));
+                return Err(MatchError(format!("unknown match type: {:?}", value)));
             }
         }
-        Err(unexpected) => {
-            return Err(Error::MatchError(format!(
-                "unexpected match type: {:?}",
-                unexpected
-            )));
+        Err(value) => {
+            return Err(MatchError(format!("unexpected match type: {:?}", value)));
         }
     }
 
     if request.path.is_empty() {
-        return Err(Error::GenericError("path cannot be empty".to_string()));
+        return Err(Error("path cannot be empty".to_string()));
     }
 
     if request.data.is_empty() {
-        return Err(Error::GenericError("data cannot be empty".to_string()));
+        return Err(Error("data cannot be empty".to_string()));
     }
 
     Ok(())
