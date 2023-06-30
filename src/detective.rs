@@ -72,9 +72,7 @@ impl Detective {
             MatchType::MATCH_TYPE_PII_HEALTH => pii::health(request),
 
             // Error cases
-            MatchType::MATCH_TYPE_UNKNOWN => {
-                return Err(Error(format!("match type cannot be unknown")))
-            }
+            MatchType::MATCH_TYPE_UNKNOWN => Err(Error("match type cannot be unknown".to_string())),
 
             // Unreachable unless a match is missed/commented out etc.
             #[allow(unreachable_patterns)]
@@ -86,7 +84,7 @@ impl Detective {
     }
 }
 
-pub fn parse_field<'a>(data: &'a Vec<u8>, path: &'a String) -> Result<Value<'a>, CustomError> {
+pub fn parse_field<'a>(data: &'a [u8], path: &'a String) -> Result<Value<'a>, CustomError> {
     let data_as_str = match str::from_utf8(data) {
         Ok(v) => v,
         Err(e) => return Err(Error(format!("unable to convert bytes to string: {}", e))),

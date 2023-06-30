@@ -32,7 +32,7 @@ pub fn common(request: &MatchRequest) -> Result<bool, CustomError> {
     Ok(result)
 }
 
-fn parse_number(input: &String) -> Result<f64, CustomError> {
+fn parse_number(input: &str) -> Result<f64, CustomError> {
     match input.parse() {
         Ok(number) => Ok(number),
         Err(err) => Err(Error(format!("failed to parse number: {}", err))),
