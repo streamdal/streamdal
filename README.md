@@ -9,7 +9,6 @@ For available matchers, look at the enums listed in
 
 # Install
 ```
-cargo add protobuf && \
 cargo add snitch-detective
 ```
 
