@@ -7,7 +7,7 @@ pub fn common(request: &MatchRequest) -> Result<bool, CustomError> {
         return Err(Error("numeric match must have exactly one arg".to_string()));
     }
 
-    // TODO: This can be simplified with ?
+    // Q: This can be simplified with ?
     let field = match crate::detective::parse_field(&request.data, &request.path)?.as_f64() {
         Some(f) => f,
         None => return Err(Error("field is not a number (f64)".to_string())),

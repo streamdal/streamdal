@@ -16,9 +16,13 @@ pub enum CustomError {
 
     #[error("ajson error: {0}")]
     AJSONError(String),
+
+    #[error("missing match type: {0}")]
+    MissingMatchType(i32),
 }
 
 impl From<ajson::Error> for CustomError {
+    // Q: how else can I extract the error from ajson::Error?
     fn from(err: ajson::Error) -> Self {
         Self::AJSONError(format!("{:?}", err))
     }

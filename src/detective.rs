@@ -1,5 +1,5 @@
 use crate::error::CustomError;
-use crate::error::CustomError::{Error, MatchError};
+use crate::error::CustomError::{Error, MatchError}; // follow-up - tend to avoid specifying variants directly; specify CustomError::Error instead
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
@@ -25,15 +25,19 @@ impl Detective {
     pub fn matches(&self, request: &MatchRequest) -> Result<bool, CustomError> {
         validate_match_request(request)?;
 
-        match request.type_.enum_value().unwrap() {
-            // DONE: Numeric matchers
+        // Follow-up suggestion
+        match request
+            .type_
+            .enum_value()
+            .map_err(CustomError::MissingMatchType)?
+        {
             MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO
             | MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL
             | MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN
             | MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL
             | MatchType::MATCH_TYPE_NUMERIC_LESS_THAN => numeric::common(request),
 
-            // // Core matchers
+            // Core matchers
             MatchType::MATCH_TYPE_STRING_EQUAL => core::string_equal_to(request),
             MatchType::MATCH_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
             MatchType::MATCH_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
@@ -73,13 +77,13 @@ impl Detective {
 
             // Error cases
             MatchType::MATCH_TYPE_UNKNOWN => Err(Error("match type cannot be unknown".to_string())),
-
-            // Unreachable unless a match is missed/commented out etc.
-            #[allow(unreachable_patterns)]
-            unhandled_type => Err(Error(format!(
-                "unhandled match request type: {:#?}",
-                unhandled_type
-            ))),
+            // follow-up - there's no need for this, compiler will notice!
+            // // Unreachable unless a match is missed/commented out etc.
+            // #[allow(unreachable_patterns)]
+            // unhandled_type => Err(Error(format!(
+            //     "unhandled match request type: {:#?}",
+            //     unhandled_type
+            // ))),
         }
     }
 }

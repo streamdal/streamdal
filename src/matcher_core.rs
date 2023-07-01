@@ -12,6 +12,10 @@ pub fn string_equal_to(request: &MatchRequest) -> Result<bool, CustomError> {
         ));
     }
 
+    // Q: Is there some way to do this with generics so I could specify the type I want without having to do
+    // to_string(), as_i64(), etc.?
+    // What I imagine is that parse_field() has a return signature like Result<T, CustomError> but
+    // I don't know how to pull that off.
     let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
 
     Ok(field == request.args[0])

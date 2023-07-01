@@ -1,6 +1,11 @@
 #[cfg(test)]
 use protos::matcher::{MatchRequest, MatchType};
 
+// Q: Is there a community-agreed-upon test framework that people use?
+// Q: How do folks feel about table driven tests?
+// Q: How do you usually handle setup() and teardown()?
+// Q: Where do benchmarks usually go? Test file? Separate file?
+
 #[test]
 fn string_tests() {
     let test_cases = vec![
