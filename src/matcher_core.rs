@@ -1,3 +1,4 @@
+use crate::detective;
 use crate::error::CustomError;
 use crate::error::CustomError::{Error, MatchError};
 use ajson::Value;
@@ -43,7 +44,7 @@ pub fn string_contains_all(request: &MatchRequest) -> Result<bool, CustomError> 
         ));
     }
 
-    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
     for arg in &request.args {
         if !field.contains(arg) {
@@ -152,10 +153,16 @@ pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
     // TODO: Remove this once Christos assists
-    let field = match ajson::get(data_as_str, &request.path)? {
-        Some(f) => f,
-        None => return Err(CustomError::Error("field not found".to_string())),
-    };
+    // want
+    // let field: Value = match parse_field(&request.data, &request.path)?;
+    // or better just parse_field -> defaults to Value?
+
+    let field: Value = detective::parse_field(&request.data, &request.path)?;
+
+    // let field = match ajson::get(data_as_str, &request.path)? {
+    //     Some(f) => f,
+    //     None => return Err(CustomError::Error("field not found".to_string())),
+    // };
 
     // If the field is null
     if field.is_null() {

@@ -84,7 +84,7 @@ impl Detective {
 pub fn parse_field<T: FromValue>(data: &[u8], path: &String) -> Result<T, CustomError> {
     let data_as_str = str::from_utf8(data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
-
+    
     match ajson::get(data_as_str, path) {
         Ok(Some(value)) => T::from_value(&value),
         Ok(None) => Err(CustomError::Error(format!(
