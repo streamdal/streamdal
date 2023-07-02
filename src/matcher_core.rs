@@ -157,7 +157,7 @@ pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
     // let field: Value = match parse_field(&request.data, &request.path)?;
     // or better just parse_field -> defaults to Value?
 
-    let field: &Value = detective::parse_field(&request.data, &request.path)?;
+    let field: Value = detective::parse_field(&request.data, &request.path)?;
 
     // let field = match ajson::get(data_as_str, &request.path)? {
     //     Some(f) => f,
