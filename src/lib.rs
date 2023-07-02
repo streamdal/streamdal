@@ -24,10 +24,8 @@ mod matcher_pii_tests;
 #[path = "test_utils.rs"]
 mod test_utils;
 
-// For parse_field()
 pub trait FromValue<'a>
 where
-    // @Christos: What is Sized trait? Why does it need to be here? Also, how do you "say" this - is this a trait bound to
     Self: Sized,
 {
     fn from_value(value: Value<'a>) -> Result<Self, CustomError>;
@@ -40,14 +38,6 @@ impl FromValue<'_> for f64 {
             .ok_or(CustomError::Error("not a number".to_string()))
     }
 }
-
-// // Q-1: How do I do this?
-// // Q-2: How do I default this?
-// impl<'a> FromValue for &'a Value<'a> {
-//     fn from_value(value: &'a Value<'a>) -> Result<&'a Value<'a>, CustomError> {
-//         Ok(value)
-//     }
-// }
 
 impl<'a> FromValue<'a> for Value<'a> {
     fn from_value(value: Value<'a>) -> Result<Value<'a>, CustomError> {
