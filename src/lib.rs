@@ -30,7 +30,7 @@ where
     // @Christos: What is Sized trait? Why does it need to be here? Also, how do you "say" this - is this a trait bound to
     Self: Sized,
 {
-    fn from_value(value: &Value) -> Result<Self, CustomError>;
+    fn from_value<'a>(value: &'a Value) -> Result<Self, CustomError>;
 }
 
 impl FromValue for f64 {
@@ -43,9 +43,9 @@ impl FromValue for f64 {
 
 // // Q-1: How do I do this?
 // // Q-2: How do I default this?
-impl FromValue for Value {
+impl FromValue for &Value {
     fn from_value(value: &Value) -> Result<Self, CustomError> {
-        Ok(value.deref().clone()) // you clone WHAT you own -- ie. pointer to bytes
+        Ok(value)
     }
 }
 
@@ -54,3 +54,43 @@ impl FromValue for String {
         Ok(value.to_string())
     }
 }
+
+trait Parse<T: ToString> {
+    type Error;
+
+    fn parse(input: T) -> Result<Self, Self::Error>;
+}
+
+impl Parse<&str> for f64 {
+    type Error = CustomError;
+
+    fn parse(input: &str) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}
+
+impl Parse<&Json> for f64 {
+    type Error = CustomError;
+
+    fn parse(input: &Json) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

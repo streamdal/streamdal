@@ -157,7 +157,7 @@ pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
     // let field: Value = match parse_field(&request.data, &request.path)?;
     // or better just parse_field -> defaults to Value?
 
-    let field: Value = detective::parse_field(&request.data, &request.path)?;
+    let field: &Value = detective::parse_field(&request.data, &request.path)?;
 
     // let field = match ajson::get(data_as_str, &request.path)? {
     //     Some(f) => f,
@@ -195,6 +195,16 @@ pub fn has_field(request: &MatchRequest) -> Result<bool, CustomError> {
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
     Ok(ajson::get(data_as_str, &request.path)?.is_some())
+}
+
+pub struct NumericMatchRequest(MatchRequest);
+
+impl TryFrom<MatchRequest> for NumericMatchRequest {
+    type Error = CustomError;
+
+    fn try_from(request: MatchRequest) -> Result<Self, Self::Error> {
+        todo!()
+    }
 }
 
 pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
