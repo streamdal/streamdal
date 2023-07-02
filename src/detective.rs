@@ -1,8 +1,7 @@
 use crate::error::CustomError;
-use crate::error::CustomError::{Error, MatchError}; // follow-up - tend to avoid specifying variants directly; specify CustomError::Error instead
-use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
+use crate::{matcher_core as core, FromValue};
 use ajson::Value;
 use protos::matcher::{MatchRequest, MatchType};
 use std::str;
@@ -75,29 +74,24 @@ impl Detective {
             MatchType::MATCH_TYPE_PII_FINANCIAL => pii::financial(request),
             MatchType::MATCH_TYPE_PII_HEALTH => pii::health(request),
 
-            // Error cases
-            MatchType::MATCH_TYPE_UNKNOWN => Err(Error("match type cannot be unknown".to_string())),
-            // follow-up - there's no need for this, compiler will notice!
-            // // Unreachable unless a match is missed/commented out etc.
-            // #[allow(unreachable_patterns)]
-            // unhandled_type => Err(Error(format!(
-            //     "unhandled match request type: {:#?}",
-            //     unhandled_type
-            // ))),
+            MatchType::MATCH_TYPE_UNKNOWN => Err(CustomError::Error(
+                "match type cannot be unknown".to_string(),
+            )),
         }
     }
 }
 
-pub fn parse_field<'a>(data: &'a [u8], path: &'a String) -> Result<Value<'a>, CustomError> {
-    let data_as_str = match str::from_utf8(data) {
-        Ok(v) => v,
-        Err(e) => return Err(Error(format!("unable to convert bytes to string: {}", e))),
-    };
+pub fn parse_field<T: FromValue>(data: &[u8], path: &String) -> Result<T, CustomError> {
+    let data_as_str = str::from_utf8(data)
+        .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
     match ajson::get(data_as_str, path) {
-        Ok(Some(value)) => Ok(value),
-        Ok(None) => Err(Error(format!("path '{}' not found in data", path))),
-        Err(e) => Err(Error(format!("error parsing field: {:?}", e))),
+        Ok(Some(value)) => T::from_value(&value),
+        Ok(None) => Err(CustomError::Error(format!(
+            "path '{}' not found in data",
+            path
+        ))),
+        Err(e) => Err(CustomError::Error(format!("error parsing field: {:?}", e))),
     }
 }
 
@@ -105,20 +99,26 @@ fn validate_match_request(request: &MatchRequest) -> Result<(), CustomError> {
     match request.type_.enum_value() {
         Ok(value) => {
             if value == MatchType::MATCH_TYPE_UNKNOWN {
-                return Err(MatchError(format!("unknown match type: {:?}", value)));
+                return Err(CustomError::MatchError(format!(
+                    "unknown match type: {:?}",
+                    value
+                )));
             }
         }
         Err(value) => {
-            return Err(MatchError(format!("unexpected match type: {:?}", value)));
+            return Err(CustomError::MatchError(format!(
+                "unexpected match type: {:?}",
+                value
+            )));
         }
     }
 
     if request.path.is_empty() {
-        return Err(Error("path cannot be empty".to_string()));
+        return Err(CustomError::Error("path cannot be empty".to_string()));
     }
 
     if request.data.is_empty() {
-        return Err(Error("data cannot be empty".to_string()));
+        return Err(CustomError::Error("data cannot be empty".to_string()));
     }
 
     Ok(())

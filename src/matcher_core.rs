@@ -1,5 +1,6 @@
 use crate::error::CustomError;
 use crate::error::CustomError::{Error, MatchError};
+use ajson::Value;
 use chrono::TimeZone;
 use protos::matcher::MatchRequest;
 use regex::Regex;
@@ -7,28 +8,24 @@ use std::str;
 
 pub fn string_equal_to(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err(Error(
+        return Err(CustomError::Error(
             "string_equal_to requires exactly 1 argument".to_string(),
         ));
     }
 
-    // Q: Is there some way to do this with generics so I could specify the type I want without having to do
-    // to_string(), as_i64(), etc.?
-    // What I imagine is that parse_field() has a return signature like Result<T, CustomError> but
-    // I don't know how to pull that off.
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     Ok(field == request.args[0])
 }
 
 pub fn string_contains_any(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.is_empty() {
-        return Err(Error(
+        return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     for arg in &request.args {
         if field.contains(arg) {
@@ -41,12 +38,12 @@ pub fn string_contains_any(request: &MatchRequest) -> Result<bool, CustomError> 
 
 pub fn string_contains_all(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.is_empty() {
-        return Err(Error(
+        return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     for arg in &request.args {
         if !field.contains(arg) {
@@ -58,7 +55,7 @@ pub fn string_contains_all(request: &MatchRequest) -> Result<bool, CustomError> 
 }
 
 pub fn ip_address(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     match request.type_.enum_value().unwrap() {
         protos::matcher::MatchType::MATCH_TYPE_IPV4_ADDRESS => {
@@ -75,12 +72,14 @@ pub fn ip_address(request: &MatchRequest) -> Result<bool, CustomError> {
 
             Ok(re.is_match(field.as_str()))
         }
-        _ => Err(MatchError("unknown ip address match type".to_string())),
+        _ => Err(CustomError::MatchError(
+            "unknown ip address match type".to_string(),
+        )),
     }
 }
 
 pub fn mac_address(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     let re = Regex::new(r"^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$")?;
 
@@ -88,7 +87,7 @@ pub fn mac_address(request: &MatchRequest) -> Result<bool, CustomError> {
 }
 
 pub fn uuid(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
     let re = Regex::new(
         r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
     )?;
@@ -97,13 +96,13 @@ pub fn uuid(request: &MatchRequest) -> Result<bool, CustomError> {
 }
 
 pub fn timestamp_rfc3339(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     Ok(chrono::DateTime::parse_from_rfc3339(field.as_str()).is_ok())
 }
 
 pub fn timestamp_unix_nano(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     if let Ok(ts) = field.parse::<i64>() {
         if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts / 1_000_000_000, 0) {
@@ -115,7 +114,7 @@ pub fn timestamp_unix_nano(request: &MatchRequest) -> Result<bool, CustomError> 
 }
 
 pub fn timestamp_unix(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     let ts: i64 = match field.parse() {
         Ok(ts) => ts,
@@ -130,7 +129,14 @@ pub fn timestamp_unix(request: &MatchRequest) -> Result<bool, CustomError> {
 }
 
 pub fn boolean(request: &MatchRequest, expected: bool) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?;
+    let data_as_str = str::from_utf8(&request.data)
+        .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+    // TODO: Remove this once Christos assists
+    let field = match ajson::get(data_as_str, &request.path)? {
+        Some(f) => f,
+        None => return Err(CustomError::Error("field not found".to_string())),
+    };
 
     if let Some(b) = field.as_bool() {
         return Ok(b == expected);
@@ -142,7 +148,14 @@ pub fn boolean(request: &MatchRequest, expected: bool) -> Result<bool, CustomErr
 // This is an all inclusive check - it'll return true if field is an empty string,
 // empty array or is null.
 pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
-    let field = crate::detective::parse_field(&request.data, &request.path)?;
+    let data_as_str = str::from_utf8(&request.data)
+        .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+    // TODO: Remove this once Christos assists
+    let field = match ajson::get(data_as_str, &request.path)? {
+        Some(f) => f,
+        None => return Err(CustomError::Error("field not found".to_string())),
+    };
 
     // If the field is null
     if field.is_null() {
@@ -171,20 +184,27 @@ pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
 }
 
 pub fn has_field(request: &MatchRequest) -> Result<bool, CustomError> {
-    let data_as_str = match str::from_utf8(&request.data) {
-        Ok(v) => v,
-        Err(e) => return Err(Error(format!("unable to convert bytes to string: {}", e))),
-    };
+    let data_as_str = str::from_utf8(&request.data)
+        .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
-    Ok(ajson::get(data_as_str, &request.path)?.is_some()) // TODO: handle unwrap
+    Ok(ajson::get(data_as_str, &request.path)?.is_some())
 }
 
 pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err(Error("is_type requires exactly 1 argument".to_string()));
-    }
+        return Err(CustomError::Error(
+            "is_type requires exactly 1 argument".to_string(),
+        ));
+    } // Q: Christos, what was your suggestion again?
 
-    let field = crate::detective::parse_field(&request.data, &request.path)?;
+    let data_as_str = str::from_utf8(&request.data)
+        .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+    // TODO: Remove this once Christos assists
+    let field = match ajson::get(data_as_str, &request.path)? {
+        Some(f) => f,
+        None => return Err(CustomError::Error("field not found".to_string())),
+    };
 
     match request.args[0].as_str() {
         "string" => Ok(field.is_string()),
@@ -194,22 +214,32 @@ pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
         "array" => Ok(field.is_array()),
         "object" => Ok(field.is_object()),
         "null" => Ok(field.is_null()),
-        _ => Err(MatchError(format!("unknown type: {}", request.args[0]))),
+        _ => Err(CustomError::MatchError(format!(
+            "unknown type: {}",
+            request.args[0]
+        ))),
     }
 }
 
 pub fn regex(request: &MatchRequest) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
-        return Err(Error("regex requires exactly 1 argument".to_string()));
+        return Err(CustomError::Error(
+            "regex requires exactly 1 argument".to_string(),
+        ));
     }
 
     let re_pattern = request.args[0].as_str();
-    let field = crate::detective::parse_field(&request.data, &request.path)?.to_string();
+    let field: String = crate::detective::parse_field(&request.data, &request.path)?;
 
     // TODO: This can be just a ? soon
     let re = match Regex::new(re_pattern) {
         Ok(re) => re,
-        Err(err) => return Err(Error(format!("failed to compile regex: {}", err))),
+        Err(err) => {
+            return Err(CustomError::Error(format!(
+                "failed to compile regex: {}",
+                err
+            )))
+        }
     };
 
     Ok(re.is_match(field.as_str()))
