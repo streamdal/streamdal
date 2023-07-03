@@ -90,11 +90,11 @@ export const NewRuleSetMenu = ({ id }: { id: string }) => {
         <Dropdown.Item icon={Edit}>Edit</Dropdown.Item>
       </a>
       <a href={`/ruleset/delete/?id=${id}`}>
-        <Dropdown.Item className="hover:bg-red-400 hover:text-white fill-web hover:fill-white">
-          <div className="flex flex-row">
-            <Delete className="w-[17px] mr-1" />
-            Delete
-          </div>
+        <Dropdown.Item
+          className="hover:bg-red-400 hover:text-white hover:fill-white"
+          icon={Delete}
+        >
+          Delete
         </Dropdown.Item>
       </a>
     </Dropdown>
