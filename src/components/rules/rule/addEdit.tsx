@@ -67,7 +67,6 @@ export const RuleAddEdit = ({
   const type = watchType || rule?.match_config?.type;
   const operator = watchOperator || rule?.match_config?.operator;
 
-  console.log("shit", errors);
   return (
     <div className="flex flex-col justify-start align-top">
       <div className="flex flex-row justify-between text-stormCloud font-medium text-[14px] leading-[18px] bg-sunset p-2">

@@ -266,7 +266,6 @@ export const RuleSetAddEdit = () => {
       ...(exchange_name &&
         binding_key && { key: `${exchange_name}|${binding_key}` }),
     };
-    console.log("damn mapped", mapped);
 
     try {
       const response = await mutate({
