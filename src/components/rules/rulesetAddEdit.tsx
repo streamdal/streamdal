@@ -24,6 +24,7 @@ export const RULESET_ERROR = "Ruleset not found!";
 
 export const NEW_RULE = {
   type: "RULE_TYPE_MATCH" as const,
+  name: "",
   match_config: {
     path: "",
     type: "string_contains_any",
@@ -124,6 +125,7 @@ const ruleSchema = z.object({
   id: z.string().optional(),
   type: z.literal("RULE_TYPE_MATCH"),
   match_config: ruleMatchSchema,
+  name: z.string().min(1, { message: "Required" }),
   failure_mode_configs: failureModeSchema
     .array()
     .min(1, { message: "At least one rule is required" }),
@@ -264,6 +266,7 @@ export const RuleSetAddEdit = () => {
       ...(exchange_name &&
         binding_key && { key: `${exchange_name}|${binding_key}` }),
     };
+    console.log("damn mapped", mapped);
 
     try {
       const response = await mutate({
