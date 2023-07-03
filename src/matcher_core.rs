@@ -1,7 +1,8 @@
 use crate::detective;
 use crate::error::CustomError;
-use ajson::Value;
 use chrono::TimeZone;
+use gjson::Kind;
+use gjson::Value;
 use protos::matcher::MatchRequest;
 use regex::Regex;
 use std::str;
@@ -117,8 +118,14 @@ pub fn timestamp_unix(request: &MatchRequest) -> Result<bool, CustomError> {
     let field: String = detective::parse_field(&request.data, &request.path)?;
 
     let ts: i64 = match field.parse() {
-        Ok(ts) => ts,
-        Err(_) => return Ok(false),
+        Ok(v) => {
+            println!("Parsed timestamp: {}", v);
+            v
+        }
+        Err(_) => {
+            println!("Failed to parse timestamp: {}", field);
+            return Ok(false);
+        }
     };
 
     if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts, 0) {
@@ -129,13 +136,9 @@ pub fn timestamp_unix(request: &MatchRequest) -> Result<bool, CustomError> {
 }
 
 pub fn boolean(request: &MatchRequest, expected: bool) -> Result<bool, CustomError> {
-    let field: Value = detective::parse_field(&request.data, &request.path)?;
+    let field: bool = detective::parse_field(&request.data, &request.path)?;
 
-    if let Some(b) = field.as_bool() {
-        return Ok(b == expected);
-    }
-
-    Ok(false)
+    return Ok(field == expected);
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,
@@ -143,47 +146,22 @@ pub fn boolean(request: &MatchRequest, expected: bool) -> Result<bool, CustomErr
 pub fn is_empty(request: &MatchRequest) -> Result<bool, CustomError> {
     let field: Value = detective::parse_field(&request.data, &request.path)?;
 
-    // If the field is null
-    if field.is_null() {
-        return Ok(true);
+    match field.kind() {
+        // Null field
+        gjson::Kind::Null => Ok(true),
+        // Maybe it's an array with 0 elements
+        gjson::Kind::Array => Ok(field.array().len() == 0),
+        // Maybe an empty string?
+        gjson::Kind::String => Ok(field.to_string().len() == 0),
+        _ => Ok(false),
     }
-
-    // Maybe it's an array with 0 elements
-    if field.is_array() {
-        if let Some(arr) = field.as_vec() {
-            if arr.len() != 0 {
-                return Ok(false);
-            }
-        }
-    }
-
-    // Maybe it's a string
-    if field.is_string() {
-        if let Some(s) = field.as_str() {
-            if s.len() != 0 {
-                return Ok(false);
-            }
-        }
-    }
-
-    Ok(true)
 }
 
 pub fn has_field(request: &MatchRequest) -> Result<bool, CustomError> {
     let data_as_str = str::from_utf8(&request.data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
-    Ok(ajson::get(data_as_str, &request.path)?.is_some())
-}
-
-pub struct NumericMatchRequest(MatchRequest);
-
-impl TryFrom<MatchRequest> for NumericMatchRequest {
-    type Error = CustomError;
-
-    fn try_from(request: MatchRequest) -> Result<Self, Self::Error> {
-        todo!()
-    }
+    Ok(gjson::get(data_as_str, &request.path).exists())
 }
 
 pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
@@ -196,13 +174,13 @@ pub fn is_type(request: &MatchRequest) -> Result<bool, CustomError> {
     let field: Value = detective::parse_field(&request.data, &request.path)?;
 
     match request.args[0].as_str() {
-        "string" => Ok(field.is_string()),
-        "number" => Ok(field.is_number()),
-        "boolean" => Ok(field.is_bool()),
-        "bool" => Ok(field.is_bool()),
-        "array" => Ok(field.is_array()),
-        "object" => Ok(field.is_object()),
-        "null" => Ok(field.is_null()),
+        "string" => Ok(field.kind() == gjson::Kind::String),
+        "number" => Ok(field.kind() == gjson::Kind::Number),
+        "boolean" => Ok(field.kind() == gjson::Kind::True || field.kind() == gjson::Kind::False),
+        "bool" => Ok(field.kind() == gjson::Kind::True || field.kind() == gjson::Kind::False),
+        "array" => Ok(field.kind() == gjson::Kind::Array),
+        "object" => Ok(field.kind() == gjson::Kind::Object),
+        "null" => Ok(field.kind() == gjson::Kind::Null),
         _ => Err(CustomError::MatchError(format!(
             "unknown type: {}",
             request.args[0]

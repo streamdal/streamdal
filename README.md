@@ -10,12 +10,14 @@ For available matchers, look at the enums listed in
 
 # Install
 ```
+cargo add snitch-protos
 cargo add snitch-detective
 ```
 
 # Usage
 ```rust
 use snitch_detective::Detective;
+use protos::rules::{MatchRequest, MatchType}; // snitch-protos
 
 fn main() {
     let detective = Detective::new();

@@ -2,7 +2,7 @@ use crate::error::CustomError;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use crate::{matcher_core as core, FromValue};
-use ajson::Value;
+use gjson::Value;
 use protos::matcher::{MatchRequest, MatchType};
 use std::str;
 
@@ -20,11 +20,9 @@ impl Detective {
         Detective {}
     }
 
-    // Value can be int, float, string, bool
     pub fn matches(&self, request: &MatchRequest) -> Result<bool, CustomError> {
         validate_match_request(request)?;
 
-        // Follow-up suggestion
         match request
             .type_
             .enum_value()
@@ -56,7 +54,7 @@ impl Detective {
             MatchType::MATCH_TYPE_MAC_ADDRESS => core::mac_address(request),
 
             // PII matchers
-            MatchType::MATCH_TYPE_PII_ANY => pii::all(request),
+            MatchType::MATCH_TYPE_PII_ANY => pii::any(request),
             MatchType::MATCH_TYPE_PII_CREDIT_CARD => pii::credit_card(request),
             MatchType::MATCH_TYPE_PII_SSN => pii::ssn(request),
             MatchType::MATCH_TYPE_PII_EMAIL => pii::email(request),
@@ -84,15 +82,17 @@ impl Detective {
 pub fn parse_field<'a, T: FromValue<'a>>(data: &'a [u8], path: &'a String) -> Result<T, CustomError> {
     let data_as_str = str::from_utf8(data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
-    
-    match ajson::get(data_as_str, path) {
-        Ok(Some(value)) => T::from_value(value),
-        Ok(None) => Err(CustomError::Error(format!(
+
+    let v = gjson::get(data_as_str, path);
+
+    if !v.exists() {
+        return Err(CustomError::Error(format!(
             "path '{}' not found in data",
             path
-        ))),
-        Err(e) => Err(CustomError::Error(format!("error parsing field: {:?}", e))),
+        )));
     }
+
+    T::from_value(v)
 }
 
 fn validate_match_request(request: &MatchRequest) -> Result<(), CustomError> {

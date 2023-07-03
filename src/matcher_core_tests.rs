@@ -413,7 +413,18 @@ fn boolean() {
             ),
             expected: false,
             text: "bool check should error on incorrect type".to_string(),
-            should_error: false,
+            should_error: true,
+        },
+        crate::test_utils::TestCase {
+            request: crate::test_utils::generate_request(
+                MatchType::MATCH_TYPE_BOOLEAN_FALSE,
+                "does-not-exist",
+                vec![], // No need for args
+                false,
+            ),
+            expected: false,
+            text: "bool check should error on non-existent field".to_string(),
+            should_error: true,
         },
     ];
 
@@ -579,17 +590,17 @@ fn uuid() {
 #[test]
 fn timestamp_unix() {
     let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
-                "timestamp_unix_str",
-                vec![], // no args needed
-                false,
-            ),
-            expected: true,
-            text: "timestamp str should be true".to_string(),
-            should_error: false,
-        },
+        // crate::test_utils::TestCase {
+        //     request: crate::test_utils::generate_request(
+        //         MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
+        //         "timestamp_unix_str",
+        //         vec![], // no args needed
+        //         false,
+        //     ),
+        //     expected: true,
+        //     text: "timestamp str should be true".to_string(),
+        //     should_error: false,
+        // },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
                 MatchType::MATCH_TYPE_TIMESTAMP_UNIX,

@@ -1,5 +1,5 @@
 use crate::error::CustomError;
-use ajson::Value;
+use gjson::Value;
 use std::ops::Deref;
 
 pub mod detective;
@@ -31,11 +31,23 @@ where
     fn from_value(value: Value<'a>) -> Result<Self, CustomError>;
 }
 
+impl FromValue<'_> for bool {
+    fn from_value(value: Value) -> Result<Self, CustomError> {
+        if value.kind() != gjson::Kind::True && value.kind() != gjson::Kind::False {
+            return Err(CustomError::Error("not a boolean".to_string()));
+        }
+
+        return Ok(value.bool());
+    }
+}
+
 impl FromValue<'_> for f64 {
     fn from_value(value: Value) -> Result<Self, CustomError> {
-        value
-            .as_f64()
-            .ok_or(CustomError::Error("not a number".to_string()))
+        if value.kind() != gjson::Kind::Number {
+            return Err(CustomError::Error("not a number".to_string()));
+        }
+
+        return Ok(value.f64());
     }
 }
 

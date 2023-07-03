@@ -17,10 +17,10 @@ fn main() {
 
     let match_request = MatchRequest {
         data: sample_json.as_bytes().to_vec(),
-        path: "field1.field2".to_string(),
+        path: "*".to_string(),
         args: vec!["1".to_string()],
         negate: false,
-        type_: EnumOrUnknown::from(MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN),
+        type_: EnumOrUnknown::from(MatchType::MATCH_TYPE_PII_ANY),
         special_fields: Default::default(),
     };
 
