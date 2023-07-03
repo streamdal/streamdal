@@ -6,7 +6,7 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				streamdalYellow: "#F2E205",
+				streamdalYellow: "#FFD260",
 				streamdalOrange: "#F8A577",
 				streamdalPurple: "#956CFF",
 				streamdalGreen: "#03CBA7",
@@ -20,6 +20,7 @@ module.exports = {
 				stormCloud: "#7C7C86",
 				haze: "#D1D3D9",
 				cloud: "#FFFFFF",
+				stream: "#C1AAFD",
 			},
 			fontFamily: {
 				sans: ["Inter"],
