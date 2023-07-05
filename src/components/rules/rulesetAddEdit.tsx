@@ -206,7 +206,6 @@ const rulesetSchema = z
     const names = rules.map((rule) => rule.name);
     const isDupe = names.find((item, idx) => names.indexOf(item) !== idx);
     if (isDupe) {
-      console.log("dupe", isDupe);
       rules.forEach((r, i) => {
         if (r.name === isDupe) {
           ctx.addIssue({
@@ -284,8 +283,6 @@ export const RuleSetAddEdit = () => {
       };
       return ruleObj;
     }, {});
-
-    console.log("rules", rules);
 
     const mapped = {
       ...set,
