@@ -24,6 +24,7 @@ export const RULESET_ERROR = "Ruleset not found!";
 
 export const NEW_RULE = {
   type: "RULE_TYPE_MATCH" as const,
+  name: "",
   match_config: {
     path: "",
     type: "string_contains_any",
@@ -124,6 +125,7 @@ const ruleSchema = z.object({
   id: z.string().optional(),
   type: z.literal("RULE_TYPE_MATCH"),
   match_config: ruleMatchSchema,
+  name: z.string().min(1, { message: "Required" }),
   failure_mode_configs: failureModeSchema
     .array()
     .min(1, { message: "At least one rule is required" }),
@@ -158,7 +160,7 @@ const rulesetSchema = z
   //
   // This kind of sucks but discriminated unions are deprecated so I don't
   // want to waste too much time figuring it out. There is a new switch api coming soon.
-  .superRefine(({ data_source, mode, ...others }, ctx) => {
+  .superRefine(({ data_source, mode, rules, ...others }, ctx) => {
     if (
       data_source === "rabbitmq" &&
       mode === "RULE_MODE_CONSUME" &&
@@ -194,6 +196,26 @@ const rulesetSchema = z
           path: ["binding_key"],
           fatal: true,
         });
+    }
+
+    const names = rules.map((rule) => rule.name);
+    const isDupe = names.find((item, idx) => names.indexOf(item) !== idx);
+    if (isDupe) {
+      rules.forEach((r, i) => {
+        if (r.name === isDupe) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Rules cannot have the same name",
+            path: [`rules[${i}][name]`],
+            fatal: true,
+          });
+        }
+      });
+      return false;
+    }
+
+    if (!isDupe) {
+      return true;
     }
   });
 

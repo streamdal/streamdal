@@ -91,6 +91,12 @@ export const RuleAddEdit = ({
           register={register}
         />
         <FormInput
+          name={`rules[${index}][name]`}
+          label={"Rule Name"}
+          register={register}
+          error={errors?.rules?.[index]?.name?.message || ""}
+        />
+        <FormInput
           name={`rules[${index}][match_config.path]`}
           label="Field Path"
           register={register}
