@@ -131,11 +131,6 @@ const ruleSchema = z.object({
     .min(1, { message: "At least one rule is required" }),
 });
 
-const validateUniqueName = (value: string, schema: any) => {
-  console.log("shit", schema);
-  // return schema.rules.map((rule: any) => rule.name === value);
-};
-
 export type RulesType = z.infer<typeof ruleSchema>;
 
 const baseSchema = z.object({
