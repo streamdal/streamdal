@@ -131,6 +131,11 @@ const ruleSchema = z.object({
     .min(1, { message: "At least one rule is required" }),
 });
 
+const validateUniqueName = (value: string, schema: any) => {
+  console.log("shit", schema);
+  // return schema.rules.map((rule: any) => rule.name === value);
+};
+
 export type RulesType = z.infer<typeof ruleSchema>;
 
 const baseSchema = z.object({
@@ -160,7 +165,7 @@ const rulesetSchema = z
   //
   // This kind of sucks but discriminated unions are deprecated so I don't
   // want to waste too much time figuring it out. There is a new switch api coming soon.
-  .superRefine(({ data_source, mode, ...others }, ctx) => {
+  .superRefine(({ data_source, mode, rules, ...others }, ctx) => {
     if (
       data_source === "rabbitmq" &&
       mode === "RULE_MODE_CONSUME" &&
@@ -196,6 +201,27 @@ const rulesetSchema = z
           path: ["binding_key"],
           fatal: true,
         });
+    }
+
+    const names = rules.map((rule) => rule.name);
+    const isDupe = names.find((item, idx) => names.indexOf(item) !== idx);
+    if (isDupe) {
+      console.log("dupe", isDupe);
+      rules.forEach((r, i) => {
+        if (r.name === isDupe) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Rules cannot have the same name",
+            path: [`rules[${i}][name]`],
+            fatal: true,
+          });
+        }
+      });
+      return false;
+    }
+
+    if (!isDupe) {
+      return true;
     }
   });
 
@@ -258,6 +284,8 @@ export const RuleSetAddEdit = () => {
       };
       return ruleObj;
     }, {});
+
+    console.log("rules", rules);
 
     const mapped = {
       ...set,
