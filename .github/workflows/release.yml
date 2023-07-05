@@ -35,6 +35,10 @@ jobs:
         with:
           command: publish
           args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
       - name: Release on npm
         working-directory: ./build/ts
         run: |
@@ -42,7 +46,3 @@ jobs:
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
