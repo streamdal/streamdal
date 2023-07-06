@@ -18,7 +18,8 @@
     "plugin:@typescript-eslint/strict",
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "prettier"
+    "prettier",
+    "plugin:prettier/recommended"
   ],
   "settings": {
     "import/resolver": {
@@ -33,5 +34,6 @@
     "import/no-extraneous-dependencies": "error",
     "import/no-mutable-exports": "error",
     "import/no-unused-modules": "error"
-  }
+  },
+  "ignorePatterns": ["/proto"]
 }
