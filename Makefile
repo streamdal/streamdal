@@ -18,25 +18,33 @@ build: build/matcher build/transformer
 .PHONY: build/matcher
 build/matcher: description = Build WASM target for matcher
 build/matcher: clean/matcher
-	cd matcher && cargo build --target=wasm32-wasi --release
+	cd matcher && \
+	cargo build --target=wasm32-wasi --release && \
+	cp target/wasm32-wasi/release/matcher.wasm ../build/
 
 .PHONY: clean/matcher
 clean/matcher: description = Remove matcher WASM artifacts
 clean/matcher:
-	rm -rf matcher/target
+	rm -rf matcher/target build/matcher.wasm
 
 .PHONY: build/transformer
 build/transformer: description = Build WASM target for transformer
 build/transformer: clean/transformer
-	cd transformer && cargo build --target=wasm32-wasi --release
+	cd transformer && \
+	cargo build --target=wasm32-wasi --release && \
+	cp target/wasm32-wasi/release/transformer.wasm ../build/
 
 .PHONY: clean/transformer
 clean/transformer: description = Remove transformer WASM artifacts
 clean/transformer:
-	rm -rf transformer/target
+	rm -rf transformer/target build/transformer.wasm
 
+.PHONY: clean
+clean: description = Remove all build artifacts
+clean: clean/matcher clean/transformer
 
 .PHONY: test
 test: description = Run tests
 test:
 	cd common && cargo test
+
