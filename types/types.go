@@ -18,7 +18,7 @@ type CounterEntry struct {
 	Name      CounterName // counter name
 	RuleID    string      // uuid of the rule
 	RuleSetID string      // uuid of the rule set
-	Type      CounterType // "errors", "count", "bytes"
+	Type      CounterType // "count", "bytes"
 	Labels    map[string]string
 	Value     int64
 }

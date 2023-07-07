@@ -79,22 +79,21 @@ type ISnitch interface {
 
 type Snitch struct {
 	*Config
-	functions    map[Module]*function
-	rules        map[Mode]map[string][]*protos.Rule
-	functionsMtx *sync.RWMutex
-	rulesMtx     *sync.RWMutex
-	Plumber      plumber.IPlumberClient
-	metrics      metrics.IMetrics
+	functions map[Module]*function
+	rules     map[Mode]map[string][]*protos.Rule
+	rulesMtx  *sync.RWMutex
+	Plumber   plumber.IPlumberClient
+	metrics   metrics.IMetrics
 }
 
 type Config struct {
-	PlumberURL   string
-	PlumberToken string
-	WasmTimeout  time.Duration
-	DryRun       bool
-	DataSource   string
-	ShutdownCtx  context.Context
-	Logger       logger.Logger
+	PlumberURL   string          // envar: PLUMBER_URL
+	PlumberToken string          // envar: PLUMBER_TOKEN
+	WasmTimeout  time.Duration   // envar: SNITCH_WASM_TIMEOUT
+	DryRun       bool            // envar: SNITCH_DRY_RUN
+	DataSource   string          // ** Required **
+	ShutdownCtx  context.Context // Golang specific
+	Logger       logger.Logger   // Optional
 }
 
 func New(cfg *Config) (*Snitch, error) {
@@ -124,13 +123,12 @@ func New(cfg *Config) (*Snitch, error) {
 	}
 
 	dq := &Snitch{
-		functions:    make(map[Module]*function),
-		functionsMtx: &sync.RWMutex{},
-		Plumber:      plumber,
-		rules:        make(map[Mode]map[string][]*protos.Rule),
-		rulesMtx:     &sync.RWMutex{},
-		Config:       cfg,
-		metrics:      m,
+		functions: make(map[Module]*function),
+		Plumber:   plumber,
+		rules:     make(map[Mode]map[string][]*protos.Rule),
+		rulesMtx:  &sync.RWMutex{},
+		Config:    cfg,
+		metrics:   m,
 	}
 
 	if cfg.DryRun {
