@@ -1,0 +1,24 @@
+export const getJson = async (apiPath: string) => {
+  console.log("api url", Deno.env.get("PUBLIC_API_URL"));
+  const response = await fetch(
+    `${Deno.env.get("PUBLIC_API_URL") || ""}${apiPath}`,
+  );
+
+  if (response.ok || response.redirected) {
+    return response.json();
+  }
+
+  throw Error("response not ok");
+};
+
+export const getText = async (apiPath: string) => {
+  const response = await fetch(
+    `${Deno.env.get("PUBLIC_API_URL") || ""}${apiPath}`,
+  );
+
+  if (response.ok || response.redirected) {
+    return response.text();
+  }
+
+  throw Error("response not ok");
+};

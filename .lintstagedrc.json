@@ -1,3 +1,0 @@
-{
-  "!(dist/**/*)*.{ts,tsx,js,jsx,astro}": ["eslint --fix"]
-}

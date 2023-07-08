@@ -1,16 +1,16 @@
-# Streamdal Embedded Console
+# Snitch Console
 
-*Optionally, for locally development, point to an external API*:
-* copy `example.env` to `.env`
-* set 
+The Snitch Console is a Deno + Fresh project, see:
+https://fresh.deno.dev/docs/getting-started
+
+### Usage
+
+Make sure to install Deno: https://deno.land/manual/getting_started/installation
+
+Then start the project:
 
 ```
-npm install
-npm start
+deno task start
 ```
 
-Note, this is an [Astro](https://docs.astro.build/en/getting-started/) app. Astro is an MPA framework that support lots 
-of build-time content generation and server side rendering. However we are using
-it simply to bundle an SPA that gets served by Plumber. So, ignore anything in the docs about build time 
-content generation (e.g. fetching) and server side rendering.
-
+This will watch the project directory and restart as necessary.

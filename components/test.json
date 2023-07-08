@@ -1,0 +1,203 @@
+{
+  "props": {
+    "params": {},
+    "url": "http://localhost:3001/",
+    "route": "/",
+    "data": {
+      "ruleSets": {
+        "034138cd-06f6-4023-a7d1-44f57eb1ff7e": {
+          "id": "034138cd-06f6-4023-a7d1-44f57eb1ff7e",
+          "name": "Test",
+          "mode": "RULE_MODE_CONSUME",
+          "rules": {
+            "635965cf-5d85-46ec-a306-1e00fee12006": {
+              "id": "635965cf-5d85-46ec-a306-1e00fee12006",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                {
+                  "mode": "RULE_FAILURE_MODE_TRANSFORM",
+                  "transform": {
+                    "path": "Test",
+                    "value": "\"string value\"",
+                    "type": "TRANSFORM_TYPE_REPLACE"
+                  }
+                }
+              ],
+              "match_config": {
+                "path": "Test rule #3",
+                "type": "string_contains_any",
+                "args": ["another"]
+              }
+            },
+            "87b13c44-4a35-4fa4-b295-1f50bab3f430": {
+              "id": "87b13c44-4a35-4fa4-b295-1f50bab3f430",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                { "mode": "RULE_FAILURE_MODE_REJECT", "reject": {} }
+              ],
+              "match_config": {
+                "path": "payload.example",
+                "type": "ts_rfc3339",
+                "args": ["12345"],
+                "operator": "MATCH_OPERATOR_OLDER_THAN_SECONDS"
+              }
+            }
+          },
+          "data_source": "rabbitmq",
+          "version": 16,
+          "key": "test-queue-name"
+        },
+        "41732e45-ee5b-4c19-86ea-1a14c386042d": {
+          "id": "41732e45-ee5b-4c19-86ea-1a14c386042d",
+          "name": "Reject Messages",
+          "mode": "RULE_MODE_PUBLISH",
+          "rules": {
+            "c195ed5a-77e1-43e7-a054-809b2181a0be": {
+              "id": "c195ed5a-77e1-43e7-a054-809b2181a0be",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                { "mode": "RULE_FAILURE_MODE_REJECT", "reject": {} }
+              ],
+              "match_config": {
+                "path": "payload.name",
+                "type": "string_contains_any",
+                "args": ["hello"]
+              }
+            }
+          },
+          "data_source": "kafka",
+          "version": 4,
+          "key": "mytopic"
+        },
+        "4daa9155-7923-4adb-b273-dbeb44834d95": {
+          "id": "4daa9155-7923-4adb-b273-dbeb44834d95",
+          "name": "Test",
+          "mode": "RULE_MODE_CONSUME",
+          "rules": {
+            "d7230c78-ea1a-48f7-8cd5-bd4526510801": {
+              "id": "d7230c78-ea1a-48f7-8cd5-bd4526510801",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                { "mode": "RULE_FAILURE_MODE_REJECT", "reject": {} }
+              ],
+              "match_config": {
+                "path": "payload.example",
+                "type": "ts_rfc3339",
+                "args": ["1234"],
+                "operator": "MATCH_OPERATOR_OLDER_THAN_SECONDS"
+              }
+            }
+          },
+          "data_source": "rabbitmq",
+          "version": 4,
+          "key": "test-queue-name"
+        },
+        "4f41df55-bf7d-48df-b70b-7008764c8780": {
+          "id": "4f41df55-bf7d-48df-b70b-7008764c8780",
+          "name": "Messages to DLQ",
+          "mode": "RULE_MODE_CONSUME",
+          "rules": {
+            "5a0413a6-92bb-45e3-b6b9-2b560102f19f": {
+              "id": "5a0413a6-92bb-45e3-b6b9-2b560102f19f",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                {
+                  "mode": "RULE_FAILURE_MODE_DLQ",
+                  "dlq": {
+                    "streamdal_token": "cdff52c9-ec49-4a17-979d-96f5c1653940"
+                  }
+                }
+              ],
+              "name": "PII Credit Card",
+              "match_config": {
+                "path": "payload.address",
+                "type": "pii_creditcard"
+              }
+            }
+          },
+          "data_source": "rabbitmq",
+          "version": 1,
+          "key": "mytopic"
+        },
+        "69164e33-5956-4e0b-9e8a-7b4e6c164869": {
+          "id": "69164e33-5956-4e0b-9e8a-7b4e6c164869",
+          "name": "Transform message",
+          "mode": "RULE_MODE_PUBLISH",
+          "rules": {
+            "b5f0a864-22ac-4215-8904-8cdc2b04e4c3": {
+              "id": "b5f0a864-22ac-4215-8904-8cdc2b04e4c3",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                {
+                  "mode": "RULE_FAILURE_MODE_TRANSFORM",
+                  "transform": { "path": "payload.ccnum", "value": "****" }
+                }
+              ],
+              "name": "PII Credit Card 2",
+              "match_config": {
+                "path": "payload.ccnum",
+                "type": "pii_creditcard"
+              }
+            }
+          },
+          "data_source": "rabbitmq",
+          "version": 2
+        },
+        "b9a02463-d905-4025-9cc6-46c61e7ae95f": {
+          "id": "b9a02463-d905-4025-9cc6-46c61e7ae95f",
+          "name": "Slack Alert for Messages",
+          "mode": "RULE_MODE_CONSUME",
+          "rules": {
+            "e5f63fc3-3199-499c-939b-f0469334248d": {
+              "id": "e5f63fc3-3199-499c-939b-f0469334248d",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                {
+                  "mode": "RULE_FAILURE_MODE_ALERT_SLACK",
+                  "alert_slack": { "slack_channel": "engineering" }
+                }
+              ],
+              "name": "Address contains credit card",
+              "match_config": {
+                "path": "payload.address",
+                "type": "pii_creditcard"
+              }
+            }
+          },
+          "data_source": "kafka",
+          "version": 1,
+          "key": "mytopic"
+        },
+        "e1fbf6ad-a771-43ea-9245-d97026309ebb": {
+          "id": "e1fbf6ad-a771-43ea-9245-d97026309ebb",
+          "name": "Kafka Test",
+          "mode": "RULE_MODE_PUBLISH",
+          "rules": {
+            "33f644a1-9efc-4339-b13b-a662da7aea95": {
+              "id": "33f644a1-9efc-4339-b13b-a662da7aea95",
+              "type": "RULE_TYPE_MATCH",
+              "failure_mode_configs": [
+                {
+                  "mode": "RULE_FAILURE_MODE_TRANSFORM",
+                  "transform": {
+                    "path": "test.path",
+                    "value": "test value",
+                    "type": "TRANSFORM_TYPE_REPLACE"
+                  }
+                }
+              ],
+              "match_config": {
+                "path": "payload.example",
+                "type": "ip_address"
+              }
+            }
+          },
+          "data_source": "kafka",
+          "version": 2,
+          "key": "test-topic"
+        }
+      },
+      "metrics": []
+    }
+  }
+}
