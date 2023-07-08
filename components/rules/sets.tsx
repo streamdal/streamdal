@@ -40,7 +40,6 @@ export interface RuleSetType {
 }
 
 export const RuleSets = ({ data }: { data: RuleSetType }) => {
-  console.log("shit props", data);
   return (
     <div className="max-w-[1440px]">
       <div className="flex flex-row justify-between align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">

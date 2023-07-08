@@ -1,5 +1,4 @@
 export const getJson = async (apiPath: string) => {
-  console.log("api url", Deno.env.get("PUBLIC_API_URL"));
   const response = await fetch(
     `${Deno.env.get("PUBLIC_API_URL") || ""}${apiPath}`,
   );
