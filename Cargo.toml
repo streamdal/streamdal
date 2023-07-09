@@ -1,0 +1,10 @@
+[package]
+name = "snitch-transform"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gjson = { git = "https://github.com/dselans/gjson.rs.git", tag = "0.8.1-with-set" }
+snitch-protos = "0.0.9"
