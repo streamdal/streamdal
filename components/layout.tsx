@@ -24,6 +24,7 @@ export const Layout = ({ children, ...meta }: LayoutProps) => (
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       />
+      <link rel="stylesheet" href="style.css" />
     </Head>
     <body className="h-screen">
       <div className="flex flex-col w-full text-web">
