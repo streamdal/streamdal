@@ -1,34 +1,28 @@
-snitch-transformer
+snitch-transform
 ==================
 
-Library used by `snitch-wasm` to transform JSON data.
+Library used by [snitch-wasm](https://github.com/streamdal/snitch-wasm) to 
+perform transformations on JSON payloads.
 
-Currently only has support for "overwrite", "mask" and "obfuscate".
+Currently only has support for `overwrite`, `mask` and `obfuscate`.
 
 ## Usage
 
 ```rust
-use snitch_transformer;
+use snitch_protos as protos;
+use snitch_transform::transform;
 
-fn main() {
-    let json = r#"{"object": {"hello": "world"}}"#;
-
-    let updated_json = transformer::overwrite(json, "object.hello", r#"test"#).unwrap();
-
-    println!("updated json: {}", updated_json);
-    // {"object": {"hello": "test"}}
+func main() {
+   let sample_json = r#"{"hello": "world"}"#;
    
-    // Keep in mind that replace value will be used as-is
-    let updated_json = transformer::overwrite(json, "object.hello", "test").unwrap();
-    // Will result in: {"object": {"hello": test}}
+   let mut req = protos::transform::TransformRequest::new();
+   req.data = sample_json.into();
+   req.path = "hello".to_string();
+   req.value = r#""baz""#.to_string();
    
-    // OR
-    let updated_json = transformer::mask(json, "object.hello", '*');
-    // updated_json == {"object": {"hello": "*****"}}
-
-    // OR
-    let updated_json = transformer::obfuscate(json, "object.hello");
-    // updated_json == {"object": {"hello": "woAF1"}}
+   let updated_json = snitch_transform::transform::overwrite(&req).unwrap();
+   
+   println!("Input JSON: {} || Result JSON: {}", sample_json, updated_json)
 }
 ```
 
