@@ -1,3 +1,7 @@
+<a href="https://crates.io/crates/snitch-transform/"><img src="https://img.shields.io/crates/v/snitch-transform.svg"></a>
+<a href="https://docs.rs/snitch-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
+
+
 snitch-transform
 ==================
 
