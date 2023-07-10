@@ -1,6 +1,5 @@
 use gjson;
 use protos::transform::TransformRequest;
-use std::backtrace::BacktraceStatus;
 
 #[derive(Debug)]
 pub enum TransformError {
@@ -23,7 +22,26 @@ pub fn overwrite(req: &TransformRequest) -> Result<String, TransformError> {
 pub fn obfuscate(req: &TransformRequest) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    todo!()
+    let data_as_str = convert_bytes_to_string(&req.data)?;
+    let value = gjson::get(data_as_str, req.path.as_str());
+
+    match value.kind() {
+        gjson::Kind::String => _obfuscate(data_as_str, req.path.as_str()),
+        _ => Err(TransformError::Generic(format!(
+            "unable to mask data: path '{}' is not a string or number",
+            req.path
+        ))),
+    }
+}
+
+fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
+    let contents = gjson::get(data, path);
+    let hashed = sha256::digest(contents.str().as_bytes());
+
+    let obfuscated = format!("\"sha256:{}\"", hashed);
+
+    Ok(gjson::set_overwrite(data, path, &obfuscated)
+        .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))?)
 }
 
 pub fn mask(req: &TransformRequest) -> Result<String, TransformError> {
@@ -95,4 +113,103 @@ fn validate_request(req: &TransformRequest, value_check: bool) -> Result<(), Tra
 fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
     Ok(std::str::from_utf8(bytes.as_slice())
         .map_err(|e| TransformError::Generic(format!("unable to parse data as UTF-8: {}", e))))?
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_DATA: &str = r#"{
+    "foo": "bar",
+    "baz": {
+        "qux": "quux"
+    },
+    "bool": true
+}"#;
+
+    #[test]
+    fn test_overwrite() {
+        let mut req = TransformRequest::new();
+        req.data = TEST_DATA.as_bytes().to_vec();
+        req.path = "baz.qux".to_string();
+        req.value = "\"test\"".to_string();
+
+        let result = overwrite(&req).unwrap();
+
+        assert_eq!(gjson::valid(&TEST_DATA), true);
+        assert_eq!(gjson::valid(&result), true);
+        assert_eq!(result, TEST_DATA.replace("quux", "test"));
+
+        let v = gjson::get(TEST_DATA, "baz.qux");
+        assert_eq!(v.str(), "quux");
+
+        let v = gjson::get(result.as_str(), "baz.qux");
+        assert_eq!(v.str(), "test");
+
+        req.path = "does-not-exist".to_string();
+        assert!(
+            overwrite(&req).is_err(),
+            "should error when path does not exist"
+        );
+
+        // Can overwrite anything
+        req.path = "bool".to_string();
+        assert!(
+            overwrite(&req).is_ok(),
+            "should be able to replace any value, regardless of type"
+        );
+    }
+
+    #[test]
+    fn test_obfuscate() {
+        let mut req = TransformRequest::new();
+        req.data = TEST_DATA.as_bytes().to_vec();
+        req.path = "baz.qux".to_string();
+
+        let result = obfuscate(&req).unwrap();
+        let hashed_value = sha256::digest("quux".as_bytes());
+
+        assert_eq!(gjson::valid(&TEST_DATA), true);
+        assert_eq!(gjson::valid(&result), true);
+
+        let v = gjson::get(TEST_DATA, "baz.qux");
+        assert_eq!(v.str(), "quux");
+
+        let v = gjson::get(result.as_str(), "baz.qux");
+        assert_eq!(v.str(), format!("sha256:{}", hashed_value));
+
+        // path does not exist
+        req.path = "does-not-exist".to_string();
+        assert!(mask(&req).is_err());
+
+        // path not a string
+        req.path = "bool".to_string();
+        assert!(mask(&req).is_err());
+    }
+
+    #[test]
+    fn test_mask() {
+        let mut req = TransformRequest::new();
+        req.data = TEST_DATA.as_bytes().to_vec();
+        req.path = "baz.qux".to_string();
+
+        let result = mask(&req).unwrap();
+
+        assert_eq!(gjson::valid(&TEST_DATA), true);
+        assert_eq!(gjson::valid(&result), true);
+
+        let v = gjson::get(TEST_DATA, "baz.qux");
+        assert_eq!(v.str(), "quux");
+
+        let v = gjson::get(result.as_str(), "baz.qux");
+        assert_eq!(v.str(), "q***");
+
+        // path does not exist
+        req.path = "does-not-exist".to_string();
+        assert!(mask(&req).is_err());
+
+        // path not a string
+        req.path = "bool".to_string();
+        assert!(mask(&req).is_err());
+    }
 }

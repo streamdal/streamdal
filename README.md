@@ -38,12 +38,11 @@ fn main() {
     1. Overwrite value will be used as-is - if target is intended to be a 
 string, then make sure to include quotes in the payload ( Ie. `"123"`)
 1. `mask()`
-    1. For `number` value types, `mask()` will default to use `0`; for strings,
-`mask` will default to `*`.
+   2. Works for numbers and strings
+   3. For numbers, it will replace 80% of the number characters with `0`
+   4. For strings, it will replace 80% of the characters with `*`
 1. `obfuscate()`
-    1. `obfuscate()` uses xxHash64 to hash values and replace 80% of the
-original value with the hash generated via xxHash.
-    1. For number value types, xxHash will replace 80% of the number characters
-with xxHash's integer representation of the original value.
+   2. Works ONLY on strings
+   3. Will replace 100% of the characters with a sha256 hash
 
 ## Use as-is - has not been tested in production :)

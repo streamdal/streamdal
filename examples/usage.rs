@@ -7,6 +7,9 @@ fn main() {
 
     println!("Mask number example");
     mask_number();
+
+    println!("Obfuscate string example");
+    obfuscate_string()
 }
 
 fn overwrite() {
@@ -48,6 +51,21 @@ fn mask_number() {
     req.data = sample_json.into();
 
     let updated_json = snitch_transform::transform::mask(&req).unwrap();
+
+    println!(
+        "Input JSON: {} || Result JSON: {}",
+        sample_json, updated_json,
+    )
+}
+
+fn obfuscate_string() {
+    let sample_json = r#"{"hello": "world"}"#;
+
+    let mut req = protos::transform::TransformRequest::new();
+    req.path = "hello".to_string();
+    req.data = sample_json.into();
+
+    let updated_json = snitch_transform::transform::obfuscate(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",

@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 gjson = { git = "https://github.com/dselans/gjson.rs.git", tag = "0.8.1-with-set" }
+sha256 = "1.1.4"
 snitch-protos = "0.0.9"
