@@ -10,7 +10,6 @@ export type LayoutProps = {
   children: ComponentChildren;
   meta?: MetaProps;
 };
-
 export const Layout = ({ children, ...meta }: LayoutProps) => (
   <html lang="en">
     <Head>
@@ -33,6 +32,10 @@ export const Layout = ({ children, ...meta }: LayoutProps) => (
         href="https://esm.sh/reactflow@11.7.4/dist/style.css"
       />
       <link rel="stylesheet" href="style.css" />
+      <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css"
+        rel="stylesheet"
+      />
     </Head>
     <body className="h-screen">
       <div className="flex flex-col w-full text-web">
@@ -49,6 +52,8 @@ export const Layout = ({ children, ...meta }: LayoutProps) => (
           {children}
         </div>
       </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js">
+      </script>
     </body>
   </html>
 );

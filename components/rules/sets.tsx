@@ -1,6 +1,7 @@
 import { MonitorIcon } from "../icons/streamdal.tsx";
 import { titleCase } from "../../lib/utils.ts";
 import { Total } from "./metrics/total.tsx";
+import { RuleMenu } from "./menu.tsx";
 
 export const TH = ({
   children,
@@ -125,8 +126,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
                   </div>
                 </TD>
                 <TD>
-                  {/*<RuleSetMenu id={r.id} />*/}
-                  {/*<NewRuleSetMenu id={r.id} />*/}
+                  <RuleMenu />
                 </TD>
               </tr>
             ))}
