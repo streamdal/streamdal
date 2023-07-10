@@ -183,8 +183,9 @@ func TestGetRuleUpdates(t *testing.T) {
 
 func TestRunMatch(t *testing.T) {
 	d := &Snitch{
-		Plumber:   getFakePlumber(),
-		functions: map[Module]*function{},
+		Plumber:      getFakePlumber(),
+		functions:    map[Module]*function{},
+		functionsMtx: &sync.RWMutex{},
 		Config: &Config{
 			DataSource: "kafka",
 		},
@@ -211,8 +212,9 @@ func TestRunMatch(t *testing.T) {
 
 func TestFailTransform(t *testing.T) {
 	d := &Snitch{
-		Plumber:   getFakePlumber(),
-		functions: map[Module]*function{},
+		Plumber:      getFakePlumber(),
+		functions:    map[Module]*function{},
+		functionsMtx: &sync.RWMutex{},
 		Config: &Config{
 			DataSource: "kafka",
 		},
@@ -241,7 +243,8 @@ func TestApplyRules_MaxData(t *testing.T) {
 	fakeLogger := &loggerfakes.FakeLogger{}
 
 	d := &Snitch{
-		functions: map[Module]*function{},
+		functions:    map[Module]*function{},
+		functionsMtx: &sync.RWMutex{},
 		rules: map[Mode]map[string][]*protos.Rule{
 			Publish: {
 				"somekey": []*protos.Rule{{
@@ -436,9 +439,9 @@ func transformBench(fileName string, b *testing.B) {
 
 func setup(m Module) (*Snitch, error) {
 	d := &Snitch{
-		functions: map[Module]*function{},
-		Plumber:   getFakePlumber(),
-		Config:    &Config{WasmTimeout: time.Second},
+		functions:    map[Module]*function{},
+		functionsMtx: &sync.RWMutex{},
+		Config:       &Config{WasmTimeout: time.Second},
 	}
 
 	wasmFile := path.Join("src", string(m)+".wasm")
@@ -464,11 +467,12 @@ func setup(m Module) (*Snitch, error) {
 
 func setupForFailure(configs []*common.FailureMode) *Snitch {
 	return &Snitch{
-		Plumber:   getFakePlumber(),
-		functions: map[Module]*function{},
-		rulesMtx:  &sync.RWMutex{},
-		Config:    &Config{DataSource: "kafka"},
-		metrics:   &metricsfakes.FakeIMetrics{},
+		Plumber:      getFakePlumber(),
+		functions:    map[Module]*function{},
+		functionsMtx: &sync.RWMutex{},
+		rulesMtx:     &sync.RWMutex{},
+		Config:       &Config{DataSource: "kafka"},
+		metrics:      &metricsfakes.FakeIMetrics{},
 		rules: map[Mode]map[string][]*protos.Rule{
 			Publish: {
 				"mytopic": {
