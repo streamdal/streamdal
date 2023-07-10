@@ -18,7 +18,6 @@ export default function Home(props: PageProps<RuleSetType>) {
   return (
     <Layout>
       <RuleSets data={props.data} />
-      <Flow />
     </Layout>
   );
 }

@@ -24,8 +24,14 @@ export const Layout = ({ children, ...meta }: LayoutProps) => (
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       />
-      <link rel="stylesheet" href="https://esm.sh/reactflow@11.7.4/dist/base.css" />
-      <link rel="stylesheet" href="https://esm.sh/reactflow@11.7.4/dist/style.css" />
+      <link
+        rel="stylesheet"
+        href="https://esm.sh/reactflow@11.7.4/dist/base.css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://esm.sh/reactflow@11.7.4/dist/style.css"
+      />
       <link rel="stylesheet" href="style.css" />
     </Head>
     <body className="h-screen">

@@ -136,7 +136,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
         <a href="/ruleset/edit">
           <input
             type="button"
-            className="flex justify-center btn-heimdal"
+            className={`flex justify-center btn-heimdal`}
             value="Add Rule Set"
           />
         </a>
