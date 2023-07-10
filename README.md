@@ -1,5 +1,7 @@
 # Snitch Go Client
 
+---
+
 [![Master build status](https://github.com/streamdal/snitch-go-client/workflows/main/badge.svg)](https://github.com/streamdal/snitch-go-client/actions/workflows/main-test.yml)
 
 ## Shim usage
