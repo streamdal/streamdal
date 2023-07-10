@@ -1,5 +1,5 @@
-use gjson;
 use protos::transform::TransformRequest;
+use snitch_gjson as gjson;
 
 #[derive(Debug)]
 pub enum TransformError {
@@ -40,8 +40,8 @@ fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
 
     let obfuscated = format!("\"sha256:{}\"", hashed);
 
-    Ok(gjson::set_overwrite(data, path, &obfuscated)
-        .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))?)
+    gjson::set_overwrite(data, path, &obfuscated)
+        .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))
 }
 
 pub fn mask(req: &TransformRequest) -> Result<String, TransformError> {
@@ -63,20 +63,17 @@ pub fn mask(req: &TransformRequest) -> Result<String, TransformError> {
 fn _mask(data: &str, path: &str, mask_char: char, quote: bool) -> Result<String, TransformError> {
     let contents = gjson::get(data, path);
     let num_chars_to_mask = (0.8 * contents.str().len() as f64).round() as usize;
-    let num_chars_to_skip = contents.str().len() - num_chars_to_mask as usize;
+    let num_chars_to_skip = contents.str().len() - num_chars_to_mask;
 
     let mut masked = contents.str()[0..num_chars_to_skip].to_string()
-        + mask_char
-            .to_string()
-            .repeat(num_chars_to_mask.clone())
-            .as_str();
+        + mask_char.to_string().repeat(num_chars_to_mask).as_str();
 
     if quote {
         masked = format!("\"{}\"", masked);
     }
 
-    Ok(gjson::set_overwrite(data, path, &masked)
-        .map_err(|e| TransformError::Generic(format!("unable to mask data: {}", e)))?)
+    gjson::set_overwrite(data, path, &masked)
+        .map_err(|e| TransformError::Generic(format!("unable to mask data: {}", e)))
 }
 
 fn validate_request(req: &TransformRequest, value_check: bool) -> Result<(), TransformError> {
@@ -136,8 +133,8 @@ mod tests {
 
         let result = overwrite(&req).unwrap();
 
-        assert_eq!(gjson::valid(&TEST_DATA), true);
-        assert_eq!(gjson::valid(&result), true);
+        assert!(gjson::valid(&TEST_DATA));
+        assert!(gjson::valid(&result));
         assert_eq!(result, TEST_DATA.replace("quux", "test"));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
@@ -169,8 +166,8 @@ mod tests {
         let result = obfuscate(&req).unwrap();
         let hashed_value = sha256::digest("quux".as_bytes());
 
-        assert_eq!(gjson::valid(&TEST_DATA), true);
-        assert_eq!(gjson::valid(&result), true);
+        assert!(gjson::valid(&TEST_DATA));
+        assert!(gjson::valid(&result));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
         assert_eq!(v.str(), "quux");
@@ -195,8 +192,8 @@ mod tests {
 
         let result = mask(&req).unwrap();
 
-        assert_eq!(gjson::valid(&TEST_DATA), true);
-        assert_eq!(gjson::valid(&result), true);
+        assert!(gjson::valid(TEST_DATA));
+        assert!(gjson::valid(&result));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
         assert_eq!(v.str(), "quux");

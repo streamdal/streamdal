@@ -2,10 +2,15 @@
 name = "snitch-transform"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "JSON data transformation lib used by snitch components"
+categories = ["data structures", "encoding"]
+keywords = ["protobuf", "json", "replace", "transform", "snitch"]
+repository = "https://github.com/streamdal/snitch-transform"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gjson = { git = "https://github.com/dselans/gjson.rs.git", tag = "0.8.1-with-set" }
+snitch-gjson = "0.8.1-with-set"
 sha256 = "1.1.4"
 snitch-protos = "0.0.9"
