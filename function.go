@@ -59,20 +59,10 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	return bytes, nil
 }
 
-func (d *Snitch) setFunctionCache(m Module, f *function) {
-	d.functionsMtx.Lock()
-	defer d.functionsMtx.Unlock()
-
-	d.functions[m] = f
-}
-
 func (d *Snitch) getFunction(m Module) (*function, error) {
-	// check cache
-	fc, ok := d.getFunctionFromCache(m)
-	if ok {
-		return fc, nil
-	}
-
+	// Intentionally creating a new instance every run to avoid
+	// memory corruption/bounds issues
+	// DO NOT CHANAGE ~MG+DS 2023-07-07
 	wasmData, err := d.Plumber.GetWasmFile(context.Background(), string(m)+".wasm")
 	if err != nil {
 		return nil, err
@@ -83,18 +73,7 @@ func (d *Snitch) getFunction(m Module) (*function, error) {
 		return nil, errors.Wrap(err, "failed to create function")
 	}
 
-	// Cache function
-	d.setFunctionCache(m, fi)
-
 	return fi, nil
-}
-
-func (d *Snitch) getFunctionFromCache(rt Module) (*function, bool) {
-	d.functionsMtx.RLock()
-	defer d.functionsMtx.RUnlock()
-
-	f, ok := d.functions[rt]
-	return f, ok
 }
 
 func createFunction(wasmBytes []byte) (*function, error) {
