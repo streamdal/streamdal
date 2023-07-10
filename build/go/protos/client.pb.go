@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.18.1
-// source: client.proto
+// source: pipeline.proto
 
 package protos
 
@@ -386,18 +386,18 @@ var file_client_proto_goTypes = []interface{}{
 	(*ClientResponseMetadata)(nil),  // 1: protos.ClientResponseMetadata
 	(*ClientRequest)(nil),           // 2: protos.ClientRequest
 	(*ClientResponse)(nil),          // 3: protos.ClientResponse
-	(*rules.MatchRequest)(nil),      // 4: rules.MatchRequest
-	(*rules.TransformRequest)(nil),  // 5: rules.TransformRequest
-	(*rules.MatchResponse)(nil),     // 6: rules.MatchResponse
-	(*rules.TransformResponse)(nil), // 7: rules.TransformResponse
+	(*rules.MatchRequest)(nil),      // 4: steps.MatchRequest
+	(*rules.TransformRequest)(nil),  // 5: steps.TransformRequest
+	(*rules.MatchResponse)(nil),     // 6: steps.MatchResponse
+	(*rules.TransformResponse)(nil), // 7: steps.TransformResponse
 }
 var file_client_proto_depIdxs = []int32{
 	0, // 0: protos.ClientRequest.metadata:type_name -> protos.ClientRequestMetadata
-	4, // 1: protos.ClientRequest.match:type_name -> rules.MatchRequest
-	5, // 2: protos.ClientRequest.transform:type_name -> rules.TransformRequest
+	4, // 1: protos.ClientRequest.match:type_name -> steps.MatchRequest
+	5, // 2: protos.ClientRequest.transform:type_name -> steps.TransformRequest
 	1, // 3: protos.ClientResponse.metadata:type_name -> protos.ClientResponseMetadata
-	6, // 4: protos.ClientResponse.match:type_name -> rules.MatchResponse
-	7, // 5: protos.ClientResponse.transform:type_name -> rules.TransformResponse
+	6, // 4: protos.ClientResponse.match:type_name -> steps.MatchResponse
+	7, // 5: protos.ClientResponse.transform:type_name -> steps.TransformResponse
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name

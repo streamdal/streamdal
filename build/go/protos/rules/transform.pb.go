@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.18.1
-// source: rules/transform.proto
+// source: steps/transform.proto
 
 package rules
 
@@ -80,7 +80,7 @@ type TransformRequest struct {
 	Data  []byte        `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	Path  string        `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
 	Value string        `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-	Type  TransformType `protobuf:"varint,4,opt,name=type,proto3,enum=rules.TransformType" json:"type,omitempty"`
+	Type  TransformType `protobuf:"varint,4,opt,name=type,proto3,enum=steps.TransformType" json:"type,omitempty"`
 }
 
 func (x *TransformRequest) Reset() {
@@ -246,12 +246,12 @@ func file_rules_transform_proto_rawDescGZIP() []byte {
 var file_rules_transform_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_rules_transform_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_rules_transform_proto_goTypes = []interface{}{
-	(TransformType)(0),        // 0: rules.TransformType
-	(*TransformRequest)(nil),  // 1: rules.TransformRequest
-	(*TransformResponse)(nil), // 2: rules.TransformResponse
+	(TransformType)(0),        // 0: steps.TransformType
+	(*TransformRequest)(nil),  // 1: steps.TransformRequest
+	(*TransformResponse)(nil), // 2: steps.TransformResponse
 }
 var file_rules_transform_proto_depIdxs = []int32{
-	0, // 0: rules.TransformRequest.type:type_name -> rules.TransformType
+	0, // 0: steps.TransformRequest.type:type_name -> steps.TransformType
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

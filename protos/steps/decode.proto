@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package protos.steps;
+
+import "common.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
+
+// WIP
+message DecodeStep {
+  string id = 1;
+  repeated Condition conditions = 2;
+}

@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `client.proto`
+//! Generated file from `pipeline.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
@@ -347,7 +347,7 @@ impl ClientRequest {
         ::std::default::Default::default()
     }
 
-    // .rules.MatchRequest match = 100;
+    // .steps.MatchRequest match = 100;
 
     pub fn match_(&self) -> &super::matcher::MatchRequest {
         match self.request_type {
@@ -396,7 +396,7 @@ impl ClientRequest {
         }
     }
 
-    // .rules.TransformRequest transform = 101;
+    // .steps.TransformRequest transform = 101;
 
     pub fn transform(&self) -> &super::transform::TransformRequest {
         match self.request_type {
@@ -646,7 +646,7 @@ impl ClientResponse {
         ::std::default::Default::default()
     }
 
-    // .rules.MatchResponse match = 100;
+    // .steps.MatchResponse match = 100;
 
     pub fn match_(&self) -> &super::matcher::MatchResponse {
         match self.response_type {
@@ -695,7 +695,7 @@ impl ClientResponse {
         }
     }
 
-    // .rules.TransformResponse transform = 101;
+    // .steps.TransformResponse transform = 101;
 
     pub fn transform(&self) -> &super::transform::TransformResponse {
         match self.response_type {
@@ -922,7 +922,7 @@ pub mod client_response {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0cclient.proto\x12\x06protos\x1a\x13rules/matcher.proto\x1a\x15rules\
+    \n\x0cclient.proto\x12\x06protos\x1a\x13rules/match.proto\x1a\x15rules\
     /transform.proto\"m\n\x15ClientRequestMetadata\x12\x0e\n\x02id\x18\x01\
     \x20\x01(\tR\x02id\x12\x16\n\x06source\x18\x02\x20\x01(\tR\x06source\x12\
     ,\n\x12timestamp_nano_utc\x18\x03\x20\x01(\x03R\x10timestampNanoUtc\"V\n\
@@ -930,12 +930,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     ,\n\x12timestamp_nano_utc\x18\x02\x20\x01(\x03R\x10timestampNanoUtc\"\
     \xc0\x01\n\rClientRequest\x129\n\x08metadata\x18\x01\x20\x01(\x0b2\x1d.p\
     rotos.ClientRequestMetadataR\x08metadata\x12+\n\x05match\x18d\x20\x01(\
-    \x0b2\x13.rules.MatchRequestH\0R\x05match\x127\n\ttransform\x18e\x20\x01\
-    (\x0b2\x17.rules.TransformRequestH\0R\ttransformB\x0e\n\x0crequest_type\
+    \x0b2\x13.steps.MatchRequestH\0R\x05match\x127\n\ttransform\x18e\x20\x01\
+    (\x0b2\x17.steps.TransformRequestH\0R\ttransformB\x0e\n\x0crequest_type\
     \"\xc5\x01\n\x0eClientResponse\x12:\n\x08metadata\x18\x01\x20\x01(\x0b2\
     \x1e.protos.ClientResponseMetadataR\x08metadata\x12,\n\x05match\x18d\x20\
-    \x01(\x0b2\x14.rules.MatchResponseH\0R\x05match\x128\n\ttransform\x18e\
-    \x20\x01(\x0b2\x18.rules.TransformResponseH\0R\ttransformB\x0f\n\rrespon\
+    \x01(\x0b2\x14.steps.MatchResponseH\0R\x05match\x128\n\ttransform\x18e\
+    \x20\x01(\x0b2\x18.steps.TransformResponseH\0R\ttransformB\x0f\n\rrespon\
     se_typeB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xbc\x06\n\
     \x06\x12\x04\0\0$\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
     \x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1d\n\t\n\x02\x03\x01\

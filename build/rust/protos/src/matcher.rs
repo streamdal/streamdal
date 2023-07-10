@@ -19,28 +19,28 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `rules/matcher.proto`
+//! Generated file from `steps/match.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.MatchRequest)
+// @@protoc_insertion_point(message:steps.MatchRequest)
 pub struct MatchRequest {
     // message fields
-    // @@protoc_insertion_point(field:rules.MatchRequest.data)
+    // @@protoc_insertion_point(field:steps.MatchRequest.data)
     pub data: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:rules.MatchRequest.path)
+    // @@protoc_insertion_point(field:steps.MatchRequest.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.MatchRequest.args)
+    // @@protoc_insertion_point(field:steps.MatchRequest.args)
     pub args: ::std::vec::Vec<::std::string::String>,
-    // @@protoc_insertion_point(field:rules.MatchRequest.negate)
+    // @@protoc_insertion_point(field:steps.MatchRequest.negate)
     pub negate: bool,
-    // @@protoc_insertion_point(field:rules.MatchRequest.type)
+    // @@protoc_insertion_point(field:steps.MatchRequest.type)
     pub type_: ::protobuf::EnumOrUnknown<MatchType>,
     // special fields
-    // @@protoc_insertion_point(special_field:rules.MatchRequest.special_fields)
+    // @@protoc_insertion_point(special_field:steps.MatchRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -220,15 +220,15 @@ impl ::protobuf::reflect::ProtobufValue for MatchRequest {
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.MatchResponse)
+// @@protoc_insertion_point(message:steps.MatchResponse)
 pub struct MatchResponse {
     // message fields
-    // @@protoc_insertion_point(field:rules.MatchResponse.is_match)
+    // @@protoc_insertion_point(field:steps.MatchResponse.is_match)
     pub is_match: bool,
-    // @@protoc_insertion_point(field:rules.MatchResponse.error)
+    // @@protoc_insertion_point(field:steps.MatchResponse.error)
     pub error: ::std::string::String,
     // special fields
-    // @@protoc_insertion_point(special_field:rules.MatchResponse.special_fields)
+    // @@protoc_insertion_point(special_field:steps.MatchResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -360,85 +360,85 @@ impl ::protobuf::reflect::ProtobufValue for MatchResponse {
 }
 
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:rules.MatchType)
+// @@protoc_insertion_point(enum:steps.MatchType)
 pub enum MatchType {
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_UNKNOWN)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_UNKNOWN)
     MATCH_TYPE_UNKNOWN = 0,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IS_EMPTY)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_IS_EMPTY)
     MATCH_TYPE_IS_EMPTY = 1000,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_HAS_FIELD)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_HAS_FIELD)
     MATCH_TYPE_HAS_FIELD = 1001,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IS_TYPE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_IS_TYPE)
     MATCH_TYPE_IS_TYPE = 1002,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_STRING_CONTAINS_ANY)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_STRING_CONTAINS_ANY)
     MATCH_TYPE_STRING_CONTAINS_ANY = 1003,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_STRING_CONTAINS_ALL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_STRING_CONTAINS_ALL)
     MATCH_TYPE_STRING_CONTAINS_ALL = 1004,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_STRING_EQUAL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_STRING_EQUAL)
     MATCH_TYPE_STRING_EQUAL = 1005,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IPV4_ADDRESS)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_IPV4_ADDRESS)
     MATCH_TYPE_IPV4_ADDRESS = 1006,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_IPV6_ADDRESS)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_IPV6_ADDRESS)
     MATCH_TYPE_IPV6_ADDRESS = 1007,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_MAC_ADDRESS)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_MAC_ADDRESS)
     MATCH_TYPE_MAC_ADDRESS = 1008,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_REGEX)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_REGEX)
     MATCH_TYPE_REGEX = 1009,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_RFC3339)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_TIMESTAMP_RFC3339)
     MATCH_TYPE_TIMESTAMP_RFC3339 = 1010,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_UNIX_NANO)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_TIMESTAMP_UNIX_NANO)
     MATCH_TYPE_TIMESTAMP_UNIX_NANO = 1011,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_TIMESTAMP_UNIX)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_TIMESTAMP_UNIX)
     MATCH_TYPE_TIMESTAMP_UNIX = 1012,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_BOOLEAN_TRUE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_BOOLEAN_TRUE)
     MATCH_TYPE_BOOLEAN_TRUE = 1013,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_BOOLEAN_FALSE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_BOOLEAN_FALSE)
     MATCH_TYPE_BOOLEAN_FALSE = 1014,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_UUID)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_UUID)
     MATCH_TYPE_UUID = 1015,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_ANY)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_ANY)
     MATCH_TYPE_PII_ANY = 2000,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_CREDIT_CARD)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_CREDIT_CARD)
     MATCH_TYPE_PII_CREDIT_CARD = 2001,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_SSN)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_SSN)
     MATCH_TYPE_PII_SSN = 2002,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_EMAIL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_EMAIL)
     MATCH_TYPE_PII_EMAIL = 2003,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_PHONE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_PHONE)
     MATCH_TYPE_PII_PHONE = 2004,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_DRIVER_LICENSE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_DRIVER_LICENSE)
     MATCH_TYPE_PII_DRIVER_LICENSE = 2005,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_PASSPORT_ID)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_PASSPORT_ID)
     MATCH_TYPE_PII_PASSPORT_ID = 2006,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_VIN_NUMBER)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_VIN_NUMBER)
     MATCH_TYPE_PII_VIN_NUMBER = 2007,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_SERIAL_NUMBER)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_SERIAL_NUMBER)
     MATCH_TYPE_PII_SERIAL_NUMBER = 2008,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_LOGIN)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_LOGIN)
     MATCH_TYPE_PII_LOGIN = 2009,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_TAXPAYER_ID)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_TAXPAYER_ID)
     MATCH_TYPE_PII_TAXPAYER_ID = 2010,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_ADDRESS)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_ADDRESS)
     MATCH_TYPE_PII_ADDRESS = 2011,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_SIGNATURE)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_SIGNATURE)
     MATCH_TYPE_PII_SIGNATURE = 2012,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_GEOLOCATION)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_GEOLOCATION)
     MATCH_TYPE_PII_GEOLOCATION = 2013,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_EDUCATION)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_EDUCATION)
     MATCH_TYPE_PII_EDUCATION = 2014,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_FINANCIAL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_FINANCIAL)
     MATCH_TYPE_PII_FINANCIAL = 2015,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_PII_HEALTH)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_PII_HEALTH)
     MATCH_TYPE_PII_HEALTH = 2016,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_EQUAL_TO)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_NUMERIC_EQUAL_TO)
     MATCH_TYPE_NUMERIC_EQUAL_TO = 3000,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_GREATER_THAN)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_NUMERIC_GREATER_THAN)
     MATCH_TYPE_NUMERIC_GREATER_THAN = 3001,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_GREATER_EQUAL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_NUMERIC_GREATER_EQUAL)
     MATCH_TYPE_NUMERIC_GREATER_EQUAL = 3002,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_LESS_THAN)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_NUMERIC_LESS_THAN)
     MATCH_TYPE_NUMERIC_LESS_THAN = 3003,
-    // @@protoc_insertion_point(enum_value:rules.MatchType.MATCH_TYPE_NUMERIC_LESS_EQUAL)
+    // @@protoc_insertion_point(enum_value:steps.MatchType.MATCH_TYPE_NUMERIC_LESS_EQUAL)
     MATCH_TYPE_NUMERIC_LESS_EQUAL = 3004,
 }
 
@@ -602,11 +602,11 @@ impl MatchType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x13rules/matcher.proto\x12\x05rules\"\x88\x01\n\x0cMatchRequest\x12\
+    \n\x13rules/match.proto\x12\x05rules\"\x88\x01\n\x0cMatchRequest\x12\
     \x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
     \x20\x01(\tR\x04path\x12\x12\n\x04args\x18\x03\x20\x03(\tR\x04args\x12\
     \x16\n\x06negate\x18\x04\x20\x01(\x08R\x06negate\x12$\n\x04type\x18\x05\
-    \x20\x01(\x0e2\x10.rules.MatchTypeR\x04type\"@\n\rMatchResponse\x12\x19\
+    \x20\x01(\x0e2\x10.steps.MatchTypeR\x04type\"@\n\rMatchResponse\x12\x19\
     \n\x08is_match\x18\x01\x20\x01(\x08R\x07isMatch\x12\x14\n\x05error\x18\
     \x02\x20\x01(\tR\x05error*\xbe\t\n\tMatchType\x12\x16\n\x12MATCH_TYPE_UN\
     KNOWN\x10\0\x12\x18\n\x13MATCH_TYPE_IS_EMPTY\x10\xe8\x07\x12\x19\n\x14MA\

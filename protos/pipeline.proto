@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package protos;
+
+import "steps/match.proto";
+import "steps/transform.proto";
+import "steps/encode.proto";
+import "steps/decode.proto";
+import "common.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+message PipelineStep {
+  string id = 1;
+  string name = 2;
+  string wasm_id = 3;
+  string wasm_bytes = 4;
+  string wasm_function = 5;
+
+  oneof step {
+    steps.MatchStep match = 1000;
+    steps.TransformStep transform = 1001;
+    steps.EncodeStep encode = 1002;
+    steps.DecodeStep decode = 1003;
+    steps.CustomStep custom = 1004;
+  }
+}
+
+///////////////////// Get pipeline /////////////////////
+message GetPipelineRequest {
+  string id = 1;
+}
+
+message GetPipelineResponse {
+  SetPipelineRequest pipeline = 1;
+  Status status = 2;
+  string message = 3;
+}
+
+///////////////////// Get all pipelines /////////////////////
+message GetAllPipelinesRequest {}
+
+message GetAllPipelinesResponse {
+  repeated SetPipelineRequest pipelines = 1;
+  Status status = 2;
+  string message = 3;
+}
+
+
+///////////////////// Add/set/update pipeline /////////////////////
+
+// Used for both Add and Update
+message SetPipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+
+  // Friendly name for the pipeline
+  string name = 2;
+
+  // One or more steps to execute
+  repeated PipelineStep steps = 3;
+
+  // Conditions that have to be met for pipeline to continue executing
+  repeated Condition global_conditions = 4;
+}
+
+message SetPipelineResponse {
+  // Unique ID for the pipeline
+  string id = 1;
+
+  // Response status code; use for identifying request success or failure
+  Status status = 2;
+
+  // Additional information regarding response status
+  string message = 3;
+}
+
+///////////////////// Delete pipeline /////////////////////
+message DeletePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message DeletePipelineResponse {
+  string id = 1;
+  Status status = 2;
+  string message = 3;
+}
+
+///////////////////// Pause pipeline /////////////////////
+message PausePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message PausePipelineResponse {
+  string id = 1;
+  Status status = 2;
+  string message = 3;
+}
+
+///////////////////// Unpause pipeline /////////////////////
+message UnpausePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message UnpausePipelineResponse {
+  string id = 1;
+  Status status = 2;
+  string message = 3;
+}

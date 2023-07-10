@@ -1,8 +1,10 @@
 syntax = "proto3";
 
-package rules;
+import "common.proto";
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos/rules";
+package protos.steps;
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
 enum MatchType {
   // 1000-1999 reserved for core match types
@@ -71,15 +73,11 @@ enum MatchType {
   MATCH_TYPE_NUMERIC_LESS_EQUAL = 3004;
 }
 
-message MatchRequest {
-  bytes data = 1;
+message MatchStep {
+  bytes input = 1;
   string path = 2;
   repeated string args = 3; // args determined by match_type
   bool negate = 4;
   MatchType type = 5;
-}
-
-message MatchResponse {
-  bool is_match = 1;
-  string error = 2;
+  repeated protos.Condition conditions = 6;
 }

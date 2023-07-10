@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.18.1
-// source: rules/matcher.proto
+// source: steps/match.proto
 
 package rules
 
@@ -203,7 +203,7 @@ type MatchRequest struct {
 	Path   string    `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
 	Args   []string  `protobuf:"bytes,3,rep,name=args,proto3" json:"args,omitempty"` // args determined by match_type
 	Negate bool      `protobuf:"varint,4,opt,name=negate,proto3" json:"negate,omitempty"`
-	Type   MatchType `protobuf:"varint,5,opt,name=type,proto3,enum=rules.MatchType" json:"type,omitempty"`
+	Type   MatchType `protobuf:"varint,5,opt,name=type,proto3,enum=steps.MatchType" json:"type,omitempty"`
 }
 
 func (x *MatchRequest) Reset() {
@@ -443,12 +443,12 @@ func file_rules_matcher_proto_rawDescGZIP() []byte {
 var file_rules_matcher_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_rules_matcher_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_rules_matcher_proto_goTypes = []interface{}{
-	(MatchType)(0),        // 0: rules.MatchType
-	(*MatchRequest)(nil),  // 1: rules.MatchRequest
-	(*MatchResponse)(nil), // 2: rules.MatchResponse
+	(MatchType)(0),        // 0: steps.MatchType
+	(*MatchRequest)(nil),  // 1: steps.MatchRequest
+	(*MatchResponse)(nil), // 2: steps.MatchResponse
 }
 var file_rules_matcher_proto_depIdxs = []int32{
-	0, // 0: rules.MatchRequest.type:type_name -> rules.MatchType
+	0, // 0: steps.MatchRequest.type:type_name -> steps.MatchType
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

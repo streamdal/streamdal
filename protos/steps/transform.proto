@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package protos.steps;
+
+import "common.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
+
+enum TransformType {
+  TRANSFORM_TYPE_UNKNOWN = 0;
+  TRANSFORM_TYPE_REPLACE_VALUE = 1;
+  TRANSFORM_TYPE_DELETE_FIELD = 2;
+  TRANSFORM_TYPE_OBFUSCATE_VALUE = 3;
+  TRANSFORM_TYPE_MASK_VALUE = 4;
+}
+
+message TransformStep {
+  bytes input = 1;
+  bytes output = 2;
+  string path = 3;
+  string value = 4;
+  TransformType type = 5;
+  repeated protos.Condition conditions = 6;
+}

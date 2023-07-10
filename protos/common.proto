@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package protos;
+
+// Common status codes used in gRPC method responses
+enum Status {
+  RESPONSE_STATUS_UNSET= 0;
+  RESPONSE_STATUS_OK = 1;
+  RESPONSE_STATUS_BAD_REQUEST = 2;
+  RESPONSE_STATUS_NOT_FOUND = 3;
+  RESPONSE_STATUS_INTERNAL_SERVER_ERROR = 4;
+  RESPONSE_STATUS_GENERIC_ERROR = 5;
+}
+
+// Condition defines how the pipeline should behave when a condition is met
+enum Condition {
+  CONDITION_UNSET = 0;
+  CONDITION_ON_ERROR_CONTINUE_PIPELINE = 1;
+  CONDITION_ON_ERROR_ABORT_PIPELINE = 2;
+  CONDITION_ON_ERROR_NOTIFY_SERVER = 3;
+  CONDITION_ON_MATCH_CONTINUE_PIPELINE = 4;
+  CONDITION_ON_MATCH_ABORT_PIPELINE = 5;
+  CONDITION_ON_MATCH_NOTIFY_SERVER = 6;
+
+  // NOTE: Doing *_NEXT_STEP or *_SKIP_STEP right now would be too complex
+}
+
+// All pipeline steps MUST return this message upon exec completion
+message StepResponse {
+  bytes output = 1;
+  StepStatus status = 2;
+  string status_message = 3;
+}
+
+enum StepStatus {
+  STEP_STATUS_UNSET = 0;
+  STEP_STATUS_SUCCESS = 1;
+  STEP_STATUS_FAILURE = 2;
+  STEP_STATUS_ERROR = 3;
+}

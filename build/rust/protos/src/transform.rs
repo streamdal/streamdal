@@ -19,26 +19,26 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `rules/transform.proto`
+//! Generated file from `steps/transform.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.TransformRequest)
+// @@protoc_insertion_point(message:steps.TransformRequest)
 pub struct TransformRequest {
     // message fields
-    // @@protoc_insertion_point(field:rules.TransformRequest.data)
+    // @@protoc_insertion_point(field:steps.TransformRequest.data)
     pub data: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:rules.TransformRequest.path)
+    // @@protoc_insertion_point(field:steps.TransformRequest.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.TransformRequest.value)
+    // @@protoc_insertion_point(field:steps.TransformRequest.value)
     pub value: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.TransformRequest.type)
+    // @@protoc_insertion_point(field:steps.TransformRequest.type)
     pub type_: ::protobuf::EnumOrUnknown<TransformType>,
     // special fields
-    // @@protoc_insertion_point(special_field:rules.TransformRequest.special_fields)
+    // @@protoc_insertion_point(special_field:steps.TransformRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -202,15 +202,15 @@ impl ::protobuf::reflect::ProtobufValue for TransformRequest {
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.TransformResponse)
+// @@protoc_insertion_point(message:steps.TransformResponse)
 pub struct TransformResponse {
     // message fields
-    // @@protoc_insertion_point(field:rules.TransformResponse.data)
+    // @@protoc_insertion_point(field:steps.TransformResponse.data)
     pub data: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:rules.TransformResponse.error)
+    // @@protoc_insertion_point(field:steps.TransformResponse.error)
     pub error: ::std::string::String,
     // special fields
-    // @@protoc_insertion_point(special_field:rules.TransformResponse.special_fields)
+    // @@protoc_insertion_point(special_field:steps.TransformResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -342,15 +342,15 @@ impl ::protobuf::reflect::ProtobufValue for TransformResponse {
 }
 
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:rules.TransformType)
+// @@protoc_insertion_point(enum:steps.TransformType)
 pub enum TransformType {
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_UNKNOWN)
+    // @@protoc_insertion_point(enum_value:steps.TransformType.TRANSFORM_TYPE_UNKNOWN)
     TRANSFORM_TYPE_UNKNOWN = 0,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_REPLACE_VALUE)
+    // @@protoc_insertion_point(enum_value:steps.TransformType.TRANSFORM_TYPE_REPLACE_VALUE)
     TRANSFORM_TYPE_REPLACE_VALUE = 1,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_DELETE_FIELD)
+    // @@protoc_insertion_point(enum_value:steps.TransformType.TRANSFORM_TYPE_DELETE_FIELD)
     TRANSFORM_TYPE_DELETE_FIELD = 2,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_OBFUSCATE_VALUE)
+    // @@protoc_insertion_point(enum_value:steps.TransformType.TRANSFORM_TYPE_OBFUSCATE_VALUE)
     TRANSFORM_TYPE_OBFUSCATE_VALUE = 3,
 }
 
@@ -407,7 +407,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x15rules/transform.proto\x12\x05rules\"z\n\x10TransformRequest\x12\
     \x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
     \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x03\x20\x01(\tR\x05value\x12\
-    (\n\x04type\x18\x04\x20\x01(\x0e2\x14.rules.TransformTypeR\x04type\"=\n\
+    (\n\x04type\x18\x04\x20\x01(\x0e2\x14.steps.TransformTypeR\x04type\"=\n\
     \x11TransformResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\
     \x12\x14\n\x05error\x18\x02\x20\x01(\tR\x05error*\x92\x01\n\rTransformTy\
     pe\x12\x1a\n\x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE\
