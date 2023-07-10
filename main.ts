@@ -11,7 +11,6 @@ import manifest from "./fresh.gen.ts";
 
 import twindPlugin from "$fresh/plugins/twind.ts";
 import twindConfig from "./twind.config.ts";
-Deno.env.set("PUBLIC_API_URL", "http://localhost:9191");
 
 await start(manifest, {
   port: 3000,

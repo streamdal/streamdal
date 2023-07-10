@@ -1,3 +1,5 @@
+import { getEnv } from "./utils.ts";
+
 export const mutate = async ({
   method,
   apiPath,
@@ -8,7 +10,7 @@ export const mutate = async ({
   body?: any;
 }) => {
   const response = await fetch(
-    `${import.meta.env.PUBLIC_API_URL || ""}${apiPath}`,
+    `${await getEnv("PUBLIC_API_URL") || "http://localhost:9191"}${apiPath}`,
     {
       method,
       ...(body ? { body: JSON.stringify(body) } : {}),

@@ -1,6 +1,8 @@
+import { getEnv } from "./utils.ts";
+
 export const getJson = async (apiPath: string) => {
   const response = await fetch(
-    `${Deno.env.get("PUBLIC_API_URL") || ""}${apiPath}`,
+    `${await getEnv("PUBLIC_API_URL") || "http://localhost:9191"}${apiPath}`,
   );
 
   if (response.ok || response.redirected) {
@@ -12,7 +14,7 @@ export const getJson = async (apiPath: string) => {
 
 export const getText = async (apiPath: string) => {
   const response = await fetch(
-    `${Deno.env.get("PUBLIC_API_URL") || ""}${apiPath}`,
+    `${await getEnv("PUBLIC_API_URL") || "http://localhost:9191"}${apiPath}`,
   );
 
   if (response.ok || response.redirected) {
