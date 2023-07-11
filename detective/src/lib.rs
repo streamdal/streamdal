@@ -1,6 +1,7 @@
 use protobuf::EnumOrUnknown;
+use protos::detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 use protos::pipeline::{PipelineStep, PipelineStepResponse, PipelineStepStatus};
-use snitch_detective::detective::Detective;
+use snitch_detective::detective::{Detective, Request};
 use std::mem;
 
 #[no_mangle]
@@ -16,8 +17,11 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         panic!("invalid step: {}", err) // TODO: Should write response here
     }
 
+    // Generate detective request
+    let req = generate_request(&step);
+
     // Run request against detective
-    match Detective::new().matches(step.detective()) {
+    match Detective::new().matches(&req) {
         Ok(match_result) => {
             println!(
                 "Request for '{:?}'; result: {}",
@@ -31,23 +35,41 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 status = PipelineStepStatus::PIPELINE_STEP_STATUS_SUCCESS
             }
 
-            write_response(
-                &step.detective().input,
-                status,
-                "completed detective run".to_string(),
-            )
+            write_response(&req.data, status, "completed detective run".to_string())
         }
         Err(e) => write_response(
-            &step.detective().input,
+            &req.data,
             PipelineStepStatus::PIPELINE_STEP_STATUS_FAILURE,
             e.to_string(),
         ),
     }
 }
 
+fn generate_request(pipeline_step: &PipelineStep) -> Request {
+    Request {
+        match_type: pipeline_step.detective().type_.unwrap(),
+        data: &pipeline_step.input,
+        path: pipeline_step.detective().path.clone(),
+        args: pipeline_step.detective().args.clone(),
+        negate: pipeline_step.detective().negate,
+    }
+}
+
 fn validate_step(step: &PipelineStep) -> Result<(), String> {
     if !step.has_detective() {
         return Err("detective is required".to_string());
+    }
+
+    if step.detective().type_ == EnumOrUnknown::from(DETECTIVE_TYPE_UNKNOWN) {
+        return Err("detective type cannot be unknown".to_string());
+    }
+
+    if step.detective().path == "" {
+        return Err("detective path cannot be empty".to_string());
+    }
+
+    if step.input.is_empty() {
+        return Err("input cannot be empty".to_string());
     }
 
     Ok(())
