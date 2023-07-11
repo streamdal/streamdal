@@ -1,17 +1,23 @@
 use crate::error::CustomError;
-use protos::detective::{DetectiveStep, DetectiveType};
+use protos::detective::DetectiveType;
 
-pub fn common(request: &DetectiveStep) -> Result<bool, CustomError> {
-    if request.args.len() != 1 {
+pub fn common(
+    match_type: DetectiveType,
+    data: &Vec<u8>,
+    path: &String,
+    args: &Vec<String>,
+    negate: bool,
+) -> Result<bool, CustomError> {
+    if args.len() != 1 {
         return Err(CustomError::Error(
             "numeric match must have exactly one arg".to_string(),
         ));
     }
 
-    let field: f64 = crate::detective::parse_field(&request.input, &request.path)?;
-    let arg = parse_number(&request.args[0])?;
+    let field: f64 = crate::detective::parse_field(data, path)?;
+    let arg = parse_number(&args[0])?;
 
-    let result = match request.type_.enum_value().unwrap() {
+    let result = match match_type {
         DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO => field == arg,
         DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN => field > arg,
         DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL => field >= arg,
@@ -25,7 +31,7 @@ pub fn common(request: &DetectiveStep) -> Result<bool, CustomError> {
         }
     };
 
-    if request.negate {
+    if negate {
         return Ok(!result);
     }
 

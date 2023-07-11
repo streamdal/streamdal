@@ -1,31 +1,6 @@
-use protos::detective::{DetectiveStep, DetectiveType};
+use protos::detective::DetectiveType;
 
-pub struct TestCase {
-    pub request: DetectiveStep,
-    pub expected: bool,
-    pub should_error: bool,
-    pub text: String,
-}
-
-pub fn run_tests(test_cases: &Vec<TestCase>) {
-    for case in test_cases {
-        let result = crate::detective::Detective::new().matches(&case.request);
-
-        if case.should_error {
-            assert_eq!(result.is_err(), true, "{}", case.text);
-        } else {
-            assert_eq!(result.unwrap(), case.expected, "{}", case.text);
-        }
-    }
-}
-
-pub fn generate_request(
-    detective_type: DetectiveType,
-    path: &str,
-    args: Vec<String>,
-    negate: bool,
-) -> DetectiveStep {
-    let sample_json = r#"{
+pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,
     "boolean_f": false,
     "object": {
@@ -54,13 +29,35 @@ pub fn generate_request(
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
 }"#;
 
-    DetectiveStep {
-        input: sample_json.as_bytes().to_vec(),
-        path: path.to_string(),
-        args,
-        negate,
-        type_: protobuf::EnumOrUnknown::from(detective_type),
-        conditions: vec![],
-        special_fields: Default::default(),
+pub struct Request {
+    pub detective_type: DetectiveType,
+    pub data: Vec<u8>,
+    pub path: String,
+    pub args: Vec<String>,
+    pub negate: bool,
+}
+
+pub struct TestCase {
+    pub request: Request,
+    pub expected: bool,
+    pub should_error: bool,
+    pub text: String,
+}
+
+pub fn run_tests(test_cases: &Vec<TestCase>) {
+    for case in test_cases {
+        let result = crate::detective::Detective::new().matches(
+            case.request.detective_type,
+            &case.request.data,
+            &case.request.path,
+            &case.request.args,
+            case.request.negate,
+        );
+
+        if case.should_error {
+            assert_eq!(result.is_err(), true, "{}", case.text);
+        } else {
+            assert_eq!(result.unwrap(), case.expected, "{}", case.text);
+        }
     }
 }
