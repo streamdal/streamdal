@@ -57,52 +57,52 @@ impl PipelineStep {
         ::std::default::Default::default()
     }
 
-    // .protos.steps.MatchStep match = 1000;
+    // .protos.steps.DetectiveStep detective = 1000;
 
-    pub fn match_(&self) -> &super::match_::MatchStep {
+    pub fn detective(&self) -> &super::detective::DetectiveStep {
         match self.step {
-            ::std::option::Option::Some(pipeline_step::Step::Match(ref v)) => v,
-            _ => <super::match_::MatchStep as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(pipeline_step::Step::Detective(ref v)) => v,
+            _ => <super::detective::DetectiveStep as ::protobuf::Message>::default_instance(),
         }
     }
 
-    pub fn clear_match_(&mut self) {
+    pub fn clear_detective(&mut self) {
         self.step = ::std::option::Option::None;
     }
 
-    pub fn has_match(&self) -> bool {
+    pub fn has_detective(&self) -> bool {
         match self.step {
-            ::std::option::Option::Some(pipeline_step::Step::Match(..)) => true,
+            ::std::option::Option::Some(pipeline_step::Step::Detective(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_match(&mut self, v: super::match_::MatchStep) {
-        self.step = ::std::option::Option::Some(pipeline_step::Step::Match(v))
+    pub fn set_detective(&mut self, v: super::detective::DetectiveStep) {
+        self.step = ::std::option::Option::Some(pipeline_step::Step::Detective(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_match(&mut self) -> &mut super::match_::MatchStep {
-        if let ::std::option::Option::Some(pipeline_step::Step::Match(_)) = self.step {
+    pub fn mut_detective(&mut self) -> &mut super::detective::DetectiveStep {
+        if let ::std::option::Option::Some(pipeline_step::Step::Detective(_)) = self.step {
         } else {
-            self.step = ::std::option::Option::Some(pipeline_step::Step::Match(super::match_::MatchStep::new()));
+            self.step = ::std::option::Option::Some(pipeline_step::Step::Detective(super::detective::DetectiveStep::new()));
         }
         match self.step {
-            ::std::option::Option::Some(pipeline_step::Step::Match(ref mut v)) => v,
+            ::std::option::Option::Some(pipeline_step::Step::Detective(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_match_(&mut self) -> super::match_::MatchStep {
-        if self.has_match() {
+    pub fn take_detective(&mut self) -> super::detective::DetectiveStep {
+        if self.has_detective() {
             match self.step.take() {
-                ::std::option::Option::Some(pipeline_step::Step::Match(v)) => v,
+                ::std::option::Option::Some(pipeline_step::Step::Detective(v)) => v,
                 _ => panic!(),
             }
         } else {
-            super::match_::MatchStep::new()
+            super::detective::DetectiveStep::new()
         }
     }
 
@@ -330,12 +330,12 @@ impl PipelineStep {
             |m: &PipelineStep| { &m.wasm_function },
             |m: &mut PipelineStep| { &mut m.wasm_function },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::match_::MatchStep>(
-            "match",
-            PipelineStep::has_match,
-            PipelineStep::match_,
-            PipelineStep::mut_match,
-            PipelineStep::set_match,
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::detective::DetectiveStep>(
+            "detective",
+            PipelineStep::has_detective,
+            PipelineStep::detective,
+            PipelineStep::mut_detective,
+            PipelineStep::set_detective,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::transform::TransformStep>(
             "transform",
@@ -400,7 +400,7 @@ impl ::protobuf::Message for PipelineStep {
                     self.wasm_function = is.read_string()?;
                 },
                 8002 => {
-                    self.step = ::std::option::Option::Some(pipeline_step::Step::Match(is.read_message()?));
+                    self.step = ::std::option::Option::Some(pipeline_step::Step::Detective(is.read_message()?));
                 },
                 8010 => {
                     self.step = ::std::option::Option::Some(pipeline_step::Step::Transform(is.read_message()?));
@@ -443,7 +443,7 @@ impl ::protobuf::Message for PipelineStep {
         }
         if let ::std::option::Option::Some(ref v) = self.step {
             match v {
-                &pipeline_step::Step::Match(ref v) => {
+                &pipeline_step::Step::Detective(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -488,7 +488,7 @@ impl ::protobuf::Message for PipelineStep {
         }
         if let ::std::option::Option::Some(ref v) = self.step {
             match v {
-                &pipeline_step::Step::Match(ref v) => {
+                &pipeline_step::Step::Detective(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(1000, v, os)?;
                 },
                 &pipeline_step::Step::Transform(ref v) => {
@@ -573,8 +573,8 @@ pub mod pipeline_step {
     #[non_exhaustive]
     // @@protoc_insertion_point(oneof:protos.PipelineStep.step)
     pub enum Step {
-        // @@protoc_insertion_point(oneof_field:protos.PipelineStep.match)
-        Match(super::super::match_::MatchStep),
+        // @@protoc_insertion_point(oneof_field:protos.PipelineStep.detective)
+        Detective(super::super::detective::DetectiveStep),
         // @@protoc_insertion_point(oneof_field:protos.PipelineStep.transform)
         Transform(super::super::transform::TransformStep),
         // @@protoc_insertion_point(oneof_field:protos.PipelineStep.encode)
@@ -2340,70 +2340,70 @@ impl ::protobuf::reflect::ProtobufValue for UnpausePipelineResponse {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0epipeline.proto\x12\x06protos\x1a\x11steps/detective.proto\x1a\x15steps\
-    /transform.proto\x1a\x12steps/encode.proto\x1a\x12steps/decode.proto\x1a\
-    \x12steps/custom.proto\x1a\x0ccommon.proto\"\xa6\x03\n\x0cPipelineStep\
-    \x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\
-    \x01(\tR\x04name\x12\x17\n\x07wasm_id\x18\x03\x20\x01(\tR\x06wasmId\x12\
-    \x1d\n\nwasm_bytes\x18\x04\x20\x01(\tR\twasmBytes\x12#\n\rwasm_function\
-    \x18\x05\x20\x01(\tR\x0cwasmFunction\x120\n\x05match\x18\xe8\x07\x20\x01\
-    (\x0b2\x17.protos.steps.MatchStepH\0R\x05match\x12<\n\ttransform\x18\xe9\
-    \x07\x20\x01(\x0b2\x1b.protos.steps.TransformStepH\0R\ttransform\x123\n\
-    \x06encode\x18\xea\x07\x20\x01(\x0b2\x18.protos.steps.EncodeStepH\0R\x06\
-    encode\x123\n\x06decode\x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.Decod\
-    eStepH\0R\x06decode\x123\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.proto\
-    s.steps.CustomStepH\0R\x06customB\x06\n\x04step\"$\n\x12GetPipelineReque\
-    st\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\"\x8f\x01\n\x13GetPipelineR\
-    esponse\x126\n\x08pipeline\x18\x01\x20\x01(\x0b2\x1a.protos.SetPipelineR\
-    equestR\x08pipeline\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.protos.St\
-    atusR\x06status\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07message\"\
-    \x18\n\x16GetAllPipelinesRequest\"\x95\x01\n\x17GetAllPipelinesResponse\
-    \x128\n\tpipelines\x18\x01\x20\x03(\x0b2\x1a.protos.SetPipelineRequestR\
-    \tpipelines\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.protos.StatusR\
-    \x06status\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07message\"\xa4\x01\
-    \n\x12SetPipelineRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\
-    \x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12*\n\x05steps\x18\x03\x20\
-    \x03(\x0b2\x14.protos.PipelineStepR\x05steps\x12>\n\x11global_conditions\
-    \x18\x04\x20\x03(\x0e2\x11.protos.ConditionR\x10globalConditions\"g\n\
-    \x13SetPipelineResponse\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12&\n\
-    \x06status\x18\x02\x20\x01(\x0e2\x0e.protos.StatusR\x06status\x12\x18\n\
-    \x07message\x18\x03\x20\x01(\tR\x07message\"'\n\x15DeletePipelineRequest\
-    \x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\"j\n\x16DeletePipelineRespons\
-    e\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12&\n\x06status\x18\x02\x20\
-    \x01(\x0e2\x0e.protos.StatusR\x06status\x12\x18\n\x07message\x18\x03\x20\
-    \x01(\tR\x07message\"&\n\x14PausePipelineRequest\x12\x0e\n\x02id\x18\x01\
-    \x20\x01(\tR\x02id\"i\n\x15PausePipelineResponse\x12\x0e\n\x02id\x18\x01\
-    \x20\x01(\tR\x02id\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.protos.Sta\
-    tusR\x06status\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07message\"(\n\
-    \x16UnpausePipelineRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\"k\
-    \n\x17UnpausePipelineResponse\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\
+    \n\x0epipeline.proto\x12\x06protos\x1a\x15steps/detective.proto\x1a\x15s\
+    teps/transform.proto\x1a\x12steps/encode.proto\x1a\x12steps/decode.proto\
+    \x1a\x12steps/custom.proto\x1a\x0ccommon.proto\"\xb2\x03\n\x0cPipelineSt\
+    ep\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\
+    \x20\x01(\tR\x04name\x12\x17\n\x07wasm_id\x18\x03\x20\x01(\tR\x06wasmId\
+    \x12\x1d\n\nwasm_bytes\x18\x04\x20\x01(\tR\twasmBytes\x12#\n\rwasm_funct\
+    ion\x18\x05\x20\x01(\tR\x0cwasmFunction\x12<\n\tdetective\x18\xe8\x07\
+    \x20\x01(\x0b2\x1b.protos.steps.DetectiveStepH\0R\tdetective\x12<\n\ttra\
+    nsform\x18\xe9\x07\x20\x01(\x0b2\x1b.protos.steps.TransformStepH\0R\ttra\
+    nsform\x123\n\x06encode\x18\xea\x07\x20\x01(\x0b2\x18.protos.steps.Encod\
+    eStepH\0R\x06encode\x123\n\x06decode\x18\xeb\x07\x20\x01(\x0b2\x18.proto\
+    s.steps.DecodeStepH\0R\x06decode\x123\n\x06custom\x18\xec\x07\x20\x01(\
+    \x0b2\x18.protos.steps.CustomStepH\0R\x06customB\x06\n\x04step\"$\n\x12G\
+    etPipelineRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\"\x8f\x01\n\
+    \x13GetPipelineResponse\x126\n\x08pipeline\x18\x01\x20\x01(\x0b2\x1a.pro\
+    tos.SetPipelineRequestR\x08pipeline\x12&\n\x06status\x18\x02\x20\x01(\
+    \x0e2\x0e.protos.StatusR\x06status\x12\x18\n\x07message\x18\x03\x20\x01(\
+    \tR\x07message\"\x18\n\x16GetAllPipelinesRequest\"\x95\x01\n\x17GetAllPi\
+    pelinesResponse\x128\n\tpipelines\x18\x01\x20\x03(\x0b2\x1a.protos.SetPi\
+    pelineRequestR\tpipelines\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.pro\
+    tos.StatusR\x06status\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07messag\
+    e\"\xa4\x01\n\x12SetPipelineRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\
+    \x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12*\n\x05steps\x18\
+    \x03\x20\x03(\x0b2\x14.protos.PipelineStepR\x05steps\x12>\n\x11global_co\
+    nditions\x18\x04\x20\x03(\x0e2\x11.protos.ConditionR\x10globalConditions\
+    \"g\n\x13SetPipelineResponse\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\
     \x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.protos.StatusR\x06status\x12\
-    \x18\n\x07message\x18\x03\x20\x01(\tR\x07messageB4Z2github.com/streamdal\
-    /snitch-protos/build/go/protosJ\xd4\x19\n\x06\x12\x04\0\0p\x01\n\x08\n\
-    \x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\
-    \0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\x03\x05\0\x1f\n\t\n\x02\x03\
-    \x02\x12\x03\x06\0\x1c\n\t\n\x02\x03\x03\x12\x03\x07\0\x1c\n\t\n\x02\x03\
-    \x04\x12\x03\x08\0\x1c\n\t\n\x02\x03\x05\x12\x03\t\0\x16\n\x08\n\x01\x08\
-    \x12\x03\x0b\0I\n\t\n\x02\x08\x0b\x12\x03\x0b\0I\n\n\n\x02\x04\0\x12\x04\
-    \r\0\x1b\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x14\n\x0b\n\x04\x04\0\x02\
-    \0\x12\x03\x0e\x02\x10\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\
-    \x12\x03\x0e\x0e\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\x12\n\x0c\
-    \n\x05\x04\0\x02\x01\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\x01\
-    \x01\x12\x03\x0f\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\x10\x11\n\
-    \x0b\n\x04\x04\0\x02\x02\x12\x03\x10\x02\x15\n\x0c\n\x05\x04\0\x02\x02\
-    \x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x10\t\x10\
-    \n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x10\x13\x14\n\x0b\n\x04\x04\0\x02\
-    \x03\x12\x03\x11\x02\x18\n\x0c\n\x05\x04\0\x02\x03\x05\x12\x03\x11\x02\
-    \x08\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x11\t\x13\n\x0c\n\x05\x04\0\
-    \x02\x03\x03\x12\x03\x11\x16\x17\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x12\
-    \x02\x1b\n\x0c\n\x05\x04\0\x02\x04\x05\x12\x03\x12\x02\x08\n\x0c\n\x05\
-    \x04\0\x02\x04\x01\x12\x03\x12\t\x16\n\x0c\n\x05\x04\0\x02\x04\x03\x12\
-    \x03\x12\x19\x1a\n\x0c\n\x04\x04\0\x08\0\x12\x04\x14\x02\x1a\x03\n\x0c\n\
-    \x05\x04\0\x08\0\x01\x12\x03\x14\x08\x0c\n\x0b\n\x04\x04\0\x02\x05\x12\
-    \x03\x15\x04!\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x15\x04\x13\n\x0c\n\
-    \x05\x04\0\x02\x05\x01\x12\x03\x15\x14\x19\n\x0c\n\x05\x04\0\x02\x05\x03\
-    \x12\x03\x15\x1c\x20\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x16\x04)\n\x0c\n\
+    \x18\n\x07message\x18\x03\x20\x01(\tR\x07message\"'\n\x15DeletePipelineR\
+    equest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\"j\n\x16DeletePipelineR\
+    esponse\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12&\n\x06status\x18\
+    \x02\x20\x01(\x0e2\x0e.protos.StatusR\x06status\x12\x18\n\x07message\x18\
+    \x03\x20\x01(\tR\x07message\"&\n\x14PausePipelineRequest\x12\x0e\n\x02id\
+    \x18\x01\x20\x01(\tR\x02id\"i\n\x15PausePipelineResponse\x12\x0e\n\x02id\
+    \x18\x01\x20\x01(\tR\x02id\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.pr\
+    otos.StatusR\x06status\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07messa\
+    ge\"(\n\x16UnpausePipelineRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\
+    \x02id\"k\n\x17UnpausePipelineResponse\x12\x0e\n\x02id\x18\x01\x20\x01(\
+    \tR\x02id\x12&\n\x06status\x18\x02\x20\x01(\x0e2\x0e.protos.StatusR\x06s\
+    tatus\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07messageB4Z2github.com/\
+    streamdal/snitch-protos/build/go/protosJ\xd4\x19\n\x06\x12\x04\0\0p\x01\
+    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
+    \x02\x03\0\x12\x03\x04\0\x1f\n\t\n\x02\x03\x01\x12\x03\x05\0\x1f\n\t\n\
+    \x02\x03\x02\x12\x03\x06\0\x1c\n\t\n\x02\x03\x03\x12\x03\x07\0\x1c\n\t\n\
+    \x02\x03\x04\x12\x03\x08\0\x1c\n\t\n\x02\x03\x05\x12\x03\t\0\x16\n\x08\n\
+    \x01\x08\x12\x03\x0b\0I\n\t\n\x02\x08\x0b\x12\x03\x0b\0I\n\n\n\x02\x04\0\
+    \x12\x04\r\0\x1b\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x14\n\x0b\n\x04\
+    \x04\0\x02\0\x12\x03\x0e\x02\x10\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\
+    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\t\x0b\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x0e\x0e\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\
+    \x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\
+    \x02\x01\x01\x12\x03\x0f\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\
+    \x10\x11\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x10\x02\x15\n\x0c\n\x05\x04\0\
+    \x02\x02\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    \x10\t\x10\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x10\x13\x14\n\x0b\n\x04\
+    \x04\0\x02\x03\x12\x03\x11\x02\x18\n\x0c\n\x05\x04\0\x02\x03\x05\x12\x03\
+    \x11\x02\x08\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x11\t\x13\n\x0c\n\x05\
+    \x04\0\x02\x03\x03\x12\x03\x11\x16\x17\n\x0b\n\x04\x04\0\x02\x04\x12\x03\
+    \x12\x02\x1b\n\x0c\n\x05\x04\0\x02\x04\x05\x12\x03\x12\x02\x08\n\x0c\n\
+    \x05\x04\0\x02\x04\x01\x12\x03\x12\t\x16\n\x0c\n\x05\x04\0\x02\x04\x03\
+    \x12\x03\x12\x19\x1a\n\x0c\n\x04\x04\0\x08\0\x12\x04\x14\x02\x1a\x03\n\
+    \x0c\n\x05\x04\0\x08\0\x01\x12\x03\x14\x08\x0c\n\x0b\n\x04\x04\0\x02\x05\
+    \x12\x03\x15\x04)\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x15\x04\x17\n\
+    \x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x15\x18!\n\x0c\n\x05\x04\0\x02\x05\
+    \x03\x12\x03\x15$(\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x16\x04)\n\x0c\n\
     \x05\x04\0\x02\x06\x06\x12\x03\x16\x04\x17\n\x0c\n\x05\x04\0\x02\x06\x01\
     \x12\x03\x16\x18!\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x16$(\n\x0b\n\
     \x04\x04\0\x02\x07\x12\x03\x17\x04#\n\x0c\n\x05\x04\0\x02\x07\x06\x12\
@@ -2530,7 +2530,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(6);
-            deps.push(super::match_::file_descriptor().clone());
+            deps.push(super::detective::file_descriptor().clone());
             deps.push(super::transform::file_descriptor().clone());
             deps.push(super::encode::file_descriptor().clone());
             deps.push(super::decode::file_descriptor().clone());

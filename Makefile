@@ -78,9 +78,9 @@ generate/protoset:
 
 	@echo Successfully generated protoset
 
-.PHONY: generate/all
-generate/all: description = Run all generate/* targets
-generate/all: generate/go generate/rust generate/protoset
+.PHONY: generate
+generate: description = Run all generate/* targets
+generate: generate/go generate/rust generate/protoset
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
@@ -96,6 +96,10 @@ clean/rust:
 clean/protoset: description = Remove protoset artifacts
 clean/protoset:
 	rm -rf ./build/protos.protoset
+
+.PHONY: clean
+clean: description = Remove all build artifacts
+clean: clean/rust clean/go clean/protoset
 
 .PHONY: lint
 lint: description = Run protolint
