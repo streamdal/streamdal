@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `steps/match.proto`
+//! Generated file from `steps/detective.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
@@ -483,7 +483,7 @@ impl MatchType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x11steps/match.proto\x12\x0cprotos.steps\x1a\x0ccommon.proto\"\xc1\
+    \n\x11steps/detective.proto\x12\x0cprotos.steps\x1a\x0ccommon.proto\"\xc1\
     \x01\n\tMatchStep\x12\x14\n\x05input\x18\x01\x20\x01(\x0cR\x05input\x12\
     \x12\n\x04path\x18\x02\x20\x01(\tR\x04path\x12\x12\n\x04args\x18\x03\x20\
     \x03(\tR\x04args\x12\x16\n\x06negate\x18\x04\x20\x01(\x08R\x06negate\x12\

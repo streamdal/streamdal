@@ -2340,7 +2340,7 @@ impl ::protobuf::reflect::ProtobufValue for UnpausePipelineResponse {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0epipeline.proto\x12\x06protos\x1a\x11steps/match.proto\x1a\x15steps\
+    \n\x0epipeline.proto\x12\x06protos\x1a\x11steps/detective.proto\x1a\x15steps\
     /transform.proto\x1a\x12steps/encode.proto\x1a\x12steps/decode.proto\x1a\
     \x12steps/custom.proto\x1a\x0ccommon.proto\"\xa6\x03\n\x0cPipelineStep\
     \x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\

@@ -6,78 +6,78 @@ package protos.steps;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
-enum MatchType {
+enum DetectiveType {
   // 1000-1999 reserved for core match types
 
-  MATCH_TYPE_UNKNOWN = 0;
-  MATCH_TYPE_IS_EMPTY = 1000;
-  MATCH_TYPE_HAS_FIELD = 1001;
-  MATCH_TYPE_IS_TYPE = 1002;
-  MATCH_TYPE_STRING_CONTAINS_ANY = 1003;
-  MATCH_TYPE_STRING_CONTAINS_ALL = 1004;
-  MATCH_TYPE_STRING_EQUAL = 1005;
-  MATCH_TYPE_IPV4_ADDRESS = 1006;
-  MATCH_TYPE_IPV6_ADDRESS = 1007;
-  MATCH_TYPE_MAC_ADDRESS = 1008;
-  MATCH_TYPE_REGEX = 1009;
-  MATCH_TYPE_TIMESTAMP_RFC3339 = 1010;
-  MATCH_TYPE_TIMESTAMP_UNIX_NANO = 1011;
-  MATCH_TYPE_TIMESTAMP_UNIX = 1012;
-  MATCH_TYPE_BOOLEAN_TRUE = 1013;
-  MATCH_TYPE_BOOLEAN_FALSE = 1014;
-  MATCH_TYPE_UUID = 1015;
+  DETECTIVE_TYPE_UNKNOWN = 0;
+  DETECTIVE_TYPE_IS_EMPTY = 1000;
+  DETECTIVE_TYPE_HAS_FIELD = 1001;
+  DETECTIVE_TYPE_IS_TYPE = 1002;
+  DETECTIVE_TYPE_STRING_CONTAINS_ANY = 1003;
+  DETECTIVE_TYPE_STRING_CONTAINS_ALL = 1004;
+  DETECTIVE_TYPE_STRING_EQUAL = 1005;
+  DETECTIVE_TYPE_IPV4_ADDRESS = 1006;
+  DETECTIVE_TYPE_IPV6_ADDRESS = 1007;
+  DETECTIVE_TYPE_MAC_ADDRESS = 1008;
+  DETECTIVE_TYPE_REGEX = 1009;
+  DETECTIVE_TYPE_TIMESTAMP_RFC3339 = 1010;
+  DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO = 1011;
+  DETECTIVE_TYPE_TIMESTAMP_UNIX = 1012;
+  DETECTIVE_TYPE_BOOLEAN_TRUE = 1013;
+  DETECTIVE_TYPE_BOOLEAN_FALSE = 1014;
+  DETECTIVE_TYPE_UUID = 1015;
 
   // PII matchers (2000-2999)
 
   /// Payloads containing values with any PII - runs all PII matchers
-  MATCH_TYPE_PII_ANY = 2000;
+  DETECTIVE_TYPE_PII_ANY = 2000;
   // Payloads containing values with a credit card number
-  MATCH_TYPE_PII_CREDIT_CARD = 2001;
+  DETECTIVE_TYPE_PII_CREDIT_CARD = 2001;
   // Payloads containing values with a social security number
-  MATCH_TYPE_PII_SSN = 2002;
+  DETECTIVE_TYPE_PII_SSN = 2002;
   // Payloads containing values with an email address
-  MATCH_TYPE_PII_EMAIL = 2003;
+  DETECTIVE_TYPE_PII_EMAIL = 2003;
   // Payloads containing values with a phone number
-  MATCH_TYPE_PII_PHONE = 2004;
+  DETECTIVE_TYPE_PII_PHONE = 2004;
   // Payloads containing values with a driver's license
-  MATCH_TYPE_PII_DRIVER_LICENSE = 2005;
+  DETECTIVE_TYPE_PII_DRIVER_LICENSE = 2005;
   // Payloads containing values with a passport ID
-  MATCH_TYPE_PII_PASSPORT_ID = 2006;
+  DETECTIVE_TYPE_PII_PASSPORT_ID = 2006;
   // Payloads containing values with a VIN number
-  MATCH_TYPE_PII_VIN_NUMBER = 2007;
+  DETECTIVE_TYPE_PII_VIN_NUMBER = 2007;
   // Payloads containing values with various serial number formats
-  MATCH_TYPE_PII_SERIAL_NUMBER = 2008;
+  DETECTIVE_TYPE_PII_SERIAL_NUMBER = 2008;
   // Payloads containing fields named "login", "username", "user", "userid", "user_id", "user", "password", "pass", "passwd", "pwd"
-  MATCH_TYPE_PII_LOGIN = 2009;
+  DETECTIVE_TYPE_PII_LOGIN = 2009;
   // Payloads containing fields named "taxpayer_id", "tax_id", "taxpayerid", "taxid"
-  MATCH_TYPE_PII_TAXPAYER_ID = 2010;
+  DETECTIVE_TYPE_PII_TAXPAYER_ID = 2010;
   // Payloads containing fields named "address", "street", "city", "state", "zip", "zipcode", "zip_code", "country"
-  MATCH_TYPE_PII_ADDRESS = 2011;
+  DETECTIVE_TYPE_PII_ADDRESS = 2011;
   // Payloads containing fields named "signature", "signature_image", "signature_image_url", "signature_image_uri"
-  MATCH_TYPE_PII_SIGNATURE = 2012;
+  DETECTIVE_TYPE_PII_SIGNATURE = 2012;
   // Payloads containing values that contain GPS data or coordinates like "lat", "lon", "latitude", "longitude"
-  MATCH_TYPE_PII_GEOLOCATION = 2013;
+  DETECTIVE_TYPE_PII_GEOLOCATION = 2013;
   // Payloads containing fields like "school", "university", "college", "education"
-  MATCH_TYPE_PII_EDUCATION = 2014;
+  DETECTIVE_TYPE_PII_EDUCATION = 2014;
   // Payloads containing fields like "account", "bank", "credit", "debit", "financial", "finance"
-  MATCH_TYPE_PII_FINANCIAL = 2015;
+  DETECTIVE_TYPE_PII_FINANCIAL = 2015;
   // Payloads containing fields like "patient", "health", "healthcare", "health care", "medical"
-  MATCH_TYPE_PII_HEALTH = 2016;
+  DETECTIVE_TYPE_PII_HEALTH = 2016;
 
   // Numeric matchers (3000-3999)
 
-  MATCH_TYPE_NUMERIC_EQUAL_TO= 3000;
-  MATCH_TYPE_NUMERIC_GREATER_THAN = 3001;
-  MATCH_TYPE_NUMERIC_GREATER_EQUAL = 3002;
-  MATCH_TYPE_NUMERIC_LESS_THAN = 3003;
-  MATCH_TYPE_NUMERIC_LESS_EQUAL = 3004;
+  DETECTIVE_TYPE_NUMERIC_EQUAL_TO= 3000;
+  DETECTIVE_TYPE_NUMERIC_GREATER_THAN = 3001;
+  DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL = 3002;
+  DETECTIVE_TYPE_NUMERIC_LESS_THAN = 3003;
+  DETECTIVE_TYPE_NUMERIC_LESS_EQUAL = 3004;
 }
 
-message MatchStep {
+message DetectiveStep {
   bytes input = 1;
   string path = 2;
   repeated string args = 3; // args determined by match_type
   bool negate = 4;
-  MatchType type = 5;
+  DetectiveType type = 5;
   repeated protos.Condition conditions = 6;
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos;
 
-import "steps/match.proto";
+import "steps/detective.proto";
 import "steps/transform.proto";
 import "steps/encode.proto";
 import "steps/decode.proto";
@@ -19,7 +19,7 @@ message PipelineStep {
   string wasm_function = 5;
 
   oneof step {
-    steps.MatchStep match = 1000;
+    steps.DetectiveStep detective = 1000;
     steps.TransformStep transform = 1001;
     steps.EncodeStep encode = 1002;
     steps.DecodeStep decode = 1003;
