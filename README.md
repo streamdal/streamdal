@@ -13,20 +13,21 @@ Currently only has support for `overwrite`, `mask` and `obfuscate`.
 ## Usage
 
 ```rust
-use snitch_protos as protos;
-use snitch_transform::transform;
+fn main() {
+    let sample_json = r#"{"hello": "world"}"#;
 
-func main() {
-   let sample_json = r#"{"hello": "world"}"#;
-   
-   let mut req = protos::transform::TransformStep::new();
-   req.data = sample_json.into();
-   req.path = "hello".to_string();
-   req.value = r#""baz""#.to_string();
-   
-   let updated_json = transform::overwrite(&req).unwrap();
-   
-   println!("Input JSON: {} || Result JSON: {}", sample_json, updated_json)
+    let req = Request {
+        data: sample_json.into(),
+        path: "hello".to_string(),
+        value: r#""baz""#.to_string(),
+    };
+
+    let updated_json = snitch_transform::transform::overwrite(&req).unwrap();
+
+    println!(
+        "Input JSON: {} || Result JSON: {}",
+        sample_json, updated_json,
+    )
 }
 ```
 

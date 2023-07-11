@@ -1,3 +1,5 @@
+use snitch_transform::transform::Request;
+
 fn main() {
     println!("Overwrite example");
     overwrite();
@@ -15,10 +17,11 @@ fn main() {
 fn overwrite() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let mut req = protos::transform::TransformStep::new();
-    req.input = sample_json.into();
-    req.path = "hello".to_string();
-    req.value = r#""baz""#.to_string();
+    let req = Request {
+        data: sample_json.into(),
+        path: "hello".to_string(),
+        value: r#""baz""#.to_string(),
+    };
 
     let updated_json = snitch_transform::transform::overwrite(&req).unwrap();
 
@@ -31,9 +34,11 @@ fn overwrite() {
 fn mask_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let mut req = protos::transform::TransformStep::new();
-    req.path = "hello".to_string();
-    req.input = sample_json.into();
+    let req = Request {
+        data: sample_json.into(),
+        path: "hello".to_string(),
+        value: "".to_string(),
+    };
 
     let updated_json = snitch_transform::transform::mask(&req).unwrap();
 
@@ -46,9 +51,11 @@ fn mask_string() {
 fn mask_number() {
     let sample_json = r#"{"hello": 329328102938}"#;
 
-    let mut req = protos::transform::TransformStep::new();
-    req.path = "hello".to_string();
-    req.input = sample_json.into();
+    let req = Request {
+        path: "hello".to_string(),
+        data: sample_json.into(),
+        value: "".to_string(), // default
+    };
 
     let updated_json = snitch_transform::transform::mask(&req).unwrap();
 
@@ -61,9 +68,11 @@ fn mask_number() {
 fn obfuscate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let mut req = protos::transform::TransformStep::new();
-    req.path = "hello".to_string();
-    req.input = sample_json.into();
+    let req = Request {
+        path: "hello".to_string(),
+        data: sample_json.into(),
+        value: "".to_string(), // default
+    };
 
     let updated_json = snitch_transform::transform::obfuscate(&req).unwrap();
 
