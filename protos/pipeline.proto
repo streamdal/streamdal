@@ -11,6 +11,13 @@ import "common.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
+enum PipelineStepStatus {
+  PIPELINE_STEP_STATUS_UNSET = 0;
+  PIPELINE_STEP_STATUS_SUCCESS = 1;
+  PIPELINE_STEP_STATUS_FAILURE = 2;
+  PIPELINE_STEP_STATUS_ERROR = 3;
+}
+
 message PipelineStep {
   string id = 1;
   string name = 2;
@@ -25,6 +32,13 @@ message PipelineStep {
     steps.DecodeStep decode = 1003;
     steps.CustomStep custom = 1004;
   }
+}
+
+// All pipeline steps MUST return this message upon exec completion
+message PipelineStepResponse {
+  bytes output = 1;
+  PipelineStepStatus status = 2;
+  string status_message = 3;
 }
 
 ///////////////////// Get pipeline /////////////////////

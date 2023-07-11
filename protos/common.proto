@@ -26,17 +26,3 @@ enum Condition {
 
   // NOTE: Doing *_NEXT_STEP or *_SKIP_STEP right now would be too complex
 }
-
-// All pipeline steps MUST return this message upon exec completion
-message StepResponse {
-  bytes output = 1;
-  StepStatus status = 2;
-  string status_message = 3;
-}
-
-enum StepStatus {
-  STEP_STATUS_UNSET = 0;
-  STEP_STATUS_SUCCESS = 1;
-  STEP_STATUS_FAILURE = 2;
-  STEP_STATUS_ERROR = 3;
-}
