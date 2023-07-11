@@ -13,35 +13,35 @@ help:
 
 .PHONY: build
 build: description = Build all targets
-build: build/matcher build/transformer
+build: build/detective build/transform
 
-.PHONY: build/matcher
-build/matcher: description = Build WASM target for matcher
-build/matcher: clean/matcher
-	cd matcher && \
+.PHONY: build/detective
+build/detective: description = Build WASM target for detective
+build/detective: clean/detective
+	cd detective && \
 	cargo build --target=wasm32-wasi --release && \
-	cp target/wasm32-wasi/release/matcher.wasm ../build/
+	cp target/wasm32-wasi/release/detective.wasm ../build/
 
-.PHONY: clean/matcher
-clean/matcher: description = Remove matcher WASM artifacts
-clean/matcher:
-	rm -rf matcher/target build/matcher.wasm
+.PHONY: clean/detective
+clean/detective: description = Remove detective WASM artifacts
+clean/detective:
+	rm -rf detective/target build/detective.wasm
 
-.PHONY: build/transformer
-build/transformer: description = Build WASM target for transformer
-build/transformer: clean/transformer
-	cd transformer && \
+.PHONY: build/transform
+build/transform: description = Build WASM target for transform
+build/transform: clean/transform
+	cd transform && \
 	cargo build --target=wasm32-wasi --release && \
-	cp target/wasm32-wasi/release/transformer.wasm ../build/
+	cp target/wasm32-wasi/release/transform.wasm ../build/
 
-.PHONY: clean/transformer
-clean/transformer: description = Remove transformer WASM artifacts
-clean/transformer:
-	rm -rf transformer/target build/transformer.wasm
+.PHONY: clean/transform
+clean/transform: description = Remove transform WASM artifacts
+clean/transform:
+	rm -rf transform/target build/transform.wasm
 
 .PHONY: clean
 clean: description = Remove all build artifacts
-clean: clean/matcher clean/transformer
+clean: clean/detective clean/transform
 
 .PHONY: test
 test: description = Run tests
