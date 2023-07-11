@@ -29,7 +29,7 @@ impl Detective {
         Detective {}
     }
 
-    pub fn matches(&self, request: Request) -> Result<bool, CustomError> {
+    pub fn matches(&self, request: &Request) -> Result<bool, CustomError> {
         validate_request(&request)?;
 
         match request.match_type {

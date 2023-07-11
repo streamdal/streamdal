@@ -19,7 +19,7 @@ fn main() {
         negate: false,
     };
 
-    match det.matches(request) {
+    match det.matches(&request) {
         Ok(value) => println!("Result: {:#?}", value),
         Err(err) => println!("Error: {:#?}", err),
     }

@@ -38,7 +38,7 @@ pub struct TestCase {
 
 pub fn run_tests(test_cases: &Vec<TestCase>) {
     for case in test_cases {
-        let result = crate::detective::Detective::new().matches(case.request.clone());
+        let result = crate::detective::Detective::new().matches(&case.request);
 
         if case.should_error {
             assert_eq!(result.is_err(), true, "{}", case.text);
