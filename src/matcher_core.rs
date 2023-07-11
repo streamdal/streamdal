@@ -15,7 +15,7 @@ pub fn string_equal_to(request: &Request) -> Result<bool, CustomError> {
         ));
     }
 
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     Ok(field == request.args[0])
 }
@@ -27,7 +27,7 @@ pub fn string_contains_any(request: &Request) -> Result<bool, CustomError> {
         ));
     }
 
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     for arg in &request.args {
         if field.contains(arg) {
@@ -45,7 +45,7 @@ pub fn string_contains_all(request: &Request) -> Result<bool, CustomError> {
         ));
     }
 
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     for arg in &request.args {
         if !field.contains(arg) {
@@ -57,7 +57,7 @@ pub fn string_contains_all(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     match request.match_type {
         DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS => {
@@ -81,7 +81,7 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     let re = Regex::new(r"^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$")?;
 
@@ -89,7 +89,7 @@ pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn uuid(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
     let re = Regex::new(
         r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
     )?;
@@ -98,13 +98,13 @@ pub fn uuid(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn timestamp_rfc3339(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     Ok(chrono::DateTime::parse_from_rfc3339(field.as_str()).is_ok())
 }
 
 pub fn timestamp_unix_nano(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     if let Ok(ts) = field.parse::<i64>() {
         if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts / 1_000_000_000, 0) {
@@ -116,7 +116,7 @@ pub fn timestamp_unix_nano(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn timestamp_unix(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
 
     let ts: i64 = match field.parse() {
         Ok(v) => {
@@ -137,7 +137,7 @@ pub fn timestamp_unix(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn boolean(request: &Request, expected: bool) -> Result<bool, CustomError> {
-    let field: bool = detective::parse_field(&request.data, &request.path)?;
+    let field: bool = detective::parse_field(request.data, &request.path)?;
 
     Ok(field == expected)
 }
@@ -145,7 +145,7 @@ pub fn boolean(request: &Request, expected: bool) -> Result<bool, CustomError> {
 // This is an all inclusive check - it'll return true if field is an empty string,
 // empty array or is null.
 pub fn is_empty(request: &Request) -> Result<bool, CustomError> {
-    let field: Value = detective::parse_field(&request.data, &request.path)?;
+    let field: Value = detective::parse_field(request.data, &request.path)?;
 
     match field.kind() {
         // Null field
@@ -159,7 +159,7 @@ pub fn is_empty(request: &Request) -> Result<bool, CustomError> {
 }
 
 pub fn has_field(request: &Request) -> Result<bool, CustomError> {
-    let data_as_str = str::from_utf8(&request.data)
+    let data_as_str = str::from_utf8(request.data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
     Ok(gjson::get(data_as_str, request.path.as_str()).exists())
@@ -172,7 +172,7 @@ pub fn is_type(request: &Request) -> Result<bool, CustomError> {
         ));
     }
 
-    let field: Value = detective::parse_field(&request.data, &request.path)?;
+    let field: Value = detective::parse_field(request.data, &request.path)?;
 
     match request.args[0].as_str() {
         "string" => Ok(field.kind() == gjson::Kind::String),
@@ -197,7 +197,7 @@ pub fn regex(request: &Request) -> Result<bool, CustomError> {
     }
 
     let re_pattern = request.args[0].as_str();
-    let field: String = detective::parse_field(&request.data, &request.path)?;
+    let field: String = detective::parse_field(request.data, &request.path)?;
     let re = Regex::new(re_pattern)?;
 
     Ok(re.is_match(field.as_str()))

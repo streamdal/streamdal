@@ -13,7 +13,7 @@ fn main() {
 
     let request = Request {
         match_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
-        data: sample_json.as_bytes().to_vec(),
+        data: &sample_json.as_bytes().to_vec(),
         path: "field1".to_string(),
         args: vec!["1".to_string()],
         negate: false,

@@ -9,7 +9,7 @@ pub fn common(request: &Request) -> Result<bool, CustomError> {
         ));
     }
 
-    let field: f64 = crate::detective::parse_field(&request.data, &request.path)?;
+    let field: f64 = crate::detective::parse_field(request.data, &request.path)?;
     let arg = parse_number(&request.args[0])?;
 
     let result = match request.match_type {

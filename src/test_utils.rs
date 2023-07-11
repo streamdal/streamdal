@@ -29,8 +29,8 @@ pub const SAMPLE_JSON: &str = r#"{
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
 }"#;
 
-pub struct TestCase {
-    pub request: Request,
+pub struct TestCase<'a> {
+    pub request: Request<'a>,
     pub expected: bool,
     pub should_error: bool,
     pub text: String,
