@@ -10,7 +10,7 @@ export const mutate = async ({
   body?: any;
 }) => {
   const response = await fetch(
-    `${await getEnv("PUBLIC_API_URL") || "http://localhost:9191"}${apiPath}`,
+    `${await getEnv("SNITCH_API_URL") || "http://localhost:9191"}${apiPath}`,
     {
       method,
       ...(body ? { body: JSON.stringify(body) } : {}),
