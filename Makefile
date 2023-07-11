@@ -41,13 +41,13 @@ generate/go: description = Compile protobuf schemas for Go
 generate/go: clean/go
 generate/go:
 	mkdir -p build/go/protos && \
-	mkdir -p build/go/protos/rules
+	mkdir -p build/go/protos/steps
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--go_out=./build/go/protos \
  		--go_opt=paths=source_relative \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
 
@@ -60,7 +60,7 @@ generate/rust:
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--rust_out=./build/rust/protos/src \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
 
@@ -74,7 +74,7 @@ generate/protoset:
  		--include_imports \
  		-o build/protos.protoset \
  		--proto_path=protos \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully generated protoset
 

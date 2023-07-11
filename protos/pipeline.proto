@@ -6,6 +6,7 @@ import "steps/match.proto";
 import "steps/transform.proto";
 import "steps/encode.proto";
 import "steps/decode.proto";
+import "steps/custom.proto";
 import "common.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";

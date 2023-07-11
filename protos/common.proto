@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package protos;
 
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
 // Common status codes used in gRPC method responses
 enum Status {
   RESPONSE_STATUS_UNSET= 0;
