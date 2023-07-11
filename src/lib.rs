@@ -1,6 +1,5 @@
 use crate::error::CustomError;
 use gjson::Value;
-use std::ops::Deref;
 
 pub mod detective;
 pub mod error;
@@ -37,7 +36,7 @@ impl FromValue<'_> for bool {
             return Err(CustomError::Error("not a boolean".to_string()));
         }
 
-        return Ok(value.bool());
+        Ok(value.bool())
     }
 }
 
@@ -47,7 +46,7 @@ impl FromValue<'_> for f64 {
             return Err(CustomError::Error("not a number".to_string()));
         }
 
-        return Ok(value.f64());
+        Ok(value.f64())
     }
 }
 

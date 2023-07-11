@@ -1,7 +1,7 @@
 use crate::detective;
 use crate::error::CustomError;
 use chrono::TimeZone;
-use gjson::Kind;
+
 use gjson::Value;
 use protos::detective::{DetectiveStep, DetectiveType};
 use regex::Regex;
@@ -138,7 +138,7 @@ pub fn timestamp_unix(request: &DetectiveStep) -> Result<bool, CustomError> {
 pub fn boolean(request: &DetectiveStep, expected: bool) -> Result<bool, CustomError> {
     let field: bool = detective::parse_field(&request.input, &request.path)?;
 
-    return Ok(field == expected);
+    Ok(field == expected)
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,

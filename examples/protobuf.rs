@@ -1,4 +1,4 @@
-use protobuf::{EnumOrUnknown, Message};
+use protobuf::{Message};
 use protobuf_json_mapping::PrintOptions;
 use protos::detective::{DetectiveStep, DetectiveType};
 

@@ -1,5 +1,5 @@
 #[cfg(test)]
-use protos::detective::{DetectiveStep, DetectiveType};
+use protos::detective::DetectiveType;
 
 // Q: Is there a community-agreed-upon test framework that people use?
 // Q: How do folks feel about table driven tests?

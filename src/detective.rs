@@ -2,7 +2,7 @@ use crate::error::CustomError;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use crate::{matcher_core as core, FromValue};
-use gjson::Value;
+
 use protos::detective::{DetectiveStep, DetectiveType};
 use std::str;
 
