@@ -3,7 +3,7 @@ use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use crate::{matcher_core as core, FromValue};
 use gjson::Value;
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 use std::str;
 
 pub struct Detective {}
@@ -20,66 +20,68 @@ impl Detective {
         Detective {}
     }
 
-    pub fn matches(&self, request: &MatchRequest) -> Result<bool, CustomError> {
-        validate_match_request(request)?;
+    pub fn matches(&self, request: &DetectiveStep) -> Result<bool, CustomError> {
+        validate_request(request)?;
 
         match request
             .type_
             .enum_value()
             .map_err(CustomError::MissingMatchType)?
         {
-            MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO
-            | MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL
-            | MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN
-            | MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL
-            | MatchType::MATCH_TYPE_NUMERIC_LESS_THAN => numeric::common(request),
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN => numeric::common(request),
 
             // Core matchers
-            MatchType::MATCH_TYPE_STRING_EQUAL => core::string_equal_to(request),
-            MatchType::MATCH_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
-            MatchType::MATCH_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
-            MatchType::MATCH_TYPE_IPV4_ADDRESS | MatchType::MATCH_TYPE_IPV6_ADDRESS => {
-                core::ip_address(request)
-            }
-            MatchType::MATCH_TYPE_REGEX => core::regex(request),
-            MatchType::MATCH_TYPE_TIMESTAMP_RFC3339 => core::timestamp_rfc3339(request),
-            MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO => core::timestamp_unix_nano(request),
-            MatchType::MATCH_TYPE_TIMESTAMP_UNIX => core::timestamp_unix(request),
-            MatchType::MATCH_TYPE_BOOLEAN_FALSE => core::boolean(request, false),
-            MatchType::MATCH_TYPE_BOOLEAN_TRUE => core::boolean(request, true),
-            MatchType::MATCH_TYPE_IS_EMPTY => core::is_empty(request),
-            MatchType::MATCH_TYPE_HAS_FIELD => core::has_field(request),
-            MatchType::MATCH_TYPE_IS_TYPE => core::is_type(request),
-            MatchType::MATCH_TYPE_UUID => core::uuid(request),
-            MatchType::MATCH_TYPE_MAC_ADDRESS => core::mac_address(request),
+            DetectiveType::DETECTIVE_TYPE_STRING_EQUAL => core::string_equal_to(request),
+            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
+            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
+            DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS
+            | DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => core::ip_address(request),
+            DetectiveType::DETECTIVE_TYPE_REGEX => core::regex(request),
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339 => core::timestamp_rfc3339(request),
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO => core::timestamp_unix_nano(request),
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX => core::timestamp_unix(request),
+            DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE => core::boolean(request, false),
+            DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE => core::boolean(request, true),
+            DetectiveType::DETECTIVE_TYPE_IS_EMPTY => core::is_empty(request),
+            DetectiveType::DETECTIVE_TYPE_HAS_FIELD => core::has_field(request),
+            DetectiveType::DETECTIVE_TYPE_IS_TYPE => core::is_type(request),
+            DetectiveType::DETECTIVE_TYPE_UUID => core::uuid(request),
+            DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS => core::mac_address(request),
 
             // PII matchers
-            MatchType::MATCH_TYPE_PII_ANY => pii::any(request),
-            MatchType::MATCH_TYPE_PII_CREDIT_CARD => pii::credit_card(request),
-            MatchType::MATCH_TYPE_PII_SSN => pii::ssn(request),
-            MatchType::MATCH_TYPE_PII_EMAIL => pii::email(request),
-            MatchType::MATCH_TYPE_PII_PHONE => pii::phone(request),
-            MatchType::MATCH_TYPE_PII_DRIVER_LICENSE => pii::drivers_license(request),
-            MatchType::MATCH_TYPE_PII_PASSPORT_ID => pii::passport_id(request),
-            MatchType::MATCH_TYPE_PII_VIN_NUMBER => pii::vin_number(request),
-            MatchType::MATCH_TYPE_PII_SERIAL_NUMBER => pii::serial_number(request),
-            MatchType::MATCH_TYPE_PII_LOGIN => pii::login(request),
-            MatchType::MATCH_TYPE_PII_TAXPAYER_ID => pii::taxpayer_id(request),
-            MatchType::MATCH_TYPE_PII_ADDRESS => pii::address(request),
-            MatchType::MATCH_TYPE_PII_SIGNATURE => pii::signature(request),
-            MatchType::MATCH_TYPE_PII_GEOLOCATION => pii::geolocation(request),
-            MatchType::MATCH_TYPE_PII_EDUCATION => pii::education(request),
-            MatchType::MATCH_TYPE_PII_FINANCIAL => pii::financial(request),
-            MatchType::MATCH_TYPE_PII_HEALTH => pii::health(request),
+            DetectiveType::DETECTIVE_TYPE_PII_ANY => pii::any(request),
+            DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii::credit_card(request),
+            DetectiveType::DETECTIVE_TYPE_PII_SSN => pii::ssn(request),
+            DetectiveType::DETECTIVE_TYPE_PII_EMAIL => pii::email(request),
+            DetectiveType::DETECTIVE_TYPE_PII_PHONE => pii::phone(request),
+            DetectiveType::DETECTIVE_TYPE_PII_DRIVER_LICENSE => pii::drivers_license(request),
+            DetectiveType::DETECTIVE_TYPE_PII_PASSPORT_ID => pii::passport_id(request),
+            DetectiveType::DETECTIVE_TYPE_PII_VIN_NUMBER => pii::vin_number(request),
+            DetectiveType::DETECTIVE_TYPE_PII_SERIAL_NUMBER => pii::serial_number(request),
+            DetectiveType::DETECTIVE_TYPE_PII_LOGIN => pii::login(request),
+            DetectiveType::DETECTIVE_TYPE_PII_TAXPAYER_ID => pii::taxpayer_id(request),
+            DetectiveType::DETECTIVE_TYPE_PII_ADDRESS => pii::address(request),
+            DetectiveType::DETECTIVE_TYPE_PII_SIGNATURE => pii::signature(request),
+            DetectiveType::DETECTIVE_TYPE_PII_GEOLOCATION => pii::geolocation(request),
+            DetectiveType::DETECTIVE_TYPE_PII_EDUCATION => pii::education(request),
+            DetectiveType::DETECTIVE_TYPE_PII_FINANCIAL => pii::financial(request),
+            DetectiveType::DETECTIVE_TYPE_PII_HEALTH => pii::health(request),
 
-            MatchType::MATCH_TYPE_UNKNOWN => Err(CustomError::Error(
+            DetectiveType::DETECTIVE_TYPE_UNKNOWN => Err(CustomError::Error(
                 "match type cannot be unknown".to_string(),
             )),
         }
     }
 }
 
-pub fn parse_field<'a, T: FromValue<'a>>(data: &'a [u8], path: &'a String) -> Result<T, CustomError> {
+pub fn parse_field<'a, T: FromValue<'a>>(
+    data: &'a [u8],
+    path: &'a String,
+) -> Result<T, CustomError> {
     let data_as_str = str::from_utf8(data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
@@ -95,10 +97,10 @@ pub fn parse_field<'a, T: FromValue<'a>>(data: &'a [u8], path: &'a String) -> Re
     T::from_value(v)
 }
 
-fn validate_match_request(request: &MatchRequest) -> Result<(), CustomError> {
+fn validate_request(request: &DetectiveStep) -> Result<(), CustomError> {
     match request.type_.enum_value() {
         Ok(value) => {
-            if value == MatchType::MATCH_TYPE_UNKNOWN {
+            if value == DetectiveType::DETECTIVE_TYPE_UNKNOWN {
                 return Err(CustomError::MatchError(format!(
                     "unknown match type: {:?}",
                     value
@@ -117,7 +119,7 @@ fn validate_match_request(request: &MatchRequest) -> Result<(), CustomError> {
         return Err(CustomError::Error("path cannot be empty".to_string()));
     }
 
-    if request.data.is_empty() {
+    if request.input.is_empty() {
         return Err(CustomError::Error("data cannot be empty".to_string()));
     }
 

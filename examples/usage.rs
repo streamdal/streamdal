@@ -1,9 +1,9 @@
 use protobuf::EnumOrUnknown;
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 use snitch_detective::detective;
 // use snitch_detective::protos;
-// use snitch_detective::protos::matcher::MatchType;
-// use snitch_detective::protos::matcher::MatchType::MATCH_TYPE_BOOLEAN_FALSE;
+// use snitch_detective::protos::detective::DetectiveType;
+// use snitch_detective::protos::detective::DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE;
 
 fn main() {
     // How to create an instance of detective
@@ -15,35 +15,36 @@ fn main() {
         }
     }"#;
 
-    let match_request = MatchRequest {
-        data: sample_json.as_bytes().to_vec(),
+    let detective_step = DetectiveStep {
+        input: sample_json.as_bytes().to_vec(),
         path: "*".to_string(),
         args: vec!["1".to_string()],
         negate: false,
-        type_: EnumOrUnknown::from(MatchType::MATCH_TYPE_PII_ANY),
+        type_: EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_PII_ANY),
+        conditions: vec![],
         special_fields: Default::default(),
     };
 
-    // println!("At create time: {:#?}", match_request);
+    // println!("At create time: {:#?}", detective_step);
     //
     // // How to serialize to bytes
-    // let data = Message::write_to_bytes(&match_request).unwrap();
+    // let data = Message::write_to_bytes(&detective_step).unwrap();
     //
     // // How to deserialize (approach 1)
-    // let deserialized: MatchRequest = Message::parse_from_bytes(&data).unwrap();
+    // let deserialized: DetectiveStep = Message::parse_from_bytes(&data).unwrap();
     //
     // println!("Deserialized: {:#?}", deserialized);
     //
     // // How to deserialize (approach 2)
-    // let deserialized_2 = MatchRequest::parse_from_bytes(&data).unwrap();
+    // let deserialized_2 = DetectiveStep::parse_from_bytes(&data).unwrap();
     //
     // println!("deserialized 2: {:#?}", deserialized_2);
     //
     // // How to print protobuf as JSON
-    // let stuff = protobuf_json_mapping::print_to_string(&match_request).unwrap();
+    // let stuff = protobuf_json_mapping::print_to_string(&detective_step).unwrap();
     // println!("Stuff: {}", stuff);
 
-    match det.matches(&match_request) {
+    match det.matches(&detective_step) {
         Ok(value) => println!("Result: {:#?}", value),
         Err(err) => println!("Error: {:#?}", err),
     }

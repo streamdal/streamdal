@@ -1,7 +1,7 @@
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 
 pub struct TestCase {
-    pub request: MatchRequest,
+    pub request: DetectiveStep,
     pub expected: bool,
     pub should_error: bool,
     pub text: String,
@@ -20,11 +20,11 @@ pub fn run_tests(test_cases: &Vec<TestCase>) {
 }
 
 pub fn generate_request(
-    match_type: MatchType,
+    detective_type: DetectiveType,
     path: &str,
     args: Vec<String>,
     negate: bool,
-) -> MatchRequest {
+) -> DetectiveStep {
     let sample_json = r#"{
     "boolean_t": true,
     "boolean_f": false,
@@ -54,12 +54,13 @@ pub fn generate_request(
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
 }"#;
 
-    MatchRequest {
-        data: sample_json.as_bytes().to_vec(),
+    DetectiveStep {
+        input: sample_json.as_bytes().to_vec(),
         path: path.to_string(),
         args,
         negate,
-        type_: protobuf::EnumOrUnknown::from(match_type),
+        type_: protobuf::EnumOrUnknown::from(detective_type),
+        conditions: vec![],
         special_fields: Default::default(),
     }
 }

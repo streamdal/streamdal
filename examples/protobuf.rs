@@ -1,14 +1,15 @@
 use protobuf::{EnumOrUnknown, Message};
 use protobuf_json_mapping::PrintOptions;
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 
 fn main() {
-    let match_request = MatchRequest {
-        data: "test".as_bytes().to_vec(),
+    let match_request = DetectiveStep {
+        input: "test".as_bytes().to_vec(),
         path: "field1.field2".to_string(),
         args: vec![],
         negate: false,
-        type_: protobuf::EnumOrUnknown::from(MatchType::MATCH_TYPE_BOOLEAN_FALSE),
+        type_: protobuf::EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE),
+        conditions: vec![],
         special_fields: Default::default(),
     };
 
@@ -20,12 +21,12 @@ fn main() {
     print("Serialized", &data);
 
     // How to deserialize (approach 1)
-    let deserialized: MatchRequest = Message::parse_from_bytes(&data).unwrap();
+    let deserialized: DetectiveStep = Message::parse_from_bytes(&data).unwrap();
 
     print("Deserialized 1", &deserialized);
 
     // How to deserialize (approach 2)
-    let deserialized_2 = MatchRequest::parse_from_bytes(&data).unwrap();
+    let deserialized_2 = DetectiveStep::parse_from_bytes(&data).unwrap();
 
     print("deserialized 2", &deserialized_2);
 

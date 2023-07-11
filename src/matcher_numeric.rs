@@ -1,22 +1,22 @@
 use crate::error::CustomError;
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 
-pub fn common(request: &MatchRequest) -> Result<bool, CustomError> {
+pub fn common(request: &DetectiveStep) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
         return Err(CustomError::Error(
             "numeric match must have exactly one arg".to_string(),
         ));
     }
 
-    let field: f64 = crate::detective::parse_field(&request.data, &request.path)?;
+    let field: f64 = crate::detective::parse_field(&request.input, &request.path)?;
     let arg = parse_number(&request.args[0])?;
 
     let result = match request.type_.enum_value().unwrap() {
-        MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO => field == arg,
-        MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN => field > arg,
-        MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL => field >= arg,
-        MatchType::MATCH_TYPE_NUMERIC_LESS_THAN => field < arg,
-        MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL => field <= arg,
+        DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO => field == arg,
+        DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN => field > arg,
+        DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL => field >= arg,
+        DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN => field < arg,
+        DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL => field <= arg,
 
         _ => {
             return Err(CustomError::MatchError(

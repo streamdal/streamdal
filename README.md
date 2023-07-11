@@ -6,7 +6,7 @@ snitch-detective
 Rust helper lib for performing value matching in `snitch` WASM functions.
 
 For available matchers, look at the enums listed in
-[snitch-protos](https://github.com/streamdal/snitch-protos/blob/main/protos/rules/matcher.proto).
+[snitch-protos](https://github.com/streamdal/snitch-protos/blob/main/protos/steps/detective.proto).
 
 # Install
 ```
@@ -17,14 +17,14 @@ cargo add snitch-detective
 # Usage
 ```rust
 use snitch_detective::Detective;
-use protos::rules::{MatchRequest, MatchType}; // snitch-protos
+use protos::steps::{DetectiveStep, DetectiveType}; // snitch-protos
 
 fn main() {
     let detective = Detective::new();
     
     let maybe_ip = "127.0.0.1".to_string();
     
-    let match_request = MatchRequest {
+    let detective_step = DetectiveStep {
         data: "test".as_bytes().to_vec(),
         path: "field1.field2".to_string(),
         args: vec![maybe_ip],
@@ -34,7 +34,7 @@ fn main() {
     };
 
 
-    let result = detective.matches(&match_request).unwrap();
+    let result = detective.matches(&detective_step).unwrap();
     assert_eq!(result, true);
 } 
 ```

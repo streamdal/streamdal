@@ -1,5 +1,5 @@
 #[cfg(test)]
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::DetectiveType;
 
 #[test]
 fn test_numeric() {
@@ -7,7 +7,7 @@ fn test_numeric() {
         // Equal
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 "number_int",
                 vec!["100".to_string()],
                 false,
@@ -18,7 +18,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 "number_float",
                 vec!["100.1".to_string()],
                 false,
@@ -30,7 +30,7 @@ fn test_numeric() {
         // Greater than
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 "number_int",
                 vec!["1".to_string()],
                 false,
@@ -41,7 +41,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 "number_float",
                 vec!["2".to_string()],
                 false,
@@ -52,7 +52,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_GREATER_THAN,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 "number_float",
                 vec!["1000".to_string()],
                 false,
@@ -64,7 +64,7 @@ fn test_numeric() {
         // Greater equal
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_GREATER_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL,
                 "number_float",
                 vec!["100.1".to_string()],
                 false,
@@ -76,7 +76,7 @@ fn test_numeric() {
         // Less than
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_LESS_THAN,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN,
                 "number_int",
                 vec!["2000".to_string()],
                 false,
@@ -88,7 +88,7 @@ fn test_numeric() {
         // Less equal
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 "number_int",
                 vec!["1000".to_string()],
                 false,
@@ -99,7 +99,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 "number_int",
                 vec!["999".to_string()],
                 false,
@@ -111,7 +111,7 @@ fn test_numeric() {
         // Negate
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_LESS_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 "number_int",
                 vec!["1000".to_string()],
                 true,
@@ -122,7 +122,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 "number_int",
                 vec!["100".to_string()],
                 true,
@@ -134,7 +134,7 @@ fn test_numeric() {
         // Error paths
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 "number_int",
                 vec!["not a number".to_string()],
                 false,
@@ -145,7 +145,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_NUMERIC_EQUAL_TO,
+                DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 "does_not_exist",
                 vec!["1000".to_string()],
                 false,

@@ -1,5 +1,5 @@
 #[cfg(test)]
-use protos::matcher::{MatchRequest, MatchType};
+use protos::detective::{DetectiveStep, DetectiveType};
 
 // Q: Is there a community-agreed-upon test framework that people use?
 // Q: How do folks feel about table driven tests?
@@ -12,7 +12,7 @@ fn string_tests() {
         // String equals
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 "object.field",
                 vec!["value".to_string()],
                 false,
@@ -23,7 +23,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 "object.field",
                 vec!["should not match".to_string()],
                 false,
@@ -34,7 +34,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_EQUAL,
+                DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 "does not exist",
                 vec!["foo".to_string()],
                 false,
@@ -48,7 +48,7 @@ fn string_tests() {
         // String contains ALL
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_CONTAINS_ALL,
+                DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
                 "object.field",
                 vec!["va".to_string(), "lue".to_string()],
                 false,
@@ -59,7 +59,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_CONTAINS_ALL,
+                DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
                 "object.field",
                 vec!["va".to_string(), "lueeeeeeee".to_string()],
                 false,
@@ -71,7 +71,7 @@ fn string_tests() {
         // String contains ANY
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_CONTAINS_ANY,
+                DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
                 "object.field",
                 vec!["va".to_string(), "lueeeeeeee".to_string()],
                 false,
@@ -82,7 +82,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_STRING_CONTAINS_ANY,
+                DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
                 "object.field",
                 vec!["vvvva".to_string(), "lueeeeeeee".to_string()],
                 false,
@@ -102,7 +102,7 @@ fn is_empty() {
         // Is empty
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "object.empty_string",
                 vec![], // is_empty doesn't have any args
                 false,
@@ -113,7 +113,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "object.null_field",
                 vec![],
                 false,
@@ -124,7 +124,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "object.empty_array",
                 vec![],
                 false,
@@ -135,7 +135,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "object2.does_not_exist",
                 vec![],
                 false,
@@ -146,7 +146,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "object.field",
                 vec![],
                 false,
@@ -157,7 +157,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_EMPTY,
+                DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 "array",
                 vec![],
                 false,
@@ -176,7 +176,7 @@ fn has_field() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_HAS_FIELD,
+                DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
                 "object",
                 vec![], // is_empty doesn't have any args
                 false,
@@ -187,7 +187,7 @@ fn has_field() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_HAS_FIELD,
+                DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
                 "does not exist",
                 vec![], // is_empty doesn't have any args
                 false,
@@ -206,7 +206,7 @@ fn is_type() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "object.field",
                 vec!["string".to_string()],
                 false,
@@ -217,7 +217,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "boolean_t",
                 vec!["bool".to_string()],
                 false,
@@ -228,7 +228,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "array",
                 vec!["array".to_string()],
                 false,
@@ -239,7 +239,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "object",
                 vec!["object".to_string()],
                 false,
@@ -250,7 +250,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "number_int",
                 vec!["number".to_string()],
                 false,
@@ -261,7 +261,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "array",
                 vec!["bool".to_string()],
                 false,
@@ -272,7 +272,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IS_TYPE,
+                DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 "does not exist",
                 vec!["bool".to_string()],
                 false,
@@ -291,7 +291,7 @@ fn ipv4_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV4_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 "object.ipv4_address",
                 vec![], // No need for args
                 false,
@@ -302,7 +302,7 @@ fn ipv4_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV4_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 "object.does_not_exist",
                 vec![], // No need for args
                 false,
@@ -313,7 +313,7 @@ fn ipv4_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV4_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 "object.field",
                 vec![], // No need for args
                 false,
@@ -332,7 +332,7 @@ fn ipv6_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV6_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 "object.ipv6_address",
                 vec![], // No need for args
                 false,
@@ -343,7 +343,7 @@ fn ipv6_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV6_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 "object.field",
                 vec![], // No need for args
                 false,
@@ -354,7 +354,7 @@ fn ipv6_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_IPV6_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 "object.non-existent-field",
                 vec![], // No need for args
                 false,
@@ -373,7 +373,7 @@ fn boolean() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_BOOLEAN_TRUE,
+                DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE,
                 "boolean_t",
                 vec![], // No need for args
                 false,
@@ -384,7 +384,7 @@ fn boolean() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_BOOLEAN_FALSE,
+                DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
                 "boolean_f",
                 vec![], // No need for args
                 false,
@@ -395,7 +395,7 @@ fn boolean() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_BOOLEAN_FALSE,
+                DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
                 "boolean_t",
                 vec![], // No need for args
                 false,
@@ -406,7 +406,7 @@ fn boolean() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_BOOLEAN_FALSE,
+                DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
                 "object",
                 vec![], // No need for args
                 false,
@@ -417,7 +417,7 @@ fn boolean() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_BOOLEAN_FALSE,
+                DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
                 "does-not-exist",
                 vec![], // No need for args
                 false,
@@ -436,7 +436,7 @@ fn regex() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_REGEX,
+                DetectiveType::DETECTIVE_TYPE_REGEX,
                 "object.field",
                 vec![r#"^[a-zA-Z0-9]+$"#.to_string()],
                 false,
@@ -447,7 +447,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_REGEX,
+                DetectiveType::DETECTIVE_TYPE_REGEX,
                 "object.number_as_string",
                 vec![r#"\d+"#.to_string()],
                 false,
@@ -458,7 +458,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_REGEX,
+                DetectiveType::DETECTIVE_TYPE_REGEX,
                 "object.field",
                 vec![r#"\d+"#.to_string()],
                 false,
@@ -469,7 +469,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_REGEX,
+                DetectiveType::DETECTIVE_TYPE_REGEX,
                 "object.field",
                 vec![r#"\d+++]["#.to_string()],
                 false,
@@ -488,7 +488,7 @@ fn mac_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_MAC_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 "object.mac_address",
                 vec![], // no args needed
                 false,
@@ -499,7 +499,7 @@ fn mac_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_MAC_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 "object.field",
                 vec![], // no args needed
                 false,
@@ -510,7 +510,7 @@ fn mac_address() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_MAC_ADDRESS,
+                DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 "object.does_not_exist",
                 vec![], // no args needed
                 false,
@@ -529,7 +529,7 @@ fn uuid() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_UUID,
+                DetectiveType::DETECTIVE_TYPE_UUID,
                 "object.uuid_dash",
                 vec![], // no args needed
                 false,
@@ -540,7 +540,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_UUID,
+                DetectiveType::DETECTIVE_TYPE_UUID,
                 "object.uuid_colon",
                 vec![], // no args needed
                 false,
@@ -551,7 +551,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_UUID,
+                DetectiveType::DETECTIVE_TYPE_UUID,
                 "object.uuid_stripped",
                 vec![], // no args needed
                 false,
@@ -562,7 +562,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_UUID,
+                DetectiveType::DETECTIVE_TYPE_UUID,
                 "object.field",
                 vec![], // no args needed
                 false,
@@ -573,7 +573,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_UUID,
+                DetectiveType::DETECTIVE_TYPE_UUID,
                 "object.does_not_exist",
                 vec![], // no args needed
                 false,
@@ -592,7 +592,7 @@ fn timestamp_unix() {
     let test_cases = vec![
         // crate::test_utils::TestCase {
         //     request: crate::test_utils::generate_request(
-        //         MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
+        //         DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
         //         "timestamp_unix_str",
         //         vec![], // no args needed
         //         false,
@@ -603,7 +603,7 @@ fn timestamp_unix() {
         // },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 "timestamp_unix_num",
                 vec![], // no args needed
                 false,
@@ -614,7 +614,7 @@ fn timestamp_unix() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 "object.field",
                 vec![], // no args needed
                 false,
@@ -625,7 +625,7 @@ fn timestamp_unix() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 "unknown_field_123",
                 vec![], // no args needed
                 false,
@@ -644,7 +644,7 @@ fn timestamp_unix_nano() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 "timestamp_unix_nano_str",
                 vec![], // no args needed
                 false,
@@ -655,7 +655,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 "timestamp_unix_nano_num",
                 vec![], // no args needed
                 false,
@@ -666,7 +666,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 "object.field",
                 vec![], // no args needed
                 false,
@@ -677,7 +677,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_UNIX_NANO,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 "does-not-exist",
                 vec![], // no args needed
                 false,
@@ -696,7 +696,7 @@ fn timestamp_rfc3339() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_RFC3339,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 "timestamp_rfc3339",
                 vec![], // no args needed
                 false,
@@ -707,7 +707,7 @@ fn timestamp_rfc3339() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_RFC3339,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 "timestamp_unix_str",
                 vec![], // no args needed
                 false,
@@ -718,7 +718,7 @@ fn timestamp_rfc3339() {
         },
         crate::test_utils::TestCase {
             request: crate::test_utils::generate_request(
-                MatchType::MATCH_TYPE_TIMESTAMP_RFC3339,
+                DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 "unknown-field-123",
                 vec![], // no args needed
                 false,
