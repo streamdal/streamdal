@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "common.proto";
-
 package protos.steps;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
@@ -74,10 +72,8 @@ enum DetectiveType {
 }
 
 message DetectiveStep {
-  bytes input = 1;
-  string path = 2;
-  repeated string args = 3; // args determined by match_type
-  bool negate = 4;
-  DetectiveType type = 5;
-  repeated protos.Condition conditions = 6;
+  string path = 1;
+  repeated string args = 2; // args determined by match_type
+  bool negate = 3;
+  DetectiveType type = 4;
 }

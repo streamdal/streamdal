@@ -96,93 +96,13 @@ impl ResponseStatus {
     }
 }
 
-///  Condition defines how the pipeline should behave when a condition is met
-#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.Condition)
-pub enum Condition {
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_UNSET)
-    CONDITION_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_ERROR_CONTINUE_PIPELINE)
-    CONDITION_ON_ERROR_CONTINUE_PIPELINE = 1,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_ERROR_ABORT_PIPELINE)
-    CONDITION_ON_ERROR_ABORT_PIPELINE = 2,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_ERROR_NOTIFY_SERVER)
-    CONDITION_ON_ERROR_NOTIFY_SERVER = 3,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_MATCH_CONTINUE_PIPELINE)
-    CONDITION_ON_MATCH_CONTINUE_PIPELINE = 4,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_MATCH_ABORT_PIPELINE)
-    CONDITION_ON_MATCH_ABORT_PIPELINE = 5,
-    // @@protoc_insertion_point(enum_value:protos.Condition.CONDITION_ON_MATCH_NOTIFY_SERVER)
-    CONDITION_ON_MATCH_NOTIFY_SERVER = 6,
-}
-
-impl ::protobuf::Enum for Condition {
-    const NAME: &'static str = "Condition";
-
-    fn value(&self) -> i32 {
-        *self as i32
-    }
-
-    fn from_i32(value: i32) -> ::std::option::Option<Condition> {
-        match value {
-            0 => ::std::option::Option::Some(Condition::CONDITION_UNSET),
-            1 => ::std::option::Option::Some(Condition::CONDITION_ON_ERROR_CONTINUE_PIPELINE),
-            2 => ::std::option::Option::Some(Condition::CONDITION_ON_ERROR_ABORT_PIPELINE),
-            3 => ::std::option::Option::Some(Condition::CONDITION_ON_ERROR_NOTIFY_SERVER),
-            4 => ::std::option::Option::Some(Condition::CONDITION_ON_MATCH_CONTINUE_PIPELINE),
-            5 => ::std::option::Option::Some(Condition::CONDITION_ON_MATCH_ABORT_PIPELINE),
-            6 => ::std::option::Option::Some(Condition::CONDITION_ON_MATCH_NOTIFY_SERVER),
-            _ => ::std::option::Option::None
-        }
-    }
-
-    const VALUES: &'static [Condition] = &[
-        Condition::CONDITION_UNSET,
-        Condition::CONDITION_ON_ERROR_CONTINUE_PIPELINE,
-        Condition::CONDITION_ON_ERROR_ABORT_PIPELINE,
-        Condition::CONDITION_ON_ERROR_NOTIFY_SERVER,
-        Condition::CONDITION_ON_MATCH_CONTINUE_PIPELINE,
-        Condition::CONDITION_ON_MATCH_ABORT_PIPELINE,
-        Condition::CONDITION_ON_MATCH_NOTIFY_SERVER,
-    ];
-}
-
-impl ::protobuf::EnumFull for Condition {
-    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("Condition").unwrap()).clone()
-    }
-
-    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
-        let index = *self as usize;
-        Self::enum_descriptor().value_by_index(index)
-    }
-}
-
-impl ::std::default::Default for Condition {
-    fn default() -> Self {
-        Condition::CONDITION_UNSET
-    }
-}
-
-impl Condition {
-    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<Condition>("Condition")
-    }
-}
-
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0ccommon.proto\x12\x06protos*\xd1\x01\n\x0eResponseStatus\x12\x19\n\
     \x15RESPONSE_STATUS_UNSET\x10\0\x12\x16\n\x12RESPONSE_STATUS_OK\x10\x01\
     \x12\x1f\n\x1bRESPONSE_STATUS_BAD_REQUEST\x10\x02\x12\x1d\n\x19RESPONSE_\
     STATUS_NOT_FOUND\x10\x03\x12)\n%RESPONSE_STATUS_INTERNAL_SERVER_ERROR\
-    \x10\x04\x12!\n\x1dRESPONSE_STATUS_GENERIC_ERROR\x10\x05*\x8e\x02\n\tCon\
-    dition\x12\x13\n\x0fCONDITION_UNSET\x10\0\x12(\n$CONDITION_ON_ERROR_CONT\
-    INUE_PIPELINE\x10\x01\x12%\n!CONDITION_ON_ERROR_ABORT_PIPELINE\x10\x02\
-    \x12$\n\x20CONDITION_ON_ERROR_NOTIFY_SERVER\x10\x03\x12(\n$CONDITION_ON_\
-    MATCH_CONTINUE_PIPELINE\x10\x04\x12%\n!CONDITION_ON_MATCH_ABORT_PIPELINE\
-    \x10\x05\x12$\n\x20CONDITION_ON_MATCH_NOTIFY_SERVER\x10\x06B4Z2github.co\
-    m/streamdal/snitch-protos/build/go/protosJ\xf7\x05\n\x06\x12\x04\0\0\x1b\
+    \x10\x04\x12!\n\x1dRESPONSE_STATUS_GENERIC_ERROR\x10\x05B4Z2github.com/s\
+    treamdal/snitch-protos/build/go/protosJ\xf4\x02\n\x06\x12\x04\0\0\x0e\
     \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\
     \x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n?\n\x02\
     \x05\0\x12\x04\x07\0\x0e\x01\x1a3\x20Common\x20status\x20codes\x20used\
@@ -198,24 +118,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x1f\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0c\x02,\n\x0c\n\x05\x05\0\x02\
     \x04\x01\x12\x03\x0c\x02'\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c*+\n\
     \x0b\n\x04\x05\0\x02\x05\x12\x03\r\x02$\n\x0c\n\x05\x05\0\x02\x05\x01\
-    \x12\x03\r\x02\x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\"#\nV\n\x02\
-    \x05\x01\x12\x04\x11\0\x1b\x01\x1aJ\x20Condition\x20defines\x20how\x20th\
-    e\x20pipeline\x20should\x20behave\x20when\x20a\x20condition\x20is\x20met\
-    \n\n\n\n\x03\x05\x01\x01\x12\x03\x11\x05\x0e\n\x0b\n\x04\x05\x01\x02\0\
-    \x12\x03\x12\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x12\x02\x11\n\
-    \x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x12\x14\x15\n\x0b\n\x04\x05\x01\x02\
-    \x01\x12\x03\x13\x02+\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x13\x02&\n\
-    \x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x13)*\n\x0b\n\x04\x05\x01\x02\x02\
-    \x12\x03\x14\x02(\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x14\x02#\n\x0c\
-    \n\x05\x05\x01\x02\x02\x02\x12\x03\x14&'\n\x0b\n\x04\x05\x01\x02\x03\x12\
-    \x03\x15\x02'\n\x0c\n\x05\x05\x01\x02\x03\x01\x12\x03\x15\x02\"\n\x0c\n\
-    \x05\x05\x01\x02\x03\x02\x12\x03\x15%&\n\x0b\n\x04\x05\x01\x02\x04\x12\
-    \x03\x16\x02+\n\x0c\n\x05\x05\x01\x02\x04\x01\x12\x03\x16\x02&\n\x0c\n\
-    \x05\x05\x01\x02\x04\x02\x12\x03\x16)*\n\x0b\n\x04\x05\x01\x02\x05\x12\
-    \x03\x17\x02(\n\x0c\n\x05\x05\x01\x02\x05\x01\x12\x03\x17\x02#\n\x0c\n\
-    \x05\x05\x01\x02\x05\x02\x12\x03\x17&'\n\x0b\n\x04\x05\x01\x02\x06\x12\
-    \x03\x18\x02'\n\x0c\n\x05\x05\x01\x02\x06\x01\x12\x03\x18\x02\"\n\x0c\n\
-    \x05\x05\x01\x02\x06\x02\x12\x03\x18%&b\x06proto3\
+    \x12\x03\r\x02\x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\"#b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -234,9 +137,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
             let mut messages = ::std::vec::Vec::with_capacity(0);
-            let mut enums = ::std::vec::Vec::with_capacity(2);
+            let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(ResponseStatus::generated_enum_descriptor_data());
-            enums.push(Condition::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

@@ -11,11 +11,27 @@ import "common.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
+// Each pipeline step includes this in the response; SDK is responsible for
+// interpreting the response status and apply it to the step condition.
 enum PipelineStepStatus {
   PIPELINE_STEP_STATUS_UNSET = 0;
   PIPELINE_STEP_STATUS_SUCCESS = 1;
   PIPELINE_STEP_STATUS_FAILURE = 2;
   PIPELINE_STEP_STATUS_ERROR = 3;
+}
+
+// A condition defines how the SDK should handle a step response -- should it
+// continue executing the pipeline, should it abort, should it notify the server?
+enum Condition {
+  CONDITION_UNSET = 0;
+  CONDITION_ON_ERROR_CONTINUE_PIPELINE = 1;
+  CONDITION_ON_ERROR_ABORT_PIPELINE = 2;
+  CONDITION_ON_ERROR_NOTIFY_SERVER = 3;
+  CONDITION_ON_MATCH_CONTINUE_PIPELINE = 4;
+  CONDITION_ON_MATCH_ABORT_PIPELINE = 5;
+  CONDITION_ON_MATCH_NOTIFY_SERVER = 6;
+
+  // NOTE: Doing *_NEXT_STEP or *_SKIP_STEP right now would be too complex
 }
 
 message PipelineStep {
@@ -25,14 +41,20 @@ message PipelineStep {
   // Friendly name for the step
   string name = 2;
 
+  // Input bytes for next step (probably PipelineStepResponse.output from previous step)
+  bytes input = 3;
+
   // WASM module ID
-  string wasm_id = 3;
+  string wasm_id = 4;
 
   // WASM module bytes
-  string wasm_bytes = 4;
+  string wasm_bytes = 5;
 
   // WASM function name to execute
-  string wasm_function = 5;
+  string wasm_function = 6;
+
+  // Conditions that SDK should check before executing next step
+  repeated Condition conditions = 7;
 
   // All steps return PipelineStepResponse upon completion
   oneof step {
@@ -86,9 +108,6 @@ message SetPipelineRequest {
 
   // One or more steps to execute
   repeated PipelineStep steps = 3;
-
-  // Conditions that have to be met for pipeline to continue executing
-  repeated Condition global_conditions = 4;
 }
 
 message SetPipelineResponse {

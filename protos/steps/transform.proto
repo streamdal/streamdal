@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package protos.steps;
 
-import "common.proto";
-
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
 enum TransformType {
@@ -15,10 +13,7 @@ enum TransformType {
 }
 
 message TransformStep {
-  bytes input = 1;
-  bytes output = 2;
-  string path = 3;
-  string value = 4;
-  TransformType type = 5;
-  repeated protos.Condition conditions = 6;
+  string path = 1;
+  string value = 2; // Should this be bytes? ~DS
+  TransformType type = 3;
 }
