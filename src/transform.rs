@@ -1,4 +1,4 @@
-use protos::transform::TransformRequest;
+use protos::transform::TransformStep;
 use snitch_gjson as gjson;
 
 #[derive(Debug)]
@@ -6,11 +6,11 @@ pub enum TransformError {
     Generic(String),
 }
 
-pub fn overwrite(req: &TransformRequest) -> Result<String, TransformError> {
+pub fn overwrite(req: &TransformStep) -> Result<String, TransformError> {
     validate_request(req, true)?;
 
     let data = gjson::set_overwrite(
-        convert_bytes_to_string(&req.data)?,
+        convert_bytes_to_string(&req.input)?,
         req.path.as_str(),
         req.value.as_str(),
     )
@@ -19,10 +19,10 @@ pub fn overwrite(req: &TransformRequest) -> Result<String, TransformError> {
     Ok(data)
 }
 
-pub fn obfuscate(req: &TransformRequest) -> Result<String, TransformError> {
+pub fn obfuscate(req: &TransformStep) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
+    let data_as_str = convert_bytes_to_string(&req.input)?;
     let value = gjson::get(data_as_str, req.path.as_str());
 
     match value.kind() {
@@ -44,10 +44,10 @@ fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
         .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))
 }
 
-pub fn mask(req: &TransformRequest) -> Result<String, TransformError> {
+pub fn mask(req: &TransformStep) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
+    let data_as_str = convert_bytes_to_string(&req.input)?;
     let value = gjson::get(data_as_str, req.path.as_str());
 
     match value.kind() {
@@ -76,12 +76,12 @@ fn _mask(data: &str, path: &str, mask_char: char, quote: bool) -> Result<String,
         .map_err(|e| TransformError::Generic(format!("unable to mask data: {}", e)))
 }
 
-fn validate_request(req: &TransformRequest, value_check: bool) -> Result<(), TransformError> {
+fn validate_request(req: &TransformStep, value_check: bool) -> Result<(), TransformError> {
     if req.path.is_empty() {
         return Err(TransformError::Generic("path cannot be empty".to_string()));
     }
 
-    if req.data.is_empty() {
+    if req.input.is_empty() {
         return Err(TransformError::Generic("data cannot be empty".to_string()));
     }
 
@@ -90,14 +90,14 @@ fn validate_request(req: &TransformRequest, value_check: bool) -> Result<(), Tra
     }
 
     // Is this valid JSON?
-    if !gjson::valid(convert_bytes_to_string(&req.data)?) {
+    if !gjson::valid(convert_bytes_to_string(&req.input)?) {
         return Err(TransformError::Generic(
             "data is not valid JSON".to_string(),
         ));
     }
 
     // Valid path?
-    if !gjson::get(convert_bytes_to_string(&req.data)?, req.path.as_str()).exists() {
+    if !gjson::get(convert_bytes_to_string(&req.input)?, req.path.as_str()).exists() {
         return Err(TransformError::Generic(format!(
             "path '{}' not found in data",
             req.path
@@ -115,6 +115,7 @@ fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use protos::transform::TransformStep;
 
     const TEST_DATA: &str = r#"{
     "foo": "bar",
@@ -126,8 +127,8 @@ mod tests {
 
     #[test]
     fn test_overwrite() {
-        let mut req = TransformRequest::new();
-        req.data = TEST_DATA.as_bytes().to_vec();
+        let mut req = TransformStep::new();
+        req.input = TEST_DATA.as_bytes().to_vec();
         req.path = "baz.qux".to_string();
         req.value = "\"test\"".to_string();
 
@@ -159,8 +160,8 @@ mod tests {
 
     #[test]
     fn test_obfuscate() {
-        let mut req = TransformRequest::new();
-        req.data = TEST_DATA.as_bytes().to_vec();
+        let mut req = TransformStep::new();
+        req.input = TEST_DATA.as_bytes().to_vec();
         req.path = "baz.qux".to_string();
 
         let result = obfuscate(&req).unwrap();
@@ -186,8 +187,8 @@ mod tests {
 
     #[test]
     fn test_mask() {
-        let mut req = TransformRequest::new();
-        req.data = TEST_DATA.as_bytes().to_vec();
+        let mut req = TransformStep::new();
+        req.input = TEST_DATA.as_bytes().to_vec();
         req.path = "baz.qux".to_string();
 
         let result = mask(&req).unwrap();

@@ -13,4 +13,4 @@ repository = "https://github.com/streamdal/snitch-transform"
 [dependencies]
 snitch-gjson = "0.8.1-with-set"
 sha256 = "1.1.4"
-snitch-protos = "0.0.9"
+snitch-protos = "0.0.12"
