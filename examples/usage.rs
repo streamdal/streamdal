@@ -17,10 +17,10 @@ fn main() {
 
     let detective_step = DetectiveStep {
         input: sample_json.as_bytes().to_vec(),
-        path: "*".to_string(),
+        path: "field1".to_string(),
         args: vec!["1".to_string()],
         negate: false,
-        type_: EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_PII_ANY),
+        type_: EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_HAS_FIELD),
         conditions: vec![],
         special_fields: Default::default(),
     };
