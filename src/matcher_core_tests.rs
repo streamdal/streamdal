@@ -1,4 +1,4 @@
-use crate::test_utils::Request;
+use crate::detective::Request;
 #[cfg(test)]
 use protos::detective::DetectiveType;
 
@@ -13,7 +13,7 @@ fn string_tests() {
         // String equals
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["value".to_string()],
@@ -25,7 +25,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["should not match".to_string()],
@@ -37,7 +37,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "does not exist".to_string(),
                 args: vec!["foo".to_string()],
@@ -52,7 +52,7 @@ fn string_tests() {
         // String contains ALL
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lue".to_string()],
@@ -64,7 +64,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
@@ -77,7 +77,7 @@ fn string_tests() {
         // String contains ANY
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
@@ -89,7 +89,7 @@ fn string_tests() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["vvvva".to_string().to_string(), "lueeeeeeee".to_string()],
@@ -110,7 +110,7 @@ fn is_empty() {
         // Is empty
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.empty_string".to_string(),
                 args: vec![], // is_empty doesn't have any args
@@ -122,7 +122,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.null_field".to_string(),
                 args: vec![],
@@ -134,7 +134,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.empty_array".to_string(),
                 args: vec![],
@@ -146,7 +146,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object2.does_not_exist".to_string(),
                 args: vec![],
@@ -158,7 +158,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![],
@@ -170,7 +170,7 @@ fn is_empty() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "array".to_string(),
                 args: vec![],
@@ -190,7 +190,7 @@ fn has_field() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
+                match_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object".to_string(),
                 args: vec![], // is_empty doesn't have any args
@@ -202,7 +202,7 @@ fn has_field() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
+                match_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "does not exist".to_string(),
                 args: vec![], // is_empty doesn't have any args
@@ -222,7 +222,7 @@ fn is_type() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec!["string".to_string()],
@@ -234,7 +234,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "boolean_t".to_string(),
                 args: vec!["bool".to_string()],
@@ -246,7 +246,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "array".to_string(),
                 args: vec!["array".to_string()],
@@ -258,7 +258,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object".to_string(),
                 args: vec!["object".to_string()],
@@ -270,7 +270,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["number".to_string()],
@@ -282,7 +282,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "array".to_string(),
                 args: vec!["bool".to_string()],
@@ -294,7 +294,7 @@ fn is_type() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+                match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "does not exist".to_string(),
                 args: vec!["bool".to_string()],
@@ -314,7 +314,7 @@ fn ipv4_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.ipv4_address".to_string(),
                 args: vec![], // No need for args
@@ -326,7 +326,7 @@ fn ipv4_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // No need for args
@@ -338,7 +338,7 @@ fn ipv4_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
@@ -358,7 +358,7 @@ fn ipv6_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.ipv6_address".to_string(),
                 args: vec![], // No need for args
@@ -370,7 +370,7 @@ fn ipv6_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
@@ -382,7 +382,7 @@ fn ipv6_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.non-existent-field".to_string(),
                 args: vec![], // No need for args
@@ -402,7 +402,7 @@ fn boolean() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE,
+                match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "boolean_t".to_string(),
                 args: vec![], // No need for args
@@ -414,7 +414,7 @@ fn boolean() {
         },
         // crate::test_utils::TestCase {
         //     request: Request {
-        //         detective_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
+        //         match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
         //         data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
         //         path: "boolean_f".to_string(),
         //         args: vec![], // No need for args
@@ -426,7 +426,7 @@ fn boolean() {
         // },
         // crate::test_utils::TestCase {
         //     request: Request {
-        //         detective_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
+        //         match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
         //         data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
         //         path: "boolean_t".to_string(),
         //         args: vec![], // No need for args
@@ -438,7 +438,7 @@ fn boolean() {
         // },
         // crate::test_utils::TestCase {
         //     request: Request {
-        //         detective_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
+        //         match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
         //         data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
         //         path: "object".to_string(),
         //         args: vec![], // No need for args
@@ -450,7 +450,7 @@ fn boolean() {
         // },
         // crate::test_utils::TestCase {
         //     request: Request {
-        //         detective_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
+        //         match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
         //         data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
         //         path: "does-not-exist".to_string(),
         //         args: vec![], // No need for args
@@ -470,7 +470,7 @@ fn regex() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_REGEX,
+                match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![r#"^[a-zA-Z0-9]+$"#.to_string()],
@@ -482,7 +482,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_REGEX,
+                match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.number_as_string".to_string(),
                 args: vec![r#"\d+"#.to_string()],
@@ -494,7 +494,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_REGEX,
+                match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![r#"\d+"#.to_string()],
@@ -506,7 +506,7 @@ fn regex() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_REGEX,
+                match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![r#"\d+++]["#.to_string()],
@@ -526,7 +526,7 @@ fn mac_address() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.mac_address".to_string(),
                 args: vec![], // no args needed
@@ -538,7 +538,7 @@ fn mac_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
@@ -550,7 +550,7 @@ fn mac_address() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
+                match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
@@ -570,7 +570,7 @@ fn uuid() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_UUID,
+                match_type: DetectiveType::DETECTIVE_TYPE_UUID,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.uuid_dash".to_string(),
                 args: vec![], // no args needed
@@ -582,7 +582,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_UUID,
+                match_type: DetectiveType::DETECTIVE_TYPE_UUID,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.uuid_colon".to_string(),
                 args: vec![], // no args needed
@@ -594,7 +594,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_UUID,
+                match_type: DetectiveType::DETECTIVE_TYPE_UUID,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.uuid_stripped".to_string(),
                 args: vec![], // no args needed
@@ -606,7 +606,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_UUID,
+                match_type: DetectiveType::DETECTIVE_TYPE_UUID,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
@@ -618,7 +618,7 @@ fn uuid() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_UUID,
+                match_type: DetectiveType::DETECTIVE_TYPE_UUID,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
@@ -648,7 +648,7 @@ fn timestamp_unix() {
         // },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "timestamp_unix_num".to_string(),
                 args: vec![], // no args needed
@@ -660,7 +660,7 @@ fn timestamp_unix() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
@@ -672,7 +672,7 @@ fn timestamp_unix() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "unknown_field_123".to_string(),
                 args: vec![], // no args needed
@@ -692,7 +692,7 @@ fn timestamp_unix_nano() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "timestamp_unix_nano_str".to_string(),
                 args: vec![], // no args needed
@@ -704,7 +704,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "timestamp_unix_nano_num".to_string(),
                 args: vec![], // no args needed
@@ -716,7 +716,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
@@ -728,7 +728,7 @@ fn timestamp_unix_nano() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "does-not-exist".to_string(),
                 args: vec![], // no args needed
@@ -748,7 +748,7 @@ fn timestamp_rfc3339() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "timestamp_rfc3339".to_string(),
                 args: vec![], // no args needed
@@ -760,7 +760,7 @@ fn timestamp_rfc3339() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "timestamp_unix_str".to_string(),
                 args: vec![], // no args needed
@@ -772,7 +772,7 @@ fn timestamp_rfc3339() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
+                match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "unknown-field-123".to_string(),
                 args: vec![], // no args needed

@@ -1,4 +1,4 @@
-use protos::detective::DetectiveType;
+use crate::detective::Request;
 
 pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,
@@ -29,14 +29,6 @@ pub const SAMPLE_JSON: &str = r#"{
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
 }"#;
 
-pub struct Request {
-    pub detective_type: DetectiveType,
-    pub data: Vec<u8>,
-    pub path: String,
-    pub args: Vec<String>,
-    pub negate: bool,
-}
-
 pub struct TestCase {
     pub request: Request,
     pub expected: bool,
@@ -46,13 +38,7 @@ pub struct TestCase {
 
 pub fn run_tests(test_cases: &Vec<TestCase>) {
     for case in test_cases {
-        let result = crate::detective::Detective::new().matches(
-            case.request.detective_type,
-            &case.request.data,
-            &case.request.path,
-            &case.request.args,
-            case.request.negate,
-        );
+        let result = crate::detective::Detective::new().matches(case.request.clone());
 
         if case.should_error {
             assert_eq!(result.is_err(), true, "{}", case.text);

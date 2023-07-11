@@ -1,4 +1,4 @@
-use crate::test_utils::Request;
+use crate::detective::Request;
 #[cfg(test)]
 use protos::detective::DetectiveType;
 
@@ -8,7 +8,7 @@ fn test_numeric() {
         // Equal
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["100".to_string()],
@@ -20,7 +20,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_float".to_string(),
                 args: vec!["100.1".to_string()],
@@ -33,7 +33,7 @@ fn test_numeric() {
         // Greater than
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["1".to_string()],
@@ -45,7 +45,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_float".to_string(),
                 args: vec!["2".to_string()],
@@ -57,7 +57,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_float".to_string(),
                 args: vec!["1000".to_string()],
@@ -70,7 +70,7 @@ fn test_numeric() {
         // Greater equal
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_float".to_string(),
                 args: vec!["100.1".to_string()],
@@ -83,7 +83,7 @@ fn test_numeric() {
         // Less than
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["2000".to_string()],
@@ -96,7 +96,7 @@ fn test_numeric() {
         // Less equal
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["1000".to_string()],
@@ -108,7 +108,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["999".to_string()],
@@ -121,7 +121,7 @@ fn test_numeric() {
         // Negate
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["1000".to_string()],
@@ -133,9 +133,9 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
-                path: "number_int".to_string(),
+                path: "number_int".to_string().to_owned(),
                 args: vec!["100".to_string()],
                 negate: true,
             },
@@ -146,7 +146,7 @@ fn test_numeric() {
         // Error paths
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "number_int".to_string(),
                 args: vec!["not a number".to_string()],
@@ -158,7 +158,7 @@ fn test_numeric() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                detective_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
                 data: crate::test_utils::SAMPLE_JSON.as_bytes().to_vec(),
                 path: "does_not_exist".to_string(),
                 args: vec!["1000".to_string()],

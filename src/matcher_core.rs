@@ -2,43 +2,34 @@ use crate::detective;
 use crate::error::CustomError;
 use chrono::TimeZone;
 
+use crate::detective::Request;
 use gjson::Value;
 use protos::detective::DetectiveType;
 use regex::Regex;
 use std::str;
 
-pub fn string_equal_to(
-    data: &Vec<u8>,
-    path: &String,
-    args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    if args.len() != 1 {
+pub fn string_equal_to(request: &Request) -> Result<bool, CustomError> {
+    if request.args.len() != 1 {
         return Err(CustomError::Error(
             "string_equal_to requires exactly 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(data, path)?;
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
-    Ok(field == args[0])
+    Ok(field == request.args[0])
 }
 
-pub fn string_contains_any(
-    data: &Vec<u8>,
-    path: &String,
-    args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    if args.is_empty() {
+pub fn string_contains_any(request: &Request) -> Result<bool, CustomError> {
+    if request.args.is_empty() {
         return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(data, path)?;
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
-    for arg in args {
+    for arg in &request.args {
         if field.contains(arg) {
             return Ok(true);
         }
@@ -47,21 +38,16 @@ pub fn string_contains_any(
     Ok(false)
 }
 
-pub fn string_contains_all(
-    data: &Vec<u8>,
-    path: &String,
-    args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    if args.is_empty() {
+pub fn string_contains_all(request: &Request) -> Result<bool, CustomError> {
+    if request.args.is_empty() {
         return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(data, path)?;
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
-    for arg in args {
+    for arg in &request.args {
         if !field.contains(arg) {
             return Ok(false);
         }
@@ -70,16 +56,10 @@ pub fn string_contains_all(
     Ok(true)
 }
 
-pub fn ip_address(
-    match_type: DetectiveType,
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
-    match match_type {
+    match request.match_type {
         DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS => {
             let re = Regex::new(
                 r"(?:\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}",
@@ -100,26 +80,16 @@ pub fn ip_address(
     }
 }
 
-pub fn mac_address(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
     let re = Regex::new(r"^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$")?;
 
     Ok(re.is_match(field.as_str()))
 }
 
-pub fn uuid(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn uuid(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
     let re = Regex::new(
         r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
     )?;
@@ -127,24 +97,14 @@ pub fn uuid(
     Ok(re.is_match(field.as_str()))
 }
 
-pub fn timestamp_rfc3339(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn timestamp_rfc3339(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
     Ok(chrono::DateTime::parse_from_rfc3339(field.as_str()).is_ok())
 }
 
-pub fn timestamp_unix_nano(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn timestamp_unix_nano(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
     if let Ok(ts) = field.parse::<i64>() {
         if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts / 1_000_000_000, 0) {
@@ -155,13 +115,8 @@ pub fn timestamp_unix_nano(
     Ok(false)
 }
 
-pub fn timestamp_unix(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(data, path)?;
+pub fn timestamp_unix(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(&request.data, &request.path)?;
 
     let ts: i64 = match field.parse() {
         Ok(v) => {
@@ -181,27 +136,16 @@ pub fn timestamp_unix(
     Ok(false)
 }
 
-pub fn boolean(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-    expected: bool,
-) -> Result<bool, CustomError> {
-    let field: bool = detective::parse_field(data, path)?;
+pub fn boolean(request: &Request, expected: bool) -> Result<bool, CustomError> {
+    let field: bool = detective::parse_field(&request.data, &request.path)?;
 
     Ok(field == expected)
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,
 // empty array or is null.
-pub fn is_empty(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let field: Value = detective::parse_field(data, path)?;
+pub fn is_empty(request: &Request) -> Result<bool, CustomError> {
+    let field: Value = detective::parse_field(&request.data, &request.path)?;
 
     match field.kind() {
         // Null field
@@ -214,33 +158,23 @@ pub fn is_empty(
     }
 }
 
-pub fn has_field(
-    data: &Vec<u8>,
-    path: &String,
-    _args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    let data_as_str = str::from_utf8(data)
+pub fn has_field(request: &Request) -> Result<bool, CustomError> {
+    let data_as_str = str::from_utf8(&request.data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
-    Ok(gjson::get(data_as_str, path.as_str()).exists())
+    Ok(gjson::get(data_as_str, request.path.as_str()).exists())
 }
 
-pub fn is_type(
-    data: &Vec<u8>,
-    path: &String,
-    args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    if args.len() != 1 {
+pub fn is_type(request: &Request) -> Result<bool, CustomError> {
+    if request.args.len() != 1 {
         return Err(CustomError::Error(
             "is_type requires exactly 1 argument".to_string(),
         ));
     }
 
-    let field: Value = detective::parse_field(data, path)?;
+    let field: Value = detective::parse_field(&request.data, &request.path)?;
 
-    match args[0].as_str() {
+    match request.args[0].as_str() {
         "string" => Ok(field.kind() == gjson::Kind::String),
         "number" => Ok(field.kind() == gjson::Kind::Number),
         "boolean" => Ok(field.kind() == gjson::Kind::True || field.kind() == gjson::Kind::False),
@@ -250,25 +184,20 @@ pub fn is_type(
         "null" => Ok(field.kind() == gjson::Kind::Null),
         _ => Err(CustomError::MatchError(format!(
             "unknown type: {}",
-            args[0]
+            request.args[0]
         ))),
     }
 }
 
-pub fn regex(
-    data: &Vec<u8>,
-    path: &String,
-    args: &Vec<String>,
-    _negate: bool,
-) -> Result<bool, CustomError> {
-    if args.len() != 1 {
+pub fn regex(request: &Request) -> Result<bool, CustomError> {
+    if request.args.len() != 1 {
         return Err(CustomError::Error(
             "regex requires exactly 1 argument".to_string(),
         ));
     }
 
-    let re_pattern = args[0].as_str();
-    let field: String = detective::parse_field(data, path)?;
+    let re_pattern = request.args[0].as_str();
+    let field: String = detective::parse_field(&request.data, &request.path)?;
     let re = Regex::new(re_pattern)?;
 
     Ok(re.is_match(field.as_str()))
