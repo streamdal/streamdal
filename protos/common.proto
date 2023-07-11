@@ -5,7 +5,7 @@ package protos;
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
 // Common status codes used in gRPC method responses
-enum Status {
+enum ResponseStatus {
   RESPONSE_STATUS_UNSET= 0;
   RESPONSE_STATUS_OK = 1;
   RESPONSE_STATUS_BAD_REQUEST = 2;

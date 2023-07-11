@@ -27,55 +27,55 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 ///  Common status codes used in gRPC method responses
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.Status)
-pub enum Status {
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_UNSET)
+// @@protoc_insertion_point(enum:protos.ResponseStatus)
+pub enum ResponseStatus {
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_UNSET)
     RESPONSE_STATUS_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_OK)
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_OK)
     RESPONSE_STATUS_OK = 1,
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_BAD_REQUEST)
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_BAD_REQUEST)
     RESPONSE_STATUS_BAD_REQUEST = 2,
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_NOT_FOUND)
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_NOT_FOUND)
     RESPONSE_STATUS_NOT_FOUND = 3,
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_INTERNAL_SERVER_ERROR)
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_INTERNAL_SERVER_ERROR)
     RESPONSE_STATUS_INTERNAL_SERVER_ERROR = 4,
-    // @@protoc_insertion_point(enum_value:protos.Status.RESPONSE_STATUS_GENERIC_ERROR)
+    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_GENERIC_ERROR)
     RESPONSE_STATUS_GENERIC_ERROR = 5,
 }
 
-impl ::protobuf::Enum for Status {
-    const NAME: &'static str = "Status";
+impl ::protobuf::Enum for ResponseStatus {
+    const NAME: &'static str = "ResponseStatus";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<Status> {
+    fn from_i32(value: i32) -> ::std::option::Option<ResponseStatus> {
         match value {
-            0 => ::std::option::Option::Some(Status::RESPONSE_STATUS_UNSET),
-            1 => ::std::option::Option::Some(Status::RESPONSE_STATUS_OK),
-            2 => ::std::option::Option::Some(Status::RESPONSE_STATUS_BAD_REQUEST),
-            3 => ::std::option::Option::Some(Status::RESPONSE_STATUS_NOT_FOUND),
-            4 => ::std::option::Option::Some(Status::RESPONSE_STATUS_INTERNAL_SERVER_ERROR),
-            5 => ::std::option::Option::Some(Status::RESPONSE_STATUS_GENERIC_ERROR),
+            0 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_UNSET),
+            1 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_OK),
+            2 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_BAD_REQUEST),
+            3 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_NOT_FOUND),
+            4 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_INTERNAL_SERVER_ERROR),
+            5 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_GENERIC_ERROR),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [Status] = &[
-        Status::RESPONSE_STATUS_UNSET,
-        Status::RESPONSE_STATUS_OK,
-        Status::RESPONSE_STATUS_BAD_REQUEST,
-        Status::RESPONSE_STATUS_NOT_FOUND,
-        Status::RESPONSE_STATUS_INTERNAL_SERVER_ERROR,
-        Status::RESPONSE_STATUS_GENERIC_ERROR,
+    const VALUES: &'static [ResponseStatus] = &[
+        ResponseStatus::RESPONSE_STATUS_UNSET,
+        ResponseStatus::RESPONSE_STATUS_OK,
+        ResponseStatus::RESPONSE_STATUS_BAD_REQUEST,
+        ResponseStatus::RESPONSE_STATUS_NOT_FOUND,
+        ResponseStatus::RESPONSE_STATUS_INTERNAL_SERVER_ERROR,
+        ResponseStatus::RESPONSE_STATUS_GENERIC_ERROR,
     ];
 }
 
-impl ::protobuf::EnumFull for Status {
+impl ::protobuf::EnumFull for ResponseStatus {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("Status").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("ResponseStatus").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -84,15 +84,15 @@ impl ::protobuf::EnumFull for Status {
     }
 }
 
-impl ::std::default::Default for Status {
+impl ::std::default::Default for ResponseStatus {
     fn default() -> Self {
-        Status::RESPONSE_STATUS_UNSET
+        ResponseStatus::RESPONSE_STATUS_UNSET
     }
 }
 
-impl Status {
+impl ResponseStatus {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<Status>("Status")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ResponseStatus>("ResponseStatus")
     }
 }
 
@@ -172,42 +172,42 @@ impl Condition {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\x12\x06protos*\xc9\x01\n\x06Status\x12\x19\n\x15RESPO\
-    NSE_STATUS_UNSET\x10\0\x12\x16\n\x12RESPONSE_STATUS_OK\x10\x01\x12\x1f\n\
-    \x1bRESPONSE_STATUS_BAD_REQUEST\x10\x02\x12\x1d\n\x19RESPONSE_STATUS_NOT\
-    _FOUND\x10\x03\x12)\n%RESPONSE_STATUS_INTERNAL_SERVER_ERROR\x10\x04\x12!\
-    \n\x1dRESPONSE_STATUS_GENERIC_ERROR\x10\x05*\x8e\x02\n\tCondition\x12\
-    \x13\n\x0fCONDITION_UNSET\x10\0\x12(\n$CONDITION_ON_ERROR_CONTINUE_PIPEL\
-    INE\x10\x01\x12%\n!CONDITION_ON_ERROR_ABORT_PIPELINE\x10\x02\x12$\n\x20C\
-    ONDITION_ON_ERROR_NOTIFY_SERVER\x10\x03\x12(\n$CONDITION_ON_MATCH_CONTIN\
-    UE_PIPELINE\x10\x04\x12%\n!CONDITION_ON_MATCH_ABORT_PIPELINE\x10\x05\x12\
-    $\n\x20CONDITION_ON_MATCH_NOTIFY_SERVER\x10\x06B4Z2github.com/streamdal/\
-    snitch-protos/build/go/protosJ\xf7\x05\n\x06\x12\x04\0\0\x1b\x01\n\x08\n\
-    \x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
-    \x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n?\n\x02\x05\0\x12\
-    \x04\x07\0\x0e\x01\x1a3\x20Common\x20status\x20codes\x20used\x20in\x20gR\
-    PC\x20method\x20responses\n\n\n\n\x03\x05\0\x01\x12\x03\x07\x05\x0b\n\
-    \x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x01\
-    \x12\x03\x08\x02\x17\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\x19\x1a\n\
-    \x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x01\
-    \x12\x03\t\x02\x14\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t\x17\x18\n\x0b\
-    \n\x04\x05\0\x02\x02\x12\x03\n\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
-    \x03\n\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n\x20!\n\x0b\n\x04\
-    \x05\0\x02\x03\x12\x03\x0b\x02\x20\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\
-    \x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0b\x1e\x1f\n\x0b\n\
-    \x04\x05\0\x02\x04\x12\x03\x0c\x02,\n\x0c\n\x05\x05\0\x02\x04\x01\x12\
-    \x03\x0c\x02'\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c*+\n\x0b\n\x04\
-    \x05\0\x02\x05\x12\x03\r\x02$\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\r\
-    \x02\x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\"#\nV\n\x02\x05\x01\x12\
-    \x04\x11\0\x1b\x01\x1aJ\x20Condition\x20defines\x20how\x20the\x20pipelin\
-    e\x20should\x20behave\x20when\x20a\x20condition\x20is\x20met\n\n\n\n\x03\
-    \x05\x01\x01\x12\x03\x11\x05\x0e\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x12\
-    \x02\x16\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x12\x02\x11\n\x0c\n\x05\
-    \x05\x01\x02\0\x02\x12\x03\x12\x14\x15\n\x0b\n\x04\x05\x01\x02\x01\x12\
-    \x03\x13\x02+\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x13\x02&\n\x0c\n\
-    \x05\x05\x01\x02\x01\x02\x12\x03\x13)*\n\x0b\n\x04\x05\x01\x02\x02\x12\
-    \x03\x14\x02(\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x14\x02#\n\x0c\n\
-    \x05\x05\x01\x02\x02\x02\x12\x03\x14&'\n\x0b\n\x04\x05\x01\x02\x03\x12\
+    \n\x0ccommon.proto\x12\x06protos*\xd1\x01\n\x0eResponseStatus\x12\x19\n\
+    \x15RESPONSE_STATUS_UNSET\x10\0\x12\x16\n\x12RESPONSE_STATUS_OK\x10\x01\
+    \x12\x1f\n\x1bRESPONSE_STATUS_BAD_REQUEST\x10\x02\x12\x1d\n\x19RESPONSE_\
+    STATUS_NOT_FOUND\x10\x03\x12)\n%RESPONSE_STATUS_INTERNAL_SERVER_ERROR\
+    \x10\x04\x12!\n\x1dRESPONSE_STATUS_GENERIC_ERROR\x10\x05*\x8e\x02\n\tCon\
+    dition\x12\x13\n\x0fCONDITION_UNSET\x10\0\x12(\n$CONDITION_ON_ERROR_CONT\
+    INUE_PIPELINE\x10\x01\x12%\n!CONDITION_ON_ERROR_ABORT_PIPELINE\x10\x02\
+    \x12$\n\x20CONDITION_ON_ERROR_NOTIFY_SERVER\x10\x03\x12(\n$CONDITION_ON_\
+    MATCH_CONTINUE_PIPELINE\x10\x04\x12%\n!CONDITION_ON_MATCH_ABORT_PIPELINE\
+    \x10\x05\x12$\n\x20CONDITION_ON_MATCH_NOTIFY_SERVER\x10\x06B4Z2github.co\
+    m/streamdal/snitch-protos/build/go/protosJ\xf7\x05\n\x06\x12\x04\0\0\x1b\
+    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\
+    \x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n?\n\x02\
+    \x05\0\x12\x04\x07\0\x0e\x01\x1a3\x20Common\x20status\x20codes\x20used\
+    \x20in\x20gRPC\x20method\x20responses\n\n\n\n\x03\x05\0\x01\x12\x03\x07\
+    \x05\x13\n\x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\
+    \x02\0\x01\x12\x03\x08\x02\x17\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\
+    \x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\
+    \x02\x01\x01\x12\x03\t\x02\x14\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t\
+    \x17\x18\n\x0b\n\x04\x05\0\x02\x02\x12\x03\n\x02\"\n\x0c\n\x05\x05\0\x02\
+    \x02\x01\x12\x03\n\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n\x20!\
+    \n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0b\x02\x20\n\x0c\n\x05\x05\0\x02\x03\
+    \x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0b\x1e\
+    \x1f\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0c\x02,\n\x0c\n\x05\x05\0\x02\
+    \x04\x01\x12\x03\x0c\x02'\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c*+\n\
+    \x0b\n\x04\x05\0\x02\x05\x12\x03\r\x02$\n\x0c\n\x05\x05\0\x02\x05\x01\
+    \x12\x03\r\x02\x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\"#\nV\n\x02\
+    \x05\x01\x12\x04\x11\0\x1b\x01\x1aJ\x20Condition\x20defines\x20how\x20th\
+    e\x20pipeline\x20should\x20behave\x20when\x20a\x20condition\x20is\x20met\
+    \n\n\n\n\x03\x05\x01\x01\x12\x03\x11\x05\x0e\n\x0b\n\x04\x05\x01\x02\0\
+    \x12\x03\x12\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x12\x02\x11\n\
+    \x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x12\x14\x15\n\x0b\n\x04\x05\x01\x02\
+    \x01\x12\x03\x13\x02+\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x13\x02&\n\
+    \x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x13)*\n\x0b\n\x04\x05\x01\x02\x02\
+    \x12\x03\x14\x02(\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x14\x02#\n\x0c\
+    \n\x05\x05\x01\x02\x02\x02\x12\x03\x14&'\n\x0b\n\x04\x05\x01\x02\x03\x12\
     \x03\x15\x02'\n\x0c\n\x05\x05\x01\x02\x03\x01\x12\x03\x15\x02\"\n\x0c\n\
     \x05\x05\x01\x02\x03\x02\x12\x03\x15%&\n\x0b\n\x04\x05\x01\x02\x04\x12\
     \x03\x16\x02+\n\x0c\n\x05\x05\x01\x02\x04\x01\x12\x03\x16\x02&\n\x0c\n\
@@ -235,7 +235,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut deps = ::std::vec::Vec::with_capacity(0);
             let mut messages = ::std::vec::Vec::with_capacity(0);
             let mut enums = ::std::vec::Vec::with_capacity(2);
-            enums.push(Status::generated_enum_descriptor_data());
+            enums.push(ResponseStatus::generated_enum_descriptor_data());
             enums.push(Condition::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),

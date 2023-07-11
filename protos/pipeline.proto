@@ -19,12 +19,22 @@ enum PipelineStepStatus {
 }
 
 message PipelineStep {
+  // Unique ID for the step
   string id = 1;
+
+  // Friendly name for the step
   string name = 2;
+
+  // WASM module ID
   string wasm_id = 3;
+
+  // WASM module bytes
   string wasm_bytes = 4;
+
+  // WASM function name to execute
   string wasm_function = 5;
 
+  // All steps return PipelineStepResponse upon completion
   oneof step {
     steps.DetectiveStep detective = 1000;
     steps.TransformStep transform = 1001;
@@ -34,35 +44,37 @@ message PipelineStep {
   }
 }
 
-// All pipeline steps MUST return this message upon exec completion
+// All WASM funcs return this upon completion. All WASM funcs MUST include `output`
+// (even if they do not modify the input).
 message PipelineStepResponse {
   bytes output = 1;
   PipelineStepStatus status = 2;
   string status_message = 3;
 }
 
-///////////////////// Get pipeline /////////////////////
+/********************** Get (single) pipeline **********************/
+
 message GetPipelineRequest {
   string id = 1;
 }
 
 message GetPipelineResponse {
   SetPipelineRequest pipeline = 1;
-  Status status = 2;
+  ResponseStatus status = 2;
   string message = 3;
 }
 
-///////////////////// Get all pipelines /////////////////////
+/********************** Get all pipelines **********************/
+
 message GetAllPipelinesRequest {}
 
 message GetAllPipelinesResponse {
   repeated SetPipelineRequest pipelines = 1;
-  Status status = 2;
+  ResponseStatus status = 2;
   string message = 3;
 }
 
-
-///////////////////// Add/set/update pipeline /////////////////////
+/********************** Add/Set/Update pipeline **********************/
 
 // Used for both Add and Update
 message SetPipelineRequest {
@@ -84,13 +96,14 @@ message SetPipelineResponse {
   string id = 1;
 
   // Response status code; use for identifying request success or failure
-  Status status = 2;
+  ResponseStatus status = 2;
 
   // Additional information regarding response status
   string message = 3;
 }
 
-///////////////////// Delete pipeline /////////////////////
+/********************** Delete pipeline *********************/
+
 message DeletePipelineRequest {
   // Unique ID for the pipeline
   string id = 1;
@@ -98,11 +111,12 @@ message DeletePipelineRequest {
 
 message DeletePipelineResponse {
   string id = 1;
-  Status status = 2;
+  ResponseStatus status = 2;
   string message = 3;
 }
 
-///////////////////// Pause pipeline /////////////////////
+/********************** Pause pipeline **********************/
+
 message PausePipelineRequest {
   // Unique ID for the pipeline
   string id = 1;
@@ -110,11 +124,12 @@ message PausePipelineRequest {
 
 message PausePipelineResponse {
   string id = 1;
-  Status status = 2;
+  ResponseStatus status = 2;
   string message = 3;
 }
 
-///////////////////// Unpause pipeline /////////////////////
+/********************** Unpause pipeline **********************/
+
 message UnpausePipelineRequest {
   // Unique ID for the pipeline
   string id = 1;
@@ -122,6 +137,6 @@ message UnpausePipelineRequest {
 
 message UnpausePipelineResponse {
   string id = 1;
-  Status status = 2;
+  ResponseStatus status = 2;
   string message = 3;
 }
