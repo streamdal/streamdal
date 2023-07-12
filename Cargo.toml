@@ -1,6 +1,6 @@
 [package]
 name = "snitch-detective"
-version = "0.0.13"
+version = "0.0.14"
 edition = "2021"
 license = "MIT"
 description = "Data matcher library used by snitch WASM functions"
