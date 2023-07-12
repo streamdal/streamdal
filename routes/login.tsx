@@ -5,7 +5,7 @@ import { LoginForm } from "../components/auth/loginForm.tsx";
 
 export default function Home(props: PageProps<RuleSetType>) {
   return (
-    <Layout>
+    <Layout hideNav={true}>
       <LoginForm />
     </Layout>
   );
