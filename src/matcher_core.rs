@@ -236,9 +236,9 @@ pub fn string_length(request: &Request) -> Result<bool, CustomError> {
 
 pub fn hostname(request: &Request) -> Result<bool, CustomError> {
     fn is_valid_char(byte: u8) -> bool {
-        (b'a'..=b'z').contains(&byte)
-            || (b'A'..=b'Z').contains(&byte)
-            || (b'0'..=b'9').contains(&byte)
+        byte.is_ascii_lowercase()
+            || byte.is_ascii_uppercase()
+            || byte.is_ascii_digit()
             || byte == b'-'
             || byte == b'.'
     }
