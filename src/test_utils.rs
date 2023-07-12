@@ -1,4 +1,6 @@
 use crate::detective::Request;
+use lazy_static::lazy_static;
+use protos::detective::DetectiveType;
 
 pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,
@@ -14,7 +16,10 @@ pub const SAMPLE_JSON: &str = r#"{
         "field": "value",
         "empty_string": "",
         "null_field": null,
-        "empty_array": []
+        "empty_array": [],
+        "semver": "1.2.3",
+        "valid_hostname": "example.com",
+        "invalid_hostname": "-example.com."
     },
     "array": [
         "value1",
@@ -28,6 +33,10 @@ pub const SAMPLE_JSON: &str = r#"{
     "timestamp_unix_nano_num": 1614556800000000000,
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
 }"#;
+
+lazy_static! {
+    pub static ref SAMPLE_JSON_BYTES: Vec<u8> = SAMPLE_JSON.as_bytes().to_vec();
+}
 
 pub struct TestCase<'a> {
     pub request: Request<'a>,
@@ -45,5 +54,19 @@ pub fn run_tests(test_cases: &Vec<TestCase>) {
         } else {
             assert_eq!(result.unwrap(), case.expected, "{}", case.text);
         }
+    }
+}
+
+pub fn generate_request_for_bench(
+    detective_type: DetectiveType,
+    path: &str,
+    args: Vec<String>,
+) -> Request {
+    Request {
+        match_type: detective_type,
+        data: &SAMPLE_JSON_BYTES,
+        path: path.to_string(),
+        args,
+        negate: false,
     }
 }
