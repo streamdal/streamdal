@@ -51,6 +51,24 @@ generate/go:
 
 	@echo Successfully compiled protos
 
+.PHONY: generate/ts
+generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
+generate/ts: clean/ts
+generate/ts:
+	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+ 		--proto_path=protos \
+ 		--include_imports \
+ 		--include_source_info \
+ 		--descriptor_set_out=./build/ts/descriptor-sets/protos.fds \
+		protos/*.proto protos/steps/*.proto || (exit 1)
+
+	cd ./build/ts; \
+		npm install; \
+		npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs \
+		--grpcLib=@grpc/grpc-js --outDir=./types ../../protos/steps/*.proto
+
+	@echo Successfully compiled protos and generated types for Typescript
+
 .PHONY: generate/rust
 generate/rust: description = Compile protobuf schemas for Go
 generate/rust: clean/rust
@@ -80,7 +98,7 @@ generate/protoset:
 
 .PHONY: generate
 generate: description = Run all generate/* targets
-generate: generate/go generate/rust generate/protoset
+generate: generate/go generate/rust generate/protoset generate/ts
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
@@ -97,9 +115,11 @@ clean/protoset: description = Remove protoset artifacts
 clean/protoset:
 	rm -rf ./build/protos.protoset
 
-.PHONY: clean
-clean: description = Remove all build artifacts
-clean: clean/rust clean/go clean/protoset
+.PHONY: clean/ts
+clean/ts: description = Remove all TS build artifacts
+clean/ts:
+	rm -rf ./build/ts/descriptor-sets/*
+	rm -rf ./build/ts/types/*
 
 .PHONY: lint
 lint: description = Run protolint

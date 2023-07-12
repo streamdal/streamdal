@@ -9,8 +9,8 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 export interface ProtoGrpcType {
   protos: {
     steps: {
-      TransformStep: MessageTypeDefinition
-      TransformType: EnumTypeDefinition
+      DetectiveStep: MessageTypeDefinition
+      DetectiveType: EnumTypeDefinition
     }
   }
 }
