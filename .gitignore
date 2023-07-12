@@ -5,6 +5,7 @@
 .env.production.local
 .env.local
 
+
 # macOS-specific files
 .DS_Store
 .idea
