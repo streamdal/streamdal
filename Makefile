@@ -55,6 +55,8 @@ generate/go:
 generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
 generate/ts: clean/ts
 generate/ts:
+	mkdir -p build/ts/descriptor-sets
+
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--include_imports \

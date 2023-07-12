@@ -88,7 +88,8 @@ message GetPipelineResponse {
 
 /********************** Get all pipelines **********************/
 
-message GetAllPipelinesRequest {}
+message GetAllPipelinesRequest {
+}
 
 message GetAllPipelinesResponse {
   repeated SetPipelineRequest pipelines = 1;
