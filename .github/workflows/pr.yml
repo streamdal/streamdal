@@ -15,4 +15,5 @@ jobs:
         run: |
           make generate/go
           make generate/rust
+          make generate/ts
           make generate/protoset

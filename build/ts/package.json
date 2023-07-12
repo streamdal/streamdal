@@ -1,0 +1,28 @@
+{
+  "name": "@streamdal/snitch-protos",
+  "version": "0.0.1",
+  "description": "Snitch Protobufs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streamdal/snitch-protos.git"
+  },
+  "keywords": [
+    "Snitch",
+    "Protobuf",
+    "Streamdal"
+  ],
+  "author": "Streamdal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/streamdal/snitch-protos/issues"
+  },
+  "homepage": "https://github.com/streamdal/stitch-protos/build/ts#readme",
+  "devDependencies": {
+    "@grpc/grpc-js": "^1.8.17",
+    "@grpc/proto-loader": "^0.7.7"
+  },
+  "main": "/ts/types"
+}

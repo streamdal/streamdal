@@ -2,12 +2,13 @@ syntax = "proto3";
 
 package protos;
 
-import "steps/detective.proto";
-import "steps/transform.proto";
-import "steps/encode.proto";
-import "steps/decode.proto";
-import "steps/custom.proto";
 import "common.proto";
+import "steps/custom.proto";
+import "steps/decode.proto";
+import "steps/detective.proto";
+import "steps/encode.proto";
+import "steps/transform.proto";
+
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
@@ -88,7 +89,8 @@ message GetPipelineResponse {
 
 /********************** Get all pipelines **********************/
 
-message GetAllPipelinesRequest {}
+message GetAllPipelinesRequest {
+}
 
 message GetAllPipelinesResponse {
   repeated SetPipelineRequest pipelines = 1;
