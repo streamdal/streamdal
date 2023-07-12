@@ -23,6 +23,10 @@ export default {
       },
       fontFamily: {
         sans: ["Inter"],
+        display: ["Space Grotesk"],
+      },
+      backgroundImage: {
+        "login": "url('/images/login/gradient.svg')",
       },
     },
   },
@@ -54,6 +58,26 @@ export default {
         "&:hover": {
           background:
             "linear-gradient(96.41deg, #C1AAFD -16.36%, #FFD260 101.19%)",
+        },
+      };
+    },
+    "btn-dark": () => {
+      return {
+        width: "137px",
+        height: "37px",
+        borderRadius: "4px",
+        fontWeight: "bold",
+        fontSize: "14px",
+        paddingRight: "5px",
+        paddingLeft: "5px",
+        color: "#FFFFFF",
+        background: "#2E2647",
+        cursor: "pointer",
+        fill: "#FFFFFF",
+        "&:hover": {
+          background: "#FFD260",
+          color: "#372D56",
+          fill: "#372D56",
         },
       };
     },
