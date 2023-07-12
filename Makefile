@@ -32,7 +32,7 @@ build/detective: description = Build WASM target for detective
 build/detective: clean/detective
 	cd detective && \
 	cargo build --target=wasm32-wasi --release && \
-	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wasm
+	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wasm 
 
 .PHONY: clean/detective
 clean/detective: description = Remove detective WASM artifacts

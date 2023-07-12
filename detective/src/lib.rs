@@ -23,12 +23,6 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Run request against detective
     match Detective::new().matches(&req) {
         Ok(match_result) => {
-            println!(
-                "Request for '{:?}'; result: {}",
-                step.to_string(),
-                match_result
-            );
-
             let mut status = PipelineStepStatus::PIPELINE_STEP_STATUS_FAILURE;
 
             if match_result {
