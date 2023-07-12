@@ -1,3 +1,4 @@
+#![feature(test)]
 use crate::error::CustomError;
 use gjson::Value;
 
@@ -22,6 +23,10 @@ mod matcher_pii_tests;
 #[cfg(test)]
 #[path = "test_utils.rs"]
 mod test_utils;
+
+#[cfg(test)]
+#[path = "test_bench.rs"]
+mod test_bench;
 
 pub trait FromValue<'a>
 where

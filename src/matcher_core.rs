@@ -2,11 +2,14 @@ use crate::detective;
 use crate::error::CustomError;
 use chrono::TimeZone;
 
-use crate::detective::Request;
+use crate::detective::{parse_number, Request};
 use gjson::Value;
 use protos::detective::DetectiveType;
 use regex::Regex;
+use std::net::IpAddr;
 use std::str;
+use std::str::FromStr;
+use url::Url;
 
 pub fn string_equal_to(request: &Request) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
@@ -61,18 +64,10 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
 
     match request.match_type {
         DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS => {
-            let re = Regex::new(
-                r"(?:\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}",
-            )?;
-
-            Ok(re.is_match(field.as_str()))
+            IpAddr::from_str(field.as_str()).map_or(Ok(false), |i| Ok(i.is_ipv4()))
         }
         DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => {
-            let re = Regex::new(
-                r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))",
-            )?;
-
-            Ok(re.is_match(field.as_str()))
+            IpAddr::from_str(field.as_str()).map_or(Ok(false), |i| Ok(i.is_ipv6()))
         }
         _ => Err(CustomError::MatchError(
             "unknown ip address match type".to_string(),
@@ -201,4 +196,66 @@ pub fn regex(request: &Request) -> Result<bool, CustomError> {
     let re = Regex::new(re_pattern)?;
 
     Ok(re.is_match(field.as_str()))
+}
+
+pub fn url(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(request.data, &request.path)?;
+    Url::parse(field.as_str()).map_or(Ok(false), |_| Ok(true))
+}
+
+pub fn string_length(request: &Request) -> Result<bool, CustomError> {
+    let mut required_args = 1;
+
+    if request.match_type == DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE {
+        required_args = 2;
+    }
+
+    if request.args.len() != required_args {
+        return Err(CustomError::Error(format!(
+            "string length requires {} arg(s)",
+            required_args
+        )));
+    }
+
+    let field: String = detective::parse_field(request.data, &request.path)?;
+    let arg1: f64 = parse_number(&request.args[0])?;
+
+    match request.match_type {
+        DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN => Ok(field.len() >= arg1 as usize),
+        DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX => Ok(field.len() <= arg1 as usize),
+        DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE => {
+            let arg2: f64 = parse_number(&request.args[1])?;
+            Ok(field.len() >= arg1 as usize && field.len() <= arg2 as usize)
+        }
+        _ => Err(CustomError::Error(format!(
+            "unknown match type: {:?}",
+            request.match_type
+        ))),
+    }
+}
+
+pub fn hostname(request: &Request) -> Result<bool, CustomError> {
+    fn is_valid_char(byte: u8) -> bool {
+        byte.is_ascii_lowercase()
+            || byte.is_ascii_uppercase()
+            || byte.is_ascii_digit()
+            || byte == b'-'
+            || byte == b'.'
+    }
+
+    let field: String = detective::parse_field(request.data, &request.path)?;
+    let hostname = field.as_str();
+
+    // From: https://github.com/pop-os/hostname-validator/blob/master/src/lib.rs
+    Ok(!(hostname.bytes().any(|byte| !is_valid_char(byte))
+        || hostname.split('.').any(|label| {
+            label.is_empty() || label.len() > 63 || label.starts_with('-') || label.ends_with('-')
+        })
+        || hostname.is_empty()
+        || hostname.len() > 253))
+}
+
+pub fn semver(request: &Request) -> Result<bool, CustomError> {
+    let field: String = detective::parse_field(request.data, &request.path)?;
+    semver::Version::parse(field.as_str()).map_or(Ok(false), |_| Ok(true))
 }

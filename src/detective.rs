@@ -37,12 +37,18 @@ impl Detective {
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL
-            | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN => numeric::common(request),
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_MIN
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_MAX
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE => numeric::common(request),
 
             // Core matchers
             DetectiveType::DETECTIVE_TYPE_STRING_EQUAL => core::string_equal_to(request),
             DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
             DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
+            DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN
+            | DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX
+            | DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE => core::string_length(request),
             DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS
             | DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => core::ip_address(request),
             DetectiveType::DETECTIVE_TYPE_REGEX => core::regex(request),
@@ -56,6 +62,9 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_IS_TYPE => core::is_type(request),
             DetectiveType::DETECTIVE_TYPE_UUID => core::uuid(request),
             DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS => core::mac_address(request),
+            DetectiveType::DETECTIVE_TYPE_URL => core::url(request),
+            DetectiveType::DETECTIVE_TYPE_HOSTNAME => core::hostname(request),
+            DetectiveType::DETECTIVE_TYPE_SEMVER => core::semver(request),
 
             // PII matchers
             DetectiveType::DETECTIVE_TYPE_PII_ANY => pii::any(request),
@@ -100,6 +109,16 @@ pub fn parse_field<'a, T: FromValue<'a>>(
     }
 
     T::from_value(v)
+}
+
+pub fn parse_number(input: &str) -> Result<f64, CustomError> {
+    match input.parse() {
+        Ok(number) => Ok(number),
+        Err(err) => Err(CustomError::Error(format!(
+            "failed to parse number: {}",
+            err
+        ))),
+    }
 }
 
 fn validate_request(request: &Request) -> Result<(), CustomError> {

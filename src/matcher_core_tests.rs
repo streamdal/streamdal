@@ -1,4 +1,5 @@
 use crate::detective::Request;
+use crate::test_utils;
 #[cfg(test)]
 use protos::detective::DetectiveType;
 
@@ -9,14 +10,12 @@ use protos::detective::DetectiveType;
 
 #[test]
 fn string_tests() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
         // String equals
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["value".to_string()],
                 negate: false,
@@ -25,10 +24,10 @@ fn string_tests() {
             text: "string should equal".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["should not match".to_string()],
                 negate: false,
@@ -37,10 +36,10 @@ fn string_tests() {
             text: "string should not equals".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_EQUAL,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "does not exist".to_string(),
                 args: vec!["foo".to_string()],
                 negate: false,
@@ -52,10 +51,10 @@ fn string_tests() {
         // TODO: Should add negation support to all funcs
 
         // String contains ALL
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lue".to_string()],
                 negate: false,
@@ -64,10 +63,10 @@ fn string_tests() {
             text: "string should contain all".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
@@ -77,10 +76,10 @@ fn string_tests() {
             should_error: false,
         },
         // String contains ANY
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
@@ -89,10 +88,10 @@ fn string_tests() {
             text: "string should contain any".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["vvvva".to_string().to_string(), "lueeeeeeee".to_string()],
                 negate: false,
@@ -103,19 +102,17 @@ fn string_tests() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn is_empty() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
         // Is empty
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.empty_string".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
@@ -124,10 +121,10 @@ fn is_empty() {
             text: "empty string should be empty".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.null_field".to_string(),
                 args: vec![],
                 negate: false,
@@ -136,10 +133,10 @@ fn is_empty() {
             text: "null field should be considered empty".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.empty_array".to_string(),
                 args: vec![],
                 negate: false,
@@ -148,10 +145,10 @@ fn is_empty() {
             text: "empty array should be considered empty".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object2.does_not_exist".to_string(),
                 args: vec![],
                 negate: false,
@@ -160,10 +157,10 @@ fn is_empty() {
             text: "non-existent path should error".to_string(),
             should_error: true,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![],
                 negate: false,
@@ -172,10 +169,10 @@ fn is_empty() {
             text: "Non-empty string should be false".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "array".to_string(),
                 args: vec![],
                 negate: false,
@@ -186,18 +183,16 @@ fn is_empty() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn has_field() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
@@ -206,10 +201,10 @@ fn has_field() {
             text: "field exists, should return true".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "does not exist".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
@@ -220,18 +215,16 @@ fn has_field() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn is_type() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec!["string".to_string()],
                 negate: false,
@@ -240,10 +233,10 @@ fn is_type() {
             text: "field should be of string type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "boolean_t".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
@@ -252,10 +245,10 @@ fn is_type() {
             text: "field should be of boolean type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "array".to_string(),
                 args: vec!["array".to_string()],
                 negate: false,
@@ -264,10 +257,10 @@ fn is_type() {
             text: "field should be of array type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object".to_string(),
                 args: vec!["object".to_string()],
                 negate: false,
@@ -276,10 +269,10 @@ fn is_type() {
             text: "field should be of object type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "number_int".to_string(),
                 args: vec!["number".to_string()],
                 negate: false,
@@ -288,10 +281,10 @@ fn is_type() {
             text: "field should be of number type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "array".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
@@ -300,10 +293,10 @@ fn is_type() {
             text: "field should NOT be of boolean type".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IS_TYPE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "does not exist".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
@@ -314,18 +307,16 @@ fn is_type() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn ipv4_address() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.ipv4_address".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -334,10 +325,10 @@ fn ipv4_address() {
             text: "field should contain an IPv4 address".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -346,10 +337,10 @@ fn ipv4_address() {
             text: "field does not exist should cause an error".to_string(),
             should_error: true,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -360,18 +351,16 @@ fn ipv4_address() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn ipv6_address() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.ipv6_address".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -380,10 +369,10 @@ fn ipv6_address() {
             text: "field is an ipv6 address".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -392,10 +381,10 @@ fn ipv6_address() {
             text: "field is not an ipv6 address".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.non-existent-field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -406,18 +395,16 @@ fn ipv6_address() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn boolean() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "boolean_t".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -426,10 +413,10 @@ fn boolean() {
             text: "field has a bool true".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "boolean_f".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -438,10 +425,10 @@ fn boolean() {
             text: "field has a bool false".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "boolean_t".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -450,10 +437,10 @@ fn boolean() {
             text: "incorrect bool check".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -462,10 +449,10 @@ fn boolean() {
             text: "bool check should error on incorrect type".to_string(),
             should_error: true,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "does-not-exist".to_string(),
                 args: vec![], // No need for args
                 negate: false,
@@ -476,18 +463,16 @@ fn boolean() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn regex() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![r#"^[a-zA-Z0-9]+$"#.to_string()],
                 negate: false,
@@ -496,10 +481,10 @@ fn regex() {
             text: "should match word".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.number_as_string".to_string(),
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
@@ -508,10 +493,10 @@ fn regex() {
             text: "should match number".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
@@ -520,10 +505,10 @@ fn regex() {
             text: "should not match number".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_REGEX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![r#"\d+++]["#.to_string()],
                 negate: false,
@@ -534,18 +519,16 @@ fn regex() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn mac_address() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.mac_address".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -554,10 +537,10 @@ fn mac_address() {
             text: "should match mac address".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -566,10 +549,10 @@ fn mac_address() {
             text: "should NOT match mac address".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -580,18 +563,16 @@ fn mac_address() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn uuid() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_UUID,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.uuid_dash".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -600,10 +581,10 @@ fn uuid() {
             text: "should match uuid with dashes".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_UUID,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.uuid_colon".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -612,10 +593,10 @@ fn uuid() {
             text: "should match uuid with colons".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_UUID,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.uuid_stripped".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -624,10 +605,10 @@ fn uuid() {
             text: "should match uuid with no separators".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_UUID,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -636,10 +617,10 @@ fn uuid() {
             text: "should NOT match uuid".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_UUID,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -650,18 +631,16 @@ fn uuid() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn timestamp_unix() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_unix_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -670,10 +649,10 @@ fn timestamp_unix() {
             text: "timestamp str should be true".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_unix_num".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -682,10 +661,10 @@ fn timestamp_unix() {
             text: "timestamp num should be true".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -694,10 +673,10 @@ fn timestamp_unix() {
             text: "non-ts field should be false".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "unknown_field_123".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -708,18 +687,16 @@ fn timestamp_unix() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn timestamp_unix_nano() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_unix_nano_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -728,10 +705,10 @@ fn timestamp_unix_nano() {
             text: "should match nano ts str".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_unix_nano_num".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -740,10 +717,10 @@ fn timestamp_unix_nano() {
             text: "should match nano ts num".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -752,10 +729,10 @@ fn timestamp_unix_nano() {
             text: "should not error on non-ts value".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "does-not-exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -766,18 +743,16 @@ fn timestamp_unix_nano() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
 }
 
 #[test]
 fn timestamp_rfc3339() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
     let test_cases = vec![
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_rfc3339".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -786,10 +761,10 @@ fn timestamp_rfc3339() {
             text: "should match rfc3339 ts".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "timestamp_unix_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -798,10 +773,10 @@ fn timestamp_rfc3339() {
             text: "should not match non-rfc3339 ts".to_string(),
             should_error: false,
         },
-        crate::test_utils::TestCase {
+        test_utils::TestCase {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339,
-                data: sample_json,
+                data: &test_utils::SAMPLE_JSON_BYTES,
                 path: "unknown-field-123".to_string(),
                 args: vec![], // no args needed
                 negate: false,
@@ -812,5 +787,152 @@ fn timestamp_rfc3339() {
         },
     ];
 
-    crate::test_utils::run_tests(&test_cases);
+    test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn string_length() {
+    let test_cases = vec![
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["10".to_string()],
+                negate: false,
+            },
+            expected: true,
+            text: "string should be <10 length".to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["5".to_string()],
+                negate: false,
+            },
+            expected: false,
+            text: "string should NOT be <5".to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["1".to_string()],
+                negate: false,
+            },
+            expected: true,
+            text: "field should contain more than 1 char and cause match to return true"
+                .to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["10".to_string()],
+                negate: false,
+            },
+            expected: false,
+            text: "field should contain less than 10 chars and cause match to return false"
+                .to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["5".to_string(), "10".to_string()],
+                negate: false,
+            },
+            expected: true,
+            text: "field contains less than 10 chars so 5-10 range should return true".to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec!["99".to_string(), "100".to_string()],
+                negate: false,
+            },
+            expected: false,
+            text: "field contains less than 10 chars so 99-100 range should return false"
+                .to_string(),
+            should_error: false,
+        },
+    ];
+
+    test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn semver() {
+    let test_cases = vec![
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_SEMVER,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.semver".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "valid semver".to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_SEMVER,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.ipv4_address".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: false,
+            text: "invalid semver".to_string(),
+            should_error: false,
+        },
+    ];
+
+    test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn hostname() {
+    let test_cases = vec![
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_HOSTNAME,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.valid_hostname".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "valid hostname".to_string(),
+            should_error: false,
+        },
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_HOSTNAME,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "object.invalid_hostname".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: false,
+            text: "invalid semver".to_string(),
+            should_error: false,
+        },
+    ];
+
+    test_utils::run_tests(&test_cases);
 }

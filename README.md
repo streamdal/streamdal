@@ -50,3 +50,14 @@ The idea is that WASM funcs will be given the ability to GET/PUT items in cache,
 If K/V trait is provided to `detective` - before compiling a regex pattern, it would first check if the cache already contains it. If yes, it'll use that, if not, it'll compile and put it in the cache.
 
 ~DS 06-29-2023
+
+## Development
+The library must be tested using Rust nightly (because we use `#![feature(test)]` to enable the ability to bench).
+
+To install nightly: `rustup install nightly`
+
+To run tests using nightly: `cargo +nightly test`
+
+To run benches using nightly: `cargo +nightly bench`
+
+<sub>You can also set nightly as default using `rustup default nightly`.</sub>
