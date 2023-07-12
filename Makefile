@@ -41,33 +41,15 @@ generate/go: description = Compile protobuf schemas for Go
 generate/go: clean/go
 generate/go:
 	mkdir -p build/go/protos && \
-	mkdir -p build/go/protos/rules
+	mkdir -p build/go/protos/steps
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--go_out=./build/go/protos \
  		--go_opt=paths=source_relative \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
-
-.PHONY: generate/ts
-generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
-generate/ts: clean/ts
-generate/ts:
-	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
- 		--proto_path=protos \
- 		--include_imports \
- 		--include_source_info \
- 		--descriptor_set_out=./build/ts/descriptor-sets/protos.fds \
-		protos/*.proto protos/rules/*.proto || (exit 1)
-
-	cd ./build/ts; \
-		npm install; \
-		npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs \
-		--grpcLib=@grpc/grpc-js --outDir=./types ../../protos/rules/*.proto
-
-	@echo Successfully compiled protos and
 
 .PHONY: generate/rust
 generate/rust: description = Compile protobuf schemas for Go
@@ -78,7 +60,7 @@ generate/rust:
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--rust_out=./build/rust/protos/src \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
 
@@ -92,13 +74,13 @@ generate/protoset:
  		--include_imports \
  		-o build/protos.protoset \
  		--proto_path=protos \
-		protos/*.proto protos/rules/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	@echo Successfully generated protoset
 
-.PHONY: generate/all
-generate/all: description = Run all generate/* targets
-generate/all: generate/go generate/rust generate/protoset
+.PHONY: generate
+generate: description = Run all generate/* targets
+generate: generate/go generate/rust generate/protoset
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
@@ -115,11 +97,9 @@ clean/protoset: description = Remove protoset artifacts
 clean/protoset:
 	rm -rf ./build/protos.protoset
 
-.PHONY: clean/ts
-clean/go: description = Remove all TS build artifacts
-clean/go:
-	rm -rf ./build/ts/descriptor-sets/*
-	rm -rf ./build/ts/types/*
+.PHONY: clean
+clean: description = Remove all build artifacts
+clean: clean/rust clean/go clean/protoset
 
 .PHONY: lint
 lint: description = Run protolint

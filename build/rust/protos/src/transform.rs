@@ -19,73 +19,66 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `rules/transform.proto`
+//! Generated file from `steps/transform.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.TransformRequest)
-pub struct TransformRequest {
+// @@protoc_insertion_point(message:protos.steps.TransformStep)
+pub struct TransformStep {
     // message fields
-    // @@protoc_insertion_point(field:rules.TransformRequest.data)
-    pub data: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:rules.TransformRequest.path)
+    // @@protoc_insertion_point(field:protos.steps.TransformStep.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.TransformRequest.value)
+    // @@protoc_insertion_point(field:protos.steps.TransformStep.value)
     pub value: ::std::string::String,
-    // @@protoc_insertion_point(field:rules.TransformRequest.type)
+    // @@protoc_insertion_point(field:protos.steps.TransformStep.type)
     pub type_: ::protobuf::EnumOrUnknown<TransformType>,
     // special fields
-    // @@protoc_insertion_point(special_field:rules.TransformRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.steps.TransformStep.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a TransformRequest {
-    fn default() -> &'a TransformRequest {
-        <TransformRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a TransformStep {
+    fn default() -> &'a TransformStep {
+        <TransformStep as ::protobuf::Message>::default_instance()
     }
 }
 
-impl TransformRequest {
-    pub fn new() -> TransformRequest {
+impl TransformStep {
+    pub fn new() -> TransformStep {
         ::std::default::Default::default()
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "data",
-            |m: &TransformRequest| { &m.data },
-            |m: &mut TransformRequest| { &mut m.data },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
-            |m: &TransformRequest| { &m.path },
-            |m: &mut TransformRequest| { &mut m.path },
+            |m: &TransformStep| { &m.path },
+            |m: &mut TransformStep| { &mut m.path },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "value",
-            |m: &TransformRequest| { &m.value },
-            |m: &mut TransformRequest| { &mut m.value },
+            |m: &TransformStep| { &m.value },
+            |m: &mut TransformStep| { &mut m.value },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
-            |m: &TransformRequest| { &m.type_ },
-            |m: &mut TransformRequest| { &mut m.type_ },
+            |m: &TransformStep| { &m.type_ },
+            |m: &mut TransformStep| { &mut m.type_ },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformRequest>(
-            "TransformRequest",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformStep>(
+            "TransformStep",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for TransformRequest {
-    const NAME: &'static str = "TransformRequest";
+impl ::protobuf::Message for TransformStep {
+    const NAME: &'static str = "TransformStep";
 
     fn is_initialized(&self) -> bool {
         true
@@ -95,15 +88,12 @@ impl ::protobuf::Message for TransformRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.data = is.read_bytes()?;
-                },
-                18 => {
                     self.path = is.read_string()?;
                 },
-                26 => {
+                18 => {
                     self.value = is.read_string()?;
                 },
-                32 => {
+                24 => {
                     self.type_ = is.read_enum_or_unknown()?;
                 },
                 tag => {
@@ -118,17 +108,14 @@ impl ::protobuf::Message for TransformRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.data.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.data);
-        }
         if !self.path.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.path);
+            my_size += ::protobuf::rt::string_size(1, &self.path);
         }
         if !self.value.is_empty() {
-            my_size += ::protobuf::rt::string_size(3, &self.value);
+            my_size += ::protobuf::rt::string_size(2, &self.value);
         }
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
-            my_size += ::protobuf::rt::int32_size(4, self.type_.value());
+            my_size += ::protobuf::rt::int32_size(3, self.type_.value());
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -136,17 +123,14 @@ impl ::protobuf::Message for TransformRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.data.is_empty() {
-            os.write_bytes(1, &self.data)?;
-        }
         if !self.path.is_empty() {
-            os.write_string(2, &self.path)?;
+            os.write_string(1, &self.path)?;
         }
         if !self.value.is_empty() {
-            os.write_string(3, &self.value)?;
+            os.write_string(2, &self.value)?;
         }
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
-            os.write_enum(4, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+            os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -160,21 +144,19 @@ impl ::protobuf::Message for TransformRequest {
         &mut self.special_fields
     }
 
-    fn new() -> TransformRequest {
-        TransformRequest::new()
+    fn new() -> TransformStep {
+        TransformStep::new()
     }
 
     fn clear(&mut self) {
-        self.data.clear();
         self.path.clear();
         self.value.clear();
         self.type_ = ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN);
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static TransformRequest {
-        static instance: TransformRequest = TransformRequest {
-            data: ::std::vec::Vec::new(),
+    fn default_instance() -> &'static TransformStep {
+        static instance: TransformStep = TransformStep {
             path: ::std::string::String::new(),
             value: ::std::string::String::new(),
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
@@ -184,174 +166,36 @@ impl ::protobuf::Message for TransformRequest {
     }
 }
 
-impl ::protobuf::MessageFull for TransformRequest {
+impl ::protobuf::MessageFull for TransformStep {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformRequest").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformStep").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for TransformRequest {
+impl ::std::fmt::Display for TransformStep {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for TransformRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:rules.TransformResponse)
-pub struct TransformResponse {
-    // message fields
-    // @@protoc_insertion_point(field:rules.TransformResponse.data)
-    pub data: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:rules.TransformResponse.error)
-    pub error: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:rules.TransformResponse.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a TransformResponse {
-    fn default() -> &'a TransformResponse {
-        <TransformResponse as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl TransformResponse {
-    pub fn new() -> TransformResponse {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "data",
-            |m: &TransformResponse| { &m.data },
-            |m: &mut TransformResponse| { &mut m.data },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "error",
-            |m: &TransformResponse| { &m.error },
-            |m: &mut TransformResponse| { &mut m.error },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformResponse>(
-            "TransformResponse",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for TransformResponse {
-    const NAME: &'static str = "TransformResponse";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.data = is.read_bytes()?;
-                },
-                18 => {
-                    self.error = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.data.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.data);
-        }
-        if !self.error.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.error);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.data.is_empty() {
-            os.write_bytes(1, &self.data)?;
-        }
-        if !self.error.is_empty() {
-            os.write_string(2, &self.error)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> TransformResponse {
-        TransformResponse::new()
-    }
-
-    fn clear(&mut self) {
-        self.data.clear();
-        self.error.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static TransformResponse {
-        static instance: TransformResponse = TransformResponse {
-            data: ::std::vec::Vec::new(),
-            error: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for TransformResponse {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformResponse").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for TransformResponse {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for TransformResponse {
+impl ::protobuf::reflect::ProtobufValue for TransformStep {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:rules.TransformType)
+// @@protoc_insertion_point(enum:protos.steps.TransformType)
 pub enum TransformType {
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_UNKNOWN)
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_UNKNOWN)
     TRANSFORM_TYPE_UNKNOWN = 0,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_REPLACE_VALUE)
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_REPLACE_VALUE)
     TRANSFORM_TYPE_REPLACE_VALUE = 1,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_DELETE_FIELD)
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_DELETE_FIELD)
     TRANSFORM_TYPE_DELETE_FIELD = 2,
-    // @@protoc_insertion_point(enum_value:rules.TransformType.TRANSFORM_TYPE_OBFUSCATE_VALUE)
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_OBFUSCATE_VALUE)
     TRANSFORM_TYPE_OBFUSCATE_VALUE = 3,
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_MASK_VALUE)
+    TRANSFORM_TYPE_MASK_VALUE = 4,
 }
 
 impl ::protobuf::Enum for TransformType {
@@ -367,6 +211,7 @@ impl ::protobuf::Enum for TransformType {
             1 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_REPLACE_VALUE),
             2 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_DELETE_FIELD),
             3 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE),
+            4 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_MASK_VALUE),
             _ => ::std::option::Option::None
         }
     }
@@ -376,6 +221,7 @@ impl ::protobuf::Enum for TransformType {
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE,
         TransformType::TRANSFORM_TYPE_DELETE_FIELD,
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE,
+        TransformType::TRANSFORM_TYPE_MASK_VALUE,
     ];
 }
 
@@ -404,46 +250,38 @@ impl TransformType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x15rules/transform.proto\x12\x05rules\"z\n\x10TransformRequest\x12\
-    \x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12\x12\n\x04path\x18\x02\
-    \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x03\x20\x01(\tR\x05value\x12\
-    (\n\x04type\x18\x04\x20\x01(\x0e2\x14.rules.TransformTypeR\x04type\"=\n\
-    \x11TransformResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\
-    \x12\x14\n\x05error\x18\x02\x20\x01(\tR\x05error*\x92\x01\n\rTransformTy\
-    pe\x12\x1a\n\x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE\
-    _REPLACE_VALUE\x10\x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\
-    \x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_VALUE\x10\x03B:Z8github.com/streamd\
-    al/snitch-protos/build/go/protos/rulesJ\xe7\x04\n\x06\x12\x04\0\0\x17\
-    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0e\n\
-    \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\
-    \x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\
-    \x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\
-    \x12\x03\x07\x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\
-    \x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\
-    \x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\
-    \n\x04\x05\0\x02\x02\x12\x03\t\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
-    \x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\
-    \x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\
-    \x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n#$\n\n\n\x02\x04\0\x12\
-    \x04\r\0\x12\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x18\n\x0b\n\x04\x04\0\
-    \x02\0\x12\x03\x0e\x02\x11\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x02\
-    \x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\x08\x0c\n\x0c\n\x05\x04\0\
-    \x02\0\x03\x12\x03\x0e\x0f\x10\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x02\
-    \x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\
-    \x02\x01\x01\x12\x03\x0f\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f\
-    \x10\x11\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x10\x02\x13\n\x0c\n\x05\x04\0\
-    \x02\x02\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
-    \x10\t\x0e\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x10\x11\x12\n\x0b\n\x04\
-    \x04\0\x02\x03\x12\x03\x11\x02\x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
-    \x11\x02\x0f\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x11\x10\x14\n\x0c\n\
-    \x05\x04\0\x02\x03\x03\x12\x03\x11\x17\x18\n\n\n\x02\x04\x01\x12\x04\x14\
-    \0\x17\x01\n\n\n\x03\x04\x01\x01\x12\x03\x14\x08\x19\n\x0b\n\x04\x04\x01\
-    \x02\0\x12\x03\x15\x02\x11\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x15\x02\
-    \x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x15\x08\x0c\n\x0c\n\x05\x04\
-    \x01\x02\0\x03\x12\x03\x15\x0f\x10\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\
-    \x16\x02\x13\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x16\x02\x08\n\x0c\n\
-    \x05\x04\x01\x02\x01\x01\x12\x03\x16\t\x0e\n\x0c\n\x05\x04\x01\x02\x01\
-    \x03\x12\x03\x16\x11\x12b\x06proto3\
+    \n\x15steps/transform.proto\x12\x0cprotos.steps\"j\n\rTransformStep\x12\
+    \x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x02\
+    \x20\x01(\tR\x05value\x12/\n\x04type\x18\x03\x20\x01(\x0e2\x1b.protos.st\
+    eps.TransformTypeR\x04type*\xb1\x01\n\rTransformType\x12\x1a\n\x16TRANSF\
+    ORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VALUE\x10\x01\
+    \x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eTRANSFORM_T\
+    YPE_OBFUSCATE_VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_VALUE\x10\
+    \x04B:Z8github.com/streamdal/snitch-protos/build/go/protos/stepsJ\xf0\
+    \x03\n\x06\x12\x04\0\0\x12\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\
+    \x0b\x12\x03\x04\0O\n\n\n\x02\x05\0\x12\x04\x06\0\x0c\x01\n\n\n\x03\x05\
+    \0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02\x1d\n\
+    \x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\x0c\n\x05\x05\0\x02\0\
+    \x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02#\n\
+    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\0\x02\
+    \x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\x02\"\n\x0c\
+    \n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\
+    \x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\x05\x05\
+    \0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n\
+    #$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\n\x0c\n\x05\x05\0\x02\
+    \x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0b\
+    \x1e\x1f\n\n\n\x02\x04\0\x12\x04\x0e\0\x12\x01\n\n\n\x03\x04\0\x01\x12\
+    \x03\x0e\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0f\x02\x12\n\x0c\n\x05\
+    \x04\0\x02\0\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
+    \x0f\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0f\x10\x11\n(\n\x04\x04\0\
+    \x02\x01\x12\x03\x10\x02\x13\"\x1b\x20Should\x20this\x20be\x20bytes?\x20\
+    ~DS\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\
+    \0\x02\x01\x01\x12\x03\x10\t\x0e\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\
+    \x10\x11\x12\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x11\x02\x19\n\x0c\n\x05\
+    \x04\0\x02\x02\x06\x12\x03\x11\x02\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
+    \x03\x11\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x11\x17\x18b\x06p\
+    roto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -461,9 +299,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(2);
-            messages.push(TransformRequest::generated_message_descriptor_data());
-            messages.push(TransformResponse::generated_message_descriptor_data());
+            let mut messages = ::std::vec::Vec::with_capacity(1);
+            messages.push(TransformStep::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(TransformType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

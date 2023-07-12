@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package protos;
+
+import "steps/detective.proto";
+import "steps/transform.proto";
+import "steps/encode.proto";
+import "steps/decode.proto";
+import "steps/custom.proto";
+import "common.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+// Each pipeline step includes this in the response; SDK is responsible for
+// interpreting the response status and apply it to the step condition.
+enum PipelineStepStatus {
+  PIPELINE_STEP_STATUS_UNSET = 0;
+  PIPELINE_STEP_STATUS_SUCCESS = 1;
+  PIPELINE_STEP_STATUS_FAILURE = 2;
+  PIPELINE_STEP_STATUS_ERROR = 3;
+}
+
+// A condition defines how the SDK should handle a step response -- should it
+// continue executing the pipeline, should it abort, should it notify the server?
+enum Condition {
+  CONDITION_UNSET = 0;
+  CONDITION_ON_ERROR_CONTINUE_PIPELINE = 1;
+  CONDITION_ON_ERROR_ABORT_PIPELINE = 2;
+  CONDITION_ON_ERROR_NOTIFY_SERVER = 3;
+  CONDITION_ON_MATCH_CONTINUE_PIPELINE = 4;
+  CONDITION_ON_MATCH_ABORT_PIPELINE = 5;
+  CONDITION_ON_MATCH_NOTIFY_SERVER = 6;
+
+  // NOTE: Doing *_NEXT_STEP or *_SKIP_STEP right now would be too complex
+}
+
+message PipelineStep {
+  // Unique ID for the step
+  string id = 1;
+
+  // Friendly name for the step
+  string name = 2;
+
+  // Input bytes for next step (probably PipelineStepResponse.output from previous step)
+  bytes input = 3;
+
+  // WASM module ID
+  string wasm_id = 4;
+
+  // WASM module bytes
+  string wasm_bytes = 5;
+
+  // WASM function name to execute
+  string wasm_function = 6;
+
+  // Conditions that SDK should check before executing next step
+  repeated Condition conditions = 7;
+
+  // All steps return PipelineStepResponse upon completion
+  oneof step {
+    steps.DetectiveStep detective = 1000;
+    steps.TransformStep transform = 1001;
+    steps.EncodeStep encode = 1002;
+    steps.DecodeStep decode = 1003;
+    steps.CustomStep custom = 1004;
+  }
+}
+
+// All WASM funcs return this upon completion. All WASM funcs MUST include `output`
+// (even if they do not modify the input).
+message PipelineStepResponse {
+  bytes output = 1;
+  PipelineStepStatus status = 2;
+  string status_message = 3;
+}
+
+/********************** Get (single) pipeline **********************/
+
+message GetPipelineRequest {
+  string id = 1;
+}
+
+message GetPipelineResponse {
+  SetPipelineRequest pipeline = 1;
+  ResponseStatus status = 2;
+  string message = 3;
+}
+
+/********************** Get all pipelines **********************/
+
+message GetAllPipelinesRequest {}
+
+message GetAllPipelinesResponse {
+  repeated SetPipelineRequest pipelines = 1;
+  ResponseStatus status = 2;
+  string message = 3;
+}
+
+/********************** Add/Set/Update pipeline **********************/
+
+// Used for both Add and Update
+message SetPipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+
+  // Friendly name for the pipeline
+  string name = 2;
+
+  // One or more steps to execute
+  repeated PipelineStep steps = 3;
+}
+
+message SetPipelineResponse {
+  // Unique ID for the pipeline
+  string id = 1;
+
+  // Response status code; use for identifying request success or failure
+  ResponseStatus status = 2;
+
+  // Additional information regarding response status
+  string message = 3;
+}
+
+/********************** Delete pipeline *********************/
+
+message DeletePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message DeletePipelineResponse {
+  string id = 1;
+  ResponseStatus status = 2;
+  string message = 3;
+}
+
+/********************** Pause pipeline **********************/
+
+message PausePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message PausePipelineResponse {
+  string id = 1;
+  ResponseStatus status = 2;
+  string message = 3;
+}
+
+/********************** Unpause pipeline **********************/
+
+message UnpausePipelineRequest {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message UnpausePipelineResponse {
+  string id = 1;
+  ResponseStatus status = 2;
+  string message = 3;
+}
