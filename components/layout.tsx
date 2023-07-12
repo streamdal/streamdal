@@ -1,4 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
+import { NavBar } from "./nav/nav.tsx";
+import { ComponentChildren } from "https://esm.sh/v128/preact@10.15.1/src/index.d.ts";
 
 export type MetaProps = {
   title?: string;
@@ -9,8 +11,9 @@ export type MetaProps = {
 export type LayoutProps = {
   children: ComponentChildren;
   meta?: MetaProps;
+  hideNav?: boolean;
 };
-export const Layout = ({ children, ...meta }: LayoutProps) => (
+export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
   <html lang="en">
     <Head>
       <title>{meta.title || "Snitch Console"}</title>
@@ -38,16 +41,8 @@ export const Layout = ({ children, ...meta }: LayoutProps) => (
       />
     </Head>
     <body className="h-screen">
-      <div className="flex flex-col w-full text-web">
-        <div className="sticky top-0 flex flex-row justify-between h-16 bg-web w-full items-center">
-          <a href="/">
-            <img
-              src="/images/logo-dark.png"
-              className="w-44 h-fit ml-4"
-              alt="Snitch Logo"
-            />
-          </a>
-        </div>
+      <div className="flex flex-col w-full h-screen text-web bg-purple-50">
+        {hideNav ? null : <NavBar />}
         <div className="mx-8 my-6">
           {children}
         </div>
