@@ -6,7 +6,7 @@ export const RuleMenu = ({ id }: { id: string }) => (
   <>
     <div
       id="dropdownDefaultButton"
-      data-dropdown-toggle="dropdown"
+      data-dropdown-toggle="rule-dropdown"
       type="button"
       className="cursor-pointer"
     >
@@ -17,7 +17,7 @@ export const RuleMenu = ({ id }: { id: string }) => (
     </div>
 
     <div
-      id="dropdown"
+      id="rule-dropdown"
       class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
     >
       <ul
@@ -25,20 +25,20 @@ export const RuleMenu = ({ id }: { id: string }) => (
         aria-labelledby="dropdownDefaultButton"
       >
         <a href="#">
-          <li className="flex w-full flex-start py-2 hover:bg-sunset text-sm">
+          <li className="flex w-full flex-start px-2 py-2 hover:bg-sunset text-sm">
             <IconEye className="w-5 h-5 text-red mx-1" />
             View
           </li>
         </a>
         <a href="#">
-          <li className="flex w-full flex-start py-2 hover:bg-sunset text-sm">
+          <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
             <Edit className="w-4 text-web mx-1" />
             Edit
           </li>
         </a>
         <a href="#">
-          <li className="flex w-full flex-start py-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
-            <Delete className="w-4 mx-1 text-eyelid hover:text-white fill-current" />
+          <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
+            <Delete className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
             Delete
           </li>
         </a>
