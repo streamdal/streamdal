@@ -71,7 +71,7 @@ message PipelineStep {
   string _wasm_id = 10000;
 
   // WASM module bytes (set by backend)
-  string _wasm_bytes = 10001;
+  bytes _wasm_bytes = 10001;
 
   // WASM function name to execute (set by backend)
   string _wasm_function = 10002;
