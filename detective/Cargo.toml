@@ -12,6 +12,7 @@ crate-type = ["cdylib"]
 protobuf = "3.2.0"
 snitch-detective = "0.0.16"
 snitch-protos = "0.0.22"
+common = { path = "../common" }
 
 [profile.release]
 lto = true
