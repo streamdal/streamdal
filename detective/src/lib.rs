@@ -1,80 +1,80 @@
 use protobuf::EnumOrUnknown;
-use protos::detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
-use protos::pipeline::{PipelineStep, PipelineStepResponse, PipelineStepStatus};
+use protos::detective::DetectiveType;
+use protos::pipeline::{WASMExitCode, WASMRequest, WASMResponse};
 use snitch_detective::detective::{Detective, Request};
 use std::mem;
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
-    let step = match read_step(ptr, length) {
-        Ok(request) => request,
+    let wasm_request = match read_request(ptr, length) {
+        Ok(req) => req,
         Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
     };
 
     // Validate request
-    if let Err(err) = validate_step(&step) {
+    if let Err(err) = validate_wasm_request(&wasm_request) {
         panic!("invalid step: {}", err) // TODO: Should write response here
     }
 
     // Generate detective request
-    let req = generate_request(&step);
+    let req = generate_detective_request(&wasm_request);
 
     // Run request against detective
     match Detective::new().matches(&req) {
         Ok(match_result) => {
-            let mut status = PipelineStepStatus::PIPELINE_STEP_STATUS_FAILURE;
+            let mut exit_code = WASMExitCode::WASM_EXIT_CODE_FAILURE;
 
             if match_result {
-                status = PipelineStepStatus::PIPELINE_STEP_STATUS_SUCCESS
+                exit_code = WASMExitCode::WASM_EXIT_CODE_SUCCESS;
             }
 
-            write_response(&req.data, status, "completed detective run".to_string())
+            write_response(&req.data, exit_code, "completed detective run".to_string())
         }
         Err(e) => write_response(
             &req.data,
-            PipelineStepStatus::PIPELINE_STEP_STATUS_FAILURE,
+            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             e.to_string(),
         ),
     }
 }
 
-fn generate_request(pipeline_step: &PipelineStep) -> Request {
+fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
     Request {
-        match_type: pipeline_step.detective().type_.unwrap(),
-        data: &pipeline_step.input,
-        path: pipeline_step.detective().path.clone(),
-        args: pipeline_step.detective().args.clone(),
-        negate: pipeline_step.detective().negate,
+        match_type: wasm_request.step.detective().type_.unwrap(),
+        data: &wasm_request.input,
+        path: wasm_request.step.detective().path.clone(),
+        args: wasm_request.step.detective().args.clone(),
+        negate: wasm_request.step.detective().negate.clone(),
     }
 }
 
-fn validate_step(step: &PipelineStep) -> Result<(), String> {
-    if !step.has_detective() {
+fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
+    if req.input.is_empty() {
+        return Err("input cannot be empty".to_string());
+    }
+
+    if !req.step.has_detective() {
         return Err("detective is required".to_string());
     }
 
-    if step.detective().type_ == EnumOrUnknown::from(DETECTIVE_TYPE_UNKNOWN) {
+    if req.step.detective().type_ == EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_UNKNOWN) {
         return Err("detective type cannot be unknown".to_string());
     }
 
-    if step.detective().path == "" {
+    if req.step.detective().path == "" {
         return Err("detective path cannot be empty".to_string());
-    }
-
-    if step.input.is_empty() {
-        return Err("input cannot be empty".to_string());
     }
 
     Ok(())
 }
 
-fn write_response(output: &Vec<u8>, status: PipelineStepStatus, message: String) -> *mut u8 {
-    let mut response = PipelineStepResponse::new();
+fn write_response(output: &Vec<u8>, exit_code: WASMExitCode, exit_msg: String) -> *mut u8 {
+    let mut response = WASMResponse::new();
 
-    response.output = output.to_owned();
-    response.status = EnumOrUnknown::from(status);
-    response.status_message = message;
+    response.output = output.to_vec();
+    response.exit_code = EnumOrUnknown::from(exit_code);
+    response.exit_msg = exit_msg;
 
     let mut bytes = protobuf::Message::write_to_bytes(&response).unwrap();
 
@@ -83,16 +83,14 @@ fn write_response(output: &Vec<u8>, status: PipelineStepStatus, message: String)
 
     let ptr = bytes.as_mut_ptr();
 
-    mem::forget(ptr);
-
     ptr
 }
 
-fn read_step(ptr: *mut u8, length: usize) -> Result<PipelineStep, String> {
+fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> {
     let request_bytes = read_memory(ptr, length);
 
     // Decode read request
-    let request: PipelineStep =
+    let request: WASMRequest =
         protobuf::Message::parse_from_bytes(request_bytes.as_slice()).map_err(|e| e.to_string())?;
 
     // Dealloc request bytes
