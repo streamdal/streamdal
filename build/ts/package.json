@@ -20,7 +20,7 @@
     "url": "https://github.com/streamdal/snitch-protos/issues"
   },
   "homepage": "https://github.com/streamdal/stitch-protos/build/ts#readme",
-  "devDependencies": {
+  "dependencies": {
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7"
   },
