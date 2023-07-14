@@ -26,7 +26,7 @@ export const Service = ({ data }) => {
 
 export const Participants = ({ data }) => {
   return (
-    <div className={"h-[96px] flex items-center"}>
+    <div className={"h-[96px] flex items-center z-40"}>
       <div
         className={"w-[185px] h-[56px] bg-white rounded shadow-lg flex items-center justify-between px-3"}
       >
@@ -53,11 +53,11 @@ export const Participants = ({ data }) => {
 export const Platform = ({ data }) => {
   return (
     <div
-      className={"h-[224px] w-[224px] flex items-center justify-center border-1"}
+      className={"h-[224px] w-[224px] z-10 flex items-center justify-center"}
     >
       <p className={"z-10 absolute text-white"}>Testing</p>
       <div
-        className={"bg-web rounded-md border-1 border-black rotate-45 h-[145px] w-[145px] shadow-lg"}
+        className={"bg-web rounded-md border-1 border-black rotate-45 h-[145px] w-[145px] shadow-xl"}
       >
       </div>
       <Handle
