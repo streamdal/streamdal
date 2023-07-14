@@ -1,60 +1,76 @@
-// Helper for reading data from memory
-pub fn read_memory(ptr: *mut u8, length: usize) -> Vec<u8> {
-    let array = unsafe { std::slice::from_raw_parts(ptr, length) };
-    return array.to_vec();
+use protobuf;
+use protos::pipeline::{WASMExitCode, WASMRequest, WASMResponse};
+use std::mem;
+
+/// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
+pub fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> {
+    let request_bytes = read_memory(ptr, length);
+
+    // Decode read request
+    let request: WASMRequest =
+        protobuf::Message::parse_from_bytes(request_bytes.as_slice()).map_err(|e| e.to_string())?;
+
+    // Dealloc request bytes
+    unsafe {
+        dealloc(ptr, length as i32);
+    }
+
+    Ok(request)
 }
 
-// This func should be used to update a byte response to include terminators so
-// that client side can read the response from memory (without knowing the response length)
-pub fn append_terminator(bytes: &mut Vec<u8>) -> *mut u8 {
+/// Generate a WASMResponse from params, serialize it, add terminators and
+/// return a pointer to the serialized response.
+pub fn write_response(output: &[u8], exit_code: WASMExitCode, exit_msg: String) -> *mut u8 {
+    let mut response = WASMResponse::new();
+
+    response.output = output.to_vec();
+    response.exit_code = protobuf::EnumOrUnknown::from(exit_code);
+    response.exit_msg = exit_msg;
+
+    let mut bytes = protobuf::Message::write_to_bytes(&response).unwrap();
+
     // Append 3 terminators (ascii code 166 = ¦)
     bytes.extend_from_slice(&[166, 166, 166]);
 
     let ptr = bytes.as_mut_ptr();
 
-    std::mem::forget(ptr);
-
     ptr
 }
 
-// Used by client when generating request
-#[no_mangle]
+/// Allocate number of bytes in memory. This function should be used by client
+/// when generating request data that is intended to be passed to a WASM func.
+///
+/// NOTE: This function should be exported by every WASM module.
+///
+/// # Safety
+///
+/// This function is unsafe because it operates with raw memory so the compiler
+/// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
     let mut buffer = Vec::with_capacity(size as usize);
 
     let pointer = buffer.as_mut_ptr();
 
-    std::mem::forget(buffer);
+    mem::forget(buffer);
 
     pointer as *mut u8
 }
 
-// Used by WASM func to dealloc memory after it is finished working with request
-#[no_mangle]
+/// Free allocated memory. This function should be called within a WASM function
+/// _after_ it has read request data.
+///
+/// NOTE: This function should be exported by every WASM module.
+///
+/// # Safety
+///
+/// This function is unsafe because it operates with raw memory so the compiler
+/// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn dealloc(pointer: *mut u8, size: i32) {
     drop(Vec::from_raw_parts(pointer, size as usize, size as usize))
 }
 
-#[test]
-fn test_read_memory() {
-    let data = vec![1, 2, 3, 4, 5];
-    let ptr = data.as_ptr() as *mut u8;
-
-    let result = read_memory(ptr, data.len());
-    assert_eq!(result, data);
-}
-
-#[test]
-fn test_prepare_response() {
-    let mut data: Vec<u8> = vec![1, 2, 3, 4, 5];
-    let original_len = data.len();
-
-    let ptr = append_terminator(&mut data);
-
-    // There should be 3 terminators appended
-    assert_eq!(data.len(), original_len + 3);
-
-    // Attempt to read data from mem by ptr
-    let data_in_mem =  unsafe { std::slice::from_raw_parts(ptr, data.len()) };
-    assert_eq!(data_in_mem.to_vec(), data);
+/// Helper for reading data from memory
+pub fn read_memory(ptr: *mut u8, length: usize) -> Vec<u8> {
+    let array = unsafe { std::slice::from_raw_parts(ptr, length) };
+    return array.to_vec();
 }

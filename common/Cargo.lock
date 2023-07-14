@@ -56,9 +56,9 @@ dependencies = [
 
 [[package]]
 name = "snitch-protos"
-version = "0.0.9"
+version = "0.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47aeac0a48c0fbcb167034f32342e4fe00a50d639b1eb4ea27dbcce2260d93ad"
+checksum = "864e9498d967a0e82131a8f78c26733f7b924c41808f6c27444598757b7af5f2"
 dependencies = [
  "protobuf",
 ]

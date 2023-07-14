@@ -32,7 +32,7 @@ build/detective: description = Build WASM target for detective
 build/detective: clean/detective
 	cd detective && \
 	cargo build --target=wasm32-wasi --release && \
-	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wasm 
+	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wasm
 
 .PHONY: clean/detective
 clean/detective: description = Remove detective WASM artifacts
@@ -44,7 +44,7 @@ build/transform: description = Build WASM target for transform
 build/transform: clean/transform
 	cd transform && \
 	cargo build --target=wasm32-wasi --release && \
-	cp target/wasm32-wasi/release/transform.wasm ../build/
+	wasm-opt -Os -o ../build/transform.wasm target/wasm32-wasi/release/transform.wasm
 
 .PHONY: clean/transform
 clean/transform: description = Remove transform WASM artifacts
