@@ -49,7 +49,7 @@ const initialEdges = [
       color: "#956CFF",
     },
     style: {
-      strokeWidth: 2,
+      strokeWidth: 1,
       stroke: "#956CFF",
     },
   },
@@ -65,7 +65,7 @@ const initialEdges = [
       color: "#956CFF",
     },
     style: {
-      strokeWidth: 2,
+      strokeWidth: 1,
       stroke: "#956CFF",
     },
   },
@@ -82,7 +82,7 @@ const initialEdges = [
       color: "#956CFF",
     },
     style: {
-      strokeWidth: 2,
+      strokeWidth: 1,
       stroke: "#956CFF",
     },
   },
@@ -99,7 +99,7 @@ const initialEdges = [
       color: "#956CFF",
     },
     style: {
-      strokeWidth: 2,
+      strokeWidth: 1,
       stroke: "#956CFF",
     },
   },
