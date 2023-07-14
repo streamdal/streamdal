@@ -1,10 +1,8 @@
-// Original file: ../../protos/pipeline.proto
+// Original file: ../../protos/grpc_public.proto
 
 
 export interface DeletePipelineRequest {
-  'id'?: (string);
 }
 
 export interface DeletePipelineRequest__Output {
-  'id': (string);
 }

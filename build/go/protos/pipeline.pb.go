@@ -21,123 +21,242 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Each pipeline step includes this in the response; SDK is responsible for
-// interpreting the response status and apply it to the step condition.
-type PipelineStepStatus int32
+// Included in WASM response; SDK is responsible for interpreting the response
+// status and how it relates to the step condition.
+// ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
+// conditions to determine what to do next.
+// ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
+// to determine what to do next;
+type WASMExitCode int32
 
 const (
-	PipelineStepStatus_PIPELINE_STEP_STATUS_UNSET   PipelineStepStatus = 0
-	PipelineStepStatus_PIPELINE_STEP_STATUS_SUCCESS PipelineStepStatus = 1
-	PipelineStepStatus_PIPELINE_STEP_STATUS_FAILURE PipelineStepStatus = 2
-	PipelineStepStatus_PIPELINE_STEP_STATUS_ERROR   PipelineStepStatus = 3
+	WASMExitCode_WASM_EXIT_CODE_UNSET          WASMExitCode = 0
+	WASMExitCode_WASM_EXIT_CODE_SUCCESS        WASMExitCode = 1
+	WASMExitCode_WASM_EXIT_CODE_FAILURE        WASMExitCode = 2 // Probably need better names for these as FAILURE is too harsh
+	WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR WASMExitCode = 3
 )
 
-// Enum value maps for PipelineStepStatus.
+// Enum value maps for WASMExitCode.
 var (
-	PipelineStepStatus_name = map[int32]string{
-		0: "PIPELINE_STEP_STATUS_UNSET",
-		1: "PIPELINE_STEP_STATUS_SUCCESS",
-		2: "PIPELINE_STEP_STATUS_FAILURE",
-		3: "PIPELINE_STEP_STATUS_ERROR",
+	WASMExitCode_name = map[int32]string{
+		0: "WASM_EXIT_CODE_UNSET",
+		1: "WASM_EXIT_CODE_SUCCESS",
+		2: "WASM_EXIT_CODE_FAILURE",
+		3: "WASM_EXIT_CODE_INTERNAL_ERROR",
 	}
-	PipelineStepStatus_value = map[string]int32{
-		"PIPELINE_STEP_STATUS_UNSET":   0,
-		"PIPELINE_STEP_STATUS_SUCCESS": 1,
-		"PIPELINE_STEP_STATUS_FAILURE": 2,
-		"PIPELINE_STEP_STATUS_ERROR":   3,
+	WASMExitCode_value = map[string]int32{
+		"WASM_EXIT_CODE_UNSET":          0,
+		"WASM_EXIT_CODE_SUCCESS":        1,
+		"WASM_EXIT_CODE_FAILURE":        2,
+		"WASM_EXIT_CODE_INTERNAL_ERROR": 3,
 	}
 )
 
-func (x PipelineStepStatus) Enum() *PipelineStepStatus {
-	p := new(PipelineStepStatus)
+func (x WASMExitCode) Enum() *WASMExitCode {
+	p := new(WASMExitCode)
 	*p = x
 	return p
 }
 
-func (x PipelineStepStatus) String() string {
+func (x WASMExitCode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (PipelineStepStatus) Descriptor() protoreflect.EnumDescriptor {
+func (WASMExitCode) Descriptor() protoreflect.EnumDescriptor {
 	return file_pipeline_proto_enumTypes[0].Descriptor()
 }
 
-func (PipelineStepStatus) Type() protoreflect.EnumType {
+func (WASMExitCode) Type() protoreflect.EnumType {
 	return &file_pipeline_proto_enumTypes[0]
 }
 
-func (x PipelineStepStatus) Number() protoreflect.EnumNumber {
+func (x WASMExitCode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use PipelineStepStatus.Descriptor instead.
-func (PipelineStepStatus) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use WASMExitCode.Descriptor instead.
+func (WASMExitCode) EnumDescriptor() ([]byte, []int) {
 	return file_pipeline_proto_rawDescGZIP(), []int{0}
 }
 
 // A condition defines how the SDK should handle a step response -- should it
 // continue executing the pipeline, should it abort, should it notify the server?
-type Condition int32
+// Each step can have multiple conditions.
+type PipelineStepCondition int32
 
 const (
-	Condition_CONDITION_UNSET                      Condition = 0
-	Condition_CONDITION_ON_ERROR_CONTINUE_PIPELINE Condition = 1
-	Condition_CONDITION_ON_ERROR_ABORT_PIPELINE    Condition = 2
-	Condition_CONDITION_ON_ERROR_NOTIFY_SERVER     Condition = 3
-	Condition_CONDITION_ON_MATCH_CONTINUE_PIPELINE Condition = 4
-	Condition_CONDITION_ON_MATCH_ABORT_PIPELINE    Condition = 5
-	Condition_CONDITION_ON_MATCH_NOTIFY_SERVER     Condition = 6
+	PipelineStepCondition_CONDITION_UNSET    PipelineStepCondition = 0
+	PipelineStepCondition_CONDITION_CONTINUE PipelineStepCondition = 1
+	PipelineStepCondition_CONDITION_ABORT    PipelineStepCondition = 2
+	PipelineStepCondition_CONDITION_NOTIFY   PipelineStepCondition = 3
 )
 
-// Enum value maps for Condition.
+// Enum value maps for PipelineStepCondition.
 var (
-	Condition_name = map[int32]string{
+	PipelineStepCondition_name = map[int32]string{
 		0: "CONDITION_UNSET",
-		1: "CONDITION_ON_ERROR_CONTINUE_PIPELINE",
-		2: "CONDITION_ON_ERROR_ABORT_PIPELINE",
-		3: "CONDITION_ON_ERROR_NOTIFY_SERVER",
-		4: "CONDITION_ON_MATCH_CONTINUE_PIPELINE",
-		5: "CONDITION_ON_MATCH_ABORT_PIPELINE",
-		6: "CONDITION_ON_MATCH_NOTIFY_SERVER",
+		1: "CONDITION_CONTINUE",
+		2: "CONDITION_ABORT",
+		3: "CONDITION_NOTIFY",
 	}
-	Condition_value = map[string]int32{
-		"CONDITION_UNSET":                      0,
-		"CONDITION_ON_ERROR_CONTINUE_PIPELINE": 1,
-		"CONDITION_ON_ERROR_ABORT_PIPELINE":    2,
-		"CONDITION_ON_ERROR_NOTIFY_SERVER":     3,
-		"CONDITION_ON_MATCH_CONTINUE_PIPELINE": 4,
-		"CONDITION_ON_MATCH_ABORT_PIPELINE":    5,
-		"CONDITION_ON_MATCH_NOTIFY_SERVER":     6,
+	PipelineStepCondition_value = map[string]int32{
+		"CONDITION_UNSET":    0,
+		"CONDITION_CONTINUE": 1,
+		"CONDITION_ABORT":    2,
+		"CONDITION_NOTIFY":   3,
 	}
 )
 
-func (x Condition) Enum() *Condition {
-	p := new(Condition)
+func (x PipelineStepCondition) Enum() *PipelineStepCondition {
+	p := new(PipelineStepCondition)
 	*p = x
 	return p
 }
 
-func (x Condition) String() string {
+func (x PipelineStepCondition) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Condition) Descriptor() protoreflect.EnumDescriptor {
+func (PipelineStepCondition) Descriptor() protoreflect.EnumDescriptor {
 	return file_pipeline_proto_enumTypes[1].Descriptor()
 }
 
-func (Condition) Type() protoreflect.EnumType {
+func (PipelineStepCondition) Type() protoreflect.EnumType {
 	return &file_pipeline_proto_enumTypes[1]
 }
 
-func (x Condition) Number() protoreflect.EnumNumber {
+func (x PipelineStepCondition) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Condition.Descriptor instead.
-func (Condition) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use PipelineStepCondition.Descriptor instead.
+func (PipelineStepCondition) EnumDescriptor() ([]byte, []int) {
 	return file_pipeline_proto_rawDescGZIP(), []int{1}
 }
 
+// SDK generates a WASM request and passes this to the WASM func
+type WasmRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Step  *PipelineStep `protobuf:"bytes,1,opt,name=step,proto3" json:"step,omitempty"`
+	Input []byte        `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
+}
+
+func (x *WasmRequest) Reset() {
+	*x = WasmRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pipeline_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WasmRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WasmRequest) ProtoMessage() {}
+
+func (x *WasmRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pipeline_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WasmRequest.ProtoReflect.Descriptor instead.
+func (*WasmRequest) Descriptor() ([]byte, []int) {
+	return file_pipeline_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *WasmRequest) GetStep() *PipelineStep {
+	if x != nil {
+		return x.Step
+	}
+	return nil
+}
+
+func (x *WasmRequest) GetInput() []byte {
+	if x != nil {
+		return x.Input
+	}
+	return nil
+}
+
+// Returned by all WASM functions
+type WasmResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Output   []byte       `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
+	ExitCode WASMExitCode `protobuf:"varint,2,opt,name=exit_code,json=exitCode,proto3,enum=protos.WASMExitCode" json:"exit_code,omitempty"`
+	ExitMsg  string       `protobuf:"bytes,3,opt,name=exit_msg,json=exitMsg,proto3" json:"exit_msg,omitempty"`
+}
+
+func (x *WasmResponse) Reset() {
+	*x = WasmResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pipeline_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WasmResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WasmResponse) ProtoMessage() {}
+
+func (x *WasmResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pipeline_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WasmResponse.ProtoReflect.Descriptor instead.
+func (*WasmResponse) Descriptor() ([]byte, []int) {
+	return file_pipeline_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *WasmResponse) GetOutput() []byte {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+func (x *WasmResponse) GetExitCode() WASMExitCode {
+	if x != nil {
+		return x.ExitCode
+	}
+	return WASMExitCode_WASM_EXIT_CODE_UNSET
+}
+
+func (x *WasmResponse) GetExitMsg() string {
+	if x != nil {
+		return x.ExitMsg
+	}
+	return ""
+}
+
+// A PipelineCommand consists of one or more pipeline steps. A pipeline step
+// is an immutable set of instructions on how to execute a step.
+// The SDK will use the pipeline step to generate a WASM request.
 type PipelineStep struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -147,18 +266,8 @@ type PipelineStep struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Friendly name for the step
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Input bytes for next step (probably PipelineStepResponse.output from previous step)
-	Input []byte `protobuf:"bytes,3,opt,name=input,proto3" json:"input,omitempty"`
-	// WASM module ID
-	WasmId string `protobuf:"bytes,4,opt,name=wasm_id,json=wasmId,proto3" json:"wasm_id,omitempty"`
-	// WASM module bytes
-	WasmBytes string `protobuf:"bytes,5,opt,name=wasm_bytes,json=wasmBytes,proto3" json:"wasm_bytes,omitempty"`
-	// WASM function name to execute
-	WasmFunction string `protobuf:"bytes,6,opt,name=wasm_function,json=wasmFunction,proto3" json:"wasm_function,omitempty"`
 	// Conditions that SDK should check before executing next step
-	Conditions []Condition `protobuf:"varint,7,rep,packed,name=conditions,proto3,enum=protos.Condition" json:"conditions,omitempty"`
-	// All steps return PipelineStepResponse upon completion
-	//
+	Conditions []PipelineStepCondition `protobuf:"varint,3,rep,packed,name=conditions,proto3,enum=protos.PipelineStepCondition" json:"conditions,omitempty"`
 	// Types that are assignable to Step:
 	//
 	//	*PipelineStep_Detective
@@ -167,12 +276,18 @@ type PipelineStep struct {
 	//	*PipelineStep_Decode
 	//	*PipelineStep_Custom
 	Step isPipelineStep_Step `protobuf_oneof:"step"`
+	// WASM module ID (set by backend)
+	XWasmId string `protobuf:"bytes,10000,opt,name=_wasm_id,json=WasmId,proto3" json:"_wasm_id,omitempty"`
+	// WASM module bytes (set by backend)
+	XWasmBytes string `protobuf:"bytes,10001,opt,name=_wasm_bytes,json=WasmBytes,proto3" json:"_wasm_bytes,omitempty"`
+	// WASM function name to execute (set by backend)
+	XWasmFunction string `protobuf:"bytes,10002,opt,name=_wasm_function,json=WasmFunction,proto3" json:"_wasm_function,omitempty"`
 }
 
 func (x *PipelineStep) Reset() {
 	*x = PipelineStep{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[0]
+		mi := &file_pipeline_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -185,7 +300,7 @@ func (x *PipelineStep) String() string {
 func (*PipelineStep) ProtoMessage() {}
 
 func (x *PipelineStep) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[0]
+	mi := &file_pipeline_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -198,7 +313,7 @@ func (x *PipelineStep) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PipelineStep.ProtoReflect.Descriptor instead.
 func (*PipelineStep) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{0}
+	return file_pipeline_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PipelineStep) GetId() string {
@@ -215,35 +330,7 @@ func (x *PipelineStep) GetName() string {
 	return ""
 }
 
-func (x *PipelineStep) GetInput() []byte {
-	if x != nil {
-		return x.Input
-	}
-	return nil
-}
-
-func (x *PipelineStep) GetWasmId() string {
-	if x != nil {
-		return x.WasmId
-	}
-	return ""
-}
-
-func (x *PipelineStep) GetWasmBytes() string {
-	if x != nil {
-		return x.WasmBytes
-	}
-	return ""
-}
-
-func (x *PipelineStep) GetWasmFunction() string {
-	if x != nil {
-		return x.WasmFunction
-	}
-	return ""
-}
-
-func (x *PipelineStep) GetConditions() []Condition {
+func (x *PipelineStep) GetConditions() []PipelineStepCondition {
 	if x != nil {
 		return x.Conditions
 	}
@@ -292,6 +379,27 @@ func (x *PipelineStep) GetCustom() *steps.CustomStep {
 	return nil
 }
 
+func (x *PipelineStep) GetXWasmId() string {
+	if x != nil {
+		return x.XWasmId
+	}
+	return ""
+}
+
+func (x *PipelineStep) GetXWasmBytes() string {
+	if x != nil {
+		return x.XWasmBytes
+	}
+	return ""
+}
+
+func (x *PipelineStep) GetXWasmFunction() string {
+	if x != nil {
+		return x.XWasmFunction
+	}
+	return ""
+}
+
 type isPipelineStep_Step interface {
 	isPipelineStep_Step()
 }
@@ -326,284 +434,8 @@ func (*PipelineStep_Decode) isPipelineStep_Step() {}
 
 func (*PipelineStep_Custom) isPipelineStep_Step() {}
 
-// All WASM funcs return this upon completion. All WASM funcs MUST include `output`
-// (even if they do not modify the input).
-type PipelineStepResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Output        []byte             `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
-	Status        PipelineStepStatus `protobuf:"varint,2,opt,name=status,proto3,enum=protos.PipelineStepStatus" json:"status,omitempty"`
-	StatusMessage string             `protobuf:"bytes,3,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty"`
-}
-
-func (x *PipelineStepResponse) Reset() {
-	*x = PipelineStepResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PipelineStepResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PipelineStepResponse) ProtoMessage() {}
-
-func (x *PipelineStepResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PipelineStepResponse.ProtoReflect.Descriptor instead.
-func (*PipelineStepResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *PipelineStepResponse) GetOutput() []byte {
-	if x != nil {
-		return x.Output
-	}
-	return nil
-}
-
-func (x *PipelineStepResponse) GetStatus() PipelineStepStatus {
-	if x != nil {
-		return x.Status
-	}
-	return PipelineStepStatus_PIPELINE_STEP_STATUS_UNSET
-}
-
-func (x *PipelineStepResponse) GetStatusMessage() string {
-	if x != nil {
-		return x.StatusMessage
-	}
-	return ""
-}
-
-type GetPipelineRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *GetPipelineRequest) Reset() {
-	*x = GetPipelineRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetPipelineRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPipelineRequest) ProtoMessage() {}
-
-func (x *GetPipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPipelineRequest.ProtoReflect.Descriptor instead.
-func (*GetPipelineRequest) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *GetPipelineRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type GetPipelineResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Pipeline *SetPipelineRequest `protobuf:"bytes,1,opt,name=pipeline,proto3" json:"pipeline,omitempty"`
-	Status   ResponseStatus      `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	Message  string              `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *GetPipelineResponse) Reset() {
-	*x = GetPipelineResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetPipelineResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPipelineResponse) ProtoMessage() {}
-
-func (x *GetPipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPipelineResponse.ProtoReflect.Descriptor instead.
-func (*GetPipelineResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetPipelineResponse) GetPipeline() *SetPipelineRequest {
-	if x != nil {
-		return x.Pipeline
-	}
-	return nil
-}
-
-func (x *GetPipelineResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *GetPipelineResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type GetAllPipelinesRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetAllPipelinesRequest) Reset() {
-	*x = GetAllPipelinesRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAllPipelinesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAllPipelinesRequest) ProtoMessage() {}
-
-func (x *GetAllPipelinesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAllPipelinesRequest.ProtoReflect.Descriptor instead.
-func (*GetAllPipelinesRequest) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{4}
-}
-
-type GetAllPipelinesResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Pipelines []*SetPipelineRequest `protobuf:"bytes,1,rep,name=pipelines,proto3" json:"pipelines,omitempty"`
-	Status    ResponseStatus        `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	Message   string                `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *GetAllPipelinesResponse) Reset() {
-	*x = GetAllPipelinesResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAllPipelinesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAllPipelinesResponse) ProtoMessage() {}
-
-func (x *GetAllPipelinesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAllPipelinesResponse.ProtoReflect.Descriptor instead.
-func (*GetAllPipelinesResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetAllPipelinesResponse) GetPipelines() []*SetPipelineRequest {
-	if x != nil {
-		return x.Pipelines
-	}
-	return nil
-}
-
-func (x *GetAllPipelinesResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *GetAllPipelinesResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 // Used for both Add and Update
-type SetPipelineRequest struct {
+type SetPipelineCommand struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -616,8 +448,166 @@ type SetPipelineRequest struct {
 	Steps []*PipelineStep `protobuf:"bytes,3,rep,name=steps,proto3" json:"steps,omitempty"`
 }
 
-func (x *SetPipelineRequest) Reset() {
-	*x = SetPipelineRequest{}
+func (x *SetPipelineCommand) Reset() {
+	*x = SetPipelineCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pipeline_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetPipelineCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetPipelineCommand) ProtoMessage() {}
+
+func (x *SetPipelineCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_pipeline_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetPipelineCommand.ProtoReflect.Descriptor instead.
+func (*SetPipelineCommand) Descriptor() ([]byte, []int) {
+	return file_pipeline_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SetPipelineCommand) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SetPipelineCommand) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SetPipelineCommand) GetSteps() []*PipelineStep {
+	if x != nil {
+		return x.Steps
+	}
+	return nil
+}
+
+type DeletePipelineCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Unique ID for the pipeline
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *DeletePipelineCommand) Reset() {
+	*x = DeletePipelineCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pipeline_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeletePipelineCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePipelineCommand) ProtoMessage() {}
+
+func (x *DeletePipelineCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_pipeline_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePipelineCommand.ProtoReflect.Descriptor instead.
+func (*DeletePipelineCommand) Descriptor() ([]byte, []int) {
+	return file_pipeline_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DeletePipelineCommand) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type PausePipelineCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Unique ID for the pipeline
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *PausePipelineCommand) Reset() {
+	*x = PausePipelineCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pipeline_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PausePipelineCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PausePipelineCommand) ProtoMessage() {}
+
+func (x *PausePipelineCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_pipeline_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PausePipelineCommand.ProtoReflect.Descriptor instead.
+func (*PausePipelineCommand) Descriptor() ([]byte, []int) {
+	return file_pipeline_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PausePipelineCommand) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type UnpausePipelineCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Unique ID for the pipeline
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *UnpausePipelineCommand) Reset() {
+	*x = UnpausePipelineCommand{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pipeline_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -625,13 +615,13 @@ func (x *SetPipelineRequest) Reset() {
 	}
 }
 
-func (x *SetPipelineRequest) String() string {
+func (x *UnpausePipelineCommand) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SetPipelineRequest) ProtoMessage() {}
+func (*UnpausePipelineCommand) ProtoMessage() {}
 
-func (x *SetPipelineRequest) ProtoReflect() protoreflect.Message {
+func (x *UnpausePipelineCommand) ProtoReflect() protoreflect.Message {
 	mi := &file_pipeline_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -643,427 +633,14 @@ func (x *SetPipelineRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SetPipelineRequest.ProtoReflect.Descriptor instead.
-func (*SetPipelineRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UnpausePipelineCommand.ProtoReflect.Descriptor instead.
+func (*UnpausePipelineCommand) Descriptor() ([]byte, []int) {
 	return file_pipeline_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *SetPipelineRequest) GetId() string {
+func (x *UnpausePipelineCommand) GetId() string {
 	if x != nil {
 		return x.Id
-	}
-	return ""
-}
-
-func (x *SetPipelineRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *SetPipelineRequest) GetSteps() []*PipelineStep {
-	if x != nil {
-		return x.Steps
-	}
-	return nil
-}
-
-type SetPipelineResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Unique ID for the pipeline
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Response status code; use for identifying request success or failure
-	Status ResponseStatus `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	// Additional information regarding response status
-	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *SetPipelineResponse) Reset() {
-	*x = SetPipelineResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SetPipelineResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetPipelineResponse) ProtoMessage() {}
-
-func (x *SetPipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetPipelineResponse.ProtoReflect.Descriptor instead.
-func (*SetPipelineResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *SetPipelineResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *SetPipelineResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *SetPipelineResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type DeletePipelineRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Unique ID for the pipeline
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *DeletePipelineRequest) Reset() {
-	*x = DeletePipelineRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeletePipelineRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeletePipelineRequest) ProtoMessage() {}
-
-func (x *DeletePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeletePipelineRequest.ProtoReflect.Descriptor instead.
-func (*DeletePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *DeletePipelineRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type DeletePipelineResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id      string         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Status  ResponseStatus `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	Message string         `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *DeletePipelineResponse) Reset() {
-	*x = DeletePipelineResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeletePipelineResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeletePipelineResponse) ProtoMessage() {}
-
-func (x *DeletePipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeletePipelineResponse.ProtoReflect.Descriptor instead.
-func (*DeletePipelineResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *DeletePipelineResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *DeletePipelineResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *DeletePipelineResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type PausePipelineRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Unique ID for the pipeline
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *PausePipelineRequest) Reset() {
-	*x = PausePipelineRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[10]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PausePipelineRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PausePipelineRequest) ProtoMessage() {}
-
-func (x *PausePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[10]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PausePipelineRequest.ProtoReflect.Descriptor instead.
-func (*PausePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *PausePipelineRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type PausePipelineResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id      string         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Status  ResponseStatus `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	Message string         `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *PausePipelineResponse) Reset() {
-	*x = PausePipelineResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[11]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PausePipelineResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PausePipelineResponse) ProtoMessage() {}
-
-func (x *PausePipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[11]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PausePipelineResponse.ProtoReflect.Descriptor instead.
-func (*PausePipelineResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *PausePipelineResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *PausePipelineResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *PausePipelineResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type UnpausePipelineRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Unique ID for the pipeline
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *UnpausePipelineRequest) Reset() {
-	*x = UnpausePipelineRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[12]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UnpausePipelineRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UnpausePipelineRequest) ProtoMessage() {}
-
-func (x *UnpausePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[12]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UnpausePipelineRequest.ProtoReflect.Descriptor instead.
-func (*UnpausePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *UnpausePipelineRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type UnpausePipelineResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id      string         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Status  ResponseStatus `protobuf:"varint,2,opt,name=status,proto3,enum=protos.ResponseStatus" json:"status,omitempty"`
-	Message string         `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *UnpausePipelineResponse) Reset() {
-	*x = UnpausePipelineResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_pipeline_proto_msgTypes[13]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UnpausePipelineResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UnpausePipelineResponse) ProtoMessage() {}
-
-func (x *UnpausePipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pipeline_proto_msgTypes[13]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UnpausePipelineResponse.ProtoReflect.Descriptor instead.
-func (*UnpausePipelineResponse) Descriptor() ([]byte, []int) {
-	return file_pipeline_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *UnpausePipelineResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *UnpausePipelineResponse) GetStatus() ResponseStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ResponseStatus_RESPONSE_STATUS_UNSET
-}
-
-func (x *UnpausePipelineResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
 	}
 	return ""
 }
@@ -1072,27 +649,32 @@ var File_pipeline_proto protoreflect.FileDescriptor
 
 var file_pipeline_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x12, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x1a, 0x15, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f,
-	0x64, 0x65, 0x74, 0x65, 0x63, 0x74, 0x69, 0x76, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
-	0x15, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f, 0x72, 0x6d,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x65, 0x6e,
-	0x63, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x73, 0x74, 0x65, 0x70,
-	0x73, 0x2f, 0x64, 0x65, 0x63, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12,
-	0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x1a, 0x0c, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0xfb, 0x03, 0x0a, 0x0c, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65,
-	0x70, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x77,
-	0x61, 0x73, 0x6d, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x77, 0x61,
-	0x73, 0x6d, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x62, 0x79, 0x74,
-	0x65, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x77, 0x61, 0x73, 0x6d, 0x42, 0x79,
-	0x74, 0x65, 0x73, 0x12, 0x23, 0x0a, 0x0d, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x66, 0x75, 0x6e, 0x63,
-	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x77, 0x61, 0x73, 0x6d,
-	0x46, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x31, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x64,
-	0x69, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28, 0x0e, 0x32, 0x11, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x43, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x12, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x1a, 0x12, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f,
+	0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x73, 0x74,
+	0x65, 0x70, 0x73, 0x2f, 0x64, 0x65, 0x63, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x1a, 0x15, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x64, 0x65, 0x74, 0x65, 0x63, 0x74, 0x69, 0x76,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x65,
+	0x6e, 0x63, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x15, 0x73, 0x74, 0x65,
+	0x70, 0x73, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x22, 0x4d, 0x0a, 0x0b, 0x57, 0x61, 0x73, 0x6d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x28, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x53, 0x74, 0x65, 0x70, 0x52, 0x04, 0x73, 0x74, 0x65, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x69,
+	0x6e, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75,
+	0x74, 0x22, 0x74, 0x0a, 0x0c, 0x57, 0x61, 0x73, 0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0c, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12, 0x31, 0x0a, 0x09, 0x65, 0x78, 0x69,
+	0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x57, 0x41, 0x53, 0x4d, 0x45, 0x78, 0x69, 0x74, 0x43, 0x6f,
+	0x64, 0x65, 0x52, 0x08, 0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x19, 0x0a, 0x08,
+	0x65, 0x78, 0x69, 0x74, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x65, 0x78, 0x69, 0x74, 0x4d, 0x73, 0x67, 0x22, 0xf7, 0x03, 0x0a, 0x0c, 0x50, 0x69, 0x70, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x3d, 0x0a, 0x0a,
+	0x63, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0e,
+	0x32, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x43, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x52,
 	0x0a, 0x63, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x3c, 0x0a, 0x09, 0x64,
 	0x65, 0x74, 0x65, 0x63, 0x74, 0x69, 0x76, 0x65, 0x18, 0xe8, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x1b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2e, 0x44,
@@ -1111,113 +693,47 @@ var file_pipeline_proto_rawDesc = []byte{
 	0x65, 0x12, 0x33, 0x0a, 0x06, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x18, 0xec, 0x07, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x18, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x73, 0x74, 0x65, 0x70,
 	0x73, 0x2e, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x53, 0x74, 0x65, 0x70, 0x48, 0x00, 0x52, 0x06,
-	0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x42, 0x06, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70, 0x22, 0x89,
-	0x01, 0x0a, 0x14, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75,
-	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12,
-	0x32, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32,
-	0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x53, 0x74, 0x65, 0x70, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f, 0x6d, 0x65,
-	0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x73, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x24, 0x0a, 0x12, 0x47, 0x65,
-	0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x12, 0x19, 0x0a, 0x08, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f,
+	0x69, 0x64, 0x18, 0x90, 0x4e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x57, 0x61, 0x73, 0x6d, 0x49,
+	0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x62, 0x79, 0x74, 0x65, 0x73,
+	0x18, 0x91, 0x4e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x57, 0x61, 0x73, 0x6d, 0x42, 0x79, 0x74,
+	0x65, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x66, 0x75, 0x6e, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x92, 0x4e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x57, 0x61, 0x73,
+	0x6d, 0x46, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x06, 0x0a, 0x04, 0x73, 0x74, 0x65,
+	0x70, 0x22, 0x64, 0x0a, 0x12, 0x53, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
+	0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x2a, 0x0a, 0x05, 0x73,
+	0x74, 0x65, 0x70, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70,
+	0x52, 0x05, 0x73, 0x74, 0x65, 0x70, 0x73, 0x22, 0x27, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
 	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
-	0x22, 0x97, 0x01, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x36, 0x0a, 0x08, 0x70, 0x69, 0x70, 0x65,
-	0x6c, 0x69, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x53, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e,
-	0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
-	0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x18, 0x0a, 0x16, 0x47, 0x65,
-	0x74, 0x41, 0x6c, 0x6c, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x22, 0x9d, 0x01, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x50,
-	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x38, 0x0a, 0x09, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x18, 0x01, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x53, 0x65, 0x74,
-	0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52,
-	0x09, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74,
-	0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x53, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65,
-	0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x22, 0x64, 0x0a, 0x12, 0x53, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
-	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x2a,
-	0x0a, 0x05, 0x73, 0x74, 0x65, 0x70, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53,
-	0x74, 0x65, 0x70, 0x52, 0x05, 0x73, 0x74, 0x65, 0x70, 0x73, 0x22, 0x6f, 0x0a, 0x13, 0x53, 0x65,
-	0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0e, 0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x27, 0x0a, 0x15, 0x44,
-	0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x69, 0x64, 0x22, 0x72, 0x0a, 0x16, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x69,
-	0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x2e,
-	0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18,
-	0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x26, 0x0a, 0x14, 0x50, 0x61, 0x75, 0x73,
-	0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
-	0x22, 0x71, 0x0a, 0x15, 0x50, 0x61, 0x75, 0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x22, 0x28, 0x0a, 0x16, 0x55, 0x6e, 0x70, 0x61, 0x75, 0x73, 0x65, 0x50, 0x69,
-	0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a,
-	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x73, 0x0a,
-	0x17, 0x55, 0x6e, 0x70, 0x61, 0x75, 0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x73, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
-	0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
-	0x67, 0x65, 0x2a, 0x98, 0x01, 0x0a, 0x12, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53,
-	0x74, 0x65, 0x70, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x1e, 0x0a, 0x1a, 0x50, 0x49, 0x50,
-	0x45, 0x4c, 0x49, 0x4e, 0x45, 0x5f, 0x53, 0x54, 0x45, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
-	0x53, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x20, 0x0a, 0x1c, 0x50, 0x49, 0x50,
-	0x45, 0x4c, 0x49, 0x4e, 0x45, 0x5f, 0x53, 0x54, 0x45, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
-	0x53, 0x5f, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x01, 0x12, 0x20, 0x0a, 0x1c, 0x50,
-	0x49, 0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x5f, 0x53, 0x54, 0x45, 0x50, 0x5f, 0x53, 0x54, 0x41,
-	0x54, 0x55, 0x53, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x02, 0x12, 0x1e, 0x0a,
-	0x1a, 0x50, 0x49, 0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x5f, 0x53, 0x54, 0x45, 0x50, 0x5f, 0x53,
-	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0x03, 0x2a, 0x8e, 0x02,
-	0x0a, 0x09, 0x43, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x13, 0x0a, 0x0f, 0x43,
-	0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00,
-	0x12, 0x28, 0x0a, 0x24, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f, 0x4e,
-	0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x5f, 0x43, 0x4f, 0x4e, 0x54, 0x49, 0x4e, 0x55, 0x45, 0x5f,
-	0x50, 0x49, 0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x10, 0x01, 0x12, 0x25, 0x0a, 0x21, 0x43, 0x4f,
-	0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f, 0x4e, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52,
-	0x5f, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x50, 0x49, 0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x10,
-	0x02, 0x12, 0x24, 0x0a, 0x20, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f,
-	0x4e, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x5f, 0x4e, 0x4f, 0x54, 0x49, 0x46, 0x59, 0x5f, 0x53,
-	0x45, 0x52, 0x56, 0x45, 0x52, 0x10, 0x03, 0x12, 0x28, 0x0a, 0x24, 0x43, 0x4f, 0x4e, 0x44, 0x49,
-	0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f, 0x4e, 0x5f, 0x4d, 0x41, 0x54, 0x43, 0x48, 0x5f, 0x43, 0x4f,
-	0x4e, 0x54, 0x49, 0x4e, 0x55, 0x45, 0x5f, 0x50, 0x49, 0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x10,
-	0x04, 0x12, 0x25, 0x0a, 0x21, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f,
-	0x4e, 0x5f, 0x4d, 0x41, 0x54, 0x43, 0x48, 0x5f, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x50, 0x49,
-	0x50, 0x45, 0x4c, 0x49, 0x4e, 0x45, 0x10, 0x05, 0x12, 0x24, 0x0a, 0x20, 0x43, 0x4f, 0x4e, 0x44,
-	0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4f, 0x4e, 0x5f, 0x4d, 0x41, 0x54, 0x43, 0x48, 0x5f, 0x4e,
-	0x4f, 0x54, 0x49, 0x46, 0x59, 0x5f, 0x53, 0x45, 0x52, 0x56, 0x45, 0x52, 0x10, 0x06, 0x42, 0x34,
-	0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72,
-	0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e, 0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x26, 0x0a, 0x14, 0x50, 0x61, 0x75, 0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x28, 0x0a, 0x16, 0x55, 0x6e, 0x70, 0x61,
+	0x75, 0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x61,
+	0x6e, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x2a, 0x83, 0x01, 0x0a, 0x0c, 0x57, 0x41, 0x53, 0x4d, 0x45, 0x78, 0x69, 0x74, 0x43,
+	0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x14, 0x57, 0x41, 0x53, 0x4d, 0x5f, 0x45, 0x58, 0x49, 0x54,
+	0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x1a, 0x0a,
+	0x16, 0x57, 0x41, 0x53, 0x4d, 0x5f, 0x45, 0x58, 0x49, 0x54, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f,
+	0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x01, 0x12, 0x1a, 0x0a, 0x16, 0x57, 0x41, 0x53,
+	0x4d, 0x5f, 0x45, 0x58, 0x49, 0x54, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x46, 0x41, 0x49, 0x4c,
+	0x55, 0x52, 0x45, 0x10, 0x02, 0x12, 0x21, 0x0a, 0x1d, 0x57, 0x41, 0x53, 0x4d, 0x5f, 0x45, 0x58,
+	0x49, 0x54, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x49, 0x4e, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c,
+	0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0x03, 0x2a, 0x6f, 0x0a, 0x15, 0x50, 0x69, 0x70, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x43, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f,
+	0x6e, 0x12, 0x13, 0x0a, 0x0f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x55,
+	0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x16, 0x0a, 0x12, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54,
+	0x49, 0x4f, 0x4e, 0x5f, 0x43, 0x4f, 0x4e, 0x54, 0x49, 0x4e, 0x55, 0x45, 0x10, 0x01, 0x12, 0x13,
+	0x0a, 0x0f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x42, 0x4f, 0x52,
+	0x54, 0x10, 0x02, 0x12, 0x14, 0x0a, 0x10, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e,
+	0x5f, 0x4e, 0x4f, 0x54, 0x49, 0x46, 0x59, 0x10, 0x03, 0x42, 0x34, 0x5a, 0x32, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61,
+	0x6c, 0x2f, 0x73, 0x6e, 0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f,
+	0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1233,53 +749,38 @@ func file_pipeline_proto_rawDescGZIP() []byte {
 }
 
 var file_pipeline_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_pipeline_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_pipeline_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_pipeline_proto_goTypes = []interface{}{
-	(PipelineStepStatus)(0),         // 0: protos.PipelineStepStatus
-	(Condition)(0),                  // 1: protos.Condition
-	(*PipelineStep)(nil),            // 2: protos.PipelineStep
-	(*PipelineStepResponse)(nil),    // 3: protos.PipelineStepResponse
-	(*GetPipelineRequest)(nil),      // 4: protos.GetPipelineRequest
-	(*GetPipelineResponse)(nil),     // 5: protos.GetPipelineResponse
-	(*GetAllPipelinesRequest)(nil),  // 6: protos.GetAllPipelinesRequest
-	(*GetAllPipelinesResponse)(nil), // 7: protos.GetAllPipelinesResponse
-	(*SetPipelineRequest)(nil),      // 8: protos.SetPipelineRequest
-	(*SetPipelineResponse)(nil),     // 9: protos.SetPipelineResponse
-	(*DeletePipelineRequest)(nil),   // 10: protos.DeletePipelineRequest
-	(*DeletePipelineResponse)(nil),  // 11: protos.DeletePipelineResponse
-	(*PausePipelineRequest)(nil),    // 12: protos.PausePipelineRequest
-	(*PausePipelineResponse)(nil),   // 13: protos.PausePipelineResponse
-	(*UnpausePipelineRequest)(nil),  // 14: protos.UnpausePipelineRequest
-	(*UnpausePipelineResponse)(nil), // 15: protos.UnpausePipelineResponse
-	(*steps.DetectiveStep)(nil),     // 16: protos.steps.DetectiveStep
-	(*steps.TransformStep)(nil),     // 17: protos.steps.TransformStep
-	(*steps.EncodeStep)(nil),        // 18: protos.steps.EncodeStep
-	(*steps.DecodeStep)(nil),        // 19: protos.steps.DecodeStep
-	(*steps.CustomStep)(nil),        // 20: protos.steps.CustomStep
-	(ResponseStatus)(0),             // 21: protos.ResponseStatus
+	(WASMExitCode)(0),              // 0: protos.WASMExitCode
+	(PipelineStepCondition)(0),     // 1: protos.PipelineStepCondition
+	(*WasmRequest)(nil),            // 2: protos.WasmRequest
+	(*WasmResponse)(nil),           // 3: protos.WasmResponse
+	(*PipelineStep)(nil),           // 4: protos.PipelineStep
+	(*SetPipelineCommand)(nil),     // 5: protos.SetPipelineCommand
+	(*DeletePipelineCommand)(nil),  // 6: protos.DeletePipelineCommand
+	(*PausePipelineCommand)(nil),   // 7: protos.PausePipelineCommand
+	(*UnpausePipelineCommand)(nil), // 8: protos.UnpausePipelineCommand
+	(*steps.DetectiveStep)(nil),    // 9: protos.steps.DetectiveStep
+	(*steps.TransformStep)(nil),    // 10: protos.steps.TransformStep
+	(*steps.EncodeStep)(nil),       // 11: protos.steps.EncodeStep
+	(*steps.DecodeStep)(nil),       // 12: protos.steps.DecodeStep
+	(*steps.CustomStep)(nil),       // 13: protos.steps.CustomStep
 }
 var file_pipeline_proto_depIdxs = []int32{
-	1,  // 0: protos.PipelineStep.conditions:type_name -> protos.Condition
-	16, // 1: protos.PipelineStep.detective:type_name -> protos.steps.DetectiveStep
-	17, // 2: protos.PipelineStep.transform:type_name -> protos.steps.TransformStep
-	18, // 3: protos.PipelineStep.encode:type_name -> protos.steps.EncodeStep
-	19, // 4: protos.PipelineStep.decode:type_name -> protos.steps.DecodeStep
-	20, // 5: protos.PipelineStep.custom:type_name -> protos.steps.CustomStep
-	0,  // 6: protos.PipelineStepResponse.status:type_name -> protos.PipelineStepStatus
-	8,  // 7: protos.GetPipelineResponse.pipeline:type_name -> protos.SetPipelineRequest
-	21, // 8: protos.GetPipelineResponse.status:type_name -> protos.ResponseStatus
-	8,  // 9: protos.GetAllPipelinesResponse.pipelines:type_name -> protos.SetPipelineRequest
-	21, // 10: protos.GetAllPipelinesResponse.status:type_name -> protos.ResponseStatus
-	2,  // 11: protos.SetPipelineRequest.steps:type_name -> protos.PipelineStep
-	21, // 12: protos.SetPipelineResponse.status:type_name -> protos.ResponseStatus
-	21, // 13: protos.DeletePipelineResponse.status:type_name -> protos.ResponseStatus
-	21, // 14: protos.PausePipelineResponse.status:type_name -> protos.ResponseStatus
-	21, // 15: protos.UnpausePipelineResponse.status:type_name -> protos.ResponseStatus
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	4,  // 0: protos.WasmRequest.step:type_name -> protos.PipelineStep
+	0,  // 1: protos.WasmResponse.exit_code:type_name -> protos.WASMExitCode
+	1,  // 2: protos.PipelineStep.conditions:type_name -> protos.PipelineStepCondition
+	9,  // 3: protos.PipelineStep.detective:type_name -> protos.steps.DetectiveStep
+	10, // 4: protos.PipelineStep.transform:type_name -> protos.steps.TransformStep
+	11, // 5: protos.PipelineStep.encode:type_name -> protos.steps.EncodeStep
+	12, // 6: protos.PipelineStep.decode:type_name -> protos.steps.DecodeStep
+	13, // 7: protos.PipelineStep.custom:type_name -> protos.steps.CustomStep
+	4,  // 8: protos.SetPipelineCommand.steps:type_name -> protos.PipelineStep
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_pipeline_proto_init() }
@@ -1287,10 +788,9 @@ func file_pipeline_proto_init() {
 	if File_pipeline_proto != nil {
 		return
 	}
-	file_common_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_pipeline_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PipelineStep); i {
+			switch v := v.(*WasmRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1302,7 +802,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PipelineStepResponse); i {
+			switch v := v.(*WasmResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1314,7 +814,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPipelineRequest); i {
+			switch v := v.(*PipelineStep); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1326,7 +826,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPipelineResponse); i {
+			switch v := v.(*SetPipelineCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1338,7 +838,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllPipelinesRequest); i {
+			switch v := v.(*DeletePipelineCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1350,7 +850,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllPipelinesResponse); i {
+			switch v := v.(*PausePipelineCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1362,91 +862,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SetPipelineRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SetPipelineResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeletePipelineRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeletePipelineResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PausePipelineRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PausePipelineResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UnpausePipelineRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_pipeline_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UnpausePipelineResponse); i {
+			switch v := v.(*UnpausePipelineCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1458,7 +874,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 	}
-	file_pipeline_proto_msgTypes[0].OneofWrappers = []interface{}{
+	file_pipeline_proto_msgTypes[2].OneofWrappers = []interface{}{
 		(*PipelineStep_Detective)(nil),
 		(*PipelineStep_Transform)(nil),
 		(*PipelineStep_Encode)(nil),
@@ -1471,7 +887,7 @@ func file_pipeline_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pipeline_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   14,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

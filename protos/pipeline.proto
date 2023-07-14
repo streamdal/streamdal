@@ -2,39 +2,53 @@ syntax = "proto3";
 
 package protos;
 
-import "common.proto";
 import "steps/custom.proto";
 import "steps/decode.proto";
 import "steps/detective.proto";
 import "steps/encode.proto";
 import "steps/transform.proto";
 
-
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-// Each pipeline step includes this in the response; SDK is responsible for
-// interpreting the response status and apply it to the step condition.
-enum PipelineStepStatus {
-  PIPELINE_STEP_STATUS_UNSET = 0;
-  PIPELINE_STEP_STATUS_SUCCESS = 1;
-  PIPELINE_STEP_STATUS_FAILURE = 2;
-  PIPELINE_STEP_STATUS_ERROR = 3;
+// Included in WASM response; SDK is responsible for interpreting the response
+// status and how it relates to the step condition.
+// ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
+// conditions to determine what to do next.
+// ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
+// to determine what to do next;
+enum WASMExitCode {
+  WASM_EXIT_CODE_UNSET = 0;
+  WASM_EXIT_CODE_SUCCESS = 1;
+  WASM_EXIT_CODE_FAILURE = 2; // Probably need better names for these as FAILURE is too harsh
+  WASM_EXIT_CODE_INTERNAL_ERROR = 3;
 }
 
 // A condition defines how the SDK should handle a step response -- should it
 // continue executing the pipeline, should it abort, should it notify the server?
-enum Condition {
+// Each step can have multiple conditions.
+enum PipelineStepCondition {
   CONDITION_UNSET = 0;
-  CONDITION_ON_ERROR_CONTINUE_PIPELINE = 1;
-  CONDITION_ON_ERROR_ABORT_PIPELINE = 2;
-  CONDITION_ON_ERROR_NOTIFY_SERVER = 3;
-  CONDITION_ON_MATCH_CONTINUE_PIPELINE = 4;
-  CONDITION_ON_MATCH_ABORT_PIPELINE = 5;
-  CONDITION_ON_MATCH_NOTIFY_SERVER = 6;
-
-  // NOTE: Doing *_NEXT_STEP or *_SKIP_STEP right now would be too complex
+  CONDITION_CONTINUE = 1;
+  CONDITION_ABORT = 2;
+  CONDITION_NOTIFY = 3;
 }
 
+// SDK generates a WASM request and passes this to the WASM func
+message WasmRequest {
+  PipelineStep step = 1;
+  bytes input = 2;
+}
+
+// Returned by all WASM functions
+message WasmResponse {
+  bytes output = 1;
+  WASMExitCode exit_code = 2;
+  string exit_msg = 3;
+}
+
+// A PipelineCommand consists of one or more pipeline steps. A pipeline step
+// is an immutable set of instructions on how to execute a step.
+// The SDK will use the pipeline step to generate a WASM request.
 message PipelineStep {
   // Unique ID for the step
   string id = 1;
@@ -42,22 +56,9 @@ message PipelineStep {
   // Friendly name for the step
   string name = 2;
 
-  // Input bytes for next step (probably PipelineStepResponse.output from previous step)
-  bytes input = 3;
-
-  // WASM module ID
-  string wasm_id = 4;
-
-  // WASM module bytes
-  string wasm_bytes = 5;
-
-  // WASM function name to execute
-  string wasm_function = 6;
-
   // Conditions that SDK should check before executing next step
-  repeated Condition conditions = 7;
+  repeated PipelineStepCondition conditions = 3;
 
-  // All steps return PipelineStepResponse upon completion
   oneof step {
     steps.DetectiveStep detective = 1000;
     steps.TransformStep transform = 1001;
@@ -65,43 +66,19 @@ message PipelineStep {
     steps.DecodeStep decode = 1003;
     steps.CustomStep custom = 1004;
   }
+
+  // WASM module ID (set by backend)
+  string _wasm_id = 10000;
+
+  // WASM module bytes (set by backend)
+  string _wasm_bytes = 10001;
+
+  // WASM function name to execute (set by backend)
+  string _wasm_function = 10002;
 }
-
-// All WASM funcs return this upon completion. All WASM funcs MUST include `output`
-// (even if they do not modify the input).
-message PipelineStepResponse {
-  bytes output = 1;
-  PipelineStepStatus status = 2;
-  string status_message = 3;
-}
-
-/********************** Get (single) pipeline **********************/
-
-message GetPipelineRequest {
-  string id = 1;
-}
-
-message GetPipelineResponse {
-  SetPipelineRequest pipeline = 1;
-  ResponseStatus status = 2;
-  string message = 3;
-}
-
-/********************** Get all pipelines **********************/
-
-message GetAllPipelinesRequest {
-}
-
-message GetAllPipelinesResponse {
-  repeated SetPipelineRequest pipelines = 1;
-  ResponseStatus status = 2;
-  string message = 3;
-}
-
-/********************** Add/Set/Update pipeline **********************/
 
 // Used for both Add and Update
-message SetPipelineRequest {
+message SetPipelineCommand {
   // Unique ID for the pipeline
   string id = 1;
 
@@ -112,52 +89,17 @@ message SetPipelineRequest {
   repeated PipelineStep steps = 3;
 }
 
-message SetPipelineResponse {
-  // Unique ID for the pipeline
-  string id = 1;
-
-  // Response status code; use for identifying request success or failure
-  ResponseStatus status = 2;
-
-  // Additional information regarding response status
-  string message = 3;
-}
-
-/********************** Delete pipeline *********************/
-
-message DeletePipelineRequest {
+message DeletePipelineCommand {
   // Unique ID for the pipeline
   string id = 1;
 }
 
-message DeletePipelineResponse {
-  string id = 1;
-  ResponseStatus status = 2;
-  string message = 3;
-}
-
-/********************** Pause pipeline **********************/
-
-message PausePipelineRequest {
+message PausePipelineCommand {
   // Unique ID for the pipeline
   string id = 1;
 }
 
-message PausePipelineResponse {
-  string id = 1;
-  ResponseStatus status = 2;
-  string message = 3;
-}
-
-/********************** Unpause pipeline **********************/
-
-message UnpausePipelineRequest {
+message UnpausePipelineCommand {
   // Unique ID for the pipeline
   string id = 1;
-}
-
-message UnpausePipelineResponse {
-  string id = 1;
-  ResponseStatus status = 2;
-  string message = 3;
 }

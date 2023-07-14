@@ -1,10 +1,10 @@
 // Original file: ../../protos/pipeline.proto
 
 
-export interface PausePipelineRequest {
+export interface DeletePipelineCommand {
   'id'?: (string);
 }
 
-export interface PausePipelineRequest__Output {
+export interface DeletePipelineCommand__Output {
   'id': (string);
 }

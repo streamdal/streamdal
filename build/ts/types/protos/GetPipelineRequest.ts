@@ -1,10 +1,8 @@
-// Original file: ../../protos/pipeline.proto
+// Original file: ../../protos/grpc_public.proto
 
 
 export interface GetPipelineRequest {
-  'id'?: (string);
 }
 
 export interface GetPipelineRequest__Output {
-  'id': (string);
 }

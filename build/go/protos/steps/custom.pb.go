@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// WIP
+// WIP -- Custom WASM exec?
 type CustomStep struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

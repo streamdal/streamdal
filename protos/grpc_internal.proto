@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package protos;
+
+import "common.proto";
+import "pipeline.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+service Internal {
+  // Initial method that an SDK should call to register itself with the server.
+  // The server will use this stream to send commands to the SDK via the
+  // `RegisterResponse` message. SDKs should continuously listen for
+  // RegisterResponse messages.
+  rpc Register(RegisterRequest) returns (stream RegisterResponse);
+
+  // SDK is responsible for sending heartbeats to the server to let the server
+  // know about active consumers and producers.
+  rpc Heartbeat(HeartbeatRequest) returns (StandardResponse);
+
+  // Use this method when Notify condition has been triggered; the server will
+  // decide on what to do about the notification.
+  rpc Notify(NotifyRequest) returns (StandardResponse);
+
+  // Send periodic metrics to the server
+  rpc Metrics(MetricsRequest) returns (StandardResponse);
+}
+
+// Each consumer and producer should send periodic heartbeats to the server
+// to let the server know that they are still active.
+message HeartbeatRequest {
+  Auth auth = 1;
+
+  Audience audience = 2;
+  int64 last_activity_unix_timestamp_utc = 3;
+
+  // Correlation ID between requests and responses. If not set, server will set
+  // a unique ID and use it in response.
+  string _id = 100;
+  map <string, string> _sdk_metadata = 101;
+}
+
+message NotifyRequest {
+  Auth auth = 1;
+
+  string rule_id = 2;
+  string rule_name = 3;
+  Audience audience = 4;
+  int64 occurred_at_unix_ts_utc = 5;
+
+  string _id = 100;
+  map <string, string> _sdk_metadata = 101;
+}
+
+message MetricsRequest {
+  Auth auth = 1;
+
+  string rule_id = 2;
+  string rule_name = 3;
+  Audience audience = 4;
+
+  string _id = 100;
+  map <string, string> _sdk_metadata = 101;
+}
+
+message RegisterRequest {
+  Auth auth = 1;
+
+  string service_name = 2;
+
+  // If set, we know that any pipelines or steps executed in this SDK will NOT
+  // modify the input/output data. As in, the SDK will log what it _would_ do
+  // and always return the original data set.
+  bool dry_run = 3;
+
+  string _id = 100;
+  map <string, string> _sdk_metadata = 101;
+}
+
+// The primary method to send commands to the SDK; server will send zero or more
+// RegisterResponse's with SetPipelineRequest on SDK instantiation.
+message RegisterResponse {
+  // Use this to determine what to expect in one_of
+  CommandType type = 1;
+
+  // Who is this command intended for?
+  Audience audience = 2;
+
+  oneof command {
+    protos.SetPipelineCommand set_pipeline = 100;
+    protos.DeletePipelineCommand delete_pipeline = 101; // Hmm, should this be here?
+    protos.PausePipelineCommand pause_pipeline = 102;
+    protos.UnpausePipelineCommand unpause_pipeline = 103;
+  }
+}
+
+// Types of commands that can be sent to the SDK
+enum CommandType {
+  SNITCH_COMMAND_TYPE_UNSET = 0;
+  SNITCH_COMMAND_TYPE_KEEPALIVE = 1; // Use this to keep connection alive; SDK doesn't need to do anything with this - it's there just to keep things alive
+  SNITCH_COMMAND_TYPE_SET_PIPELINE = 2;
+  SNITCH_COMMAND_TYPE_DELETE_PIPELINE = 3;
+  SNITCH_COMMAND_TYPE_PAUSE_PIPELINE = 4;
+  SNITCH_COMMAND_TYPE_UNPAUSE_PIPELINE = 5;
+
+  // IMPORTANT: Skip Getter methods for now because it would require bidirectional streaming
+  // Idea: To get around this, we can inject pipeline stats into HeartbeatRequest's
+}
+
+enum OperationType {
+  OPERATION_TYPE_UNSET = 0;
+  OPERATION_TYPE_CONSUMER = 1;
+  OPERATION_TYPE_PRODUCER = 2;
+}
+
+// Used to indicate who a request/command is intended for
+message Audience {
+  // Name of the service
+  string service_name = 1;
+
+  // Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+  string component_name = 2;
+
+  // Consumer or Producer
+  OperationType operation_type = 3;
+}

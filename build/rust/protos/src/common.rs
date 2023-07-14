@@ -25,57 +25,340 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
-///  Common status codes used in gRPC method responses
-#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.ResponseStatus)
-pub enum ResponseStatus {
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_UNSET)
-    RESPONSE_STATUS_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_OK)
-    RESPONSE_STATUS_OK = 1,
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_BAD_REQUEST)
-    RESPONSE_STATUS_BAD_REQUEST = 2,
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_NOT_FOUND)
-    RESPONSE_STATUS_NOT_FOUND = 3,
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_INTERNAL_SERVER_ERROR)
-    RESPONSE_STATUS_INTERNAL_SERVER_ERROR = 4,
-    // @@protoc_insertion_point(enum_value:protos.ResponseStatus.RESPONSE_STATUS_GENERIC_ERROR)
-    RESPONSE_STATUS_GENERIC_ERROR = 5,
+///  Common response message for many gRPC methods
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.StandardResponse)
+pub struct StandardResponse {
+    // message fields
+    ///  Co-relation ID for the request / response
+    // @@protoc_insertion_point(field:protos.StandardResponse.id)
+    pub id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.StandardResponse.code)
+    pub code: ::protobuf::EnumOrUnknown<ResponseCode>,
+    // @@protoc_insertion_point(field:protos.StandardResponse.message)
+    pub message: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.StandardResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl ::protobuf::Enum for ResponseStatus {
-    const NAME: &'static str = "ResponseStatus";
+impl<'a> ::std::default::Default for &'a StandardResponse {
+    fn default() -> &'a StandardResponse {
+        <StandardResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl StandardResponse {
+    pub fn new() -> StandardResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &StandardResponse| { &m.id },
+            |m: &mut StandardResponse| { &mut m.id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "code",
+            |m: &StandardResponse| { &m.code },
+            |m: &mut StandardResponse| { &mut m.code },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "message",
+            |m: &StandardResponse| { &m.message },
+            |m: &mut StandardResponse| { &mut m.message },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<StandardResponse>(
+            "StandardResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for StandardResponse {
+    const NAME: &'static str = "StandardResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.id = is.read_string()?;
+                },
+                16 => {
+                    self.code = is.read_enum_or_unknown()?;
+                },
+                26 => {
+                    self.message = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
+        }
+        if self.code != ::protobuf::EnumOrUnknown::new(ResponseCode::RESPONSE_CODE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(2, self.code.value());
+        }
+        if !self.message.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.message);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
+        }
+        if self.code != ::protobuf::EnumOrUnknown::new(ResponseCode::RESPONSE_CODE_UNSET) {
+            os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.code))?;
+        }
+        if !self.message.is_empty() {
+            os.write_string(3, &self.message)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> StandardResponse {
+        StandardResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.code = ::protobuf::EnumOrUnknown::new(ResponseCode::RESPONSE_CODE_UNSET);
+        self.message.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static StandardResponse {
+        static instance: StandardResponse = StandardResponse {
+            id: ::std::string::String::new(),
+            code: ::protobuf::EnumOrUnknown::from_i32(0),
+            message: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for StandardResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("StandardResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for StandardResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for StandardResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  Common auth message used in all gRPC methods
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.Auth)
+pub struct Auth {
+    // message fields
+    // @@protoc_insertion_point(field:protos.Auth.token)
+    pub token: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.Auth.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a Auth {
+    fn default() -> &'a Auth {
+        <Auth as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Auth {
+    pub fn new() -> Auth {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "token",
+            |m: &Auth| { &m.token },
+            |m: &mut Auth| { &mut m.token },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Auth>(
+            "Auth",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for Auth {
+    const NAME: &'static str = "Auth";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.token = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.token.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.token);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.token.is_empty() {
+            os.write_string(1, &self.token)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> Auth {
+        Auth::new()
+    }
+
+    fn clear(&mut self) {
+        self.token.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static Auth {
+        static instance: Auth = Auth {
+            token: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for Auth {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("Auth").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for Auth {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Auth {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  Common status codes used in gRPC method responses
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.ResponseCode)
+pub enum ResponseCode {
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_UNSET)
+    RESPONSE_CODE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_OK)
+    RESPONSE_CODE_OK = 1,
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_BAD_REQUEST)
+    RESPONSE_CODE_BAD_REQUEST = 2,
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_NOT_FOUND)
+    RESPONSE_CODE_NOT_FOUND = 3,
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_INTERNAL_SERVER_ERROR)
+    RESPONSE_CODE_INTERNAL_SERVER_ERROR = 4,
+    // @@protoc_insertion_point(enum_value:protos.ResponseCode.RESPONSE_CODE_GENERIC_ERROR)
+    RESPONSE_CODE_GENERIC_ERROR = 5,
+}
+
+impl ::protobuf::Enum for ResponseCode {
+    const NAME: &'static str = "ResponseCode";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<ResponseStatus> {
+    fn from_i32(value: i32) -> ::std::option::Option<ResponseCode> {
         match value {
-            0 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_UNSET),
-            1 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_OK),
-            2 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_BAD_REQUEST),
-            3 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_NOT_FOUND),
-            4 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_INTERNAL_SERVER_ERROR),
-            5 => ::std::option::Option::Some(ResponseStatus::RESPONSE_STATUS_GENERIC_ERROR),
+            0 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_UNSET),
+            1 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_OK),
+            2 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_BAD_REQUEST),
+            3 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_NOT_FOUND),
+            4 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_INTERNAL_SERVER_ERROR),
+            5 => ::std::option::Option::Some(ResponseCode::RESPONSE_CODE_GENERIC_ERROR),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [ResponseStatus] = &[
-        ResponseStatus::RESPONSE_STATUS_UNSET,
-        ResponseStatus::RESPONSE_STATUS_OK,
-        ResponseStatus::RESPONSE_STATUS_BAD_REQUEST,
-        ResponseStatus::RESPONSE_STATUS_NOT_FOUND,
-        ResponseStatus::RESPONSE_STATUS_INTERNAL_SERVER_ERROR,
-        ResponseStatus::RESPONSE_STATUS_GENERIC_ERROR,
+    const VALUES: &'static [ResponseCode] = &[
+        ResponseCode::RESPONSE_CODE_UNSET,
+        ResponseCode::RESPONSE_CODE_OK,
+        ResponseCode::RESPONSE_CODE_BAD_REQUEST,
+        ResponseCode::RESPONSE_CODE_NOT_FOUND,
+        ResponseCode::RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+        ResponseCode::RESPONSE_CODE_GENERIC_ERROR,
     ];
 }
 
-impl ::protobuf::EnumFull for ResponseStatus {
+impl ::protobuf::EnumFull for ResponseCode {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("ResponseStatus").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("ResponseCode").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -84,41 +367,61 @@ impl ::protobuf::EnumFull for ResponseStatus {
     }
 }
 
-impl ::std::default::Default for ResponseStatus {
+impl ::std::default::Default for ResponseCode {
     fn default() -> Self {
-        ResponseStatus::RESPONSE_STATUS_UNSET
+        ResponseCode::RESPONSE_CODE_UNSET
     }
 }
 
-impl ResponseStatus {
+impl ResponseCode {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ResponseStatus>("ResponseStatus")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ResponseCode>("ResponseCode")
     }
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\x12\x06protos*\xd1\x01\n\x0eResponseStatus\x12\x19\n\
-    \x15RESPONSE_STATUS_UNSET\x10\0\x12\x16\n\x12RESPONSE_STATUS_OK\x10\x01\
-    \x12\x1f\n\x1bRESPONSE_STATUS_BAD_REQUEST\x10\x02\x12\x1d\n\x19RESPONSE_\
-    STATUS_NOT_FOUND\x10\x03\x12)\n%RESPONSE_STATUS_INTERNAL_SERVER_ERROR\
-    \x10\x04\x12!\n\x1dRESPONSE_STATUS_GENERIC_ERROR\x10\x05B4Z2github.com/s\
-    treamdal/snitch-protos/build/go/protosJ\xf4\x02\n\x06\x12\x04\0\0\x0e\
-    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\
-    \x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n?\n\x02\
-    \x05\0\x12\x04\x07\0\x0e\x01\x1a3\x20Common\x20status\x20codes\x20used\
-    \x20in\x20gRPC\x20method\x20responses\n\n\n\n\x03\x05\0\x01\x12\x03\x07\
-    \x05\x13\n\x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\
-    \x02\0\x01\x12\x03\x08\x02\x17\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\
-    \x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\
-    \x02\x01\x01\x12\x03\t\x02\x14\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t\
-    \x17\x18\n\x0b\n\x04\x05\0\x02\x02\x12\x03\n\x02\"\n\x0c\n\x05\x05\0\x02\
-    \x02\x01\x12\x03\n\x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n\x20!\
-    \n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0b\x02\x20\n\x0c\n\x05\x05\0\x02\x03\
-    \x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0b\x1e\
-    \x1f\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0c\x02,\n\x0c\n\x05\x05\0\x02\
-    \x04\x01\x12\x03\x0c\x02'\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0c*+\n\
-    \x0b\n\x04\x05\0\x02\x05\x12\x03\r\x02$\n\x0c\n\x05\x05\0\x02\x05\x01\
-    \x12\x03\r\x02\x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\"#b\x06proto3\
+    \n\x0ccommon.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\x02i\
+    d\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\x14.pro\
+    tos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07me\
+    ssage\"\x1c\n\x04Auth\x12\x14\n\x05token\x18\x01\x20\x01(\tR\x05token*\
+    \xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\
+    \x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUES\
+    T\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_C\
+    ODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC_ERR\
+    OR\x10\x05B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\x8e\
+    \x06\n\x06\x12\x04\0\0\x1b\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\
+    \x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Common\
+    \x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\
+    \x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\x02\x10\
+    \x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20response\n\n\
+    \x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\
+    \x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\n\x0b\n\
+    \x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
+    \x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\x12\
+    \x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\x0c\
+    \n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\x03\
+    \x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Common\
+    \x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\n\n\
+    \x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x10\
+    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x11\
+    \x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\
+    \x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
+    \x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\
+    \x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\x0c\
+    \n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\
+    \x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\x0c\n\
+    \x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
+    \x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\x05\
+    \x05\0\x02\x05\x02\x12\x03\x15\x20!\n:\n\x02\x04\x01\x12\x04\x19\0\x1b\
+    \x01\x1a.\x20Common\x20auth\x20message\x20used\x20in\x20all\x20gRPC\x20m\
+    ethods\n\n\n\n\x03\x04\x01\x01\x12\x03\x19\x08\x0c\n\x0b\n\x04\x04\x01\
+    \x02\0\x12\x03\x1a\x02\x13\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1a\x02\
+    \x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x1a\t\x0e\n\x0c\n\x05\x04\x01\
+    \x02\0\x03\x12\x03\x1a\x11\x12b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -136,9 +439,11 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(0);
+            let mut messages = ::std::vec::Vec::with_capacity(2);
+            messages.push(StandardResponse::generated_message_descriptor_data());
+            messages.push(Auth::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
-            enums.push(ResponseStatus::generated_enum_descriptor_data());
+            enums.push(ResponseCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

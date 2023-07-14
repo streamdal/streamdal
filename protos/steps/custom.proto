@@ -4,7 +4,7 @@ package protos.steps;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
-// WIP
+// WIP -- Custom WASM exec?
 message CustomStep {
   string id = 1;
 }

@@ -1,5 +1,6 @@
 # snitch-protos
 [![Build Status](https://github.com/streamdal/snitch-protos/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/snitch-protos/actions/workflows/release.yml)
+<a href="https://crates.io/crates/snitch-protos/"><img src="https://img.shields.io/crates/v/snitch-protos.svg"></a>
 
 This repo contains the common protobuf definitions for all of the snitch-related
 components.

@@ -2,13 +2,13 @@
 
 import type { PipelineStep as _protos_PipelineStep, PipelineStep__Output as _protos_PipelineStep__Output } from '../protos/PipelineStep';
 
-export interface SetPipelineRequest {
+export interface SetPipelineCommand {
   'id'?: (string);
   'name'?: (string);
   'steps'?: (_protos_PipelineStep)[];
 }
 
-export interface SetPipelineRequest__Output {
+export interface SetPipelineCommand__Output {
   'id': (string);
   'name': (string);
   'steps': (_protos_PipelineStep__Output)[];
