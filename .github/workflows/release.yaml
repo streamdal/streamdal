@@ -30,6 +30,11 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
       - name: Release on crates.io
         uses: actions-rs/cargo@v1
         with:
