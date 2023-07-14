@@ -1,5 +1,5 @@
 import type * as grpc from '@grpc/grpc-js';
-import type { MessageTypeDefinition } from '@grpc/proto-loader';
+import type { EnumTypeDefinition, MessageTypeDefinition } from '@grpc/proto-loader';
 
 
 type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> = {
@@ -8,9 +8,9 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 
 export interface ProtoGrpcType {
   protos: {
-    steps: {
-      DecodeStep: MessageTypeDefinition
-    }
+    Auth: MessageTypeDefinition
+    ResponseCode: EnumTypeDefinition
+    StandardResponse: MessageTypeDefinition
   }
 }
 
