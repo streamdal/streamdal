@@ -8,14 +8,17 @@ service Public {
   // Build a service map
   rpc GetServices(GetServicesRequest) returns (GetServicesResponse);
 
+  // Figure out consumers/producers, pipelines and targets for a given service
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse);
+
   // Get all available pipelines
   rpc GetPipelines(GetPipelinesRequest) returns (GetPipelinesResponse);
 
   // Get a pipeline (and its steps)
   rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse);
 
-  // Associate steps with a pipeline
-  rpc UpdatePipeline(UpdatePipelineRequest) returns (UpdatePipelineResponse);
+  // Associate steps with a pipeline // Can also use this to set steps in one big push
+  rpc SetPipeline(SetPipelineRequest) returns (SetPipelineResponse);
 
   // Delete a pipeline
   rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse);
@@ -36,12 +39,14 @@ service Public {
 // protolint:disable INDENT
 message GetServicesRequest {}
 message GetServicesResponse {}
+message GetServiceRequest {}
+message GetServiceResponse {}
 message GetPipelinesRequest {}
 message GetPipelinesResponse {}
 message GetPipelineRequest {}
 message GetPipelineResponse {}
-message UpdatePipelineRequest {}
-message UpdatePipelineResponse {}
+message SetPipelineRequest {}
+message SetPipelineResponse {}
 message DeletePipelineRequest {}
 message DeletePipelineResponse {}
 message GetStepsRequest {}

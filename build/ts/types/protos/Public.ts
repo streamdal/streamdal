@@ -12,12 +12,14 @@ import type { GetPipelineRequest as _protos_GetPipelineRequest, GetPipelineReque
 import type { GetPipelineResponse as _protos_GetPipelineResponse, GetPipelineResponse__Output as _protos_GetPipelineResponse__Output } from '../protos/GetPipelineResponse';
 import type { GetPipelinesRequest as _protos_GetPipelinesRequest, GetPipelinesRequest__Output as _protos_GetPipelinesRequest__Output } from '../protos/GetPipelinesRequest';
 import type { GetPipelinesResponse as _protos_GetPipelinesResponse, GetPipelinesResponse__Output as _protos_GetPipelinesResponse__Output } from '../protos/GetPipelinesResponse';
+import type { GetServiceRequest as _protos_GetServiceRequest, GetServiceRequest__Output as _protos_GetServiceRequest__Output } from '../protos/GetServiceRequest';
+import type { GetServiceResponse as _protos_GetServiceResponse, GetServiceResponse__Output as _protos_GetServiceResponse__Output } from '../protos/GetServiceResponse';
 import type { GetServicesRequest as _protos_GetServicesRequest, GetServicesRequest__Output as _protos_GetServicesRequest__Output } from '../protos/GetServicesRequest';
 import type { GetServicesResponse as _protos_GetServicesResponse, GetServicesResponse__Output as _protos_GetServicesResponse__Output } from '../protos/GetServicesResponse';
 import type { GetStepsRequest as _protos_GetStepsRequest, GetStepsRequest__Output as _protos_GetStepsRequest__Output } from '../protos/GetStepsRequest';
 import type { GetStepsResponse as _protos_GetStepsResponse, GetStepsResponse__Output as _protos_GetStepsResponse__Output } from '../protos/GetStepsResponse';
-import type { UpdatePipelineRequest as _protos_UpdatePipelineRequest, UpdatePipelineRequest__Output as _protos_UpdatePipelineRequest__Output } from '../protos/UpdatePipelineRequest';
-import type { UpdatePipelineResponse as _protos_UpdatePipelineResponse, UpdatePipelineResponse__Output as _protos_UpdatePipelineResponse__Output } from '../protos/UpdatePipelineResponse';
+import type { SetPipelineRequest as _protos_SetPipelineRequest, SetPipelineRequest__Output as _protos_SetPipelineRequest__Output } from '../protos/SetPipelineRequest';
+import type { SetPipelineResponse as _protos_SetPipelineResponse, SetPipelineResponse__Output as _protos_SetPipelineResponse__Output } from '../protos/SetPipelineResponse';
 import type { UpdateStepRequest as _protos_UpdateStepRequest, UpdateStepRequest__Output as _protos_UpdateStepRequest__Output } from '../protos/UpdateStepRequest';
 import type { UpdateStepResponse as _protos_UpdateStepResponse, UpdateStepResponse__Output as _protos_UpdateStepResponse__Output } from '../protos/UpdateStepResponse';
 
@@ -67,6 +69,15 @@ export interface PublicClient extends grpc.Client {
   getPipelines(argument: _protos_GetPipelinesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetPipelinesResponse__Output>): grpc.ClientUnaryCall;
   getPipelines(argument: _protos_GetPipelinesRequest, callback: grpc.requestCallback<_protos_GetPipelinesResponse__Output>): grpc.ClientUnaryCall;
   
+  GetService(argument: _protos_GetServiceRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  GetService(argument: _protos_GetServiceRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  GetService(argument: _protos_GetServiceRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  GetService(argument: _protos_GetServiceRequest, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  getService(argument: _protos_GetServiceRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  getService(argument: _protos_GetServiceRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  getService(argument: _protos_GetServiceRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  getService(argument: _protos_GetServiceRequest, callback: grpc.requestCallback<_protos_GetServiceResponse__Output>): grpc.ClientUnaryCall;
+  
   GetServices(argument: _protos_GetServicesRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServicesResponse__Output>): grpc.ClientUnaryCall;
   GetServices(argument: _protos_GetServicesRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_GetServicesResponse__Output>): grpc.ClientUnaryCall;
   GetServices(argument: _protos_GetServicesRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetServicesResponse__Output>): grpc.ClientUnaryCall;
@@ -85,14 +96,14 @@ export interface PublicClient extends grpc.Client {
   getSteps(argument: _protos_GetStepsRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_GetStepsResponse__Output>): grpc.ClientUnaryCall;
   getSteps(argument: _protos_GetStepsRequest, callback: grpc.requestCallback<_protos_GetStepsResponse__Output>): grpc.ClientUnaryCall;
   
-  UpdatePipeline(argument: _protos_UpdatePipelineRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  UpdatePipeline(argument: _protos_UpdatePipelineRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  UpdatePipeline(argument: _protos_UpdatePipelineRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  UpdatePipeline(argument: _protos_UpdatePipelineRequest, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  updatePipeline(argument: _protos_UpdatePipelineRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  updatePipeline(argument: _protos_UpdatePipelineRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  updatePipeline(argument: _protos_UpdatePipelineRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
-  updatePipeline(argument: _protos_UpdatePipelineRequest, callback: grpc.requestCallback<_protos_UpdatePipelineResponse__Output>): grpc.ClientUnaryCall;
+  SetPipeline(argument: _protos_SetPipelineRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  SetPipeline(argument: _protos_SetPipelineRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  SetPipeline(argument: _protos_SetPipelineRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  SetPipeline(argument: _protos_SetPipelineRequest, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  setPipeline(argument: _protos_SetPipelineRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  setPipeline(argument: _protos_SetPipelineRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  setPipeline(argument: _protos_SetPipelineRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
+  setPipeline(argument: _protos_SetPipelineRequest, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
   
   UpdateStep(argument: _protos_UpdateStepRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdateStepResponse__Output>): grpc.ClientUnaryCall;
   UpdateStep(argument: _protos_UpdateStepRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_UpdateStepResponse__Output>): grpc.ClientUnaryCall;
@@ -116,11 +127,13 @@ export interface PublicHandlers extends grpc.UntypedServiceImplementation {
   
   GetPipelines: grpc.handleUnaryCall<_protos_GetPipelinesRequest__Output, _protos_GetPipelinesResponse>;
   
+  GetService: grpc.handleUnaryCall<_protos_GetServiceRequest__Output, _protos_GetServiceResponse>;
+  
   GetServices: grpc.handleUnaryCall<_protos_GetServicesRequest__Output, _protos_GetServicesResponse>;
   
   GetSteps: grpc.handleUnaryCall<_protos_GetStepsRequest__Output, _protos_GetStepsResponse>;
   
-  UpdatePipeline: grpc.handleUnaryCall<_protos_UpdatePipelineRequest__Output, _protos_UpdatePipelineResponse>;
+  SetPipeline: grpc.handleUnaryCall<_protos_SetPipelineRequest__Output, _protos_SetPipelineResponse>;
   
   UpdateStep: grpc.handleUnaryCall<_protos_UpdateStepRequest__Output, _protos_UpdateStepResponse>;
   
@@ -132,8 +145,9 @@ export interface PublicDefinition extends grpc.ServiceDefinition {
   DeleteStep: MethodDefinition<_protos_DeleteStepRequest, _protos_DeleteStepResponse, _protos_DeleteStepRequest__Output, _protos_DeleteStepResponse__Output>
   GetPipeline: MethodDefinition<_protos_GetPipelineRequest, _protos_GetPipelineResponse, _protos_GetPipelineRequest__Output, _protos_GetPipelineResponse__Output>
   GetPipelines: MethodDefinition<_protos_GetPipelinesRequest, _protos_GetPipelinesResponse, _protos_GetPipelinesRequest__Output, _protos_GetPipelinesResponse__Output>
+  GetService: MethodDefinition<_protos_GetServiceRequest, _protos_GetServiceResponse, _protos_GetServiceRequest__Output, _protos_GetServiceResponse__Output>
   GetServices: MethodDefinition<_protos_GetServicesRequest, _protos_GetServicesResponse, _protos_GetServicesRequest__Output, _protos_GetServicesResponse__Output>
   GetSteps: MethodDefinition<_protos_GetStepsRequest, _protos_GetStepsResponse, _protos_GetStepsRequest__Output, _protos_GetStepsResponse__Output>
-  UpdatePipeline: MethodDefinition<_protos_UpdatePipelineRequest, _protos_UpdatePipelineResponse, _protos_UpdatePipelineRequest__Output, _protos_UpdatePipelineResponse__Output>
+  SetPipeline: MethodDefinition<_protos_SetPipelineRequest, _protos_SetPipelineResponse, _protos_SetPipelineRequest__Output, _protos_SetPipelineResponse__Output>
   UpdateStep: MethodDefinition<_protos_UpdateStepRequest, _protos_UpdateStepResponse, _protos_UpdateStepRequest__Output, _protos_UpdateStepResponse__Output>
 }

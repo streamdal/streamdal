@@ -135,7 +135,7 @@ func (PipelineStepCondition) EnumDescriptor() ([]byte, []int) {
 }
 
 // SDK generates a WASM request and passes this to the WASM func
-type WasmRequest struct {
+type WASMRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -144,8 +144,8 @@ type WasmRequest struct {
 	Input []byte        `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
 }
 
-func (x *WasmRequest) Reset() {
-	*x = WasmRequest{}
+func (x *WASMRequest) Reset() {
+	*x = WASMRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pipeline_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -153,13 +153,13 @@ func (x *WasmRequest) Reset() {
 	}
 }
 
-func (x *WasmRequest) String() string {
+func (x *WASMRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WasmRequest) ProtoMessage() {}
+func (*WASMRequest) ProtoMessage() {}
 
-func (x *WasmRequest) ProtoReflect() protoreflect.Message {
+func (x *WASMRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_pipeline_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -171,19 +171,19 @@ func (x *WasmRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WasmRequest.ProtoReflect.Descriptor instead.
-func (*WasmRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use WASMRequest.ProtoReflect.Descriptor instead.
+func (*WASMRequest) Descriptor() ([]byte, []int) {
 	return file_pipeline_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *WasmRequest) GetStep() *PipelineStep {
+func (x *WASMRequest) GetStep() *PipelineStep {
 	if x != nil {
 		return x.Step
 	}
 	return nil
 }
 
-func (x *WasmRequest) GetInput() []byte {
+func (x *WASMRequest) GetInput() []byte {
 	if x != nil {
 		return x.Input
 	}
@@ -191,7 +191,7 @@ func (x *WasmRequest) GetInput() []byte {
 }
 
 // Returned by all WASM functions
-type WasmResponse struct {
+type WASMResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -201,8 +201,8 @@ type WasmResponse struct {
 	ExitMsg  string       `protobuf:"bytes,3,opt,name=exit_msg,json=exitMsg,proto3" json:"exit_msg,omitempty"`
 }
 
-func (x *WasmResponse) Reset() {
-	*x = WasmResponse{}
+func (x *WASMResponse) Reset() {
+	*x = WASMResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pipeline_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -210,13 +210,13 @@ func (x *WasmResponse) Reset() {
 	}
 }
 
-func (x *WasmResponse) String() string {
+func (x *WASMResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WasmResponse) ProtoMessage() {}
+func (*WASMResponse) ProtoMessage() {}
 
-func (x *WasmResponse) ProtoReflect() protoreflect.Message {
+func (x *WASMResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_pipeline_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -228,26 +228,26 @@ func (x *WasmResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WasmResponse.ProtoReflect.Descriptor instead.
-func (*WasmResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use WASMResponse.ProtoReflect.Descriptor instead.
+func (*WASMResponse) Descriptor() ([]byte, []int) {
 	return file_pipeline_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *WasmResponse) GetOutput() []byte {
+func (x *WASMResponse) GetOutput() []byte {
 	if x != nil {
 		return x.Output
 	}
 	return nil
 }
 
-func (x *WasmResponse) GetExitCode() WASMExitCode {
+func (x *WASMResponse) GetExitCode() WASMExitCode {
 	if x != nil {
 		return x.ExitCode
 	}
 	return WASMExitCode_WASM_EXIT_CODE_UNSET
 }
 
-func (x *WasmResponse) GetExitMsg() string {
+func (x *WASMResponse) GetExitMsg() string {
 	if x != nil {
 		return x.ExitMsg
 	}
@@ -656,12 +656,12 @@ var file_pipeline_proto_rawDesc = []byte{
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x65,
 	0x6e, 0x63, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x15, 0x73, 0x74, 0x65,
 	0x70, 0x73, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x22, 0x4d, 0x0a, 0x0b, 0x57, 0x61, 0x73, 0x6d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x6f, 0x22, 0x4d, 0x0a, 0x0b, 0x57, 0x41, 0x53, 0x4d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x28, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
 	0x65, 0x53, 0x74, 0x65, 0x70, 0x52, 0x04, 0x73, 0x74, 0x65, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x69,
 	0x6e, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75,
-	0x74, 0x22, 0x74, 0x0a, 0x0c, 0x57, 0x61, 0x73, 0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x74, 0x22, 0x74, 0x0a, 0x0c, 0x57, 0x41, 0x53, 0x4d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
 	0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0c, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12, 0x31, 0x0a, 0x09, 0x65, 0x78, 0x69,
 	0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x70,
@@ -753,8 +753,8 @@ var file_pipeline_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_pipeline_proto_goTypes = []interface{}{
 	(WASMExitCode)(0),              // 0: protos.WASMExitCode
 	(PipelineStepCondition)(0),     // 1: protos.PipelineStepCondition
-	(*WasmRequest)(nil),            // 2: protos.WasmRequest
-	(*WasmResponse)(nil),           // 3: protos.WasmResponse
+	(*WASMRequest)(nil),            // 2: protos.WASMRequest
+	(*WASMResponse)(nil),           // 3: protos.WASMResponse
 	(*PipelineStep)(nil),           // 4: protos.PipelineStep
 	(*SetPipelineCommand)(nil),     // 5: protos.SetPipelineCommand
 	(*DeletePipelineCommand)(nil),  // 6: protos.DeletePipelineCommand
@@ -767,8 +767,8 @@ var file_pipeline_proto_goTypes = []interface{}{
 	(*steps.CustomStep)(nil),       // 13: protos.steps.CustomStep
 }
 var file_pipeline_proto_depIdxs = []int32{
-	4,  // 0: protos.WasmRequest.step:type_name -> protos.PipelineStep
-	0,  // 1: protos.WasmResponse.exit_code:type_name -> protos.WASMExitCode
+	4,  // 0: protos.WASMRequest.step:type_name -> protos.PipelineStep
+	0,  // 1: protos.WASMResponse.exit_code:type_name -> protos.WASMExitCode
 	1,  // 2: protos.PipelineStep.conditions:type_name -> protos.PipelineStepCondition
 	9,  // 3: protos.PipelineStep.detective:type_name -> protos.steps.DetectiveStep
 	10, // 4: protos.PipelineStep.transform:type_name -> protos.steps.TransformStep
@@ -790,7 +790,7 @@ func file_pipeline_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_pipeline_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*WasmRequest); i {
+			switch v := v.(*WASMRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -802,7 +802,7 @@ func file_pipeline_proto_init() {
 			}
 		}
 		file_pipeline_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*WasmResponse); i {
+			switch v := v.(*WASMResponse); i {
 			case 0:
 				return &v.state
 			case 1:

@@ -34,13 +34,13 @@ enum PipelineStepCondition {
 }
 
 // SDK generates a WASM request and passes this to the WASM func
-message WasmRequest {
+message WASMRequest {
   PipelineStep step = 1;
   bytes input = 2;
 }
 
 // Returned by all WASM functions
-message WasmResponse {
+message WASMResponse {
   bytes output = 1;
   WASMExitCode exit_code = 2;
   string exit_msg = 3;

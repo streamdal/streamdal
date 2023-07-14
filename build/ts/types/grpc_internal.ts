@@ -28,8 +28,8 @@ export interface ProtoGrpcType {
     StandardResponse: MessageTypeDefinition
     UnpausePipelineCommand: MessageTypeDefinition
     WASMExitCode: EnumTypeDefinition
-    WasmRequest: MessageTypeDefinition
-    WasmResponse: MessageTypeDefinition
+    WASMRequest: MessageTypeDefinition
+    WASMResponse: MessageTypeDefinition
     steps: {
       CustomStep: MessageTypeDefinition
       DecodeStep: MessageTypeDefinition

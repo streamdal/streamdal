@@ -19,13 +19,15 @@ export interface ProtoGrpcType {
     GetPipelineResponse: MessageTypeDefinition
     GetPipelinesRequest: MessageTypeDefinition
     GetPipelinesResponse: MessageTypeDefinition
+    GetServiceRequest: MessageTypeDefinition
+    GetServiceResponse: MessageTypeDefinition
     GetServicesRequest: MessageTypeDefinition
     GetServicesResponse: MessageTypeDefinition
     GetStepsRequest: MessageTypeDefinition
     GetStepsResponse: MessageTypeDefinition
     Public: SubtypeConstructor<typeof grpc.Client, _protos_PublicClient> & { service: _protos_PublicDefinition }
-    UpdatePipelineRequest: MessageTypeDefinition
-    UpdatePipelineResponse: MessageTypeDefinition
+    SetPipelineRequest: MessageTypeDefinition
+    SetPipelineResponse: MessageTypeDefinition
     UpdateStepRequest: MessageTypeDefinition
     UpdateStepResponse: MessageTypeDefinition
   }
