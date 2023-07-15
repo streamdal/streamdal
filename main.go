@@ -10,6 +10,7 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/batchcorp/snitch-server/apis/grpcapi"
 	"github.com/batchcorp/snitch-server/apis/httpapi"
 	"github.com/batchcorp/snitch-server/config"
 	"github.com/batchcorp/snitch-server/deps"
@@ -72,12 +73,12 @@ func main() {
 func run(d *deps.Dependencies) error {
 	errChan := make(chan error, 1)
 
-	//// Run gRPC server
-	//go func() {
-	//	if err := d.GRPCAPIService.Run(); err != nil {
-	//		errChan <- errors.Wrap(err, "error during gRPC server run")
-	//	}
-	//}()
+	// Run gRPC server
+	go func() {
+		if err := grpcapi.New(d).Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during gRPC server run")
+		}
+	}()
 
 	// Run REST server
 	go func() {

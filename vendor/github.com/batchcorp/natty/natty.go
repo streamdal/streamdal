@@ -23,7 +23,7 @@ const (
 	DefaultSubBatchSize      = 256
 	DefaultWorkerIdleTimeout = time.Minute
 	DefaultPublishTimeout    = time.Second * 5 // TODO: figure out a good value for this
-) 
+)
 
 var (
 	ErrEmptyStreamName   = errors.New("StreamName cannot be empty")

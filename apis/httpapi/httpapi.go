@@ -10,16 +10,9 @@ import (
 	"github.com/batchcorp/snitch-server/deps"
 )
 
-var (
-	log *logrus.Entry
-)
-
-func init() {
-	log = logrus.WithField("pkg", "api")
-}
-
 type HTTPAPI struct {
 	Deps *deps.Dependencies
+	log  *logrus.Entry
 }
 
 type ResponseJSON struct {
@@ -32,11 +25,12 @@ type ResponseJSON struct {
 func New(d *deps.Dependencies) *HTTPAPI {
 	return &HTTPAPI{
 		Deps: d,
+		log:  logrus.WithField("pkg", "api"),
 	}
 }
 
 func (a *HTTPAPI) Run() error {
-	llog := log.WithField("method", "Run")
+	llog := a.log.WithField("method", "Run")
 
 	router := httprouter.New()
 
