@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/batchcorp/snitch-server/config"
-	"github.com/batchcorp/snitch-server/deps"
+	"github.com/streamdal/snitch-server/config"
+	"github.com/streamdal/snitch-server/deps"
 )
 
 var _ = Describe("HTTPAPI", func() {

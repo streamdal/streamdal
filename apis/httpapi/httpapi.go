@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 
-	"github.com/batchcorp/snitch-server/deps"
+	"github.com/streamdal/snitch-server/deps"
 )
 
 type HTTPAPI struct {

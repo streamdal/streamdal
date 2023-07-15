@@ -8,7 +8,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
 
-	"github.com/batchcorp/snitch-server/deps"
+	"github.com/streamdal/snitch-server/deps"
 )
 
 type GRPCAPI struct {

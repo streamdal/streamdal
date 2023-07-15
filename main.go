@@ -10,10 +10,10 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 
-	"github.com/batchcorp/snitch-server/apis/grpcapi"
-	"github.com/batchcorp/snitch-server/apis/httpapi"
-	"github.com/batchcorp/snitch-server/config"
-	"github.com/batchcorp/snitch-server/deps"
+	"github.com/streamdal/snitch-server/apis/grpcapi"
+	"github.com/streamdal/snitch-server/apis/httpapi"
+	"github.com/streamdal/snitch-server/config"
+	"github.com/streamdal/snitch-server/deps"
 )
 
 var (

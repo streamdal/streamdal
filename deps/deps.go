@@ -13,8 +13,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 
-	"github.com/batchcorp/snitch-server/backends/cache"
-	"github.com/batchcorp/snitch-server/config"
+	"github.com/streamdal/snitch-server/backends/cache"
+	"github.com/streamdal/snitch-server/config"
 )
 
 const (
