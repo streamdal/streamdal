@@ -15,6 +15,7 @@ import (
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
+	"github.com/streamdal/snitch-server/services/messaging"
 )
 
 const (
@@ -32,9 +33,10 @@ type Dependencies struct {
 	NATSBackend  natty.INatty
 
 	// Services
-	// ConsumerService consumer.IConsumer
-	Health         health.IHealth
-	DefaultContext context.Context
+	MessagingService *messaging.Msg
+	Health           health.IHealth
+	ShutdownContext  context.Context
+	ShutdownCancel   context.CancelFunc
 }
 
 func New(version string, cfg *config.Config) (*Dependencies, error) {
@@ -45,11 +47,14 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		return nil, errors.New("config cannot be nil")
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	d := &Dependencies{
-		Version:        version,
-		Config:         cfg,
-		Health:         gohealth,
-		DefaultContext: context.Background(),
+		Version:         version,
+		Config:          cfg,
+		Health:          gohealth,
+		ShutdownContext: ctx,
+		ShutdownCancel:  cancel,
 	}
 
 	if err := d.setupHealthChecks(); err != nil {
@@ -118,6 +123,13 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
+	msgService, err := messaging.New(d.ShutdownContext, d.NATSBackend)
+	if err != nil {
+		return errors.Wrap(err, "unable to create new messaging service")
+	}
+
+	d.MessagingService = msgService
+
 	return nil
 }
 
@@ -136,7 +148,7 @@ func createTLSConfig(caCert, clientCert, clientKey string) (*tls.Config, error) 
 	}, nil
 }
 
-// Satisfy the go-health.ICheckable interface
+// Status satisfies the go-health.ICheckable interface
 func (c *customCheck) Status() (interface{}, error) {
 	if false {
 		return nil, errors.New("something major just broke")

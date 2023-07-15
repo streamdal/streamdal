@@ -87,12 +87,12 @@ func run(d *deps.Dependencies) error {
 		}
 	}()
 
-	//// Run NATS Consumer
-	//go func() {
-	//	if err := d.ConsumerService.Run(); err != nil {
-	//		errChan <- errors.Wrap(err, "error during NATS consumer run")
-	//	}
-	//}()
+	// Run Messaging service
+	go func() {
+		if err := d.MessagingService.Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during NATS consumer run")
+		}
+	}()
 
 	return <-errChan
 }
