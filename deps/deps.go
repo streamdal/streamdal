@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/InVisionApp/go-health"
+	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"

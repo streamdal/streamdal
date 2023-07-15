@@ -3,7 +3,7 @@ module github.com/streamdal/snitch-server
 go 1.18
 
 require (
-	github.com/InVisionApp/go-health v2.1.0+incompatible
+	github.com/InVisionApp/go-health/v2 v2.1.3
 	github.com/InVisionApp/go-logger v1.0.1
 	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/joho/godotenv v1.3.0
