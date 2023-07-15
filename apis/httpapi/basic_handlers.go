@@ -15,7 +15,7 @@ func (a *HTTPAPI) healthCheckHandler(wr http.ResponseWriter, r *http.Request) {
 
 	wr.WriteHeader(status)
 	if _, err := wr.Write([]byte(body)); err != nil {
-		log.Errorf("unable to write respons in healthCheckHandler: %s", err)
+		a.log.Errorf("unable to write respons in healthCheckHandler: %s", err)
 	}
 }
 

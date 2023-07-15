@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/batchcorp/snitch-server/apis/grpcapi"
 	"github.com/batchcorp/snitch-server/apis/httpapi"
