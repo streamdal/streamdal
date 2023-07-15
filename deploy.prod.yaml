@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-template-deployment
+spec:
+  selector:
+    matchLabels:
+      app: go-template
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: go-template
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/env: "prod"
+        tags.datadoghq.com/service: "go-template"
+    spec:
+      containers:
+        - name: go-template
+          image: ghcr.io/streamdal/{{SERVICE}}:{{VERSION}}
+          ports:
+            - containerPort: 8282
+          env:
+            - name: ENV_NAME
+              value: "prod"
+            - name: DEBUG
+              value: "false"
+            - name: BACKEND_STORAGE_ENABLE_TLS
+              value: "true"
+            - name: NATS_URL
+              value: "{{vault:kubernetes-prod/nats:url}}"
+            - name: NATS_USE_TLS
+              value: "true"
+            - name: NATS_TLS_CA_FILE
+              value: "{{vault:kubernetes-prod/global:ca.pem}}"
+            - name: NATS_NUM_BUCKET_REPLICAS
+              value: "3"
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_AGENT_APM_PORT
+              value: "8126"
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              value: "{{VERSION}}"
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "500m"
+            limits:
+              memory: "128Mi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: 8282
+            initialDelaySeconds: 60
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: regcredv2
