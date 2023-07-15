@@ -1,7 +1,7 @@
 import type * as grpc from '@grpc/grpc-js';
 import type { MessageTypeDefinition } from '@grpc/proto-loader';
 
-import type { PublicClient as _protos_PublicClient, PublicDefinition as _protos_PublicDefinition } from './protos/Public';
+import type { ExternalClient as _protos_ExternalClient, ExternalDefinition as _protos_ExternalDefinition } from './protos/External';
 
 type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> = {
   new(...args: ConstructorParameters<Constructor>): Subtype;
@@ -15,6 +15,7 @@ export interface ProtoGrpcType {
     DeletePipelineResponse: MessageTypeDefinition
     DeleteStepRequest: MessageTypeDefinition
     DeleteStepResponse: MessageTypeDefinition
+    External: SubtypeConstructor<typeof grpc.Client, _protos_ExternalClient> & { service: _protos_ExternalDefinition }
     GetPipelineRequest: MessageTypeDefinition
     GetPipelineResponse: MessageTypeDefinition
     GetPipelinesRequest: MessageTypeDefinition
@@ -25,7 +26,6 @@ export interface ProtoGrpcType {
     GetServicesResponse: MessageTypeDefinition
     GetStepsRequest: MessageTypeDefinition
     GetStepsResponse: MessageTypeDefinition
-    Public: SubtypeConstructor<typeof grpc.Client, _protos_PublicClient> & { service: _protos_PublicDefinition }
     SetPipelineRequest: MessageTypeDefinition
     SetPipelineResponse: MessageTypeDefinition
     UpdateStepRequest: MessageTypeDefinition

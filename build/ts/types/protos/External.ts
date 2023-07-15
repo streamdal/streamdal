@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_public.proto
+// Original file: ../../protos/external_api.proto
 
 import type * as grpc from '@grpc/grpc-js'
 import type { MethodDefinition } from '@grpc/proto-loader'
@@ -23,7 +23,7 @@ import type { SetPipelineResponse as _protos_SetPipelineResponse, SetPipelineRes
 import type { UpdateStepRequest as _protos_UpdateStepRequest, UpdateStepRequest__Output as _protos_UpdateStepRequest__Output } from '../protos/UpdateStepRequest';
 import type { UpdateStepResponse as _protos_UpdateStepResponse, UpdateStepResponse__Output as _protos_UpdateStepResponse__Output } from '../protos/UpdateStepResponse';
 
-export interface PublicClient extends grpc.Client {
+export interface ExternalClient extends grpc.Client {
   CreateStep(argument: _protos_CreateStepRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_CreateStepResponse__Output>): grpc.ClientUnaryCall;
   CreateStep(argument: _protos_CreateStepRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_CreateStepResponse__Output>): grpc.ClientUnaryCall;
   CreateStep(argument: _protos_CreateStepRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_CreateStepResponse__Output>): grpc.ClientUnaryCall;
@@ -116,7 +116,7 @@ export interface PublicClient extends grpc.Client {
   
 }
 
-export interface PublicHandlers extends grpc.UntypedServiceImplementation {
+export interface ExternalHandlers extends grpc.UntypedServiceImplementation {
   CreateStep: grpc.handleUnaryCall<_protos_CreateStepRequest__Output, _protos_CreateStepResponse>;
   
   DeletePipeline: grpc.handleUnaryCall<_protos_DeletePipelineRequest__Output, _protos_DeletePipelineResponse>;
@@ -139,7 +139,7 @@ export interface PublicHandlers extends grpc.UntypedServiceImplementation {
   
 }
 
-export interface PublicDefinition extends grpc.ServiceDefinition {
+export interface ExternalDefinition extends grpc.ServiceDefinition {
   CreateStep: MethodDefinition<_protos_CreateStepRequest, _protos_CreateStepResponse, _protos_CreateStepRequest__Output, _protos_CreateStepResponse__Output>
   DeletePipeline: MethodDefinition<_protos_DeletePipelineRequest, _protos_DeletePipelineResponse, _protos_DeletePipelineRequest__Output, _protos_DeletePipelineResponse__Output>
   DeleteStep: MethodDefinition<_protos_DeleteStepRequest, _protos_DeleteStepResponse, _protos_DeleteStepRequest__Output, _protos_DeleteStepResponse__Output>

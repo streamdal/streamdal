@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_public.proto
+// Original file: ../../protos/external_api.proto
 
 
 export interface GetPipelineRequest {

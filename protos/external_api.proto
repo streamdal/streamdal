@@ -4,7 +4,7 @@ package protos;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-service Public {
+service External {
   // Build a service map
   rpc GetServices(GetServicesRequest) returns (GetServicesResponse);
 

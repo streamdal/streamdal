@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_internal.proto
+// Original file: ../../protos/internal_api.proto
 
 export const OperationType = {
   OPERATION_TYPE_UNSET: 'OPERATION_TYPE_UNSET',

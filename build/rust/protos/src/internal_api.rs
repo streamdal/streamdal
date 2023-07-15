@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `grpc_internal.proto`
+//! Generated file from `internal_api.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
@@ -1673,8 +1673,8 @@ impl OperationType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x13grpc_internal.proto\x12\x06protos\x1a\x0ccommon.proto\x1a\x0epipel\
-    ine.proto\"\xca\x02\n\x10HeartbeatRequest\x12\x20\n\x04auth\x18\x01\x20\
+    \n\x12internal_api.proto\x12\x06protos\x1a\x0ccommon.proto\x1a\x0epipeli\
+    ne.proto\"\xca\x02\n\x10HeartbeatRequest\x12\x20\n\x04auth\x18\x01\x20\
     \x01(\x0b2\x0c.protos.AuthR\x04auth\x12,\n\x08audience\x18\x02\x20\x01(\
     \x0b2\x10.protos.AudienceR\x08audience\x12F\n\x20last_activity_unix_time\
     stamp_utc\x18\x03\x20\x01(\x03R\x1clastActivityUnixTimestampUtc\x12\x0f\

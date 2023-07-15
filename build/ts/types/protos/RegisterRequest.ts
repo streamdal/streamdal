@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_internal.proto
+// Original file: ../../protos/internal_api.proto
 
 import type { Auth as _protos_Auth, Auth__Output as _protos_Auth__Output } from '../protos/Auth';
 

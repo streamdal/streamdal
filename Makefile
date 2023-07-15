@@ -46,6 +46,8 @@ generate/go:
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--go_out=./build/go/protos \
+ 		--go-grpc_out=./build/go/protos \
+ 		--go-grpc_opt=paths=source_relative \
  		--go_opt=paths=source_relative \
 		protos/*.proto protos/steps/*.proto || (exit 1)
 

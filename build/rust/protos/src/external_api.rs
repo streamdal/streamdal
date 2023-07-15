@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `grpc_public.proto`
+//! Generated file from `external_api.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
@@ -2087,7 +2087,7 @@ impl ::protobuf::reflect::ProtobufValue for DeleteStepResponse {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x11grpc_public.proto\x12\x06protos\"\x14\n\x12GetServicesRequest\"\
+    \n\x12external_api.proto\x12\x06protos\"\x14\n\x12GetServicesRequest\"\
     \x15\n\x13GetServicesResponse\"\x13\n\x11GetServiceRequest\"\x14\n\x12Ge\
     tServiceResponse\"\x15\n\x13GetPipelinesRequest\"\x16\n\x14GetPipelinesR\
     esponse\"\x14\n\x12GetPipelineRequest\"\x15\n\x13GetPipelineResponse\"\
@@ -2096,13 +2096,13 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     psRequest\"\x12\n\x10GetStepsResponse\"\x13\n\x11CreateStepRequest\"\x14\
     \n\x12CreateStepResponse\"\x13\n\x11UpdateStepRequest\"\x14\n\x12UpdateS\
     tepResponse\"\x13\n\x11DeleteStepRequest\"\x14\n\x12DeleteStepResponse2\
-    \xcf\x05\n\x06Public\x12F\n\x0bGetServices\x12\x1a.protos.GetServicesReq\
-    uest\x1a\x1b.protos.GetServicesResponse\x12C\n\nGetService\x12\x19.proto\
-    s.GetServiceRequest\x1a\x1a.protos.GetServiceResponse\x12I\n\x0cGetPipel\
-    ines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.protos.GetPipelinesRespo\
-    nse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipelineRequest\x1a\x1b.prot\
-    os.GetPipelineResponse\x12F\n\x0bSetPipeline\x12\x1a.protos.SetPipelineR\
-    equest\x1a\x1b.protos.SetPipelineResponse\x12O\n\x0eDeletePipeline\x12\
+    \xd1\x05\n\x08External\x12F\n\x0bGetServices\x12\x1a.protos.GetServicesR\
+    equest\x1a\x1b.protos.GetServicesResponse\x12C\n\nGetService\x12\x19.pro\
+    tos.GetServiceRequest\x1a\x1a.protos.GetServiceResponse\x12I\n\x0cGetPip\
+    elines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.protos.GetPipelinesRes\
+    ponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipelineRequest\x1a\x1b.pr\
+    otos.GetPipelineResponse\x12F\n\x0bSetPipeline\x12\x1a.protos.SetPipelin\
+    eRequest\x1a\x1b.protos.SetPipelineResponse\x12O\n\x0eDeletePipeline\x12\
     \x1d.protos.DeletePipelineRequest\x1a\x1e.protos.DeletePipelineResponse\
     \x12=\n\x08GetSteps\x12\x17.protos.GetStepsRequest\x1a\x18.protos.GetSte\
     psResponse\x12C\n\nCreateStep\x12\x19.protos.CreateStepRequest\x1a\x1a.p\
@@ -2112,7 +2112,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     mdal/snitch-protos/build/go/protosJ\xc1\x0b\n\x06\x12\x04\0\0:\x1d\n\x08\
     \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
     \x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x06\0\x12\
-    \x04\x06\0$\x01\n\n\n\x03\x06\0\x01\x12\x03\x06\x08\x0e\n\"\n\x04\x06\0\
+    \x04\x06\0$\x01\n\n\n\x03\x06\0\x01\x12\x03\x06\x08\x10\n\"\n\x04\x06\0\
     \x02\0\x12\x03\x08\x02D\x1a\x15\x20Build\x20a\x20service\x20map\n\n\x0c\
     \n\x05\x06\0\x02\0\x01\x12\x03\x08\x06\x11\n\x0c\n\x05\x06\0\x02\0\x02\
     \x12\x03\x08\x12$\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x08/B\nX\n\x04\x06\

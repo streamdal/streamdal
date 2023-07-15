@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_internal.proto
+// Original file: ../../protos/internal_api.proto
 
 import type { CommandType as _protos_CommandType, CommandType__Output as _protos_CommandType__Output } from '../protos/CommandType';
 import type { Audience as _protos_Audience, Audience__Output as _protos_Audience__Output } from '../protos/Audience';
