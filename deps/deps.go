@@ -9,9 +9,9 @@ import (
 
 	"github.com/InVisionApp/go-health"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
-	"github.com/batchcorp/natty"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	"github.com/streamdal/natty"
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"

@@ -6,7 +6,6 @@ require (
 	github.com/InVisionApp/go-health v2.1.0+incompatible
 	github.com/InVisionApp/go-logger v1.0.1
 	github.com/alecthomas/kingpin/v2 v2.3.2
-	github.com/batchcorp/natty v0.0.31 // TODO: Need to update this to use newer NATS client!
 	github.com/joho/godotenv v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nats-io/nats.go v1.27.1
@@ -15,6 +14,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // TODO: Switch this to bigcache
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
+	github.com/streamdal/natty v0.0.35
 	github.com/streamdal/snitch-protos v0.0.24
 	golang.org/x/crypto v0.11.0
 	google.golang.org/grpc v1.56.2
@@ -32,6 +32,7 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/glog v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

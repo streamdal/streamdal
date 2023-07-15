@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
@@ -588,4 +589,14 @@ func validateConsumerConfig(cfg *ConsumerConfig) error {
 	}
 
 	return nil
+}
+
+func MustNewUUID() string {
+	tmpUUID, err := uuid.NewV4()
+	if err != nil {
+		panic("unable to generate uuid: " + err.Error())
+	}
+
+	return tmpUUID.String()
+
 }

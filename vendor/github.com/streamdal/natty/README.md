@@ -1,11 +1,11 @@
 natty
 =====
-[![Go Reference](https://pkg.go.dev/badge/github.com/batchcorp/natty.svg)](https://pkg.go.dev/github.com/batchcorp/natty)
-[![Go Report Card](https://goreportcard.com/badge/github.com/batchcorp/natty)](https://goreportcard.com/report/github.com/batchcorp/natty)
+[![Go Reference](https://pkg.go.dev/badge/github.com/streamdal/natty.svg)](https://pkg.go.dev/github.com/streamdal/natty)
+[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/natty)](https://goreportcard.com/report/github.com/streamdal/natty)
 
 An opinionated, [NATS](https://nats.io) Jetstream client wrapper lib for Go.
 
-Used by [plumber](https://github.com/batchcorp/plumber) and other Batch applications.
+Used by [plumber](https://github.com/streamdal/plumber) and other Batch applications.
 
 ## Why
 
@@ -19,7 +19,7 @@ The library exposes several, opinionated, quality-of-life functionality such as:
 * Methods for interacting with key/value store in NATS
 * Concurrency / leader election functionality
 
-See the full interface [here](https://pkg.go.dev/github.com/batchcorp/natty#INatty).
+See the full interface [here](https://pkg.go.dev/github.com/streamdal/natty#INatty).
 
 ## Consume & Publish
 
