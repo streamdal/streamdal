@@ -1,4 +1,4 @@
-module github.com/batchcorp/go-template
+module github.com/batchcorp/snitch-server
 
 go 1.18
 

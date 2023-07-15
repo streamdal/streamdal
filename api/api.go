@@ -7,8 +7,8 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 
-	"github.com/batchcorp/go-template/config"
-	"github.com/batchcorp/go-template/deps"
+	"github.com/batchcorp/snitch-server/config"
+	"github.com/batchcorp/snitch-server/deps"
 )
 
 var (

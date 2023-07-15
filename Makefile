@@ -1,11 +1,11 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
-SERVICE = go-template
+SERVICE = snitch-server
 ARCH ?= $(shell uname -m)
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
 GO_BUILD_FLAGS = -ldflags "-X main.version=${VERSION}"
-DATABASE_URL = postgres://postgres:password@localhost:5432/go-template?sslmode=disable
+DATABASE_URL = postgres://postgres:password@localhost:5432/snitch-server?sslmode=disable
 MIGRATIONS_DIR = ./backends/postgres/migrations
 
 # Utility functions

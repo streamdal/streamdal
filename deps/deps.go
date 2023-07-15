@@ -18,13 +18,13 @@ import (
 	"github.com/batchcorp/rabbit"
 	"github.com/batchcorp/schemas/build/go/events"
 
-	"github.com/batchcorp/go-template/backends/cache"
-	"github.com/batchcorp/go-template/backends/db"
-	"github.com/batchcorp/go-template/backends/kafka"
-	"github.com/batchcorp/go-template/backends/postgres"
-	"github.com/batchcorp/go-template/config"
-	"github.com/batchcorp/go-template/services/hsb"
-	"github.com/batchcorp/go-template/services/isb"
+	"github.com/batchcorp/snitch-server/backends/cache"
+	"github.com/batchcorp/snitch-server/backends/db"
+	"github.com/batchcorp/snitch-server/backends/kafka"
+	"github.com/batchcorp/snitch-server/backends/postgres"
+	"github.com/batchcorp/snitch-server/config"
+	"github.com/batchcorp/snitch-server/services/hsb"
+	"github.com/batchcorp/snitch-server/services/isb"
 )
 
 const (

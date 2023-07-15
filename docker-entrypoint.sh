@@ -11,4 +11,4 @@ if [ -f "/ca/batch_ca.crt" ]; then
   update-ca-certificates
 fi
 
-/go-template-linux -d
+/snitch-server-linux -d

@@ -1,10 +1,10 @@
 version: "3"
 services:
-  go-template:
+  snitch-server:
     build: .
     environment:
        RABBITMQ_URL: "amqp://rabbitmq"
-    container_name: go-template
+    container_name: snitch-server
     links:
       - rabbitmq
 

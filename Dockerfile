@@ -26,7 +26,7 @@ ARG TARGETOS
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy bin, tools, scripts, migrations
-COPY --from=builder /build/go-template-$TARGETOS-$TARGETARCH /go-template-linux
+COPY --from=builder /build/snitch-server-$TARGETOS-$TARGETARCH /snitch-server-linux
 COPY --from=builder /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=builder /backends/db/migrations /migrations
 COPY --from=builder /dbmate /dbmate

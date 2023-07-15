@@ -15,7 +15,7 @@ type Config struct {
 	ListenAddress string `envconfig:"LISTEN_ADDRESS" default:":8282"`
 	HealthFreqSec int    `envconfig:"HEALTH_FREQ_SEC" default:"60"`
 	EnvName       string `envconfig:"ENV_NAME" default:"local"`
-	ServiceName   string `envconfig:"SERVICE_NAME" default:"go-template"`
+	ServiceName   string `envconfig:"SERVICE_NAME" default:"snitch-server"`
 
 	// Queue for _internal_ events
 	ISBDedicatedURLs              []string `envconfig:"ISB_DEDICATED_URL" default:"amqp://localhost"`
@@ -40,7 +40,7 @@ type Config struct {
 	ISBSharedExchangeDeclare   bool     `envconfig:"ISB_SHARED_EXCHANGE_DECLARE" default:"false"`
 	ISBSharedExchangeDurable   bool     `envconfig:"ISB_SHARED_EXCHANGE_DURABLE" default:"true"`
 	ISBSharedBindingKeys       []string `envconfig:"ISB_SHARED_ROUTING_KEY" default:"messages.collect.#"` // UPDATE THIS
-	ISBSharedQueueName         string   `envconfig:"ISB_SHARED_QUEUE_NAME" default:"go-template_shared"`
+	ISBSharedQueueName         string   `envconfig:"ISB_SHARED_QUEUE_NAME" default:"snitch-server_shared"`
 	ISBSharedNumConsumers      int      `envconfig:"ISB_SHARED_NUM_CONSUMERS" default:"3"`
 	ISBSharedRetryReconnectSec int      `envconfig:"ISB_SHARED_RETRY_RECONNECT_SEC" default:"10"`
 	ISBSharedAutoAck           bool     `envconfig:"ISB_SHARED_AUTO_ACK" default:"false"`
@@ -61,7 +61,7 @@ type Config struct {
 
 	// Medium term storage
 	BackendStorageHost      string `envconfig:"BACKEND_STORAGE_HOST" default:"localhost"`
-	BackendStorageName      string `envconfig:"BACKEND_STORAGE_NAME" default:"go-template"`
+	BackendStorageName      string `envconfig:"BACKEND_STORAGE_NAME" default:"snitch-server"`
 	BackendStoragePort      int    `envconfig:"BACKEND_STORAGE_PORT" default:"5432"`
 	BackendStorageUser      string `envconfig:"BACKEND_STORAGE_USER" default:"postgres"`
 	BackendStoragePass      string `envconfig:"BACKEND_STORAGE_PASS"`

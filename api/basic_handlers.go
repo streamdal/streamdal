@@ -22,7 +22,7 @@ func (a *API) versionHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	rw.WriteHeader(http.StatusOK)
 
-	response := &ResponseJSON{Status: http.StatusOK, Message: "batchcorp/go-template " + a.Version}
+	response := &ResponseJSON{Status: http.StatusOK, Message: "batchcorp/snitch-server " + a.Version}
 
 	if err := json.NewEncoder(rw).Encode(response); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)

@@ -12,7 +12,7 @@ import (
 
 	"github.com/batchcorp/rabbit"
 
-	"github.com/batchcorp/go-template/backends/cache"
+	"github.com/batchcorp/snitch-server/backends/cache"
 )
 
 const (

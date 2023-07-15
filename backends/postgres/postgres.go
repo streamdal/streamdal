@@ -3,7 +3,7 @@ package postgres
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/batchcorp/go-template/backends/db"
+	"github.com/batchcorp/snitch-server/backends/db"
 )
 
 type Postgres struct {

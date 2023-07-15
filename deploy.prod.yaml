@@ -2,11 +2,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: go-template-deployment
+  name: snitch-server-deployment
 spec:
   selector:
     matchLabels:
-      app: go-template
+      app: snitch-server
   replicas: 2
   strategy:
     type: RollingUpdate
@@ -17,13 +17,13 @@ spec:
   template:
     metadata:
       labels:
-        app: go-template
+        app: snitch-server
         admission.datadoghq.com/enabled: "true"
         tags.datadoghq.com/env: "prod"
-        tags.datadoghq.com/service: "go-template"
+        tags.datadoghq.com/service: "snitch-server"
     spec:
       containers:
-        - name: go-template
+        - name: snitch-server
           image: ghcr.io/streamdal/{{SERVICE}}:{{VERSION}}
           ports:
             - containerPort: 8282
