@@ -1,1 +1,0 @@
-/opt/bitnami/postgresql/bin/postgres "-D" "/bitnami/postgresql/data" "--config-file=/opt/bitnami/postgresql/conf/postgresql.conf" "--external_pid_file=/opt/bitnami/postgresql/tmp/postgresql.pid" "--hba_file=/opt/bitnami/postgresql/conf/pg_hba.conf"

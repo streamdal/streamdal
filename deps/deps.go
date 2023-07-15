@@ -9,22 +9,12 @@ import (
 
 	"github.com/InVisionApp/go-health"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
+	"github.com/batchcorp/natty"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
-
-	"github.com/batchcorp/natty"
-	"github.com/batchcorp/rabbit"
-	"github.com/batchcorp/schemas/build/go/events"
 
 	"github.com/batchcorp/snitch-server/backends/cache"
-	"github.com/batchcorp/snitch-server/backends/db"
-	"github.com/batchcorp/snitch-server/backends/kafka"
-	"github.com/batchcorp/snitch-server/backends/postgres"
 	"github.com/batchcorp/snitch-server/config"
-	"github.com/batchcorp/snitch-server/services/hsb"
-	"github.com/batchcorp/snitch-server/services/isb"
 )
 
 const (
@@ -34,32 +24,32 @@ const (
 type customCheck struct{}
 
 type Dependencies struct {
+	Version string
+	Config  *config.Config
+
 	// Backends
-	ISBDedicatedBackend rabbit.IRabbit
-	ISBSharedBackend    rabbit.IRabbit
-	HSBBackend          kafka.IKafka
-	CacheBackend        cache.ICache
-	NATSBackend         natty.INatty
-	Postgres            *postgres.Postgres
+	CacheBackend cache.ICache
+	NATSBackend  natty.INatty
 
 	// Services
-	ISBService isb.IISB
-	HSBService hsb.IHSB
-
-	HSBChan chan *events.Manifest
-
+	// ConsumerService consumer.IConsumer
 	Health         health.IHealth
 	DefaultContext context.Context
 }
 
-func New(cfg *config.Config) (*Dependencies, error) {
+func New(version string, cfg *config.Config) (*Dependencies, error) {
 	gohealth := health.New()
 	gohealth.Logger = gllogrus.New(nil)
 
+	if cfg == nil {
+		return nil, errors.New("config cannot be nil")
+	}
+
 	d := &Dependencies{
+		Version:        version,
+		Config:         cfg,
 		Health:         gohealth,
 		DefaultContext: context.Background(),
-		HSBChan:        make(chan *events.Manifest, 0),
 	}
 
 	if err := d.setupHealthChecks(); err != nil {
@@ -124,137 +114,10 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 
 	d.NATSBackend = n
 
-	// Events rabbitmq backend
-	isbDedicatedBackend, err := rabbit.New(&rabbit.Options{
-		URLs:      cfg.ISBDedicatedURLs,
-		Mode:      0,
-		QueueName: cfg.ISBDedicatedQueueName,
-		Bindings: []rabbit.Binding{
-			{
-				ExchangeName:    cfg.ISBDedicatedExchangeName,
-				ExchangeType:    amqp.ExchangeTopic,
-				ExchangeDeclare: cfg.ISBDedicatedExchangeDeclare,
-				BindingKeys:     cfg.ISBDedicatedBindingKeys,
-			},
-		},
-		RetryReconnectSec: rabbit.DefaultRetryReconnectSec,
-		QueueDurable:      cfg.ISBDedicatedQueueDurable,
-		QueueExclusive:    cfg.ISBDedicatedQueueExclusive,
-		QueueAutoDelete:   cfg.ISBDedicatedQueueAutoDelete,
-		QueueDeclare:      cfg.ISBDedicatedQueueDeclare,
-		AutoAck:           cfg.ISBDedicatedAutoAck,
-		AppID:             cfg.ServiceName,
-		UseTLS:            cfg.ISBDedicatedUseTLS,
-		SkipVerifyTLS:     cfg.ISBDedicatedSkipVerifyTLS,
-	})
-	if err != nil {
-		return errors.Wrap(err, "unable to create new dedicated rabbit backend")
-	}
-
-	d.ISBDedicatedBackend = isbDedicatedBackend
-
-	// Shared backend
-	isbSharedBackend, err := rabbit.New(&rabbit.Options{
-		URLs:      cfg.ISBSharedURLs,
-		Mode:      0,
-		QueueName: cfg.ISBSharedQueueName,
-		Bindings: []rabbit.Binding{
-			{
-				ExchangeName:    cfg.ISBSharedExchangeName,
-				ExchangeType:    amqp.ExchangeTopic,
-				ExchangeDeclare: cfg.ISBSharedExchangeDeclare,
-				ExchangeDurable: cfg.ISBSharedExchangeDurable,
-				BindingKeys:     cfg.ISBSharedBindingKeys,
-			},
-		},
-		RetryReconnectSec: rabbit.DefaultRetryReconnectSec,
-		QueueDurable:      cfg.ISBSharedQueueDurable,
-		QueueExclusive:    cfg.ISBSharedQueueExclusive,
-		QueueAutoDelete:   cfg.ISBSharedQueueAutoDelete,
-		QueueDeclare:      cfg.ISBSharedQueueDeclare,
-		AutoAck:           cfg.ISBSharedAutoAck,
-		UseTLS:            cfg.ISBSharedUseTLS,
-		SkipVerifyTLS:     cfg.ISBSharedSkipVerifyTLS,
-	})
-	if err != nil {
-		return errors.Wrap(err, "unable to create new shared rabbit backend")
-	}
-
-	d.ISBSharedBackend = isbSharedBackend
-
-	if cfg.HSBUseTLS {
-		logrus.Debug("using TLS for HSB")
-	}
-
-	hsbBackend, err := kafka.New(
-		&kafka.Options{
-			Topic:     cfg.HSBTopicName,
-			Brokers:   cfg.HSBBrokerURLs,
-			Timeout:   cfg.HSBConnectTimeout,
-			BatchSize: cfg.HSBBatchSize,
-			UseTLS:    cfg.HSBUseTLS,
-		},
-		d.DefaultContext,
-	)
-	if err != nil {
-		return errors.Wrap(err, "unable to create new kafka instance")
-	}
-
-	d.HSBBackend = hsbBackend
-
-	storage, err := db.New(&db.Options{
-		Host:      cfg.BackendStorageHost,
-		Name:      cfg.BackendStorageName,
-		User:      cfg.BackendStorageUser,
-		Pass:      cfg.BackendStoragePass,
-		Port:      cfg.BackendStoragePort,
-		EnableTLS: cfg.BackendStorageEnableTLS,
-	})
-
-	if err != nil {
-		return errors.Wrap(err, "unable to create new db instance")
-	}
-
-	pg := postgres.New(storage)
-
-	d.Postgres = pg
-
 	return nil
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	isbService, err := isb.New(&isb.Config{
-		Cache: d.CacheBackend,
-		RabbitMap: map[string]*isb.RabbitConfig{
-			"dedicated": {
-				RabbitInstance: d.ISBDedicatedBackend,
-				NumConsumers:   cfg.ISBDedicatedNumConsumers,
-				Func:           "DedicatedConsumeFunc",
-			},
-			"shared": {
-				RabbitInstance: d.ISBSharedBackend,
-				NumConsumers:   cfg.ISBSharedNumConsumers,
-				Func:           "SharedConsumeFunc",
-			},
-		},
-	})
-	if err != nil {
-		return errors.Wrap(err, "unable to setup event")
-	}
-
-	d.ISBService = isbService
-
-	hsbService, err := hsb.New(&hsb.Config{
-		Kafka:         d.HSBBackend,
-		NumPublishers: cfg.HSBNumPublishers,
-		HSBChan:       d.HSBChan,
-	})
-	if err != nil {
-		return errors.Wrap(err, "unable to setup hsb")
-	}
-
-	d.HSBService = hsbService
-
 	return nil
 }
 

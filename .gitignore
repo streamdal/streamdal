@@ -1,4 +1,4 @@
 .env
 .idea
-backend-data/*
 c.out
+backend-data

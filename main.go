@@ -1,16 +1,16 @@
 package main
 
 import (
-	"context"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/batchcorp/snitch-server/api"
+	"github.com/batchcorp/snitch-server/apis/httpapi"
 	"github.com/batchcorp/snitch-server/config"
 	"github.com/batchcorp/snitch-server/deps"
 )
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// JSON formatter for log output if not running in a TTY
-	// because Loggly likes JSON but humans like colors
+	// because loggers likes JSON but humans like colors
 	if !terminal.IsTerminal(int(os.Stderr.Fd())) {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
@@ -56,31 +56,42 @@ func main() {
 
 	cfg := config.New()
 	if err := cfg.LoadEnvVars(); err != nil {
-		log.WithError(err).Fatal("Could not instantiate configuration")
+		log.WithError(err).Fatal("could not instantiate configuration")
 	}
 
-	d, err := deps.New(cfg)
+	d, err := deps.New(version, cfg)
 	if err != nil {
-		log.WithError(err).Fatal("Could not setup dependencies")
+		log.WithError(err).Fatal("could not setup dependencies")
 	}
 
-	if err := d.PreCreateBuckets(context.Background(), cfg); err != nil {
-		log.WithError(err).Fatalln("unable to create NATS buckets")
+	if err := run(d); err != nil {
+		log.WithError(err).Fatal("error during run")
 	}
+}
 
-	log = log.WithField("environment", cfg.EnvName)
+func run(d *deps.Dependencies) error {
+	errChan := make(chan error, 1)
 
-	// Start isb consumer
-	if err := d.ISBService.StartConsumers(); err != nil {
-		log.WithError(err).Fatal("Unable to start isb consumers")
-	}
+	//// Run gRPC server
+	//go func() {
+	//	if err := d.GRPCAPIService.Run(); err != nil {
+	//		errChan <- errors.Wrap(err, "error during gRPC server run")
+	//	}
+	//}()
 
-	// Start hsb publishers
-	if err := d.HSBService.StartPublishers(); err != nil {
-		log.WithError(err).Fatal("Unable to start hsb consumers")
-	}
+	// Run REST server
+	go func() {
+		if err := httpapi.New(d).Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during REST server run")
+		}
+	}()
 
-	// Start API server
-	a := api.New(cfg, d, version)
-	log.Fatal(a.Run())
+	//// Run NATS Consumer
+	//go func() {
+	//	if err := d.ConsumerService.Run(); err != nil {
+	//		errChan <- errors.Wrap(err, "error during NATS consumer run")
+	//	}
+	//}()
+
+	return <-errChan
 }
