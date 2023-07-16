@@ -1,14 +1,22 @@
 package grpcapi
 
 import (
+	"context"
+	"fmt"
 	"net"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-server/deps"
+)
+
+var (
+	GRPCMissingAuthError = errors.New("missing auth token")
+	GRPCInvalidAuthError = errors.New("invalid auth token")
 )
 
 type GRPCAPI struct {
@@ -31,7 +39,9 @@ func (g *GRPCAPI) Run() error {
 		return errors.Wrapf(err, "unable to listen on %s", g.Deps.Config.GRPCAPIListenAddress)
 	}
 
-	var opts []grpc.ServerOption
+	opts := []grpc.ServerOption{
+		grpc.UnaryInterceptor(g.AuthServerUnaryInterceptor()),
+	}
 
 	grpcServer := grpc.NewServer(opts...)
 
@@ -42,4 +52,26 @@ func (g *GRPCAPI) Run() error {
 
 	// TODO: Implement listening to ctx
 	return grpcServer.Serve(lis)
+}
+
+// AuthServerUnaryInterceptor is a GRPC interceptor (middleware) that checks
+// for a valid auth token
+func (g *GRPCAPI) AuthServerUnaryInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return nil, fmt.Errorf("couldn't parse incoming context metadata")
+		}
+
+		auth := md.Get("authorization")
+		if len(auth) == 0 {
+			return nil, GRPCMissingAuthError
+		}
+
+		if auth[0] != g.Deps.Config.AuthToken {
+			return nil, GRPCInvalidAuthError
+		}
+
+		return handler(ctx, req)
+	}
 }

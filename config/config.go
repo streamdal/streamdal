@@ -15,6 +15,7 @@ type Config struct {
 	EnvName       string `envconfig:"ENV_NAME" default:"local"`
 	ServiceName   string `envconfig:"SERVICE_NAME" default:"snitch-server"`
 
+	AuthToken            string `envconfig:"AUTH_TOKEN" required:"true"`
 	HTTPAPIListenAddress string `envconfig:"HTTP_API_LISTEN_ADDRESS" default:":8080"`
 	GRPCAPIListenAddress string `envconfig:"GRPC_API_LISTEN_ADDRESS" default:":9090"`
 
