@@ -18,6 +18,8 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 }
 
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
+	// Get inbound request
+
 	//TODO implement me
 	panic("implement me")
 }

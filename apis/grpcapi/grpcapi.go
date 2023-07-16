@@ -14,6 +14,10 @@ import (
 	"github.com/streamdal/snitch-server/deps"
 )
 
+const (
+	GRPCAuthMetadataKey = "authorization"
+)
+
 var (
 	GRPCMissingAuthError = errors.New("missing auth token")
 	GRPCInvalidAuthError = errors.New("invalid auth token")
@@ -63,7 +67,7 @@ func (g *GRPCAPI) AuthServerUnaryInterceptor() grpc.UnaryServerInterceptor {
 			return nil, fmt.Errorf("couldn't parse incoming context metadata")
 		}
 
-		auth := md.Get("authorization")
+		auth := md.Get(GRPCAuthMetadataKey)
 		if len(auth) == 0 {
 			return nil, GRPCMissingAuthError
 		}
