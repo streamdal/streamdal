@@ -650,30 +650,30 @@ impl ::protobuf::reflect::ProtobufValue for RegisterRequest {
 ///  The primary method to send commands to the SDK; server will send zero or more
 ///  RegisterResponse's with SetPipelineRequest on SDK instantiation.
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.RegisterResponse)
-pub struct RegisterResponse {
+// @@protoc_insertion_point(message:protos.CommandResponse)
+pub struct CommandResponse {
     // message fields
     ///  Use this to determine what to expect in one_of
-    // @@protoc_insertion_point(field:protos.RegisterResponse.type)
+    // @@protoc_insertion_point(field:protos.CommandResponse.type)
     pub type_: ::protobuf::EnumOrUnknown<CommandType>,
     ///  Who is this command intended for?
-    // @@protoc_insertion_point(field:protos.RegisterResponse.audience)
+    // @@protoc_insertion_point(field:protos.CommandResponse.audience)
     pub audience: ::protobuf::MessageField<Audience>,
     // message oneof groups
-    pub command: ::std::option::Option<register_response::Command>,
+    pub command: ::std::option::Option<command_response::Command>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.RegisterResponse.special_fields)
+    // @@protoc_insertion_point(special_field:protos.CommandResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a RegisterResponse {
-    fn default() -> &'a RegisterResponse {
-        <RegisterResponse as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a CommandResponse {
+    fn default() -> &'a CommandResponse {
+        <CommandResponse as ::protobuf::Message>::default_instance()
     }
 }
 
-impl RegisterResponse {
-    pub fn new() -> RegisterResponse {
+impl CommandResponse {
+    pub fn new() -> CommandResponse {
         ::std::default::Default::default()
     }
 
@@ -681,7 +681,7 @@ impl RegisterResponse {
 
     pub fn set_pipeline(&self) -> &super::pipeline::SetPipelineCommand {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::SetPipeline(ref v)) => v,
+            ::std::option::Option::Some(command_response::Command::SetPipeline(ref v)) => v,
             _ => <super::pipeline::SetPipelineCommand as ::protobuf::Message>::default_instance(),
         }
     }
@@ -692,24 +692,24 @@ impl RegisterResponse {
 
     pub fn has_set_pipeline(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::SetPipeline(..)) => true,
+            ::std::option::Option::Some(command_response::Command::SetPipeline(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
     pub fn set_set_pipeline(&mut self, v: super::pipeline::SetPipelineCommand) {
-        self.command = ::std::option::Option::Some(register_response::Command::SetPipeline(v))
+        self.command = ::std::option::Option::Some(command_response::Command::SetPipeline(v))
     }
 
     // Mutable pointer to the field.
     pub fn mut_set_pipeline(&mut self) -> &mut super::pipeline::SetPipelineCommand {
-        if let ::std::option::Option::Some(register_response::Command::SetPipeline(_)) = self.command {
+        if let ::std::option::Option::Some(command_response::Command::SetPipeline(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(register_response::Command::SetPipeline(super::pipeline::SetPipelineCommand::new()));
+            self.command = ::std::option::Option::Some(command_response::Command::SetPipeline(super::pipeline::SetPipelineCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(register_response::Command::SetPipeline(ref mut v)) => v,
+            ::std::option::Option::Some(command_response::Command::SetPipeline(ref mut v)) => v,
             _ => panic!(),
         }
     }
@@ -718,7 +718,7 @@ impl RegisterResponse {
     pub fn take_set_pipeline(&mut self) -> super::pipeline::SetPipelineCommand {
         if self.has_set_pipeline() {
             match self.command.take() {
-                ::std::option::Option::Some(register_response::Command::SetPipeline(v)) => v,
+                ::std::option::Option::Some(command_response::Command::SetPipeline(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -730,7 +730,7 @@ impl RegisterResponse {
 
     pub fn delete_pipeline(&self) -> &super::pipeline::DeletePipelineCommand {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::DeletePipeline(ref v)) => v,
+            ::std::option::Option::Some(command_response::Command::DeletePipeline(ref v)) => v,
             _ => <super::pipeline::DeletePipelineCommand as ::protobuf::Message>::default_instance(),
         }
     }
@@ -741,24 +741,24 @@ impl RegisterResponse {
 
     pub fn has_delete_pipeline(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::DeletePipeline(..)) => true,
+            ::std::option::Option::Some(command_response::Command::DeletePipeline(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
     pub fn set_delete_pipeline(&mut self, v: super::pipeline::DeletePipelineCommand) {
-        self.command = ::std::option::Option::Some(register_response::Command::DeletePipeline(v))
+        self.command = ::std::option::Option::Some(command_response::Command::DeletePipeline(v))
     }
 
     // Mutable pointer to the field.
     pub fn mut_delete_pipeline(&mut self) -> &mut super::pipeline::DeletePipelineCommand {
-        if let ::std::option::Option::Some(register_response::Command::DeletePipeline(_)) = self.command {
+        if let ::std::option::Option::Some(command_response::Command::DeletePipeline(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(register_response::Command::DeletePipeline(super::pipeline::DeletePipelineCommand::new()));
+            self.command = ::std::option::Option::Some(command_response::Command::DeletePipeline(super::pipeline::DeletePipelineCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(register_response::Command::DeletePipeline(ref mut v)) => v,
+            ::std::option::Option::Some(command_response::Command::DeletePipeline(ref mut v)) => v,
             _ => panic!(),
         }
     }
@@ -767,7 +767,7 @@ impl RegisterResponse {
     pub fn take_delete_pipeline(&mut self) -> super::pipeline::DeletePipelineCommand {
         if self.has_delete_pipeline() {
             match self.command.take() {
-                ::std::option::Option::Some(register_response::Command::DeletePipeline(v)) => v,
+                ::std::option::Option::Some(command_response::Command::DeletePipeline(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -779,7 +779,7 @@ impl RegisterResponse {
 
     pub fn pause_pipeline(&self) -> &super::pipeline::PausePipelineCommand {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::PausePipeline(ref v)) => v,
+            ::std::option::Option::Some(command_response::Command::PausePipeline(ref v)) => v,
             _ => <super::pipeline::PausePipelineCommand as ::protobuf::Message>::default_instance(),
         }
     }
@@ -790,24 +790,24 @@ impl RegisterResponse {
 
     pub fn has_pause_pipeline(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::PausePipeline(..)) => true,
+            ::std::option::Option::Some(command_response::Command::PausePipeline(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
     pub fn set_pause_pipeline(&mut self, v: super::pipeline::PausePipelineCommand) {
-        self.command = ::std::option::Option::Some(register_response::Command::PausePipeline(v))
+        self.command = ::std::option::Option::Some(command_response::Command::PausePipeline(v))
     }
 
     // Mutable pointer to the field.
     pub fn mut_pause_pipeline(&mut self) -> &mut super::pipeline::PausePipelineCommand {
-        if let ::std::option::Option::Some(register_response::Command::PausePipeline(_)) = self.command {
+        if let ::std::option::Option::Some(command_response::Command::PausePipeline(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(register_response::Command::PausePipeline(super::pipeline::PausePipelineCommand::new()));
+            self.command = ::std::option::Option::Some(command_response::Command::PausePipeline(super::pipeline::PausePipelineCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(register_response::Command::PausePipeline(ref mut v)) => v,
+            ::std::option::Option::Some(command_response::Command::PausePipeline(ref mut v)) => v,
             _ => panic!(),
         }
     }
@@ -816,7 +816,7 @@ impl RegisterResponse {
     pub fn take_pause_pipeline(&mut self) -> super::pipeline::PausePipelineCommand {
         if self.has_pause_pipeline() {
             match self.command.take() {
-                ::std::option::Option::Some(register_response::Command::PausePipeline(v)) => v,
+                ::std::option::Option::Some(command_response::Command::PausePipeline(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -828,7 +828,7 @@ impl RegisterResponse {
 
     pub fn unpause_pipeline(&self) -> &super::pipeline::UnpausePipelineCommand {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::UnpausePipeline(ref v)) => v,
+            ::std::option::Option::Some(command_response::Command::UnpausePipeline(ref v)) => v,
             _ => <super::pipeline::UnpausePipelineCommand as ::protobuf::Message>::default_instance(),
         }
     }
@@ -839,24 +839,24 @@ impl RegisterResponse {
 
     pub fn has_unpause_pipeline(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(register_response::Command::UnpausePipeline(..)) => true,
+            ::std::option::Option::Some(command_response::Command::UnpausePipeline(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
     pub fn set_unpause_pipeline(&mut self, v: super::pipeline::UnpausePipelineCommand) {
-        self.command = ::std::option::Option::Some(register_response::Command::UnpausePipeline(v))
+        self.command = ::std::option::Option::Some(command_response::Command::UnpausePipeline(v))
     }
 
     // Mutable pointer to the field.
     pub fn mut_unpause_pipeline(&mut self) -> &mut super::pipeline::UnpausePipelineCommand {
-        if let ::std::option::Option::Some(register_response::Command::UnpausePipeline(_)) = self.command {
+        if let ::std::option::Option::Some(command_response::Command::UnpausePipeline(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(register_response::Command::UnpausePipeline(super::pipeline::UnpausePipelineCommand::new()));
+            self.command = ::std::option::Option::Some(command_response::Command::UnpausePipeline(super::pipeline::UnpausePipelineCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(register_response::Command::UnpausePipeline(ref mut v)) => v,
+            ::std::option::Option::Some(command_response::Command::UnpausePipeline(ref mut v)) => v,
             _ => panic!(),
         }
     }
@@ -865,7 +865,7 @@ impl RegisterResponse {
     pub fn take_unpause_pipeline(&mut self) -> super::pipeline::UnpausePipelineCommand {
         if self.has_unpause_pipeline() {
             match self.command.take() {
-                ::std::option::Option::Some(register_response::Command::UnpausePipeline(v)) => v,
+                ::std::option::Option::Some(command_response::Command::UnpausePipeline(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -878,53 +878,53 @@ impl RegisterResponse {
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
-            |m: &RegisterResponse| { &m.type_ },
-            |m: &mut RegisterResponse| { &mut m.type_ },
+            |m: &CommandResponse| { &m.type_ },
+            |m: &mut CommandResponse| { &mut m.type_ },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, Audience>(
             "audience",
-            |m: &RegisterResponse| { &m.audience },
-            |m: &mut RegisterResponse| { &mut m.audience },
+            |m: &CommandResponse| { &m.audience },
+            |m: &mut CommandResponse| { &mut m.audience },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::pipeline::SetPipelineCommand>(
             "set_pipeline",
-            RegisterResponse::has_set_pipeline,
-            RegisterResponse::set_pipeline,
-            RegisterResponse::mut_set_pipeline,
-            RegisterResponse::set_set_pipeline,
+            CommandResponse::has_set_pipeline,
+            CommandResponse::set_pipeline,
+            CommandResponse::mut_set_pipeline,
+            CommandResponse::set_set_pipeline,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::pipeline::DeletePipelineCommand>(
             "delete_pipeline",
-            RegisterResponse::has_delete_pipeline,
-            RegisterResponse::delete_pipeline,
-            RegisterResponse::mut_delete_pipeline,
-            RegisterResponse::set_delete_pipeline,
+            CommandResponse::has_delete_pipeline,
+            CommandResponse::delete_pipeline,
+            CommandResponse::mut_delete_pipeline,
+            CommandResponse::set_delete_pipeline,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::pipeline::PausePipelineCommand>(
             "pause_pipeline",
-            RegisterResponse::has_pause_pipeline,
-            RegisterResponse::pause_pipeline,
-            RegisterResponse::mut_pause_pipeline,
-            RegisterResponse::set_pause_pipeline,
+            CommandResponse::has_pause_pipeline,
+            CommandResponse::pause_pipeline,
+            CommandResponse::mut_pause_pipeline,
+            CommandResponse::set_pause_pipeline,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::pipeline::UnpausePipelineCommand>(
             "unpause_pipeline",
-            RegisterResponse::has_unpause_pipeline,
-            RegisterResponse::unpause_pipeline,
-            RegisterResponse::mut_unpause_pipeline,
-            RegisterResponse::set_unpause_pipeline,
+            CommandResponse::has_unpause_pipeline,
+            CommandResponse::unpause_pipeline,
+            CommandResponse::mut_unpause_pipeline,
+            CommandResponse::set_unpause_pipeline,
         ));
-        oneofs.push(register_response::Command::generated_oneof_descriptor_data());
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<RegisterResponse>(
-            "RegisterResponse",
+        oneofs.push(command_response::Command::generated_oneof_descriptor_data());
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CommandResponse>(
+            "CommandResponse",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for RegisterResponse {
-    const NAME: &'static str = "RegisterResponse";
+impl ::protobuf::Message for CommandResponse {
+    const NAME: &'static str = "CommandResponse";
 
     fn is_initialized(&self) -> bool {
         true
@@ -940,16 +940,16 @@ impl ::protobuf::Message for RegisterResponse {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
                 },
                 802 => {
-                    self.command = ::std::option::Option::Some(register_response::Command::SetPipeline(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command_response::Command::SetPipeline(is.read_message()?));
                 },
                 810 => {
-                    self.command = ::std::option::Option::Some(register_response::Command::DeletePipeline(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command_response::Command::DeletePipeline(is.read_message()?));
                 },
                 818 => {
-                    self.command = ::std::option::Option::Some(register_response::Command::PausePipeline(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command_response::Command::PausePipeline(is.read_message()?));
                 },
                 826 => {
-                    self.command = ::std::option::Option::Some(register_response::Command::UnpausePipeline(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command_response::Command::UnpausePipeline(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -972,19 +972,19 @@ impl ::protobuf::Message for RegisterResponse {
         }
         if let ::std::option::Option::Some(ref v) = self.command {
             match v {
-                &register_response::Command::SetPipeline(ref v) => {
+                &command_response::Command::SetPipeline(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &register_response::Command::DeletePipeline(ref v) => {
+                &command_response::Command::DeletePipeline(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &register_response::Command::PausePipeline(ref v) => {
+                &command_response::Command::PausePipeline(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &register_response::Command::UnpausePipeline(ref v) => {
+                &command_response::Command::UnpausePipeline(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -1004,16 +1004,16 @@ impl ::protobuf::Message for RegisterResponse {
         }
         if let ::std::option::Option::Some(ref v) = self.command {
             match v {
-                &register_response::Command::SetPipeline(ref v) => {
+                &command_response::Command::SetPipeline(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
                 },
-                &register_response::Command::DeletePipeline(ref v) => {
+                &command_response::Command::DeletePipeline(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(101, v, os)?;
                 },
-                &register_response::Command::PausePipeline(ref v) => {
+                &command_response::Command::PausePipeline(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(102, v, os)?;
                 },
-                &register_response::Command::UnpausePipeline(ref v) => {
+                &command_response::Command::UnpausePipeline(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
                 },
             };
@@ -1030,8 +1030,8 @@ impl ::protobuf::Message for RegisterResponse {
         &mut self.special_fields
     }
 
-    fn new() -> RegisterResponse {
-        RegisterResponse::new()
+    fn new() -> CommandResponse {
+        CommandResponse::new()
     }
 
     fn clear(&mut self) {
@@ -1044,8 +1044,8 @@ impl ::protobuf::Message for RegisterResponse {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static RegisterResponse {
-        static instance: RegisterResponse = RegisterResponse {
+    fn default_instance() -> &'static CommandResponse {
+        static instance: CommandResponse = CommandResponse {
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
             audience: ::protobuf::MessageField::none(),
             command: ::std::option::Option::None,
@@ -1055,37 +1055,37 @@ impl ::protobuf::Message for RegisterResponse {
     }
 }
 
-impl ::protobuf::MessageFull for RegisterResponse {
+impl ::protobuf::MessageFull for CommandResponse {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("RegisterResponse").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CommandResponse").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for RegisterResponse {
+impl ::std::fmt::Display for CommandResponse {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for RegisterResponse {
+impl ::protobuf::reflect::ProtobufValue for CommandResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-/// Nested message and enums of message `RegisterResponse`
-pub mod register_response {
+/// Nested message and enums of message `CommandResponse`
+pub mod command_response {
 
     #[derive(Clone,PartialEq,Debug)]
     #[non_exhaustive]
-    // @@protoc_insertion_point(oneof:protos.RegisterResponse.command)
+    // @@protoc_insertion_point(oneof:protos.CommandResponse.command)
     pub enum Command {
-        // @@protoc_insertion_point(oneof_field:protos.RegisterResponse.set_pipeline)
+        // @@protoc_insertion_point(oneof_field:protos.CommandResponse.set_pipeline)
         SetPipeline(super::super::pipeline::SetPipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.RegisterResponse.delete_pipeline)
+        // @@protoc_insertion_point(oneof_field:protos.CommandResponse.delete_pipeline)
         DeletePipeline(super::super::pipeline::DeletePipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.RegisterResponse.pause_pipeline)
+        // @@protoc_insertion_point(oneof_field:protos.CommandResponse.pause_pipeline)
         PausePipeline(super::super::pipeline::PausePipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.RegisterResponse.unpause_pipeline)
+        // @@protoc_insertion_point(oneof_field:protos.CommandResponse.unpause_pipeline)
         UnpausePipeline(super::super::pipeline::UnpausePipelineCommand),
     }
 
@@ -1095,7 +1095,7 @@ pub mod register_response {
     impl ::protobuf::OneofFull for Command {
         fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
             static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| <super::RegisterResponse as ::protobuf::MessageFull>::descriptor().oneof_by_name("command").unwrap()).clone()
+            descriptor.get(|| <super::CommandResponse as ::protobuf::MessageFull>::descriptor().oneof_by_name("command").unwrap()).clone()
         }
     }
 
@@ -1410,8 +1410,8 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x1b\n\trule_name\x18\x02\x20\x01(\tR\x08ruleName\x12,\n\x08audience\
     \x18\x03\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"M\n\x0fRegister\
     Request\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\
-    \x17\n\x07dry_run\x18\x02\x20\x01(\x08R\x06dryRun\"\x93\x03\n\x10Registe\
-    rResponse\x12'\n\x04type\x18\x01\x20\x01(\x0e2\x13.protos.CommandTypeR\
+    \x17\n\x07dry_run\x18\x02\x20\x01(\x08R\x06dryRun\"\x92\x03\n\x0fCommand\
+    Response\x12'\n\x04type\x18\x01\x20\x01(\x0e2\x13.protos.CommandTypeR\
     \x04type\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\
     \x08audience\x12?\n\x0cset_pipeline\x18d\x20\x01(\x0b2\x1a.protos.SetPip\
     elineCommandH\0R\x0bsetPipeline\x12H\n\x0fdelete_pipeline\x18e\x20\x01(\
@@ -1428,139 +1428,140 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     LINE\x10\x03\x12&\n\"SNITCH_COMMAND_TYPE_PAUSE_PIPELINE\x10\x04\x12(\n$S\
     NITCH_COMMAND_TYPE_UNPAUSE_PIPELINE\x10\x05*c\n\rOperationType\x12\x18\n\
     \x14OPERATION_TYPE_UNSET\x10\0\x12\x1b\n\x17OPERATION_TYPE_CONSUMER\x10\
-    \x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\x022\x84\x02\n\x08Internal\
-    \x12?\n\x08Register\x12\x17.protos.RegisterRequest\x1a\x18.protos.Regist\
-    erResponse0\x01\x12?\n\tHeartbeat\x12\x18.protos.HeartbeatRequest\x1a\
-    \x18.protos.StandardResponse\x129\n\x06Notify\x12\x15.protos.NotifyReque\
-    st\x1a\x18.protos.StandardResponse\x12;\n\x07Metrics\x12\x16.protos.Metr\
-    icsRequest\x1a\x18.protos.StandardResponseB4Z2github.com/streamdal/snitc\
-    h-protos/build/go/protosJ\x9d\x1b\n\x06\x12\x04\0\0g\x01\n\x08\n\x01\x0c\
+    \x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\x022\x83\x02\n\x08Internal\
+    \x12>\n\x08Register\x12\x17.protos.RegisterRequest\x1a\x17.protos.Comman\
+    dResponse0\x01\x12?\n\tHeartbeat\x12\x18.protos.HeartbeatRequest\x1a\x18\
+    .protos.StandardResponse\x129\n\x06Notify\x12\x15.protos.NotifyRequest\
+    \x1a\x18.protos.StandardResponse\x12;\n\x07Metrics\x12\x16.protos.Metric\
+    sRequest\x1a\x18.protos.StandardResponseB4Z2github.com/streamdal/snitch-\
+    protos/build/go/protosJ\xdd\x1b\n\x06\x12\x04\0\0h\x01\n\x08\n\x01\x0c\
     \x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\
     \x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\x12\
     \x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\n\n\n\x02\x06\0\x12\x04\t\0\
-    \x1a\x01\n\n\n\x03\x06\0\x01\x12\x03\t\x08\x10\n\xfc\x01\n\x04\x06\0\x02\
-    \0\x12\x03\x0e\x02B\x1a\xee\x01\x20Initial\x20method\x20that\x20an\x20SD\
+    \x1b\x01\n\n\n\x03\x06\0\x01\x12\x03\t\x08\x10\n\xbc\x02\n\x04\x06\0\x02\
+    \0\x12\x03\x0f\x02A\x1a\xae\x02\x20Initial\x20method\x20that\x20an\x20SD\
     K\x20should\x20call\x20to\x20register\x20itself\x20with\x20the\x20server\
     .\n\x20The\x20server\x20will\x20use\x20this\x20stream\x20to\x20send\x20c\
-    ommands\x20to\x20the\x20SDK\x20via\x20the\n\x20`RegisterResponse`\x20mes\
-    sage.\x20SDKs\x20should\x20continuously\x20listen\x20for\n\x20RegisterRe\
-    sponse\x20messages.\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\x0e\x06\x0e\n\
-    \x0c\n\x05\x06\0\x02\0\x02\x12\x03\x0e\x0f\x1e\n\x0c\n\x05\x06\0\x02\0\
-    \x06\x12\x03\x0e)/\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x0e0@\n\x84\x01\n\
-    \x04\x06\0\x02\x01\x12\x03\x12\x02=\x1aw\x20SDK\x20is\x20responsible\x20\
-    for\x20sending\x20heartbeats\x20to\x20the\x20server\x20to\x20let\x20the\
-    \x20server\n\x20know\x20about\x20active\x20consumers\x20and\x20producers\
-    .\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x12\x06\x0f\n\x0c\n\x05\x06\0\
-    \x02\x01\x02\x12\x03\x12\x10\x20\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\
-    \x12+;\n\x86\x01\n\x04\x06\0\x02\x02\x12\x03\x16\x027\x1ay\x20Use\x20thi\
-    s\x20method\x20when\x20Notify\x20condition\x20has\x20been\x20triggered;\
-    \x20the\x20server\x20will\n\x20decide\x20on\x20what\x20to\x20do\x20about\
-    \x20the\x20notification.\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x16\x06\
-    \x0c\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x16\r\x1a\n\x0c\n\x05\x06\0\
-    \x02\x02\x03\x12\x03\x16%5\n2\n\x04\x06\0\x02\x03\x12\x03\x19\x029\x1a%\
-    \x20Send\x20periodic\x20metrics\x20to\x20the\x20server\n\n\x0c\n\x05\x06\
-    \0\x02\x03\x01\x12\x03\x19\x06\r\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\
-    \x19\x0e\x1c\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\x19'7\n\x8a\x01\n\x02\
-    \x04\0\x12\x04\x1e\0!\x01\x1a~\x20Each\x20consumer\x20and\x20producer\
-    \x20should\x20send\x20periodic\x20heartbeats\x20to\x20the\x20server\n\
-    \x20to\x20let\x20the\x20server\x20know\x20that\x20they\x20are\x20still\
-    \x20active.\n\n\n\n\x03\x04\0\x01\x12\x03\x1e\x08\x18\n\x0b\n\x04\x04\0\
-    \x02\0\x12\x03\x1f\x02\x18\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x1f\x02\n\
-    \n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1f\x0b\x13\n\x0c\n\x05\x04\0\x02\0\
-    \x03\x12\x03\x1f\x16\x17\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x20\x02-\n\
-    \x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x20\x02\x07\n\x0c\n\x05\x04\0\x02\
-    \x01\x01\x12\x03\x20\x08(\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x20+,\n\
-    \n\n\x02\x04\x01\x12\x04#\0(\x01\n\n\n\x03\x04\x01\x01\x12\x03#\x08\x15\
-    \n\x0b\n\x04\x04\x01\x02\0\x12\x03$\x02\x15\n\x0c\n\x05\x04\x01\x02\0\
-    \x05\x12\x03$\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03$\t\x10\n\x0c\
-    \n\x05\x04\x01\x02\0\x03\x12\x03$\x13\x14\n\x0b\n\x04\x04\x01\x02\x01\
-    \x12\x03%\x02\x17\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03%\x02\x08\n\x0c\
-    \n\x05\x04\x01\x02\x01\x01\x12\x03%\t\x12\n\x0c\n\x05\x04\x01\x02\x01\
-    \x03\x12\x03%\x15\x16\n\x0b\n\x04\x04\x01\x02\x02\x12\x03&\x02\x18\n\x0c\
-    \n\x05\x04\x01\x02\x02\x06\x12\x03&\x02\n\n\x0c\n\x05\x04\x01\x02\x02\
-    \x01\x12\x03&\x0b\x13\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03&\x16\x17\n\
-    \x0b\n\x04\x04\x01\x02\x03\x12\x03'\x02$\n\x0c\n\x05\x04\x01\x02\x03\x05\
-    \x12\x03'\x02\x07\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03'\x08\x1f\n\x0c\
-    \n\x05\x04\x01\x02\x03\x03\x12\x03'\"#\n\n\n\x02\x04\x02\x12\x04*\0.\x01\
-    \n\n\n\x03\x04\x02\x01\x12\x03*\x08\x16\n\x0b\n\x04\x04\x02\x02\0\x12\
-    \x03+\x02\x15\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03+\x02\x08\n\x0c\n\x05\
-    \x04\x02\x02\0\x01\x12\x03+\t\x10\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03+\
-    \x13\x14\n\x0b\n\x04\x04\x02\x02\x01\x12\x03,\x02\x17\n\x0c\n\x05\x04\
-    \x02\x02\x01\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\
-    \x03,\t\x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03,\x15\x16\n\x0b\n\x04\
-    \x04\x02\x02\x02\x12\x03-\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\
-    \x03-\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03-\x0b\x13\n\x0c\n\x05\
-    \x04\x02\x02\x02\x03\x12\x03-\x16\x17\n\n\n\x02\x04\x03\x12\x040\07\x01\
-    \n\n\n\x03\x04\x03\x01\x12\x030\x08\x17\n\x0b\n\x04\x04\x03\x02\0\x12\
-    \x031\x02\x1a\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x031\x02\x08\n\x0c\n\x05\
-    \x04\x03\x02\0\x01\x12\x031\t\x15\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x031\
-    \x18\x19\n\xcd\x01\n\x04\x04\x03\x02\x01\x12\x036\x02\x13\x1a\xbf\x01\
-    \x20If\x20set,\x20we\x20know\x20that\x20any\x20pipelines\x20or\x20steps\
-    \x20executed\x20in\x20this\x20SDK\x20will\x20NOT\n\x20modify\x20the\x20i\
-    nput/output\x20data.\x20As\x20in,\x20the\x20SDK\x20will\x20log\x20what\
-    \x20it\x20_would_\x20do\n\x20and\x20always\x20return\x20the\x20original\
-    \x20data\x20set.\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x036\x02\x06\n\
-    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x036\x07\x0e\n\x0c\n\x05\x04\x03\x02\
-    \x01\x03\x12\x036\x11\x12\n\x9e\x01\n\x02\x04\x04\x12\x04;\0H\x01\x1a\
-    \x91\x01\x20The\x20primary\x20method\x20to\x20send\x20commands\x20to\x20\
-    the\x20SDK;\x20server\x20will\x20send\x20zero\x20or\x20more\n\x20Registe\
-    rResponse's\x20with\x20SetPipelineRequest\x20on\x20SDK\x20instantiation.\
-    \n\n\n\n\x03\x04\x04\x01\x12\x03;\x08\x18\n=\n\x04\x04\x04\x02\0\x12\x03\
-    =\x02\x17\x1a0\x20Use\x20this\x20to\x20determine\x20what\x20to\x20expect\
-    \x20in\x20one_of\n\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03=\x02\r\n\x0c\n\
-    \x05\x04\x04\x02\0\x01\x12\x03=\x0e\x12\n\x0c\n\x05\x04\x04\x02\0\x03\
-    \x12\x03=\x15\x16\n0\n\x04\x04\x04\x02\x01\x12\x03@\x02\x18\x1a#\x20Who\
-    \x20is\x20this\x20command\x20intended\x20for?\n\n\x0c\n\x05\x04\x04\x02\
-    \x01\x06\x12\x03@\x02\n\n\x0c\n\x05\x04\x04\x02\x01\x01\x12\x03@\x0b\x13\
-    \n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x03@\x16\x17\n\x0c\n\x04\x04\x04\
-    \x08\0\x12\x04B\x02G\x03\n\x0c\n\x05\x04\x04\x08\0\x01\x12\x03B\x08\x0f\
-    \n\x0b\n\x04\x04\x04\x02\x02\x12\x03C\x041\n\x0c\n\x05\x04\x04\x02\x02\
-    \x06\x12\x03C\x04\x1d\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\x03C\x1e*\n\
-    \x0c\n\x05\x04\x04\x02\x02\x03\x12\x03C-0\n(\n\x04\x04\x04\x02\x03\x12\
-    \x03D\x047\"\x1b\x20Hmm,\x20should\x20this\x20be\x20here?\n\n\x0c\n\x05\
-    \x04\x04\x02\x03\x06\x12\x03D\x04\x20\n\x0c\n\x05\x04\x04\x02\x03\x01\
-    \x12\x03D!0\n\x0c\n\x05\x04\x04\x02\x03\x03\x12\x03D36\n\x0b\n\x04\x04\
-    \x04\x02\x04\x12\x03E\x045\n\x0c\n\x05\x04\x04\x02\x04\x06\x12\x03E\x04\
-    \x1f\n\x0c\n\x05\x04\x04\x02\x04\x01\x12\x03E\x20.\n\x0c\n\x05\x04\x04\
-    \x02\x04\x03\x12\x03E14\n\x0b\n\x04\x04\x04\x02\x05\x12\x03F\x049\n\x0c\
-    \n\x05\x04\x04\x02\x05\x06\x12\x03F\x04!\n\x0c\n\x05\x04\x04\x02\x05\x01\
-    \x12\x03F\"2\n\x0c\n\x05\x04\x04\x02\x05\x03\x12\x03F58\n;\n\x02\x05\0\
-    \x12\x04K\0U\x01\x1a/\x20Types\x20of\x20commands\x20that\x20can\x20be\
-    \x20sent\x20to\x20the\x20SDK\n\n\n\n\x03\x05\0\x01\x12\x03K\x05\x10\n\
-    \x0b\n\x04\x05\0\x02\0\x12\x03L\x02\x20\n\x0c\n\x05\x05\0\x02\0\x01\x12\
-    \x03L\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03L\x1e\x1f\n\x82\x01\n\
-    \x04\x05\0\x02\x01\x12\x03M\x02$\"u\x20Use\x20this\x20to\x20keep\x20conn\
-    ection\x20alive;\x20SDK\x20doesn't\x20need\x20to\x20do\x20anything\x20wi\
-    th\x20this\x20-\x20it's\x20there\x20just\x20to\x20keep\x20things\x20aliv\
-    e\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03M\x02\x1f\n\x0c\n\x05\x05\0\x02\
-    \x01\x02\x12\x03M\"#\n\x0b\n\x04\x05\0\x02\x02\x12\x03N\x02'\n\x0c\n\x05\
-    \x05\0\x02\x02\x01\x12\x03N\x02\"\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03N\
-    %&\n\x0b\n\x04\x05\0\x02\x03\x12\x03O\x02*\n\x0c\n\x05\x05\0\x02\x03\x01\
-    \x12\x03O\x02%\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03O()\n\x0b\n\x04\x05\
-    \0\x02\x04\x12\x03P\x02)\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03P\x02$\n\
-    \x0c\n\x05\x05\0\x02\x04\x02\x12\x03P'(\n\x0b\n\x04\x05\0\x02\x05\x12\
-    \x03Q\x02+\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03Q\x02&\n\x0c\n\x05\x05\0\
-    \x02\x05\x02\x12\x03Q)*\n\n\n\x02\x05\x01\x12\x04W\0[\x01\n\n\n\x03\x05\
-    \x01\x01\x12\x03W\x05\x12\n\x0b\n\x04\x05\x01\x02\0\x12\x03X\x02\x1b\n\
-    \x0c\n\x05\x05\x01\x02\0\x01\x12\x03X\x02\x16\n\x0c\n\x05\x05\x01\x02\0\
-    \x02\x12\x03X\x19\x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\x03Y\x02\x1e\n\x0c\
-    \n\x05\x05\x01\x02\x01\x01\x12\x03Y\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\
-    \x02\x12\x03Y\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03Z\x02\x1e\n\x0c\
-    \n\x05\x05\x01\x02\x02\x01\x12\x03Z\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\
-    \x02\x12\x03Z\x1c\x1d\nD\n\x02\x04\x05\x12\x04^\0g\x01\x1a8\x20Used\x20t\
-    o\x20indicate\x20who\x20a\x20request/command\x20is\x20intended\x20for\n\
-    \n\n\n\x03\x04\x05\x01\x12\x03^\x08\x10\n\"\n\x04\x04\x05\x02\0\x12\x03`\
-    \x02\x1a\x1a\x15\x20Name\x20of\x20the\x20service\n\n\x0c\n\x05\x04\x05\
-    \x02\0\x05\x12\x03`\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03`\t\x15\
-    \n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03`\x18\x19\nX\n\x04\x04\x05\x02\x01\
-    \x12\x03c\x02\x1c\x1aK\x20Name\x20of\x20the\x20component\x20the\x20SDK\
-    \x20is\x20interacting\x20with\x20(ie.\x20kafka-$topic-name)\n\n\x0c\n\
-    \x05\x04\x05\x02\x01\x05\x12\x03c\x02\x08\n\x0c\n\x05\x04\x05\x02\x01\
-    \x01\x12\x03c\t\x17\n\x0c\n\x05\x04\x05\x02\x01\x03\x12\x03c\x1a\x1b\n#\
-    \n\x04\x04\x05\x02\x02\x12\x03f\x02#\x1a\x16\x20Consumer\x20or\x20Produc\
-    er\n\n\x0c\n\x05\x04\x05\x02\x02\x06\x12\x03f\x02\x0f\n\x0c\n\x05\x04\
-    \x05\x02\x02\x01\x12\x03f\x10\x1e\n\x0c\n\x05\x04\x05\x02\x02\x03\x12\
-    \x03f!\"b\x06proto3\
+    ommands\x20to\x20the\x20SDK\x20via\x20the\n\x20`CommandResponse`\x20mess\
+    age.\x20Clients\x20should\x20continuously\x20listen\x20for\n\x20CommandR\
+    esponse\x20messages\x20and\x20re-establish\x20registration\x20if\x20the\
+    \x20stream\x20gets\n\x20disconnected.\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\
+    \x03\x0f\x06\x0e\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x0f\x0f\x1e\n\x0c\n\
+    \x05\x06\0\x02\0\x06\x12\x03\x0f)/\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\
+    \x0f0?\n\x84\x01\n\x04\x06\0\x02\x01\x12\x03\x13\x02=\x1aw\x20SDK\x20is\
+    \x20responsible\x20for\x20sending\x20heartbeats\x20to\x20the\x20server\
+    \x20to\x20let\x20the\x20server\n\x20know\x20about\x20active\x20consumers\
+    \x20and\x20producers.\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x13\x06\
+    \x0f\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x13\x10\x20\n\x0c\n\x05\x06\0\
+    \x02\x01\x03\x12\x03\x13+;\n\x86\x01\n\x04\x06\0\x02\x02\x12\x03\x17\x02\
+    7\x1ay\x20Use\x20this\x20method\x20when\x20Notify\x20condition\x20has\
+    \x20been\x20triggered;\x20the\x20server\x20will\n\x20decide\x20on\x20wha\
+    t\x20to\x20do\x20about\x20the\x20notification.\n\n\x0c\n\x05\x06\0\x02\
+    \x02\x01\x12\x03\x17\x06\x0c\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x17\r\
+    \x1a\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x17%5\n2\n\x04\x06\0\x02\x03\
+    \x12\x03\x1a\x029\x1a%\x20Send\x20periodic\x20metrics\x20to\x20the\x20se\
+    rver\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x1a\x06\r\n\x0c\n\x05\x06\0\
+    \x02\x03\x02\x12\x03\x1a\x0e\x1c\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\
+    \x1a'7\n\x8a\x01\n\x02\x04\0\x12\x04\x1f\0\"\x01\x1a~\x20Each\x20consume\
+    r\x20and\x20producer\x20should\x20send\x20periodic\x20heartbeats\x20to\
+    \x20the\x20server\n\x20to\x20let\x20the\x20server\x20know\x20that\x20the\
+    y\x20are\x20still\x20active.\n\n\n\n\x03\x04\0\x01\x12\x03\x1f\x08\x18\n\
+    \x0b\n\x04\x04\0\x02\0\x12\x03\x20\x02\x18\n\x0c\n\x05\x04\0\x02\0\x06\
+    \x12\x03\x20\x02\n\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x20\x0b\x13\n\x0c\
+    \n\x05\x04\0\x02\0\x03\x12\x03\x20\x16\x17\n\x0b\n\x04\x04\0\x02\x01\x12\
+    \x03!\x02-\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03!\x02\x07\n\x0c\n\x05\
+    \x04\0\x02\x01\x01\x12\x03!\x08(\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03!+\
+    ,\n\n\n\x02\x04\x01\x12\x04$\0)\x01\n\n\n\x03\x04\x01\x01\x12\x03$\x08\
+    \x15\n\x0b\n\x04\x04\x01\x02\0\x12\x03%\x02\x15\n\x0c\n\x05\x04\x01\x02\
+    \0\x05\x12\x03%\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03%\t\x10\n\
+    \x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x13\x14\n\x0b\n\x04\x04\x01\x02\
+    \x01\x12\x03&\x02\x17\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03&\x02\x08\n\
+    \x0c\n\x05\x04\x01\x02\x01\x01\x12\x03&\t\x12\n\x0c\n\x05\x04\x01\x02\
+    \x01\x03\x12\x03&\x15\x16\n\x0b\n\x04\x04\x01\x02\x02\x12\x03'\x02\x18\n\
+    \x0c\n\x05\x04\x01\x02\x02\x06\x12\x03'\x02\n\n\x0c\n\x05\x04\x01\x02\
+    \x02\x01\x12\x03'\x0b\x13\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03'\x16\
+    \x17\n\x0b\n\x04\x04\x01\x02\x03\x12\x03(\x02$\n\x0c\n\x05\x04\x01\x02\
+    \x03\x05\x12\x03(\x02\x07\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03(\x08\
+    \x1f\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\x03(\"#\n\n\n\x02\x04\x02\x12\
+    \x04+\0/\x01\n\n\n\x03\x04\x02\x01\x12\x03+\x08\x16\n\x0b\n\x04\x04\x02\
+    \x02\0\x12\x03,\x02\x15\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03,\x02\x08\n\
+    \x0c\n\x05\x04\x02\x02\0\x01\x12\x03,\t\x10\n\x0c\n\x05\x04\x02\x02\0\
+    \x03\x12\x03,\x13\x14\n\x0b\n\x04\x04\x02\x02\x01\x12\x03-\x02\x17\n\x0c\
+    \n\x05\x04\x02\x02\x01\x05\x12\x03-\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\
+    \x01\x12\x03-\t\x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03-\x15\x16\n\
+    \x0b\n\x04\x04\x02\x02\x02\x12\x03.\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\
+    \x06\x12\x03.\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03.\x0b\x13\n\
+    \x0c\n\x05\x04\x02\x02\x02\x03\x12\x03.\x16\x17\n\n\n\x02\x04\x03\x12\
+    \x041\08\x01\n\n\n\x03\x04\x03\x01\x12\x031\x08\x17\n\x0b\n\x04\x04\x03\
+    \x02\0\x12\x032\x02\x1a\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x032\x02\x08\n\
+    \x0c\n\x05\x04\x03\x02\0\x01\x12\x032\t\x15\n\x0c\n\x05\x04\x03\x02\0\
+    \x03\x12\x032\x18\x19\n\xcd\x01\n\x04\x04\x03\x02\x01\x12\x037\x02\x13\
+    \x1a\xbf\x01\x20If\x20set,\x20we\x20know\x20that\x20any\x20pipelines\x20\
+    or\x20steps\x20executed\x20in\x20this\x20SDK\x20will\x20NOT\n\x20modify\
+    \x20the\x20input/output\x20data.\x20As\x20in,\x20the\x20SDK\x20will\x20l\
+    og\x20what\x20it\x20_would_\x20do\n\x20and\x20always\x20return\x20the\
+    \x20original\x20data\x20set.\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x037\
+    \x02\x06\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x037\x07\x0e\n\x0c\n\x05\
+    \x04\x03\x02\x01\x03\x12\x037\x11\x12\n\x9e\x01\n\x02\x04\x04\x12\x04<\0\
+    I\x01\x1a\x91\x01\x20The\x20primary\x20method\x20to\x20send\x20commands\
+    \x20to\x20the\x20SDK;\x20server\x20will\x20send\x20zero\x20or\x20more\n\
+    \x20RegisterResponse's\x20with\x20SetPipelineRequest\x20on\x20SDK\x20ins\
+    tantiation.\n\n\n\n\x03\x04\x04\x01\x12\x03<\x08\x17\n=\n\x04\x04\x04\
+    \x02\0\x12\x03>\x02\x17\x1a0\x20Use\x20this\x20to\x20determine\x20what\
+    \x20to\x20expect\x20in\x20one_of\n\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03\
+    >\x02\r\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03>\x0e\x12\n\x0c\n\x05\x04\
+    \x04\x02\0\x03\x12\x03>\x15\x16\n0\n\x04\x04\x04\x02\x01\x12\x03A\x02\
+    \x18\x1a#\x20Who\x20is\x20this\x20command\x20intended\x20for?\n\n\x0c\n\
+    \x05\x04\x04\x02\x01\x06\x12\x03A\x02\n\n\x0c\n\x05\x04\x04\x02\x01\x01\
+    \x12\x03A\x0b\x13\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x03A\x16\x17\n\x0c\
+    \n\x04\x04\x04\x08\0\x12\x04C\x02H\x03\n\x0c\n\x05\x04\x04\x08\0\x01\x12\
+    \x03C\x08\x0f\n\x0b\n\x04\x04\x04\x02\x02\x12\x03D\x041\n\x0c\n\x05\x04\
+    \x04\x02\x02\x06\x12\x03D\x04\x1d\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\
+    \x03D\x1e*\n\x0c\n\x05\x04\x04\x02\x02\x03\x12\x03D-0\n(\n\x04\x04\x04\
+    \x02\x03\x12\x03E\x047\"\x1b\x20Hmm,\x20should\x20this\x20be\x20here?\n\
+    \n\x0c\n\x05\x04\x04\x02\x03\x06\x12\x03E\x04\x20\n\x0c\n\x05\x04\x04\
+    \x02\x03\x01\x12\x03E!0\n\x0c\n\x05\x04\x04\x02\x03\x03\x12\x03E36\n\x0b\
+    \n\x04\x04\x04\x02\x04\x12\x03F\x045\n\x0c\n\x05\x04\x04\x02\x04\x06\x12\
+    \x03F\x04\x1f\n\x0c\n\x05\x04\x04\x02\x04\x01\x12\x03F\x20.\n\x0c\n\x05\
+    \x04\x04\x02\x04\x03\x12\x03F14\n\x0b\n\x04\x04\x04\x02\x05\x12\x03G\x04\
+    9\n\x0c\n\x05\x04\x04\x02\x05\x06\x12\x03G\x04!\n\x0c\n\x05\x04\x04\x02\
+    \x05\x01\x12\x03G\"2\n\x0c\n\x05\x04\x04\x02\x05\x03\x12\x03G58\n;\n\x02\
+    \x05\0\x12\x04L\0V\x01\x1a/\x20Types\x20of\x20commands\x20that\x20can\
+    \x20be\x20sent\x20to\x20the\x20SDK\n\n\n\n\x03\x05\0\x01\x12\x03L\x05\
+    \x10\n\x0b\n\x04\x05\0\x02\0\x12\x03M\x02\x20\n\x0c\n\x05\x05\0\x02\0\
+    \x01\x12\x03M\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03M\x1e\x1f\n\x82\
+    \x01\n\x04\x05\0\x02\x01\x12\x03N\x02$\"u\x20Use\x20this\x20to\x20keep\
+    \x20connection\x20alive;\x20SDK\x20doesn't\x20need\x20to\x20do\x20anythi\
+    ng\x20with\x20this\x20-\x20it's\x20there\x20just\x20to\x20keep\x20things\
+    \x20alive\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03N\x02\x1f\n\x0c\n\x05\
+    \x05\0\x02\x01\x02\x12\x03N\"#\n\x0b\n\x04\x05\0\x02\x02\x12\x03O\x02'\n\
+    \x0c\n\x05\x05\0\x02\x02\x01\x12\x03O\x02\"\n\x0c\n\x05\x05\0\x02\x02\
+    \x02\x12\x03O%&\n\x0b\n\x04\x05\0\x02\x03\x12\x03P\x02*\n\x0c\n\x05\x05\
+    \0\x02\x03\x01\x12\x03P\x02%\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03P()\n\
+    \x0b\n\x04\x05\0\x02\x04\x12\x03Q\x02)\n\x0c\n\x05\x05\0\x02\x04\x01\x12\
+    \x03Q\x02$\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03Q'(\n\x0b\n\x04\x05\0\
+    \x02\x05\x12\x03R\x02+\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03R\x02&\n\x0c\
+    \n\x05\x05\0\x02\x05\x02\x12\x03R)*\n\n\n\x02\x05\x01\x12\x04X\0\\\x01\n\
+    \n\n\x03\x05\x01\x01\x12\x03X\x05\x12\n\x0b\n\x04\x05\x01\x02\0\x12\x03Y\
+    \x02\x1b\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03Y\x02\x16\n\x0c\n\x05\x05\
+    \x01\x02\0\x02\x12\x03Y\x19\x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\x03Z\x02\
+    \x1e\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03Z\x02\x19\n\x0c\n\x05\x05\
+    \x01\x02\x01\x02\x12\x03Z\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03[\
+    \x02\x1e\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03[\x02\x19\n\x0c\n\x05\
+    \x05\x01\x02\x02\x02\x12\x03[\x1c\x1d\nD\n\x02\x04\x05\x12\x04_\0h\x01\
+    \x1a8\x20Used\x20to\x20indicate\x20who\x20a\x20request/command\x20is\x20\
+    intended\x20for\n\n\n\n\x03\x04\x05\x01\x12\x03_\x08\x10\n\"\n\x04\x04\
+    \x05\x02\0\x12\x03a\x02\x1a\x1a\x15\x20Name\x20of\x20the\x20service\n\n\
+    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03a\x02\x08\n\x0c\n\x05\x04\x05\x02\0\
+    \x01\x12\x03a\t\x15\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03a\x18\x19\nX\n\
+    \x04\x04\x05\x02\x01\x12\x03d\x02\x1c\x1aK\x20Name\x20of\x20the\x20compo\
+    nent\x20the\x20SDK\x20is\x20interacting\x20with\x20(ie.\x20kafka-$topic-\
+    name)\n\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03d\x02\x08\n\x0c\n\x05\x04\
+    \x05\x02\x01\x01\x12\x03d\t\x17\n\x0c\n\x05\x04\x05\x02\x01\x03\x12\x03d\
+    \x1a\x1b\n#\n\x04\x04\x05\x02\x02\x12\x03g\x02#\x1a\x16\x20Consumer\x20o\
+    r\x20Producer\n\n\x0c\n\x05\x04\x05\x02\x02\x06\x12\x03g\x02\x0f\n\x0c\n\
+    \x05\x04\x05\x02\x02\x01\x12\x03g\x10\x1e\n\x0c\n\x05\x04\x05\x02\x02\
+    \x03\x12\x03g!\"b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1585,7 +1586,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(NotifyRequest::generated_message_descriptor_data());
             messages.push(MetricsRequest::generated_message_descriptor_data());
             messages.push(RegisterRequest::generated_message_descriptor_data());
-            messages.push(RegisterResponse::generated_message_descriptor_data());
+            messages.push(CommandResponse::generated_message_descriptor_data());
             messages.push(Audience::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(CommandType::generated_enum_descriptor_data());

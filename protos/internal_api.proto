@@ -10,9 +10,10 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 service Internal {
   // Initial method that an SDK should call to register itself with the server.
   // The server will use this stream to send commands to the SDK via the
-  // `RegisterResponse` message. SDKs should continuously listen for
-  // RegisterResponse messages.
-  rpc Register(RegisterRequest) returns (stream RegisterResponse);
+  // `CommandResponse` message. Clients should continuously listen for
+  // CommandResponse messages and re-establish registration if the stream gets
+  // disconnected.
+  rpc Register(RegisterRequest) returns (stream CommandResponse);
 
   // SDK is responsible for sending heartbeats to the server to let the server
   // know about active consumers and producers.
@@ -57,7 +58,7 @@ message RegisterRequest {
 
 // The primary method to send commands to the SDK; server will send zero or more
 // RegisterResponse's with SetPipelineRequest on SDK instantiation.
-message RegisterResponse {
+message CommandResponse {
   // Use this to determine what to expect in one_of
   CommandType type = 1;
 

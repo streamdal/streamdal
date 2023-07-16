@@ -7,7 +7,7 @@ import type { DeletePipelineCommand as _protos_DeletePipelineCommand, DeletePipe
 import type { PausePipelineCommand as _protos_PausePipelineCommand, PausePipelineCommand__Output as _protos_PausePipelineCommand__Output } from '../protos/PausePipelineCommand';
 import type { UnpausePipelineCommand as _protos_UnpausePipelineCommand, UnpausePipelineCommand__Output as _protos_UnpausePipelineCommand__Output } from '../protos/UnpausePipelineCommand';
 
-export interface RegisterResponse {
+export interface CommandResponse {
   'type'?: (_protos_CommandType);
   'audience'?: (_protos_Audience | null);
   'setPipeline'?: (_protos_SetPipelineCommand | null);
@@ -17,7 +17,7 @@ export interface RegisterResponse {
   'command'?: "setPipeline"|"deletePipeline"|"pausePipeline"|"unpausePipeline";
 }
 
-export interface RegisterResponse__Output {
+export interface CommandResponse__Output {
   'type': (_protos_CommandType__Output);
   'audience': (_protos_Audience__Output | null);
   'setPipeline'?: (_protos_SetPipelineCommand__Output | null);

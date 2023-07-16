@@ -24,8 +24,9 @@ const _ = grpc.SupportPackageIsVersion7
 type InternalClient interface {
 	// Initial method that an SDK should call to register itself with the server.
 	// The server will use this stream to send commands to the SDK via the
-	// `RegisterResponse` message. SDKs should continuously listen for
-	// RegisterResponse messages.
+	// `CommandResponse` message. Clients should continuously listen for
+	// CommandResponse messages and re-establish registration if the stream gets
+	// disconnected.
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (Internal_RegisterClient, error)
 	// SDK is responsible for sending heartbeats to the server to let the server
 	// know about active consumers and producers.
@@ -61,7 +62,7 @@ func (c *internalClient) Register(ctx context.Context, in *RegisterRequest, opts
 }
 
 type Internal_RegisterClient interface {
-	Recv() (*RegisterResponse, error)
+	Recv() (*CommandResponse, error)
 	grpc.ClientStream
 }
 
@@ -69,8 +70,8 @@ type internalRegisterClient struct {
 	grpc.ClientStream
 }
 
-func (x *internalRegisterClient) Recv() (*RegisterResponse, error) {
-	m := new(RegisterResponse)
+func (x *internalRegisterClient) Recv() (*CommandResponse, error) {
+	m := new(CommandResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -110,8 +111,9 @@ func (c *internalClient) Metrics(ctx context.Context, in *MetricsRequest, opts .
 type InternalServer interface {
 	// Initial method that an SDK should call to register itself with the server.
 	// The server will use this stream to send commands to the SDK via the
-	// `RegisterResponse` message. SDKs should continuously listen for
-	// RegisterResponse messages.
+	// `CommandResponse` message. Clients should continuously listen for
+	// CommandResponse messages and re-establish registration if the stream gets
+	// disconnected.
 	Register(*RegisterRequest, Internal_RegisterServer) error
 	// SDK is responsible for sending heartbeats to the server to let the server
 	// know about active consumers and producers.
@@ -162,7 +164,7 @@ func _Internal_Register_Handler(srv interface{}, stream grpc.ServerStream) error
 }
 
 type Internal_RegisterServer interface {
-	Send(*RegisterResponse) error
+	Send(*CommandResponse) error
 	grpc.ServerStream
 }
 
@@ -170,7 +172,7 @@ type internalRegisterServer struct {
 	grpc.ServerStream
 }
 
-func (x *internalRegisterServer) Send(m *RegisterResponse) error {
+func (x *internalRegisterServer) Send(m *CommandResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 

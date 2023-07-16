@@ -10,6 +10,7 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 export interface ProtoGrpcType {
   protos: {
     Audience: MessageTypeDefinition
+    CommandResponse: MessageTypeDefinition
     CommandType: EnumTypeDefinition
     DeletePipelineCommand: MessageTypeDefinition
     HeartbeatRequest: MessageTypeDefinition
@@ -21,7 +22,6 @@ export interface ProtoGrpcType {
     PipelineStep: MessageTypeDefinition
     PipelineStepCondition: EnumTypeDefinition
     RegisterRequest: MessageTypeDefinition
-    RegisterResponse: MessageTypeDefinition
     ResponseCode: EnumTypeDefinition
     SetPipelineCommand: MessageTypeDefinition
     StandardResponse: MessageTypeDefinition
