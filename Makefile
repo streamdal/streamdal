@@ -71,7 +71,9 @@ generate/ts:
 		npm install; \
 		npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs \
 			--grpcLib=@grpc/grpc-js --outDir=./grpc ../../protos/*.proto; \
-		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/**/*.proto
+		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/**/*.proto; \
+		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/*.proto
+
 
 	@echo Successfully compiled protos and generated types for Typescript
 
