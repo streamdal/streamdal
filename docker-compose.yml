@@ -2,11 +2,11 @@
 version: "3"
 services:
   natsjs:
-    image: nats:2.9.20-alpine3.18
+    image: store:2.9.20-alpine3.18
     ports:
       - "4222:4222" # NATS Port
       - "6222:6222"
       - "8222:8222" # HTTP Monitor
     volumes:
       - ${PWD}/backend-data/jetstream:/data/jetstream
-      - ${PWD}/assets/nats-server.conf:/etc/nats/nats-server.conf
+      - ${PWD}/assets/store-server.conf:/etc/store/store-server.conf

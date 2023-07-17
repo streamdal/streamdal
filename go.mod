@@ -15,11 +15,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/streamdal/natty v0.0.35
-	github.com/streamdal/snitch-protos v0.0.24
+	github.com/streamdal/snitch-protos v0.0.26
 	golang.org/x/crypto v0.11.0
 	google.golang.org/grpc v1.56.2
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
 )
+
+require github.com/gofrs/uuid v4.4.0+incompatible
 
 require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.0.0-20211129110424-6491aa3bf583 // indirect
@@ -32,7 +34,6 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/glog v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -51,6 +52,7 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tinylib/msgp v1.1.2 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
+	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/term v0.10.0 // indirect

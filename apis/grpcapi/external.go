@@ -27,47 +27,48 @@ func (s *ExternalServer) GetService(ctx context.Context, req *protos.GetServiceR
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetPipelines(ctx context.Context, request *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
+func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetPipeline(ctx context.Context, request *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
+func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) SetPipeline(ctx context.Context, reqq *protos.SetPipelineRequest) (*protos.SetPipelineResponse, error) {
+func (s *ExternalServer) SetPipeline(ctx context.Context, req *protos.SetPipelineRequest) (*protos.SetPipelineResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) DeletePipeline(ctx context.Context, request *protos.DeletePipelineRequest) (*protos.DeletePipelineResponse, error) {
+func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.DeletePipelineResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetSteps(ctx context.Context, request *protos.GetStepsRequest) (*protos.GetStepsResponse, error) {
+func (s *ExternalServer) GetSteps(ctx context.Context, req *protos.GetStepsRequest) (*protos.GetStepsResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) CreateStep(ctx context.Context, request *protos.CreateStepRequest) (*protos.CreateStepResponse, error) {
+func (s *ExternalServer) CreateStep(ctx context.Context, req *protos.CreateStepRequest) (*protos.CreateStepResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) UpdateStep(ctx context.Context, request *protos.UpdateStepRequest) (*protos.UpdateStepResponse, error) {
+func (s *ExternalServer) UpdateStep(ctx context.Context, req *protos.UpdateStepRequest) (*protos.UpdateStepResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) DeleteStep(ctx context.Context, request *protos.DeleteStepRequest) (*protos.DeleteStepResponse, error) {
+func (s *ExternalServer) DeleteStep(ctx context.Context, req *protos.DeleteStepRequest) (*protos.DeleteStepResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ExternalServer) mustEmbedUnimplementedExternalServer() {
-	//TODO implement me
-	panic("implement me")
-}
+// Don't think this is needed?
+//func (s *ExternalServer) mustEmbedUnimplementedExternalServer() {
+//	//TODO implement me
+//	panic("implement me")
+//}

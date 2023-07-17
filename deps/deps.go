@@ -12,10 +12,12 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/streamdal/natty"
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/messaging"
+	"github.com/streamdal/snitch-server/services/store"
 )
 
 const (
@@ -28,12 +30,15 @@ type Dependencies struct {
 	Version string
 	Config  *config.Config
 
+	CommandChannel chan *protos.CommandResponse
+
 	// Backends
 	CacheBackend cache.ICache
 	NATSBackend  natty.INatty
 
 	// Services
-	MessagingService *messaging.Msg
+	MessagingService messaging.IMsg
+	StoreService     store.IStore
 	Health           health.IHealth
 	ShutdownContext  context.Context
 	ShutdownCancel   context.CancelFunc
@@ -55,6 +60,7 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		Health:          gohealth,
 		ShutdownContext: ctx,
 		ShutdownCancel:  cancel,
+		CommandChannel:  make(chan *protos.CommandResponse),
 	}
 
 	if err := d.setupHealthChecks(); err != nil {
@@ -114,7 +120,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "unable to create new nats backend")
+		return errors.Wrap(err, "unable to create new store backend")
 	}
 
 	d.NATSBackend = n
@@ -129,6 +135,13 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	}
 
 	d.MessagingService = msgService
+
+	storeService, err := store.New(d.ShutdownContext, d.CacheBackend, d.NATSBackend)
+	if err != nil {
+		return errors.Wrap(err, "unable to create new store service")
+	}
+
+	d.StoreService = storeService
 
 	return nil
 }
