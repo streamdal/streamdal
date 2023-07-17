@@ -55,19 +55,21 @@ generate/go:
 generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
 generate/ts: clean/ts
 generate/ts:
-	mkdir -p build/ts/descriptor-sets
+	mkdir -p build/ts/protos
+	mkdir -p build/ts/grpc
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--include_imports \
  		--include_source_info \
- 		--descriptor_set_out=./build/ts/descriptor-sets/protos.fds \
+ 		--descriptor_set_out=./build/ts/protos/protos.fds \
 		protos/*.proto protos/steps/*.proto || (exit 1)
 
 	cd ./build/ts; \
 		npm install; \
 		npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs \
-			--grpcLib=@grpc/grpc-js --outDir=./types ../../protos/*.proto
+			--grpcLib=@grpc/grpc-js --outDir=./grpc ../../protos/*.proto; \
+		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/**/*.proto
 
 	@echo Successfully compiled protos and generated types for Typescript
 
@@ -120,8 +122,8 @@ clean/protoset:
 .PHONY: clean/ts
 clean/ts: description = Remove all TS build artifacts
 clean/ts:
-	rm -rf ./build/ts/descriptor-sets/*
-	rm -rf ./build/ts/types/*
+	rm -rf ./build/ts/protos/*
+	rm -rf ./build/ts/grpc/*
 
 .PHONY: lint
 lint: description = Run protolint

@@ -22,7 +22,8 @@
   "homepage": "https://github.com/streamdal/stitch-protos/build/ts#readme",
   "dependencies": {
     "@grpc/grpc-js": "^1.8.17",
-    "@grpc/proto-loader": "^0.7.7"
+    "@grpc/proto-loader": "^0.7.7",
+    "@protobuf-ts/plugin": "^2.9.0"
   },
   "main": "/ts/types"
 }
