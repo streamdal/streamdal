@@ -29,6 +29,12 @@ func init() {
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.CommandLine.VersionFlag.Short('v')
 	kingpin.Parse()
+
+	if *debug {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
 }
 
 func main() {
@@ -36,10 +42,6 @@ func main() {
 	if os.Getenv("DD_ENV") != "" {
 		tracer.Start(tracer.WithAnalytics(true))
 		defer tracer.Stop()
-	}
-
-	if *debug {
-		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	// JSON formatter for log output if not running in a TTY
@@ -94,5 +96,12 @@ func run(d *deps.Dependencies) error {
 		}
 	}()
 
+	displayInfo(d)
+
 	return <-errChan
+}
+
+func displayInfo(d *deps.Dependencies) {
+	logrus.Infof("Version: %s", d.Version)
+	logrus.Infof("Configuration: %+v", d.Config)
 }

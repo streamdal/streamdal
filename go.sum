@@ -700,6 +700,8 @@ github.com/streamdal/snitch-protos v0.0.25 h1:rFcyUm5LA53Yk16QlfJjHFpt6pfGuw5Kp9
 github.com/streamdal/snitch-protos v0.0.25/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/streamdal/snitch-protos v0.0.26 h1:CdGeEMhuAD43VMtmhO67RGWcune0teHm2CjtZw3Mekg=
 github.com/streamdal/snitch-protos v0.0.26/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.27 h1:CiPwFADvraHHya2CqO4+t3omeGiFxVAnHe5qCkPOcCk=
+github.com/streamdal/snitch-protos v0.0.27/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

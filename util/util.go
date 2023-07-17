@@ -1,7 +1,14 @@
 package util
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/gofrs/uuid"
+)
+
+var (
+	SpaceRegex = regexp.MustCompile(`\s+`)
 )
 
 func GenerateUUID() string {
@@ -11,4 +18,9 @@ func GenerateUUID() string {
 	}
 
 	return v.String()
+}
+
+func NormalizeString(s string) string {
+	s = strings.ToLower(s)
+	return SpaceRegex.ReplaceAllString(s, "-")
 }

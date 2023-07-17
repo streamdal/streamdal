@@ -3,6 +3,7 @@ package messaging
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -13,6 +14,8 @@ import (
 const (
 	StreamName    = "snitch"
 	StreamSubject = "events"
+
+	BroadcastSourceMetadataKey = "broadcast_src"
 )
 
 type IMsg interface {
@@ -23,20 +26,26 @@ type IMsg interface {
 }
 
 type Msg struct {
-	NATS natty.INatty
-	ctx  context.Context
-	log  *logrus.Entry
+	NATS     natty.INatty
+	nodeName string
+	ctx      context.Context
+	log      *logrus.Entry
 }
 
-func New(ctx context.Context, natsBackend natty.INatty) (*Msg, error) {
+func New(ctx context.Context, natsBackend natty.INatty, nodeName string) (*Msg, error) {
+	if nodeName == "" {
+		return nil, errors.New("node name must be provided")
+	}
+
 	if err := prepareNATS(ctx, natsBackend); err != nil {
 		return nil, errors.Wrap(err, "error creating consumer")
 	}
 
 	return &Msg{
-		NATS: natsBackend,
-		ctx:  ctx,
-		log:  logrus.WithField("pkg", "messaging"),
+		NATS:     natsBackend,
+		nodeName: nodeName,
+		ctx:      ctx,
+		log:      logrus.WithField("pkg", "messaging"),
 	}, nil
 }
 
@@ -79,9 +88,20 @@ func (m *Msg) RunConsumer() error {
 	return nil
 }
 
-// TODO: Implement
+// NOTE: We should only broadcast commands! This ensures that we can always
+// unmarshal to check the type of message and route it accordingly in the
+// consumer handler!!!! ~DS 07.16.2023
 func (m *Msg) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	m.log.Debugf("broadcasting registration: %v", req)
+	req.XMetadata[BroadcastSourceMetadataKey] = m.nodeName
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return errors.Wrap(err, "error marshalling request")
+	}
+
+	m.NATS.Publish(ctx, StreamSubject, data)
+
 	return nil
 }
 
@@ -104,5 +124,6 @@ func (m *Msg) BroadcastDeregistration(req *protos.RegisterRequest) error {
 // TODO: Implement
 func (m *Msg) handler(ctx context.Context, msg *nats.Msg) error {
 	m.log.WithField("msg", string(msg.Data)).Info("Received message")
+
 	return nil
 }

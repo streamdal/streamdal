@@ -129,7 +129,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	msgService, err := messaging.New(d.ShutdownContext, d.NATSBackend)
+	msgService, err := messaging.New(d.ShutdownContext, d.NATSBackend, cfg.NodeName)
 	if err != nil {
 		return errors.Wrap(err, "unable to create new messaging service")
 	}
