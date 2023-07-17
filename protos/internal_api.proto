@@ -54,6 +54,9 @@ message RegisterRequest {
   // modify the input/output data. As in, the SDK will log what it _would_ do
   // and always return the original data set.
   bool dry_run = 2;
+
+  // snitch-server uses this under the hood for debug
+  map <string, string> _metadata = 1000;
 }
 
 // The primary method to send commands to the SDK; server will send zero or more
@@ -71,6 +74,8 @@ message CommandResponse {
     protos.PausePipelineCommand pause_pipeline = 102;
     protos.UnpausePipelineCommand unpause_pipeline = 103;
   }
+
+  map <string, string> _metadata = 1000;
 }
 
 // Types of commands that can be sent to the SDK

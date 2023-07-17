@@ -14,6 +14,7 @@ export interface CommandResponse {
   'deletePipeline'?: (_protos_DeletePipelineCommand | null);
   'pausePipeline'?: (_protos_PausePipelineCommand | null);
   'unpausePipeline'?: (_protos_UnpausePipelineCommand | null);
+  '_metadata'?: ({[key: string]: string});
   'command'?: "setPipeline"|"deletePipeline"|"pausePipeline"|"unpausePipeline";
 }
 
@@ -24,5 +25,6 @@ export interface CommandResponse__Output {
   'deletePipeline'?: (_protos_DeletePipelineCommand__Output | null);
   'pausePipeline'?: (_protos_PausePipelineCommand__Output | null);
   'unpausePipeline'?: (_protos_UnpausePipelineCommand__Output | null);
+  '_metadata': ({[key: string]: string});
   'command': "setPipeline"|"deletePipeline"|"pausePipeline"|"unpausePipeline";
 }
