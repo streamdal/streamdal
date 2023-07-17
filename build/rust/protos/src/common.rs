@@ -185,129 +185,6 @@ impl ::protobuf::reflect::ProtobufValue for StandardResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  Common auth message used in all gRPC methods
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.Auth)
-pub struct Auth {
-    // message fields
-    // @@protoc_insertion_point(field:protos.Auth.token)
-    pub token: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.Auth.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a Auth {
-    fn default() -> &'a Auth {
-        <Auth as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl Auth {
-    pub fn new() -> Auth {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "token",
-            |m: &Auth| { &m.token },
-            |m: &mut Auth| { &mut m.token },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Auth>(
-            "Auth",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for Auth {
-    const NAME: &'static str = "Auth";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.token = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.token.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.token);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.token.is_empty() {
-            os.write_string(1, &self.token)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> Auth {
-        Auth::new()
-    }
-
-    fn clear(&mut self) {
-        self.token.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static Auth {
-        static instance: Auth = Auth {
-            token: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for Auth {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("Auth").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for Auth {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for Auth {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
 ///  Common status codes used in gRPC method responses
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.ResponseCode)
@@ -383,16 +260,15 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0ccommon.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\x02i\
     d\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\x14.pro\
     tos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07me\
-    ssage\"\x1c\n\x04Auth\x12\x14\n\x05token\x18\x01\x20\x01(\tR\x05token*\
-    \xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\
-    \x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUES\
-    T\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_C\
-    ODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC_ERR\
-    OR\x10\x05B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\x8e\
-    \x06\n\x06\x12\x04\0\0\x1b\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
-    \x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\
-    \x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Common\
-    \x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\
+    ssage*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\
+    \x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_RE\
+    QUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPON\
+    SE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC\
+    _ERROR\x10\x05B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\
+    \x8f\x05\n\x06\x12\x04\0\0\x16\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
+    \n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\
+    \x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Com\
+    mon\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\
     \x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\x02\x10\
     \x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20response\n\n\
     \x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\
@@ -416,12 +292,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\x0c\n\
     \x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
     \x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\x05\
-    \x05\0\x02\x05\x02\x12\x03\x15\x20!\n:\n\x02\x04\x01\x12\x04\x19\0\x1b\
-    \x01\x1a.\x20Common\x20auth\x20message\x20used\x20in\x20all\x20gRPC\x20m\
-    ethods\n\n\n\n\x03\x04\x01\x01\x12\x03\x19\x08\x0c\n\x0b\n\x04\x04\x01\
-    \x02\0\x12\x03\x1a\x02\x13\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1a\x02\
-    \x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x1a\t\x0e\n\x0c\n\x05\x04\x01\
-    \x02\0\x03\x12\x03\x1a\x11\x12b\x06proto3\
+    \x05\0\x02\x05\x02\x12\x03\x15\x20!b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -439,9 +310,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(2);
+            let mut messages = ::std::vec::Vec::with_capacity(1);
             messages.push(StandardResponse::generated_message_descriptor_data());
-            messages.push(Auth::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(ResponseCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

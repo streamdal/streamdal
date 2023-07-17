@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_internal.proto
+// Original file: ../../protos/internal_api.proto
 
 import type { OperationType as _protos_OperationType, OperationType__Output as _protos_OperationType__Output } from '../protos/OperationType';
 

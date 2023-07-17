@@ -17,7 +17,7 @@ export interface PipelineStep {
   'decode'?: (_protos_steps_DecodeStep | null);
   'custom'?: (_protos_steps_CustomStep | null);
   '_wasmId'?: (string);
-  '_wasmBytes'?: (string);
+  '_wasmBytes'?: (Buffer | Uint8Array | string);
   '_wasmFunction'?: (string);
   'step'?: "detective"|"transform"|"encode"|"decode"|"custom";
 }
@@ -32,7 +32,7 @@ export interface PipelineStep__Output {
   'decode'?: (_protos_steps_DecodeStep__Output | null);
   'custom'?: (_protos_steps_CustomStep__Output | null);
   '_wasmId': (string);
-  '_wasmBytes': (string);
+  '_wasmBytes': (Buffer);
   '_wasmFunction': (string);
   'step': "detective"|"transform"|"encode"|"decode"|"custom";
 }

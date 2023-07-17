@@ -27,26 +27,26 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 ///  SDK generates a WASM request and passes this to the WASM func
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.WasmRequest)
-pub struct WasmRequest {
+// @@protoc_insertion_point(message:protos.WASMRequest)
+pub struct WASMRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.WasmRequest.step)
+    // @@protoc_insertion_point(field:protos.WASMRequest.step)
     pub step: ::protobuf::MessageField<PipelineStep>,
-    // @@protoc_insertion_point(field:protos.WasmRequest.input)
+    // @@protoc_insertion_point(field:protos.WASMRequest.input)
     pub input: ::std::vec::Vec<u8>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.WasmRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.WASMRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a WasmRequest {
-    fn default() -> &'a WasmRequest {
-        <WasmRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a WASMRequest {
+    fn default() -> &'a WASMRequest {
+        <WASMRequest as ::protobuf::Message>::default_instance()
     }
 }
 
-impl WasmRequest {
-    pub fn new() -> WasmRequest {
+impl WASMRequest {
+    pub fn new() -> WASMRequest {
         ::std::default::Default::default()
     }
 
@@ -55,24 +55,24 @@ impl WasmRequest {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, PipelineStep>(
             "step",
-            |m: &WasmRequest| { &m.step },
-            |m: &mut WasmRequest| { &mut m.step },
+            |m: &WASMRequest| { &m.step },
+            |m: &mut WASMRequest| { &mut m.step },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "input",
-            |m: &WasmRequest| { &m.input },
-            |m: &mut WasmRequest| { &mut m.input },
+            |m: &WASMRequest| { &m.input },
+            |m: &mut WASMRequest| { &mut m.input },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WasmRequest>(
-            "WasmRequest",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WASMRequest>(
+            "WASMRequest",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for WasmRequest {
-    const NAME: &'static str = "WasmRequest";
+impl ::protobuf::Message for WASMRequest {
+    const NAME: &'static str = "WASMRequest";
 
     fn is_initialized(&self) -> bool {
         true
@@ -130,8 +130,8 @@ impl ::protobuf::Message for WasmRequest {
         &mut self.special_fields
     }
 
-    fn new() -> WasmRequest {
-        WasmRequest::new()
+    fn new() -> WASMRequest {
+        WASMRequest::new()
     }
 
     fn clear(&mut self) {
@@ -140,8 +140,8 @@ impl ::protobuf::Message for WasmRequest {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static WasmRequest {
-        static instance: WasmRequest = WasmRequest {
+    fn default_instance() -> &'static WASMRequest {
+        static instance: WASMRequest = WASMRequest {
             step: ::protobuf::MessageField::none(),
             input: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
@@ -150,47 +150,47 @@ impl ::protobuf::Message for WasmRequest {
     }
 }
 
-impl ::protobuf::MessageFull for WasmRequest {
+impl ::protobuf::MessageFull for WASMRequest {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("WasmRequest").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("WASMRequest").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for WasmRequest {
+impl ::std::fmt::Display for WASMRequest {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for WasmRequest {
+impl ::protobuf::reflect::ProtobufValue for WASMRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
 ///  Returned by all WASM functions
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.WasmResponse)
-pub struct WasmResponse {
+// @@protoc_insertion_point(message:protos.WASMResponse)
+pub struct WASMResponse {
     // message fields
-    // @@protoc_insertion_point(field:protos.WasmResponse.output)
+    // @@protoc_insertion_point(field:protos.WASMResponse.output)
     pub output: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:protos.WasmResponse.exit_code)
+    // @@protoc_insertion_point(field:protos.WASMResponse.exit_code)
     pub exit_code: ::protobuf::EnumOrUnknown<WASMExitCode>,
-    // @@protoc_insertion_point(field:protos.WasmResponse.exit_msg)
+    // @@protoc_insertion_point(field:protos.WASMResponse.exit_msg)
     pub exit_msg: ::std::string::String,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.WasmResponse.special_fields)
+    // @@protoc_insertion_point(special_field:protos.WASMResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a WasmResponse {
-    fn default() -> &'a WasmResponse {
-        <WasmResponse as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a WASMResponse {
+    fn default() -> &'a WASMResponse {
+        <WASMResponse as ::protobuf::Message>::default_instance()
     }
 }
 
-impl WasmResponse {
-    pub fn new() -> WasmResponse {
+impl WASMResponse {
+    pub fn new() -> WASMResponse {
         ::std::default::Default::default()
     }
 
@@ -199,29 +199,29 @@ impl WasmResponse {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "output",
-            |m: &WasmResponse| { &m.output },
-            |m: &mut WasmResponse| { &mut m.output },
+            |m: &WASMResponse| { &m.output },
+            |m: &mut WASMResponse| { &mut m.output },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "exit_code",
-            |m: &WasmResponse| { &m.exit_code },
-            |m: &mut WasmResponse| { &mut m.exit_code },
+            |m: &WASMResponse| { &m.exit_code },
+            |m: &mut WASMResponse| { &mut m.exit_code },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "exit_msg",
-            |m: &WasmResponse| { &m.exit_msg },
-            |m: &mut WasmResponse| { &mut m.exit_msg },
+            |m: &WASMResponse| { &m.exit_msg },
+            |m: &mut WASMResponse| { &mut m.exit_msg },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WasmResponse>(
-            "WasmResponse",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WASMResponse>(
+            "WASMResponse",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for WasmResponse {
-    const NAME: &'static str = "WasmResponse";
+impl ::protobuf::Message for WASMResponse {
+    const NAME: &'static str = "WASMResponse";
 
     fn is_initialized(&self) -> bool {
         true
@@ -287,8 +287,8 @@ impl ::protobuf::Message for WasmResponse {
         &mut self.special_fields
     }
 
-    fn new() -> WasmResponse {
-        WasmResponse::new()
+    fn new() -> WASMResponse {
+        WASMResponse::new()
     }
 
     fn clear(&mut self) {
@@ -298,8 +298,8 @@ impl ::protobuf::Message for WasmResponse {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static WasmResponse {
-        static instance: WasmResponse = WasmResponse {
+    fn default_instance() -> &'static WASMResponse {
+        static instance: WASMResponse = WASMResponse {
             output: ::std::vec::Vec::new(),
             exit_code: ::protobuf::EnumOrUnknown::from_i32(0),
             exit_msg: ::std::string::String::new(),
@@ -309,20 +309,20 @@ impl ::protobuf::Message for WasmResponse {
     }
 }
 
-impl ::protobuf::MessageFull for WasmResponse {
+impl ::protobuf::MessageFull for WASMResponse {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("WasmResponse").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("WASMResponse").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for WasmResponse {
+impl ::std::fmt::Display for WASMResponse {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for WasmResponse {
+impl ::protobuf::reflect::ProtobufValue for WASMResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -347,7 +347,7 @@ pub struct PipelineStep {
     pub _wasm_id: ::std::string::String,
     ///  WASM module bytes (set by backend)
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_bytes)
-    pub _wasm_bytes: ::std::string::String,
+    pub _wasm_bytes: ::std::vec::Vec<u8>,
     ///  WASM function name to execute (set by backend)
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_function)
     pub _wasm_function: ::std::string::String,
@@ -732,7 +732,7 @@ impl ::protobuf::Message for PipelineStep {
                     self._wasm_id = is.read_string()?;
                 },
                 80010 => {
-                    self._wasm_bytes = is.read_string()?;
+                    self._wasm_bytes = is.read_bytes()?;
                 },
                 80018 => {
                     self._wasm_function = is.read_string()?;
@@ -762,7 +762,7 @@ impl ::protobuf::Message for PipelineStep {
             my_size += ::protobuf::rt::string_size(10000, &self._wasm_id);
         }
         if !self._wasm_bytes.is_empty() {
-            my_size += ::protobuf::rt::string_size(10001, &self._wasm_bytes);
+            my_size += ::protobuf::rt::bytes_size(10001, &self._wasm_bytes);
         }
         if !self._wasm_function.is_empty() {
             my_size += ::protobuf::rt::string_size(10002, &self._wasm_function);
@@ -810,7 +810,7 @@ impl ::protobuf::Message for PipelineStep {
             os.write_string(10000, &self._wasm_id)?;
         }
         if !self._wasm_bytes.is_empty() {
-            os.write_string(10001, &self._wasm_bytes)?;
+            os.write_bytes(10001, &self._wasm_bytes)?;
         }
         if !self._wasm_function.is_empty() {
             os.write_string(10002, &self._wasm_function)?;
@@ -871,7 +871,7 @@ impl ::protobuf::Message for PipelineStep {
             name: ::std::string::String::new(),
             conditions: ::std::vec::Vec::new(),
             _wasm_id: ::std::string::String::new(),
-            _wasm_bytes: ::std::string::String::new(),
+            _wasm_bytes: ::std::vec::Vec::new(),
             _wasm_function: ::std::string::String::new(),
             step: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
@@ -1601,9 +1601,9 @@ impl PipelineStepCondition {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0epipeline.proto\x12\x06protos\x1a\x12steps/custom.proto\x1a\x12step\
     s/decode.proto\x1a\x15steps/detective.proto\x1a\x12steps/encode.proto\
-    \x1a\x15steps/transform.proto\"M\n\x0bWasmRequest\x12(\n\x04step\x18\x01\
+    \x1a\x15steps/transform.proto\"M\n\x0bWASMRequest\x12(\n\x04step\x18\x01\
     \x20\x01(\x0b2\x14.protos.PipelineStepR\x04step\x12\x14\n\x05input\x18\
-    \x02\x20\x01(\x0cR\x05input\"t\n\x0cWasmResponse\x12\x16\n\x06output\x18\
+    \x02\x20\x01(\x0cR\x05input\"t\n\x0cWASMResponse\x12\x16\n\x06output\x18\
     \x01\x20\x01(\x0cR\x06output\x121\n\texit_code\x18\x02\x20\x01(\x0e2\x14\
     .protos.WASMExitCodeR\x08exitCode\x12\x19\n\x08exit_msg\x18\x03\x20\x01(\
     \tR\x07exitMsg\"\xf7\x03\n\x0cPipelineStep\x12\x0e\n\x02id\x18\x01\x20\
@@ -1616,9 +1616,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.DecodeStepH\0R\x06decode\x12\
     3\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.protos.steps.CustomStepH\0R\
     \x06custom\x12\x19\n\x08_wasm_id\x18\x90N\x20\x01(\tR\x06WasmId\x12\x1f\
-    \n\x0b_wasm_bytes\x18\x91N\x20\x01(\tR\tWasmBytes\x12%\n\x0e_wasm_functi\
-    on\x18\x92N\x20\x01(\tR\x0cWasmFunctionB\x06\n\x04step\"d\n\x12SetPipeli\
-    neCommand\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\
+    \n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cR\tWasmBytes\x12%\n\x0e_wasm_func\
+    tion\x18\x92N\x20\x01(\tR\x0cWasmFunctionB\x06\n\x04step\"d\n\x12SetPipe\
+    lineCommand\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\
     \x18\x02\x20\x01(\tR\x04name\x12*\n\x05steps\x18\x03\x20\x03(\x0b2\x14.p\
     rotos.PipelineStepR\x05steps\"'\n\x15DeletePipelineCommand\x12\x0e\n\x02\
     id\x18\x01\x20\x01(\tR\x02id\"&\n\x14PausePipelineCommand\x12\x0e\n\x02i\
@@ -1718,39 +1718,39 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     SM\x20module\x20ID\x20(set\x20by\x20backend)\n\n\x0c\n\x05\x04\x02\x02\
     \x08\x05\x12\x03F\x02\x08\n\x0c\n\x05\x04\x02\x02\x08\x01\x12\x03F\t\x11\
     \n\x0c\n\x05\x04\x02\x02\x08\x03\x12\x03F\x14\x19\n1\n\x04\x04\x02\x02\t\
-    \x12\x03I\x02\x1d\x1a$\x20WASM\x20module\x20bytes\x20(set\x20by\x20backe\
-    nd)\n\n\x0c\n\x05\x04\x02\x02\t\x05\x12\x03I\x02\x08\n\x0c\n\x05\x04\x02\
-    \x02\t\x01\x12\x03I\t\x14\n\x0c\n\x05\x04\x02\x02\t\x03\x12\x03I\x17\x1c\
-    \n=\n\x04\x04\x02\x02\n\x12\x03L\x02\x20\x1a0\x20WASM\x20function\x20nam\
-    e\x20to\x20execute\x20(set\x20by\x20backend)\n\n\x0c\n\x05\x04\x02\x02\n\
-    \x05\x12\x03L\x02\x08\n\x0c\n\x05\x04\x02\x02\n\x01\x12\x03L\t\x17\n\x0c\
-    \n\x05\x04\x02\x02\n\x03\x12\x03L\x1a\x1f\n*\n\x02\x04\x03\x12\x04P\0Y\
-    \x01\x1a\x1e\x20Used\x20for\x20both\x20Add\x20and\x20Update\n\n\n\n\x03\
-    \x04\x03\x01\x12\x03P\x08\x1a\n)\n\x04\x04\x03\x02\0\x12\x03R\x02\x10\
-    \x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\x03\
-    \x02\0\x05\x12\x03R\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03R\t\x0b\
-    \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03R\x0e\x0f\n-\n\x04\x04\x03\x02\x01\
-    \x12\x03U\x02\x12\x1a\x20\x20Friendly\x20name\x20for\x20the\x20pipeline\
-    \n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03U\x02\x08\n\x0c\n\x05\x04\x03\
-    \x02\x01\x01\x12\x03U\t\r\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03U\x10\
-    \x11\n+\n\x04\x04\x03\x02\x02\x12\x03X\x02\"\x1a\x1e\x20One\x20or\x20mor\
-    e\x20steps\x20to\x20execute\n\n\x0c\n\x05\x04\x03\x02\x02\x04\x12\x03X\
-    \x02\n\n\x0c\n\x05\x04\x03\x02\x02\x06\x12\x03X\x0b\x17\n\x0c\n\x05\x04\
-    \x03\x02\x02\x01\x12\x03X\x18\x1d\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\
-    \x03X\x20!\n\n\n\x02\x04\x04\x12\x04[\0^\x01\n\n\n\x03\x04\x04\x01\x12\
-    \x03[\x08\x1d\n)\n\x04\x04\x04\x02\0\x12\x03]\x02\x10\x1a\x1c\x20Unique\
-    \x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03\
-    ]\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03]\t\x0b\n\x0c\n\x05\x04\
-    \x04\x02\0\x03\x12\x03]\x0e\x0f\n\n\n\x02\x04\x05\x12\x04`\0c\x01\n\n\n\
-    \x03\x04\x05\x01\x12\x03`\x08\x1c\n)\n\x04\x04\x05\x02\0\x12\x03b\x02\
-    \x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\
-    \x05\x02\0\x05\x12\x03b\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03b\t\
-    \x0b\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03b\x0e\x0f\n\n\n\x02\x04\x06\
-    \x12\x04e\0h\x01\n\n\n\x03\x04\x06\x01\x12\x03e\x08\x1e\n)\n\x04\x04\x06\
-    \x02\0\x12\x03g\x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipelin\
-    e\n\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03g\x02\x08\n\x0c\n\x05\x04\x06\
-    \x02\0\x01\x12\x03g\t\x0b\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03g\x0e\x0f\
-    b\x06proto3\
+    \x12\x03I\x02\x1c\x1a$\x20WASM\x20module\x20bytes\x20(set\x20by\x20backe\
+    nd)\n\n\x0c\n\x05\x04\x02\x02\t\x05\x12\x03I\x02\x07\n\x0c\n\x05\x04\x02\
+    \x02\t\x01\x12\x03I\x08\x13\n\x0c\n\x05\x04\x02\x02\t\x03\x12\x03I\x16\
+    \x1b\n=\n\x04\x04\x02\x02\n\x12\x03L\x02\x20\x1a0\x20WASM\x20function\
+    \x20name\x20to\x20execute\x20(set\x20by\x20backend)\n\n\x0c\n\x05\x04\
+    \x02\x02\n\x05\x12\x03L\x02\x08\n\x0c\n\x05\x04\x02\x02\n\x01\x12\x03L\t\
+    \x17\n\x0c\n\x05\x04\x02\x02\n\x03\x12\x03L\x1a\x1f\n*\n\x02\x04\x03\x12\
+    \x04P\0Y\x01\x1a\x1e\x20Used\x20for\x20both\x20Add\x20and\x20Update\n\n\
+    \n\n\x03\x04\x03\x01\x12\x03P\x08\x1a\n)\n\x04\x04\x03\x02\0\x12\x03R\
+    \x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\
+    \x04\x03\x02\0\x05\x12\x03R\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\
+    \x03R\t\x0b\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03R\x0e\x0f\n-\n\x04\x04\
+    \x03\x02\x01\x12\x03U\x02\x12\x1a\x20\x20Friendly\x20name\x20for\x20the\
+    \x20pipeline\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03U\x02\x08\n\x0c\n\
+    \x05\x04\x03\x02\x01\x01\x12\x03U\t\r\n\x0c\n\x05\x04\x03\x02\x01\x03\
+    \x12\x03U\x10\x11\n+\n\x04\x04\x03\x02\x02\x12\x03X\x02\"\x1a\x1e\x20One\
+    \x20or\x20more\x20steps\x20to\x20execute\n\n\x0c\n\x05\x04\x03\x02\x02\
+    \x04\x12\x03X\x02\n\n\x0c\n\x05\x04\x03\x02\x02\x06\x12\x03X\x0b\x17\n\
+    \x0c\n\x05\x04\x03\x02\x02\x01\x12\x03X\x18\x1d\n\x0c\n\x05\x04\x03\x02\
+    \x02\x03\x12\x03X\x20!\n\n\n\x02\x04\x04\x12\x04[\0^\x01\n\n\n\x03\x04\
+    \x04\x01\x12\x03[\x08\x1d\n)\n\x04\x04\x04\x02\0\x12\x03]\x02\x10\x1a\
+    \x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\x04\x02\
+    \0\x05\x12\x03]\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03]\t\x0b\n\
+    \x0c\n\x05\x04\x04\x02\0\x03\x12\x03]\x0e\x0f\n\n\n\x02\x04\x05\x12\x04`\
+    \0c\x01\n\n\n\x03\x04\x05\x01\x12\x03`\x08\x1c\n)\n\x04\x04\x05\x02\0\
+    \x12\x03b\x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\
+    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03b\x02\x08\n\x0c\n\x05\x04\x05\x02\0\
+    \x01\x12\x03b\t\x0b\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03b\x0e\x0f\n\n\n\
+    \x02\x04\x06\x12\x04e\0h\x01\n\n\n\x03\x04\x06\x01\x12\x03e\x08\x1e\n)\n\
+    \x04\x04\x06\x02\0\x12\x03g\x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20th\
+    e\x20pipeline\n\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03g\x02\x08\n\x0c\n\
+    \x05\x04\x06\x02\0\x01\x12\x03g\t\x0b\n\x0c\n\x05\x04\x06\x02\0\x03\x12\
+    \x03g\x0e\x0fb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1774,8 +1774,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::encode::file_descriptor().clone());
             deps.push(super::transform::file_descriptor().clone());
             let mut messages = ::std::vec::Vec::with_capacity(7);
-            messages.push(WasmRequest::generated_message_descriptor_data());
-            messages.push(WasmResponse::generated_message_descriptor_data());
+            messages.push(WASMRequest::generated_message_descriptor_data());
+            messages.push(WASMResponse::generated_message_descriptor_data());
             messages.push(PipelineStep::generated_message_descriptor_data());
             messages.push(SetPipelineCommand::generated_message_descriptor_data());
             messages.push(DeletePipelineCommand::generated_message_descriptor_data());

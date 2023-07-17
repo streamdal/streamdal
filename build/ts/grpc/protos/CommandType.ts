@@ -1,4 +1,4 @@
-// Original file: ../../protos/grpc_internal.proto
+// Original file: ../../protos/internal_api.proto
 
 export const CommandType = {
   SNITCH_COMMAND_TYPE_UNSET: 'SNITCH_COMMAND_TYPE_UNSET',
