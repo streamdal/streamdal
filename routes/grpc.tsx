@@ -5,11 +5,14 @@ import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 const transport = new GrpcWebFetchTransport({
   baseUrl: "http://localhost:9091",
   format: "binary",
-  fetchInit: {
-    meta: {
-      "auth_token": "1234",
-    },
-  },
+  // fetchInit: {
+  //   meta: {
+  //     "auth_token": "1234",
+  //   },
+  //   headers: {
+  //     "auth_token": "1234",
+  //   },
+  // },
 });
 
 const client = new ExternalClient(transport);
