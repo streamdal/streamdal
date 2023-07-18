@@ -73,7 +73,7 @@ test:
 ### Docker
 
 .PHONY: docker/build/local
-docker/build/local: description = Build docker image locally (needed for m1)
+docker/build/local: description = Build docker image locally (needed for M1+)
 docker/build/local:
 	docker build --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
 	-t streamdal/$(SERVICE):$(VERSION) \
