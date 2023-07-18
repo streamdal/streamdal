@@ -37,6 +37,9 @@ pub struct StandardResponse {
     pub code: ::protobuf::EnumOrUnknown<ResponseCode>,
     // @@protoc_insertion_point(field:protos.StandardResponse.message)
     pub message: ::std::string::String,
+    ///  Debug info that server may populate with additional info.
+    // @@protoc_insertion_point(field:protos.StandardResponse._metadata)
+    pub _metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.StandardResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -54,7 +57,7 @@ impl StandardResponse {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut fields = ::std::vec::Vec::with_capacity(4);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "id",
@@ -70,6 +73,11 @@ impl StandardResponse {
             "message",
             |m: &StandardResponse| { &m.message },
             |m: &mut StandardResponse| { &mut m.message },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "_metadata",
+            |m: &StandardResponse| { &m._metadata },
+            |m: &mut StandardResponse| { &mut m._metadata },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<StandardResponse>(
             "StandardResponse",
@@ -98,6 +106,21 @@ impl ::protobuf::Message for StandardResponse {
                 26 => {
                     self.message = is.read_string()?;
                 },
+                8002 => {
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self._metadata.insert(key, value);
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -119,6 +142,12 @@ impl ::protobuf::Message for StandardResponse {
         if !self.message.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.message);
         }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -134,6 +163,15 @@ impl ::protobuf::Message for StandardResponse {
         if !self.message.is_empty() {
             os.write_string(3, &self.message)?;
         }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(8002)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -154,17 +192,13 @@ impl ::protobuf::Message for StandardResponse {
         self.id.clear();
         self.code = ::protobuf::EnumOrUnknown::new(ResponseCode::RESPONSE_CODE_UNSET);
         self.message.clear();
+        self._metadata.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static StandardResponse {
-        static instance: StandardResponse = StandardResponse {
-            id: ::std::string::String::new(),
-            code: ::protobuf::EnumOrUnknown::from_i32(0),
-            message: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
+        static instance: ::protobuf::rt::Lazy<StandardResponse> = ::protobuf::rt::Lazy::new();
+        instance.get(StandardResponse::new)
     }
 }
 
@@ -257,42 +291,49 @@ impl ResponseCode {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\x02i\
-    d\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\x14.pro\
-    tos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07me\
-    ssage*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\
-    \x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_RE\
-    QUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPON\
-    SE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC\
-    _ERROR\x10\x05B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\
-    \x8f\x05\n\x06\x12\x04\0\0\x16\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
-    \n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\
-    \x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Com\
-    mon\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\
-    \x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\x02\x10\
-    \x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20response\n\n\
-    \x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\
-    \x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\n\x0b\n\
-    \x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
-    \x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\x0c\n\
-    \x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\x12\
-    \x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\x0c\
-    \n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\x03\
-    \x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Common\
+    \n\x0ccommon.proto\x12\x06protos\"\xe9\x01\n\x10StandardResponse\x12\x0e\
+    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\
+    \x14.protos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\
+    \tR\x07message\x12D\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2&.protos.Stand\
+    ardResponse.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\
+    \x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\t\
+    R\x05value:\x028\x01*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CO\
+    DE_UNSET\x10\0\x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPON\
+    SE_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\
+    \x12'\n#RESPONSE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONS\
+    E_CODE_GENERIC_ERROR\x10\x05B4Z2github.com/streamdal/snitch-protos/build\
+    /go/protosJ\x83\x06\n\x06\x12\x04\0\0\x19\x01\n\x08\n\x01\x0c\x12\x03\0\
+    \0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\
+    \n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0f\x01\
+    \x1a/\x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\
+    \n\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\
+    \t\x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20re\
+    sponse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
+    \x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\
+    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\
+    \x06\x12\x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\
+    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\
+    \x12\x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\
+    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03\x0b\x13\x14\nH\n\x04\x04\0\x02\x03\x12\x03\x0e\x02(\x1a;\
+    \x20Debug\x20info\x20that\x20server\x20may\x20populate\x20with\x20additi\
+    onal\x20info.\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x0e\x02\x16\n\x0c\
+    \n\x05\x04\0\x02\x03\x01\x12\x03\x0e\x17\x20\n\x0c\n\x05\x04\0\x02\x03\
+    \x03\x12\x03\x0e#'\n?\n\x02\x05\0\x12\x04\x12\0\x19\x01\x1a3\x20Common\
     \x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\n\n\
-    \x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x10\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x11\
-    \x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
-    \x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\
-    \x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\x0c\
-    \n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\
-    \x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\x0c\n\
-    \x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
-    \x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\x05\
-    \x05\0\x02\x05\x02\x12\x03\x15\x20!b\x06proto3\
+    \x03\x05\0\x01\x12\x03\x12\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x13\
+    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x13\x02\x15\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x13\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x14\
+    \x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x14\x02\x12\n\x0c\n\x05\
+    \x05\0\x02\x01\x02\x12\x03\x14\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
+    \x15\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x15\x02\x1b\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03\x15\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\
+    \x03\x16\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x16\x02\x19\n\x0c\
+    \n\x05\x05\0\x02\x03\x02\x12\x03\x16\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\
+    \x12\x03\x17\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x17\x02%\n\x0c\n\
+    \x05\x05\0\x02\x04\x02\x12\x03\x17()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
+    \x18\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x18\x02\x1d\n\x0c\n\x05\
+    \x05\0\x02\x05\x02\x12\x03\x18\x20!b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

@@ -13,6 +13,9 @@ export class HeartbeatRequest extends jspb.Message {
   getLastActivityUnixTimestampUtc(): number;
   setLastActivityUnixTimestampUtc(value: number): HeartbeatRequest;
 
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): HeartbeatRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): HeartbeatRequest.AsObject;
   static toObject(includeInstance: boolean, msg: HeartbeatRequest): HeartbeatRequest.AsObject;
@@ -25,6 +28,7 @@ export namespace HeartbeatRequest {
   export type AsObject = {
     audience?: Audience.AsObject,
     lastActivityUnixTimestampUtc: number,
+    metadataMap: Array<[string, string]>,
   }
 }
 
@@ -43,6 +47,9 @@ export class NotifyRequest extends jspb.Message {
   getOccurredAtUnixTsUtc(): number;
   setOccurredAtUnixTsUtc(value: number): NotifyRequest;
 
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): NotifyRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): NotifyRequest.AsObject;
   static toObject(includeInstance: boolean, msg: NotifyRequest): NotifyRequest.AsObject;
@@ -57,6 +64,7 @@ export namespace NotifyRequest {
     ruleName: string,
     audience?: Audience.AsObject,
     occurredAtUnixTsUtc: number,
+    metadataMap: Array<[string, string]>,
   }
 }
 
@@ -72,6 +80,9 @@ export class MetricsRequest extends jspb.Message {
   hasAudience(): boolean;
   clearAudience(): MetricsRequest;
 
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): MetricsRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MetricsRequest.AsObject;
   static toObject(includeInstance: boolean, msg: MetricsRequest): MetricsRequest.AsObject;
@@ -85,6 +96,7 @@ export namespace MetricsRequest {
     ruleId: string,
     ruleName: string,
     audience?: Audience.AsObject,
+    metadataMap: Array<[string, string]>,
   }
 }
 
@@ -114,10 +126,53 @@ export namespace RegisterRequest {
   }
 }
 
-export class CommandResponse extends jspb.Message {
-  getType(): CommandType;
-  setType(value: CommandType): CommandResponse;
+export class BusEvent extends jspb.Message {
+  getRequestId(): string;
+  setRequestId(value: string): BusEvent;
 
+  getSource(): string;
+  setSource(value: string): BusEvent;
+
+  getCommandResponse(): CommandResponse | undefined;
+  setCommandResponse(value?: CommandResponse): BusEvent;
+  hasCommandResponse(): boolean;
+  clearCommandResponse(): BusEvent;
+
+  getRegisterRequest(): RegisterRequest | undefined;
+  setRegisterRequest(value?: RegisterRequest): BusEvent;
+  hasRegisterRequest(): boolean;
+  clearRegisterRequest(): BusEvent;
+
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): BusEvent;
+
+  getEventCase(): BusEvent.EventCase;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): BusEvent.AsObject;
+  static toObject(includeInstance: boolean, msg: BusEvent): BusEvent.AsObject;
+  static serializeBinaryToWriter(message: BusEvent, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): BusEvent;
+  static deserializeBinaryFromReader(message: BusEvent, reader: jspb.BinaryReader): BusEvent;
+}
+
+export namespace BusEvent {
+  export type AsObject = {
+    requestId: string,
+    source: string,
+    commandResponse?: CommandResponse.AsObject,
+    registerRequest?: RegisterRequest.AsObject,
+    metadataMap: Array<[string, string]>,
+  }
+
+  export enum EventCase { 
+    EVENT_NOT_SET = 0,
+    COMMAND_RESPONSE = 100,
+    REGISTER_REQUEST = 101,
+  }
+}
+
+export class CommandResponse extends jspb.Message {
   getAudience(): Audience | undefined;
   setAudience(value?: Audience): CommandResponse;
   hasAudience(): boolean;
@@ -158,7 +213,6 @@ export class CommandResponse extends jspb.Message {
 
 export namespace CommandResponse {
   export type AsObject = {
-    type: CommandType,
     audience?: Audience.AsObject,
     setPipeline?: pipeline_pb.SetPipelineCommand.AsObject,
     deletePipeline?: pipeline_pb.DeletePipelineCommand.AsObject,

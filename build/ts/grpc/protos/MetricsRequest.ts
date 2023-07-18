@@ -6,10 +6,12 @@ export interface MetricsRequest {
   'ruleId'?: (string);
   'ruleName'?: (string);
   'audience'?: (_protos_Audience | null);
+  '_metadata'?: ({[key: string]: string});
 }
 
 export interface MetricsRequest__Output {
   'ruleId': (string);
   'ruleName': (string);
   'audience': (_protos_Audience__Output | null);
+  '_metadata': ({[key: string]: string});
 }

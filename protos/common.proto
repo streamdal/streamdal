@@ -10,6 +10,9 @@ message StandardResponse {
   string id = 1;
   ResponseCode code = 2;
   string message = 3;
+
+  // Debug info that server may populate with additional info.
+  map <string, string> _metadata = 1000;
 }
 
 // Common status codes used in gRPC method responses

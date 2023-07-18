@@ -12,6 +12,9 @@ export class StandardResponse extends jspb.Message {
   getMessage(): string;
   setMessage(value: string): StandardResponse;
 
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): StandardResponse;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): StandardResponse.AsObject;
   static toObject(includeInstance: boolean, msg: StandardResponse): StandardResponse.AsObject;
@@ -25,6 +28,7 @@ export namespace StandardResponse {
     id: string,
     code: ResponseCode,
     message: string,
+    metadataMap: Array<[string, string]>,
   }
 }
 
