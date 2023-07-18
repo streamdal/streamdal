@@ -138,7 +138,8 @@ clean/rust:
 .PHONY: clean/python
 clean/python: description = Remove all Python build artifacts
 clean/python:
-	rm -rf ./build/python/*
+	rm -rf ./build/python/snitch_protos
+	rm -rf ./build/python/snitch_protos.egg-info
 
 .PHONY: clean/protoset
 clean/protoset: description = Remove protoset artifacts
