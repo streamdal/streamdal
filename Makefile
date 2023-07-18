@@ -103,8 +103,6 @@ generate/python:
 		-I /defs/protos/steps/ \
 		/defs/protos/*.proto || (exit 1)
 
-	cp -R assets/python/* build/python
-
 	@echo Successfully compiled protos
 
 # Protoset files contain binary encoded google.protobuf.FileDescriptorSet protos
