@@ -17,39 +17,4 @@ jobs:
           make generate/rust
           make generate/ts
           make generate/protoset
-
-  python-build-dist:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build python dist
-        run: |
-          ls -l
-          cd build/python
-          sed -i "s/version=.*/version='0.0.11',/" setup.py
-          python3 setup.py sdist
-      - name: Upload artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: dist_gzip
-          path: build/python/dist
-  pypi-publish:
-    needs: python-build-dist
-    name: Upload release to PyPI
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://test.pypi.org/legacy/
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist_gzip
-          path: build/python/dist
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: build/python/dist
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository-url: https://test.pypi.org/legacy/
+          make generate/python
