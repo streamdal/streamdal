@@ -1,12 +1,36 @@
 # Used for tests
 version: "3"
 services:
+  snitch-server:
+    image: streamdal/snitch-server
+    environment:
+      - SNITCH_SERVER_AUTH_TOKEN=1234
+      - SNITCH_SERVER_NATS_URL=nats://natsjs:4222
+    container_name: snitch-server
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    links:
+      - natsjs
+
   natsjs:
-    image: store:2.9.20-alpine3.18
+    image: nats:2.9.20-alpine3.18
     ports:
       - "4222:4222" # NATS Port
       - "6222:6222"
       - "8222:8222" # HTTP Monitor
+    container_name: snitch-nats
     volumes:
       - ${PWD}/backend-data/jetstream:/data/jetstream
-      - ${PWD}/assets/store-server.conf:/etc/store/store-server.conf
+      - ${PWD}/assets/nats-server.conf:/etc/nats/nats-server.conf
+
+  envoy:
+    build:
+      context: ./
+      dockerfile: .${PWD}/assets/envoy-Dockerfile
+    image: grpcweb/envoy
+    container_name: snitch-envoy
+    ports:
+      - "9091:9091"
+    links:
+      - snitch-server
