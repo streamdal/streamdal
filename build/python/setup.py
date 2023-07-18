@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='snitch-protos',
-    version='0.0.6',
+    version='0.0.9',
     description='Protobuf python package for Streamdal.com Snitch',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -15,7 +15,7 @@ setup(
     author='Streamdal.com',
     author_email='engineering@streamdal.com',
     license='MIT',
-    packages=['snitch_protos', 'snitch_protos.protos'],
+    packages=['snitch_protos', 'snitch_protos.protos', 'snitch_protos.protos.steps'],
     install_requires=[''],
     python_requires=">=3.7",
 
