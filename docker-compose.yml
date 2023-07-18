@@ -27,7 +27,7 @@ services:
   envoy:
     build:
       context: ./
-      dockerfile: .${PWD}/assets/envoy-Dockerfile
+      dockerfile: ${PWD}/assets/envoy-Dockerfile
     image: grpcweb/envoy
     container_name: snitch-envoy
     ports:
