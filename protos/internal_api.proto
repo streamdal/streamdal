@@ -32,6 +32,8 @@ service Internal {
 message HeartbeatRequest {
   Audience audience = 1;
   int64 last_activity_unix_timestamp_utc = 2;
+
+  map <string, string> _metadata = 1000;
 }
 
 message NotifyRequest {
@@ -39,12 +41,16 @@ message NotifyRequest {
   string rule_name = 2;
   Audience audience = 3;
   int64 occurred_at_unix_ts_utc = 4;
+
+  map <string, string> _metadata = 1000;
 }
 
 message MetricsRequest {
   string rule_id = 1;
   string rule_name = 2;
   Audience audience = 3;
+
+  map <string, string> _metadata = 1000;
 }
 
 message RegisterRequest {
@@ -59,14 +65,24 @@ message RegisterRequest {
   map <string, string> _metadata = 1000;
 }
 
+// Type used by `snitch-server` for sending messages on its local bus.
+message BusEvent {
+  string request_id = 1;
+  string source = 2;
+
+  oneof event {
+    CommandResponse command_response = 100;
+    RegisterRequest register_request = 101;
+  }
+
+  map <string, string> _metadata = 1000;
+}
+
 // The primary method to send commands to the SDK; server will send zero or more
 // RegisterResponse's with SetPipelineRequest on SDK instantiation.
 message CommandResponse {
-  // Use this to determine what to expect in one_of
-  CommandType type = 1;
-
   // Who is this command intended for?
-  Audience audience = 2;
+  Audience audience = 1;
 
   oneof command {
     protos.SetPipelineCommand set_pipeline = 100;

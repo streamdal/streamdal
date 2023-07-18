@@ -10,6 +10,7 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 export interface ProtoGrpcType {
   protos: {
     Audience: MessageTypeDefinition
+    BusEvent: MessageTypeDefinition
     CommandResponse: MessageTypeDefinition
     CommandType: EnumTypeDefinition
     DeletePipelineCommand: MessageTypeDefinition

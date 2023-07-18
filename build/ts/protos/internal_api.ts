@@ -32,6 +32,12 @@ export interface HeartbeatRequest {
      * @generated from protobuf field: int64 last_activity_unix_timestamp_utc = 2;
      */
     lastActivityUnixTimestampUtc: bigint;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
@@ -53,6 +59,12 @@ export interface NotifyRequest {
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: bigint;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
@@ -70,6 +82,12 @@ export interface MetricsRequest {
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * @generated from protobuf message protos.RegisterRequest
@@ -97,6 +115,45 @@ export interface RegisterRequest {
     };
 }
 /**
+ * Type used by `snitch-server` for sending messages on its local bus.
+ *
+ * @generated from protobuf message protos.BusEvent
+ */
+export interface BusEvent {
+    /**
+     * @generated from protobuf field: string request_id = 1;
+     */
+    requestId: string;
+    /**
+     * @generated from protobuf field: string source = 2;
+     */
+    source: string;
+    /**
+     * @generated from protobuf oneof: event
+     */
+    event: {
+        oneofKind: "commandResponse";
+        /**
+         * @generated from protobuf field: protos.CommandResponse command_response = 100;
+         */
+        commandResponse: CommandResponse;
+    } | {
+        oneofKind: "registerRequest";
+        /**
+         * @generated from protobuf field: protos.RegisterRequest register_request = 101;
+         */
+        registerRequest: RegisterRequest;
+    } | {
+        oneofKind: undefined;
+    };
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
+}
+/**
  * The primary method to send commands to the SDK; server will send zero or more
  * RegisterResponse's with SetPipelineRequest on SDK instantiation.
  *
@@ -104,15 +161,9 @@ export interface RegisterRequest {
  */
 export interface CommandResponse {
     /**
-     * Use this to determine what to expect in one_of
-     *
-     * @generated from protobuf field: protos.CommandType type = 1;
-     */
-    type: CommandType;
-    /**
      * Who is this command intended for?
      *
-     * @generated from protobuf field: protos.Audience audience = 2;
+     * @generated from protobuf field: protos.Audience audience = 1;
      */
     audience?: Audience;
     /**
@@ -232,11 +283,12 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 2, name: "last_activity_unix_timestamp_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 2, name: "last_activity_unix_timestamp_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<HeartbeatRequest>): HeartbeatRequest {
-        const message = { lastActivityUnixTimestampUtc: 0n };
+        const message = { lastActivityUnixTimestampUtc: 0n, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<HeartbeatRequest>(this, message, value);
@@ -253,6 +305,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
                 case /* int64 last_activity_unix_timestamp_utc */ 2:
                     message.lastActivityUnixTimestampUtc = reader.int64().toBigInt();
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -264,6 +319,22 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
         }
         return message;
     }
+    private binaryReadMap1000(map: HeartbeatRequest["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof HeartbeatRequest["Metadata"] | undefined, val: HeartbeatRequest["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.HeartbeatRequest._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
+    }
     internalBinaryWrite(message: HeartbeatRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* protos.Audience audience = 1; */
         if (message.audience)
@@ -271,6 +342,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
         /* int64 last_activity_unix_timestamp_utc = 2; */
         if (message.lastActivityUnixTimestampUtc !== 0n)
             writer.tag(2, WireType.Varint).int64(message.lastActivityUnixTimestampUtc);
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -288,11 +362,12 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
             { no: 1, name: "rule_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "rule_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
-            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<NotifyRequest>): NotifyRequest {
-        const message = { ruleId: "", ruleName: "", occurredAtUnixTsUtc: 0n };
+        const message = { ruleId: "", ruleName: "", occurredAtUnixTsUtc: 0n, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<NotifyRequest>(this, message, value);
@@ -315,6 +390,9 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
                 case /* int64 occurred_at_unix_ts_utc */ 4:
                     message.occurredAtUnixTsUtc = reader.int64().toBigInt();
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -325,6 +403,22 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
             }
         }
         return message;
+    }
+    private binaryReadMap1000(map: NotifyRequest["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof NotifyRequest["Metadata"] | undefined, val: NotifyRequest["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.NotifyRequest._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
     }
     internalBinaryWrite(message: NotifyRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string rule_id = 1; */
@@ -339,6 +433,9 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         /* int64 occurred_at_unix_ts_utc = 4; */
         if (message.occurredAtUnixTsUtc !== 0n)
             writer.tag(4, WireType.Varint).int64(message.occurredAtUnixTsUtc);
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -355,11 +452,12 @@ class MetricsRequest$Type extends MessageType<MetricsRequest> {
         super("protos.MetricsRequest", [
             { no: 1, name: "rule_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "rule_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "audience", kind: "message", T: () => Audience }
+            { no: 3, name: "audience", kind: "message", T: () => Audience },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<MetricsRequest>): MetricsRequest {
-        const message = { ruleId: "", ruleName: "" };
+        const message = { ruleId: "", ruleName: "", Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<MetricsRequest>(this, message, value);
@@ -379,6 +477,9 @@ class MetricsRequest$Type extends MessageType<MetricsRequest> {
                 case /* protos.Audience audience */ 3:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -390,6 +491,22 @@ class MetricsRequest$Type extends MessageType<MetricsRequest> {
         }
         return message;
     }
+    private binaryReadMap1000(map: MetricsRequest["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof MetricsRequest["Metadata"] | undefined, val: MetricsRequest["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.MetricsRequest._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
+    }
     internalBinaryWrite(message: MetricsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string rule_id = 1; */
         if (message.ruleId !== "")
@@ -400,6 +517,9 @@ class MetricsRequest$Type extends MessageType<MetricsRequest> {
         /* protos.Audience audience = 3; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -488,11 +608,107 @@ class RegisterRequest$Type extends MessageType<RegisterRequest> {
  */
 export const RegisterRequest = new RegisterRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class BusEvent$Type extends MessageType<BusEvent> {
+    constructor() {
+        super("protos.BusEvent", [
+            { no: 1, name: "request_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => CommandResponse },
+            { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+    create(value?: PartialMessage<BusEvent>): BusEvent {
+        const message = { requestId: "", source: "", event: { oneofKind: undefined }, Metadata: {} };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<BusEvent>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BusEvent): BusEvent {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string request_id */ 1:
+                    message.requestId = reader.string();
+                    break;
+                case /* string source */ 2:
+                    message.source = reader.string();
+                    break;
+                case /* protos.CommandResponse command_response */ 100:
+                    message.event = {
+                        oneofKind: "commandResponse",
+                        commandResponse: CommandResponse.internalBinaryRead(reader, reader.uint32(), options, (message.event as any).commandResponse)
+                    };
+                    break;
+                case /* protos.RegisterRequest register_request */ 101:
+                    message.event = {
+                        oneofKind: "registerRequest",
+                        registerRequest: RegisterRequest.internalBinaryRead(reader, reader.uint32(), options, (message.event as any).registerRequest)
+                    };
+                    break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    private binaryReadMap1000(map: BusEvent["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof BusEvent["Metadata"] | undefined, val: BusEvent["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.BusEvent._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
+    }
+    internalBinaryWrite(message: BusEvent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string request_id = 1; */
+        if (message.requestId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.requestId);
+        /* string source = 2; */
+        if (message.source !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.source);
+        /* protos.CommandResponse command_response = 100; */
+        if (message.event.oneofKind === "commandResponse")
+            CommandResponse.internalBinaryWrite(message.event.commandResponse, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
+        /* protos.RegisterRequest register_request = 101; */
+        if (message.event.oneofKind === "registerRequest")
+            RegisterRequest.internalBinaryWrite(message.event.registerRequest, writer.tag(101, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.BusEvent
+ */
+export const BusEvent = new BusEvent$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class CommandResponse$Type extends MessageType<CommandResponse> {
     constructor() {
         super("protos.CommandResponse", [
-            { no: 1, name: "type", kind: "enum", T: () => ["protos.CommandType", CommandType] },
-            { no: 2, name: "audience", kind: "message", T: () => Audience },
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
             { no: 100, name: "set_pipeline", kind: "message", oneof: "command", T: () => SetPipelineCommand },
             { no: 101, name: "delete_pipeline", kind: "message", oneof: "command", T: () => DeletePipelineCommand },
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
@@ -501,7 +717,7 @@ class CommandResponse$Type extends MessageType<CommandResponse> {
         ]);
     }
     create(value?: PartialMessage<CommandResponse>): CommandResponse {
-        const message = { type: 0, command: { oneofKind: undefined }, Metadata: {} };
+        const message = { command: { oneofKind: undefined }, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<CommandResponse>(this, message, value);
@@ -512,10 +728,7 @@ class CommandResponse$Type extends MessageType<CommandResponse> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.CommandType type */ 1:
-                    message.type = reader.int32();
-                    break;
-                case /* protos.Audience audience */ 2:
+                case /* protos.Audience audience */ 1:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 case /* protos.SetPipelineCommand set_pipeline */ 100:
@@ -573,12 +786,9 @@ class CommandResponse$Type extends MessageType<CommandResponse> {
         map[key ?? ""] = val ?? "";
     }
     internalBinaryWrite(message: CommandResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* protos.CommandType type = 1; */
-        if (message.type !== 0)
-            writer.tag(1, WireType.Varint).int32(message.type);
-        /* protos.Audience audience = 2; */
+        /* protos.Audience audience = 1; */
         if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* protos.SetPipelineCommand set_pipeline = 100; */
         if (message.command.oneofKind === "setPipeline")
             SetPipelineCommand.internalBinaryWrite(message.command.setPipeline, writer.tag(100, WireType.LengthDelimited).fork(), options).join();

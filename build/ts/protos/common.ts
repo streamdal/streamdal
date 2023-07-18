@@ -31,6 +31,14 @@ export interface StandardResponse {
      * @generated from protobuf field: string message = 3;
      */
     message: string;
+    /**
+     * Debug info that server may populate with additional info.
+     *
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * Common status codes used in gRPC method responses
@@ -69,11 +77,12 @@ class StandardResponse$Type extends MessageType<StandardResponse> {
         super("protos.StandardResponse", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "code", kind: "enum", T: () => ["protos.ResponseCode", ResponseCode, "RESPONSE_CODE_"] },
-            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<StandardResponse>): StandardResponse {
-        const message = { id: "", code: 0, message: "" };
+        const message = { id: "", code: 0, message: "", Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<StandardResponse>(this, message, value);
@@ -93,6 +102,9 @@ class StandardResponse$Type extends MessageType<StandardResponse> {
                 case /* string message */ 3:
                     message.message = reader.string();
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -104,6 +116,22 @@ class StandardResponse$Type extends MessageType<StandardResponse> {
         }
         return message;
     }
+    private binaryReadMap1000(map: StandardResponse["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof StandardResponse["Metadata"] | undefined, val: StandardResponse["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.StandardResponse._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
+    }
     internalBinaryWrite(message: StandardResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string id = 1; */
         if (message.id !== "")
@@ -114,6 +142,9 @@ class StandardResponse$Type extends MessageType<StandardResponse> {
         /* string message = 3; */
         if (message.message !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.message);
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

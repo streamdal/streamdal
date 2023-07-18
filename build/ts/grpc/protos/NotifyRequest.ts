@@ -8,6 +8,7 @@ export interface NotifyRequest {
   'ruleName'?: (string);
   'audience'?: (_protos_Audience | null);
   'occurredAtUnixTsUtc'?: (number | string | Long);
+  '_metadata'?: ({[key: string]: string});
 }
 
 export interface NotifyRequest__Output {
@@ -15,4 +16,5 @@ export interface NotifyRequest__Output {
   'ruleName': (string);
   'audience': (_protos_Audience__Output | null);
   'occurredAtUnixTsUtc': (string);
+  '_metadata': ({[key: string]: string});
 }

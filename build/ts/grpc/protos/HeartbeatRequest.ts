@@ -6,9 +6,11 @@ import type { Long } from '@grpc/proto-loader';
 export interface HeartbeatRequest {
   'audience'?: (_protos_Audience | null);
   'lastActivityUnixTimestampUtc'?: (number | string | Long);
+  '_metadata'?: ({[key: string]: string});
 }
 
 export interface HeartbeatRequest__Output {
   'audience': (_protos_Audience__Output | null);
   'lastActivityUnixTimestampUtc': (string);
+  '_metadata': ({[key: string]: string});
 }
