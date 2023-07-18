@@ -42,6 +42,8 @@ type ExternalClient interface {
 	UpdateStep(ctx context.Context, in *UpdateStepRequest, opts ...grpc.CallOption) (*UpdateStepResponse, error)
 	// Delete a step
 	DeleteStep(ctx context.Context, in *DeleteStepRequest, opts ...grpc.CallOption) (*DeleteStepResponse, error)
+	// Test method
+	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
 
 type externalClient struct {
@@ -142,6 +144,15 @@ func (c *externalClient) DeleteStep(ctx context.Context, in *DeleteStepRequest, 
 	return out, nil
 }
 
+func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
+	out := new(TestResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExternalServer is the server API for External service.
 // All implementations must embed UnimplementedExternalServer
 // for forward compatibility
@@ -166,6 +177,8 @@ type ExternalServer interface {
 	UpdateStep(context.Context, *UpdateStepRequest) (*UpdateStepResponse, error)
 	// Delete a step
 	DeleteStep(context.Context, *DeleteStepRequest) (*DeleteStepResponse, error)
+	// Test method
+	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
 }
 
@@ -202,6 +215,9 @@ func (UnimplementedExternalServer) UpdateStep(context.Context, *UpdateStepReques
 }
 func (UnimplementedExternalServer) DeleteStep(context.Context, *DeleteStepRequest) (*DeleteStepResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteStep not implemented")
+}
+func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
 }
 func (UnimplementedExternalServer) mustEmbedUnimplementedExternalServer() {}
 
@@ -396,6 +412,24 @@ func _External_DeleteStep_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).Test(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/Test",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).Test(ctx, req.(*TestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // External_ServiceDesc is the grpc.ServiceDesc for External service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -442,6 +476,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteStep",
 			Handler:    _External_DeleteStep_Handler,
+		},
+		{
+			MethodName: "Test",
+			Handler:    _External_Test_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

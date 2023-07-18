@@ -20,6 +20,8 @@ import type { GetStepsRequest as _protos_GetStepsRequest, GetStepsRequest__Outpu
 import type { GetStepsResponse as _protos_GetStepsResponse, GetStepsResponse__Output as _protos_GetStepsResponse__Output } from '../protos/GetStepsResponse';
 import type { SetPipelineRequest as _protos_SetPipelineRequest, SetPipelineRequest__Output as _protos_SetPipelineRequest__Output } from '../protos/SetPipelineRequest';
 import type { SetPipelineResponse as _protos_SetPipelineResponse, SetPipelineResponse__Output as _protos_SetPipelineResponse__Output } from '../protos/SetPipelineResponse';
+import type { TestRequest as _protos_TestRequest, TestRequest__Output as _protos_TestRequest__Output } from '../protos/TestRequest';
+import type { TestResponse as _protos_TestResponse, TestResponse__Output as _protos_TestResponse__Output } from '../protos/TestResponse';
 import type { UpdateStepRequest as _protos_UpdateStepRequest, UpdateStepRequest__Output as _protos_UpdateStepRequest__Output } from '../protos/UpdateStepRequest';
 import type { UpdateStepResponse as _protos_UpdateStepResponse, UpdateStepResponse__Output as _protos_UpdateStepResponse__Output } from '../protos/UpdateStepResponse';
 
@@ -105,6 +107,15 @@ export interface ExternalClient extends grpc.Client {
   setPipeline(argument: _protos_SetPipelineRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
   setPipeline(argument: _protos_SetPipelineRequest, callback: grpc.requestCallback<_protos_SetPipelineResponse__Output>): grpc.ClientUnaryCall;
   
+  Test(argument: _protos_TestRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  Test(argument: _protos_TestRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  Test(argument: _protos_TestRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  Test(argument: _protos_TestRequest, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  test(argument: _protos_TestRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  test(argument: _protos_TestRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  test(argument: _protos_TestRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  test(argument: _protos_TestRequest, callback: grpc.requestCallback<_protos_TestResponse__Output>): grpc.ClientUnaryCall;
+  
   UpdateStep(argument: _protos_UpdateStepRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdateStepResponse__Output>): grpc.ClientUnaryCall;
   UpdateStep(argument: _protos_UpdateStepRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_protos_UpdateStepResponse__Output>): grpc.ClientUnaryCall;
   UpdateStep(argument: _protos_UpdateStepRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_protos_UpdateStepResponse__Output>): grpc.ClientUnaryCall;
@@ -135,6 +146,8 @@ export interface ExternalHandlers extends grpc.UntypedServiceImplementation {
   
   SetPipeline: grpc.handleUnaryCall<_protos_SetPipelineRequest__Output, _protos_SetPipelineResponse>;
   
+  Test: grpc.handleUnaryCall<_protos_TestRequest__Output, _protos_TestResponse>;
+  
   UpdateStep: grpc.handleUnaryCall<_protos_UpdateStepRequest__Output, _protos_UpdateStepResponse>;
   
 }
@@ -149,5 +162,6 @@ export interface ExternalDefinition extends grpc.ServiceDefinition {
   GetServices: MethodDefinition<_protos_GetServicesRequest, _protos_GetServicesResponse, _protos_GetServicesRequest__Output, _protos_GetServicesResponse__Output>
   GetSteps: MethodDefinition<_protos_GetStepsRequest, _protos_GetStepsResponse, _protos_GetStepsRequest__Output, _protos_GetStepsResponse__Output>
   SetPipeline: MethodDefinition<_protos_SetPipelineRequest, _protos_SetPipelineResponse, _protos_SetPipelineRequest__Output, _protos_SetPipelineResponse__Output>
+  Test: MethodDefinition<_protos_TestRequest, _protos_TestResponse, _protos_TestRequest__Output, _protos_TestResponse__Output>
   UpdateStep: MethodDefinition<_protos_UpdateStepRequest, _protos_UpdateStepResponse, _protos_UpdateStepRequest__Output, _protos_UpdateStepResponse__Output>
 }

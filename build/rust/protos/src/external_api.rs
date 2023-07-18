@@ -2086,6 +2086,250 @@ impl ::protobuf::reflect::ProtobufValue for DeleteStepResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.TestRequest)
+pub struct TestRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.TestRequest.input)
+    pub input: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.TestRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TestRequest {
+    fn default() -> &'a TestRequest {
+        <TestRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TestRequest {
+    pub fn new() -> TestRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "input",
+            |m: &TestRequest| { &m.input },
+            |m: &mut TestRequest| { &mut m.input },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TestRequest>(
+            "TestRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TestRequest {
+    const NAME: &'static str = "TestRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.input = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.input.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.input);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.input.is_empty() {
+            os.write_string(1, &self.input)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TestRequest {
+        TestRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.input.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TestRequest {
+        static instance: TestRequest = TestRequest {
+            input: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TestRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TestRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TestRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TestRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.TestResponse)
+pub struct TestResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.TestResponse.output)
+    pub output: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.TestResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TestResponse {
+    fn default() -> &'a TestResponse {
+        <TestResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TestResponse {
+    pub fn new() -> TestResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "output",
+            |m: &TestResponse| { &m.output },
+            |m: &mut TestResponse| { &mut m.output },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TestResponse>(
+            "TestResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TestResponse {
+    const NAME: &'static str = "TestResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                18 => {
+                    self.output = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.output.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.output);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.output.is_empty() {
+            os.write_string(2, &self.output)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TestResponse {
+        TestResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.output.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TestResponse {
+        static instance: TestResponse = TestResponse {
+            output: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TestResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TestResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TestResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TestResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x12external_api.proto\x12\x06protos\"\x14\n\x12GetServicesRequest\"\
     \x15\n\x13GetServicesResponse\"\x13\n\x11GetServiceRequest\"\x14\n\x12Ge\
@@ -2095,29 +2339,32 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     eletePipelineRequest\"\x18\n\x16DeletePipelineResponse\"\x11\n\x0fGetSte\
     psRequest\"\x12\n\x10GetStepsResponse\"\x13\n\x11CreateStepRequest\"\x14\
     \n\x12CreateStepResponse\"\x13\n\x11UpdateStepRequest\"\x14\n\x12UpdateS\
-    tepResponse\"\x13\n\x11DeleteStepRequest\"\x14\n\x12DeleteStepResponse2\
-    \xd1\x05\n\x08External\x12F\n\x0bGetServices\x12\x1a.protos.GetServicesR\
-    equest\x1a\x1b.protos.GetServicesResponse\x12C\n\nGetService\x12\x19.pro\
-    tos.GetServiceRequest\x1a\x1a.protos.GetServiceResponse\x12I\n\x0cGetPip\
-    elines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.protos.GetPipelinesRes\
-    ponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipelineRequest\x1a\x1b.pr\
-    otos.GetPipelineResponse\x12F\n\x0bSetPipeline\x12\x1a.protos.SetPipelin\
-    eRequest\x1a\x1b.protos.SetPipelineResponse\x12O\n\x0eDeletePipeline\x12\
-    \x1d.protos.DeletePipelineRequest\x1a\x1e.protos.DeletePipelineResponse\
-    \x12=\n\x08GetSteps\x12\x17.protos.GetStepsRequest\x1a\x18.protos.GetSte\
-    psResponse\x12C\n\nCreateStep\x12\x19.protos.CreateStepRequest\x1a\x1a.p\
-    rotos.CreateStepResponse\x12C\n\nUpdateStep\x12\x19.protos.UpdateStepReq\
-    uest\x1a\x1a.protos.UpdateStepResponse\x12C\n\nDeleteStep\x12\x19.protos\
-    .DeleteStepRequest\x1a\x1a.protos.DeleteStepResponseB4Z2github.com/strea\
-    mdal/snitch-protos/build/go/protosJ\xc1\x0b\n\x06\x12\x04\0\0:\x1d\n\x08\
-    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
-    \x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x06\0\x12\
-    \x04\x06\0$\x01\n\n\n\x03\x06\0\x01\x12\x03\x06\x08\x10\n\"\n\x04\x06\0\
-    \x02\0\x12\x03\x08\x02D\x1a\x15\x20Build\x20a\x20service\x20map\n\n\x0c\
-    \n\x05\x06\0\x02\0\x01\x12\x03\x08\x06\x11\n\x0c\n\x05\x06\0\x02\0\x02\
-    \x12\x03\x08\x12$\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x08/B\nX\n\x04\x06\
-    \0\x02\x01\x12\x03\x0b\x02A\x1aK\x20Figure\x20out\x20consumers/producers\
-    ,\x20pipelines\x20and\x20targets\x20for\x20a\x20given\x20service\n\n\x0c\
+    tepResponse\"\x13\n\x11DeleteStepRequest\"\x14\n\x12DeleteStepResponse\"\
+    #\n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\
+    \x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\x84\
+    \x06\n\x08External\x12F\n\x0bGetServices\x12\x1a.protos.GetServicesReque\
+    st\x1a\x1b.protos.GetServicesResponse\x12C\n\nGetService\x12\x19.protos.\
+    GetServiceRequest\x1a\x1a.protos.GetServiceResponse\x12I\n\x0cGetPipelin\
+    es\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.protos.GetPipelinesRespons\
+    e\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipelineRequest\x1a\x1b.protos\
+    .GetPipelineResponse\x12F\n\x0bSetPipeline\x12\x1a.protos.SetPipelineReq\
+    uest\x1a\x1b.protos.SetPipelineResponse\x12O\n\x0eDeletePipeline\x12\x1d\
+    .protos.DeletePipelineRequest\x1a\x1e.protos.DeletePipelineResponse\x12=\
+    \n\x08GetSteps\x12\x17.protos.GetStepsRequest\x1a\x18.protos.GetStepsRes\
+    ponse\x12C\n\nCreateStep\x12\x19.protos.CreateStepRequest\x1a\x1a.protos\
+    .CreateStepResponse\x12C\n\nUpdateStep\x12\x19.protos.UpdateStepRequest\
+    \x1a\x1a.protos.UpdateStepResponse\x12C\n\nDeleteStep\x12\x19.protos.Del\
+    eteStepRequest\x1a\x1a.protos.DeleteStepResponse\x121\n\x04Test\x12\x13.\
+    protos.TestRequest\x1a\x14.protos.TestResponseB4Z2github.com/streamdal/s\
+    nitch-protos/build/go/protosJ\xa5\r\n\x06\x12\x04\0\0E\x01\n\x08\n\x01\
+    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\
+    \x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x06\0\x12\x04\
+    \x06\0'\x01\n\n\n\x03\x06\0\x01\x12\x03\x06\x08\x10\n\"\n\x04\x06\0\x02\
+    \0\x12\x03\x08\x02D\x1a\x15\x20Build\x20a\x20service\x20map\n\n\x0c\n\
+    \x05\x06\0\x02\0\x01\x12\x03\x08\x06\x11\n\x0c\n\x05\x06\0\x02\0\x02\x12\
+    \x03\x08\x12$\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x08/B\nX\n\x04\x06\0\
+    \x02\x01\x12\x03\x0b\x02A\x1aK\x20Figure\x20out\x20consumers/producers,\
+    \x20pipelines\x20and\x20targets\x20for\x20a\x20given\x20service\n\n\x0c\
     \n\x05\x06\0\x02\x01\x01\x12\x03\x0b\x06\x10\n\x0c\n\x05\x06\0\x02\x01\
     \x02\x12\x03\x0b\x11\"\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\x0b-?\n*\n\
     \x04\x06\0\x02\x02\x12\x03\x0e\x02G\x1a\x1d\x20Get\x20all\x20available\
@@ -2146,28 +2393,38 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x03\x20\x11\"\n\x0c\n\x05\x06\0\x02\x08\x03\x12\x03\x20-?\n\x1c\n\
     \x04\x06\0\x02\t\x12\x03#\x02A\x1a\x0f\x20Delete\x20a\x20step\n\n\x0c\n\
     \x05\x06\0\x02\t\x01\x12\x03#\x06\x10\n\x0c\n\x05\x06\0\x02\t\x02\x12\
-    \x03#\x11\"\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03#-?\n%\n\x02\x04\0\x12\
-    \x03'\0\x1d\x1a\x1a\x20protolint:disable\x20INDENT\n\n\n\n\x03\x04\0\x01\
-    \x12\x03'\x08\x1a\n\t\n\x02\x04\x01\x12\x03(\0\x1e\n\n\n\x03\x04\x01\x01\
-    \x12\x03(\x08\x1b\n\t\n\x02\x04\x02\x12\x03)\0\x1c\n\n\n\x03\x04\x02\x01\
-    \x12\x03)\x08\x19\n\t\n\x02\x04\x03\x12\x03*\0\x1d\n\n\n\x03\x04\x03\x01\
-    \x12\x03*\x08\x1a\n\t\n\x02\x04\x04\x12\x03+\0\x1e\n\n\n\x03\x04\x04\x01\
-    \x12\x03+\x08\x1b\n\t\n\x02\x04\x05\x12\x03,\0\x1f\n\n\n\x03\x04\x05\x01\
-    \x12\x03,\x08\x1c\n\t\n\x02\x04\x06\x12\x03-\0\x1d\n\n\n\x03\x04\x06\x01\
-    \x12\x03-\x08\x1a\n\t\n\x02\x04\x07\x12\x03.\0\x1e\n\n\n\x03\x04\x07\x01\
-    \x12\x03.\x08\x1b\n\t\n\x02\x04\x08\x12\x03/\0\x1d\n\n\n\x03\x04\x08\x01\
-    \x12\x03/\x08\x1a\n\t\n\x02\x04\t\x12\x030\0\x1e\n\n\n\x03\x04\t\x01\x12\
-    \x030\x08\x1b\n\t\n\x02\x04\n\x12\x031\0\x20\n\n\n\x03\x04\n\x01\x12\x03\
-    1\x08\x1d\n\t\n\x02\x04\x0b\x12\x032\0!\n\n\n\x03\x04\x0b\x01\x12\x032\
-    \x08\x1e\n\t\n\x02\x04\x0c\x12\x033\0\x1a\n\n\n\x03\x04\x0c\x01\x12\x033\
-    \x08\x17\n\t\n\x02\x04\r\x12\x034\0\x1b\n\n\n\x03\x04\r\x01\x12\x034\x08\
-    \x18\n\t\n\x02\x04\x0e\x12\x035\0\x1c\n\n\n\x03\x04\x0e\x01\x12\x035\x08\
-    \x19\n\t\n\x02\x04\x0f\x12\x036\0\x1c\n\n\n\x03\x04\x0f\x01\x12\x036\x08\
-    \x1a\n\t\n\x02\x04\x10\x12\x037\0\x1c\n\n\n\x03\x04\x10\x01\x12\x037\x08\
-    \x19\n\t\n\x02\x04\x11\x12\x038\0\x1d\n\n\n\x03\x04\x11\x01\x12\x038\x08\
-    \x1a\n\t\n\x02\x04\x12\x12\x039\0\x1c\n\n\n\x03\x04\x12\x01\x12\x039\x08\
-    \x19\n\t\n\x02\x04\x13\x12\x03:\0\x1d\n\n\n\x03\x04\x13\x01\x12\x03:\x08\
-    \x1ab\x06proto3\
+    \x03#\x11\"\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03#-?\n\x1a\n\x04\x06\0\x02\
+    \n\x12\x03&\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\x05\x06\0\x02\n\x01\
+    \x12\x03&\x06\n\n\x0c\n\x05\x06\0\x02\n\x02\x12\x03&\x0b\x16\n\x0c\n\x05\
+    \x06\0\x02\n\x03\x12\x03&!-\n%\n\x02\x04\0\x12\x03*\0\x1d\x1a\x1a\x20pro\
+    tolint:disable\x20INDENT\n\n\n\n\x03\x04\0\x01\x12\x03*\x08\x1a\n\t\n\
+    \x02\x04\x01\x12\x03+\0\x1e\n\n\n\x03\x04\x01\x01\x12\x03+\x08\x1b\n\t\n\
+    \x02\x04\x02\x12\x03,\0\x1c\n\n\n\x03\x04\x02\x01\x12\x03,\x08\x19\n\t\n\
+    \x02\x04\x03\x12\x03-\0\x1d\n\n\n\x03\x04\x03\x01\x12\x03-\x08\x1a\n\t\n\
+    \x02\x04\x04\x12\x03.\0\x1e\n\n\n\x03\x04\x04\x01\x12\x03.\x08\x1b\n\t\n\
+    \x02\x04\x05\x12\x03/\0\x1f\n\n\n\x03\x04\x05\x01\x12\x03/\x08\x1c\n\t\n\
+    \x02\x04\x06\x12\x030\0\x1d\n\n\n\x03\x04\x06\x01\x12\x030\x08\x1a\n\t\n\
+    \x02\x04\x07\x12\x031\0\x1e\n\n\n\x03\x04\x07\x01\x12\x031\x08\x1b\n\t\n\
+    \x02\x04\x08\x12\x032\0\x1d\n\n\n\x03\x04\x08\x01\x12\x032\x08\x1a\n\t\n\
+    \x02\x04\t\x12\x033\0\x1e\n\n\n\x03\x04\t\x01\x12\x033\x08\x1b\n\t\n\x02\
+    \x04\n\x12\x034\0\x20\n\n\n\x03\x04\n\x01\x12\x034\x08\x1d\n\t\n\x02\x04\
+    \x0b\x12\x035\0!\n\n\n\x03\x04\x0b\x01\x12\x035\x08\x1e\n\t\n\x02\x04\
+    \x0c\x12\x036\0\x1a\n\n\n\x03\x04\x0c\x01\x12\x036\x08\x17\n\t\n\x02\x04\
+    \r\x12\x037\0\x1b\n\n\n\x03\x04\r\x01\x12\x037\x08\x18\n\t\n\x02\x04\x0e\
+    \x12\x038\0\x1c\n\n\n\x03\x04\x0e\x01\x12\x038\x08\x19\n\t\n\x02\x04\x0f\
+    \x12\x039\0\x1c\n\n\n\x03\x04\x0f\x01\x12\x039\x08\x1a\n\t\n\x02\x04\x10\
+    \x12\x03:\0\x1c\n\n\n\x03\x04\x10\x01\x12\x03:\x08\x19\n\t\n\x02\x04\x11\
+    \x12\x03;\0\x1d\n\n\n\x03\x04\x11\x01\x12\x03;\x08\x1a\n\t\n\x02\x04\x12\
+    \x12\x03<\0\x1c\n\n\n\x03\x04\x12\x01\x12\x03<\x08\x19\n\t\n\x02\x04\x13\
+    \x12\x03=\0\x1d\n\n\n\x03\x04\x13\x01\x12\x03=\x08\x1a\n\n\n\x02\x04\x14\
+    \x12\x04?\0A\x01\n\n\n\x03\x04\x14\x01\x12\x03?\x08\x13\n\x0b\n\x04\x04\
+    \x14\x02\0\x12\x03@\x02\x13\n\x0c\n\x05\x04\x14\x02\0\x05\x12\x03@\x02\
+    \x08\n\x0c\n\x05\x04\x14\x02\0\x01\x12\x03@\t\x0e\n\x0c\n\x05\x04\x14\
+    \x02\0\x03\x12\x03@\x11\x12\n\n\n\x02\x04\x15\x12\x04C\0E\x01\n\n\n\x03\
+    \x04\x15\x01\x12\x03C\x08\x14\n\x0b\n\x04\x04\x15\x02\0\x12\x03D\x02\x14\
+    \n\x0c\n\x05\x04\x15\x02\0\x05\x12\x03D\x02\x08\n\x0c\n\x05\x04\x15\x02\
+    \0\x01\x12\x03D\t\x0f\n\x0c\n\x05\x04\x15\x02\0\x03\x12\x03D\x12\x13b\
+    \x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -2185,7 +2442,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(20);
+            let mut messages = ::std::vec::Vec::with_capacity(22);
             messages.push(GetServicesRequest::generated_message_descriptor_data());
             messages.push(GetServicesResponse::generated_message_descriptor_data());
             messages.push(GetServiceRequest::generated_message_descriptor_data());
@@ -2206,6 +2463,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(UpdateStepResponse::generated_message_descriptor_data());
             messages.push(DeleteStepRequest::generated_message_descriptor_data());
             messages.push(DeleteStepResponse::generated_message_descriptor_data());
+            messages.push(TestRequest::generated_message_descriptor_data());
+            messages.push(TestResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(0);
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),

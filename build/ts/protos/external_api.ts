@@ -2,6 +2,7 @@
 // @generated from protobuf file "external_api.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
+import { WireType } from "@protobuf-ts/runtime";
 import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
 import type { IBinaryWriter } from "@protobuf-ts/runtime";
 import { UnknownFieldHandler } from "@protobuf-ts/runtime";
@@ -112,6 +113,24 @@ export interface DeleteStepRequest {
  * @generated from protobuf message protos.DeleteStepResponse
  */
 export interface DeleteStepResponse {
+}
+/**
+ * @generated from protobuf message protos.TestRequest
+ */
+export interface TestRequest {
+    /**
+     * @generated from protobuf field: string input = 1;
+     */
+    input: string;
+}
+/**
+ * @generated from protobuf message protos.TestResponse
+ */
+export interface TestResponse {
+    /**
+     * @generated from protobuf field: string output = 2;
+     */
+    output: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class GetServicesRequest$Type extends MessageType<GetServicesRequest> {
@@ -633,6 +652,100 @@ class DeleteStepResponse$Type extends MessageType<DeleteStepResponse> {
  * @generated MessageType for protobuf message protos.DeleteStepResponse
  */
 export const DeleteStepResponse = new DeleteStepResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TestRequest$Type extends MessageType<TestRequest> {
+    constructor() {
+        super("protos.TestRequest", [
+            { no: 1, name: "input", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<TestRequest>): TestRequest {
+        const message = { input: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<TestRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TestRequest): TestRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string input */ 1:
+                    message.input = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: TestRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string input = 1; */
+        if (message.input !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.input);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TestRequest
+ */
+export const TestRequest = new TestRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TestResponse$Type extends MessageType<TestResponse> {
+    constructor() {
+        super("protos.TestResponse", [
+            { no: 2, name: "output", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<TestResponse>): TestResponse {
+        const message = { output: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<TestResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TestResponse): TestResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string output */ 2:
+                    message.output = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: TestResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string output = 2; */
+        if (message.output !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.output);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TestResponse
+ */
+export const TestResponse = new TestResponse$Type();
 /**
  * @generated ServiceType for protobuf service protos.External
  */
@@ -646,5 +759,6 @@ export const External = new ServiceType("protos.External", [
     { name: "GetSteps", options: {}, I: GetStepsRequest, O: GetStepsResponse },
     { name: "CreateStep", options: {}, I: CreateStepRequest, O: CreateStepResponse },
     { name: "UpdateStep", options: {}, I: UpdateStepRequest, O: UpdateStepResponse },
-    { name: "DeleteStep", options: {}, I: DeleteStepRequest, O: DeleteStepResponse }
+    { name: "DeleteStep", options: {}, I: DeleteStepRequest, O: DeleteStepResponse },
+    { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

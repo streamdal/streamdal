@@ -4,6 +4,8 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./external_api";
+import type { TestResponse } from "./external_api";
+import type { TestRequest } from "./external_api";
 import type { DeleteStepResponse } from "./external_api";
 import type { DeleteStepRequest } from "./external_api";
 import type { UpdateStepResponse } from "./external_api";
@@ -91,6 +93,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: DeleteStep(protos.DeleteStepRequest) returns (protos.DeleteStepResponse);
      */
     deleteStep(input: DeleteStepRequest, options?: RpcOptions): UnaryCall<DeleteStepRequest, DeleteStepResponse>;
+    /**
+     * Test method
+     *
+     * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
+     */
+    test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse>;
 }
 /**
  * @generated from protobuf service protos.External
@@ -190,5 +198,14 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
     deleteStep(input: DeleteStepRequest, options?: RpcOptions): UnaryCall<DeleteStepRequest, DeleteStepResponse> {
         const method = this.methods[9], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeleteStepRequest, DeleteStepResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * Test method
+     *
+     * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
+     */
+    test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
+        const method = this.methods[10], opt = this._transport.mergeOptions(options);
+        return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

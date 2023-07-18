@@ -34,6 +34,9 @@ service External {
 
   // Delete a step
   rpc DeleteStep(DeleteStepRequest) returns (DeleteStepResponse);
+
+  // Test method
+  rpc Test(TestRequest) returns (TestResponse);
 }
 
 // protolint:disable INDENT
@@ -57,3 +60,11 @@ message UpdateStepRequest {}
 message UpdateStepResponse {}
 message DeleteStepRequest {}
 message DeleteStepResponse {}
+
+message TestRequest {
+  string input = 1;
+}
+
+message TestResponse {
+  string output = 2;
+}

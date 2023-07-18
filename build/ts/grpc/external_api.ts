@@ -28,6 +28,8 @@ export interface ProtoGrpcType {
     GetStepsResponse: MessageTypeDefinition
     SetPipelineRequest: MessageTypeDefinition
     SetPipelineResponse: MessageTypeDefinition
+    TestRequest: MessageTypeDefinition
+    TestResponse: MessageTypeDefinition
     UpdateStepRequest: MessageTypeDefinition
     UpdateStepResponse: MessageTypeDefinition
   }
