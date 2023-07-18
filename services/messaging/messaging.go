@@ -3,12 +3,12 @@ package messaging
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
