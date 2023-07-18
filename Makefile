@@ -59,6 +59,7 @@ generate/ts: clean/ts
 generate/ts:
 	mkdir -p build/ts/protos
 	mkdir -p build/ts/grpc
+	mkdir -p build/ts/grpc-web
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
@@ -71,7 +72,9 @@ generate/ts:
 		npm install; \
 		npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs \
 			--grpcLib=@grpc/grpc-js --outDir=./grpc ../../protos/*.proto; \
-		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto
+		npx protoc --ts_out ./protos --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto; \
+		npx protoc --proto_path=../../protos --grpc-web_out=import_style=typescript,mode=grpcweb:./grpc-web \
+		../../protos/**/*.proto ../../protos/*.proto
 
 	@echo Successfully compiled protos and generated types for Typescript
 
@@ -126,6 +129,7 @@ clean/ts: description = Remove all TS build artifacts
 clean/ts:
 	rm -rf ./build/ts/protos/*
 	rm -rf ./build/ts/grpc/*
+	rm -rf ./build/ts/grpc-web/*
 
 .PHONY: lint
 lint: description = Run protolint
