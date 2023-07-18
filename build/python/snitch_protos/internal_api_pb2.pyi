@@ -27,8 +27,29 @@ class Audience(_message.Message):
     service_name: str
     def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ...) -> None: ...
 
+class BusEvent(_message.Message):
+    __slots__ = ["_metadata", "command_response", "register_request", "request_id", "source"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    COMMAND_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    REGISTER_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
+    command_response: CommandResponse
+    register_request: RegisterRequest
+    request_id: str
+    source: str
+    def __init__(self, request_id: _Optional[str] = ..., source: _Optional[str] = ..., command_response: _Optional[_Union[CommandResponse, _Mapping]] = ..., register_request: _Optional[_Union[RegisterRequest, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class CommandResponse(_message.Message):
-    __slots__ = ["_metadata", "audience", "delete_pipeline", "pause_pipeline", "set_pipeline", "type", "unpause_pipeline"]
+    __slots__ = ["_metadata", "audience", "delete_pipeline", "pause_pipeline", "set_pipeline", "unpause_pipeline"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -40,7 +61,6 @@ class CommandResponse(_message.Message):
     DELETE_PIPELINE_FIELD_NUMBER: _ClassVar[int]
     PAUSE_PIPELINE_FIELD_NUMBER: _ClassVar[int]
     SET_PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
     UNPAUSE_PIPELINE_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
     _metadata: _containers.ScalarMap[str, str]
@@ -48,39 +68,65 @@ class CommandResponse(_message.Message):
     delete_pipeline: _pipeline_pb2.DeletePipelineCommand
     pause_pipeline: _pipeline_pb2.PausePipelineCommand
     set_pipeline: _pipeline_pb2.SetPipelineCommand
-    type: CommandType
     unpause_pipeline: _pipeline_pb2.UnpausePipelineCommand
-    def __init__(self, type: _Optional[_Union[CommandType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., set_pipeline: _Optional[_Union[_pipeline_pb2.SetPipelineCommand, _Mapping]] = ..., delete_pipeline: _Optional[_Union[_pipeline_pb2.DeletePipelineCommand, _Mapping]] = ..., pause_pipeline: _Optional[_Union[_pipeline_pb2.PausePipelineCommand, _Mapping]] = ..., unpause_pipeline: _Optional[_Union[_pipeline_pb2.UnpausePipelineCommand, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., set_pipeline: _Optional[_Union[_pipeline_pb2.SetPipelineCommand, _Mapping]] = ..., delete_pipeline: _Optional[_Union[_pipeline_pb2.DeletePipelineCommand, _Mapping]] = ..., pause_pipeline: _Optional[_Union[_pipeline_pb2.PausePipelineCommand, _Mapping]] = ..., unpause_pipeline: _Optional[_Union[_pipeline_pb2.UnpausePipelineCommand, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
-    __slots__ = ["audience", "last_activity_unix_timestamp_utc"]
+    __slots__ = ["_metadata", "audience", "last_activity_unix_timestamp_utc"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     LAST_ACTIVITY_UNIX_TIMESTAMP_UTC_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     last_activity_unix_timestamp_utc: int
-    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., last_activity_unix_timestamp_utc: _Optional[int] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., last_activity_unix_timestamp_utc: _Optional[int] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class MetricsRequest(_message.Message):
-    __slots__ = ["audience", "rule_id", "rule_name"]
+    __slots__ = ["_metadata", "audience", "rule_id", "rule_name"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     RULE_ID_FIELD_NUMBER: _ClassVar[int]
     RULE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     rule_id: str
     rule_name: str
-    def __init__(self, rule_id: _Optional[str] = ..., rule_name: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, rule_id: _Optional[str] = ..., rule_name: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class NotifyRequest(_message.Message):
-    __slots__ = ["audience", "occurred_at_unix_ts_utc", "rule_id", "rule_name"]
+    __slots__ = ["_metadata", "audience", "occurred_at_unix_ts_utc", "rule_id", "rule_name"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
     RULE_ID_FIELD_NUMBER: _ClassVar[int]
     RULE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     occurred_at_unix_ts_utc: int
     rule_id: str
     rule_name: str
-    def __init__(self, rule_id: _Optional[str] = ..., rule_name: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
+    def __init__(self, rule_id: _Optional[str] = ..., rule_name: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
     __slots__ = ["_metadata", "dry_run", "service_name"]
