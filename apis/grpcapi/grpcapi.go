@@ -9,6 +9,8 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/reflection"
+	_ "google.golang.org/grpc/reflection"
 
 	"github.com/streamdal/snitch-server/deps"
 	"github.com/streamdal/snitch-server/util"
@@ -59,6 +61,8 @@ func (g *GRPCAPI) Run() error {
 
 	protos.RegisterInternalServer(grpcServer, g.newInternalServer())
 	protos.RegisterExternalServer(grpcServer, g.newExternalServer())
+
+	reflection.Register(grpcServer)
 
 	llog.Infof("GRPCAPI server listening on %v", g.Deps.Config.GRPCAPIListenAddress)
 
