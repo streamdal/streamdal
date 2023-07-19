@@ -1,6 +1,6 @@
 [package]
 name = "snitch-protos"
-version = "0.0.36"
+version = "0.0.37"
 edition = "2021"
 authors = ["Daniel Selans <daniel@streamdal.com>"]
 categories = ["development-tools"]
