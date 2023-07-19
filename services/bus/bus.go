@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -9,11 +10,15 @@ import (
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/snitch-server/validate"
 )
 
 const (
-	StreamName    = "snitch"
-	StreamSubject = "events"
+	StreamName    = "snitch_events"
+	StreamSubject = "broadcast"
+	FullSubject   = StreamName + "." + StreamSubject
 
 	BroadcastSourceMetadataKey = "broadcast_src"
 )
@@ -51,12 +56,12 @@ func New(ctx context.Context, natsBackend natty.INatty, nodeName string) (*Bus, 
 
 func prepareNATS(ctx context.Context, natsBackend natty.INatty, nodeName string) error {
 	// Won't error if stream already exists
-	if err := natsBackend.CreateStream(ctx, StreamName, []string{StreamSubject}); err != nil {
+	if err := natsBackend.CreateStream(ctx, StreamName, []string{FullSubject}); err != nil {
 		return errors.Wrap(err, "error creating stream")
 	}
 
 	// Won't error if consumer already exists
-	if err := natsBackend.CreateConsumer(ctx, StreamName, nodeName, StreamSubject); err != nil {
+	if err := natsBackend.CreateConsumer(ctx, StreamName, nodeName, FullSubject); err != nil {
 		return errors.Wrap(err, "error creating consumer")
 	}
 
@@ -68,7 +73,7 @@ func prepareNATS(ctx context.Context, natsBackend natty.INatty, nodeName string)
 func (b *Bus) RunConsumer() error {
 	for {
 		err := b.NATS.Consume(b.ctx, &natty.ConsumerConfig{
-			Subject:      StreamSubject,
+			Subject:      FullSubject,
 			StreamName:   StreamName,
 			ConsumerName: b.nodeName,
 		}, b.handler)
@@ -92,14 +97,21 @@ func (b *Bus) RunConsumer() error {
 // consumer handler!!!! ~DS 07.16.2023
 func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("broadcasting registration: %v", req)
-	req.XMetadata[BroadcastSourceMetadataKey] = b.nodeName
 
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return errors.Wrap(err, "error marshalling request")
+	// Generate a bus event
+	busMessage := &protos.BusEvent{
+		RequestId: util.GenerateUUID(),
+		Source:    b.nodeName,
+		Event:     &protos.BusEvent_RegisterRequest{RegisterRequest: req},
+		XMetadata: nil, // original metadata is inside the register request
 	}
 
-	b.NATS.Publish(ctx, StreamSubject, data)
+	data, err := proto.Marshal(busMessage)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling bus message")
+	}
+
+	b.NATS.Publish(ctx, FullSubject, data)
 
 	return nil
 }
@@ -116,13 +128,67 @@ func (b *Bus) BroadcastDeregistration(req *protos.RegisterRequest) error {
 	return nil
 }
 
-// handler is the handler that is used for deciding what to do with a message
-// consumed from the snitch NATS stream. In other words, when something is
-// broadcast across the snitch stream - this handler will be executed;
-// *nats.Bus.Data will contain the protos.ResponseCommand payload.
-// TODO: Implement
+// handler every time a new message is received on the NATS broadcast stream.
+// This method is responsible for decoding the message and executing the
+// appropriate msg handler.
 func (b *Bus) handler(ctx context.Context, msg *nats.Msg) error {
-	b.log.WithField("msg", string(msg.Data)).Info("Received message")
+	llog := b.log.WithField("method", "handler")
+	llog.Debug("received message")
+
+	if err := msg.AckSync(); err != nil {
+		llog.Errorf("unable to ack message: %s", err)
+	}
+
+	busEvent := &protos.BusEvent{}
+
+	if err := proto.Unmarshal(msg.Data, busEvent); err != nil {
+		return errors.Wrap(err, "error unmarshalling bus event")
+	}
+
+	if err := validate.BusEvent(busEvent); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	llog = llog.WithFields(logrus.Fields{
+		"request_id": busEvent.RequestId,
+		"source":     busEvent.Source,
+	})
+
+	var err error
+
+	switch t := busEvent.Event.(type) {
+	case *protos.BusEvent_RegisterRequest:
+		err = b.handleRegisterRequestBusEvent(ctx, busEvent.GetRegisterRequest())
+	case *protos.BusEvent_CommandResponse:
+		err = b.handleCommandResponseBusEvent(ctx, busEvent.GetCommandResponse())
+	default:
+		return fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
+	}
+
+	if err != nil {
+		return errors.Wrap(err, "error handling bus event")
+	}
+
+	return nil
+}
+
+// TODO: Implement
+func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.RegisterRequest) error {
+	b.log.Debugf("handling register request bus event: %v", req)
+	if err := validate.RegisterRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	return nil
+}
+
+// TODO: Implement
+func (b *Bus) handleCommandResponseBusEvent(ctx context.Context, req *protos.CommandResponse) error {
+	b.log.Debugf("handling comand response bus event: %v", req)
+
+	if err := validate.CommandResponse(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
 
 	return nil
 }

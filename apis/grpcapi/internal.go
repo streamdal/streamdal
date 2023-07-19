@@ -28,7 +28,6 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "invalid register request")
 	}
 
-	// TODO: Save registration internally -- should we do this here or do it through broadcast?
 	if err := s.Deps.StoreService.SaveRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")
 	}
