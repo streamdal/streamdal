@@ -3,12 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/alecthomas/kingpin/v2"
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
+	_ "gopkg.in/relistan/rubberneck.v1"
 
 	"github.com/streamdal/snitch-server/apis/grpcapi"
 	"github.com/streamdal/snitch-server/apis/httpapi"
@@ -18,26 +17,17 @@ import (
 
 var (
 	version = "No version specified"
-
-	envFile = kingpin.Flag("envfile", "Local Env file to read at startup").Short('e').Default(".env").String()
-	debug   = kingpin.Flag("debug", "Enable debug output").Short('d').Bool()
 )
 
-func init() {
-	// Parse CLI stuff
-	kingpin.Version(version)
-	kingpin.CommandLine.HelpFlag.Short('h')
-	kingpin.CommandLine.VersionFlag.Short('v')
-	kingpin.Parse()
+func main() {
+	cfg := config.New(version)
 
-	if *debug {
+	if cfg.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	} else {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
-}
 
-func main() {
 	// Start DataDog tracer
 	if os.Getenv("DD_ENV") != "" {
 		tracer.Start(tracer.WithAnalytics(true))
@@ -51,16 +41,6 @@ func main() {
 	}
 
 	log := logrus.WithField("method", "main")
-	log.WithField("filename", *envFile).Debug("Loading env file")
-
-	if err := godotenv.Load(*envFile); err != nil {
-		log.WithFields(logrus.Fields{"filename": *envFile, "err": err.Error()}).Warn("Unable to load dotenv file")
-	}
-
-	cfg := config.New()
-	if err := cfg.LoadEnvVars(); err != nil {
-		log.WithError(err).Fatal("could not instantiate configuration")
-	}
 
 	d, err := deps.New(version, cfg)
 	if err != nil {
@@ -102,6 +82,5 @@ func run(d *deps.Dependencies) error {
 }
 
 func displayInfo(d *deps.Dependencies) {
-	logrus.Infof("Version: %s", d.Version)
-	logrus.Infof("Configuration: %+v", d.Config)
+	logrus.Infof("version: %s", d.Config.VersionStr)
 }

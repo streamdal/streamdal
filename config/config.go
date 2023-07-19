@@ -1,57 +1,58 @@
 package config
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
-
-	"github.com/streamdal/snitch-server/util"
+	"github.com/alecthomas/kong"
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 const (
+	EnvFile         = ".env"
 	EnvConfigPrefix = "SNITCH_SERVER"
 )
 
 type Config struct {
-	HealthFreqSec int    `envconfig:"HEALTH_FREQ_SEC" default:"60"`
-	EnvName       string `envconfig:"ENV_NAME" default:"local"`
-	ServiceName   string `envconfig:"SERVICE_NAME" default:"snitch-server"`
-	NodeName      string `envconfig:"NODE_NAME"`
+	Version               kong.VersionFlag `help:"Show version and exit" short:"v" env:"-"`
+	Debug                 bool             `help:"Enable debug logging" short:"d" default:"false"`
+	NodeName              string           `help:"Name for this node" required:"true" help:"Node name (must be unique in cluster)" short:"n"`
+	AuthToken             string           `help:"Authentication token" required:"true" short:"t"`
+	HTTPAPIListenAddress  string           `help:"HTTP API listen address" default:":8080"`
+	GRPCAPIListenAddress  string           `help:"gRPC API listen address" default:":9090"`
+	NATSURL               []string         `help:"Address for NATS cluster used by snitch-server" default:"localhost:4222"`
+	NATSUseTLS            bool             `help:"Whether to use TLS for NATS" default:"false"`
+	NATSTLSSkipVerify     bool             `help:"Whether to skip TLS verification" default:"false"`
+	NATSTLSCertFile       string           `help:"TLS cert file"`
+	NATSTLSKeyFile        string           `help:"TLS key file"`
+	NATSTLSCaFile         string           `help:"TLS ca file"`
+	NATSNumBucketReplicas int              `help:"Number of replicas NATS K/V buckets should use" default:"1"`
+	HealthFreqSec         int              `help:"How often to perform health checks on dependencies" default:"60"`
 
-	AuthToken            string `envconfig:"AUTH_TOKEN" required:"true"`
-	HTTPAPIListenAddress string `envconfig:"HTTP_API_LISTEN_ADDRESS" default:":8080"`
-	GRPCAPIListenAddress string `envconfig:"GRPC_API_LISTEN_ADDRESS" default:":9090"`
-
-	NATSURL               []string `envconfig:"NATS_URL" default:"localhost:4222"`
-	NATSUseTLS            bool     `envconfig:"NATS_USE_TLS" default:"false"`
-	NATSTLSSkipVerify     bool     `envconfig:"NATS_TLS_SKIP_VERIFY" default:"false"`
-	NATSTLSCertFile       string   `envconfig:"NATS_TLS_CERT_FILE"`
-	NATSTLSKeyFile        string   `envconfig:"NATS_TLS_KEY_FILE"`
-	NATSTLSCaFile         string   `envconfig:"NATS_TLS_CA_FILE"`
-	NATSNumBucketReplicas int      `envconfig:"NATS_NUM_BUCKET_REPLICAS"  default:"1"`
+	KongContext *kong.Context `kong:"-"`
+	// Need this because we are unable to access kong's vars
+	VersionStr string `kong:"-"`
 }
 
-func New() *Config {
-	return &Config{}
-}
+func New(version string) *Config {
+	logrus.WithField("filename", EnvFile).Debug("loading env file")
 
-func (c *Config) LoadEnvVars() error {
-	if err := envconfig.Process(EnvConfigPrefix, c); err != nil {
-		return fmt.Errorf("unable to fetch env vars: %s", err)
+	if err := godotenv.Load(EnvFile); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"filename": EnvFile,
+			"err":      err.Error(),
+		}).Debug("unable to load dotenv file")
 	}
 
-	if c.NodeName == "" {
-		hostname, err := os.Hostname()
-		if err != nil {
-			return errors.New("cannot determine hostname; set NODE_NAME env var")
-		}
+	cfg := &Config{}
+	cfg.KongContext = kong.Parse(cfg,
+		kong.Name("snitch-server"),
+		kong.Description("Server component in the snitch ecosystem"),
+		kong.DefaultEnvars(EnvConfigPrefix),
+		kong.Vars{
+			"version": version,
+		},
+	)
 
-		c.NodeName = hostname
-	}
+	cfg.VersionStr = version
 
-	c.NodeName = util.NormalizeString(c.NodeName)
-
-	return nil
+	return cfg
 }

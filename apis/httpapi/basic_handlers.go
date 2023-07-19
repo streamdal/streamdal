@@ -25,7 +25,7 @@ func (a *HTTPAPI) versionHandler(rw http.ResponseWriter, r *http.Request) {
 
 	response := &ResponseJSON{
 		Status:  http.StatusOK,
-		Message: "streamdal/snitch-server " + a.Deps.Version,
+		Message: "streamdal/snitch-server " + a.Deps.Config.VersionStr,
 	}
 
 	WriteJSON(rw, response, http.StatusOK)

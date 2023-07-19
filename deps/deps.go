@@ -16,7 +16,7 @@ import (
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
-	"github.com/streamdal/snitch-server/services/messaging"
+	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/store"
 )
 
@@ -27,8 +27,7 @@ const (
 type customCheck struct{}
 
 type Dependencies struct {
-	Version string
-	Config  *config.Config
+	Config *config.Config
 
 	CommandChannel chan *protos.CommandResponse
 
@@ -37,7 +36,7 @@ type Dependencies struct {
 	NATSBackend  natty.INatty
 
 	// Services
-	MessagingService messaging.IMsg
+	MessagingService bus.IBus
 	StoreService     store.IStore
 	Health           health.IHealth
 	ShutdownContext  context.Context
@@ -55,7 +54,6 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	d := &Dependencies{
-		Version:         version,
 		Config:          cfg,
 		Health:          gohealth,
 		ShutdownContext: ctx,
@@ -129,9 +127,9 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	msgService, err := messaging.New(d.ShutdownContext, d.NATSBackend, cfg.NodeName)
+	msgService, err := bus.New(d.ShutdownContext, d.NATSBackend, cfg.NodeName)
 	if err != nil {
-		return errors.Wrap(err, "unable to create new messaging service")
+		return errors.Wrap(err, "unable to create new bus service")
 	}
 
 	d.MessagingService = msgService

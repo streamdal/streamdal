@@ -23,12 +23,11 @@ var _ = Describe("HTTPAPI", func() {
 	)
 
 	BeforeEach(func() {
-		cfg = config.New()
+		cfg = config.New(testVersion)
 
 		d = &deps.Dependencies{
-			Version: testVersion,
-			Config:  cfg,
-			Health:  health.New(),
+			Config: cfg,
+			Health: health.New(),
 		}
 
 		api = New(d)
@@ -40,7 +39,7 @@ var _ = Describe("HTTPAPI", func() {
 		Context("when instantiating an api", func() {
 			It("should have correct attributes", func() {
 				Expect(api.Deps.Config).ToNot(BeNil())
-				Expect(api.Deps.Version).To(Equal(testVersion))
+				Expect(api.Deps.Config.VersionStr).To(Equal(testVersion))
 			})
 		})
 	})

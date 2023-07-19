@@ -5,9 +5,7 @@ go 1.18
 require (
 	github.com/InVisionApp/go-health/v2 v2.1.3
 	github.com/InVisionApp/go-logger v1.0.1
-	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/joho/godotenv v1.3.0
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nats-io/nats.go v1.27.1
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.8
@@ -22,8 +20,10 @@ require (
 )
 
 require (
+	github.com/alecthomas/kong v0.8.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	google.golang.org/protobuf v1.31.0
+	gopkg.in/relistan/rubberneck.v1 v1.1.0
 )
 
 require (
@@ -32,7 +32,6 @@ require (
 	github.com/DataDog/datadog-go/v5 v5.0.2 // indirect
 	github.com/DataDog/sketches-go v1.0.0 // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
-	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -52,9 +51,9 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/relistan/rubberneck v1.3.0 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tinylib/msgp v1.1.2 // indirect
-	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/term v0.10.0 // indirect
