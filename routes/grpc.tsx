@@ -1,28 +1,18 @@
 import { Layout } from "../components/layout.tsx";
-import { ExternalClient } from "../lib/protos/external_api.client.ts";
+import { ExternalClient } from "snitch-protos/protos/external_api.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+import { getEnv } from "../lib/utils.ts";
 
 const transport = new GrpcWebFetchTransport({
-  baseUrl: "http://localhost:9091",
+  baseUrl: `${await getEnv("SNITCH_GRPC_WEB_URL") || "http://localhost:9091"}`,
   format: "binary",
-  // fetchInit: {
-  //   meta: {
-  //     "auth_token": "1234",
-  //   },
-  //   headers: {
-  //     "auth_token": "1234",
-  //   },
-  // },
 });
 
 const client = new ExternalClient(transport);
 
 try {
-  // not 100% sure about the test request format
-  // const input = new TextEncoder().encode(JSON.stringify("test grpc-web call"));
-  // const r = TestRequest.create({ input });
   const { response } = await client.test({ input: "hello world" }, {
-    meta: { "auth_token": "1234" },
+    meta: { "auth-token": "1234" },
   });
   console.log("test response:", response);
 } catch (error) {
