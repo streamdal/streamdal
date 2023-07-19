@@ -1,7 +1,15 @@
 import { Handle, Position } from "reactflow";
 import { ParticipantsMenu } from "../rules/participantsMenu.tsx";
 
-const handleStyle = { left: 10 };
+// const handleStyle = { left: 2 };
+
+const getHandlePosition = (input: any) => {
+  if (input === "top") {
+    return Position.Top;
+  } else {
+    return Position.Bottom;
+  }
+};
 
 export const Service = ({ data }) => {
   return (
@@ -18,11 +26,20 @@ export const Service = ({ data }) => {
           </p>
         </div>
       </div>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-2 h-2 bg-purple-500"
-      />
+      <div className={"flex justify-evenly w-1/2 mt-2"}>
+        <Handle
+          type="target"
+          id="c"
+          position={Position.Bottom}
+          className="bg-transparent border-0 relative"
+        />
+        <Handle
+          type="source"
+          id="d"
+          position={Position.Bottom}
+          className="bg-transparent border-0 relative"
+        />
+      </div>
     </div>
   );
 };
@@ -41,14 +58,14 @@ export const Participants = ({ data }) => {
         <ParticipantsMenu id={data.label} />
       </div>
       <Handle
-        type="target"
-        position={Position.Top}
-        className="bg-transparent"
+        type="source"
+        position={getHandlePosition(data.source)}
+        className="bg-transparent border-0"
       />
       <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-2 h-2 bg-purple-500"
+        type="target"
+        position={getHandlePosition(data.target)}
+        className="bg-transparent border-0"
       />
     </div>
   );
@@ -56,26 +73,25 @@ export const Participants = ({ data }) => {
 
 export const Platform = ({ data }) => {
   return (
-    <div
-      className={"h-[224px] w-[224px] z-10 flex items-center justify-center"}
-    >
-      <p className={"z-10 absolute text-white"}>Kafka</p>
+    <>
       <div
-        className={"bg-web rounded-md border-1 border-black rotate-45 h-[145px] w-[145px] shadow-xl"}
+        className={"bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
+          " items-center"}
       >
+        <p className={"z-10 text-white"}>Kafka</p>
+        <Handle
+          type="source"
+          position={Position.Left}
+          id="a"
+          className="bg-transparent border-0"
+        />
+        <Handle
+          type="target"
+          position={Position.Right}
+          id="b"
+          className="bg-transparent border-0"
+        />
       </div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="a"
-        className="bg-transparent"
-      />
-      <Handle
-        type="target"
-        position={Position.Right}
-        id="b"
-        className="bg-transparent"
-      />
-    </div>
+    </>
   );
 };
