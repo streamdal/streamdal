@@ -1,8 +1,10 @@
-## Snitch Protobuf and Typescript types for Node
+## Typescript types and code for Snitch Protobuf
 
+This package contains a protobuf descriptor set at `/protos/protos.fds` as well as Typescript types
+for all protos and typescript client code for working with protos at `/protos`.
 
-There is a protobuf descriptor set (`/protos/protos.fds`), GRPC & bundled protobuf types at `/grpc`, 
-Typescript code and bundled protobuf types at (`/protos`) and GRPC-Web compatible types at `/grpc-web`.
+Additionally there are ESM Module compliant versions at `/esm`. These are suitable for use in Deno
+and other ESM Module compliant envs. 
 
 For an example of how to use them in your Node app,
 see: [Snitch Node Client](https://github.com/streamdal/snitch-node-client)
