@@ -3,15 +3,15 @@
 // tslint:disable
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
-import { Internal } from "./internal_api";
-import type { MetricsRequest } from "./internal_api";
-import type { NotifyRequest } from "./internal_api";
-import type { StandardResponse } from "./common";
-import type { HeartbeatRequest } from "./internal_api";
+import { Internal } from "./internal_api.ts";
+import type { MetricsRequest } from "./internal_api.ts";
+import type { NotifyRequest } from "./internal_api.ts";
+import type { StandardResponse } from "./common.ts";
+import type { HeartbeatRequest } from "./internal_api.ts";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
-import type { CommandResponse } from "./internal_api";
-import type { RegisterRequest } from "./internal_api";
+import type { CommandResponse } from "./internal_api.ts";
+import type { RegisterRequest } from "./internal_api.ts";
 import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 /**

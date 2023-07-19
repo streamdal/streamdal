@@ -2,11 +2,11 @@
 // @generated from protobuf file "pipeline.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
-import { CustomStep } from "./steps/custom";
-import { DecodeStep } from "./steps/decode";
-import { EncodeStep } from "./steps/encode";
-import { TransformStep } from "./steps/transform";
-import { DetectiveStep } from "./steps/detective";
+import { CustomStep } from "./steps/custom.ts";
+import { DecodeStep } from "./steps/decode.ts";
+import { EncodeStep } from "./steps/encode.ts";
+import { TransformStep } from "./steps/transform.ts";
+import { DetectiveStep } from "./steps/detective.ts";
 /**
  * SDK generates a WASM request and passes this to the WASM func
  *
