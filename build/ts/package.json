@@ -26,5 +26,5 @@
     "@protobuf-ts/plugin": "^2.9.0",
     "glob": "^10.3.3"
   },
-  "main": "/ts/types"
+  "main": "/protos/external_api.client.ts"
 }
