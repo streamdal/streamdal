@@ -7,6 +7,7 @@ import {
 } from "../components/shapes/customNodes.tsx";
 import {
   MarkerType,
+  useNodesState,
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 
 const initialNodes = [
@@ -111,10 +112,12 @@ const nodeTypes = {
   participants: Participants,
 };
 export default function Flow() {
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <ReactFlow
-        nodes={initialNodes}
+        nodes={nodes}
+        onNodesChange={onNodesChange}
         edges={initialEdges}
         nodeTypes={nodeTypes}
       >
