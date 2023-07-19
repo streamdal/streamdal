@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/streamdal/stitch-protos/build/ts/node",
   "dependencies": {
+    "@grpc/grpc-js":"^1.8.18",
     "@protobuf-ts/plugin": "^2.9.0"
   },
   "devDependencies": {

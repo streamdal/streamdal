@@ -63,7 +63,7 @@ generate/ts:
 
 	cd ./build/ts; \
 		npm install; \
-		npx protoc --ts_out ./protos --ts_opt optimize_code_size --proto_path \
+		npx protoc --ts_out ./protos --ts_opt optimize_code_size,client_grpc1 --proto_path \
 			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
 		npm run build:deno; \
 		npm run build:node; \
