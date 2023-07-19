@@ -2,10 +2,14 @@
 
 The server component in the `snitch` ecosystem.
 
-The server exposes two APIs: 
+The server exposes 3 APIs:
 
-1. gRPC API on `:9090`
-2. REST API on `:8080`
+1. gRPC API on port `9090` (used by SDKs)
+   1. Used by SDKs
+2. gRPC-Web API on port `9091`
+   1. Used by the UI component
+3. REST API on port `8080`
+   1. Exposes metrics, prometheus and health-check endpoints
 
 ## Development
 
@@ -13,7 +17,10 @@ To develop _against_ the `snitch-server`, you must have Go installed as you
 will need to compile the server. You can run `make setup` which will install
 it via `brew`. Otherwise, you will have to install Go manually.
 
-To run the full stack, run: `make run/dev`
+To run the `snitch-server` and its dependencies, run: `make run/dev`
+
+To develop the `snitch-server` itself, you'll want to only run the `NATS` and
+`envoy` dependencies and run `go run main.go` manually, on-demand.
 
 ## gRPC API Usage
 

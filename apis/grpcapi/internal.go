@@ -64,7 +64,7 @@ MAIN:
 	}
 
 	if shutdown {
-		s.log.Debug("register handler shutting down for req id '%s'", server.Context().Value("id"))
+		s.log.Debugf("register handler shutting down for req id '%s'", server.Context().Value("id"))
 
 		// Notify client that they need to re-register because of shutdown
 		return GRPCServerShutdownError
