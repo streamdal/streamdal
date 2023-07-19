@@ -7,6 +7,14 @@ The server exposes two APIs:
 1. gRPC API on `:9090`
 2. REST API on `:8080`
 
+## Development
+
+To develop _against_ the `snitch-server`, you must have Go installed as you 
+will need to compile the server. You can run `make setup` which will install
+it via `brew`. Otherwise, you will have to install Go manually.
+
+To run the full stack, run: `make run/dev`
+
 ## gRPC API Usage
 
 You can view the available methods by looking at [protos](https://github.com/streamdal/protos)
@@ -48,3 +56,4 @@ either in code or via `grpcurl`:
 $ grpcurl -d '{"input": "Hello world"}' -plaintext -H "auth-token: 1234" \
 localhost:9090 protos.External/Test
 ```
+

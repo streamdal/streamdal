@@ -23,7 +23,7 @@ static_resources:
                     routes:
                       - match: { prefix: "/" }
                         route:
-                          cluster: echo_service
+                          cluster: snitch
                           timeout: 0s
                           max_stream_duration:
                             grpc_timeout_header_max: 0s
@@ -45,13 +45,13 @@ static_resources:
                   typed_config:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: echo_service
+    - name: snitch
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
       lb_policy: round_robin
       load_assignment:
-        cluster_name: cluster_0
+        cluster_name: snitch
         endpoints:
           - lb_endpoints:
             - endpoint:

@@ -26,6 +26,21 @@ help: HELP_SCRIPT = \
 help:
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
 
+### Setup
+
+.PHONY: setup/darwin
+setup/darwin: description = Setup for darwin
+setup/darwin:
+	brew install go
+
+### Dev
+
+.PHONY: run/dev
+run/dev: description = Run service & deps for dev
+run/dev:
+	docker-compose -f docker-compose.dev.yaml build && \
+	docker-compose -f docker-compose.dev.yaml up -d
+
 ### Build
 
 .PHONY: build
@@ -93,9 +108,3 @@ docker/push: description = Push local docker image
 docker/push:
 	docker push streamdal/$(SERVICE):$(VERSION) && \
 	docker push streamdal/$(SERVICE):latest
-
-
-.PHONY: docker/run
-docker/run: description = Build and run container + deps via docker-compose
-docker/run:
-	docker-compose up -d
