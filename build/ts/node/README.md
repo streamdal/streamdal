@@ -5,10 +5,6 @@ for Snitch Protobuf and GRPC.
 
 Example use:
 
-```typescript
-
-...coming soon...
-
-```
+`...coming soon...`
 
 For a more complete example, see the [snitch-node-client](https://github.com/streamdal/snitch-node-client)
