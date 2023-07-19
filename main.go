@@ -82,5 +82,5 @@ func run(d *deps.Dependencies) error {
 }
 
 func displayInfo(d *deps.Dependencies) {
-	logrus.Infof("version: %s", d.Config.VersionStr)
+	logrus.Infof("version: %s", d.Config.GetVersion())
 }

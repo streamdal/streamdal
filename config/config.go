@@ -28,8 +28,6 @@ type Config struct {
 	HealthFreqSec         int              `help:"How often to perform health checks on dependencies" default:"60"`
 
 	KongContext *kong.Context `kong:"-"`
-	// Need this because we are unable to access kong's vars
-	VersionStr string `kong:"-"`
 }
 
 func New(version string) *Config {
@@ -52,7 +50,14 @@ func New(version string) *Config {
 		},
 	)
 
-	cfg.VersionStr = version
-
 	return cfg
+}
+
+func (c *Config) GetVersion() string {
+	if ver, ok := c.KongContext.Model.Vars()["version"]; ok {
+		return ver
+	}
+
+	// If we ever get here, something with CLI/env var parsing is wrong
+	return "unknown"
 }
