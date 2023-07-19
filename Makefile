@@ -57,13 +57,16 @@ generate/go:
 generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
 generate/ts: clean/ts
 generate/ts:
-	mkdir -p build/ts/protos
+	mkdir -p build/ts/protos/node
+	mkdir -p build/ts/protos/deno
 	mkdir -p build/ts/deno
 	mkdir -p build/ts/node
 
 	cd ./build/ts; \
 		npm install; \
-		npx protoc --ts_out ./protos --ts_opt optimize_code_size,client_grpc1 --proto_path \
+		npx protoc --ts_out ./protos/node --ts_opt optimize_code_size,client_grpc1 --proto_path \
+			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
+		npx protoc --ts_out ./protos/deno --ts_opt optimize_code_size --proto_path \
 			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
 		npm run build:deno; \
 		npm run build:node; \
