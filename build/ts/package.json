@@ -5,7 +5,7 @@
   "main": "protos/external_api_client.js",
   "scripts": {
     "build:node": "npm run clean && npm run type:dts && npm run build:compile",
-    "build:compile": "swc ./protos -d ./node/protos",
+    "build:compile": "swc ./protos/node -d ./node/protos",
     "clean": "rimraf build coverage nyc_output",
     "build:deno": "node esm_module_extensions.js",
     "test": "echo \"Error: no test specified\" && exit 1",

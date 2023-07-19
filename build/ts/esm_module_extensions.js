@@ -2,7 +2,7 @@ import { glob } from "glob";
 import fs from "fs";
 import path from 'path';
 
-const files = await glob("./protos/**/*.ts")
+const files = await glob("./protos/deno/**/*.ts")
 
 files.forEach(file => {
   const dir = `./deno/${path.dirname(file)}`;
