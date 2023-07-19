@@ -58,15 +58,20 @@ generate/ts: description = Compile protobuf schema descriptor and generate types
 generate/ts: clean/ts
 generate/ts:
 	mkdir -p build/ts/protos
-	mkdir -p build/ts/esm
+	mkdir -p build/ts/deno
+	mkdir -p build/ts/node
 
 	cd ./build/ts; \
 		npm install; \
 		npx protoc --ts_out ./protos --ts_opt optimize_code_size --proto_path \
 			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
-		npm run esm || (exit 1)
+		npm run build:deno; \
+		npm run build:node; \
+		cp DENO.README.md ./deno/README.md; \
+		cp NODE.README.md ./node/README.md; \
+		cp package.json ./node/package.json || (exit 1)
 
-	@echo Successfully compiled Typescript protobuf types and client code
+	@echo Successfully compiled Typescript Protobuf libs for Node and Deno
 
 .PHONY: generate/rust
 generate/rust: description = Compile protobuf schemas for Go
@@ -118,7 +123,8 @@ clean/protoset:
 clean/ts: description = Remove all TS build artifacts
 clean/ts:
 	rm -rf ./build/ts/protos/*
-	rm -rf ./build/ts/esm/*
+	rm -rf ./build/ts/deno/*
+	rm -rf ./build/ts/node/*
 
 .PHONY: lint
 lint: description = Run protolint
