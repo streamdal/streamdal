@@ -36,3 +36,59 @@ func BusEvent(req *protos.BusEvent) error {
 
 	return nil
 }
+
+func SetPipelineCommand(req *protos.SetPipelineCommand) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.Name == "" {
+		return EmptyFieldError("Name")
+	}
+
+	if len(req.Steps) == 0 {
+		return errors.New("must have at least one step in pipeline")
+	}
+
+	return nil
+}
+
+func DeletePipelineCommand(req *protos.DeletePipelineCommand) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.Id == "" {
+		return EmptyFieldError("Id")
+	}
+
+	return nil
+}
+
+func PausePipelineCommand(req *protos.PausePipelineCommand) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.Id == "" {
+		return EmptyFieldError("Id")
+	}
+
+	return nil
+}
+
+func UnpausePipelineCommand(req *protos.UnpausePipelineCommand) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.Id == "" {
+		return EmptyFieldError("Id")
+	}
+
+	return nil
+}
+
+func EmptyFieldError(field string) error {
+	return errors.Errorf("field '%s' cannot be empty", field)
+}

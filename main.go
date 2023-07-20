@@ -71,7 +71,7 @@ func run(d *deps.Dependencies) error {
 
 	// Run Messaging service
 	go func() {
-		if err := d.MessagingService.RunConsumer(); err != nil {
+		if err := d.BusService.RunConsumer(); err != nil {
 			errChan <- errors.Wrap(err, "error during NATS consumer run")
 		}
 	}()

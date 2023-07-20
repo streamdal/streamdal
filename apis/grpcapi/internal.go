@@ -28,27 +28,30 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "invalid register request")
 	}
 
-	if err := s.Deps.StoreService.SaveRegistration(server.Context(), request); err != nil {
+	if err := s.Deps.StoreService.AddRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")
 	}
 
 	// Broadcast registration
-	if err := s.Deps.MessagingService.BroadcastRegistration(server.Context(), request); err != nil {
+	if err := s.Deps.BusService.BroadcastRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to broadcast registration")
 	}
 
 	var shutdown bool
 
-	// In loop: listen for commands on channel
+	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
 		select {
+		case <-server.Context().Done():
+			s.log.Debug("register handler detected client disconnect")
+			break MAIN
 		case <-s.Deps.ShutdownContext.Done():
 			s.log.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
 		case cmd := <-s.Deps.CommandChannel:
-			// Send command to current client
+			// Send command to connected client
 			if err := server.Send(cmd); err != nil {
 				s.log.WithError(err).Error("unable to send command to client")
 
@@ -56,7 +59,7 @@ MAIN:
 				return errors.Wrap(err, "unable to send command to client")
 			}
 
-			if err := s.Deps.MessagingService.BroadcastCommand(server.Context(), cmd); err != nil {
+			if err := s.Deps.BusService.BroadcastCommand(server.Context(), cmd); err != nil {
 				s.log.WithError(err).Error("unable to broadcast command")
 			}
 		}
@@ -70,7 +73,7 @@ MAIN:
 	}
 
 	// Client has disconnected -> broadcast deregistration
-	if err := s.Deps.MessagingService.BroadcastDeregistration(request); err != nil {
+	if err := s.Deps.BusService.BroadcastDeregistration(request); err != nil {
 		s.log.WithError(err).Error("unable to broadcast deregistration")
 	}
 

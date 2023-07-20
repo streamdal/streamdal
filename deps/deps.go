@@ -36,11 +36,11 @@ type Dependencies struct {
 	NATSBackend  natty.INatty
 
 	// Services
-	MessagingService bus.IBus
-	StoreService     store.IStore
-	Health           health.IHealth
-	ShutdownContext  context.Context
-	ShutdownCancel   context.CancelFunc
+	BusService      bus.IBus
+	StoreService    store.IStore
+	Health          health.IHealth
+	ShutdownContext context.Context
+	ShutdownCancel  context.CancelFunc
 }
 
 func New(version string, cfg *config.Config) (*Dependencies, error) {
@@ -127,19 +127,24 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	msgService, err := bus.New(d.ShutdownContext, d.NATSBackend, cfg.NodeName)
-	if err != nil {
-		return errors.Wrap(err, "unable to create new bus service")
-	}
-
-	d.MessagingService = msgService
-
 	storeService, err := store.New(d.ShutdownContext, d.CacheBackend, d.NATSBackend)
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
 	}
 
 	d.StoreService = storeService
+
+	busService, err := bus.New(&bus.Options{
+		Store:       storeService,
+		NATS:        d.NATSBackend,
+		NodeName:    d.Config.NodeName,
+		ShutdownCtx: d.ShutdownContext,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to create new bus service")
+	}
+
+	d.BusService = busService
 
 	return nil
 }
