@@ -39,7 +39,7 @@ var _ = Describe("HTTPAPI", func() {
 		Context("when instantiating an api", func() {
 			It("should have correct attributes", func() {
 				Expect(api.Deps.Config).ToNot(BeNil())
-				Expect(api.Deps.Config.VersionStr).To(Equal(testVersion))
+				Expect(api.Deps.Config.GetVersion()).To(Equal(testVersion))
 			})
 		})
 	})
