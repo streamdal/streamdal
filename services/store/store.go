@@ -11,7 +11,7 @@ import (
 )
 
 type IStore interface {
-	SaveRegistration(ctx context.Context, req *protos.RegisterRequest) error
+	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 }
 
 type Store struct {
@@ -30,7 +30,14 @@ func New(shutdownCtx context.Context, cacheBackend cache.ICache, natsBackend nat
 	}, nil
 }
 
-func (s *Store) SaveRegistration(ctx context.Context, req *protos.RegisterRequest) error {
+func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	s.log.Debugf("saving registration: %v", req)
+
+	// Maybe add it to cache
+
+	// Maybe add it to K/V
+
+	// Maybe send upstream to Streamdal cloud
+
 	return nil
 }

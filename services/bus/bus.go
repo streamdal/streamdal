@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -9,11 +10,15 @@ import (
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/validate"
 )
 
 const (
-	StreamName    = "snitch"
-	StreamSubject = "events"
+	StreamName    = "snitch_events"
+	StreamSubject = "broadcast"
+	FullSubject   = StreamName + "." + StreamSubject
 
 	BroadcastSourceMetadataKey = "broadcast_src"
 )
@@ -26,38 +31,61 @@ type IBus interface {
 }
 
 type Bus struct {
-	NATS     natty.INatty
-	nodeName string
-	ctx      context.Context
-	log      *logrus.Entry
+	options *Options
+	log     *logrus.Entry
 }
 
-func New(ctx context.Context, natsBackend natty.INatty, nodeName string) (*Bus, error) {
-	if nodeName == "" {
-		return nil, errors.New("node name must be provided")
+type Options struct {
+	Store       store.IStore
+	NATS        natty.INatty
+	NodeName    string
+	ShutdownCtx context.Context
+}
+
+func New(opts *Options) (*Bus, error) {
+	if err := opts.validate(); err != nil {
+		return nil, errors.Wrap(err, "error validating params")
 	}
 
-	if err := prepareNATS(ctx, natsBackend, nodeName); err != nil {
+	if err := prepareNATS(opts); err != nil {
 		return nil, errors.Wrap(err, "error creating consumer")
 	}
 
 	return &Bus{
-		NATS:     natsBackend,
-		nodeName: nodeName,
-		ctx:      ctx,
-		log:      logrus.WithField("pkg", "bus"),
+		options: opts,
+		log:     logrus.WithField("pkg", "bus"),
 	}, nil
 }
 
-func prepareNATS(ctx context.Context, natsBackend natty.INatty, nodeName string) error {
+func prepareNATS(opts *Options) error {
 	// Won't error if stream already exists
-	if err := natsBackend.CreateStream(ctx, StreamName, []string{StreamSubject}); err != nil {
+	if err := opts.NATS.CreateStream(opts.ShutdownCtx, StreamName, []string{FullSubject}); err != nil {
 		return errors.Wrap(err, "error creating stream")
 	}
 
 	// Won't error if consumer already exists
-	if err := natsBackend.CreateConsumer(ctx, StreamName, nodeName, StreamSubject); err != nil {
+	if err := opts.NATS.CreateConsumer(opts.ShutdownCtx, StreamName, opts.NodeName, FullSubject); err != nil {
 		return errors.Wrap(err, "error creating consumer")
+	}
+
+	return nil
+}
+
+func (o *Options) validate() error {
+	if o.ShutdownCtx == nil {
+		return errors.New("context must be provided")
+	}
+
+	if o.NodeName == "" {
+		return errors.New("node name must be provided")
+	}
+
+	if o.NATS == nil {
+		return errors.New("nats backend must be provided")
+	}
+
+	if o.Store == nil {
+		return errors.New("store service must be provided")
 	}
 
 	return nil
@@ -66,11 +94,13 @@ func prepareNATS(ctx context.Context, natsBackend natty.INatty, nodeName string)
 // RunConsumer is used for consuming message from the snitch NATS stream and
 // executing a message handler.
 func (b *Bus) RunConsumer() error {
+	fmt.Printf("options: %+v\n", b.options)
+
 	for {
-		err := b.NATS.Consume(b.ctx, &natty.ConsumerConfig{
-			Subject:      StreamSubject,
+		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
+			Subject:      FullSubject,
 			StreamName:   StreamName,
-			ConsumerName: b.nodeName,
+			ConsumerName: b.options.NodeName,
 		}, b.handler)
 		if err != nil {
 			if err == context.Canceled {
@@ -87,42 +117,46 @@ func (b *Bus) RunConsumer() error {
 	return nil
 }
 
-// NOTE: We should only broadcast commands! This ensures that we can always
-// unmarshal to check the type of message and route it accordingly in the
-// consumer handler!!!! ~DS 07.16.2023
-func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
-	b.log.Debugf("broadcasting registration: %v", req)
-	req.XMetadata[BroadcastSourceMetadataKey] = b.nodeName
+// handler every time a new message is received on the NATS broadcast stream.
+// This method is responsible for decoding the message and executing the
+// appropriate msg handler.
+func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
+	llog := b.log.WithField("method", "handler")
+	llog.Debug("received message")
 
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return errors.Wrap(err, "error marshalling request")
+	if err := msg.AckSync(); err != nil {
+		llog.Errorf("unable to ack message: %s", err)
 	}
 
-	b.NATS.Publish(ctx, StreamSubject, data)
+	busEvent := &protos.BusEvent{}
 
-	return nil
-}
+	if err := proto.Unmarshal(msg.Data, busEvent); err != nil {
+		return errors.Wrap(err, "error unmarshalling bus event")
+	}
 
-// TODO: Implement
-func (b *Bus) BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse) error {
-	b.log.Debugf("broadcasting command: %v", cmd)
-	return nil
-}
+	if err := validate.BusEvent(busEvent); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
 
-// TODO: Implement
-func (b *Bus) BroadcastDeregistration(req *protos.RegisterRequest) error {
-	b.log.Debugf("broadcasting deregistration: %v", req)
-	return nil
-}
+	llog = llog.WithFields(logrus.Fields{
+		"request_id": busEvent.RequestId,
+		"source":     busEvent.Source,
+	})
 
-// handler is the handler that is used for deciding what to do with a message
-// consumed from the snitch NATS stream. In other words, when something is
-// broadcast across the snitch stream - this handler will be executed;
-// *nats.Bus.Data will contain the protos.ResponseCommand payload.
-// TODO: Implement
-func (b *Bus) handler(ctx context.Context, msg *nats.Msg) error {
-	b.log.WithField("msg", string(msg.Data)).Info("Received message")
+	var err error
+
+	switch t := busEvent.Event.(type) {
+	case *protos.BusEvent_RegisterRequest:
+		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
+	case *protos.BusEvent_CommandResponse:
+		err = b.handleCommandResponseBusEvent(shutdownCtx, busEvent.GetCommandResponse())
+	default:
+		return fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
+	}
+
+	if err != nil {
+		return errors.Wrap(err, "error handling bus event")
+	}
 
 	return nil
 }

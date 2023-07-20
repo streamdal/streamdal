@@ -71,7 +71,7 @@ func run(d *deps.Dependencies) error {
 
 	// Run Messaging service
 	go func() {
-		if err := d.MessagingService.RunConsumer(); err != nil {
+		if err := d.BusService.RunConsumer(); err != nil {
 			errChan <- errors.Wrap(err, "error during NATS consumer run")
 		}
 	}()
@@ -82,5 +82,5 @@ func run(d *deps.Dependencies) error {
 }
 
 func displayInfo(d *deps.Dependencies) {
-	logrus.Infof("version: %s", d.Config.VersionStr)
+	logrus.Infof("version: %s", d.Config.GetVersion())
 }
