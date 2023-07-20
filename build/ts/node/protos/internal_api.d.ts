@@ -1,9 +1,9 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
-import { UnpausePipelineCommand } from "./pipeline";
-import { PausePipelineCommand } from "./pipeline";
-import { DeletePipelineCommand } from "./pipeline";
-import { SetPipelineCommand } from "./pipeline";
+import { UnpausePipelineCommand } from "./pipeline.js";
+import { PausePipelineCommand } from "./pipeline.js";
+import { DeletePipelineCommand } from "./pipeline.js";
+import { SetPipelineCommand } from "./pipeline.js";
 /**
  * Each consumer and producer should send periodic heartbeats to the server
  * to let the server know that they are still active.

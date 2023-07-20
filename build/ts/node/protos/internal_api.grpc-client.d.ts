@@ -1,11 +1,11 @@
 import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
 import type { BinaryReadOptions } from "@protobuf-ts/runtime";
-import type { MetricsRequest } from "./internal_api";
-import type { NotifyRequest } from "./internal_api";
-import type { StandardResponse } from "./common";
-import type { HeartbeatRequest } from "./internal_api";
-import type { CommandResponse } from "./internal_api";
-import type { RegisterRequest } from "./internal_api";
+import type { MetricsRequest } from "./internal_api.js";
+import type { NotifyRequest } from "./internal_api.js";
+import type { StandardResponse } from "./common.js";
+import type { HeartbeatRequest } from "./internal_api.js";
+import type { CommandResponse } from "./internal_api.js";
+import type { RegisterRequest } from "./internal_api.js";
 import * as grpc from "@grpc/grpc-js";
 /**
  * @generated from protobuf service protos.Internal
