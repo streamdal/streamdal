@@ -120,6 +120,19 @@ class RegisterRequest$Type extends MessageType {
  */
 export const RegisterRequest = new RegisterRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class DeregisterRequest$Type extends MessageType {
+    constructor() {
+        super("protos.DeregisterRequest", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeregisterRequest
+ */
+export const DeregisterRequest = new DeregisterRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class BusEvent$Type extends MessageType {
     constructor() {
         super("protos.BusEvent", [
@@ -127,6 +140,7 @@ class BusEvent$Type extends MessageType {
             { no: 2, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => CommandResponse },
             { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
+            { no: 102, name: "deregister_request", kind: "message", oneof: "event", T: () => DeregisterRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
