@@ -31,9 +31,11 @@ func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.D
 		return errors.Wrap(err, "validation error")
 	}
 
-	if err := b.options.Store.DeleteRegistration(req); err != nil {
+	if err := b.options.Store.DeleteRegistration(ctx, req); err != nil {
 		return errors.Wrap(err, "unable to delete registration")
 	}
+
+	return nil
 }
 
 func (b *Bus) handleCommandResponseBusEvent(ctx context.Context, req *protos.CommandResponse) error {

@@ -8,8 +8,8 @@ import (
 )
 
 type ICache interface {
-	Add(key string, value interface{}) error
-	Set(key string, value interface{})
+	Add(key string, value interface{}, ttl ...time.Duration) error
+	Set(key string, value interface{}, ttl ...time.Duration)
 	Get(key string) (value interface{}, ok bool)
 	Contains(key string) (exists bool)
 	Remove(key string) bool
@@ -22,19 +22,31 @@ type Cache struct {
 
 func New() (*Cache, error) {
 	return &Cache{
-		Cache: gcache.New(gcache.NoExpiration, 10*time.Minute),
+		Cache: gcache.New(gcache.NoExpiration, time.Minute),
 		log:   logrus.WithField("pkg", "cache"),
 	}, nil
 }
 
 // Add will error if adding a key that already exists in cache
-func (c *Cache) Add(key string, value interface{}) error {
-	return c.Cache.Add(key, value, gcache.NoExpiration)
+func (c *Cache) Add(key string, value interface{}, ttl ...time.Duration) error {
+	expiration := gcache.NoExpiration
+
+	if len(ttl) > 0 {
+		expiration = ttl[0]
+	}
+
+	return c.Cache.Add(key, value, expiration)
 }
 
 // Set will add OR overwrite an element in the cache
-func (c *Cache) Set(key string, value interface{}) {
-	c.Cache.Set(key, value, gcache.NoExpiration)
+func (c *Cache) Set(key string, value interface{}, ttl ...time.Duration) {
+	expiration := gcache.NoExpiration
+
+	if len(ttl) > 0 {
+		expiration = ttl[0]
+	}
+
+	c.Cache.Set(key, value, expiration)
 }
 
 func (c *Cache) Get(key string) (interface{}, bool) {
