@@ -27,7 +27,7 @@ type IBus interface {
 	RunConsumer() error
 	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse) error
-	BroadcastDeregistration(req *protos.RegisterRequest) error
+	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
 }
 
 type Bus struct {

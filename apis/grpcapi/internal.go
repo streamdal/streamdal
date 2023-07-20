@@ -82,7 +82,9 @@ MAIN:
 	}
 
 	// Client has disconnected -> broadcast deregistration
-	if err := s.Deps.BusService.BroadcastDeregistration(request); err != nil {
+	if err := s.Deps.BusService.BroadcastDeregistration(server.Context(), &protos.DeregisterRequest{
+		ServiceName: request.ServiceName,
+	}); err != nil {
 		llog.WithError(err).Error("unable to broadcast deregistration")
 	}
 

@@ -13,7 +13,7 @@ import (
 func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("broadcasting registration: %v", req)
 
-	// Generate a bus event
+	// Generate bus event
 	busMessage := &protos.BusEvent{
 		RequestId: util.GenerateUUID(),
 		Source:    b.options.NodeName,
@@ -37,8 +37,23 @@ func (b *Bus) BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse)
 	return nil
 }
 
-// TODO: Implement
-func (b *Bus) BroadcastDeregistration(req *protos.RegisterRequest) error {
-	b.log.Debugf("broadcasting deregistration: %v", req)
+func (b *Bus) BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error {
+	b.log.Debugf("broadcasting deregistration for service '%s'", req.ServiceName)
+
+	// Generate bus event
+	busMessage := &protos.BusEvent{
+		RequestId: util.GenerateUUID(),
+		Source:    b.options.NodeName,
+		Event:     &protos.BusEvent_DeregisterRequest{DeregisterRequest: req},
+		XMetadata: nil, // original metadata is inside the register request
+	}
+
+	data, err := proto.Marshal(busMessage)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling bus message")
+	}
+
+	b.options.NATS.Publish(ctx, FullSubject, data)
+
 	return nil
 }
