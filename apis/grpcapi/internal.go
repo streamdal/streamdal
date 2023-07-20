@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
@@ -37,6 +38,12 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "unable to broadcast registration")
 	}
 
+	llog := s.log.WithFields(logrus.Fields{
+		"service_name": request.ServiceName,
+	})
+
+	llog.Debug("beginning register command loop")
+
 	var shutdown bool
 
 	// Listen for cmds from external API; forward them to connected clients
@@ -44,13 +51,15 @@ MAIN:
 	for {
 		select {
 		case <-server.Context().Done():
-			s.log.Debug("register handler detected client disconnect")
+			llog.Debugf("register handler detected client (service: '%v') disconnect", request.ServiceName)
 			break MAIN
 		case <-s.Deps.ShutdownContext.Done():
-			s.log.Debug("register handler detected shutdown context cancellation")
+			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
 		case cmd := <-s.Deps.CommandChannel:
+			llog.Debug("received command on command channel")
+
 			// Send command to connected client
 			if err := server.Send(cmd); err != nil {
 				s.log.WithError(err).Error("unable to send command to client")
@@ -60,13 +69,13 @@ MAIN:
 			}
 
 			if err := s.Deps.BusService.BroadcastCommand(server.Context(), cmd); err != nil {
-				s.log.WithError(err).Error("unable to broadcast command")
+				llog.WithError(err).Error("unable to broadcast command")
 			}
 		}
 	}
 
 	if shutdown {
-		s.log.Debugf("register handler shutting down for req id '%s'", server.Context().Value("id"))
+		llog.Debugf("register handler shutting down for req id '%s'", server.Context().Value("id"))
 
 		// Notify client that they need to re-register because of shutdown
 		return GRPCServerShutdownError
@@ -74,7 +83,7 @@ MAIN:
 
 	// Client has disconnected -> broadcast deregistration
 	if err := s.Deps.BusService.BroadcastDeregistration(request); err != nil {
-		s.log.WithError(err).Error("unable to broadcast deregistration")
+		llog.WithError(err).Error("unable to broadcast deregistration")
 	}
 
 	return nil
