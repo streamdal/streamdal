@@ -4,6 +4,8 @@ import path from 'path';
 
 const files = await glob("./protos/deno/**/*.ts")
 
+//
+// Add .ts to imports so they are esm compliant (deno requires this)
 files.forEach(file => {
   //
   // going from /protos/deno to /deno/protos

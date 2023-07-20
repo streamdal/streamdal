@@ -1,9 +1,9 @@
 import { MessageType } from "@protobuf-ts/runtime";
-import { CustomStep } from "./steps/custom";
-import { DecodeStep } from "./steps/decode";
-import { EncodeStep } from "./steps/encode";
-import { TransformStep } from "./steps/transform";
-import { DetectiveStep } from "./steps/detective";
+import { CustomStep } from "./steps/custom.js";
+import { DecodeStep } from "./steps/decode.js";
+import { EncodeStep } from "./steps/encode.js";
+import { TransformStep } from "./steps/transform.js";
+import { DetectiveStep } from "./steps/detective.js";
 /**
  * SDK generates a WASM request and passes this to the WASM func
  *
