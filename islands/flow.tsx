@@ -1,5 +1,4 @@
 import ReactFlow, { Background, Controls } from "reactflow";
-import { useMemo } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import {
   Participants,
   Platform,
@@ -8,25 +7,35 @@ import {
 import {
   MarkerType,
   useNodesState,
+  useViewport,
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
+import {
+  useEffect,
+  useState,
+} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
 const initialNodes = [
   {
     id: "1",
     type: "service",
+    dragHandle: "#dragHandle",
     position: { x: 150, y: 0 },
     data: { label: "Service" },
   },
   {
     id: "2",
     type: "participants",
-    position: { x: 60, y: 200 },
+    dragHandle: "#dragHandle",
+    position: { x: 50, y: 200 },
+    zIndex: 2,
     data: { label: "Consumer", source: "top", target: "bottom" },
   },
   {
     id: "3",
     type: "participants",
-    position: { x: 335, y: 200 },
+    dragHandle: "#dragHandle",
+    position: { x: 325, y: 200 },
+    zIndex: 2,
     data: { label: "Producer", source: "bottom", target: "top" },
   },
   {
@@ -112,16 +121,39 @@ const nodeTypes = {
 };
 export default function Flow() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  // console.log("fuck", window.innerWidth / 2, window.innerHeight / 4);
+  const [width, setWidth] = useState<number>(window.innerWidth / 2);
+  const [height, setHeight] = useState<number>(window.innerHeight / 2);
+
+  const [defaultViewport, setDefaultViewport] = useState<any>({});
+
+  useEffect(() => {
+    setDefaultViewport({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      zoom: 1,
+    });
+    console.log(defaultViewport);
+  }, [width, height]);
+
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div
+      style={{ width: "100%", height: "100vh", zIndex: 0 }}
+      class="m-0 z-10"
+    >
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}
         edges={initialEdges}
         nodeTypes={nodeTypes}
+        defaultViewport={{
+          x: window.innerWidth / 3.5,
+          y: window.innerHeight / 10,
+          zoom: 1,
+        }}
       >
-        <Background />
-        <Controls />
+        <Background style={{ height: "100vh" }} />
+        <Controls position="top-right" style={{ marginTop: "30px" }} />
       </ReactFlow>
     </div>
   );

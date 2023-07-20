@@ -40,10 +40,10 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
         rel="stylesheet"
       />
     </Head>
-    <body className="h-screen">
-      <div className="flex flex-col w-full h-screen text-web bg-purple-50">
+    <body className="h-screen bg-purple-50">
+      <div className="flex flex-col w-screen h-screen text-web">
         {hideNav ? null : <NavBar />}
-        <div className="mx-8 my-6">
+        <div className="mx-8 my-6 z-0">
           {children}
         </div>
       </div>

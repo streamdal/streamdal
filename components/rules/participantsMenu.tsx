@@ -1,6 +1,6 @@
 import IconEye from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/eye.tsx";
 import { Delete, Edit } from "../icons/crud.tsx";
-import IconChevronDown from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/chevron-down.tsx";
+import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
 export const ParticipantsMenu = ({ id }: { id: string }) => {
@@ -12,14 +12,14 @@ export const ParticipantsMenu = ({ id }: { id: string }) => {
   };
 
   return (
-    <>
+    <div className={"rounded bg-purple-50 ml-4"}>
       <div
         id="dropdownButton"
         type="button"
         class="cursor-pointer"
         onClick={handleClick}
       >
-        <IconChevronDown class="w-6 h-6" aria-hidden="true" />
+        <IconDots class="w-6 h-6 text-gray-400" aria-hidden="true" />
       </div>
       <div
         id={`flow-${id}`}
@@ -51,6 +51,6 @@ export const ParticipantsMenu = ({ id }: { id: string }) => {
           </a>
         </ul>
       </div>
-    </>
+    </div>
   );
 };

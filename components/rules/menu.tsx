@@ -3,12 +3,12 @@ import IconEye from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/eye.tsx";
 import { Delete, Edit } from "../icons/crud.tsx";
 
 export const RuleMenu = ({ id }: { id: string }) => (
-  <>
+  <div className="z-40">
     <div
       id="dropdownDefaultButton"
       data-dropdown-toggle="rule-dropdown"
       type="button"
-      className="cursor-pointer"
+      className="cursor-pointer z-40"
     >
       <Kebab
         className="hover:text-web h-[20px] relative"
@@ -18,7 +18,7 @@ export const RuleMenu = ({ id }: { id: string }) => (
 
     <div
       id="rule-dropdown"
-      class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+      class="z-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
     >
       <ul
         class="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -44,5 +44,5 @@ export const RuleMenu = ({ id }: { id: string }) => (
         </a>
       </ul>
     </div>
-  </>
+  </div>
 );

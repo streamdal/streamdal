@@ -1,5 +1,6 @@
 import { Handle, Position } from "reactflow";
 import { ParticipantsMenu } from "../rules/participantsMenu.tsx";
+import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
 
 // const handleStyle = { left: 2 };
 
@@ -14,17 +15,22 @@ const getHandlePosition = (input: any) => {
 export const Service = ({ data }) => {
   return (
     <div class="h-[100px]">
-      <div class="h-[80px] w-[271px] flex items-center justify-between bg-white rounded shadow-lg z-10 border-1 border-purple-200 px-4">
+      <div class="h-[80px] w-[280px] flex items-center justify-between bg-white rounded shadow-lg z-10 border-1 border-purple-200 px-2">
+        <IconGripVertical
+          class="w-6 h-6 text-purple-100 cursor-grab"
+          id="dragHandle"
+        />
         <img
-          src={"/images/service-placeholder-icon.png"}
-          className={"h-[60px]"}
+          src={"/images/placeholder-icon.png"}
+          className={"h-[40px]"}
         />
         <div>
-          <h2 className={"text-xl mr-3"}>$Service Name</h2>
+          <h2 className={"text-lg mr-3"}>$Service Name</h2>
           <p class="text-streamdalPurple text-xs font-semibold mt-1">
             4 instances
           </p>
         </div>
+        <ParticipantsMenu id={data.label} />
       </div>
       <div className={"flex justify-evenly w-1/2 mt-2"}>
         <Handle
@@ -47,13 +53,17 @@ export const Service = ({ data }) => {
 export const Participants = ({ data }) => {
   return (
     <div className="h-[96px] flex items-center z-40">
-      <div className="w-[185px] h-[56px] bg-white rounded-md shadow-lg border-1 border-purple-200 flex items-center justify-between px-3">
+      <div className="w-[205px] h-[64px] bg-white rounded-md shadow-lg border-1 border-purple-200 flex items-center justify-between px-1">
+        <IconGripVertical
+          class="w-6 h-6 text-purple-100 cursor-grab"
+          id="dragHandle"
+        />
         <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
         <div className={"flex flex-col"}>
-          <h2 className={"text-md"}>
+          <h2 className={"text-[16px]"}>
             Item Name
           </h2>
-          <h3 class="text-sm text-gray-500">{data.label}</h3>
+          <h3 class="text-xs text-gray-500">{data.label}</h3>
         </div>
         <ParticipantsMenu id={data.label} />
       </div>
@@ -73,25 +83,23 @@ export const Participants = ({ data }) => {
 
 export const Platform = ({ data }) => {
   return (
-    <>
-      <div
-        className={"bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
-          " items-center"}
-      >
-        <p className={"z-10 text-white"}>Kafka</p>
-        <Handle
-          type="source"
-          position={Position.Left}
-          id="a"
-          className="bg-transparent border-0"
-        />
-        <Handle
-          type="target"
-          position={Position.Right}
-          id="b"
-          className="bg-transparent border-0"
-        />
-      </div>
-    </>
+    <div
+      className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
+        " items-center"}
+    >
+      <p className={"z-10 text-white"}>Kafka</p>
+      <Handle
+        type="source"
+        position={Position.Left}
+        id="a"
+        className="bg-transparent border-0"
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        id="b"
+        className="bg-transparent border-0"
+      />
+    </div>
   );
 };
