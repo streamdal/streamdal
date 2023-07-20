@@ -65,6 +65,13 @@ message RegisterRequest {
   map <string, string> _metadata = 1000;
 }
 
+// Same as RegisterRequest - used for broadcasting a deregistration event
+message DeregisterRequest {
+  string service_name = 1;
+
+  map <string, string> _metadata = 1000;
+}
+
 // Type used by `snitch-server` for sending messages on its local bus.
 message BusEvent {
   string request_id = 1;
@@ -73,6 +80,7 @@ message BusEvent {
   oneof event {
     CommandResponse command_response = 100;
     RegisterRequest register_request = 101;
+    DeregisterRequest deregister_request = 102;
   }
 
   map <string, string> _metadata = 1000;

@@ -102,6 +102,23 @@ export interface RegisterRequest {
     };
 }
 /**
+ * Same as RegisterRequest - used for broadcasting a deregistration event
+ *
+ * @generated from protobuf message protos.DeregisterRequest
+ */
+export interface DeregisterRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
+}
+/**
  * Type used by `snitch-server` for sending messages on its local bus.
  *
  * @generated from protobuf message protos.BusEvent
@@ -130,6 +147,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.RegisterRequest register_request = 101;
          */
         registerRequest: RegisterRequest;
+    } | {
+        oneofKind: "deregisterRequest";
+        /**
+         * @generated from protobuf field: protos.DeregisterRequest deregister_request = 102;
+         */
+        deregisterRequest: DeregisterRequest;
     } | {
         oneofKind: undefined;
     };
@@ -293,6 +316,13 @@ declare class RegisterRequest$Type extends MessageType<RegisterRequest> {
  * @generated MessageType for protobuf message protos.RegisterRequest
  */
 export declare const RegisterRequest: RegisterRequest$Type;
+declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.DeregisterRequest
+ */
+export declare const DeregisterRequest: DeregisterRequest$Type;
 declare class BusEvent$Type extends MessageType<BusEvent> {
     constructor();
 }

@@ -106,6 +106,23 @@ export interface RegisterRequest {
     };
 }
 /**
+ * Same as RegisterRequest - used for broadcasting a deregistration event
+ *
+ * @generated from protobuf message protos.DeregisterRequest
+ */
+export interface DeregisterRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
+}
+/**
  * Type used by `snitch-server` for sending messages on its local bus.
  *
  * @generated from protobuf message protos.BusEvent
@@ -134,6 +151,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.RegisterRequest register_request = 101;
          */
         registerRequest: RegisterRequest;
+    } | {
+        oneofKind: "deregisterRequest";
+        /**
+         * @generated from protobuf field: protos.DeregisterRequest deregister_request = 102;
+         */
+        deregisterRequest: DeregisterRequest;
     } | {
         oneofKind: undefined;
     };
@@ -329,6 +352,19 @@ class RegisterRequest$Type extends MessageType<RegisterRequest> {
  */
 export const RegisterRequest = new RegisterRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
+    constructor() {
+        super("protos.DeregisterRequest", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeregisterRequest
+ */
+export const DeregisterRequest = new DeregisterRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class BusEvent$Type extends MessageType<BusEvent> {
     constructor() {
         super("protos.BusEvent", [
@@ -336,6 +372,7 @@ class BusEvent$Type extends MessageType<BusEvent> {
             { no: 2, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => CommandResponse },
             { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
+            { no: 102, name: "deregister_request", kind: "message", oneof: "event", T: () => DeregisterRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
