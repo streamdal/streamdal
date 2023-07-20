@@ -10,7 +10,6 @@ import (
 	"github.com/streamdal/snitch-server/validate"
 )
 
-// TODO: Implement
 func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("handling register request bus event: %v", req)
 
@@ -23,6 +22,18 @@ func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.Reg
 	}
 
 	return nil
+}
+
+func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.DeregisterRequest) error {
+	b.log.Debugf("handling delete register request bus event: %v", req)
+
+	if err := validate.DeregisterRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	if err := b.options.Store.DeleteRegistration(req); err != nil {
+		return errors.Wrap(err, "unable to delete registration")
+	}
 }
 
 func (b *Bus) handleCommandResponseBusEvent(ctx context.Context, req *protos.CommandResponse) error {

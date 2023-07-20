@@ -14,6 +14,22 @@ func RegisterRequest(req *protos.RegisterRequest) error {
 		return ErrNilRequest
 	}
 
+	if req.ServiceName == "" {
+		return EmptyFieldError("ServiceName")
+	}
+
+	return nil
+}
+
+func DeregisterRequest(req *protos.DeregisterRequest) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.ServiceName == "" {
+		return EmptyFieldError("ServiceName")
+	}
+
 	return nil
 }
 

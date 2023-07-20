@@ -146,6 +146,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	var err error
 
 	switch t := busEvent.Event.(type) {
+	case *protos.BusEvent_DeregisterRequest:
+		err = b.handleDeregisterRequestBusEvent(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_RegisterRequest:
 		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
 	case *protos.BusEvent_CommandResponse:
