@@ -2,9 +2,14 @@ package grpcapi
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/snitch-server/validate"
 )
 
 // InternalServer implements the internal GRPC API interface
@@ -24,7 +29,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	s.log.Info("Got a hit for register!")
 
 	// Validate request
-	if err := s.validateRegisterRequest(request); err != nil {
+	if err := validate.RegisterRequest(request); err != nil {
 		return errors.Wrap(err, "invalid register request")
 	}
 
@@ -37,6 +42,12 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "unable to broadcast registration")
 	}
 
+	llog := s.log.WithFields(logrus.Fields{
+		"service_name": request.ServiceName,
+	})
+
+	llog.Debug("beginning register command loop")
+
 	var shutdown bool
 
 	// Listen for cmds from external API; forward them to connected clients
@@ -44,13 +55,15 @@ MAIN:
 	for {
 		select {
 		case <-server.Context().Done():
-			s.log.Debug("register handler detected client disconnect")
+			llog.Debugf("register handler detected client (service: '%v') disconnect", request.ServiceName)
 			break MAIN
 		case <-s.Deps.ShutdownContext.Done():
-			s.log.Debug("register handler detected shutdown context cancellation")
+			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
 		case cmd := <-s.Deps.CommandChannel:
+			llog.Debug("received command on command channel")
+
 			// Send command to connected client
 			if err := server.Send(cmd); err != nil {
 				s.log.WithError(err).Error("unable to send command to client")
@@ -60,42 +73,46 @@ MAIN:
 			}
 
 			if err := s.Deps.BusService.BroadcastCommand(server.Context(), cmd); err != nil {
-				s.log.WithError(err).Error("unable to broadcast command")
+				llog.WithError(err).Error("unable to broadcast command")
 			}
 		}
 	}
 
 	if shutdown {
-		s.log.Debugf("register handler shutting down for req id '%s'", server.Context().Value("id"))
+		llog.Debugf("register handler shutting down for req id '%s'", server.Context().Value("id"))
 
 		// Notify client that they need to re-register because of shutdown
 		return GRPCServerShutdownError
 	}
 
 	// Client has disconnected -> broadcast deregistration
-	if err := s.Deps.BusService.BroadcastDeregistration(request); err != nil {
-		s.log.WithError(err).Error("unable to broadcast deregistration")
+	if err := s.Deps.BusService.BroadcastDeregistration(server.Context(), &protos.DeregisterRequest{
+		ServiceName: request.ServiceName,
+	}); err != nil {
+		llog.WithError(err).Error("unable to broadcast deregistration")
 	}
 
 	return nil
 }
 
-func (s *InternalServer) validateRegisterRequest(request *protos.RegisterRequest) error {
-	// Not sure if this is possible or necessary
-	if request == nil {
-		return errors.New("request cannot be nil")
+func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
+	if err := validate.HeartbeatRequest(req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			Message: fmt.Sprintf("invalid heartbeat req: %s", err.Error()),
+		}, nil
 	}
 
-	if request.ServiceName == "" {
-		return errors.New("service name cannot be empty")
+	if err := s.Deps.BusService.BroadcastHeartbeat(ctx, req); err != nil {
+		s.log.Error("unable to broadcast heartbeat for audience '%s': %s", util.AudienceStr(req.Audience), err.Error())
+
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: fmt.Sprintf("unable to broadcast heartbeat: %s", err.Error()),
+		}, nil
 	}
-
-	return nil
-}
-
-func (s *InternalServer) Heartbeat(ctx context.Context, request *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
-	//TODO implement me
-	s.log.Info("got a hit for heartbeat!")
 
 	return &protos.StandardResponse{
 		Id:      "123",
@@ -105,11 +122,11 @@ func (s *InternalServer) Heartbeat(ctx context.Context, request *protos.Heartbea
 }
 
 func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyRequest) (*protos.StandardResponse, error) {
-	//TODO implement me
+	// TODO: implement me
 	panic("implement me")
 }
 
 func (s *InternalServer) Metrics(ctx context.Context, request *protos.MetricsRequest) (*protos.StandardResponse, error) {
-	//TODO implement me
+	// TODO: implement me
 	panic("implement me")
 }

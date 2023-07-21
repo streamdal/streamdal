@@ -27,7 +27,8 @@ type IBus interface {
 	RunConsumer() error
 	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse) error
-	BroadcastDeregistration(req *protos.RegisterRequest) error
+	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
+	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 }
 
 type Bus struct {
@@ -94,15 +95,18 @@ func (o *Options) validate() error {
 // RunConsumer is used for consuming message from the snitch NATS stream and
 // executing a message handler.
 func (b *Bus) RunConsumer() error {
-	fmt.Printf("options: %+v\n", b.options)
-
 	for {
 		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
 			Subject:      FullSubject,
 			StreamName:   StreamName,
 			ConsumerName: b.options.NodeName,
 		}, b.handler)
+
+		// NOTE: Consumer won't exit on handler err - err is passed errorCh by
+		// natty - error reading should occur elsewhere
 		if err != nil {
+			fmt.Println("Do we hit this error check?")
+
 			if err == context.Canceled {
 				b.log.Debug("context cancellation detected")
 				break
@@ -122,7 +126,7 @@ func (b *Bus) RunConsumer() error {
 // appropriate msg handler.
 func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	llog := b.log.WithField("method", "handler")
-	llog.Debug("received message")
+	llog.Debug("received new broadcast message")
 
 	if err := msg.AckSync(); err != nil {
 		llog.Errorf("unable to ack message: %s", err)
@@ -146,15 +150,20 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	var err error
 
 	switch t := busEvent.Event.(type) {
+	case *protos.BusEvent_DeregisterRequest:
+		err = b.handleDeregisterRequestBusEvent(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_RegisterRequest:
 		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
 	case *protos.BusEvent_CommandResponse:
 		err = b.handleCommandResponseBusEvent(shutdownCtx, busEvent.GetCommandResponse())
+	case *protos.BusEvent_HeartbeatRequest:
+		err = b.handleHeartbeatRequestBusEvent(shutdownCtx, busEvent.GetHeartbeatRequest())
 	default:
-		return fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
+		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}
 
 	if err != nil {
+		b.log.Error(err)
 		return errors.Wrap(err, "error handling bus event")
 	}
 
