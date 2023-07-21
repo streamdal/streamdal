@@ -81,6 +81,7 @@ message BusEvent {
     CommandResponse command_response = 100;
     RegisterRequest register_request = 101;
     DeregisterRequest deregister_request = 102;
+    HeartbeatRequest heartbeat_request = 103;
   }
 
   map <string, string> _metadata = 1000;
