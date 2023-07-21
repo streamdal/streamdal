@@ -1,57 +1,36 @@
-import { credentials, loadPackageDefinition } from "@grpc/grpc-js";
-import { loadFileDescriptorSetFromBuffer } from "@grpc/proto-loader";
-import { ProtoGrpcType } from "@streamdal/plumber-schemas/types/ps_base";
-import { readFileSync } from "fs";
+import { ChannelCredentials } from "@grpc/grpc-js";
+import { GrpcTransport } from "@protobuf-ts/grpc-transport";
+import {
+  ExternalClient,
+  IExternalClient,
+} from "@streamdal/snitch-protos/protos/external_api.client.js";
 
-export const hello = () => "Hello World!";
-
-enum Mode {
-  Consume,
-  Publish,
-}
-
-interface Config {
-  dataSource: string;
-  plumberUrl: string;
-  plumberToken: string;
-  dryRun: boolean;
-  wasmTimeout: string; // seconds
-}
-
-export const getConfigs = (): Config => ({
-  dataSource: "",
-  plumberUrl: process.env.PLUMBER_URL || "",
-  plumberToken: process.env.PLUMBER_TOKEN || "",
-  dryRun: !process.env.DATAQUAL_DRY_RUN,
-  wasmTimeout: `${process.env.DATAQUAL_WASM_TIMEOUT || 1}s`,
+const transport = new GrpcTransport({
+  host: "localhost:9091",
+  channelCredentials: ChannelCredentials.createInsecure(),
 });
 
-const buffer = readFileSync(
-  require.resolve("@streamdal/plumber-schemas/descriptor-sets/protos.fds")
-);
-const definition = loadFileDescriptorSetFromBuffer(buffer);
+const client: IExternalClient = new ExternalClient(transport);
 
-const proto: ProtoGrpcType = loadPackageDefinition(
-  definition
-) as unknown as ProtoGrpcType;
-
-const plumberClient = new proto.protos.PlumberServer(
-  "0.0.0.0:9090",
-  credentials.createInsecure()
-);
-
-const start = () => {
-  plumberClient.GetAllRelays(
-    {
-      auth: {
-        token: "streamdal",
-      },
-    },
-    (error, response) => {
-      error && console.info("relay errors", error);
-      console.log("relays", response);
-    }
+const start = async () => {
+  const call = client.test(
+    { input: "hello world" },
+    { meta: { "auth-token": "1234" } }
   );
+
+  console.log(`### calling method "${call.method.name}"...`);
+
+  const headers = await call.headers;
+  console.log("got response headers: ", headers);
+
+  const response = await call.response;
+  console.log("got response message: ", response);
+
+  const status = await call.status;
+  console.log("got status: ", status);
+
+  const trailers = await call.trailers;
+  console.log("got trailers: ", trailers);
 };
 
-start();
+await start();
