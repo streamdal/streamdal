@@ -154,6 +154,12 @@ export interface BusEvent {
          */
         deregisterRequest: DeregisterRequest;
     } | {
+        oneofKind: "heartbeatRequest";
+        /**
+         * @generated from protobuf field: protos.HeartbeatRequest heartbeat_request = 103;
+         */
+        heartbeatRequest: HeartbeatRequest;
+    } | {
         oneofKind: undefined;
     };
     /**
