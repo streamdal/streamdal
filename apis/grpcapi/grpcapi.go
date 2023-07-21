@@ -88,7 +88,7 @@ func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.Serve
 	return handler(srv, stream)
 }
 
-// Have to do this so we can
+// Have to do this so we can modify context
 type serverStream struct {
 	grpc.ServerStream
 	ctx context.Context
@@ -136,16 +136,18 @@ func (g *GRPCAPI) RequestIDServerUnaryInterceptor(ctx context.Context, req inter
 }
 
 func (g *GRPCAPI) setRequestID(ctx context.Context) (context.Context, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
+	existingMD, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, GRPCMissingMetadataError
 	}
 
-	values := md.Get(GRPCRequestIDMetadataKey)
+	values := existingMD.Get(GRPCRequestIDMetadataKey)
 
+	// Request ID not set - set a new one
 	if len(values) == 0 {
-		md.Set(GRPCRequestIDMetadataKey, util.GenerateUUID())
+		existingMD.Append(GRPCRequestIDMetadataKey, util.GenerateUUID())
+		ctx = metadata.NewIncomingContext(ctx, existingMD)
 	}
 
-	return metadata.NewOutgoingContext(ctx, md), nil
+	return ctx, nil
 }

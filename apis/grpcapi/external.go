@@ -72,9 +72,3 @@ func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*pr
 		Output: "Pong: " + req.Input,
 	}, nil
 }
-
-// Don't think this is needed?
-//func (s *ExternalServer) mustEmbedUnimplementedExternalServer() {
-//	//TODO implement me
-//	panic("implement me")
-//}

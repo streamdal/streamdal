@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -32,12 +33,12 @@ func CtxStringValue(ctx context.Context, key string) string {
 		return ""
 	}
 
-	v, ok := ctx.Value(key).(string)
-	if !ok {
+	values := metadata.ValueFromIncomingContext(ctx, key)
+	if len(values) == 0 {
 		return ""
 	}
 
-	return v
+	return values[0]
 }
 
 func CtxRequestId(ctx context.Context) string {
