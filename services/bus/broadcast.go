@@ -11,44 +11,28 @@ import (
 )
 
 func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
-	b.log.Debugf("broadcasting registration: %v", req)
-
-	// Generate bus event
-	busMessage := &protos.BusEvent{
-		RequestId: util.GenerateUUID(),
-		Source:    b.options.NodeName,
-		Event:     &protos.BusEvent_RegisterRequest{RegisterRequest: req},
-		XMetadata: nil, // original metadata is inside the register request
-	}
-
-	data, err := proto.Marshal(busMessage)
-	if err != nil {
-		return errors.Wrap(err, "error marshaling bus message")
-	}
-
-	b.options.NATS.Publish(ctx, FullSubject, data)
-
-	return nil
+	return b.broadcast(ctx, "register", &protos.BusEvent{Event: &protos.BusEvent_RegisterRequest{RegisterRequest: req}})
 }
 
-// TODO: Implement
-func (b *Bus) BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse) error {
-	b.log.Debugf("broadcasting command: %v", cmd)
-	return nil
+func (b *Bus) BroadcastCommand(ctx context.Context, req *protos.CommandResponse) error {
+	return b.broadcast(ctx, "command", &protos.BusEvent{Event: &protos.BusEvent_CommandResponse{CommandResponse: req}})
+}
+
+func (b *Bus) BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
+	return b.broadcast(ctx, "heartbeat", &protos.BusEvent{Event: &protos.BusEvent_HeartbeatRequest{HeartbeatRequest: req}})
 }
 
 func (b *Bus) BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error {
-	b.log.Debugf("broadcasting deregistration for service '%s'", req.ServiceName)
+	return b.broadcast(ctx, "deregistration", &protos.BusEvent{Event: &protos.BusEvent_DeregisterRequest{DeregisterRequest: req}})
+}
 
-	// Generate bus event
-	busMessage := &protos.BusEvent{
-		RequestId: util.GenerateUUID(),
-		Source:    b.options.NodeName,
-		Event:     &protos.BusEvent_DeregisterRequest{DeregisterRequest: req},
-		XMetadata: nil, // original metadata is inside the register request
-	}
+func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.BusEvent) error {
+	event.RequestId = util.CtxRequestId(ctx)
+	event.Source = b.options.NodeName
 
-	data, err := proto.Marshal(busMessage)
+	b.log.Debugf("broadcasting event '%v' for request id '%s'", eventType, event.RequestId)
+
+	data, err := proto.Marshal(event)
 	if err != nil {
 		return errors.Wrap(err, "error marshaling bus message")
 	}

@@ -24,6 +24,20 @@ func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.Reg
 	return nil
 }
 
+func (b *Bus) handleHeartbeatRequestBusEvent(ctx context.Context, req *protos.HeartbeatRequest) error {
+	b.log.Debugf("handling heartbeat request bus event: %v", req)
+
+	if err := validate.HeartbeatRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	if err := b.options.Store.AddHeartbeat(ctx, req); err != nil {
+		return errors.Wrap(err, "error saving heartbeat")
+	}
+
+	return nil
+}
+
 func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.DeregisterRequest) error {
 	b.log.Debugf("handling delete register request bus event: %v", req)
 

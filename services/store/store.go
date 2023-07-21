@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -74,14 +75,17 @@ const (
 	CacheRegistrationPrefix = "registration"
 	CachePipelinePrefix     = "pipeline"
 	CacheHeartbeatPrefix    = "heartbeat"
+	CacheHeartbeatEntryTTL  = time.Minute
 
 	NATSRegistrationsBucket = "snitch_registrations"
+	NATSHeartbeatBucket     = "snitch_heartbeats"
+	NATSHeartbeatBucketTTL  = time.Minute
 )
 
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
-	// AddHeartbeat <--- 60s TTL on bucket
+	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	// AddPipeline
 	// DeletePipeline
 }
@@ -143,6 +147,27 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	// Remove from K/V
 	if err := s.NATSBackend.Delete(ctx, NATSRegistrationsBucket, req.ServiceName); err != nil {
 		return errors.Wrap(err, "error deleting from K/V")
+	}
+
+	return nil
+}
+
+func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
+	if err := validate.HeartbeatRequest(req); err != nil {
+		return errors.Wrap(err, "error validating request")
+	}
+
+	// Set in cache
+	s.CacheBackend.Set(CacheHeartbeatPrefix+":"+req.Audience.ServiceName, req, CacheHeartbeatEntryTTL)
+
+	// Set in K/V
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling protobuf")
+	}
+
+	if err := s.NATSBackend.Put(ctx, NATSHeartbeatBucket, req.Audience.ServiceName, data, NATSHeartbeatBucketTTL); err != nil {
+		return errors.Wrap(err, "error writing to K/V")
 	}
 
 	return nil
