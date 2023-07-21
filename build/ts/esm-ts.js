@@ -2,15 +2,12 @@ import { glob } from "glob";
 import fs from "fs";
 import path from 'path';
 
-const files = await glob("./protos/deno/**/*.ts")
+const files = await glob("./protos/**/*.ts")
 
 //
 // Add .ts to imports so they are esm compliant (deno requires this)
 files.forEach(file => {
-  //
-  // going from /protos/deno to /deno/protos
-  const f = file.replace("deno/", "");
-  const dir = `./deno/${path.dirname(f)}`;
+  const dir = `./deno/${path.dirname(file)}`;
   const content = fs.readFileSync(file, 'utf-8')
     .split('\n').map(s => s.replace(/^(import .+? from ["']\..+?)(["'];)$/, '$1.ts$2'))
     .join('\n');
@@ -18,5 +15,8 @@ files.forEach(file => {
   if (!fs.existsSync(dir)){
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(`./deno/${f}`, content, 'utf-8')
+
+  //
+  // move from /protos to /deno/protos
+  fs.writeFileSync(`./deno/${file}`, content, 'utf-8')
 });

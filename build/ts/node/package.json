@@ -4,13 +4,15 @@
   "description": "Snitch Protobufs",
   "main": "protos/external_api_client.js",
   "scripts": {
-    "build:node": "npm run build:esm && npm run clean && npm run build:compile",
-    "build:esm": "node esm-js.js",
-    "build:compile": "tsc",
+    "build": "npm run gen && npm run deno:esm && npm run node:esm && npm run clean && npm run node:compile && npm run copy",
+    "node:esm": "node esm-js.js",
+    "node:compile": "tsc",
     "clean": "rimraf build coverage nyc_output",
-    "build:deno": "node esm-ts.js",
+    "copy": "cp DENO.README.md ./deno/README.md && cp NODE.README.md ./node/README.md && cp package.json ./node/package.json",
+    "deno:esm": "node esm-ts.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "type:dts": "tsc --emitDeclarationOnly --project tsconfig.build.json"
+    "type:dts": "tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "gen": "npx protoc --ts_out ./protos --ts_opt optimize_code_size --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto"
   },
   "repository": {
     "type": "git",

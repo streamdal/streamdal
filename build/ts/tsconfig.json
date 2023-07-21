@@ -1,6 +1,6 @@
 {
   "include": [
-    "./protos/node/**/*.ts"
+    "./protos/**/*.ts"
   ],
   "compilerOptions": {
     "outDir": "node/protos",
