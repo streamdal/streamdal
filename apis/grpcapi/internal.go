@@ -115,9 +115,9 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 	}
 
 	return &protos.StandardResponse{
-		Id:      "123",
-		Code:    0,
-		Message: "test test",
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Heartbeat received",
 	}, nil
 }
 
