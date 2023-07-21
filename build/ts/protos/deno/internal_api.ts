@@ -158,6 +158,12 @@ export interface BusEvent {
          */
         deregisterRequest: DeregisterRequest;
     } | {
+        oneofKind: "heartbeatRequest";
+        /**
+         * @generated from protobuf field: protos.HeartbeatRequest heartbeat_request = 103;
+         */
+        heartbeatRequest: HeartbeatRequest;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -373,6 +379,7 @@ class BusEvent$Type extends MessageType<BusEvent> {
             { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => CommandResponse },
             { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
             { no: 102, name: "deregister_request", kind: "message", oneof: "event", T: () => DeregisterRequest },
+            { no: 103, name: "heartbeat_request", kind: "message", oneof: "event", T: () => HeartbeatRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
