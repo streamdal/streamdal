@@ -1,9 +1,5 @@
 import ReactFlow, { Background, Controls } from "reactflow";
-import {
-  Participants,
-  Platform,
-  Service,
-} from "../components/shapes/customNodes.tsx";
+import { Participants, Platform, Service } from "../components/customNodes.tsx";
 import {
   MarkerType,
   useNodesState,
