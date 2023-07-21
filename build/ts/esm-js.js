@@ -2,7 +2,7 @@ import { glob } from "glob";
 import fs from "fs";
 import path from 'path';
 
-const files = await glob("./protos/node/**/*.ts")
+const files = await glob("./protos/**/*.ts")
 
 //
 // Add .js to imports so they are esm compliant

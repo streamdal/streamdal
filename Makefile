@@ -1,4 +1,5 @@
 PROTOC_IMAGE = rvolosatovs/protoc:4.0
+NODE_IMAGE = node:lts-alpine
 
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text
@@ -57,23 +58,13 @@ generate/go:
 generate/ts: description = Compile protobuf schema descriptor and generate types for Typescript
 generate/ts: clean/ts
 generate/ts:
-	mkdir -p build/ts/protos/node
-	mkdir -p build/ts/protos/deno
+	mkdir -p build/ts/protos
 	mkdir -p build/ts/deno
 	mkdir -p build/ts/node
 
-	cd ./build/ts; \
-		npm install; \
-		npx protoc --ts_out ./protos/node --ts_opt optimize_code_size --proto_path \
-			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
-		npx protoc --ts_out ./protos/deno --ts_opt optimize_code_size --proto_path \
-			../../protos ../../protos/**/*.proto ../../protos/*.proto; \
-		npm run build:deno; \
-		npm run build:node; \
-		cp DENO.README.md ./deno/README.md; \
-		cp NODE.README.md ./node/README.md; \
-		cp package.json ./node/package.json || (exit 1)
-
+	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD}/build/ts ${NODE_IMAGE} \
+		./build.sh
+		
 	@echo Successfully compiled Typescript Protobuf libs for Node and Deno
 
 .PHONY: generate/rust
