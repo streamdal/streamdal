@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package protos;
+
+import "common.proto";
+import "info.proto";
+import "pipeline.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+service External {
+  // Build a service map
+  rpc GetServiceMap(GetServiceMapRequest) returns (GetServiceMapResponse);
+
+  // Test method
+  rpc Test(TestRequest) returns (TestResponse);
+}
+
+message GetServiceMapRequest {
+  // Don't think there is anything to pass in (yet)?
+}
+
+message GetServiceMapResponse {
+  // Key == service name
+  map<string, protos.ServiceInfo> service_map = 1;
+}
+
+message TestRequest {
+  string input = 1;
+}
+
+message TestResponse {
+  string output = 2;
+}

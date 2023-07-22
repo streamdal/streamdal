@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `external_api.proto`
+//! Generated file from `external.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.

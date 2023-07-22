@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package protos;
+
+import "command.proto";
+import "common.proto";
+import "pipeline.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+service Internal {
+  // Initial method that an SDK should call to register itself with the server.
+  // The server will use this stream to send commands to the SDK via the
+  // `CommandResponse` message. Clients should continuously listen for
+  // CommandResponse messages and re-establish registration if the stream gets
+  // disconnected.
+  rpc Register(RegisterRequest) returns (stream protos.Command);
+
+  // SDK is responsible for sending heartbeats to the server to let the server
+  // know about active consumers and producers.
+  rpc Heartbeat(HeartbeatRequest) returns (StandardResponse);
+
+  // Use this method when Notify condition has been triggered; the server will
+  // decide on what to do about the notification.
+  rpc Notify(NotifyRequest) returns (StandardResponse);
+
+  // Send periodic metrics to the server
+  rpc Metrics(MetricsRequest) returns (StandardResponse);
+}
+
+// Each consumer and producer should send periodic heartbeats to the server
+// to let the server know that they are still active.
+message HeartbeatRequest {
+  Audience audience = 1;
+  int64 last_activity_unix_timestamp_utc = 2;
+
+  map <string, string> _metadata = 1000;
+}
+
+message NotifyRequest {
+  string rule_id = 1;
+  string rule_name = 2;
+  Audience audience = 3;
+  int64 occurred_at_unix_ts_utc = 4;
+
+  map <string, string> _metadata = 1000;
+}
+
+message MetricsRequest {
+  string rule_id = 1;
+  string rule_name = 2;
+  Audience audience = 3;
+}
+
+message RegisterRequest {
+  string service_name = 1;
+
+  // If set, we know that any pipelines or steps executed in this SDK will NOT
+  // modify the input/output data. As in, the SDK will log what it _would_ do
+  // and always return the original data set.
+  bool dry_run = 2;
+}
+
+// Same as RegisterRequest - used for broadcasting a deregistration event
+message DeregisterRequest {
+  string service_name = 1;
+}

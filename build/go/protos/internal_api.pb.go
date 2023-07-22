@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.18.1
-// source: internal_api.proto
+// source: internal.proto
 
 package protos
 

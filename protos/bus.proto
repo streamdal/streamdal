@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package protos;
+
+import "command.proto";
+import "internal.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+// Type used by `snitch-server` for sending messages on its local bus.
+message BusEvent {
+  string source = 1;
+
+  oneof event {
+    protos.Command command_response = 100;
+    protos.RegisterRequest register_request = 101;
+    protos.DeregisterRequest deregister_request = 102;
+    protos.HeartbeatRequest heartbeat_request = 103;
+  }
+
+  // All gRPC metadata is stored in ctx; when request goes outside of gRPC
+  // bounds, we will translate ctx metadata into this field.
+  //
+  // Example:
+  // 1. Request comes into snitch-server via external gRPC to set new pipeline
+  // 2. snitch-server has to send SetPipeline cmd to SDK via gRPC - it passes
+  //    on original metadata in request.
+  // 3. snitch-server has to broadcast SetPipeline cmd to other services via bus
+  // 4. Since this is not a gRPC call, snitch-server translates ctx metadata to
+  //    this field and includes it in the bus event.
+  map <string, string> _metadata = 1000;
+}

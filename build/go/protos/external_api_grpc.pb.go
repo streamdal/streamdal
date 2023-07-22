@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.18.1
-// source: external_api.proto
+// source: external.proto
 
 package protos
 
@@ -483,5 +483,5 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "external_api.proto",
+	Metadata: "external.proto",
 }

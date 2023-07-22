@@ -10,17 +10,18 @@ import "steps/transform.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-// Included in WASM response; SDK is responsible for interpreting the response
-// status and how it relates to the step condition.
-// ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
-// conditions to determine what to do next.
-// ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
-// to determine what to do next;
-enum WASMExitCode {
-  WASM_EXIT_CODE_UNSET = 0;
-  WASM_EXIT_CODE_SUCCESS = 1;
-  WASM_EXIT_CODE_FAILURE = 2; // Probably need better names for these as FAILURE is too harsh
-  WASM_EXIT_CODE_INTERNAL_ERROR = 3;
+// Pipeline is a structure that holds one or more pipeline steps. This structure
+// is intended to be immutable; clients are expected to generate WASMRequest's
+// that contain a pipeline step.
+message Pipeline {
+  // Unique ID for the pipeline
+  string id = 1;
+
+  // Friendly name for the pipeline
+  string name = 2;
+
+  // One or more steps to execute
+  repeated PipelineStep steps = 3;
 }
 
 // A condition defines how the SDK should handle a step response -- should it
@@ -33,22 +34,7 @@ enum PipelineStepCondition {
   CONDITION_NOTIFY = 3;
 }
 
-// SDK generates a WASM request and passes this to the WASM func
-message WASMRequest {
-  PipelineStep step = 1;
-  bytes input = 2;
-}
-
-// Returned by all WASM functions
-message WASMResponse {
-  bytes output = 1;
-  WASMExitCode exit_code = 2;
-  string exit_msg = 3;
-}
-
-// A PipelineCommand consists of one or more pipeline steps. A pipeline step
-// is an immutable set of instructions on how to execute a step.
-// The SDK will use the pipeline step to generate a WASM request.
+// A pipeline step is a single step in a pipeline.
 message PipelineStep {
   // Unique ID for the step
   string id = 1;
@@ -56,8 +42,11 @@ message PipelineStep {
   // Friendly name for the step
   string name = 2;
 
-  // Conditions that SDK should check before executing next step
-  repeated PipelineStepCondition conditions = 3;
+  // What should SDK do if step succeeds?
+  repeated PipelineStepCondition on_success = 3;
+
+  // What should SDK do if step fails?
+  repeated  PipelineStepCondition on_failure = 4;
 
   oneof step {
     steps.DetectiveStep detective = 1000;
@@ -67,39 +56,12 @@ message PipelineStep {
     steps.CustomStep custom = 1004;
   }
 
-  // WASM module ID (set by backend)
+  // WASM module ID (set by snitch-server)
   string _wasm_id = 10000;
 
-  // WASM module bytes (set by backend)
+  // WASM module bytes (set by snitch-server)
   bytes _wasm_bytes = 10001;
 
-  // WASM function name to execute (set by backend)
+  // WASM function name to execute (set by snitch-server)
   string _wasm_function = 10002;
-}
-
-// Used for both Add and Update
-message SetPipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1;
-
-  // Friendly name for the pipeline
-  string name = 2;
-
-  // One or more steps to execute
-  repeated PipelineStep steps = 3;
-}
-
-message DeletePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1;
-}
-
-message PausePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1;
-}
-
-message UnpausePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1;
 }
