@@ -3,12 +3,13 @@ import logging
 import os
 import snitch_protos.protos as protos
 import socket
-from time import sleep
+from .exceptions import SnitchException, SnitchRegisterException
+from copy import copy
 from dataclasses import dataclass
 from grpclib.client import Channel
 from metrics import Metrics
+from time import sleep
 from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, Instance
-from .exceptions import SnitchException, SnitchRegisterException
 
 DEFAULT_SNITCH_PORT = 9090
 DEFAULT_SNITCH_URL = "localhost"
@@ -19,12 +20,13 @@ DEFAULT_GRPC_TIMEOUT = 5  # 5 seconds
 DEFAULT_HEARTBEAT_INTERVAL = 30  # 30 seconds
 MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 megabyte
 
-MODE_CONSUME = 1
-MODE_PRODUCE = 2
+MODE_CONSUMER = 1
+MODE_PRODUCER = 2
 
 
 @dataclass(frozen=True)
 class SnitchRequest:
+    name: str
     operation: int
     component: str
     data: bytes
@@ -62,7 +64,7 @@ class SnitchClient:
     functions: dict[str, (Instance, Store)]
 
     def __init__(self, cfg: SnitchConfig):
-        self.__validate_config(cfg)
+        self._validate_config(cfg)
 
         channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port)
         self.channel = channel
@@ -83,7 +85,7 @@ class SnitchClient:
         self.__run_heartbeat()
 
     @staticmethod
-    def __validate_config(cfg: SnitchConfig) -> None:
+    def _validate_config(cfg: SnitchConfig) -> None:
         if cfg is None:
             raise ValueError("cfg is required")
         elif cfg.service_name == "":
@@ -97,14 +99,76 @@ class SnitchClient:
 
     def process(self, req: SnitchRequest) -> SnitchResponse:
         """Apply pipelines to a component+operation"""
+        if req is None:
+            raise ValueError("req is required")
+
+        # Ensure no side-effects are propagated to outside the library
+        data = copy(req.data)
+
+        # Get rules based on operation and component
+        pipelines = self.__get_pipelines(req.operation, req.component)
+
+        for step in pipelines:
+            # Exec wasm
+            wasm_resp = self.__call_wasm(step, data)
+
+            # If successful, continue to next step, don't need to check conditions
+            if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+                continue
+
+            should_continue = False
+            for cond in step.conditions:
+                if cond == protos.PipelineStepCondition.CONDITION_CONTINUE:
+                    # We still need to continue to remaining pipeline steps after other conditions have been processed
+                    should_continue = True
+                elif cond == protos.PipelineStepCondition.CONDITION_NOTIFY:
+                    self.__notify_condition(step, wasm_resp)
+                elif cond == protos.PipelineStepCondition.CONDITION_ABORT:
+                    should_continue = False
+
+                # Not continuing, exit function early
+                if not should_continue:
+                    return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+
+        return SnitchResponse(data=data, error=False, message="")
+
+    def __notify_condition(self, step: protos.PipelineStep, resp: protos.WasmResponse) -> bool:
+        # TODO: implement
         pass
+
+    def __call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
+        try:
+            req = protos.WasmRequest()
+            req.input = data
+            req.step = step
+
+            wasm_bytes = self.exec_wasm(step.wasm_function, data)
+
+            # Unmarshal WASM response
+            resp = protos.WasmResponse()
+            resp.FromString(wasm_bytes)
+
+            return resp
+        except Exception as e:
+            resp = protos.WasmResponse()
+            resp.output = ""
+            resp.exit_msg = "Failed to execute WASM: {}".format(e)
+            resp.exit_code = protos.WasmExitCode.WASM_EXIT_CODE_INTERNAL_ERROR
+
+    def __get_pipelines(self, operation: int, component: str) -> list[protos.PipelineStep] | None:
+        op = self.pipelines.get(operation)
+        if op is None:
+            return None
+
+        return op.get(component)
 
     def __run_heartbeat(self):
         async def call():
-            while True:
-                await self.stub.heartbeat(protos.HeartbeatRequest(), timeout=self.grpc_timeout, metadata=self.__get_metadata())
+            self.log.debug("Sending heartbeat")
+            await self.stub.heartbeat(protos.HeartbeatRequest(), timeout=self.grpc_timeout, metadata=self.__get_metadata())
 
-        self.loop.run_until_complete(call())
+        while True:
+            self.loop.run_until_complete(call())
 
     def __get_metadata(self) -> dict:
         """Returns map of metadata needed for gRPC calls"""
@@ -138,7 +202,7 @@ class SnitchClient:
 
             async for r in self.stub.register(req, timeout=self.grpc_timeout, metadata=self.__get_metadata()):
                 if r.keep_alive is not None:
-                    self.log.debug("Received keep alive")  # TODO: remove logging
+                    self.log.debug("Received keep alive")  # TODO: remove logging after testing
                     pass
                 elif r.set_pipeline is not None:
                     self.__set_pipeline(r)
@@ -161,26 +225,39 @@ class SnitchClient:
             raise SnitchRegisterException("Failed to register: {}".format(e))
 
     @staticmethod
-    def __put_pipeline(pipes_map: dict, aud: protos.Audience, pipeline_id: str, steps: list[protos.PipelineStep]) -> None:
+    def get_mode_from_proto(op: protos.OperationType) -> int:
+        mode = MODE_CONSUMER
+        if op == protos.OperationType.OPERATION_TYPE_PRODUCER:
+            mode = MODE_PRODUCER
+
+        return mode
+
+    @staticmethod
+    def __put_pipeline(
+            pipes_map: dict,
+            aud: protos.Audience,
+            pipeline_id: str,
+            steps: list[protos.PipelineStep]) -> None:
+
         """Set pipeline in internal map of pipelines"""
-        mode = aud.operation_type.__str__()
-        topic = aud.topic
+        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
+        component = aud.component_name
 
         # Create mode key if it doesn't exist
         if pipes_map.get(mode) is None:
             pipes_map[mode] = {}
 
-        # Create topic key if it doesn't exist
-        if pipes_map[mode].get(topic) is None:
-            pipes_map[mode][topic] = {}
+        # Create component key if it doesn't exist
+        if pipes_map[mode].get(component) is None:
+            pipes_map[mode][component] = {}
 
-        pipes_map[mode][topic][pipeline_id] = steps
+        pipes_map[mode][component][pipeline_id] = steps
 
     @staticmethod
     def __pop_pipeline(pipes_map: dict, aud: protos.Audience, pipeline_id: str) -> list[protos.PipelineStep] | None:
         """Grab pipeline in internal map of pipelines and remove it"""
-        mode = aud.operation_type.__str__()
-        topic = aud.topic
+        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
+        topic = aud.component_name
 
         if pipes_map.get(mode) is None:
             return None
@@ -254,14 +331,22 @@ class SnitchClient:
 
         return True
 
-    def __unpause_pipeline(self, cmd: protos.CommandResponse):
+    def __unpause_pipeline(self, cmd: protos.CommandResponse) -> None:
         """Resumes execution of a specified pipeline"""
+
+        if not self.__is_paused(cmd.audience, cmd.unpause_pipeline.id):
+            return
+
+        # Remove from paused pipelines and add to pipelines
+        pipeline = self.__pop_pipeline(self.paused_pipelines, cmd.audience, cmd.unpause_pipeline.id)
+        self.__put_pipeline(self.pipelines, cmd.audience, cmd.unpause_pipeline.id, pipeline)
+
         self.log.debug("Resuming pipeline {} for audience {}".format(cmd.unpause_pipeline.id, cmd.audience.service_name))
 
     def __is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
         """Check if a pipeline is paused"""
-        mode = aud.operation_type.__str__()
-        topic = aud.topic
+        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
+        topic = aud.component_name
 
         if self.paused_pipelines.get(mode) is None:
             return False
@@ -274,7 +359,7 @@ class SnitchClient:
 
         return True
 
-    def get_function(self, name: str) -> (Instance, Store):
+    def __get_function(self, name: str) -> (Instance, Store):
         """Get a function from the internal map of functions"""
         if self.functions.get(name) is not None:
             return self.functions[name]
@@ -301,9 +386,9 @@ class SnitchClient:
         self.functions[name] = (instance, store)
         return instance, store
 
-    def exec_wasm(self, data: bytes) -> bytearray:
+    def exec_wasm(self, func: str, data: bytes) -> bytes:
         try:
-            instance, store = self.get_function("detective")
+            instance, store = self.__get_function(func)
         except Exception as e:
             raise SnitchException("Failed to instantiate function: {}".format(e))
 
@@ -327,7 +412,7 @@ class SnitchClient:
         return self.__read_memory(memory, store, result_ptr)
 
     @staticmethod
-    def __read_memory(memory: Memory, store: Store, result_ptr: int, length: int = 0) -> bytearray:
+    def __read_memory(memory: Memory, store: Store, result_ptr: int, length: int = 0) -> bytes:
         mem_len = memory.data_len(store)
 
         # Ensure we aren't reading out of bounds
@@ -355,4 +440,4 @@ class SnitchClient:
             if length == count:
                 break
 
-        return res
+        return bytes(res)

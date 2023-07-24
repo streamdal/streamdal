@@ -137,7 +137,6 @@ class Metrics:
         self.incr_queue.put_nowait(entry)
 
 
-
     # TODO: figure out if we can capture shutdown and force counters
     # TODO: flush before we exit the metrics service
     def shutdown(self) -> None:
