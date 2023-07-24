@@ -1,6 +1,5 @@
 {
   "name": "snitch-node-client",
-
   "version": "0.0.1",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
@@ -19,7 +18,7 @@
     "semantic-release": "semantic-release",
     "setup": "tsx ./scripts/setup.ts",
     "spell:check": "cspell \"{README.md,CONTRIBUTING.md,.github/*.md,src/**/*.ts}\"",
-    "start": "tsc-watch --onSuccess \"node ./build/index.js\"",
+    "start": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/index.js\"",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
@@ -39,7 +38,8 @@
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
     "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@streamdal/snitch-protos": "^0.0.43"
+    "@streamdal/snitch-protos": "^0.0.46",
+    "flowbite": "^1.7.0"
   },
   "devDependencies": {
     "@ryansonshine/commitizen": "^4.2.8",
