@@ -2,12 +2,14 @@ import { MonitorIcon } from "../icons/streamdal.tsx";
 import { titleCase } from "../../lib/utils.ts";
 import { Total } from "./metrics/total.tsx";
 import { RuleMenu } from "./menu.tsx";
+import { ReactNode } from "https://esm.sh/v118/@types/react@18.2.6/index.d.ts";
+import { Metric } from "../../lib/metrics.ts";
 
 export const TH = ({
   children,
   className,
 }: {
-  children?: ReactNode;
+  children?: any;
   className?: string;
 }) => (
   <th
@@ -21,7 +23,7 @@ export const TD = ({
   children,
   className,
 }: {
-  children: ReactNode;
+  children: any;
   className?: string;
 }) => (
   <td
@@ -37,7 +39,8 @@ export const humanMode = (mode?: string) =>
 export type RuleSet = { [key in string]: { id: string; name: string } };
 
 export interface RuleSetType {
-  ruleSet: RuleSet;
+  ruleSets: RuleSet[];
+  metrics: Metric[];
 }
 
 export const RuleSets = ({ data }: { data: RuleSetType }) => {

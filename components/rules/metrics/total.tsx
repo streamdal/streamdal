@@ -1,4 +1,5 @@
-import { getRuleTotal, MetricsKind } from "../../../lib/metrics.ts";
+import type { Metric, MetricsKind, MetricsType } from "../../../lib/metrics.ts";
+import { getRuleTotal } from "../../../lib/metrics.ts";
 import { formatBytes, formatNumber } from "../../../lib/utils.ts";
 
 export const metricColor = (kind: MetricsKind, value: number) => {

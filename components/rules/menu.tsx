@@ -2,7 +2,7 @@ import { Kebab } from "../icons/nav.tsx";
 import IconEye from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/eye.tsx";
 import { Delete, Edit } from "../icons/crud.tsx";
 
-export const RuleMenu = ({ id }: { id: string }) => (
+export const RuleMenu = ({ id }: { id?: string }) => (
   <>
     <div
       id="dropdownDefaultButton"
