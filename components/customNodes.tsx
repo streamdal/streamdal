@@ -1,6 +1,8 @@
 import { Handle, Position } from "reactflow";
 import { ParticipantsMenu } from "./rules/participantsMenu.tsx";
 import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
+import "flowbite";
+import "twind";
 
 // const handleStyle = { left: 2 };
 
@@ -56,13 +58,13 @@ export const Service = ({ data }) => {
           type="target"
           id="c"
           position={Position.Bottom}
-          className="bg-transparent border-0 relative"
+          style={{ opacity: 0, background: "#FFFFFF", position: "relative" }}
         />
         <Handle
           type="source"
           id="d"
           position={Position.Bottom}
-          className="bg-transparent border-0 relative"
+          style={{ opacity: 0, background: "#FFFFFF", position: "relative" }}
         />
       </div>
     </div>
@@ -128,12 +130,12 @@ export const Participants = ({ data }) => {
       <Handle
         type="source"
         position={getHandlePosition(data.source)}
-        className="bg-transparent border-0"
+        style={{ opacity: 0 }}
       />
       <Handle
         type="target"
         position={getHandlePosition(data.target)}
-        className="bg-transparent border-0"
+        style={{ opacity: 0 }}
       />
     </div>
   );
@@ -153,13 +155,13 @@ export const Platform = ({ data }) => {
         type="source"
         position={Position.Left}
         id="a"
-        className="bg-transparent border-0"
+        style={{ opacity: 0 }}
       />
       <Handle
         type="target"
         position={Position.Right}
         id="b"
-        className="bg-transparent border-0"
+        style={{ opacity: 0 }}
       />
     </div>
   );

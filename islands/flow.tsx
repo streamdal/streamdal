@@ -4,12 +4,7 @@ import {
   MarkerType,
   useNodesState,
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
-import {
-  useEffect,
-  useState,
-} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import "flowbite";
-import { initFlowbite, plugin } from "flowbite";
 
 const initialNodes = [
   {
@@ -117,11 +112,6 @@ const nodeTypes = {
   participants: Participants,
 };
 export default function Flow() {
-  // initialize components based on data attribute selectors
-  useEffect(() => {
-    initFlowbite();
-  }, []);
-
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
 
   return (
