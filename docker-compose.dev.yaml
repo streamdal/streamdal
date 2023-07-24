@@ -5,9 +5,12 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    depends_on: 
+      - natsjs
     environment:
       - SNITCH_SERVER_AUTH_TOKEN=1234
-      - SNITCH_SERVER_NATS_URL=nats://natsjs:4222
+      - SNITCH_SERVER_NATSURL=natsjs:4222
+      - SNITCH_SERVER_NODE_NAME=node1
     container_name: snitch-server
     ports:
       - "8080:8080"
