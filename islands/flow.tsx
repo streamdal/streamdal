@@ -3,12 +3,13 @@ import { Participants, Platform, Service } from "../components/customNodes.tsx";
 import {
   MarkerType,
   useNodesState,
-  useViewport,
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 import {
   useEffect,
   useState,
 } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import "flowbite";
+import { initFlowbite, plugin } from "flowbite";
 
 const initialNodes = [
   {
@@ -116,21 +117,12 @@ const nodeTypes = {
   participants: Participants,
 };
 export default function Flow() {
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  // console.log("fuck", window.innerWidth / 2, window.innerHeight / 4);
-  const [width, setWidth] = useState<number>(window.innerWidth / 2);
-  const [height, setHeight] = useState<number>(window.innerHeight / 2);
-
-  const [defaultViewport, setDefaultViewport] = useState<any>({});
-
+  // initialize components based on data attribute selectors
   useEffect(() => {
-    setDefaultViewport({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      zoom: 1,
-    });
-    console.log(defaultViewport);
-  }, [width, height]);
+    initFlowbite();
+  }, []);
+
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
 
   return (
     <div
