@@ -76,7 +76,7 @@ class SnitchClient:
         self.paused_pipelines = {}
         self.log = logging.getLogger("snitch-client")
         self.metrics = Metrics(stub=self.stub, log=self.log)
-        self.functions = {}  # TODO: needed?
+        self.functions = {}
 
         # Run register
         self.__register()
@@ -333,6 +333,14 @@ class SnitchClient:
 
     def __unpause_pipeline(self, cmd: protos.CommandResponse) -> None:
         """Resumes execution of a specified pipeline"""
+
+        if cmd is None:
+            self.log.error("Command is None")
+            return
+
+        if cmd.audience.operation_type == protos.OperationType.OPERATION_TYPE_UNSET:
+            self.log.error("Operation type not set")
+            return
 
         if not self.__is_paused(cmd.audience, cmd.unpause_pipeline.id):
             return
