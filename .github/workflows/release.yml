@@ -45,7 +45,7 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Release on npm
-        working-directory: ./build/ts
+        working-directory: ./build/ts/node
         run: |
           npm version ${{ steps.get_new_version.outputs.new_version }}
           npm publish --access public
