@@ -121,7 +121,7 @@ generate/protoset:
 
 .PHONY: generate
 generate: description = Run all generate/* targets
-generate: lint generate/go generate/rust generate/protoset generate/ts
+generate: lint generate/go generate/rust generate/protoset generate/ts generate/python
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
