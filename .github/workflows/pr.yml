@@ -8,4 +8,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: build
         run: |
+          rustup target add wasm32-wasi
+          cargo install wasm-opt
           make build
