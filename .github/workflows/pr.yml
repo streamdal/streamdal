@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Protobuf Liting
+      - name: Protobuf Linting
         uses: plexsystems/protolint-action@v0.4.0
         with:
           configDirectory: ./
