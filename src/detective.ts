@@ -9,6 +9,7 @@ import {
 import * as fs from "fs";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
+import { readResponse } from "./wasm.js";
 
 const wasi = new WASI({
   preopens: {
@@ -101,29 +102,4 @@ export const testDetective = async () => {
     JSON.parse(new TextDecoder().decode(resp.output))
   );
   console.info("### end web assembly test");
-};
-
-const readResponse = (pointer: number, buffer: Uint8Array) => {
-  let nullHits = 0;
-  const data = [];
-
-  for (let i = pointer; i < buffer.length; i++) {
-    //
-    // Have three nulls in a row, can quit
-    if (nullHits === 3) {
-      break;
-    }
-
-    // Don't have a length, have to see if we hit three sequential terminators
-    if (buffer[i] === 166) {
-      nullHits++;
-      continue;
-    }
-
-    // Not a terminator, reset null hits
-    nullHits = 0;
-    data.push(buffer[i]);
-  }
-
-  return new Uint8Array(data);
 };

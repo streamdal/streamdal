@@ -24,4 +24,8 @@ const start = () => {
   }, HEARTBEAT_INTERVAL);
 };
 
+export const close = () => {
+  transport.close();
+};
+
 start();
