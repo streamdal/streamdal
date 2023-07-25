@@ -1,4 +1,5 @@
 import metrics
+import snitch_protos.protos as protos
 
 
 def test_composite_id():
@@ -8,6 +9,7 @@ def test_composite_id():
         ruleset_id="ruleset",
         labels={"test": "test", "id": "some-uuid", "unit": "bytes"},
         value=0.0,
+        audience=protos.Audience()
     )
     assert metrics.composite_id(entry) == "test-some-uuid-bytes"
 
@@ -17,7 +19,8 @@ def test_new_counter():
         name="test",
         rule_id="rule",
         ruleset_id="ruleset",
-        labels={}
+        labels={},
+        audience=protos.Audience()
     )
 
     m = metrics.Metrics()
@@ -30,12 +33,13 @@ def test_new_counter():
     assert counter.entry.name == "test"
 
 
-def test_incr():
+def test_incr_counter():
     entry = metrics.CounterEntry(
         name="test",
         rule_id="rule",
         ruleset_id="ruleset",
-        labels={}
+        labels={},
+        audience=protos.Audience()
     )
 
     m = metrics.Metrics()
@@ -44,6 +48,29 @@ def test_incr():
     c.incr(2)
 
     assert c.val() == 2.0
+
+def test_incr_metrics():
+    entry = metrics.CounterEntry(
+        name="test",
+        rule_id="rule",
+        ruleset_id="ruleset",
+        labels={},
+        audience=protos.Audience(),
+        value=3.0
+    )
+
+    m = metrics.Metrics()
+    m.incr(entry=entry)
+
+    c = m.get_counter(metrics.CounterEntry(
+        name="test",
+        rule_id="rule",
+        ruleset_id="ruleset",
+        labels={},
+        audience=protos.Audience(),
+    ))
+
+    assert c.val() == 3.0
 
 
 def test_flush_counter():

@@ -63,21 +63,22 @@ class SnitchClient:
     metrics: Metrics
     functions: dict[str, (Instance, Store)]
 
-    def __init__(self, cfg: SnitchConfig):
-        self._validate_config(cfg)
+    def __new__(cls, cfg: SnitchConfig):
+        cls._validate_config(cfg)
 
         channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port)
-        self.channel = channel
-        self.stub = protos.InternalStub(channel=self.channel)
-        self.auth_token = cfg.grpc_token
-        self.loop = asyncio.get_event_loop()
-        self.grpc_timeout = 5
-        self.pipelines = {}
-        self.paused_pipelines = {}
-        self.log = logging.getLogger("snitch-client")
-        self.metrics = Metrics(stub=self.stub, log=self.log)
-        self.functions = {}
+        cls.channel = channel
+        cls.stub = protos.InternalStub(channel=cls.channel)
+        cls.auth_token = cfg.grpc_token
+        cls.loop = asyncio.get_event_loop()
+        cls.grpc_timeout = 5
+        cls.pipelines = {}
+        cls.paused_pipelines = {}
+        cls.log = logging.getLogger("snitch-client")
+        cls.metrics = Metrics(stub=cls.stub, log=cls.log)
+        cls.functions = {}
 
+    def __init__(self, cfg: SnitchConfig):
         # Run register
         self.__register()
 
@@ -132,9 +133,18 @@ class SnitchClient:
 
         return SnitchResponse(data=data, error=False, message="")
 
-    def __notify_condition(self, step: protos.PipelineStep, resp: protos.WasmResponse) -> bool:
-        # TODO: implement
-        pass
+    def __notify_condition(self, step: protos.PipelineStep, resp: protos.WasmResponse):
+        async def call():
+            req = protos.NotifyRequest()
+            req.rule_id = step.id # ????
+            req.audience = None
+            req.metadata = {}
+            req.rule_name = ""
+
+            await self.stub.notify(req, timeout=self.grpc_timeout, metadata=self.__get_metadata())
+
+        self.log.debug("Notifying")
+        self.loop.run_until_complete(call())
 
     def __call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
         try:
@@ -191,7 +201,7 @@ class SnitchClient:
             sleep(DEFAULT_HEARTBEAT_INTERVAL) # TODO: what should heartbeat interval be?
             self.loop.run_until_complete(call())
 
-    async def __register(self) -> None:
+    def __register(self) -> None:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         async def call():
             self.log.debug("Registering with snitch server")
@@ -221,7 +231,6 @@ class SnitchClient:
             self.loop.run_until_complete(call())
             self.log.debug("Register looper completed, closing connection")
         except Exception as e:
-            # Calling client should handle this. Maybe wrap in custom exception type?
             raise SnitchRegisterException("Failed to register: {}".format(e))
 
     @staticmethod
