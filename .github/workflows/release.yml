@@ -11,8 +11,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/snitch-protos
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@main
       - name: Generate new tag (dry run)

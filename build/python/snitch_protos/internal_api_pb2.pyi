@@ -28,7 +28,7 @@ class Audience(_message.Message):
     def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ...) -> None: ...
 
 class BusEvent(_message.Message):
-    __slots__ = ["_metadata", "command_response", "register_request", "request_id", "source"]
+    __slots__ = ["_metadata", "command_response", "deregister_request", "heartbeat_request", "register_request", "request_id", "source"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -37,16 +37,20 @@ class BusEvent(_message.Message):
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     COMMAND_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    DEREGISTER_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    HEARTBEAT_REQUEST_FIELD_NUMBER: _ClassVar[int]
     REGISTER_REQUEST_FIELD_NUMBER: _ClassVar[int]
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
     _metadata: _containers.ScalarMap[str, str]
     command_response: CommandResponse
+    deregister_request: DeregisterRequest
+    heartbeat_request: HeartbeatRequest
     register_request: RegisterRequest
     request_id: str
     source: str
-    def __init__(self, request_id: _Optional[str] = ..., source: _Optional[str] = ..., command_response: _Optional[_Union[CommandResponse, _Mapping]] = ..., register_request: _Optional[_Union[RegisterRequest, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, request_id: _Optional[str] = ..., source: _Optional[str] = ..., command_response: _Optional[_Union[CommandResponse, _Mapping]] = ..., register_request: _Optional[_Union[RegisterRequest, _Mapping]] = ..., deregister_request: _Optional[_Union[DeregisterRequest, _Mapping]] = ..., heartbeat_request: _Optional[_Union[HeartbeatRequest, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CommandResponse(_message.Message):
     __slots__ = ["_metadata", "audience", "delete_pipeline", "pause_pipeline", "set_pipeline", "unpause_pipeline"]
@@ -70,6 +74,21 @@ class CommandResponse(_message.Message):
     set_pipeline: _pipeline_pb2.SetPipelineCommand
     unpause_pipeline: _pipeline_pb2.UnpausePipelineCommand
     def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., set_pipeline: _Optional[_Union[_pipeline_pb2.SetPipelineCommand, _Mapping]] = ..., delete_pipeline: _Optional[_Union[_pipeline_pb2.DeletePipelineCommand, _Mapping]] = ..., pause_pipeline: _Optional[_Union[_pipeline_pb2.PausePipelineCommand, _Mapping]] = ..., unpause_pipeline: _Optional[_Union[_pipeline_pb2.UnpausePipelineCommand, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class DeregisterRequest(_message.Message):
+    __slots__ = ["_metadata", "service_name"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
+    service_name: str
+    def __init__(self, service_name: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["_metadata", "audience", "last_activity_unix_timestamp_utc"]

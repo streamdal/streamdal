@@ -341,6 +341,18 @@ class RegisterRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class DeregisterRequest(betterproto.Message):
+    """
+    Same as RegisterRequest - used for broadcasting a deregistration event
+    """
+
+    service_name: str = betterproto.string_field(1)
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+
+
+@dataclass(eq=False, repr=False)
 class BusEvent(betterproto.Message):
     """Type used by `snitch-server` for sending messages on its local bus."""
 
@@ -348,6 +360,12 @@ class BusEvent(betterproto.Message):
     source: str = betterproto.string_field(2)
     command_response: "CommandResponse" = betterproto.message_field(100, group="event")
     register_request: "RegisterRequest" = betterproto.message_field(101, group="event")
+    deregister_request: "DeregisterRequest" = betterproto.message_field(
+        102, group="event"
+    )
+    heartbeat_request: "HeartbeatRequest" = betterproto.message_field(
+        103, group="event"
+    )
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
