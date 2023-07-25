@@ -80,6 +80,20 @@ generate/rust:
 
 	@echo Successfully compiled protos
 
+.PHONY: generate/python
+generate/python: description = Compile protobuf schema descriptor and generate types for python
+generate/python: clean/python
+generate/python:
+	mkdir -p build/python/snitch_protos
+	docker run --rm -v ${PWD}:/defs streamdal/betterproto:latest \
+ 		--python_betterproto_out=/defs/build/python/snitch_protos \
+ 		--pyi_out=/defs/build/python/snitch_protos \
+		-I /defs/protos/ \
+		-I /defs/protos/steps/ \
+		/defs/protos/*.proto || (exit 1)
+
+	@echo Successfully compiled protos
+
 # Protoset files contain binary encoded google.protobuf.FileDescriptorSet protos
 .PHONY: generate/protoset
 generate/protoset: description = Generate protoset for services
@@ -96,7 +110,7 @@ generate/protoset:
 
 .PHONY: generate
 generate: description = Run all generate/* targets
-generate: lint generate/go generate/rust generate/protoset generate/ts
+generate: lint generate/go generate/rust generate/protoset generate/ts generate/python
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
@@ -107,6 +121,12 @@ clean/go:
 clean/rust: description = Remove all Rust build artifacts
 clean/rust:
 	rm -rf ./build/rust/protos/src/*
+
+.PHONY: clean/python
+clean/python: description = Remove all Python build artifacts
+clean/python:
+	rm -rf ./build/python/snitch_protos
+	rm -rf ./build/python/snitch_protos.egg-info
 
 .PHONY: clean/protoset
 clean/protoset: description = Remove protoset artifacts

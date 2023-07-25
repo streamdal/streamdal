@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_tag: ${{ steps.create_tag.outputs.new_tag }}
+    environment:
+      name: pypi
+      url: https://pypi.org/p/snitch-protos
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@main
       - name: Generate new tag (dry run)
@@ -46,3 +51,13 @@ jobs:
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build python dist
+        run: |
+          cd build/python
+          sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
+          python3 setup.py sdist
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: build/python/dist
+          password: ${{ secrets.PYPI_API_TOKEN }}
