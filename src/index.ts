@@ -6,11 +6,12 @@ import {
 } from "@streamdal/snitch-protos/protos/internal_api.client.js";
 import { register } from "./register.js";
 import { heartbeat } from "./heartbeat.js";
+import "dotenv/config";
 
 const HEARTBEAT_INTERVAL = 30000;
 
 const transport = new GrpcTransport({
-  host: "localhost:9091",
+  host: process.env.SNITCH_URL || "localhost:9091",
   channelCredentials: ChannelCredentials.createInsecure(),
 });
 

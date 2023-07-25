@@ -14,7 +14,7 @@ export const heartbeat = async () => {
       },
       Metadata: {},
     },
-    { meta: { "auth-token": "1234" } }
+    { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
   );
   console.info(`### heartbeat sent`);
 
