@@ -50,6 +50,7 @@ export const process = async ({
   };
 
   for (const pipeline of pipeLines) {
+    console.info(`running pipeline ${pipeline.name}...`);
     const result = await runPipeline({ pipeline, ...status });
     status.data = result.data;
 
@@ -63,7 +64,7 @@ export const process = async ({
     console.info(`pipeline ${pipeline.name} complete`);
   }
 
-  return { data: status.data, error: false, message: "Succes" };
+  return { data: status.data, error: false, message: "Success" };
 };
 
 const notifyStep = (step: Status) => {
@@ -79,8 +80,6 @@ export const runPipeline = async ({
   pipeline: SetPipelineCommand;
   data: Uint8Array;
 }): Promise<Status> => {
-  console.info(`running pipeline ${pipeline.name}...`);
-
   const status: Status = {
     pipeline,
     data,
@@ -91,17 +90,24 @@ export const runPipeline = async ({
   try {
     for (const step of pipeline.steps) {
       console.info(`running pipeline step ${step.name}...`);
-      const result = await runWasm({
+      const { output, exitCode, exitMsg } = await runWasm({
         wasmBytes: step.WasmBytes,
         wasmFunction: step.WasmFunction,
         data: status.data,
       });
 
-      (status.step = step), (status.data = result.output);
-      status.error = result.exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
-      status.message = result.exitMsg;
+      status.step = step;
+      status.data = output;
+      status.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
+      status.message = exitMsg;
 
-      if (result.exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS) {
+      exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS
+        ? console.info(`pipeline step ${step.name} completed successfully`)
+        : console.info(
+            `pipeline step ${step.name} completed with error ${exitMsg}`
+          );
+
+      if (exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS) {
         continue;
       }
 
@@ -110,6 +116,7 @@ export const runPipeline = async ({
       }
 
       if (step.conditions.includes(PipelineStepCondition.CONDITION_ABORT)) {
+        console.info("aborting the pipeline per step condition");
         return {
           data: status.data,
           error: true,
