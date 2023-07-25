@@ -91,9 +91,6 @@ class Metrics:
     incr_queue: SimpleQueue = SimpleQueue()
 
     def __init__(self, **kwargs):
-        if kwargs.get("stub") is None:
-            raise ValueError("stub is required")
-
         self.stub = kwargs.get("stub")
         self.log = kwargs.get("log", logging.getLogger("snitch-client"))
         self.lock = Lock()
@@ -161,7 +158,7 @@ class Metrics:
         req.rule_id = entry.rule_id
         req.rule_name = entry.ruleset_id
         req.audience = entry.audience  # TODO: implement
-        req.metadata = None # TODO: what is this?
+        req.metadata = None  # TODO: what is this?
 
         loop = asyncio.new_event_loop()
         loop.run_until_complete(call(req))

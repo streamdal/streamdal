@@ -27,3 +27,10 @@ setup:
 test:
 	@echo "Running tests..."
 	pytest .
+
+.PHONY: test/wasm
+test/wasm: description = Pull latest releaser of snitch-wasm
+test/wasm:
+	curl -L https://github.com/streamdal/snitch-wasm/releases/latest/download/release.zip -o release.zip
+	unzip -o -q release.zip -d assets/test/
+	rm release.zip
