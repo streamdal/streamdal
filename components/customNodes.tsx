@@ -4,14 +4,8 @@ import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/gri
 import "flowbite";
 import "twind";
 
-// const handleStyle = { left: 2 };
-
-const getHandlePosition = (input: any) => {
-  if (input === "top") {
-    return Position.Top;
-  } else {
-    return Position.Bottom;
-  }
+const getHandlePosition = (input: string) => {
+  return input === "top" ? Position.Top : Position.Bottom;
 };
 
 export const Service = ({ data }) => {
