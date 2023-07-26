@@ -122,8 +122,15 @@ class SnitchClient:
             # Exec wasm
             wasm_resp = self._call_wasm(step, data)
 
+            if self.cfg.dry_run:
+                self.log.debug("Running step '{}' in dry-run mode".format(step.name))
+
             # If successful, continue to next step, don't need to check conditions
             if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+                if self.cfg.dry_run:
+                    self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
+
+                data = wasm_resp.output
                 continue
 
             should_continue = False
@@ -131,14 +138,22 @@ class SnitchClient:
                 if cond == protos.PipelineStepCondition.CONDITION_CONTINUE:
                     # We still need to continue to remaining pipeline steps after other conditions have been processed
                     should_continue = True
+                    self.log.debug("Step '{}' failed, continuing to next step".format(step.name))
                 elif cond == protos.PipelineStepCondition.CONDITION_NOTIFY:
                     self._notify_condition(step, wasm_resp)
+                    self.log.debug("Step '{}' failed, notifying".format(step.name))
                 elif cond == protos.PipelineStepCondition.CONDITION_ABORT:
                     should_continue = False
+                    self.log.debug("Step '{}' failed, aborting".format(step.name))
 
                 # Not continuing, exit function early
-                if not should_continue:
+                if should_continue is False and self.cfg.dry_run is False:
                     return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+
+        # The value of data will be modified each step above regardless of dry run, so that pipelines
+        # can execute as expected. This is why we need to reset to the original data here.
+        if self.cfg.dry_run:
+            data = req.data
 
         return SnitchResponse(data=data, error=False, message="")
 
@@ -153,7 +168,8 @@ class SnitchClient:
             await self.stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         self.log.debug("Notifying")
-        self.loop.run_until_complete(call())
+        if not self.cfg.dry_run:
+            self.loop.run_until_complete(call())
 
     def _get_pipelines(self, operation: int, component: str) -> list[protos.PipelineStep] | None:
         op = self.pipelines.get(operation)
@@ -388,8 +404,8 @@ class SnitchClient:
     def _call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
         try:
             req = protos.WasmRequest()
-            req.input = data
-            req.step = step
+            req.input = copy(data)
+            req.step = copy(step)
 
             response_bytes = self._exec_wasm(req)
 
@@ -439,13 +455,12 @@ class SnitchClient:
             raise SnitchException("Failed to instantiate function: {}".format(e))
 
         req.step.wasm_bytes = None  # Don't need to write this
-        data = bytes(req)
 
-        print(req)
+        data = bytes(req)
 
         # Get memory from module
         memory = instance.exports(store)["memory"]
-        # memory.grow(store, 14)  # Set memory limit to 1MB
+        memory.grow(store, 14)  # Set memory limit to 1MB
 
         # Get alloc() from module
         alloc = instance.exports(store)["alloc"]
@@ -465,7 +480,7 @@ class SnitchClient:
         return self._read_memory(memory, store, result_ptr)
 
     @staticmethod
-    def _read_memory(memory: Memory, store: Store, result_ptr: int, length: int = 0) -> bytes:
+    def _read_memory(memory: Memory, store: Store, result_ptr: int, length: int = -1) -> bytes:
         mem_len = memory.data_len(store)
 
         # Ensure we aren't reading out of bounds
@@ -480,20 +495,22 @@ class SnitchClient:
         count = 0  # How many bytes we've read, used to check against length, if provided
 
         for v in result_data:
-            if nulls == 3:
-                res = res.rstrip(b'\x00')
+            if length == count and length != -1:
                 break
+
+            if nulls == 3:
+                break
+
+            if v == 166:
+                nulls += 1
+                res.append(v)
+                continue
 
             count += 1
             res.append(v)
-
-            if v == 0:
-                nulls += 1
-                continue
-
             nulls = 0  # Reset nulls since we read another byte and thus aren't at the end
 
-            if length == count:
-                break
+        if count == len(result_data) and nulls != 3:
+            raise SnitchException("unable to read response from wasm - no terminators found in response data")
 
-        return bytes(res)
+        return bytes(res).rstrip(b'\xa6')

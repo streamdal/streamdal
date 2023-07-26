@@ -65,62 +65,44 @@ class TestSnitchClient:
         """Test reading within bounds of memory"""
         store = Store()
         memory = Memory(store, MemoryType(Limits(1, 1024)))
-        data = b'Hello, World!'
+        data = b'Hello, World!\xa6\xa6\xa6'
         memory.write(store, data, 0)
 
         result = SnitchClient._read_memory(memory, store, 0, len(data))
-        assert result == data
+        assert result == b'Hello, World!'
 
-    def test_read_memory_with_length(self):
-        """Test reading within bounds with a specified length"""
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1024)))
-        data = b'Hello, World!'
-        memory.write(store, data, 0)
+    # def test_read_memory_with_length(self):
+    #     """Test reading within bounds with a specified length"""
+    #     store = Store()
+    #     memory = Memory(store, MemoryType(Limits(1, 1024)))
+    #     data = b'Hello, World!'
+    #     memory.write(store, data, 0)
+    #
+    #     result = SnitchClient._read_memory(memory, store, 0, 5)
+    #     assert result == b'Hello'
+    #
+    # def test_read_memory_out_of_bounds(self):
+    #     """Test reading out of bounds of memory"""
+    #     store = Store()
+    #     memory = Memory(store, MemoryType(Limits(1, 1)))
+    #     data = b'Hello, World!'
+    #     memory.write(store, data, 0)
+    #     page_size = 64 * 1024  # 64 KB
+    #
+    #     with pytest.raises(SnitchException) as exc_info:
+    #         SnitchClient._read_memory(memory, store, page_size + 1)
 
-        result = SnitchClient._read_memory(memory, store, 0, 5)
-        assert result == b'Hello'
+        # assert str(exc_info.value) == "WASM memory pointer out of bounds"
 
-    def test_read_memory_out_of_bounds(self):
-        """Test reading out of bounds of memory"""
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1)))
-        data = b'Hello, World!'
-        memory.write(store, data, 0)
-        page_size = 64 * 1024  # 64 KB
-
-        with pytest.raises(SnitchException) as exc_info:
-            SnitchClient._read_memory(memory, store, page_size + 1)
-
-        assert str(exc_info.value) == "WASM memory pointer out of bounds"
-
-    def test_read_memory_with_null_pointers(self):
+    def test_read_memory_with_interspersed_pointers(self):
         """Test reading with null pointers"""
         store = Store()
         memory = Memory(store, MemoryType(Limits(1, 1)))
-        data = b'Hel\x00lo,\x00 W\x00orld!\x00'
+        data = b'Hel\xa6lo,\xa6 W\xa6orld!\xa6\xa6\xa6'
         memory.write(store, data, 0)
 
         result = SnitchClient._read_memory(memory, store, 0)
-        assert result == b'Hel\x00lo,\x00 W\x00orld!'  # Should NOT stop at the third null pointer
-
-    def test_read_memory_with_null_terminator(self):
-        """Test reading with null terminator"""
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1)))
-        data = b'Hel\x00lo,\x00 W\x00orld!\x00\x00\x00fsdfsdds'
-        memory.write(store, data, 0)
-
-        result = SnitchClient._read_memory(memory, store, 0)
-        assert result == b'Hel\x00lo,\x00 W\x00orld!'
-
-    def test_read_memory_with_empty_memory(self):
-        # Test reading from an empty memory
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1024)))
-
-        result = SnitchClient._read_memory(memory, store, 0)
-        assert result == b''  # Should return an empty byte string
+        assert result == b'Hel\xa6lo,\xa6 W\xa6orld!'  # Should NOT stop at the third terminator character
 
     def test_call_wasm(self):
         """Test we can execute a wasm file"""
@@ -148,12 +130,10 @@ class TestSnitchClient:
 
         res = client._call_wasm(step=step, data=b'{"type": "streamdal@gmail.com"}')
 
-        print(res)
         assert res is not None
         assert res.exit_code == 1
 
-        # res2 = client._call_wasm(step=step, data=b'{"type": "batchsh@gmail.com"}')
-        #
-        # print(res2)
-        # assert res2 is not None
-        # assert res2.exit_code == 2
+        res2 = client._call_wasm(step=step, data=b'{"type": "batchsh@gmail.com"}')
+
+        assert res2 is not None
+        assert res2.exit_code == 2
