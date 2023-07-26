@@ -1,9 +1,8 @@
 import { Audience } from "@streamdal/snitch-protos/protos/internal_api.js";
-import { internalPipelines } from "./pipeline.js";
+import { EnhancedStep, internalPipelines, PipelineType } from "./pipeline.js";
 import {
   PipelineStep,
   PipelineStepCondition,
-  SetPipelineCommand,
   WASMExitCode,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 import { runWasm } from "./wasm.js";
@@ -14,20 +13,42 @@ export interface SnitchRequest {
   data: Uint8Array;
 }
 
-export interface Status {
-  pipeline?: SetPipelineCommand;
-  step?: PipelineStep;
-  error?: boolean;
+export interface StepStatus {
+  id: string;
+  name: string;
+  pipelineId: string;
+  pipelineName: string;
+  error: boolean;
   message?: string;
-  abort?: boolean;
+  abort: boolean;
+}
+
+export interface PipelinesStatus {
   data: Uint8Array;
+  stepStatuses: StepStatus[];
 }
 
 export interface SnitchResponse {
   data: Uint8Array;
   error: boolean;
   message?: string;
+  stepStatuses?: StepStatus[];
 }
+
+//
+// Flatten all pipelines steps so we can have a single loop, but
+// add pipeline information to the steps so we can log/notify
+// appropriately
+const mapAllSteps = (pipeLines: PipelineType[]): EnhancedStep[] =>
+  pipeLines
+    .map((p: PipelineType) =>
+      p.steps.map((s: PipelineStep) => ({
+        ...s,
+        pipelineId: p.id,
+        pipelineName: p.name,
+      }))
+    )
+    .flat(1);
 
 export const processPipelines = async ({
   audience,
@@ -41,39 +62,51 @@ export const processPipelines = async ({
     return { data, error: true, message };
   }
 
+  const allSteps = mapAllSteps(pipeLines);
+
   //
-  // wrapping data up in a status object so we can bubble up
-  // transformations and errors from nested steps
-  const status: Status = {
+  // wrapping data up in a status object so we can track
+  // statuses and set/pass along the data from step to step
+  // since it can be altered.
+  let pipelineStatus: PipelinesStatus = {
     data,
-    error: false,
-    message: "",
+    stepStatuses: [],
   };
 
-  for (const pipeline of pipeLines) {
-    console.info(`running pipeline ${pipeline.name}...`);
-    const result = await runPipeline({ pipeline, ...status });
-    status.data = result.data;
+  for (const step of allSteps) {
+    console.info(
+      `running pipeline step ${step.pipelineName} - ${step.name}...`
+    );
 
-    if (result.abort) {
-      return {
-        data: result.data,
-        error: true,
-        message: result.message,
-      };
+    pipelineStatus = await runStep({
+      step,
+      pipeline: pipelineStatus,
+    });
+
+    console.info(`pipeline step ${step.pipelineName} - ${step.name} complete`);
+
+    if (pipelineStatus.stepStatuses.at(-1)?.abort) {
+      break;
     }
-    console.info(`pipeline ${pipeline.name} complete`);
   }
 
-  return { data: status.data, error: false, message: "Success" };
+  //
+  // For now top level response status is synonymous with the last step status
+  const finalStatus = pipelineStatus.stepStatuses.at(-1);
+
+  return {
+    ...pipelineStatus,
+    error: !finalStatus?.error,
+    message: finalStatus?.message || "Success",
+  };
 };
 
-const notifyStep = async (step: Status) => {
+const notifyStep = async (step: StepStatus) => {
   console.info("notifying error step", step);
   await grpcClient.notify(
     {
-      ruleId: step.step?.id || "unknown",
-      ruleName: step.step?.name || "unknown",
+      ruleId: step.id || "unknown",
+      ruleName: step.name || "unknown",
       occurredAtUnixTsUtc: BigInt(Date.now()),
       Metadata: {},
     },
@@ -81,66 +114,55 @@ const notifyStep = async (step: Status) => {
   );
 };
 
-export const runPipeline = async ({
+export const runStep = async ({
+  step,
   pipeline,
-  data,
 }: {
-  pipeline: SetPipelineCommand;
-  data: Uint8Array;
-}): Promise<Status> => {
-  const status: Status = {
-    pipeline,
-    data,
+  step: EnhancedStep;
+  pipeline: PipelinesStatus;
+}): Promise<PipelinesStatus> => {
+  const stepStatus: StepStatus = {
+    id: step.id,
+    name: step.name,
+    pipelineId: step.pipelineId,
+    pipelineName: step.pipelineName,
     error: false,
-    message: "",
+    abort: false,
   };
 
+  let data = pipeline.data;
+
   try {
-    for (const step of pipeline.steps) {
-      console.info(`running pipeline step ${step.name}...`);
-      const { output, exitCode, exitMsg } = await runWasm({
-        wasmBytes: step.WasmBytes,
-        wasmFunction: step.WasmFunction,
-        data: status.data,
-      });
+    const { output, exitCode, exitMsg } = await runWasm({
+      wasmBytes: step.WasmBytes,
+      wasmFunction: step.WasmFunction,
+      data: pipeline.data,
+    });
 
-      status.step = step;
-      status.data = output;
-      status.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
-      status.message = exitMsg;
+    //
+    // output gets passed back as data for the next function
+    data = output;
+    stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
+    stepStatus.message = exitMsg;
 
-      exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS
-        ? console.info(`pipeline step ${step.name} completed successfully`)
-        : console.info(
-            `pipeline step ${step.name} completed with error ${exitMsg}`
-          );
+    if (
+      stepStatus.error &&
+      step.conditions.includes(PipelineStepCondition.CONDITION_NOTIFY)
+    ) {
+      void notifyStep(stepStatus);
+    }
 
-      if (exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS) {
-        continue;
-      }
-
-      if (step.conditions.includes(PipelineStepCondition.CONDITION_NOTIFY)) {
-        void notifyStep(status);
-      }
-
-      if (step.conditions.includes(PipelineStepCondition.CONDITION_ABORT)) {
-        console.info("aborting the pipeline per step condition");
-        return {
-          data: status.data,
-          error: true,
-          message: status.message,
-          abort: true,
-        };
-      }
+    if (
+      stepStatus.error &&
+      step.conditions.includes(PipelineStepCondition.CONDITION_ABORT)
+    ) {
+      stepStatus.abort = true;
     }
   } catch (error: any) {
-    return {
-      data: status.data,
-      error: true,
-      message: error.toString(),
-      abort: true,
-    };
+    stepStatus.error = true;
+    stepStatus.message = error.toString();
+    stepStatus.abort = true;
   }
 
-  return status;
+  return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };
 };

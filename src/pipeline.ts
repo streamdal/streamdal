@@ -4,11 +4,17 @@ import {
 } from "@streamdal/snitch-protos/protos/internal_api.js";
 import {
   DeletePipelineCommand,
+  PipelineStep,
   SetPipelineCommand,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 
 export type PipelineType = SetPipelineCommand & {
   paused: boolean;
+};
+
+export type EnhancedStep = PipelineStep & {
+  pipelineId: string;
+  pipelineName: string;
 };
 
 export const internalPipelines = new Map<Audience, PipelineType[]>();
