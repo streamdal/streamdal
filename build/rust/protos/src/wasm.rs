@@ -175,7 +175,7 @@ pub struct WASMResponse {
     // @@protoc_insertion_point(field:protos.WASMResponse.output)
     pub output: ::std::vec::Vec<u8>,
     // @@protoc_insertion_point(field:protos.WASMResponse.exit_code)
-    pub exit_code: ::protobuf::EnumOrUnknown<WasmExitCode>,
+    pub exit_code: ::protobuf::EnumOrUnknown<WASMExitCode>,
     // @@protoc_insertion_point(field:protos.WASMResponse.exit_msg)
     pub exit_msg: ::std::string::String,
     // special fields
@@ -254,7 +254,7 @@ impl ::protobuf::Message for WASMResponse {
         if !self.output.is_empty() {
             my_size += ::protobuf::rt::bytes_size(1, &self.output);
         }
-        if self.exit_code != ::protobuf::EnumOrUnknown::new(WasmExitCode::WASM_EXIT_CODE_UNSET) {
+        if self.exit_code != ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET) {
             my_size += ::protobuf::rt::int32_size(2, self.exit_code.value());
         }
         if !self.exit_msg.is_empty() {
@@ -269,7 +269,7 @@ impl ::protobuf::Message for WASMResponse {
         if !self.output.is_empty() {
             os.write_bytes(1, &self.output)?;
         }
-        if self.exit_code != ::protobuf::EnumOrUnknown::new(WasmExitCode::WASM_EXIT_CODE_UNSET) {
+        if self.exit_code != ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET) {
             os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.exit_code))?;
         }
         if !self.exit_msg.is_empty() {
@@ -293,7 +293,7 @@ impl ::protobuf::Message for WASMResponse {
 
     fn clear(&mut self) {
         self.output.clear();
-        self.exit_code = ::protobuf::EnumOrUnknown::new(WasmExitCode::WASM_EXIT_CODE_UNSET);
+        self.exit_code = ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET);
         self.exit_msg.clear();
         self.special_fields.clear();
     }
@@ -333,47 +333,47 @@ impl ::protobuf::reflect::ProtobufValue for WASMResponse {
 ///  ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
 ///  to determine what to do next;
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.WasmExitCode)
-pub enum WasmExitCode {
-    // @@protoc_insertion_point(enum_value:protos.WasmExitCode.WASM_EXIT_CODE_UNSET)
+// @@protoc_insertion_point(enum:protos.WASMExitCode)
+pub enum WASMExitCode {
+    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_UNSET)
     WASM_EXIT_CODE_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS)
+    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_SUCCESS)
     WASM_EXIT_CODE_SUCCESS = 1,
-    // @@protoc_insertion_point(enum_value:protos.WasmExitCode.WASM_EXIT_CODE_FAILURE)
+    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_FAILURE)
     WASM_EXIT_CODE_FAILURE = 2,
-    // @@protoc_insertion_point(enum_value:protos.WasmExitCode.WASM_EXIT_CODE_INTERNAL_ERROR)
+    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_INTERNAL_ERROR)
     WASM_EXIT_CODE_INTERNAL_ERROR = 3,
 }
 
-impl ::protobuf::Enum for WasmExitCode {
-    const NAME: &'static str = "WasmExitCode";
+impl ::protobuf::Enum for WASMExitCode {
+    const NAME: &'static str = "WASMExitCode";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<WasmExitCode> {
+    fn from_i32(value: i32) -> ::std::option::Option<WASMExitCode> {
         match value {
-            0 => ::std::option::Option::Some(WasmExitCode::WASM_EXIT_CODE_UNSET),
-            1 => ::std::option::Option::Some(WasmExitCode::WASM_EXIT_CODE_SUCCESS),
-            2 => ::std::option::Option::Some(WasmExitCode::WASM_EXIT_CODE_FAILURE),
-            3 => ::std::option::Option::Some(WasmExitCode::WASM_EXIT_CODE_INTERNAL_ERROR),
+            0 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_UNSET),
+            1 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_SUCCESS),
+            2 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_FAILURE),
+            3 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [WasmExitCode] = &[
-        WasmExitCode::WASM_EXIT_CODE_UNSET,
-        WasmExitCode::WASM_EXIT_CODE_SUCCESS,
-        WasmExitCode::WASM_EXIT_CODE_FAILURE,
-        WasmExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+    const VALUES: &'static [WASMExitCode] = &[
+        WASMExitCode::WASM_EXIT_CODE_UNSET,
+        WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+        WASMExitCode::WASM_EXIT_CODE_FAILURE,
+        WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
     ];
 }
 
-impl ::protobuf::EnumFull for WasmExitCode {
+impl ::protobuf::EnumFull for WASMExitCode {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("WasmExitCode").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("WASMExitCode").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -382,15 +382,15 @@ impl ::protobuf::EnumFull for WasmExitCode {
     }
 }
 
-impl ::std::default::Default for WasmExitCode {
+impl ::std::default::Default for WASMExitCode {
     fn default() -> Self {
-        WasmExitCode::WASM_EXIT_CODE_UNSET
+        WASMExitCode::WASM_EXIT_CODE_UNSET
     }
 }
 
-impl WasmExitCode {
+impl WASMExitCode {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<WasmExitCode>("WasmExitCode")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<WASMExitCode>("WASMExitCode")
     }
 }
 
@@ -399,51 +399,51 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12(\n\x04step\x18\x01\x20\x01(\x0b2\x14.protos.PipelineStepR\x04step\
     \x12\x14\n\x05input\x18\x02\x20\x01(\x0cR\x05input\"t\n\x0cWASMResponse\
     \x12\x16\n\x06output\x18\x01\x20\x01(\x0cR\x06output\x121\n\texit_code\
-    \x18\x02\x20\x01(\x0e2\x14.protos.WasmExitCodeR\x08exitCode\x12\x19\n\
-    \x08exit_msg\x18\x03\x20\x01(\tR\x07exitMsg*\x83\x01\n\x0cWasmExitCode\
+    \x18\x02\x20\x01(\x0e2\x14.protos.WASMExitCodeR\x08exitCode\x12\x19\n\
+    \x08exit_msg\x18\x03\x20\x01(\tR\x07exitMsg*\x83\x01\n\x0cWASMExitCode\
     \x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\x1a\n\x16WASM_EXIT_CODE_SUC\
     CESS\x10\x01\x12\x1a\n\x16WASM_EXIT_CODE_FAILURE\x10\x02\x12!\n\x1dWASM_\
     EXIT_CODE_INTERNAL_ERROR\x10\x03B4Z2github.com/streamdal/snitch-protos/b\
-    uild/go/protosJ\xb8\x08\n\x06\x12\x04\0\0\x20\x01\n\x08\n\x01\x0c\x12\
+    uild/go/protosJ\xea\x08\n\x06\x12\x04\0\0\x20\x01\n\x08\n\x01\x0c\x12\
     \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\
     \x04\0\x18\n\x08\n\x01\x08\x12\x03\x06\0I\n\t\n\x02\x08\x0b\x12\x03\x06\
-    \0I\n\xe3\x02\n\x02\x05\0\x12\x04\x0e\0\x13\x01\x1a\xd6\x02\x20Included\
+    \0I\n\x95\x03\n\x02\x05\0\x12\x04\x0e\0\x13\x01\x1a\xd6\x02\x20Included\
     \x20in\x20WASM\x20response;\x20SDK\x20is\x20responsible\x20for\x20interp\
     reting\x20the\x20response\n\x20status\x20and\x20how\x20it\x20relates\x20\
     to\x20the\x20step\x20condition.\n\x20ie.\x20WASM\x20func\x20returns\x20W\
     ASM_EXIT_CODE_INTERNAL_ERROR\x20lookup\x20ON_ERROR\n\x20conditions\x20to\
     \x20determine\x20what\x20to\x20do\x20next.\n\x20ie.\x20WASM\x20func\x20r\
     eturns\x20WASM_EXIT_CODE_SUCCESS\x20lookup\x20ON_MATCH\x20conditions\n\
-    \x20to\x20determine\x20what\x20to\x20do\x20next;\n\n\n\n\x03\x05\0\x01\
-    \x12\x03\x0e\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x0f\x02\x1b\n\x0c\n\
-    \x05\x05\0\x02\0\x01\x12\x03\x0f\x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\
-    \x03\x0f\x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x10\x02\x1d\n\x0c\n\
-    \x05\x05\0\x02\x01\x01\x12\x03\x10\x02\x18\n\x0c\n\x05\x05\0\x02\x01\x02\
-    \x12\x03\x10\x1b\x1c\nK\n\x04\x05\0\x02\x02\x12\x03\x11\x02\x1d\">\x20Pr\
-    obably\x20need\x20better\x20names\x20for\x20these\x20as\x20FAILURE\x20is\
-    \x20too\x20harsh\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x11\x02\x18\n\
-    \x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x11\x1b\x1c\n\x0b\n\x04\x05\0\x02\
-    \x03\x12\x03\x12\x02$\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x12\x02\x1f\
-    \n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x12\"#\nK\n\x02\x04\0\x12\x04\x16\
-    \0\x19\x01\x1a?\x20SDK\x20generates\x20a\x20WASM\x20request\x20and\x20pa\
-    sses\x20this\x20to\x20the\x20WASM\x20func\n\n\n\n\x03\x04\0\x01\x12\x03\
-    \x16\x08\x13\n\x0b\n\x04\x04\0\x02\0\x12\x03\x17\x02\x1f\n\x0c\n\x05\x04\
-    \0\x02\0\x06\x12\x03\x17\x02\x15\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x17\
-    \x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x17\x1d\x1e\n\x0b\n\x04\x04\
-    \0\x02\x01\x12\x03\x18\x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x18\
-    \x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x18\x08\r\n\x0c\n\x05\x04\
-    \0\x02\x01\x03\x12\x03\x18\x10\x11\n,\n\x02\x04\x01\x12\x04\x1c\0\x20\
-    \x01\x1a\x20\x20Returned\x20by\x20all\x20WASM\x20functions\n\n\n\n\x03\
-    \x04\x01\x01\x12\x03\x1c\x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1d\
-    \x02\x13\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1d\x02\x07\n\x0c\n\x05\
-    \x04\x01\x02\0\x01\x12\x03\x1d\x08\x0e\n\x0c\n\x05\x04\x01\x02\0\x03\x12\
-    \x03\x1d\x11\x12\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x1e\x02\x1d\n\x0c\n\
-    \x05\x04\x01\x02\x01\x06\x12\x03\x1e\x02\x0e\n\x0c\n\x05\x04\x01\x02\x01\
-    \x01\x12\x03\x1e\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03\x1e\x1b\
-    \x1c\n\x0b\n\x04\x04\x01\x02\x02\x12\x03\x1f\x02\x16\n\x0c\n\x05\x04\x01\
-    \x02\x02\x05\x12\x03\x1f\x02\x08\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03\
-    \x1f\t\x11\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03\x1f\x14\x15b\x06proto\
-    3\
+    \x20to\x20determine\x20what\x20to\x20do\x20next;\n\"0\x20protolint:disab\
+    le:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\x03\x0e\x05\
+    \x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x0f\x02\x1b\n\x0c\n\x05\x05\0\x02\0\
+    \x01\x12\x03\x0f\x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0f\x19\x1a\
+    \n\x0b\n\x04\x05\0\x02\x01\x12\x03\x10\x02\x1d\n\x0c\n\x05\x05\0\x02\x01\
+    \x01\x12\x03\x10\x02\x18\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x10\x1b\
+    \x1c\nK\n\x04\x05\0\x02\x02\x12\x03\x11\x02\x1d\">\x20Probably\x20need\
+    \x20better\x20names\x20for\x20these\x20as\x20FAILURE\x20is\x20too\x20har\
+    sh\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x11\x02\x18\n\x0c\n\x05\x05\0\
+    \x02\x02\x02\x12\x03\x11\x1b\x1c\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x12\
+    \x02$\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x12\x02\x1f\n\x0c\n\x05\x05\
+    \0\x02\x03\x02\x12\x03\x12\"#\nK\n\x02\x04\0\x12\x04\x16\0\x19\x01\x1a?\
+    \x20SDK\x20generates\x20a\x20WASM\x20request\x20and\x20passes\x20this\
+    \x20to\x20the\x20WASM\x20func\n\n\n\n\x03\x04\0\x01\x12\x03\x16\x08\x13\
+    \n\x0b\n\x04\x04\0\x02\0\x12\x03\x17\x02\x1f\n\x0c\n\x05\x04\0\x02\0\x06\
+    \x12\x03\x17\x02\x15\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x17\x16\x1a\n\
+    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x17\x1d\x1e\n\x0b\n\x04\x04\0\x02\x01\
+    \x12\x03\x18\x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x18\x02\x07\n\
+    \x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x18\x08\r\n\x0c\n\x05\x04\0\x02\x01\
+    \x03\x12\x03\x18\x10\x11\n,\n\x02\x04\x01\x12\x04\x1c\0\x20\x01\x1a\x20\
+    \x20Returned\x20by\x20all\x20WASM\x20functions\n\n\n\n\x03\x04\x01\x01\
+    \x12\x03\x1c\x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1d\x02\x13\n\x0c\
+    \n\x05\x04\x01\x02\0\x05\x12\x03\x1d\x02\x07\n\x0c\n\x05\x04\x01\x02\0\
+    \x01\x12\x03\x1d\x08\x0e\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1d\x11\
+    \x12\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x1e\x02\x1d\n\x0c\n\x05\x04\x01\
+    \x02\x01\x06\x12\x03\x1e\x02\x0e\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\
+    \x1e\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03\x1e\x1b\x1c\n\x0b\n\
+    \x04\x04\x01\x02\x02\x12\x03\x1f\x02\x16\n\x0c\n\x05\x04\x01\x02\x02\x05\
+    \x12\x03\x1f\x02\x08\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03\x1f\t\x11\n\
+    \x0c\n\x05\x04\x01\x02\x02\x03\x12\x03\x1f\x14\x15b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -466,7 +466,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(WASMRequest::generated_message_descriptor_data());
             messages.push(WASMResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
-            enums.push(WasmExitCode::generated_enum_descriptor_data());
+            enums.push(WASMExitCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
