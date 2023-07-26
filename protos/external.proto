@@ -76,10 +76,12 @@ message DetachPipelineRequest {
 
 message PausePipelineRequest {
   string pipeline_id = 1;
+  protos.Audience audience = 2;
 }
 
 message ResumePipelineRequest {
   string pipeline_id = 1;
+  protos.Audience audience = 2;
 }
 
 message TestRequest {

@@ -141,7 +141,8 @@ export const DetachPipelineRequest = new DetachPipelineRequest$Type();
 class PausePipelineRequest$Type extends MessageType {
     constructor() {
         super("protos.PausePipelineRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }
@@ -153,7 +154,8 @@ export const PausePipelineRequest = new PausePipelineRequest$Type();
 class ResumePipelineRequest$Type extends MessageType {
     constructor() {
         super("protos.ResumePipelineRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }

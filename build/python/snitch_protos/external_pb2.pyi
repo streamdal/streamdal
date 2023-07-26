@@ -76,16 +76,20 @@ class GetServiceMapResponse(_message.Message):
     def __init__(self, service_map: _Optional[_Mapping[str, _info_pb2.ServiceInfo]] = ...) -> None: ...
 
 class PausePipelineRequest(_message.Message):
-    __slots__ = ["pipeline_id"]
+    __slots__ = ["audience", "pipeline_id"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    audience: _common_pb2.Audience
     pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class ResumePipelineRequest(_message.Message):
-    __slots__ = ["pipeline_id"]
+    __slots__ = ["audience", "pipeline_id"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    audience: _common_pb2.Audience
     pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class TestRequest(_message.Message):
     __slots__ = ["input"]

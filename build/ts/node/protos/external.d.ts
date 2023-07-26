@@ -118,6 +118,10 @@ export interface PausePipelineRequest {
      * @generated from protobuf field: string pipeline_id = 1;
      */
     pipelineId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.ResumePipelineRequest
@@ -127,6 +131,10 @@ export interface ResumePipelineRequest {
      * @generated from protobuf field: string pipeline_id = 1;
      */
     pipelineId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TestRequest

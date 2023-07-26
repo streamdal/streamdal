@@ -394,11 +394,13 @@ class DetachPipelineRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class PausePipelineRequest(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
+    audience: "Audience" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
 class ResumePipelineRequest(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
+    audience: "Audience" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)

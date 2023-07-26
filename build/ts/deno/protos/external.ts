@@ -122,6 +122,10 @@ export interface PausePipelineRequest {
      * @generated from protobuf field: string pipeline_id = 1;
      */
     pipelineId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.ResumePipelineRequest
@@ -131,6 +135,10 @@ export interface ResumePipelineRequest {
      * @generated from protobuf field: string pipeline_id = 1;
      */
     pipelineId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -284,7 +292,8 @@ export const DetachPipelineRequest = new DetachPipelineRequest$Type();
 class PausePipelineRequest$Type extends MessageType<PausePipelineRequest> {
     constructor() {
         super("protos.PausePipelineRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }
@@ -296,7 +305,8 @@ export const PausePipelineRequest = new PausePipelineRequest$Type();
 class ResumePipelineRequest$Type extends MessageType<ResumePipelineRequest> {
     constructor() {
         super("protos.ResumePipelineRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }
