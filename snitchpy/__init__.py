@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import platform
 import snitch_protos.protos as protos
 import socket
 from .exceptions import SnitchException, SnitchRegisterException
@@ -64,9 +65,6 @@ class SnitchClient:
     metrics: Metrics
     functions: dict[str, (Instance, Store)]
     exit: bool = False
-    #
-    # def __new__(cls, cfg: SnitchConfig):
-    #
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -204,6 +202,18 @@ class SnitchClient:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         async def call():
             self.log.debug("Registering with snitch server")
+
+            # string library_name = 2;
+            # string library_version = 3;
+            # string language = 4;
+            # string arch = 5;
+            # string os = 6;
+
+            library_name = "snitchpy"
+            library_version = "0.0.1"  # TODO: how to inject via github CI?
+            language = "python"
+            sys_arch = platform.processor()
+            sys_os = platform.system()
 
             req = protos.RegisterRequest()
             req.dry_run = self.cfg.dry_run
@@ -381,23 +391,24 @@ class SnitchClient:
             req.input = data
             req.step = step
 
-            wasm_bytes = self._exec_wasm(step.wasm_function, data)
+            response_bytes = self._exec_wasm(req)
+
+            print(response_bytes)
 
             # Unmarshal WASM response
-            resp = protos.WasmResponse()
-            resp.FromString(wasm_bytes)
-
-            return resp
+            return protos.WasmResponse().parse(response_bytes)
         except Exception as e:
             resp = protos.WasmResponse()
             resp.output = ""
             resp.exit_msg = "Failed to execute WASM: {}".format(e)
             resp.exit_code = protos.WasmExitCode.WASM_EXIT_CODE_INTERNAL_ERROR
 
-    def _get_function(self, name: str) -> (Instance, Store):
+            return resp
+
+    def _get_function(self, step: protos.PipelineStep) -> (Instance, Store):
         """Get a function from the internal map of functions"""
-        if self.functions.get(name) is not None:
-            return self.functions[name]
+        if self.functions.get(step.wasm_id) is not None:
+            return self.functions[step.wasm_id]
 
         # Function not instantiated yet
         cfg = Config()
@@ -406,7 +417,7 @@ class SnitchClient:
         linker = Linker(engine)
         linker.define_wasi()
 
-        module = Module.from_file(linker.engine, "./{}.wasm".format(name))
+        module = Module(linker.engine, wasm=step.wasm_bytes)
 
         wasi = WasiConfig()
         wasi.inherit_stdout()
@@ -418,18 +429,23 @@ class SnitchClient:
 
         instance = linker.instantiate(store, module)
 
-        self.functions[name] = (instance, store)
+        self.functions[step.wasm_id] = (instance, store)
         return instance, store
 
-    def _exec_wasm(self, func: str, data: bytes) -> bytes:
+    def _exec_wasm(self, req: protos.WasmRequest) -> bytes:
         try:
-            instance, store = self._get_function(func)
+            instance, store = self._get_function(req.step)
         except Exception as e:
             raise SnitchException("Failed to instantiate function: {}".format(e))
 
+        req.step.wasm_bytes = None  # Don't need to write this
+        data = bytes(req)
+
+        print(req)
+
         # Get memory from module
         memory = instance.exports(store)["memory"]
-        memory.grow(store, 14)  # Set memory limit to 1MB
+        # memory.grow(store, 14)  # Set memory limit to 1MB
 
         # Get alloc() from module
         alloc = instance.exports(store)["alloc"]
@@ -439,8 +455,10 @@ class SnitchClient:
         # Write to memory starting at pointer returned bys alloc()
         memory.write(store, data, start_ptr)
 
+        print("start_ptr: ", start_ptr)
+
         # Execute the function
-        f = instance.exports(store)["f"]
+        f = instance.exports(store)[req.step.wasm_function]
         result_ptr = f(store, start_ptr, len(data))
 
         # Read from result pointer
@@ -462,15 +480,18 @@ class SnitchClient:
         count = 0  # How many bytes we've read, used to check against length, if provided
 
         for v in result_data:
-            if nulls == 3 and length == 0:
+            if nulls == 3:
+                res = res.rstrip(b'\x00')
                 break
+
+            count += 1
+            res.append(v)
 
             if v == 0:
                 nulls += 1
                 continue
 
-            res.append(v)
-            count += 1
+            nulls = 0  # Reset nulls since we read another byte and thus aren't at the end
 
             if length == count:
                 break
