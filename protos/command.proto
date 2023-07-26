@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package protos;
+
+import "common.proto";
+import "pipeline.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+// Command is used by snitch-server for sending commands to SDKs
+message Command {
+  // Who is this command intended for?
+  protos.Audience audience = 1;
+
+  oneof command {
+    protos.SetPipelineCommand set_pipeline = 100;
+    protos.DeletePipelineCommand delete_pipeline = 101; // Hmm, should this be here?
+    protos.PausePipelineCommand pause_pipeline = 102;
+    protos.UnpausePipelineCommand unpause_pipeline = 103;
+    protos.KeepAliveCommand keep_alive = 104;
+  }
+}
+
+// Used for both Add and Update
+message SetPipelineCommand {
+  protos.Pipeline pipeline = 1;
+}
+
+message DeletePipelineCommand {
+  // Unique ID for the pipeline
+  string id = 1; // TODO: Where does this ID come from? How do we know it? A: We get it on pipeline creation (CreatePipeline external RPC)
+}
+
+message PausePipelineCommand {
+  // Unique ID for the pipeline
+  string id = 1; // TODO: Where does this come from? A: We get it on pipeline creation (CreatePipeline external RPC)
+}
+
+message UnpausePipelineCommand {
+  // Unique ID for the pipeline
+  string id = 1;
+}
+
+message KeepAliveCommand {
+  // Nothing needed in here, just a ping from server to SDK
+}

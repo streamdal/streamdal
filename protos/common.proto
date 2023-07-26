@@ -10,9 +10,6 @@ message StandardResponse {
   string id = 1;
   ResponseCode code = 2;
   string message = 3;
-
-  // Debug info that server may populate with additional info.
-  map <string, string> _metadata = 1000;
 }
 
 // Common status codes used in gRPC method responses
@@ -23,4 +20,24 @@ enum ResponseCode {
   RESPONSE_CODE_NOT_FOUND = 3;
   RESPONSE_CODE_INTERNAL_SERVER_ERROR = 4;
   RESPONSE_CODE_GENERIC_ERROR = 5;
+}
+
+// Each SDK client is a $service + $component + $operation_type
+enum OperationType {
+  OPERATION_TYPE_UNSET = 0;
+  OPERATION_TYPE_CONSUMER = 1;
+  OPERATION_TYPE_PRODUCER = 2;
+}
+
+// Used to indicate who a command is intended for
+message Audience {
+  // Name of the service -- let's include the service name on all calls, we can
+  // optimize later ~DS
+  string service_name = 1;
+
+  // Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+  string component_name = 2;
+
+  // Consumer or Producer
+  OperationType operation_type = 3;
 }

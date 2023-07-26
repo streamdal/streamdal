@@ -8,37 +8,6 @@ import { EncodeStep } from "./steps/encode.js";
 import { TransformStep } from "./steps/transform.js";
 import { DetectiveStep } from "./steps/detective.js";
 /**
- * Included in WASM response; SDK is responsible for interpreting the response
- * status and how it relates to the step condition.
- * ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
- * conditions to determine what to do next.
- * ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
- * to determine what to do next;
- *
- * @generated from protobuf enum protos.WASMExitCode
- */
-export var WASMExitCode;
-(function (WASMExitCode) {
-    /**
-     * @generated from protobuf enum value: WASM_EXIT_CODE_UNSET = 0;
-     */
-    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_UNSET"] = 0] = "WASM_EXIT_CODE_UNSET";
-    /**
-     * @generated from protobuf enum value: WASM_EXIT_CODE_SUCCESS = 1;
-     */
-    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_SUCCESS"] = 1] = "WASM_EXIT_CODE_SUCCESS";
-    /**
-     * Probably need better names for these as FAILURE is too harsh
-     *
-     * @generated from protobuf enum value: WASM_EXIT_CODE_FAILURE = 2;
-     */
-    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_FAILURE"] = 2] = "WASM_EXIT_CODE_FAILURE";
-    /**
-     * @generated from protobuf enum value: WASM_EXIT_CODE_INTERNAL_ERROR = 3;
-     */
-    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_INTERNAL_ERROR"] = 3] = "WASM_EXIT_CODE_INTERNAL_ERROR";
-})(WASMExitCode || (WASMExitCode = {}));
-/**
  * A condition defines how the SDK should handle a step response -- should it
  * continue executing the pipeline, should it abort, should it notify the server?
  * Each step can have multiple conditions.
@@ -48,56 +17,39 @@ export var WASMExitCode;
 export var PipelineStepCondition;
 (function (PipelineStepCondition) {
     /**
-     * @generated from protobuf enum value: CONDITION_UNSET = 0;
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_UNSET = 0;
      */
-    PipelineStepCondition[PipelineStepCondition["CONDITION_UNSET"] = 0] = "CONDITION_UNSET";
+    PipelineStepCondition[PipelineStepCondition["UNSET"] = 0] = "UNSET";
     /**
-     * @generated from protobuf enum value: CONDITION_CONTINUE = 1;
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT = 1;
      */
-    PipelineStepCondition[PipelineStepCondition["CONDITION_CONTINUE"] = 1] = "CONDITION_CONTINUE";
+    PipelineStepCondition[PipelineStepCondition["ABORT"] = 1] = "ABORT";
     /**
-     * @generated from protobuf enum value: CONDITION_ABORT = 2;
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_NOTIFY = 2;
      */
-    PipelineStepCondition[PipelineStepCondition["CONDITION_ABORT"] = 2] = "CONDITION_ABORT";
-    /**
-     * @generated from protobuf enum value: CONDITION_NOTIFY = 3;
-     */
-    PipelineStepCondition[PipelineStepCondition["CONDITION_NOTIFY"] = 3] = "CONDITION_NOTIFY";
+    PipelineStepCondition[PipelineStepCondition["NOTIFY"] = 2] = "NOTIFY";
 })(PipelineStepCondition || (PipelineStepCondition = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class WASMRequest$Type extends MessageType {
+class Pipeline$Type extends MessageType {
     constructor() {
-        super("protos.WASMRequest", [
-            { no: 1, name: "step", kind: "message", T: () => PipelineStep },
-            { no: 2, name: "input", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        super("protos.Pipeline", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.WASMRequest
+ * @generated MessageType for protobuf message protos.Pipeline
  */
-export const WASMRequest = new WASMRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class WASMResponse$Type extends MessageType {
-    constructor() {
-        super("protos.WASMResponse", [
-            { no: 1, name: "output", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
-            { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.WASMResponse
- */
-export const WASMResponse = new WASMResponse$Type();
+export const Pipeline = new Pipeline$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PipelineStep$Type extends MessageType {
     constructor() {
         super("protos.PipelineStep", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "conditions", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition] },
+            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "on_success", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
+            { no: 3, name: "on_failure", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
             { no: 1000, name: "detective", kind: "message", oneof: "step", T: () => DetectiveStep },
             { no: 1001, name: "transform", kind: "message", oneof: "step", T: () => TransformStep },
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => EncodeStep },
@@ -113,54 +65,4 @@ class PipelineStep$Type extends MessageType {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export const PipelineStep = new PipelineStep$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class SetPipelineCommand$Type extends MessageType {
-    constructor() {
-        super("protos.SetPipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.SetPipelineCommand
- */
-export const SetPipelineCommand = new SetPipelineCommand$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class DeletePipelineCommand$Type extends MessageType {
-    constructor() {
-        super("protos.DeletePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.DeletePipelineCommand
- */
-export const DeletePipelineCommand = new DeletePipelineCommand$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class PausePipelineCommand$Type extends MessageType {
-    constructor() {
-        super("protos.PausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.PausePipelineCommand
- */
-export const PausePipelineCommand = new PausePipelineCommand$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class UnpausePipelineCommand$Type extends MessageType {
-    constructor() {
-        super("protos.UnpausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.UnpausePipelineCommand
- */
-export const UnpausePipelineCommand = new UnpausePipelineCommand$Type();
 //# sourceMappingURL=pipeline.js.map

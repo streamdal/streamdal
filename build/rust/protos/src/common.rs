@@ -37,9 +37,6 @@ pub struct StandardResponse {
     pub code: ::protobuf::EnumOrUnknown<ResponseCode>,
     // @@protoc_insertion_point(field:protos.StandardResponse.message)
     pub message: ::std::string::String,
-    ///  Debug info that server may populate with additional info.
-    // @@protoc_insertion_point(field:protos.StandardResponse._metadata)
-    pub _metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.StandardResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -57,7 +54,7 @@ impl StandardResponse {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "id",
@@ -73,11 +70,6 @@ impl StandardResponse {
             "message",
             |m: &StandardResponse| { &m.message },
             |m: &mut StandardResponse| { &mut m.message },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
-            "_metadata",
-            |m: &StandardResponse| { &m._metadata },
-            |m: &mut StandardResponse| { &mut m._metadata },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<StandardResponse>(
             "StandardResponse",
@@ -106,21 +98,6 @@ impl ::protobuf::Message for StandardResponse {
                 26 => {
                     self.message = is.read_string()?;
                 },
-                8002 => {
-                    let len = is.read_raw_varint32()?;
-                    let old_limit = is.push_limit(len as u64)?;
-                    let mut key = ::std::default::Default::default();
-                    let mut value = ::std::default::Default::default();
-                    while let Some(tag) = is.read_raw_tag_or_eof()? {
-                        match tag {
-                            10 => key = is.read_string()?,
-                            18 => value = is.read_string()?,
-                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
-                        };
-                    }
-                    is.pop_limit(old_limit);
-                    self._metadata.insert(key, value);
-                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -142,12 +119,6 @@ impl ::protobuf::Message for StandardResponse {
         if !self.message.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.message);
         }
-        for (k, v) in &self._metadata {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::string_size(2, &v);
-            my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
-        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -163,15 +134,6 @@ impl ::protobuf::Message for StandardResponse {
         if !self.message.is_empty() {
             os.write_string(3, &self.message)?;
         }
-        for (k, v) in &self._metadata {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::string_size(2, &v);
-            os.write_raw_varint32(8002)?; // Tag.
-            os.write_raw_varint32(entry_size as u32)?;
-            os.write_string(1, &k)?;
-            os.write_string(2, &v)?;
-        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -192,13 +154,17 @@ impl ::protobuf::Message for StandardResponse {
         self.id.clear();
         self.code = ::protobuf::EnumOrUnknown::new(ResponseCode::RESPONSE_CODE_UNSET);
         self.message.clear();
-        self._metadata.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static StandardResponse {
-        static instance: ::protobuf::rt::Lazy<StandardResponse> = ::protobuf::rt::Lazy::new();
-        instance.get(StandardResponse::new)
+        static instance: StandardResponse = StandardResponse {
+            id: ::std::string::String::new(),
+            code: ::protobuf::EnumOrUnknown::from_i32(0),
+            message: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
     }
 }
 
@@ -216,6 +182,169 @@ impl ::std::fmt::Display for StandardResponse {
 }
 
 impl ::protobuf::reflect::ProtobufValue for StandardResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  Used to indicate who a command is intended for
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.Audience)
+pub struct Audience {
+    // message fields
+    ///  Name of the service -- let's include the service name on all calls, we can
+    ///  optimize later ~DS
+    // @@protoc_insertion_point(field:protos.Audience.service_name)
+    pub service_name: ::std::string::String,
+    ///  Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+    // @@protoc_insertion_point(field:protos.Audience.component_name)
+    pub component_name: ::std::string::String,
+    ///  Consumer or Producer
+    // @@protoc_insertion_point(field:protos.Audience.operation_type)
+    pub operation_type: ::protobuf::EnumOrUnknown<OperationType>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.Audience.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a Audience {
+    fn default() -> &'a Audience {
+        <Audience as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Audience {
+    pub fn new() -> Audience {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "service_name",
+            |m: &Audience| { &m.service_name },
+            |m: &mut Audience| { &mut m.service_name },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "component_name",
+            |m: &Audience| { &m.component_name },
+            |m: &mut Audience| { &mut m.component_name },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "operation_type",
+            |m: &Audience| { &m.operation_type },
+            |m: &mut Audience| { &mut m.operation_type },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Audience>(
+            "Audience",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for Audience {
+    const NAME: &'static str = "Audience";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.service_name = is.read_string()?;
+                },
+                18 => {
+                    self.component_name = is.read_string()?;
+                },
+                24 => {
+                    self.operation_type = is.read_enum_or_unknown()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.service_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.service_name);
+        }
+        if !self.component_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.component_name);
+        }
+        if self.operation_type != ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(3, self.operation_type.value());
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.service_name.is_empty() {
+            os.write_string(1, &self.service_name)?;
+        }
+        if !self.component_name.is_empty() {
+            os.write_string(2, &self.component_name)?;
+        }
+        if self.operation_type != ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET) {
+            os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.operation_type))?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> Audience {
+        Audience::new()
+    }
+
+    fn clear(&mut self) {
+        self.service_name.clear();
+        self.component_name.clear();
+        self.operation_type = ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET);
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static Audience {
+        static instance: Audience = Audience {
+            service_name: ::std::string::String::new(),
+            component_name: ::std::string::String::new(),
+            operation_type: ::protobuf::EnumOrUnknown::from_i32(0),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for Audience {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("Audience").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for Audience {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Audience {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -290,21 +419,82 @@ impl ResponseCode {
     }
 }
 
+///  Each SDK client is a $service + $component + $operation_type
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.OperationType)
+pub enum OperationType {
+    // @@protoc_insertion_point(enum_value:protos.OperationType.OPERATION_TYPE_UNSET)
+    OPERATION_TYPE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.OperationType.OPERATION_TYPE_CONSUMER)
+    OPERATION_TYPE_CONSUMER = 1,
+    // @@protoc_insertion_point(enum_value:protos.OperationType.OPERATION_TYPE_PRODUCER)
+    OPERATION_TYPE_PRODUCER = 2,
+}
+
+impl ::protobuf::Enum for OperationType {
+    const NAME: &'static str = "OperationType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<OperationType> {
+        match value {
+            0 => ::std::option::Option::Some(OperationType::OPERATION_TYPE_UNSET),
+            1 => ::std::option::Option::Some(OperationType::OPERATION_TYPE_CONSUMER),
+            2 => ::std::option::Option::Some(OperationType::OPERATION_TYPE_PRODUCER),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [OperationType] = &[
+        OperationType::OPERATION_TYPE_UNSET,
+        OperationType::OPERATION_TYPE_CONSUMER,
+        OperationType::OPERATION_TYPE_PRODUCER,
+    ];
+}
+
+impl ::protobuf::EnumFull for OperationType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("OperationType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for OperationType {
+    fn default() -> Self {
+        OperationType::OPERATION_TYPE_UNSET
+    }
+}
+
+impl OperationType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<OperationType>("OperationType")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\x12\x06protos\"\xe9\x01\n\x10StandardResponse\x12\x0e\
-    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\
-    \x14.protos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\
-    \tR\x07message\x12D\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2&.protos.Stand\
-    ardResponse.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\
-    \x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\t\
-    R\x05value:\x028\x01*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CO\
-    DE_UNSET\x10\0\x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPON\
-    SE_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\
+    \n\x0ccommon.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\x02i\
+    d\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\x14.pro\
+    tos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07me\
+    ssage\"\x92\x01\n\x08Audience\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\
+    \x0bserviceName\x12%\n\x0ecomponent_name\x18\x02\x20\x01(\tR\rcomponentN\
+    ame\x12<\n\x0eoperation_type\x18\x03\x20\x01(\x0e2\x15.protos.OperationT\
+    ypeR\roperationType*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_COD\
+    E_UNSET\x10\0\x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONS\
+    E_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\
     \x12'\n#RESPONSE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONS\
-    E_CODE_GENERIC_ERROR\x10\x05B4Z2github.com/streamdal/snitch-protos/build\
-    /go/protosJ\x83\x06\n\x06\x12\x04\0\0\x19\x01\n\x08\n\x01\x0c\x12\x03\0\
-    \0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\
-    \n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0f\x01\
+    E_CODE_GENERIC_ERROR\x10\x05*c\n\rOperationType\x12\x18\n\x14OPERATION_T\
+    YPE_UNSET\x10\0\x12\x1b\n\x17OPERATION_TYPE_CONSUMER\x10\x01\x12\x1b\n\
+    \x17OPERATION_TYPE_PRODUCER\x10\x02B4Z2github.com/streamdal/snitch-proto\
+    s/build/go/protosJ\x98\n\n\x06\x12\x04\0\0*\x01\n\x08\n\x01\x0c\x12\x03\
+    \0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0\
+    I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\
     \x1a/\x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\
     \n\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\
     \t\x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20re\
@@ -315,25 +505,44 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\
     \x12\x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\
     \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\
-    \x03\x12\x03\x0b\x13\x14\nH\n\x04\x04\0\x02\x03\x12\x03\x0e\x02(\x1a;\
-    \x20Debug\x20info\x20that\x20server\x20may\x20populate\x20with\x20additi\
-    onal\x20info.\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x0e\x02\x16\n\x0c\
-    \n\x05\x04\0\x02\x03\x01\x12\x03\x0e\x17\x20\n\x0c\n\x05\x04\0\x02\x03\
-    \x03\x12\x03\x0e#'\n?\n\x02\x05\0\x12\x04\x12\0\x19\x01\x1a3\x20Common\
-    \x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\n\n\
-    \x03\x05\0\x01\x12\x03\x12\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x13\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x13\x02\x15\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x13\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x14\
-    \x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x14\x02\x12\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x14\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
-    \x15\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x15\x02\x1b\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\x15\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\
-    \x03\x16\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x16\x02\x19\n\x0c\
-    \n\x05\x05\0\x02\x03\x02\x12\x03\x16\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\
-    \x12\x03\x17\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x17\x02%\n\x0c\n\
-    \x05\x05\0\x02\x04\x02\x12\x03\x17()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
-    \x18\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x18\x02\x1d\n\x0c\n\x05\
-    \x05\0\x02\x05\x02\x12\x03\x18\x20!b\x06proto3\
+    \x03\x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Co\
+    mmon\x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\
+    \n\n\x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\
+    \x10\x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\
+    \x05\0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\
+    \x11\x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\
+    \x05\x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\
+    \x03\x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\
+    \n\x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\
+    \x12\x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\
+    \x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\
+    \x04\x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\
+    \x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\
+    \x03\x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\
+    \x05\x05\0\x02\x05\x02\x12\x03\x15\x20!\nJ\n\x02\x05\x01\x12\x04\x19\0\
+    \x1d\x01\x1a>\x20Each\x20SDK\x20client\x20is\x20a\x20$service\x20+\x20$c\
+    omponent\x20+\x20$operation_type\n\n\n\n\x03\x05\x01\x01\x12\x03\x19\x05\
+    \x12\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1a\x02\x1b\n\x0c\n\x05\x05\x01\
+    \x02\0\x01\x12\x03\x1a\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x1a\
+    \x19\x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x1b\x02\x1e\n\x0c\n\x05\x05\
+    \x01\x02\x01\x01\x12\x03\x1b\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\
+    \x03\x1b\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\
+    \x05\x05\x01\x02\x02\x01\x12\x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\
+    \x02\x12\x03\x1c\x1c\x1d\n<\n\x02\x04\x01\x12\x04\x20\0*\x01\x1a0\x20Use\
+    d\x20to\x20indicate\x20who\x20a\x20command\x20is\x20intended\x20for\n\n\
+    \n\n\x03\x04\x01\x01\x12\x03\x20\x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\
+    \x02\x1a\x1a`\x20Name\x20of\x20the\x20service\x20--\x20let's\x20include\
+    \x20the\x20service\x20name\x20on\x20all\x20calls,\x20we\x20can\n\x20opti\
+    mize\x20later\x20~DS\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03#\x02\x08\n\
+    \x0c\n\x05\x04\x01\x02\0\x01\x12\x03#\t\x15\n\x0c\n\x05\x04\x01\x02\0\
+    \x03\x12\x03#\x18\x19\nX\n\x04\x04\x01\x02\x01\x12\x03&\x02\x1c\x1aK\x20\
+    Name\x20of\x20the\x20component\x20the\x20SDK\x20is\x20interacting\x20wit\
+    h\x20(ie.\x20kafka-$topic-name)\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
+    \x03&\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03&\t\x17\n\x0c\n\x05\
+    \x04\x01\x02\x01\x03\x12\x03&\x1a\x1b\n#\n\x04\x04\x01\x02\x02\x12\x03)\
+    \x02#\x1a\x16\x20Consumer\x20or\x20Producer\n\n\x0c\n\x05\x04\x01\x02\
+    \x02\x06\x12\x03)\x02\x0f\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03)\x10\
+    \x1e\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03)!\"b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -351,10 +560,12 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(1);
+            let mut messages = ::std::vec::Vec::with_capacity(2);
             messages.push(StandardResponse::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(1);
+            messages.push(Audience::generated_message_descriptor_data());
+            let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(ResponseCode::generated_enum_descriptor_data());
+            enums.push(OperationType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

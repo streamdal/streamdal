@@ -25,172 +25,35 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
-///  SDK generates a WASM request and passes this to the WASM func
+///  Pipeline is a structure that holds one or more pipeline steps. This structure
+///  is intended to be immutable; clients are expected to generate WASMRequest's
+///  that contain a pipeline step.
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.WASMRequest)
-pub struct WASMRequest {
+// @@protoc_insertion_point(message:protos.Pipeline)
+pub struct Pipeline {
     // message fields
-    // @@protoc_insertion_point(field:protos.WASMRequest.step)
-    pub step: ::protobuf::MessageField<PipelineStep>,
-    // @@protoc_insertion_point(field:protos.WASMRequest.input)
-    pub input: ::std::vec::Vec<u8>,
+    ///  Set by snitch-server on Create; must be present on Update calls
+    // @@protoc_insertion_point(field:protos.Pipeline.id)
+    pub id: ::std::string::String,
+    ///  Friendly name for the pipeline
+    // @@protoc_insertion_point(field:protos.Pipeline.name)
+    pub name: ::std::string::String,
+    ///  One or more steps to execute
+    // @@protoc_insertion_point(field:protos.Pipeline.steps)
+    pub steps: ::std::vec::Vec<PipelineStep>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.WASMRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.Pipeline.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a WASMRequest {
-    fn default() -> &'a WASMRequest {
-        <WASMRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a Pipeline {
+    fn default() -> &'a Pipeline {
+        <Pipeline as ::protobuf::Message>::default_instance()
     }
 }
 
-impl WASMRequest {
-    pub fn new() -> WASMRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, PipelineStep>(
-            "step",
-            |m: &WASMRequest| { &m.step },
-            |m: &mut WASMRequest| { &mut m.step },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "input",
-            |m: &WASMRequest| { &m.input },
-            |m: &mut WASMRequest| { &mut m.input },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WASMRequest>(
-            "WASMRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for WASMRequest {
-    const NAME: &'static str = "WASMRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.step)?;
-                },
-                18 => {
-                    self.input = is.read_bytes()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let Some(v) = self.step.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        if !self.input.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(2, &self.input);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.step.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
-        if !self.input.is_empty() {
-            os.write_bytes(2, &self.input)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> WASMRequest {
-        WASMRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.step.clear();
-        self.input.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static WASMRequest {
-        static instance: WASMRequest = WASMRequest {
-            step: ::protobuf::MessageField::none(),
-            input: ::std::vec::Vec::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for WASMRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("WASMRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for WASMRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for WASMRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-///  Returned by all WASM functions
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.WASMResponse)
-pub struct WASMResponse {
-    // message fields
-    // @@protoc_insertion_point(field:protos.WASMResponse.output)
-    pub output: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:protos.WASMResponse.exit_code)
-    pub exit_code: ::protobuf::EnumOrUnknown<WASMExitCode>,
-    // @@protoc_insertion_point(field:protos.WASMResponse.exit_msg)
-    pub exit_msg: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.WASMResponse.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a WASMResponse {
-    fn default() -> &'a WASMResponse {
-        <WASMResponse as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl WASMResponse {
-    pub fn new() -> WASMResponse {
+impl Pipeline {
+    pub fn new() -> Pipeline {
         ::std::default::Default::default()
     }
 
@@ -198,30 +61,30 @@ impl WASMResponse {
         let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "output",
-            |m: &WASMResponse| { &m.output },
-            |m: &mut WASMResponse| { &mut m.output },
+            "id",
+            |m: &Pipeline| { &m.id },
+            |m: &mut Pipeline| { &mut m.id },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "exit_code",
-            |m: &WASMResponse| { &m.exit_code },
-            |m: &mut WASMResponse| { &mut m.exit_code },
+            "name",
+            |m: &Pipeline| { &m.name },
+            |m: &mut Pipeline| { &mut m.name },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "exit_msg",
-            |m: &WASMResponse| { &m.exit_msg },
-            |m: &mut WASMResponse| { &mut m.exit_msg },
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "steps",
+            |m: &Pipeline| { &m.steps },
+            |m: &mut Pipeline| { &mut m.steps },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WASMResponse>(
-            "WASMResponse",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Pipeline>(
+            "Pipeline",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for WASMResponse {
-    const NAME: &'static str = "WASMResponse";
+impl ::protobuf::Message for Pipeline {
+    const NAME: &'static str = "Pipeline";
 
     fn is_initialized(&self) -> bool {
         true
@@ -231,13 +94,13 @@ impl ::protobuf::Message for WASMResponse {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.output = is.read_bytes()?;
+                    self.id = is.read_string()?;
                 },
-                16 => {
-                    self.exit_code = is.read_enum_or_unknown()?;
+                18 => {
+                    self.name = is.read_string()?;
                 },
                 26 => {
-                    self.exit_msg = is.read_string()?;
+                    self.steps.push(is.read_message()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -251,30 +114,31 @@ impl ::protobuf::Message for WASMResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.output.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.output);
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
         }
-        if self.exit_code != ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET) {
-            my_size += ::protobuf::rt::int32_size(2, self.exit_code.value());
+        if !self.name.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.name);
         }
-        if !self.exit_msg.is_empty() {
-            my_size += ::protobuf::rt::string_size(3, &self.exit_msg);
-        }
+        for value in &self.steps {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.output.is_empty() {
-            os.write_bytes(1, &self.output)?;
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
         }
-        if self.exit_code != ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET) {
-            os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.exit_code))?;
+        if !self.name.is_empty() {
+            os.write_string(2, &self.name)?;
         }
-        if !self.exit_msg.is_empty() {
-            os.write_string(3, &self.exit_msg)?;
-        }
+        for v in &self.steps {
+            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -287,68 +151,67 @@ impl ::protobuf::Message for WASMResponse {
         &mut self.special_fields
     }
 
-    fn new() -> WASMResponse {
-        WASMResponse::new()
+    fn new() -> Pipeline {
+        Pipeline::new()
     }
 
     fn clear(&mut self) {
-        self.output.clear();
-        self.exit_code = ::protobuf::EnumOrUnknown::new(WASMExitCode::WASM_EXIT_CODE_UNSET);
-        self.exit_msg.clear();
+        self.id.clear();
+        self.name.clear();
+        self.steps.clear();
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static WASMResponse {
-        static instance: WASMResponse = WASMResponse {
-            output: ::std::vec::Vec::new(),
-            exit_code: ::protobuf::EnumOrUnknown::from_i32(0),
-            exit_msg: ::std::string::String::new(),
+    fn default_instance() -> &'static Pipeline {
+        static instance: Pipeline = Pipeline {
+            id: ::std::string::String::new(),
+            name: ::std::string::String::new(),
+            steps: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
     }
 }
 
-impl ::protobuf::MessageFull for WASMResponse {
+impl ::protobuf::MessageFull for Pipeline {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("WASMResponse").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("Pipeline").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for WASMResponse {
+impl ::std::fmt::Display for Pipeline {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for WASMResponse {
+impl ::protobuf::reflect::ProtobufValue for Pipeline {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  A PipelineCommand consists of one or more pipeline steps. A pipeline step
-///  is an immutable set of instructions on how to execute a step.
-///  The SDK will use the pipeline step to generate a WASM request.
+///  A pipeline step is a single step in a pipeline.
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.PipelineStep)
 pub struct PipelineStep {
     // message fields
-    ///  Unique ID for the step
-    // @@protoc_insertion_point(field:protos.PipelineStep.id)
-    pub id: ::std::string::String,
     ///  Friendly name for the step
     // @@protoc_insertion_point(field:protos.PipelineStep.name)
     pub name: ::std::string::String,
-    ///  Conditions that SDK should check before executing next step
-    // @@protoc_insertion_point(field:protos.PipelineStep.conditions)
-    pub conditions: ::std::vec::Vec<::protobuf::EnumOrUnknown<PipelineStepCondition>>,
-    ///  WASM module ID (set by backend)
+    ///  What should SDK do if step succeeds?
+    ///
+    // @@protoc_insertion_point(field:protos.PipelineStep.on_success)
+    pub on_success: ::std::vec::Vec<::protobuf::EnumOrUnknown<PipelineStepCondition>>,
+    ///  What should SDK do if step fails?
+    // @@protoc_insertion_point(field:protos.PipelineStep.on_failure)
+    pub on_failure: ::std::vec::Vec<::protobuf::EnumOrUnknown<PipelineStepCondition>>,
+    ///  WASM module ID (set by snitch-server)
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_id)
     pub _wasm_id: ::std::string::String,
-    ///  WASM module bytes (set by backend)
+    ///  WASM module bytes (set by snitch-server)
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_bytes)
     pub _wasm_bytes: ::std::vec::Vec<u8>,
-    ///  WASM function name to execute (set by backend)
+    ///  WASM function name to execute (set by snitch-server)
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_function)
     pub _wasm_function: ::std::string::String,
     // message oneof groups
@@ -618,19 +481,19 @@ impl PipelineStep {
         let mut fields = ::std::vec::Vec::with_capacity(11);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &PipelineStep| { &m.id },
-            |m: &mut PipelineStep| { &mut m.id },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "name",
             |m: &PipelineStep| { &m.name },
             |m: &mut PipelineStep| { &mut m.name },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
-            "conditions",
-            |m: &PipelineStep| { &m.conditions },
-            |m: &mut PipelineStep| { &mut m.conditions },
+            "on_success",
+            |m: &PipelineStep| { &m.on_success },
+            |m: &mut PipelineStep| { &mut m.on_success },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "on_failure",
+            |m: &PipelineStep| { &m.on_failure },
+            |m: &mut PipelineStep| { &mut m.on_failure },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::detective::DetectiveStep>(
             "detective",
@@ -702,16 +565,19 @@ impl ::protobuf::Message for PipelineStep {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.id = is.read_string()?;
-                },
-                18 => {
                     self.name = is.read_string()?;
                 },
+                16 => {
+                    self.on_success.push(is.read_enum_or_unknown()?);
+                },
+                18 => {
+                    ::protobuf::rt::read_repeated_packed_enum_or_unknown_into(is, &mut self.on_success)?
+                },
                 24 => {
-                    self.conditions.push(is.read_enum_or_unknown()?);
+                    self.on_failure.push(is.read_enum_or_unknown()?);
                 },
                 26 => {
-                    ::protobuf::rt::read_repeated_packed_enum_or_unknown_into(is, &mut self.conditions)?
+                    ::protobuf::rt::read_repeated_packed_enum_or_unknown_into(is, &mut self.on_failure)?
                 },
                 8002 => {
                     self.step = ::std::option::Option::Some(pipeline_step::Step::Detective(is.read_message()?));
@@ -749,13 +615,13 @@ impl ::protobuf::Message for PipelineStep {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
         if !self.name.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.name);
+            my_size += ::protobuf::rt::string_size(1, &self.name);
         }
-        for value in &self.conditions {
+        for value in &self.on_success {
+            my_size += ::protobuf::rt::int32_size(2, value.value());
+        };
+        for value in &self.on_failure {
             my_size += ::protobuf::rt::int32_size(3, value.value());
         };
         if !self._wasm_id.is_empty() {
@@ -797,13 +663,13 @@ impl ::protobuf::Message for PipelineStep {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
         if !self.name.is_empty() {
-            os.write_string(2, &self.name)?;
+            os.write_string(1, &self.name)?;
         }
-        for v in &self.conditions {
+        for v in &self.on_success {
+            os.write_enum(2, ::protobuf::EnumOrUnknown::value(v))?;
+        };
+        for v in &self.on_failure {
             os.write_enum(3, ::protobuf::EnumOrUnknown::value(v))?;
         };
         if !self._wasm_id.is_empty() {
@@ -851,9 +717,9 @@ impl ::protobuf::Message for PipelineStep {
     }
 
     fn clear(&mut self) {
-        self.id.clear();
         self.name.clear();
-        self.conditions.clear();
+        self.on_success.clear();
+        self.on_failure.clear();
         self.step = ::std::option::Option::None;
         self.step = ::std::option::Option::None;
         self.step = ::std::option::Option::None;
@@ -867,9 +733,9 @@ impl ::protobuf::Message for PipelineStep {
 
     fn default_instance() -> &'static PipelineStep {
         static instance: PipelineStep = PipelineStep {
-            id: ::std::string::String::new(),
             name: ::std::string::String::new(),
-            conditions: ::std::vec::Vec::new(),
+            on_success: ::std::vec::Vec::new(),
+            on_failure: ::std::vec::Vec::new(),
             _wasm_id: ::std::string::String::new(),
             _wasm_bytes: ::std::vec::Vec::new(),
             _wasm_function: ::std::string::String::new(),
@@ -933,620 +799,18 @@ pub mod pipeline_step {
     }
 }
 
-///  Used for both Add and Update
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.SetPipelineCommand)
-pub struct SetPipelineCommand {
-    // message fields
-    ///  Unique ID for the pipeline
-    // @@protoc_insertion_point(field:protos.SetPipelineCommand.id)
-    pub id: ::std::string::String,
-    ///  Friendly name for the pipeline
-    // @@protoc_insertion_point(field:protos.SetPipelineCommand.name)
-    pub name: ::std::string::String,
-    ///  One or more steps to execute
-    // @@protoc_insertion_point(field:protos.SetPipelineCommand.steps)
-    pub steps: ::std::vec::Vec<PipelineStep>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.SetPipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a SetPipelineCommand {
-    fn default() -> &'a SetPipelineCommand {
-        <SetPipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl SetPipelineCommand {
-    pub fn new() -> SetPipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &SetPipelineCommand| { &m.id },
-            |m: &mut SetPipelineCommand| { &mut m.id },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "name",
-            |m: &SetPipelineCommand| { &m.name },
-            |m: &mut SetPipelineCommand| { &mut m.name },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
-            "steps",
-            |m: &SetPipelineCommand| { &m.steps },
-            |m: &mut SetPipelineCommand| { &mut m.steps },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelineCommand>(
-            "SetPipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for SetPipelineCommand {
-    const NAME: &'static str = "SetPipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.id = is.read_string()?;
-                },
-                18 => {
-                    self.name = is.read_string()?;
-                },
-                26 => {
-                    self.steps.push(is.read_message()?);
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
-        if !self.name.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.name);
-        }
-        for value in &self.steps {
-            let len = value.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        };
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
-        if !self.name.is_empty() {
-            os.write_string(2, &self.name)?;
-        }
-        for v in &self.steps {
-            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
-        };
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> SetPipelineCommand {
-        SetPipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.id.clear();
-        self.name.clear();
-        self.steps.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static SetPipelineCommand {
-        static instance: SetPipelineCommand = SetPipelineCommand {
-            id: ::std::string::String::new(),
-            name: ::std::string::String::new(),
-            steps: ::std::vec::Vec::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for SetPipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("SetPipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for SetPipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for SetPipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.DeletePipelineCommand)
-pub struct DeletePipelineCommand {
-    // message fields
-    ///  Unique ID for the pipeline
-    // @@protoc_insertion_point(field:protos.DeletePipelineCommand.id)
-    pub id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.DeletePipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a DeletePipelineCommand {
-    fn default() -> &'a DeletePipelineCommand {
-        <DeletePipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl DeletePipelineCommand {
-    pub fn new() -> DeletePipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &DeletePipelineCommand| { &m.id },
-            |m: &mut DeletePipelineCommand| { &mut m.id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<DeletePipelineCommand>(
-            "DeletePipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for DeletePipelineCommand {
-    const NAME: &'static str = "DeletePipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> DeletePipelineCommand {
-        DeletePipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static DeletePipelineCommand {
-        static instance: DeletePipelineCommand = DeletePipelineCommand {
-            id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for DeletePipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("DeletePipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for DeletePipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for DeletePipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.PausePipelineCommand)
-pub struct PausePipelineCommand {
-    // message fields
-    ///  Unique ID for the pipeline
-    // @@protoc_insertion_point(field:protos.PausePipelineCommand.id)
-    pub id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.PausePipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a PausePipelineCommand {
-    fn default() -> &'a PausePipelineCommand {
-        <PausePipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl PausePipelineCommand {
-    pub fn new() -> PausePipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &PausePipelineCommand| { &m.id },
-            |m: &mut PausePipelineCommand| { &mut m.id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PausePipelineCommand>(
-            "PausePipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for PausePipelineCommand {
-    const NAME: &'static str = "PausePipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> PausePipelineCommand {
-        PausePipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static PausePipelineCommand {
-        static instance: PausePipelineCommand = PausePipelineCommand {
-            id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for PausePipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("PausePipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for PausePipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for PausePipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.UnpausePipelineCommand)
-pub struct UnpausePipelineCommand {
-    // message fields
-    ///  Unique ID for the pipeline
-    // @@protoc_insertion_point(field:protos.UnpausePipelineCommand.id)
-    pub id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.UnpausePipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a UnpausePipelineCommand {
-    fn default() -> &'a UnpausePipelineCommand {
-        <UnpausePipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl UnpausePipelineCommand {
-    pub fn new() -> UnpausePipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &UnpausePipelineCommand| { &m.id },
-            |m: &mut UnpausePipelineCommand| { &mut m.id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<UnpausePipelineCommand>(
-            "UnpausePipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for UnpausePipelineCommand {
-    const NAME: &'static str = "UnpausePipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> UnpausePipelineCommand {
-        UnpausePipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static UnpausePipelineCommand {
-        static instance: UnpausePipelineCommand = UnpausePipelineCommand {
-            id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for UnpausePipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("UnpausePipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for UnpausePipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for UnpausePipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-///  Included in WASM response; SDK is responsible for interpreting the response
-///  status and how it relates to the step condition.
-///  ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
-///  conditions to determine what to do next.
-///  ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
-///  to determine what to do next;
-#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.WASMExitCode)
-pub enum WASMExitCode {
-    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_UNSET)
-    WASM_EXIT_CODE_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_SUCCESS)
-    WASM_EXIT_CODE_SUCCESS = 1,
-    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_FAILURE)
-    WASM_EXIT_CODE_FAILURE = 2,
-    // @@protoc_insertion_point(enum_value:protos.WASMExitCode.WASM_EXIT_CODE_INTERNAL_ERROR)
-    WASM_EXIT_CODE_INTERNAL_ERROR = 3,
-}
-
-impl ::protobuf::Enum for WASMExitCode {
-    const NAME: &'static str = "WASMExitCode";
-
-    fn value(&self) -> i32 {
-        *self as i32
-    }
-
-    fn from_i32(value: i32) -> ::std::option::Option<WASMExitCode> {
-        match value {
-            0 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_UNSET),
-            1 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_SUCCESS),
-            2 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_FAILURE),
-            3 => ::std::option::Option::Some(WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR),
-            _ => ::std::option::Option::None
-        }
-    }
-
-    const VALUES: &'static [WASMExitCode] = &[
-        WASMExitCode::WASM_EXIT_CODE_UNSET,
-        WASMExitCode::WASM_EXIT_CODE_SUCCESS,
-        WASMExitCode::WASM_EXIT_CODE_FAILURE,
-        WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-    ];
-}
-
-impl ::protobuf::EnumFull for WASMExitCode {
-    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("WASMExitCode").unwrap()).clone()
-    }
-
-    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
-        let index = *self as usize;
-        Self::enum_descriptor().value_by_index(index)
-    }
-}
-
-impl ::std::default::Default for WASMExitCode {
-    fn default() -> Self {
-        WASMExitCode::WASM_EXIT_CODE_UNSET
-    }
-}
-
-impl WASMExitCode {
-    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<WASMExitCode>("WASMExitCode")
-    }
-}
-
 ///  A condition defines how the SDK should handle a step response -- should it
 ///  continue executing the pipeline, should it abort, should it notify the server?
 ///  Each step can have multiple conditions.
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.PipelineStepCondition)
 pub enum PipelineStepCondition {
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.CONDITION_UNSET)
-    CONDITION_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.CONDITION_CONTINUE)
-    CONDITION_CONTINUE = 1,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.CONDITION_ABORT)
-    CONDITION_ABORT = 2,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.CONDITION_NOTIFY)
-    CONDITION_NOTIFY = 3,
+    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_UNSET)
+    PIPELINE_STEP_CONDITION_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT)
+    PIPELINE_STEP_CONDITION_ABORT = 1,
+    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY)
+    PIPELINE_STEP_CONDITION_NOTIFY = 2,
 }
 
 impl ::protobuf::Enum for PipelineStepCondition {
@@ -1558,19 +822,17 @@ impl ::protobuf::Enum for PipelineStepCondition {
 
     fn from_i32(value: i32) -> ::std::option::Option<PipelineStepCondition> {
         match value {
-            0 => ::std::option::Option::Some(PipelineStepCondition::CONDITION_UNSET),
-            1 => ::std::option::Option::Some(PipelineStepCondition::CONDITION_CONTINUE),
-            2 => ::std::option::Option::Some(PipelineStepCondition::CONDITION_ABORT),
-            3 => ::std::option::Option::Some(PipelineStepCondition::CONDITION_NOTIFY),
+            0 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET),
+            1 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT),
+            2 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_NOTIFY),
             _ => ::std::option::Option::None
         }
     }
 
     const VALUES: &'static [PipelineStepCondition] = &[
-        PipelineStepCondition::CONDITION_UNSET,
-        PipelineStepCondition::CONDITION_CONTINUE,
-        PipelineStepCondition::CONDITION_ABORT,
-        PipelineStepCondition::CONDITION_NOTIFY,
+        PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET,
+        PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT,
+        PipelineStepCondition::PIPELINE_STEP_CONDITION_NOTIFY,
     ];
 }
 
@@ -1588,7 +850,7 @@ impl ::protobuf::EnumFull for PipelineStepCondition {
 
 impl ::std::default::Default for PipelineStepCondition {
     fn default() -> Self {
-        PipelineStepCondition::CONDITION_UNSET
+        PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET
     }
 }
 
@@ -1601,156 +863,99 @@ impl PipelineStepCondition {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0epipeline.proto\x12\x06protos\x1a\x12steps/custom.proto\x1a\x12step\
     s/decode.proto\x1a\x15steps/detective.proto\x1a\x12steps/encode.proto\
-    \x1a\x15steps/transform.proto\"M\n\x0bWASMRequest\x12(\n\x04step\x18\x01\
-    \x20\x01(\x0b2\x14.protos.PipelineStepR\x04step\x12\x14\n\x05input\x18\
-    \x02\x20\x01(\x0cR\x05input\"t\n\x0cWASMResponse\x12\x16\n\x06output\x18\
-    \x01\x20\x01(\x0cR\x06output\x121\n\texit_code\x18\x02\x20\x01(\x0e2\x14\
-    .protos.WASMExitCodeR\x08exitCode\x12\x19\n\x08exit_msg\x18\x03\x20\x01(\
-    \tR\x07exitMsg\"\xf7\x03\n\x0cPipelineStep\x12\x0e\n\x02id\x18\x01\x20\
-    \x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12=\n\ncon\
-    ditions\x18\x03\x20\x03(\x0e2\x1d.protos.PipelineStepConditionR\nconditi\
-    ons\x12<\n\tdetective\x18\xe8\x07\x20\x01(\x0b2\x1b.protos.steps.Detecti\
-    veStepH\0R\tdetective\x12<\n\ttransform\x18\xe9\x07\x20\x01(\x0b2\x1b.pr\
-    otos.steps.TransformStepH\0R\ttransform\x123\n\x06encode\x18\xea\x07\x20\
-    \x01(\x0b2\x18.protos.steps.EncodeStepH\0R\x06encode\x123\n\x06decode\
-    \x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.DecodeStepH\0R\x06decode\x12\
-    3\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.protos.steps.CustomStepH\0R\
-    \x06custom\x12\x19\n\x08_wasm_id\x18\x90N\x20\x01(\tR\x06WasmId\x12\x1f\
-    \n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cR\tWasmBytes\x12%\n\x0e_wasm_func\
-    tion\x18\x92N\x20\x01(\tR\x0cWasmFunctionB\x06\n\x04step\"d\n\x12SetPipe\
-    lineCommand\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\
-    \x18\x02\x20\x01(\tR\x04name\x12*\n\x05steps\x18\x03\x20\x03(\x0b2\x14.p\
-    rotos.PipelineStepR\x05steps\"'\n\x15DeletePipelineCommand\x12\x0e\n\x02\
-    id\x18\x01\x20\x01(\tR\x02id\"&\n\x14PausePipelineCommand\x12\x0e\n\x02i\
-    d\x18\x01\x20\x01(\tR\x02id\"(\n\x16UnpausePipelineCommand\x12\x0e\n\x02\
-    id\x18\x01\x20\x01(\tR\x02id*\x83\x01\n\x0cWASMExitCode\x12\x18\n\x14WAS\
-    M_EXIT_CODE_UNSET\x10\0\x12\x1a\n\x16WASM_EXIT_CODE_SUCCESS\x10\x01\x12\
-    \x1a\n\x16WASM_EXIT_CODE_FAILURE\x10\x02\x12!\n\x1dWASM_EXIT_CODE_INTERN\
-    AL_ERROR\x10\x03*o\n\x15PipelineStepCondition\x12\x13\n\x0fCONDITION_UNS\
-    ET\x10\0\x12\x16\n\x12CONDITION_CONTINUE\x10\x01\x12\x13\n\x0fCONDITION_\
-    ABORT\x10\x02\x12\x14\n\x10CONDITION_NOTIFY\x10\x03B4Z2github.com/stream\
-    dal/snitch-protos/build/go/protosJ\xda\x19\n\x06\x12\x04\0\0h\x01\n\x08\
-    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\
-    \x03\0\x12\x03\x04\0\x1c\n\t\n\x02\x03\x01\x12\x03\x05\0\x1c\n\t\n\x02\
-    \x03\x02\x12\x03\x06\0\x1f\n\t\n\x02\x03\x03\x12\x03\x07\0\x1c\n\t\n\x02\
-    \x03\x04\x12\x03\x08\0\x1f\n\x08\n\x01\x08\x12\x03\n\0I\n\t\n\x02\x08\
-    \x0b\x12\x03\n\0I\n\xe3\x02\n\x02\x05\0\x12\x04\x12\0\x17\x01\x1a\xd6\
-    \x02\x20Included\x20in\x20WASM\x20response;\x20SDK\x20is\x20responsible\
-    \x20for\x20interpreting\x20the\x20response\n\x20status\x20and\x20how\x20\
-    it\x20relates\x20to\x20the\x20step\x20condition.\n\x20ie.\x20WASM\x20fun\
-    c\x20returns\x20WASM_EXIT_CODE_INTERNAL_ERROR\x20lookup\x20ON_ERROR\n\
-    \x20conditions\x20to\x20determine\x20what\x20to\x20do\x20next.\n\x20ie.\
-    \x20WASM\x20func\x20returns\x20WASM_EXIT_CODE_SUCCESS\x20lookup\x20ON_MA\
-    TCH\x20conditions\n\x20to\x20determine\x20what\x20to\x20do\x20next;\n\n\
-    \n\n\x03\x05\0\x01\x12\x03\x12\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\
-    \x13\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x13\x02\x16\n\x0c\n\x05\
-    \x05\0\x02\0\x02\x12\x03\x13\x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\x03\
-    \x14\x02\x1d\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x14\x02\x18\n\x0c\n\
-    \x05\x05\0\x02\x01\x02\x12\x03\x14\x1b\x1c\nK\n\x04\x05\0\x02\x02\x12\
-    \x03\x15\x02\x1d\">\x20Probably\x20need\x20better\x20names\x20for\x20the\
-    se\x20as\x20FAILURE\x20is\x20too\x20harsh\n\n\x0c\n\x05\x05\0\x02\x02\
-    \x01\x12\x03\x15\x02\x18\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x15\x1b\
-    \x1c\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x16\x02$\n\x0c\n\x05\x05\0\x02\
-    \x03\x01\x12\x03\x16\x02\x1f\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x16\"\
-    #\n\xd2\x01\n\x02\x05\x01\x12\x04\x1c\0!\x01\x1a\xc5\x01\x20A\x20conditi\
-    on\x20defines\x20how\x20the\x20SDK\x20should\x20handle\x20a\x20step\x20r\
-    esponse\x20--\x20should\x20it\n\x20continue\x20executing\x20the\x20pipel\
-    ine,\x20should\x20it\x20abort,\x20should\x20it\x20notify\x20the\x20serve\
-    r?\n\x20Each\x20step\x20can\x20have\x20multiple\x20conditions.\n\n\n\n\
-    \x03\x05\x01\x01\x12\x03\x1c\x05\x1a\n\x0b\n\x04\x05\x01\x02\0\x12\x03\
-    \x1d\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1d\x02\x11\n\x0c\n\
-    \x05\x05\x01\x02\0\x02\x12\x03\x1d\x14\x15\n\x0b\n\x04\x05\x01\x02\x01\
-    \x12\x03\x1e\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x1e\x02\x14\
-    \n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x1e\x17\x18\n\x0b\n\x04\x05\x01\
-    \x02\x02\x12\x03\x1f\x02\x16\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x1f\
-    \x02\x11\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x1f\x14\x15\n\x0b\n\x04\
-    \x05\x01\x02\x03\x12\x03\x20\x02\x17\n\x0c\n\x05\x05\x01\x02\x03\x01\x12\
-    \x03\x20\x02\x12\n\x0c\n\x05\x05\x01\x02\x03\x02\x12\x03\x20\x15\x16\nK\
-    \n\x02\x04\0\x12\x04$\0'\x01\x1a?\x20SDK\x20generates\x20a\x20WASM\x20re\
-    quest\x20and\x20passes\x20this\x20to\x20the\x20WASM\x20func\n\n\n\n\x03\
-    \x04\0\x01\x12\x03$\x08\x13\n\x0b\n\x04\x04\0\x02\0\x12\x03%\x02\x18\n\
-    \x0c\n\x05\x04\0\x02\0\x06\x12\x03%\x02\x0e\n\x0c\n\x05\x04\0\x02\0\x01\
-    \x12\x03%\x0f\x13\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03%\x16\x17\n\x0b\n\
-    \x04\x04\0\x02\x01\x12\x03&\x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\
-    \x03&\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03&\x08\r\n\x0c\n\x05\
-    \x04\0\x02\x01\x03\x12\x03&\x10\x11\n,\n\x02\x04\x01\x12\x04*\0.\x01\x1a\
-    \x20\x20Returned\x20by\x20all\x20WASM\x20functions\n\n\n\n\x03\x04\x01\
-    \x01\x12\x03*\x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\x03+\x02\x13\n\x0c\n\
-    \x05\x04\x01\x02\0\x05\x12\x03+\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\
-    \x12\x03+\x08\x0e\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03+\x11\x12\n\x0b\n\
-    \x04\x04\x01\x02\x01\x12\x03,\x02\x1d\n\x0c\n\x05\x04\x01\x02\x01\x06\
-    \x12\x03,\x02\x0e\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03,\x0f\x18\n\x0c\
-    \n\x05\x04\x01\x02\x01\x03\x12\x03,\x1b\x1c\n\x0b\n\x04\x04\x01\x02\x02\
-    \x12\x03-\x02\x16\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03-\x02\x08\n\x0c\
-    \n\x05\x04\x01\x02\x02\x01\x12\x03-\t\x11\n\x0c\n\x05\x04\x01\x02\x02\
-    \x03\x12\x03-\x14\x15\n\xd7\x01\n\x02\x04\x02\x12\x043\0M\x01\x1a\xca\
-    \x01\x20A\x20PipelineCommand\x20consists\x20of\x20one\x20or\x20more\x20p\
-    ipeline\x20steps.\x20A\x20pipeline\x20step\n\x20is\x20an\x20immutable\
-    \x20set\x20of\x20instructions\x20on\x20how\x20to\x20execute\x20a\x20step\
-    .\n\x20The\x20SDK\x20will\x20use\x20the\x20pipeline\x20step\x20to\x20gen\
-    erate\x20a\x20WASM\x20request.\n\n\n\n\x03\x04\x02\x01\x12\x033\x08\x14\
-    \n%\n\x04\x04\x02\x02\0\x12\x035\x02\x10\x1a\x18\x20Unique\x20ID\x20for\
-    \x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x035\x02\x08\n\x0c\n\
-    \x05\x04\x02\x02\0\x01\x12\x035\t\x0b\n\x0c\n\x05\x04\x02\x02\0\x03\x12\
-    \x035\x0e\x0f\n)\n\x04\x04\x02\x02\x01\x12\x038\x02\x12\x1a\x1c\x20Frien\
-    dly\x20name\x20for\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\
-    \x038\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x038\t\r\n\x0c\n\x05\
-    \x04\x02\x02\x01\x03\x12\x038\x10\x11\nJ\n\x04\x04\x02\x02\x02\x12\x03;\
-    \x020\x1a=\x20Conditions\x20that\x20SDK\x20should\x20check\x20before\x20\
-    executing\x20next\x20step\n\n\x0c\n\x05\x04\x02\x02\x02\x04\x12\x03;\x02\
-    \n\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x03;\x0b\x20\n\x0c\n\x05\x04\x02\
-    \x02\x02\x01\x12\x03;!+\n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x03;./\n\x0c\
-    \n\x04\x04\x02\x08\0\x12\x04=\x02C\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\
-    \x03=\x08\x0c\n\x0b\n\x04\x04\x02\x02\x03\x12\x03>\x04)\n\x0c\n\x05\x04\
-    \x02\x02\x03\x06\x12\x03>\x04\x17\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\
-    \x03>\x18!\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\x03>$(\n\x0b\n\x04\x04\
-    \x02\x02\x04\x12\x03?\x04)\n\x0c\n\x05\x04\x02\x02\x04\x06\x12\x03?\x04\
-    \x17\n\x0c\n\x05\x04\x02\x02\x04\x01\x12\x03?\x18!\n\x0c\n\x05\x04\x02\
-    \x02\x04\x03\x12\x03?$(\n\x0b\n\x04\x04\x02\x02\x05\x12\x03@\x04#\n\x0c\
-    \n\x05\x04\x02\x02\x05\x06\x12\x03@\x04\x14\n\x0c\n\x05\x04\x02\x02\x05\
-    \x01\x12\x03@\x15\x1b\n\x0c\n\x05\x04\x02\x02\x05\x03\x12\x03@\x1e\"\n\
-    \x0b\n\x04\x04\x02\x02\x06\x12\x03A\x04#\n\x0c\n\x05\x04\x02\x02\x06\x06\
-    \x12\x03A\x04\x14\n\x0c\n\x05\x04\x02\x02\x06\x01\x12\x03A\x15\x1b\n\x0c\
-    \n\x05\x04\x02\x02\x06\x03\x12\x03A\x1e\"\n\x0b\n\x04\x04\x02\x02\x07\
-    \x12\x03B\x04#\n\x0c\n\x05\x04\x02\x02\x07\x06\x12\x03B\x04\x14\n\x0c\n\
-    \x05\x04\x02\x02\x07\x01\x12\x03B\x15\x1b\n\x0c\n\x05\x04\x02\x02\x07\
-    \x03\x12\x03B\x1e\"\n.\n\x04\x04\x02\x02\x08\x12\x03F\x02\x1a\x1a!\x20WA\
-    SM\x20module\x20ID\x20(set\x20by\x20backend)\n\n\x0c\n\x05\x04\x02\x02\
-    \x08\x05\x12\x03F\x02\x08\n\x0c\n\x05\x04\x02\x02\x08\x01\x12\x03F\t\x11\
-    \n\x0c\n\x05\x04\x02\x02\x08\x03\x12\x03F\x14\x19\n1\n\x04\x04\x02\x02\t\
-    \x12\x03I\x02\x1c\x1a$\x20WASM\x20module\x20bytes\x20(set\x20by\x20backe\
-    nd)\n\n\x0c\n\x05\x04\x02\x02\t\x05\x12\x03I\x02\x07\n\x0c\n\x05\x04\x02\
-    \x02\t\x01\x12\x03I\x08\x13\n\x0c\n\x05\x04\x02\x02\t\x03\x12\x03I\x16\
-    \x1b\n=\n\x04\x04\x02\x02\n\x12\x03L\x02\x20\x1a0\x20WASM\x20function\
-    \x20name\x20to\x20execute\x20(set\x20by\x20backend)\n\n\x0c\n\x05\x04\
-    \x02\x02\n\x05\x12\x03L\x02\x08\n\x0c\n\x05\x04\x02\x02\n\x01\x12\x03L\t\
-    \x17\n\x0c\n\x05\x04\x02\x02\n\x03\x12\x03L\x1a\x1f\n*\n\x02\x04\x03\x12\
-    \x04P\0Y\x01\x1a\x1e\x20Used\x20for\x20both\x20Add\x20and\x20Update\n\n\
-    \n\n\x03\x04\x03\x01\x12\x03P\x08\x1a\n)\n\x04\x04\x03\x02\0\x12\x03R\
-    \x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\
-    \x04\x03\x02\0\x05\x12\x03R\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\
-    \x03R\t\x0b\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03R\x0e\x0f\n-\n\x04\x04\
-    \x03\x02\x01\x12\x03U\x02\x12\x1a\x20\x20Friendly\x20name\x20for\x20the\
-    \x20pipeline\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03U\x02\x08\n\x0c\n\
-    \x05\x04\x03\x02\x01\x01\x12\x03U\t\r\n\x0c\n\x05\x04\x03\x02\x01\x03\
-    \x12\x03U\x10\x11\n+\n\x04\x04\x03\x02\x02\x12\x03X\x02\"\x1a\x1e\x20One\
-    \x20or\x20more\x20steps\x20to\x20execute\n\n\x0c\n\x05\x04\x03\x02\x02\
-    \x04\x12\x03X\x02\n\n\x0c\n\x05\x04\x03\x02\x02\x06\x12\x03X\x0b\x17\n\
-    \x0c\n\x05\x04\x03\x02\x02\x01\x12\x03X\x18\x1d\n\x0c\n\x05\x04\x03\x02\
-    \x02\x03\x12\x03X\x20!\n\n\n\x02\x04\x04\x12\x04[\0^\x01\n\n\n\x03\x04\
-    \x04\x01\x12\x03[\x08\x1d\n)\n\x04\x04\x04\x02\0\x12\x03]\x02\x10\x1a\
-    \x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\x04\x02\
-    \0\x05\x12\x03]\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03]\t\x0b\n\
-    \x0c\n\x05\x04\x04\x02\0\x03\x12\x03]\x0e\x0f\n\n\n\x02\x04\x05\x12\x04`\
-    \0c\x01\n\n\n\x03\x04\x05\x01\x12\x03`\x08\x1c\n)\n\x04\x04\x05\x02\0\
-    \x12\x03b\x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20the\x20pipeline\n\n\
-    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03b\x02\x08\n\x0c\n\x05\x04\x05\x02\0\
-    \x01\x12\x03b\t\x0b\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03b\x0e\x0f\n\n\n\
-    \x02\x04\x06\x12\x04e\0h\x01\n\n\n\x03\x04\x06\x01\x12\x03e\x08\x1e\n)\n\
-    \x04\x04\x06\x02\0\x12\x03g\x02\x10\x1a\x1c\x20Unique\x20ID\x20for\x20th\
-    e\x20pipeline\n\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03g\x02\x08\n\x0c\n\
-    \x05\x04\x06\x02\0\x01\x12\x03g\t\x0b\n\x0c\n\x05\x04\x06\x02\0\x03\x12\
-    \x03g\x0e\x0fb\x06proto3\
+    \x1a\x15steps/transform.proto\"Z\n\x08Pipeline\x12\x0e\n\x02id\x18\x01\
+    \x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12*\n\
+    \x05steps\x18\x03\x20\x03(\x0b2\x14.protos.PipelineStepR\x05steps\"\xa4\
+    \x04\n\x0cPipelineStep\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x12\
+    <\n\non_success\x18\x02\x20\x03(\x0e2\x1d.protos.PipelineStepConditionR\
+    \tonSuccess\x12<\n\non_failure\x18\x03\x20\x03(\x0e2\x1d.protos.Pipeline\
+    StepConditionR\tonFailure\x12<\n\tdetective\x18\xe8\x07\x20\x01(\x0b2\
+    \x1b.protos.steps.DetectiveStepH\0R\tdetective\x12<\n\ttransform\x18\xe9\
+    \x07\x20\x01(\x0b2\x1b.protos.steps.TransformStepH\0R\ttransform\x123\n\
+    \x06encode\x18\xea\x07\x20\x01(\x0b2\x18.protos.steps.EncodeStepH\0R\x06\
+    encode\x123\n\x06decode\x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.Decod\
+    eStepH\0R\x06decode\x123\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.proto\
+    s.steps.CustomStepH\0R\x06custom\x12\x19\n\x08_wasm_id\x18\x90N\x20\x01(\
+    \tR\x06WasmId\x12\x1f\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cR\tWasmBytes\
+    \x12%\n\x0e_wasm_function\x18\x92N\x20\x01(\tR\x0cWasmFunctionB\x06\n\
+    \x04step*\x81\x01\n\x15PipelineStepCondition\x12!\n\x1dPIPELINE_STEP_CON\
+    DITION_UNSET\x10\0\x12!\n\x1dPIPELINE_STEP_CONDITION_ABORT\x10\x01\x12\"\
+    \n\x1ePIPELINE_STEP_CONDITION_NOTIFY\x10\x02B4Z2github.com/streamdal/sni\
+    tch-protos/build/go/protosJ\xd1\x10\n\x06\x12\x04\0\0?\x01\n\x08\n\x01\
+    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
+    \x12\x03\x04\0\x1c\n\t\n\x02\x03\x01\x12\x03\x05\0\x1c\n\t\n\x02\x03\x02\
+    \x12\x03\x06\0\x1f\n\t\n\x02\x03\x03\x12\x03\x07\0\x1c\n\t\n\x02\x03\x04\
+    \x12\x03\x08\0\x1f\n\x08\n\x01\x08\x12\x03\n\0I\n\t\n\x02\x08\x0b\x12\
+    \x03\n\0I\n\xc8\x01\n\x02\x04\0\x12\x04\x0f\0\x18\x01\x1a\xbb\x01\x20Pip\
+    eline\x20is\x20a\x20structure\x20that\x20holds\x20one\x20or\x20more\x20p\
+    ipeline\x20steps.\x20This\x20structure\n\x20is\x20intended\x20to\x20be\
+    \x20immutable;\x20clients\x20are\x20expected\x20to\x20generate\x20WASMRe\
+    quest's\n\x20that\x20contain\x20a\x20pipeline\x20step.\n\n\n\n\x03\x04\0\
+    \x01\x12\x03\x0f\x08\x10\nN\n\x04\x04\0\x02\0\x12\x03\x11\x02\x10\x1aA\
+    \x20Set\x20by\x20snitch-server\x20on\x20Create;\x20must\x20be\x20present\
+    \x20on\x20Update\x20calls\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\x02\
+    \x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x11\t\x0b\n\x0c\n\x05\x04\0\x02\
+    \0\x03\x12\x03\x11\x0e\x0f\n-\n\x04\x04\0\x02\x01\x12\x03\x14\x02\x12\
+    \x1a\x20\x20Friendly\x20name\x20for\x20the\x20pipeline\n\n\x0c\n\x05\x04\
+    \0\x02\x01\x05\x12\x03\x14\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\
+    \x14\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x14\x10\x11\n+\n\x04\x04\
+    \0\x02\x02\x12\x03\x17\x02\"\x1a\x1e\x20One\x20or\x20more\x20steps\x20to\
+    \x20execute\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03\x17\x02\n\n\x0c\n\
+    \x05\x04\0\x02\x02\x06\x12\x03\x17\x0b\x17\n\x0c\n\x05\x04\0\x02\x02\x01\
+    \x12\x03\x17\x18\x1d\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x17\x20!\n\
+    \xd2\x01\n\x02\x05\0\x12\x04\x1d\0!\x01\x1a\xc5\x01\x20A\x20condition\
+    \x20defines\x20how\x20the\x20SDK\x20should\x20handle\x20a\x20step\x20res\
+    ponse\x20--\x20should\x20it\n\x20continue\x20executing\x20the\x20pipelin\
+    e,\x20should\x20it\x20abort,\x20should\x20it\x20notify\x20the\x20server?\
+    \n\x20Each\x20step\x20can\x20have\x20multiple\x20conditions.\n\n\n\n\x03\
+    \x05\0\x01\x12\x03\x1d\x05\x1a\n\x0b\n\x04\x05\0\x02\0\x12\x03\x1e\x02$\
+    \n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x1e\x02\x1f\n\x0c\n\x05\x05\0\x02\0\
+    \x02\x12\x03\x1e\"#\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x1f\x02$\n\x0c\n\
+    \x05\x05\0\x02\x01\x01\x12\x03\x1f\x02\x1f\n\x0c\n\x05\x05\0\x02\x01\x02\
+    \x12\x03\x1f\"#\n\x0b\n\x04\x05\0\x02\x02\x12\x03\x20\x02%\n\x0c\n\x05\
+    \x05\0\x02\x02\x01\x12\x03\x20\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x02\x12\
+    \x03\x20#$\n=\n\x02\x04\x01\x12\x04$\0?\x01\x1a1\x20A\x20pipeline\x20ste\
+    p\x20is\x20a\x20single\x20step\x20in\x20a\x20pipeline.\n\n\n\n\x03\x04\
+    \x01\x01\x12\x03$\x08\x14\n)\n\x04\x04\x01\x02\0\x12\x03&\x02\x12\x1a\
+    \x1c\x20Friendly\x20name\x20for\x20the\x20step\n\n\x0c\n\x05\x04\x01\x02\
+    \0\x05\x12\x03&\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03&\t\r\n\x0c\
+    \n\x05\x04\x01\x02\0\x03\x12\x03&\x10\x11\n4\n\x04\x04\x01\x02\x01\x12\
+    \x03*\x020\x1a'\x20What\x20should\x20SDK\x20do\x20if\x20step\x20succeeds\
+    ?\n\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x03*\x02\n\n\x0c\n\x05\x04\x01\
+    \x02\x01\x06\x12\x03*\x0b\x20\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03*!+\
+    \n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03*./\n0\n\x04\x04\x01\x02\x02\x12\
+    \x03-\x021\x1a#\x20What\x20should\x20SDK\x20do\x20if\x20step\x20fails?\n\
+    \n\x0c\n\x05\x04\x01\x02\x02\x04\x12\x03-\x02\n\n\x0c\n\x05\x04\x01\x02\
+    \x02\x06\x12\x03-\x0c!\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03-\",\n\x0c\
+    \n\x05\x04\x01\x02\x02\x03\x12\x03-/0\n\x0c\n\x04\x04\x01\x08\0\x12\x04/\
+    \x025\x03\n\x0c\n\x05\x04\x01\x08\0\x01\x12\x03/\x08\x0c\n\x0b\n\x04\x04\
+    \x01\x02\x03\x12\x030\x04)\n\x0c\n\x05\x04\x01\x02\x03\x06\x12\x030\x04\
+    \x17\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x030\x18!\n\x0c\n\x05\x04\x01\
+    \x02\x03\x03\x12\x030$(\n\x0b\n\x04\x04\x01\x02\x04\x12\x031\x04)\n\x0c\
+    \n\x05\x04\x01\x02\x04\x06\x12\x031\x04\x17\n\x0c\n\x05\x04\x01\x02\x04\
+    \x01\x12\x031\x18!\n\x0c\n\x05\x04\x01\x02\x04\x03\x12\x031$(\n\x0b\n\
+    \x04\x04\x01\x02\x05\x12\x032\x04#\n\x0c\n\x05\x04\x01\x02\x05\x06\x12\
+    \x032\x04\x14\n\x0c\n\x05\x04\x01\x02\x05\x01\x12\x032\x15\x1b\n\x0c\n\
+    \x05\x04\x01\x02\x05\x03\x12\x032\x1e\"\n\x0b\n\x04\x04\x01\x02\x06\x12\
+    \x033\x04#\n\x0c\n\x05\x04\x01\x02\x06\x06\x12\x033\x04\x14\n\x0c\n\x05\
+    \x04\x01\x02\x06\x01\x12\x033\x15\x1b\n\x0c\n\x05\x04\x01\x02\x06\x03\
+    \x12\x033\x1e\"\n\x0b\n\x04\x04\x01\x02\x07\x12\x034\x04#\n\x0c\n\x05\
+    \x04\x01\x02\x07\x06\x12\x034\x04\x14\n\x0c\n\x05\x04\x01\x02\x07\x01\
+    \x12\x034\x15\x1b\n\x0c\n\x05\x04\x01\x02\x07\x03\x12\x034\x1e\"\nk\n\
+    \x04\x04\x01\x02\x08\x12\x038\x02\x1a\x1a'\x20WASM\x20module\x20ID\x20(s\
+    et\x20by\x20snitch-server)\n\"5\x20protolint:disable:this\x20FIELD_NAMES\
+    _LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\x08\x05\x12\x038\x02\x08\n\
+    \x0c\n\x05\x04\x01\x02\x08\x01\x12\x038\t\x11\n\x0c\n\x05\x04\x01\x02\
+    \x08\x03\x12\x038\x14\x19\nn\n\x04\x04\x01\x02\t\x12\x03;\x02\x1c\x1a*\
+    \x20WASM\x20module\x20bytes\x20(set\x20by\x20snitch-server)\n\"5\x20prot\
+    olint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\
+    \x02\t\x05\x12\x03;\x02\x07\n\x0c\n\x05\x04\x01\x02\t\x01\x12\x03;\x08\
+    \x13\n\x0c\n\x05\x04\x01\x02\t\x03\x12\x03;\x16\x1b\nz\n\x04\x04\x01\x02\
+    \n\x12\x03>\x02\x20\x1a6\x20WASM\x20function\x20name\x20to\x20execute\
+    \x20(set\x20by\x20snitch-server)\n\"5\x20protolint:disable:this\x20FIELD\
+    _NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\n\x05\x12\x03>\x02\x08\
+    \n\x0c\n\x05\x04\x01\x02\n\x01\x12\x03>\t\x17\n\x0c\n\x05\x04\x01\x02\n\
+    \x03\x12\x03>\x1a\x1fb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1773,16 +978,10 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::detective::file_descriptor().clone());
             deps.push(super::encode::file_descriptor().clone());
             deps.push(super::transform::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(7);
-            messages.push(WASMRequest::generated_message_descriptor_data());
-            messages.push(WASMResponse::generated_message_descriptor_data());
+            let mut messages = ::std::vec::Vec::with_capacity(2);
+            messages.push(Pipeline::generated_message_descriptor_data());
             messages.push(PipelineStep::generated_message_descriptor_data());
-            messages.push(SetPipelineCommand::generated_message_descriptor_data());
-            messages.push(DeletePipelineCommand::generated_message_descriptor_data());
-            messages.push(PausePipelineCommand::generated_message_descriptor_data());
-            messages.push(UnpausePipelineCommand::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(2);
-            enums.push(WASMExitCode::generated_enum_descriptor_data());
+            let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(PipelineStepCondition::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
