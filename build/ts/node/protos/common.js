@@ -34,14 +34,33 @@ export var ResponseCode;
      */
     ResponseCode[ResponseCode["GENERIC_ERROR"] = 5] = "GENERIC_ERROR";
 })(ResponseCode || (ResponseCode = {}));
+/**
+ * Each SDK client is a $service + $component + $operation_type
+ *
+ * @generated from protobuf enum protos.OperationType
+ */
+export var OperationType;
+(function (OperationType) {
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_UNSET = 0;
+     */
+    OperationType[OperationType["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_CONSUMER = 1;
+     */
+    OperationType[OperationType["CONSUMER"] = 1] = "CONSUMER";
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_PRODUCER = 2;
+     */
+    OperationType[OperationType["PRODUCER"] = 2] = "PRODUCER";
+})(OperationType || (OperationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType {
     constructor() {
         super("protos.StandardResponse", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "code", kind: "enum", T: () => ["protos.ResponseCode", ResponseCode, "RESPONSE_CODE_"] },
-            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
@@ -49,4 +68,18 @@ class StandardResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.StandardResponse
  */
 export const StandardResponse = new StandardResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Audience$Type extends MessageType {
+    constructor() {
+        super("protos.Audience", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "component_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Audience
+ */
+export const Audience = new Audience$Type();
 //# sourceMappingURL=common.js.map

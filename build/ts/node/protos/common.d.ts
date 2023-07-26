@@ -19,14 +19,32 @@ export interface StandardResponse {
      * @generated from protobuf field: string message = 3;
      */
     message: string;
+}
+/**
+ * Used to indicate who a command is intended for
+ *
+ * @generated from protobuf message protos.Audience
+ */
+export interface Audience {
     /**
-     * Debug info that server may populate with additional info.
+     * Name of the service -- let's include the service name on all calls, we can
+     * optimize later ~DS
      *
-     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     * @generated from protobuf field: string service_name = 1;
      */
-    Metadata: {
-        [key: string]: string;
-    };
+    serviceName: string;
+    /**
+     * Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+     *
+     * @generated from protobuf field: string component_name = 2;
+     */
+    componentName: string;
+    /**
+     * Consumer or Producer
+     *
+     * @generated from protobuf field: protos.OperationType operation_type = 3;
+     */
+    operationType: OperationType;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -59,6 +77,25 @@ export declare enum ResponseCode {
      */
     GENERIC_ERROR = 5
 }
+/**
+ * Each SDK client is a $service + $component + $operation_type
+ *
+ * @generated from protobuf enum protos.OperationType
+ */
+export declare enum OperationType {
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_CONSUMER = 1;
+     */
+    CONSUMER = 1,
+    /**
+     * @generated from protobuf enum value: OPERATION_TYPE_PRODUCER = 2;
+     */
+    PRODUCER = 2
+}
 declare class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor();
 }
@@ -66,4 +103,11 @@ declare class StandardResponse$Type extends MessageType<StandardResponse> {
  * @generated MessageType for protobuf message protos.StandardResponse
  */
 export declare const StandardResponse: StandardResponse$Type;
+declare class Audience$Type extends MessageType<Audience> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.Audience
+ */
+export declare const Audience: Audience$Type;
 export {};

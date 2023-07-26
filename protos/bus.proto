@@ -28,5 +28,5 @@ message BusEvent {
   // 3. snitch-server has to broadcast SetPipeline cmd to other services via bus
   // 4. Since this is not a gRPC call, snitch-server translates ctx metadata to
   //    this field and includes it in the bus event.
-  map <string, string> _metadata = 1000;
+  map <string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

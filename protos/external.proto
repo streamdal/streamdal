@@ -12,6 +12,17 @@ service External {
   // Build a service map
   rpc GetServiceMap(GetServiceMapRequest) returns (GetServiceMapResponse);
 
+  rpc GetPipelines(GetPipelinesRequest) returns (GetPipelinesResponse);
+  rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse);
+  rpc CreatePipeline(CreatePipelineRequest) returns (protos.StandardResponse);
+  rpc UpdatePipeline(UpdatePipelineRequest) returns (protos.StandardResponse);
+  rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
+
+  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse);
+  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse);
+  rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
+  rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -23,6 +34,52 @@ message GetServiceMapRequest {
 message GetServiceMapResponse {
   // Key == service name
   map<string, protos.ServiceInfo> service_map = 1;
+}
+
+message GetPipelinesRequest {
+  // Don't think we need anything here
+}
+
+message GetPipelinesResponse {
+  repeated protos.Pipeline pipelines = 1;
+}
+
+message GetPipelineRequest {
+  string pipeline_id = 1;
+}
+
+message GetPipelineResponse {
+  protos.Pipeline pipeline = 1;
+}
+
+message CreatePipelineRequest {
+  protos.Pipeline pipeline = 1;
+}
+
+message UpdatePipelineRequest {
+  protos.Pipeline pipeline = 1;
+}
+
+message DeletePipelineRequest {
+  string pipeline_id = 1;
+}
+
+message AttachPipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+}
+
+message DetachPipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+}
+
+message PausePipelineRequest {
+  string pipeline_id = 1;
+}
+
+message ResumePipelineRequest {
+  string pipeline_id = 1;
 }
 
 message TestRequest {

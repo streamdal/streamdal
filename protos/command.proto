@@ -28,12 +28,12 @@ message SetPipelineCommand {
 
 message DeletePipelineCommand {
   // Unique ID for the pipeline
-  string id = 1;
+  string id = 1; // TODO: Where does this ID come from? How do we know it? A: We get it on pipeline creation (CreatePipeline external RPC)
 }
 
 message PausePipelineCommand {
   // Unique ID for the pipeline
-  string id = 1;
+  string id = 1; // TODO: Where does this come from? A: We get it on pipeline creation (CreatePipeline external RPC)
 }
 
 message UnpausePipelineCommand {
@@ -42,6 +42,5 @@ message UnpausePipelineCommand {
 }
 
 message KeepAliveCommand {
-  // Unique ID for the pipeline
-  string id = 1;
+  // Nothing needed in here, just a ping from server to SDK
 }

@@ -10,9 +10,6 @@ message StandardResponse {
   string id = 1;
   ResponseCode code = 2;
   string message = 3;
-
-  // Debug info that server may populate with additional info.
-  map <string, string> _metadata = 1000;
 }
 
 // Common status codes used in gRPC method responses
@@ -34,7 +31,8 @@ enum OperationType {
 
 // Used to indicate who a command is intended for
 message Audience {
-  // Name of the service
+  // Name of the service -- let's include the service name on all calls, we can
+  // optimize later ~DS
   string service_name = 1;
 
   // Name of the component the SDK is interacting with (ie. kafka-$topic-name)

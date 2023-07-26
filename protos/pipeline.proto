@@ -14,7 +14,7 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 // is intended to be immutable; clients are expected to generate WASMRequest's
 // that contain a pipeline step.
 message Pipeline {
-  // Unique ID for the pipeline
+  // Set by snitch-server on Create; must be present on Update calls
   string id = 1;
 
   // Friendly name for the pipeline
@@ -28,25 +28,22 @@ message Pipeline {
 // continue executing the pipeline, should it abort, should it notify the server?
 // Each step can have multiple conditions.
 enum PipelineStepCondition {
-  CONDITION_UNSET = 0;
-  CONDITION_CONTINUE = 1;
-  CONDITION_ABORT = 2;
-  CONDITION_NOTIFY = 3;
+  PIPELINE_STEP_CONDITION_UNSET = 0;
+  PIPELINE_STEP_CONDITION_ABORT = 1;
+  PIPELINE_STEP_CONDITION_NOTIFY = 2;
 }
 
 // A pipeline step is a single step in a pipeline.
 message PipelineStep {
-  // Unique ID for the step
-  string id = 1;
-
   // Friendly name for the step
-  string name = 2;
+  string name = 1;
 
   // What should SDK do if step succeeds?
-  repeated PipelineStepCondition on_success = 3;
+  //
+  repeated PipelineStepCondition on_success = 2;
 
   // What should SDK do if step fails?
-  repeated  PipelineStepCondition on_failure = 4;
+  repeated  PipelineStepCondition on_failure = 3;
 
   oneof step {
     steps.DetectiveStep detective = 1000;
@@ -57,11 +54,11 @@ message PipelineStep {
   }
 
   // WASM module ID (set by snitch-server)
-  string _wasm_id = 10000;
+  string _wasm_id = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // WASM module bytes (set by snitch-server)
-  bytes _wasm_bytes = 10001;
+  bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // WASM function name to execute (set by snitch-server)
-  string _wasm_function = 10002;
+  string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

@@ -4,7 +4,7 @@ package protos;
 
 import "command.proto";
 import "common.proto";
-import "pipeline.proto";
+import "info.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
@@ -33,23 +33,23 @@ service Internal {
 message HeartbeatRequest {
   Audience audience = 1;
   int64 last_activity_unix_timestamp_utc = 2;
-
-  map <string, string> _metadata = 1000;
 }
 
 message NotifyRequest {
-  string rule_id = 1;
-  string rule_name = 2;
+  string pipeline_id = 1;
+  string step_name = 2;
   Audience audience = 3;
   int64 occurred_at_unix_ts_utc = 4;
+}
 
-  map <string, string> _metadata = 1000;
+message Metrics {
+  string name = 1;
+  map<string, string> labels = 2;
+  double value = 3;
 }
 
 message MetricsRequest {
-  string rule_id = 1;
-  string rule_name = 2;
-  Audience audience = 3;
+  repeated Metrics metrics = 1;
 }
 
 message RegisterRequest {
@@ -59,6 +59,13 @@ message RegisterRequest {
   // modify the input/output data. As in, the SDK will log what it _would_ do
   // and always return the original data set.
   bool dry_run = 2;
+
+  // Info about the client (lib name, lang, os, arch, etc.)
+  protos.ClientInfo client_info = 3;
+
+  // OPTIONAL -- if these are defined, these will show up in the UI even if
+  // there is no active .Process() call from the SDK.
+  repeated protos.Audience audiences = 4;
 }
 
 // Same as RegisterRequest - used for broadcasting a deregistration event

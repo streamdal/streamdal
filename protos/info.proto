@@ -38,6 +38,7 @@ enum ClientType {
   CLIENT_TYPE_SHIM = 2;
 }
 
+// This should come from the register call
 message ClientInfo {
   ClientType client_type = 1;
   string library_name = 2;
