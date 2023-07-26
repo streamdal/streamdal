@@ -11,29 +11,31 @@ import { PipelineStep } from "./pipeline.js";
  * ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
  * to determine what to do next;
  *
- * @generated from protobuf enum protos.WasmExitCode
+ * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+ *
+ * @generated from protobuf enum protos.WASMExitCode
  */
-export var WasmExitCode;
-(function (WasmExitCode) {
+export var WASMExitCode;
+(function (WASMExitCode) {
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_UNSET = 0;
      */
-    WasmExitCode[WasmExitCode["UNSET"] = 0] = "UNSET";
+    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_UNSET"] = 0] = "WASM_EXIT_CODE_UNSET";
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_SUCCESS = 1;
      */
-    WasmExitCode[WasmExitCode["SUCCESS"] = 1] = "SUCCESS";
+    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_SUCCESS"] = 1] = "WASM_EXIT_CODE_SUCCESS";
     /**
      * Probably need better names for these as FAILURE is too harsh
      *
      * @generated from protobuf enum value: WASM_EXIT_CODE_FAILURE = 2;
      */
-    WasmExitCode[WasmExitCode["FAILURE"] = 2] = "FAILURE";
+    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_FAILURE"] = 2] = "WASM_EXIT_CODE_FAILURE";
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_INTERNAL_ERROR = 3;
      */
-    WasmExitCode[WasmExitCode["INTERNAL_ERROR"] = 3] = "INTERNAL_ERROR";
-})(WasmExitCode || (WasmExitCode = {}));
+    WASMExitCode[WASMExitCode["WASM_EXIT_CODE_INTERNAL_ERROR"] = 3] = "WASM_EXIT_CODE_INTERNAL_ERROR";
+})(WASMExitCode || (WASMExitCode = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WASMRequest$Type extends MessageType {
     constructor() {
@@ -52,7 +54,7 @@ class WASMResponse$Type extends MessageType {
     constructor() {
         super("protos.WASMResponse", [
             { no: 1, name: "output", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WasmExitCode", WasmExitCode, "WASM_EXIT_CODE_"] },
+            { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
             { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }

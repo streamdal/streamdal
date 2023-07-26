@@ -26,24 +26,24 @@ const (
 // conditions to determine what to do next.
 // ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
 // to determine what to do next;
-type WasmExitCode int32
+type WASMExitCode int32
 
 const (
-	WasmExitCode_WASM_EXIT_CODE_UNSET          WasmExitCode = 0
-	WasmExitCode_WASM_EXIT_CODE_SUCCESS        WasmExitCode = 1
-	WasmExitCode_WASM_EXIT_CODE_FAILURE        WasmExitCode = 2 // Probably need better names for these as FAILURE is too harsh
-	WasmExitCode_WASM_EXIT_CODE_INTERNAL_ERROR WasmExitCode = 3
+	WASMExitCode_WASM_EXIT_CODE_UNSET          WASMExitCode = 0
+	WASMExitCode_WASM_EXIT_CODE_SUCCESS        WASMExitCode = 1
+	WASMExitCode_WASM_EXIT_CODE_FAILURE        WASMExitCode = 2 // Probably need better names for these as FAILURE is too harsh
+	WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR WASMExitCode = 3
 )
 
-// Enum value maps for WasmExitCode.
+// Enum value maps for WASMExitCode.
 var (
-	WasmExitCode_name = map[int32]string{
+	WASMExitCode_name = map[int32]string{
 		0: "WASM_EXIT_CODE_UNSET",
 		1: "WASM_EXIT_CODE_SUCCESS",
 		2: "WASM_EXIT_CODE_FAILURE",
 		3: "WASM_EXIT_CODE_INTERNAL_ERROR",
 	}
-	WasmExitCode_value = map[string]int32{
+	WASMExitCode_value = map[string]int32{
 		"WASM_EXIT_CODE_UNSET":          0,
 		"WASM_EXIT_CODE_SUCCESS":        1,
 		"WASM_EXIT_CODE_FAILURE":        2,
@@ -51,30 +51,30 @@ var (
 	}
 )
 
-func (x WasmExitCode) Enum() *WasmExitCode {
-	p := new(WasmExitCode)
+func (x WASMExitCode) Enum() *WASMExitCode {
+	p := new(WASMExitCode)
 	*p = x
 	return p
 }
 
-func (x WasmExitCode) String() string {
+func (x WASMExitCode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (WasmExitCode) Descriptor() protoreflect.EnumDescriptor {
+func (WASMExitCode) Descriptor() protoreflect.EnumDescriptor {
 	return file_wasm_proto_enumTypes[0].Descriptor()
 }
 
-func (WasmExitCode) Type() protoreflect.EnumType {
+func (WASMExitCode) Type() protoreflect.EnumType {
 	return &file_wasm_proto_enumTypes[0]
 }
 
-func (x WasmExitCode) Number() protoreflect.EnumNumber {
+func (x WASMExitCode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use WasmExitCode.Descriptor instead.
-func (WasmExitCode) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use WASMExitCode.Descriptor instead.
+func (WASMExitCode) EnumDescriptor() ([]byte, []int) {
 	return file_wasm_proto_rawDescGZIP(), []int{0}
 }
 
@@ -141,7 +141,7 @@ type WASMResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	Output   []byte       `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
-	ExitCode WasmExitCode `protobuf:"varint,2,opt,name=exit_code,json=exitCode,proto3,enum=protos.WasmExitCode" json:"exit_code,omitempty"`
+	ExitCode WASMExitCode `protobuf:"varint,2,opt,name=exit_code,json=exitCode,proto3,enum=protos.WASMExitCode" json:"exit_code,omitempty"`
 	ExitMsg  string       `protobuf:"bytes,3,opt,name=exit_msg,json=exitMsg,proto3" json:"exit_msg,omitempty"`
 }
 
@@ -184,11 +184,11 @@ func (x *WASMResponse) GetOutput() []byte {
 	return nil
 }
 
-func (x *WASMResponse) GetExitCode() WasmExitCode {
+func (x *WASMResponse) GetExitCode() WASMExitCode {
 	if x != nil {
 		return x.ExitCode
 	}
-	return WasmExitCode_WASM_EXIT_CODE_UNSET
+	return WASMExitCode_WASM_EXIT_CODE_UNSET
 }
 
 func (x *WASMResponse) GetExitMsg() string {
@@ -212,11 +212,11 @@ var file_wasm_proto_rawDesc = []byte{
 	0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x0c, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12, 0x31, 0x0a, 0x09, 0x65,
 	0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x57, 0x61, 0x73, 0x6d, 0x45, 0x78, 0x69, 0x74,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x57, 0x41, 0x53, 0x4d, 0x45, 0x78, 0x69, 0x74,
 	0x43, 0x6f, 0x64, 0x65, 0x52, 0x08, 0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x19,
 	0x0a, 0x08, 0x65, 0x78, 0x69, 0x74, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x65, 0x78, 0x69, 0x74, 0x4d, 0x73, 0x67, 0x2a, 0x83, 0x01, 0x0a, 0x0c, 0x57, 0x61,
-	0x73, 0x6d, 0x45, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x14, 0x57, 0x41,
+	0x52, 0x07, 0x65, 0x78, 0x69, 0x74, 0x4d, 0x73, 0x67, 0x2a, 0x83, 0x01, 0x0a, 0x0c, 0x57, 0x41,
+	0x53, 0x4d, 0x45, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x14, 0x57, 0x41,
 	0x53, 0x4d, 0x5f, 0x45, 0x58, 0x49, 0x54, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x55, 0x4e, 0x53,
 	0x45, 0x54, 0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16, 0x57, 0x41, 0x53, 0x4d, 0x5f, 0x45, 0x58, 0x49,
 	0x54, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x01,
@@ -245,14 +245,14 @@ func file_wasm_proto_rawDescGZIP() []byte {
 var file_wasm_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_wasm_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_wasm_proto_goTypes = []interface{}{
-	(WasmExitCode)(0),    // 0: protos.WasmExitCode
+	(WASMExitCode)(0),    // 0: protos.WASMExitCode
 	(*WASMRequest)(nil),  // 1: protos.WASMRequest
 	(*WASMResponse)(nil), // 2: protos.WASMResponse
 	(*PipelineStep)(nil), // 3: protos.PipelineStep
 }
 var file_wasm_proto_depIdxs = []int32{
 	3, // 0: protos.WASMRequest.step:type_name -> protos.PipelineStep
-	0, // 1: protos.WASMResponse.exit_code:type_name -> protos.WasmExitCode
+	0, // 1: protos.WASMResponse.exit_code:type_name -> protos.WASMExitCode
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

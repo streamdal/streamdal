@@ -29,9 +29,9 @@ export interface WASMResponse {
      */
     output: Uint8Array;
     /**
-     * @generated from protobuf field: protos.WasmExitCode exit_code = 2;
+     * @generated from protobuf field: protos.WASMExitCode exit_code = 2;
      */
-    exitCode: WasmExitCode;
+    exitCode: WASMExitCode;
     /**
      * @generated from protobuf field: string exit_msg = 3;
      */
@@ -45,27 +45,29 @@ export interface WASMResponse {
  * ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
  * to determine what to do next;
  *
- * @generated from protobuf enum protos.WasmExitCode
+ * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+ *
+ * @generated from protobuf enum protos.WASMExitCode
  */
-export enum WasmExitCode {
+export enum WASMExitCode {
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_UNSET = 0;
      */
-    UNSET = 0,
+    WASM_EXIT_CODE_UNSET = 0,
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_SUCCESS = 1;
      */
-    SUCCESS = 1,
+    WASM_EXIT_CODE_SUCCESS = 1,
     /**
      * Probably need better names for these as FAILURE is too harsh
      *
      * @generated from protobuf enum value: WASM_EXIT_CODE_FAILURE = 2;
      */
-    FAILURE = 2,
+    WASM_EXIT_CODE_FAILURE = 2,
     /**
      * @generated from protobuf enum value: WASM_EXIT_CODE_INTERNAL_ERROR = 3;
      */
-    INTERNAL_ERROR = 3
+    WASM_EXIT_CODE_INTERNAL_ERROR = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class WASMRequest$Type extends MessageType<WASMRequest> {
@@ -85,7 +87,7 @@ class WASMResponse$Type extends MessageType<WASMResponse> {
     constructor() {
         super("protos.WASMResponse", [
             { no: 1, name: "output", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WasmExitCode", WasmExitCode, "WASM_EXIT_CODE_"] },
+            { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
             { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
