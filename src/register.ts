@@ -1,4 +1,4 @@
-import { client } from "./index.js";
+import { grpcClient } from "./index.js";
 import { processResponse } from "./pipeline.js";
 
 export const serviceName = "snitch-node-client";
@@ -7,7 +7,7 @@ export const register = async () => {
   try {
     console.info(`### registering with grpc server...`);
 
-    const call = client.register(
+    const call = grpcClient.register(
       { serviceName, dryRun: false, Metadata: {} },
       { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
     );

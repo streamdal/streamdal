@@ -15,7 +15,7 @@ const transport = new GrpcTransport({
   channelCredentials: ChannelCredentials.createInsecure(),
 });
 
-export const client: IInternalClient = new InternalClient(transport);
+export const grpcClient: IInternalClient = new InternalClient(transport);
 
 const start = () => {
   void register();

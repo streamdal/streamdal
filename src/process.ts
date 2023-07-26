@@ -7,6 +7,7 @@ import {
   WASMExitCode,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 import { runWasm } from "./wasm.js";
+import { grpcClient } from "./index.js";
 
 export interface SnitchRequest {
   audience: Audience;
@@ -28,7 +29,7 @@ export interface SnitchResponse {
   message?: string;
 }
 
-export const process = async ({
+export const processPipelines = async ({
   audience,
   data,
 }: SnitchRequest): Promise<SnitchResponse> => {
@@ -67,10 +68,17 @@ export const process = async ({
   return { data: status.data, error: false, message: "Success" };
 };
 
-const notifyStep = (step: Status) => {
+const notifyStep = async (step: Status) => {
   console.info("notifying error step", step);
-  //
-  //...coming soon...
+  await grpcClient.notify(
+    {
+      ruleId: step.step?.id || "unknown",
+      ruleName: step.step?.name || "unknown",
+      occurredAtUnixTsUtc: BigInt(Date.now()),
+      Metadata: {},
+    },
+    { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
+  );
 };
 
 export const runPipeline = async ({
@@ -112,7 +120,7 @@ export const runPipeline = async ({
       }
 
       if (step.conditions.includes(PipelineStepCondition.CONDITION_NOTIFY)) {
-        notifyStep(status);
+        void notifyStep(status);
       }
 
       if (step.conditions.includes(PipelineStepCondition.CONDITION_ABORT)) {

@@ -1,10 +1,10 @@
-import { client } from "./index.js";
+import { grpcClient } from "./index.js";
 import { serviceName } from "./register.js";
 import { OperationType } from "@streamdal/snitch-protos/protos/internal_api.js";
 
 export const heartbeat = async () => {
   console.info(`### sending heartbeat to grpc server...`);
-  const call = client.heartbeat(
+  const call = grpcClient.heartbeat(
     {
       lastActivityUnixTimestampUtc: BigInt(Date.now()),
       audience: {
