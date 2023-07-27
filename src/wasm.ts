@@ -1,6 +1,6 @@
-import { WASMResponse } from "@streamdal/snitch-protos/protos/pipeline.js";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
+import { WASMResponse } from "@streamdal/snitch-protos/protos/wasm.js";
 
 const wasi = new WASI({
   preopens: {

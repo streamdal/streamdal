@@ -1,14 +1,11 @@
+import { Command } from "@streamdal/snitch-protos/protos/command.js";
+import { Audience } from "@streamdal/snitch-protos/protos/common.js";
 import {
-  Audience,
-  CommandResponse,
-} from "@streamdal/snitch-protos/protos/internal_api.js";
-import {
-  DeletePipelineCommand,
+  Pipeline,
   PipelineStep,
-  SetPipelineCommand,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 
-export type PipelineType = SetPipelineCommand & {
+export type InternalPipeline = Pipeline & {
   paused: boolean;
 };
 
@@ -17,74 +14,49 @@ export type EnhancedStep = PipelineStep & {
   pipelineName: string;
 };
 
-export const internalPipelines = new Map<Audience, PipelineType[]>();
+export const internalPipelines = new Map<Audience, InternalPipeline>();
 
-export const processResponse = (commandResponse: CommandResponse) => {
-  if (!commandResponse.audience) {
+export const processResponse = (command: Command) => {
+  if (!command.audience) {
     console.error("command response has no audience, ignoring");
     return;
   }
 
-  switch (commandResponse.command.oneofKind) {
+  console.info("processing grpc server command...");
+
+  switch (command.command.oneofKind) {
     case "setPipeline":
-      setPipeline(
-        commandResponse.audience,
-        commandResponse.command.setPipeline
-      );
+      command.command.setPipeline.pipeline &&
+        setPipeline(command.audience, command.command.setPipeline.pipeline);
       break;
     case "deletePipeline":
-      deletePipeline(
-        commandResponse.audience,
-        commandResponse.command.deletePipeline
-      );
+      deletePipeline(command.audience, command.command.deletePipeline.id);
       break;
     case "pausePipeline":
       togglePausePipeline(
-        commandResponse.audience,
-        commandResponse.command.pausePipeline.id,
+        command.audience,
+        command.command.pausePipeline.id,
         true
       );
       break;
     case "unpausePipeline":
       togglePausePipeline(
-        commandResponse.audience,
-        commandResponse.command.unpausePipeline.id,
+        command.audience,
+        command.command.unpausePipeline.id,
         false
       );
       break;
   }
 
-  console.info("response command processed");
+  console.info("grpc server command processed");
 };
 
-export const setPipeline = (
-  audience: Audience,
-  pipeline: SetPipelineCommand
-) => {
-  const steps = internalPipelines.get(audience) ?? [];
-  const index = steps.findIndex(
-    ({ id }: SetPipelineCommand) => id === pipeline.id
-  );
+export const setPipeline = (audience: Audience, pipeline: Pipeline) =>
+  internalPipelines.set(audience, { ...pipeline, paused: false });
 
-  index >= 0
-    ? (steps[index] = { ...pipeline, paused: false })
-    : steps.push({ ...pipeline, paused: false });
-
-  internalPipelines.set(audience, steps);
-};
-
-export const deletePipeline = (
-  audience: Audience,
-  pipeline: DeletePipelineCommand
-) => {
-  const steps = internalPipelines.get(audience) ?? [];
-  const index = steps.findIndex(
-    ({ id }: SetPipelineCommand) => id === pipeline.id
-  );
-
-  index >= 0 ? steps.splice(index, 1) : null;
-
-  internalPipelines.set(audience, steps);
+export const deletePipeline = (audience: Audience, pipelineId: string) => {
+  const p = internalPipelines.get(audience);
+  pipelineId === p?.id && internalPipelines.delete(audience);
 };
 
 export const togglePausePipeline = (
@@ -92,12 +64,6 @@ export const togglePausePipeline = (
   pipelineId: string,
   paused: boolean
 ) => {
-  const steps = internalPipelines.get(audience) ?? [];
-  const index = steps.findIndex(
-    ({ id }: SetPipelineCommand) => id === pipelineId
-  );
-
-  index >= 0 ? (steps[index] = { ...steps[index], paused }) : null;
-
-  internalPipelines.set(audience, steps);
+  const p = internalPipelines.get(audience);
+  pipelineId === p?.id && internalPipelines.set(audience, { ...p, paused });
 };

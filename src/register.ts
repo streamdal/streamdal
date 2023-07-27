@@ -1,5 +1,7 @@
 import { grpcClient } from "./index.js";
 import { processResponse } from "./pipeline.js";
+import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
+import { version } from "../package.json";
 
 export const serviceName = "snitch-node-client";
 
@@ -8,7 +10,19 @@ export const register = async () => {
     console.info(`### registering with grpc server...`);
 
     const call = grpcClient.register(
-      { serviceName, dryRun: false, Metadata: {} },
+      {
+        serviceName,
+        dryRun: false,
+        clientInfo: {
+          clientType: ClientType.SDK,
+          libraryName: "snitch-node-client",
+          libraryVersion: version,
+          language: "Typescript",
+          arch: process.arch,
+          os: process.platform,
+        },
+        audiences: [],
+      },
       { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
     );
 

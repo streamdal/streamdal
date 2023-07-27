@@ -1,12 +1,17 @@
-import { Audience } from "@streamdal/snitch-protos/protos/internal_api.js";
-import { EnhancedStep, internalPipelines, PipelineType } from "./pipeline.js";
+import {
+  EnhancedStep,
+  InternalPipeline,
+  internalPipelines,
+} from "./pipeline.js";
+
+import { runWasm } from "./wasm.js";
+import { grpcClient } from "./index.js";
+import { Audience } from "@streamdal/snitch-protos/protos/common.js";
 import {
   PipelineStep,
   PipelineStepCondition,
-  WASMExitCode,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
-import { runWasm } from "./wasm.js";
-import { grpcClient } from "./index.js";
+import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
 
 export interface SnitchRequest {
   audience: Audience;
@@ -14,8 +19,7 @@ export interface SnitchRequest {
 }
 
 export interface StepStatus {
-  id: string;
-  name: string;
+  stepName: string;
   pipelineId: string;
   pipelineName: string;
   error: boolean;
@@ -36,38 +40,32 @@ export interface SnitchResponse {
 }
 
 //
-// Flatten all pipelines steps so we can have a single loop, but
 // add pipeline information to the steps so we can log/notify
-// appropriately
-const mapAllSteps = (pipeLines: PipelineType[]): EnhancedStep[] =>
-  pipeLines
-    .map((p: PipelineType) =>
-      p.steps.map((s: PipelineStep) => ({
-        ...s,
-        pipelineId: p.id,
-        pipelineName: p.name,
-      }))
-    )
-    .flat(1);
+// appropriately as we go
+const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
+  pipeline.steps.map((s: PipelineStep) => ({
+    ...s,
+    pipelineId: pipeline.id,
+    pipelineName: pipeline.name,
+  })) as EnhancedStep[];
 
-export const processPipelines = async ({
+export const processPipeline = async ({
   audience,
   data,
 }: SnitchRequest): Promise<SnitchResponse> => {
-  const pipeLines = internalPipelines.get(audience);
+  const pipeline = internalPipelines.get(audience);
 
-  if (!pipeLines) {
-    const message = "no pipelines found for this audience, returning data";
+  if (!pipeline) {
+    const message = "no pipeline found for this audience, returning data";
     console.info(message);
     return { data, error: true, message };
   }
 
-  const allSteps = mapAllSteps(pipeLines);
+  const allSteps = mapAllSteps(pipeline);
 
   //
   // wrapping data up in a status object so we can track
-  // statuses and set/pass along the data from step to step
-  // since it can be altered.
+  // statuses pass along updated data from step to step
   let pipelineStatus: PipelinesStatus = {
     data,
     stepStatuses: [],
@@ -105,13 +103,25 @@ const notifyStep = async (step: StepStatus) => {
   console.info("notifying error step", step);
   await grpcClient.notify(
     {
-      ruleId: step.id || "unknown",
-      ruleName: step.name || "unknown",
+      pipelineId: step.pipelineId,
+      stepName: step.stepName,
       occurredAtUnixTsUtc: BigInt(Date.now()),
-      Metadata: {},
     },
     { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
   );
+};
+
+export const resultCondition = (
+  conditions: PipelineStepCondition[],
+  stepStatus: StepStatus
+) => {
+  if (conditions.includes(PipelineStepCondition.NOTIFY)) {
+    void notifyStep(stepStatus);
+  }
+
+  if (conditions.includes(PipelineStepCondition.ABORT)) {
+    stepStatus.abort = true;
+  }
 };
 
 export const runStep = async ({
@@ -122,8 +132,7 @@ export const runStep = async ({
   pipeline: PipelinesStatus;
 }): Promise<PipelinesStatus> => {
   const stepStatus: StepStatus = {
-    id: step.id,
-    name: step.name,
+    stepName: step.name,
     pipelineId: step.pipelineId,
     pipelineName: step.pipelineName,
     error: false,
@@ -144,25 +153,16 @@ export const runStep = async ({
     data = output;
     stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
     stepStatus.message = exitMsg;
-
-    if (
-      stepStatus.error &&
-      step.conditions.includes(PipelineStepCondition.CONDITION_NOTIFY)
-    ) {
-      void notifyStep(stepStatus);
-    }
-
-    if (
-      stepStatus.error &&
-      step.conditions.includes(PipelineStepCondition.CONDITION_ABORT)
-    ) {
-      stepStatus.abort = true;
-    }
   } catch (error: any) {
     stepStatus.error = true;
     stepStatus.message = error.toString();
     stepStatus.abort = true;
   }
+
+  resultCondition(
+    stepStatus.error ? step.onFailure : step.onSuccess,
+    stepStatus
+  );
 
   return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };
 };
