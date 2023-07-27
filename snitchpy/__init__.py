@@ -135,16 +135,16 @@ class SnitchClient:
 
             should_continue = False
             for cond in step.conditions:
-                if cond == protos.PipelineStepCondition.CONDITION_CONTINUE:
+                if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                    self._notify_condition(step, wasm_resp)
+                    self.log.debug("Step '{}' failed, notifying".format(step.name))
+                elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                    should_continue = False
+                    self.log.debug("Step '{}' failed, aborting".format(step.name))
+                else:
                     # We still need to continue to remaining pipeline steps after other conditions have been processed
                     should_continue = True
                     self.log.debug("Step '{}' failed, continuing to next step".format(step.name))
-                elif cond == protos.PipelineStepCondition.CONDITION_NOTIFY:
-                    self._notify_condition(step, wasm_resp)
-                    self.log.debug("Step '{}' failed, notifying".format(step.name))
-                elif cond == protos.PipelineStepCondition.CONDITION_ABORT:
-                    should_continue = False
-                    self.log.debug("Step '{}' failed, aborting".format(step.name))
 
                 # Not continuing, exit function early
                 if should_continue is False and self.cfg.dry_run is False:
@@ -313,7 +313,7 @@ class SnitchClient:
 
         return pipeline
 
-    def _delete_pipeline(self, cmd: protos.CommandResponse) -> bool:
+    def _delete_pipeline(self, cmd: protos.Command) -> bool:
         """Delete pipeline from internal map of pipelines"""
         if cmd is None:
             raise ValueError("Command is None")
@@ -333,7 +333,7 @@ class SnitchClient:
 
         return True
 
-    def _set_pipeline(self, cmd: protos.CommandResponse) -> bool:
+    def _set_pipeline(self, cmd: protos.Command) -> bool:
         """
         Put pipeline in internal map of pipelines
 
@@ -349,7 +349,7 @@ class SnitchClient:
 
         return True
 
-    def _pause_pipeline(self, cmd: protos.CommandResponse) -> bool:
+    def _pause_pipeline(self, cmd: protos.Command) -> bool:
         """Pauses execution of a specified pipeline"""
         if cmd is None:
             self.log.error("Command is None")
@@ -365,7 +365,7 @@ class SnitchClient:
 
         return True
 
-    def _unpause_pipeline(self, cmd: protos.CommandResponse) -> None:
+    def _unpause_pipeline(self, cmd: protos.Command) -> None:
         """Resumes execution of a specified pipeline"""
 
         if cmd is None:

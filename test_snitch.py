@@ -3,7 +3,6 @@ import uuid
 import pytest
 from snitchpy import SnitchClient, SnitchConfig
 from wasmtime import Store, Memory, MemoryType, Limits
-from snitchpy.exceptions import SnitchException
 from snitch_protos.protos import PipelineStep, PipelineStepCondition
 from snitch_protos.protos.steps import DetectiveStep, DetectiveType
 
@@ -114,9 +113,9 @@ class TestSnitchClient:
             wasm_bytes = file.read()
 
         step = PipelineStep(
-            id=uuid.uuid4().__str__(),
             name="detective",
-            conditions=[PipelineStepCondition(PipelineStepCondition.CONDITION_ABORT)],
+            on_success=[PipelineStepCondition(PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY)],
+            on_failure=[PipelineStepCondition(PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT)],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -128,8 +127,9 @@ class TestSnitchClient:
             )
         )
 
-        res = client._call_wasm(step=step, data=b'{"type": "streamdal@gmail.com"}')
+        res = client._call_wasm(step=step, data=b'{"type": "batchsh@gmail.com"}')
 
+        print("res: ", res)
         assert res is not None
         assert res.exit_code == 1
 
