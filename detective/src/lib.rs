@@ -1,6 +1,6 @@
 use protobuf::EnumOrUnknown;
 use protos::detective::DetectiveType;
-use protos::pipeline::{WASMExitCode, WASMRequest};
+use protos::wasm::{WASMExitCode, WASMRequest};
 use snitch_detective::detective::{Detective, Request};
 
 #[no_mangle]
