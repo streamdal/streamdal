@@ -11,7 +11,7 @@ class BusEvent$Type extends MessageType {
     constructor() {
         super("protos.BusEvent", [
             { no: 1, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => Command },
+            { no: 100, name: "command", kind: "message", oneof: "event", T: () => Command },
             { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
             { no: 102, name: "deregister_request", kind: "message", oneof: "event", T: () => DeregisterRequest },
             { no: 103, name: "heartbeat_request", kind: "message", oneof: "event", T: () => HeartbeatRequest },

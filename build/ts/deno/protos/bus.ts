@@ -20,11 +20,11 @@ export interface BusEvent {
      * @generated from protobuf oneof: event
      */
     event: {
-        oneofKind: "commandResponse";
+        oneofKind: "command";
         /**
-         * @generated from protobuf field: protos.Command command_response = 100;
+         * @generated from protobuf field: protos.Command command = 100;
          */
-        commandResponse: Command;
+        command: Command;
     } | {
         oneofKind: "registerRequest";
         /**
@@ -69,7 +69,7 @@ class BusEvent$Type extends MessageType<BusEvent> {
     constructor() {
         super("protos.BusEvent", [
             { no: 1, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 100, name: "command_response", kind: "message", oneof: "event", T: () => Command },
+            { no: 100, name: "command", kind: "message", oneof: "event", T: () => Command },
             { no: 101, name: "register_request", kind: "message", oneof: "event", T: () => RegisterRequest },
             { no: 102, name: "deregister_request", kind: "message", oneof: "event", T: () => DeregisterRequest },
             { no: 103, name: "heartbeat_request", kind: "message", oneof: "event", T: () => HeartbeatRequest },

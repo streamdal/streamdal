@@ -52,48 +52,48 @@ impl BusEvent {
         ::std::default::Default::default()
     }
 
-    // .protos.Command command_response = 100;
+    // .protos.Command command = 100;
 
-    pub fn command_response(&self) -> &super::command::Command {
+    pub fn command(&self) -> &super::command::Command {
         match self.event {
-            ::std::option::Option::Some(bus_event::Event::CommandResponse(ref v)) => v,
+            ::std::option::Option::Some(bus_event::Event::Command(ref v)) => v,
             _ => <super::command::Command as ::protobuf::Message>::default_instance(),
         }
     }
 
-    pub fn clear_command_response(&mut self) {
+    pub fn clear_command(&mut self) {
         self.event = ::std::option::Option::None;
     }
 
-    pub fn has_command_response(&self) -> bool {
+    pub fn has_command(&self) -> bool {
         match self.event {
-            ::std::option::Option::Some(bus_event::Event::CommandResponse(..)) => true,
+            ::std::option::Option::Some(bus_event::Event::Command(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_command_response(&mut self, v: super::command::Command) {
-        self.event = ::std::option::Option::Some(bus_event::Event::CommandResponse(v))
+    pub fn set_command(&mut self, v: super::command::Command) {
+        self.event = ::std::option::Option::Some(bus_event::Event::Command(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_command_response(&mut self) -> &mut super::command::Command {
-        if let ::std::option::Option::Some(bus_event::Event::CommandResponse(_)) = self.event {
+    pub fn mut_command(&mut self) -> &mut super::command::Command {
+        if let ::std::option::Option::Some(bus_event::Event::Command(_)) = self.event {
         } else {
-            self.event = ::std::option::Option::Some(bus_event::Event::CommandResponse(super::command::Command::new()));
+            self.event = ::std::option::Option::Some(bus_event::Event::Command(super::command::Command::new()));
         }
         match self.event {
-            ::std::option::Option::Some(bus_event::Event::CommandResponse(ref mut v)) => v,
+            ::std::option::Option::Some(bus_event::Event::Command(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_command_response(&mut self) -> super::command::Command {
-        if self.has_command_response() {
+    pub fn take_command(&mut self) -> super::command::Command {
+        if self.has_command() {
             match self.event.take() {
-                ::std::option::Option::Some(bus_event::Event::CommandResponse(v)) => v,
+                ::std::option::Option::Some(bus_event::Event::Command(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -257,11 +257,11 @@ impl BusEvent {
             |m: &mut BusEvent| { &mut m.source },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::command::Command>(
-            "command_response",
-            BusEvent::has_command_response,
-            BusEvent::command_response,
-            BusEvent::mut_command_response,
-            BusEvent::set_command_response,
+            "command",
+            BusEvent::has_command,
+            BusEvent::command,
+            BusEvent::mut_command,
+            BusEvent::set_command,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::internal::RegisterRequest>(
             "register_request",
@@ -312,7 +312,7 @@ impl ::protobuf::Message for BusEvent {
                     self.source = is.read_string()?;
                 },
                 802 => {
-                    self.event = ::std::option::Option::Some(bus_event::Event::CommandResponse(is.read_message()?));
+                    self.event = ::std::option::Option::Some(bus_event::Event::Command(is.read_message()?));
                 },
                 810 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::RegisterRequest(is.read_message()?));
@@ -361,7 +361,7 @@ impl ::protobuf::Message for BusEvent {
         };
         if let ::std::option::Option::Some(ref v) = self.event {
             match v {
-                &bus_event::Event::CommandResponse(ref v) => {
+                &bus_event::Event::Command(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -399,7 +399,7 @@ impl ::protobuf::Message for BusEvent {
         };
         if let ::std::option::Option::Some(ref v) = self.event {
             match v {
-                &bus_event::Event::CommandResponse(ref v) => {
+                &bus_event::Event::Command(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
                 },
                 &bus_event::Event::RegisterRequest(ref v) => {
@@ -469,8 +469,8 @@ pub mod bus_event {
     #[non_exhaustive]
     // @@protoc_insertion_point(oneof:protos.BusEvent.event)
     pub enum Event {
-        // @@protoc_insertion_point(oneof_field:protos.BusEvent.command_response)
-        CommandResponse(super::super::command::Command),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.command)
+        Command(super::super::command::Command),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.register_request)
         RegisterRequest(super::super::internal::RegisterRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.deregister_request)
@@ -498,35 +498,35 @@ pub mod bus_event {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\tbus.proto\x12\x06protos\x1a\rcommand.proto\x1a\x0einternal.proto\"\
-    \xbf\x03\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06source\
-    \x12<\n\x10command_response\x18d\x20\x01(\x0b2\x0f.protos.CommandH\0R\
-    \x0fcommandResponse\x12D\n\x10register_request\x18e\x20\x01(\x0b2\x17.pr\
-    otos.RegisterRequestH\0R\x0fregisterRequest\x12J\n\x12deregister_request\
-    \x18f\x20\x01(\x0b2\x19.protos.DeregisterRequestH\0R\x11deregisterReques\
-    t\x12G\n\x11heartbeat_request\x18g\x20\x01(\x0b2\x18.protos.HeartbeatReq\
-    uestH\0R\x10heartbeatRequest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\
-    \x1e.protos.BusEvent.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\
-    \x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\
-    \x20\x01(\tR\x05value:\x028\x01B\x07\n\x05eventB4Z2github.com/streamdal/\
-    snitch-protos/build/go/protosJ\xd6\x08\n\x06\x12\x04\0\0\x1f\x01\n\x08\n\
-    \x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\
-    \0\x12\x03\x04\0\x17\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\
-    \x12\x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\nQ\n\x02\x04\0\x12\x04\
-    \n\0\x1f\x01\x1aE\x20Type\x20used\x20by\x20`snitch-server`\x20for\x20sen\
-    ding\x20messages\x20on\x20its\x20local\x20bus.\n\n\n\n\x03\x04\0\x01\x12\
-    \x03\n\x08\x10\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\x05\
-    \x04\0\x02\0\x05\x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
-    \x0b\t\x0f\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0b\x12\x13\n\x0c\n\x04\
-    \x04\0\x08\0\x12\x04\r\x02\x12\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\r\
-    \x08\r\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0e\x04*\n\x0c\n\x05\x04\0\x02\
-    \x01\x06\x12\x03\x0e\x04\x12\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0e\
-    \x13#\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0e&)\n\x0b\n\x04\x04\0\x02\
-    \x02\x12\x03\x0f\x042\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x0f\x04\x1a\
-    \n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0f\x1b+\n\x0c\n\x05\x04\0\x02\
-    \x02\x03\x12\x03\x0f.1\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x10\x046\n\x0c\
-    \n\x05\x04\0\x02\x03\x06\x12\x03\x10\x04\x1c\n\x0c\n\x05\x04\0\x02\x03\
-    \x01\x12\x03\x10\x1d/\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1025\n\x0b\
-    \n\x04\x04\0\x02\x04\x12\x03\x11\x044\n\x0c\n\x05\x04\0\x02\x04\x06\x12\
+    \xae\x03\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06source\
+    \x12+\n\x07command\x18d\x20\x01(\x0b2\x0f.protos.CommandH\0R\x07command\
+    \x12D\n\x10register_request\x18e\x20\x01(\x0b2\x17.protos.RegisterReques\
+    tH\0R\x0fregisterRequest\x12J\n\x12deregister_request\x18f\x20\x01(\x0b2\
+    \x19.protos.DeregisterRequestH\0R\x11deregisterRequest\x12G\n\x11heartbe\
+    at_request\x18g\x20\x01(\x0b2\x18.protos.HeartbeatRequestH\0R\x10heartbe\
+    atRequest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\x1e.protos.BusEven\
+    t.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\
+    \x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\
+    \x028\x01B\x07\n\x05eventB4Z2github.com/streamdal/snitch-protos/build/go\
+    /protosJ\xd6\x08\n\x06\x12\x04\0\0\x1f\x01\n\x08\n\x01\x0c\x12\x03\0\0\
+    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x17\
+    \n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\x12\x03\x07\0I\n\t\
+    \n\x02\x08\x0b\x12\x03\x07\0I\nQ\n\x02\x04\0\x12\x04\n\0\x1f\x01\x1aE\
+    \x20Type\x20used\x20by\x20`snitch-server`\x20for\x20sending\x20messages\
+    \x20on\x20its\x20local\x20bus.\n\n\n\n\x03\x04\0\x01\x12\x03\n\x08\x10\n\
+    \x0b\n\x04\x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\x05\x04\0\x02\0\x05\
+    \x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0b\t\x0f\n\x0c\
+    \n\x05\x04\0\x02\0\x03\x12\x03\x0b\x12\x13\n\x0c\n\x04\x04\0\x08\0\x12\
+    \x04\r\x02\x12\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\r\x08\r\n\x0b\n\
+    \x04\x04\0\x02\x01\x12\x03\x0e\x04!\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
+    \x03\x0e\x04\x12\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0e\x13\x1a\n\x0c\
+    \n\x05\x04\0\x02\x01\x03\x12\x03\x0e\x1d\x20\n\x0b\n\x04\x04\0\x02\x02\
+    \x12\x03\x0f\x042\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x0f\x04\x1a\n\
+    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0f\x1b+\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03\x0f.1\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x10\x046\n\x0c\n\
+    \x05\x04\0\x02\x03\x06\x12\x03\x10\x04\x1c\n\x0c\n\x05\x04\0\x02\x03\x01\
+    \x12\x03\x10\x1d/\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1025\n\x0b\n\
+    \x04\x04\0\x02\x04\x12\x03\x11\x044\n\x0c\n\x05\x04\0\x02\x04\x06\x12\
     \x03\x11\x04\x1b\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x11\x1c-\n\x0c\n\
     \x05\x04\0\x02\x04\x03\x12\x03\x1103\n\xd4\x04\n\x04\x04\0\x02\x05\x12\
     \x03\x1e\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20is\x20stored\x20\

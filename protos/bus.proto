@@ -12,7 +12,7 @@ message BusEvent {
   string source = 1;
 
   oneof event {
-    protos.Command command_response = 100;
+    protos.Command command = 100;
     protos.RegisterRequest register_request = 101;
     protos.DeregisterRequest deregister_request = 102;
     protos.HeartbeatRequest heartbeat_request = 103;

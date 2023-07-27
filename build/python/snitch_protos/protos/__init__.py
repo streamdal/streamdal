@@ -308,7 +308,7 @@ class BusEvent(betterproto.Message):
     """Type used by `snitch-server` for sending messages on its local bus."""
 
     source: str = betterproto.string_field(1)
-    command_response: "Command" = betterproto.message_field(100, group="event")
+    command: "Command" = betterproto.message_field(100, group="event")
     register_request: "RegisterRequest" = betterproto.message_field(101, group="event")
     deregister_request: "DeregisterRequest" = betterproto.message_field(
         102, group="event"

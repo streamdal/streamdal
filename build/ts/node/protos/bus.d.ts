@@ -17,11 +17,11 @@ export interface BusEvent {
      * @generated from protobuf oneof: event
      */
     event: {
-        oneofKind: "commandResponse";
+        oneofKind: "command";
         /**
-         * @generated from protobuf field: protos.Command command_response = 100;
+         * @generated from protobuf field: protos.Command command = 100;
          */
-        commandResponse: Command;
+        command: Command;
     } | {
         oneofKind: "registerRequest";
         /**
