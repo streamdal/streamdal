@@ -11,7 +11,7 @@ jobs:
         with:
           toolchain: nightly
           override: true
-          #components: rustfmt, clippy
+          components: clippy
       - name: build
         run: |
           rustup target add wasm32-wasi
