@@ -29,6 +29,12 @@ type IBus interface {
 	BroadcastCommand(ctx context.Context, cmd *protos.Command) error
 	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
 	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
+	//BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
+	//BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
+	//BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
+	//BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
+	//BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
+	//BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 }
 
 type Bus struct {

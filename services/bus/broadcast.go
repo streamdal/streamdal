@@ -26,6 +26,8 @@ func (b *Bus) BroadcastDeregistration(ctx context.Context, req *protos.Deregiste
 	return b.broadcast(ctx, "deregistration", &protos.BusEvent{Event: &protos.BusEvent_DeregisterRequest{DeregisterRequest: req}})
 }
 
+func (b *Bus) Broadcast
+
 func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.BusEvent) error {
 	// Need to translate metadata from ctx -> metadata in event
 

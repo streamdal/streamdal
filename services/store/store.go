@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
@@ -83,12 +84,19 @@ const (
 	NATSHeartbeatBucketTTL  = time.Minute
 )
 
+var (
+	ErrPipelineNotFound = errors.New("pipeline not found")
+)
+
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
+	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
+	//DeletePipeline(ctx context.Context, pipelineId string) error
+	//UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 }
 
 type Store struct {
@@ -236,6 +244,10 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	// Not in cache, fetch from NATS
 	data, err := s.NATSBackend.Get(ctx, NATSPipelinesBucket, pipelineId)
 	if err != nil {
+		if err == nats.ErrKeyNotFound {
+			return nil, ErrPipelineNotFound
+		}
+
 		return nil, errors.Wrapf(err, "unable to fetch pipeline '%s' from NATS", pipelineId)
 	}
 
@@ -250,4 +262,25 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 
 	llog.Debugf("found pipeline '%s' in NATS", pipelineId)
 	return p2, nil
+}
+
+func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
+	if err := validate.Pipeline(pipeline); err != nil {
+		return errors.Wrap(err, "error validating pipeline")
+	}
+
+	// Save to cache
+	s.CacheBackend.Set(CachePipelinePrefix+":"+pipeline.Id, pipeline)
+
+	// Save to K/V
+	data, err := proto.Marshal(pipeline)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling protobuf")
+	}
+
+	if err := s.NATSBackend.Put(ctx, NATSPipelinesBucket, pipeline.Id, data); err != nil {
+		return errors.Wrap(err, "error writing to K/V")
+	}
+
+	return nil
 }

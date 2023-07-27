@@ -78,3 +78,13 @@ func NormalizeString(s string) string {
 	s = strings.ToLower(s)
 	return SpaceRegex.ReplaceAllString(s, "-")
 }
+
+func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string) *protos.StandardResponse {
+	reqId := CtxRequestId(ctx)
+
+	return &protos.StandardResponse{
+		Id:      reqId,
+		Code:    code,
+		Message: msg,
+	}
+}

@@ -2,10 +2,13 @@ package grpcapi
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
 
@@ -17,9 +20,7 @@ type ExternalServer struct {
 }
 
 func (g *GRPCAPI) newExternalServer() *ExternalServer {
-	return &ExternalServer{
-		GRPCAPI: *g,
-	}
+	return &ExternalServer{}
 }
 
 func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
@@ -64,14 +65,66 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 }
 
 func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.CreatePipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Create ID for pipeline
+	req.Pipeline.Id = util.GenerateUUID()
+
+	// We DO NOT need to broadcast this because the pipeline is brand new and not in use (yet)
+	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' created", req.Pipeline.Id),
+	}, nil
 }
 
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.UpdatePipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Is this a known pipeline?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.Pipeline.Id); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Pipeline exists, we need to broadcast the update because the pipeline
+	// MIGHT be actively used and if it was updated, the active pipeline needs
+	// to be updated as well
+
+	if err := s.Deps.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' updated", req.Pipeline.Id),
+	}, nil
 }
 
 func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeletePipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// TODO: Does this ID exist?
+
+	// We DO need to broadcast this because the pipeline MIGHT be actively used
+	// and now needs to be stopped and deleted.
+
+	// TODO: Broadcast pipeline delete command
+
 	panic("implement me")
 }
 
