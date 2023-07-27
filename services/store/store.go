@@ -40,17 +40,17 @@ On DELETE, it will delete from both in-memory cache and NATS k/V.
 
 ### Commands
 
-We need to store `CommandResponse.SetPipeline` commands. We need this in order
+We need to store `Command.SetPipeline` commands. We need this in order
 to be able to send pipelines to newly connected SDKs.
 
 * NATS:
 	* We store these commands as serialized protobuf in the `pipelines` bucket
-	* The 'key' is the `id` that can be found in `CommandResponse.SetPipeline`
-	* The value is the serialized protobuf of `CommandResponse.SetPipeline`
+	* The 'key' is the `id` that can be found in `Command.SetPipeline`
+	* The value is the serialized protobuf of `Command.SetPipeline`
 * Cache:
 	* Commands are stored in key "pipeline:$id" where $id is the `id` in
 	  `SetPipeline` protobuf.
-	* Value is deserialized protobuf of `CommandResponse.SetPipeline`
+	* Value is deserialized protobuf of `Command.SetPipeline`
 
 ### Heartbeats
 

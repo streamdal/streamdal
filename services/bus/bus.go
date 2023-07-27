@@ -26,7 +26,7 @@ const (
 type IBus interface {
 	RunConsumer() error
 	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
-	BroadcastCommand(ctx context.Context, cmd *protos.CommandResponse) error
+	BroadcastCommand(ctx context.Context, cmd *protos.Command) error
 	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
 	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 }
@@ -143,9 +143,11 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	}
 
 	llog = llog.WithFields(logrus.Fields{
-		"request_id": busEvent.RequestId,
-		"source":     busEvent.Source,
+		"metadata": busEvent.XMetadata,
+		"source":   busEvent.Source,
 	})
+
+	llog.Debug("received message successfully unmarshalled and validated; passing to handler")
 
 	var err error
 
@@ -154,8 +156,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handleDeregisterRequestBusEvent(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_RegisterRequest:
 		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
-	case *protos.BusEvent_CommandResponse:
-		err = b.handleCommandResponseBusEvent(shutdownCtx, busEvent.GetCommandResponse())
+	case *protos.BusEvent_Command:
+		err = b.handleCommandBusEvent(shutdownCtx, busEvent.GetCommand())
 	case *protos.BusEvent_HeartbeatRequest:
 		err = b.handleHeartbeatRequestBusEvent(shutdownCtx, busEvent.GetHeartbeatRequest())
 	default:

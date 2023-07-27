@@ -14,56 +14,48 @@ type ExternalServer struct {
 }
 
 func (g *GRPCAPI) newExternalServer() *ExternalServer {
-	return &ExternalServer{}
+	return &ExternalServer{
+		GRPCAPI: *g,
+	}
 }
 
-func (s *ExternalServer) GetServices(ctx context.Context, req *protos.GetServicesRequest) (*protos.GetServicesResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) GetServiceMap(context.Context, *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetService(ctx context.Context, req *protos.GetServiceRequest) (*protos.GetServiceResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) GetPipelines(context.Context, *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) GetPipeline(context.Context, *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) CreatePipeline(context.Context, *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) SetPipeline(ctx context.Context, req *protos.SetPipelineRequest) (*protos.SetPipelineResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) UpdatePipeline(context.Context, *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.DeletePipelineResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) DeletePipeline(context.Context, *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) GetSteps(ctx context.Context, req *protos.GetStepsRequest) (*protos.GetStepsResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) AttachPipeline(context.Context, *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) CreateStep(ctx context.Context, req *protos.CreateStepRequest) (*protos.CreateStepResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) DetachPipeline(context.Context, *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) UpdateStep(ctx context.Context, req *protos.UpdateStepRequest) (*protos.UpdateStepResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) PausePipeline(context.Context, *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 
-func (s *ExternalServer) DeleteStep(ctx context.Context, req *protos.DeleteStepRequest) (*protos.DeleteStepResponse, error) {
-	//TODO implement me
+func (s *ExternalServer) ResumePipeline(context.Context, *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
 	panic("implement me")
 }
 

@@ -65,7 +65,7 @@ func DeregisterRequest(req *protos.DeregisterRequest) error {
 	return nil
 }
 
-func CommandResponse(req *protos.CommandResponse) error {
+func Command(req *protos.Command) error {
 	if req == nil {
 		return ErrNilRequest
 	}
@@ -90,11 +90,15 @@ func SetPipelineCommand(req *protos.SetPipelineCommand) error {
 		return ErrNilRequest
 	}
 
-	if req.Name == "" {
+	if req.Pipeline == nil {
+		return errors.New(".Pipeline cannot be nil")
+	}
+
+	if req.Pipeline.Name == "" {
 		return ErrEmptyField("Name")
 	}
 
-	if len(req.Steps) == 0 {
+	if len(req.Pipeline.Steps) == 0 {
 		return errors.New("must have at least one step in pipeline")
 	}
 

@@ -14,8 +14,8 @@ func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterReq
 	return b.broadcast(ctx, "register", &protos.BusEvent{Event: &protos.BusEvent_RegisterRequest{RegisterRequest: req}})
 }
 
-func (b *Bus) BroadcastCommand(ctx context.Context, req *protos.CommandResponse) error {
-	return b.broadcast(ctx, "command", &protos.BusEvent{Event: &protos.BusEvent_CommandResponse{CommandResponse: req}})
+func (b *Bus) BroadcastCommand(ctx context.Context, req *protos.Command) error {
+	return b.broadcast(ctx, "command", &protos.BusEvent{Event: &protos.BusEvent_Command{Command: req}})
 }
 
 func (b *Bus) BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
@@ -27,10 +27,12 @@ func (b *Bus) BroadcastDeregistration(ctx context.Context, req *protos.Deregiste
 }
 
 func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.BusEvent) error {
-	event.RequestId = util.CtxRequestId(ctx)
+	// Need to translate metadata from ctx -> metadata in event
+
+	event.XMetadata = util.CtxMetadata(ctx)
 	event.Source = b.options.NodeName
 
-	b.log.Debugf("broadcasting event '%v' for request id '%s'", eventType, event.RequestId)
+	b.log.Debugf("broadcasting event '%v' metadata: '%+v", eventType, event.XMetadata)
 
 	data, err := proto.Marshal(event)
 	if err != nil {

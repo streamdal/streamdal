@@ -29,7 +29,7 @@ type customCheck struct{}
 type Dependencies struct {
 	Config *config.Config
 
-	CommandChannel chan *protos.CommandResponse
+	CommandChannel chan *protos.Command
 
 	// Backends
 	CacheBackend cache.ICache
@@ -58,7 +58,7 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		Health:          gohealth,
 		ShutdownContext: ctx,
 		ShutdownCancel:  cancel,
-		CommandChannel:  make(chan *protos.CommandResponse),
+		CommandChannel:  make(chan *protos.Command),
 	}
 
 	if err := d.setupHealthChecks(); err != nil {

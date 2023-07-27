@@ -52,24 +52,24 @@ func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.D
 	return nil
 }
 
-func (b *Bus) handleCommandResponseBusEvent(ctx context.Context, req *protos.CommandResponse) error {
+func (b *Bus) handleCommandBusEvent(ctx context.Context, req *protos.Command) error {
 	b.log.Debugf("handling comand response bus event: %v", req)
 
-	if err := validate.CommandResponse(req); err != nil {
+	if err := validate.Command(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
 
 	var err error
 
 	switch req.Command.(type) {
-	case *protos.CommandResponse_SetPipeline:
-		err = b.handleSetPipelineCommandResponse(ctx, req.GetSetPipeline())
-	case *protos.CommandResponse_DeletePipeline:
-		err = b.handleDeletePipelineCommandResponse(ctx, req.GetDeletePipeline())
-	case *protos.CommandResponse_PausePipeline:
-		err = b.handlePausePipelineCommandResponse(ctx, req.GetPausePipeline())
-	case *protos.CommandResponse_UnpausePipeline:
-		err = b.handleUnpausePipelineCommandResponse(ctx, req.GetUnpausePipeline())
+	case *protos.Command_SetPipeline:
+		err = b.handleSetPipelineCommand(ctx, req.GetSetPipeline())
+	case *protos.Command_DeletePipeline:
+		err = b.handleDeletePipelineCommand(ctx, req.GetDeletePipeline())
+	case *protos.Command_PausePipeline:
+		err = b.handlePausePipelineCommand(ctx, req.GetPausePipeline())
+	case *protos.Command_UnpausePipeline:
+		err = b.handleUnpausePipelineCommand(ctx, req.GetUnpausePipeline())
 	default:
 		return fmt.Errorf("unknown command type '%v'", req.Command)
 	}
@@ -81,7 +81,7 @@ func (b *Bus) handleCommandResponseBusEvent(ctx context.Context, req *protos.Com
 	return nil
 }
 
-func (b *Bus) handleSetPipelineCommandResponse(ctx context.Context, req *protos.SetPipelineCommand) error {
+func (b *Bus) handleSetPipelineCommand(ctx context.Context, req *protos.SetPipelineCommand) error {
 	if err := validate.SetPipelineCommand(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
@@ -89,7 +89,7 @@ func (b *Bus) handleSetPipelineCommandResponse(ctx context.Context, req *protos.
 	return nil
 }
 
-func (b *Bus) handleDeletePipelineCommandResponse(ctx context.Context, req *protos.DeletePipelineCommand) error {
+func (b *Bus) handleDeletePipelineCommand(ctx context.Context, req *protos.DeletePipelineCommand) error {
 	if err := validate.DeletePipelineCommand(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
@@ -97,7 +97,7 @@ func (b *Bus) handleDeletePipelineCommandResponse(ctx context.Context, req *prot
 	return nil
 }
 
-func (b *Bus) handlePausePipelineCommandResponse(ctx context.Context, req *protos.PausePipelineCommand) error {
+func (b *Bus) handlePausePipelineCommand(ctx context.Context, req *protos.PausePipelineCommand) error {
 	if err := validate.PausePipelineCommand(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
@@ -105,7 +105,7 @@ func (b *Bus) handlePausePipelineCommandResponse(ctx context.Context, req *proto
 	return nil
 }
 
-func (b *Bus) handleUnpausePipelineCommandResponse(ctx context.Context, req *protos.UnpausePipelineCommand) error {
+func (b *Bus) handleUnpausePipelineCommand(ctx context.Context, req *protos.UnpausePipelineCommand) error {
 	if err := validate.UnpausePipelineCommand(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}

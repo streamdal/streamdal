@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.18.1
-// source: internal_api.proto
+// source: internal.proto
 
 package protos
 
@@ -62,7 +62,7 @@ func (c *internalClient) Register(ctx context.Context, in *RegisterRequest, opts
 }
 
 type Internal_RegisterClient interface {
-	Recv() (*CommandResponse, error)
+	Recv() (*Command, error)
 	grpc.ClientStream
 }
 
@@ -70,8 +70,8 @@ type internalRegisterClient struct {
 	grpc.ClientStream
 }
 
-func (x *internalRegisterClient) Recv() (*CommandResponse, error) {
-	m := new(CommandResponse)
+func (x *internalRegisterClient) Recv() (*Command, error) {
+	m := new(Command)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func _Internal_Register_Handler(srv interface{}, stream grpc.ServerStream) error
 }
 
 type Internal_RegisterServer interface {
-	Send(*CommandResponse) error
+	Send(*Command) error
 	grpc.ServerStream
 }
 
@@ -172,7 +172,7 @@ type internalRegisterServer struct {
 	grpc.ServerStream
 }
 
-func (x *internalRegisterServer) Send(m *CommandResponse) error {
+func (x *internalRegisterServer) Send(m *Command) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -257,5 +257,5 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "internal_api.proto",
+	Metadata: "internal.proto",
 }

@@ -28,6 +28,27 @@ func GenerateUUID() string {
 	return v.String()
 }
 
+// CtxMetadata will return a map[string]string of the metadata in the given context (if md exists).
+// NOTE: Will use only first value in metadata value slice.
+func CtxMetadata(ctx context.Context) map[string]string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return map[string]string{}
+	}
+
+	m := map[string]string{}
+
+	for k, v := range md {
+		if len(v) < 1 {
+			continue
+		}
+
+		m[k] = v[0]
+	}
+
+	return m
+}
+
 func CtxStringValue(ctx context.Context, key string) string {
 	if ctx == nil {
 		return ""
