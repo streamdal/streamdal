@@ -96,7 +96,7 @@ export const processPipelines = async ({
 
   return {
     ...pipelineStatus,
-    error: !finalStatus?.error,
+    error: !!finalStatus?.error,
     message: finalStatus?.message || "Success",
   };
 };
