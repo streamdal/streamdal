@@ -45,7 +45,7 @@ export interface RuleSetType {
 
 export const RuleSets = ({ data }: { data: RuleSetType }) => {
   return (
-    <div className="max-w-[1440px]">
+    <div className="max-w-[1440px] mx-8 my-6">
       <div className="flex flex-row justify-between align-middle pb-4 mb-4 font-bold text-lg leading-5 border-b">
         <div className="flex flex-row justify-start">
           <MonitorIcon className="mr-2 w-[14px]" />
