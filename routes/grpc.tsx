@@ -1,5 +1,5 @@
 import { Layout } from "../components/layout.tsx";
-import { ExternalClient } from "snitch-protos/protos/external_api.client.ts";
+import { ExternalClient } from "snitch-protos/protos/external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import { getEnv } from "../lib/utils.ts";
 
@@ -8,12 +8,16 @@ const transport = new GrpcWebFetchTransport({
   format: "binary",
 });
 
-const client = new ExternalClient(transport);
+export const client = new ExternalClient(transport);
 
 try {
-  const { response } = await client.test({ input: "hello world" }, {
+  // const { response } = await client.test({ input: "hello world" }, {
+  //   meta: { "auth-token": "1234" },
+  // });
+  const { response } = await client.getServiceMap({}, {
     meta: { "auth-token": "1234" },
   });
+
   console.log("test response:", response);
 } catch (error) {
   console.log("error", error);
