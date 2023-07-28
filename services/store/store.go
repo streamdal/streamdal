@@ -265,7 +265,7 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 }
 
 func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
-	if err := validate.Pipeline(pipeline); err != nil {
+	if err := validate.Pipeline(pipeline, false); err != nil {
 		return errors.Wrap(err, "error validating pipeline")
 	}
 
