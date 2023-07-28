@@ -116,14 +116,15 @@ class Metrics:
         self.workers = []
 
         for i in range(WORKER_POOL_SIZE):
-            worker = Thread(target=self.run_counter_worker_pool, args=(i+1,), daemon=False)
-            worker.start()
-            self.workers.append(worker)
+            incr_worker = Thread(target=self.run_incrementer_worker, args=(i+1,), daemon=False)
+            incr_worker.start()
+            self.workers.append(incr_worker)
 
-        # Run counter incrementer. We use no blocking queue when increasing counters and then
-        # this background thread does the actual incrementing. This is to avoid blocking the caller of incr()
-        incr = Thread(target=self.run_incrementer, daemon=False)
-        incr.start()
+            # Run counter incrementer. We use no blocking queue when increasing counters and then
+            # this background thread does the actual incrementing. This is to avoid blocking the caller of incr()
+            publish_worker = Thread(target=self.run_publisher_worker, args=(i+1,), daemon=False)
+            publish_worker.start()
+            self.workers.append(publish_worker)
 
         # Run counter reaper, this cleans up old empty counters to prevent memory leaks
         reaper = Thread(target=self.run_reaper, daemon=False)
@@ -137,10 +138,8 @@ class Metrics:
         for worker in self.workers:
             worker.join()
 
-        incr.join()
         reaper.join()
         publisher.join()
-        print("after join")
 
     def get_counter(self, entry: CounterEntry) -> Counter:
         id = composite_id(entry)
@@ -183,8 +182,8 @@ class Metrics:
         loop.run_until_complete(call(req))
         self.log.debug("Published metrics: {}".format(req))
 
-    def run_counter_worker_pool(self, id: int) -> None:
-        """Counter worker pool is responsible for listening to incr() requests and flush requests"""
+    def run_publisher_worker(self, id: int) -> None:
+        """Counter worker pool is responsible for listening to incr() requests and publish queue """
         self.log.debug("Starting counter worker {}".format(id))
         while not self.exit.is_set():
             self.exit.wait(1)
@@ -257,8 +256,11 @@ class Metrics:
 
         self.log.debug("Exiting reaper")
 
-    def run_incrementer(self) -> None:
-        self.log.debug("Starting incrementer")
+    def run_incrementer_worker(self, id: int) -> None:
+        """
+        Incrementer is a background task that listens to incr() requests sent to incr_queue and increments counters
+        """
+        self.log.debug("Starting incrementer {}".format(id))
 
         while not self.exit.is_set():
             try:
@@ -274,4 +276,4 @@ class Metrics:
             else:
                 counter.incr(entry.value)
 
-        self.log.info("Exiting incrementer")
+        self.log.info("Exiting incrementer {}".format(id))
