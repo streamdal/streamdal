@@ -111,7 +111,8 @@ const nodeTypes = {
     service: Service,
     participants: Participants,
 };
-export default function Flow() {
+export default function Flow(props: any) {
+    console.log("these here be the props", props)
     const [nodes, , onNodesChange] = useNodesState(initialNodes);
 
     return (
