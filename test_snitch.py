@@ -114,26 +114,26 @@ class TestSnitchClient:
 
         step = PipelineStep(
             name="detective",
-            on_success=[PipelineStepCondition(PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY)],
+            on_success=[],
             on_failure=[PipelineStepCondition(PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT)],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
             detective=DetectiveStep(
-                path="type",
+                path="object.field",
                 args=["streamdal"],
                 negate=False,
                 type=DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
             )
         )
 
-        res = client._call_wasm(step=step, data=b'{"type": "batchsh@gmail.com"}')
+        res = client._call_wasm(step=step, data=b'{"object":  {"field": "streamdal@gmail.com"}}')
 
-        print("res: ", res)
         assert res is not None
         assert res.exit_code == 1
+        assert res.output == b'{"object":  {"field": "streamdal@gmail.com"}}'
 
-        res2 = client._call_wasm(step=step, data=b'{"type": "batchsh@gmail.com"}')
+        res2 = client._call_wasm(step=step, data=b'{"object":  {"field": "mark@gmail.com"}}')
 
         assert res2 is not None
         assert res2.exit_code == 2

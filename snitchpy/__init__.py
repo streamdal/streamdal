@@ -4,6 +4,7 @@ import os
 import platform
 import snitch_protos.protos as protos
 import socket
+import signal
 from .exceptions import SnitchException, SnitchRegisterException
 from copy import copy
 from dataclasses import dataclass
@@ -24,6 +25,9 @@ MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 megabyte
 
 MODE_CONSUMER = 1
 MODE_PRODUCER = 2
+
+CLIENT_TYPE_SDK = 1
+CLIENT_TYPE_SHIM = 2
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,7 @@ class SnitchConfig:
     step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", 1/100)
     service_name: str = os.getenv("SNITCH_SERVICE_NAME", socket.getfqdn())
     dry_run: bool = os.getenv("SNITCH_DRY_RUN", False)
+    client_type: int = CLIENT_TYPE_SDK
 
 
 class SnitchClient:
@@ -82,7 +87,10 @@ class SnitchClient:
         self.metrics = Metrics(stub=self.stub, log=self.log)
         self.functions = {}
 
-        self.exit = True
+        self.exit = False
+
+        signal.signal(signal.SIGINT, self.shutdown)
+        signal.signal(signal.SIGTERM, self.shutdown)
 
         # Run register
         register = Thread(target=self._register)
@@ -160,7 +168,7 @@ class SnitchClient:
     def _notify_condition(self, step: protos.PipelineStep, resp: protos.WasmResponse):
         async def call():
             req = protos.NotifyRequest()
-            req.rule_id = step.id # ????
+            req.rule_id = step.id  # TODO: ????
             req.audience = None
             req.metadata = {}
             req.rule_name = ""
@@ -197,7 +205,7 @@ class SnitchClient:
         self.log.debug("Closing gRPC connection")
         self.channel.close()
 
-    def shutdown(self):
+    def shutdown(self, *args):
         self.exit = True
 
     def _heartbeat(self):
@@ -219,23 +227,20 @@ class SnitchClient:
         async def call():
             self.log.debug("Registering with snitch server")
 
-            # string library_name = 2;
-            # string library_version = 3;
-            # string language = 4;
-            # string arch = 5;
-            # string os = 6;
-
-            library_name = "snitchpy"
-            library_version = "0.0.1"  # TODO: how to inject via github CI?
-            language = "python"
-            sys_arch = platform.processor()
-            sys_os = platform.system()
-
             req = protos.RegisterRequest()
             req.dry_run = self.cfg.dry_run
             req.service_name = self.cfg.service_name
+            req.client_info = protos.ClientInfo(
+                client_type=protos.ClientType(self.cfg.client_type),  # TODO: this needs to be passed in config
+                library_name="snitch-python-client",
+                library_version="0.0.1",  # TODO: how to inject via github CI?
+                language="python",
+                arch=platform.processor(),
+                os=platform.system()
+            )
 
             async for r in self.stub.register(req, timeout=self.grpc_timeout, metadata=self._get_metadata()):
+                print("Received command: ", r)
                 if r.keep_alive is not None:
                     self.log.debug("Received keep alive")  # TODO: remove logging after testing
                     pass
@@ -256,6 +261,7 @@ class SnitchClient:
             self.loop.run_until_complete(call())
             self.log.debug("Register looper completed, closing connection")
         except Exception as e:
+            self.channel.close()
             raise SnitchRegisterException("Failed to register: {}".format(e))
 
     @staticmethod
@@ -409,8 +415,6 @@ class SnitchClient:
 
             response_bytes = self._exec_wasm(req)
 
-            print(response_bytes)
-
             # Unmarshal WASM response
             return protos.WasmResponse().parse(response_bytes)
         except Exception as e:
@@ -454,23 +458,22 @@ class SnitchClient:
         except Exception as e:
             raise SnitchException("Failed to instantiate function: {}".format(e))
 
+        req = copy(req)
         req.step.wasm_bytes = None  # Don't need to write this
 
         data = bytes(req)
 
         # Get memory from module
         memory = instance.exports(store)["memory"]
-        memory.grow(store, 14)  # Set memory limit to 1MB
+        #memory.grow(store, 14)  # Set memory limit to 1MB
 
         # Get alloc() from module
         alloc = instance.exports(store)["alloc"]
         # Allocate enough memory for the length of the data and receive memory pointer
-        start_ptr = alloc(store, len(data))
+        start_ptr = alloc(store, len(data)+64)
 
         # Write to memory starting at pointer returned bys alloc()
         memory.write(store, data, start_ptr)
-
-        print("start_ptr: ", start_ptr)
 
         # Execute the function
         f = instance.exports(store)[req.step.wasm_function]
