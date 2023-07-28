@@ -8,12 +8,13 @@ const transport = new GrpcWebFetchTransport({
   format: "binary",
 });
 
-const client = new ExternalClient(transport);
+export const client = new ExternalClient(transport);
 
 try {
-  const { response } = await client.test({ input: "hello world" }, {
+  const { response } = await client.getServiceMap({}, {
     meta: { "auth-token": "1234" },
   });
+  
   console.log("test response:", response);
 } catch (error) {
   console.log("error", error);
