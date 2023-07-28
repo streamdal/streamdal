@@ -89,7 +89,7 @@ export const Participants = ({data}) => {
                     id="dragHandle"
                 />
                 <img src={"/images/placeholder-icon.png"} className="w-[30px]"/>
-                <a href={"/flow/info"}>
+                <a href={`/flow/${data.label}`}>
                     <div className={"flex flex-col"}>
                         <h2 className={"text-[16px]"}>
                             Item Name

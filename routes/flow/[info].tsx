@@ -10,10 +10,10 @@ import {PageProps} from "$fresh/src/server/types.ts";
 // 
 
 export default function FlowRoute(props: PageProps) {
-    console.log(props)
+    // console.log(props)
     return (
         <Layout>
-            <InfoModal/>
+            <InfoModal name={props}/>
             <ReactFlowProvider>
                 <Flow/>
             </ReactFlowProvider>
