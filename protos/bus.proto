@@ -3,8 +3,8 @@ syntax = "proto3";
 package protos;
 
 import "command.proto";
-import "internal.proto";
 import "external.proto";
+import "internal.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
@@ -12,8 +12,12 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 message BusEvent {
   string source = 1;
 
-  // This _should_ contain request messages - each node can determine how to
-  // interpret and handle the message.
+  // This _should_ contain request messages - each snitch-server can determine
+  // how to interpret and handle the message.
+  //
+  // NOTE: The bus _should not_ be used for transmitting commands to SDKs. The
+  // consumer in each SDK should receive a request and potentially craft a new
+  // command to send to the appropriate SDK(s).
   oneof event {
     protos.RegisterRequest register_request = 100;
     protos.DeregisterRequest deregister_request = 101;
