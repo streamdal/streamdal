@@ -7,6 +7,7 @@ import {
   IInternalClient,
   InternalClient,
 } from "@streamdal/snitch-protos/protos/internal.client.js";
+import { METRIC_INTERVAL, sendMetrics } from "./metrics.js";
 
 const transport = new GrpcTransport({
   host: process.env.SNITCH_URL || "localhost:9091",
@@ -17,9 +18,14 @@ export const grpcClient: IInternalClient = new InternalClient(transport);
 
 const start = () => {
   void register();
+
   setInterval(() => {
     void heartbeat();
   }, HEARTBEAT_INTERVAL);
+
+  setInterval(() => {
+    void sendMetrics();
+  }, METRIC_INTERVAL);
 };
 
 export const close = () => {

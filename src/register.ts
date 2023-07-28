@@ -1,7 +1,6 @@
 import { grpcClient } from "./index.js";
 import { processResponse } from "./pipeline.js";
 import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
-import { version } from "../package.json";
 
 export const serviceName = "snitch-node-client";
 
@@ -16,7 +15,7 @@ export const register = async () => {
         clientInfo: {
           clientType: ClientType.SDK,
           libraryName: "snitch-node-client",
-          libraryVersion: version,
+          libraryVersion: "1234",
           language: "Typescript",
           arch: process.arch,
           os: process.platform,

@@ -12,6 +12,7 @@ import {
   PipelineStepCondition,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
+import { lock, metrics } from "./metrics.js";
 
 export interface SnitchRequest {
   audience: Audience;
@@ -124,6 +125,22 @@ export const resultCondition = (
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
+export const stepMetrics = async (stepStatus: StepStatus) => {
+  lock.writeLock((release) => {
+    metrics.push({
+      name: "Rule run",
+      value: 1,
+      labels: {
+        pipeLineId: stepStatus.pipelineId,
+        stepName: stepStatus.stepName,
+        result: stepStatus.error ? "failure" : "success",
+      },
+    });
+    release();
+  });
+};
+
 export const runStep = async ({
   step,
   pipeline,
@@ -163,6 +180,8 @@ export const runStep = async ({
     stepStatus.error ? step.onFailure : step.onSuccess,
     stepStatus
   );
+
+  void stepMetrics(stepStatus);
 
   return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };
 };

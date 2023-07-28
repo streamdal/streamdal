@@ -1,8 +1,4 @@
 import {
-  WASMRequest,
-  WASMResponse,
-} from "@streamdal/snitch-protos/protos/pipeline.js";
-import {
   TransformStep,
   TransformType,
 } from "@streamdal/snitch-protos/protos/steps/transform.js";
@@ -10,6 +6,11 @@ import * as fs from "fs";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 import { readResponse } from "./wasm.js";
+import {
+  WASMRequest,
+  WASMResponse,
+} from "@streamdal/snitch-protos/protos/wasm.js";
+import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/pipeline.js";
 
 const wasi = new WASI({
   preopens: {
@@ -58,9 +59,9 @@ export const testDetective = async () => {
   const input = new TextEncoder().encode(JSON.stringify(example));
   const request = WASMRequest.create({
     step: {
-      id: "some-id",
       name: "some-name",
-      conditions: undefined,
+      onSuccess: [PipelineStepCondition.NOTIFY],
+      onFailure: [PipelineStepCondition.NOTIFY],
       WasmId: "some-wasm",
       WasmBytes: new TextEncoder().encode(JSON.stringify("bytes")),
       WasmFunction: "some-func",

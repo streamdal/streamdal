@@ -41,7 +41,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-console": ["error", { "allow": ["warn", "error", "info", "log", "dir"] }],
+    "no-console": ["error", { "allow": ["warn", "error", "info", "log", "dir", "debug"] }],
     "@typescript-eslint/ban-types": [
       "error",
       {
