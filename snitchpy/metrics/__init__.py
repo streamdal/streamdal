@@ -1,11 +1,11 @@
 import time
 from dataclasses import dataclass
 import snitch_protos.protos as protos
-from threading import Lock
-from multiprocessing import Process, set_start_method
-from queue import SimpleQueue
+from threading import Thread, Lock, Event
+from queue import SimpleQueue, Empty
 import asyncio
 import logging
+import signal
 from datetime import datetime
 from copy import deepcopy
 
@@ -84,6 +84,8 @@ def composite_id(entry: CounterEntry) -> str:
 class Metrics:
     """Class Metrics is used to manage counter metrics, and ship them to Snitch server asynchronously"""
 
+    log: logging.Logger
+    exit: Event
     counters: dict[str:Counter] = {}
     stub: protos.InternalStub = None
     lock: Lock
@@ -91,36 +93,54 @@ class Metrics:
     incr_queue: SimpleQueue = SimpleQueue()
 
     def __init__(self, **kwargs):
+        log = kwargs.get("log", logging.getLogger("snitch-client"))
+        logging.basicConfig()
+        log.setLevel(logging.DEBUG)
+
         self.stub = kwargs.get("stub")
-        self.log = kwargs.get("log", logging.getLogger("snitch-client"))
+        self.log = log
         self.lock = Lock()
 
-        try:
-            self.__start()
-        except KeyboardInterrupt:
-            self.shutdown()
+        # TODO: remove after testing
+        if kwargs.get("exit") is None:
+            self.exit = Event()
+            events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
+            for e in events:
+                signal.signal(e, self.shutdown)
+
+        self.__start()
 
     def __start(self):
         """Start the background tasks that manage counters and publish metrics"""
 
-        self.workers = {int: Process}
-        set_start_method('fork')
+        self.workers = []
 
         for i in range(WORKER_POOL_SIZE):
-            worker = Process(target=self.run_counter_worker_pool, args=(i+1,), daemon=False)
+            worker = Thread(target=self.run_counter_worker_pool, args=(i+1,), daemon=False)
             worker.start()
-            self.workers[i] = worker
+            self.workers.append(worker)
 
         # Run counter incrementer. We use no blocking queue when increasing counters and then
         # this background thread does the actual incrementing. This is to avoid blocking the caller of incr()
-        Process(target=self.run_incrementer, daemon=False).start()
+        incr = Thread(target=self.run_incrementer, daemon=False)
+        incr.start()
 
         # Run counter reaper, this cleans up old empty counters to prevent memory leaks
-        Process(target=self.run_reaper, daemon=False).start()
+        reaper = Thread(target=self.run_reaper, daemon=False)
+        reaper.start()
 
         # Run counter publisher. This reads values from counters,
         # adds them to the publish queue and then resets the counter.
-        Process(target=self.run_publisher, daemon=False).start()
+        publisher = Thread(target=self.run_publisher, daemon=False)
+        publisher.start()
+
+        for worker in self.workers:
+            worker.join()
+
+        incr.join()
+        reaper.join()
+        publisher.join()
+        print("after join")
 
     def get_counter(self, entry: CounterEntry) -> Counter:
         id = composite_id(entry)
@@ -142,12 +162,11 @@ class Metrics:
         # DODO: validate
         self.incr_queue.put_nowait(entry)
 
-    def shutdown(self) -> None:
+    def shutdown(self, *args) -> None:
         """Shutdown the metrics service, pushing all in-memory data before we allow exit"""
         self.log.debug("Shutting down metrics service")
-        for i in range(WORKER_POOL_SIZE+1):
-            self.workers[i].terminate()
         # TODO: flush before we exit the metrics service
+        self.exit.set()
         pass
 
     def publish_metrics(self, entry: CounterEntry) -> None:
@@ -166,17 +185,22 @@ class Metrics:
 
     def run_counter_worker_pool(self, id: int) -> None:
         """Counter worker pool is responsible for listening to incr() requests and flush requests"""
-        while True:
+        self.log.debug("Starting counter worker {}".format(id))
+        while not self.exit.is_set():
+            self.exit.wait(1)
+
             # Get entry from the queue. This is blocking to avoid having to handle queue.Empty exceptions
             try:
-                entry = self.publish_queue.get(block=True)
-            except KeyboardInterrupt:
-                return
+                entry = self.publish_queue.get(block=False)
+            except Empty:
+                continue
 
             try:
                 self.publish_metrics(entry)
             except Exception as e:
                 self.log.error("Failed to publish metrics: {}".format(e))
+
+        self.log.debug("Exiting counter worker {}".format(id))
 
     def remove_counter(self, id: str) -> None:
         """Remove a counter from the internal map"""
@@ -189,30 +213,35 @@ class Metrics:
         Counter ticker is a background task that reads values from counters,
         adds them to the publish queue, and then resets the counter's value to zero.
         """
-        for id, counter in self.counters:
-            # We don't need to publish empty counters
-            # run_reaper() will clean these up if they remain zero for a while
-            if counter.val() > 0:
-                continue
+        self.log.debug("Starting publisher")
+        while not self.exit.is_set():
+            self.exit.wait(1)
 
-            # Ensure a fresh copy of the CounterEntry
-            entry = deepcopy(counter.entry)
-            entry.value = counter.val()
+            for id, counter in self.counters:
 
-            # Reset counter's value to 0
-            counter.reset()
+                # We don't need to publish empty counters
+                # run_reaper() will clean these up if they remain zero for a while
+                if counter.val() > 0:
+                    continue
 
-            # Put in the publish queue for a publisher worker to pick up
-            self.publish_queue.put_nowait(entry)
+                # Ensure a fresh copy of the CounterEntry
+                entry = deepcopy(counter.entry)
+                entry.value = counter.val()
 
-    def run_reaper(self) -> None:
+                # Reset counter's value to 0
+                counter.reset()
+
+                # Put in the publish queue for a publisher worker to pick up
+                self.publish_queue.put_nowait(entry)
+
+        self.log.debug("Exiting publisher")
+
+    def run_reaper(self):
         """Reaper is a background task that prunes old counters from the internal map"""
-        while True:
+        self.log.debug("Starting reaper")
+        while not self.exit.is_set():
             # Sleep on startup and then and between each loop run
-            try:
-                time.sleep(DEFAULT_COUNTER_REAPER_INTERVAL)
-            except KeyboardInterrupt:
-                return
+            self.exit.wait(DEFAULT_COUNTER_REAPER_INTERVAL)
 
             # Get all counters
             # Loop over each counter, get the value,
@@ -226,13 +255,17 @@ class Metrics:
                     self.remove_counter(id)
                     self.log.debug("reaped stale counter '{}'".format(id))
 
+        self.log.debug("Exiting reaper")
+
     def run_incrementer(self) -> None:
-        while True:
-            # Blocking to avoid having to handle queue.Empty exceptions
+        self.log.debug("Starting incrementer")
+
+        while not self.exit.is_set():
             try:
-                entry = self.incr_queue.get(block=True)
-            except KeyboardInterrupt:
-                return
+                entry = self.incr_queue.get(block=False)
+            except Empty:
+                self.exit.wait(1)
+                continue
 
             counter = self.get_counter(entry)
             if counter is None:
@@ -240,3 +273,5 @@ class Metrics:
                 counter.incr(entry.value)
             else:
                 counter.incr(entry.value)
+
+        self.log.info("Exiting incrementer")

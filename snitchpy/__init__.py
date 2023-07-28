@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from grpclib.client import Channel
 from .metrics import Metrics
 from time import sleep
-from threading import Thread
+from threading import Thread, Event
 from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, Instance
 
 DEFAULT_SNITCH_PORT = 9090
@@ -20,7 +20,7 @@ DEFAULT_SNITCH_TOKEN = "1234"
 DEFAULT_PIPELINE_TIMEOUT = 1/10  # 100 milliseconds
 DEFAULT_STEP_TIMEOUT = 1/100  # 10 milliseconds
 DEFAULT_GRPC_TIMEOUT = 5  # 5 seconds
-DEFAULT_HEARTBEAT_INTERVAL = 30  # 30 seconds
+DEFAULT_HEARTBEAT_INTERVAL = 1  # 1 second
 MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 megabyte
 
 MODE_CONSUMER = 1
@@ -69,7 +69,7 @@ class SnitchClient:
     log: logging.Logger
     metrics: Metrics
     functions: dict[str, (Instance, Store)]
-    exit: bool = False
+    exit: Event
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -84,23 +84,23 @@ class SnitchClient:
         self.pipelines = {}
         self.paused_pipelines = {}
         self.log = logging.getLogger("snitch-client")
-        self.metrics = Metrics(stub=self.stub, log=self.log)
+        self.exit = Event()
+        self.metrics = Metrics(stub=self.stub, log=self.log, event=self.exit)
         self.functions = {}
 
-        self.exit = False
-
-        signal.signal(signal.SIGINT, self.shutdown)
-        signal.signal(signal.SIGTERM, self.shutdown)
+        events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
+        for e in events:
+            signal.signal(e, self.shutdown)
 
         # Run register
         register = Thread(target=self._register)
         register.start()
-        register.join()
 
         # Start heartbeat
         heartbeat = Thread(target=self._heartbeat)
         heartbeat.start()
-        heartbeat.join()
+
+        # TODO: figure out joins
 
     @staticmethod
     def _validate_config(cfg: SnitchConfig) -> None:
@@ -191,9 +191,7 @@ class SnitchClient:
             self.log.debug("Sending heartbeat")
             await self.stub.heartbeat(protos.HeartbeatRequest(), timeout=self.grpc_timeout, metadata=self._get_metadata())
 
-        while True:
-            if self.exit:
-                return
+        while not self.exit.is_set():
             self.loop.run_until_complete(call())
 
     def _get_metadata(self) -> dict:
@@ -206,7 +204,7 @@ class SnitchClient:
         self.channel.close()
 
     def shutdown(self, *args):
-        self.exit = True
+        self.exit.set()
 
     def _heartbeat(self):
         async def call():
@@ -217,9 +215,7 @@ class SnitchClient:
             await self.stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         while True:
-            if self.exit:
-                return
-            sleep(DEFAULT_HEARTBEAT_INTERVAL) # TODO: what should heartbeat interval be?
+            self.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
             self.loop.run_until_complete(call())
 
     def _register(self) -> None:
