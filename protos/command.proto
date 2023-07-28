@@ -13,32 +13,28 @@ message Command {
   protos.Audience audience = 1;
 
   oneof command {
-    protos.SetPipelineCommand set_pipeline = 100;
-    protos.DeletePipelineCommand delete_pipeline = 101; // Hmm, should this be here?
+    protos.AttachPipelineCommand attach_pipeline = 100;
+    protos.DetachPipelineCommand detach_pipeline = 101;
     protos.PausePipelineCommand pause_pipeline = 102;
-    protos.UnpausePipelineCommand unpause_pipeline = 103;
+    protos.ResumePipelineCommand resume_pipeline = 103;
     protos.KeepAliveCommand keep_alive = 104;
   }
 }
 
-// Used for both Add and Update
-message SetPipelineCommand {
+message AttachPipelineCommand {
   protos.Pipeline pipeline = 1;
 }
 
-message DeletePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1; // TODO: Where does this ID come from? How do we know it? A: We get it on pipeline creation (CreatePipeline external RPC)
+message DetachPipelineCommand {
+  string pipeline_id = 1;
 }
 
 message PausePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1; // TODO: Where does this come from? A: We get it on pipeline creation (CreatePipeline external RPC)
+  string pipeline_id = 1;
 }
 
-message UnpausePipelineCommand {
-  // Unique ID for the pipeline
-  string id = 1;
+message ResumePipelineCommand {
+  string pipeline_id = 1;
 }
 
 message KeepAliveCommand {
