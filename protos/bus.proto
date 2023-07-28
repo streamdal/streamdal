@@ -2,20 +2,32 @@ syntax = "proto3";
 
 package protos;
 
-import "command.proto";
+import "external.proto";
 import "internal.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-// Type used by `snitch-server` for sending messages on its local bus.
+// Type used by `snitch-server` for broadcasting events to other snitch nodes
 message BusEvent {
   string source = 1;
 
+  // This _should_ contain request messages - each snitch-server can determine
+  // how to interpret and handle the message.
+  //
+  // NOTE: The bus _should not_ be used for transmitting commands to SDKs. The
+  // consumer in each SDK should receive a request and potentially craft a new
+  // command to send to the appropriate SDK(s).
   oneof event {
-    protos.Command command = 100;
-    protos.RegisterRequest register_request = 101;
-    protos.DeregisterRequest deregister_request = 102;
-    protos.HeartbeatRequest heartbeat_request = 103;
+    protos.RegisterRequest register_request = 100;
+    protos.DeregisterRequest deregister_request = 101;
+    protos.HeartbeatRequest heartbeat_request = 102;
+    protos.CreatePipelineRequest create_pipeline_request = 103;
+    protos.DeletePipelineRequest delete_pipeline_request = 104;
+    protos.UpdatePipelineRequest update_pipeline_request = 105;
+    protos.AttachPipelineRequest attach_pipeline_request = 106;
+    protos.DetachPipelineRequest detach_pipeline_request = 107;
+    protos.PausePipelineRequest pause_pipeline_request = 108;
+    protos.ResumePipelineRequest resume_pipeline_request = 109;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC

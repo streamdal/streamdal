@@ -9,10 +9,10 @@ class Command$Type extends MessageType {
     constructor() {
         super("protos.Command", [
             { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 100, name: "set_pipeline", kind: "message", oneof: "command", T: () => SetPipelineCommand },
-            { no: 101, name: "delete_pipeline", kind: "message", oneof: "command", T: () => DeletePipelineCommand },
+            { no: 100, name: "attach_pipeline", kind: "message", oneof: "command", T: () => AttachPipelineCommand },
+            { no: 101, name: "detach_pipeline", kind: "message", oneof: "command", T: () => DetachPipelineCommand },
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
-            { no: 103, name: "unpause_pipeline", kind: "message", oneof: "command", T: () => UnpausePipelineCommand },
+            { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand }
         ]);
     }
@@ -22,34 +22,34 @@ class Command$Type extends MessageType {
  */
 export const Command = new Command$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class SetPipelineCommand$Type extends MessageType {
+class AttachPipelineCommand$Type extends MessageType {
     constructor() {
-        super("protos.SetPipelineCommand", [
+        super("protos.AttachPipelineCommand", [
             { no: 1, name: "pipeline", kind: "message", T: () => Pipeline }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.SetPipelineCommand
+ * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
-export const SetPipelineCommand = new SetPipelineCommand$Type();
+export const AttachPipelineCommand = new AttachPipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class DeletePipelineCommand$Type extends MessageType {
+class DetachPipelineCommand$Type extends MessageType {
     constructor() {
-        super("protos.DeletePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        super("protos.DetachPipelineCommand", [
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.DeletePipelineCommand
+ * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
-export const DeletePipelineCommand = new DeletePipelineCommand$Type();
+export const DetachPipelineCommand = new DetachPipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PausePipelineCommand$Type extends MessageType {
     constructor() {
         super("protos.PausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
@@ -58,17 +58,17 @@ class PausePipelineCommand$Type extends MessageType {
  */
 export const PausePipelineCommand = new PausePipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class UnpausePipelineCommand$Type extends MessageType {
+class ResumePipelineCommand$Type extends MessageType {
     constructor() {
-        super("protos.UnpausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        super("protos.ResumePipelineCommand", [
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.UnpausePipelineCommand
+ * @generated MessageType for protobuf message protos.ResumePipelineCommand
  */
-export const UnpausePipelineCommand = new UnpausePipelineCommand$Type();
+export const ResumePipelineCommand = new ResumePipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class KeepAliveCommand$Type extends MessageType {
     constructor() {
