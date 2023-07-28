@@ -15,7 +15,7 @@ try {
     meta: { "auth-token": "1234" },
   });
   
-  // console.log("test response:", response);
+  console.log("test response:", response);
 } catch (error) {
   console.log("error", error);
 }

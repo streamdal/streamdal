@@ -19,6 +19,7 @@ export const InfoModal = (props: any) => {
                                     <h3 class="text-lg text-gray-900 dark:text-white">
                                         Item-Name
                                     </h3>
+                                    {/* This is a placeholder--won't use this janky chained string iterators on actual modal */}
                                     <p class="text-xs text-gray-500">{item.charAt(0).toUpperCase() + item.slice(1)}</p>
                                 </div>
 
