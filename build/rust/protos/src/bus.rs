@@ -25,7 +25,7 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
-///  Type used by `snitch-server` for sending messages on its local bus.
+///  Type used by `snitch-server` for broadcasting events to other snitch nodes
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.BusEvent)
 pub struct BusEvent {
@@ -52,56 +52,7 @@ impl BusEvent {
         ::std::default::Default::default()
     }
 
-    // .protos.Command command = 100;
-
-    pub fn command(&self) -> &super::command::Command {
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::Command(ref v)) => v,
-            _ => <super::command::Command as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_command(&mut self) {
-        self.event = ::std::option::Option::None;
-    }
-
-    pub fn has_command(&self) -> bool {
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::Command(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_command(&mut self, v: super::command::Command) {
-        self.event = ::std::option::Option::Some(bus_event::Event::Command(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_command(&mut self) -> &mut super::command::Command {
-        if let ::std::option::Option::Some(bus_event::Event::Command(_)) = self.event {
-        } else {
-            self.event = ::std::option::Option::Some(bus_event::Event::Command(super::command::Command::new()));
-        }
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::Command(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_command(&mut self) -> super::command::Command {
-        if self.has_command() {
-            match self.event.take() {
-                ::std::option::Option::Some(bus_event::Event::Command(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            super::command::Command::new()
-        }
-    }
-
-    // .protos.RegisterRequest register_request = 101;
+    // .protos.RegisterRequest register_request = 100;
 
     pub fn register_request(&self) -> &super::internal::RegisterRequest {
         match self.event {
@@ -150,7 +101,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.DeregisterRequest deregister_request = 102;
+    // .protos.DeregisterRequest deregister_request = 101;
 
     pub fn deregister_request(&self) -> &super::internal::DeregisterRequest {
         match self.event {
@@ -199,7 +150,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.HeartbeatRequest heartbeat_request = 103;
+    // .protos.HeartbeatRequest heartbeat_request = 102;
 
     pub fn heartbeat_request(&self) -> &super::internal::HeartbeatRequest {
         match self.event {
@@ -248,20 +199,356 @@ impl BusEvent {
         }
     }
 
+    // .protos.CreatePipelineRequest create_pipeline_request = 103;
+
+    pub fn create_pipeline_request(&self) -> &super::external::CreatePipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(ref v)) => v,
+            _ => <super::external::CreatePipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_create_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_create_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_create_pipeline_request(&mut self, v: super::external::CreatePipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_create_pipeline_request(&mut self) -> &mut super::external::CreatePipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(super::external::CreatePipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_create_pipeline_request(&mut self) -> super::external::CreatePipelineRequest {
+        if self.has_create_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::CreatePipelineRequest::new()
+        }
+    }
+
+    // .protos.DeletePipelineRequest delete_pipeline_request = 104;
+
+    pub fn delete_pipeline_request(&self) -> &super::external::DeletePipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(ref v)) => v,
+            _ => <super::external::DeletePipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_delete_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_delete_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_delete_pipeline_request(&mut self, v: super::external::DeletePipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_delete_pipeline_request(&mut self) -> &mut super::external::DeletePipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(super::external::DeletePipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_delete_pipeline_request(&mut self) -> super::external::DeletePipelineRequest {
+        if self.has_delete_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::DeletePipelineRequest::new()
+        }
+    }
+
+    // .protos.UpdatePipelineRequest update_pipeline_request = 105;
+
+    pub fn update_pipeline_request(&self) -> &super::external::UpdatePipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(ref v)) => v,
+            _ => <super::external::UpdatePipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_update_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_update_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_update_pipeline_request(&mut self, v: super::external::UpdatePipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_update_pipeline_request(&mut self) -> &mut super::external::UpdatePipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(super::external::UpdatePipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_update_pipeline_request(&mut self) -> super::external::UpdatePipelineRequest {
+        if self.has_update_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::UpdatePipelineRequest::new()
+        }
+    }
+
+    // .protos.AttachPipelineRequest attach_pipeline_request = 106;
+
+    pub fn attach_pipeline_request(&self) -> &super::external::AttachPipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(ref v)) => v,
+            _ => <super::external::AttachPipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_attach_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_attach_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_attach_pipeline_request(&mut self, v: super::external::AttachPipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_attach_pipeline_request(&mut self) -> &mut super::external::AttachPipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(super::external::AttachPipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_attach_pipeline_request(&mut self) -> super::external::AttachPipelineRequest {
+        if self.has_attach_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::AttachPipelineRequest::new()
+        }
+    }
+
+    // .protos.DetachPipelineRequest detach_pipeline_request = 107;
+
+    pub fn detach_pipeline_request(&self) -> &super::external::DetachPipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(ref v)) => v,
+            _ => <super::external::DetachPipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_detach_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_detach_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_detach_pipeline_request(&mut self, v: super::external::DetachPipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_detach_pipeline_request(&mut self) -> &mut super::external::DetachPipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(super::external::DetachPipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_detach_pipeline_request(&mut self) -> super::external::DetachPipelineRequest {
+        if self.has_detach_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::DetachPipelineRequest::new()
+        }
+    }
+
+    // .protos.PausePipelineRequest pause_pipeline_request = 108;
+
+    pub fn pause_pipeline_request(&self) -> &super::external::PausePipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(ref v)) => v,
+            _ => <super::external::PausePipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_pause_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_pause_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_pause_pipeline_request(&mut self, v: super::external::PausePipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_pause_pipeline_request(&mut self) -> &mut super::external::PausePipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(super::external::PausePipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_pause_pipeline_request(&mut self) -> super::external::PausePipelineRequest {
+        if self.has_pause_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::PausePipelineRequest::new()
+        }
+    }
+
+    // .protos.ResumePipelineRequest resume_pipeline_request = 109;
+
+    pub fn resume_pipeline_request(&self) -> &super::external::ResumePipelineRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(ref v)) => v,
+            _ => <super::external::ResumePipelineRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_resume_pipeline_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_resume_pipeline_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_resume_pipeline_request(&mut self, v: super::external::ResumePipelineRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_resume_pipeline_request(&mut self) -> &mut super::external::ResumePipelineRequest {
+        if let ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(super::external::ResumePipelineRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_resume_pipeline_request(&mut self) -> super::external::ResumePipelineRequest {
+        if self.has_resume_pipeline_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::external::ResumePipelineRequest::new()
+        }
+    }
+
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(6);
+        let mut fields = ::std::vec::Vec::with_capacity(12);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "source",
             |m: &BusEvent| { &m.source },
             |m: &mut BusEvent| { &mut m.source },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::command::Command>(
-            "command",
-            BusEvent::has_command,
-            BusEvent::command,
-            BusEvent::mut_command,
-            BusEvent::set_command,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::internal::RegisterRequest>(
             "register_request",
@@ -283,6 +570,55 @@ impl BusEvent {
             BusEvent::heartbeat_request,
             BusEvent::mut_heartbeat_request,
             BusEvent::set_heartbeat_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::CreatePipelineRequest>(
+            "create_pipeline_request",
+            BusEvent::has_create_pipeline_request,
+            BusEvent::create_pipeline_request,
+            BusEvent::mut_create_pipeline_request,
+            BusEvent::set_create_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::DeletePipelineRequest>(
+            "delete_pipeline_request",
+            BusEvent::has_delete_pipeline_request,
+            BusEvent::delete_pipeline_request,
+            BusEvent::mut_delete_pipeline_request,
+            BusEvent::set_delete_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::UpdatePipelineRequest>(
+            "update_pipeline_request",
+            BusEvent::has_update_pipeline_request,
+            BusEvent::update_pipeline_request,
+            BusEvent::mut_update_pipeline_request,
+            BusEvent::set_update_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::AttachPipelineRequest>(
+            "attach_pipeline_request",
+            BusEvent::has_attach_pipeline_request,
+            BusEvent::attach_pipeline_request,
+            BusEvent::mut_attach_pipeline_request,
+            BusEvent::set_attach_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::DetachPipelineRequest>(
+            "detach_pipeline_request",
+            BusEvent::has_detach_pipeline_request,
+            BusEvent::detach_pipeline_request,
+            BusEvent::mut_detach_pipeline_request,
+            BusEvent::set_detach_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::PausePipelineRequest>(
+            "pause_pipeline_request",
+            BusEvent::has_pause_pipeline_request,
+            BusEvent::pause_pipeline_request,
+            BusEvent::mut_pause_pipeline_request,
+            BusEvent::set_pause_pipeline_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::ResumePipelineRequest>(
+            "resume_pipeline_request",
+            BusEvent::has_resume_pipeline_request,
+            BusEvent::resume_pipeline_request,
+            BusEvent::mut_resume_pipeline_request,
+            BusEvent::set_resume_pipeline_request,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
             "_metadata",
@@ -312,16 +648,34 @@ impl ::protobuf::Message for BusEvent {
                     self.source = is.read_string()?;
                 },
                 802 => {
-                    self.event = ::std::option::Option::Some(bus_event::Event::Command(is.read_message()?));
-                },
-                810 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::RegisterRequest(is.read_message()?));
                 },
-                818 => {
+                810 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::DeregisterRequest(is.read_message()?));
                 },
-                826 => {
+                818 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(is.read_message()?));
+                },
+                826 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(is.read_message()?));
+                },
+                834 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(is.read_message()?));
+                },
+                842 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(is.read_message()?));
+                },
+                850 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(is.read_message()?));
+                },
+                858 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(is.read_message()?));
+                },
+                866 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(is.read_message()?));
+                },
+                874 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(is.read_message()?));
                 },
                 8002 => {
                     let len = is.read_raw_varint32()?;
@@ -361,10 +715,6 @@ impl ::protobuf::Message for BusEvent {
         };
         if let ::std::option::Option::Some(ref v) = self.event {
             match v {
-                &bus_event::Event::Command(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
                 &bus_event::Event::RegisterRequest(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
@@ -374,6 +724,34 @@ impl ::protobuf::Message for BusEvent {
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
                 &bus_event::Event::HeartbeatRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::CreatePipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::DeletePipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::UpdatePipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::AttachPipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::DetachPipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::PausePipelineRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::ResumePipelineRequest(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -399,17 +777,35 @@ impl ::protobuf::Message for BusEvent {
         };
         if let ::std::option::Option::Some(ref v) = self.event {
             match v {
-                &bus_event::Event::Command(ref v) => {
+                &bus_event::Event::RegisterRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
                 },
-                &bus_event::Event::RegisterRequest(ref v) => {
+                &bus_event::Event::DeregisterRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(101, v, os)?;
                 },
-                &bus_event::Event::DeregisterRequest(ref v) => {
+                &bus_event::Event::HeartbeatRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(102, v, os)?;
                 },
-                &bus_event::Event::HeartbeatRequest(ref v) => {
+                &bus_event::Event::CreatePipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
+                },
+                &bus_event::Event::DeletePipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
+                },
+                &bus_event::Event::UpdatePipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
+                },
+                &bus_event::Event::AttachPipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(106, v, os)?;
+                },
+                &bus_event::Event::DetachPipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(107, v, os)?;
+                },
+                &bus_event::Event::PausePipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(108, v, os)?;
+                },
+                &bus_event::Event::ResumePipelineRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(109, v, os)?;
                 },
             };
         }
@@ -431,6 +827,12 @@ impl ::protobuf::Message for BusEvent {
 
     fn clear(&mut self) {
         self.source.clear();
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
@@ -469,14 +871,26 @@ pub mod bus_event {
     #[non_exhaustive]
     // @@protoc_insertion_point(oneof:protos.BusEvent.event)
     pub enum Event {
-        // @@protoc_insertion_point(oneof_field:protos.BusEvent.command)
-        Command(super::super::command::Command),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.register_request)
         RegisterRequest(super::super::internal::RegisterRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.deregister_request)
         DeregisterRequest(super::super::internal::DeregisterRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.heartbeat_request)
         HeartbeatRequest(super::super::internal::HeartbeatRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.create_pipeline_request)
+        CreatePipelineRequest(super::super::external::CreatePipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.delete_pipeline_request)
+        DeletePipelineRequest(super::super::external::DeletePipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.update_pipeline_request)
+        UpdatePipelineRequest(super::super::external::UpdatePipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.attach_pipeline_request)
+        AttachPipelineRequest(super::super::external::AttachPipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.detach_pipeline_request)
+        DetachPipelineRequest(super::super::external::DetachPipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.pause_pipeline_request)
+        PausePipelineRequest(super::super::external::PausePipelineRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.resume_pipeline_request)
+        ResumePipelineRequest(super::super::external::ResumePipelineRequest),
     }
 
     impl ::protobuf::Oneof for Event {
@@ -497,53 +911,85 @@ pub mod bus_event {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\tbus.proto\x12\x06protos\x1a\rcommand.proto\x1a\x0einternal.proto\"\
-    \xae\x03\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06source\
-    \x12+\n\x07command\x18d\x20\x01(\x0b2\x0f.protos.CommandH\0R\x07command\
-    \x12D\n\x10register_request\x18e\x20\x01(\x0b2\x17.protos.RegisterReques\
-    tH\0R\x0fregisterRequest\x12J\n\x12deregister_request\x18f\x20\x01(\x0b2\
-    \x19.protos.DeregisterRequestH\0R\x11deregisterRequest\x12G\n\x11heartbe\
-    at_request\x18g\x20\x01(\x0b2\x18.protos.HeartbeatRequestH\0R\x10heartbe\
-    atRequest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\x1e.protos.BusEven\
-    t.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\
-    \x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\
-    \x028\x01B\x07\n\x05eventB4Z2github.com/streamdal/snitch-protos/build/go\
-    /protosJ\xd6\x08\n\x06\x12\x04\0\0\x1f\x01\n\x08\n\x01\x0c\x12\x03\0\0\
-    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x17\
-    \n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\x12\x03\x07\0I\n\t\
-    \n\x02\x08\x0b\x12\x03\x07\0I\nQ\n\x02\x04\0\x12\x04\n\0\x1f\x01\x1aE\
-    \x20Type\x20used\x20by\x20`snitch-server`\x20for\x20sending\x20messages\
-    \x20on\x20its\x20local\x20bus.\n\n\n\n\x03\x04\0\x01\x12\x03\n\x08\x10\n\
-    \x0b\n\x04\x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\x05\x04\0\x02\0\x05\
-    \x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0b\t\x0f\n\x0c\
-    \n\x05\x04\0\x02\0\x03\x12\x03\x0b\x12\x13\n\x0c\n\x04\x04\0\x08\0\x12\
-    \x04\r\x02\x12\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\r\x08\r\n\x0b\n\
-    \x04\x04\0\x02\x01\x12\x03\x0e\x04!\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
-    \x03\x0e\x04\x12\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0e\x13\x1a\n\x0c\
-    \n\x05\x04\0\x02\x01\x03\x12\x03\x0e\x1d\x20\n\x0b\n\x04\x04\0\x02\x02\
-    \x12\x03\x0f\x042\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x0f\x04\x1a\n\
-    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0f\x1b+\n\x0c\n\x05\x04\0\x02\x02\
-    \x03\x12\x03\x0f.1\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x10\x046\n\x0c\n\
-    \x05\x04\0\x02\x03\x06\x12\x03\x10\x04\x1c\n\x0c\n\x05\x04\0\x02\x03\x01\
-    \x12\x03\x10\x1d/\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1025\n\x0b\n\
-    \x04\x04\0\x02\x04\x12\x03\x11\x044\n\x0c\n\x05\x04\0\x02\x04\x06\x12\
-    \x03\x11\x04\x1b\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x11\x1c-\n\x0c\n\
-    \x05\x04\0\x02\x04\x03\x12\x03\x1103\n\xd4\x04\n\x04\x04\0\x02\x05\x12\
-    \x03\x1e\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20is\x20stored\x20\
-    in\x20ctx;\x20when\x20request\x20goes\x20outside\x20of\x20gRPC\n\x20boun\
-    ds,\x20we\x20will\x20translate\x20ctx\x20metadata\x20into\x20this\x20fie\
-    ld.\n\n\x20Example:\n\x201.\x20Request\x20comes\x20into\x20snitch-server\
-    \x20via\x20external\x20gRPC\x20to\x20set\x20new\x20pipeline\n\x202.\x20s\
-    nitch-server\x20has\x20to\x20send\x20SetPipeline\x20cmd\x20to\x20SDK\x20\
-    via\x20gRPC\x20-\x20it\x20passes\n\x20\x20\x20\x20on\x20original\x20meta\
-    data\x20in\x20request.\n\x203.\x20snitch-server\x20has\x20to\x20broadcas\
-    t\x20SetPipeline\x20cmd\x20to\x20other\x20services\x20via\x20bus\n\x204.\
-    \x20Since\x20this\x20is\x20not\x20a\x20gRPC\x20call,\x20snitch-server\
-    \x20translates\x20ctx\x20metadata\x20to\n\x20\x20\x20\x20this\x20field\
-    \x20and\x20includes\x20it\x20in\x20the\x20bus\x20event.\n\"5\x20protolin\
-    t:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\0\x02\
-    \x05\x06\x12\x03\x1e\x02\x16\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x1e\
-    \x17\x20\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x1e#'b\x06proto3\
+    \n\tbus.proto\x12\x06protos\x1a\x0eexternal.proto\x1a\x0einternal.proto\
+    \"\xed\x07\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06sour\
+    ce\x12D\n\x10register_request\x18d\x20\x01(\x0b2\x17.protos.RegisterRequ\
+    estH\0R\x0fregisterRequest\x12J\n\x12deregister_request\x18e\x20\x01(\
+    \x0b2\x19.protos.DeregisterRequestH\0R\x11deregisterRequest\x12G\n\x11he\
+    artbeat_request\x18f\x20\x01(\x0b2\x18.protos.HeartbeatRequestH\0R\x10he\
+    artbeatRequest\x12W\n\x17create_pipeline_request\x18g\x20\x01(\x0b2\x1d.\
+    protos.CreatePipelineRequestH\0R\x15createPipelineRequest\x12W\n\x17dele\
+    te_pipeline_request\x18h\x20\x01(\x0b2\x1d.protos.DeletePipelineRequestH\
+    \0R\x15deletePipelineRequest\x12W\n\x17update_pipeline_request\x18i\x20\
+    \x01(\x0b2\x1d.protos.UpdatePipelineRequestH\0R\x15updatePipelineRequest\
+    \x12W\n\x17attach_pipeline_request\x18j\x20\x01(\x0b2\x1d.protos.AttachP\
+    ipelineRequestH\0R\x15attachPipelineRequest\x12W\n\x17detach_pipeline_re\
+    quest\x18k\x20\x01(\x0b2\x1d.protos.DetachPipelineRequestH\0R\x15detachP\
+    ipelineRequest\x12T\n\x16pause_pipeline_request\x18l\x20\x01(\x0b2\x1c.p\
+    rotos.PausePipelineRequestH\0R\x14pausePipelineRequest\x12W\n\x17resume_\
+    pipeline_request\x18m\x20\x01(\x0b2\x1d.protos.ResumePipelineRequestH\0R\
+    \x15resumePipelineRequest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\
+    \x1e.protos.BusEvent.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\
+    \x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\
+    \x20\x01(\tR\x05value:\x028\x01B\x07\n\x05eventB4Z2github.com/streamdal/\
+    snitch-protos/build/go/protosJ\xe3\r\n\x06\x12\x04\0\0+\x01\n\x08\n\x01\
+    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
+    \x12\x03\x04\0\x18\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\
+    \x12\x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\nX\n\x02\x04\0\x12\x04\
+    \n\0+\x01\x1aL\x20Type\x20used\x20by\x20`snitch-server`\x20for\x20broadc\
+    asting\x20events\x20to\x20other\x20snitch\x20nodes\n\n\n\n\x03\x04\0\x01\
+    \x12\x03\n\x08\x10\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\
+    \x05\x04\0\x02\0\x05\x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
+    \x03\x0b\t\x0f\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0b\x12\x13\n\xc7\x02\
+    \n\x04\x04\0\x08\0\x12\x04\x13\x02\x1e\x03\x1a\xb8\x02\x20This\x20_shoul\
+    d_\x20contain\x20request\x20messages\x20-\x20each\x20snitch-server\x20ca\
+    n\x20determine\n\x20how\x20to\x20interpret\x20and\x20handle\x20the\x20me\
+    ssage.\n\n\x20NOTE:\x20The\x20bus\x20_should\x20not_\x20be\x20used\x20fo\
+    r\x20transmitting\x20commands\x20to\x20SDKs.\x20The\n\x20consumer\x20in\
+    \x20each\x20SDK\x20should\x20receive\x20a\x20request\x20and\x20potential\
+    ly\x20craft\x20a\x20new\n\x20command\x20to\x20send\x20to\x20the\x20appro\
+    priate\x20SDK(s).\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x13\x08\r\n\x0b\
+    \n\x04\x04\0\x02\x01\x12\x03\x14\x042\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
+    \x03\x14\x04\x1a\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x14\x1b+\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03\x14.1\n\x0b\n\x04\x04\0\x02\x02\x12\x03\
+    \x15\x046\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x15\x04\x1c\n\x0c\n\x05\
+    \x04\0\x02\x02\x01\x12\x03\x15\x1d/\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
+    \x03\x1525\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\x044\n\x0c\n\x05\x04\0\
+    \x02\x03\x06\x12\x03\x16\x04\x1b\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
+    \x16\x1c-\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1603\n\x0b\n\x04\x04\0\
+    \x02\x04\x12\x03\x17\x04?\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x17\x04\
+    \x20\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17!8\n\x0c\n\x05\x04\0\x02\
+    \x04\x03\x12\x03\x17;>\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x18\x04?\n\x0c\
+    \n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x20\n\x0c\n\x05\x04\0\x02\x05\
+    \x01\x12\x03\x18!8\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x18;>\n\x0b\n\
+    \x04\x04\0\x02\x06\x12\x03\x19\x04?\n\x0c\n\x05\x04\0\x02\x06\x06\x12\
+    \x03\x19\x04\x20\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19!8\n\x0c\n\x05\
+    \x04\0\x02\x06\x03\x12\x03\x19;>\n\x0b\n\x04\x04\0\x02\x07\x12\x03\x1a\
+    \x04?\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1a\x04\x20\n\x0c\n\x05\x04\
+    \0\x02\x07\x01\x12\x03\x1a!8\n\x0c\n\x05\x04\0\x02\x07\x03\x12\x03\x1a;>\
+    \n\x0b\n\x04\x04\0\x02\x08\x12\x03\x1b\x04?\n\x0c\n\x05\x04\0\x02\x08\
+    \x06\x12\x03\x1b\x04\x20\n\x0c\n\x05\x04\0\x02\x08\x01\x12\x03\x1b!8\n\
+    \x0c\n\x05\x04\0\x02\x08\x03\x12\x03\x1b;>\n\x0b\n\x04\x04\0\x02\t\x12\
+    \x03\x1c\x04=\n\x0c\n\x05\x04\0\x02\t\x06\x12\x03\x1c\x04\x1f\n\x0c\n\
+    \x05\x04\0\x02\t\x01\x12\x03\x1c\x206\n\x0c\n\x05\x04\0\x02\t\x03\x12\
+    \x03\x1c9<\n\x0b\n\x04\x04\0\x02\n\x12\x03\x1d\x04?\n\x0c\n\x05\x04\0\
+    \x02\n\x06\x12\x03\x1d\x04\x20\n\x0c\n\x05\x04\0\x02\n\x01\x12\x03\x1d!8\
+    \n\x0c\n\x05\x04\0\x02\n\x03\x12\x03\x1d;>\n\xd4\x04\n\x04\x04\0\x02\x0b\
+    \x12\x03*\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20is\x20stored\
+    \x20in\x20ctx;\x20when\x20request\x20goes\x20outside\x20of\x20gRPC\n\x20\
+    bounds,\x20we\x20will\x20translate\x20ctx\x20metadata\x20into\x20this\
+    \x20field.\n\n\x20Example:\n\x201.\x20Request\x20comes\x20into\x20snitch\
+    -server\x20via\x20external\x20gRPC\x20to\x20set\x20new\x20pipeline\n\x20\
+    2.\x20snitch-server\x20has\x20to\x20send\x20SetPipeline\x20cmd\x20to\x20\
+    SDK\x20via\x20gRPC\x20-\x20it\x20passes\n\x20\x20\x20\x20on\x20original\
+    \x20metadata\x20in\x20request.\n\x203.\x20snitch-server\x20has\x20to\x20\
+    broadcast\x20SetPipeline\x20cmd\x20to\x20other\x20services\x20via\x20bus\
+    \n\x204.\x20Since\x20this\x20is\x20not\x20a\x20gRPC\x20call,\x20snitch-s\
+    erver\x20translates\x20ctx\x20metadata\x20to\n\x20\x20\x20\x20this\x20fi\
+    eld\x20and\x20includes\x20it\x20in\x20the\x20bus\x20event.\n\"5\x20proto\
+    lint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\0\
+    \x02\x0b\x06\x12\x03*\x02\x16\n\x0c\n\x05\x04\0\x02\x0b\x01\x12\x03*\x17\
+    \x20\n\x0c\n\x05\x04\0\x02\x0b\x03\x12\x03*#'b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -561,7 +1007,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(2);
-            deps.push(super::command::file_descriptor().clone());
+            deps.push(super::external::file_descriptor().clone());
             deps.push(super::internal::file_descriptor().clone());
             let mut messages = ::std::vec::Vec::with_capacity(1);
             messages.push(BusEvent::generated_message_descriptor_data());

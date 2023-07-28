@@ -20,17 +20,17 @@ export interface Command {
      * @generated from protobuf oneof: command
      */
     command: {
-        oneofKind: "setPipeline";
+        oneofKind: "attachPipeline";
         /**
-         * @generated from protobuf field: protos.SetPipelineCommand set_pipeline = 100;
+         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100;
          */
-        setPipeline: SetPipelineCommand;
+        attachPipeline: AttachPipelineCommand;
     } | {
-        oneofKind: "deletePipeline";
+        oneofKind: "detachPipeline";
         /**
-         * @generated from protobuf field: protos.DeletePipelineCommand delete_pipeline = 101;
+         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101;
          */
-        deletePipeline: DeletePipelineCommand; // Hmm, should this be here?
+        detachPipeline: DetachPipelineCommand;
     } | {
         oneofKind: "pausePipeline";
         /**
@@ -38,11 +38,11 @@ export interface Command {
          */
         pausePipeline: PausePipelineCommand;
     } | {
-        oneofKind: "unpausePipeline";
+        oneofKind: "resumePipeline";
         /**
-         * @generated from protobuf field: protos.UnpausePipelineCommand unpause_pipeline = 103;
+         * @generated from protobuf field: protos.ResumePipelineCommand resume_pipeline = 103;
          */
-        unpausePipeline: UnpausePipelineCommand;
+        resumePipeline: ResumePipelineCommand;
     } | {
         oneofKind: "keepAlive";
         /**
@@ -54,48 +54,40 @@ export interface Command {
     };
 }
 /**
- * Used for both Add and Update
- *
- * @generated from protobuf message protos.SetPipelineCommand
+ * @generated from protobuf message protos.AttachPipelineCommand
  */
-export interface SetPipelineCommand {
+export interface AttachPipelineCommand {
     /**
      * @generated from protobuf field: protos.Pipeline pipeline = 1;
      */
     pipeline?: Pipeline;
 }
 /**
- * @generated from protobuf message protos.DeletePipelineCommand
+ * @generated from protobuf message protos.DetachPipelineCommand
  */
-export interface DeletePipelineCommand {
+export interface DetachPipelineCommand {
     /**
-     * Unique ID for the pipeline
-     *
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: string pipeline_id = 1;
      */
-    id: string; // TODO: Where does this ID come from? How do we know it? A: We get it on pipeline creation (CreatePipeline external RPC)
+    pipelineId: string;
 }
 /**
  * @generated from protobuf message protos.PausePipelineCommand
  */
 export interface PausePipelineCommand {
     /**
-     * Unique ID for the pipeline
-     *
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: string pipeline_id = 1;
      */
-    id: string; // TODO: Where does this come from? A: We get it on pipeline creation (CreatePipeline external RPC)
+    pipelineId: string;
 }
 /**
- * @generated from protobuf message protos.UnpausePipelineCommand
+ * @generated from protobuf message protos.ResumePipelineCommand
  */
-export interface UnpausePipelineCommand {
+export interface ResumePipelineCommand {
     /**
-     * Unique ID for the pipeline
-     *
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: string pipeline_id = 1;
      */
-    id: string;
+    pipelineId: string;
 }
 /**
  * Nothing needed in here, just a ping from server to SDK
@@ -109,10 +101,10 @@ class Command$Type extends MessageType<Command> {
     constructor() {
         super("protos.Command", [
             { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 100, name: "set_pipeline", kind: "message", oneof: "command", T: () => SetPipelineCommand },
-            { no: 101, name: "delete_pipeline", kind: "message", oneof: "command", T: () => DeletePipelineCommand },
+            { no: 100, name: "attach_pipeline", kind: "message", oneof: "command", T: () => AttachPipelineCommand },
+            { no: 101, name: "detach_pipeline", kind: "message", oneof: "command", T: () => DetachPipelineCommand },
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
-            { no: 103, name: "unpause_pipeline", kind: "message", oneof: "command", T: () => UnpausePipelineCommand },
+            { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand }
         ]);
     }
@@ -122,34 +114,34 @@ class Command$Type extends MessageType<Command> {
  */
 export const Command = new Command$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class SetPipelineCommand$Type extends MessageType<SetPipelineCommand> {
+class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor() {
-        super("protos.SetPipelineCommand", [
+        super("protos.AttachPipelineCommand", [
             { no: 1, name: "pipeline", kind: "message", T: () => Pipeline }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.SetPipelineCommand
+ * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
-export const SetPipelineCommand = new SetPipelineCommand$Type();
+export const AttachPipelineCommand = new AttachPipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class DeletePipelineCommand$Type extends MessageType<DeletePipelineCommand> {
+class DetachPipelineCommand$Type extends MessageType<DetachPipelineCommand> {
     constructor() {
-        super("protos.DeletePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        super("protos.DetachPipelineCommand", [
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.DeletePipelineCommand
+ * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
-export const DeletePipelineCommand = new DeletePipelineCommand$Type();
+export const DetachPipelineCommand = new DetachPipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PausePipelineCommand$Type extends MessageType<PausePipelineCommand> {
     constructor() {
         super("protos.PausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
@@ -158,17 +150,17 @@ class PausePipelineCommand$Type extends MessageType<PausePipelineCommand> {
  */
 export const PausePipelineCommand = new PausePipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class UnpausePipelineCommand$Type extends MessageType<UnpausePipelineCommand> {
+class ResumePipelineCommand$Type extends MessageType<ResumePipelineCommand> {
     constructor() {
-        super("protos.UnpausePipelineCommand", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        super("protos.ResumePipelineCommand", [
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.UnpausePipelineCommand
+ * @generated MessageType for protobuf message protos.ResumePipelineCommand
  */
-export const UnpausePipelineCommand = new UnpausePipelineCommand$Type();
+export const ResumePipelineCommand = new ResumePipelineCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
     constructor() {

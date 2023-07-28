@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package protos;
 
-import "command.proto";
 import "external.proto";
 import "internal.proto";
 
