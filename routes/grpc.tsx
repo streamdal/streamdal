@@ -11,14 +11,11 @@ const transport = new GrpcWebFetchTransport({
 export const client = new ExternalClient(transport);
 
 try {
-  // const { response } = await client.test({ input: "hello world" }, {
-  //   meta: { "auth-token": "1234" },
-  // });
   const { response } = await client.getServiceMap({}, {
     meta: { "auth-token": "1234" },
   });
-
-  console.log("test response:", response);
+  
+  // console.log("test response:", response);
 } catch (error) {
   console.log("error", error);
 }
