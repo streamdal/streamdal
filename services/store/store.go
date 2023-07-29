@@ -97,6 +97,10 @@ type IStore interface {
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	//DeletePipeline(ctx context.Context, pipelineId string) error
 	//UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
+	//AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
+	//DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
+	//PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
+	//ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 }
 
 type Store struct {
