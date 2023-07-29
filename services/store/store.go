@@ -119,6 +119,9 @@ func New(shutdownCtx context.Context, cacheBackend cache.ICache, natsBackend nat
 	}, nil
 }
 
+// TODO: If this contains Audiences - we MUST handle it and store it outside of
+// registrations!!!
+// TODO 2: Registrations cannot be stored under $ServiceName - there will be collissions!
 func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	llog := s.log.WithField("method", "AddRegistration")
 	llog.Debug("received request to add registration")
