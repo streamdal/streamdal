@@ -72,11 +72,7 @@ MAIN:
 				return errors.Wrap(err, "unable to send command to client")
 			}
 
-			// WARNING: I DON"T THINK THIS IS NEEDED. THE COMMAND WAS ALREADY
-			// SENT TO US VIA THE BUS. WHY WOULD WE SEND IT AGAIN?
-			if err := s.Deps.BusService.BroadcastCommand(server.Context(), cmd); err != nil {
-				llog.WithError(err).Error("unable to broadcast command")
-			}
+			llog.Debug("sent command to client")
 		}
 	}
 

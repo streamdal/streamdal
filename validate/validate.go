@@ -76,14 +76,6 @@ func DeregisterRequest(req *protos.DeregisterRequest) error {
 	return nil
 }
 
-func Command(req *protos.Command) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	return nil
-}
-
 func BusEvent(req *protos.BusEvent) error {
 	if req == nil {
 		return ErrNilInput
@@ -91,62 +83,6 @@ func BusEvent(req *protos.BusEvent) error {
 
 	if req.Event == nil {
 		return errors.New(".Event cannot be nil")
-	}
-
-	return nil
-}
-
-func SetPipelineCommand(req *protos.SetPipelineCommand) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.Pipeline == nil {
-		return errors.New(".Pipeline cannot be nil")
-	}
-
-	if req.Pipeline.Name == "" {
-		return ErrEmptyField("Name")
-	}
-
-	if len(req.Pipeline.Steps) == 0 {
-		return errors.New("must have at least one step in pipeline")
-	}
-
-	return nil
-}
-
-func DeletePipelineCommand(req *protos.DeletePipelineCommand) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.Id == "" {
-		return ErrEmptyField("Id")
-	}
-
-	return nil
-}
-
-func PausePipelineCommand(req *protos.PausePipelineCommand) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.Id == "" {
-		return ErrEmptyField("Id")
-	}
-
-	return nil
-}
-
-func UnpausePipelineCommand(req *protos.UnpausePipelineCommand) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.Id == "" {
-		return ErrEmptyField("Id")
 	}
 
 	return nil
@@ -238,4 +174,64 @@ func UpdatePipelineRequest(req *protos.UpdatePipelineRequest) error {
 	}
 
 	return Pipeline(req.Pipeline, true)
+}
+
+func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
+}
+
+func AttachPipelineRequest(req *protos.AttachPipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
+}
+
+func DetachPipelineRequest(req *protos.DetachPipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
+}
+
+func PausePipelineRequest(req *protos.PausePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
+}
+
+func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
 }

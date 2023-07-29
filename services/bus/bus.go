@@ -26,15 +26,15 @@ const (
 type IBus interface {
 	RunConsumer() error
 	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
-	BroadcastCommand(ctx context.Context, cmd *protos.Command) error
 	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
 	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
-	//BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
-	//BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
-	//BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
-	//BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
-	//BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
-	//BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	BroadcastCreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) error
+	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
+	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
+	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
+	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
+	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
+	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 }
 
 type Bus struct {
@@ -158,14 +158,26 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	var err error
 
 	switch t := busEvent.Event.(type) {
-	case *protos.BusEvent_DeregisterRequest:
-		err = b.handleDeregisterRequestBusEvent(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_RegisterRequest:
-		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
-	case *protos.BusEvent_Command:
-		err = b.handleCommandBusEvent(shutdownCtx, busEvent.GetCommand())
+		err = b.handleRegisterRequest(shutdownCtx, busEvent.GetRegisterRequest())
+	case *protos.BusEvent_DeregisterRequest:
+		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
+	case *protos.BusEvent_CreatePipelineRequest:
+		err = b.handleCreatePipelineRequest(shutdownCtx, busEvent.GetCreatePipelineRequest())
+	case *protos.BusEvent_DeletePipelineRequest:
+		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
+	case *protos.BusEvent_UpdatePipelineRequest:
+		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
+	case *protos.BusEvent_AttachPipelineRequest:
+		err = b.handleAttachPipelineRequest(shutdownCtx, busEvent.GetAttachPipelineRequest())
+	case *protos.BusEvent_DetachPipelineRequest:
+		err = b.handleDetachPipelineRequest(shutdownCtx, busEvent.GetDetachPipelineRequest())
+	case *protos.BusEvent_PausePipelineRequest:
+		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
+	case *protos.BusEvent_ResumePipelineRequest:
+		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	case *protos.BusEvent_HeartbeatRequest:
-		err = b.handleHeartbeatRequestBusEvent(shutdownCtx, busEvent.GetHeartbeatRequest())
+		err = b.handleHeartbeatRequest(shutdownCtx, busEvent.GetHeartbeatRequest())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}

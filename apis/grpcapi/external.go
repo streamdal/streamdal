@@ -72,7 +72,6 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	// Create ID for pipeline
 	req.Pipeline.Id = util.GenerateUUID()
 
-	// We DO NOT need to broadcast this because the pipeline is brand new and not in use (yet)
 	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -98,10 +97,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, we need to broadcast the update because the pipeline
-	// MIGHT be actively used and if it was updated, the active pipeline needs
-	// to be updated as well
-
+	// Pipeline exists, broadcast the update
 	if err := s.Deps.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -118,30 +114,129 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	// TODO: Does this ID exist?
+	// Does this pipeline exist?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
 
-	// We DO need to broadcast this because the pipeline MIGHT be actively used
-	// and now needs to be stopped and deleted.
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
 
-	// TODO: Broadcast pipeline delete command
+	// Pipeline exists, broadcast delete
+	if err := s.Deps.BusService.BroadcastDeletePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
 
-	panic("implement me")
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' deleted", req.PipelineId),
+	}, nil
 }
 
 func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.AttachPipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Does this pipeline exist?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Pipeline exists, broadcast attach
+	if err := s.Deps.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' attached", req.PipelineId),
+	}, nil
 }
 
 func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.DetachPipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Does this pipeline exist?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Pipeline exists, broadcast delete
+	if err := s.Deps.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' detached", req.PipelineId),
+	}, nil
 }
 
 func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.PausePipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Does this pipeline exist?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Pipeline exists, broadcast pause
+	if err := s.Deps.BusService.BroadcastPausePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' paused", req.PipelineId),
+	}, nil
 }
 
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
-	panic("implement me")
+	if err := validate.ResumePipelineRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Does this pipeline exist?
+	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+		if err == store.ErrPipelineNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Pipeline exists, broadcast resume
+	if err := s.Deps.BusService.BroadcastResumePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("pipeline '%s' deleted", req.PipelineId),
+	}, nil
 }
 
 func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {

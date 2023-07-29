@@ -2,7 +2,6 @@ package bus
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -10,7 +9,7 @@ import (
 	"github.com/streamdal/snitch-server/validate"
 )
 
-func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.RegisterRequest) error {
+func (b *Bus) handleRegisterRequest(ctx context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("handling register request bus event: %v", req)
 
 	if err := validate.RegisterRequest(req); err != nil {
@@ -24,21 +23,7 @@ func (b *Bus) handleRegisterRequestBusEvent(ctx context.Context, req *protos.Reg
 	return nil
 }
 
-func (b *Bus) handleHeartbeatRequestBusEvent(ctx context.Context, req *protos.HeartbeatRequest) error {
-	b.log.Debugf("handling heartbeat request bus event: %v", req)
-
-	if err := validate.HeartbeatRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	if err := b.options.Store.AddHeartbeat(ctx, req); err != nil {
-		return errors.Wrap(err, "error saving heartbeat")
-	}
-
-	return nil
-}
-
-func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.DeregisterRequest) error {
+func (b *Bus) handleDeregisterRequest(ctx context.Context, req *protos.DeregisterRequest) error {
 	b.log.Debugf("handling delete register request bus event: %v", req)
 
 	if err := validate.DeregisterRequest(req); err != nil {
@@ -52,62 +37,43 @@ func (b *Bus) handleDeregisterRequestBusEvent(ctx context.Context, req *protos.D
 	return nil
 }
 
-func (b *Bus) handleCommandBusEvent(ctx context.Context, req *protos.Command) error {
-	b.log.Debugf("handling comand response bus event: %v", req)
-
-	if err := validate.Command(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	var err error
-
-	switch req.Command.(type) {
-	case *protos.Command_SetPipeline:
-		err = b.handleSetPipelineCommand(ctx, req.GetSetPipeline())
-	case *protos.Command_DeletePipeline:
-		err = b.handleDeletePipelineCommand(ctx, req.GetDeletePipeline())
-	case *protos.Command_PausePipeline:
-		err = b.handlePausePipelineCommand(ctx, req.GetPausePipeline())
-	case *protos.Command_UnpausePipeline:
-		err = b.handleUnpausePipelineCommand(ctx, req.GetUnpausePipeline())
-	default:
-		return fmt.Errorf("unknown command type '%v'", req.Command)
-	}
-
-	if err != nil {
-		return errors.Wrap(err, "error handling command response")
-	}
-
+func (b *Bus) handleCreatePipelineRequest(ctx context.Context, req *protos.CreatePipelineRequest) error {
 	return nil
 }
 
-func (b *Bus) handleSetPipelineCommand(ctx context.Context, req *protos.SetPipelineCommand) error {
-	if err := validate.SetPipelineCommand(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
+func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
 	return nil
 }
 
-func (b *Bus) handleDeletePipelineCommand(ctx context.Context, req *protos.DeletePipelineCommand) error {
-	if err := validate.DeletePipelineCommand(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
+func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.UpdatePipelineRequest) error {
 	return nil
 }
 
-func (b *Bus) handlePausePipelineCommand(ctx context.Context, req *protos.PausePipelineCommand) error {
-	if err := validate.PausePipelineCommand(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
+func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.AttachPipelineRequest) error {
 	return nil
 }
 
-func (b *Bus) handleUnpausePipelineCommand(ctx context.Context, req *protos.UnpausePipelineCommand) error {
-	if err := validate.UnpausePipelineCommand(req); err != nil {
+func (b *Bus) handleDetachPipelineRequest(ctx context.Context, req *protos.DetachPipelineRequest) error {
+	return nil
+}
+
+func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PausePipelineRequest) error {
+	return nil
+}
+
+func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.ResumePipelineRequest) error {
+	return nil
+}
+
+func (b *Bus) handleHeartbeatRequest(ctx context.Context, req *protos.HeartbeatRequest) error {
+	b.log.Debugf("handling heartbeat request bus event: %v", req)
+
+	if err := validate.HeartbeatRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
+	}
+
+	if err := b.options.Store.AddHeartbeat(ctx, req); err != nil {
+		return errors.Wrap(err, "error saving heartbeat")
 	}
 
 	return nil
