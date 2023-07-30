@@ -18,6 +18,10 @@ func RegisterRequest(req *protos.RegisterRequest) error {
 		return ErrEmptyField("ServiceName")
 	}
 
+	if req.SessionId == "" {
+		return ErrEmptyField("SessionId")
+	}
+
 	if req.ClientInfo == nil {
 		return errors.New(".ClientInfo cannot be nil")
 	}
@@ -37,8 +41,8 @@ func HeartbeatRequest(req *protos.HeartbeatRequest) error {
 		return ErrNilInput
 	}
 
-	if err := Audience(req.Audience); err != nil {
-		return errors.Wrap(err, "invalid audience")
+	if req.SessionId == "" {
+		return ErrEmptyField("SessionId")
 	}
 
 	return nil
@@ -69,6 +73,7 @@ func DeregisterRequest(req *protos.DeregisterRequest) error {
 		return ErrNilInput
 	}
 
+	// TODO: This should be session_id instead
 	if req.ServiceName == "" {
 		return ErrEmptyField("ServiceName")
 	}
@@ -234,4 +239,16 @@ func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
 	}
 
 	return nil
+}
+
+func NewAudienceRequest(req *protos.NewAudienceRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.SessionId == "" {
+		return ErrEmptyField("SessionId")
+	}
+
+	return Audience(req.Audience)
 }

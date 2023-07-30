@@ -11,6 +11,7 @@ import (
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -115,6 +116,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 		TLSCACertFile:     cfg.NATSTLSCaFile,
 		TLSClientCertFile: cfg.NATSTLSCertFile,
 		TLSClientKeyFile:  cfg.NATSTLSKeyFile,
+		Logger:            logrus.WithField("pkg", "natty"),
 	})
 
 	if err != nil {
@@ -127,7 +129,12 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	storeService, err := store.New(d.ShutdownContext, d.CacheBackend, d.NATSBackend)
+	storeService, err := store.New(&store.Options{
+		NATSBackend:  d.NATSBackend,
+		CacheBackend: d.CacheBackend,
+		ShutdownCtx:  d.ShutdownContext,
+		NodeName:     cfg.NodeName,
+	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
 	}

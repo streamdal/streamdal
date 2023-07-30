@@ -129,7 +129,7 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 	}
 
 	// Save attachment configuration
-	if err := b.options.Store.RecordAttachment(ctx, req); err != nil {
+	if err := b.options.Store.AttachPipeline(ctx, req); err != nil {
 		b.log.Debugf("unable to save attachment for pipeline %s: %s", req.PipelineId, err)
 		return errors.Wrapf(err, "error saving attachment for pipeline '%s'", req.PipelineId)
 	}
