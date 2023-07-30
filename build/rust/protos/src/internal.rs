@@ -25,16 +25,158 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.NewAudienceRequest)
+pub struct NewAudienceRequest {
+    // message fields
+    ///  The session that is performing this call
+    // @@protoc_insertion_point(field:protos.NewAudienceRequest.session_id)
+    pub session_id: ::std::string::String,
+    ///  Newly created audience.
+    // @@protoc_insertion_point(field:protos.NewAudienceRequest.audience)
+    pub audience: ::protobuf::MessageField<super::common::Audience>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.NewAudienceRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a NewAudienceRequest {
+    fn default() -> &'a NewAudienceRequest {
+        <NewAudienceRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl NewAudienceRequest {
+    pub fn new() -> NewAudienceRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "session_id",
+            |m: &NewAudienceRequest| { &m.session_id },
+            |m: &mut NewAudienceRequest| { &mut m.session_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::common::Audience>(
+            "audience",
+            |m: &NewAudienceRequest| { &m.audience },
+            |m: &mut NewAudienceRequest| { &mut m.audience },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NewAudienceRequest>(
+            "NewAudienceRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for NewAudienceRequest {
+    const NAME: &'static str = "NewAudienceRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.session_id = is.read_string()?;
+                },
+                18 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.session_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.session_id);
+        }
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.session_id.is_empty() {
+            os.write_string(1, &self.session_id)?;
+        }
+        if let Some(v) = self.audience.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> NewAudienceRequest {
+        NewAudienceRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.session_id.clear();
+        self.audience.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static NewAudienceRequest {
+        static instance: NewAudienceRequest = NewAudienceRequest {
+            session_id: ::std::string::String::new(),
+            audience: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for NewAudienceRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("NewAudienceRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for NewAudienceRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for NewAudienceRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Each consumer and producer should send periodic heartbeats to the server
 ///  to let the server know that they are still active.
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.HeartbeatRequest)
 pub struct HeartbeatRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.HeartbeatRequest.audience)
-    pub audience: ::protobuf::MessageField<super::common::Audience>,
-    // @@protoc_insertion_point(field:protos.HeartbeatRequest.last_activity_unix_timestamp_utc)
-    pub last_activity_unix_timestamp_utc: i64,
+    ///  Session ID for this instance of the SDK.
+    // @@protoc_insertion_point(field:protos.HeartbeatRequest.session_id)
+    pub session_id: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.HeartbeatRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -52,17 +194,12 @@ impl HeartbeatRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::common::Audience>(
-            "audience",
-            |m: &HeartbeatRequest| { &m.audience },
-            |m: &mut HeartbeatRequest| { &mut m.audience },
-        ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "last_activity_unix_timestamp_utc",
-            |m: &HeartbeatRequest| { &m.last_activity_unix_timestamp_utc },
-            |m: &mut HeartbeatRequest| { &mut m.last_activity_unix_timestamp_utc },
+            "session_id",
+            |m: &HeartbeatRequest| { &m.session_id },
+            |m: &mut HeartbeatRequest| { &mut m.session_id },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<HeartbeatRequest>(
             "HeartbeatRequest",
@@ -83,10 +220,7 @@ impl ::protobuf::Message for HeartbeatRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
-                },
-                16 => {
-                    self.last_activity_unix_timestamp_utc = is.read_int64()?;
+                    self.session_id = is.read_string()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -100,12 +234,8 @@ impl ::protobuf::Message for HeartbeatRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.audience.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        if self.last_activity_unix_timestamp_utc != 0 {
-            my_size += ::protobuf::rt::int64_size(2, self.last_activity_unix_timestamp_utc);
+        if !self.session_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.session_id);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -113,11 +243,8 @@ impl ::protobuf::Message for HeartbeatRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.audience.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
-        if self.last_activity_unix_timestamp_utc != 0 {
-            os.write_int64(2, self.last_activity_unix_timestamp_utc)?;
+        if !self.session_id.is_empty() {
+            os.write_string(1, &self.session_id)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -136,15 +263,13 @@ impl ::protobuf::Message for HeartbeatRequest {
     }
 
     fn clear(&mut self) {
-        self.audience.clear();
-        self.last_activity_unix_timestamp_utc = 0;
+        self.session_id.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static HeartbeatRequest {
         static instance: HeartbeatRequest = HeartbeatRequest {
-            audience: ::protobuf::MessageField::none(),
-            last_activity_unix_timestamp_utc: 0,
+            session_id: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -646,20 +771,27 @@ impl ::protobuf::reflect::ProtobufValue for MetricsRequest {
 // @@protoc_insertion_point(message:protos.RegisterRequest)
 pub struct RegisterRequest {
     // message fields
+    ///  REQUIRED -- Name of the service that is registering.
     // @@protoc_insertion_point(field:protos.RegisterRequest.service_name)
     pub service_name: ::std::string::String,
-    ///  If set, we know that any pipelines or steps executed in this SDK will NOT
-    ///  modify the input/output data. As in, the SDK will log what it _would_ do
-    ///  and always return the original data set.
-    // @@protoc_insertion_point(field:protos.RegisterRequest.dry_run)
-    pub dry_run: bool,
-    ///  Info about the client (lib name, lang, os, arch, etc.)
+    ///  REQUIRED -- Unique ID for this SDK instance.
+    ///
+    ///  This should be generated every time the SDK is instantiated (oe. every
+    ///  time a NEW registration is performed).
+    // @@protoc_insertion_point(field:protos.RegisterRequest.session_id)
+    pub session_id: ::std::string::String,
+    ///  REQUIRED -- Info about the client (lib name, lang, os, arch, etc.)
     // @@protoc_insertion_point(field:protos.RegisterRequest.client_info)
     pub client_info: ::protobuf::MessageField<super::info::ClientInfo>,
     ///  OPTIONAL -- if these are defined, these will show up in the UI even if
     ///  there is no active .Process() call from the SDK.
     // @@protoc_insertion_point(field:protos.RegisterRequest.audiences)
     pub audiences: ::std::vec::Vec<super::common::Audience>,
+    ///  OPTIONAL -- If set, we know that any pipelines or steps executed in this
+    ///  SDK will NOT modify the input/output data. As in, the SDK will log what it
+    ///  _would_ do and always return the original data set.
+    // @@protoc_insertion_point(field:protos.RegisterRequest.dry_run)
+    pub dry_run: bool,
     // special fields
     // @@protoc_insertion_point(special_field:protos.RegisterRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -677,7 +809,7 @@ impl RegisterRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "service_name",
@@ -685,9 +817,9 @@ impl RegisterRequest {
             |m: &mut RegisterRequest| { &mut m.service_name },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "dry_run",
-            |m: &RegisterRequest| { &m.dry_run },
-            |m: &mut RegisterRequest| { &mut m.dry_run },
+            "session_id",
+            |m: &RegisterRequest| { &m.session_id },
+            |m: &mut RegisterRequest| { &mut m.session_id },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::info::ClientInfo>(
             "client_info",
@@ -698,6 +830,11 @@ impl RegisterRequest {
             "audiences",
             |m: &RegisterRequest| { &m.audiences },
             |m: &mut RegisterRequest| { &mut m.audiences },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "dry_run",
+            |m: &RegisterRequest| { &m.dry_run },
+            |m: &mut RegisterRequest| { &mut m.dry_run },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<RegisterRequest>(
             "RegisterRequest",
@@ -720,14 +857,17 @@ impl ::protobuf::Message for RegisterRequest {
                 10 => {
                     self.service_name = is.read_string()?;
                 },
-                16 => {
-                    self.dry_run = is.read_bool()?;
+                18 => {
+                    self.session_id = is.read_string()?;
                 },
                 26 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.client_info)?;
                 },
                 34 => {
                     self.audiences.push(is.read_message()?);
+                },
+                40 => {
+                    self.dry_run = is.read_bool()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -744,8 +884,8 @@ impl ::protobuf::Message for RegisterRequest {
         if !self.service_name.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.service_name);
         }
-        if self.dry_run != false {
-            my_size += 1 + 1;
+        if !self.session_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.session_id);
         }
         if let Some(v) = self.client_info.as_ref() {
             let len = v.compute_size();
@@ -755,6 +895,9 @@ impl ::protobuf::Message for RegisterRequest {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         };
+        if self.dry_run != false {
+            my_size += 1 + 1;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -764,8 +907,8 @@ impl ::protobuf::Message for RegisterRequest {
         if !self.service_name.is_empty() {
             os.write_string(1, &self.service_name)?;
         }
-        if self.dry_run != false {
-            os.write_bool(2, self.dry_run)?;
+        if !self.session_id.is_empty() {
+            os.write_string(2, &self.session_id)?;
         }
         if let Some(v) = self.client_info.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
@@ -773,6 +916,9 @@ impl ::protobuf::Message for RegisterRequest {
         for v in &self.audiences {
             ::protobuf::rt::write_message_field_with_cached_size(4, v, os)?;
         };
+        if self.dry_run != false {
+            os.write_bool(5, self.dry_run)?;
+        }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -791,18 +937,20 @@ impl ::protobuf::Message for RegisterRequest {
 
     fn clear(&mut self) {
         self.service_name.clear();
-        self.dry_run = false;
+        self.session_id.clear();
         self.client_info.clear();
         self.audiences.clear();
+        self.dry_run = false;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static RegisterRequest {
         static instance: RegisterRequest = RegisterRequest {
             service_name: ::std::string::String::new(),
-            dry_run: false,
+            session_id: ::std::string::String::new(),
             client_info: ::protobuf::MessageField::none(),
             audiences: ::std::vec::Vec::new(),
+            dry_run: false,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -951,118 +1099,141 @@ impl ::protobuf::reflect::ProtobufValue for DeregisterRequest {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0einternal.proto\x12\x06protos\x1a\rcommand.proto\x1a\x0ccommon.prot\
-    o\x1a\ninfo.proto\"\x88\x01\n\x10HeartbeatRequest\x12,\n\x08audience\x18\
-    \x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12F\n\x20last_activ\
-    ity_unix_timestamp_utc\x18\x02\x20\x01(\x03R\x1clastActivityUnixTimestam\
-    pUtc\"\xb1\x01\n\rNotifyRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01\
-    (\tR\npipelineId\x12\x1b\n\tstep_name\x18\x02\x20\x01(\tR\x08stepName\
-    \x12,\n\x08audience\x18\x03\x20\x01(\x0b2\x10.protos.AudienceR\x08audien\
-    ce\x124\n\x17occurred_at_unix_ts_utc\x18\x04\x20\x01(\x03R\x13occurredAt\
-    UnixTsUtc\"\xa3\x01\n\x07Metrics\x12\x12\n\x04name\x18\x01\x20\x01(\tR\
-    \x04name\x123\n\x06labels\x18\x02\x20\x03(\x0b2\x1b.protos.Metrics.Label\
-    sEntryR\x06labels\x12\x14\n\x05value\x18\x03\x20\x01(\x01R\x05value\x1a9\
-    \n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\
-    \x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\";\n\x0eMetricsRequest\
-    \x12)\n\x07metrics\x18\x01\x20\x03(\x0b2\x0f.protos.MetricsR\x07metrics\
-    \"\xb2\x01\n\x0fRegisterRequest\x12!\n\x0cservice_name\x18\x01\x20\x01(\
-    \tR\x0bserviceName\x12\x17\n\x07dry_run\x18\x02\x20\x01(\x08R\x06dryRun\
-    \x123\n\x0bclient_info\x18\x03\x20\x01(\x0b2\x12.protos.ClientInfoR\ncli\
-    entInfo\x12.\n\taudiences\x18\x04\x20\x03(\x0b2\x10.protos.AudienceR\tau\
-    diences\"6\n\x11DeregisterRequest\x12!\n\x0cservice_name\x18\x01\x20\x01\
-    (\tR\x0bserviceName2\xfb\x01\n\x08Internal\x126\n\x08Register\x12\x17.pr\
-    otos.RegisterRequest\x1a\x0f.protos.Command0\x01\x12?\n\tHeartbeat\x12\
-    \x18.protos.HeartbeatRequest\x1a\x18.protos.StandardResponse\x129\n\x06N\
-    otify\x12\x15.protos.NotifyRequest\x1a\x18.protos.StandardResponse\x12;\
-    \n\x07Metrics\x12\x16.protos.MetricsRequest\x1a\x18.protos.StandardRespo\
-    nseB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xcd\x13\n\x06\
-    \x12\x04\0\0I\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
-    \x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x17\n\t\n\x02\x03\x01\x12\
-    \x03\x05\0\x16\n\t\n\x02\x03\x02\x12\x03\x06\0\x14\n\x08\n\x01\x08\x12\
-    \x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0\
-    \x1c\x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n\xbc\x02\n\x04\x06\0\x02\
-    \0\x12\x03\x10\x02@\x1a\xae\x02\x20Initial\x20method\x20that\x20an\x20SD\
-    K\x20should\x20call\x20to\x20register\x20itself\x20with\x20the\x20server\
-    .\n\x20The\x20server\x20will\x20use\x20this\x20stream\x20to\x20send\x20c\
-    ommands\x20to\x20the\x20SDK\x20via\x20the\n\x20`CommandResponse`\x20mess\
-    age.\x20Clients\x20should\x20continuously\x20listen\x20for\n\x20CommandR\
-    esponse\x20messages\x20and\x20re-establish\x20registration\x20if\x20the\
-    \x20stream\x20gets\n\x20disconnected.\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\
-    \x03\x10\x06\x0e\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x10\x0f\x1e\n\x0c\n\
-    \x05\x06\0\x02\0\x06\x12\x03\x10)/\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\
-    \x100>\n\x84\x01\n\x04\x06\0\x02\x01\x12\x03\x14\x02=\x1aw\x20SDK\x20is\
-    \x20responsible\x20for\x20sending\x20heartbeats\x20to\x20the\x20server\
-    \x20to\x20let\x20the\x20server\n\x20know\x20about\x20active\x20consumers\
-    \x20and\x20producers.\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x14\x06\
-    \x0f\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x14\x10\x20\n\x0c\n\x05\x06\0\
-    \x02\x01\x03\x12\x03\x14+;\n\x86\x01\n\x04\x06\0\x02\x02\x12\x03\x18\x02\
-    7\x1ay\x20Use\x20this\x20method\x20when\x20Notify\x20condition\x20has\
-    \x20been\x20triggered;\x20the\x20server\x20will\n\x20decide\x20on\x20wha\
-    t\x20to\x20do\x20about\x20the\x20notification.\n\n\x0c\n\x05\x06\0\x02\
-    \x02\x01\x12\x03\x18\x06\x0c\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x18\r\
-    \x1a\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x18%5\n2\n\x04\x06\0\x02\x03\
-    \x12\x03\x1b\x029\x1a%\x20Send\x20periodic\x20metrics\x20to\x20the\x20se\
-    rver\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x1b\x06\r\n\x0c\n\x05\x06\0\
-    \x02\x03\x02\x12\x03\x1b\x0e\x1c\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\
-    \x1b'7\n\x8a\x01\n\x02\x04\0\x12\x04\x20\0#\x01\x1a~\x20Each\x20consumer\
-    \x20and\x20producer\x20should\x20send\x20periodic\x20heartbeats\x20to\
-    \x20the\x20server\n\x20to\x20let\x20the\x20server\x20know\x20that\x20the\
-    y\x20are\x20still\x20active.\n\n\n\n\x03\x04\0\x01\x12\x03\x20\x08\x18\n\
-    \x0b\n\x04\x04\0\x02\0\x12\x03!\x02\x18\n\x0c\n\x05\x04\0\x02\0\x06\x12\
-    \x03!\x02\n\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03!\x0b\x13\n\x0c\n\x05\x04\
-    \0\x02\0\x03\x12\x03!\x16\x17\n\x0b\n\x04\x04\0\x02\x01\x12\x03\"\x02-\n\
-    \x0c\n\x05\x04\0\x02\x01\x05\x12\x03\"\x02\x07\n\x0c\n\x05\x04\0\x02\x01\
-    \x01\x12\x03\"\x08(\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\"+,\n\n\n\x02\
-    \x04\x01\x12\x04%\0*\x01\n\n\n\x03\x04\x01\x01\x12\x03%\x08\x15\n\x0b\n\
-    \x04\x04\x01\x02\0\x12\x03&\x02\x19\n\x0c\n\x05\x04\x01\x02\0\x05\x12\
-    \x03&\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03&\t\x14\n\x0c\n\x05\
-    \x04\x01\x02\0\x03\x12\x03&\x17\x18\n\x0b\n\x04\x04\x01\x02\x01\x12\x03'\
-    \x02\x17\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03'\x02\x08\n\x0c\n\x05\
-    \x04\x01\x02\x01\x01\x12\x03'\t\x12\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\
-    \x03'\x15\x16\n\x0b\n\x04\x04\x01\x02\x02\x12\x03(\x02\x18\n\x0c\n\x05\
-    \x04\x01\x02\x02\x06\x12\x03(\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\
-    \x03(\x0b\x13\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03(\x16\x17\n\x0b\n\
-    \x04\x04\x01\x02\x03\x12\x03)\x02$\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\
-    \x03)\x02\x07\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03)\x08\x1f\n\x0c\n\
-    \x05\x04\x01\x02\x03\x03\x12\x03)\"#\n\n\n\x02\x04\x02\x12\x04,\00\x01\n\
-    \n\n\x03\x04\x02\x01\x12\x03,\x08\x0f\n\x0b\n\x04\x04\x02\x02\0\x12\x03-\
-    \x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03-\x02\x08\n\x0c\n\x05\x04\
-    \x02\x02\0\x01\x12\x03-\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03-\x10\
-    \x11\n\x0b\n\x04\x04\x02\x02\x01\x12\x03.\x02!\n\x0c\n\x05\x04\x02\x02\
-    \x01\x06\x12\x03.\x02\x15\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x03.\x16\
-    \x1c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03.\x1f\x20\n\x0b\n\x04\x04\
-    \x02\x02\x02\x12\x03/\x02\x13\n\x0c\n\x05\x04\x02\x02\x02\x05\x12\x03/\
-    \x02\x08\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03/\t\x0e\n\x0c\n\x05\x04\
-    \x02\x02\x02\x03\x12\x03/\x11\x12\n\n\n\x02\x04\x03\x12\x042\04\x01\n\n\
-    \n\x03\x04\x03\x01\x12\x032\x08\x16\n\x0b\n\x04\x04\x03\x02\0\x12\x033\
-    \x02\x1f\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x033\x02\n\n\x0c\n\x05\x04\
-    \x03\x02\0\x06\x12\x033\x0b\x12\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x033\
-    \x13\x1a\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x033\x1d\x1e\n\n\n\x02\x04\
-    \x04\x12\x046\0D\x01\n\n\n\x03\x04\x04\x01\x12\x036\x08\x17\n\x0b\n\x04\
-    \x04\x04\x02\0\x12\x037\x02\x1a\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x037\
-    \x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x037\t\x15\n\x0c\n\x05\x04\
-    \x04\x02\0\x03\x12\x037\x18\x19\n\xcd\x01\n\x04\x04\x04\x02\x01\x12\x03<\
-    \x02\x13\x1a\xbf\x01\x20If\x20set,\x20we\x20know\x20that\x20any\x20pipel\
-    ines\x20or\x20steps\x20executed\x20in\x20this\x20SDK\x20will\x20NOT\n\
-    \x20modify\x20the\x20input/output\x20data.\x20As\x20in,\x20the\x20SDK\
-    \x20will\x20log\x20what\x20it\x20_would_\x20do\n\x20and\x20always\x20ret\
-    urn\x20the\x20original\x20data\x20set.\n\n\x0c\n\x05\x04\x04\x02\x01\x05\
-    \x12\x03<\x02\x06\n\x0c\n\x05\x04\x04\x02\x01\x01\x12\x03<\x07\x0e\n\x0c\
-    \n\x05\x04\x04\x02\x01\x03\x12\x03<\x11\x12\nE\n\x04\x04\x04\x02\x02\x12\
-    \x03?\x02$\x1a8\x20Info\x20about\x20the\x20client\x20(lib\x20name,\x20la\
-    ng,\x20os,\x20arch,\x20etc.)\n\n\x0c\n\x05\x04\x04\x02\x02\x06\x12\x03?\
-    \x02\x13\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\x03?\x14\x1f\n\x0c\n\x05\
-    \x04\x04\x02\x02\x03\x12\x03?\"#\n\x87\x01\n\x04\x04\x04\x02\x03\x12\x03\
-    C\x02)\x1az\x20OPTIONAL\x20--\x20if\x20these\x20are\x20defined,\x20these\
-    \x20will\x20show\x20up\x20in\x20the\x20UI\x20even\x20if\n\x20there\x20is\
-    \x20no\x20active\x20.Process()\x20call\x20from\x20the\x20SDK.\n\n\x0c\n\
-    \x05\x04\x04\x02\x03\x04\x12\x03C\x02\n\n\x0c\n\x05\x04\x04\x02\x03\x06\
-    \x12\x03C\x0b\x1a\n\x0c\n\x05\x04\x04\x02\x03\x01\x12\x03C\x1b$\n\x0c\n\
-    \x05\x04\x04\x02\x03\x03\x12\x03C'(\nT\n\x02\x04\x05\x12\x04G\0I\x01\x1a\
-    H\x20Same\x20as\x20RegisterRequest\x20-\x20used\x20for\x20broadcasting\
-    \x20a\x20deregistration\x20event\n\n\n\n\x03\x04\x05\x01\x12\x03G\x08\
-    \x19\n\x0b\n\x04\x04\x05\x02\0\x12\x03H\x02\x1a\n\x0c\n\x05\x04\x05\x02\
-    \0\x05\x12\x03H\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03H\t\x15\n\
-    \x0c\n\x05\x04\x05\x02\0\x03\x12\x03H\x18\x19b\x06proto3\
+    o\x1a\ninfo.proto\"a\n\x12NewAudienceRequest\x12\x1d\n\nsession_id\x18\
+    \x01\x20\x01(\tR\tsessionId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10\
+    .protos.AudienceR\x08audience\"1\n\x10HeartbeatRequest\x12\x1d\n\nsessio\
+    n_id\x18\x01\x20\x01(\tR\tsessionId\"\xb1\x01\n\rNotifyRequest\x12\x1f\n\
+    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12\x1b\n\tstep_name\x18\
+    \x02\x20\x01(\tR\x08stepName\x12,\n\x08audience\x18\x03\x20\x01(\x0b2\
+    \x10.protos.AudienceR\x08audience\x124\n\x17occurred_at_unix_ts_utc\x18\
+    \x04\x20\x01(\x03R\x13occurredAtUnixTsUtc\"\xa3\x01\n\x07Metrics\x12\x12\
+    \n\x04name\x18\x01\x20\x01(\tR\x04name\x123\n\x06labels\x18\x02\x20\x03(\
+    \x0b2\x1b.protos.Metrics.LabelsEntryR\x06labels\x12\x14\n\x05value\x18\
+    \x03\x20\x01(\x01R\x05value\x1a9\n\x0bLabelsEntry\x12\x10\n\x03key\x18\
+    \x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\
+    \x028\x01\";\n\x0eMetricsRequest\x12)\n\x07metrics\x18\x01\x20\x03(\x0b2\
+    \x0f.protos.MetricsR\x07metrics\"\xd1\x01\n\x0fRegisterRequest\x12!\n\
+    \x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\x1d\n\nsession_i\
+    d\x18\x02\x20\x01(\tR\tsessionId\x123\n\x0bclient_info\x18\x03\x20\x01(\
+    \x0b2\x12.protos.ClientInfoR\nclientInfo\x12.\n\taudiences\x18\x04\x20\
+    \x03(\x0b2\x10.protos.AudienceR\taudiences\x12\x17\n\x07dry_run\x18\x05\
+    \x20\x01(\x08R\x06dryRun\"6\n\x11DeregisterRequest\x12!\n\x0cservice_nam\
+    e\x18\x01\x20\x01(\tR\x0bserviceName2\xc0\x02\n\x08Internal\x126\n\x08Re\
+    gister\x12\x17.protos.RegisterRequest\x1a\x0f.protos.Command0\x01\x12C\n\
+    \x0bNewAudience\x12\x1a.protos.NewAudienceRequest\x1a\x18.protos.Standar\
+    dResponse\x12?\n\tHeartbeat\x12\x18.protos.HeartbeatRequest\x1a\x18.prot\
+    os.StandardResponse\x129\n\x06Notify\x12\x15.protos.NotifyRequest\x1a\
+    \x18.protos.StandardResponse\x12;\n\x07Metrics\x12\x16.protos.MetricsReq\
+    uest\x1a\x18.protos.StandardResponseB4Z2github.com/streamdal/snitch-prot\
+    os/build/go/protosJ\x96\x19\n\x06\x12\x04\0\0]\x01\n\x08\n\x01\x0c\x12\
+    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\
+    \x04\0\x17\n\t\n\x02\x03\x01\x12\x03\x05\0\x16\n\t\n\x02\x03\x02\x12\x03\
+    \x06\0\x14\n\x08\n\x01\x08\x12\x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\
+    \0I\n\n\n\x02\x06\0\x12\x04\n\0!\x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\
+    \x10\n\xbc\x02\n\x04\x06\0\x02\0\x12\x03\x10\x02@\x1a\xae\x02\x20Initial\
+    \x20method\x20that\x20an\x20SDK\x20should\x20call\x20to\x20register\x20i\
+    tself\x20with\x20the\x20server.\n\x20The\x20server\x20will\x20use\x20thi\
+    s\x20stream\x20to\x20send\x20commands\x20to\x20the\x20SDK\x20via\x20the\
+    \n\x20`CommandResponse`\x20message.\x20Clients\x20should\x20continuously\
+    \x20listen\x20for\n\x20CommandResponse\x20messages\x20and\x20re-establis\
+    h\x20registration\x20if\x20the\x20stream\x20gets\n\x20disconnected.\n\n\
+    \x0c\n\x05\x06\0\x02\0\x01\x12\x03\x10\x06\x0e\n\x0c\n\x05\x06\0\x02\0\
+    \x02\x12\x03\x10\x0f\x1e\n\x0c\n\x05\x06\0\x02\0\x06\x12\x03\x10)/\n\x0c\
+    \n\x05\x06\0\x02\0\x03\x12\x03\x100>\n\xb0\x01\n\x04\x06\0\x02\x01\x12\
+    \x03\x15\x02A\x1a\xa2\x01\x20Declare\x20a\x20new\x20audience\x20that\x20\
+    the\x20SDK\x20is\x20able\x20to\x20accept\x20commands\x20for.\n\x20An\x20\
+    SDK\x20would\x20use\x20this\x20method\x20when\x20a\x20new\x20audience\
+    \x20is\x20declared\x20by\x20the\x20user\n\x20via\x20`.Process()`.\n\n\
+    \x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x15\x06\x11\n\x0c\n\x05\x06\0\x02\
+    \x01\x02\x12\x03\x15\x12$\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\x15/?\n\
+    \x84\x01\n\x04\x06\0\x02\x02\x12\x03\x19\x02=\x1aw\x20SDK\x20is\x20respo\
+    nsible\x20for\x20sending\x20heartbeats\x20to\x20the\x20server\x20to\x20l\
+    et\x20the\x20server\n\x20know\x20about\x20active\x20consumers\x20and\x20\
+    producers.\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x19\x06\x0f\n\x0c\n\
+    \x05\x06\0\x02\x02\x02\x12\x03\x19\x10\x20\n\x0c\n\x05\x06\0\x02\x02\x03\
+    \x12\x03\x19+;\n\x86\x01\n\x04\x06\0\x02\x03\x12\x03\x1d\x027\x1ay\x20Us\
+    e\x20this\x20method\x20when\x20Notify\x20condition\x20has\x20been\x20tri\
+    ggered;\x20the\x20server\x20will\n\x20decide\x20on\x20what\x20to\x20do\
+    \x20about\x20the\x20notification.\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\
+    \x03\x1d\x06\x0c\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\x1d\r\x1a\n\x0c\n\
+    \x05\x06\0\x02\x03\x03\x12\x03\x1d%5\n2\n\x04\x06\0\x02\x04\x12\x03\x20\
+    \x029\x1a%\x20Send\x20periodic\x20metrics\x20to\x20the\x20server\n\n\x0c\
+    \n\x05\x06\0\x02\x04\x01\x12\x03\x20\x06\r\n\x0c\n\x05\x06\0\x02\x04\x02\
+    \x12\x03\x20\x0e\x1c\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x20'7\n\n\n\
+    \x02\x04\0\x12\x04#\0)\x01\n\n\n\x03\x04\0\x01\x12\x03#\x08\x1a\n7\n\x04\
+    \x04\0\x02\0\x12\x03%\x02\x18\x1a*\x20The\x20session\x20that\x20is\x20pe\
+    rforming\x20this\x20call\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03%\x02\x08\
+    \n\x0c\n\x05\x04\0\x02\0\x01\x12\x03%\t\x13\n\x0c\n\x05\x04\0\x02\0\x03\
+    \x12\x03%\x16\x17\n&\n\x04\x04\0\x02\x01\x12\x03(\x02\x18\x1a\x19\x20New\
+    ly\x20created\x20audience.\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03(\x02\
+    \n\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03(\x0b\x13\n\x0c\n\x05\x04\0\x02\
+    \x01\x03\x12\x03(\x16\x17\n\x8a\x01\n\x02\x04\x01\x12\x04-\00\x01\x1a~\
+    \x20Each\x20consumer\x20and\x20producer\x20should\x20send\x20periodic\
+    \x20heartbeats\x20to\x20the\x20server\n\x20to\x20let\x20the\x20server\
+    \x20know\x20that\x20they\x20are\x20still\x20active.\n\n\n\n\x03\x04\x01\
+    \x01\x12\x03-\x08\x18\n7\n\x04\x04\x01\x02\0\x12\x03/\x02\x18\x1a*\x20Se\
+    ssion\x20ID\x20for\x20this\x20instance\x20of\x20the\x20SDK.\n\n\x0c\n\
+    \x05\x04\x01\x02\0\x05\x12\x03/\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\
+    \x12\x03/\t\x13\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03/\x16\x17\n\n\n\x02\
+    \x04\x02\x12\x042\07\x01\n\n\n\x03\x04\x02\x01\x12\x032\x08\x15\n\x0b\n\
+    \x04\x04\x02\x02\0\x12\x033\x02\x19\n\x0c\n\x05\x04\x02\x02\0\x05\x12\
+    \x033\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x033\t\x14\n\x0c\n\x05\
+    \x04\x02\x02\0\x03\x12\x033\x17\x18\n\x0b\n\x04\x04\x02\x02\x01\x12\x034\
+    \x02\x17\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x034\x02\x08\n\x0c\n\x05\
+    \x04\x02\x02\x01\x01\x12\x034\t\x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\
+    \x034\x15\x16\n\x0b\n\x04\x04\x02\x02\x02\x12\x035\x02\x18\n\x0c\n\x05\
+    \x04\x02\x02\x02\x06\x12\x035\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\
+    \x035\x0b\x13\n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x035\x16\x17\n\x0b\n\
+    \x04\x04\x02\x02\x03\x12\x036\x02$\n\x0c\n\x05\x04\x02\x02\x03\x05\x12\
+    \x036\x02\x07\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\x036\x08\x1f\n\x0c\n\
+    \x05\x04\x02\x02\x03\x03\x12\x036\"#\n\n\n\x02\x04\x03\x12\x049\0=\x01\n\
+    \n\n\x03\x04\x03\x01\x12\x039\x08\x0f\n\x0b\n\x04\x04\x03\x02\0\x12\x03:\
+    \x02\x12\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03:\x02\x08\n\x0c\n\x05\x04\
+    \x03\x02\0\x01\x12\x03:\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03:\x10\
+    \x11\n\x0b\n\x04\x04\x03\x02\x01\x12\x03;\x02!\n\x0c\n\x05\x04\x03\x02\
+    \x01\x06\x12\x03;\x02\x15\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x03;\x16\
+    \x1c\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03;\x1f\x20\n\x0b\n\x04\x04\
+    \x03\x02\x02\x12\x03<\x02\x13\n\x0c\n\x05\x04\x03\x02\x02\x05\x12\x03<\
+    \x02\x08\n\x0c\n\x05\x04\x03\x02\x02\x01\x12\x03<\t\x0e\n\x0c\n\x05\x04\
+    \x03\x02\x02\x03\x12\x03<\x11\x12\n\n\n\x02\x04\x04\x12\x04?\0A\x01\n\n\
+    \n\x03\x04\x04\x01\x12\x03?\x08\x16\n\x0b\n\x04\x04\x04\x02\0\x12\x03@\
+    \x02\x1f\n\x0c\n\x05\x04\x04\x02\0\x04\x12\x03@\x02\n\n\x0c\n\x05\x04\
+    \x04\x02\0\x06\x12\x03@\x0b\x12\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03@\
+    \x13\x1a\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03@\x1d\x1e\n\n\n\x02\x04\
+    \x05\x12\x04C\0X\x01\n\n\n\x03\x04\x05\x01\x12\x03C\x08\x17\nC\n\x04\x04\
+    \x05\x02\0\x12\x03E\x02\x1a\x1a6\x20REQUIRED\x20--\x20Name\x20of\x20the\
+    \x20service\x20that\x20is\x20registering.\n\n\x0c\n\x05\x04\x05\x02\0\
+    \x05\x12\x03E\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03E\t\x15\n\x0c\
+    \n\x05\x04\x05\x02\0\x03\x12\x03E\x18\x19\n\xad\x01\n\x04\x04\x05\x02\
+    \x01\x12\x03K\x02\x18\x1a\x9f\x01\x20REQUIRED\x20--\x20Unique\x20ID\x20f\
+    or\x20this\x20SDK\x20instance.\n\n\x20This\x20should\x20be\x20generated\
+    \x20every\x20time\x20the\x20SDK\x20is\x20instantiated\x20(oe.\x20every\n\
+    \x20time\x20a\x20NEW\x20registration\x20is\x20performed).\n\n\x0c\n\x05\
+    \x04\x05\x02\x01\x05\x12\x03K\x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\
+    \x12\x03K\t\x13\n\x0c\n\x05\x04\x05\x02\x01\x03\x12\x03K\x16\x17\nQ\n\
+    \x04\x04\x05\x02\x02\x12\x03N\x02$\x1aD\x20REQUIRED\x20--\x20Info\x20abo\
+    ut\x20the\x20client\x20(lib\x20name,\x20lang,\x20os,\x20arch,\x20etc.)\n\
+    \n\x0c\n\x05\x04\x05\x02\x02\x06\x12\x03N\x02\x13\n\x0c\n\x05\x04\x05\
+    \x02\x02\x01\x12\x03N\x14\x1f\n\x0c\n\x05\x04\x05\x02\x02\x03\x12\x03N\"\
+    #\n\x87\x01\n\x04\x04\x05\x02\x03\x12\x03R\x02)\x1az\x20OPTIONAL\x20--\
+    \x20if\x20these\x20are\x20defined,\x20these\x20will\x20show\x20up\x20in\
+    \x20the\x20UI\x20even\x20if\n\x20there\x20is\x20no\x20active\x20.Process\
+    ()\x20call\x20from\x20the\x20SDK.\n\n\x0c\n\x05\x04\x05\x02\x03\x04\x12\
+    \x03R\x02\n\n\x0c\n\x05\x04\x05\x02\x03\x06\x12\x03R\x0b\x1a\n\x0c\n\x05\
+    \x04\x05\x02\x03\x01\x12\x03R\x1b$\n\x0c\n\x05\x04\x05\x02\x03\x03\x12\
+    \x03R'(\n\xd9\x01\n\x04\x04\x05\x02\x04\x12\x03W\x02\x13\x1a\xcb\x01\x20\
+    OPTIONAL\x20--\x20If\x20set,\x20we\x20know\x20that\x20any\x20pipelines\
+    \x20or\x20steps\x20executed\x20in\x20this\n\x20SDK\x20will\x20NOT\x20mod\
+    ify\x20the\x20input/output\x20data.\x20As\x20in,\x20the\x20SDK\x20will\
+    \x20log\x20what\x20it\n\x20_would_\x20do\x20and\x20always\x20return\x20t\
+    he\x20original\x20data\x20set.\n\n\x0c\n\x05\x04\x05\x02\x04\x05\x12\x03\
+    W\x02\x06\n\x0c\n\x05\x04\x05\x02\x04\x01\x12\x03W\x07\x0e\n\x0c\n\x05\
+    \x04\x05\x02\x04\x03\x12\x03W\x11\x12\nT\n\x02\x04\x06\x12\x04[\0]\x01\
+    \x1aH\x20Same\x20as\x20RegisterRequest\x20-\x20used\x20for\x20broadcasti\
+    ng\x20a\x20deregistration\x20event\n\n\n\n\x03\x04\x06\x01\x12\x03[\x08\
+    \x19\n\x0b\n\x04\x04\x06\x02\0\x12\x03\\\x02\x1a\n\x0c\n\x05\x04\x06\x02\
+    \0\x05\x12\x03\\\x02\x08\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x03\\\t\x15\n\
+    \x0c\n\x05\x04\x06\x02\0\x03\x12\x03\\\x18\x19b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1083,7 +1254,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::command::file_descriptor().clone());
             deps.push(super::common::file_descriptor().clone());
             deps.push(super::info::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(6);
+            let mut messages = ::std::vec::Vec::with_capacity(7);
+            messages.push(NewAudienceRequest::generated_message_descriptor_data());
             messages.push(HeartbeatRequest::generated_message_descriptor_data());
             messages.push(NotifyRequest::generated_message_descriptor_data());
             messages.push(Metrics::generated_message_descriptor_data());

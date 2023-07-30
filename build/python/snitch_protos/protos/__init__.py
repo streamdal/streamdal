@@ -321,14 +321,23 @@ class KeepAliveCommand(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class NewAudienceRequest(betterproto.Message):
+    session_id: str = betterproto.string_field(1)
+    """The session that is performing this call"""
+
+    audience: "Audience" = betterproto.message_field(2)
+    """Newly created audience."""
+
+
+@dataclass(eq=False, repr=False)
 class HeartbeatRequest(betterproto.Message):
     """
     Each consumer and producer should send periodic heartbeats to the server to
     let the server know that they are still active.
     """
 
-    audience: "Audience" = betterproto.message_field(1)
-    last_activity_unix_timestamp_utc: int = betterproto.int64_field(2)
+    session_id: str = betterproto.string_field(1)
+    """Session ID for this instance of the SDK."""
 
 
 @dataclass(eq=False, repr=False)
@@ -356,20 +365,29 @@ class MetricsRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class RegisterRequest(betterproto.Message):
     service_name: str = betterproto.string_field(1)
-    dry_run: bool = betterproto.bool_field(2)
+    """REQUIRED -- Name of the service that is registering."""
+
+    session_id: str = betterproto.string_field(2)
     """
-    If set, we know that any pipelines or steps executed in this SDK will NOT
-    modify the input/output data. As in, the SDK will log what it _would_ do
-    and always return the original data set.
+    REQUIRED -- Unique ID for this SDK instance. This should be generated every
+    time the SDK is instantiated (oe. every time a NEW registration is
+    performed).
     """
 
     client_info: "ClientInfo" = betterproto.message_field(3)
-    """Info about the client (lib name, lang, os, arch, etc.)"""
+    """REQUIRED -- Info about the client (lib name, lang, os, arch, etc.)"""
 
     audiences: List["Audience"] = betterproto.message_field(4)
     """
     OPTIONAL -- if these are defined, these will show up in the UI even if
     there is no active .Process() call from the SDK.
+    """
+
+    dry_run: bool = betterproto.bool_field(5)
+    """
+    OPTIONAL -- If set, we know that any pipelines or steps executed in this
+    SDK will NOT modify the input/output data. As in, the SDK will log what it
+    _would_ do and always return the original data set.
     """
 
 
@@ -657,6 +675,23 @@ class InternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def new_audience(
+        self,
+        new_audience_request: "NewAudienceRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.Internal/NewAudience",
+            new_audience_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def heartbeat(
         self,
         heartbeat_request: "HeartbeatRequest",
@@ -919,6 +954,11 @@ class InternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield Command()
 
+    async def new_audience(
+        self, new_audience_request: "NewAudienceRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def heartbeat(
         self, heartbeat_request: "HeartbeatRequest"
     ) -> "StandardResponse":
@@ -939,6 +979,13 @@ class InternalBase(ServiceBase):
             stream,
             request,
         )
+
+    async def __rpc_new_audience(
+        self, stream: "grpclib.server.Stream[NewAudienceRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.new_audience(request)
+        await stream.send_message(response)
 
     async def __rpc_heartbeat(
         self, stream: "grpclib.server.Stream[HeartbeatRequest, StandardResponse]"
@@ -968,6 +1015,12 @@ class InternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_STREAM,
                 RegisterRequest,
                 Command,
+            ),
+            "/protos.Internal/NewAudience": grpclib.const.Handler(
+                self.__rpc_new_audience,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                NewAudienceRequest,
+                StandardResponse,
             ),
             "/protos.Internal/Heartbeat": grpclib.const.Handler(
                 self.__rpc_heartbeat,

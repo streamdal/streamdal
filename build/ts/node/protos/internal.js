@@ -8,11 +8,23 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { ClientInfo } from "./info.js";
 import { Audience } from "./common.js";
 // @generated message type with reflection information, may provide speed optimized methods
+class NewAudienceRequest$Type extends MessageType {
+    constructor() {
+        super("protos.NewAudienceRequest", [
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.NewAudienceRequest
+ */
+export const NewAudienceRequest = new NewAudienceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class HeartbeatRequest$Type extends MessageType {
     constructor() {
         super("protos.HeartbeatRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 2, name: "last_activity_unix_timestamp_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
@@ -66,9 +78,10 @@ class RegisterRequest$Type extends MessageType {
     constructor() {
         super("protos.RegisterRequest", [
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "client_info", kind: "message", T: () => ClientInfo },
-            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 5, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
@@ -93,6 +106,7 @@ export const DeregisterRequest = new DeregisterRequest$Type();
  */
 export const Internal = new ServiceType("protos.Internal", [
     { name: "Register", serverStreaming: true, options: {}, I: RegisterRequest, O: Command },
+    { name: "NewAudience", options: {}, I: NewAudienceRequest, O: StandardResponse },
     { name: "Heartbeat", options: {}, I: HeartbeatRequest, O: StandardResponse },
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
     { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse }

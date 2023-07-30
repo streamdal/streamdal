@@ -6,8 +6,9 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Internal } from "./internal.js";
 import type { MetricsRequest } from "./internal.js";
 import type { NotifyRequest } from "./internal.js";
-import type { StandardResponse } from "./common.js";
 import type { HeartbeatRequest } from "./internal.js";
+import type { StandardResponse } from "./common.js";
+import type { NewAudienceRequest } from "./internal.js";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
 import type { Command } from "./command.js";
@@ -28,6 +29,14 @@ export interface IInternalClient {
      * @generated from protobuf rpc: Register(protos.RegisterRequest) returns (stream protos.Command);
      */
     register(input: RegisterRequest, options?: RpcOptions): ServerStreamingCall<RegisterRequest, Command>;
+    /**
+     * Declare a new audience that the SDK is able to accept commands for.
+     * An SDK would use this method when a new audience is declared by the user
+     * via `.Process()`.
+     *
+     * @generated from protobuf rpc: NewAudience(protos.NewAudienceRequest) returns (protos.StandardResponse);
+     */
+    newAudience(input: NewAudienceRequest, options?: RpcOptions): UnaryCall<NewAudienceRequest, StandardResponse>;
     /**
      * SDK is responsible for sending heartbeats to the server to let the server
      * know about active consumers and producers.
@@ -72,13 +81,24 @@ export class InternalClient implements IInternalClient, ServiceInfo {
         return stackIntercept<RegisterRequest, Command>("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * Declare a new audience that the SDK is able to accept commands for.
+     * An SDK would use this method when a new audience is declared by the user
+     * via `.Process()`.
+     *
+     * @generated from protobuf rpc: NewAudience(protos.NewAudienceRequest) returns (protos.StandardResponse);
+     */
+    newAudience(input: NewAudienceRequest, options?: RpcOptions): UnaryCall<NewAudienceRequest, StandardResponse> {
+        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        return stackIntercept<NewAudienceRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * SDK is responsible for sending heartbeats to the server to let the server
      * know about active consumers and producers.
      *
      * @generated from protobuf rpc: Heartbeat(protos.HeartbeatRequest) returns (protos.StandardResponse);
      */
     heartbeat(input: HeartbeatRequest, options?: RpcOptions): UnaryCall<HeartbeatRequest, StandardResponse> {
-        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept<HeartbeatRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -88,7 +108,7 @@ export class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: Notify(protos.NotifyRequest) returns (protos.StandardResponse);
      */
     notify(input: NotifyRequest, options?: RpcOptions): UnaryCall<NotifyRequest, StandardResponse> {
-        const method = this.methods[2], opt = this._transport.mergeOptions(options);
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
         return stackIntercept<NotifyRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -97,7 +117,7 @@ export class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: Metrics(protos.MetricsRequest) returns (protos.StandardResponse);
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse> {
-        const method = this.methods[3], opt = this._transport.mergeOptions(options);
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<MetricsRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
 }

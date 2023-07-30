@@ -25,13 +25,24 @@ export class InternalClient {
         return stackIntercept("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * Declare a new audience that the SDK is able to accept commands for.
+     * An SDK would use this method when a new audience is declared by the user
+     * via `.Process()`.
+     *
+     * @generated from protobuf rpc: NewAudience(protos.NewAudienceRequest) returns (protos.StandardResponse);
+     */
+    newAudience(input, options) {
+        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        return stackIntercept("unary", this._transport, method, opt, input);
+    }
+    /**
      * SDK is responsible for sending heartbeats to the server to let the server
      * know about active consumers and producers.
      *
      * @generated from protobuf rpc: Heartbeat(protos.HeartbeatRequest) returns (protos.StandardResponse);
      */
     heartbeat(input, options) {
-        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
@@ -41,7 +52,7 @@ export class InternalClient {
      * @generated from protobuf rpc: Notify(protos.NotifyRequest) returns (protos.StandardResponse);
      */
     notify(input, options) {
-        const method = this.methods[2], opt = this._transport.mergeOptions(options);
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
@@ -50,7 +61,7 @@ export class InternalClient {
      * @generated from protobuf rpc: Metrics(protos.MetricsRequest) returns (protos.StandardResponse);
      */
     metrics(input, options) {
-        const method = this.methods[3], opt = this._transport.mergeOptions(options);
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
 }

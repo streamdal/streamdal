@@ -8,6 +8,23 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { ClientInfo } from "./info.js";
 import { Audience } from "./common.js";
 /**
+ * @generated from protobuf message protos.NewAudienceRequest
+ */
+export interface NewAudienceRequest {
+    /**
+     * The session that is performing this call
+     *
+     * @generated from protobuf field: string session_id = 1;
+     */
+    sessionId: string;
+    /**
+     * Newly created audience.
+     *
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+}
+/**
  * Each consumer and producer should send periodic heartbeats to the server
  * to let the server know that they are still active.
  *
@@ -15,13 +32,11 @@ import { Audience } from "./common.js";
  */
 export interface HeartbeatRequest {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * Session ID for this instance of the SDK.
+     *
+     * @generated from protobuf field: string session_id = 1;
      */
-    audience?: Audience;
-    /**
-     * @generated from protobuf field: int64 last_activity_unix_timestamp_utc = 2;
-     */
-    lastActivityUnixTimestampUtc: bigint;
+    sessionId: string;
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
@@ -77,19 +92,22 @@ export interface MetricsRequest {
  */
 export interface RegisterRequest {
     /**
+     * REQUIRED -- Name of the service that is registering.
+     *
      * @generated from protobuf field: string service_name = 1;
      */
     serviceName: string;
     /**
-     * If set, we know that any pipelines or steps executed in this SDK will NOT
-     * modify the input/output data. As in, the SDK will log what it _would_ do
-     * and always return the original data set.
+     * REQUIRED -- Unique ID for this SDK instance.
      *
-     * @generated from protobuf field: bool dry_run = 2;
+     * This should be generated every time the SDK is instantiated (oe. every
+     * time a NEW registration is performed).
+     *
+     * @generated from protobuf field: string session_id = 2;
      */
-    dryRun: boolean;
+    sessionId: string;
     /**
-     * Info about the client (lib name, lang, os, arch, etc.)
+     * REQUIRED -- Info about the client (lib name, lang, os, arch, etc.)
      *
      * @generated from protobuf field: protos.ClientInfo client_info = 3;
      */
@@ -101,6 +119,14 @@ export interface RegisterRequest {
      * @generated from protobuf field: repeated protos.Audience audiences = 4;
      */
     audiences: Audience[];
+    /**
+     * OPTIONAL -- If set, we know that any pipelines or steps executed in this
+     * SDK will NOT modify the input/output data. As in, the SDK will log what it
+     * _would_ do and always return the original data set.
+     *
+     * @generated from protobuf field: bool dry_run = 5;
+     */
+    dryRun: boolean;
 }
 /**
  * Same as RegisterRequest - used for broadcasting a deregistration event
@@ -114,11 +140,23 @@ export interface DeregisterRequest {
     serviceName: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
+class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
+    constructor() {
+        super("protos.NewAudienceRequest", [
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.NewAudienceRequest
+ */
+export const NewAudienceRequest = new NewAudienceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor() {
         super("protos.HeartbeatRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 2, name: "last_activity_unix_timestamp_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
@@ -172,9 +210,10 @@ class RegisterRequest$Type extends MessageType<RegisterRequest> {
     constructor() {
         super("protos.RegisterRequest", [
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "client_info", kind: "message", T: () => ClientInfo },
-            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 5, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
@@ -199,6 +238,7 @@ export const DeregisterRequest = new DeregisterRequest$Type();
  */
 export const Internal = new ServiceType("protos.Internal", [
     { name: "Register", serverStreaming: true, options: {}, I: RegisterRequest, O: Command },
+    { name: "NewAudience", options: {}, I: NewAudienceRequest, O: StandardResponse },
     { name: "Heartbeat", options: {}, I: HeartbeatRequest, O: StandardResponse },
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
     { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse }

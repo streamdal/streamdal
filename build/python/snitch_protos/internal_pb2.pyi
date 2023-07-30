@@ -15,12 +15,10 @@ class DeregisterRequest(_message.Message):
     def __init__(self, service_name: _Optional[str] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
-    __slots__ = ["audience", "last_activity_unix_timestamp_utc"]
-    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    LAST_ACTIVITY_UNIX_TIMESTAMP_UTC_FIELD_NUMBER: _ClassVar[int]
-    audience: _common_pb2.Audience
-    last_activity_unix_timestamp_utc: int
-    def __init__(self, audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ..., last_activity_unix_timestamp_utc: _Optional[int] = ...) -> None: ...
+    __slots__ = ["session_id"]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    session_id: str
+    def __init__(self, session_id: _Optional[str] = ...) -> None: ...
 
 class Metrics(_message.Message):
     __slots__ = ["labels", "name", "value"]
@@ -45,6 +43,14 @@ class MetricsRequest(_message.Message):
     metrics: _containers.RepeatedCompositeFieldContainer[Metrics]
     def __init__(self, metrics: _Optional[_Iterable[_Union[Metrics, _Mapping]]] = ...) -> None: ...
 
+class NewAudienceRequest(_message.Message):
+    __slots__ = ["audience", "session_id"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    audience: _common_pb2.Audience
+    session_id: str
+    def __init__(self, session_id: _Optional[str] = ..., audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+
 class NotifyRequest(_message.Message):
     __slots__ = ["audience", "occurred_at_unix_ts_utc", "pipeline_id", "step_name"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
@@ -58,13 +64,15 @@ class NotifyRequest(_message.Message):
     def __init__(self, pipeline_id: _Optional[str] = ..., step_name: _Optional[str] = ..., audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
-    __slots__ = ["audiences", "client_info", "dry_run", "service_name"]
+    __slots__ = ["audiences", "client_info", "dry_run", "service_name", "session_id"]
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     CLIENT_INFO_FIELD_NUMBER: _ClassVar[int]
     DRY_RUN_FIELD_NUMBER: _ClassVar[int]
     SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
     client_info: _info_pb2.ClientInfo
     dry_run: bool
     service_name: str
-    def __init__(self, service_name: _Optional[str] = ..., dry_run: bool = ..., client_info: _Optional[_Union[_info_pb2.ClientInfo, _Mapping]] = ..., audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
+    session_id: str
+    def __init__(self, service_name: _Optional[str] = ..., session_id: _Optional[str] = ..., client_info: _Optional[_Union[_info_pb2.ClientInfo, _Mapping]] = ..., audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., dry_run: bool = ...) -> None: ...
