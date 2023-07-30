@@ -16,6 +16,11 @@ service Internal {
   // disconnected.
   rpc Register(RegisterRequest) returns (stream protos.Command);
 
+  // Declare a new audience that the SDK is able to accept commands for.
+  // An SDK would use this method when a new audience is declared by the user
+  // via `.Process()`.
+  rpc NewAudience(NewAudienceRequest) returns (StandardResponse);
+
   // SDK is responsible for sending heartbeats to the server to let the server
   // know about active consumers and producers.
   rpc Heartbeat(HeartbeatRequest) returns (StandardResponse);
@@ -28,11 +33,19 @@ service Internal {
   rpc Metrics(MetricsRequest) returns (StandardResponse);
 }
 
+message NewAudienceRequest {
+  // The session that is performing this call
+  string session_id = 1;
+
+  // Newly created audience.
+  Audience audience = 2;
+}
+
 // Each consumer and producer should send periodic heartbeats to the server
 // to let the server know that they are still active.
 message HeartbeatRequest {
-  Audience audience = 1;
-  int64 last_activity_unix_timestamp_utc = 2;
+  // Session ID for this instance of the SDK.
+  string session_id = 1;
 }
 
 message NotifyRequest {
@@ -53,19 +66,26 @@ message MetricsRequest {
 }
 
 message RegisterRequest {
+  // REQUIRED -- Name of the service that is registering.
   string service_name = 1;
 
-  // If set, we know that any pipelines or steps executed in this SDK will NOT
-  // modify the input/output data. As in, the SDK will log what it _would_ do
-  // and always return the original data set.
-  bool dry_run = 2;
+  // REQUIRED -- Unique ID for this SDK instance.
+  //
+  // This should be generated every time the SDK is instantiated (oe. every
+  // time a NEW registration is performed).
+  string session_id = 2;
 
-  // Info about the client (lib name, lang, os, arch, etc.)
+  // REQUIRED -- Info about the client (lib name, lang, os, arch, etc.)
   protos.ClientInfo client_info = 3;
 
   // OPTIONAL -- if these are defined, these will show up in the UI even if
   // there is no active .Process() call from the SDK.
   repeated protos.Audience audiences = 4;
+
+  // OPTIONAL -- If set, we know that any pipelines or steps executed in this
+  // SDK will NOT modify the input/output data. As in, the SDK will log what it
+  // _would_ do and always return the original data set.
+  bool dry_run = 5;
 }
 
 // Same as RegisterRequest - used for broadcasting a deregistration event
