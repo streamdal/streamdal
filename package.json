@@ -1,8 +1,10 @@
 {
-  "name": "snitch-node-client",
+  "name": "@streamdal/snitch-node-client",
   "version": "0.0.0",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
+    "snitch",
+    "streamdal",
     "typescript",
     "node",
     "data quality"
@@ -27,13 +29,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/streamdal/node-dataqual.git"
+    "url": "git+https://github.com/streamdal/snitch-node-client.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/streamdal/node-dataqual/issues"
+    "url": "https://github.com/streamdal/snitch-node-client/issues"
   },
-  "homepage": "https://github.com/streamdal/node-dataqual#readme",
+  "homepage": "https://github.com/streamdal/snitch-node-client#readme",
   "dependencies": {
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
