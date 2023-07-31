@@ -215,7 +215,7 @@ class SnitchClient:
     def _run_heartbeat(self):
         async def call():
             self.log.debug("Sending heartbeat")
-            await self.stub.heartbeat(protos.HeartbeatRequest(), timeout=self.grpc_timeout, metadata=self._get_metadata())
+            await self.stub.heartbeat(protos.HeartbeatRequest(session_id=self.session_id), timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         while not self.exit.is_set():
             self.loop.run_until_complete(call())
@@ -246,13 +246,11 @@ class SnitchClient:
 
     def _register(self) -> None:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
-        async def call():
-            self.log.debug("Registering with snitch server")
-
-            req = protos.RegisterRequest()
-            req.dry_run = self.cfg.dry_run
-            req.service_name = self.cfg.service_name
-            req.client_info = protos.ClientInfo(
+        req = protos.RegisterRequest(
+            dry_run=self.cfg.dry_run,
+            service_name=self.cfg.service_name,
+            session_id=self.session_id,
+            client_info=protos.ClientInfo(
                 client_type=protos.ClientType(self.cfg.client_type),  # TODO: this needs to be passed in config
                 library_name="snitch-python-client",
                 library_version="0.0.1",  # TODO: how to inject via github CI?
@@ -260,6 +258,10 @@ class SnitchClient:
                 arch=platform.processor(),
                 os=platform.system()
             )
+        )
+
+        async def call():
+            self.log.debug("Registering with snitch server")
 
             async for r in self.stub.register(req, timeout=self.grpc_timeout, metadata=self._get_metadata()):
                 print("Received command: ", r)
