@@ -23,7 +23,7 @@ jobs:
       - name: Release on npm
         working-directory: ./build
         run: |
-          npm version ${{ github.event.release.tag_name }} --ignore-scripts
+          npm version --allow-same-version ${{ github.event.release.tag_name }} --ignore-scripts
           npm publish --access public --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
