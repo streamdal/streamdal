@@ -69,7 +69,7 @@ class SnitchClient:
     paused_pipelines: dict
     log: logging.Logger
     metrics: Metrics
-    functions: dict[str, (Instance, Store)]
+    functions: dict
     exit: Event
     session_id: str
 
