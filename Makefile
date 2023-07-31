@@ -26,7 +26,7 @@ setup:
 .PHONY: test
 test:
 	@echo "Running tests..."
-	pytest .
+	pytest --cov=snitchpy
 
 .PHONY: test/wasm
 test/wasm: description = Pull latest releaser of snitch-wasm

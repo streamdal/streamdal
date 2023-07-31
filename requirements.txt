@@ -5,6 +5,7 @@ certifi==2023.5.7
 cffi==1.15.1
 charset-normalizer==3.2.0
 click==8.1.5
+coverage==7.2.7
 docutils==0.20.1
 grpcio==1.56.0
 grpclib==0.4.5
@@ -33,6 +34,7 @@ protobuf==4.23.4
 pycparser==2.21
 Pygments==2.15.1
 pytest==7.4.0
+pytest-cov==4.1.0
 python-dateutil==2.8.2
 readme-renderer==40.0
 requests==2.31.0
