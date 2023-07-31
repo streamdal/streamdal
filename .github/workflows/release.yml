@@ -13,6 +13,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 20
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: npm install --force
@@ -28,6 +29,6 @@ jobs:
 
       - name: Release to npm
         working-directory: ./build
-        run: npm publish --access public --ignore-scripts
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
