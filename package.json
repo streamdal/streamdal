@@ -1,6 +1,6 @@
 {
   "name": "@streamdal/snitch-node-client",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
     "snitch",
@@ -17,7 +17,6 @@
     "copy": "cp README.md ./build/README.md && cp package.json ./build/package.json",
     "cz": "cz",
     "lint": "eslint src --ext .ts --fix",
-    "prepare": "husky install",
     "semantic-release": "semantic-release",
     "setup": "tsx ./scripts/setup.ts",
     "spell:check": "cspell \"{README.md,CONTRIBUTING.md,.github/*.md,src/**/*.ts}\"",
