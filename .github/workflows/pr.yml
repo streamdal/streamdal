@@ -25,4 +25,6 @@ jobs:
           pip install -r requirements.txt  # If you have any specific requirements for your project
 
       - name: Run Pytest
-        run: pytest
+        run: |
+          make test/wasm
+          pytest
