@@ -102,15 +102,7 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	if err := s.Deps.BusService.BroadcastHeartbeat(ctx, req); err != nil {
-		s.log.Error("unable to broadcast heartbeat for audience '%s': %s", util.AudienceStr(req.Audience), err.Error())
-
-		return &protos.StandardResponse{
-			Id:      util.CtxRequestId(ctx),
-			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-			Message: fmt.Sprintf("unable to broadcast heartbeat: %s", err.Error()),
-		}, nil
-	}
+	// TODO: Record heartbeat locally - no need to broadcast it
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),

@@ -122,11 +122,6 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 	// TODO: ALSO - does this audience pertain to any of our clients?
 
 	// Do we know about this pipeline?
-	pipeline, err := b.options.Store.GetPipeline(ctx, req.PipelineId)
-	if err != nil {
-		b.log.Debugf("pipeline %s not found, cannot attach", req.PipelineId)
-		return errors.Wrapf(err, "pipeline '%s' not found", req.PipelineId)
-	}
 
 	// Save attachment configuration
 	if err := b.options.Store.AttachPipeline(ctx, req); err != nil {

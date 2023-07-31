@@ -27,7 +27,6 @@ type IBus interface {
 	RunConsumer() error
 	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
-	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	BroadcastCreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) error
 	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
@@ -176,8 +175,6 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
 	case *protos.BusEvent_ResumePipelineRequest:
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
-	case *protos.BusEvent_HeartbeatRequest:
-		err = b.handleHeartbeatRequest(shutdownCtx, busEvent.GetHeartbeatRequest())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}
