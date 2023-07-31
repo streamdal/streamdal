@@ -8,9 +8,17 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm install --force
+
+      - name: Build
+        run: npm run build
+
       - name: Release on npm
+        working-directory: ./build
         run: |
           npm version ${{ github.event.release.tag_name }}
           npm publish --access public

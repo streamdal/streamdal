@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  console:
+    build: .
+    container_name: snitch-console-container
+    image: snitch-console-image
+    environment:
+      - SNITCH_API_URL=http://host.docker.internal:9191
+    ports:
+      - "3000:3000"

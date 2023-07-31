@@ -11,9 +11,10 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "npm run clean && npm run type:dts && npm run build:main",
-    "build:main": "swc ./src -d ./build",
+    "build": "npm run clean && npm run type:dts && npm run build:main && npm run copy",
+    "build:main": "tsc",
     "clean": "rimraf build coverage nyc_output",
+    "copy": "cp README.md ./build/README.md && cp package.json ./build/package.json",
     "cz": "cz",
     "lint": "eslint src --ext .ts --fix",
     "prepare": "husky install",

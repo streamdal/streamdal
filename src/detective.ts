@@ -46,7 +46,7 @@ export const examplePayload = {
   timestamp_rfc3339: "2023-06-29T12:34:56Z",
 };
 
-export const testDetective = async (data: Uint8Array): string => {
+export const testDetective = async (data: Uint8Array): Promise<string> => {
   console.info("\n");
   console.info("### start web assembly test");
   const wasm = await WebAssembly.compile(
