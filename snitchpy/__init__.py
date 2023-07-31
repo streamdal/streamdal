@@ -204,7 +204,13 @@ class SnitchClient:
         if not self.cfg.dry_run:
             self.loop.run_until_complete(call())
 
-    def _get_pipelines(self, mode: int, op: str) -> dict[str:protos.Command]:
+    def _get_pipelines(self, mode: int, op: str) -> dict:
+        """
+        Get pipelines for a given mode and operation
+
+        :return: dict of pipelines in format dict[str:protos.Command]
+        """
+
         aud_str = "{}:{}".format(mode, op)
 
         if self.pipelines.get(aud_str) is None:

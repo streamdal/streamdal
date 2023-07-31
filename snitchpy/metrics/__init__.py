@@ -1,5 +1,5 @@
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import snitch_protos.protos as protos
 from threading import Thread, Lock, Event
 from queue import SimpleQueue, Empty
@@ -34,7 +34,7 @@ class CounterEntry:
     rule_id: str
     ruleset_id: str
     audience: protos.Audience
-    labels: dict = dict[str:str]
+    labels: dict = field(default_factory=dict)
     value: float = 0.0
 
 
@@ -86,7 +86,7 @@ class Metrics:
 
     log: logging.Logger
     exit: Event
-    counters: dict[str:Counter] = {}
+    counters: dict = field(default_factory=dict)
     stub: protos.InternalStub = None
     lock: Lock
     publish_queue: SimpleQueue = SimpleQueue()
