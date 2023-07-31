@@ -398,6 +398,7 @@ class DeregisterRequest(betterproto.Message):
     """
 
     service_name: str = betterproto.string_field(1)
+    session_id: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -411,29 +412,26 @@ class BusEvent(betterproto.Message):
     deregister_request: "DeregisterRequest" = betterproto.message_field(
         101, group="event"
     )
-    heartbeat_request: "HeartbeatRequest" = betterproto.message_field(
+    create_pipeline_request: "CreatePipelineRequest" = betterproto.message_field(
         102, group="event"
     )
-    create_pipeline_request: "CreatePipelineRequest" = betterproto.message_field(
+    delete_pipeline_request: "DeletePipelineRequest" = betterproto.message_field(
         103, group="event"
     )
-    delete_pipeline_request: "DeletePipelineRequest" = betterproto.message_field(
+    update_pipeline_request: "UpdatePipelineRequest" = betterproto.message_field(
         104, group="event"
     )
-    update_pipeline_request: "UpdatePipelineRequest" = betterproto.message_field(
+    attach_pipeline_request: "AttachPipelineRequest" = betterproto.message_field(
         105, group="event"
     )
-    attach_pipeline_request: "AttachPipelineRequest" = betterproto.message_field(
+    detach_pipeline_request: "DetachPipelineRequest" = betterproto.message_field(
         106, group="event"
     )
-    detach_pipeline_request: "DetachPipelineRequest" = betterproto.message_field(
+    pause_pipeline_request: "PausePipelineRequest" = betterproto.message_field(
         107, group="event"
     )
-    pause_pipeline_request: "PausePipelineRequest" = betterproto.message_field(
-        108, group="event"
-    )
     resume_pipeline_request: "ResumePipelineRequest" = betterproto.message_field(
-        109, group="event"
+        108, group="event"
     )
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING

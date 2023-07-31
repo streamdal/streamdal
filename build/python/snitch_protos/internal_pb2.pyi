@@ -9,10 +9,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DeregisterRequest(_message.Message):
-    __slots__ = ["service_name"]
+    __slots__ = ["service_name", "session_id"]
     SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     service_name: str
-    def __init__(self, service_name: _Optional[str] = ...) -> None: ...
+    session_id: str
+    def __init__(self, service_name: _Optional[str] = ..., session_id: _Optional[str] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["session_id"]

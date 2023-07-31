@@ -93,7 +93,8 @@ export const RegisterRequest = new RegisterRequest$Type();
 class DeregisterRequest$Type extends MessageType {
     constructor() {
         super("protos.DeregisterRequest", [
-            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
