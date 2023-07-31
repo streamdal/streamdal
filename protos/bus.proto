@@ -20,14 +20,13 @@ message BusEvent {
   oneof event {
     protos.RegisterRequest register_request = 100;
     protos.DeregisterRequest deregister_request = 101;
-    protos.HeartbeatRequest heartbeat_request = 102;
-    protos.CreatePipelineRequest create_pipeline_request = 103;
-    protos.DeletePipelineRequest delete_pipeline_request = 104;
-    protos.UpdatePipelineRequest update_pipeline_request = 105;
-    protos.AttachPipelineRequest attach_pipeline_request = 106;
-    protos.DetachPipelineRequest detach_pipeline_request = 107;
-    protos.PausePipelineRequest pause_pipeline_request = 108;
-    protos.ResumePipelineRequest resume_pipeline_request = 109;
+    protos.CreatePipelineRequest create_pipeline_request = 102;
+    protos.DeletePipelineRequest delete_pipeline_request = 103;
+    protos.UpdatePipelineRequest update_pipeline_request = 104;
+    protos.AttachPipelineRequest attach_pipeline_request = 105;
+    protos.DetachPipelineRequest detach_pipeline_request = 106;
+    protos.PausePipelineRequest pause_pipeline_request = 107;
+    protos.ResumePipelineRequest resume_pipeline_request = 108;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC

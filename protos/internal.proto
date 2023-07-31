@@ -91,4 +91,5 @@ message RegisterRequest {
 // Same as RegisterRequest - used for broadcasting a deregistration event
 message DeregisterRequest {
   string service_name = 1;
+  string session_id = 2;
 }

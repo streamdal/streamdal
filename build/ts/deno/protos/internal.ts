@@ -138,6 +138,10 @@ export interface DeregisterRequest {
      * @generated from protobuf field: string service_name = 1;
      */
     serviceName: string;
+    /**
+     * @generated from protobuf field: string session_id = 2;
+     */
+    sessionId: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
@@ -225,7 +229,8 @@ export const RegisterRequest = new RegisterRequest$Type();
 class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
     constructor() {
         super("protos.DeregisterRequest", [
-            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }

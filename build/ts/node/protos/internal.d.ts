@@ -133,6 +133,10 @@ export interface DeregisterRequest {
      * @generated from protobuf field: string service_name = 1;
      */
     serviceName: string;
+    /**
+     * @generated from protobuf field: string session_id = 2;
+     */
+    sessionId: string;
 }
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();

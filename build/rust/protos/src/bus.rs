@@ -150,56 +150,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.HeartbeatRequest heartbeat_request = 102;
-
-    pub fn heartbeat_request(&self) -> &super::internal::HeartbeatRequest {
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(ref v)) => v,
-            _ => <super::internal::HeartbeatRequest as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_heartbeat_request(&mut self) {
-        self.event = ::std::option::Option::None;
-    }
-
-    pub fn has_heartbeat_request(&self) -> bool {
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_heartbeat_request(&mut self, v: super::internal::HeartbeatRequest) {
-        self.event = ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_heartbeat_request(&mut self) -> &mut super::internal::HeartbeatRequest {
-        if let ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(_)) = self.event {
-        } else {
-            self.event = ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(super::internal::HeartbeatRequest::new()));
-        }
-        match self.event {
-            ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_heartbeat_request(&mut self) -> super::internal::HeartbeatRequest {
-        if self.has_heartbeat_request() {
-            match self.event.take() {
-                ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            super::internal::HeartbeatRequest::new()
-        }
-    }
-
-    // .protos.CreatePipelineRequest create_pipeline_request = 103;
+    // .protos.CreatePipelineRequest create_pipeline_request = 102;
 
     pub fn create_pipeline_request(&self) -> &super::external::CreatePipelineRequest {
         match self.event {
@@ -248,7 +199,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.DeletePipelineRequest delete_pipeline_request = 104;
+    // .protos.DeletePipelineRequest delete_pipeline_request = 103;
 
     pub fn delete_pipeline_request(&self) -> &super::external::DeletePipelineRequest {
         match self.event {
@@ -297,7 +248,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.UpdatePipelineRequest update_pipeline_request = 105;
+    // .protos.UpdatePipelineRequest update_pipeline_request = 104;
 
     pub fn update_pipeline_request(&self) -> &super::external::UpdatePipelineRequest {
         match self.event {
@@ -346,7 +297,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.AttachPipelineRequest attach_pipeline_request = 106;
+    // .protos.AttachPipelineRequest attach_pipeline_request = 105;
 
     pub fn attach_pipeline_request(&self) -> &super::external::AttachPipelineRequest {
         match self.event {
@@ -395,7 +346,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.DetachPipelineRequest detach_pipeline_request = 107;
+    // .protos.DetachPipelineRequest detach_pipeline_request = 106;
 
     pub fn detach_pipeline_request(&self) -> &super::external::DetachPipelineRequest {
         match self.event {
@@ -444,7 +395,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.PausePipelineRequest pause_pipeline_request = 108;
+    // .protos.PausePipelineRequest pause_pipeline_request = 107;
 
     pub fn pause_pipeline_request(&self) -> &super::external::PausePipelineRequest {
         match self.event {
@@ -493,7 +444,7 @@ impl BusEvent {
         }
     }
 
-    // .protos.ResumePipelineRequest resume_pipeline_request = 109;
+    // .protos.ResumePipelineRequest resume_pipeline_request = 108;
 
     pub fn resume_pipeline_request(&self) -> &super::external::ResumePipelineRequest {
         match self.event {
@@ -543,7 +494,7 @@ impl BusEvent {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(12);
+        let mut fields = ::std::vec::Vec::with_capacity(11);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "source",
@@ -563,13 +514,6 @@ impl BusEvent {
             BusEvent::deregister_request,
             BusEvent::mut_deregister_request,
             BusEvent::set_deregister_request,
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::internal::HeartbeatRequest>(
-            "heartbeat_request",
-            BusEvent::has_heartbeat_request,
-            BusEvent::heartbeat_request,
-            BusEvent::mut_heartbeat_request,
-            BusEvent::set_heartbeat_request,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::external::CreatePipelineRequest>(
             "create_pipeline_request",
@@ -654,27 +598,24 @@ impl ::protobuf::Message for BusEvent {
                     self.event = ::std::option::Option::Some(bus_event::Event::DeregisterRequest(is.read_message()?));
                 },
                 818 => {
-                    self.event = ::std::option::Option::Some(bus_event::Event::HeartbeatRequest(is.read_message()?));
-                },
-                826 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::CreatePipelineRequest(is.read_message()?));
                 },
-                834 => {
+                826 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::DeletePipelineRequest(is.read_message()?));
                 },
-                842 => {
+                834 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::UpdatePipelineRequest(is.read_message()?));
                 },
-                850 => {
+                842 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::AttachPipelineRequest(is.read_message()?));
                 },
-                858 => {
+                850 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::DetachPipelineRequest(is.read_message()?));
                 },
-                866 => {
+                858 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::PausePipelineRequest(is.read_message()?));
                 },
-                874 => {
+                866 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::ResumePipelineRequest(is.read_message()?));
                 },
                 8002 => {
@@ -720,10 +661,6 @@ impl ::protobuf::Message for BusEvent {
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
                 &bus_event::Event::DeregisterRequest(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-                &bus_event::Event::HeartbeatRequest(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -783,29 +720,26 @@ impl ::protobuf::Message for BusEvent {
                 &bus_event::Event::DeregisterRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(101, v, os)?;
                 },
-                &bus_event::Event::HeartbeatRequest(ref v) => {
+                &bus_event::Event::CreatePipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(102, v, os)?;
                 },
-                &bus_event::Event::CreatePipelineRequest(ref v) => {
+                &bus_event::Event::DeletePipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
                 },
-                &bus_event::Event::DeletePipelineRequest(ref v) => {
+                &bus_event::Event::UpdatePipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
                 },
-                &bus_event::Event::UpdatePipelineRequest(ref v) => {
+                &bus_event::Event::AttachPipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
                 },
-                &bus_event::Event::AttachPipelineRequest(ref v) => {
+                &bus_event::Event::DetachPipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(106, v, os)?;
                 },
-                &bus_event::Event::DetachPipelineRequest(ref v) => {
+                &bus_event::Event::PausePipelineRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(107, v, os)?;
                 },
-                &bus_event::Event::PausePipelineRequest(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(108, v, os)?;
-                },
                 &bus_event::Event::ResumePipelineRequest(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(109, v, os)?;
+                    ::protobuf::rt::write_message_field_with_cached_size(108, v, os)?;
                 },
             };
         }
@@ -827,7 +761,6 @@ impl ::protobuf::Message for BusEvent {
 
     fn clear(&mut self) {
         self.source.clear();
-        self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
@@ -875,8 +808,6 @@ pub mod bus_event {
         RegisterRequest(super::super::internal::RegisterRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.deregister_request)
         DeregisterRequest(super::super::internal::DeregisterRequest),
-        // @@protoc_insertion_point(oneof_field:protos.BusEvent.heartbeat_request)
-        HeartbeatRequest(super::super::internal::HeartbeatRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.create_pipeline_request)
         CreatePipelineRequest(super::super::external::CreatePipelineRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.delete_pipeline_request)
@@ -912,70 +843,66 @@ pub mod bus_event {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\tbus.proto\x12\x06protos\x1a\x0eexternal.proto\x1a\x0einternal.proto\
-    \"\xed\x07\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06sour\
+    \"\xa4\x07\n\x08BusEvent\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06sour\
     ce\x12D\n\x10register_request\x18d\x20\x01(\x0b2\x17.protos.RegisterRequ\
     estH\0R\x0fregisterRequest\x12J\n\x12deregister_request\x18e\x20\x01(\
-    \x0b2\x19.protos.DeregisterRequestH\0R\x11deregisterRequest\x12G\n\x11he\
-    artbeat_request\x18f\x20\x01(\x0b2\x18.protos.HeartbeatRequestH\0R\x10he\
-    artbeatRequest\x12W\n\x17create_pipeline_request\x18g\x20\x01(\x0b2\x1d.\
-    protos.CreatePipelineRequestH\0R\x15createPipelineRequest\x12W\n\x17dele\
-    te_pipeline_request\x18h\x20\x01(\x0b2\x1d.protos.DeletePipelineRequestH\
-    \0R\x15deletePipelineRequest\x12W\n\x17update_pipeline_request\x18i\x20\
-    \x01(\x0b2\x1d.protos.UpdatePipelineRequestH\0R\x15updatePipelineRequest\
-    \x12W\n\x17attach_pipeline_request\x18j\x20\x01(\x0b2\x1d.protos.AttachP\
-    ipelineRequestH\0R\x15attachPipelineRequest\x12W\n\x17detach_pipeline_re\
-    quest\x18k\x20\x01(\x0b2\x1d.protos.DetachPipelineRequestH\0R\x15detachP\
-    ipelineRequest\x12T\n\x16pause_pipeline_request\x18l\x20\x01(\x0b2\x1c.p\
-    rotos.PausePipelineRequestH\0R\x14pausePipelineRequest\x12W\n\x17resume_\
-    pipeline_request\x18m\x20\x01(\x0b2\x1d.protos.ResumePipelineRequestH\0R\
-    \x15resumePipelineRequest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\
-    \x1e.protos.BusEvent.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEntry\
-    \x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\
-    \x20\x01(\tR\x05value:\x028\x01B\x07\n\x05eventB4Z2github.com/streamdal/\
-    snitch-protos/build/go/protosJ\xe3\r\n\x06\x12\x04\0\0+\x01\n\x08\n\x01\
-    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
-    \x12\x03\x04\0\x18\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\
-    \x12\x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\nX\n\x02\x04\0\x12\x04\
-    \n\0+\x01\x1aL\x20Type\x20used\x20by\x20`snitch-server`\x20for\x20broadc\
-    asting\x20events\x20to\x20other\x20snitch\x20nodes\n\n\n\n\x03\x04\0\x01\
-    \x12\x03\n\x08\x10\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\
-    \x05\x04\0\x02\0\x05\x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
-    \x03\x0b\t\x0f\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0b\x12\x13\n\xc7\x02\
-    \n\x04\x04\0\x08\0\x12\x04\x13\x02\x1e\x03\x1a\xb8\x02\x20This\x20_shoul\
-    d_\x20contain\x20request\x20messages\x20-\x20each\x20snitch-server\x20ca\
-    n\x20determine\n\x20how\x20to\x20interpret\x20and\x20handle\x20the\x20me\
-    ssage.\n\n\x20NOTE:\x20The\x20bus\x20_should\x20not_\x20be\x20used\x20fo\
-    r\x20transmitting\x20commands\x20to\x20SDKs.\x20The\n\x20consumer\x20in\
-    \x20each\x20SDK\x20should\x20receive\x20a\x20request\x20and\x20potential\
-    ly\x20craft\x20a\x20new\n\x20command\x20to\x20send\x20to\x20the\x20appro\
-    priate\x20SDK(s).\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x13\x08\r\n\x0b\
-    \n\x04\x04\0\x02\x01\x12\x03\x14\x042\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
-    \x03\x14\x04\x1a\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x14\x1b+\n\x0c\n\
-    \x05\x04\0\x02\x01\x03\x12\x03\x14.1\n\x0b\n\x04\x04\0\x02\x02\x12\x03\
-    \x15\x046\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x15\x04\x1c\n\x0c\n\x05\
-    \x04\0\x02\x02\x01\x12\x03\x15\x1d/\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
-    \x03\x1525\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\x044\n\x0c\n\x05\x04\0\
-    \x02\x03\x06\x12\x03\x16\x04\x1b\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
-    \x16\x1c-\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1603\n\x0b\n\x04\x04\0\
-    \x02\x04\x12\x03\x17\x04?\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x17\x04\
-    \x20\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17!8\n\x0c\n\x05\x04\0\x02\
-    \x04\x03\x12\x03\x17;>\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x18\x04?\n\x0c\
-    \n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x20\n\x0c\n\x05\x04\0\x02\x05\
-    \x01\x12\x03\x18!8\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x18;>\n\x0b\n\
-    \x04\x04\0\x02\x06\x12\x03\x19\x04?\n\x0c\n\x05\x04\0\x02\x06\x06\x12\
-    \x03\x19\x04\x20\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19!8\n\x0c\n\x05\
-    \x04\0\x02\x06\x03\x12\x03\x19;>\n\x0b\n\x04\x04\0\x02\x07\x12\x03\x1a\
-    \x04?\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1a\x04\x20\n\x0c\n\x05\x04\
-    \0\x02\x07\x01\x12\x03\x1a!8\n\x0c\n\x05\x04\0\x02\x07\x03\x12\x03\x1a;>\
-    \n\x0b\n\x04\x04\0\x02\x08\x12\x03\x1b\x04?\n\x0c\n\x05\x04\0\x02\x08\
-    \x06\x12\x03\x1b\x04\x20\n\x0c\n\x05\x04\0\x02\x08\x01\x12\x03\x1b!8\n\
-    \x0c\n\x05\x04\0\x02\x08\x03\x12\x03\x1b;>\n\x0b\n\x04\x04\0\x02\t\x12\
-    \x03\x1c\x04=\n\x0c\n\x05\x04\0\x02\t\x06\x12\x03\x1c\x04\x1f\n\x0c\n\
-    \x05\x04\0\x02\t\x01\x12\x03\x1c\x206\n\x0c\n\x05\x04\0\x02\t\x03\x12\
-    \x03\x1c9<\n\x0b\n\x04\x04\0\x02\n\x12\x03\x1d\x04?\n\x0c\n\x05\x04\0\
-    \x02\n\x06\x12\x03\x1d\x04\x20\n\x0c\n\x05\x04\0\x02\n\x01\x12\x03\x1d!8\
-    \n\x0c\n\x05\x04\0\x02\n\x03\x12\x03\x1d;>\n\xd4\x04\n\x04\x04\0\x02\x0b\
-    \x12\x03*\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20is\x20stored\
+    \x0b2\x19.protos.DeregisterRequestH\0R\x11deregisterRequest\x12W\n\x17cr\
+    eate_pipeline_request\x18f\x20\x01(\x0b2\x1d.protos.CreatePipelineReques\
+    tH\0R\x15createPipelineRequest\x12W\n\x17delete_pipeline_request\x18g\
+    \x20\x01(\x0b2\x1d.protos.DeletePipelineRequestH\0R\x15deletePipelineReq\
+    uest\x12W\n\x17update_pipeline_request\x18h\x20\x01(\x0b2\x1d.protos.Upd\
+    atePipelineRequestH\0R\x15updatePipelineRequest\x12W\n\x17attach_pipelin\
+    e_request\x18i\x20\x01(\x0b2\x1d.protos.AttachPipelineRequestH\0R\x15att\
+    achPipelineRequest\x12W\n\x17detach_pipeline_request\x18j\x20\x01(\x0b2\
+    \x1d.protos.DetachPipelineRequestH\0R\x15detachPipelineRequest\x12T\n\
+    \x16pause_pipeline_request\x18k\x20\x01(\x0b2\x1c.protos.PausePipelineRe\
+    questH\0R\x14pausePipelineRequest\x12W\n\x17resume_pipeline_request\x18l\
+    \x20\x01(\x0b2\x1d.protos.ResumePipelineRequestH\0R\x15resumePipelineReq\
+    uest\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\x1e.protos.BusEvent.Met\
+    adataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\
+    \x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x02\
+    8\x01B\x07\n\x05eventB4Z2github.com/streamdal/snitch-protos/build/go/pro\
+    tosJ\xac\r\n\x06\x12\x04\0\0*\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
+    \n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x18\n\t\n\x02\
+    \x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\x12\x03\x07\0I\n\t\n\x02\x08\
+    \x0b\x12\x03\x07\0I\nX\n\x02\x04\0\x12\x04\n\0*\x01\x1aL\x20Type\x20used\
+    \x20by\x20`snitch-server`\x20for\x20broadcasting\x20events\x20to\x20othe\
+    r\x20snitch\x20nodes\n\n\n\n\x03\x04\0\x01\x12\x03\n\x08\x10\n\x0b\n\x04\
+    \x04\0\x02\0\x12\x03\x0b\x02\x14\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0b\
+    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0b\t\x0f\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x0b\x12\x13\n\xc7\x02\n\x04\x04\0\x08\0\x12\x04\x13\
+    \x02\x1d\x03\x1a\xb8\x02\x20This\x20_should_\x20contain\x20request\x20me\
+    ssages\x20-\x20each\x20snitch-server\x20can\x20determine\n\x20how\x20to\
+    \x20interpret\x20and\x20handle\x20the\x20message.\n\n\x20NOTE:\x20The\
+    \x20bus\x20_should\x20not_\x20be\x20used\x20for\x20transmitting\x20comma\
+    nds\x20to\x20SDKs.\x20The\n\x20consumer\x20in\x20each\x20SDK\x20should\
+    \x20receive\x20a\x20request\x20and\x20potentially\x20craft\x20a\x20new\n\
+    \x20command\x20to\x20send\x20to\x20the\x20appropriate\x20SDK(s).\n\n\x0c\
+    \n\x05\x04\0\x08\0\x01\x12\x03\x13\x08\r\n\x0b\n\x04\x04\0\x02\x01\x12\
+    \x03\x14\x042\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x14\x04\x1a\n\x0c\n\
+    \x05\x04\0\x02\x01\x01\x12\x03\x14\x1b+\n\x0c\n\x05\x04\0\x02\x01\x03\
+    \x12\x03\x14.1\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x15\x046\n\x0c\n\x05\
+    \x04\0\x02\x02\x06\x12\x03\x15\x04\x1c\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
+    \x03\x15\x1d/\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1525\n\x0b\n\x04\
+    \x04\0\x02\x03\x12\x03\x16\x04?\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
+    \x16\x04\x20\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x16!8\n\x0c\n\x05\x04\
+    \0\x02\x03\x03\x12\x03\x16;>\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x17\x04?\
+    \n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x17\x04\x20\n\x0c\n\x05\x04\0\x02\
+    \x04\x01\x12\x03\x17!8\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x17;>\n\x0b\
+    \n\x04\x04\0\x02\x05\x12\x03\x18\x04?\n\x0c\n\x05\x04\0\x02\x05\x06\x12\
+    \x03\x18\x04\x20\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x18!8\n\x0c\n\x05\
+    \x04\0\x02\x05\x03\x12\x03\x18;>\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x19\
+    \x04?\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\x19\x04\x20\n\x0c\n\x05\x04\
+    \0\x02\x06\x01\x12\x03\x19!8\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x19;>\
+    \n\x0b\n\x04\x04\0\x02\x07\x12\x03\x1a\x04?\n\x0c\n\x05\x04\0\x02\x07\
+    \x06\x12\x03\x1a\x04\x20\n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1a!8\n\
+    \x0c\n\x05\x04\0\x02\x07\x03\x12\x03\x1a;>\n\x0b\n\x04\x04\0\x02\x08\x12\
+    \x03\x1b\x04=\n\x0c\n\x05\x04\0\x02\x08\x06\x12\x03\x1b\x04\x1f\n\x0c\n\
+    \x05\x04\0\x02\x08\x01\x12\x03\x1b\x206\n\x0c\n\x05\x04\0\x02\x08\x03\
+    \x12\x03\x1b9<\n\x0b\n\x04\x04\0\x02\t\x12\x03\x1c\x04?\n\x0c\n\x05\x04\
+    \0\x02\t\x06\x12\x03\x1c\x04\x20\n\x0c\n\x05\x04\0\x02\t\x01\x12\x03\x1c\
+    !8\n\x0c\n\x05\x04\0\x02\t\x03\x12\x03\x1c;>\n\xd4\x04\n\x04\x04\0\x02\n\
+    \x12\x03)\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20is\x20stored\
     \x20in\x20ctx;\x20when\x20request\x20goes\x20outside\x20of\x20gRPC\n\x20\
     bounds,\x20we\x20will\x20translate\x20ctx\x20metadata\x20into\x20this\
     \x20field.\n\n\x20Example:\n\x201.\x20Request\x20comes\x20into\x20snitch\
@@ -988,8 +915,8 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     erver\x20translates\x20ctx\x20metadata\x20to\n\x20\x20\x20\x20this\x20fi\
     eld\x20and\x20includes\x20it\x20in\x20the\x20bus\x20event.\n\"5\x20proto\
     lint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\0\
-    \x02\x0b\x06\x12\x03*\x02\x16\n\x0c\n\x05\x04\0\x02\x0b\x01\x12\x03*\x17\
-    \x20\n\x0c\n\x05\x04\0\x02\x0b\x03\x12\x03*#'b\x06proto3\
+    \x02\n\x06\x12\x03)\x02\x16\n\x0c\n\x05\x04\0\x02\n\x01\x12\x03)\x17\x20\
+    \n\x0c\n\x05\x04\0\x02\n\x03\x12\x03)#'b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
