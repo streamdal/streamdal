@@ -23,7 +23,7 @@ jobs:
       - name: Set version
         working-directory:
         run: |
-          npm version --force --allow-same-version ${{ github.event.release.tag_name }} 
+          npm version --no-git-tag-version --force --allow-same-version ${{ github.event.release.tag_name }} 
           npm run copy
 
       - name: Release to npm
