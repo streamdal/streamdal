@@ -459,7 +459,7 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	llog := s.log.WithField("method", "ResumePipeline")
 	llog.Debug("received request to resume pipeline")
 
-	if err := validate.PausePipelineRequest(req); err != nil {
+	if err := validate.ResumePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "error validating pause pipeline request")
 	}
 
