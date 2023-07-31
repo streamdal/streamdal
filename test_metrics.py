@@ -5,8 +5,7 @@ import snitch_protos.protos as protos
 def test_composite_id():
     entry = CounterEntry(
         name="test",
-        rule_id="rule",
-        ruleset_id="ruleset",
+        pipeline_id="some-uuid",
         labels={"test": "test", "id": "some-uuid", "unit": "bytes"},
         value=0.0,
         audience=protos.Audience()

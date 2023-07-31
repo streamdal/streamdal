@@ -123,6 +123,30 @@ class SnitchClient:
         if req is None:
             raise ValueError("req is required")
 
+        payload_size = len(req.data)  # No need to compute this multiple times
+
+        if payload_size > MAX_PAYLOAD_SIZE:
+            self.metrics.incr(metrics.CounterEntry(
+                name=metrics.COUNTER_FAILURE_TRIGGER, value=1.0, pipeline_id="",
+                audience=protos.Audience(
+                    component_name=req.component,
+                    operation_type=protos.OperationType(req.operation),
+                    service_name=self.cfg.service_name,
+                ),
+                labels={
+                    "type": "count",
+                    "component_name": req.component,
+                    "operation": self.op_to_string(protos.OperationType(req.operation)),
+                }
+            ))
+
+            return SnitchResponse(data=req.data, error=False, message="")
+
+        if req.operation == MODE_CONSUMER:
+            counter = metrics.COUNTER_CONSUME
+        else:
+            counter = metrics.COUNTER_PUBLISH
+
         # Ensure no side-effects are propagated to outside the library
         data = copy(req.data)
 
@@ -132,6 +156,16 @@ class SnitchClient:
         for k, cmd in pipelines:
             pipeline = cmd.attatch_pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
+
+            self.metrics.incr(metrics.CounterEntry(
+                name=counter, value=1.0, audience=cmd.audience, pipeline_id=pipeline.id,
+                labels={"type": "count", "component_name": req.component}
+            ))
+
+            self.metrics.incr(metrics.CounterEntry(
+                name=counter, value=payload_size,  audience=cmd.audience, pipeline_id=pipeline.id,
+                labels={"type": "bytes", "component_name": req.component}
+            ))
 
             for step in pipeline.steps:
                 # Exec wasm
@@ -191,12 +225,18 @@ class SnitchClient:
 
     def _notify_condition(self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience):
         async def call():
-            req = protos.NotifyRequest()
-            req.pipeline_id = pipeline.id
-            req.audience = aud
-            req.metadata = {}
-            req.step_name = step.name
-            req.occurred_at_unix_ts_utc = int(datetime.datetime.utcnow().timestamp())
+            op_str = self.op_to_string(aud.operation_type)
+            self.metrics.incr(metrics.CounterEntry(
+                name=metrics.COUNTER_FAILURE_TRIGGER, value=1.0, audience=aud, pipeline_id=pipeline.id,
+                labels={"type": "count", "component_name": aud.component_name, "operation": op_str}
+            ))
+
+            req = protos.NotifyRequest(
+                pipeline_id=pipeline.id,
+                audience=aud,
+                step_name=step.name,
+                occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp())
+            )
 
             await self.stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
@@ -213,10 +253,11 @@ class SnitchClient:
 
         aud_str = "{}:{}".format(mode, op)
 
-        if self.pipelines.get(aud_str) is None:
-            return None
+        pipelines = self.pipelines.get(aud_str)
+        if pipelines is None:
+            return {}
 
-        return self.pipelines.get(aud_str)
+        return pipelines
 
     def _run_heartbeat(self):
         async def call():
@@ -533,3 +574,10 @@ class SnitchClient:
     @staticmethod
     def audience(aud: protos.Audience) -> str:
         return "{}-{}".format(aud.operation_type, aud.component_name)
+
+    @staticmethod
+    def op_to_string(op: protos.OperationType) -> str:
+        if op == protos.OperationType.OPERATION_TYPE_PRODUCER:
+            return "producer"
+
+        return "consumer"

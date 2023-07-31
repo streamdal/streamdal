@@ -31,8 +31,7 @@ class CounterEntry:
     """
 
     name: str
-    rule_id: str
-    ruleset_id: str
+    pipeline_id: str
     audience: protos.Audience
     labels: dict = field(default_factory=dict)
     value: float = 0.0
@@ -78,7 +77,7 @@ def composite_id(entry: CounterEntry) -> str:
     type, rule, ruleset, and labels.
     """
     labels = list(entry.labels.values())
-    return "-".join(labels)
+    return "{}-{}".format(entry.name, "-".join(labels))
 
 
 class Metrics:
@@ -172,8 +171,8 @@ class Metrics:
             await self.stub.metrics(request)
 
         req = protos.MetricsRequest()
-        req.rule_id = entry.rule_id
-        req.rule_name = entry.ruleset_id
+        req.pipeline_id = entry.pipeline_id
+        req.rule_name = entry.name
         req.audience = entry.audience  # TODO: implement
         req.metadata = None  # TODO: what is this?
 

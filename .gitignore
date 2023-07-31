@@ -3,3 +3,5 @@
 *.pyc
 *.wasm
 .coverage
+*.egg-info
+dist/*
