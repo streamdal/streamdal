@@ -1,6 +1,6 @@
 {
   "name": "@streamdal/snitch-node-client",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
     "snitch",
