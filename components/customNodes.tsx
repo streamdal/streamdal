@@ -5,9 +5,6 @@ import "flowbite";
 import "twind";
 import {useState} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
-const getHandlePosition = (input: string) => {
-    return input === "top" ? Position.Top : Position.Bottom;
-};
 
 export const Service = ({data}: any) => {
     return (
@@ -136,12 +133,12 @@ export const Producer = ({data}) => {
             </div>
             <Handle
                 type="source"
-                position={getHandlePosition(data.source)}
+                position={Position.Bottom}
                 style={{opacity: 0}}
             />
             <Handle
                 type="target"
-                position={getHandlePosition(data.target)}
+                position={Position.Top}
                 style={{opacity: 0}}
             />
         </div>
@@ -216,12 +213,12 @@ export const Consumer = ({data}) => {
             </div>
             <Handle
                 type="source"
-                position={getHandlePosition(data.source)}
+                position={Position.Top}
                 style={{opacity: 0}}
             />
             <Handle
                 type="target"
-                position={getHandlePosition(data.target)}
+                position={Position.Bottom}
                 style={{opacity: 0}}
             />
         </div>
@@ -229,7 +226,6 @@ export const Consumer = ({data}) => {
 };
 
 export const Platform = ({data}: any) => {
-    console.log(data?.label)
     return (
         <div
             className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
