@@ -204,7 +204,7 @@ class SnitchClient:
         if not self.cfg.dry_run:
             self.loop.run_until_complete(call())
 
-    def _get_pipelines(self, mode: int, op: str) -> dict[str:protos.Command] | None:
+    def _get_pipelines(self, mode: int, op: str) -> dict[str:protos.Command]:
         aud_str = "{}:{}".format(mode, op)
 
         if self.pipelines.get(aud_str) is None:
@@ -300,7 +300,7 @@ class SnitchClient:
         pipes_map[aud_str][pipeline_id] = cmd
 
     @staticmethod
-    def _pop_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> protos.Command | None:
+    def _pop_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> protos.Command:
         """Grab pipeline in internal map of pipelines and remove it"""
         aud_str = SnitchClient.audience(cmd.audience)
 
