@@ -1,16 +1,17 @@
 import asyncio
+import datetime
 import logging
 import os
 import platform
+import signal
 import snitch_protos.protos as protos
 import socket
-import signal
+import uuid
 from .exceptions import SnitchException, SnitchRegisterException
 from copy import copy
 from dataclasses import dataclass
 from grpclib.client import Channel
 from .metrics import Metrics
-from time import sleep
 from threading import Thread, Event
 from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, Instance
 
@@ -70,6 +71,7 @@ class SnitchClient:
     metrics: Metrics
     functions: dict[str, (Instance, Store)]
     exit: Event
+    session_id: str
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -87,6 +89,7 @@ class SnitchClient:
         self.exit = Event()
         self.metrics = Metrics(stub=self.stub, log=self.log, event=self.exit)
         self.functions = {}
+        self.session_id = uuid.uuid4().__str__()
 
         events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
         for e in events:
@@ -126,37 +129,58 @@ class SnitchClient:
         # Get rules based on operation and component
         pipelines = self._get_pipelines(req.operation, req.component)
 
-        for step in pipelines:
-            # Exec wasm
-            wasm_resp = self._call_wasm(step, data)
+        for k, cmd in pipelines:
+            pipeline = cmd.attatch_pipeline
+            self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
-            if self.cfg.dry_run:
-                self.log.debug("Running step '{}' in dry-run mode".format(step.name))
+            for step in pipeline.steps:
+                # Exec wasm
+                wasm_resp = self._call_wasm(step, data)
 
-            # If successful, continue to next step, don't need to check conditions
-            if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
                 if self.cfg.dry_run:
-                    self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
+                    self.log.debug("Running step '{}' in dry-run mode".format(step.name))
 
-                data = wasm_resp.output
-                continue
+                # If successful, continue to next step, don't need to check conditions
+                if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+                    data = wasm_resp.output
 
-            should_continue = False
-            for cond in step.conditions:
-                if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
-                    self._notify_condition(step, wasm_resp)
-                    self.log.debug("Step '{}' failed, notifying".format(step.name))
-                elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
-                    should_continue = False
-                    self.log.debug("Step '{}' failed, aborting".format(step.name))
-                else:
-                    # We still need to continue to remaining pipeline steps after other conditions have been processed
+                    if self.cfg.dry_run:
+                        self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
+                        continue
+
                     should_continue = True
-                    self.log.debug("Step '{}' failed, continuing to next step".format(step.name))
+                    for cond in step.on_success:
+                        if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                            self._notify_condition(pipeline, step, cmd.audience)
+                            self.log.debug("Step '{}' succeeded, notifying".format(step.name))
+                        elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                            should_continue = False
+                            self.log.debug("Step '{}' succeeded, aborting".format(step.name))
+                        else:
+                            # We still need to continue to remaining pipeline steps after other conditions have been processed
+                            self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
 
-                # Not continuing, exit function early
-                if should_continue is False and self.cfg.dry_run is False:
-                    return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+                        # Not continuing, exit function early
+                        if should_continue is False and self.cfg.dry_run is False:
+                            return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+
+                    continue
+
+                should_continue = True
+                for cond in step.on_failure:
+                    if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                        self._notify_condition(pipeline, step, cmd.audience)
+                        self.log.debug("Step '{}' failed, notifying".format(step.name))
+                    elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                        should_continue = False
+                        self.log.debug("Step '{}' failed, aborting".format(step.name))
+                    else:
+                        # We still need to continue to remaining pipeline steps after other conditions have been processed
+                        self.log.debug("Step '{}' failed, continuing to next step".format(step.name))
+
+                    # Not continuing, exit function early
+                    if should_continue is False and self.cfg.dry_run is False:
+                        return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
@@ -165,13 +189,14 @@ class SnitchClient:
 
         return SnitchResponse(data=data, error=False, message="")
 
-    def _notify_condition(self, step: protos.PipelineStep, resp: protos.WasmResponse):
+    def _notify_condition(self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience):
         async def call():
             req = protos.NotifyRequest()
-            req.rule_id = step.id  # TODO: ????
-            req.audience = None
+            req.pipeline_id = pipeline.id
+            req.audience = aud
             req.metadata = {}
-            req.rule_name = ""
+            req.step_name = step.name
+            req.occurred_at_unix_ts_utc = int(datetime.datetime.utcnow().timestamp())
 
             await self.stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
@@ -179,12 +204,13 @@ class SnitchClient:
         if not self.cfg.dry_run:
             self.loop.run_until_complete(call())
 
-    def _get_pipelines(self, operation: int, component: str) -> list[protos.PipelineStep] | None:
-        op = self.pipelines.get(operation)
-        if op is None:
+    def _get_pipelines(self, mode: int, op: str) -> dict[str:protos.Command] | None:
+        aud_str = "{}:{}".format(mode, op)
+
+        if self.pipelines.get(aud_str) is None:
             return None
 
-        return op.get(component)
+        return self.pipelines.get(aud_str)
 
     def _run_heartbeat(self):
         async def call():
@@ -241,9 +267,9 @@ class SnitchClient:
                     self.log.debug("Received keep alive")  # TODO: remove logging after testing
                     pass
                 elif r.set_pipeline is not None:
-                    self._set_pipeline(r)
-                elif r.delete_pipeline is not None:
-                    self._delete_pipeline(r)
+                    self._attach_pipeline(r)
+                elif r.detatch_pipeline is not None:
+                    self._detatch_pipeline(r)
                 elif r.pause_pipeline is not None:
                     self._pause_pipeline(r)
                 elif r.unpause_pipeline is not None:
@@ -261,61 +287,36 @@ class SnitchClient:
             raise SnitchRegisterException("Failed to register: {}".format(e))
 
     @staticmethod
-    def get_mode_from_proto(op: protos.OperationType) -> int:
-        mode = MODE_CONSUMER
-        if op == protos.OperationType.OPERATION_TYPE_PRODUCER:
-            mode = MODE_PRODUCER
-
-        return mode
-
-    @staticmethod
-    def _put_pipeline(
-            pipes_map: dict,
-            aud: protos.Audience,
-            pipeline_id: str,
-            steps: list[protos.PipelineStep]) -> None:
-
+    def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
         """Set pipeline in internal map of pipelines"""
-        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
-        component = aud.component_name
+        aud_str = SnitchClient.audience(cmd.audience)
 
-        # Create mode key if it doesn't exist
-        if pipes_map.get(mode) is None:
-            pipes_map[mode] = {}
+        # Create audience key if it doesn't exist
+        if pipes_map.get(aud_str) is None:
+            pipes_map[aud_str] = {}
 
-        # Create component key if it doesn't exist
-        if pipes_map[mode].get(component) is None:
-            pipes_map[mode][component] = {}
-
-        pipes_map[mode][component][pipeline_id] = steps
+        pipes_map[aud_str][pipeline_id] = cmd
 
     @staticmethod
-    def _pop_pipeline(pipes_map: dict, aud: protos.Audience, pipeline_id: str) -> list[protos.PipelineStep] | None:
+    def _pop_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> protos.Command | None:
         """Grab pipeline in internal map of pipelines and remove it"""
-        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
-        topic = aud.component_name
+        aud_str = SnitchClient.audience(cmd.audience)
 
-        if pipes_map.get(mode) is None:
+        if pipes_map.get(aud_str) is None:
             return None
 
-        if pipes_map[mode].get(topic) is None:
+        if pipes_map[aud_str].get(pipeline_id) is None:
             return None
 
-        if pipes_map[mode][topic].get(pipeline_id) is None:
-            return None
+        pipeline = pipes_map[aud_str][pipeline_id]
 
-        pipeline = pipes_map[mode][topic][pipeline_id]
-        del pipes_map[mode][topic][pipeline_id]
-
-        if len(pipes_map[mode][topic]) == 0:
-            del pipes_map[mode][topic]
-
-        if len(pipes_map[mode]) == 0:
-            del pipes_map[mode]
+        del pipes_map[aud_str][pipeline_id]
+        if len(pipes_map[aud_str]) == 0:
+            del pipes_map[aud_str]
 
         return pipeline
 
-    def _delete_pipeline(self, cmd: protos.Command) -> bool:
+    def _detatch_pipeline(self, cmd: protos.Command) -> bool:
         """Delete pipeline from internal map of pipelines"""
         if cmd is None:
             raise ValueError("Command is None")
@@ -327,27 +328,32 @@ class SnitchClient:
             self.log.debug("Service name does not match, ignoring")
             return False
 
-        self.log.debug("Deleting pipeline {} for audience {}".format(cmd.delete_pipeline.id, cmd.audience.operation_type))
+        aud_str = SnitchClient.audience(cmd.audience)
+
+        self.log.debug("Deleting pipeline {} for audience {}".format(cmd.detach_pipeline.pipeline_id, aud_str))
 
         # Delete from all maps
-        self._pop_pipeline(self.pipelines, cmd.audience, cmd.delete_pipeline.id)
-        self._pop_pipeline(self.paused_pipelines, cmd.audience, cmd.delete_pipeline.id)
+        self._pop_pipeline(self.pipelines, cmd, cmd.detach_pipeline.pipeline_id)
+        self._pop_pipeline(self.paused_pipelines, cmd, cmd.detach_pipeline.pipeline_id)
 
         return True
 
-    def _set_pipeline(self, cmd: protos.Command) -> bool:
+    def _attach_pipeline(self, cmd: protos.Command) -> bool:
         """
         Put pipeline in internal map of pipelines
 
         If the pipeline is paused, the paused map will be updated, otherwise active will
         This is to ensure pauses/resumes are explicit
         """
-        if self._is_paused(cmd.audience, cmd.set_pipeline.id):
-            self.log.debug("Pipeline {} is paused, updating in paused list".format(cmd.set_pipeline.id))
-            self._put_pipeline(self.paused_pipelines, cmd.audience, cmd.set_pipeline.id, cmd.set_pipeline.steps)
+
+        pipeline_id = cmd.attach_pipeline.pipeline.id
+
+        if self._is_paused(cmd.audience, pipeline_id):
+            self.log.debug("Pipeline {} is paused, updating in paused list".format(pipeline_id))
+            self._put_pipeline(self.paused_pipelines, cmd, pipeline_id)
         else:
-            self.log.debug("Pipeline {} is not paused, updating in active list".format(cmd.set_pipeline.id))
-            self._put_pipeline(self.pipelines, cmd.audience, cmd.set_pipeline.id, cmd.set_pipeline.steps)
+            self.log.debug("Pipeline {} is not paused, updating in active list".format(pipeline_id))
+            self._put_pipeline(self.pipelines, cmd, pipeline_id)
 
         return True
 
@@ -361,9 +367,14 @@ class SnitchClient:
             self.log.error("Operation type not set")
             return False
 
+        if cmd.audience.service_name != self.cfg.service_name:
+            self.log.debug("Service name does not match, ignoring")
+            return False
+
         # Remove from pipelines and add to paused pipelines
-        pipeline = self._pop_pipeline(self.pipelines, cmd.audience, cmd.pause_pipeline.id)
-        self._put_pipeline(self.paused_pipelines, cmd.audience, cmd.pause_pipeline.id, pipeline)
+        pipeline = self._pop_pipeline(self.pipelines, cmd, cmd.pause_pipeline.pipeline_id)
+
+        self._put_pipeline(self.paused_pipelines, pipeline, cmd.pause_pipeline.pipeline_id)
 
         return True
 
@@ -378,30 +389,27 @@ class SnitchClient:
             self.log.error("Operation type not set")
             return
 
+        if cmd.audience.service_name != self.cfg.service_name:
+            self.log.debug("Service name does not match, ignoring")
+            return
+
         if not self._is_paused(cmd.audience, cmd.unpause_pipeline.id):
             return
 
         # Remove from paused pipelines and add to pipelines
-        pipeline = self._pop_pipeline(self.paused_pipelines, cmd.audience, cmd.unpause_pipeline.id)
-        self._put_pipeline(self.pipelines, cmd.audience, cmd.unpause_pipeline.id, pipeline)
+        pipeline = self._pop_pipeline(self.paused_pipelines, cmd, cmd.unpause_pipeline.id)
+        self._put_pipeline(self.pipelines, pipeline, cmd.unpause_pipeline.id)
 
         self.log.debug("Resuming pipeline {} for audience {}".format(cmd.unpause_pipeline.id, cmd.audience.service_name))
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
         """Check if a pipeline is paused"""
-        mode = SnitchClient.get_mode_from_proto(aud.operation_type)
-        topic = aud.component_name
+        aud_str = SnitchClient.audience(aud)
 
-        if self.paused_pipelines.get(mode) is None:
+        if self.paused_pipelines.get(aud_str) is None:
             return False
 
-        if self.paused_pipelines[mode].get(topic) is None:
-            return False
-
-        if self.paused_pipelines[mode][topic].get(pipeline_id) is None:
-            return False
-
-        return True
+        return self.paused_pipelines[aud_str].get(pipeline_id) is not None
 
     def _call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
         try:
@@ -513,3 +521,7 @@ class SnitchClient:
             raise SnitchException("unable to read response from wasm - no terminators found in response data")
 
         return bytes(res).rstrip(b'\xa6')
+
+    @staticmethod
+    def audience(aud: protos.Audience) -> str:
+        return "{}-{}".format(aud.operation_type, aud.component_name)

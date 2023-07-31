@@ -94,7 +94,6 @@ class Metrics:
 
     def __init__(self, **kwargs):
         log = kwargs.get("log", logging.getLogger("snitch-client"))
-        logging.basicConfig()
         log.setLevel(logging.DEBUG)
 
         self.stub = kwargs.get("stub")
