@@ -20,10 +20,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Release on npm
-        working-directory: ./build
+      - name: Set version
+        working-directory:
         run: |
-          npm version --allow-same-version ${{ github.event.release.tag_name }} --ignore-scripts
-          npm publish --access public --ignore-scripts
+          npm version --allow-same-version ${{ github.event.release.tag_name }} 
+          npm run copy
+
+      - name: Release to npm
+        working-directory: ./build
+        run: npm publish --access public --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -11,7 +11,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "npm run clean && npm run type:dts && npm run build:main && npm run copy",
+    "build": "npm run clean && npm run type:dts && npm run build:main",
     "build:main": "tsc",
     "clean": "rimraf build coverage nyc_output",
     "copy": "cp README.md ./build/README.md && cp package.json ./build/package.json",
