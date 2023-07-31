@@ -1,7 +1,7 @@
 import ReactFlow, { Background, Controls, useEdgesState } from "reactflow";
 import {
+  Audience,
   Consumer,
-  Platform,
   Producer,
   Service,
 } from "../components/customNodes.tsx";
@@ -11,13 +11,26 @@ import {
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 import "flowbite";
 import { useEffect } from "https://esm.sh/preact@10.15.1/hooks";
-
+import { string } from "https://deno.land/x/zod@v3.21.4/types.ts";
 
 const nodeTypes = {
-  platform: Platform,
+  audience: Audience,
   producer: Producer,
   consumer: Consumer,
   service: Service,
+};
+
+export type Node = {
+  id: string;
+  type: string;
+  dragHandle: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  data: {
+    label: string;
+  };
 };
 
 export default function Flow(props: any) {
@@ -25,6 +38,7 @@ export default function Flow(props: any) {
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
 
   useEffect(() => {
+    //this currently doesn't support more than one service or audience
     const keys = Object.keys(props.props.serviceMap);
     const serviceMap = props.props.serviceMap;
     let nodes = [
@@ -37,7 +51,7 @@ export default function Flow(props: any) {
       },
       {
         id: "10",
-        type: "platform",
+        type: "audience",
         sourcePosition: "right",
         targetPosition: "left",
         position: { x: 215, y: 350 },
@@ -54,16 +68,16 @@ export default function Flow(props: any) {
   }, []);
 
   useEffect(() => {
-    const newEdges = nodes.map((node: any, i: any) => {
+    const newEdges = nodes.map((node: Node, i: number) => {
       let targetNode;
       if (node.type === "service") {
-        targetNode = nodes.find((node) => node.type === "producer");
+        targetNode = nodes.find((node: Node) => node.type === "producer");
       } else if (node.type === "producer") {
-        targetNode = nodes.find((node) => node.type === "platform");
-      } else if (node.type === "platform") {
-        targetNode = nodes.find((node) => node.type === "consumer");
-      } else {
-        targetNode = nodes.find((node) => node.type === "service");
+        targetNode = nodes.find((node: Node) => node.type === "audience");
+      } else if (node.type === "audience") {
+        targetNode = nodes.find((node: Node) => node.type === "consumer");
+      } else if (node.type === "consumer") {
+        targetNode = nodes.find((node: Node) => node.type === "service");
       }
       return {
         id: i,
@@ -81,10 +95,10 @@ export default function Flow(props: any) {
         },
       };
     });
-    setEdges(newEdges)
+    setEdges(newEdges);
   }, [nodes]);
 
-  const getProducers = (prod: any) => {
+  const getProducers = (prod: []) => {
     if (prod.length === 0) {
       return {
         id: "1000",
@@ -106,7 +120,7 @@ export default function Flow(props: any) {
     }
   };
 
-  const getConsumers = (prod: any) => {
+  const getConsumers = (prod: []) => {
     if (prod.length === 0) {
       return {
         id: "2000",

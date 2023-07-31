@@ -225,7 +225,7 @@ export const Consumer = ({data}) => {
     );
 };
 
-export const Platform = ({data}: any) => {
+export const Audience = ({data}: any) => {
     return (
         <div
             className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
