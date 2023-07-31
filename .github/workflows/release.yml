@@ -5,11 +5,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v3
+    steps:    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up node
+        uses: actions/setup-node@v1
         with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
+          node-version: 20
 
       - name: Install dependencies
         run: npm install --force
