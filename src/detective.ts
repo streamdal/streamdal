@@ -1,16 +1,16 @@
+import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/pipeline.js";
 import {
   TransformStep,
   TransformType,
 } from "@streamdal/snitch-protos/protos/steps/transform.js";
-import * as fs from "fs";
-// eslint-disable-next-line import/no-unresolved
-import { WASI } from "wasi";
-import { readResponse } from "./wasm.js";
 import {
   WASMRequest,
   WASMResponse,
 } from "@streamdal/snitch-protos/protos/wasm.js";
-import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/pipeline.js";
+import * as fs from "fs";
+// eslint-disable-next-line import/no-unresolved
+import { WASI } from "wasi";
+import { readResponse } from "./wasm.js";
 
 const wasi = new WASI({
   preopens: {
@@ -20,7 +20,7 @@ const wasi = new WASI({
 
 const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
 
-const example = {
+export const examplePayload = {
   boolean_t: true,
   boolean_f: false,
   object: {
@@ -46,7 +46,7 @@ const example = {
   timestamp_rfc3339: "2023-06-29T12:34:56Z",
 };
 
-export const testDetective = async () => {
+export const testDetective = async (data: Uint8Array): string => {
   console.info("\n");
   console.info("### start web assembly test");
   const wasm = await WebAssembly.compile(
@@ -56,7 +56,6 @@ export const testDetective = async () => {
   const { exports } = instance;
   const { memory, alloc, f } = exports;
 
-  const input = new TextEncoder().encode(JSON.stringify(example));
   const request = WASMRequest.create({
     step: {
       name: "some-name",
@@ -80,11 +79,10 @@ export const testDetective = async () => {
         // }),
       },
     },
-    input,
+    input: data,
   });
 
-  console.info("sending the following payload to transform/mask step");
-  console.dir(example);
+  console.info("sending the payload to transform/mask step");
 
   const bytes = WASMRequest.toBinary(request);
   const ptr = alloc(bytes.length);
@@ -97,10 +95,7 @@ export const testDetective = async () => {
   const content = readResponse(returnPtr, completeBufferFromMemory);
 
   const resp = WASMResponse.fromBinary(content);
-  console.info("wasm response", resp);
-  console.info(
-    "wasm output",
-    JSON.parse(new TextDecoder().decode(resp.output))
-  );
+  const output: string = JSON.parse(new TextDecoder().decode(resp.output));
   console.info("### end web assembly test");
+  return output;
 };

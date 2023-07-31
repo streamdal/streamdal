@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "nodenext"
   },
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"],
+  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
 }

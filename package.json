@@ -1,6 +1,6 @@
 {
   "name": "snitch-node-client",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
     "typescript",
@@ -38,7 +38,7 @@
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
     "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@streamdal/snitch-protos": "^0.0.50",
+    "@streamdal/snitch-protos": "^0.0.55",
     "@types/rwlock": "^5.0.3",
     "dotenv": "^16.3.1",
     "rwlock": "^5.0.0"

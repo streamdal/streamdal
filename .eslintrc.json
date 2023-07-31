@@ -35,13 +35,16 @@
     "import/no-mutable-exports": "error",
     "import/no-unused-modules": "error"
   },
-  "ignorePatterns": ["/proto"],
+  "ignorePatterns": ["/proto", "src/**/*.test.tsx", "src/**/*.test.ts"],
   "rules": {
     "prefer-const": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-console": ["error", { "allow": ["warn", "error", "info", "log", "dir", "debug"] }],
+    "no-console": [
+      "error",
+      { "allow": ["warn", "error", "info", "log", "dir", "debug"] }
+    ],
     "@typescript-eslint/ban-types": [
       "error",
       {
