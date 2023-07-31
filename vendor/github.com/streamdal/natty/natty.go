@@ -98,6 +98,12 @@ type INatty interface {
 	// Keys will return all of the keys in a bucket (empty slice if none found)
 	Keys(ctx context.Context, bucket string) ([]string, error)
 
+	// Refresh will attempt to perform a "safe" refresh of a key that has a TTL.
+	// Natty will first attempt to fetch the key so that it can get its revision
+	// and then perform an Update() referencing the revision. If the revision
+	// does not match, it will return an error.
+	Refresh(ctx context.Context, bucket, key string) error
+
 	// AsLeader enables simple leader election by using NATS k/v functionality.
 	//
 	// AsLeader will execute opts.Func if and only if the node executing AsLeader

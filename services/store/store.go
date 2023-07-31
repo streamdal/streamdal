@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -40,6 +41,7 @@ On DELETE, it will delete from both in-memory cache and NATS k/V.
 
 var (
 	ErrPipelineNotFound = errors.New("pipeline not found")
+	ErrRegisterNotFound = errors.New("no registration found")
 )
 
 type IStore interface {
@@ -126,9 +128,57 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	llog := s.log.WithField("method", "DeleteRegistration")
 	llog.Debug("received request to delete registration")
 
-	// TODO: DeregisterRequest should take a session id (instead of service name)
+	if err := validate.DeregisterRequest(req); err != nil {
+		return errors.Wrap(err, "error validating deregister request")
+	}
+
+	// Remove from cache
+	s.options.CacheBackend.Remove(CacheRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId))
+
+	// Remove from K/V
+	if err := s.options.NATSBackend.Delete(ctx, NATSRegisterBucket, NATSRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId)); err != nil {
+		return errors.Wrap(err, "error deleting registration from K/V")
+	}
 
 	return nil
+}
+
+func (s *Store) GetRegistrationBySessionId(ctx context.Context, sessionId string) (*protos.RegisterRequest, error) {
+	llog := s.log.WithField("method", "GetRegistrationBySessionId")
+	llog.Debug("received request to get registration by session id")
+
+	// Cache does not expose a "Keys()" method so we have to fetch registrations via NATS
+	registrations, err := s.options.NATSBackend.Keys(ctx, NATSRegisterBucket)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching registrations from NATS")
+	}
+
+	// Filter by session ID
+	for _, r := range registrations {
+		splitData := strings.Split(r, ":")
+
+		if len(splitData) != 3 {
+			llog.Warningf("invalid registration key '%s'", r)
+			continue
+		}
+
+		if splitData[2] == sessionId {
+			req, err := s.options.NATSBackend.Get(ctx, NATSRegisterBucket, r)
+			if err != nil {
+				return nil, errors.Wrap(err, "error fetching registration from NATS")
+			}
+
+			registerRequest := &protos.RegisterRequest{}
+
+			if err := proto.Unmarshal(req, registerRequest); err != nil {
+				return nil, errors.Wrap(err, "error unmarshaling register request")
+			}
+
+			return registerRequest, nil
+		}
+	}
+
+	return nil, ErrRegisterNotFound
 }
 
 // AddHeartbeat updates the TTL for a given registration
@@ -137,23 +187,21 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 	llog.Debug("received request to add heartbeat")
 
 	// Find registration by session id
-	registration, err := s.GetRegistrationBySessionID(ctx, req.SessionId)
+	registration, err := s.GetRegistrationBySessionId(ctx, req.SessionId)
 	if err != nil {
 		return errors.Wrapf(err, "unable to lookup registration by session id '%s'", req.SessionId)
 	}
 
 	// Refresh in cache
-	if ok := s.options.CacheBackend.Refresh(CacheRegisterKey(s.options.NodeName, registration.ServiceName, registration.SessionId)); !ok {
-		return errors.Errorf("unable to refresh cache for registration '%s'", registration.SessionId)
-	}
+	s.options.CacheBackend.Set(CacheRegisterKey(s.options.NodeName, registration.ServiceName, registration.SessionId), registration, CacheRegisterTTL)
 
 	// Refresh in NATS
-	if _, err := s.options.NATSBackend.RefreshKey(
+	if err := s.options.NATSBackend.Refresh(
 		ctx,
 		NATSRegisterBucket,
 		NATSRegisterKey(s.options.NodeName, registration.ServiceName, registration.SessionId),
 	); err != nil {
-		return errors.Wrapf(err, "unable to refresh NATS for registration '%s'", registration.SessionId)
+		return errors.Wrapf(err, "error refreshing registration for session id '%s' in NATS", registration.SessionId)
 	}
 
 	return nil

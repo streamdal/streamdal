@@ -17,6 +17,7 @@ The library exposes several, opinionated, quality-of-life functionality such as:
 * Simplified publish/consume API *specifically* to be used with NATS-JS
     * `Consume()` uses ONLY durable consumers (as we want kafka-like behavior)
 * Methods for interacting with key/value store in NATS
+  * Ability to perform safe key `Refresh()`
 * Concurrency / leader election functionality
 
 See the full interface [here](https://pkg.go.dev/github.com/streamdal/natty#INatty).

@@ -159,6 +159,31 @@ func (n *Natty) CreateBucket(_ context.Context, name string, ttl time.Duration, 
 	return nil
 }
 
+// Refresh will refresh the TTL of a key in a bucket. Since there is no built-in
+// way to perform a refresh, we will first get the key and then attempt to update
+// it referencing the revision ID we got.
+func (n *Natty) Refresh(_ context.Context, bucket string, key string) error {
+	kv, err := n.getBucket(context.Background(), bucket, false, 0)
+	if err != nil {
+		return errors.Wrap(err, "unable to fetch bucket")
+	}
+
+	kve, err := kv.Get(key)
+	if err != nil {
+		if err == nats.ErrKeyNotFound {
+			return err
+		}
+
+		return errors.Wrap(err, "unable to fetch key")
+	}
+
+	if _, err := kv.Update(key, kve.Value(), kve.Revision()); err != nil {
+		return errors.Wrap(err, "unable to update key for refresh")
+	}
+
+	return nil
+}
+
 func validateCreateBucket(name string, _ time.Duration, replicaCount int) error {
 	if name == "" {
 		return errors.New("bucket name cannot be empty")
