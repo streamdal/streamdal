@@ -1,11 +1,13 @@
-import uuid
-
+import logging
 import pytest
+import snitch_protos.protos as protos
+import uuid
 from snitchpy import SnitchClient, SnitchConfig
 from wasmtime import Store, Memory, MemoryType, Limits
-from snitch_protos.protos import PipelineStep, PipelineStepCondition
-from snitch_protos.protos.steps import DetectiveStep, DetectiveType
 
+logging.basicConfig()
+logger = logging.getLogger("abc")
+logger.setLevel(logging.CRITICAL)
 
 class TestSnitchClient:
     def test_valid_config(self):
@@ -70,29 +72,6 @@ class TestSnitchClient:
         result = SnitchClient._read_memory(memory, store, 0, len(data))
         assert result == b'Hello, World!'
 
-    # def test_read_memory_with_length(self):
-    #     """Test reading within bounds with a specified length"""
-    #     store = Store()
-    #     memory = Memory(store, MemoryType(Limits(1, 1024)))
-    #     data = b'Hello, World!'
-    #     memory.write(store, data, 0)
-    #
-    #     result = SnitchClient._read_memory(memory, store, 0, 5)
-    #     assert result == b'Hello'
-    #
-    # def test_read_memory_out_of_bounds(self):
-    #     """Test reading out of bounds of memory"""
-    #     store = Store()
-    #     memory = Memory(store, MemoryType(Limits(1, 1)))
-    #     data = b'Hello, World!'
-    #     memory.write(store, data, 0)
-    #     page_size = 64 * 1024  # 64 KB
-    #
-    #     with pytest.raises(SnitchException) as exc_info:
-    #         SnitchClient._read_memory(memory, store, page_size + 1)
-
-        # assert str(exc_info.value) == "WASM memory pointer out of bounds"
-
     def test_read_memory_with_interspersed_pointers(self):
         """Test reading with null pointers"""
         store = Store()
@@ -112,18 +91,18 @@ class TestSnitchClient:
         with open("./assets/test/detective.wasm", "rb") as file:
             wasm_bytes = file.read()
 
-        step = PipelineStep(
+        step = protos.PipelineStep(
             name="detective",
             on_success=[],
-            on_failure=[PipelineStepCondition(PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT)],
+            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
-            detective=DetectiveStep(
+            detective=protos.steps.DetectiveStep(
                 path="object.field",
                 args=["streamdal"],
                 negate=False,
-                type=DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
             )
         )
 
@@ -137,3 +116,161 @@ class TestSnitchClient:
 
         assert res2 is not None
         assert res2.exit_code == 2
+
+    def test_is_paused(self):
+        """Test is_paused returns True when paused"""
+        client = object.__new__(SnitchClient)
+        client.paused_pipelines = {}
+
+        aud = protos.Audience(
+            component_name="test",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+        )
+
+        pipeline_id = uuid.uuid4().__str__()
+        aud_str = SnitchClient.audience(aud)
+        client.paused_pipelines[aud_str] = {}
+        client.paused_pipelines[aud_str][pipeline_id] = protos.Command
+
+        assert client._is_paused(aud, uuid.uuid4().__str__()) is False
+        assert client._is_paused(aud, pipeline_id) is True
+
+    def test_attach_pipeline(self):
+        """Test set_pipeline adds a pipeline to the pipelines dict"""
+
+        client = object.__new__(SnitchClient)
+        client.pipelines = {}
+        client.paused_pipelines = {}
+        client.log = logger
+
+        pipeline_id = uuid.uuid4().__str__()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=pipeline_id,
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        aud_str = SnitchClient.audience(cmd.audience)
+        assert client.pipelines[aud_str] is not None
+        assert client.pipelines[aud_str][pipeline_id] is not None
+
+    def test_pop_pipeline(self):
+        client = object.__new__(SnitchClient)
+        client.pipelines = {}
+        client.paused_pipelines = {}
+        client.log = logger
+
+        pipeline_id = uuid.uuid4().__str__()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=pipeline_id,
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        pipeline = SnitchClient._pop_pipeline(client.pipelines, cmd, pipeline_id)
+
+        assert pipeline is not None
+        assert pipeline.attach_pipeline.pipeline.id == pipeline_id
+
+    def test_pause_pipeline(self):
+        client = object.__new__(SnitchClient)
+        client.cfg = SnitchConfig(service_name="testing")
+        client.pipelines = {}
+        client.paused_pipelines = {}
+        client.log = logger
+
+        pipeline_id = uuid.uuid4().__str__()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=pipeline_id,
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        pause_cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            ),
+            pause_pipeline=protos.PausePipelineCommand(
+                pipeline_id=pipeline_id,
+            )
+        )
+
+        res = client._pause_pipeline(pause_cmd)
+        assert res is True
+
+        aud_str = SnitchClient.audience(cmd.audience)
+        assert len(client.paused_pipelines) == 1
+        assert len(client.pipelines) == 0
+        assert client.paused_pipelines[aud_str] is not None
+        assert client.paused_pipelines[aud_str][pipeline_id] is not None
+
+    def test_delete_pipeline(self):
+        client = object.__new__(SnitchClient)
+        client.cfg = SnitchConfig(service_name="testing")
+        client.pipelines = {}
+        client.paused_pipelines = {}
+        client.log = logger
+
+        pipeline_id = uuid.uuid4().__str__()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=pipeline_id,
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        delete_cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            ),
+            detach_pipeline=protos.DetachPipelineCommand(
+                pipeline_id=pipeline_id,
+            )
+        )
+
+        res = client._detatch_pipeline(delete_cmd)
+
+        assert res is True
+        assert len(client.pipelines) == 0
+        assert len(client.paused_pipelines) == 0
