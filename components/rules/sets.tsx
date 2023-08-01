@@ -1,9 +1,8 @@
-import { MonitorIcon } from "../icons/streamdal.tsx";
-import { titleCase } from "../../lib/utils.ts";
-import { Total } from "./metrics/total.tsx";
-import { RuleMenu } from "./menu.tsx";
-import { ReactNode } from "https://esm.sh/v118/@types/react@18.2.6/index.d.ts";
 import { Metric } from "../../lib/metrics.ts";
+import { titleCase } from "../../lib/utils.ts";
+import { MonitorIcon } from "../icons/streamdal.tsx";
+import { RuleMenu } from "./menu.tsx";
+import { Total } from "./metrics/total.tsx";
 
 export const TH = ({
   children,
