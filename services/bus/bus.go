@@ -103,7 +103,7 @@ func (o *Options) validate() error {
 		return errors.New("store service must be provided")
 	}
 
-	if o.CmdService == nil {
+	if o.Cmd == nil {
 		return errors.New("cmd service must be provided")
 	}
 

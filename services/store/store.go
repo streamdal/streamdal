@@ -11,6 +11,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/streamdal/snitch-server/services/store/types"
 	"github.com/streamdal/snitch-server/util"
 )
 
@@ -43,6 +44,8 @@ type IStore interface {
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
+	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
+	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineId string) error
@@ -185,7 +188,7 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 
 	pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
 	if err != nil {
-		if err != nats.ErrKeyNotFound {
+		if err == nats.ErrKeyNotFound {
 			return nil, ErrPipelineNotFound
 		}
 
@@ -261,7 +264,7 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 	}
 
 	// Store attachment in NATS
-	natsKey := NATSConfigKey(util.AudienceStr(req.Audience))
+	natsKey := NATSConfigKey(util.AudienceToStr(req.Audience))
 
 	if err := s.options.NATSBackend.Put(ctx, NATSConfigBucket, natsKey, []byte(req.PipelineId)); err != nil {
 		return errors.Wrap(err, "error saving pipeline attachment to NATS")
@@ -284,7 +287,7 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	if err := s.options.NATSBackend.Delete(ctx, NATSConfigBucket, NATSConfigKey(util.AudienceStr(req.Audience))); err != nil {
+	if err := s.options.NATSBackend.Delete(ctx, NATSConfigBucket, NATSConfigKey(util.AudienceToStr(req.Audience))); err != nil {
 		return errors.Wrap(err, "error deleting pipeline attachment from NATS")
 	}
 
@@ -315,7 +318,7 @@ func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequ
 	if err := s.options.NATSBackend.Put(
 		ctx,
 		NATSPausedBucket,
-		NATSPausedKey(util.AudienceStr(req.Audience), req.PipelineId),
+		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
 		nil,
 	); err != nil {
 		return errors.Wrap(err, "error saving pipeline pause state")
@@ -331,7 +334,7 @@ func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelin
 
 	if _, err := s.options.NATSBackend.Get(ctx,
 		NATSPausedBucket,
-		NATSPausedKey(util.AudienceStr(audience), pipelineID),
+		NATSPausedKey(util.AudienceToStr(audience), pipelineID),
 	); err != nil {
 		if err == nats.ErrKeyNotFound {
 			return false, nil
@@ -361,7 +364,7 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	if err := s.options.NATSBackend.Delete(
 		ctx,
 		NATSPausedBucket,
-		NATSPausedKey(util.AudienceStr(req.Audience), req.PipelineId),
+		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
 	); err != nil {
 		return errors.Wrap(err, "error deleting pipeline pause state")
 	}
@@ -376,7 +379,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	if err := s.options.NATSBackend.Put(
 		ctx,
 		NATSLiveBucket,
-		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceStr(req.Audience)),
+		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
 		nil,
 		NATSLiveTTL,
 	); err != nil {
@@ -384,6 +387,80 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	}
 
 	return nil
+}
+
+func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience]string, error) {
+	cfgs := make(map[*protos.Audience]string)
+
+	audienceKeys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching config keys from NATS")
+	}
+
+	for _, aud := range audienceKeys {
+		// Fetch key so we get the pipeline ID
+		pipelineID, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, aud)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching config key '%s' from NATS", aud)
+		}
+
+		fullAudience := util.AudienceFromStr(aud)
+		if fullAudience == nil {
+			return nil, errors.Errorf("error converting string audience '%s' to struct", aud)
+		}
+
+		cfgs[fullAudience] = string(pipelineID)
+	}
+
+	return cfgs, nil
+}
+
+func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
+	live := make([]*types.LiveEntry, 0)
+
+	// Fetch all live keys from NATS
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching live keys from NATS")
+	}
+
+	// key is of the format:
+	//
+	// <sessionID>:<nodeName>:<<service>:<operation_type>:<component>>
+	// OR
+	// <sessionID>:<nodeName>:register
+
+	for _, key := range keys {
+		parts := strings.SplitN(key, ":", 2)
+
+		if len(parts) != 2 {
+			return nil, errors.Errorf("invalid live key '%s'", key)
+		}
+
+		sessionID := parts[0]
+		nodeName := parts[1]
+		maybeAud := parts[2]
+
+		entry := &types.LiveEntry{
+			SessionID: sessionID,
+			NodeName:  nodeName,
+		}
+
+		if maybeAud == "register" {
+			entry.Register = true
+		} else {
+			aud := util.AudienceFromStr(maybeAud)
+			if aud == nil {
+				return nil, errors.Errorf("invalid live key '%s'", key)
+			}
+
+			entry.Audience = aud
+		}
+
+		live = append(live, entry)
+	}
+
+	return live, nil
 }
 
 func (o *Options) validate() error {

@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/validate"
 )
 
@@ -14,11 +15,69 @@ type PipelineUsage struct {
 	Active     bool
 	NodeName   string
 	SessionId  string
+	Audience   *protos.Audience
 }
 
-// TODO: Implement
+// Get pipeline usage across the entire cluster
 func (b *Bus) getPipelineUsage(ctx context.Context, pipelineId string) ([]*PipelineUsage, error) {
-	return nil, nil
+	pipelines := make([]*PipelineUsage, 0)
+
+	// Get config for all pipelines & audiences
+	cfgs, err := b.options.Store.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting configs")
+	}
+
+	// Get live clients
+	live, err := b.options.Store.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live audiences")
+	}
+
+	// Build list of all used pipelines
+	for aud, pid := range cfgs {
+		pu := &PipelineUsage{
+			PipelineId: pid,
+			Audience:   aud,
+		}
+
+		// Check if this pipeline is "active"
+		for _, l := range live {
+			if l.Audience == aud {
+				pu.Active = true
+				pu.NodeName = l.NodeName
+				pu.SessionId = l.SessionID
+			}
+		}
+
+		pipelines = append(pipelines, pu)
+	}
+
+	return pipelines, nil
+}
+
+// Get active pipelines on this node
+func (b *Bus) getActivePipelineUsage(ctx context.Context, pipelineId string) ([]*PipelineUsage, error) {
+	usage, err := b.getPipelineUsage(ctx, pipelineId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting pipeline usage")
+	}
+
+	active := make([]*PipelineUsage, 0)
+
+	for _, u := range usage {
+		if !u.Active {
+			continue
+		}
+
+		if u.NodeName != b.options.NodeName {
+			continue
+		}
+
+		active = append(active, u)
+	}
+
+	return active, nil
 }
 
 // Pipeline was updated - check if this service has an active registration that
@@ -31,38 +90,21 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		return errors.Wrap(err, "validation error")
 	}
 
-	// Determine pipeline usage
-	usage, err := b.getPipelineUsage(ctx, req.Pipeline.Id)
+	// Determine active pipeline usage
+	usage, err := b.getActivePipelineUsage(ctx, req.Pipeline.Id)
 	if err != nil {
 		return errors.Wrap(err, "error getting pipeline usage")
 	}
 
-	active := make([]*PipelineUsage, 0)
-
-	for _, u := range usage {
-		// If not active, skip
-		if !u.Active {
-			continue
-		}
-
-		// It is active but maybe not on our node
-		if u.NodeName != b.options.NodeName {
-			continue
-		}
-
-		// Active and it is on our node -> need to inform
-		active = append(active, u)
-	}
-
-	if len(active) == 0 {
-		// No active usage -> no need to inform any clients
-		b.log.Debugf("no active usage for updated pipeline '%s' - nothing to do", req.Pipeline.Id)
+	if len(usage) == 0 {
+		b.log.Debugf("no active pipeline usage found for pipeline id '%s' on node '%s' - skipping", req.Pipeline.Id, b.options.NodeName)
 		return nil
 	}
 
-	for _, u := range active {
-		// TODO: Need to check if have an active cmd channel for this session id
-		if _, ok := b.options.CommandChannel[u.SessionId]; !ok { // This needs mutexes
+	for _, u := range usage {
+		cmdCh := b.options.Cmd.GetChannel(u.SessionId)
+
+		if cmdCh == nil {
 			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
 			continue
 		}
@@ -70,7 +112,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		b.log.Debugf("sending detach cmd to client '%s' for pipeline '%s'", u.SessionId, u.PipelineId)
 
 		// Send DetachPipeline cmd to client
-		b.options.CommandChannel[u.SessionId] <- &protos.Command{
+		cmdCh <- &protos.Command{
 			Command: &protos.Command_DetachPipeline{
 				DetachPipeline: &protos.DetachPipelineCommand{
 					PipelineId: u.PipelineId,
@@ -81,7 +123,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		b.log.Debugf("sending attach cmd to client '%s' for pipeline '%s'", u.SessionId, u.PipelineId)
 
 		// Send AttachPipeline cmd to client
-		b.options.CommandChannel[u.SessionId] <- &protos.Command{
+		cmdCh <- &protos.Command{
 			Command: &protos.Command_AttachPipeline{
 				AttachPipeline: &protos.AttachPipelineCommand{
 					Pipeline: req.Pipeline,
@@ -93,9 +135,8 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	return nil
 }
 
-// Pipeline was deleted - check if this service has an active registration that
-// uses this pipeline ID. If it does, we need to have the client "unload" the
-// pipeline. We can do this by sending the client a "DeletePipeline" cmd.
+// Pipeline was deleted. We need to determine if we have any active clients
+// using that pipeline. If yes, we need to tell them to detach the pipeline.
 func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
 	b.log.Debugf("handling delete pipeline request bus event: %v", req)
 
@@ -103,13 +144,41 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 		return errors.Wrap(err, "validation error")
 	}
 
-	if err := b.options.Store.DeletePipeline(ctx, req.PipelineId); err != nil {
-		b.log.Debugf("error deleting pipeline '%s'", req.PipelineId)
-
-		return errors.Wrap(err, "error deleting pipeline")
+	// Determine active pipeline usage
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
+	if err != nil {
+		return errors.Wrap(err, "error getting pipeline usage")
 	}
 
-	// TODO: Send DeletePipeline commands to clients that use this pipeline
+	if len(usage) == 0 {
+		b.log.Debugf("no active pipeline usage found for pipeline id '%s' on node '%s' - skipping", req.PipelineId, b.options.NodeName)
+		return nil
+	}
+
+	b.log.Debugf("found '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", len(usage), req.PipelineId, b.options.NodeName)
+
+	notified := 0
+
+	// Inform active clients to detach pipeline
+	for _, u := range usage {
+		ch := b.options.Cmd.GetChannel(u.SessionId)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Command: &protos.Command_DetachPipeline{
+				DetachPipeline: &protos.DetachPipelineCommand{
+					PipelineId: req.PipelineId,
+				},
+			},
+		}
+
+		notified += 1
+	}
+
+	b.log.Debugf("notified '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", notified, req.PipelineId, b.options.NodeName)
 
 	return nil
 }
@@ -124,11 +193,71 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 		return errors.Wrap(err, "validation error")
 	}
 
-	// TODO: ALSO - does this audience pertain to any of our clients?
+	// Is this a valid pipeline id?
+	pipeline, err := b.options.Store.GetPipeline(ctx, req.PipelineId)
+	if err != nil {
+		if err == store.ErrPipelineNotFound {
+			b.log.Debugf("pipeline id '%s' not found - skipping", req.PipelineId)
+			return nil
+		}
 
-	// Do we know about this pipeline?
+		b.log.Errorf("error getting pipeline '%s' from store: %v", req.PipelineId, err)
+		return errors.Wrapf(err, "error getting pipeline '%s' from store", req.PipelineId)
+	}
 
-	// TODO: Send SetPipeline commands to appropriate clients
+	// Is this audience already attached to a pipeline?
+	audienceAssignment, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
+	if err != nil {
+		if err == store.ErrConfigNotFound {
+			b.log.Debugf("config for audience '%s' not found - nothing to do", req.Audience)
+			return nil
+		}
+
+		b.log.Errorf("error getting audience '%s' config from store: %v", req.Audience, err)
+		return errors.Wrapf(err, "error getting audience '%s' config from store", req.Audience)
+	}
+
+	if audienceAssignment != "" {
+		b.log.Debugf("audience '%s' is already attached to pipeline '%s'", req.Audience, audienceAssignment)
+		return nil
+	}
+
+	// Is this an active live audience on this node?
+	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience)
+	if err != nil {
+		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
+		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
+	}
+
+	if len(sessionIDs) == 0 {
+		b.log.Debugf("no active sessions found for audience '%s' - skipping", req.Audience)
+		return nil
+	}
+
+	b.log.Debugf("found '%d' active session(s) for audience '%s'", len(sessionIDs), req.Audience)
+
+	attached := 0
+
+	// OK we have an active audience on this node - let's tell it to attach!
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Command: &protos.Command_AttachPipeline{
+				AttachPipeline: &protos.AttachPipelineCommand{
+					Pipeline: pipeline,
+				},
+			},
+		}
+
+		attached += 1
+	}
+
+	b.log.Debugf("sent attach pipeline command to '%d' active session(s) for audience '%s'", attached, req.Audience)
 
 	return nil
 }
@@ -158,10 +287,6 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 		return errors.Wrap(err, "validation error")
 	}
 
-	// TODO: Does this audience pertain to us?
-
-	// TODO: Send PausePipeline commands to clients that use this pipeline
-
 	return nil
 }
 
@@ -174,10 +299,6 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
-
-	// TODO: Does this audience pertain to us?
-
-	// TODO: Maybe send PausePipeline commands to clients that use this pipeline
 
 	return nil
 }
