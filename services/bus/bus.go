@@ -11,16 +11,27 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/validate"
 )
+
+/*
+
+Broadcast handlers should not have to write to storage - it should already
+handled before the broadcast occurred. Instead, the broadcast handler should
+perform business logic that should be performed by ALL cluster nodes.
+
+Example: If an UpdatePipeline comes in, the handler should determine if the
+current node has an active session that uses this pipeline - if it does, it
+should send commands to the client (via the register cmd channel).
+
+*/
 
 const (
 	StreamName    = "snitch_events"
 	StreamSubject = "broadcast"
 	FullSubject   = StreamName + "." + StreamSubject
-
-	BroadcastSourceMetadataKey = "broadcast_src"
 )
 
 type IBus interface {
@@ -41,6 +52,7 @@ type Bus struct {
 type Options struct {
 	Store       store.IStore
 	NATS        natty.INatty
+	Cmd         cmd.ICmd
 	NodeName    string
 	ShutdownCtx context.Context
 }
@@ -89,6 +101,10 @@ func (o *Options) validate() error {
 
 	if o.Store == nil {
 		return errors.New("store service must be provided")
+	}
+
+	if o.CmdService == nil {
+		return errors.New("cmd service must be provided")
 	}
 
 	return nil

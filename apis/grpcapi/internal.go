@@ -33,15 +33,25 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "invalid register request")
 	}
 
-	if err := s.Deps.StoreService.AddRegistration(server.Context(), request); err != nil {
-		return errors.Wrap(err, "unable to save registration")
-	}
-
 	llog := s.log.WithFields(logrus.Fields{
 		"service_name": request.ServiceName,
 	})
 
-	llog.Debug("beginning register command loop")
+	// Store registration
+	if err := s.Deps.StoreService.AddRegistration(server.Context(), request); err != nil {
+		return errors.Wrap(err, "unable to save registration")
+	}
+
+	// Create a new command channel
+	ch, newCh := s.Deps.CmdService.AddChannel(request.ServiceName)
+
+	if newCh {
+		llog.Debugf("new channel created for session id '%s'", request.SessionId)
+	} else {
+		llog.Debugf("channel already exists for session id '%s'", request.SessionId)
+	}
+
+	llog.Debug("beginning register cmd loop")
 
 	var shutdown bool
 
@@ -56,18 +66,18 @@ MAIN:
 			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
-		case cmd := <-s.Deps.CommandChannel:
-			llog.Debug("received command on command channel")
+		case cmd := <-ch:
+			llog.Debug("received cmd on cmd channel")
 
-			// Send command to connected client
+			// Send cmd to connected client
 			if err := server.Send(cmd); err != nil {
-				s.log.WithError(err).Error("unable to send command to client")
+				s.log.WithError(err).Error("unable to send cmd to client")
 
 				// TODO: Retry? Ignore?
-				return errors.Wrap(err, "unable to send command to client")
+				return errors.Wrap(err, "unable to send cmd to client")
 			}
 
-			llog.Debug("sent command to client")
+			llog.Debug("sent cmd to client")
 		}
 	}
 
@@ -79,6 +89,13 @@ MAIN:
 	}
 
 	llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
+
+	// Remove command channel
+	if ok := s.Deps.CmdService.RemoveChannel(request.SessionId); ok {
+		llog.Debugf("removed channel for session id '%s'", request.SessionId)
+	} else {
+		llog.Debugf("no channel found for session id '%s'", request.SessionId)
+	}
 
 	if err := s.Deps.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
 		ServiceName: request.ServiceName,
@@ -128,7 +145,6 @@ func (s *InternalServer) Metrics(ctx context.Context, request *protos.MetricsReq
 	return nil, nil
 }
 
-// TODO: Implement
 func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienceRequest) (*protos.StandardResponse, error) {
 	s.log.Debugf("received new audience request for session id '%s'", req.SessionId)
 
