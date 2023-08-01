@@ -31,7 +31,7 @@ export default function FlowRoute({data}: any) {
   return (
     <Layout>
       <ReactFlowProvider>
-        <Flow props={data}/>
+        <Flow data={data}/>
       </ReactFlowProvider>
     </Layout>
   );

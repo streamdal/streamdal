@@ -11,7 +11,8 @@ import {
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 import "flowbite";
 import { useEffect } from "https://esm.sh/preact@10.15.1/hooks";
-import { string } from "https://deno.land/x/zod@v3.21.4/types.ts";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
 
 const nodeTypes = {
   component: Component,
@@ -34,14 +35,14 @@ export type Node = {
   };
 };
 
-export default function Flow(props: any) {
+export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
 
   useEffect(() => {
     //todo: add functionality for more than one service and component
-    const keys = Object.keys(props.props.serviceMap);
-    const serviceMap = props.props.serviceMap;
+    const keys = Object.keys(data.serviceMap);
+    const serviceMap = data.serviceMap;
 
     let nodes = [
       {
@@ -58,7 +59,7 @@ export default function Flow(props: any) {
         targetPosition: "left",
         position: { x: 215, y: 350 },
         data: {
-          label: `${serviceMap[keys[0]].pipelines[0].audience.componentName}`,
+          label: `${serviceMap[keys[0]].pipelines[0].audience?.componentName}`,
         },
       },
     ];
@@ -69,8 +70,8 @@ export default function Flow(props: any) {
   }, []);
 
   useEffect(() => {
-    //edges created based off the node created
-    const unique = nodes.reduce((acc: any, node: Node) => {
+    //edges created based off the nodes created
+    const unique = nodes.reduce((acc: [], node: Node) => {
       if (!acc.length || !acc.find((item: Node) => item.type === node.type)) {
         return [...acc, node];
       } else {
@@ -112,10 +113,10 @@ export default function Flow(props: any) {
     setEdges(newEdges);
   }, [nodes]);
 
-  const getOperation = (pipeline: any) => {
-    //creates producer and consumer nodes
-    return pipeline.map((component: any, i: number) => {
-      switch (component.audience.operationType) {
+  const getOperation = (pipeline: PipelineInfo[]) => {
+    //creates producer and consumer nodes based on audience data
+    return pipeline.map((component: PipelineInfo, i: number) => {
+      switch (component.audience?.operationType) {
         case (1):
           return {
             id: `${2000 + i}`,
