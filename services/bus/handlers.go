@@ -187,6 +187,30 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 	return nil
 }
 
+// Get session id's (by audience and node)
+func (b *Bus) getActiveSessionIDs(ctx context.Context, audience *protos.Audience) ([]string, error) {
+	entries, err := b.options.Store.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range entries {
+		if e.Audience != audience {
+			continue
+		}
+
+		if e.NodeName != b.options.NodeName {
+			continue
+		}
+
+		sessionIDs = append(sessionIDs, e.SessionID)
+	}
+
+	return sessionIDs, nil
+}
+
 // Pipeline was attached to an audience - check if this service has an active
 // registration with the provided audience. If it does, we need to send a
 // AttachPipeline cmd to the client.
@@ -210,7 +234,7 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 	}
 
 	// Is this audience already attached to a pipeline?
-	audienceAssignment, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
+	attachedPipelineID, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
 	if err != nil {
 		if err == store.ErrConfigNotFound {
 			b.log.Debugf("config for audience '%s' not found - nothing to do", req.Audience)
@@ -221,24 +245,23 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 		return errors.Wrapf(err, "error getting audience '%s' config from store", req.Audience)
 	}
 
-	if audienceAssignment != "" {
-		b.log.Debugf("audience '%s' is already attached to pipeline '%s'", req.Audience, audienceAssignment)
+	if attachedPipelineID != "" {
+		b.log.Debugf("audience '%s' is already attached to pipeline '%s'", req.Audience, attachedPipelineID)
 		return nil
 	}
 
-	// Is this an active live audience on this node?
-	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience)
+	sessionIDs, err := b.getActiveSessionIDs(ctx, req.Audience)
 	if err != nil {
 		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
 		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
 	}
 
 	if len(sessionIDs) == 0 {
-		b.log.Debugf("no active sessions found for audience '%s' - skipping", req.Audience)
+		b.log.Debugf("no active sessions found for audience '%s' on node '%s' - skipping", req.Audience, b.options.NodeName)
 		return nil
 	}
 
-	b.log.Debugf("found '%d' active session(s) for audience '%s'", len(sessionIDs), req.Audience)
+	b.log.Debugf("found '%d' active session(s) for audience '%s' on node '%s'", len(sessionIDs), req.Audience, b.options.NodeName)
 
 	attached := 0
 

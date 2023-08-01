@@ -36,6 +36,7 @@ store any persistent state in memory!
 
 var (
 	ErrPipelineNotFound = errors.New("pipeline not found")
+	ErrConfigNotFound   = errors.New("config not found")
 )
 
 type IStore interface {
@@ -55,6 +56,7 @@ type IStore interface {
 	PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
+	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
 }
 
 type Options struct {
@@ -462,6 +464,21 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	}
 
 	return live, nil
+}
+
+func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error) {
+	audStr := util.AudienceToStr(audience)
+
+	pipelineID, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, audStr)
+	if err != nil {
+		if err == nats.ErrKeyNotFound {
+			return "", ErrConfigNotFound
+		}
+
+		return "", errors.Wrapf(err, "error fetching config for audience '%s'", audStr)
+	}
+
+	return string(pipelineID), nil
 }
 
 func (o *Options) validate() error {
