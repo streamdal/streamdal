@@ -19,7 +19,7 @@ type PipelineUsage struct {
 }
 
 // Get pipeline usage across the entire cluster
-func (b *Bus) getPipelineUsage(ctx context.Context, pipelineId string) ([]*PipelineUsage, error) {
+func (b *Bus) getPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
 	pipelines := make([]*PipelineUsage, 0)
 
 	// Get config for all pipelines & audiences
@@ -57,8 +57,8 @@ func (b *Bus) getPipelineUsage(ctx context.Context, pipelineId string) ([]*Pipel
 }
 
 // Get active pipelines on this node
-func (b *Bus) getActivePipelineUsage(ctx context.Context, pipelineId string) ([]*PipelineUsage, error) {
-	usage, err := b.getPipelineUsage(ctx, pipelineId)
+func (b *Bus) getActivePipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
+	usage, err := b.getPipelineUsage(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline usage")
 	}
@@ -145,7 +145,7 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 	}
 
 	// Determine active pipeline usage
-	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId) // TODO: Should update this
 	if err != nil {
 		return errors.Wrap(err, "error getting pipeline usage")
 	}
@@ -272,7 +272,41 @@ func (b *Bus) handleDetachPipelineRequest(ctx context.Context, req *protos.Detac
 		return errors.Wrap(err, "validation error")
 	}
 
-	// Do we know about this attachment?
+	// Get active pipelines on this node for this pipeline ID
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
+	if err != nil {
+		b.log.Errorf("error getting active pipeline usage from store: %v", err)
+		return errors.Wrap(err, "error getting active pipeline usage from store")
+	}
+
+	if len(usage) == 0 {
+		b.log.Debugf("pipeline id '%s' not used on node '%s' - skipping", req.PipelineId, b.options.NodeName)
+		return nil
+	}
+
+	b.log.Debugf("found '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", len(usage), req.PipelineId, b.options.NodeName)
+
+	detached := 0
+
+	for _, u := range usage {
+		ch := b.options.Cmd.GetChannel(u.SessionId)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Command: &protos.Command_DetachPipeline{
+				DetachPipeline: &protos.DetachPipelineCommand{
+					PipelineId: req.PipelineId,
+				},
+			},
+		}
+
+		detached += 1
+	}
+
+	b.log.Debugf("sent detach pipeline command to '%d' active session(s) for pipeline id '%s'", detached, req.PipelineId)
 
 	return nil
 }
