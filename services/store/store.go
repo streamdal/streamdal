@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"strings"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -34,7 +35,6 @@ store any persistent state in memory!
 
 var (
 	ErrPipelineNotFound = errors.New("pipeline not found")
-	ErrRegisterNotFound = errors.New("no registration found")
 )
 
 type IStore interface {
@@ -75,7 +75,6 @@ func New(opts *Options) (*Store, error) {
 	}, nil
 }
 
-// DONE
 func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	llog := s.log.WithField("method", "AddRegistration")
 	llog.Debug("received request to add registration")
@@ -108,7 +107,6 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 	return nil
 }
 
-// DONE
 func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error {
 	llog := s.log.WithField("method", "DeleteRegistration")
 	llog.Debug("received request to delete registration")
@@ -125,17 +123,32 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	return nil
 }
 
-// AddHeartbeat updates the TTL for a given registration
+// AddHeartbeat updates the TTL for registration and all audiences in snitch_live bucket
 func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
 	llog := s.log.WithField("method", "AddHeartbeat")
 	llog.Debug("received request to add heartbeat")
 
-	// TODO: Implement
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
+	if err != nil {
+		return errors.Wrap(err, "error fetching keys from K/V")
+	}
+
+	for _, k := range keys {
+		if !strings.HasPrefix(k, req.SessionId) {
+			continue
+		}
+
+		// Key has session_id prefix, refresh it
+		llog.Debugf("attempting to refresh key '%s'", k)
+
+		if err := s.options.NATSBackend.Refresh(ctx, NATSLiveBucket, k); err != nil {
+			return errors.Wrap(err, "error refreshing key")
+		}
+	}
 
 	return nil
 }
 
-// DONE
 func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipelines")
 	llog.Debug("received request to get pipelines")
@@ -166,7 +179,6 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	return pipelines, nil
 }
 
-// DONE
 func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipeline")
 	llog.Debug("received request to get pipeline")
@@ -189,7 +201,6 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	return pipeline, nil
 }
 
-// DONE
 func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
 	llog := s.log.WithField("method", "CreatePipeline")
 	llog.Debug("received request to create pipeline")
@@ -207,7 +218,6 @@ func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
-// DONE
 func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 	llog := s.log.WithField("method", "DeletePipeline")
 	llog.Debug("received request to delete pipeline")
@@ -224,7 +234,6 @@ func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 	return nil
 }
 
-// DONE
 func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
 	llog := s.log.WithField("method", "UpdatePipeline")
 	llog.Debug("received request to update pipeline")
@@ -242,7 +251,6 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
-// DONE
 func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error {
 	llog := s.log.WithField("method", "AttachPipeline")
 	llog.Debug("received request to attach pipeline")
@@ -262,7 +270,6 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 	return nil
 }
 
-// DONE
 func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
 	llog := s.log.WithField("method", "DetachPipeline")
 	llog.Debug("received request to detach pipeline")
@@ -284,7 +291,6 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 	return nil
 }
 
-// DONE
 func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error {
 	llog := s.log.WithField("method", "PausePipeline")
 	llog.Debug("received request to pause pipeline")
@@ -318,7 +324,6 @@ func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequ
 	return nil
 }
 
-// DONE
 // IsPaused returns if pipeline is paused and if it exists
 func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
 	llog := s.log.WithField("method", "IsPaused")
@@ -338,7 +343,6 @@ func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelin
 	return true, nil
 }
 
-// DONE
 func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error {
 	llog := s.log.WithField("method", "ResumePipeline")
 	llog.Debug("received request to resume pipeline")
@@ -365,7 +369,6 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	return nil
 }
 
-// DONE
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
 	llog := s.log.WithField("method", "AddAudience")
 	llog.Debug("received request to add audience")
