@@ -10,7 +10,7 @@ export const Service = ({data}: any) => {
     return (
         <div class="h-[100px]">
             <div
-                class="h-[80px] w-[280px] flex items-center justify-between bg-white rounded shadow-lg z-10 border-1 border-purple-200 px-2">
+                class="h-[80px] w-[320px] flex items-center justify-between bg-white rounded shadow-lg z-10 border-1 border-purple-200 px-2">
                 <IconGripVertical
                     class="w-6 h-6 text-purple-100 cursor-grab"
                     id="dragHandle"
@@ -20,7 +20,7 @@ export const Service = ({data}: any) => {
                     className={"h-[40px]"}
                 />
                 <div>
-                    <h2 className={"text-lg mr-3"}>{data.label}</h2>
+                    <h2 className={"text-lg mr-3 ml-2"}>{data.label}</h2>
                     <p class="text-streamdalPurple text-xs font-semibold mt-1">
                         4 instances
                     </p>
@@ -65,8 +65,8 @@ export const Service = ({data}: any) => {
     );
 };
 
-export const Producer = ({data}) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+export const Producer = ({data}: any) => {
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleModalOpen = () => {
         setIsOpen(true);
@@ -145,8 +145,8 @@ export const Producer = ({data}) => {
     );
 };
 
-export const Consumer = ({data}) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+export const Consumer = ({data}: any) => {
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleModalOpen = () => {
         setIsOpen(true);
@@ -225,7 +225,7 @@ export const Consumer = ({data}) => {
     );
 };
 
-export const Audience = ({data}: any) => {
+export const Component = ({data}: any) => {
     return (
         <div
             className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +

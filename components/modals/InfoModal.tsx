@@ -6,7 +6,7 @@ export const InfoModal = (props: any) => {
     return (
         <div>
             <div
-                tabIndex="-1"
+                tabIndex={-1}
                 class="absolute mt-20 right-10 z-50 w-[308px] h-[560px] p-4 overflow-x-hidden overflow-y-hidden"
             >
                 <div class="relative w-full max-w-2xl max-h-full">
