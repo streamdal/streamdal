@@ -54,6 +54,7 @@ type IStore interface {
 	DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
 	PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 }
 
 type Options struct {

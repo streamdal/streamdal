@@ -57,7 +57,7 @@ func (b *Bus) getPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
 }
 
 // Get active pipelines on this node
-func (b *Bus) getActivePipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
+func (b *Bus) getActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error) {
 	usage, err := b.getPipelineUsage(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline usage")
@@ -71,6 +71,10 @@ func (b *Bus) getActivePipelineUsage(ctx context.Context) ([]*PipelineUsage, err
 		}
 
 		if u.NodeName != b.options.NodeName {
+			continue
+		}
+
+		if u.PipelineId != pipelineID {
 			continue
 		}
 
@@ -321,6 +325,44 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 		return errors.Wrap(err, "validation error")
 	}
 
+	// Do we have a live audience on this node?
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
+	if err != nil {
+		b.log.Errorf("error getting active pipeline usage from store: %v", err)
+		return errors.Wrap(err, "error getting active pipeline usage from store")
+	}
+
+	if len(usage) == 0 {
+		b.log.Debugf("pipeline id '%s' not used on node '%s' - skipping", req.PipelineId, b.options.NodeName)
+		return nil
+	}
+
+	// No point in trying to figure out if pause command was already sent -
+	// send it again, the SDK can figure out if it's already paused or not.
+	b.log.Debugf("found '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", len(usage), req.PipelineId, b.options.NodeName)
+
+	paused := 0
+
+	for _, u := range usage {
+		ch := b.options.Cmd.GetChannel(u.SessionId)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Command: &protos.Command_PausePipeline{
+				PausePipeline: &protos.PausePipelineCommand{
+					PipelineId: req.PipelineId,
+				},
+			},
+		}
+
+		paused += 1
+	}
+
+	b.log.Debugf("sent pause pipeline command to '%d' active session(s) for pipeline id '%s'", paused, req.PipelineId)
+
 	return nil
 }
 
@@ -333,6 +375,44 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
+
+	// Do we have a live audience on this node?
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
+	if err != nil {
+		b.log.Errorf("error getting active pipeline usage from store: %v", err)
+		return errors.Wrap(err, "error getting active pipeline usage from store")
+	}
+
+	if len(usage) == 0 {
+		b.log.Debugf("pipeline id '%s' not used on node '%s' - skipping", req.PipelineId, b.options.NodeName)
+		return nil
+	}
+
+	// No point in trying to figure out if pause command was already sent -
+	// send it again, the SDK can figure out if it's already paused or not.
+	b.log.Debugf("found '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", len(usage), req.PipelineId, b.options.NodeName)
+
+	paused := 0
+
+	for _, u := range usage {
+		ch := b.options.Cmd.GetChannel(u.SessionId)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Command: &protos.Command_ResumePipeline{
+				ResumePipeline: &protos.ResumePipelineCommand{
+					PipelineId: req.PipelineId,
+				},
+			},
+		}
+
+		paused += 1
+	}
+
+	b.log.Debugf("sent resume pipeline command to '%d' active session(s) for pipeline id '%s'", paused, req.PipelineId)
 
 	return nil
 }
