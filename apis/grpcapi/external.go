@@ -23,6 +23,7 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	return &ExternalServer{}
 }
 
+// TODO: Implement
 func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
 	panic("implement me")
 }
@@ -97,7 +98,9 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, broadcast the update
+	// Pipeline exists - broadcast it as there might be snitch-servers that have
+	// a client that has an active registration using this pipeline (and it should
+	// get updated)
 	if err := s.Deps.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}

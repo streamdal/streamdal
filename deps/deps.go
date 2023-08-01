@@ -130,10 +130,9 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
 	storeService, err := store.New(&store.Options{
-		NATSBackend:  d.NATSBackend,
-		CacheBackend: d.CacheBackend,
-		ShutdownCtx:  d.ShutdownContext,
-		NodeName:     cfg.NodeName,
+		NATSBackend: d.NATSBackend,
+		ShutdownCtx: d.ShutdownContext,
+		NodeName:    cfg.NodeName,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")

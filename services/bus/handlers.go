@@ -10,86 +10,17 @@ import (
 	"github.com/streamdal/snitch-server/validate"
 )
 
-func (b *Bus) handleRegisterRequest(ctx context.Context, req *protos.RegisterRequest) error {
-	b.log.Debugf("handling register request bus event: %v", req)
-
-	if err := validate.RegisterRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	if err := b.options.Store.AddRegistration(ctx, req); err != nil {
-		return errors.Wrap(err, "error saving registration")
-	}
-
-	return nil
-}
-
-func (b *Bus) handleDeregisterRequest(ctx context.Context, req *protos.DeregisterRequest) error {
-	b.log.Debugf("handling delete register request bus event: %v", req)
-
-	if err := validate.DeregisterRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	if err := b.options.Store.DeleteRegistration(ctx, req); err != nil {
-		return errors.Wrap(err, "unable to delete registration")
-	}
-
-	return nil
-}
-
-func (b *Bus) handleCreatePipelineRequest(ctx context.Context, req *protos.CreatePipelineRequest) error {
-	b.log.Debugf("handling create pipeline request bus event: %v", req)
-
-	if err := validate.CreatePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	// Do we know about this pipeline? If not, create it
-	if _, err := b.options.Store.GetPipeline(ctx, req.Pipeline.Id); err != nil {
-		if err == store.ErrPipelineNotFound {
-			b.log.Debugf("pipeline %s not found, creating", req.Pipeline.Id)
-
-			if err := b.options.Store.CreatePipeline(ctx, req.Pipeline); err != nil {
-				return errors.Wrap(err, "error creating pipeline")
-			}
-
-			return nil
-		}
-
-		return errors.Wrap(err, "error getting pipeline")
-	}
-
-	b.log.Debugf("pipeline %s already exists, skipping", req.Pipeline.Id)
-
-	return nil
-}
-
-func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
-	b.log.Debugf("handling delete pipeline request bus event: %v", req)
-
-	if err := validate.DeletePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	if err := b.options.Store.DeletePipeline(ctx, req.PipelineId); err != nil {
-		b.log.Debugf("error deleting pipeline '%s'", req.PipelineId)
-
-		return errors.Wrap(err, "error deleting pipeline")
-	}
-
-	// TODO: Send DeletePipeline commands to clients that use this pipeline
-
-	return nil
-}
-
-// Can only update pipeline that already exists
+// Pipeline was updated - check if this service has an active registration that
+// uses this pipeline id. If it does, we need to have the client "reload" the
+// pipeline. We can do this by sending a "SetPipeline" command to the client.
 func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.UpdatePipelineRequest) error {
 	b.log.Debugf("handling update pipeline request bus event: %v", req)
 
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
+
+	// TODO: Figure out logic
 
 	// Error if doesn't exist
 	if _, err := b.options.Store.GetPipeline(ctx, req.Pipeline.Id); err != nil {
@@ -112,6 +43,30 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	return nil
 }
 
+// Pipeline was deleted - check if this service has an active registration that
+// uses this pipeline ID. If it does, we need to have the client "unload" the
+// pipeline. We can do this by sending the client a "DeletePipeline" command.
+func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
+	b.log.Debugf("handling delete pipeline request bus event: %v", req)
+
+	if err := validate.DeletePipelineRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	if err := b.options.Store.DeletePipeline(ctx, req.PipelineId); err != nil {
+		b.log.Debugf("error deleting pipeline '%s'", req.PipelineId)
+
+		return errors.Wrap(err, "error deleting pipeline")
+	}
+
+	// TODO: Send DeletePipeline commands to clients that use this pipeline
+
+	return nil
+}
+
+// Pipeline was attached to an audience - check if this service has an active
+// registration with the provided audience. If it does, we need to send a
+// AttachPipeline command to the client.
 func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.AttachPipelineRequest) error {
 	b.log.Debugf("handling attach pipeline request bus event: %v", req)
 
@@ -134,6 +89,9 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 	return nil
 }
 
+// Pipeline was detached from an audience - check if this service has an active
+// registration with the provided audience. If it does, we need to send a
+// DetachPipeline command to the client.
 func (b *Bus) handleDetachPipelineRequest(ctx context.Context, req *protos.DetachPipelineRequest) error {
 	b.log.Debugf("handling detach pipeline request bus event: %v", req)
 
@@ -146,6 +104,9 @@ func (b *Bus) handleDetachPipelineRequest(ctx context.Context, req *protos.Detac
 	return nil
 }
 
+// Pipeline was paused - check if this service has an active registration with
+// the provided audience. If it does, we need to send a PausePipeline command
+// to the client.
 func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PausePipelineRequest) error {
 	b.log.Debugf("handling pause pipeline request bus event: %v", req)
 
@@ -155,11 +116,14 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 
 	// TODO: Does this audience pertain to us?
 
-	// TODO: Maybe send PausePipeline commands to clients that use this pipeline
+	// TODO: Send PausePipeline commands to clients that use this pipeline
 
 	return nil
 }
 
+// Pipeline was resumed - check if this service has an active registration with
+// the provided audience. If it does, we need to send a ResumePipeline command
+// to the client.
 func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.ResumePipelineRequest) error {
 	b.log.Debugf("handling resume pipeline request bus event: %v", req)
 
@@ -170,20 +134,6 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 	// TODO: Does this audience pertain to us?
 
 	// TODO: Maybe send PausePipeline commands to clients that use this pipeline
-
-	return nil
-}
-
-func (b *Bus) handleHeartbeatRequest(ctx context.Context, req *protos.HeartbeatRequest) error {
-	b.log.Debugf("handling heartbeat request bus event: %v", req)
-
-	if err := validate.HeartbeatRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	if err := b.options.Store.AddHeartbeat(ctx, req); err != nil {
-		return errors.Wrap(err, "error saving heartbeat")
-	}
 
 	return nil
 }

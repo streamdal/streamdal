@@ -10,18 +10,6 @@ import (
 	"github.com/streamdal/snitch-server/util"
 )
 
-func (b *Bus) BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error {
-	return b.broadcast(ctx, "register", &protos.BusEvent{Event: &protos.BusEvent_RegisterRequest{RegisterRequest: req}})
-}
-
-func (b *Bus) BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error {
-	return b.broadcast(ctx, "deregistration", &protos.BusEvent{Event: &protos.BusEvent_DeregisterRequest{DeregisterRequest: req}})
-}
-
-func (b *Bus) BroadcastCreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) error {
-	return b.broadcast(ctx, "create_pipeline", &protos.BusEvent{Event: &protos.BusEvent_CreatePipelineRequest{CreatePipelineRequest: req}})
-}
-
 func (b *Bus) BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error {
 	return b.broadcast(ctx, "update_pipeline", &protos.BusEvent{Event: &protos.BusEvent_UpdatePipelineRequest{UpdatePipelineRequest: req}})
 }

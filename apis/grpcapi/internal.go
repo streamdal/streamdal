@@ -28,18 +28,13 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
 	s.log.Info("Got a hit for register!")
 
-	// Validate request
+	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
 		return errors.Wrap(err, "invalid register request")
 	}
 
 	if err := s.Deps.StoreService.AddRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")
-	}
-
-	// Broadcast registration
-	if err := s.Deps.BusService.BroadcastRegistration(server.Context(), request); err != nil {
-		return errors.Wrap(err, "unable to broadcast registration")
 	}
 
 	llog := s.log.WithFields(logrus.Fields{
@@ -83,17 +78,21 @@ MAIN:
 		return GRPCServerShutdownError
 	}
 
-	// Client has disconnected -> broadcast deregistration
-	if err := s.Deps.BusService.BroadcastDeregistration(server.Context(), &protos.DeregisterRequest{
+	llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
+
+	if err := s.Deps.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
 		ServiceName: request.ServiceName,
+		SessionId:   request.SessionId,
 	}); err != nil {
-		llog.WithError(err).Error("unable to broadcast deregistration")
+		return errors.Wrap(err, "unable to delete registration")
 	}
 
 	return nil
 }
 
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
+	s.log.Debug("received heartbeat request for session id '%s'", req.SessionId)
+
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
@@ -102,7 +101,15 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	// TODO: Record heartbeat locally - no need to broadcast it
+	if err := s.Deps.StoreService.AddHeartbeat(ctx, req); err != nil {
+		s.log.Errorf("unable to save heartbeat: %s", err.Error())
+
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: fmt.Sprintf("unable to save heartbeat: %s", err.Error()),
+		}, nil
+	}
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
@@ -111,12 +118,41 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 	}, nil
 }
 
+// TODO: implement me
 func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyRequest) (*protos.StandardResponse, error) {
-	// TODO: implement me
-	panic("implement me")
+	return nil, nil
 }
 
+// TODO: Implement
 func (s *InternalServer) Metrics(ctx context.Context, request *protos.MetricsRequest) (*protos.StandardResponse, error) {
-	// TODO: implement me
-	panic("implement me")
+	return nil, nil
+}
+
+// TODO: Implement
+func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienceRequest) (*protos.StandardResponse, error) {
+	s.log.Debugf("received new audience request for session id '%s'", req.SessionId)
+
+	if err := validate.NewAudienceRequest(req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			Message: fmt.Sprintf("invalid new audience req: %s", err.Error()),
+		}, nil
+	}
+
+	if err := s.Deps.StoreService.AddAudience(ctx, req); err != nil {
+		s.log.Errorf("unable to save audience: %s", err.Error())
+
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: fmt.Sprintf("unable to save audience: %s", err.Error()),
+		}, nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Audience created",
+	}, nil
 }

@@ -2,8 +2,6 @@ package store
 
 import (
 	"context"
-	"encoding/json"
-	"strings"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -12,9 +10,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/util"
-	"github.com/streamdal/snitch-server/validate"
 )
 
 /*
@@ -30,13 +26,10 @@ https://www.notion.so/streamdal/Snitch-Server-Storage-Spec-417bfa71f04b481082373
 `store` is a service that handles storage and retrieval of data such as service
 registrations and service commands.
 
-On READ, it performs lookups by first looking in in-memory cache and if not
-present, it will attempt to fetch the data from NATS K/V.
+`store` is backed by a `natty.INatty` instance, which is a wrapper for NATS.
 
-On WRITE, it will write to both in-memory cache and NATS K/V.
-
-On DELETE, it will delete from both in-memory cache and NATS k/V.
-
+All reads, writes and deletes are performed via NATS -- snitch-server does NOT
+store any persistent state in memory!
 */
 
 var (
@@ -61,10 +54,9 @@ type IStore interface {
 }
 
 type Options struct {
-	NATSBackend  natty.INatty
-	CacheBackend cache.ICache
-	ShutdownCtx  context.Context
-	NodeName     string
+	NATSBackend natty.INatty
+	ShutdownCtx context.Context
+	NodeName    string
 }
 
 type Store struct {
@@ -73,7 +65,7 @@ type Store struct {
 }
 
 func New(opts *Options) (*Store, error) {
-	if err := opts.Validate(); err != nil {
+	if err := opts.validate(); err != nil {
 		return nil, errors.Wrap(err, "error validating options")
 	}
 
@@ -83,35 +75,27 @@ func New(opts *Options) (*Store, error) {
 	}, nil
 }
 
+// DONE
 func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest) error {
 	llog := s.log.WithField("method", "AddRegistration")
 	llog.Debug("received request to add registration")
 
-	if err := validate.RegisterRequest(req); err != nil {
-		return errors.Wrap(err, "error validating register request")
-	}
-
-	// Save registration to cache
-	s.options.CacheBackend.Set(CacheRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId), req)
-
-	// Save registration to K/V
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return errors.Wrap(err, "error marshaling register request")
-	}
-
+	// Add registration in snitch_live bucket
 	if err := s.options.NATSBackend.Put(
 		ctx,
-		NATSRegisterBucket,
-		NATSRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId),
-		data,
+		NATSLiveBucket,
+		NATSLiveKey(req.SessionId, s.options.NodeName, "register"),
+		nil,
+		NATSLiveTTL,
 	); err != nil {
-		return errors.Wrap(err, "error saving register request to NATS")
+		return errors.Wrap(err, "error adding registration to K/V")
 	}
 
-	// Save audience(s)
+	// Save audience(s) if they are present in Register request
 	if req.Audiences != nil && len(req.Audiences) > 0 {
 		for _, audience := range req.Audiences {
+			llog.Debugf("adding audience '%s' for session '%s'", audience, req.SessionId)
+
 			if err := s.AddAudience(ctx, &protos.NewAudienceRequest{
 				SessionId: req.SessionId,
 				Audience:  audience,
@@ -124,61 +108,21 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 	return nil
 }
 
+// DONE
 func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error {
 	llog := s.log.WithField("method", "DeleteRegistration")
 	llog.Debug("received request to delete registration")
 
-	if err := validate.DeregisterRequest(req); err != nil {
-		return errors.Wrap(err, "error validating deregister request")
-	}
-
-	// Remove from cache
-	s.options.CacheBackend.Remove(CacheRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId))
-
 	// Remove from K/V
-	if err := s.options.NATSBackend.Delete(ctx, NATSRegisterBucket, NATSRegisterKey(s.options.NodeName, req.ServiceName, req.SessionId)); err != nil {
+	if err := s.options.NATSBackend.Delete(
+		ctx,
+		NATSLiveBucket,
+		NATSLiveKey(req.SessionId, s.options.NodeName, "register"),
+	); err != nil {
 		return errors.Wrap(err, "error deleting registration from K/V")
 	}
 
 	return nil
-}
-
-func (s *Store) GetRegistrationBySessionId(ctx context.Context, sessionId string) (*protos.RegisterRequest, error) {
-	llog := s.log.WithField("method", "GetRegistrationBySessionId")
-	llog.Debug("received request to get registration by session id")
-
-	// Cache does not expose a "Keys()" method so we have to fetch registrations via NATS
-	registrations, err := s.options.NATSBackend.Keys(ctx, NATSRegisterBucket)
-	if err != nil {
-		return nil, errors.Wrap(err, "error fetching registrations from NATS")
-	}
-
-	// Filter by session ID
-	for _, r := range registrations {
-		splitData := strings.Split(r, ":")
-
-		if len(splitData) != 3 {
-			llog.Warningf("invalid registration key '%s'", r)
-			continue
-		}
-
-		if splitData[2] == sessionId {
-			req, err := s.options.NATSBackend.Get(ctx, NATSRegisterBucket, r)
-			if err != nil {
-				return nil, errors.Wrap(err, "error fetching registration from NATS")
-			}
-
-			registerRequest := &protos.RegisterRequest{}
-
-			if err := proto.Unmarshal(req, registerRequest); err != nil {
-				return nil, errors.Wrap(err, "error unmarshaling register request")
-			}
-
-			return registerRequest, nil
-		}
-	}
-
-	return nil, ErrRegisterNotFound
 }
 
 // AddHeartbeat updates the TTL for a given registration
@@ -186,32 +130,16 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 	llog := s.log.WithField("method", "AddHeartbeat")
 	llog.Debug("received request to add heartbeat")
 
-	// Find registration by session id
-	registration, err := s.GetRegistrationBySessionId(ctx, req.SessionId)
-	if err != nil {
-		return errors.Wrapf(err, "unable to lookup registration by session id '%s'", req.SessionId)
-	}
-
-	// Refresh in cache
-	s.options.CacheBackend.Set(CacheRegisterKey(s.options.NodeName, registration.ServiceName, registration.SessionId), registration, CacheRegisterTTL)
-
-	// Refresh in NATS
-	if err := s.options.NATSBackend.Refresh(
-		ctx,
-		NATSRegisterBucket,
-		NATSRegisterKey(s.options.NodeName, registration.ServiceName, registration.SessionId),
-	); err != nil {
-		return errors.Wrapf(err, "error refreshing registration for session id '%s' in NATS", registration.SessionId)
-	}
+	// TODO: Implement
 
 	return nil
 }
 
+// DONE
 func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipelines")
 	llog.Debug("received request to get pipelines")
 
-	// Attempt to fetch pipelines from NATS first (as cache currently does not have a Keys() method)
 	pipelineIds, err := s.options.NATSBackend.Keys(ctx, NATSPipelineBucket)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching pipeline keys from NATS")
@@ -238,20 +166,11 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	return pipelines, nil
 }
 
+// DONE
 func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipeline")
 	llog.Debug("received request to get pipeline")
 
-	// Attempt to fetch from cache first
-	tmpPipeline, ok := s.options.CacheBackend.Get(CachePipelineKey(pipelineId))
-	if ok {
-		pipeline, ok := tmpPipeline.(*protos.Pipeline)
-		if ok {
-			return pipeline, nil
-		}
-	}
-
-	// Either not in cache or unable to assert pipeline
 	pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
 	if err != nil {
 		if err != nats.ErrKeyNotFound {
@@ -267,22 +186,13 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 		return nil, errors.Wrap(err, "error deserializing pipeline")
 	}
 
-	// Save it to cache
-	s.options.CacheBackend.Set(CachePipelineKey(pipelineId), pipeline)
-
 	return pipeline, nil
 }
 
+// DONE
 func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
 	llog := s.log.WithField("method", "CreatePipeline")
 	llog.Debug("received request to create pipeline")
-
-	if err := validate.Pipeline(pipeline, false); err != nil {
-		return errors.Wrap(err, "error validating pipeline")
-	}
-
-	// Save to cache
-	s.options.CacheBackend.Set(CachePipelineKey(pipeline.Id), pipeline)
 
 	// Save to K/V
 	pipelineData, err := proto.Marshal(pipeline)
@@ -297,6 +207,7 @@ func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
+// DONE
 func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 	llog := s.log.WithField("method", "DeletePipeline")
 	llog.Debug("received request to delete pipeline")
@@ -306,9 +217,6 @@ func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Pipeline exists -> delete it
-	s.options.CacheBackend.Remove(CachePipelineKey(pipelineId))
-
 	if err := s.options.NATSBackend.Delete(ctx, NATSPipelineBucket, NATSPipelineKey(pipelineId)); err != nil {
 		return errors.Wrap(err, "error deleting pipeline from NATS")
 	}
@@ -316,16 +224,10 @@ func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 	return nil
 }
 
+// DONE
 func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
 	llog := s.log.WithField("method", "UpdatePipeline")
 	llog.Debug("received request to update pipeline")
-
-	if err := validate.Pipeline(pipeline, true); err != nil {
-		return errors.Wrap(err, "error validating pipeline")
-	}
-
-	// Save to cache
-	s.options.CacheBackend.Set(CachePipelineKey(pipeline.Id), pipeline)
 
 	// Save to K/V
 	pipelineData, err := proto.Marshal(pipeline)
@@ -340,25 +242,19 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
+// DONE
 func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error {
 	llog := s.log.WithField("method", "AttachPipeline")
 	llog.Debug("received request to attach pipeline")
-
-	if err := validate.AttachPipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating attach pipeline request")
-	}
 
 	// Does this pipeline exist?
 	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Pipeline exists -> record the attachment
-	cacheKey := CacheConfigKey(util.AudienceStr(req.Audience))
-	s.options.CacheBackend.Set(cacheKey, req.PipelineId)
-
 	// Store attachment in NATS
 	natsKey := NATSConfigKey(util.AudienceStr(req.Audience))
+
 	if err := s.options.NATSBackend.Put(ctx, NATSConfigBucket, natsKey, []byte(req.PipelineId)); err != nil {
 		return errors.Wrap(err, "error saving pipeline attachment to NATS")
 	}
@@ -366,13 +262,10 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 	return nil
 }
 
+// DONE
 func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
 	llog := s.log.WithField("method", "DetachPipeline")
 	llog.Debug("received request to detach pipeline")
-
-	if err := validate.DetachPipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating detach pipeline request")
-	}
 
 	// Does this pipeline exist?
 	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
@@ -384,9 +277,6 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Pipeline attachment exists, OK to remove it
-	s.options.CacheBackend.Remove(CacheConfigKey(util.AudienceStr(req.Audience)))
-
 	if err := s.options.NATSBackend.Delete(ctx, NATSConfigBucket, NATSConfigKey(util.AudienceStr(req.Audience))); err != nil {
 		return errors.Wrap(err, "error deleting pipeline attachment from NATS")
 	}
@@ -394,192 +284,112 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 	return nil
 }
 
+// DONE
 func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error {
 	llog := s.log.WithField("method", "PausePipeline")
 	llog.Debug("received request to pause pipeline")
 
-	if err := validate.PausePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating pause pipeline request")
-	}
-
 	// Does this pipeline exist?
 	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Pipeline exists, is it already paused?
-	isPaused, exists := s.IsPaused(ctx, req.Audience, req.PipelineId)
-	if !exists {
-		return errors.New("pipeline does not have state")
+	paused, err := s.IsPaused(ctx, req.Audience, req.PipelineId)
+	if err != nil {
+		return errors.Wrap(err, "error checking if pipeline is paused")
 	}
 
-	if isPaused {
-		llog.Debug("pipeline is already paused - nothing to do")
+	if paused {
+		llog.Debugf("pipeline '%s' already paused; nothing to do", req.PipelineId)
 		return nil
 	}
 
-	llog.Debug("pipeline is not paused - pausing")
+	llog.Debugf("pipeline '%s' not paused; setting pause state now", req.PipelineId)
 
-	// Save pause state in cache
-	s.options.CacheBackend.Set(CacheStateKey(util.AudienceStr(req.Audience), req.PipelineId), nil)
-
-	// Save pause state in NATS
-	if err := s.options.NATSBackend.Put(ctx, NATSStateBucket, NATSStateKey(util.AudienceStr(req.Audience), req.PipelineId), nil); err != nil {
-		return errors.Wrap(err, "error saving pipeline state to NATS")
+	if err := s.options.NATSBackend.Put(
+		ctx,
+		NATSPausedBucket,
+		NATSPausedKey(util.AudienceStr(req.Audience), req.PipelineId),
+		nil,
+	); err != nil {
+		return errors.Wrap(err, "error saving pipeline pause state")
 	}
 
 	return nil
 }
 
+// DONE
 // IsPaused returns if pipeline is paused and if it exists
-func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, bool) {
+func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
 	llog := s.log.WithField("method", "IsPaused")
 	llog.Debug("received request to check if pipeline is paused")
 
-	// Check cache
-	if _, exists := s.options.CacheBackend.Get(CacheStateKey(util.AudienceStr(audience), pipelineID)); exists {
-		return true, true
-	}
-
-	// Not in cache - check NATS
-	if _, err := s.options.NATSBackend.Get(ctx, NATSStateBucket, NATSStateKey(util.AudienceStr(audience), pipelineID)); err != nil {
+	if _, err := s.options.NATSBackend.Get(ctx,
+		NATSPausedBucket,
+		NATSPausedKey(util.AudienceStr(audience), pipelineID),
+	); err != nil {
 		if err == nats.ErrKeyNotFound {
-			llog.Debug("pipeline state not found in NATS")
-		} else {
-			llog.WithError(err).Error("error fetching pipeline state from NATS")
+			return false, nil
 		}
 
-		return false, false
+		return false, errors.Wrap(err, "error fetching pipeline pause state")
 	}
 
-	return true, true
+	return true, nil
 }
 
+// DONE
 func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error {
 	llog := s.log.WithField("method", "ResumePipeline")
 	llog.Debug("received request to resume pipeline")
 
-	if err := validate.ResumePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating pause pipeline request")
+	paused, err := s.IsPaused(ctx, req.Audience, req.PipelineId)
+	if err != nil {
+		return errors.Wrap(err, "error checking if pipeline is paused")
 	}
 
-	// Does this pipeline exist?
-	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
-		return errors.Wrap(err, "error fetching pipeline")
-	}
-
-	// Pipeline exists, is it already resumed?
-	isPaused, exists := s.IsPaused(ctx, req.Audience, req.PipelineId)
-	if !exists || !isPaused {
-		// Pipeline does not have state, so it is not paused
+	if !paused {
+		llog.Debugf("pipeline '%s' not paused; nothing to do", req.PipelineId)
 		return nil
 	}
 
-	// Pipeline is paused, resume it
-	llog.Debug("pipeline is paused - resuming")
-	s.options.CacheBackend.Remove(CacheStateKey(util.AudienceStr(req.Audience), req.PipelineId))
-
-	if err := s.options.NATSBackend.Delete(ctx, NATSStateBucket, NATSStateKey(util.AudienceStr(req.Audience), req.PipelineId)); err != nil {
-		return errors.Wrap(err, "error deleting pipeline state from NATS")
+	llog.Debugf("pipeline '%s' paused; removing pause state now", req.PipelineId)
+	if err := s.options.NATSBackend.Delete(
+		ctx,
+		NATSPausedBucket,
+		NATSPausedKey(util.AudienceStr(req.Audience), req.PipelineId),
+	); err != nil {
+		return errors.Wrap(err, "error deleting pipeline pause state")
 	}
 
 	return nil
 }
 
+// DONE
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
 	llog := s.log.WithField("method", "AddAudience")
 	llog.Debug("received request to add audience")
 
-	if err := validate.NewAudienceRequest(req); err != nil {
-		return errors.Wrap(err, "error validating new audience request")
-	}
-
-	// Does this audience already exist?
-	audiences, err := s.GetAudiences(ctx, req.Audience.ServiceName)
-	if err != nil {
-		return errors.Wrap(err, "error fetching existing audiences")
-	}
-
-	for _, a := range audiences {
-		if a.ServiceName == req.Audience.ServiceName &&
-			a.ComponentName == req.Audience.ComponentName &&
-			a.OperationType == req.Audience.OperationType {
-
-			llog.Debugf("audience '%s' already exists - nothing to do", util.AudienceStr(req.Audience))
-			return nil
-		}
-	}
-
-	// Audience doesn't exist - add new audience to existing audiences and save to cache
-	audiences = append(audiences, req.Audience)
-	s.options.CacheBackend.Set(CacheAudienceKey(req.Audience.ServiceName), audiences)
-
-	// Save audience in NATS
-	data, err := json.Marshal(audiences)
-	if err != nil {
-		return errors.Wrap(err, "error marshalling audiences")
-	}
-
-	if err := s.options.NATSBackend.Put(ctx, NATSAudienceBucket, NATSAudienceKey(req.Audience.ServiceName), data); err != nil {
-		return errors.Wrap(err, "error saving audiences to NATS")
+	if err := s.options.NATSBackend.Put(
+		ctx,
+		NATSLiveBucket,
+		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceStr(req.Audience)),
+		nil,
+		NATSLiveTTL,
+	); err != nil {
+		return errors.Wrap(err, "error saving audience to NATS")
 	}
 
 	return nil
 }
 
-// Will return empty audiences if none exist
-func (s *Store) GetAudiences(ctx context.Context, serviceName string) ([]*protos.Audience, error) {
-	llog := s.log.WithField("method", "GetAudiences")
-	llog.Debug("received request to get audiences")
-
-	// Attempt to fetch audiences from cache
-	if tmpAudiences, exists := s.options.CacheBackend.Get(CacheAudienceKey(serviceName)); exists {
-		llog.Debug("audiences found in cache")
-		audiences, ok := tmpAudiences.([]*protos.Audience)
-
-		if ok {
-			llog.Debug("successfully converted audiences from cache")
-			return audiences, nil
-		}
-
-		llog.Debug("error converting audiences from cache")
-	}
-
-	llog.Debug("attempting to fetch audiences from NATS")
-
-	audiencesData, err := s.options.NATSBackend.Get(ctx, NATSAudienceBucket, NATSAudienceKey(serviceName))
-	if err != nil {
-		if err == nats.ErrKeyNotFound {
-			llog.Debug("no audiences found in NATS")
-			return make([]*protos.Audience, 0), nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching audiences from NATS")
-	}
-
-	llog.Debug("successfully fetched audiences from NATS")
-	audiences := make([]*protos.Audience, 0)
-
-	if err := json.Unmarshal(audiencesData, &audiences); err != nil {
-		return nil, errors.Wrap(err, "error unmarshalling audiences from JSON")
-	}
-
-	llog.Debug("successfully unmarshalled audiences from JSON")
-
-	return audiences, nil
-}
-
-func (o *Options) Validate() error {
+func (o *Options) validate() error {
 	if o == nil {
 		return errors.New("options cannot be nil")
 	}
 
 	if o.NodeName == "" {
 		return errors.New("node name cannot be empty")
-	}
-
-	if o.CacheBackend == nil {
-		return errors.New("cache backend cannot be nil")
 	}
 
 	if o.NATSBackend == nil {
