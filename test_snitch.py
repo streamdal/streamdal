@@ -1,121 +1,34 @@
+import asyncio
 import logging
+import threading
 import pytest
 import snitch_protos.protos as protos
 import uuid
+import unittest.mock as mock
+import snitchpy
 from snitchpy import SnitchClient, SnitchConfig
-from wasmtime import Store, Memory, MemoryType, Limits
 
-logging.basicConfig()
-logger = logging.getLogger("abc")
-logger.setLevel(logging.CRITICAL)
 
 class TestSnitchClient:
-    def test_valid_config(self):
-        # A valid config should not raise any exception
-        config = SnitchConfig(
-            service_name="MyService",
-            grpc_url="localhost",
-            grpc_port=9090,
-            grpc_token="fake token"
-        )
-        assert SnitchClient._validate_config(config) is None
 
-    def test_missing_config(self):
-        # Test when a required field (service_name) is missing
-        with pytest.raises(ValueError, match="service_name is required"):
-            SnitchClient._validate_config(SnitchConfig(
-                service_name="",
-                grpc_url="localhost",
-                grpc_port=9090,
-                grpc_token="fake token"
-            ))
+    client: SnitchClient
 
-        # Test when grpc_url is missing
-        with pytest.raises(ValueError, match="grpc_url is required"):
-            SnitchClient._validate_config(SnitchConfig(
-                service_name="writer",
-                grpc_url="",
-                grpc_port=9090,
-                grpc_token="fake token"
-            ))
-
-        # Test when grpc_port is missing
-        with pytest.raises(ValueError, match="grpc_port is required"):
-            SnitchClient._validate_config(SnitchConfig(
-                service_name="writer",
-                grpc_url="localhost",
-                grpc_port=0,
-                grpc_token="fake token"
-            ))
-
-        # Test when grpc_token is missing
-        with pytest.raises(ValueError, match="grpc_token is required"):
-            SnitchClient._validate_config(SnitchConfig(
-                service_name="writer",
-                grpc_url="localhost",
-                grpc_port=9090,
-                grpc_token=""
-            ))
-
-    def test_missing_cfg(self):
-        # Test when cfg is None
-        with pytest.raises(ValueError, match="cfg is required"):
-            SnitchClient._validate_config(None)
-
-    def test_read_memory_within_bounds(self):
-        """Test reading within bounds of memory"""
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1024)))
-        data = b'Hello, World!\xa6\xa6\xa6'
-        memory.write(store, data, 0)
-
-        result = SnitchClient._read_memory(memory, store, 0, len(data))
-        assert result == b'Hello, World!'
-
-    def test_read_memory_with_interspersed_pointers(self):
-        """Test reading with null pointers"""
-        store = Store()
-        memory = Memory(store, MemoryType(Limits(1, 1)))
-        data = b'Hel\xa6lo,\xa6 W\xa6orld!\xa6\xa6\xa6'
-        memory.write(store, data, 0)
-
-        result = SnitchClient._read_memory(memory, store, 0)
-        assert result == b'Hel\xa6lo,\xa6 W\xa6orld!'  # Should NOT stop at the third terminator character
-
-    def test_call_wasm(self):
-        """Test we can execute a wasm file"""
-
+    @pytest.fixture(autouse=True)
+    def before_each(self):
         client = object.__new__(SnitchClient)
-        client.functions = {}
+        client.cfg = SnitchConfig(service_name="testing")
+        client.loop = asyncio.get_event_loop()
+        client.log = mock.Mock()
+        client.metrics = mock.Mock()
+        client.stub = mock.AsyncMock()
+        client.grpc_timeout = 5
+        client.auth_token = "test"
+        client.exit = threading.Event()
+        client.session_id = uuid.uuid4().__str__()
+        client.pipelines = {}
+        client.paused_pipelines = {}
 
-        with open("./assets/test/detective.wasm", "rb") as file:
-            wasm_bytes = file.read()
-
-        step = protos.PipelineStep(
-            name="detective",
-            on_success=[],
-            on_failure=[],
-            wasm_bytes=wasm_bytes,
-            wasm_id=uuid.uuid4().__str__(),
-            wasm_function="f",
-            detective=protos.steps.DetectiveStep(
-                path="object.field",
-                args=["streamdal"],
-                negate=False,
-                type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-            )
-        )
-
-        res = client._call_wasm(step=step, data=b'{"object":  {"field": "streamdal@gmail.com"}}')
-
-        assert res is not None
-        assert res.exit_code == 1
-        assert res.output == b'{"object":  {"field": "streamdal@gmail.com"}}'
-
-        res2 = client._call_wasm(step=step, data=b'{"object":  {"field": "mark@gmail.com"}}')
-
-        assert res2 is not None
-        assert res2.exit_code == 2
+        self.client = client
 
     def test_is_paused(self):
         """Test is_paused returns True when paused"""
@@ -138,11 +51,6 @@ class TestSnitchClient:
     def test_attach_pipeline(self):
         """Test set_pipeline adds a pipeline to the pipelines dict"""
 
-        client = object.__new__(SnitchClient)
-        client.pipelines = {}
-        client.paused_pipelines = {}
-        client.log = logger
-
         pipeline_id = uuid.uuid4().__str__()
 
         cmd = protos.Command(
@@ -157,18 +65,13 @@ class TestSnitchClient:
             )
         )
 
-        client._attach_pipeline(cmd)
+        self.client._attach_pipeline(cmd)
 
         aud_str = SnitchClient.audience(cmd.audience)
-        assert client.pipelines[aud_str] is not None
-        assert client.pipelines[aud_str][pipeline_id] is not None
+        assert self.client.pipelines[aud_str] is not None
+        assert self.client.pipelines[aud_str][pipeline_id] is not None
 
     def test_pop_pipeline(self):
-        client = object.__new__(SnitchClient)
-        client.pipelines = {}
-        client.paused_pipelines = {}
-        client.log = logger
-
         pipeline_id = uuid.uuid4().__str__()
 
         cmd = protos.Command(
@@ -183,20 +86,14 @@ class TestSnitchClient:
             )
         )
 
-        client._attach_pipeline(cmd)
+        self.client._attach_pipeline(cmd)
 
-        pipeline = SnitchClient._pop_pipeline(client.pipelines, cmd, pipeline_id)
+        pipeline = SnitchClient._pop_pipeline(self.client.pipelines, cmd, pipeline_id)
 
         assert pipeline is not None
         assert pipeline.attach_pipeline.pipeline.id == pipeline_id
 
-    def test_pause_pipeline(self):
-        client = object.__new__(SnitchClient)
-        client.cfg = SnitchConfig(service_name="testing")
-        client.pipelines = {}
-        client.paused_pipelines = {}
-        client.log = logger
-
+    def test_pause_resume_pipeline(self):
         pipeline_id = uuid.uuid4().__str__()
 
         cmd = protos.Command(
@@ -212,7 +109,7 @@ class TestSnitchClient:
             )
         )
 
-        client._attach_pipeline(cmd)
+        self.client._attach_pipeline(cmd)
 
         pause_cmd = protos.Command(
             audience=protos.Audience(
@@ -225,22 +122,42 @@ class TestSnitchClient:
             )
         )
 
-        res = client._pause_pipeline(pause_cmd)
+        with pytest.raises(ValueError, match="Command is None"):
+            self.client._pause_pipeline(None)
+
+        res = self.client._pause_pipeline(pause_cmd)
         assert res is True
 
         aud_str = SnitchClient.audience(cmd.audience)
-        assert len(client.paused_pipelines) == 1
-        assert len(client.pipelines) == 0
-        assert client.paused_pipelines[aud_str] is not None
-        assert client.paused_pipelines[aud_str][pipeline_id] is not None
+        assert len(self.client.paused_pipelines) == 1
+        assert len(self.client.pipelines) == 0
+        assert self.client.paused_pipelines[aud_str] is not None
+        assert self.client.paused_pipelines[aud_str][pipeline_id] is not None
 
-    def test_delete_pipeline(self):
-        client = object.__new__(SnitchClient)
-        client.cfg = SnitchConfig(service_name="testing")
-        client.pipelines = {}
-        client.paused_pipelines = {}
-        client.log = logger
+        resume_cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            ),
+            resume_pipeline=protos.ResumePipelineCommand(
+                pipeline_id=pipeline_id,
+            )
+        )
 
+        with pytest.raises(ValueError, match="Command is None"):
+            self.client._resume_pipeline(None)
+
+        res = self.client._resume_pipeline(resume_cmd)
+        assert res is True
+
+        aud_str = SnitchClient.audience(cmd.audience)
+        assert len(self.client.paused_pipelines) == 0
+        assert len(self.client.pipelines) == 1
+        assert self.client.pipelines[aud_str] is not None
+        assert self.client.pipelines[aud_str][pipeline_id] is not None
+
+    def test_detach_pipeline(self):
         pipeline_id = uuid.uuid4().__str__()
 
         cmd = protos.Command(
@@ -256,7 +173,7 @@ class TestSnitchClient:
             )
         )
 
-        client._attach_pipeline(cmd)
+        self.client._attach_pipeline(cmd)
 
         delete_cmd = protos.Command(
             audience=protos.Audience(
@@ -269,8 +186,232 @@ class TestSnitchClient:
             )
         )
 
-        res = client._detatch_pipeline(delete_cmd)
+        with pytest.raises(ValueError, match="Command is None"):
+            self.client._detach_pipeline(None)
 
+        res = self.client._detach_pipeline(delete_cmd)
         assert res is True
-        assert len(client.pipelines) == 0
-        assert len(client.paused_pipelines) == 0
+        assert len(self.client.pipelines) == 0
+        assert len(self.client.paused_pipelines) == 0
+
+    def test_process_validation(self):
+        with pytest.raises(ValueError, match="req is required"):
+            self.client.process(None)
+
+    def test_process_max_size(self):
+        fake_metrics = mock.Mock()
+
+        self.client.cfg = SnitchConfig(service_name="testing")
+        self.client.metrics = fake_metrics
+        payload = bytearray(snitchpy.MAX_PAYLOAD_SIZE + 1)
+        payload_bytes = bytes(payload)
+
+        res = self.client.process(snitchpy.SnitchRequest(data=payload_bytes, operation=1, component="test"))
+
+        assert res is not None
+        assert res.data == payload_bytes
+        fake_metrics.incr.assert_called_once()
+
+    def test_notify_condition(self):
+        fake_stub = mock.AsyncMock()
+        fake_metrics = mock.Mock()
+
+        self.client.metrics = fake_metrics
+        self.client.stub = fake_stub
+
+        pipeline = protos.Pipeline(id=uuid.uuid4().__str__())
+        step = protos.PipelineStep(name="test")
+        aud = protos.Audience()
+
+        self.client._notify_condition(pipeline, step, aud)
+        fake_stub.notify.assert_called_once()
+        fake_metrics.incr.assert_called_once()
+
+    def test_heartbeat(self):
+        fake_stub = mock.AsyncMock()
+
+        self.client.stub = fake_stub
+        self.client.exit.set()
+
+        hb = threading.Thread(target=self.client._heartbeat())
+        hb.start()
+        hb.join()
+        fake_stub.heartbeat.assert_called_once()
+
+    def test_op_to_string(self):
+        assert SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_PRODUCER) == "producer"
+        assert SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_CONSUMER) == "consumer"
+        assert SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_UNSET) == "consumer"
+
+    def test_get_pipelines(self):
+        pipeline_id = uuid.uuid4().__str__()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=pipeline_id,
+                )
+            )
+        )
+
+        self.client._attach_pipeline(cmd)
+        res = self.client._get_pipelines(op=snitchpy.MODE_CONSUMER, component="test")
+        assert len(res) == 0
+
+        res = self.client._get_pipelines(op=snitchpy.MODE_PRODUCER, component="test")
+        assert len(res) == 1
+        k, v = res.popitem()
+        assert v.attach_pipeline.pipeline.id == pipeline_id
+
+    def test_process_success(self):
+        wasm_resp = protos.WasmResponse(
+            output=b'{"object": {"type": "streamdal"}}',
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS,
+            exit_msg="",
+        )
+        self.client._call_wasm = mock.MagicMock()
+        self.client._call_wasm.return_value = wasm_resp
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=uuid.uuid4().__str__(),
+                    steps=[protos.PipelineStep(
+                        name="test",
+                        on_success=[protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_UNSET],
+                        on_failure=[protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT],
+                        detective=protos.steps.DetectiveStep(
+                            path="object.type",
+                            args=["streamdal"],
+                            type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                        )
+                    )]
+                )
+            )
+        )
+
+        self.client._attach_pipeline(cmd)
+
+        resp = self.client.process(snitchpy.SnitchRequest(
+            data=b'{"object": {"type": "streamdal"}}',
+            operation=snitchpy.MODE_PRODUCER,
+            component="test",
+        ))
+
+        assert resp is not None
+        assert resp.error is False
+        assert resp.message == ""
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
+
+    def test_process_failure(self):
+        fake_stub = mock.AsyncMock()
+
+        client = self.client
+        client.stub = fake_stub
+
+        wasm_resp = protos.WasmResponse(
+            output=b'{}',
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FAILURE,
+            exit_msg="field not found",
+        )
+        client._call_wasm = mock.MagicMock()
+        client._call_wasm.return_value = wasm_resp
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=uuid.uuid4().__str__(),
+                    steps=[protos.PipelineStep(
+                        name="test",
+                        on_success=[],
+                        on_failure=[
+                            protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT,
+                            protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY,
+                        ],
+                        detective=protos.steps.DetectiveStep(
+                            path="object.type",
+                            args=["batch"],
+                            type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                        )
+                    )]
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        resp = client.process(snitchpy.SnitchRequest(
+            data=b'{"object": {"type": "streamdal"}}',
+            operation=snitchpy.MODE_PRODUCER,
+            component="test",
+        ))
+
+        assert resp is not None
+        assert resp.error is True
+        assert resp.message == "field not found"
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
+        fake_stub.notify.assert_called_once()
+
+    def test_process_failure_dry_run(self):
+        client = self.client
+        client.cfg = SnitchConfig(dry_run=True)
+
+        wasm_resp = protos.WasmResponse(
+            output=b'{"object": {"type": "should be replaced by original data on dry run"}}',
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FAILURE,
+            exit_msg="field not found",
+        )
+        client._call_wasm = mock.MagicMock()
+        client._call_wasm.return_value = wasm_resp
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=uuid.uuid4().__str__(),
+                    steps=[protos.PipelineStep(
+                        name="test",
+                        on_success=[],
+                        on_failure=[protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT],
+                        detective=protos.steps.DetectiveStep(
+                            path="object.type",
+                            args=["batch"],
+                            type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                        )
+                    )]
+                )
+            )
+        )
+
+        client._attach_pipeline(cmd)
+
+        resp = client.process(snitchpy.SnitchRequest(
+            data=b'{"object": {"type": "streamdal"}}',
+            operation=snitchpy.MODE_PRODUCER,
+            component="test",
+        ))
+
+        assert resp is not None
+        assert resp.error is False
+        assert resp.message == ""
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
+

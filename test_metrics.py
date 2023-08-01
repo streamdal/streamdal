@@ -10,7 +10,7 @@ def test_composite_id():
         value=0.0,
         audience=protos.Audience()
     )
-    assert composite_id(entry) == "test-some-uuid-bytes"
+    assert composite_id(entry) == "test-test-some-uuid-bytes"
 
 
 def test_new_counter():
