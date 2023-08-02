@@ -173,6 +173,10 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 
 	pipelineIds, err := s.options.NATSBackend.Keys(ctx, NATSPipelineBucket)
 	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return make(map[string]*protos.Pipeline, 0), nil
+		}
+
 		return nil, errors.Wrap(err, "error fetching pipeline keys from NATS")
 	}
 

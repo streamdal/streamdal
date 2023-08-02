@@ -20,12 +20,13 @@ type ExternalServer struct {
 }
 
 func (g *GRPCAPI) newExternalServer() *ExternalServer {
-	return &ExternalServer{}
+	return &ExternalServer{
+		GRPCAPI: *g,
+	}
 }
 
-// TODO: Implement
 func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
-	panic("implement me")
+	return nil, errors.New("not implemented")
 }
 
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
@@ -39,8 +40,9 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	// convert map to slice
-	pipelineSlice := make([]*protos.Pipeline, 0, len(pipelines))
+	// Convert map to slice
+	pipelineSlice := make([]*protos.Pipeline, 0)
+
 	for _, pipeline := range pipelines {
 		pipelineSlice = append(pipelineSlice, pipeline)
 	}
