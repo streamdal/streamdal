@@ -3,7 +3,6 @@ import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
 import {useState} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
 export const ParticipantsMenu = ({id}: { id: string }) => {
-    // console.log("is this happening?");
     const [isOpen, setIsOpen] = useState();
 
     const handleClick = () => {

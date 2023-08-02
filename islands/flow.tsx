@@ -87,13 +87,11 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
   useEffect(() => {
     //todo: add functionality for more than one service and component
     // console.log(localStorage[flowKey]);
-    console.log(data)
     const keys = Object.keys(data.serviceMap);
     const serviceMap = data.serviceMap;
     //toDo: wire up localStorage (sort of working but need to refine)
     // if (localStorage[flowKey]) {
     //     const flow = JSON.parse(localStorage[flowKey]);
-    //     console.log("what", flow)
 
     //     if (flow) {
     //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
@@ -178,7 +176,6 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
   useEffect(() => {
     if (nodes) {
       console.log(edges);
-      console.log("the fuck is this", rfInstance);
       setStorage();
     }
   }, [edges, nodes]);
@@ -240,7 +237,6 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
   const setStorage = useCallback(() => {
     if (rfInstance) {
-      console.log("the fuck is this", rfInstance);
       const flow = rfInstance.toObject();
       localStorage.setItem(flowKey, JSON.stringify(flow));
     }

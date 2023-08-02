@@ -18,7 +18,6 @@ export const handler: Handlers<ServiceMap> = {
         meta: { "auth-token": "1234" },
       });
       console.dir(response, { depth: 20 });
-      console.log("in info");
       return ctx.render(response);
     } catch (error) {
       console.log(error);
