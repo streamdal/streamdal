@@ -55,6 +55,13 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
       },
     },
     {
+        audience: {
+          serviceName: "Test Service Name",
+          componentName: "kafka",
+          operationType: 2,
+        },
+      },
+    {
       audience: {
         serviceName: "Test Service Name",
         componentName: "kafka",
@@ -94,12 +101,12 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         },
       },
     ];
-    // console.log([...nodes, ...getOperation(example)]);
+    console.log([...nodes, ...getOperation(example)]);
 
     setNodes([
       ...nodes,
         ...getOperation(serviceMap[keys[0]].pipelines),
-    //   ...getOperation(example),
+      ...getOperation(example),
     ]);
   }, []);
 
@@ -163,7 +170,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
           position: isCovered
             ? { x: 0 - (i * 4), y: 0 + (i * 4) }
             : { x: 50, y: 200 },
-          style: { zIndex: isCovered ? 0 : 20 },
+          style: { zIndex: isCovered ? 20 - i : 20 },
           ...(isCovered && { parentNode: "2000" }),
           data: {
             label: "Consumer",
@@ -188,7 +195,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
           position: isCovered
             ? { x: 0 - (i * 4), y: 0 + (i * 4) }
             : { x: 325, y: 200 },
-          style: { zIndex: isCovered ? 0 : 20 },
+          style: { zIndex: isCovered ? 20 - i : 20 },
           ...(i > 0 && { parentNode: "1000" }),
           data: {
             label: "Producer",
