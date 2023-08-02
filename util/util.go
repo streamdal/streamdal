@@ -71,7 +71,7 @@ func AudienceToStr(audience *protos.Audience) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:%s:%s", audience.ServiceName, audience.ComponentName, audience.OperationType)
+	return fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.ComponentName, audience.OperationType)
 }
 
 func AudienceFromStr(s string) *protos.Audience {
@@ -79,7 +79,7 @@ func AudienceFromStr(s string) *protos.Audience {
 		return nil
 	}
 
-	parts := strings.Split(s, ":")
+	parts := strings.Split(s, "/")
 	if len(parts) != 3 {
 		return nil
 	}
@@ -97,11 +97,6 @@ func AudienceFromStr(s string) *protos.Audience {
 		ComponentName: parts[1],
 		OperationType: opType,
 	}
-}
-
-func NormalizeString(s string) string {
-	s = strings.ToLower(s)
-	return SpaceRegex.ReplaceAllString(s, "-")
 }
 
 func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string) *protos.StandardResponse {

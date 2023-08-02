@@ -433,12 +433,12 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 
 	// key is of the format:
 	//
-	// <sessionID>:<nodeName>:<<service>:<operation_type>:<component>>
+	// <sessionID>/<nodeName>/<<service>/<operation_type>/<component>>
 	// OR
-	// <sessionID>:<nodeName>:register
+	// <sessionID>/<nodeName>/register
 
 	for _, key := range keys {
-		parts := strings.SplitN(key, ":", 2)
+		parts := strings.SplitN(key, "/", 2)
 
 		if len(parts) != 2 {
 			return nil, errors.Errorf("invalid live key '%s'", key)
