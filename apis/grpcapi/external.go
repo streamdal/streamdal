@@ -220,7 +220,11 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, broadcast pause
+	// Can attempt to pause; PausePipeline() will noop if pipeline is already paused
+	if err := s.Deps.StoreService.PausePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	if err := s.Deps.BusService.BroadcastPausePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
