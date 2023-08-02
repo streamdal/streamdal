@@ -325,21 +325,64 @@ var _ = Describe("External gRPC API", func() {
 	})
 
 	Describe("UpdatePipeline", func() {
+		It("should update a pipeline", func() {
+			// Create a pipeline
+			pipelineCopy := testPipeline
+
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: pipelineCopy,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+
+			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
+
+			Expect(createdPipelineID).ToNot(BeEmpty())
+
+			// Update its name
+			pipelineCopy.Name = "new-name"
+
+			// Fetch it from the bucket
+
+			// Verify it has the updated data
+		})
 	})
 
 	Describe("DeletePipeline", func() {
+		It("deletes a pipeline", func() {
+			// Create a pipeline
+
+			// Get the pipeline
+
+			// Delete the pipeline
+
+			// Get the pipeline again - should fail
+		})
 	})
 
 	Describe("AttachPipeline", func() {
+		It("should attach a pipeline to an audience", func() {
+
+		})
 	})
 
 	Describe("DetachPipeline", func() {
+		It("should detach a pipeline from an audience", func() {
+
+		})
 	})
 
 	Describe("PausePipeline", func() {
+		It("should pause the pipeline", func() {
+
+		})
 	})
 
 	Describe("ResumePipeline", func() {
+		It("should resume the pipeline", func() {
+
+		})
 	})
 })
 
