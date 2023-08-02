@@ -66,15 +66,45 @@ func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
 }
 
-func AudienceStr(audience *protos.Audience) string {
+func AudienceToStr(audience *protos.Audience) string {
 	if audience == nil {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:%s:%s", audience.ServiceName, audience.ComponentName, audience.OperationType)
+	return fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.ComponentName, audience.OperationType)
 }
 
-func NormalizeString(s string) string {
-	s = strings.ToLower(s)
-	return SpaceRegex.ReplaceAllString(s, "-")
+func AudienceFromStr(s string) *protos.Audience {
+	if s == "" {
+		return nil
+	}
+
+	parts := strings.Split(s, "/")
+	if len(parts) != 3 {
+		return nil
+	}
+
+	opType := protos.OperationType_OPERATION_TYPE_UNSET
+
+	if parts[2] == protos.OperationType_OPERATION_TYPE_CONSUMER.String() {
+		opType = protos.OperationType_OPERATION_TYPE_CONSUMER
+	} else {
+		opType = protos.OperationType_OPERATION_TYPE_PRODUCER
+	}
+
+	return &protos.Audience{
+		ServiceName:   parts[0],
+		ComponentName: parts[1],
+		OperationType: opType,
+	}
+}
+
+func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string) *protos.StandardResponse {
+	reqId := CtxRequestId(ctx)
+
+	return &protos.StandardResponse{
+		Id:      reqId,
+		Code:    code,
+		Message: msg,
+	}
 }

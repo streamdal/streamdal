@@ -28,6 +28,10 @@ type InternalClient interface {
 	// CommandResponse messages and re-establish registration if the stream gets
 	// disconnected.
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (Internal_RegisterClient, error)
+	// Declare a new audience that the SDK is able to accept commands for.
+	// An SDK would use this method when a new audience is declared by the user
+	// via `.Process()`.
+	NewAudience(ctx context.Context, in *NewAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// SDK is responsible for sending heartbeats to the server to let the server
 	// know about active consumers and producers.
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -78,6 +82,15 @@ func (x *internalRegisterClient) Recv() (*Command, error) {
 	return m, nil
 }
 
+func (c *internalClient) NewAudience(ctx context.Context, in *NewAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.Internal/NewAudience", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *internalClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, "/protos.Internal/Heartbeat", in, out, opts...)
@@ -115,6 +128,10 @@ type InternalServer interface {
 	// CommandResponse messages and re-establish registration if the stream gets
 	// disconnected.
 	Register(*RegisterRequest, Internal_RegisterServer) error
+	// Declare a new audience that the SDK is able to accept commands for.
+	// An SDK would use this method when a new audience is declared by the user
+	// via `.Process()`.
+	NewAudience(context.Context, *NewAudienceRequest) (*StandardResponse, error)
 	// SDK is responsible for sending heartbeats to the server to let the server
 	// know about active consumers and producers.
 	Heartbeat(context.Context, *HeartbeatRequest) (*StandardResponse, error)
@@ -132,6 +149,9 @@ type UnimplementedInternalServer struct {
 
 func (UnimplementedInternalServer) Register(*RegisterRequest, Internal_RegisterServer) error {
 	return status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedInternalServer) NewAudience(context.Context, *NewAudienceRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewAudience not implemented")
 }
 func (UnimplementedInternalServer) Heartbeat(context.Context, *HeartbeatRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
@@ -174,6 +194,24 @@ type internalRegisterServer struct {
 
 func (x *internalRegisterServer) Send(m *Command) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _Internal_NewAudience_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewAudienceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InternalServer).NewAudience(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.Internal/NewAudience",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InternalServer).NewAudience(ctx, req.(*NewAudienceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Internal_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -237,6 +275,10 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protos.Internal",
 	HandlerType: (*InternalServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "NewAudience",
+			Handler:    _Internal_NewAudience_Handler,
+		},
 		{
 			MethodName: "Heartbeat",
 			Handler:    _Internal_Heartbeat_Handler,

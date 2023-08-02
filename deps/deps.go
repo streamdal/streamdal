@@ -11,12 +11,13 @@ import (
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
+	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/store"
 )
 
@@ -29,8 +30,6 @@ type customCheck struct{}
 type Dependencies struct {
 	Config *config.Config
 
-	CommandChannel chan *protos.Command
-
 	// Backends
 	CacheBackend cache.ICache
 	NATSBackend  natty.INatty
@@ -38,6 +37,7 @@ type Dependencies struct {
 	// Services
 	BusService      bus.IBus
 	StoreService    store.IStore
+	CmdService      cmd.ICmd
 	Health          health.IHealth
 	ShutdownContext context.Context
 	ShutdownCancel  context.CancelFunc
@@ -58,7 +58,6 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		Health:          gohealth,
 		ShutdownContext: ctx,
 		ShutdownCancel:  cancel,
-		CommandChannel:  make(chan *protos.Command),
 	}
 
 	if err := d.setupHealthChecks(); err != nil {
@@ -115,6 +114,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 		TLSCACertFile:     cfg.NATSTLSCaFile,
 		TLSClientCertFile: cfg.NATSTLSCertFile,
 		TLSClientKeyFile:  cfg.NATSTLSKeyFile,
+		Logger:            logrus.WithField("pkg", "natty"),
 	})
 
 	if err != nil {
@@ -127,7 +127,18 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	storeService, err := store.New(d.ShutdownContext, d.CacheBackend, d.NATSBackend)
+	c, err := cmd.New()
+	if err != nil {
+		return errors.Wrap(err, "unable to create new command service")
+	}
+
+	d.CmdService = c
+
+	storeService, err := store.New(&store.Options{
+		NATSBackend: d.NATSBackend,
+		ShutdownCtx: d.ShutdownContext,
+		NodeName:    cfg.NodeName,
+	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
 	}
@@ -137,6 +148,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	busService, err := bus.New(&bus.Options{
 		Store:       storeService,
 		NATS:        d.NATSBackend,
+		Cmd:         d.CmdService,
 		NodeName:    d.Config.NodeName,
 		ShutdownCtx: d.ShutdownContext,
 	})

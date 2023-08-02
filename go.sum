@@ -697,6 +697,10 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/streamdal/natty v0.0.35 h1:FGoSUEhqupOx7ZEOLQIW3BBxd1wNF5fma84DxAyxODc=
 github.com/streamdal/natty v0.0.35/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
+github.com/streamdal/natty v0.0.36 h1:rj8UvnOk3o8ZJnF8nUHVOOcjOAMnu0iEJY+lJesk6Lg=
+github.com/streamdal/natty v0.0.36/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
+github.com/streamdal/natty v0.0.37 h1:yXTLLwZlBrWQBI6RFqil/Ju+eATxaOhjiC+1TQOGHJg=
+github.com/streamdal/natty v0.0.37/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
 github.com/streamdal/snitch-protos v0.0.30 h1:EBJCkqaBPQ8tiLR6NEnTaw4BxSWf6Iohu5Yp8baADpM=
 github.com/streamdal/snitch-protos v0.0.30/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/streamdal/snitch-protos v0.0.38 h1:Uxo0HQYnh5tlAi3rsLMZcduuJh1Tl1sUJrOTVvp0E/I=
@@ -709,6 +713,12 @@ github.com/streamdal/snitch-protos v0.0.50 h1:g9btME+28Z5UclyqzNalxkL1ri2IzDULts
 github.com/streamdal/snitch-protos v0.0.50/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/streamdal/snitch-protos v0.0.52 h1:yMsw57E89gG1aTv6bLCV4r5QxurQKbsAUGyWlDKC/ys=
 github.com/streamdal/snitch-protos v0.0.52/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.53 h1:Ji+qJCK7R0CCZDAS/yFYrAg4mHvyrPSEHmlAYf1UwIU=
+github.com/streamdal/snitch-protos v0.0.53/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.54 h1:yVL5K760OdF002zyiZvqjuNrNHAKixNN16dLhrkaWVw=
+github.com/streamdal/snitch-protos v0.0.54/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.55 h1:tAoJ26O3DClPcSSHyVU8ClLjdbBAm+SyqHsn0UhIoME=
+github.com/streamdal/snitch-protos v0.0.55/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

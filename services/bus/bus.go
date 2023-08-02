@@ -11,24 +11,37 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/validate"
 )
+
+/*
+
+Broadcast handlers should not have to write to storage - it should already
+handled before the broadcast occurred. Instead, the broadcast handler should
+perform business logic that should be performed by ALL cluster nodes.
+
+Example: If an UpdatePipeline comes in, the handler should determine if the
+current node has an active session that uses this pipeline - if it does, it
+should send commands to the client (via the register cmd channel).
+
+*/
 
 const (
 	StreamName    = "snitch_events"
 	StreamSubject = "broadcast"
 	FullSubject   = StreamName + "." + StreamSubject
-
-	BroadcastSourceMetadataKey = "broadcast_src"
 )
 
 type IBus interface {
 	RunConsumer() error
-	BroadcastRegistration(ctx context.Context, req *protos.RegisterRequest) error
-	BroadcastCommand(ctx context.Context, cmd *protos.Command) error
-	BroadcastDeregistration(ctx context.Context, req *protos.DeregisterRequest) error
-	BroadcastHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
+	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
+	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
+	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
+	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
+	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
+	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 }
 
 type Bus struct {
@@ -39,6 +52,7 @@ type Bus struct {
 type Options struct {
 	Store       store.IStore
 	NATS        natty.INatty
+	Cmd         cmd.ICmd
 	NodeName    string
 	ShutdownCtx context.Context
 }
@@ -87,6 +101,10 @@ func (o *Options) validate() error {
 
 	if o.Store == nil {
 		return errors.New("store service must be provided")
+	}
+
+	if o.Cmd == nil {
+		return errors.New("cmd service must be provided")
 	}
 
 	return nil
@@ -152,14 +170,18 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	var err error
 
 	switch t := busEvent.Event.(type) {
-	case *protos.BusEvent_DeregisterRequest:
-		err = b.handleDeregisterRequestBusEvent(shutdownCtx, busEvent.GetDeregisterRequest())
-	case *protos.BusEvent_RegisterRequest:
-		err = b.handleRegisterRequestBusEvent(shutdownCtx, busEvent.GetRegisterRequest())
-	case *protos.BusEvent_Command:
-		err = b.handleCommandBusEvent(shutdownCtx, busEvent.GetCommand())
-	case *protos.BusEvent_HeartbeatRequest:
-		err = b.handleHeartbeatRequestBusEvent(shutdownCtx, busEvent.GetHeartbeatRequest())
+	case *protos.BusEvent_UpdatePipelineRequest:
+		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
+	case *protos.BusEvent_DeletePipelineRequest:
+		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
+	case *protos.BusEvent_AttachPipelineRequest:
+		err = b.handleAttachPipelineRequest(shutdownCtx, busEvent.GetAttachPipelineRequest())
+	case *protos.BusEvent_DetachPipelineRequest:
+		err = b.handleDetachPipelineRequest(shutdownCtx, busEvent.GetDetachPipelineRequest())
+	case *protos.BusEvent_PausePipelineRequest:
+		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
+	case *protos.BusEvent_ResumePipelineRequest:
+		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}

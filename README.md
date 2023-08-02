@@ -64,3 +64,5 @@ $ grpcurl -d '{"input": "Hello world"}' -plaintext -H "auth-token: 1234" \
 localhost:9090 protos.External/Test
 ```
 
+TODO: There's a scattering of `Id` vs `ID` used throughout the project. 
+We should settle on `ID` as described here: https://github.com/golang/go/wiki/CodeReviewComments#initialisms
