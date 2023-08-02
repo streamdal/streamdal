@@ -16,7 +16,9 @@ import (
 )
 
 const (
-	AuthToken = "1234"
+	GRPCAPIAddress = ":19090"
+	HTTPAPIAddress = ":19091"
+	AuthToken      = "1234"
 )
 
 var (
@@ -353,8 +355,8 @@ func runServer() {
 		Debug:                true,
 		NodeName:             "test",
 		AuthToken:            AuthToken,
-		HTTPAPIListenAddress: ":9091",
-		GRPCAPIListenAddress: ":9090",
+		HTTPAPIListenAddress: HTTPAPIAddress,
+		GRPCAPIListenAddress: GRPCAPIAddress,
 		NATSURL:              []string{"localhost:4222"},
 		NATSUseTLS:           false,
 		NATSTLSSkipVerify:    true,
@@ -370,7 +372,7 @@ func runServer() {
 }
 
 func newExternalClient() (protos.ExternalClient, error) {
-	conn, err := grpc.Dial(":9090", grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
@@ -379,7 +381,7 @@ func newExternalClient() (protos.ExternalClient, error) {
 }
 
 func newInternalClient() (protos.InternalClient, error) {
-	conn, err := grpc.Dial(":9090", grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
