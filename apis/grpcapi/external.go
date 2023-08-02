@@ -5,7 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+
+	"github.com/streamdal/snitch-server/validate"
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -21,85 +22,73 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
-func (s *ExternalServer) GetServiceMap(context.Context, *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
-	// This is a dummy return just to avoid a panic
-	return &protos.GetServiceMapResponse{
-		ServiceMap: map[string]*protos.ServiceInfo{
-			"Test Service Name": {
-				Name:        "Test Service Name",
-				Description: "This is a test service",
-				Pipelines: []*protos.PipelineInfo{
-					&protos.PipelineInfo{
-						Audience: &protos.Audience{
-							ServiceName:   "Test Service Name",
-							ComponentName: "kafka",
-							OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-						},
-						Pipeline: &protos.Pipeline{
-							Id:   "1234-1234-123456",
-							Name: "Best pipeline",
-							Steps: []*protos.PipelineStep{
-								&protos.PipelineStep{
-									Name:      "Best step",
-									OnSuccess: nil, // unset, notify, nil == continue
-									OnFailure: []protos.PipelineStepCondition{
-										protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT,
-									},
-									Step: &protos.PipelineStep_Detective{
-										Detective: &steps.DetectiveStep{
-											Path:   "object.field",
-											Args:   nil,
-											Negate: false,
-											Type:   steps.DetectiveType_DETECTIVE_TYPE_IPV4_ADDRESS,
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				Consumers: nil,
-				Producers: nil,
-				Clients:   nil,
-			},
-		},
+func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
+	panic("implement me")
+}
+
+func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
+	if err := validate.GetPipelinesRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get pipelines request")
+	}
+
+	// Read all keys in "snitch_pipelines"
+	pipelines, err := s.Deps.StoreService.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	// convert map to slice
+	pipelineSlice := make([]*protos.Pipeline, 0, len(pipelines))
+	for _, pipeline := range pipelines {
+		pipelineSlice = append(pipelineSlice, pipeline)
+	}
+
+	return &protos.GetPipelinesResponse{
+		Pipelines: pipelineSlice,
 	}, nil
 }
 
-func (s *ExternalServer) GetPipelines(context.Context, *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
+	if err := validate.GetPipelineRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get pipeline request")
+	}
+
+	pipeline, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	return &protos.GetPipelineResponse{
+		Pipeline: pipeline,
+	}, nil
 }
 
-func (s *ExternalServer) GetPipeline(context.Context, *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) CreatePipeline(context.Context, *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) UpdatePipeline(context.Context, *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) DeletePipeline(context.Context, *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) AttachPipeline(context.Context, *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) DetachPipeline(context.Context, *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
-func (s *ExternalServer) PausePipeline(context.Context, *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (s *ExternalServer) ResumePipeline(context.Context, *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
+	panic("implement me")
 }
 
 func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {

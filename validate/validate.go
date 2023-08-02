@@ -18,6 +18,17 @@ func RegisterRequest(req *protos.RegisterRequest) error {
 		return ErrEmptyField("ServiceName")
 	}
 
+	if req.ClientInfo == nil {
+		return errors.New(".ClientInfo cannot be nil")
+	}
+
+	// OK to not have audiences, but if defined, they must contain valid entries
+	for _, v := range req.Audiences {
+		if err := Audience(v); err != nil {
+			return errors.Wrap(err, "invalid audience")
+		}
+	}
+
 	return nil
 }
 
@@ -151,4 +162,24 @@ func ErrNilField(field string) error {
 
 func ErrUnsetEnum(field string) error {
 	return errors.Errorf("enum '%s' cannot be unset", field)
+}
+
+func GetPipelineRequest(req *protos.GetPipelineRequest) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
+}
+
+func GetPipelinesRequest(req *protos.GetPipelinesRequest) error {
+	if req == nil {
+		return ErrNilRequest
+	}
+
+	return nil
 }

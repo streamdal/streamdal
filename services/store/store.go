@@ -73,21 +73,22 @@ changes in the UI will take effect.
 
 const (
 	CacheRegistrationPrefix = "registration"
-	CachePipelinePrefix     = "pipeline"
+	CachePipelinesPrefix    = "pipeline"
 	CacheHeartbeatPrefix    = "heartbeat"
 	CacheHeartbeatEntryTTL  = time.Minute
 
-	NATSRegistrationsBucket = "snitch_registrations"
-	NATSHeartbeatBucket     = "snitch_heartbeats"
-	NATSHeartbeatBucketTTL  = time.Minute
+	NATSRegistrationBucket = "snitch_registrations"
+	NATSHeartbeatBucket    = "snitch_heartbeats"
+	NATSPipelinesBucket    = "snitch_pipelines"
+	NATSHeartbeatBucketTTL = time.Minute
 )
 
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
-	// AddPipeline
-	// DeletePipeline
+	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
+	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
 }
 
 type Store struct {
@@ -129,7 +130,7 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 		return errors.Wrap(err, "error marshaling protobuf")
 	}
 
-	if err := s.NATSBackend.Put(ctx, NATSRegistrationsBucket, req.ServiceName, data); err != nil {
+	if err := s.NATSBackend.Put(ctx, NATSRegistrationBucket, req.ServiceName, data); err != nil {
 		return errors.Wrap(err, "error writing to K/V")
 	}
 
@@ -145,7 +146,7 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	s.CacheBackend.Remove(CacheRegistrationPrefix + ":" + req.ServiceName)
 
 	// Remove from K/V
-	if err := s.NATSBackend.Delete(ctx, NATSRegistrationsBucket, req.ServiceName); err != nil {
+	if err := s.NATSBackend.Delete(ctx, NATSRegistrationBucket, req.ServiceName); err != nil {
 		return errors.Wrap(err, "error deleting from K/V")
 	}
 
@@ -171,4 +172,47 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 	}
 
 	return nil
+}
+
+func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error) {
+	ids, err := s.NATSBackend.Keys(ctx, NATSPipelinesBucket)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to fetch pipeline id's from NATS")
+	}
+
+	pipelines := make(map[string]*protos.Pipeline)
+
+	for _, id := range ids {
+		// Attempt to fetch each p1 from cache
+		p1, ok := s.CacheBackend.Get(CachePipelinesPrefix + ":" + id)
+		if ok {
+			pipelines[id] = p1.(*protos.Pipeline)
+			continue
+		}
+
+		// Not in cache, attempt to fetch from NATS
+		data, err := s.NATSBackend.Get(ctx, NATSPipelinesBucket, id)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to fetch pipeline '%s' from NATS", id)
+		}
+
+		// Pipeline found, try to unmarshal
+		p2 := &protos.Pipeline{}
+
+		if err := proto.Unmarshal(data, p2); err != nil {
+			return nil, errors.Wrapf(err, "unable to unmarshal pipeline id '%s'", id)
+		}
+
+		// Now that we have grabbed it from NATS, put it in cache
+		s.CacheBackend.Set(CachePipelinesPrefix+":"+id, p2)
+
+		// And lastly, add to map
+		pipelines[id] = p2
+	}
+
+	return pipelines, nil
+}
+
+func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error) {
+	panic("implement")
 }
