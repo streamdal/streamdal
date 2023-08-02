@@ -41,7 +41,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	}
 
 	// Create a new command channel
-	ch, newCh := s.Deps.CmdService.AddChannel(request.ServiceName)
+	ch, newCh := s.Deps.CmdService.AddChannel(request.SessionId)
 
 	if newCh {
 		llog.Debugf("new channel created for session id '%s'", request.SessionId)
