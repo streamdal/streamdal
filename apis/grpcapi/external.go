@@ -189,6 +189,11 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// Remove config entry
+	if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists, broadcast delete
 	if err := s.Deps.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
