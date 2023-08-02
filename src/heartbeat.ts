@@ -1,6 +1,4 @@
-import { grpcClient } from "./index.js";
-import { serviceName } from "./register.js";
-import { OperationType } from "@streamdal/snitch-protos/protos/common.js";
+import { grpcClient, sessionId } from "./index.js";
 
 export const HEARTBEAT_INTERVAL = 30000;
 
@@ -8,12 +6,7 @@ export const heartbeat = async () => {
   console.info(`### sending heartbeat to grpc server...`);
   const call = grpcClient.heartbeat(
     {
-      lastActivityUnixTimestampUtc: BigInt(Date.now()),
-      audience: {
-        serviceName,
-        componentName: "heartbeat",
-        operationType: OperationType.CONSUMER,
-      },
+      sessionId,
     },
     { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
   );

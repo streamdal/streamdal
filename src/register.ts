@@ -1,8 +1,7 @@
-import { grpcClient } from "./index.js";
-import { processResponse } from "./pipeline.js";
 import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
 
-export const serviceName = "snitch-node-client";
+import { grpcClient, serviceName, sessionId } from "./index.js";
+import { processResponse } from "./pipeline.js";
 
 export const register = async () => {
   try {
@@ -10,6 +9,7 @@ export const register = async () => {
 
     const call = grpcClient.register(
       {
+        sessionId,
         serviceName,
         dryRun: false,
         clientInfo: {

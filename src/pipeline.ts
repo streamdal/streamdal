@@ -25,24 +25,30 @@ export const processResponse = (command: Command) => {
   console.info("processing grpc server command...");
 
   switch (command.command.oneofKind) {
-    case "setPipeline":
-      command.command.setPipeline.pipeline &&
-        setPipeline(command.audience, command.command.setPipeline.pipeline);
+    case "attachPipeline":
+      command.command.attachPipeline.pipeline &&
+        attachPipeline(
+          command.audience,
+          command.command.attachPipeline.pipeline
+        );
       break;
-    case "deletePipeline":
-      deletePipeline(command.audience, command.command.deletePipeline.id);
+    case "detachPipeline":
+      detachPipeline(
+        command.audience,
+        command.command.detachPipeline.pipelineId
+      );
       break;
     case "pausePipeline":
       togglePausePipeline(
         command.audience,
-        command.command.pausePipeline.id,
+        command.command.pausePipeline.pipelineId,
         true
       );
       break;
-    case "unpausePipeline":
+    case "resumePipeline":
       togglePausePipeline(
         command.audience,
-        command.command.unpausePipeline.id,
+        command.command.resumePipeline.pipelineId,
         false
       );
       break;
@@ -51,10 +57,10 @@ export const processResponse = (command: Command) => {
   console.info("grpc server command processed");
 };
 
-export const setPipeline = (audience: Audience, pipeline: Pipeline) =>
+export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
   internalPipelines.set(audience, { ...pipeline, paused: false });
 
-export const deletePipeline = (audience: Audience, pipelineId: string) => {
+export const detachPipeline = (audience: Audience, pipelineId: string) => {
   const p = internalPipelines.get(audience);
   pipelineId === p?.id && internalPipelines.delete(audience);
 };
