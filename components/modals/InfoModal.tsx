@@ -3,6 +3,11 @@ import { Producer } from "../icons/producer.tsx";
 
 export const InfoModal = (props: any) => {
   const item = props.name.params.info;
+  console.log(
+    "where are you:",
+    props.name.data.serviceMap["Test Service Name"].pipelines,
+  );
+  const pipelines = props.name.data.serviceMap["Test Service Name"].pipelines;
   return (
     <div>
       <div
@@ -51,14 +56,29 @@ export const InfoModal = (props: any) => {
               </a>
             </div>
             <div class="px-4 py-1">
-              <h3 class="text-white text-sm mb-2">Attached Pipeline</h3>
+              <div class="mb-2 flex justify-between items-center pr-2">
+                <h3 class="text-white text-sm">Attached Pipeline</h3>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="cursor-pointer"
+                >
+                  <path
+                    d="M7.78557 1.01015C7.78557 0.615663 7.46578 0.295867 7.07129 0.295867C6.6768 0.295866 6.357 0.615663 6.357 1.01015L6.357 6.35679L1.01039 6.35679C0.615904 6.35679 0.296108 6.67659 0.296107 7.07108C0.296107 7.46557 0.615904 7.78536 1.01039 7.78536L6.357 7.78536L6.357 13.132C6.357 13.5265 6.6768 13.8463 7.07129 13.8463C7.46578 13.8463 7.78557 13.5265 7.78557 13.132L7.78557 7.78536L13.1322 7.78536C13.5267 7.78536 13.8465 7.46557 13.8465 7.07108C13.8465 6.67659 13.5267 6.35679 13.1322 6.35679L7.78557 6.35679L7.78557 1.01015Z"
+                    fill="white"
+                  />
+                </svg>
+              </div>
               <button
                 id="attached-pipeline"
                 data-dropdown-toggle="attached-pipeline-dropdown"
                 class="text-white font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
                 type="button"
               >
-                Dropdown button{" "}
+                {pipelines[0].pipeline.name}
                 <svg
                   class="w-2.5 h-2.5 ml-2.5"
                   aria-hidden="true"
@@ -83,38 +103,11 @@ export const InfoModal = (props: any) => {
                   class="py-2 text-sm text-gray-700 dark:text-gray-200"
                   aria-labelledby="dropdownDefaultButton"
                 >
-                  <li>
-                    <a
-                      href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Dashboard
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Settings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Earnings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Sign out
-                    </a>
-                  </li>
+                  {pipelines.map((pipeline) => (
+                    <li>
+                      <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{pipeline.pipeline.name}</a>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

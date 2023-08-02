@@ -27,7 +27,7 @@ export const handler: Handlers<ServiceMap> = {
 };
 
 export default function FlowRoute(props: PageProps) {
-  console.log(props);
+  console.dir(props, { depth: 20 });
   return (
     <Layout>
       <InfoModal name={props} />
