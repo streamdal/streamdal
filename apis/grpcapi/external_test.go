@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -38,9 +39,6 @@ var (
 )
 
 func init() {
-	// Start gRPC server
-	go runServer()
-
 	var err error
 
 	// Setup nats client
@@ -48,6 +46,12 @@ func init() {
 	if err != nil {
 		panic("unable to create new nats client: " + err.Error())
 	}
+
+	// Clear buckets
+	rmBuckets()
+
+	// Start gRPC server
+	go runServer()
 
 	time.Sleep(time.Second)
 }
@@ -327,8 +331,6 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdPipelineProto.Name).To(Equal(pipeline.Name))
 			Expect(createdPipelineProto.Id).To(Equal(createdPipelineID))
 
-			fmt.Printf("pipeline fetched from NATS (pre-update): %+v\n", createdPipelineProto)
-
 			// Update its name
 			pipeline.Id = createdPipelineID
 			pipeline.Name = "new-name"
@@ -350,8 +352,6 @@ var _ = Describe("External gRPC API", func() {
 			updatedPipelineProto := &protos.Pipeline{}
 			err = proto.Unmarshal(updatedPipelineData, updatedPipelineProto)
 			Expect(err).ToNot(HaveOccurred())
-
-			fmt.Println("pipeline fetched from NATS (post-update): ", updatedPipelineProto)
 
 			Expect(updatedPipelineProto.Name).To(Equal(pipeline.Name))
 			Expect(updatedPipelineProto.Id).To(Equal(pipeline.Id))
@@ -621,5 +621,17 @@ func newPipeline() *protos.Pipeline {
 				XWasmFunction: "",
 			},
 		},
+	}
+}
+
+func rmBuckets() {
+	buckets := []string{"snitch_live", "snitch_config", "snitch_pipeline", "snitch_paused"}
+
+	for _, b := range buckets {
+		if err := natsClient.DeleteBucket(context.Background(), b); err != nil {
+			if err != nats.ErrBucketNotFound {
+				panic(fmt.Sprintf("error deleting bucket '%s': %s", b, err.Error()))
+			}
+		}
 	}
 }

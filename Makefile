@@ -83,10 +83,6 @@ clean:
 test: description = Run Go unit tests
 test: GOFLAGS=
 test:
-	nats kv del -f snitch_pipeline; \
-	nats kv del -f snitch_config; \
-	nats kv del -f snitch_live; \
-	nats kv del -f snitch_paused; \
 	$(GO) test ./...
 
 ### Docker
