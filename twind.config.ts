@@ -63,6 +63,20 @@ export default {
         },
       };
     },
+    "btn-secondary": () => {
+      return {
+        width: "100px",
+        height: "47px",
+        borderRadius: "4px",
+        border: "none",
+        fontWeight: "bold",
+        fontSize: "14px",
+        color: "#372D56",
+        "&:hover": {
+          background: "#F9F7FF",
+        },
+      };
+    },
     "btn-dark": () => {
       return {
         width: "137px",

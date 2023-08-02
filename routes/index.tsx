@@ -25,22 +25,22 @@ export const handler: Handlers<ServiceMap> = {
   async GET(_req, ctx) {
     try {
       const { response } = await client.getServiceMap({}, {
-            meta: { "auth-token": "1234" },
-          });
-          console.dir(response, {depth: 20})
-          return ctx.render(response);
-        } catch (error) {
-          console.log(error)
-          return new Response("Project not found", { status: 404 });
-        }
-    },
+        meta: { "auth-token": "1234" },
+      });
+      console.dir(response, { depth: 20 });
+      return ctx.render(response);
+    } catch (error) {
+      console.log(error);
+      return new Response("Project not found", { status: 404 });
+    }
+  },
 };
 
-export default function FlowRoute({data}: any) {
+export default function FlowRoute({ data }: any) {
   return (
     <Layout>
       <ReactFlowProvider>
-        <Flow data={data}/>
+        <Flow data={data} />
       </ReactFlowProvider>
     </Layout>
   );
