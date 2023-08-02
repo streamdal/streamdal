@@ -121,12 +121,12 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         },
       },
     ];
-    console.log([...nodes, ...getOperation(example)]);
+    // console.log([...nodes, ...getOperation(example)]);
 
     setNodes([
       ...nodes,
       ...getOperation(serviceMap[keys[0]].pipelines),
-      ...getOperation(example),
+      // ...getOperation(example),
     ]);
     // }
   }, []);
