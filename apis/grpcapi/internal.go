@@ -3,6 +3,7 @@ package grpcapi
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -53,6 +54,8 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	var shutdown bool
 
+	ticker := time.NewTicker(1 * time.Second)
+
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
@@ -64,6 +67,15 @@ MAIN:
 			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
+		case <-ticker.C:
+			llog.Debug("sending heartbeat")
+			if err := server.Send(&protos.Command{
+				Command: &protos.Command_KeepAlive{
+					KeepAlive: &protos.KeepAliveCommand{},
+				},
+			}); err != nil {
+				llog.WithError(err).Error("unable to send heartbeat")
+			}
 		case cmd := <-ch:
 			llog.Debug("received cmd on cmd channel")
 
