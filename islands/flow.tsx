@@ -86,7 +86,8 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
   useEffect(() => {
     //todo: add functionality for more than one service and component
-    console.log(localStorage[flowKey]);
+    // console.log(localStorage[flowKey]);
+    console.log(data)
     const keys = Object.keys(data.serviceMap);
     const serviceMap = data.serviceMap;
     //toDo: wire up localStorage (sort of working but need to refine)
