@@ -100,6 +100,11 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// Update pipeline in storage
+	if err := s.Deps.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists - broadcast it as there might be snitch-servers that have
 	// a client that has an active registration using this pipeline (and it should
 	// get updated)

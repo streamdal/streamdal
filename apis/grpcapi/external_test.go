@@ -75,32 +75,6 @@ var _ = Describe("External gRPC API", func() {
 	var (
 		err            error
 		externalClient protos.ExternalClient
-
-		testPipeline = &protos.Pipeline{
-			Name: "Pipeline_Name",
-			Steps: []*protos.PipelineStep{
-				{
-					Name: "test step",
-					OnSuccess: []protos.PipelineStepCondition{
-						protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY,
-					},
-					OnFailure: []protos.PipelineStepCondition{
-						protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT,
-					},
-					Step: &protos.PipelineStep_Detective{
-						Detective: &steps.DetectiveStep{
-							Path:   "object.field",
-							Args:   nil,
-							Negate: false,
-							Type:   steps.DetectiveType_DETECTIVE_TYPE_BOOLEAN_TRUE,
-						},
-					},
-					XWasmId:       "", // TODO: Remember to fill this in
-					XWasmBytes:    nil,
-					XWasmFunction: "",
-				},
-			},
-		}
 	)
 
 	BeforeEach(func() {
@@ -238,7 +212,7 @@ var _ = Describe("External gRPC API", func() {
 	Describe("CreatePipeline", func() {
 		It("should create a pipeline", func() {
 			resp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
-				Pipeline: testPipeline,
+				Pipeline: newPipeline(),
 			})
 
 			// Verify that resp is correct
@@ -269,7 +243,7 @@ var _ = Describe("External gRPC API", func() {
 		It("should get a pipeline", func() {
 			// Create a pipeline
 			createResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
-				Pipeline: testPipeline,
+				Pipeline: newPipeline(),
 			})
 
 			Expect(err).ToNot(HaveOccurred())
@@ -303,7 +277,7 @@ var _ = Describe("External gRPC API", func() {
 			// Create 5 pipelines
 			for i := 0; i < 5; i++ {
 				createResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
-					Pipeline: testPipeline,
+					Pipeline: newPipeline(),
 				})
 
 				Expect(err).ToNot(HaveOccurred())
@@ -324,13 +298,14 @@ var _ = Describe("External gRPC API", func() {
 		})
 	})
 
-	Describe("UpdatePipeline", func() {
+	FDescribe("UpdatePipeline", func() {
 		It("should update a pipeline", func() {
 			// Create a pipeline
-			pipelineCopy := testPipeline
+			pipeline := newPipeline()
+			pipeline.Name = "old-name"
 
 			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
-				Pipeline: pipelineCopy,
+				Pipeline: pipeline,
 			})
 
 			Expect(err).ToNot(HaveOccurred())
@@ -340,12 +315,47 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(createdPipelineID).ToNot(BeEmpty())
 
+			// Fetch it from bucket, verify has correct name
+			createdPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdPipeline).ToNot(BeNil())
+
+			createdPipelineProto := &protos.Pipeline{}
+			err = proto.Unmarshal(createdPipeline, createdPipelineProto)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(createdPipelineProto.Name).To(Equal(pipeline.Name))
+			Expect(createdPipelineProto.Id).To(Equal(createdPipelineID))
+
+			fmt.Printf("pipeline fetched from NATS (pre-update): %+v\n", createdPipelineProto)
+
 			// Update its name
-			pipelineCopy.Name = "new-name"
+			pipeline.Id = createdPipelineID
+			pipeline.Name = "new-name"
+
+			updatedResponse, err := externalClient.UpdatePipeline(ctxWithGoodAuth, &protos.UpdatePipelineRequest{Pipeline: pipeline})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(updatedResponse).ToNot(BeNil())
+
+			Expect(updatedResponse.Message).To(ContainSubstring("updated"))
+			Expect(updatedResponse.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Fetch it from the bucket
+			updatedPipelineData, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(updatedPipelineData).ToNot(BeNil())
 
 			// Verify it has the updated data
+			updatedPipelineProto := &protos.Pipeline{}
+			err = proto.Unmarshal(updatedPipelineData, updatedPipelineProto)
+			Expect(err).ToNot(HaveOccurred())
+
+			fmt.Println("pipeline fetched from NATS (post-update): ", updatedPipelineProto)
+
+			Expect(updatedPipelineProto.Name).To(Equal(pipeline.Name))
+			Expect(updatedPipelineProto.Id).To(Equal(pipeline.Id))
+
 		})
 	})
 
@@ -584,4 +594,32 @@ func getPipelineIDFromMessage(msg string) string {
 	}
 
 	return matches[1]
+}
+
+func newPipeline() *protos.Pipeline {
+	return &protos.Pipeline{
+		Name: "Pipeline_Name",
+		Steps: []*protos.PipelineStep{
+			{
+				Name: "test step",
+				OnSuccess: []protos.PipelineStepCondition{
+					protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY,
+				},
+				OnFailure: []protos.PipelineStepCondition{
+					protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT,
+				},
+				Step: &protos.PipelineStep_Detective{
+					Detective: &steps.DetectiveStep{
+						Path:   "object.field",
+						Args:   nil,
+						Negate: false,
+						Type:   steps.DetectiveType_DETECTIVE_TYPE_BOOLEAN_TRUE,
+					},
+				},
+				XWasmId:       "", // TODO: Remember to fill this in
+				XWasmBytes:    nil,
+				XWasmFunction: "",
+			},
+		},
+	}
 }
