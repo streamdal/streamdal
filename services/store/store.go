@@ -438,9 +438,9 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	// <sessionID>/<nodeName>/register
 
 	for _, key := range keys {
-		parts := strings.SplitN(key, "/", 2)
+		parts := strings.SplitN(key, "/", 3)
 
-		if len(parts) != 2 {
+		if len(parts) != 3 {
 			return nil, errors.Errorf("invalid live key '%s'", key)
 		}
 
