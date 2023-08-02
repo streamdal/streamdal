@@ -118,7 +118,7 @@ MAIN:
 }
 
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
-	s.log.Debug("received heartbeat request for session id '%s'", req.SessionId)
+	s.log.Debugf("received heartbeat request for session id '%s'", req.SessionId)
 
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
