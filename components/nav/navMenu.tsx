@@ -1,3 +1,4 @@
+import IconListCheck from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/list-check.tsx";
 import IconMenu2 from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/menu-2.tsx";
 
 export const NavMenu = () => {
@@ -16,7 +17,7 @@ export const NavMenu = () => {
       <div
         id="drawer-backdrop"
         class="fixed left-0 mt-10 transition-transform -translate-x-full top-[40px] z-50 p-4 overflow-y-auto bg-white w-64 dark:bg-gray-800"
-        tabindex="-1"
+        tabIndex={-1}
         aria-labelledby="drawer-backdrop-scrolling-label"
       >
         <h5
@@ -66,6 +67,15 @@ export const NavMenu = () => {
                   <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
                 </svg>
                 <span class="ml-3">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/pipelines"
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
+                <IconListCheck class="w-6 h-6 text-gray-500" />
+                <span class="ml-3">Pipelines</span>
               </a>
             </li>
             <li>

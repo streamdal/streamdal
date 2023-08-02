@@ -19,6 +19,40 @@ export const dummyPipelines = [{
       WasmBytes: [],
       WasmFunction: "",
     },
+    {
+      name: "Another pretty good step",
+      onSuccess: [],
+      onFailure: [1],
+      step: {
+        oneofKind: "detective",
+        detective: {
+          path: "object.field",
+          args: [],
+          negate: false,
+          type: 1006,
+        },
+      },
+      WasmId: "",
+      WasmBytes: [],
+      WasmFunction: "",
+    },
+    {
+      name: "A step we probably don't even need",
+      onSuccess: [],
+      onFailure: [1],
+      step: {
+        oneofKind: "detective",
+        detective: {
+          path: "object.field",
+          args: [],
+          negate: false,
+          type: 1006,
+        },
+      },
+      WasmId: "",
+      WasmBytes: [],
+      WasmFunction: "",
+    },
   ],
 }, {
   id: "5432-5432-32432",

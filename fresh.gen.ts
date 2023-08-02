@@ -10,7 +10,8 @@ import * as $4 from "./routes/index.tsx";
 import * as $5 from "./routes/login.tsx";
 import * as $6 from "./routes/pipelines/index.tsx";
 import * as $$0 from "./islands/flow.tsx";
-import * as $$1 from "./islands/pipelines.tsx";
+import * as $$1 from "./islands/pipeline.tsx";
+import * as $$2 from "./islands/pipelines.tsx";
 
 const manifest = {
   routes: {
@@ -24,7 +25,8 @@ const manifest = {
   },
   islands: {
     "./islands/flow.tsx": $$0,
-    "./islands/pipelines.tsx": $$1,
+    "./islands/pipeline.tsx": $$1,
+    "./islands/pipelines.tsx": $$2,
   },
   baseUrl: import.meta.url,
 };

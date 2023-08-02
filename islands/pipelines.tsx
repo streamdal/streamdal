@@ -1,3 +1,4 @@
+import IconPencil from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/pencil.tsx";
 import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import {
@@ -7,6 +8,8 @@ import {
 import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
 import { TransformType } from "snitch-protos/protos/steps/transform.ts";
 import * as z from "zod/index.ts";
+import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
+import PipelineDetail from "./pipeline.tsx";
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
@@ -65,6 +68,7 @@ export type PipelineType = z.infer<typeof pipelineSchema>;
 
 const Pipelines = ({ pipelines }: { pipelines?: Pipeline[] }) => {
   const [selected, setSelected] = useState(0);
+  console.log("shit pipelines", pipelines);
   return (
     <div
       id="defaultModal"
@@ -72,7 +76,7 @@ const Pipelines = ({ pipelines }: { pipelines?: Pipeline[] }) => {
       class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex"
       role="dialog"
     >
-      <div class="relative w-full max-w-4xl max-h-full">
+      <div class="relative w-full max-w-5xl max-h-full">
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div class="flex justify-start">
             <div class="border-r w-1/3 flex flex-col pb-[16px]">
@@ -82,19 +86,27 @@ const Pipelines = ({ pipelines }: { pipelines?: Pipeline[] }) => {
               </div>
               {pipelines?.map((p: Pipeline, i: number) => (
                 <div
-                  class={`py-[14px] pl-[30px] ${
+                  class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
                     i === selected && "bg-sunset"
                   } cursor-pointer`}
-                  onClick={() => setSelected(i)}
                 >
-                  {p.name}
+                  <div
+                    onClick={() => setSelected(i)}
+                  >
+                    {p.name}
+                  </div>
+                  {selected === i && <IconPencil class="w-4 h-4 text-web" />}
                 </div>
               ))}
             </div>
             <div class="w-full">
-              <div class="flex justify-between rounded-t items-center p-[18px]">
-                <div class="text-[30px] font-medium">
-                  {pipelines[selected]?.name}
+              <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
+                <div class="flex flex-row items-center">
+                  <div class="text-[30px] font-medium mr-2">
+                    {pipelines && pipelines[selected]?.name ||
+                      "<- Add a Pipeline"}
+                  </div>
+                  {pipelines && <PipelineMenu id={pipelines[selected]?.id} />}
                 </div>
                 <div>
                   <a href="/">
@@ -122,11 +134,9 @@ const Pipelines = ({ pipelines }: { pipelines?: Pipeline[] }) => {
                   </a>
                 </div>
               </div>
-              <div class="p-6 space-y-6">
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                  Rule details coming here.
-                </p>
-              </div>
+              {pipelines && pipelines[selected] && (
+                <PipelineDetail pipeline={pipelines[selected]} />
+              )}
             </div>
           </div>
         </div>

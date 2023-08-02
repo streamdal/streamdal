@@ -20,6 +20,8 @@ export default {
         haze: "#D1D3D9",
         cloud: "#FFFFFF",
         stream: "#C1AAFD",
+        lunar: "#8E84AD",
+        twilight: "#E6DDFE",
       },
       fontFamily: {
         sans: ["Inter"],
