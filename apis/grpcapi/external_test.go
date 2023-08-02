@@ -516,9 +516,6 @@ var _ = Describe("External gRPC API", func() {
 
 			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdPipelineID)
 
-			fmt.Printf("Created Pipeline ID: %s\n", createdPipelineID)
-			fmt.Println("Config Key: ", configKey)
-
 			// Should have an entry in snitch_paused
 			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
 			Expect(err).ToNot(HaveOccurred())
@@ -526,17 +523,59 @@ var _ = Describe("External gRPC API", func() {
 		})
 	})
 
-	FDescribe("ResumePipeline", func() {
+	Describe("ResumePipeline", func() {
 		It("should resume the pipeline", func() {
 			// Create pipeline
+			audience := &protos.Audience{
+				ServiceName:   "secret-service",
+				ComponentName: "sqlite",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+			}
+
+			// Create a pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: newPipeline(),
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+
+			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
+			Expect(createdPipelineID).ToNot(BeEmpty())
 
 			// Pause it
+			pauseResp, err := externalClient.PausePipeline(ctxWithGoodAuth, &protos.PausePipelineRequest{
+				PipelineId: createdPipelineID,
+				Audience:   audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(pauseResp).ToNot(BeNil())
+			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+			Expect(pauseResp.Message).To(ContainSubstring("paused"))
+
+			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdPipelineID)
 
 			// Should have an entry in snitch_paused
+			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value).To(BeEmpty())
 
 			// Resume it
+			resumeResp, err := externalClient.ResumePipeline(ctxWithGoodAuth, &protos.ResumePipelineRequest{
+				PipelineId: createdPipelineID,
+				Audience:   audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resumeResp).ToNot(BeNil())
+			Expect(resumeResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Entry should be removed from snitch_paused
+			value, err = natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
+			Expect(err).To(HaveOccurred())
+			Expect(value).To(BeNil())
+			Expect(err).To(Equal(nats.ErrKeyNotFound))
 		})
 	})
 })

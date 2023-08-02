@@ -250,6 +250,11 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// Can attempt to resume; ResumePipeline() will noop if pipeline is already running
+	if err := s.Deps.StoreService.ResumePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists, broadcast resume
 	if err := s.Deps.BusService.BroadcastResumePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
