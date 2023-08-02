@@ -85,11 +85,15 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 	llog := s.log.WithField("method", "AddRegistration")
 	llog.Debug("received request to add registration")
 
+	registrationKey := NATSLiveKey(req.SessionId, s.options.NodeName, "register")
+
+	s.log.Debugf("attempting to save registration under key '%s'", registrationKey)
+
 	// Add registration in snitch_live bucket
 	if err := s.options.NATSBackend.Put(
 		ctx,
 		NATSLiveBucket,
-		NATSLiveKey(req.SessionId, s.options.NodeName, "register"),
+		registrationKey,
 		nil,
 		NATSLiveTTL,
 	); err != nil {

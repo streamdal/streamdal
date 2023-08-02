@@ -7,7 +7,7 @@ import (
 
 const (
 	NATSLiveBucket = "snitch_live"
-	NATSLiveFormat = "%s:%s:%s" // K: $session_id:$node_name:$audience OR $session_id:$node_name:$service_name:register; V: NONE
+	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience OR $session_id/$node_name/register; V: NONE
 	NATSLiveTTL    = 5 * time.Second
 
 	NATSPipelineBucket    = "snitch_pipeline"
@@ -17,7 +17,7 @@ const (
 	NATSConfigKeyFormat = "%s" // K: $audience V: $pipeline_id (string)
 
 	NATSPausedBucket    = "snitch_paused"
-	NATSPausedKeyFormat = "%s:%s" // K: $audience:$pipeline_id V: NONE
+	NATSPausedKeyFormat = "%s/%s" // K: $audience:$pipeline_id V: NONE
 )
 
 func NATSLiveKey(session, node, audience string) string {

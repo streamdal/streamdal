@@ -30,7 +30,7 @@ func New() (*Cmd, error) {
 
 func (c *Cmd) HaveChannel(sessionId string) bool {
 	c.channelsMtx.RLock()
-	defer c.channelsMtx.Unlock()
+	defer c.channelsMtx.RUnlock()
 
 	_, ok := c.channels[sessionId]
 
