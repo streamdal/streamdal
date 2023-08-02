@@ -20,6 +20,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/deps"
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/util"
 )
 
 const (
@@ -275,7 +276,7 @@ var _ = Describe("External gRPC API", func() {
 		})
 	})
 
-	FDescribe("GetPipelines", func() {
+	Describe("GetPipelines", func() {
 		It("should get all pipelines", func() {
 
 			// Create 5 pipelines
@@ -302,7 +303,7 @@ var _ = Describe("External gRPC API", func() {
 		})
 	})
 
-	FDescribe("UpdatePipeline", func() {
+	Describe("UpdatePipeline", func() {
 		It("should update a pipeline", func() {
 			// Create a pipeline
 			pipeline := newPipeline()
@@ -362,18 +363,71 @@ var _ = Describe("External gRPC API", func() {
 	Describe("DeletePipeline", func() {
 		It("deletes a pipeline", func() {
 			// Create a pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: newPipeline(),
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+
+			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
+			Expect(createdPipelineID).ToNot(BeEmpty())
 
 			// Get the pipeline
+			fetchedPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fetchedPipeline).ToNot(BeNil())
 
 			// Delete the pipeline
+			err = natsClient.Delete(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			Expect(err).ToNot(HaveOccurred())
 
 			// Get the pipeline again - should fail
+			shouldNotExist, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(shouldNotExist).To(BeNil())
 		})
 	})
 
-	Describe("AttachPipeline", func() {
+	FDescribe("AttachPipeline", func() {
 		It("should attach a pipeline to an audience", func() {
+			audience := &protos.Audience{
+				ServiceName:   "secret-service",
+				ComponentName: "sqlite",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+			}
 
+			// Create a pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: newPipeline(),
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+
+			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
+			Expect(createdPipelineID).ToNot(BeEmpty())
+
+			// Attach it to an audience
+			attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
+				PipelineId: createdPipelineID,
+				Audience:   audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(attachResp).ToNot(BeNil())
+			Expect(attachResp.Message).To(ContainSubstring("attached"))
+			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			configKey := util.AudienceToStr(audience)
+			fmt.Println("Attempting to fetch key:", configKey)
+
+			// Should have an entry in snitch_config
+			storedPipelineID, err := natsClient.Get(context.Background(), store.NATSConfigBucket, configKey)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(storedPipelineID).ToNot(BeNil())
+			Expect(string(storedPipelineID)).To(Equal(createdPipelineID))
 		})
 	})
 

@@ -159,6 +159,10 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	if err := s.Deps.StoreService.AttachPipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists, broadcast attach
 	if err := s.Deps.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
