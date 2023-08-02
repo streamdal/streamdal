@@ -1,5 +1,5 @@
 import { dummyPipelines, dummyServiceMap } from "./dummies.ts";
-import { client } from "./grpc.ts";
+import { client } from "../routes/index.tsx";
 
 export const getServiceMap = async () => {
   try {
