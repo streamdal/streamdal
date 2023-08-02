@@ -2,33 +2,53 @@ package grpcapi
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
+	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/deps"
+	"github.com/streamdal/snitch-server/services/store"
 )
 
 const (
 	GRPCAPIAddress = ":19090"
 	HTTPAPIAddress = ":19091"
 	AuthToken      = "1234"
+	NATSAddress    = "localhost:4222"
 )
 
 var (
+	natsClient natty.INatty
+
+	testPipelines   = make([]string, 0)
 	ctxWithNoAuth   = context.Background()
 	ctxWithBadAuth  = metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"auth-token": "incorrect"}))
 	ctxWithGoodAuth = metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"auth-token": AuthToken}))
 )
 
 func init() {
+	// Start gRPC server
 	go runServer()
+
+	var err error
+
+	// Setup nats client
+	natsClient, err = newNATSClient()
+	if err != nil {
+		panic("unable to create new nats client: " + err.Error())
+	}
+
 	time.Sleep(time.Second)
 }
 
@@ -39,10 +59,48 @@ type AuthTest struct {
 	ErrorShouldContain string
 }
 
+var _ = AfterSuite(func() {
+	// Remove created pipelines
+	for _, p := range testPipelines {
+		err := natsClient.Delete(context.Background(), store.NATSPipelineBucket, p)
+		if err != nil {
+			fmt.Printf("CLEANUP ERROR: unable to remove pipeline '%s' from NATS: %s\n", p, err.Error())
+		}
+	}
+
+	// Remove attachments
+})
+
 var _ = Describe("External gRPC API", func() {
 	var (
 		err            error
 		externalClient protos.ExternalClient
+
+		testPipeline = &protos.Pipeline{
+			Name: "Pipeline_Name",
+			Steps: []*protos.PipelineStep{
+				{
+					Name: "test step",
+					OnSuccess: []protos.PipelineStepCondition{
+						protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY,
+					},
+					OnFailure: []protos.PipelineStepCondition{
+						protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT,
+					},
+					Step: &protos.PipelineStep_Detective{
+						Detective: &steps.DetectiveStep{
+							Path:   "object.field",
+							Args:   nil,
+							Negate: false,
+							Type:   steps.DetectiveType_DETECTIVE_TYPE_BOOLEAN_TRUE,
+						},
+					},
+					XWasmId:       "", // TODO: Remember to fill this in
+					XWasmBytes:    nil,
+					XWasmFunction: "",
+				},
+			},
+		}
 	)
 
 	BeforeEach(func() {
@@ -178,12 +236,92 @@ var _ = Describe("External gRPC API", func() {
 	})
 
 	Describe("CreatePipeline", func() {
+		It("should create a pipeline", func() {
+			resp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: testPipeline,
+			})
+
+			// Verify that resp is correct
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("created"))
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			// Verify that we wrote pipeline to bucket
+			expectedPipelineID := getPipelineIDFromMessage(resp.Message)
+			Expect(expectedPipelineID).ToNot(BeEmpty())
+
+			data, err := natsClient.Get(context.Background(), store.NATSConfigBucket, expectedPipelineID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
+
+			testPipelines = append(testPipelines, expectedPipelineID)
+
+			// Verify that data can be unmarshalled into protos.Pipeline
+			pipeline := &protos.Pipeline{}
+			err = proto.Unmarshal(data, pipeline)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(pipeline.Id).To(Equal(expectedPipelineID))
+		})
 	})
 
 	Describe("GetPipeline", func() {
+		It("should get a pipeline", func() {
+			// Create a pipeline
+			createResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: testPipeline,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createResp).ToNot(BeNil())
+
+			createdPipelineID := getPipelineIDFromMessage(createResp.Message)
+
+			// Fetch the pipeline
+			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
+				PipelineId: createdPipelineID + "foo",
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(getResp).ToNot(BeNil())
+		})
+
+		It("should return an error if pipeline does not exist", func() {
+			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
+				PipelineId: "does-not-exist",
+			})
+
+			Expect(err).To(HaveOccurred())
+			Expect(getResp).To(BeNil())
+			Expect(err.Error()).To(ContainSubstring("pipeline not found"))
+		})
 	})
 
-	Describe("GetPipelines", func() {
+	FDescribe("GetPipelines", func() {
+		It("should get all pipelines", func() {
+
+			// Create 5 pipelines
+			for i := 0; i < 5; i++ {
+				createResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+					Pipeline: testPipeline,
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(createResp).ToNot(BeNil())
+
+				pipelineID := getPipelineIDFromMessage(createResp.Message)
+				Expect(pipelineID).ToNot(BeEmpty())
+
+				testPipelines = append(testPipelines, pipelineID)
+			}
+
+			// Fetch all pipelines
+			getResp, err := externalClient.GetPipelines(ctxWithGoodAuth, &protos.GetPipelinesRequest{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(getResp).ToNot(BeNil())
+
+			Expect(len(getResp.Pipelines)).To(Equal(5))
+		})
 	})
 
 	Describe("UpdatePipeline", func() {
@@ -358,7 +496,6 @@ func runServer() {
 		HTTPAPIListenAddress: HTTPAPIAddress,
 		GRPCAPIListenAddress: GRPCAPIAddress,
 		NATSURL:              []string{"localhost:4222"},
-		NATSUseTLS:           false,
 		NATSTLSSkipVerify:    true,
 	})
 
@@ -387,4 +524,21 @@ func newInternalClient() (protos.InternalClient, error) {
 	}
 
 	return protos.NewInternalClient(conn), nil
+}
+
+func newNATSClient() (natty.INatty, error) {
+	return natty.New(&natty.Config{
+		NatsURL: []string{NATSAddress},
+	})
+}
+
+// Parse pipelineID from "created '...' pipeline" message
+func getPipelineIDFromMessage(msg string) string {
+	idRegex := regexp.MustCompile(`^pipeline '(.+)' created$`)
+	matches := idRegex.FindStringSubmatch(msg)
+	if len(matches) != 2 {
+		return ""
+	}
+
+	return matches[1]
 }
