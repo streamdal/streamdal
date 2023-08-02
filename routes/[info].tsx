@@ -9,8 +9,6 @@ import { PageProps } from "$fresh/src/server/types.ts";
 
 
 export default function FlowRoute(props: PageProps, data: any) {
-  console.log(props);
-  console.log("hellish", data);
   return (
     <Layout>
       <InfoModal name={props} />

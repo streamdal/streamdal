@@ -10,7 +10,11 @@ import {
   useNodesState,
 } from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 import "flowbite";
-import { useEffect } from "https://esm.sh/preact@10.15.1/hooks";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "https://esm.sh/preact@10.15.1/hooks";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
 import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
 
@@ -35,9 +39,12 @@ export type Node = {
   };
 };
 
+const flowKey: string = "flow-storage";
+
 export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
+  const [rfInstance, setRfInstance] = useState<any>();
 
   const example = [
     {
@@ -55,12 +62,12 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
       },
     },
     {
-        audience: {
-          serviceName: "Test Service Name",
-          componentName: "kafka",
-          operationType: 2,
-        },
+      audience: {
+        serviceName: "Test Service Name",
+        componentName: "kafka",
+        operationType: 2,
       },
+    },
     {
       audience: {
         serviceName: "Test Service Name",
@@ -79,9 +86,20 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
   useEffect(() => {
     //todo: add functionality for more than one service and component
+    console.log(localStorage[flowKey]);
     const keys = Object.keys(data.serviceMap);
     const serviceMap = data.serviceMap;
+    //toDo: wire up localStorage (sort of working but need to refine)
+    // if (localStorage[flowKey]) {
+    //     const flow = JSON.parse(localStorage[flowKey]);
+    //     console.log("what", flow)
 
+    //     if (flow) {
+    //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+    //       setNodes(flow.nodes || []);
+    //       setEdges(flow.edges || []);
+    //     }
+    // } else {
     let nodes = [
       {
         id: "1",
@@ -97,7 +115,8 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         targetPosition: "left",
         position: { x: 215, y: 350 },
         data: {
-          label: `${serviceMap[keys[0]].pipelines[0].audience?.componentName}`,
+          label: `${serviceMap[keys[0]].pipelines[0].audience
+            ?.componentName}`,
         },
       },
     ];
@@ -105,9 +124,10 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
     setNodes([
       ...nodes,
-        ...getOperation(serviceMap[keys[0]].pipelines),
+      ...getOperation(serviceMap[keys[0]].pipelines),
       ...getOperation(example),
     ]);
+    // }
   }, []);
 
   useEffect(() => {
@@ -153,6 +173,14 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     });
     setEdges(newEdges);
   }, [nodes]);
+
+  useEffect(() => {
+    if (nodes) {
+      console.log(edges);
+      console.log("the fuck is this", rfInstance);
+      setStorage();
+    }
+  }, [edges, nodes]);
 
   const getOperation = (pipeline: PipelineInfo[]) => {
     //creates producer and consumer nodes based on audience data. Messy and seperated because node groupings based on seperate consumers and producers
@@ -209,6 +237,14 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     return [consumerNodes, producerNodes].flat();
   };
 
+  const setStorage = useCallback(() => {
+    if (rfInstance) {
+      console.log("the fuck is this", rfInstance);
+      const flow = rfInstance.toObject();
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [rfInstance]);
+
   return (
     <div
       style={{ width: "100%", height: "100vh" }}
@@ -219,6 +255,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         onNodesChange={onNodesChange}
         edges={edges}
         nodeTypes={nodeTypes}
+        onInit={setRfInstance}
         defaultViewport={{
           x: 0,
           y: 150,
