@@ -1,25 +1,30 @@
-import { getEnv } from "./utils.ts";
+import { dummyPipelines, dummyServiceMap } from "./dummies.ts";
+import { client } from "./grpc.ts";
 
-export const getJson = async (apiPath: string) => {
-  const response = await fetch(
-    `${await getEnv("SNITCH_API_URL") || "http://localhost:9191"}${apiPath}`,
-  );
+export const getServiceMap = async () => {
+  try {
+    const { response } = await client.getServiceMap({}, {
+      meta: { "auth-token": "1234" },
+    });
 
-  if (response.ok || response.redirected) {
-    return response.json();
+    return response;
+  } catch (error) {
+    console.log("error fetching service map", error);
+    console.log("returning dummy data instead");
+    return dummyServiceMap;
   }
-
-  throw Error("response not ok");
 };
 
-export const getText = async (apiPath: string) => {
-  const response = await fetch(
-    `${await getEnv("SNITCH_API_URL") || "http://localhost:9191"}${apiPath}`,
-  );
+export const getPipelines = async () => {
+  try {
+    const { response } = await client.getPipelines({}, {
+      meta: { "auth-token": "1234" },
+    });
 
-  if (response.ok || response.redirected) {
-    return response.text();
+    return response?.pipelines?.length || dummyPipelines;
+  } catch (error) {
+    console.log("error fetching pipelines", error);
+    console.log("sending dummy data until this is implemented");
+    return dummyPipelines;
   }
-
-  throw Error("response not ok");
 };

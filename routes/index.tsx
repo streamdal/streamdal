@@ -1,6 +1,6 @@
+import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Layout } from "../components/layout.tsx";
 import { RuleSetType } from "../components/rules/sets.tsx";
-import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import Flow from "../islands/flow.tsx";
 import { ExternalClient } from "snitch-protos/protos/external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
