@@ -39,6 +39,37 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
 
+  const example = [
+    {
+      audience: {
+        serviceName: "Test Service Name",
+        componentName: "kafka",
+        operationType: 1,
+      },
+    },
+    {
+      audience: {
+        serviceName: "Test Service Name",
+        componentName: "kafka",
+        operationType: 2,
+      },
+    },
+    {
+      audience: {
+        serviceName: "Test Service Name",
+        componentName: "kafka",
+        operationType: 1,
+      },
+    },
+    {
+      audience: {
+        serviceName: "Test Service Name",
+        componentName: "kafka",
+        operationType: 2,
+      },
+    },
+  ];
+
   useEffect(() => {
     //todo: add functionality for more than one service and component
     const keys = Object.keys(data.serviceMap);
@@ -63,9 +94,12 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         },
       },
     ];
+    // console.log([...nodes, ...getOperation(example)]);
+
     setNodes([
       ...nodes,
-      ...getOperation(serviceMap[keys[0]].pipelines),
+        ...getOperation(serviceMap[keys[0]].pipelines),
+    //   ...getOperation(example),
     ]);
   }, []);
 
@@ -114,29 +148,58 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
   }, [nodes]);
 
   const getOperation = (pipeline: PipelineInfo[]) => {
-    //creates producer and consumer nodes based on audience data
-    return pipeline.map((component: PipelineInfo, i: number) => {
-      switch (component.audience?.operationType) {
-        case (1):
-          return {
-            id: `${2000 + i}`,
-            type: "consumer",
-            dragHandle: "#dragHandle",
-            position: { x: 50 + (i * 4), y: 200 },
-            zIndex: 2,
-            data: { label: "Consumer", source: "bottom", target: "top" },
-          };
-        case (2):
-          return {
-            id: `${1000 + i}`,
-            type: "producer",
-            dragHandle: "#dragHandle",
-            position: { x: 325 + (i * 4), y: 200 },
-            zIndex: 2,
-            data: { label: "Producer", source: "bottom", target: "top" },
-          };
-      }
-    });
+    //creates producer and consumer nodes based on audience data. Messy and seperated because node groupings based on seperate consumers and producers
+    //had to hack in the zIndex as the reactFlow native zIndex wasn't working
+    const consumers = pipeline.filter((info) =>
+      info.audience?.operationType === 1
+    );
+    const consumerNodes = consumers.map(
+      (component: PipelineInfo, i: number) => {
+        const isCovered = i !== 0 ? true : false;
+        return {
+          id: `${2000 + i}`,
+          type: "consumer",
+          dragHandle: "#dragHandle",
+          position: isCovered
+            ? { x: 0 - (i * 4), y: 0 + (i * 4) }
+            : { x: 50, y: 200 },
+          style: { zIndex: isCovered ? 0 : 20 },
+          ...(isCovered && { parentNode: "2000" }),
+          data: {
+            label: "Consumer",
+            source: "bottom",
+            target: "top",
+            instances: i === 0 && consumers.length,
+          },
+        };
+      },
+    );
+
+    const producers = pipeline.filter((info) =>
+      info.audience?.operationType === 2
+    );
+    const producerNodes = producers.map(
+      (component: PipelineInfo, i: number) => {
+        const isCovered = i !== 0 ? true : false;
+        return {
+          id: `${1000 + i}`,
+          type: "producer",
+          dragHandle: "#dragHandle",
+          position: isCovered
+            ? { x: 0 - (i * 4), y: 0 + (i * 4) }
+            : { x: 325, y: 200 },
+          style: { zIndex: isCovered ? 0 : 20 },
+          ...(i > 0 && { parentNode: "1000" }),
+          data: {
+            label: "Producer",
+            source: "bottom",
+            target: "top",
+            instances: i === 0 && producers.length,
+          },
+        };
+      },
+    );
+    return [consumerNodes, producerNodes].flat();
   };
 
   return (
