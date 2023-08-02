@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -21,17 +22,17 @@ const (
 )
 
 func NATSLiveKey(session, node, audience string) string {
-	return fmt.Sprintf(NATSLiveFormat, session, node, audience)
+	return strings.ToLower(fmt.Sprintf(NATSLiveFormat, session, node, audience))
 }
 
 func NATSPipelineKey(pipelineId string) string {
-	return fmt.Sprintf(NATSPipelineKeyFormat, pipelineId)
+	return strings.ToLower(fmt.Sprintf(NATSPipelineKeyFormat, pipelineId))
 }
 
 func NATSConfigKey(audience string) string {
-	return fmt.Sprintf(NATSConfigKeyFormat, audience)
+	return strings.ToLower(fmt.Sprintf(NATSConfigKeyFormat, audience))
 }
 
 func NATSPausedKey(audience, pipelineId string) string {
-	return fmt.Sprintf(NATSPausedKeyFormat, audience, pipelineId)
+	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, audience, pipelineId))
 }

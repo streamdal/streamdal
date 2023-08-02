@@ -26,8 +26,6 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 }
 
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
-	s.log.Info("Got a hit for register!")
-
 	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
 		return errors.Wrap(err, "invalid register request")

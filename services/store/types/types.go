@@ -5,6 +5,7 @@ import (
 )
 
 type LiveEntry struct {
+	Key       string
 	SessionID string
 	NodeName  string
 	Audience  *protos.Audience

@@ -121,13 +121,21 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	llog := s.log.WithField("method", "DeleteRegistration")
 	llog.Debug("received request to delete registration")
 
-	// Remove from K/V
-	if err := s.options.NATSBackend.Delete(
-		ctx,
-		NATSLiveBucket,
-		NATSLiveKey(req.SessionId, s.options.NodeName, "register"),
-	); err != nil {
-		return errors.Wrap(err, "error deleting registration from K/V")
+	// Remove all keys referencing the same session_id
+	entries, err := s.GetLive(ctx)
+	if err != nil {
+		return errors.Wrap(err, "error fetching live entries")
+	}
+
+	for _, e := range entries {
+		if e.SessionID != req.SessionId {
+			continue
+		}
+
+		// Same session id - remove the key
+		if err := s.options.NATSBackend.Delete(ctx, NATSLiveBucket, e.Key); err != nil {
+			s.log.Errorf("unable to remove key '%s' from K/V", e.Key)
+		}
 	}
 
 	return nil
@@ -449,6 +457,7 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 		maybeAud := parts[2]
 
 		entry := &types.LiveEntry{
+			Key:       key,
 			SessionID: sessionID,
 			NodeName:  nodeName,
 		}
