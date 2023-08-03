@@ -40,4 +40,7 @@ message Audience {
 
   // Consumer or Producer
   OperationType operation_type = 3;
+
+  // Name for the consumer or producer
+  string operation_name = 4;
 }

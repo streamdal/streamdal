@@ -45,6 +45,12 @@ export interface Audience {
      * @generated from protobuf field: protos.OperationType operation_type = 3;
      */
     operationType: OperationType;
+    /**
+     * Name for the consumer or producer
+     *
+     * @generated from protobuf field: string operation_name = 4;
+     */
+    operationName: string;
 }
 /**
  * Common status codes used in gRPC method responses

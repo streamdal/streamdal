@@ -200,6 +200,9 @@ pub struct Audience {
     ///  Consumer or Producer
     // @@protoc_insertion_point(field:protos.Audience.operation_type)
     pub operation_type: ::protobuf::EnumOrUnknown<OperationType>,
+    ///  Name for the consumer or producer
+    // @@protoc_insertion_point(field:protos.Audience.operation_name)
+    pub operation_name: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.Audience.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -217,7 +220,7 @@ impl Audience {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut fields = ::std::vec::Vec::with_capacity(4);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "service_name",
@@ -233,6 +236,11 @@ impl Audience {
             "operation_type",
             |m: &Audience| { &m.operation_type },
             |m: &mut Audience| { &mut m.operation_type },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "operation_name",
+            |m: &Audience| { &m.operation_name },
+            |m: &mut Audience| { &mut m.operation_name },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Audience>(
             "Audience",
@@ -261,6 +269,9 @@ impl ::protobuf::Message for Audience {
                 24 => {
                     self.operation_type = is.read_enum_or_unknown()?;
                 },
+                34 => {
+                    self.operation_name = is.read_string()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -282,6 +293,9 @@ impl ::protobuf::Message for Audience {
         if self.operation_type != ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET) {
             my_size += ::protobuf::rt::int32_size(3, self.operation_type.value());
         }
+        if !self.operation_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.operation_name);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -296,6 +310,9 @@ impl ::protobuf::Message for Audience {
         }
         if self.operation_type != ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET) {
             os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.operation_type))?;
+        }
+        if !self.operation_name.is_empty() {
+            os.write_string(4, &self.operation_name)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -317,6 +334,7 @@ impl ::protobuf::Message for Audience {
         self.service_name.clear();
         self.component_name.clear();
         self.operation_type = ::protobuf::EnumOrUnknown::new(OperationType::OPERATION_TYPE_UNSET);
+        self.operation_name.clear();
         self.special_fields.clear();
     }
 
@@ -325,6 +343,7 @@ impl ::protobuf::Message for Audience {
             service_name: ::std::string::String::new(),
             component_name: ::std::string::String::new(),
             operation_type: ::protobuf::EnumOrUnknown::from_i32(0),
+            operation_name: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -482,23 +501,24 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0ccommon.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\x02i\
     d\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\x14.pro\
     tos.ResponseCodeR\x04code\x12\x18\n\x07message\x18\x03\x20\x01(\tR\x07me\
-    ssage\"\x92\x01\n\x08Audience\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\
+    ssage\"\xb9\x01\n\x08Audience\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\
     \x0bserviceName\x12%\n\x0ecomponent_name\x18\x02\x20\x01(\tR\rcomponentN\
     ame\x12<\n\x0eoperation_type\x18\x03\x20\x01(\x0e2\x15.protos.OperationT\
-    ypeR\roperationType*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_COD\
-    E_UNSET\x10\0\x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONS\
-    E_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\
-    \x12'\n#RESPONSE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONS\
-    E_CODE_GENERIC_ERROR\x10\x05*c\n\rOperationType\x12\x18\n\x14OPERATION_T\
-    YPE_UNSET\x10\0\x12\x1b\n\x17OPERATION_TYPE_CONSUMER\x10\x01\x12\x1b\n\
-    \x17OPERATION_TYPE_PRODUCER\x10\x02B4Z2github.com/streamdal/snitch-proto\
-    s/build/go/protosJ\x98\n\n\x06\x12\x04\0\0*\x01\n\x08\n\x01\x0c\x12\x03\
-    \0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0\
-    I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\
-    \x1a/\x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\
-    \n\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\
-    \t\x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20re\
-    sponse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
+    ypeR\roperationType\x12%\n\x0eoperation_name\x18\x04\x20\x01(\tR\roperat\
+    ionName*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\
+    \0\x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_\
+    REQUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESP\
+    ONSE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENER\
+    IC_ERROR\x10\x05*c\n\rOperationType\x12\x18\n\x14OPERATION_TYPE_UNSET\
+    \x10\0\x12\x1b\n\x17OPERATION_TYPE_CONSUMER\x10\x01\x12\x1b\n\x17OPERATI\
+    ON_TYPE_PRODUCER\x10\x02B4Z2github.com/streamdal/snitch-protos/build/go/\
+    protosJ\xf4\n\n\x06\x12\x04\0\0-\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
+    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\
+    \x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\
+    \x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\
+    \n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\
+    \x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20resp\
+    onse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
     \x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\
     \n\x0b\n\x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\
     \x06\x12\x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\
@@ -528,7 +548,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x02\x01\x01\x12\x03\x1b\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\
     \x03\x1b\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\
     \x05\x05\x01\x02\x02\x01\x12\x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\
-    \x02\x12\x03\x1c\x1c\x1d\n<\n\x02\x04\x01\x12\x04\x20\0*\x01\x1a0\x20Use\
+    \x02\x12\x03\x1c\x1c\x1d\n<\n\x02\x04\x01\x12\x04\x20\0-\x01\x1a0\x20Use\
     d\x20to\x20indicate\x20who\x20a\x20command\x20is\x20intended\x20for\n\n\
     \n\n\x03\x04\x01\x01\x12\x03\x20\x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\
     \x02\x1a\x1a`\x20Name\x20of\x20the\x20service\x20--\x20let's\x20include\
@@ -542,7 +562,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x01\x02\x01\x03\x12\x03&\x1a\x1b\n#\n\x04\x04\x01\x02\x02\x12\x03)\
     \x02#\x1a\x16\x20Consumer\x20or\x20Producer\n\n\x0c\n\x05\x04\x01\x02\
     \x02\x06\x12\x03)\x02\x0f\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03)\x10\
-    \x1e\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03)!\"b\x06proto3\
+    \x1e\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03)!\"\n0\n\x04\x04\x01\x02\
+    \x03\x12\x03,\x02\x1c\x1a#\x20Name\x20for\x20the\x20consumer\x20or\x20pr\
+    oducer\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03,\x02\x08\n\x0c\n\x05\
+    \x04\x01\x02\x03\x01\x12\x03,\t\x17\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\
+    \x03,\x1a\x1bb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

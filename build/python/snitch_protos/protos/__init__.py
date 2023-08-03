@@ -106,6 +106,9 @@ class Audience(betterproto.Message):
     operation_type: "OperationType" = betterproto.enum_field(3)
     """Consumer or Producer"""
 
+    operation_name: str = betterproto.string_field(4)
+    """Name for the consumer or producer"""
+
 
 @dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):

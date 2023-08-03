@@ -74,7 +74,8 @@ class Audience$Type extends MessageType {
         super("protos.Audience", [
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "component_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] }
+            { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] },
+            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
