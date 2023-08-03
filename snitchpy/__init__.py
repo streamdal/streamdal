@@ -79,16 +79,21 @@ class SnitchClient:
         self._validate_config(cfg)
         self.cfg = cfg
 
-        channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port)
-        self.channel = channel
-        self.stub = protos.InternalStub(channel=self.channel)
+        register_loop = asyncio.new_event_loop()
+        self.register_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=register_loop)
+        self.register_stub = protos.InternalStub(channel=self.register_channel)
+
+        grpc_loop = asyncio.new_event_loop()
+        self.grpc_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=grpc_loop)
+        self.grpc_stub = protos.InternalStub(channel=self.grpc_channel)
+        self.grpc_loop = grpc_loop
+
         self.auth_token = cfg.grpc_token
-        self.loop = asyncio.get_event_loop()
         self.grpc_timeout = 5
         self.pipelines = {}
         self.paused_pipelines = {}
         self.log = logging.getLogger("snitch-client")
-        self.metrics = Metrics(stub=self.stub, log=self.log, event=self.cfg.exit)
+        #self.metrics = Metrics(stub=self.grpc_stub, log=self.log, event=self.cfg.exit)
         self.functions = {}
         self.session_id = uuid.uuid4().__str__()
         self.threads = []
@@ -97,20 +102,17 @@ class SnitchClient:
         for e in events:
             signal.signal(e, self.shutdown)
 
-        # Run register
-        register = Thread(target=self._register,daemon=False)
+        # # Run register
+        register = Thread(target=self._register, args=(register_loop,), daemon=False)
         register.start()
         self.threads.append(register)
 
         # Start heartbeat
-        # heartbeat = Thread(target=self._heartbeat, daemon=False)
-        # heartbeat.start()
-        # self.threads.append(heartbeat)
+        heartbeat = Thread(target=self._heartbeat, daemon=False)
+        heartbeat.start()
+        self.threads.append(heartbeat)
 
         print("SnitchClient initialized")
-
-        # for thread in self.threads:
-        #     thread.join()
 
     @staticmethod
     def _validate_config(cfg: SnitchConfig) -> None:
@@ -245,11 +247,14 @@ class SnitchClient:
                 occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp())
             )
 
-            await self.stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
+            await self.grpc_stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         self.log.debug("Notifying")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
         if not self.cfg.dry_run:
-            self.loop.create_task(call())
+            loop.run_until_complete(call())
 
     def _get_pipelines(self, op: int, component: str) -> dict:
         """
@@ -281,25 +286,25 @@ class SnitchClient:
         self.metrics.shutdown(args)
 
         self.log.debug("Closing gRPC connection")
-        self.channel.close()
-
-        self.loop.stop()
+        self.grpc_channel.close()
+        self.register_channel.close()
 
     def _heartbeat(self):
         async def call():
             self.log.debug("Sending heartbeat")
-            req = protos.HeartbeatRequest()
-            req.session_id = self.session_id
 
-            await self.stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
+            req = protos.HeartbeatRequest(
+                session_id=self.session_id,
+            )
+
+            await self.grpc_stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         # Send at least once
         while not self.cfg.exit.is_set():
-            self.loop.run_until_complete(call())
+            self.grpc_loop.run_until_complete(call())
             self.cfg.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
 
-    def _register(self) -> None:
-        loop = asyncio.new_event_loop()
+    def _register(self, loop) -> None:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
@@ -320,7 +325,7 @@ class SnitchClient:
 
             try:
                 print("registering")
-                async for cmd in self.stub.register(req, timeout=None, metadata=self._get_metadata()):
+                async for cmd in self.register_stub.register(req, timeout=None, metadata=self._get_metadata()):
                     print("received command: {}".format(cmd))
 
                     if cmd.keep_alive is not None:
@@ -341,9 +346,10 @@ class SnitchClient:
         self.log.debug("Starting register looper")
 
         try:
-            while not self.cfg.exit.is_set():
-                loop.run_until_complete(call())
-                self.log.debug("Register looper completed, closing connection")
+            loop.run_until_complete(call())
+            # while not self.cfg.exit.is_set():
+            #
+            self.log.debug("Register looper completed, closing connection")
         except Exception as e:
             self.channel.close()
             raise SnitchRegisterException("Failed to register: {}".format(e))
