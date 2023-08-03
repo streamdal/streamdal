@@ -23,7 +23,7 @@ export const Service = ({ data }: any) => {
             4 instances
           </p>
         </div>
-        <NodeMenu id={data.label} />
+        <NodeMenu data={data.pipeline} />
       </div>
       <span class="sr-only">Notifications</span>
 
@@ -74,7 +74,7 @@ export const Producer = ({ data }: any) => {
             <h3 class="text-xs text-gray-500">{data.label}</h3>
           </div>
         </a>
-        <NodeMenu id={data.label} />
+        <NodeMenu data={data.pipeline} />
       </div>
       <div
         data-popover
@@ -113,7 +113,6 @@ export const Producer = ({ data }: any) => {
 
 export const Consumer = ({ data }: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  console.log("node data", data.pipeline.audience.serviceName);
 
   const handleModalOpen = () => {
     setIsOpen(true);
@@ -149,7 +148,7 @@ export const Consumer = ({ data }: any) => {
             <h3 class="text-xs text-gray-500">{data.label}</h3>
           </div>
         </a>
-        <NodeMenu id={data.label} />
+        <NodeMenu data={data.pipeline} />
       </div>
       <div
         data-popover

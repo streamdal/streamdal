@@ -175,7 +175,6 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
   useEffect(() => {
     if (nodes) {
-      console.log(edges);
       setStorage();
     }
   }, [edges, nodes]);
