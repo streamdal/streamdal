@@ -20,8 +20,9 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
-import { FormSelect } from "../components/form/formSelect.tsx";
+import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
 import { titleCase } from "../lib/utils.ts";
+import { InlineInput } from "../components/form/inlineInput.tsx";
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
@@ -93,20 +94,11 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
     e.preventDefault();
 
     const { data, errors } = validate(pipelineSchema, new FormData(e.target));
+
+    console.log("submit errors", errors);
+    console.log("submit data", data);
     setErrors(errors);
   };
-
-  const updateStep = (index: number, key: string, value: string) =>
-    setData({
-      ...data,
-      steps: data.steps.map((
-        s: PipelineStep,
-        i: number,
-      ) => ({
-        ...s,
-        ...i === index && { [`${key}`]: value },
-      })),
-    });
 
   return (
     <form onSubmit={onSubmit}>
@@ -114,12 +106,12 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
         <div class="flex flex-row items-center">
           <div class="text-[30px] font-medium mr-2 h-[54px]">
             <FormHidden name="id" value={data?.id} />
-            <FormInput
+            <InlineInput
               placeHolder="Name your pipeline"
               name={"name"}
-              value={data?.name}
+              data={data}
+              setData={setData}
               errors={errors}
-              onChange={(value) => setData({ ...data, name: value })}
             />
           </div>
           {<PipelineMenu id={pipeline.id} />}
@@ -181,11 +173,11 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
                     <IconGripVertical class="w-6 h-6 text-twilight cursor-pointer" />
                   </div>
                   <div class="text-[16px] font-medium mr-2">
-                    <FormInput
+                    <InlineInput
                       name={`steps[${i}].name`}
-                      value={data?.steps[i]?.name}
+                      data={data}
+                      setData={setData}
                       errors={errors}
-                      onChange={(value) => updateStep(i, "name", value)}
                     />
                   </div>
                   <StepMenu
@@ -209,24 +201,47 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
               </div>
               {open.includes(i)
                 ? (
-                  <div class="border-t p-[13px]">
-                    <div class="text-[16px] font-medium mr-2">
-                      <FormSelect
-                        name={`steps[${i}].step.oneofKind`}
-                        label="Type"
-                        value={data?.steps[i]?.step?.oneofKind}
+                  <div class="border-t p-[13px] text-[16px] font-medium mr-2">
+                    <FormSelect
+                      name={`steps[${i}].step.oneofKind`}
+                      data={data}
+                      setData={setData}
+                      label="Step Type"
+                      errors={errors}
+                      inputClass="w-36"
+                      children={kinds.map((k, i) => (
+                        <option
+                          key={`step-kind-key-${i}`}
+                          value={k}
+                          label={titleCase(k)}
+                        />
+                      ))}
+                    />
+                    {["detective", "transform"].includes(
+                      data?.steps[i]?.step?.oneofKind,
+                    ) && (
+                      <FormInput
+                        name={`steps[${i}].step.detective.path`}
+                        data={data}
+                        setData={setData}
+                        label="Path"
+                        placeHolder="ex: object.field"
                         errors={errors}
-                        onChange={(value) => setData({ ...data, name: value })}
-                        inputClass="w-36"
-                        children={kinds.map((k, i) => (
-                          <option
-                            key={`step-kind-key-${i}`}
-                            value={k}
-                            label={titleCase(k)}
-                          />
-                        ))}
                       />
-                    </div>
+                    )}
+                    {"detective" ===
+                        data?.steps[i]?.step?.oneofKind &&
+                      (
+                        <FormSelect
+                          name={`steps[${i}].step.detective.type`}
+                          label="Detective Type"
+                          data={data}
+                          setData={setData}
+                          errors={errors}
+                          inputClass="w-64"
+                          children={optionsFromEnum(DetectiveType)}
+                        />
+                      )}
                   </div>
                 )
                 : null}

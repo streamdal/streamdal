@@ -1,42 +1,34 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
 
+// An unadorned input for use in non-traditional form placements
 export type FormInputProps = {
   name: string;
   data: any;
   setData: (data: any) => void;
-  label?: string;
   placeHolder?: string;
   errors: ErrorType;
   inputClass?: string;
   wrapperClass?: string;
 };
 
-export const FormInput = ({
+export const InlineInput = ({
   name,
   data,
   setData,
   errors,
-  label,
   placeHolder,
   inputClass,
   wrapperClass,
 }: FormInputProps) => {
   const value = resolveValue(data, name);
+
   return (
-    <div class={`flex flex-col my-2 ${wrapperClass}`}>
-      {label && (
-        <label
-          htmlFor={name}
-          className={`text-xs mb-[3px] ${errors[name] && "text-streamdalRed"}`}
-        >
-          {label}
-        </label>
-      )}
+    <div class={`flex flex-col ${wrapperClass}`}>
       <input
         id={name}
         name={name}
-        class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
-          errors[name] ? "streamdalRed" : "border-twilight"
+        class={`px-2 rounded-sm border border-${
+          errors[name] ? "streamdalRed" : "white"
         } ${inputClass}`}
         value={value}
         onChange={(e) =>

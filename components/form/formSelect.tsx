@@ -1,43 +1,51 @@
-import { ErrorType } from "./validate.ts";
+import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
+import { isNumeric } from "../../lib/utils.ts";
 
 export type FormSelectProps = {
   name: string;
-  value: string;
+  data: any;
+  setData: (data: any) => void;
   placeHolder?: string;
   label?: string;
   errors: ErrorType;
   children: React.ReactNode;
-  onChange: (value: string) => void;
   inputClass?: string;
   wrapperClass?: string;
 };
 
 export const FormSelect = ({
   name,
-  value,
+  data,
+  setData,
   errors,
   label,
-  onChange,
   children,
   placeHolder,
   inputClass,
   wrapperClass,
 }: FormSelectProps) => {
+  const value = resolveValue(data, name);
+
   return (
-    <div class={`flex flex-col ${wrapperClass}`}>
+    <div class={`flex flex-col my-2 ${wrapperClass}`}>
       {label && (
-        <label htmlFor={name} className={"text-xs ml-2"}>
+        <label
+          htmlFor={name}
+          className={`text-xs mb-[3px] ${errors[name] && "text-streamdalRed"}`}
+        >
           {label}
         </label>
       )}
       <select
         id={name}
         name={name}
-        class={`rounded-sm border outline-0 mt-2 px-2 pe-6 h-[47px] border-${
+        class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
           errors[name] ? "streamdalRed" : "twilight"
         } ${inputClass}`}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) =>
+          updateData(data, setData, parsePath(name), e.target.value)}
         placeholder={placeHolder}
       >
         {children}
@@ -49,3 +57,18 @@ export const FormSelect = ({
     </div>
   );
 };
+
+export const optionsFromEnum = (optionsEnum: any) =>
+  Object.entries(optionsEnum).filter((
+    [k, _],
+  ) => isNumeric(k))
+    .map(([
+      k,
+      v,
+    ], i) => (
+      <option
+        key={`option-type-key-${i}-${k}`}
+        value={k}
+        label={v}
+      />
+    ));
