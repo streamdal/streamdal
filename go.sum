@@ -701,6 +701,8 @@ github.com/streamdal/natty v0.0.36 h1:rj8UvnOk3o8ZJnF8nUHVOOcjOAMnu0iEJY+lJesk6L
 github.com/streamdal/natty v0.0.36/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
 github.com/streamdal/natty v0.0.37 h1:yXTLLwZlBrWQBI6RFqil/Ju+eATxaOhjiC+1TQOGHJg=
 github.com/streamdal/natty v0.0.37/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
+github.com/streamdal/natty v0.0.38 h1:kD14anjlqvl1I3dv5nCl33M07Dj6DRNn2UryJgRakcs=
+github.com/streamdal/natty v0.0.38/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
 github.com/streamdal/snitch-protos v0.0.30 h1:EBJCkqaBPQ8tiLR6NEnTaw4BxSWf6Iohu5Yp8baADpM=
 github.com/streamdal/snitch-protos v0.0.30/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/streamdal/snitch-protos v0.0.38 h1:Uxo0HQYnh5tlAi3rsLMZcduuJh1Tl1sUJrOTVvp0E/I=

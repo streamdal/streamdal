@@ -95,6 +95,9 @@ type INatty interface {
 	// WatchBucket returns an instance of nats.KeyWatcher for the given bucket
 	WatchBucket(ctx context.Context, bucket string) (nats.KeyWatcher, error)
 
+	// WatchKey returns an instance of nats.KeyWatcher for the given bucket and key
+	WatchKey(ctx context.Context, bucket, key string) (nats.KeyWatcher, error)
+
 	// Keys will return all of the keys in a bucket (empty slice if none found)
 	Keys(ctx context.Context, bucket string) ([]string, error)
 

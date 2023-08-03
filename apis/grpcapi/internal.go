@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -26,6 +28,72 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 	}
 }
 
+func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessionId string, noHeartbeatCh chan struct{}) error {
+	// Validate inputs
+	if serverCtx == nil {
+		return errors.New("server context cannot be nil")
+	}
+
+	if sessionId == "" {
+		return errors.New("session id cannot be empty")
+	}
+
+	if noHeartbeatCh == nil {
+		return errors.New("heartbeatCh cannot be nil")
+	}
+
+	llog := s.log.WithFields(logrus.Fields{
+		"method":     "startHeartbeatWatcher",
+		"session_id": sessionId,
+	})
+
+	lastHeartbeat := time.Now()
+
+	// Start heartbeat watcher
+	kw, err := s.Deps.NATSBackend.WatchKey(serverCtx, store.NATSLiveBucket, store.NATSRegisterKey(sessionId, s.Deps.Config.NodeName))
+	if err != nil {
+		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
+	}
+
+	go func() {
+	MAIN:
+		for {
+			select {
+			case <-serverCtx.Done():
+				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
+				break MAIN
+			case <-s.Deps.ShutdownContext.Done():
+				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
+				break MAIN
+			case key := <-kw.Updates():
+				// Sometimes we can receive nils - ignore
+				if key == nil {
+					continue
+				}
+
+				switch key.Operation() {
+				case nats.KeyValuePut:
+					llog.Debug("detected heartbeat")
+					lastHeartbeat = time.Now()
+				default:
+					llog.Debug("received non-put operation on key watcher; ignoring")
+				}
+			case <-time.After(time.Second):
+				// Check if heartbeat has been received in the last 5 seconds
+				if time.Now().Sub(lastHeartbeat) > 5*time.Second {
+					llog.Debug("no heartbeat received in the last 5 seconds; sending disconnect cmd and exiting")
+					noHeartbeatCh <- struct{}{}
+					break MAIN
+				}
+			}
+		}
+
+		llog.Debug("heartbeat watcher exiting")
+	}()
+
+	return nil
+}
+
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
 	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
@@ -34,6 +102,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	llog := s.log.WithFields(logrus.Fields{
 		"service_name": request.ServiceName,
+		"session_id":   request.SessionId,
 	})
 
 	// Store registration
@@ -52,29 +121,46 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	llog.Debug("beginning register cmd loop")
 
-	var shutdown bool
+	var (
+		shutdown    bool
+		noHeartbeat bool
+	)
 
+	// Send a keepalive every tick
 	ticker := time.NewTicker(1 * time.Second)
+
+	noHeartbeatCh := make(chan struct{})
+
+	// Launch heartbeat watcher
+	if err := s.startHeartbeatWatcher(server.Context(), request.SessionId, noHeartbeatCh); err != nil {
+		llog.Errorf("unable to start heartbeat watcher: %v", err)
+		return errors.Wrapf(err, "unable to start heartbeat watcher for session id '%s'", request.SessionId)
+	}
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
 		select {
 		case <-server.Context().Done():
-			llog.Debugf("register handler detected client (service: '%v') disconnect", request.ServiceName)
+			llog.Debug("register handler detected client disconnect")
 			break MAIN
 		case <-s.Deps.ShutdownContext.Done():
 			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
+		case <-noHeartbeatCh:
+			noHeartbeat = true
+			llog.Debug("register handler detected no heartbeat; disconnecting client")
+			break MAIN
 		case <-ticker.C:
 			llog.Debug("sending heartbeat")
+
 			if err := server.Send(&protos.Command{
 				Command: &protos.Command_KeepAlive{
 					KeepAlive: &protos.KeepAliveCommand{},
 				},
 			}); err != nil {
-				llog.WithError(err).Error("unable to send heartbeat")
+				llog.WithError(err).Errorf("unable to send heartbeat for session id '%s'", request.SessionId)
 			}
 		case cmd := <-ch:
 			llog.Debug("received cmd on cmd channel")
@@ -98,7 +184,11 @@ MAIN:
 		return GRPCServerShutdownError
 	}
 
-	llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
+	if noHeartbeat {
+		llog.Debugf("client with session id '%s' forcefully disconnected (due to no heartbeat); de-registering", request.SessionId)
+	} else {
+		llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
+	}
 
 	// Remove command channel
 	if ok := s.Deps.CmdService.RemoveChannel(request.SessionId); ok {
