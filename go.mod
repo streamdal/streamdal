@@ -13,7 +13,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/streamdal/natty v0.0.37
-	github.com/streamdal/snitch-protos v0.0.55
+	github.com/streamdal/snitch-protos v0.0.56
 	golang.org/x/crypto v0.11.0
 	google.golang.org/grpc v1.56.2
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
