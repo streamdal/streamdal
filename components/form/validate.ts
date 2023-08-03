@@ -33,7 +33,7 @@ export const updateData = (
   });
 
 export const parsePath = (path: string) =>
-  path.split(/[\.\[\]\'\"]/).filter((p) => p);
+  path.split(/[\.\[\]'\"]/).filter((p) => p);
 
 export const resolveValue = (object: any, path: string) =>
   parsePath(path)
