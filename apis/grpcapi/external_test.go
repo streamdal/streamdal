@@ -400,6 +400,7 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
 				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
 			}
 
 			// Create a pipeline
@@ -438,6 +439,7 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
 				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
 			}
 
 			// Create a pipeline
@@ -494,6 +496,7 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
 				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
 			}
 
 			// Create a pipeline
@@ -534,6 +537,7 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
 				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
 			}
 
 			// Create a pipeline

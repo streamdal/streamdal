@@ -120,6 +120,14 @@ func Audience(audience *protos.Audience) error {
 		return ErrUnsetEnum("Audience.OperationType")
 	}
 
+	if audience.OperationName == "" {
+		return ErrEmptyField("Audience.OperationName")
+	}
+
+	if !ValidCharactersRegex.MatchString(audience.OperationName) {
+		return ErrInvalidCharacters("OperationName")
+	}
+
 	return nil
 }
 

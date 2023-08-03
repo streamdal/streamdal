@@ -15,24 +15,26 @@ type AudienceTestCase struct {
 var (
 	testCasesFromStr = []AudienceTestCase{
 		{
-			StrAudience: "service-name/some-component/operation_type_producer",
+			StrAudience: "service-name/operation_type_producer/producer-name/some-component",
 			Audience: &protos.Audience{
 				ServiceName:   "service-name",
 				ComponentName: "some-component",
 				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "producer-name",
 			},
 		},
 		{
-			StrAudience: "sErvIcE-NamE/SomE-CoMPonEnt/oPerAtIon_tYpe_proDucer",
+			StrAudience: "sErvIcE-NamE/oPerAtIon_tYpe_proDucer/ProDuCer-nAme/SomE-CoMPonEnt",
 			Audience: &protos.Audience{
 				ServiceName:   "service-name",
 				ComponentName: "some-component",
 				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "producer-name",
 			},
 		},
 		{
 			// FromStr should return nil
-			StrAudience: "invalid/number/elements/operation_type_producer",
+			StrAudience: "invalid/number/elements/operation_type_producer/producer-name",
 			Audience:    nil,
 		},
 	}
@@ -40,20 +42,22 @@ var (
 	testCasesToStr = []AudienceTestCase{
 		{
 			// Happy path
-			StrAudience: "service-name/some-component/operation_type_producer",
+			StrAudience: "service-name/operation_type_producer/producer-name/some-component",
 			Audience: &protos.Audience{
 				ServiceName:   "service-name",
 				ComponentName: "some-component",
 				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "producer-name",
 			},
 		},
 		{
 			// ToStr should lowercase the audience
-			StrAudience: "service-name/some-component/operation_type_producer",
+			StrAudience: "service-name/operation_type_producer/producer-name/some-component",
 			Audience: &protos.Audience{
 				ServiceName:   "sErViCe-nAmE",
 				ComponentName: "sOMe-componeNt",
 				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "pRoDucEr-naMe",
 			},
 		},
 		{

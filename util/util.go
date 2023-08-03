@@ -66,7 +66,7 @@ func AudienceToStr(audience *protos.Audience) string {
 		return ""
 	}
 
-	return strings.ToLower(fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.ComponentName, audience.OperationType))
+	return strings.ToLower(fmt.Sprintf("%s/%s/%s/%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
 }
 
 func AudienceFromStr(s string) *protos.Audience {
@@ -75,13 +75,13 @@ func AudienceFromStr(s string) *protos.Audience {
 	}
 
 	parts := strings.Split(s, "/")
-	if len(parts) != 3 {
+	if len(parts) != 4 {
 		return nil
 	}
 
 	opType := protos.OperationType_OPERATION_TYPE_UNSET
 
-	if parts[2] == strings.ToLower(protos.OperationType_OPERATION_TYPE_CONSUMER.String()) {
+	if parts[1] == strings.ToLower(protos.OperationType_OPERATION_TYPE_CONSUMER.String()) {
 		opType = protos.OperationType_OPERATION_TYPE_CONSUMER
 	} else {
 		opType = protos.OperationType_OPERATION_TYPE_PRODUCER
@@ -89,8 +89,9 @@ func AudienceFromStr(s string) *protos.Audience {
 
 	return &protos.Audience{
 		ServiceName:   strings.ToLower(parts[0]),
-		ComponentName: strings.ToLower(parts[1]),
 		OperationType: opType,
+		OperationName: strings.ToLower(parts[2]),
+		ComponentName: strings.ToLower(parts[3]),
 	}
 }
 
