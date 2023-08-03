@@ -6,6 +6,6 @@ services:
     container_name: snitch-console-container
     image: snitch-console-image
     environment:
-      - SNITCH_GRPC_WEB_URL
+      - SNITCH_GRPC_WEB_URL="http://localhost:9091"
     ports:
       - "3000:3000"

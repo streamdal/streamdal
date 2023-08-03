@@ -4,7 +4,7 @@ import { getEnv } from "../lib/utils.ts";
 
 const transport = new GrpcWebFetchTransport({
   baseUrl: `${
-    (await getEnv("SNITCH_GRPC_WEB_URL")) || "http://localhost:9091"
+    (await Deno.env.get("SNITCH_GRPC_WEB_URL")) || "http://localhost:9091"
   }`,
   format: "binary",
 });
