@@ -74,14 +74,19 @@ class SnitchClient:
     session_id: str
     grpc_timeout: int
     auth_token: str
+    workers: list
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
         self.cfg = cfg
 
+        log = logging.getLogger("snitch-client")
+        log.setLevel(logging.DEBUG)
+
         register_loop = asyncio.new_event_loop()
         self.register_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=register_loop)
         self.register_stub = protos.InternalStub(channel=self.register_channel)
+        self.register_loop = register_loop
 
         grpc_loop = asyncio.new_event_loop()
         self.grpc_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=grpc_loop)
@@ -92,27 +97,27 @@ class SnitchClient:
         self.grpc_timeout = 5
         self.pipelines = {}
         self.paused_pipelines = {}
-        self.log = logging.getLogger("snitch-client")
-        #self.metrics = Metrics(stub=self.grpc_stub, log=self.log, event=self.cfg.exit)
+        self.log = log
+        self.metrics = Metrics(stub=self.grpc_stub, log=self.log, event=self.cfg.exit)
         self.functions = {}
         self.session_id = uuid.uuid4().__str__()
-        self.threads = []
+        self.workers = []
 
         events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
         for e in events:
             signal.signal(e, self.shutdown)
 
-        # # Run register
-        register = Thread(target=self._register, args=(register_loop,), daemon=False)
-        register.start()
-        self.threads.append(register)
-
         # Start heartbeat
         heartbeat = Thread(target=self._heartbeat, daemon=False)
         heartbeat.start()
-        self.threads.append(heartbeat)
+        self.workers.append(heartbeat)
 
-        print("SnitchClient initialized")
+        # Run register
+        register = Thread(target=self._register, daemon=False)
+        register.start()
+        self.workers.append(register)
+
+        self.log.debug("Client started")
 
     @staticmethod
     def _validate_config(cfg: SnitchConfig) -> None:
@@ -277,34 +282,45 @@ class SnitchClient:
 
     def shutdown(self, *args):
         """Shutdown the service"""
-        self.log.debug("Shutdown signal received")
+        self.log.debug("called shutdown()")
         self.cfg.exit.set()
-
-        for thread in self.threads:
-            thread.join()
-
         self.metrics.shutdown(args)
 
-        self.log.debug("Closing gRPC connection")
+        for worker in self.workers:
+            self.log.debug("Waiting for worker {} to exit".format(worker.name))
+            try:
+                if worker.is_alive():
+                    worker.join()
+            except RuntimeError as e:
+                self.log.error("Could not exit worker {}".format(worker.name))
+                continue
+
         self.grpc_channel.close()
         self.register_channel.close()
+        self.log.debug("exited shutdown()")
 
     def _heartbeat(self):
         async def call():
-            self.log.debug("Sending heartbeat")
-
             req = protos.HeartbeatRequest(
                 session_id=self.session_id,
             )
 
-            await self.grpc_stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
+            return await self.grpc_stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         # Send at least once
+        # try:
+        asyncio.set_event_loop(self.grpc_loop)
         while not self.cfg.exit.is_set():
             self.grpc_loop.run_until_complete(call())
             self.cfg.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
 
-    def _register(self, loop) -> None:
+        # Wait for all pending tasks to complete before exiting thread, to avoid exception
+        self.grpc_loop.run_until_complete(asyncio.gather(*asyncio.all_tasks(self.grpc_loop)))
+
+        self.grpc_channel.close()
+        self.log.debug("Heartbeat thread exiting")
+
+    def _register(self) -> None:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
@@ -323,36 +339,40 @@ class SnitchClient:
         async def call():
             self.log.debug("Registering with snitch server")
 
-            try:
-                print("registering")
-                async for cmd in self.register_stub.register(req, timeout=None, metadata=self._get_metadata()):
-                    print("received command: {}".format(cmd))
+            async for cmd in self.register_stub.register(req, timeout=None, metadata=self._get_metadata()):
+                if self.cfg.exit.is_set():
+                    return
 
-                    if cmd.keep_alive is not None:
-                        self.log.debug("Received keep alive")  # TODO: remove logging after testing
-                    elif cmd.attach_pipeline is not None:
-                        self._attach_pipeline(cmd)
-                    elif cmd.detach_pipeline is not None:
-                        self._detach_pipeline(cmd)
-                    elif cmd.pause_pipeline is not None:
-                        self._pause_pipeline(cmd)
-                    elif cmd.resume_pipeline is not None:
-                        self._resume_pipeline(cmd)
-                    else:
-                        self.log.error("Unknown response type: {}".format(cmd))
-            except TimeoutError:
-                self.log.debug("timed out")
+                # Log except for keep-alives
+                if cmd.keep_alive is None:
+                    self.log.debug("received command: {}".format(cmd))
+                else:
+                    continue
+
+                if cmd.attach_pipeline is not None:
+                    self._attach_pipeline(cmd)
+                elif cmd.detach_pipeline is not None:
+                    self._detach_pipeline(cmd)
+                elif cmd.pause_pipeline is not None:
+                    self._pause_pipeline(cmd)
+                elif cmd.resume_pipeline is not None:
+                    self._resume_pipeline(cmd)
+                else:
+                    self.log.error("Unknown response type: {}".format(cmd))
 
         self.log.debug("Starting register looper")
+        asyncio.set_event_loop(self.register_loop)
+        self.cancel_task = self.register_loop.create_task(call())
+        self.register_loop.run_until_complete(self.cancel_task)
 
-        try:
-            loop.run_until_complete(call())
-            # while not self.cfg.exit.is_set():
-            #
-            self.log.debug("Register looper completed, closing connection")
-        except Exception as e:
-            self.channel.close()
-            raise SnitchRegisterException("Failed to register: {}".format(e))
+        # Wait for all pending tasks to complete before exiting thread, to avoid exception
+        self.register_loop.run_until_complete(asyncio.gather(*asyncio.all_tasks(self.register_loop)))
+
+        # Cleanup gRPC connections
+        self.register_channel.close()
+        self.register_loop.stop()
+
+        self.log.debug("Exited register looper")
 
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:

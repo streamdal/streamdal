@@ -163,8 +163,13 @@ class Metrics:
         self.exit.set()
 
         for worker in self.workers:
-            print("shutting down metrics worker")
-            worker.join()
+            self.log.debug("Waiting for worker {} to exit".format(worker.name))
+            try:
+                if worker.is_alive():
+                    worker.join()
+            except RuntimeError as e:
+                self.log.error("Could not exit worker {}".format(worker.name))
+                continue
 
     def publish_metrics(self, entry: CounterEntry) -> None:
         async def call(request: protos.MetricsRequest):
