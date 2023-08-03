@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -63,6 +64,7 @@ type Options struct {
 	NATSBackend natty.INatty
 	ShutdownCtx context.Context
 	NodeName    string
+	SessionTTL  time.Duration
 }
 
 type Store struct {
@@ -95,7 +97,7 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 		NATSLiveBucket,
 		registrationKey,
 		nil,
-		NATSLiveTTL,
+		s.options.SessionTTL,
 	); err != nil {
 		return errors.Wrap(err, "error adding registration to K/V")
 	}
@@ -400,7 +402,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		NATSLiveBucket,
 		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
 		nil,
-		NATSLiveTTL,
+		s.options.SessionTTL,
 	); err != nil {
 		return errors.Wrap(err, "error saving audience to NATS")
 	}
@@ -513,6 +515,10 @@ func (o *Options) validate() error {
 
 	if o.ShutdownCtx == nil {
 		return errors.New("shutdown context cannot be nil")
+	}
+
+	if o.SessionTTL < time.Second || o.SessionTTL > time.Minute {
+		return errors.New("session TTL must be between 1 second and 1 minute")
 	}
 
 	return nil

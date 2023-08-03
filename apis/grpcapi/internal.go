@@ -79,9 +79,9 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 					llog.Debug("received non-put operation on key watcher; ignoring")
 				}
 			case <-time.After(time.Second):
-				// Check if heartbeat has been received in the last 5 seconds
-				if time.Now().Sub(lastHeartbeat) > 5*time.Second {
-					llog.Debug("no heartbeat received in the last 5 seconds; sending disconnect cmd and exiting")
+				// Check if heartbeat is older than session TTL
+				if time.Now().Sub(lastHeartbeat) > s.Deps.Config.SessionTTL {
+					llog.Debugf("no heartbeat received during the last '%v'; sending disconnect cmd and exiting", s.Deps.Config.SessionTTL)
 					noHeartbeatCh <- struct{}{}
 					break MAIN
 				}

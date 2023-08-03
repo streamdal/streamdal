@@ -1,9 +1,18 @@
 package grpcapi
 
 import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/nats-io/nats.go"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/util"
 )
 
 var _ = Describe("Internal gRPC API", func() {
@@ -104,19 +113,119 @@ var _ = Describe("Internal gRPC API", func() {
 	})
 
 	Describe("Register", func() {
+		// Testing a streaming RPC is not great - the test is flakey because of
+		// the sleeps but should get the job done for now. ~DS 08/2023
 		It("should register a new externalClient", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			heartbeatCtx, heartbeatCancel := context.WithCancel(context.Background())
+			defer heartbeatCancel()
+			defer cancel()
+
+			registerRequest := newRegisterRequest()
+
+			go func() {
+				resp, err := internalClient.Register(ctxWithGoodAuth, registerRequest)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resp).ToNot(BeNil())
+
+				// Launch a heartbeat goroutine
+				go func() {
+					for {
+						select {
+						case <-heartbeatCtx.Done():
+							break
+						default:
+							resp, err := internalClient.Heartbeat(ctxWithGoodAuth, &protos.HeartbeatRequest{SessionId: registerRequest.SessionId})
+							Expect(err).ToNot(HaveOccurred())
+							Expect(resp).ToNot(BeNil())
+
+							time.Sleep(200 * time.Millisecond)
+						}
+					}
+				}()
+
+				// Run until context is cancelled
+				<-ctx.Done()
+
+				// Close the stream
+				Expect(resp.CloseSend()).ToNot(HaveOccurred())
+			}()
+
+			// Wait a little bit for register to go through
+			time.Sleep(time.Second)
+
+			// Verify that K/V is created
+			data, err := natsClient.Get(ctx, store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
+
+			cancel()
+
+			time.Sleep(2 * time.Second)
+
+			// Registration should still exist (because of heartbeat)
+			data, err = natsClient.Get(ctx, store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
+
+			// Stop the heartbeat; registration should be removed
+			heartbeatCancel()
+
+			time.Sleep(time.Second)
+
+			data, err = natsClient.Get(ctx, store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(data).To(BeNil())
 		})
 
 		It("should error with no session ID", func() {
+			registerRequest := newRegisterRequest()
+			registerRequest.SessionId = ""
 
+			// Since Register() is a streaming method, it won't error until we try to recv
+			resp, err := internalClient.Register(ctxWithGoodAuth, registerRequest)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+
+			cmd, err := resp.Recv()
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("field 'SessionId' cannot be empty"))
+			Expect(cmd).To(BeNil())
 		})
 
-		It("should remove session keys from K/V on deregister", func() {
+		It("should disconnect client without heartbeat", func() {
+			registerCtx, registerCancel := context.WithCancel(ctxWithGoodAuth)
+			heartbeatCtx, heartbeatCancel := context.WithCancel(ctxWithGoodAuth)
+			registerExitCh := make(chan struct{}, 1)
+			registerRequest := newRegisterRequest()
 
-		})
+			defer registerCancel() // JIC
 
-		It("keys should disappear without heartbeat", func() {
+			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
+			startHeartbeat(heartbeatCtx, internalClient, registerRequest)
 
+			// Wait for everything to startup
+			time.Sleep(time.Second)
+
+			// Verify that K/V is created
+			data, err := natsClient.Get(context.Background(), store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
+
+			// Stop heartbeat
+			heartbeatCancel()
+
+			// Wait for NATS to TTL the key
+			time.Sleep(2 * time.Second)
+
+			// K/V should be gone
+			data, err = natsClient.Get(context.Background(), store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).To(HaveOccurred())
+			Expect(data).To(BeNil())
+
+			// Register goroutine should've exited as well
+			Eventually(registerExitCh).Should(Receive())
 		})
 	})
 
@@ -150,3 +259,83 @@ var _ = Describe("Internal gRPC API", func() {
 	Describe("Notify", func() {
 	})
 })
+
+func newRegisterRequest() *protos.RegisterRequest {
+	return &protos.RegisterRequest{
+		ServiceName: "service-" + util.GenerateUUID(),
+		SessionId:   "session-" + util.GenerateUUID(),
+		ClientInfo: &protos.ClientInfo{
+			ClientType:     protos.ClientType_CLIENT_TYPE_SDK,
+			LibraryName:    "foo-lib",
+			LibraryVersion: "1.2.3",
+			Language:       "php",
+			Arch:           "i386",
+			Os:             "knoppix",
+		},
+		Audiences: nil,
+		DryRun:    false,
+	}
+}
+
+func startRegister(ctx context.Context, client protos.InternalClient, req *protos.RegisterRequest, registerExit chan struct{}) {
+	go func() {
+		defer GinkgoRecover()
+
+		resp, err := client.Register(ctx, req)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resp).ToNot(BeNil())
+
+	MAIN:
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("startRegister: context done")
+				break MAIN
+			default:
+				// Continue
+			}
+
+			// Do nothing, stay connected
+			_, recvErr := resp.Recv()
+			if recvErr != nil {
+				if strings.Contains(recvErr.Error(), "EOF") {
+					fmt.Println("startRegister: EOF")
+					break MAIN
+				} else {
+					fmt.Println("startRegister: recv error: ", recvErr)
+					Expect(recvErr).ToNot(HaveOccurred())
+				}
+			}
+		}
+
+		fmt.Println("startRegister: exiting")
+		registerExit <- struct{}{}
+	}()
+}
+
+// Send heartbeat every 200ms
+func startHeartbeat(ctx context.Context, client protos.InternalClient, req *protos.RegisterRequest) {
+	go func() {
+		defer GinkgoRecover()
+
+	MAIN:
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("startHeartbeat: context done")
+				break MAIN
+			default:
+				// Continue
+			}
+
+			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: req.SessionId})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+
+			time.Sleep(200 * time.Millisecond)
+		}
+
+		fmt.Println("startHeartbeat: exiting")
+	}()
+}

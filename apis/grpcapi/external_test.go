@@ -24,6 +24,7 @@ import (
 )
 
 const (
+	TestNodeName   = "test-node"
 	GRPCAPIAddress = ":19090"
 	HTTPAPIAddress = ":19091"
 	AuthToken      = "1234"
@@ -591,12 +592,13 @@ var _ = Describe("External gRPC API", func() {
 func runServer() {
 	d, err := deps.New("", &config.Config{
 		Debug:                true,
-		NodeName:             "test",
+		NodeName:             TestNodeName,
 		AuthToken:            AuthToken,
 		HTTPAPIListenAddress: HTTPAPIAddress,
 		GRPCAPIListenAddress: GRPCAPIAddress,
 		NATSURL:              []string{"localhost:4222"},
 		NATSTLSSkipVerify:    true,
+		SessionTTL:           time.Second, // Override TTL to improve test speed
 	})
 
 	if err != nil {

@@ -80,10 +80,10 @@ clean:
 ### Test
 
 .PHONY: test
-test: description = Run Go unit tests
+test: description = Run Go tests (make sure to bring up deps first)
 test: GOFLAGS=
 test:
-	$(GO) test ./...
+	$(GO) test ./... -v -count=1
 
 ### Docker
 
