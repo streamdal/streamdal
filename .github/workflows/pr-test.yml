@@ -17,4 +17,4 @@ jobs:
       with:
         time: '30s'
     - name: Test
-      run: sudo go test ./... -v
+      run: make test
