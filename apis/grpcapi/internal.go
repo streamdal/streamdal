@@ -133,7 +133,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	// Launch heartbeat watcher
 	if err := s.startHeartbeatWatcher(server.Context(), request.SessionId, noHeartbeatCh); err != nil {
-		s.log.Errorf("unable to start heartbeat watcher for session id '%s': %v", request.SessionId, err)
+		llog.Errorf("unable to start heartbeat watcher: %v", err)
 		return errors.Wrapf(err, "unable to start heartbeat watcher for session id '%s'", request.SessionId)
 	}
 
