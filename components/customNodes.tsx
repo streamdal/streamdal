@@ -1,6 +1,6 @@
 import { Handle, Position } from "reactflow";
 import { ParticipantsMenu } from "./rules/participantsMenu.tsx";
-import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
+import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import "flowbite";
 import "twind";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";

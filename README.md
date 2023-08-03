@@ -8,8 +8,8 @@ https://fresh.deno.dev/docs/getting-started
 Make sure to install Deno: https://deno.land/manual/getting_started/installation
 
 Optionally, copy `example.env` -> `.env` and set environment variables as
-needed. By default the console will access the API runningn on
-`http://localhost:9191`
+needed. By default the console will access the GRPC WEB API running on
+`http://localhost:9091`
 
 Then start the project:
 
@@ -23,8 +23,8 @@ If you make any significant Deno lib and/or configuration changes and your IDE
 gets confused, you can force update the Deno lib cache with
 `deno cache --reload main.ts`
 
-#### Temporary Notes
+### Server
 
-Currently, the console only runs against Plumber branch `blinktag/wasm`
-(https://github.com/streamdal/plumber/tree/blinktag/wasm). To populate that with
-test data, fetch: http://localhost:9191/v1/temp-populate
+This console needs a snitch-server to run against. See
+[snitch-server](https://github.com/streamdal/snitch-server) for instructions on
+running it locally.

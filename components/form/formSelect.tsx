@@ -1,38 +1,50 @@
-export type FormInputProps = {
+import { ErrorType } from "./validate.ts";
+
+export type FormSelectProps = {
   name: string;
-  label: string;
-  register: any;
-  error: any;
-  children: any;
+  value: string;
+  placeHolder?: string;
+  label?: string;
+  errors: ErrorType;
+  children: React.ReactNode;
+  onChange: (value: string) => void;
+  inputClass?: string;
+  wrapperClass?: string;
 };
 
 export const FormSelect = ({
   name,
+  value,
+  errors,
   label,
-  register,
-  error,
-  ...props
-}: FormInputProps) => {
+  onChange,
+  children,
+  placeHolder,
+  inputClass,
+  wrapperClass,
+}: FormSelectProps) => {
   return (
-    <div className="flex flex-col mb-4">
-      <label
-        className="text-stormCloud font-medium text-[14px] leading-[18px]"
-        htmlFor={name}
-      >
-        {label}
-      </label>
+    <div class={`flex flex-col ${wrapperClass}`}>
+      {label && (
+        <label htmlFor={name} className={"text-xs ml-2"}>
+          {label}
+        </label>
+      )}
       <select
-        className={`rounded-sm border outline-0 mt-2 px-2 pe-6 h-[47px] text-[14px] border-${
-          error ? "streamdalRed" : ""
-        }`}
-        {...register(name)}
-        {...props}
+        id={name}
+        name={name}
+        class={`rounded-sm border outline-0 mt-2 px-2 pe-6 h-[47px] border-${
+          errors[name] ? "streamdalRed" : "twilight"
+        } ${inputClass}`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeHolder}
       >
-        {props.children}
+        {children}
       </select>
 
       <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
-        {error}
+        {errors[name]}
       </div>
     </div>
   );

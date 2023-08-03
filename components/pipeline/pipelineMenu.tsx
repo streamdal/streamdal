@@ -1,6 +1,6 @@
-import IconCopy from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/copy.tsx";
-import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
-import IconTrash from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/trash.tsx";
+import IconCopy from "tabler-icons/tsx/copy.tsx";
+import IconDots from "tabler-icons/tsx/dots.tsx";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
 
 export const PipelineMenu = ({ id }: { id?: string }) => (
   <div className="z-40">

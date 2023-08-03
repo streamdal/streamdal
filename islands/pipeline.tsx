@@ -1,8 +1,8 @@
-import IconChevronDown from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/chevron-down.tsx";
-import IconChevronUp from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/chevron-up.tsx";
-import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
-import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
+import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
+import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
+import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
 
 import {
   Pipeline,
@@ -11,108 +11,116 @@ import {
 } from "snitch-protos/protos/pipeline.ts";
 import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
 import { TransformType } from "snitch-protos/protos/steps/transform.ts";
-import * as z from "zod/index.ts";
 import { zfd } from "zod-form-data";
+import * as z from "zod/index.ts";
 
 import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
 import { StepMenu } from "../components/pipeline/stepMenu.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { ZodError, ZodIssue } from "zod/index.ts";
+import { ErrorType, validate } from "../components/form/validate.ts";
+import { FormInput } from "../components/form/formInput.tsx";
+import { FormHidden } from "../components/form/formHidden.tsx";
+import { FormSelect } from "../components/form/formSelect.tsx";
+import { titleCase } from "../lib/utils.ts";
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
 const TransformTypeEnum = z.nativeEnum(TransformType);
 
-const baseStepSchema = z.object({
+const kinds = ["detective", "transform", "encode", "decode"];
+
+const stepKindSchema = z.discriminatedUnion("oneofKind", [
+  z.object({
+    oneofKind: z.literal("detective"),
+    path: z.string().min(1, { message: "Required" }),
+    args: z.string().array().optional(),
+    type: DetectiveTypeEnum,
+    negate: z.boolean(),
+  }),
+  z.object({
+    oneofKind: z.literal("transform"),
+    path: z.string().min(1, { message: "Required" }),
+    value: z.string().min(1, { message: "Required" }),
+    type: TransformTypeEnum,
+  }),
+  z.object({
+    oneofKind: z.literal("encode"),
+    id: z.string().min(1, { message: "Required" }),
+  }),
+  z.object({
+    oneofKind: z.literal("decode"),
+    id: z.string().min(1, { message: "Required" }),
+  }),
+  z.object({
+    oneofKind: z.literal("custom"),
+    id: z.string().min(1, { message: "Required" }),
+  }),
+]);
+
+const stepSchema = z.object({
   id: z.string().optional(),
-  type: z.literal("RULE_TYPE_MATCH"),
   name: z.string().min(1, { message: "Required" }),
   onSuccess: StepConditionEnum.array(),
   onFailure: StepConditionEnum.array(),
+  step: stepKindSchema,
 });
-
-const stepSchema = z
-  .discriminatedUnion("oneofKind", [
-    baseStepSchema.extend({
-      oneofKind: z.literal("detective"),
-      path: z.string().min(1, { message: "Required" }),
-      args: z.string().array().optional(),
-      type: DetectiveTypeEnum,
-      negate: z.boolean(),
-    }),
-    baseStepSchema.extend({
-      oneofKind: z.literal("transform"),
-      path: z.string().min(1, { message: "Required" }),
-      value: z.string().min(1, { message: "Required" }),
-      type: TransformTypeEnum,
-    }),
-    baseStepSchema.extend({
-      oneofKind: z.literal("encode"),
-      id: z.string().min(1, { message: "Required" }),
-    }),
-    baseStepSchema.extend({
-      oneofKind: z.literal("decode"),
-      id: z.string().min(1, { message: "Required" }),
-    }),
-    baseStepSchema.extend({
-      oneofKind: z.literal("custom"),
-      id: z.string().min(1, { message: "Required" }),
-    }),
-  ]);
 
 export type StepType = z.infer<typeof stepSchema>;
 
 const pipelineSchema = zfd.formData({
-  pipeline: z.object({
-    id: z.string().optional(),
-    name: z.string().min(1, { message: "Required" }),
-    steps: stepSchema
-      .array()
-      .min(1, { message: "At least one pipeline step is required" }),
-  }),
+  id: z.string().optional(),
+  name: z.string().min(1, { message: "Required" }),
+  steps: zfd.repeatable(
+    z
+      .array(stepSchema)
+      .min(1, { message: "At least one step  is required" }),
+  ),
 });
 
 export type PipelineType = z.infer<typeof pipelineSchema>;
 
 const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
   const [open, setOpen] = useState(new Array(0));
-  const [errors, setErrors] = useState({});
+
+  //
+  // typing the initializer to force preact useState hooks to
+  // properly type this since it doesn't support useState<type>
+  const e: ErrorType = {};
+  const [errors, setErrors] = useState(e);
+  const [data, setData] = useState(pipeline);
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
 
-    try {
-      pipelineSchema.parse(new FormData(e.target));
-      setErrors({});
-    } catch (error: ZodError) {
-      const errors = error.issues.reduce(
-        (o, e: ZodIssue) => ({ ...o, [e.path.join(".")]: e.message }),
-        {},
-      );
-      setErrors(errors);
-    }
+    const { data, errors } = validate(pipelineSchema, new FormData(e.target));
+    setErrors(errors);
   };
+
+  const updateStep = (index: number, key: string, value: string) =>
+    setData({
+      ...data,
+      steps: data.steps.map((
+        s: PipelineStep,
+        i: number,
+      ) => ({
+        ...s,
+        ...i === index && { [`${key}`]: value },
+      })),
+    });
 
   return (
     <form onSubmit={onSubmit}>
       <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
         <div class="flex flex-row items-center">
           <div class="text-[30px] font-medium mr-2 h-[54px]">
-            <div class="flex flex-col">
-              <input
-                id="pipeline.name"
-                name="pipeline.name"
-                class={`rounded-sm border border-${
-                  errors["pipeline.name"] ? "streamdalRed" : "white"
-                }`}
-                value={pipeline?.name}
-                placeholder="Name your pipeline"
-              />
-
-              <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
-                {errors["pipeline.name"]}
-              </div>
-            </div>
+            <FormHidden name="id" value={data?.id} />
+            <FormInput
+              placeHolder="Name your pipeline"
+              name={"name"}
+              value={data?.name}
+              errors={errors}
+              onChange={(value) => setData({ ...data, name: value })}
+            />
           </div>
           {<PipelineMenu id={pipeline.id} />}
         </div>
@@ -158,7 +166,7 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
           />
           <Tooltip targetId="step-add" message="Add a step" />
         </div>
-        {pipeline?.steps?.map((
+        {data?.steps?.map((
           step: PipelineStep,
           i: number,
         ) => (
@@ -173,7 +181,12 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
                     <IconGripVertical class="w-6 h-6 text-twilight cursor-pointer" />
                   </div>
                   <div class="text-[16px] font-medium mr-2">
-                    {step.name}
+                    <FormInput
+                      name={`steps[${i}].name`}
+                      value={data?.steps[i]?.name}
+                      errors={errors}
+                      onChange={(value) => updateStep(i, "name", value)}
+                    />
                   </div>
                   <StepMenu
                     onDelete={() => console.log("delete coming soon...")}
@@ -197,7 +210,23 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
               {open.includes(i)
                 ? (
                   <div class="border-t p-[13px]">
-                    ...step details coming soon...
+                    <div class="text-[16px] font-medium mr-2">
+                      <FormSelect
+                        name={`steps[${i}].step.oneofKind`}
+                        label="Type"
+                        value={data?.steps[i]?.step?.oneofKind}
+                        errors={errors}
+                        onChange={(value) => setData({ ...data, name: value })}
+                        inputClass="w-36"
+                        children={kinds.map((k, i) => (
+                          <option
+                            key={`step-kind-key-${i}`}
+                            value={k}
+                            label={titleCase(k)}
+                          />
+                        ))}
+                      />
+                    </div>
                   </div>
                 )
                 : null}

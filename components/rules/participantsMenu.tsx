@@ -1,5 +1,5 @@
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
-import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
+import IconDots from "tabler-icons/tsx/dots.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
 export const ParticipantsMenu = ({ id }: { id: string }) => {
