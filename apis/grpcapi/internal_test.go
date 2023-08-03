@@ -115,7 +115,7 @@ var _ = Describe("Internal gRPC API", func() {
 	Describe("Register", func() {
 		// Testing a streaming RPC is not great - the test is flakey because of
 		// the sleeps but should get the job done for now. ~DS 08/2023
-		It("should register a new externalClient", func() {
+		FIt("should register a new externalClient", func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			heartbeatCtx, heartbeatCancel := context.WithCancel(context.Background())
 			defer heartbeatCancel()
@@ -154,10 +154,22 @@ var _ = Describe("Internal gRPC API", func() {
 			// Wait a little bit for register to go through
 			time.Sleep(time.Second)
 
-			// Verify that K/V is created
+			// Verify that register K/V is created
 			data, err := natsClient.Get(ctx, store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeNil())
+
+			// Verify that audience K/V's are created
+			for _, aud := range registerRequest.Audiences {
+				data, err := natsClient.Get(ctx, store.NATSLiveBucket, store.NATSLiveKey(
+					registerRequest.SessionId,
+					TestNodeName,
+					util.AudienceToStr(aud),
+				))
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(data).ToNot(BeNil())
+			}
 
 			cancel()
 
@@ -177,6 +189,19 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(nats.ErrKeyNotFound))
 			Expect(data).To(BeNil())
+
+			// Audience keys should disappear as well
+			for _, aud := range registerRequest.Audiences {
+				data, err := natsClient.Get(ctx, store.NATSLiveBucket, store.NATSLiveKey(
+					registerRequest.SessionId,
+					TestNodeName,
+					util.AudienceToStr(aud),
+				))
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(nats.ErrKeyNotFound))
+				Expect(data).To(BeNil())
+			}
 		})
 
 		It("should error with no session ID", func() {
@@ -231,11 +256,35 @@ var _ = Describe("Internal gRPC API", func() {
 
 	Describe("Heartbeat", func() {
 		It("heartbeat should update all session keys in live bucket", func() {
+			registerCtx, registerCancel := context.WithCancel(ctxWithGoodAuth)
+			heartbeatCtx, heartbeatCancel := context.WithCancel(ctxWithGoodAuth)
+			registerExitCh := make(chan struct{}, 1)
+			registerRequest := newRegisterRequest()
 
+			defer registerCancel()
+			defer heartbeatCancel()
+
+			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
+			startHeartbeat(heartbeatCtx, internalClient, registerRequest)
+
+			// Wait for everything to startup
+			time.Sleep(time.Second)
+
+			// Verify that K/V is created
+			data, err := natsClient.Get(context.Background(), store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
+
+			// Wait another TTL cycle - heartbeat should've kept key alive
+			time.Sleep(time.Second)
+
+			data, err = natsClient.Get(context.Background(), store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(data).ToNot(BeNil())
 		})
 
 		It("keys should disappear without heartbeat", func() {
-
+			// Tested in Register()
 		})
 	})
 
@@ -261,9 +310,11 @@ var _ = Describe("Internal gRPC API", func() {
 })
 
 func newRegisterRequest() *protos.RegisterRequest {
+	serviceName := "test-service-" + util.GenerateUUID()
+
 	return &protos.RegisterRequest{
-		ServiceName: "service-" + util.GenerateUUID(),
-		SessionId:   "session-" + util.GenerateUUID(),
+		ServiceName: serviceName,
+		SessionId:   "test-session-" + util.GenerateUUID(),
 		ClientInfo: &protos.ClientInfo{
 			ClientType:     protos.ClientType_CLIENT_TYPE_SDK,
 			LibraryName:    "foo-lib",
@@ -272,8 +323,21 @@ func newRegisterRequest() *protos.RegisterRequest {
 			Arch:           "i386",
 			Os:             "knoppix",
 		},
-		Audiences: nil,
-		DryRun:    false,
+		Audiences: []*protos.Audience{
+			{
+				ServiceName:   serviceName,
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "main",
+			},
+			{
+				ServiceName:   serviceName,
+				ComponentName: "rabbitmq",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "main",
+			},
+		},
+		DryRun: false,
 	}
 }
 
