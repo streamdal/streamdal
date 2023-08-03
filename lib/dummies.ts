@@ -89,6 +89,7 @@ export const dummyServiceMap = {
             serviceName: "Test Service Name",
             componentName: "kafka",
             operationType: 1,
+            operationName: "consumer-name",
           },
           pipeline: {
             id: "1234-1234-123456",

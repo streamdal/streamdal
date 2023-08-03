@@ -203,7 +203,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
             source: "bottom",
             target: "top",
             instances: i === 0 && consumers.length,
-            pipeline: component.pipeline
+            pipeline: component,
           },
         };
       },
@@ -229,7 +229,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
             source: "bottom",
             target: "top",
             instances: i === 0 && producers.length,
-            pipeline: component.pipeline
+            pipeline: component,
           },
         };
       },

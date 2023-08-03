@@ -1,13 +1,16 @@
-import { Consumer } from "../icons/consumer.tsx";
-import { Producer } from "../icons/producer.tsx";
+import { pipeline } from "https://deno.land/x/zod@v3.21.4/types.ts";
+import { Consumer } from "../components/icons/consumer.tsx";
+import { Producer } from "../components/icons/producer.tsx";
 
-export const InfoModal = (props: any) => {
-  const item = props.name.params.info;
+export default function InfoModal(props: any) {
+  const params = props.name.params;
+  console.log(params);
   console.log(
     "where are you:",
-    props.name.data.serviceMap["Test Service Name"].pipelines,
+    props.name.data.serviceMap["Test Service Name"],
   );
-  const pipelines = props.name.data.serviceMap["Test Service Name"].pipelines;
+  const pipelines = props.name.data.serviceMap[params.service].pipelines;
+  console.log("the pipelines", pipelines[0].audience);
   return (
     <div>
       <div
@@ -23,11 +26,13 @@ export const InfoModal = (props: any) => {
                   : <Producer className={"mx-2"} />}
                 <div class="flex flex-col">
                   <h3 class="text-lg text-white dark:text-white">
-                    Item-Name
+                    {params.operationName}
                   </h3>
-                  {/* This is a placeholder--won't use this janky chained string iterators on actual modal */}
+                  {/* janky uppercase stuff */}
                   <p class="text-xs text-gray-500">
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                    {`${params.operationType.charAt(0).toUpperCase()}${
+                      params.operationType.slice(1)
+                    }`}
                   </p>
                 </div>
               </div>
@@ -78,7 +83,9 @@ export const InfoModal = (props: any) => {
                 class="text-white font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
                 type="button"
               >
-                {pipelines[0].pipeline.name}
+                {pipelines.find((pipeline) =>
+                  pipeline.audience.operationName === params.operationName
+                ).pipeline.name}
                 <svg
                   class="w-2.5 h-2.5 ml-2.5"
                   aria-hidden="true"
@@ -105,7 +112,9 @@ export const InfoModal = (props: any) => {
                 >
                   {pipelines.map((pipeline: any) => (
                     <li>
-                      <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{pipeline.pipeline.name}</a>
+                      <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                        {pipeline.pipeline.name}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -250,4 +259,4 @@ export const InfoModal = (props: any) => {
       </div>
     </div>
   );
-};
+}

@@ -48,7 +48,6 @@ export const Service = ({ data }: any) => {
 export const Producer = ({ data }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
-
   const handleModalOpen = () => {
     setIsOpen(true);
   };
@@ -93,9 +92,11 @@ export const Producer = ({ data }: any) => {
         </div>
       </div>
       <span class="sr-only">Notifications</span>
-      {data.instances && <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-        {data.instances}
-      </div>}
+      {data.instances && (
+        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
+          {data.instances}
+        </div>
+      )}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -112,6 +113,7 @@ export const Producer = ({ data }: any) => {
 
 export const Consumer = ({ data }: any) => {
   const [isOpen, setIsOpen] = useState(false);
+  console.log("node data", data.pipeline.audience.serviceName);
 
   const handleModalOpen = () => {
     setIsOpen(true);
@@ -131,7 +133,15 @@ export const Consumer = ({ data }: any) => {
           id="dragHandle"
         />
         <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
-        <a href={`/${data.label.toLowerCase()}`}>
+        <a
+          href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
+            encodeURIComponent(data.pipeline.audience.componentName)
+          }/${data.pipeline.audience.operationType === 1 ?
+            encodeURIComponent("consumer") : encodeURIComponent("producer")
+          }/${
+            encodeURIComponent(data.pipeline.audience.operationName)
+          }`}
+        >
           <div className={"flex flex-col"}>
             <h2 className={"text-[16px]"}>
               Item Name
@@ -157,9 +167,11 @@ export const Consumer = ({ data }: any) => {
         </div>
       </div>
       <span class="sr-only">Notifications</span>
-      {data.instances && <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-        {data.instances}
-      </div>}
+      {data.instances && (
+        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
+          {data.instances}
+        </div>
+      )}
       <Handle
         type="source"
         position={Position.Top}
