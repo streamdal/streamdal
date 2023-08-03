@@ -2,7 +2,7 @@ import {Edit, Info, Pause, Silence} from "../icons/crud.tsx";
 import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
 import {useState} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
-export const ParticipantsMenu = ({id}: { id: string }) => {
+export const NodeMenu = ({id}: { id: string }) => {
     const [isOpen, setIsOpen] = useState();
 
     const handleClick = () => {
@@ -47,12 +47,12 @@ export const ParticipantsMenu = ({id}: { id: string }) => {
                             More Information
                         </li>
                     </a>
-                    <a href="#">
+                    <button class="w-full" >
                         <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
                             <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current"/>
                             Pause
                         </li>
-                    </a>
+                    </button>
                 </ul>
             </div>
         </div>

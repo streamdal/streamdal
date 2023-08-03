@@ -28,3 +28,16 @@ export const getPipelines = async () => {
     return dummyPipelines;
   }
 };
+
+export const pausePipeline = async (pipeline : any) => {
+  try {
+    const { response } = await client.pausePipeline({pipelineId: pipeline}, {
+      meta: {"auth-token": "1234"},
+    })
+    return response
+  } catch (error) {
+    console.log("error pausing pipeline", error);
+    console.log("dummy data??");
+    return dummyPipelines
+  }
+}

@@ -1,5 +1,5 @@
 import { Handle, Position } from "reactflow";
-import { ParticipantsMenu } from "./rules/participantsMenu.tsx";
+import { NodeMenu } from "./rules/participantsMenu.tsx";
 import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
 import "flowbite";
 import "twind";
@@ -23,7 +23,7 @@ export const Service = ({ data }: any) => {
             4 instances
           </p>
         </div>
-        <ParticipantsMenu id={data.label} />
+        <NodeMenu id={data.label} />
       </div>
       <span class="sr-only">Notifications</span>
 
@@ -67,7 +67,7 @@ export const Producer = ({ data }: any) => {
           id="dragHandle"
         />
         <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
-        <a href={`/flow/${data.label.toLowerCase()}`}>
+        <a href={`/${data.label.toLowerCase()}`}>
           <div className={"flex flex-col"}>
             <h2 className={"text-[16px]"}>
               Item Name
@@ -75,7 +75,7 @@ export const Producer = ({ data }: any) => {
             <h3 class="text-xs text-gray-500">{data.label}</h3>
           </div>
         </a>
-        <ParticipantsMenu id={data.label} />
+        <NodeMenu id={data.label} />
       </div>
       <div
         data-popover
@@ -139,7 +139,7 @@ export const Consumer = ({ data }: any) => {
             <h3 class="text-xs text-gray-500">{data.label}</h3>
           </div>
         </a>
-        <ParticipantsMenu id={data.label} />
+        <NodeMenu id={data.label} />
       </div>
       <div
         data-popover
