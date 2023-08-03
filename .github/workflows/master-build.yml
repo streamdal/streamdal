@@ -20,7 +20,7 @@ jobs:
           time: '30s'
       - name: Master buld tests
         run: |
-          make test
+          sudo make test
 
   build:
     needs:

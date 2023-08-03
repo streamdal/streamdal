@@ -17,4 +17,4 @@ jobs:
       with:
         time: '30s'
     - name: Test
-      run: make test
+      run: sudo make test
