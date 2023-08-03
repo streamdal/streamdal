@@ -48,7 +48,6 @@ export const Service = ({ data }: any) => {
 export const Producer = ({ data }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
-
   const handleModalOpen = () => {
     setIsOpen(true);
   };
@@ -93,9 +92,11 @@ export const Producer = ({ data }: any) => {
         </div>
       </div>
       <span class="sr-only">Notifications</span>
-      {data.instances && <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-        {data.instances}
-      </div>}
+      {data.instances && (
+        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
+          {data.instances}
+        </div>
+      )}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -157,9 +158,11 @@ export const Consumer = ({ data }: any) => {
         </div>
       </div>
       <span class="sr-only">Notifications</span>
-      {data.instances && <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-        {data.instances}
-      </div>}
+      {data.instances && (
+        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
+          {data.instances}
+        </div>
+      )}
       <Handle
         type="source"
         position={Position.Top}

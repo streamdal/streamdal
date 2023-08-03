@@ -17,7 +17,7 @@ export const handler: Handlers<ServiceMap> = {
       const { response } = await client.getServiceMap({}, {
         meta: { "auth-token": "1234" },
       });
-      console.dir(response, { depth: 20 });
+
       return ctx.render(response);
     } catch (error) {
       console.log(error);
@@ -27,7 +27,6 @@ export const handler: Handlers<ServiceMap> = {
 };
 
 export default function FlowRoute(props: PageProps) {
-  console.log(props);
   return (
     <Layout>
       <InfoModal name={props} />
