@@ -7,7 +7,7 @@ import asyncio
 import logging
 import signal
 from datetime import datetime
-from copy import deepcopy
+from copy import deepcopy, copy
 
 WORKER_POOL_SIZE = 3
 DEFAULT_COUNTER_REAPER_INTERVAL = 10
@@ -62,10 +62,10 @@ class Counter:
         self.value = 0.0
         self.lock.release()
 
-    def val(self):
+    def val(self) -> float:
         """Return the current value of the counter"""
         self.lock.acquire(blocking=False)
-        value = self.value
+        value = copy(self.value)
         self.lock.release()
         return value
 
@@ -97,6 +97,7 @@ class Metrics:
 
         self.stub = kwargs.get("stub")
         self.log = log
+        self.counters = {}
         self.lock = Lock()
 
         # TODO: remove after testing
@@ -127,17 +128,13 @@ class Metrics:
         # Run counter reaper, this cleans up old empty counters to prevent memory leaks
         reaper = Thread(target=self.run_reaper, daemon=False)
         reaper.start()
+        self.workers.append(reaper)
 
         # Run counter publisher. This reads values from counters,
         # adds them to the publish queue and then resets the counter.
         publisher = Thread(target=self.run_publisher, daemon=False)
         publisher.start()
-
-        for worker in self.workers:
-            worker.join()
-
-        reaper.join()
-        publisher.join()
+        self.workers.append(publisher)
 
     def get_counter(self, entry: CounterEntry) -> Counter:
         id = composite_id(entry)
@@ -164,7 +161,10 @@ class Metrics:
         self.log.debug("Shutting down metrics service")
         # TODO: flush before we exit the metrics service
         self.exit.set()
-        pass
+
+        for worker in self.workers:
+            print("shutting down metrics worker")
+            worker.join()
 
     def publish_metrics(self, entry: CounterEntry) -> None:
         async def call(request: protos.MetricsRequest):
@@ -212,13 +212,16 @@ class Metrics:
         """
         self.log.debug("Starting publisher")
         while not self.exit.is_set():
-            self.exit.wait(1)
 
-            for id, counter in self.counters:
+            self.lock.acquire(blocking=True)
+            counters = list(self.counters.values())
+            self.lock.release()
+
+            for counter in counters:
 
                 # We don't need to publish empty counters
                 # run_reaper() will clean these up if they remain zero for a while
-                if counter.val() > 0:
+                if counter.val() == 0:
                     continue
 
                 # Ensure a fresh copy of the CounterEntry
@@ -230,6 +233,9 @@ class Metrics:
 
                 # Put in the publish queue for a publisher worker to pick up
                 self.publish_queue.put_nowait(entry)
+
+
+            self.exit.wait(1)
 
         self.log.debug("Exiting publisher")
 
@@ -244,12 +250,18 @@ class Metrics:
             # Loop over each counter, get the value,
             #   if value > 0, continue
             #   if now() - last_updated > 10 seconds, remove counter
-            for id, counter in self.counters:
+            self.lock.acquire(blocking=True)
+            items = list(self.counters)
+            self.lock.release()
+            for counter in items:
                 if counter.val() > 0:
                     continue
 
                 if (datetime.utcnow() - counter.last_updated).total_seconds() > 10:
-                    self.remove_counter(id)
+                    self.lock.acquire(blocking=True)
+                    self.remove_counter(composite_id(counter.entry))
+                    self.lock.release()
+
                     self.log.debug("reaped stale counter '{}'".format(id))
 
         self.log.debug("Exiting reaper")

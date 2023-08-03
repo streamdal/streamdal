@@ -57,6 +57,7 @@ class SnitchConfig:
     service_name: str = os.getenv("SNITCH_SERVICE_NAME", socket.getfqdn())
     dry_run: bool = os.getenv("SNITCH_DRY_RUN", False)
     client_type: int = CLIENT_TYPE_SDK
+    exit: Event = Event()
 
 
 class SnitchClient:
@@ -87,8 +88,7 @@ class SnitchClient:
         self.pipelines = {}
         self.paused_pipelines = {}
         self.log = logging.getLogger("snitch-client")
-        self.exit = Event()
-        self.metrics = Metrics(stub=self.stub, log=self.log, event=self.exit)
+        self.metrics = Metrics(stub=self.stub, log=self.log, event=self.cfg.exit)
         self.functions = {}
         self.session_id = uuid.uuid4().__str__()
         self.threads = []
@@ -98,14 +98,19 @@ class SnitchClient:
             signal.signal(e, self.shutdown)
 
         # Run register
-        register = Thread(target=self._register)
+        register = Thread(target=self._register,daemon=False)
         register.start()
         self.threads.append(register)
 
         # Start heartbeat
-        heartbeat = Thread(target=self._heartbeat)
-        heartbeat.start()
-        self.threads.append(heartbeat)
+        # heartbeat = Thread(target=self._heartbeat, daemon=False)
+        # heartbeat.start()
+        # self.threads.append(heartbeat)
+
+        print("SnitchClient initialized")
+
+        # for thread in self.threads:
+        #     thread.join()
 
     @staticmethod
     def _validate_config(cfg: SnitchConfig) -> None:
@@ -244,7 +249,7 @@ class SnitchClient:
 
         self.log.debug("Notifying")
         if not self.cfg.dry_run:
-            self.loop.run_until_complete(call())
+            self.loop.create_task(call())
 
     def _get_pipelines(self, op: int, component: str) -> dict:
         """
@@ -266,13 +271,19 @@ class SnitchClient:
         return {"auth-token": self.auth_token}
 
     def shutdown(self, *args):
-        self.exit.set()
+        """Shutdown the service"""
+        self.log.debug("Shutdown signal received")
+        self.cfg.exit.set()
 
         for thread in self.threads:
             thread.join()
 
+        self.metrics.shutdown(args)
+
         self.log.debug("Closing gRPC connection")
         self.channel.close()
+
+        self.loop.stop()
 
     def _heartbeat(self):
         async def call():
@@ -283,13 +294,12 @@ class SnitchClient:
             await self.stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
 
         # Send at least once
-        self.loop.run_until_complete(call())
-
-        while not self.exit.is_set():
-            self.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
+        while not self.cfg.exit.is_set():
             self.loop.run_until_complete(call())
+            self.cfg.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
 
     def _register(self) -> None:
+        loop = asyncio.new_event_loop()
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
@@ -308,27 +318,32 @@ class SnitchClient:
         async def call():
             self.log.debug("Registering with snitch server")
 
-            async for r in self.stub.register(req, timeout=self.grpc_timeout, metadata=self._get_metadata()):
-                print("Received command: ", r)
-                if r.keep_alive is not None:
-                    self.log.debug("Received keep alive")  # TODO: remove logging after testing
-                    pass
-                elif r.attach_pipeline is not None:
-                    self._attach_pipeline(r)
-                elif r.detach_pipeline is not None:
-                    self._detach_pipeline(r)
-                elif r.pause_pipeline is not None:
-                    self._pause_pipeline(r)
-                elif r.resume_pipeline is not None:
-                    self._resume_pipeline(r)
-                else:
-                    raise SnitchException("Unknown response type: {}".format(r))
+            try:
+                print("registering")
+                async for cmd in self.stub.register(req, timeout=None, metadata=self._get_metadata()):
+                    print("received command: {}".format(cmd))
+
+                    if cmd.keep_alive is not None:
+                        self.log.debug("Received keep alive")  # TODO: remove logging after testing
+                    elif cmd.attach_pipeline is not None:
+                        self._attach_pipeline(cmd)
+                    elif cmd.detach_pipeline is not None:
+                        self._detach_pipeline(cmd)
+                    elif cmd.pause_pipeline is not None:
+                        self._pause_pipeline(cmd)
+                    elif cmd.resume_pipeline is not None:
+                        self._resume_pipeline(cmd)
+                    else:
+                        self.log.error("Unknown response type: {}".format(cmd))
+            except TimeoutError:
+                self.log.debug("timed out")
 
         self.log.debug("Starting register looper")
 
         try:
-            self.loop.run_until_complete(call())
-            self.log.debug("Register looper completed, closing connection")
+            while not self.cfg.exit.is_set():
+                loop.run_until_complete(call())
+                self.log.debug("Register looper completed, closing connection")
         except Exception as e:
             self.channel.close()
             raise SnitchRegisterException("Failed to register: {}".format(e))
