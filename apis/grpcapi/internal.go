@@ -42,9 +42,14 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 		return errors.New("heartbeatCh cannot be nil")
 	}
 
-	// Start heartbeat watcher
+	llog := s.log.WithFields(logrus.Fields{
+		"method":     "startHeartbeatWatcher",
+		"session_id": sessionId,
+	})
+
 	lastHeartbeat := time.Now()
 
+	// Start heartbeat watcher
 	kw, err := s.Deps.NATSBackend.WatchKey(serverCtx, store.NATSLiveBucket, store.NATSRegisterKey(sessionId, s.Deps.Config.NodeName))
 	if err != nil {
 		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
@@ -55,34 +60,35 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 		for {
 			select {
 			case <-serverCtx.Done():
-				s.log.Debugf("heartbeat watcher detected server context cancellation for session id '%s'; exiting", sessionId)
+				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
 				break MAIN
 			case <-s.Deps.ShutdownContext.Done():
-				s.log.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
+				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
 				break MAIN
 			case key := <-kw.Updates():
+				// Sometimes we can receive nils - ignore
 				if key == nil {
 					continue
 				}
 
 				switch key.Operation() {
 				case nats.KeyValuePut:
-					s.log.Debugf("received put operation on key watcher for session id '%s'; updating last heartbeat", sessionId)
+					llog.Debug("detected heartbeat")
 					lastHeartbeat = time.Now()
 				default:
-					s.log.Debugf("received non-put operation on key watcher for session id '%s'; ignoring", sessionId)
+					llog.Debug("received non-put operation on key watcher; ignoring")
 				}
 			case <-time.After(time.Second):
 				// Check if heartbeat has been received in the last 5 seconds
 				if time.Now().Sub(lastHeartbeat) > 5*time.Second {
-					s.log.Debugf("no heartbeat received in the last 5 seconds for session id '%s'; sending disconnect cmd and exiting", sessionId)
+					llog.Debug("no heartbeat received in the last 5 seconds; sending disconnect cmd and exiting")
 					noHeartbeatCh <- struct{}{}
 					break MAIN
 				}
 			}
 		}
 
-		s.log.Debugf("heartbeat watcher exiting for session id '%s'", sessionId)
+		llog.Debug("heartbeat watcher exiting")
 	}()
 
 	return nil
