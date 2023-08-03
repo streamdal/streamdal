@@ -201,6 +201,21 @@ func validateCreateBucket(name string, _ time.Duration, replicaCount int) error 
 	return nil
 }
 
+// WatchKey returns an instance of nats.KeyWatcher for the given bucket
+func (n *Natty) WatchKey(ctx context.Context, bucket, key string) (nats.KeyWatcher, error) {
+	b, err := n.getBucket(ctx, bucket, false, 0)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to watch bucket '%s'", bucket)
+	}
+
+	watcher, err := b.Watch(key)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to watch bucket '%s'", bucket)
+	}
+
+	return watcher, nil
+}
+
 // WatchBucket returns an instance of nats.KeyWatcher for the given bucket
 func (n *Natty) WatchBucket(ctx context.Context, bucket string) (nats.KeyWatcher, error) {
 	b, err := n.getBucket(ctx, bucket, false, 0)

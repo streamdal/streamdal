@@ -8,8 +8,11 @@ import (
 
 const (
 	NATSLiveBucket = "snitch_live"
-	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience OR $session_id/$node_name/register; V: NONE
+	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience
 	NATSLiveTTL    = 5 * time.Second
+
+	// NATSRegisterFormat key resides in the NATSLiveBucket
+	NATSRegisterFormat = "%s/%s/register" // K: $session_id/$node_name/register; V: NONE
 
 	NATSPipelineBucket    = "snitch_pipeline"
 	NATSPipelineKeyFormat = "%s" // K: $pipeline_id V: serialized protos.Pipeline
@@ -20,6 +23,10 @@ const (
 	NATSPausedBucket    = "snitch_paused"
 	NATSPausedKeyFormat = "%s/%s" // K: $audience:$pipeline_id V: NONE
 )
+
+func NATSRegisterKey(session, node string) string {
+	return strings.ToLower(fmt.Sprintf(NATSRegisterFormat, session, node))
+}
 
 func NATSLiveKey(session, node, audience string) string {
 	return strings.ToLower(fmt.Sprintf(NATSLiveFormat, session, node, audience))

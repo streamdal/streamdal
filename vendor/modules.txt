@@ -159,7 +159,7 @@ github.com/relistan/go-director
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/natty v0.0.37
+# github.com/streamdal/natty v0.0.38
 ## explicit; go 1.18
 github.com/streamdal/natty
 # github.com/streamdal/snitch-protos v0.0.56

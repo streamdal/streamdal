@@ -12,7 +12,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // TODO: Switch this to bigcache
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/natty v0.0.37
+	github.com/streamdal/natty v0.0.38
 	github.com/streamdal/snitch-protos v0.0.56
 	golang.org/x/crypto v0.11.0
 	google.golang.org/grpc v1.56.2
