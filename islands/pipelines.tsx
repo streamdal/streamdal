@@ -1,5 +1,5 @@
-import IconPencil from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/pencil.tsx";
-import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
+import IconPencil from "tabler-icons/tsx/pencil.tsx";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";

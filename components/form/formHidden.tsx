@@ -1,9 +1,16 @@
-type HiddenInputProps = {
+export type HiddenInputProps = {
   name: string;
   value: string;
-  register: any;
 };
 
-export const FormHidden = ({ name, value, register }: HiddenInputProps) => (
-  <input type="hidden" {...register(name)} value={value} />
+export const FormHidden = ({
+  name,
+  value,
+}: HiddenInputProps) => (
+  <input
+    type="hidden"
+    id={name}
+    name={name}
+    value={value}
+  />
 );

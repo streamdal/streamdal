@@ -1,41 +1,40 @@
+import { ErrorType } from "./validate.ts";
+
 export type FormInputProps = {
   name: string;
-  label: string;
-  register: any;
-  error: any;
-  row?: boolean;
-  margin?: string;
+  value: string;
+  placeHolder?: string;
+  errors: ErrorType;
+  onChange: (value: string) => void;
+  inputClass?: string;
+  wrapperClass?: string;
 };
 
 export const FormInput = ({
   name,
-  label,
-  register,
-  error,
-  row,
-  margin = "mb-4",
-  ...props
+  value,
+  errors,
+  onChange,
+  placeHolder,
+  inputClass,
+  wrapperClass,
 }: FormInputProps) => {
   return (
-    <div className={`flex flex-col ${margin} w-full`}>
-      <div className={`flex ${row ? "flex-row" : "flex-col"}`}>
-        <label
-          className="text-stormCloud font-medium text-[14px] leading-[18px]"
-          htmlFor={name}
-        >
-          {label}
-        </label>
-        <input
-          className={`rounded-sm border outline-0 mt-2 px-2 h-[47px] text-[14px] border-${
-            error ? "streamdalRed" : ""
-          }`}
-          {...register(name)}
-          {...props}
-        />
-      </div>
+    <div class={`flex flex-col ${wrapperClass}`}>
+      <input
+        id={name}
+        name={name}
+        class={`rounded-sm border border-${
+          errors[name] ? "streamdalRed" : "white"
+        } ${inputClass}`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeHolder}
+        size={value.length}
+      />
 
       <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
-        {error}
+        {errors[name]}
       </div>
     </div>
   );
