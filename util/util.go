@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/gofrs/uuid"
@@ -13,10 +12,6 @@ import (
 
 const (
 	GRPCRequestIDMetadataKey = "request-id"
-)
-
-var (
-	SpaceRegex = regexp.MustCompile(`\s+`)
 )
 
 func GenerateUUID() string {
@@ -71,7 +66,7 @@ func AudienceToStr(audience *protos.Audience) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.ComponentName, audience.OperationType)
+	return strings.ToLower(fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.ComponentName, audience.OperationType))
 }
 
 func AudienceFromStr(s string) *protos.Audience {
@@ -86,15 +81,15 @@ func AudienceFromStr(s string) *protos.Audience {
 
 	opType := protos.OperationType_OPERATION_TYPE_UNSET
 
-	if parts[2] == protos.OperationType_OPERATION_TYPE_CONSUMER.String() {
+	if parts[2] == strings.ToLower(protos.OperationType_OPERATION_TYPE_CONSUMER.String()) {
 		opType = protos.OperationType_OPERATION_TYPE_CONSUMER
 	} else {
 		opType = protos.OperationType_OPERATION_TYPE_PRODUCER
 	}
 
 	return &protos.Audience{
-		ServiceName:   parts[0],
-		ComponentName: parts[1],
+		ServiceName:   strings.ToLower(parts[0]),
+		ComponentName: strings.ToLower(parts[1]),
 		OperationType: opType,
 	}
 }

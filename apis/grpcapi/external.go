@@ -100,6 +100,11 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// Update pipeline in storage
+	if err := s.Deps.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists - broadcast it as there might be snitch-servers that have
 	// a client that has an active registration using this pipeline (and it should
 	// get updated)
@@ -154,6 +159,10 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	if err := s.Deps.StoreService.AttachPipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	// Pipeline exists, broadcast attach
 	if err := s.Deps.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
@@ -177,6 +186,11 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Remove config entry
+	if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -206,7 +220,11 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, broadcast pause
+	// Can attempt to pause; PausePipeline() will noop if pipeline is already paused
+	if err := s.Deps.StoreService.PausePipeline(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
 	if err := s.Deps.BusService.BroadcastPausePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -229,6 +247,11 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Can attempt to resume; ResumePipeline() will noop if pipeline is already running
+	if err := s.Deps.StoreService.ResumePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
