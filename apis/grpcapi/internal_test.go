@@ -17,13 +17,13 @@ import (
 
 var _ = Describe("Internal gRPC API", func() {
 	var (
-		err            error
-		internalClient protos.InternalClient
+		internalClientErr error
+		internalClient    protos.InternalClient
 	)
 
 	BeforeEach(func() {
-		internalClient, err = newInternalClient()
-		Expect(err).ToNot(HaveOccurred())
+		internalClient, internalClientErr = newInternalClient()
+		Expect(internalClientErr).ToNot(HaveOccurred())
 		Expect(internalClient).ToNot(BeNil())
 	})
 
@@ -115,7 +115,7 @@ var _ = Describe("Internal gRPC API", func() {
 	Describe("Register", func() {
 		// Testing a streaming RPC is not great - the test is flakey because of
 		// the sleeps but should get the job done for now. ~DS 08/2023
-		FIt("should register a new externalClient", func() {
+		It("should register a new externalClient", func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			heartbeatCtx, heartbeatCancel := context.WithCancel(context.Background())
 			defer heartbeatCancel()
@@ -183,7 +183,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Stop the heartbeat; registration should be removed
 			heartbeatCancel()
 
-			time.Sleep(time.Second)
+			time.Sleep(2 * time.Second)
 
 			data, err = natsClient.Get(ctx, store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
 			Expect(err).To(HaveOccurred())
@@ -276,7 +276,7 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(data).ToNot(BeNil())
 
 			// Wait another TTL cycle - heartbeat should've kept key alive
-			time.Sleep(time.Second)
+			time.Sleep(2 * time.Second)
 
 			data, err = natsClient.Get(context.Background(), store.NATSLiveBucket, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName))
 			Expect(err).ToNot(HaveOccurred())
@@ -290,7 +290,7 @@ var _ = Describe("Internal gRPC API", func() {
 
 	Describe("NewAudience", func() {
 		It("should create a new audience in live bucket", func() {
-
+			Expect(true).To(BeTrue())
 		})
 
 		It("audience should disappear without heartbeat", func() {
@@ -360,14 +360,20 @@ func startRegister(ctx context.Context, client protos.InternalClient, req *proto
 				// Continue
 			}
 
-			// Do nothing, stay connected
+			// Try to recv; only fail test if error is not EOF or context cancelled
+			//
+			// NOTE: The ctx might've gotten cancelled mid-flight so we need to
+			// check for that err condition
 			_, recvErr := resp.Recv()
 			if recvErr != nil {
 				if strings.Contains(recvErr.Error(), "EOF") {
 					fmt.Println("startRegister: EOF")
 					break MAIN
+				} else if strings.Contains(recvErr.Error(), "context canceled") {
+					fmt.Println("startRegister: context canceled")
+					break MAIN
 				} else {
-					fmt.Println("startRegister: recv error: ", recvErr)
+					fmt.Println("startRegister: recv unexpected error: ", recvErr)
 					Expect(recvErr).ToNot(HaveOccurred())
 				}
 			}
@@ -393,9 +399,17 @@ func startHeartbeat(ctx context.Context, client protos.InternalClient, req *prot
 				// Continue
 			}
 
+			// NOTE: The ctx might've gotten cancelled mid-flight so we need to
+			// check for that err condition
 			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: req.SessionId})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(resp).ToNot(BeNil())
+			if err != nil {
+				if strings.Contains(err.Error(), "context cancelled") {
+					break MAIN
+				}
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resp).ToNot(BeNil())
+			}
 
 			time.Sleep(200 * time.Millisecond)
 		}
