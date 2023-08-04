@@ -282,4 +282,8 @@ class TestSnitchClient:
             operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
-        assert self.client.str_to_aud("testing.kafka.2.test-topic") == aud
+        parsed = self.client.str_to_aud("testing.kafka.2.test-topic")
+        assert parsed.component_name == aud.component_name
+        assert parsed.service_name == aud.service_name
+        assert parsed.operation_name == aud.operation_name
+        assert parsed.operation_type == aud.operation_type

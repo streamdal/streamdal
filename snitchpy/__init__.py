@@ -158,9 +158,9 @@ class SnitchClient:
         parts = aud.split(".")
         return protos.Audience(
             service_name=parts[0],
-            operation_type=protos.OperationType(parts[2]),
-            operation_name=parts[1],
-            component_name=parts[3],
+            operation_type=protos.OperationType(int(parts[2])),
+            operation_name=parts[3],
+            component_name=parts[1],
         )
 
     def seen_audience(self, aud: protos.Audience) -> bool:
