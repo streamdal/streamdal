@@ -4,7 +4,8 @@ import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/gri
 import "flowbite";
 import "twind";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
-import {ConsumerIcon} from "./icons/consumer.tsx"
+import { ConsumerIcon } from "./icons/consumer.tsx";
+import { ProducerIcon } from "./icons/producer.tsx";
 
 export const Service = ({ data }: any) => {
   return (
@@ -66,8 +67,16 @@ export const Producer = ({ data }: any) => {
           class="w-6 h-6 text-purple-100 cursor-grab"
           id="dragHandle"
         />
-        <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
-        <a href={`/${data.label.toLowerCase()}`}>
+        <ProducerIcon />
+        <a
+          href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
+            encodeURIComponent(data.pipeline.audience.componentName)
+          }/${
+            data.pipeline.audience.operationType === 1
+              ? encodeURIComponent("consumer")
+              : encodeURIComponent("producer")
+          }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
+        >
           <div className={"flex flex-col p-1"}>
             <h2 className={"text-[16px]"}>
               {data.label}

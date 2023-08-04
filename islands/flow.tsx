@@ -225,7 +225,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
           style: { zIndex: isCovered ? 20 - i : 20 },
           ...(i > 0 && { parentNode: "1000" }),
           data: {
-            label: "Producer",
+            label: component.audience?.operationName,
             source: "bottom",
             target: "top",
             instances: i === 0 && producers.length,
