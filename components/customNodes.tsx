@@ -4,11 +4,12 @@ import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/gri
 import "flowbite";
 import "twind";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import {ConsumerIcon} from "./icons/consumer.tsx"
 
 export const Service = ({ data }: any) => {
   return (
     <div class="h-[100px]">
-      <div class="h-[80px] w-[320px] flex items-center justify-between bg-white rounded shadow-lg z-10 border-1 border-purple-200 px-2">
+      <div class="h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
         <IconGripVertical
           class="w-6 h-6 text-purple-100 cursor-grab"
           id="dragHandle"
@@ -59,7 +60,7 @@ export const Producer = ({ data }: any) => {
         data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
-        className="w-[205px] h-[64px] bg-white rounded-md shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
+        className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
       >
         <IconGripVertical
           class="w-6 h-6 text-purple-100 cursor-grab"
@@ -67,11 +68,11 @@ export const Producer = ({ data }: any) => {
         />
         <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
         <a href={`/${data.label.toLowerCase()}`}>
-          <div className={"flex flex-col"}>
+          <div className={"flex flex-col p-1"}>
             <h2 className={"text-[16px]"}>
-              Item Name
+              {data.label}
             </h2>
-            <h3 class="text-xs text-gray-500">{data.label}</h3>
+            <h3 class="text-xs text-gray-500">Producer</h3>
           </div>
         </a>
         <NodeMenu data={data.pipeline} />
@@ -125,27 +126,28 @@ export const Consumer = ({ data }: any) => {
         data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
-        className="w-[205px] h-[64px] bg-white rounded-md shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
+        className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
       >
         <IconGripVertical
           class="w-6 h-6 text-purple-100 cursor-grab"
           id="dragHandle"
         />
-        <img src={"/images/placeholder-icon.png"} className="w-[30px]" />
+
+        <ConsumerIcon className={"mx-2"} />
         <a
           href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
             encodeURIComponent(data.pipeline.audience.componentName)
-          }/${data.pipeline.audience.operationType === 1 ?
-            encodeURIComponent("consumer") : encodeURIComponent("producer")
           }/${
-            encodeURIComponent(data.pipeline.audience.operationName)
-          }`}
+            data.pipeline.audience.operationType === 1
+              ? encodeURIComponent("consumer")
+              : encodeURIComponent("producer")
+          }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
         >
-          <div className={"flex flex-col"}>
-            <h2 className={"text-[16px]"}>
-              Item Name
+          <div className={"flex flex-col p-1"}>
+            <h2 className={"text-[16px] text-center"}>
+              {data.label}
             </h2>
-            <h3 class="text-xs text-gray-500">{data.label}</h3>
+            <h3 class="text-xs text-gray-500">Consumer</h3>
           </div>
         </a>
         <NodeMenu data={data.pipeline} />

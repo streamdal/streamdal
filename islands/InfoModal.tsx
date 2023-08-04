@@ -1,5 +1,5 @@
-import { Consumer } from "../components/icons/consumer.tsx";
-import { Producer } from "../components/icons/producer.tsx";
+import { ConsumerIcon } from "../components/icons/consumer.tsx";
+import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
 import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
 import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
@@ -20,9 +20,9 @@ export default function InfoModal(props: any) {
           <div class="relative bg-[#28203F] rounded-lg shadow dark:bg-gray-700">
             <div class="rounded-t flex justify-between">
               <div class="flex items-start justify-between p-4">
-                {props.name.params.info === "consumer"
-                  ? <Consumer className={"mx-2"} />
-                  : <Producer className={"mx-2"} />}
+                {params.operationType === "consumer"
+                  ? <ConsumerIcon className={"mx-2"} />
+                  : <ProducerIcon className={"mx-2"} />}
                 <div class="flex flex-col">
                   <h3 class="text-lg text-white dark:text-white">
                     {params.operationName}
