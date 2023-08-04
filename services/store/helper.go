@@ -3,13 +3,11 @@ package store
 import (
 	"fmt"
 	"strings"
-	"time"
 )
 
 const (
 	NATSLiveBucket = "snitch_live"
 	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience
-	NATSLiveTTL    = 5 * time.Second
 
 	// NATSRegisterFormat key resides in the NATSLiveBucket
 	NATSRegisterFormat = "%s/%s/register" // K: $session_id/$node_name/register; V: NONE

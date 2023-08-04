@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/alecthomas/kong"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -26,6 +28,7 @@ type Config struct {
 	NATSTLSCaFile         string           `help:"TLS ca file"`
 	NATSNumBucketReplicas int              `help:"Number of replicas NATS K/V buckets should use" default:"1"`
 	HealthFreqSec         int              `help:"How often to perform health checks on dependencies" default:"60"`
+	SessionTTL            time.Duration    `help:"TTL for session keys in NATS live K/V bucket" default:"5s"`
 
 	KongContext *kong.Context `kong:"-"`
 }
@@ -49,6 +52,10 @@ func New(version string) *Config {
 			"version": version,
 		},
 	)
+
+	if cfg.SessionTTL < time.Second || cfg.SessionTTL > time.Minute {
+		logrus.WithField("ttl", cfg.SessionTTL).Fatal("invalid SessionTTL; value must be between 1s and 1m")
+	}
 
 	return cfg
 }

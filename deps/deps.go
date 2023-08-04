@@ -138,6 +138,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		NATSBackend: d.NATSBackend,
 		ShutdownCtx: d.ShutdownContext,
 		NodeName:    cfg.NodeName,
+		SessionTTL:  cfg.SessionTTL,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
