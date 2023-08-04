@@ -1,0 +1,92 @@
+version: "3.8"
+services:
+  natsjs:
+    image: nats:2.9.20-alpine3.18
+    ports:
+      - "4222:4222" # NATS Port
+      - "6222:6222"
+      - "8222:8222" # HTTP Monitor
+    container_name: snitch-nats
+    volumes:
+      - jetstream-data:/data/jetstream
+      - ${PWD}/assets/nats/nats-server.conf:/etc/nats/nats-server.conf
+    networks:
+      - snitch-network
+  snitch-server-1:
+    image: streamdal/snitch-server:latest
+    depends_on:
+      - natsjs
+    environment:
+      - SNITCH_SERVER_NODE_ID=node1
+      - SNITCH_SERVER_AUTH_TOKEN=1234
+      - SNITCH_SERVER_NATSURL=natsjs:4222
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    networks:
+      - snitch-network
+    restart: on-failure
+
+  snitch-server-2:
+    image: streamdal/snitch-server:latest
+    depends_on:
+      - natsjs
+    environment:
+      - SNITCH_SERVER_NODE_ID=node2
+      - SNITCH_SERVER_AUTH_TOKEN=1234
+      - SNITCH_SERVER_NATSURL=natsjs:4222
+    ports:
+      - "8080"
+      - "9090"
+    networks:
+      - snitch-network
+    restart: on-failure
+
+  snitch-server-3:
+    image: streamdal/snitch-server:latest
+    depends_on:
+      - natsjs
+    environment:
+      - SNITCH_SERVER_NODE_ID=node3
+      - SNITCH_SERVER_AUTH_TOKEN=1234
+      - SNITCH_SERVER_NATSURL=natsjs:4222
+    ports:
+      - "8080"
+      - "9090"
+    networks:
+      - snitch-network
+    restart: on-failure
+
+  envoy:
+    build:
+      context: ${PWD}/assets/envoy
+      dockerfile: ${PWD}/assets/envoy/Dockerfile
+    image: grpcweb/envoy
+    container_name: snitch-envoy
+    depends_on:
+      - snitch-server-1
+      - snitch-server-2
+      - snitch-server-3
+    ports:
+      - "9091:9091"
+    networks:
+      - snitch-network
+
+  web:
+    image: streamdal/snitch-console:latest
+    container_name: snitch-console-container
+    depends_on:
+      - envoy
+    environment:
+      - SNITCH_GRPC_WEB_URL="http://envoy:9091"
+    ports:
+      - "3000:3000"
+    networks:
+      - snitch-network
+
+volumes:
+  jetstream-data:
+
+networks:
+  snitch-network:
+
