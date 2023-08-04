@@ -3,23 +3,34 @@ import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
 import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
 import { attachPipeline } from "../lib/fetch.ts";
+import {
+  PipelineInfo,
+  ServiceInfo,
+} from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
 
-export default function InfoModal(props: any) {
-  // console.log("fuck", props.name.data);
-  const params = props.name.params;
-  const attachedPipeline =
-    props.name.data.serviceMap.serviceMap[params.service].pipelines.find(
+type Params = {
+  service: string;
+  component: string;
+  operationType: string;
+  operationName: string;
+};
+
+export default function InfoModal(
+  { params, pipelines, serviceMap }: {
+    params: Params;
+    pipelines: PipelineInfo[];
+    serviceMap: ServiceInfo;
+  },
+) {
+  const associatedPipeline = serviceMap
+    .pipelines.find(
       (item: any) => item.audience.operationName === params.operationName,
-    ).pipeline;
-  console.log(attachedPipeline);
-  // console.log("fucking params", params);
-  const pipelines = props.name.data.pipelines;
-  console.log("shit", pipelines);
+    );
+  const attachedPipeline = associatedPipeline?.pipeline;
 
-  const attachNewPipeline = (id: string) => {
-    attachPipeline(id);
-    // console.log("hi");
-  };
+  // const attachNewPipeline = (id: string) => {
+  //   attachPipeline(id);
+  // };
 
   return (
     <div data-modal-target="accordion-collapse">
@@ -85,7 +96,7 @@ export default function InfoModal(props: any) {
                 class="text-white border border-gray-600 font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
                 type="button"
               >
-                {attachedPipeline.name}
+                {attachedPipeline?.name}
                 <svg
                   class="w-2.5 h-2.5 ml-2.5"
                   aria-hidden="true"
@@ -113,17 +124,20 @@ export default function InfoModal(props: any) {
                   {pipelines.map((pipeline: any) => (
                     <li>
                       <button
-                        data-tooltip-target={pipeline.id !== attachedPipeline.id
+                        data-tooltip-target={pipeline.id !==
+                            attachedPipeline?.id
                           ? "tooltip-default"
                           : null}
                         data-tooltip-placement="top"
                         type="button"
                         class={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white flex justify-start text-left w-full ${
-                          pipeline.id === attachedPipeline.id && "font-bold"
+                          pipeline.id === attachedPipeline?.id && "font-bold"
                         }`}
-                        onClick={pipeline.id !== attachedPipeline.id
-                          ? () => attachNewPipeline(pipeline.id)
-                          : undefined}
+                        onClick={() => {
+                          pipeline.id !== attachedPipeline?.id
+                            ? attachNewPipeline(pipeline.id)
+                            : undefined;
+                        }}
                       >
                         {pipeline.name}
                       </button>
