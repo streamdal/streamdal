@@ -17,11 +17,12 @@ export default function InfoModal(props: any) {
   console.log("shit", pipelines);
 
   const attachNewPipeline = (id: string) => {
-    attachPipeline(id);
+    // attachPipeline(id);
+    console.log("hi");
   };
 
   return (
-    <div>
+    <div data-modal-target="accordion-collapse">
       <div
         tabIndex={-1}
         class="absolute mt-20 right-10 z-50 w-[308px] px-4 py-2 overflow-x-hidden overflow-y-hidden"
@@ -61,17 +62,27 @@ export default function InfoModal(props: any) {
                 <a href={"/pipelines"}>
                   <button
                     type="button"
+                    data-tooltip-target="add-pipeline-tooltip"
+                    data-tooltip-placement="top"
                     className="mt-1 mr-1 text-white bg-transparent hover:bg-gray-500 hover:text-white-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-hide="accordion-collapse"
                   >
                     <IconPlus class="w-5 h-5 text-white" />
                   </button>
+                  <div
+                    id="add-pipeline-tooltip"
+                    role="tooltip"
+                    class="absolute z-10 invisible inline-block px-2 py-1 text-xs font-medium text-white transition-opacity duration-300 bg-gray-500 rounded-xs shadow-sm opacity-0 tooltip dark:bg-gray-700"
+                  >
+                    Add new pipeline
+                    <div class="tooltip-arrow" data-popper-arrow></div>
+                  </div>
                 </a>
               </div>
               <button
                 id="attached-pipeline"
                 data-dropdown-toggle="attached-pipeline-dropdown"
-                class="text-white font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
+                class="text-white border border-gray-600 font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
                 type="button"
               >
                 {attachedPipeline.name}
