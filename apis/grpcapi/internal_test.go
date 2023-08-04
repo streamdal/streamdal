@@ -403,7 +403,7 @@ func startHeartbeat(ctx context.Context, client protos.InternalClient, req *prot
 			// check for that err condition
 			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: req.SessionId})
 			if err != nil {
-				if strings.Contains(err.Error(), "context cancelled") {
+				if strings.Contains(err.Error(), "context canceled") {
 					break MAIN
 				}
 
