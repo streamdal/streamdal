@@ -1,6 +1,5 @@
 import { ExternalClient } from "snitch-protos/protos/external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
-import { getEnv } from "../lib/utils.ts";
 
 const transport = new GrpcWebFetchTransport({
   baseUrl: `${

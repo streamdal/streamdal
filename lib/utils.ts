@@ -1,5 +1,3 @@
-import { load } from "https://deno.land/std/dotenv/mod.ts";
-
 const UNITS = [
   "byte",
   "kilobyte",
@@ -53,8 +51,3 @@ export const formatNumber = (number?: number | bigint) =>
 export const isNumeric = (num: any) =>
   (typeof num === "number" || (typeof num === "string" && num.trim() !== "")) &&
   !isNaN(num as number);
-
-export const getEnv = async (param: string) => {
-  const env = await load();
-  return env[param];
-};
