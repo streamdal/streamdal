@@ -5,20 +5,20 @@ import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
 import { attachPipeline } from "../lib/fetch.ts";
 
 export default function InfoModal(props: any) {
-  console.log("fuck", props.name.data);
+  // console.log("fuck", props.name.data);
   const params = props.name.params;
   const attachedPipeline =
     props.name.data.serviceMap.serviceMap[params.service].pipelines.find(
       (item: any) => item.audience.operationName === params.operationName,
     ).pipeline;
   console.log(attachedPipeline);
-  console.log("fucking params", params);
+  // console.log("fucking params", params);
   const pipelines = props.name.data.pipelines;
   console.log("shit", pipelines);
 
   const attachNewPipeline = (id: string) => {
-    // attachPipeline(id);
-    console.log("hi");
+    attachPipeline(id);
+    // console.log("hi");
   };
 
   return (
