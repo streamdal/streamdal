@@ -2,6 +2,7 @@ import { Options } from "$fresh/plugins/twind.ts";
 
 export default {
   selfURL: import.meta.url,
+  important: true,
   theme: {
     extend: {
       colors: {

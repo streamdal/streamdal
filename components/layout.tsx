@@ -43,7 +43,7 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
     <body className="h-screen bg-purple-50 m-0">
       <div className="flex flex-col w-screen h-screen text-web">
         {hideNav ? null : <NavBar />}
-        <div className="h-screen w-screen z-0">
+        <div className="h-screen w-screen">
           {children}
         </div>
       </div>

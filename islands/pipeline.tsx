@@ -23,6 +23,8 @@ import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
 import { titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
+import { argTypes, StepArgs } from "../components/pipeline/stepArgs.tsx";
+import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
@@ -156,7 +158,7 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
             data-tooltip-target="step-add"
             class="w-5 h-5 cursor-pointer"
           />
-          <Tooltip targetId="step-add" message="Add a step" />
+          <Tooltip targetId="step-add" message="Add a new step" />
         </div>
         {data?.steps?.map((
           step: PipelineStep,
@@ -232,16 +234,40 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
                     {"detective" ===
                         data?.steps[i]?.step?.oneofKind &&
                       (
-                        <FormSelect
-                          name={`steps[${i}].step.detective.type`}
-                          label="Detective Type"
-                          data={data}
-                          setData={setData}
-                          errors={errors}
-                          inputClass="w-64"
-                          children={optionsFromEnum(DetectiveType)}
-                        />
+                        <div class="flex flex-col">
+                          <FormSelect
+                            name={`steps[${i}].step.detective.type`}
+                            label="Detective Type"
+                            data={data}
+                            setData={setData}
+                            errors={errors}
+                            inputClass="w-64"
+                            children={optionsFromEnum(DetectiveType)}
+                          />
+                          <div>
+                            {argTypes.includes(
+                              DetectiveType[data.steps[i].step.detective.type],
+                            ) &&
+                              (
+                                <StepArgs
+                                  stepIndex={i}
+                                  type={DetectiveType[
+                                    data.steps[i].step.detective.type
+                                  ]}
+                                  data={data}
+                                  setData={setData}
+                                  errors={errors}
+                                />
+                              )}
+                          </div>
+                        </div>
                       )}
+                    <StepConditions
+                      stepIndex={i}
+                      data={data}
+                      setData={setData}
+                      errors={errors}
+                    />
                   </div>
                 )
                 : null}

@@ -1,0 +1,39 @@
+import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
+import { ErrorType } from "../form/validate.ts";
+import { StepArgType } from "./stepArgs.tsx";
+import { CheckboxGroup } from "../form/checkboxGroup.tsx";
+import { PipelineStepCondition } from "snitch-protos/protos/pipeline.ts";
+
+export type StepConditionType = {
+  stepIndex: number;
+  data: any;
+  setData: (data: any) => void;
+  errors: ErrorType;
+};
+
+export const StepConditions = (
+  { stepIndex, data, setData, errors }: StepConditionType,
+) => {
+  return (
+    <div class="flex flex-row justify-between">
+      <CheckboxGroup
+        label="On Success"
+        name={`steps[${stepIndex}].step.onSuccess`}
+        data={data}
+        setData={setData}
+        errors={errors}
+        options={PipelineStepCondition}
+        wrapperClass="w-1/2 mr-1"
+      />
+      <CheckboxGroup
+        label="On Failure"
+        name={`steps[${stepIndex}].step.onFailure`}
+        data={data}
+        setData={setData}
+        errors={errors}
+        options={PipelineStepCondition}
+        wrapperClass="w-1/2 ml-1"
+      />
+    </div>
+  );
+};

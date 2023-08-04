@@ -11,7 +11,7 @@ const Pipelines = ({ pipelines }: { pipelines?: Pipeline[] }) => {
     <div
       id="defaultModal"
       aria-modal="true"
-      class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center flex"
+      class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-rem)] max-h-full justify-center items-center flex"
       role="dialog"
     >
       <div class="relative w-full max-w-5xl max-h-full">
