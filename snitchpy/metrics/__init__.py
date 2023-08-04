@@ -97,7 +97,13 @@ class Metrics:
 
         self.stub = kwargs.get("stub")
         self.log = log
-        self.counters = {}
+        self.counters = {
+            "somename": Counter(
+                CounterEntry(
+                    name="somename", pipeline_id="someid", audience=protos.Audience()
+                )
+            )
+        }
         self.lock = Lock()
 
         # TODO: remove after testing
@@ -115,13 +121,17 @@ class Metrics:
         self.workers = []
 
         for i in range(WORKER_POOL_SIZE):
-            incr_worker = Thread(target=self.run_incrementer_worker, args=(i+1,), daemon=False)
+            incr_worker = Thread(
+                target=self.run_incrementer_worker, args=(i + 1,), daemon=False
+            )
             incr_worker.start()
             self.workers.append(incr_worker)
 
             # Run counter incrementer. We use no blocking queue when increasing counters and then
             # this background thread does the actual incrementing. This is to avoid blocking the caller of incr()
-            publish_worker = Thread(target=self.run_publisher_worker, args=(i+1,), daemon=False)
+            publish_worker = Thread(
+                target=self.run_publisher_worker, args=(i + 1,), daemon=False
+            )
             publish_worker.start()
             self.workers.append(publish_worker)
 
@@ -186,7 +196,7 @@ class Metrics:
         self.log.debug("Published metrics: {}".format(req))
 
     def run_publisher_worker(self, id: int) -> None:
-        """Counter worker pool is responsible for listening to incr() requests and publish queue """
+        """Counter worker pool is responsible for listening to incr() requests and publish queue"""
         self.log.debug("Starting counter worker {}".format(id))
         while not self.exit.is_set():
             self.exit.wait(1)
@@ -217,13 +227,11 @@ class Metrics:
         """
         self.log.debug("Starting publisher")
         while not self.exit.is_set():
-
             self.lock.acquire(blocking=True)
             counters = list(self.counters.values())
             self.lock.release()
 
             for counter in counters:
-
                 # We don't need to publish empty counters
                 # run_reaper() will clean these up if they remain zero for a while
                 if counter.val() == 0:
@@ -238,7 +246,6 @@ class Metrics:
 
                 # Put in the publish queue for a publisher worker to pick up
                 self.publish_queue.put_nowait(entry)
-
 
             self.exit.wait(1)
 
@@ -256,15 +263,15 @@ class Metrics:
             #   if value > 0, continue
             #   if now() - last_updated > 10 seconds, remove counter
             self.lock.acquire(blocking=True)
-            items = list(self.counters)
+            items = self.counters.items()
             self.lock.release()
-            for counter in items:
+            for name, counter in items:
                 if counter.val() > 0:
                     continue
 
                 if (datetime.utcnow() - counter.last_updated).total_seconds() > 10:
                     self.lock.acquire(blocking=True)
-                    self.remove_counter(composite_id(counter.entry))
+                    self.remove_counter(name)
                     self.lock.release()
 
                     self.log.debug("reaped stale counter '{}'".format(id))

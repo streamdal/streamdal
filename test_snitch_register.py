@@ -7,7 +7,6 @@ from snitchpy import SnitchClient, SnitchConfig
 
 
 class TestSnitchRegisterMethods:
-
     client: SnitchClient
 
     @pytest.fixture(autouse=True)
@@ -25,11 +24,11 @@ class TestSnitchRegisterMethods:
 
         aud = protos.Audience(
             component_name="test",
-            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
         pipeline_id = uuid.uuid4().__str__()
-        aud_str = SnitchClient.audience(aud)
+        aud_str = SnitchClient.aud_to_str(aud)
         self.client.paused_pipelines[aud_str] = {}
         self.client.paused_pipelines[aud_str][pipeline_id] = protos.Command
 
@@ -44,18 +43,18 @@ class TestSnitchRegisterMethods:
         cmd = protos.Command(
             audience=protos.Audience(
                 component_name="test",
-                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             attach_pipeline=protos.AttachPipelineCommand(
                 pipeline=protos.Pipeline(
                     id=pipeline_id,
                 )
-            )
+            ),
         )
 
         self.client._attach_pipeline(cmd)
 
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = SnitchClient.aud_to_str(cmd.audience)
         assert self.client.pipelines[aud_str] is not None
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
@@ -65,13 +64,13 @@ class TestSnitchRegisterMethods:
         cmd = protos.Command(
             audience=protos.Audience(
                 component_name="test",
-                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             attach_pipeline=protos.AttachPipelineCommand(
                 pipeline=protos.Pipeline(
                     id=pipeline_id,
                 )
-            )
+            ),
         )
 
         self.client._attach_pipeline(cmd)
@@ -94,7 +93,7 @@ class TestSnitchRegisterMethods:
                 pipeline=protos.Pipeline(
                     id=pipeline_id,
                 )
-            )
+            ),
         )
 
         self.client._attach_pipeline(cmd)
@@ -103,11 +102,11 @@ class TestSnitchRegisterMethods:
             audience=protos.Audience(
                 component_name="test",
                 service_name="testing",
-                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             pause_pipeline=protos.PausePipelineCommand(
                 pipeline_id=pipeline_id,
-            )
+            ),
         )
 
         with pytest.raises(ValueError, match="Command is None"):
@@ -116,7 +115,7 @@ class TestSnitchRegisterMethods:
         res = self.client._pause_pipeline(pause_cmd)
         assert res is True
 
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = SnitchClient.aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 1
         assert len(self.client.pipelines) == 0
         assert self.client.paused_pipelines[aud_str] is not None
@@ -126,11 +125,11 @@ class TestSnitchRegisterMethods:
             audience=protos.Audience(
                 component_name="test",
                 service_name="testing",
-                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             resume_pipeline=protos.ResumePipelineCommand(
                 pipeline_id=pipeline_id,
-            )
+            ),
         )
 
         with pytest.raises(ValueError, match="Command is None"):
@@ -139,7 +138,7 @@ class TestSnitchRegisterMethods:
         res = self.client._resume_pipeline(resume_cmd)
         assert res is True
 
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = SnitchClient.aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 0
         assert len(self.client.pipelines) == 1
         assert self.client.pipelines[aud_str] is not None
@@ -150,28 +149,30 @@ class TestSnitchRegisterMethods:
 
         cmd = protos.Command(
             audience=protos.Audience(
-                component_name="test",
+                component_name="kafka",
                 service_name="testing",
+                operation_name="test-topic",
                 operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             attach_pipeline=protos.AttachPipelineCommand(
                 pipeline=protos.Pipeline(
                     id=pipeline_id,
                 )
-            )
+            ),
         )
 
         self.client._attach_pipeline(cmd)
 
         delete_cmd = protos.Command(
             audience=protos.Audience(
-                component_name="test",
+                component_name="kafka",
                 service_name="testing",
-                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER
+                operation_name="test-topic",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             detach_pipeline=protos.DetachPipelineCommand(
                 pipeline_id=pipeline_id,
-            )
+            ),
         )
 
         with pytest.raises(ValueError, match="Command is None"):
@@ -187,22 +188,37 @@ class TestSnitchRegisterMethods:
 
         cmd = protos.Command(
             audience=protos.Audience(
-                component_name="test",
+                component_name="kafka",
                 service_name="testing",
+                operation_name="test-topic",
                 operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
             attach_pipeline=protos.AttachPipelineCommand(
                 pipeline=protos.Pipeline(
                     id=pipeline_id,
                 )
-            )
+            ),
         )
 
         self.client._attach_pipeline(cmd)
-        res = self.client._get_pipelines(op=snitchpy.MODE_CONSUMER, component="test")
+        res = self.client._get_pipelines(
+            protos.Audience(
+                component_name="kafka",
+                service_name="testing",
+                operation_name="test-topic",
+                operation_type=protos.OperationType.OPERATION_TYPE_CONSUMER,
+            )
+        )
         assert len(res) == 0
 
-        res = self.client._get_pipelines(op=snitchpy.MODE_PRODUCER, component="test")
+        res = self.client._get_pipelines(
+            protos.Audience(
+                component_name="kafka",
+                service_name="testing",
+                operation_name="test-topic",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            )
+        )
         assert len(res) == 1
         k, v = res.popitem()
         assert v.attach_pipeline.pipeline.id == pipeline_id

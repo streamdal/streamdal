@@ -9,7 +9,7 @@ import socket
 import uuid
 from .exceptions import SnitchException, SnitchRegisterException
 from copy import copy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from grpclib.client import Channel
 from .metrics import Metrics
 from threading import Thread, Event
@@ -18,8 +18,8 @@ from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, 
 DEFAULT_SNITCH_PORT = 9090
 DEFAULT_SNITCH_URL = "localhost"
 DEFAULT_SNITCH_TOKEN = "1234"
-DEFAULT_PIPELINE_TIMEOUT = 1/10  # 100 milliseconds
-DEFAULT_STEP_TIMEOUT = 1/100  # 10 milliseconds
+DEFAULT_PIPELINE_TIMEOUT = 1 / 10  # 100 milliseconds
+DEFAULT_STEP_TIMEOUT = 1 / 100  # 10 milliseconds
 DEFAULT_GRPC_TIMEOUT = 5  # 5 seconds
 DEFAULT_HEARTBEAT_INTERVAL = 1  # 1 second
 MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 megabyte
@@ -33,8 +33,9 @@ CLIENT_TYPE_SHIM = 2
 
 @dataclass(frozen=True)
 class SnitchRequest:
-    operation: int
-    component: str
+    operation_type: int
+    operation_name: str
+    component_name: str
     data: bytes
 
 
@@ -48,16 +49,18 @@ class SnitchResponse:
 @dataclass(frozen=True)
 class SnitchConfig:
     """SnitchConfig is a dataclass that holds configuration for the SnitchClient"""
+
     grpc_url: str = os.getenv("SNITCH_URL", DEFAULT_SNITCH_URL)
     grpc_port: int = os.getenv("SNITCH_PORT", DEFAULT_SNITCH_PORT)
     grpc_token: str = os.getenv("SNITCH_TOKEN", DEFAULT_SNITCH_TOKEN)
     grpc_timeout: int = os.getenv("SNITCH_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
-    pipeline_timeout: int = os.getenv("SNITCH_PIPELINE_TIMEOUT", 1/10)
-    step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", 1/100)
+    pipeline_timeout: int = os.getenv("SNITCH_PIPELINE_TIMEOUT", 1 / 10)
+    step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", 1 / 100)
     service_name: str = os.getenv("SNITCH_SERVICE_NAME", socket.getfqdn())
     dry_run: bool = os.getenv("SNITCH_DRY_RUN", False)
     client_type: int = CLIENT_TYPE_SDK
     exit: Event = Event()
+    audiences: list = field(default_factory=list)
 
 
 class SnitchClient:
@@ -75,6 +78,7 @@ class SnitchClient:
     grpc_timeout: int
     auth_token: str
     workers: list
+    audiences: dict
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -84,12 +88,16 @@ class SnitchClient:
         log.setLevel(logging.DEBUG)
 
         register_loop = asyncio.new_event_loop()
-        self.register_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=register_loop)
+        self.register_channel = Channel(
+            host=cfg.grpc_url, port=cfg.grpc_port, loop=register_loop
+        )
         self.register_stub = protos.InternalStub(channel=self.register_channel)
         self.register_loop = register_loop
 
         grpc_loop = asyncio.new_event_loop()
-        self.grpc_channel = Channel(host=cfg.grpc_url, port=cfg.grpc_port, loop=grpc_loop)
+        self.grpc_channel = Channel(
+            host=cfg.grpc_url, port=cfg.grpc_port, loop=grpc_loop
+        )
         self.grpc_stub = protos.InternalStub(channel=self.grpc_channel)
         self.grpc_loop = grpc_loop
 
@@ -97,6 +105,7 @@ class SnitchClient:
         self.grpc_timeout = 5
         self.pipelines = {}
         self.paused_pipelines = {}
+        self.audiences = {}
         self.log = log
         self.metrics = Metrics(stub=self.grpc_stub, log=self.log, event=self.cfg.exit)
         self.functions = {}
@@ -106,6 +115,10 @@ class SnitchClient:
         events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
         for e in events:
             signal.signal(e, self.shutdown)
+
+        # Add audiences passed on config
+        for aud in self.cfg.audiences:
+            self.add_audience(aud)
 
         # Start heartbeat
         heartbeat = Thread(target=self._heartbeat, daemon=False)
@@ -132,6 +145,43 @@ class SnitchClient:
         elif cfg.grpc_token == "":
             raise ValueError("grpc_token is required")
 
+    @staticmethod
+    def aud_to_str(aud: protos.Audience) -> str:
+        """Convert an Audience to a string"""
+        return "{}.{}.{}.{}".format(
+            aud.service_name, aud.component_name, aud.operation_type, aud.operation_name
+        )
+
+    @staticmethod
+    def str_to_aud(aud: str) -> protos.Audience:
+        """Convert a string to an Audience"""
+        parts = aud.split(".")
+        return protos.Audience(
+            service_name=parts[0],
+            operation_type=protos.OperationType(parts[2]),
+            operation_name=parts[1],
+            component_name=parts[3],
+        )
+
+    def seen_audience(self, aud: protos.Audience) -> bool:
+        """Have we seen this audience before?"""
+        return self.audiences.get(self.aud_to_str(aud)) is not None
+
+    def add_audience(self, aud: protos.Audience) -> None:
+        """Add an audience to the local map and send to snitch-server"""
+        if self.seen_audience(aud):
+            return
+
+        async def call():
+            req = protos.NewAudienceRequest(audience=aud)
+            await self.grpc_stub.new_audience(
+                req, timeout=self.grpc_timeout, metadata=self._get_metadata()
+            )
+
+        # We haven't seen it yet, add to local map and send to snitch-server
+        self.audiences[self.aud_to_str(aud)] = aud
+        self.grpc_loop.run_until_complete(call())
+
     def process(self, req: SnitchRequest) -> SnitchResponse:
         """Apply pipelines to a component+operation"""
         if req is None:
@@ -139,24 +189,32 @@ class SnitchClient:
 
         payload_size = len(req.data)  # No need to compute this multiple times
 
-        if payload_size > MAX_PAYLOAD_SIZE:
-            self.metrics.incr(metrics.CounterEntry(
-                name=metrics.COUNTER_FAILURE_TRIGGER, value=1.0, pipeline_id="",
-                audience=protos.Audience(
-                    component_name=req.component,
-                    operation_type=protos.OperationType(req.operation),
-                    service_name=self.cfg.service_name,
-                ),
-                labels={
-                    "type": "count",
-                    "component_name": req.component,
-                    "operation": self.op_to_string(protos.OperationType(req.operation)),
-                }
-            ))
+        aud = protos.Audience(
+            service_name=self.cfg.service_name,
+            operation_type=protos.OperationType(req.operation_type),
+            operation_name=req.operation_name,
+            component_name=req.component_name,
+        )
 
+        if payload_size > MAX_PAYLOAD_SIZE:
+            self.metrics.incr(
+                metrics.CounterEntry(
+                    name=metrics.COUNTER_FAILURE_TRIGGER,
+                    value=1.0,
+                    pipeline_id="",
+                    audience=aud,
+                    labels={
+                        "type": "count",
+                        "component_name": req.component_name,
+                        "operation": self.op_to_string(
+                            protos.OperationType(req.operation_type)
+                        ),
+                    },
+                )
+            )
             return SnitchResponse(data=req.data, error=False, message="")
 
-        if req.operation == MODE_CONSUMER:
+        if req.operation_type == MODE_CONSUMER:
             counter = metrics.COUNTER_CONSUME
         else:
             counter = metrics.COUNTER_PUBLISH
@@ -165,70 +223,114 @@ class SnitchClient:
         data = copy(req.data)
 
         # Get rules based on operation and component
-        pipelines = self._get_pipelines(req.operation, req.component)
+        pipelines = self._get_pipelines(aud)
 
         for _, cmd in pipelines.items():
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
-            self.metrics.incr(metrics.CounterEntry(
-                name=counter, value=1.0, audience=cmd.audience, pipeline_id=pipeline.id,
-                labels={"type": "count", "component_name": req.component}
-            ))
+            self.metrics.incr(
+                metrics.CounterEntry(
+                    name=counter,
+                    value=1.0,
+                    audience=cmd.audience,
+                    pipeline_id=pipeline.id,
+                    labels={"type": "count", "component_name": req.component_name},
+                )
+            )
 
-            self.metrics.incr(metrics.CounterEntry(
-                name=counter, value=payload_size,  audience=cmd.audience, pipeline_id=pipeline.id,
-                labels={"type": "bytes", "component_name": req.component}
-            ))
+            self.metrics.incr(
+                metrics.CounterEntry(
+                    name=counter,
+                    value=payload_size,
+                    audience=cmd.audience,
+                    pipeline_id=pipeline.id,
+                    labels={"type": "bytes", "component_name": req.component_name},
+                )
+            )
 
             for step in pipeline.steps:
                 # Exec wasm
                 wasm_resp = self._call_wasm(step, data)
 
                 if self.cfg.dry_run:
-                    self.log.debug("Running step '{}' in dry-run mode".format(step.name))
+                    self.log.debug(
+                        "Running step '{}' in dry-run mode".format(step.name)
+                    )
 
                 # If successful, continue to next step, don't need to check conditions
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
                     data = wasm_resp.output
 
                     if self.cfg.dry_run:
-                        self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
+                        self.log.debug(
+                            "Step '{}' succeeded, continuing to next step".format(
+                                step.name
+                            )
+                        )
                         continue
 
                     should_continue = True
                     for cond in step.on_success:
-                        if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                        if (
+                            cond
+                            == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY
+                        ):
                             self._notify_condition(pipeline, step, cmd.audience)
-                            self.log.debug("Step '{}' succeeded, notifying".format(step.name))
-                        elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                            self.log.debug(
+                                "Step '{}' succeeded, notifying".format(step.name)
+                            )
+                        elif (
+                            cond
+                            == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
+                        ):
                             should_continue = False
-                            self.log.debug("Step '{}' succeeded, aborting".format(step.name))
+                            self.log.debug(
+                                "Step '{}' succeeded, aborting".format(step.name)
+                            )
                         else:
                             # We still need to continue to remaining steps after other conditions have been processed
-                            self.log.debug("Step '{}' succeeded, continuing to next step".format(step.name))
+                            self.log.debug(
+                                "Step '{}' succeeded, continuing to next step".format(
+                                    step.name
+                                )
+                            )
 
                     # Not continuing, exit function early
                     if should_continue is False and self.cfg.dry_run is False:
-                        return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+                        return SnitchResponse(
+                            data=data, error=True, message=wasm_resp.exit_msg
+                        )
 
                     continue
 
                 should_continue = True
                 for cond in step.on_failure:
-                    if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                    if (
+                        cond
+                        == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY
+                    ):
                         self._notify_condition(pipeline, step, cmd.audience)
                         self.log.debug("Step '{}' failed, notifying".format(step.name))
-                    elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                    elif (
+                        cond
+                        == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
+                    ):
                         should_continue = False
                         self.log.debug("Step '{}' failed, aborting".format(step.name))
                     else:
                         # We still need to continue to remaining steps after other conditions have been processed
-                        self.log.debug("Step '{}' failed, continuing to next step".format(step.name))
+                        self.log.debug(
+                            "Step '{}' failed, continuing to next step".format(
+                                step.name
+                            )
+                        )
 
                 # Not continuing, exit function early
                 if should_continue is False and self.cfg.dry_run is False:
-                    return SnitchResponse(data=data, error=True, message=wasm_resp.exit_msg)
+                    return SnitchResponse(
+                        data=data, error=True, message=wasm_resp.exit_msg
+                    )
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
@@ -237,22 +339,35 @@ class SnitchClient:
 
         return SnitchResponse(data=data, error=False, message="")
 
-    def _notify_condition(self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience):
+    def _notify_condition(
+        self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience
+    ):
         async def call():
             op_str = self.op_to_string(aud.operation_type)
-            self.metrics.incr(metrics.CounterEntry(
-                name=metrics.COUNTER_FAILURE_TRIGGER, value=1.0, audience=aud, pipeline_id=pipeline.id,
-                labels={"type": "count", "component_name": aud.component_name, "operation": op_str}
-            ))
+            self.metrics.incr(
+                metrics.CounterEntry(
+                    name=metrics.COUNTER_FAILURE_TRIGGER,
+                    value=1.0,
+                    audience=aud,
+                    pipeline_id=pipeline.id,
+                    labels={
+                        "type": "count",
+                        "component_name": aud.component_name,
+                        "operation": op_str,
+                    },
+                )
+            )
 
             req = protos.NotifyRequest(
                 pipeline_id=pipeline.id,
                 audience=aud,
                 step_name=step.name,
-                occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp())
+                occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp()),
             )
 
-            await self.grpc_stub.notify(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
+            await self.grpc_stub.notify(
+                req, timeout=self.grpc_timeout, metadata=self._get_metadata()
+            )
 
         self.log.debug("Notifying")
         loop = asyncio.new_event_loop()
@@ -261,14 +376,13 @@ class SnitchClient:
         if not self.cfg.dry_run:
             loop.run_until_complete(call())
 
-    def _get_pipelines(self, op: int, component: str) -> dict:
+    def _get_pipelines(self, aud: protos.Audience) -> dict:
         """
         Get pipelines for a given mode and operation
 
         :return: dict of pipelines in format dict[str:protos.Command]
         """
-
-        aud_str = "{}-{}".format(op, component)
+        aud_str = self.aud_to_str(aud)
 
         pipelines = self.pipelines.get(aud_str)
         if pipelines is None:
@@ -305,7 +419,9 @@ class SnitchClient:
                 session_id=self.session_id,
             )
 
-            return await self.grpc_stub.heartbeat(req, timeout=self.grpc_timeout, metadata=self._get_metadata())
+            return await self.grpc_stub.heartbeat(
+                req, timeout=self.grpc_timeout, metadata=self._get_metadata()
+            )
 
         # Send at least once
         # try:
@@ -315,7 +431,9 @@ class SnitchClient:
             self.cfg.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
 
         # Wait for all pending tasks to complete before exiting thread, to avoid exception
-        self.grpc_loop.run_until_complete(asyncio.gather(*asyncio.all_tasks(self.grpc_loop)))
+        self.grpc_loop.run_until_complete(
+            asyncio.gather(*asyncio.all_tasks(self.grpc_loop))
+        )
 
         self.grpc_channel.close()
         self.log.debug("Heartbeat thread exiting")
@@ -327,19 +445,23 @@ class SnitchClient:
             service_name=self.cfg.service_name,
             session_id=self.session_id,
             client_info=protos.ClientInfo(
-                client_type=protos.ClientType(self.cfg.client_type),  # TODO: this needs to be passed in config
+                client_type=protos.ClientType(
+                    self.cfg.client_type
+                ),  # TODO: this needs to be passed in config
                 library_name="snitch-python-client",
                 library_version="0.0.1",  # TODO: how to inject via github CI?
                 language="python",
                 arch=platform.processor(),
-                os=platform.system()
-            )
+                os=platform.system(),
+            ),
         )
 
         async def call():
             self.log.debug("Registering with snitch server")
 
-            async for cmd in self.register_stub.register(req, timeout=None, metadata=self._get_metadata()):
+            async for cmd in self.register_stub.register(
+                req, timeout=None, metadata=self._get_metadata()
+            ):
                 if self.cfg.exit.is_set():
                     return
 
@@ -366,7 +488,9 @@ class SnitchClient:
         self.register_loop.run_until_complete(self.cancel_task)
 
         # Wait for all pending tasks to complete before exiting thread, to avoid exception
-        self.register_loop.run_until_complete(asyncio.gather(*asyncio.all_tasks(self.register_loop)))
+        self.register_loop.run_until_complete(
+            asyncio.gather(*asyncio.all_tasks(self.register_loop))
+        )
 
         # Cleanup gRPC connections
         self.register_channel.close()
@@ -377,7 +501,7 @@ class SnitchClient:
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
         """Set pipeline in internal map of pipelines"""
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = SnitchClient.aud_to_str(cmd.audience)
 
         # Create audience key if it doesn't exist
         if pipes_map.get(aud_str) is None:
@@ -386,9 +510,11 @@ class SnitchClient:
         pipes_map[aud_str][pipeline_id] = cmd
 
     @staticmethod
-    def _pop_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> protos.Command:
+    def _pop_pipeline(
+        pipes_map: dict, cmd: protos.Command, pipeline_id: str
+    ) -> protos.Command:
         """Grab pipeline in internal map of pipelines and remove it"""
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = SnitchClient.aud_to_str(cmd.audience)
 
         if pipes_map.get(aud_str) is None:
             return None
@@ -416,9 +542,13 @@ class SnitchClient:
             self.log.debug("Service name does not match, ignoring")
             return False
 
-        aud_str = SnitchClient.audience(cmd.audience)
+        aud_str = self.aud_to_str(cmd.audience)
 
-        self.log.debug("Deleting pipeline {} for audience {}".format(cmd.detach_pipeline.pipeline_id, aud_str))
+        self.log.debug(
+            "Deleting pipeline {} for audience {}".format(
+                cmd.detach_pipeline.pipeline_id, aud_str
+            )
+        )
 
         # Delete from all maps
         self._pop_pipeline(self.pipelines, cmd, cmd.detach_pipeline.pipeline_id)
@@ -437,10 +567,14 @@ class SnitchClient:
         pipeline_id = cmd.attach_pipeline.pipeline.id
 
         if self._is_paused(cmd.audience, pipeline_id):
-            self.log.debug("Pipeline {} is paused, updating in paused list".format(pipeline_id))
+            self.log.debug(
+                "Pipeline {} is paused, updating in paused list".format(pipeline_id)
+            )
             self._put_pipeline(self.paused_pipelines, cmd, pipeline_id)
         else:
-            self.log.debug("Pipeline {} is not paused, updating in active list".format(pipeline_id))
+            self.log.debug(
+                "Pipeline {} is not paused, updating in active list".format(pipeline_id)
+            )
             self._put_pipeline(self.pipelines, cmd, pipeline_id)
 
         return True
@@ -458,9 +592,13 @@ class SnitchClient:
             return False
 
         # Remove from pipelines and add to paused pipelines
-        pipeline = self._pop_pipeline(self.pipelines, cmd, cmd.pause_pipeline.pipeline_id)
+        pipeline = self._pop_pipeline(
+            self.pipelines, cmd, cmd.pause_pipeline.pipeline_id
+        )
 
-        self._put_pipeline(self.paused_pipelines, pipeline, cmd.pause_pipeline.pipeline_id)
+        self._put_pipeline(
+            self.paused_pipelines, pipeline, cmd.pause_pipeline.pipeline_id
+        )
 
         return True
 
@@ -481,16 +619,22 @@ class SnitchClient:
             return False
 
         # Remove from paused pipelines and add to pipelines
-        pipeline = self._pop_pipeline(self.paused_pipelines, cmd, cmd.resume_pipeline.pipeline_id)
+        pipeline = self._pop_pipeline(
+            self.paused_pipelines, cmd, cmd.resume_pipeline.pipeline_id
+        )
         self._put_pipeline(self.pipelines, pipeline, cmd.resume_pipeline.pipeline_id)
 
-        self.log.debug("Resuming pipeline {} for audience {}".format(cmd.resume_pipeline.pipeline_id, cmd.audience.service_name))
+        self.log.debug(
+            "Resuming pipeline {} for audience {}".format(
+                cmd.resume_pipeline.pipeline_id, cmd.audience.service_name
+            )
+        )
 
         return True
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
         """Check if a pipeline is paused"""
-        aud_str = SnitchClient.audience(aud)
+        aud_str = self.aud_to_str(aud)
 
         if self.paused_pipelines.get(aud_str) is None:
             return False
@@ -555,12 +699,12 @@ class SnitchClient:
 
         # Get memory from module
         memory = instance.exports(store)["memory"]
-        #memory.grow(store, 14)  # Set memory limit to 1MB
+        # memory.grow(store, 14)  # Set memory limit to 1MB
 
         # Get alloc() from module
         alloc = instance.exports(store)["alloc"]
         # Allocate enough memory for the length of the data and receive memory pointer
-        start_ptr = alloc(store, len(data)+64)
+        start_ptr = alloc(store, len(data) + 64)
 
         # Write to memory starting at pointer returned bys alloc()
         memory.write(store, data, start_ptr)
@@ -573,7 +717,9 @@ class SnitchClient:
         return self._read_memory(memory, store, result_ptr)
 
     @staticmethod
-    def _read_memory(memory: Memory, store: Store, result_ptr: int, length: int = -1) -> bytes:
+    def _read_memory(
+        memory: Memory, store: Store, result_ptr: int, length: int = -1
+    ) -> bytes:
         mem_len = memory.data_len(store)
 
         # Ensure we aren't reading out of bounds
@@ -585,7 +731,9 @@ class SnitchClient:
 
         res = bytearray()  # Used to build our result
         nulls = 0  # How many null pointers we've encountered
-        count = 0  # How many bytes we've read, used to check against length, if provided
+        count = (
+            0  # How many bytes we've read, used to check against length, if provided
+        )
 
         for v in result_data:
             if length == count and length != -1:
@@ -601,16 +749,16 @@ class SnitchClient:
 
             count += 1
             res.append(v)
-            nulls = 0  # Reset nulls since we read another byte and thus aren't at the end
+            nulls = (
+                0  # Reset nulls since we read another byte and thus aren't at the end
+            )
 
         if count == len(result_data) and nulls != 3:
-            raise SnitchException("unable to read response from wasm - no terminators found in response data")
+            raise SnitchException(
+                "unable to read response from wasm - no terminators found in response data"
+            )
 
-        return bytes(res).rstrip(b'\xa6')
-
-    @staticmethod
-    def audience(aud: protos.Audience) -> str:
-        return "{}-{}".format(aud.operation_type, aud.component_name)
+        return bytes(res).rstrip(b"\xa6")
 
     @staticmethod
     def op_to_string(op: protos.OperationType) -> str:
