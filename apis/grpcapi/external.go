@@ -45,6 +45,9 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 
 	for _, pipeline := range pipelines {
 		pipelineSlice = append(pipelineSlice, pipeline)
+
+		// Strip WASM fields (to save on b/w)
+		util.StripWASMFields(pipeline)
 	}
 
 	return &protos.GetPipelinesResponse{
@@ -62,6 +65,9 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
+	// Strip WASM fields (to save on b/w)
+	util.StripWASMFields(pipeline)
+
 	return &protos.GetPipelineResponse{
 		Pipeline: pipeline,
 	}, nil
@@ -74,6 +80,11 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 
 	// Create ID for pipeline
 	req.Pipeline.Id = util.GenerateUUID()
+
+	// Populate WASM fields
+	if err := util.PopulateWASMFields(req.Pipeline, s.Deps.Config.WASMDir); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
 
 	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil

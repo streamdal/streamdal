@@ -7,6 +7,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
 
@@ -111,6 +112,11 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		if cmdCh == nil {
 			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
 			continue
+		}
+
+		// Populate WASM fields
+		if err := util.PopulateWASMFields(req.Pipeline, b.options.WASMDir); err != nil {
+			return errors.Wrap(err, "error populating wasm fields")
 		}
 
 		b.log.Debugf("sending detach cmd to client '%s' for pipeline '%s'", u.SessionId, u.PipelineId)

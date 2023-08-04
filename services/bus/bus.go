@@ -54,6 +54,7 @@ type Options struct {
 	NATS        natty.INatty
 	Cmd         cmd.ICmd
 	NodeName    string
+	WASMDir     string
 	ShutdownCtx context.Context
 }
 
@@ -105,6 +106,10 @@ func (o *Options) validate() error {
 
 	if o.Cmd == nil {
 		return errors.New("cmd service must be provided")
+	}
+
+	if o.WASMDir == "" {
+		return errors.New("wasm dir must be provided")
 	}
 
 	return nil

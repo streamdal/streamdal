@@ -189,6 +189,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		Cmd:         d.CmdService,
 		NodeName:    d.Config.NodeName,
 		ShutdownCtx: d.ShutdownContext,
+		WASMDir:     d.Config.WASMDir,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")
