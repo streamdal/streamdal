@@ -290,7 +290,33 @@ var _ = Describe("Internal gRPC API", func() {
 
 	Describe("NewAudience", func() {
 		It("should create a new audience in live bucket", func() {
-			Expect(true).To(BeTrue())
+			sessionID := util.GenerateUUID()
+
+			Expect(sessionID).ToNot(BeEmpty())
+
+			resp, err := internalClient.NewAudience(ctxWithGoodAuth, &protos.NewAudienceRequest{
+				SessionId: sessionID,
+				Audience: &protos.Audience{
+					ServiceName:   "test-service",
+					ComponentName: "kafka",
+					OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+					OperationName: "main",
+				},
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("Audience created"))
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			// TODO: Discovered a minor issue -- the audience key is created in
+			// the live audience because we are assuming that NewAudience() will
+			// only be called by the SDK when it is registered!
+			// This means that if the audience is not assigned to a pipeline, it
+			// will disappear when the SDK disconnects.
+			// Solution: Should store audience in both live and a separate bucket.
+			// That way we know what audiences are available LIVE and which
+			// audiences are available for assignment but are NOT live.
 		})
 
 		It("audience should disappear without heartbeat", func() {
