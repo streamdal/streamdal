@@ -26,13 +26,13 @@ func TestLoad(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		mapping, err := Load(tc.name, "./assets/wasm")
+		mapping, err := Load(tc.name, "../assets/wasm")
 		if err == nil && tc.shouldError {
 			t.Errorf("Load(%s) should have errored", tc.name)
 		}
 
 		if err != nil && !tc.shouldError {
-			t.Errorf("Load(%s) should NOT have errored", tc.name)
+			t.Errorf("Load(%s) should NOT have errored: %s", tc.name, err)
 		}
 
 		if !tc.shouldError && mapping == nil {

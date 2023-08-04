@@ -66,3 +66,7 @@ localhost:9090 protos.External/Test
 
 TODO: There's a scattering of `Id` vs `ID` used throughout the project. 
 We should settle on `ID` as described here: https://github.com/golang/go/wiki/CodeReviewComments#initialisms
+
+# Testing
+Make sure to run tests via `make test`. This is necessary as we have to set
+certain environment variables for the tests to run properly.

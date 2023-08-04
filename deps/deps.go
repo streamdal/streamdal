@@ -86,6 +86,11 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 }
 
 func (d *Dependencies) validateWASM() error {
+	// Lame... means that tests need to be ran through `make test`
+	if os.Getenv("TEST") != "" {
+		os.Chdir("../..")
+	}
+
 	for name, mapping := range wasm.Config {
 		if mapping.Filename == "" {
 			return errors.Errorf("wasm.Config[%s].Filename cannot be empty", name)
@@ -96,11 +101,15 @@ func (d *Dependencies) validateWASM() error {
 		}
 
 		// Check if the file exists
-		// TODO: This is annoying for tests and `go run` - fix
 		fullPath := d.Config.WASMDir + "/" + mapping.Filename
 
 		if _, err := os.Stat(fullPath); err != nil {
 			return errors.Wrapf(err, "unable to stat wasm file '%s'", fullPath)
+		}
+
+		// TODO: Remove
+		if _, err := wasm.Load(name, d.Config.WASMDir); err != nil {
+			return errors.Wrapf(err, "unable to load wasm file '%s'", name)
 		}
 	}
 
