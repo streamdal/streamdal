@@ -72,9 +72,7 @@ export const Producer = ({ data }: any) => {
           href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
             encodeURIComponent(data.pipeline.audience.componentName)
           }/${
-            data.pipeline.audience.operationType === 1
-              ? encodeURIComponent("consumer")
-              : encodeURIComponent("producer")
+            data.pipeline.audience.operationType === 1 ? "consumer" : "producer"
           }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
         >
           <div className={"flex flex-col p-1"}>
@@ -147,9 +145,7 @@ export const Consumer = ({ data }: any) => {
           href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
             encodeURIComponent(data.pipeline.audience.componentName)
           }/${
-            data.pipeline.audience.operationType === 1
-              ? encodeURIComponent("consumer")
-              : encodeURIComponent("producer")
+            data.pipeline.audience.operationType === 1 ? "consumer" : "producer"
           }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
         >
           <div className={"flex flex-col p-1"}>

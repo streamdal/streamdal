@@ -28,6 +28,7 @@ export default function InfoModal(
     );
   const attachedPipeline = associatedPipeline?.pipeline;
 
+  //todo: pass down envars to browser/move call to route handler
   // const attachNewPipeline = (id: string) => {
   //   attachPipeline(id);
   // };
@@ -133,11 +134,12 @@ export default function InfoModal(
                         class={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white flex justify-start text-left w-full ${
                           pipeline.id === attachedPipeline?.id && "font-bold"
                         }`}
-                        onClick={() => {
-                          pipeline.id !== attachedPipeline?.id
-                            ? attachNewPipeline(pipeline.id)
-                            : undefined;
-                        }}
+                        //todo pass down envars to browser
+                        // onClick={() => {
+                        //   pipeline.id !== attachedPipeline?.id
+                        //     ? attachNewPipeline(pipeline.id)
+                        //     : undefined;
+                        // }}
                       >
                         {pipeline.name}
                       </button>

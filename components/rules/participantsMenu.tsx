@@ -10,10 +10,10 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-
-  const pause = (id: string | undefined) => {
-    pausePipeline(id);
-  };
+  //todo: pass down envars to browser/move call to route handler
+  //   const pause = (id: string | undefined) => {
+  //     pausePipeline(id);
+  //   };
 
   return (
     <div className={"rounded bg-purple-50 ml-4"}>
@@ -63,7 +63,9 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
               </li>
             </a>
           )}
-          <button class="w-full" onClick={() => pause(data.pipeline?.id)}>
+          <button class="w-full" //todo: pass down envars to browser/move call to route handler
+            //   onClick={() => pause(data.pipeline?.id)}
+          >
             <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
               <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
               Pause
