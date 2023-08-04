@@ -21,10 +21,8 @@ export const handler: Handlers<any> = {
   },
 };
 
-
-
 export default function FlowRoute(props: PageProps) {
-  console.dir(props, {depth: 20})
+  console.dir(props, { depth: 20 });
   return (
     <Layout>
       <InfoModal name={props} />
