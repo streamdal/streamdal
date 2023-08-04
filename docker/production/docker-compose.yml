@@ -17,7 +17,7 @@ services:
     depends_on:
       - natsjs
     environment:
-      - SNITCH_SERVER_NODE_ID=node1
+      - SNITCH_SERVER_NODE_NAME=node1
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_NATSURL=natsjs:4222
     ports:
@@ -32,7 +32,7 @@ services:
     depends_on:
       - natsjs
     environment:
-      - SNITCH_SERVER_NODE_ID=node2
+      - SNITCH_SERVER_NODE_NAME=node2
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_NATSURL=natsjs:4222
     ports:
@@ -47,7 +47,7 @@ services:
     depends_on:
       - natsjs
     environment:
-      - SNITCH_SERVER_NODE_ID=node3
+      - SNITCH_SERVER_NODE_NAME=node3
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_NATSURL=natsjs:4222
     ports:
