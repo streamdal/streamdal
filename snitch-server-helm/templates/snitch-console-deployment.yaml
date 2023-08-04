@@ -16,15 +16,6 @@ spec:
         app.kubernetes.io/name: {{ include "snitch.name" . }}-console
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      initContainers:
-      - name: prepare-esbuild-cache
-        image: alpine
-        command: ["/bin/sh", "-c"]
-        args:
-          - mkdir -p /root/.cache/esbuild/bin && chmod 777 /root/.cache/esbuild/bin
-        volumeMounts:
-        - mountPath: /root/.cache
-          name: esbuild-cache
       containers:
         - name: snitch-console
           image: "streamdal/snitch-console:latest" # Fixed the image and tag definition
