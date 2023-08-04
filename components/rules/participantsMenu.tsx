@@ -1,7 +1,7 @@
 import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
-import {  Edit, Info, Pause, Silence  } from "../icons/crud.tsx";
+import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
-import {  useState  } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import { pausePipeline } from "../../lib/fetch.ts";
 
 export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
@@ -9,6 +9,10 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
 
   const handleClick = () => {
     setIsOpen(!isOpen);
+  };
+
+  const pause = (id: string | undefined) => {
+    pausePipeline(id);
   };
 
   return (
@@ -59,7 +63,7 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
               </li>
             </a>
           )}
-          <button class="w-full">
+          <button class="w-full" onClick={() => pause(data.pipeline?.id)}>
             <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
               <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
               Pause
