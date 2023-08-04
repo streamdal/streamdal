@@ -6,17 +6,22 @@ import {
 import InfoModal from "../../../../islands/InfoModal.tsx";
 import { client } from "../../../index.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { getServiceMap } from "../../../../lib/fetch.ts";
+import { getPipelines, getServiceMap } from "../../../../lib/fetch.ts";
 
 interface ServiceMap {
   serviceMap: any;
 }
 
-export const handler: Handlers<ServiceMap> = {
+export const handler: Handlers<any> = {
   async GET(_req, ctx) {
-    return ctx.render(await getServiceMap());
+    return ctx.render({
+      pipelines: await getPipelines(),
+      serviceMap: await getServiceMap(),
+    });
   },
 };
+
+
 
 export default function FlowRoute(props: PageProps) {
   console.dir(props, {depth: 20})
@@ -24,7 +29,7 @@ export default function FlowRoute(props: PageProps) {
     <Layout>
       <InfoModal name={props} />
       <ReactFlowProvider>
-        <Flow data={props.data} />
+        <Flow data={props.data.serviceMap} />
       </ReactFlowProvider>
     </Layout>
   );

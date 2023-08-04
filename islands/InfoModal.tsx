@@ -2,14 +2,24 @@ import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
 import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
-import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
+import { attachPipeline } from "../lib/fetch.ts";
 
 export default function InfoModal(props: any) {
+  console.log("fuck", props.name.data);
   const params = props.name.params;
-  const pipelines = props.name.data.serviceMap[params.service].pipelines;
-  const name = pipelines.find((pipeline: PipelineInfo) =>
-  pipeline.audience?.operationName === params.operationName
-).pipeline?.name
+  const attachedPipeline =
+    props.name.data.serviceMap.serviceMap[params.service].pipelines.find(
+      (item: any) => item.audience.operationName === params.operationName,
+    ).pipeline;
+  console.log(attachedPipeline);
+  console.log("fucking params", params);
+  const pipelines = props.name.data.pipelines;
+  console.log("shit", pipelines);
+
+  const attachNewPipeline = (id: string) => {
+    attachPipeline(id);
+  };
+
   return (
     <div>
       <div
@@ -64,7 +74,7 @@ export default function InfoModal(props: any) {
                 class="text-white font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center"
                 type="button"
               >
-                {name}
+                {attachedPipeline.name}
                 <svg
                   class="w-2.5 h-2.5 ml-2.5"
                   aria-hidden="true"
@@ -91,9 +101,29 @@ export default function InfoModal(props: any) {
                 >
                   {pipelines.map((pipeline: any) => (
                     <li>
-                      <a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                        {pipeline.pipeline.name}
-                      </a>
+                      <button
+                        data-tooltip-target={pipeline.id !== attachedPipeline.id
+                          ? "tooltip-default"
+                          : null}
+                        data-tooltip-placement="top"
+                        type="button"
+                        class={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white flex justify-start text-left w-full ${
+                          pipeline.id === attachedPipeline.id && "font-bold"
+                        }`}
+                        onClick={pipeline.id !== attachedPipeline.id
+                          ? () => attachNewPipeline(pipeline.id)
+                          : undefined}
+                      >
+                        {pipeline.name}
+                      </button>
+                      <div
+                        id="tooltip-default"
+                        role="tooltip"
+                        class="absolute z-10 invisible inline-block px-2 py-1 text-xs font-medium text-white transition-opacity duration-300 bg-gray-500 rounded-xs shadow-sm opacity-0 tooltip dark:bg-gray-700"
+                      >
+                        Attach pipeline
+                        <div class="tooltip-arrow" data-popper-arrow></div>
+                      </div>
                     </li>
                   ))}
                 </ul>
