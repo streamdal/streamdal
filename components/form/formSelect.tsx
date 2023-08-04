@@ -40,7 +40,7 @@ export const FormSelect = ({
       <select
         id={name}
         name={name}
-        class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
+        class={`cursor-pointer rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
           errors[name] ? "streamdalRed" : "twilight"
         } ${inputClass}`}
         value={value}
