@@ -20,7 +20,8 @@
     "snitch-protos/": "https://deno.land/x/snitch_protos@v0.0.56/",
     "zod": "https://deno.land/x/zod@v3.21.4",
     "zod/": "https://deno.land/x/zod@v3.21.4/",
-    "react-hook-form": "https://esm.sh/react-hook-form@^7.44.3",
-    "@hookform/resolvers": "https://esm.sh/@hookform/resolvers@^3.1.0"
+    "zod-form-data": "https://esm.sh/zod-form-data@^2.0.1",
+    "zod-validation-error": "https://esm.sh/zod-validation-error@^1.3.1",
+    "tabler-icons/": "https://deno.land/x/tabler_icons_tsx@0.0.3/"
   }
 }

@@ -1,5 +1,5 @@
-import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
-import IconTrash from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/trash.tsx";
+import IconDots from "tabler-icons/tsx/dots.tsx";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
 
 export const StepMenu = ({ onDelete }: { onDelete: () => void }) => (
   <div className="z-40">

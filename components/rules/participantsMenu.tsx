@@ -1,7 +1,7 @@
 import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
-import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
-import IconDots from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/dots.tsx";
-import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import {  Edit, Info, Pause, Silence  } from "../icons/crud.tsx";
+import IconDots from "tabler-icons/tsx/dots.tsx";
+import {  useState  } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import { pausePipeline } from "../../lib/fetch.ts";
 
 export const NodeMenu = ({ data }: { data: PipelineInfo }) => {

@@ -2,6 +2,7 @@ import { Options } from "$fresh/plugins/twind.ts";
 
 export default {
   selfURL: import.meta.url,
+  important: true,
   theme: {
     extend: {
       colors: {
@@ -60,6 +61,20 @@ export default {
         "&:hover": {
           background:
             "linear-gradient(96.41deg, #C1AAFD -16.36%, #FFD260 101.19%)",
+        },
+      };
+    },
+    "btn-secondary": () => {
+      return {
+        width: "100px",
+        height: "47px",
+        borderRadius: "4px",
+        border: "none",
+        fontWeight: "bold",
+        fontSize: "14px",
+        color: "#372D56",
+        "&:hover": {
+          background: "#F9F7FF",
         },
       };
     },

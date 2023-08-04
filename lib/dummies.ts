@@ -12,7 +12,7 @@ export const dummyPipelines = [{
           path: "object.field",
           args: [],
           negate: false,
-          type: 1006,
+          type: 1004,
         },
       },
       WasmId: "",

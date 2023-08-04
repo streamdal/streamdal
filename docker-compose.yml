@@ -6,6 +6,6 @@ services:
     container_name: snitch-console-container
     image: snitch-console-image
     environment:
-      - SNITCH_API_URL=http://host.docker.internal:9191
+      - SNITCH_GRPC_WEB_URL="http://127.0.0.1:9091"
     ports:
       - "3000:3000"

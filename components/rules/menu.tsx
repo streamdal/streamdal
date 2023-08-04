@@ -1,4 +1,4 @@
-import IconEye from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/eye.tsx";
+import IconEye from "tabler-icons/tsx/eye.tsx";
 import { Info, Pause } from "../icons/crud.tsx";
 import { Kebab } from "../icons/nav.tsx";
 

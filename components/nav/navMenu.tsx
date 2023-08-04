@@ -1,5 +1,5 @@
-import IconListCheck from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/list-check.tsx";
-import IconMenu2 from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/menu-2.tsx";
+import IconListCheck from "tabler-icons/tsx/list-check.tsx";
+import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
 
 export const NavMenu = () => {
   return (

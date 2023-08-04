@@ -15,6 +15,4 @@ export const ProducerIcon = (props: any) => {
                 </linearGradient>
             </defs>
         </svg>
-
-    )
-}
+    )}
