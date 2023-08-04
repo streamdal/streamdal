@@ -25,8 +25,9 @@ ARG TARGETOS
 # SSL and quality-of-life tools
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
-# Copy bin, tools, scripts, migrations
+# Copy bin & WASM
 COPY --from=builder /build/snitch-server-$TARGETOS-$TARGETARCH /snitch-server
+COPY --from=builder /assets/wasm/* /assets/wasm/
 
 RUN chmod +x /snitch-server
 
