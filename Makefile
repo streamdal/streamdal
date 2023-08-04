@@ -93,7 +93,7 @@ docker/build/local:
 	docker build --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
 	-t streamdal/$(SERVICE):$(VERSION) \
 	-t streamdal/$(SERVICE):latest \
-	-f ./assets/snitch-server-Dockerfile .
+	-f ./Dockerfile .
 
 .PHONY: docker/build
 docker/build: description = Build docker image
@@ -101,7 +101,7 @@ docker/build:
 	docker buildx build --push --platform=linux/amd64,linux/arm64 \
 	-t streamdal/$(SERVICE):$(VERSION) \
 	-t streamdal/$(SERVICE):latest \
-	-f ./assets/snitch-server-Dockerfile .
+	-f ./Dockerfile .
 
 .PHONY: docker/push
 docker/push: description = Push local docker image
