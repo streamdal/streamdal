@@ -107,7 +107,7 @@ func (d *Dependencies) validateWASM() error {
 			return errors.Wrapf(err, "unable to stat wasm file '%s'", fullPath)
 		}
 
-		// TODO: Remove
+		// Just in case, try to load it as well
 		if _, err := wasm.Load(name, d.Config.WASMDir); err != nil {
 			return errors.Wrapf(err, "unable to load wasm file '%s'", name)
 		}
