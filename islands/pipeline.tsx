@@ -25,6 +25,7 @@ import { logFormData, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { argTypes, StepArgs } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
+import { DeleteModal } from "../components/pipeline/deleteModal.tsx";
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);

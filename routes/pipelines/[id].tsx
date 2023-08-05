@@ -11,7 +11,7 @@ import { getPipelines, getServiceMap } from "../../lib/fetch.ts";
 import { ErrorType, validate } from "../../components/form/validate.ts";
 import { pipelineSchema } from "../../islands/pipeline.tsx";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
-import { upsertPipeline } from "../../lib/mutation.ts";
+import { deletePipeline, upsertPipeline } from "../../lib/mutation.ts";
 
 export const handler: Handlers<any> = {
   async GET(_req, ctx) {
@@ -21,6 +21,7 @@ export const handler: Handlers<any> = {
     });
   },
   async POST(req, ctx) {
+    console.log("ctx", ctx);
     const formData = await req.formData();
 
     const { data: pipeline, errors }: {
@@ -32,7 +33,6 @@ export const handler: Handlers<any> = {
     );
 
     console.debug("pipeline handler validate errors", errors);
-    console.dir(pipeline, { depth: 20 });
     const response = await upsertPipeline(pipeline);
 
     return ctx.render({
@@ -40,6 +40,15 @@ export const handler: Handlers<any> = {
         ...errors,
         ...response.code !== ResponseCode.OK ? { response } : {},
       },
+      success: response.code === ResponseCode.OK,
+      pipelines: await getPipelines(),
+      serviceMap: await getServiceMap(),
+    });
+  },
+  async DELETE(req, ctx) {
+    const response = await deletePipeline(ctx.params.id);
+    console.log("shit response", response);
+    return ctx.render({
       success: response.code === ResponseCode.OK,
       pipelines: await getPipelines(),
       serviceMap: await getServiceMap(),

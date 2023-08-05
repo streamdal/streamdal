@@ -19,3 +19,15 @@ export const upsertPipeline = async (
 
   return response;
 };
+
+export const deletePipeline = async (
+  pipelineId: string,
+): Promise<StandardResponse> => {
+  const { _, response }: { _; response: StandardResponse } = await client
+    .deletePipeline(
+      { pipelineId },
+      meta,
+    );
+
+  return response;
+};
