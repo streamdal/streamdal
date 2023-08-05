@@ -29,6 +29,7 @@ type Config struct {
 	NATSNumBucketReplicas int              `help:"Number of replicas NATS K/V buckets should use" default:"1"`
 	HealthFreqSec         int              `help:"How often to perform health checks on dependencies" default:"60"`
 	SessionTTL            time.Duration    `help:"TTL for session keys in NATS live K/V bucket" default:"5s"`
+	WASMDir               string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
 
 	KongContext *kong.Context `kong:"-"`
 }

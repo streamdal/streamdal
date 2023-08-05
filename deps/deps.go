@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
@@ -19,6 +20,7 @@ import (
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/wasm"
 )
 
 const (
@@ -60,6 +62,10 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		ShutdownCancel:  cancel,
 	}
 
+	if err := d.validateWASM(); err != nil {
+		return nil, errors.Wrap(err, "unable to validate WASM")
+	}
+
 	if err := d.setupHealthChecks(); err != nil {
 		return nil, errors.Wrap(err, "unable to setup health check(s)")
 	}
@@ -77,6 +83,37 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 	}
 
 	return d, nil
+}
+
+func (d *Dependencies) validateWASM() error {
+	// Lame... means that tests need to be ran through `make test`
+	if os.Getenv("TEST") != "" {
+		os.Chdir("../..")
+	}
+
+	for name, mapping := range wasm.Config {
+		if mapping.Filename == "" {
+			return errors.Errorf("wasm.Config[%s].Filename cannot be empty", name)
+		}
+
+		if mapping.FuncName == "" {
+			return errors.Errorf("wasm.Config[%s].FuncName cannot be empty", name)
+		}
+
+		// Check if the file exists
+		fullPath := d.Config.WASMDir + "/" + mapping.Filename
+
+		if _, err := os.Stat(fullPath); err != nil {
+			return errors.Wrapf(err, "unable to stat wasm file '%s'", fullPath)
+		}
+
+		// Just in case, try to load it as well
+		if _, err := wasm.Load(name, d.Config.WASMDir); err != nil {
+			return errors.Wrapf(err, "unable to load wasm file '%s'", name)
+		}
+	}
+
+	return nil
 }
 
 func (d *Dependencies) setupHealthChecks() error {
@@ -152,6 +189,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		Cmd:         d.CmdService,
 		NodeName:    d.Config.NodeName,
 		ShutdownCtx: d.ShutdownContext,
+		WASMDir:     d.Config.WASMDir,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")

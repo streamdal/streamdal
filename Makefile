@@ -83,7 +83,7 @@ clean:
 test: description = Run Go tests (make sure to bring up deps first)
 test: GOFLAGS=
 test:
-	$(GO) test ./... -v -count=1
+	TEST=true $(GO) test ./... -v -count=1
 
 ### Docker
 

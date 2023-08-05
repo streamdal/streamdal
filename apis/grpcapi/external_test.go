@@ -599,6 +599,7 @@ func runServer() {
 		NATSURL:              []string{"localhost:4222"},
 		NATSTLSSkipVerify:    true,
 		SessionTTL:           time.Second, // Override TTL to improve test speed
+		WASMDir:              "./assets/wasm",
 	})
 
 	if err != nil {

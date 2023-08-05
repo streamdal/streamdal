@@ -6,8 +6,11 @@ import (
 	"strings"
 
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/streamdal/snitch-server/wasm"
 )
 
 const (
@@ -102,5 +105,48 @@ func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string)
 		Id:      reqId,
 		Code:    code,
 		Message: msg,
+	}
+}
+
+func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
+	if pipeline == nil {
+		return errors.New("pipeline cannot be nil")
+	}
+
+	for _, s := range pipeline.Steps {
+		var (
+			mapping *wasm.Mapping
+			err     error
+		)
+
+		// We can do this dynamically later
+		switch s.Step.(type) {
+		case *protos.PipelineStep_Detective:
+			mapping, err = wasm.Load("detective", prefix)
+		case *protos.PipelineStep_Transform:
+			mapping, err = wasm.Load("transform", prefix)
+		default:
+			return errors.Errorf("unknown pipeline step type: %T", s.Step)
+		}
+
+		if err != nil {
+			return errors.Wrapf(err, "error loading '%T' WASM mapping", s.Step)
+		}
+
+		s.XWasmFunction = mapping.FuncName
+		s.XWasmBytes = mapping.Contents
+	}
+
+	return nil
+}
+
+func StripWASMFields(pipeline *protos.Pipeline) {
+	if pipeline == nil {
+		return
+	}
+
+	for _, s := range pipeline.Steps {
+		s.XWasmFunction = ""
+		s.XWasmBytes = nil
 	}
 }
