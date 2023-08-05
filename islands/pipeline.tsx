@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -21,7 +21,7 @@ import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { titleCase } from "../lib/utils.ts";
+import { logFormData, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { argTypes, StepArgs } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
@@ -35,42 +35,67 @@ const kinds = ["detective", "transform", "encode", "decode"];
 const stepKindSchema = z.discriminatedUnion("oneofKind", [
   z.object({
     oneofKind: z.literal("detective"),
-    path: z.string().min(1, { message: "Required" }),
-    args: z.string().array().optional(),
-    type: DetectiveTypeEnum,
-    negate: z.boolean(),
+    detective: z.object({
+      path: z.string().optional(),
+      args: zfd.repeatable(z.array(z.string()).default([""])),
+      type: zfd.numeric(DetectiveTypeEnum),
+      //
+      // TODO: these can go away once they are marked as optional in the protos
+      negate: z.string().default(""),
+    }),
   }),
   z.object({
     oneofKind: z.literal("transform"),
-    path: z.string().min(1, { message: "Required" }),
-    value: z.string().min(1, { message: "Required" }),
-    type: TransformTypeEnum,
+    transform: z.object({
+      path: z.string().min(1, { message: "Required" }),
+      value: z.string().min(1, { message: "Required" }),
+      type: zfd.numeric(TransformTypeEnum),
+    }),
   }),
   z.object({
     oneofKind: z.literal("encode"),
-    id: z.string().min(1, { message: "Required" }),
+    encode: z.object({
+      id: z.string().min(1, { message: "Required" }),
+    }),
   }),
   z.object({
     oneofKind: z.literal("decode"),
-    id: z.string().min(1, { message: "Required" }),
+    decode: z.object({
+      id: z.string().min(1, { message: "Required" }),
+    }),
   }),
   z.object({
     oneofKind: z.literal("custom"),
-    id: z.string().min(1, { message: "Required" }),
+    custom: z.object({
+      id: z.string().min(1, { message: "Required" }),
+    }),
   }),
 ]);
 
 const stepSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
-  onSuccess: StepConditionEnum.array(),
-  onFailure: StepConditionEnum.array(),
+  onSuccess: zfd.repeatable(
+    z.array(zfd.numeric(StepConditionEnum)).default(
+      [],
+    ),
+  ),
+  onFailure: zfd.repeatable(
+    z.array(zfd.numeric(StepConditionEnum)).default(
+      [],
+    ),
+  ),
   step: stepKindSchema,
+  //
+  // TODO: these can go away once they are marked as optional in the protos
+  WasmId: z.string().default(""),
+  WasmFunction: z.string().default(""),
+  WasmBytes: z.string().default(""),
 });
 
 export type StepType = z.infer<typeof stepSchema>;
 
-const pipelineSchema = zfd.formData({
+export const pipelineSchema = zfd.formData({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
   steps: zfd.repeatable(
@@ -92,14 +117,29 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState(pipeline);
 
+  useEffect(() => {
+    setData(pipeline);
+  }, [pipeline]);
+
   const onSubmit = async (e: any) => {
     e.preventDefault();
 
-    const { data, errors } = validate(pipelineSchema, new FormData(e.target));
+    const formData = new FormData(e.target);
 
-    console.log("submit errors", errors);
-    console.log("submit data", data);
-    setErrors(errors);
+    const { data, errors } = validate(pipelineSchema, formData);
+    logFormData(formData);
+
+    const response = await fetch(`/pipelines/${data.id}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok || response.redirected) {
+      //
+      // TODO: pop a success
+    }
+
+    setErrors(errors || {});
   };
 
   return (
@@ -110,7 +150,7 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
             <FormHidden name="id" value={data?.id} />
             <InlineInput
               placeHolder="Name your pipeline"
-              name={"name"}
+              name="name"
               data={data}
               setData={setData}
               errors={errors}
@@ -201,76 +241,76 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
                     />
                   )}
               </div>
-              {open.includes(i)
-                ? (
-                  <div class="border-t p-[13px] text-[16px] font-medium mr-2">
-                    <FormSelect
-                      name={`steps[${i}].step.oneofKind`}
-                      data={data}
-                      setData={setData}
-                      label="Step Type"
-                      errors={errors}
-                      inputClass="w-36"
-                      children={kinds.map((k, i) => (
-                        <option
-                          key={`step-kind-key-${i}`}
-                          value={k}
-                          label={titleCase(k)}
-                        />
-                      ))}
+              <div
+                class={`border-t p-[13px] text-[16px] font-medium mr-2 ${
+                  open.includes(i) ? "visible" : "hidden"
+                }`}
+              >
+                <FormSelect
+                  name={`steps[${i}].step.oneofKind`}
+                  data={data}
+                  setData={setData}
+                  label="Step Type"
+                  errors={errors}
+                  inputClass="w-36"
+                  children={kinds.map((k, i) => (
+                    <option
+                      key={`step-kind-key-${i}`}
+                      value={k}
+                      label={titleCase(k)}
                     />
-                    {["detective", "transform"].includes(
-                      data?.steps[i]?.step?.oneofKind,
-                    ) && (
-                      <FormInput
-                        name={`steps[${i}].step.detective.path`}
+                  ))}
+                />
+                {["detective", "transform"].includes(
+                  data?.steps[i]?.step?.oneofKind,
+                ) && (
+                  <FormInput
+                    name={`steps[${i}].step.detective.path`}
+                    data={data}
+                    setData={setData}
+                    label="Path"
+                    placeHolder="ex: object.field"
+                    errors={errors}
+                  />
+                )}
+                {"detective" ===
+                    data?.steps[i]?.step?.oneofKind &&
+                  (
+                    <div class="flex flex-col">
+                      <FormSelect
+                        name={`steps[${i}].step.detective.type`}
+                        label="Detective Type"
                         data={data}
                         setData={setData}
-                        label="Path"
-                        placeHolder="ex: object.field"
                         errors={errors}
+                        inputClass="w-64"
+                        children={optionsFromEnum(DetectiveType)}
                       />
-                    )}
-                    {"detective" ===
-                        data?.steps[i]?.step?.oneofKind &&
-                      (
-                        <div class="flex flex-col">
-                          <FormSelect
-                            name={`steps[${i}].step.detective.type`}
-                            label="Detective Type"
-                            data={data}
-                            setData={setData}
-                            errors={errors}
-                            inputClass="w-64"
-                            children={optionsFromEnum(DetectiveType)}
-                          />
-                          <div>
-                            {argTypes.includes(
-                              DetectiveType[data.steps[i].step.detective.type],
-                            ) &&
-                              (
-                                <StepArgs
-                                  stepIndex={i}
-                                  type={DetectiveType[
-                                    data.steps[i].step.detective.type
-                                  ]}
-                                  data={data}
-                                  setData={setData}
-                                  errors={errors}
-                                />
-                              )}
-                          </div>
-                        </div>
-                      )}
-                    <StepConditions
-                      stepIndex={i}
-                      data={data}
-                      setData={setData}
-                      errors={errors}
-                    />
-                  </div>
-                )
-                : null}
+                      <div>
+                        {argTypes.includes(
+                          DetectiveType[data.steps[i].step.detective.type],
+                        ) &&
+                          (
+                            <StepArgs
+                              stepIndex={i}
+                              type={DetectiveType[
+                                data.steps[i].step.detective.type
+                              ]}
+                              data={data}
+                              setData={setData}
+                              errors={errors}
+                            />
+                          )}
+                      </div>
+                    </div>
+                  )}
+                <StepConditions
+                  stepIndex={i}
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                />
+              </div>
             </div>
           </div>
         ))}

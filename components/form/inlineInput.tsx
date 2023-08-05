@@ -1,4 +1,10 @@
-import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import {
+  ErrorType,
+  parsePath,
+  resolveValue,
+  setValue,
+  updateData,
+} from "./validate.ts";
 
 // An unadorned input for use in non-traditional form placements
 export type FormInputProps = {
