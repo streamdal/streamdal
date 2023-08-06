@@ -38,22 +38,30 @@ export const CheckboxGroup = ({
       >
         {Object.entries(options).filter((
           [k, _],
-        ) => k !== "0" && isNumeric(k)).map(([k, v]) => (
-          <div class="flex flex-row items-center">
-            <input
-              type="checkbox"
-              id={name}
-              name={name}
-              className={`w-4 h-4 rounded border mx-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 ${inputClass}`}
-              value={k}
-              onChange={(e) =>
-                updateData(data, setData, parsePath(name), e.target.value)}
-            />
-            <label class="text-web font-medium text-[14px]">
-              {titleCase(v)}
-            </label>
-          </div>
-        ))}
+        ) => k !== "0" && isNumeric(k)).map(([k, v], i) => {
+          const path = `${name}[${i}]`;
+          return (
+            <div class="flex flex-row items-center">
+              <input
+                type="checkbox"
+                id={path}
+                name={path}
+                className={`w-4 h-4 rounded border mx-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 ${inputClass}`}
+                value={k}
+                onChange={(e) =>
+                  updateData(
+                    data,
+                    setData,
+                    parsePath(path),
+                    e.target.value,
+                  )}
+              />
+              <label class="text-web font-medium text-[14px]">
+                {titleCase(v)}
+              </label>
+            </div>
+          );
+        })}
       </div>
       <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
         {errors[name]}

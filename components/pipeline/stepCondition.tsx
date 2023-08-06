@@ -18,7 +18,7 @@ export const StepConditions = (
     <div class="flex flex-row justify-between">
       <CheckboxGroup
         label="On Success"
-        name={`steps[${stepIndex}].step.onSuccess`}
+        name={`steps[${stepIndex}].onSuccess`}
         data={data}
         setData={setData}
         errors={errors}
@@ -27,7 +27,7 @@ export const StepConditions = (
       />
       <CheckboxGroup
         label="On Failure"
-        name={`steps[${stepIndex}].step.onFailure`}
+        name={`steps[${stepIndex}].onFailure`}
         data={data}
         setData={setData}
         errors={errors}
