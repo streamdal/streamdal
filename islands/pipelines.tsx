@@ -4,7 +4,7 @@ import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import PipelineDetail from "./pipeline.tsx";
-import { DeleteModal } from "../components/pipeline/deleteModal.tsx";
+import { DeleteModal } from "../components/modals/deleteModal.tsx";
 
 const Pipelines = (
   { id, pipelines }: { id?: string; pipelines?: Pipeline[] },
@@ -14,7 +14,7 @@ const Pipelines = (
 
   return (
     <div
-      id="defaultModal"
+      id="pipelinesModal"
       aria-modal="true"
       class="fixed top-0 left-0 right-0 z-50 w-full p-4 inset-0 max-h-full justify-center items-center flex"
       role="dialog"
@@ -45,10 +45,6 @@ const Pipelines = (
             </div>
             <div class="w-full max-h-[80vh] overflow-y-auto">
               <PipelineDetail pipeline={pipelines[selected]} />
-              <DeleteModal
-                url={`/pipelines/${pipelines[selected]?.id}`}
-                id={"delete-pipeline"}
-              />
             </div>
           </div>
         </div>
