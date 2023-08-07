@@ -18,6 +18,17 @@ Envoy acts as a proxy, especially useful for gRPC communication, providing addit
 
 A web-based user interface that communicates with the Snitch Server through gRPC via Envoy, providing a user-friendly interface to manage and monitor the system.
 
+```mermaid
+graph TD
+    A[Client: Snitch Console] -->|gRPC/Web| D[Envoy]
+    D -->|gRPC| E[Snitch Server 1]
+    D -->|gRPC| F[Snitch Server 2]
+    D -->|gRPC| G[Snitch Server 3]
+    E -->|Messaging| H[NATS Jetstream]
+    F -->|Messaging| H
+    G -->|Messaging| H
+```
+
 ## 2. Key Concepts
 
 ### Nodes
