@@ -1,5 +1,12 @@
-import { ExternalClient } from "snitch-protos/protos/external.client.ts";
+import {
+  ExternalClient,
+  IExternalClient,
+} from "snitch-protos/protos/external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+
+export const meta = {
+  meta: { "auth-token": "1234" },
+};
 
 const transport = new GrpcWebFetchTransport({
   baseUrl: `${
@@ -8,4 +15,4 @@ const transport = new GrpcWebFetchTransport({
   format: "binary",
 });
 
-export const client = new ExternalClient(transport);
+export const client: IExternalClient = new ExternalClient(transport);
