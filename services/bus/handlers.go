@@ -29,6 +29,11 @@ func (b *Bus) getPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
 		return nil, errors.Wrap(err, "error getting configs")
 	}
 
+	// No cfgs == no pipelines
+	if len(cfgs) == 0 {
+		return pipelines, nil
+	}
+
 	// Get live clients
 	live, err := b.options.Store.GetLive(ctx)
 	if err != nil {

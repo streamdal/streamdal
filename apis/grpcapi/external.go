@@ -144,7 +144,12 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, broadcast delete
+	// Pipeline exists, delete it
+	if err := s.Deps.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Now broadcast delete
 	if err := s.Deps.BusService.BroadcastDeletePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}

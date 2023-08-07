@@ -415,6 +415,11 @@ func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience]string, err
 
 	audienceKeys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
 	if err != nil {
+		// No bucket == no configs
+		if err == nats.ErrBucketNotFound {
+			return cfgs, nil
+		}
+
 		return nil, errors.Wrap(err, "error fetching config keys from NATS")
 	}
 
@@ -442,6 +447,11 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	// Fetch all live keys from NATS
 	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
 	if err != nil {
+		// No bucket == no live entries yet
+		if err == nats.ErrBucketNotFound {
+			return live, nil
+		}
+
 		return nil, errors.Wrap(err, "error fetching live keys from NATS")
 	}
 
