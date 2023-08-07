@@ -175,7 +175,6 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
 
   useEffect(() => {
     if (nodes) {
-      // console.log(edges);
       setStorage();
     }
   }, [edges, nodes]);
@@ -188,6 +187,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     );
     const consumerNodes = consumers.map(
       (component: PipelineInfo, i: number) => {
+        console.log(component)
         const isCovered = i !== 0 ? true : false;
         return {
           id: `${2000 + i}`,
@@ -199,10 +199,11 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
           style: { zIndex: isCovered ? 20 - i : 20 },
           ...(isCovered && { parentNode: "2000" }),
           data: {
-            label: "Consumer",
+            label: component.audience?.operationName,
             source: "bottom",
             target: "top",
             instances: i === 0 && consumers.length,
+            pipeline: component,
           },
         };
       },
@@ -224,10 +225,11 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
           style: { zIndex: isCovered ? 20 - i : 20 },
           ...(i > 0 && { parentNode: "1000" }),
           data: {
-            label: "Producer",
+            label: component.audience?.operationName,
             source: "bottom",
             target: "top",
             instances: i === 0 && producers.length,
+            pipeline: component,
           },
         };
       },
