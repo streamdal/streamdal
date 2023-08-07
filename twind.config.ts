@@ -98,5 +98,21 @@ export default {
         },
       };
     },
+    "btn-delete": () => {
+      return {
+        width: "137px",
+        height: "47px",
+        borderRadius: "4px",
+        fontWeight: "bold",
+        fontSize: "14px",
+        color: "#FFFFFF",
+        background: "#FF7D68",
+        cursor: "pointer",
+        "&:hover": {
+          background:
+            "linear-gradient(96.41deg, #FF7D68 -16.36%, #FFB9AD 101.19%)",
+        },
+      };
+    },
   },
 } as Options;

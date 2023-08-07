@@ -1,7 +1,7 @@
 import IconCopy from "tabler-icons/tsx/copy.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { DeleteModal } from "./deleteModal.tsx";
+import { DeleteModal } from "../modals/deleteModal.tsx";
 
 export const PipelineMenu = ({ id }: { id?: string }) => (
   <>
@@ -29,10 +29,12 @@ export const PipelineMenu = ({ id }: { id?: string }) => (
               Duplicate Pipeline
             </li>
           </a>
-          <li className="cursor-pointer group flex w-full items-center py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
-            <IconTrash class="w-4 h-4 mr-2 text-eyelid group-hover:text-white" />
-            Delete
-          </li>
+          <a href={`/pipelines/${id}/delete`}>
+            <li className="cursor-pointer group flex w-full items-center py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
+              <IconTrash class="w-4 h-4 mr-2 text-eyelid group-hover:text-white" />
+              Delete
+            </li>
+          </a>
         </ul>
       </div>
     </div>

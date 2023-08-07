@@ -8,9 +8,17 @@ import { Layout } from "../../components/layout.tsx";
 import Flow from "../../islands/flow.tsx";
 import Pipelines from "../../islands/pipelines.tsx";
 import { getPipelines, getServiceMap } from "../../lib/fetch.ts";
+import { Success } from "./[id]/delete.tsx";
 
 export const handler: Handlers<any> = {
   async GET(_req, ctx) {
+    return ctx.render({
+      pipelines: await getPipelines(),
+      serviceMap: await getServiceMap(),
+    });
+  },
+
+  async POST(_req, ctx) {
     return ctx.render({
       pipelines: await getPipelines(),
       serviceMap: await getServiceMap(),
@@ -20,7 +28,11 @@ export const handler: Handlers<any> = {
 
 export default function PipelinesRoute(
   props: PageProps<
-    { pipelines: Pipeline[]; serviceMap: GetServiceMapResponse }
+    {
+      pipelines: Pipeline[];
+      serviceMap: GetServiceMapResponse;
+      success: Success;
+    }
   >,
 ) {
   return (
