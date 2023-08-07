@@ -2,12 +2,15 @@ package snitch
 
 import (
 	"context"
+	"net"
 	"os"
 	"path"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -77,6 +80,45 @@ func TestValidateConfig(t *testing.T) {
 		}
 		_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
 	})
+}
+
+func TestNew(t *testing.T) {
+	type InternalServer struct {
+		// Must be implemented in order to satisfy the protos InternalServer interface
+		protos.UnimplementedInternalServer
+	}
+
+	//srv := protos.Internal_RegisterServer()
+
+	lis, err := net.Listen("tcp", ":9090")
+	if err != nil {
+		t.Fatalf("failed to listen: %v", err)
+	}
+
+	srv := grpc.NewServer()
+	protos.RegisterInternalServer(srv, &InternalServer{})
+
+	go func() {
+		if err := srv.Serve(lis); err != nil {
+			panic("failed to serve: " + err.Error())
+		}
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cfg := &Config{
+		ServiceName: "mysvc1",
+		ShutdownCtx: ctx,
+		SnitchURL:   "localhost:9090",
+		SnitchToken: "foo",
+		DryRun:      false,
+		Logger:      &loggerfakes.FakeLogger{},
+	}
+
+	if _, err := New(cfg); err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
 }
 
 func TestGetPipelines(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/relistan/go-director"
@@ -32,10 +33,11 @@ func (s *Snitch) register(looper director.Looper) {
 	var err error
 	var quit bool
 
-	srv, err := s.serverClient.Register(context.Background(), req)
-	if err != nil {
+	srv, err := s.serverClient.Register(s.ShutdownCtx, req)
+	if err != nil && !strings.Contains(err.Error(), context.Canceled.Error()) {
 		panic("Failed to register with snitch server: " + err.Error())
 	}
+	stream = srv
 
 	looper.Loop(func() error {
 		if quit {
@@ -44,21 +46,25 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if stream == nil {
-			newStream, err := s.serverClient.Register(context.Background(), req)
+			newStream, err := s.serverClient.Register(s.ShutdownCtx, req)
 			if err != nil {
-				if errors.Is(err, context.Canceled) {
+				if strings.Contains(err.Error(), context.Canceled.Error()) {
 					s.Logger.Debug("context cancelled during connect")
 					quit = true
 					looper.Quit()
 					return nil
 				}
+
+				s.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				time.Sleep(ReconnectSleep)
+				return nil
 			}
 
 			stream = newStream
 		}
 
 		// Blocks until something is received
-		cmd, err := srv.Recv()
+		cmd, err := stream.Recv()
 		if err != nil {
 			if err.Error() == "rpc error: code = Canceled desc = context canceled" {
 				s.Logger.Errorf("context cancelled during recv: %s", err)
