@@ -3,7 +3,7 @@ entries:
   nats:
   - apiVersion: v2
     appVersion: 2.9.20
-    created: "2023-08-07T10:12:59.190602-04:00"
+    created: "2023-08-07T10:15:40.63542-04:00"
     description: A Helm chart for the NATS.io High Speed Cloud Native Distributed
       Communications Technology.
     digest: efd2db6b480286011e8f8cc39abbb98ca5c8857ba31f4b725f3efe512cedad81
@@ -21,34 +21,19 @@ entries:
     urls:
     - https://streamdal.github.io/snitch/helm-charts/snitch-server/charts/nats-1.0.0.tgz
     version: 1.0.0
-  snitch:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2023-08-07T10:12:59.18663-04:00"
-    dependencies:
-    - name: nats
-      repository: https://nats-io.github.io/k8s/helm/charts/
-      version: 1.0.0
-    description: A Helm chart for Kubernetes
-    digest: 1ffae2f972279fec181f8d244b89743206ed6e52a33045d8324bc2fccf2dccb0
-    name: snitch
-    type: application
-    urls:
-    - https://streamdal.github.io/snitch/helm-charts/snitch-server/snitch-0.1.0.tgz
-    version: 0.1.0
   snitch-server:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-07T10:12:59.189274-04:00"
+    created: "2023-08-07T10:15:40.633954-04:00"
     dependencies:
     - name: nats
       repository: https://nats-io.github.io/k8s/helm/charts/
       version: 1.0.0
     description: A Helm chart for Kubernetes
-    digest: 4df0a32eb63726c4e898bc08e597b3da7b7c0b1e83513736187de4a4f5ae62d5
+    digest: e91ffb7a26708261a4cd465b521271b5b0577614d7a3590785f385ab33677f4e
     name: snitch-server
     type: application
     urls:
     - https://streamdal.github.io/snitch/helm-charts/snitch-server/snitch-server-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-07T10:12:59.183272-04:00"
+generated: "2023-08-07T10:15:40.629838-04:00"
