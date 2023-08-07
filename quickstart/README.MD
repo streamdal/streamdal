@@ -31,9 +31,9 @@ graph TD
 
 ## 2. Key Concepts
 
-### Nodes
+### Snitch Server
 
-Nodes represent instances of the Snitch Server, and they communicate amongst each other and share information.
+Snitch servers are highly available and communicate state of amoung each other. Rules and Metrics live here.
 
 ### Tokens
 
