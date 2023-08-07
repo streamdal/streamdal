@@ -3,7 +3,10 @@ import { client, meta } from "./grpc.ts";
 
 export const getServiceMap = async () => {
   try {
-    const { response } = await client.getServiceMap({}, meta);
+    const { response } = await client.getServiceMap({}, {
+      meta: { "auth-token": "1234" },
+    });
+
     return response;
   } catch (error) {
     console.error("error fetching service map", error);
@@ -13,11 +16,30 @@ export const getServiceMap = async () => {
 };
 
 export const getPipelines = async () => {
-  const { response } = await client.getPipelines({}, meta);
+  const { response } = await client.getPipelines({}, {
+    meta: { "auth-token": "1234" },
+  });
+
   return response?.pipelines;
 };
 
 export const getPipeline = async (pipelineId: string) => {
   const { response } = await client.getPipeline({ pipelineId }, meta);
   return response?.pipeline;
+};
+
+export const pausePipeline = async (pipeline: any) => {
+  const { response } = await client.pausePipeline(
+    { pipelineId: pipeline },
+    meta,
+  );
+  return response;
+};
+
+export const attachPipeline = async (pipeline: string) => {
+  const { response } = await client.attachPipeline(
+    { pipelineId: pipeline },
+    meta,
+  );
+  return response;
 };
