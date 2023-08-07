@@ -1,0 +1,39 @@
+apiVersion: v1
+entries:
+  nats:
+  - apiVersion: v2
+    appVersion: 2.9.20
+    created: "2023-08-07T09:26:16.084455-04:00"
+    description: A Helm chart for the NATS.io High Speed Cloud Native Distributed
+      Communications Technology.
+    digest: efd2db6b480286011e8f8cc39abbb98ca5c8857ba31f4b725f3efe512cedad81
+    home: http://github.com/nats-io/k8s
+    icon: https://nats.io/img/nats-icon-color.png
+    keywords:
+    - nats
+    - messaging
+    - cncf
+    maintainers:
+    - email: info@nats.io
+      name: The NATS Authors
+      url: https://github.com/nats-io
+    name: nats
+    urls:
+    - https://streamdal.github.io/snitch/charts/nats-1.0.0.tgz
+    version: 1.0.0
+  snitch:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-08-07T09:26:16.08278-04:00"
+    dependencies:
+    - name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts/
+      version: 1.0.0
+    description: A Helm chart for Kubernetes
+    digest: be1864da80f142851273c2d882dd3cb2424e53fe772ac5f150b9917832fbf229
+    name: snitch
+    type: application
+    urls:
+    - https://streamdal.github.io/snitch/snitch-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-08-07T09:26:16.079306-04:00"
