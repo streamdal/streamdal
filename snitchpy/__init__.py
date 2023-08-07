@@ -53,7 +53,7 @@ class SnitchConfig:
     grpc_url: str = os.getenv("SNITCH_URL", DEFAULT_SNITCH_URL)
     grpc_port: int = os.getenv("SNITCH_PORT", DEFAULT_SNITCH_PORT)
     grpc_token: str = os.getenv("SNITCH_TOKEN", DEFAULT_SNITCH_TOKEN)
-    grpc_timeout: int = os.getenv("SNITCH_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
+    grpc_timeout: int = os.getenv("SNITCH_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
     pipeline_timeout: int = os.getenv("SNITCH_PIPELINE_TIMEOUT", 1 / 10)
     step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", 1 / 100)
     service_name: str = os.getenv("SNITCH_SERVICE_NAME", socket.getfqdn())
@@ -317,7 +317,11 @@ class SnitchClient:
                         == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
                     ):
                         should_continue = False
-                        self.log.debug("Step '{}' failed, aborting".format(step.name))
+                        self.log.debug(
+                            "Step '{}' failed, aborting further pipeline steps".format(
+                                step.name
+                            )
+                        )
                     else:
                         # We still need to continue to remaining steps after other conditions have been processed
                         self.log.debug(
