@@ -2,6 +2,7 @@ package snitch
 
 import "fmt"
 
+// TODO: allow 166 inside of the string
 func (f *function) ReadMemory(ptr uint32, length int) ([]byte, error) {
 	data := make([]byte, 0)
 	nullHits := 0

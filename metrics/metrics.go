@@ -6,11 +6,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/streamdal/snitch-go-client/server"
+
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/plumber"
 	"github.com/streamdal/snitch-go-client/types"
 )
 
@@ -51,7 +52,7 @@ type Config struct {
 	ReaperCounterInterval time.Duration
 	ReaperCounterTTL      time.Duration
 	CounterWorkerPoolSize int
-	Plumber               plumber.IPlumberClient
+	ServerClient          server.IServerClient
 	ShutdownCtx           context.Context
 	Log                   logger.Logger
 }
@@ -93,7 +94,7 @@ func New(cfg *Config) (*Metrics, error) {
 }
 
 func validateConfig(cfg *Config) error {
-	if cfg.Plumber == nil {
+	if cfg.ServerClient == nil {
 		return ErrMissingPlumberClient
 	}
 
@@ -219,7 +220,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
 			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Name, entry.Value)
-			err = m.Plumber.SendMetrics(context.Background(), entry)
+			err = m.ServerClient.SendMetrics(context.Background(), entry)
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()

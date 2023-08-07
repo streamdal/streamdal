@@ -9,9 +9,12 @@ import (
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
 type function struct {
+	ID      string
 	Inst    api.Module
 	f       api.Function
 	alloc   api.Function
@@ -59,52 +62,47 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	return bytes, nil
 }
 
-func (d *Snitch) setFunctionCache(m Module, f *function) {
-	d.functionsMtx.Lock()
-	defer d.functionsMtx.Unlock()
+func (s *Snitch) setFunctionCache(wasmID string, f *function) {
+	s.functionsMtx.Lock()
+	defer s.functionsMtx.Unlock()
 
-	d.functions[m] = f
+	s.functions[wasmID] = f
 }
 
-func (d *Snitch) getFunction(m Module) (*function, error) {
+func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*function, error) {
 	// check cache
-	fc, ok := d.getFunctionFromCache(m)
+	fc, ok := s.getFunctionFromCache(step.XWasmId)
 	if ok {
 		return fc, nil
 	}
 
-	wasmData, err := d.Plumber.GetWasmFile(context.Background(), string(m)+".wasm")
-	if err != nil {
-		return nil, err
-	}
-
-	fi, err := createFunction(wasmData)
+	fi, err := createFunction(step)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create function")
 	}
 
 	// Cache function
-	d.setFunctionCache(m, fi)
+	s.setFunctionCache(step.XWasmId, fi)
 
 	return fi, nil
 }
 
-func (d *Snitch) getFunctionFromCache(rt Module) (*function, bool) {
-	d.functionsMtx.RLock()
-	defer d.functionsMtx.RUnlock()
+func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
+	s.functionsMtx.RLock()
+	defer s.functionsMtx.RUnlock()
 
-	f, ok := d.functions[rt]
+	f, ok := s.functions[wasmID]
 	return f, ok
 }
 
-func createFunction(wasmBytes []byte) (*function, error) {
-	inst, err := createWASMInstance(wasmBytes)
+func createFunction(step *protos.PipelineStep) (*function, error) {
+	inst, err := createWASMInstance(step.XWasmBytes)
 	if err != nil {
 		return nil, err
 	}
 
 	// This is the actual function we'll be executing
-	f := inst.ExportedFunction("f")
+	f := inst.ExportedFunction(step.XWasmFunction)
 	if f == nil {
 		return nil, errors.New("unable to get func")
 	}
@@ -122,6 +120,7 @@ func createFunction(wasmBytes []byte) (*function, error) {
 	}
 
 	return &function{
+		ID:      step.XWasmId,
 		Inst:    inst,
 		f:       f,
 		alloc:   alloc,
