@@ -1,6 +1,4 @@
-import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
 import { ErrorType } from "../form/validate.ts";
-import { StepArgType } from "./stepArgs.tsx";
 import { CheckboxGroup } from "../form/checkboxGroup.tsx";
 import { PipelineStepCondition } from "snitch-protos/protos/pipeline.ts";
 
@@ -18,7 +16,7 @@ export const StepConditions = (
     <div class="flex flex-row justify-between">
       <CheckboxGroup
         label="On Success"
-        name={`steps[${stepIndex}].onSuccess`}
+        name={`steps.${stepIndex}.onSuccess`}
         data={data}
         setData={setData}
         errors={errors}
@@ -27,7 +25,7 @@ export const StepConditions = (
       />
       <CheckboxGroup
         label="On Failure"
-        name={`steps[${stepIndex}].onFailure`}
+        name={`steps.${stepIndex}.onFailure`}
         data={data}
         setData={setData}
         errors={errors}

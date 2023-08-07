@@ -113,7 +113,6 @@ export const dummyServiceMap = {
                 WasmFunction: "",
               },
             ],
-
           },
         },
         {
@@ -121,7 +120,7 @@ export const dummyServiceMap = {
             serviceName: "Test Service Name",
             componentName: "kafka",
             operationType: 2,
-            operationName: "producer-name"
+            operationName: "producer-name",
           },
           pipeline: {
             id: "1234-1234-123456",
@@ -145,7 +144,6 @@ export const dummyServiceMap = {
                 WasmFunction: "",
               },
             ],
-            
           },
         },
         {
@@ -153,7 +151,7 @@ export const dummyServiceMap = {
             serviceName: "Test Service Name",
             componentName: "kafka",
             operationType: 1,
-            operationName: "consumer-billing"
+            operationName: "consumer-billing",
           },
           pipeline: {
             id: "1234-1234-123456",
@@ -177,7 +175,6 @@ export const dummyServiceMap = {
                 WasmFunction: "",
               },
             ],
-            
           },
         },
       ],

@@ -12,7 +12,7 @@ export const upsertPipeline = async (
         meta,
       )
     : await client
-      .updatePipeline(
+      .createPipeline(
         { pipeline },
         meta,
       );

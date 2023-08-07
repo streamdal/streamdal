@@ -3,9 +3,7 @@ import { client, meta } from "./grpc.ts";
 
 export const getServiceMap = async () => {
   try {
-    const { response } = await client.getServiceMap({}, {
-      meta: { "auth-token": "1234" },
-    });
+    const { response } = await client.getServiceMap({}, meta);
 
     return response;
   } catch (error) {
@@ -16,9 +14,7 @@ export const getServiceMap = async () => {
 };
 
 export const getPipelines = async () => {
-  const { response } = await client.getPipelines({}, {
-    meta: { "auth-token": "1234" },
-  });
+  const { response } = await client.getPipelines({}, meta);
 
   return response?.pipelines;
 };

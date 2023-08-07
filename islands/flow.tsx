@@ -39,8 +39,6 @@ export type Node = {
   };
 };
 
-const flowKey: string = "flow-storage";
-
 export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
@@ -99,26 +97,26 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     //       setEdges(flow.edges || []);
     //     }
     // } else {
-    let nodes = [
-      {
-        id: "1",
-        type: "service",
-        dragHandle: "#dragHandle",
-        position: { x: 150, y: 0 },
-        data: { label: `${serviceMap[keys[0]].name}` },
-      },
-      {
-        id: "10",
-        type: "component",
-        sourcePosition: "right",
-        targetPosition: "left",
-        position: { x: 215, y: 350 },
-        data: {
-          label: `${serviceMap[keys[0]].pipelines[0].audience
-            ?.componentName}`,
-        },
-      },
-    ];
+    // let nodes = [
+    //   {
+    //     id: "1",
+    //     type: "service",
+    //     dragHandle: "#dragHandle",
+    //     position: { x: 150, y: 0 },
+    //     data: { label: `${serviceMap[keys[0]].name}` },
+    //   },
+    //   {
+    //     id: "10",
+    //     type: "component",
+    //     sourcePosition: "right",
+    //     targetPosition: "left",
+    //     position: { x: 215, y: 350 },
+    //     data: {
+    //       label: `${serviceMap[keys[0]].pipelines[0].audience
+    //         ?.componentName}`,
+    //     },
+    //   },
+    // ];
     // console.log([...nodes, ...getOperation(example)]);
 
     setNodes([
@@ -187,7 +185,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     );
     const consumerNodes = consumers.map(
       (component: PipelineInfo, i: number) => {
-        console.log(component)
+        console.log(component);
         const isCovered = i !== 0 ? true : false;
         return {
           id: `${2000 + i}`,

@@ -7,7 +7,7 @@ export const DeleteModal = (
     <div
       id={id}
       aria-modal="true"
-      class="fixed top-[10%] left-[30%] right-0 z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-h-[80vh]"
+      class="fixed top-[10%] left-[30%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-h-[80vh]"
       role="dialog"
     >
       <div class="relative w-full max-w-md max-h-full">
