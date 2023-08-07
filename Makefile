@@ -19,7 +19,7 @@ setup/darwin:
 .PHONY: test
 test: description = Run all tests
 test:
-	#bash ./init_wasm.sh
+	bash ./init_wasm.sh
 	go test ./...
 
 .PHONY: test/fakes
@@ -33,5 +33,5 @@ test/fakes:
 .PHONY: test/coverage
 test/coverage: description = Run all tests
 test/coverage:
-	#bash ./init_wasm.sh
+	bash ./init_wasm.sh
 	go test ./... -coverprofile c.out
