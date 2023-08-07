@@ -1,13 +1,22 @@
 import { Handle, Position } from "reactflow";
-import { NodeMenu } from "./rules/participantsMenu.tsx";
+import { NodeMenu, ServiceNodeMenu } from "./rules/participantsMenu.tsx";
 import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
 import "flowbite";
 import "twind";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import { ConsumerIcon } from "./icons/consumer.tsx";
 import { ProducerIcon } from "./icons/producer.tsx";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
 
-export const Service = ({ data }: any) => {
+type ActorNodeData = {
+  label: string;
+  source?: string;
+  target?: string;
+  instances: number;
+  pipeline: PipelineInfo;
+};
+
+export const Service = ({ data }: { data: { label: string } }) => {
   return (
     <div class="h-[100px]">
       <div class="h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
@@ -25,7 +34,7 @@ export const Service = ({ data }: any) => {
             4 instances
           </p>
         </div>
-        <NodeMenu data={data.pipeline} />
+        <ServiceNodeMenu />
       </div>
       <span class="sr-only">Notifications</span>
 
@@ -47,7 +56,7 @@ export const Service = ({ data }: any) => {
   );
 };
 
-export const Producer = ({ data }: any) => {
+export const Producer = ({ data }: { data: ActorNodeData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -68,20 +77,24 @@ export const Producer = ({ data }: any) => {
           id="dragHandle"
         />
         <ProducerIcon />
-        <a
-          href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
-            encodeURIComponent(data.pipeline.audience.componentName)
-          }/${
-            data.pipeline.audience.operationType === 1 ? "consumer" : "producer"
-          }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
-        >
-          <div className={"flex flex-col p-1"}>
-            <h2 className={"text-[16px]"}>
-              {data.label}
-            </h2>
-            <h3 class="text-xs text-gray-500">Producer</h3>
-          </div>
-        </a>
+        {data.pipeline.audience && (
+          <a
+            href={`/service/${encodeURIComponent(data.pipeline.audience.serviceName)}/component/${
+              encodeURIComponent(data.pipeline.audience.componentName)
+            }/${
+              data.pipeline.audience.operationType === 1
+                ? "consumer"
+                : "producer"
+            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
+          >
+            <div className={"flex flex-col p-1"}>
+              <h2 className={"text-[16px]"}>
+                {data.label}
+              </h2>
+              <h3 class="text-xs text-gray-500">Producer</h3>
+            </div>
+          </a>
+        )}
         <NodeMenu data={data.pipeline} />
       </div>
       <div
@@ -119,7 +132,7 @@ export const Producer = ({ data }: any) => {
   );
 };
 
-export const Consumer = ({ data }: any) => {
+export const Consumer = ({ data }: { data: ActorNodeData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -141,20 +154,24 @@ export const Consumer = ({ data }: any) => {
         />
 
         <ConsumerIcon className={"mx-2"} />
-        <a
-          href={`/${encodeURIComponent(data.pipeline.audience.serviceName)}/${
-            encodeURIComponent(data.pipeline.audience.componentName)
-          }/${
-            data.pipeline.audience.operationType === 1 ? "consumer" : "producer"
-          }/${encodeURIComponent(data.pipeline.audience.operationName)}`}
-        >
-          <div className={"flex flex-col p-1"}>
-            <h2 className={"text-[16px] text-center"}>
-              {data.label}
-            </h2>
-            <h3 class="text-xs text-gray-500">Consumer</h3>
-          </div>
-        </a>
+        {data.pipeline.audience && (
+          <a
+            href={`/service/${encodeURIComponent(data.pipeline.audience.serviceName)}/component/${
+              encodeURIComponent(data.pipeline.audience.componentName)
+            }/${
+              data.pipeline.audience.operationType === 1
+                ? "consumer"
+                : "producer"
+            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
+          >
+            <div className={"flex flex-col p-1"}>
+              <h2 className={"text-[16px] text-center"}>
+                {data.label}
+              </h2>
+              <h3 class="text-xs text-gray-500">Consumer</h3>
+            </div>
+          </a>
+        )}
         <NodeMenu data={data.pipeline} />
       </div>
       <div
@@ -192,7 +209,7 @@ export const Consumer = ({ data }: any) => {
   );
 };
 
-export const Component = ({ data }: any) => {
+export const Component = ({ data }: { data: { label: string } }) => {
   return (
     <div
       className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +

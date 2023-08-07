@@ -7,6 +7,7 @@ import {
   PipelineInfo,
   ServiceInfo,
 } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
+import { titleCase } from "../lib/utils.ts";
 
 type Params = {
   service: string;
@@ -52,8 +53,7 @@ export default function InfoModal(
                   </h3>
                   {/* janky uppercase stuff */}
                   <p class="text-xs text-gray-500">
-                    {`${params.operationType.charAt(0).toUpperCase()}${
-                      params.operationType.slice(1)
+                    {`${titleCase(params.operationType)
                     }`}
                   </p>
                 </div>
