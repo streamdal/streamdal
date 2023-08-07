@@ -384,14 +384,27 @@ var _ = Describe("External gRPC API", func() {
 			Expect(fetchedPipeline).ToNot(BeNil())
 
 			// Delete the pipeline
-			err = natsClient.Delete(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			resp, err := externalClient.DeletePipeline(ctxWithGoodAuth, &protos.DeletePipelineRequest{
+				PipelineId: createdPipelineID,
+			})
+
 			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
 
 			// Get the pipeline again - should fail
 			shouldNotExist, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(nats.ErrKeyNotFound))
 			Expect(shouldNotExist).To(BeNil())
+
+			// Get pipeline via external API - should fail
+			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
+				PipelineId: createdPipelineID,
+			})
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("pipeline not found"))
+			Expect(getResp).To(BeNil())
 		})
 	})
 
