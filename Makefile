@@ -11,32 +11,19 @@ help: HELP_SCRIPT = \
 help:
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
 
-.PHONY: build
-build: description = Build everything
-build:
-	tinygo build -o src/match.wasm -target wasi src/match.go
-	tinygo build -o src/transform.wasm -target wasi src/transform.go
-
-
 .PHONY: setup/darwin
 setup/darwin: description = Install toolkit for building on macOS M1
 setup/darwin:
-	brew tap tinygo-org/tools && brew install tinygo wasmtime
-	go install -v github.com/CosmWasm/tinyjson
-
-.PHONY: generate
-generate: description = generate json marshal/unmarshal code
-generate:
-	tinyjson -all common/common.go
+	brew install tinygo wasmtime
 
 .PHONY: test
 test: description = Run all tests
 test:
-	bash ./init_wasm.sh
+	#bash ./init_wasm.sh
 	go test ./...
 
 .PHONY: test/coverage
 test/coverage: description = Run all tests
 test/coverage:
-	bash ./init_wasm.sh
+	#bash ./init_wasm.sh
 	go test ./... -coverprofile c.out
