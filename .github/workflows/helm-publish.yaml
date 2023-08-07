@@ -1,0 +1,43 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    paths:
+      - 'helm-charts/**'
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@github.com"
+
+    - name: Install Helm
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+
+    - name: Package Helm Chart
+      run: |
+        cd helm-charts/snitch-server
+        helm package .
+
+    - name: Update Helm repo index
+      run: |
+        helm repo index helm-charts/snitch-server --url https://streamdal.github.io/snitch/helm-charts/snitch-server
+        git add helm-charts/snitch-server/index.yaml
+        git add helm-charts/snitch-server/*.tgz
+
+    - name: Push changes
+      run: |
+        git commit -m "Update Helm chart"
+        git push

@@ -13,10 +13,11 @@ This Helm chart deploys the Snitch Server
 ### Add repo
 
 ```bash
-helm repo add snitch https://streamdal.github.io/snitch/helm-charts
+helm repo add snitch https://streamdal.github.io/snitch/helm-charts/snitch-server
 ```
 
 ### Update repos
+
 ```bash
 helm repo update
 ```
@@ -24,7 +25,7 @@ helm repo update
 ### Install
 
 ```bash
- helm install snitch snitch/snitch-server-helm 
+helm install snitch snitch/snitch-server
 ```
 
 ### View console
