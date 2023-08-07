@@ -17,13 +17,10 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
@@ -45,8 +42,8 @@ type OperationType int
 type ClientType int
 
 const (
-	// Publish tells Process to run the pipelines against the publish ruleset
-	Publish OperationType = 1
+	// Produce tells Process to run the pipelines against the produce ruleset
+	Produce OperationType = 1
 
 	// Consume tells Process to run the pipelines against the consume ruleset
 	Consume OperationType = 2
@@ -94,7 +91,7 @@ type Snitch struct {
 	functionsMtx       *sync.RWMutex
 	pipelinesMtx       *sync.RWMutex
 	pipelinesPausedMtx *sync.RWMutex
-	ServerClient       server.IServerClient
+	serverClient       server.IServerClient
 	metrics            metrics.IMetrics
 	audiences          map[string]struct{}
 	audiencesMtx       *sync.RWMutex
@@ -155,7 +152,7 @@ func New(cfg *Config) (*Snitch, error) {
 	s := &Snitch{
 		functions:          make(map[string]*function),
 		functionsMtx:       &sync.RWMutex{},
-		ServerClient:       serverClient,
+		serverClient:       serverClient,
 		pipelines:          make(map[string]map[string]*protos.Command),
 		pipelinesMtx:       &sync.RWMutex{},
 		pipelinesPaused:    make(map[string]map[string]*protos.Command),
@@ -243,33 +240,15 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
-	// Don't need to add twice
-	if s.seenAudience(ctx, aud) {
-		return
-	}
-
-	s.audiencesMtx.Lock()
-	if s.audiences == nil {
-		s.audiences = make(map[string]struct{})
-	}
-	s.audiences[audToStr(aud)] = struct{}{}
-	s.audiencesMtx.Unlock()
-
-	// Run as goroutine to avoid blocking processing
-	go func() {
-		if err := s.ServerClient.NewAudience(ctx, aud); err != nil {
-			s.Logger.Errorf("failed to add audience: %s", err)
-		}
-	}()
-}
-
 func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
 	// Get WASM module
 	f, err := s.getFunction(ctx, step)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
+
+	// Don't need this anymore, and don't want to send it to the wasm function
+	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
 		Input: data,
@@ -295,18 +274,6 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 	return resp, nil
 }
 
-func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
-	s.audiencesMtx.RLock()
-	defer s.audiencesMtx.RUnlock()
-
-	if s.audiences == nil {
-		return false
-	}
-
-	_, ok := s.audiences[audToStr(aud)]
-	return ok
-}
-
 func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
 	s.pipelinesMtx.RLock()
 	defer s.pipelinesMtx.RUnlock()
@@ -328,7 +295,8 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 		return nil, errors.New("request cannot be nil")
 	}
 
-	payloadSize := len(req.Data)
+	data := req.Data
+	payloadSize := len(data)
 
 	aud := &protos.Audience{
 		ServiceName:   s.ServiceName,
@@ -340,7 +308,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 	pipelines := s.getPipelines(ctx, aud)
 	if len(pipelines) == 0 {
 		// No pipelines for this mode, nothing to do
-		return &SnitchResponse{Data: req.Data}, nil
+		return &SnitchResponse{Data: data, Message: "No pipelines, message ignored"}, nil
 	}
 
 	if payloadSize > MaxPayloadSize {
@@ -352,21 +320,24 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 		//})
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
 		s.Logger.Warn(msg)
-		return &SnitchResponse{Data: req.Data, Error: true, Message: msg}, nil
+		return &SnitchResponse{Data: data, Error: true, Message: msg}, nil
 	}
 
 	for _, pipeline := range pipelines {
 		for _, step := range pipeline.GetAttachPipeline().GetPipeline().Steps {
-			wasmResp, err := s.runStep(ctx, step, req.Data)
+			wasmResp, err := s.runStep(ctx, step, data)
 			if err != nil {
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &SnitchResponse{
-						Data:    wasmResp.Output,
+						Data:    req.Data,
 						Error:   true,
 						Message: err.Error(),
 					}, nil
 				}
+
+				// wasmResp will be nil, so don't allow code below to execute
+				continue
 			}
 
 			// Check on success and on-failures
@@ -385,15 +356,27 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 				if !shouldContinue {
 					return &SnitchResponse{
 						Data:    wasmResp.Output,
-						Error:   false,
-						Message: "",
+						Error:   true,
+						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
 					}, nil
 				}
 			}
+
+			data = wasmResp.Output
 		}
 	}
 
-	return nil, nil
+	// Dry run should not modify anything, but we must allow pipeline to
+	// mutate internal state in order to function properly
+	if s.DryRun {
+		data = req.Data
+	}
+
+	return &SnitchResponse{
+		Data:    data,
+		Error:   false,
+		Message: "",
+	}, nil
 }
 
 func (s *Snitch) handleConditions(
@@ -409,7 +392,7 @@ func (s *Snitch) handleConditions(
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
 			s.Logger.Debugf("Step '%s' failed, notifying", step.Name)
 			if !s.DryRun {
-				if err := s.ServerClient.Notify(ctx, pipeline, step, aud); err != nil {
+				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
 					s.Logger.Errorf("failed to notify condition: %v", err)
 				}
 			}
@@ -423,35 +406,4 @@ func (s *Snitch) handleConditions(
 	}
 
 	return shouldContinue
-}
-
-func audToStr(aud *protos.Audience) string {
-	if aud == nil {
-		return ""
-	}
-
-	return fmt.Sprintf("%s:%s:%d:%s", aud.ServiceName, aud.ComponentName, aud.OperationType, aud.OperationName)
-}
-
-func strToAud(str string) *protos.Audience {
-	if str == "" {
-		return nil
-	}
-
-	parts := strings.Split(str, ":")
-	if len(parts) != 4 {
-		return nil
-	}
-
-	opType, err := strconv.Atoi(parts[2])
-	if err != nil {
-		return nil
-	}
-
-	return &protos.Audience{
-		ServiceName:   parts[0],
-		ComponentName: parts[1],
-		OperationType: protos.OperationType(opType),
-		OperationName: parts[3],
-	}
 }

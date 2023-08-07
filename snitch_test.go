@@ -9,442 +9,418 @@ import (
 	"testing"
 	"time"
 
-	"github.com/batchcorp/plumber-schemas/build/go/protos/common"
-	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
-	"github.com/streamdal/snitch-go-client/plumber/plumberfakes"
+	"github.com/streamdal/snitch-go-client/server/serverfakes"
 )
-
-func TestMatch(t *testing.T) {
-	cases := []struct {
-		data     []byte
-		search   string
-		expected bool
-	}{
-		{[]byte(`{"type": "hello world"}`), "hello", true},
-		{[]byte(`{"type": "hello world"}`), "gmail", false},
-	}
-
-	d, err := setup(Match)
-	if err != nil {
-		t.Error(err)
-	}
-
-	for _, c := range cases {
-		cfg := &protos.RuleConfigMatch{
-			Path:     "type",
-			Type:     "string_contains_any",
-			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
-			Args:     []string{c.search},
-		}
-
-		isMatch, err := d.runMatch(context.Background(), c.data, cfg)
-		if err != nil {
-			t.Error("error during runMatch: " + err.Error())
-		}
-
-		if isMatch != c.expected {
-			t.Errorf("expected %v, got %v", c.expected, isMatch)
-		}
-	}
-}
 
 func TestValidateConfig(t *testing.T) {
 	t.Run("invalid config", func(t *testing.T) {
 		err := validateConfig(nil)
-		if err != ErrEmptyConfig {
+		if !errors.Is(err, ErrEmptyConfig) {
 			t.Error("expected error but got nil")
 		}
 	})
 
 	t.Run("empty data source", func(t *testing.T) {
 		cfg := &Config{
-			DataSource:   "",
-			ShutdownCtx:  context.Background(),
-			PlumberURL:   "http://localhost:9090",
-			PlumberToken: "foo",
-			DryRun:       false,
-			WasmTimeout:  time.Second,
-			Logger:       &logger.NoOpLogger{},
+			ServiceName: "",
+			ShutdownCtx: context.Background(),
+			SnitchURL:   "http://localhost:9090",
+			SnitchToken: "foo",
+			DryRun:      false,
+			StepTimeout: time.Second,
+			Logger:      &logger.NoOpLogger{},
 		}
 		err := validateConfig(cfg)
-		if err != ErrEmptyDataSource {
-			t.Error("expected ErrEmptyDataSource")
+		if !errors.Is(err, ErrEmptyServiceName) {
+			t.Error("expected ErrEmptyServiceName")
 		}
 	})
 
 	t.Run("empty context", func(t *testing.T) {
 		cfg := &Config{
-			DataSource:   "kafka",
-			ShutdownCtx:  nil,
-			PlumberURL:   "http://localhost:9090",
-			PlumberToken: "foo",
-			DryRun:       false,
-			WasmTimeout:  time.Second,
-			Logger:       &logger.NoOpLogger{},
+			ServiceName: "mysvc1",
+			ShutdownCtx: nil,
+			SnitchURL:   "http://localhost:9090",
+			SnitchToken: "foo",
+			DryRun:      false,
+			StepTimeout: time.Second,
+			Logger:      &logger.NoOpLogger{},
 		}
 		err := validateConfig(cfg)
-		if err != ErrMissingShutdownCtx {
+		if !errors.Is(err, ErrMissingShutdownCtx) {
 			t.Error("expected ErrMissingShutdownCtx")
 		}
 	})
 
 	t.Run("invalid wasm timeout duration", func(t *testing.T) {
-		os.Setenv("SNITCH_WASM_TIMEOUT", "foo")
+		_ = os.Setenv("SNITCH_STEP_TIMEOUT", "foo")
 		cfg := &Config{
-			DataSource:   "kafka",
-			ShutdownCtx:  context.Background(),
-			PlumberURL:   "http://localhost:9090",
-			PlumberToken: "foo",
-			DryRun:       false,
-			Logger:       &logger.NoOpLogger{},
+			ServiceName: "mysvc1",
+			ShutdownCtx: context.Background(),
+			SnitchURL:   "http://localhost:9090",
+			SnitchToken: "foo",
+			DryRun:      false,
+			Logger:      &logger.NoOpLogger{},
 		}
 		err := validateConfig(cfg)
-		if err == nil || !strings.Contains(err.Error(), "unable to parse SNITCH_WASM_TIMEOUT") {
+		if err == nil || !strings.Contains(err.Error(), "unable to parse SNITCH_STEP_TIMEOUT") {
 			t.Error("expected time.ParseDuration error")
 		}
-		os.Unsetenv("SNITCH_WASM_TIMEOUT")
+		_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
 	})
 }
 
-func TestGetRuleUpdates(t *testing.T) {
-	rsID := uuid.New().String()
-	ruleID := uuid.New().String()
+func TestGetPipelines(t *testing.T) {
+	ctx := context.Background()
 
-	fakePlumber := getFakePlumber()
-	fakePlumber.GetRulesStub = func(context.Context, string) ([]*common.RuleSet, error) {
-		return []*common.RuleSet{
+	fakeClient := &serverfakes.FakeIServerClient{}
+
+	s := &Snitch{
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines:    map[string]map[string]*protos.Command{},
+		serverClient: fakeClient,
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+	}
+
+	aud := &protos.Audience{
+		ServiceName:   "mysvc1",
+		ComponentName: "kafka",
+		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+		OperationName: "mytopic",
+	}
+
+	t.Run("no pipelines", func(t *testing.T) {
+		pipelines := s.getPipelines(ctx, aud)
+		if len(pipelines) != 0 {
+			t.Error("expected empty map")
+		}
+
+		// Allow time for goroutine to run
+		time.Sleep(time.Millisecond * 500)
+
+		// Audience should be created on the server
+		if fakeClient.NewAudienceCallCount() != 1 {
+			t.Error("expected NewAudience to be called")
+		}
+	})
+
+	t.Run("single pipeline", func(t *testing.T) {
+		s.pipelines[audToStr(aud)] = map[string]*protos.Command{
+			uuid.New().String(): {},
+		}
+
+		if len(s.getPipelines(ctx, aud)) != 1 {
+			t.Error("expected 1 pipeline")
+		}
+	})
+}
+
+func TestHandleConditions(t *testing.T) {
+	fakeClient := &serverfakes.FakeIServerClient{}
+
+	s := &Snitch{
+		serverClient: fakeClient,
+		Config: &Config{
+			Logger: &loggerfakes.FakeLogger{},
+			DryRun: false,
+		},
+	}
+
+	aud := &protos.Audience{}
+	pipeline := &protos.Pipeline{}
+	step := &protos.PipelineStep{}
+
+	t.Run("notify condition", func(t *testing.T) {
+		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
+
+		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud)
+		if got != true {
+			t.Error("handleConditions() should return true")
+		}
+		if fakeClient.NotifyCallCount() != 1 {
+			t.Error("expected Notify() to be called")
+		}
+	})
+
+	t.Run("abort condition", func(t *testing.T) {
+		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT}
+
+		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud)
+		if got != false {
+			t.Error("handleConditions() should return false")
+		}
+	})
+
+}
+
+func TestProcess_nil(t *testing.T) {
+	s := &Snitch{}
+	_, err := s.Process(context.Background(), nil)
+	if err == nil || !strings.Contains(err.Error(), "request cannot be nil") {
+		t.Error("expected error")
+	}
+}
+
+func TestProcess_success(t *testing.T) {
+	aud := &protos.Audience{
+		ServiceName:   "mysvc1",
+		ComponentName: "kafka",
+		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+		OperationName: "mytopic",
+	}
+
+	wasmData, err := os.ReadFile("src/detective.wasm")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pipeline := &protos.Pipeline{
+		Id:   uuid.New().String(),
+		Name: "Test Pipeline",
+		Steps: []*protos.PipelineStep{
 			{
-				Id:         rsID,
-				Name:       "Transform message",
-				Mode:       common.RuleMode_RULE_MODE_PUBLISH,
-				DataSource: "kafka",
-				Key:        "mytopic",
-				Version:    2,
-				Rules: map[string]*common.Rule{
-					ruleID: {
-						Id:   ruleID,
-						Type: common.RuleType_RULE_TYPE_MATCH,
-						RuleConfig: &common.Rule_MatchConfig{
-							MatchConfig: &common.RuleConfigMatch{
-								Path: "payload.ccnum",
-								Type: "pii_creditcard",
-							},
-						},
-						FailureModeConfigs: []*common.FailureMode{
-							{
-								Mode: common.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM,
-								Config: &common.FailureMode_Transform{
-									Transform: &common.FailureModeTransform{
-										Path:  "payload.ccnum",
-										Value: "****",
-									},
-								},
-							},
+				Name:          "Step 1",
+				XWasmId:       uuid.New().String(),
+				XWasmBytes:    wasmData,
+				XWasmFunction: "f",
+				OnSuccess:     make([]protos.PipelineStepCondition, 0),
+				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+				Step: &protos.PipelineStep_Detective{
+					Detective: &steps.DetectiveStep{
+						Path:   "object.payload",
+						Args:   []string{"gmail.com"},
+						Negate: false,
+						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+					},
+				},
+			},
+		},
+	}
+
+	s := &Snitch{
+		serverClient: &serverfakes.FakeIServerClient{},
+		functionsMtx: &sync.RWMutex{},
+		functions:    map[string]*function{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+		Config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		metrics:      &metricsfakes.FakeIMetrics{},
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines: map[string]map[string]*protos.Command{
+			audToStr(aud): {
+				pipeline.Id: {
+					Audience: aud,
+					Command: &protos.Command_AttachPipeline{
+						AttachPipeline: &protos.AttachPipelineCommand{
+							Pipeline: pipeline,
 						},
 					},
 				},
 			},
-		}, nil
-	}
-
-	d := &Snitch{
-		Plumber:  fakePlumber,
-		rulesMtx: &sync.RWMutex{},
-		Config: &Config{
-			DataSource: "kafka",
 		},
 	}
 
-	// Ensure method doesn't error
-	if err := d.getRuleUpdates(); err != nil {
-		t.Error("unexpected error: " + err.Error())
-	}
-
-	// We should have gotten 1 rule
-	if len(d.rules) != 1 {
-		t.Errorf("expected 1 rule set, got %d", len(d.rules))
-	}
-
-	if _, ok := d.rules[Publish]["mytopic"]; !ok {
-		t.Error("expected publish rule for topic 'mytopic' to be in rules map")
-	}
-
-	if len(d.rules[Publish]["mytopic"]) != 1 {
-		t.Errorf("expected 1 rule for topic 'mytopic', got %d", len(d.rules[Publish]["mytopic"]))
-	}
-
-}
-
-func TestRunMatch(t *testing.T) {
-	d := &Snitch{
-		Plumber:      getFakePlumber(),
-		functions:    map[Module]*function{},
-		functionsMtx: &sync.RWMutex{},
-		Config: &Config{
-			DataSource: "kafka",
-		},
-	}
-
-	data := []byte(`{"type": "hello world"}`)
-
-	cfg := &protos.RuleConfigMatch{
-		Path:     "type",
-		Type:     "string_contains_any",
-		Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
-		Args:     []string{"hello"},
-	}
-
-	matched, err := d.runMatch(context.Background(), data, cfg)
+	resp, err := s.Process(context.Background(), &SnitchRequest{
+		ComponentName: aud.ComponentName,
+		OperationType: OperationType(aud.OperationType),
+		OperationName: aud.OperationName,
+		Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
+	})
 	if err != nil {
-		t.Error("unexpected error: " + err.Error())
+		t.Fatal(err)
 	}
 
-	if !matched {
-		t.Error("expected match")
+	if resp.Error {
+		t.Error(resp.Message)
+	}
+
+	if resp.Message == "No pipelines, message ignored" {
+		t.Error("no pipelines, message ignored")
 	}
 }
 
-func TestFailTransform(t *testing.T) {
-	d := &Snitch{
-		Plumber:      getFakePlumber(),
-		functions:    map[Module]*function{},
-		functionsMtx: &sync.RWMutex{},
-		Config: &Config{
-			DataSource: "kafka",
-		},
+func TestProcess_matchfail_and_abort(t *testing.T) {
+	aud := &protos.Audience{
+		ServiceName:   "mysvc1",
+		ComponentName: "kafka",
+		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+		OperationName: "mytopic",
 	}
 
-	data := []byte(`{"type": "hello world"}`)
-
-	cfg := &common.FailureModeTransform{
-		Type:  common.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
-		Path:  "type",
-		Value: `"****"`,
-	}
-
-	want := []byte(`{"type": "****"}`)
-	got, err := d.failTransform(context.Background(), data, cfg)
+	wasmData, err := os.ReadFile("src/detective.wasm")
 	if err != nil {
-		t.Error("unexpected error: " + err.Error())
+		t.Fatal(err)
 	}
 
-	if string(got) != string(want) {
-		t.Errorf("expected transformed data to be %s', got %s", string(want), string(got))
-	}
-}
-
-func TestApplyRules_MaxData(t *testing.T) {
-	fakeLogger := &loggerfakes.FakeLogger{}
-
-	d := &Snitch{
-		functions:    map[Module]*function{},
-		functionsMtx: &sync.RWMutex{},
-		rules: map[Mode]map[string][]*protos.Rule{
-			Publish: {
-				"somekey": []*protos.Rule{{
-					Id: "foo",
-				}},
-			},
-		},
-		rulesMtx: &sync.RWMutex{},
-		Config: &Config{
-			DataSource: "kafka",
-			Logger:     fakeLogger,
-		},
-		metrics: &metricsfakes.FakeIMetrics{},
-	}
-
-	got, err := d.ApplyRules(context.Background(), Publish, "somekey", make([]byte, DefaultMaxDataSize+1))
-	if err != nil {
-		t.Error("unexpected error: " + err.Error())
-	}
-
-	// Ensure a warning was logged
-	if fakeLogger.WarnfCallCount() != 1 {
-		t.Error("expected warning to be logged")
-	}
-
-	// Ensure data was returned unmodified
-	if len(got) != DefaultMaxDataSize+1 {
-		t.Errorf("expected data to be %d bytes, got %d", DefaultMaxDataSize+1, len(got))
-	}
-}
-
-func TestApplyRules_FailTransform(t *testing.T) {
-	d := setupForFailure([]*common.FailureMode{
-		{
-			Mode: common.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM,
-			Config: &common.FailureMode_Transform{
-				Transform: &common.FailureModeTransform{
-					Type:  common.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
-					Path:  "type",
-					Value: `"****"`,
+	pipeline := &protos.Pipeline{
+		Id:   uuid.New().String(),
+		Name: "Test Pipeline",
+		Steps: []*protos.PipelineStep{
+			{
+				Name:          "Step 1",
+				XWasmId:       uuid.New().String(),
+				XWasmBytes:    wasmData,
+				XWasmFunction: "f",
+				OnSuccess:     make([]protos.PipelineStepCondition, 0),
+				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+				Step: &protos.PipelineStep_Detective{
+					Detective: &steps.DetectiveStep{
+						Path:   "object.payload",
+						Args:   []string{"gmail.com"},
+						Negate: false,
+						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+					},
 				},
 			},
 		},
-	})
-
-	want := `{"type": "****"}`
-	got, err := d.ApplyRules(context.Background(), Publish, "mytopic", []byte(`{"type": "hello world"}`))
-	if err != nil {
-		t.Error("unexpected error: " + err.Error())
 	}
 
-	if string(got) != want {
-		t.Errorf("expected data to be %s, got %s", want, string(got))
-	}
-}
-
-func TestApplyRules_FailReject(t *testing.T) {
-	d := setupForFailure([]*common.FailureMode{
-		{
-			Mode:   common.RuleFailureMode_RULE_FAILURE_MODE_REJECT,
-			Config: &common.FailureMode_Reject{},
-		},
-	})
-
-	got, err := d.ApplyRules(context.Background(), Publish, "mytopic", []byte(`{"type": "hello world"}`))
-
-	// We should be getting back an error indicating the message was dropped
-	if err != ErrMessageDropped {
-		t.Error("expected ErrMessageDropped error")
-	}
-
-	// Ensure data was dropped
-	if len(got) != 0 {
-		t.Errorf("expected data to be empty, got %s", string(got))
-	}
-}
-
-func TestApplyRules_FailPlumber(t *testing.T) {
-
-	d := setupForFailure([]*common.FailureMode{
-		{
-			Mode: common.RuleFailureMode_RULE_FAILURE_MODE_DLQ,
-			Config: &common.FailureMode_Dlq{
-				Dlq: &common.FailureModeDLQ{
-					StreamdalToken: uuid.New().String(),
+	s := &Snitch{
+		serverClient: &serverfakes.FakeIServerClient{},
+		functionsMtx: &sync.RWMutex{},
+		functions:    map[string]*function{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+		Config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		metrics:      &metricsfakes.FakeIMetrics{},
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines: map[string]map[string]*protos.Command{
+			audToStr(aud): {
+				pipeline.Id: {
+					Audience: aud,
+					Command: &protos.Command_AttachPipeline{
+						AttachPipeline: &protos.AttachPipelineCommand{
+							Pipeline: pipeline,
+						},
+					},
 				},
 			},
 		},
+	}
+
+	resp, err := s.Process(context.Background(), &SnitchRequest{
+		ComponentName: aud.ComponentName,
+		OperationType: OperationType(aud.OperationType),
+		OperationName: aud.OperationName,
+		Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
 	})
-
-	// Overwrite since we need SendRuleNotificationCallCount()
-	fakePlumber := getFakePlumber()
-	d.Plumber = fakePlumber
-
-	_, err := d.ApplyRules(context.Background(), Publish, "mytopic", []byte(`{"type": "hello world"}`))
-
 	if err != nil {
-		t.Error("unexpected error: " + err.Error())
+		t.Fatal(err)
 	}
 
-	// Ensure SendRuleNotification was called
-	if fakePlumber.SendRuleNotificationCallCount() != 1 {
-		t.Error("expected SendRuleNotification to be called")
-	}
-}
-
-func BenchmarkMatchSmallJSON(b *testing.B) {
-	matchBench("json-examples/small.json", b)
-}
-
-func BenchmarkMatchMediumJSON(b *testing.B) {
-	matchBench("json-examples/medium.json", b)
-}
-
-func BenchmarkMatchLargeJSON(b *testing.B) {
-	matchBench("json-examples/large.json", b)
-}
-
-func BenchmarkTransformSmallJSON(b *testing.B) {
-	transformBench("json-examples/small.json", b)
-}
-
-func BenchmarkTransformMediumJSON(b *testing.B) {
-	transformBench("json-examples/medium.json", b)
-}
-
-func BenchmarkTransformLargeJSON(b *testing.B) {
-	transformBench("json-examples/large.json", b)
-}
-
-func matchBench(fileName string, b *testing.B) {
-	jsonData, err := os.ReadFile(fileName)
-	if err != nil {
-		b.Error("unable to read json: " + err.Error())
+	if !resp.Error {
+		t.Error("expected SnitchResponse.Error = true")
 	}
 
-	d, err := setup(Match)
-	if err != nil {
-		b.Error(err)
-	}
-
-	b.ResetTimer()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	for i := 0; i < b.N; i++ {
-		cfg := &protos.RuleConfigMatch{
-			Path:     "firstname",
-			Type:     "string_contains_any",
-			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
-			Args:     []string{"Rani"},
-		}
-		_, err := d.runMatch(ctx, jsonData, cfg)
-		if err != nil {
-			cancel()
-			b.Fatal("error during runMatch: " + err.Error())
-		}
-		cancel()
+	if resp.Message != "detective step failed" {
+		t.Error("Expected SnitchResponse.Message = 'detective step failed'")
 	}
 }
 
-func transformBench(fileName string, b *testing.B) {
-	jsonData, err := os.ReadFile(fileName)
-	if err != nil {
-		b.Error("unable to read json: " + err.Error())
-	}
+//func BenchmarkMatchSmallJSON(b *testing.B) {
+//	matchBench("json-examples/small.json", b)
+//}
+//
+//func BenchmarkMatchMediumJSON(b *testing.B) {
+//	matchBench("json-examples/medium.json", b)
+//}
+//
+//func BenchmarkMatchLargeJSON(b *testing.B) {
+//	matchBench("json-examples/large.json", b)
+//}
+//
+//func BenchmarkTransformSmallJSON(b *testing.B) {
+//	transformBench("json-examples/small.json", b)
+//}
+//
+//func BenchmarkTransformMediumJSON(b *testing.B) {
+//	transformBench("json-examples/medium.json", b)
+//}
+//
+//func BenchmarkTransformLargeJSON(b *testing.B) {
+//	transformBench("json-examples/large.json", b)
+//}
 
-	d, err := setup(Transform)
-	if err != nil {
-		b.Error(err)
-	}
+//func matchBench(fileName string, b *testing.B) {
+//	jsonData, err := os.ReadFile(fileName)
+//	if err != nil {
+//		b.Error("unable to read json: " + err.Error())
+//	}
+//
+//	d, err := setup(Match)
+//	if err != nil {
+//		b.Error(err)
+//	}
+//
+//	b.ResetTimer()
+//
+//	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+//	defer cancel()
+//
+//	for i := 0; i < b.N; i++ {
+//		cfg := &protos.RuleConfigMatch{
+//			Path:     "firstname",
+//			Type:     "string_contains_any",
+//			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
+//			Args:     []string{"Rani"},
+//		}
+//		_, err := d.runMatch(ctx, jsonData, cfg)
+//		if err != nil {
+//			cancel()
+//			b.Fatal("error during runMatch: " + err.Error())
+//		}
+//		cancel()
+//	}
+//}
+//
+//func transformBench(fileName string, b *testing.B) {
+//	jsonData, err := os.ReadFile(fileName)
+//	if err != nil {
+//		b.Error("unable to read json: " + err.Error())
+//	}
+//
+//	d, err := setup(Transform)
+//	if err != nil {
+//		b.Error(err)
+//	}
+//
+//	b.ResetTimer()
+//
+//	fm := &protos.FailureModeTransform{
+//		Type:  protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
+//		Path:  "firstname",
+//		Value: "Testing",
+//	}
+//
+//	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+//	defer cancel()
+//
+//	for i := 0; i < b.N; i++ {
+//		_, err := d.failTransform(ctx, jsonData, fm)
+//		if err != nil {
+//			b.Error("error during runTransform: " + err.Error())
+//		}
+//	}
+//}
 
-	b.ResetTimer()
-
-	fm := &protos.FailureModeTransform{
-		Type:  protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
-		Path:  "firstname",
-		Value: "Testing",
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	for i := 0; i < b.N; i++ {
-		_, err := d.failTransform(ctx, jsonData, fm)
-		if err != nil {
-			b.Error("error during runTransform: " + err.Error())
-		}
-	}
-}
-
-func setup(m Module) (*Snitch, error) {
+func setup(funcID, wasmFile string) (*Snitch, error) {
 	d := &Snitch{
-		functions:    map[Module]*function{},
+		functions:    map[string]*function{},
 		functionsMtx: &sync.RWMutex{},
-		Config:       &Config{WasmTimeout: time.Second},
+		Config:       &Config{StepTimeout: time.Second},
 	}
 
-	wasmFile := path.Join("src", string(m)+".wasm")
+	wasmFile = path.Join("src", wasmFile+".wasm")
 
 	data, err := os.ReadFile(wasmFile)
 	if err != nil {
@@ -455,56 +431,83 @@ func setup(m Module) (*Snitch, error) {
 		return nil, errors.New("empty wasm file")
 	}
 
-	inst, err := createFunction(data)
+	step := &protos.PipelineStep{
+		XWasmId:       uuid.New().String(),
+		XWasmFunction: "f",
+		XWasmBytes:    data,
+	}
+
+	inst, err := createFunction(step)
 	if err != nil {
 		return nil, err
 	}
 
-	d.functions[m] = inst
+	d.functions[step.XWasmId] = inst
 
 	return d, nil
 }
 
-func setupForFailure(configs []*common.FailureMode) *Snitch {
-	return &Snitch{
-		Plumber:      getFakePlumber(),
-		functions:    map[Module]*function{},
-		functionsMtx: &sync.RWMutex{},
-		rulesMtx:     &sync.RWMutex{},
-		Config:       &Config{DataSource: "kafka"},
-		metrics:      &metricsfakes.FakeIMetrics{},
-		rules: map[Mode]map[string][]*protos.Rule{
-			Publish: {
-				"mytopic": {
-					{
-						Id:         uuid.New().String(),
-						XRulesetId: uuid.New().String(),
-						Type:       common.RuleType_RULE_TYPE_MATCH,
-						RuleConfig: &common.Rule_MatchConfig{
-							MatchConfig: &common.RuleConfigMatch{
-								Path: "type",
-								Type: "string_contains_any",
-								Args: []string{"hello"},
-							},
-						},
-						FailureModeConfigs: configs,
-					},
-				},
-			},
-		},
-	}
-}
+//func setupForFailure(funcID, wasmFile string) *Snitch {
+//	aud := &protos.Audience{
+//		ServiceName:   "mysvc1",
+//		ComponentName: "kafka",
+//		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+//		OperationName: "mytopic",
+//	}
+//
+//	pipeline := &protos.Pipeline{
+//		Id:   uuid.New().String(),
+//		Name: "Test Pipeline",
+//		Steps: []*protos.PipelineStep{
+//			{
+//				Name:          "Step 1",
+//				XWasmId:       "", // TODO
+//				XWasmBytes:    make([]byte, 0),
+//				XWasmFunction: "entry",
+//				Step: &protos.PipelineStep_Detective{
+//					Detective: &steps.DetectiveStep{
+//						Path:   "object.payload",
+//						Args:   []string{"gmail.com"},
+//						Negate: false,
+//						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+//					},
+//				},
+//			},
+//		},
+//	}
+//
+//	return &Snitch{
+//		serverClient: getFakeClient(),
+//		functions:    map[string]*function{},
+//		functionsMtx: &sync.RWMutex{},
+//		pipelinesMtx: &sync.RWMutex{},
+//		Config:       &Config{ServiceName: "mysvc1"},
+//		metrics:      &metricsfakes.FakeIMetrics{},
+//		pipelines: map[string]map[string]*protos.Command{
+//			audToStr(aud): map[string]*protos.Command{
+//				funcID: &protos.Command{
+//					Audience: aud,
+//					Command: &protos.Command_AttachPipeline{
+//						AttachPipeline: &protos.AttachPipelineCommand{
+//							Pipeline: pipeline,
+//						},
+//					},
+//				},
+//			},
+//		},
+//	}
+//}
 
-func getFakePlumber() *plumberfakes.FakeIPlumberClient {
-	fakePlumber := &plumberfakes.FakeIPlumberClient{}
-	fakePlumber.GetWasmFileStub = func(ctx context.Context, file string) ([]byte, error) {
-		data, err := os.ReadFile("src/" + file)
-		if err != nil {
-			return nil, err
-		}
-
-		return data, nil
-	}
+func getFakeClient() *serverfakes.FakeIServerClient {
+	fakePlumber := &serverfakes.FakeIServerClient{}
+	//fakePlumber.GetWasmFileStub = func(ctx context.Context, file string) ([]byte, error) {
+	//	data, err := os.ReadFile("src/" + file)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	return data, nil
+	//}
 
 	return fakePlumber
 }

@@ -16,7 +16,7 @@ import (
 type function struct {
 	ID      string
 	Inst    api.Module
-	f       api.Function
+	entry   api.Function
 	alloc   api.Function
 	dealloc api.Function
 }
@@ -40,7 +40,7 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 			ptrVal, len(req), f.Inst.Memory().Size())
 	}
 
-	result, err := f.f.Call(ctx, ptrVal, ptrLen)
+	result, err := f.entry.Call(ctx, ptrVal, ptrLen)
 	if err != nil {
 		// Clear mem on error
 		if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
@@ -104,7 +104,7 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	// This is the actual function we'll be executing
 	f := inst.ExportedFunction(step.XWasmFunction)
 	if f == nil {
-		return nil, errors.New("unable to get func")
+		return nil, fmt.Errorf("unable to get exported function '%s'", step.XWasmFunction)
 	}
 
 	// alloc allows us to pre-allocate memory in order to pass data to the WASM module
@@ -122,7 +122,7 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	return &function{
 		ID:      step.XWasmId,
 		Inst:    inst,
-		f:       f,
+		entry:   f,
 		alloc:   alloc,
 		dealloc: dealloc,
 	}, nil

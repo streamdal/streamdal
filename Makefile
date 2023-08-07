@@ -22,6 +22,14 @@ test:
 	#bash ./init_wasm.sh
 	go test ./...
 
+.PHONY: test/fakes
+test/fakes: description = Generate all fakes
+test/fakes:
+	go run github.com/maxbrunsfeld/counterfeiter/v6 -o test-assets/fakes/memoryfake.go github.com/tetratelabs/wazero/api.Memory
+	go run github.com/maxbrunsfeld/counterfeiter/v6 -o test-assets/fakes/modulefake.go github.com/tetratelabs/wazero/api.Module
+	go generate ./...
+
+
 .PHONY: test/coverage
 test/coverage: description = Run all tests
 test/coverage:

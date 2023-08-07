@@ -32,7 +32,7 @@ func (s *Snitch) register(looper director.Looper) {
 	var err error
 	var quit bool
 
-	srv, err := s.ServerClient.Register(context.Background(), req)
+	srv, err := s.serverClient.Register(context.Background(), req)
 	if err != nil {
 		panic("Failed to register with snitch server: " + err.Error())
 	}
@@ -44,7 +44,7 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if stream == nil {
-			newStream, err := s.ServerClient.Register(context.Background(), req)
+			newStream, err := s.serverClient.Register(context.Background(), req)
 			if err != nil {
 				if errors.Is(err, context.Canceled) {
 					s.Logger.Debug("context cancelled during connect")

@@ -6,12 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/snitch-go-client/server"
-
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/server"
 	"github.com/streamdal/snitch-go-client/types"
 )
 
@@ -30,7 +29,6 @@ const (
 var (
 	ErrMissingPlumberClient = errors.New("PlumberClient cannot be nil")
 	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
-	ErrEmptyEntryID         = errors.New("ID must be set")
 	ErrEmptyEntryType       = errors.New("Type must be set")
 	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
 )
