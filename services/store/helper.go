@@ -9,6 +9,9 @@ const (
 	NATSLiveBucket = "snitch_live"
 	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience
 
+	NATSAudienceBucket    = "snitch_audience"
+	NATSAudienceKeyFormat = "%s" // K: $audience V: NONE
+
 	// NATSRegisterFormat key resides in the NATSLiveBucket
 	NATSRegisterFormat = "%s/%s/register" // K: $session_id/$node_name/register; V: NONE
 
@@ -24,6 +27,10 @@ const (
 
 func NATSRegisterKey(session, node string) string {
 	return strings.ToLower(fmt.Sprintf(NATSRegisterFormat, session, node))
+}
+
+func NATSAudienceKey(audience string) string {
+	return strings.ToLower(fmt.Sprintf(NATSAudienceKeyFormat, audience))
 }
 
 func NATSLiveKey(session, node, audience string) string {

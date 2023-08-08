@@ -397,12 +397,23 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	llog := s.log.WithField("method", "AddAudience")
 	llog.Debug("received request to add audience")
 
+	// Add it to the live bucket
 	if err := s.options.NATSBackend.Put(
 		ctx,
 		NATSLiveBucket,
 		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
 		nil,
 		s.options.SessionTTL,
+	); err != nil {
+		return errors.Wrap(err, "error saving audience to NATS")
+	}
+
+	// And add it to more permanent storage (that doesn't care about the session id)
+	if err := s.options.NATSBackend.Put(
+		ctx,
+		NATSAudienceBucket,
+		NATSAudienceKey(util.AudienceToStr(req.Audience)),
+		nil,
 	); err != nil {
 		return errors.Wrap(err, "error saving audience to NATS")
 	}
