@@ -53,12 +53,9 @@ message PipelineStep {
     steps.CustomStep custom = 1004;
   }
 
-  // WASM module ID (set by snitch-server)
-  string _wasm_id = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-
   // WASM module bytes (set by snitch-server)
-  bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // WASM function name to execute (set by snitch-server)
-  string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

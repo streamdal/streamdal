@@ -146,13 +146,14 @@ class PipelineStep(betterproto.Message):
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
     decode: "steps.DecodeStep" = betterproto.message_field(1003, group="step")
     custom: "steps.CustomStep" = betterproto.message_field(1004, group="step")
-    wasm_id: str = betterproto.string_field(10000)
-    """WASM module ID (set by snitch-server)"""
-
-    wasm_bytes: bytes = betterproto.bytes_field(10001)
+    wasm_bytes: Optional[bytes] = betterproto.bytes_field(
+        10001, optional=True, group="X_wasm_bytes"
+    )
     """WASM module bytes (set by snitch-server)"""
 
-    wasm_function: str = betterproto.string_field(10002)
+    wasm_function: Optional[str] = betterproto.string_field(
+        10002, optional=True, group="X_wasm_function"
+    )
     """WASM function name to execute (set by snitch-server)"""
 
 

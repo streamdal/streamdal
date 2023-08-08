@@ -4,7 +4,10 @@
 # This file has been @generated
 
 from dataclasses import dataclass
-from typing import List
+from typing import (
+    List,
+    Optional,
+)
 
 import betterproto
 
@@ -142,9 +145,9 @@ class DecodeStep(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class DetectiveStep(betterproto.Message):
-    path: str = betterproto.string_field(1)
+    path: Optional[str] = betterproto.string_field(1, optional=True, group="_path")
     args: List[str] = betterproto.string_field(2)
-    negate: bool = betterproto.bool_field(3)
+    negate: Optional[bool] = betterproto.bool_field(3, optional=True, group="_negate")
     type: "DetectiveType" = betterproto.enum_field(4)
 
 
