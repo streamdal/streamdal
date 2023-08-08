@@ -10,54 +10,51 @@ CLIENT_TYPE_SDK: ClientType
 CLIENT_TYPE_SHIM: ClientType
 CLIENT_TYPE_UNSET: ClientType
 DESCRIPTOR: _descriptor.FileDescriptor
+PIPELINE_STATE_PAUSED: PipelineState
+PIPELINE_STATE_UNSET: PipelineState
 
 class ClientInfo(_message.Message):
-    __slots__ = ["arch", "client_type", "language", "library_name", "library_version", "os"]
+    __slots__ = ["_node_name", "_service_name", "_session_id", "arch", "client_type", "language", "library_name", "library_version", "os"]
     ARCH_FIELD_NUMBER: _ClassVar[int]
     CLIENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     LANGUAGE_FIELD_NUMBER: _ClassVar[int]
     LIBRARY_NAME_FIELD_NUMBER: _ClassVar[int]
     LIBRARY_VERSION_FIELD_NUMBER: _ClassVar[int]
     OS_FIELD_NUMBER: _ClassVar[int]
+    _NODE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    _node_name: str
+    _service_name: str
+    _session_id: str
     arch: str
     client_type: ClientType
     language: str
     library_name: str
     library_version: str
     os: str
-    def __init__(self, client_type: _Optional[_Union[ClientType, str]] = ..., library_name: _Optional[str] = ..., library_version: _Optional[str] = ..., language: _Optional[str] = ..., arch: _Optional[str] = ..., os: _Optional[str] = ...) -> None: ...
+    def __init__(self, client_type: _Optional[_Union[ClientType, str]] = ..., library_name: _Optional[str] = ..., library_version: _Optional[str] = ..., language: _Optional[str] = ..., arch: _Optional[str] = ..., os: _Optional[str] = ..., _session_id: _Optional[str] = ..., _service_name: _Optional[str] = ..., _node_name: _Optional[str] = ...) -> None: ...
 
-class ConsumerInfo(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
+class LiveInfo(_message.Message):
+    __slots__ = ["audiences", "client"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    CLIENT_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
+    client: ClientInfo
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., client: _Optional[_Union[ClientInfo, _Mapping]] = ...) -> None: ...
 
 class PipelineInfo(_message.Message):
-    __slots__ = ["audience", "pipeline"]
-    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["audiences", "pipeline", "state"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    audience: _common_pb2.Audience
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
     pipeline: _pipeline_pb2.Pipeline
-    def __init__(self, audience: _Optional[_Union[_common_pb2.Audience, _Mapping]] = ..., pipeline: _Optional[_Union[_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
+    state: PipelineState
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., pipeline: _Optional[_Union[_pipeline_pb2.Pipeline, _Mapping]] = ..., state: _Optional[_Union[PipelineState, str]] = ...) -> None: ...
 
-class ProducerInfo(_message.Message):
+class PipelineState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
-    def __init__(self) -> None: ...
-
-class ServiceInfo(_message.Message):
-    __slots__ = ["clients", "consumers", "description", "name", "pipelines", "producers"]
-    CLIENTS_FIELD_NUMBER: _ClassVar[int]
-    CONSUMERS_FIELD_NUMBER: _ClassVar[int]
-    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    PIPELINES_FIELD_NUMBER: _ClassVar[int]
-    PRODUCERS_FIELD_NUMBER: _ClassVar[int]
-    clients: _containers.RepeatedCompositeFieldContainer[ClientInfo]
-    consumers: _containers.RepeatedCompositeFieldContainer[ConsumerInfo]
-    description: str
-    name: str
-    pipelines: _containers.RepeatedCompositeFieldContainer[PipelineInfo]
-    producers: _containers.RepeatedCompositeFieldContainer[ProducerInfo]
-    def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ..., pipelines: _Optional[_Iterable[_Union[PipelineInfo, _Mapping]]] = ..., consumers: _Optional[_Iterable[_Union[ConsumerInfo, _Mapping]]] = ..., producers: _Optional[_Iterable[_Union[ProducerInfo, _Mapping]]] = ..., clients: _Optional[_Iterable[_Union[ClientInfo, _Mapping]]] = ...) -> None: ...
 
 class ClientType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

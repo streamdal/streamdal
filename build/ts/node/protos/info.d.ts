@@ -2,63 +2,41 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Pipeline } from "./pipeline.js";
 import { Audience } from "./common.js";
 /**
- * @generated from protobuf message protos.ServiceInfo
+ * @generated from protobuf message protos.LiveInfo
  */
-export interface ServiceInfo {
+export interface LiveInfo {
     /**
-     * @generated from protobuf field: string name = 1;
+     * If empty, client has not announced any audiences
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
-    name: string;
+    audiences: Audience[];
     /**
-     * @generated from protobuf field: string description = 2;
+     * @generated from protobuf field: protos.ClientInfo client = 2;
      */
-    description: string;
-    /**
-     * @generated from protobuf field: repeated protos.PipelineInfo pipelines = 100;
-     */
-    pipelines: PipelineInfo[];
-    /**
-     * @generated from protobuf field: repeated protos.ConsumerInfo consumers = 101;
-     */
-    consumers: ConsumerInfo[];
-    /**
-     * @generated from protobuf field: repeated protos.ProducerInfo producers = 102;
-     */
-    producers: ProducerInfo[];
-    /**
-     * @generated from protobuf field: repeated protos.ClientInfo clients = 103;
-     */
-    clients: ClientInfo[];
+    client?: ClientInfo;
 }
 /**
  * @generated from protobuf message protos.PipelineInfo
  */
 export interface PipelineInfo {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * If empty, pipeline is not attached to any audience
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
-    audience?: Audience;
+    audiences: Audience[];
     /**
      * @generated from protobuf field: protos.Pipeline pipeline = 2;
      */
     pipeline?: Pipeline;
+    /**
+     * @generated from protobuf field: protos.PipelineState state = 3;
+     */
+    state: PipelineState;
 }
 /**
- * TBD
- *
- * @generated from protobuf message protos.ConsumerInfo
- */
-export interface ConsumerInfo {
-}
-/**
- * TBD
- *
- * @generated from protobuf message protos.ProducerInfo
- */
-export interface ProducerInfo {
-}
-/**
- * This should come from the register call
+ * Most of this is constructed by client SDKs and provided during Register call
  *
  * @generated from protobuf message protos.ClientInfo
  */
@@ -87,6 +65,33 @@ export interface ClientInfo {
      * @generated from protobuf field: string os = 6;
      */
     os: string;
+    /**
+     * Filled out by snitch_server on GetAll()
+     *
+     * @generated from protobuf field: optional string _session_id = 7;
+     */
+    SessionId?: string;
+    /**
+     * @generated from protobuf field: optional string _service_name = 8;
+     */
+    ServiceName?: string;
+    /**
+     * @generated from protobuf field: optional string _node_name = 9;
+     */
+    NodeName?: string;
+}
+/**
+ * @generated from protobuf enum protos.PipelineState
+ */
+export declare enum PipelineState {
+    /**
+     * @generated from protobuf enum value: PIPELINE_STATE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: PIPELINE_STATE_PAUSED = 1;
+     */
+    PAUSED = 1
 }
 /**
  * @generated from protobuf enum protos.ClientType
@@ -105,13 +110,13 @@ export declare enum ClientType {
      */
     SHIM = 2
 }
-declare class ServiceInfo$Type extends MessageType<ServiceInfo> {
+declare class LiveInfo$Type extends MessageType<LiveInfo> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.ServiceInfo
+ * @generated MessageType for protobuf message protos.LiveInfo
  */
-export declare const ServiceInfo: ServiceInfo$Type;
+export declare const LiveInfo: LiveInfo$Type;
 declare class PipelineInfo$Type extends MessageType<PipelineInfo> {
     constructor();
 }
@@ -119,20 +124,6 @@ declare class PipelineInfo$Type extends MessageType<PipelineInfo> {
  * @generated MessageType for protobuf message protos.PipelineInfo
  */
 export declare const PipelineInfo: PipelineInfo$Type;
-declare class ConsumerInfo$Type extends MessageType<ConsumerInfo> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.ConsumerInfo
- */
-export declare const ConsumerInfo: ConsumerInfo$Type;
-declare class ProducerInfo$Type extends MessageType<ProducerInfo> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.ProducerInfo
- */
-export declare const ProducerInfo: ProducerInfo$Type;
 declare class ClientInfo$Type extends MessageType<ClientInfo> {
     constructor();
 }

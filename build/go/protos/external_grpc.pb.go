@@ -22,16 +22,25 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ExternalClient interface {
-	// Build a service map
-	GetServiceMap(ctx context.Context, in *GetServiceMapRequest, opts ...grpc.CallOption) (*GetServiceMapResponse, error)
+	// Should return everything that is needed to build the initial view in the console
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(ctx context.Context, in *GetPipelinesRequest, opts ...grpc.CallOption) (*GetPipelinesResponse, error)
+	// Returns a single pipeline (_wasm_bytes field is stripped)
 	GetPipeline(ctx context.Context, in *GetPipelineRequest, opts ...grpc.CallOption) (*GetPipelineResponse, error)
+	// Create a new pipeline; id must be left empty on create
 	CreatePipeline(ctx context.Context, in *CreatePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Update an existing pipeline; id must be set
 	UpdatePipeline(ctx context.Context, in *UpdatePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Delete a pipeline
 	DeletePipeline(ctx context.Context, in *DeletePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Attach a pipeline to an audience
 	AttachPipeline(ctx context.Context, in *AttachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Detach a pipeline from an audience
 	DetachPipeline(ctx context.Context, in *DetachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Pause a pipeline; noop if pipeline is already paused
 	PausePipeline(ctx context.Context, in *PausePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(ctx context.Context, in *ResumePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -51,9 +60,9 @@ func NewExternalClient(cc grpc.ClientConnInterface) ExternalClient {
 	return &externalClient{cc}
 }
 
-func (c *externalClient) GetServiceMap(ctx context.Context, in *GetServiceMapRequest, opts ...grpc.CallOption) (*GetServiceMapResponse, error) {
-	out := new(GetServiceMapResponse)
-	err := c.cc.Invoke(ctx, "/protos.External/GetServiceMap", in, out, opts...)
+func (c *externalClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -208,16 +217,25 @@ func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc
 // All implementations must embed UnimplementedExternalServer
 // for forward compatibility
 type ExternalServer interface {
-	// Build a service map
-	GetServiceMap(context.Context, *GetServiceMapRequest) (*GetServiceMapResponse, error)
+	// Should return everything that is needed to build the initial view in the console
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(context.Context, *GetPipelinesRequest) (*GetPipelinesResponse, error)
+	// Returns a single pipeline (_wasm_bytes field is stripped)
 	GetPipeline(context.Context, *GetPipelineRequest) (*GetPipelineResponse, error)
+	// Create a new pipeline; id must be left empty on create
 	CreatePipeline(context.Context, *CreatePipelineRequest) (*StandardResponse, error)
+	// Update an existing pipeline; id must be set
 	UpdatePipeline(context.Context, *UpdatePipelineRequest) (*StandardResponse, error)
+	// Delete a pipeline
 	DeletePipeline(context.Context, *DeletePipelineRequest) (*StandardResponse, error)
+	// Attach a pipeline to an audience
 	AttachPipeline(context.Context, *AttachPipelineRequest) (*StandardResponse, error)
+	// Detach a pipeline from an audience
 	DetachPipeline(context.Context, *DetachPipelineRequest) (*StandardResponse, error)
+	// Pause a pipeline; noop if pipeline is already paused
 	PausePipeline(context.Context, *PausePipelineRequest) (*StandardResponse, error)
+	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error)
 	CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error)
 	UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error)
@@ -234,8 +252,8 @@ type ExternalServer interface {
 type UnimplementedExternalServer struct {
 }
 
-func (UnimplementedExternalServer) GetServiceMap(context.Context, *GetServiceMapRequest) (*GetServiceMapResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServiceMap not implemented")
+func (UnimplementedExternalServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedExternalServer) GetPipelines(context.Context, *GetPipelinesRequest) (*GetPipelinesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPipelines not implemented")
@@ -298,20 +316,20 @@ func RegisterExternalServer(s grpc.ServiceRegistrar, srv ExternalServer) {
 	s.RegisterService(&External_ServiceDesc, srv)
 }
 
-func _External_GetServiceMap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServiceMapRequest)
+func _External_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExternalServer).GetServiceMap(ctx, in)
+		return srv.(ExternalServer).GetAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protos.External/GetServiceMap",
+		FullMethod: "/protos.External/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalServer).GetServiceMap(ctx, req.(*GetServiceMapRequest))
+		return srv.(ExternalServer).GetAll(ctx, req.(*GetAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -612,8 +630,8 @@ var External_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ExternalServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetServiceMap",
-			Handler:    _External_GetServiceMap_Handler,
+			MethodName: "GetAll",
+			Handler:    _External_GetAll_Handler,
 		},
 		{
 			MethodName: "GetPipelines",

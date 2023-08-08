@@ -7,17 +7,17 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface DetectiveStep {
     /**
-     * @generated from protobuf field: string path = 1;
+     * @generated from protobuf field: optional string path = 1;
      */
-    path: string;
+    path?: string;
     /**
      * @generated from protobuf field: repeated string args = 2;
      */
     args: string[]; // args determined by match_type
     /**
-     * @generated from protobuf field: bool negate = 3;
+     * @generated from protobuf field: optional bool negate = 3;
      */
-    negate: boolean;
+    negate?: boolean;
     /**
      * @generated from protobuf field: protos.steps.DetectiveType type = 4;
      */
@@ -260,9 +260,9 @@ export enum DetectiveType {
 class DetectiveStep$Type extends MessageType<DetectiveStep> {
     constructor() {
         super("protos.steps.DetectiveStep", [
-            { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "path", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "args", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "negate", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "negate", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] }
         ]);
     }

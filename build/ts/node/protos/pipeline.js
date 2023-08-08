@@ -55,9 +55,9 @@ class PipelineStep$Type extends MessageType {
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => EncodeStep },
             { no: 1003, name: "decode", kind: "message", oneof: "step", T: () => DecodeStep },
             { no: 1004, name: "custom", kind: "message", oneof: "step", T: () => CustomStep },
-            { no: 10000, name: "_wasm_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 10001, name: "_wasm_bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 10002, name: "_wasm_function", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }

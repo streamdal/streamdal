@@ -1,27 +1,41 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
-import { NotificationConfig } from "./notify.js";
-import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
-import { ServiceInfo } from "./info.js";
+import { PipelineInfo } from "./info.js";
+import { Audience } from "./common.js";
+import { LiveInfo } from "./info.js";
 /**
  * Don't think there is anything to pass in (yet)?
  *
- * @generated from protobuf message protos.GetServiceMapRequest
+ * @generated from protobuf message protos.GetAllRequest
  */
-export interface GetServiceMapRequest {
+export interface GetAllRequest {
 }
 /**
- * @generated from protobuf message protos.GetServiceMapResponse
+ * @generated from protobuf message protos.GetAllResponse
  */
-export interface GetServiceMapResponse {
+export interface GetAllResponse {
     /**
-     * Key == service name
+     * Clients currently connected to the server
      *
-     * @generated from protobuf field: map<string, protos.ServiceInfo> service_map = 1;
+     * @generated from protobuf field: repeated protos.LiveInfo live = 1;
      */
-    serviceMap: {
-        [key: string]: ServiceInfo;
+    live: LiveInfo[];
+    /**
+     * All of the audiences that are known to the server
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     */
+    audiences: Audience[];
+    /**
+     * All of the pipelines known to the server + pipeline <-> audience mappings
+     * key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+     * to any audience.
+     *
+     * @generated from protobuf field: map<string, protos.PipelineInfo> pipelines = 3;
+     */
+    pipelines: {
+        [key: string]: PipelineInfo;
     };
 }
 /**
@@ -138,84 +152,6 @@ export interface ResumePipelineRequest {
     audience?: Audience;
 }
 /**
- * Notifications
- *
- * @generated from protobuf message protos.CreateNotificationRequest
- */
-export interface CreateNotificationRequest {
-    /**
-     * @generated from protobuf field: protos.NotificationConfig notification = 1;
-     */
-    notification?: NotificationConfig;
-}
-/**
- * @generated from protobuf message protos.UpdateNotificationRequest
- */
-export interface UpdateNotificationRequest {
-    /**
-     * @generated from protobuf field: protos.NotificationConfig notification = 1;
-     */
-    notification?: NotificationConfig;
-}
-/**
- * @generated from protobuf message protos.DeleteNotificationRequest
- */
-export interface DeleteNotificationRequest {
-    /**
-     * @generated from protobuf field: string notification_id = 1;
-     */
-    notificationId: string;
-}
-/**
- * Don't think we need anything here
- *
- * @generated from protobuf message protos.GetNotificationsRequest
- */
-export interface GetNotificationsRequest {
-}
-/**
- * @generated from protobuf message protos.GetNotificationsResponse
- */
-export interface GetNotificationsResponse {
-    /**
-     * @generated from protobuf field: map<string, protos.NotificationConfig> notifications = 1;
-     */
-    notifications: {
-        [key: string]: NotificationConfig;
-    };
-}
-/**
- * @generated from protobuf message protos.GetNotificationRequest
- */
-export interface GetNotificationRequest {
-    /**
-     * @generated from protobuf field: string notification_id = 1;
-     */
-    notificationId: string;
-}
-/**
- * @generated from protobuf message protos.GetNotificationResponse
- */
-export interface GetNotificationResponse {
-    /**
-     * @generated from protobuf field: protos.NotificationConfig notification = 1;
-     */
-    notification?: NotificationConfig;
-}
-/**
- * @generated from protobuf message protos.AttachNotificationRequest
- */
-export interface AttachNotificationRequest {
-    /**
-     * @generated from protobuf field: string notification_id = 1;
-     */
-    notificationId: string;
-    /**
-     * @generated from protobuf field: string pipeline_id = 2;
-     */
-    pipelineId: string;
-}
-/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -233,20 +169,20 @@ export interface TestResponse {
      */
     output: string;
 }
-declare class GetServiceMapRequest$Type extends MessageType<GetServiceMapRequest> {
+declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapRequest
+ * @generated MessageType for protobuf message protos.GetAllRequest
  */
-export declare const GetServiceMapRequest: GetServiceMapRequest$Type;
-declare class GetServiceMapResponse$Type extends MessageType<GetServiceMapResponse> {
+export declare const GetAllRequest: GetAllRequest$Type;
+declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapResponse
+ * @generated MessageType for protobuf message protos.GetAllResponse
  */
-export declare const GetServiceMapResponse: GetServiceMapResponse$Type;
+export declare const GetAllResponse: GetAllResponse$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
 }
@@ -324,62 +260,6 @@ declare class ResumePipelineRequest$Type extends MessageType<ResumePipelineReque
  * @generated MessageType for protobuf message protos.ResumePipelineRequest
  */
 export declare const ResumePipelineRequest: ResumePipelineRequest$Type;
-declare class CreateNotificationRequest$Type extends MessageType<CreateNotificationRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.CreateNotificationRequest
- */
-export declare const CreateNotificationRequest: CreateNotificationRequest$Type;
-declare class UpdateNotificationRequest$Type extends MessageType<UpdateNotificationRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.UpdateNotificationRequest
- */
-export declare const UpdateNotificationRequest: UpdateNotificationRequest$Type;
-declare class DeleteNotificationRequest$Type extends MessageType<DeleteNotificationRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.DeleteNotificationRequest
- */
-export declare const DeleteNotificationRequest: DeleteNotificationRequest$Type;
-declare class GetNotificationsRequest$Type extends MessageType<GetNotificationsRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.GetNotificationsRequest
- */
-export declare const GetNotificationsRequest: GetNotificationsRequest$Type;
-declare class GetNotificationsResponse$Type extends MessageType<GetNotificationsResponse> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.GetNotificationsResponse
- */
-export declare const GetNotificationsResponse: GetNotificationsResponse$Type;
-declare class GetNotificationRequest$Type extends MessageType<GetNotificationRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.GetNotificationRequest
- */
-export declare const GetNotificationRequest: GetNotificationRequest$Type;
-declare class GetNotificationResponse$Type extends MessageType<GetNotificationResponse> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.GetNotificationResponse
- */
-export declare const GetNotificationResponse: GetNotificationResponse$Type;
-declare class AttachNotificationRequest$Type extends MessageType<AttachNotificationRequest> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.AttachNotificationRequest
- */
-export declare const AttachNotificationRequest: AttachNotificationRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
 }

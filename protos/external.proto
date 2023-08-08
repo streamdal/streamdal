@@ -10,18 +10,34 @@ import "pipeline.proto";
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
 service External {
-  // Build a service map
-  rpc GetServiceMap(GetServiceMapRequest) returns (GetServiceMapResponse);
+  // Should return everything that is needed to build the initial view in the console
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
 
+  // Returns pipelines (_wasm_bytes field is stripped)
   rpc GetPipelines(GetPipelinesRequest) returns (GetPipelinesResponse);
+
+  // Returns a single pipeline (_wasm_bytes field is stripped)
   rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse);
+
+  // Create a new pipeline; id must be left empty on create
   rpc CreatePipeline(CreatePipelineRequest) returns (protos.StandardResponse);
+
+  // Update an existing pipeline; id must be set
   rpc UpdatePipeline(UpdatePipelineRequest) returns (protos.StandardResponse);
+
+  // Delete a pipeline
   rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
 
+  // Attach a pipeline to an audience
   rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse);
+
+  // Detach a pipeline from an audience
   rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse);
+
+  // Pause a pipeline; noop if pipeline is already paused
   rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
+
+  // Resume a pipeline; noop if pipeline is not paused
   rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
 
   rpc CreateNotification(CreateNotificationRequest) returns (protos.StandardResponse);
@@ -35,13 +51,21 @@ service External {
   rpc Test(TestRequest) returns (TestResponse);
 }
 
-message GetServiceMapRequest {
+message GetAllRequest {
   // Don't think there is anything to pass in (yet)?
 }
 
-message GetServiceMapResponse {
-  // Key == service name
-  map<string, protos.ServiceInfo> service_map = 1;
+message GetAllResponse {
+  // Clients currently connected to the server
+  repeated protos.LiveInfo live = 1;
+
+  // All of the audiences that are known to the server
+  repeated protos.Audience audiences = 2;
+
+  // All of the pipelines known to the server + pipeline <-> audience mappings
+  // key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+  // to any audience.
+  map <string, protos.PipelineInfo> pipelines = 3;
 }
 
 message GetPipelinesRequest {

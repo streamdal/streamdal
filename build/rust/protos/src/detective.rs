@@ -30,11 +30,11 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 pub struct DetectiveStep {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.DetectiveStep.path)
-    pub path: ::std::string::String,
+    pub path: ::std::option::Option<::std::string::String>,
     // @@protoc_insertion_point(field:protos.steps.DetectiveStep.args)
     pub args: ::std::vec::Vec<::std::string::String>,
     // @@protoc_insertion_point(field:protos.steps.DetectiveStep.negate)
-    pub negate: bool,
+    pub negate: ::std::option::Option<bool>,
     // @@protoc_insertion_point(field:protos.steps.DetectiveStep.type)
     pub type_: ::protobuf::EnumOrUnknown<DetectiveType>,
     // special fields
@@ -56,7 +56,7 @@ impl DetectiveStep {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(4);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "path",
             |m: &DetectiveStep| { &m.path },
             |m: &mut DetectiveStep| { &mut m.path },
@@ -66,7 +66,7 @@ impl DetectiveStep {
             |m: &DetectiveStep| { &m.args },
             |m: &mut DetectiveStep| { &mut m.args },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "negate",
             |m: &DetectiveStep| { &m.negate },
             |m: &mut DetectiveStep| { &mut m.negate },
@@ -95,13 +95,13 @@ impl ::protobuf::Message for DetectiveStep {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.path = is.read_string()?;
+                    self.path = ::std::option::Option::Some(is.read_string()?);
                 },
                 18 => {
                     self.args.push(is.read_string()?);
                 },
                 24 => {
-                    self.negate = is.read_bool()?;
+                    self.negate = ::std::option::Option::Some(is.read_bool()?);
                 },
                 32 => {
                     self.type_ = is.read_enum_or_unknown()?;
@@ -118,13 +118,13 @@ impl ::protobuf::Message for DetectiveStep {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.path.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.path);
+        if let Some(v) = self.path.as_ref() {
+            my_size += ::protobuf::rt::string_size(1, &v);
         }
         for value in &self.args {
             my_size += ::protobuf::rt::string_size(2, &value);
         };
-        if self.negate != false {
+        if let Some(v) = self.negate {
             my_size += 1 + 1;
         }
         if self.type_ != ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_UNKNOWN) {
@@ -136,14 +136,14 @@ impl ::protobuf::Message for DetectiveStep {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.path.is_empty() {
-            os.write_string(1, &self.path)?;
+        if let Some(v) = self.path.as_ref() {
+            os.write_string(1, v)?;
         }
         for v in &self.args {
             os.write_string(2, &v)?;
         };
-        if self.negate != false {
-            os.write_bool(3, self.negate)?;
+        if let Some(v) = self.negate {
+            os.write_bool(3, v)?;
         }
         if self.type_ != ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_UNKNOWN) {
             os.write_enum(4, ::protobuf::EnumOrUnknown::value(&self.type_))?;
@@ -165,18 +165,18 @@ impl ::protobuf::Message for DetectiveStep {
     }
 
     fn clear(&mut self) {
-        self.path.clear();
+        self.path = ::std::option::Option::None;
         self.args.clear();
-        self.negate = false;
+        self.negate = ::std::option::Option::None;
         self.type_ = ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_UNKNOWN);
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static DetectiveStep {
         static instance: DetectiveStep = DetectiveStep {
-            path: ::std::string::String::new(),
+            path: ::std::option::Option::None,
             args: ::std::vec::Vec::new(),
-            negate: false,
+            negate: ::std::option::Option::None,
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -489,58 +489,59 @@ impl DetectiveType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x15steps/detective.proto\x12\x0cprotos.steps\"\x80\x01\n\rDetectiveSt\
-    ep\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x12\n\x04args\x18\
-    \x02\x20\x03(\tR\x04args\x12\x16\n\x06negate\x18\x03\x20\x01(\x08R\x06ne\
-    gate\x12/\n\x04type\x18\x04\x20\x01(\x0e2\x1b.protos.steps.DetectiveType\
-    R\x04type*\x8d\r\n\rDetectiveType\x12\x1a\n\x16DETECTIVE_TYPE_UNKNOWN\
-    \x10\0\x12\x1c\n\x17DETECTIVE_TYPE_IS_EMPTY\x10\xe8\x07\x12\x1d\n\x18DET\
-    ECTIVE_TYPE_HAS_FIELD\x10\xe9\x07\x12\x1b\n\x16DETECTIVE_TYPE_IS_TYPE\
-    \x10\xea\x07\x12'\n\"DETECTIVE_TYPE_STRING_CONTAINS_ANY\x10\xeb\x07\x12'\
-    \n\"DETECTIVE_TYPE_STRING_CONTAINS_ALL\x10\xec\x07\x12\x20\n\x1bDETECTIV\
-    E_TYPE_STRING_EQUAL\x10\xed\x07\x12\x20\n\x1bDETECTIVE_TYPE_IPV4_ADDRESS\
-    \x10\xee\x07\x12\x20\n\x1bDETECTIVE_TYPE_IPV6_ADDRESS\x10\xef\x07\x12\
-    \x1f\n\x1aDETECTIVE_TYPE_MAC_ADDRESS\x10\xf0\x07\x12\x19\n\x14DETECTIVE_\
-    TYPE_REGEX\x10\xf1\x07\x12%\n\x20DETECTIVE_TYPE_TIMESTAMP_RFC3339\x10\
-    \xf2\x07\x12'\n\"DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO\x10\xf3\x07\x12\"\n\
-    \x1dDETECTIVE_TYPE_TIMESTAMP_UNIX\x10\xf4\x07\x12\x20\n\x1bDETECTIVE_TYP\
-    E_BOOLEAN_TRUE\x10\xf5\x07\x12!\n\x1cDETECTIVE_TYPE_BOOLEAN_FALSE\x10\
-    \xf6\x07\x12\x18\n\x13DETECTIVE_TYPE_UUID\x10\xf7\x07\x12\x17\n\x12DETEC\
-    TIVE_TYPE_URL\x10\xf8\x07\x12\x1c\n\x17DETECTIVE_TYPE_HOSTNAME\x10\xf9\
-    \x07\x12%\n\x20DETECTIVE_TYPE_STRING_LENGTH_MIN\x10\xfa\x07\x12%\n\x20DE\
-    TECTIVE_TYPE_STRING_LENGTH_MAX\x10\xfb\x07\x12'\n\"DETECTIVE_TYPE_STRING\
-    _LENGTH_RANGE\x10\xfc\x07\x12\x1a\n\x15DETECTIVE_TYPE_SEMVER\x10\xe5\x0f\
-    \x12\x1b\n\x16DETECTIVE_TYPE_PII_ANY\x10\xd0\x0f\x12#\n\x1eDETECTIVE_TYP\
-    E_PII_CREDIT_CARD\x10\xd1\x0f\x12\x1b\n\x16DETECTIVE_TYPE_PII_SSN\x10\
-    \xd2\x0f\x12\x1d\n\x18DETECTIVE_TYPE_PII_EMAIL\x10\xd3\x0f\x12\x1d\n\x18\
-    DETECTIVE_TYPE_PII_PHONE\x10\xd4\x0f\x12&\n!DETECTIVE_TYPE_PII_DRIVER_LI\
-    CENSE\x10\xd5\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_PASSPORT_ID\x10\xd6\x0f\
-    \x12\"\n\x1dDETECTIVE_TYPE_PII_VIN_NUMBER\x10\xd7\x0f\x12%\n\x20DETECTIV\
-    E_TYPE_PII_SERIAL_NUMBER\x10\xd8\x0f\x12\x1d\n\x18DETECTIVE_TYPE_PII_LOG\
-    IN\x10\xd9\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_TAXPAYER_ID\x10\xda\x0f\x12\
-    \x1f\n\x1aDETECTIVE_TYPE_PII_ADDRESS\x10\xdb\x0f\x12!\n\x1cDETECTIVE_TYP\
-    E_PII_SIGNATURE\x10\xdc\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_GEOLOCATION\x10\
-    \xdd\x0f\x12!\n\x1cDETECTIVE_TYPE_PII_EDUCATION\x10\xde\x0f\x12!\n\x1cDE\
-    TECTIVE_TYPE_PII_FINANCIAL\x10\xdf\x0f\x12\x1e\n\x19DETECTIVE_TYPE_PII_H\
-    EALTH\x10\xe0\x0f\x12$\n\x1fDETECTIVE_TYPE_NUMERIC_EQUAL_TO\x10\xb8\x17\
-    \x12(\n#DETECTIVE_TYPE_NUMERIC_GREATER_THAN\x10\xb9\x17\x12)\n$DETECTIVE\
-    _TYPE_NUMERIC_GREATER_EQUAL\x10\xba\x17\x12%\n\x20DETECTIVE_TYPE_NUMERIC\
-    _LESS_THAN\x10\xbb\x17\x12&\n!DETECTIVE_TYPE_NUMERIC_LESS_EQUAL\x10\xbc\
-    \x17\x12!\n\x1cDETECTIVE_TYPE_NUMERIC_RANGE\x10\xbd\x17\x12\x1f\n\x1aDET\
-    ECTIVE_TYPE_NUMERIC_MIN\x10\xbe\x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_\
-    MAX\x10\xbf\x17B:Z8github.com/streamdal/snitch-protos/build/go/protos/st\
-    epsJ\xb2\x1d\n\x06\x12\x04\0\0W\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
-    \x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\
-    \x02\x08\x0b\x12\x03\x04\0O\n5\n\x02\x05\0\x12\x04\x06\0P\x01\")\x201000\
-    -1999\x20reserved\x20for\x20core\x20match\x20types\n\n\n\n\x03\x05\0\x01\
-    \x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\t\x02\x1d\n\x0c\n\
-    \x05\x05\0\x02\0\x01\x12\x03\t\x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\
-    \x03\t\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\n\x02!\n\x0c\n\x05\x05\
-    \0\x02\x01\x01\x12\x03\n\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\n\
-    \x1c\x20\n\x0b\n\x04\x05\0\x02\x02\x12\x03\x0b\x02\"\n\x0c\n\x05\x05\0\
-    \x02\x02\x01\x12\x03\x0b\x02\x1a\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\
-    \x0b\x1d!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0c\x02\x20\n\x0c\n\x05\x05\
-    \0\x02\x03\x01\x12\x03\x0c\x02\x18\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\
+    \n\x15steps/detective.proto\x12\x0cprotos.steps\"\x9e\x01\n\rDetectiveSt\
+    ep\x12\x17\n\x04path\x18\x01\x20\x01(\tH\0R\x04path\x88\x01\x01\x12\x12\
+    \n\x04args\x18\x02\x20\x03(\tR\x04args\x12\x1b\n\x06negate\x18\x03\x20\
+    \x01(\x08H\x01R\x06negate\x88\x01\x01\x12/\n\x04type\x18\x04\x20\x01(\
+    \x0e2\x1b.protos.steps.DetectiveTypeR\x04typeB\x07\n\x05_pathB\t\n\x07_n\
+    egate*\x8d\r\n\rDetectiveType\x12\x1a\n\x16DETECTIVE_TYPE_UNKNOWN\x10\0\
+    \x12\x1c\n\x17DETECTIVE_TYPE_IS_EMPTY\x10\xe8\x07\x12\x1d\n\x18DETECTIVE\
+    _TYPE_HAS_FIELD\x10\xe9\x07\x12\x1b\n\x16DETECTIVE_TYPE_IS_TYPE\x10\xea\
+    \x07\x12'\n\"DETECTIVE_TYPE_STRING_CONTAINS_ANY\x10\xeb\x07\x12'\n\"DETE\
+    CTIVE_TYPE_STRING_CONTAINS_ALL\x10\xec\x07\x12\x20\n\x1bDETECTIVE_TYPE_S\
+    TRING_EQUAL\x10\xed\x07\x12\x20\n\x1bDETECTIVE_TYPE_IPV4_ADDRESS\x10\xee\
+    \x07\x12\x20\n\x1bDETECTIVE_TYPE_IPV6_ADDRESS\x10\xef\x07\x12\x1f\n\x1aD\
+    ETECTIVE_TYPE_MAC_ADDRESS\x10\xf0\x07\x12\x19\n\x14DETECTIVE_TYPE_REGEX\
+    \x10\xf1\x07\x12%\n\x20DETECTIVE_TYPE_TIMESTAMP_RFC3339\x10\xf2\x07\x12'\
+    \n\"DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO\x10\xf3\x07\x12\"\n\x1dDETECTIVE_\
+    TYPE_TIMESTAMP_UNIX\x10\xf4\x07\x12\x20\n\x1bDETECTIVE_TYPE_BOOLEAN_TRUE\
+    \x10\xf5\x07\x12!\n\x1cDETECTIVE_TYPE_BOOLEAN_FALSE\x10\xf6\x07\x12\x18\
+    \n\x13DETECTIVE_TYPE_UUID\x10\xf7\x07\x12\x17\n\x12DETECTIVE_TYPE_URL\
+    \x10\xf8\x07\x12\x1c\n\x17DETECTIVE_TYPE_HOSTNAME\x10\xf9\x07\x12%\n\x20\
+    DETECTIVE_TYPE_STRING_LENGTH_MIN\x10\xfa\x07\x12%\n\x20DETECTIVE_TYPE_ST\
+    RING_LENGTH_MAX\x10\xfb\x07\x12'\n\"DETECTIVE_TYPE_STRING_LENGTH_RANGE\
+    \x10\xfc\x07\x12\x1a\n\x15DETECTIVE_TYPE_SEMVER\x10\xe5\x0f\x12\x1b\n\
+    \x16DETECTIVE_TYPE_PII_ANY\x10\xd0\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_CRED\
+    IT_CARD\x10\xd1\x0f\x12\x1b\n\x16DETECTIVE_TYPE_PII_SSN\x10\xd2\x0f\x12\
+    \x1d\n\x18DETECTIVE_TYPE_PII_EMAIL\x10\xd3\x0f\x12\x1d\n\x18DETECTIVE_TY\
+    PE_PII_PHONE\x10\xd4\x0f\x12&\n!DETECTIVE_TYPE_PII_DRIVER_LICENSE\x10\
+    \xd5\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_PASSPORT_ID\x10\xd6\x0f\x12\"\n\
+    \x1dDETECTIVE_TYPE_PII_VIN_NUMBER\x10\xd7\x0f\x12%\n\x20DETECTIVE_TYPE_P\
+    II_SERIAL_NUMBER\x10\xd8\x0f\x12\x1d\n\x18DETECTIVE_TYPE_PII_LOGIN\x10\
+    \xd9\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_TAXPAYER_ID\x10\xda\x0f\x12\x1f\n\
+    \x1aDETECTIVE_TYPE_PII_ADDRESS\x10\xdb\x0f\x12!\n\x1cDETECTIVE_TYPE_PII_\
+    SIGNATURE\x10\xdc\x0f\x12#\n\x1eDETECTIVE_TYPE_PII_GEOLOCATION\x10\xdd\
+    \x0f\x12!\n\x1cDETECTIVE_TYPE_PII_EDUCATION\x10\xde\x0f\x12!\n\x1cDETECT\
+    IVE_TYPE_PII_FINANCIAL\x10\xdf\x0f\x12\x1e\n\x19DETECTIVE_TYPE_PII_HEALT\
+    H\x10\xe0\x0f\x12$\n\x1fDETECTIVE_TYPE_NUMERIC_EQUAL_TO\x10\xb8\x17\x12(\
+    \n#DETECTIVE_TYPE_NUMERIC_GREATER_THAN\x10\xb9\x17\x12)\n$DETECTIVE_TYPE\
+    _NUMERIC_GREATER_EQUAL\x10\xba\x17\x12%\n\x20DETECTIVE_TYPE_NUMERIC_LESS\
+    _THAN\x10\xbb\x17\x12&\n!DETECTIVE_TYPE_NUMERIC_LESS_EQUAL\x10\xbc\x17\
+    \x12!\n\x1cDETECTIVE_TYPE_NUMERIC_RANGE\x10\xbd\x17\x12\x1f\n\x1aDETECTI\
+    VE_TYPE_NUMERIC_MIN\x10\xbe\x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MAX\
+    \x10\xbf\x17B:Z8github.com/streamdal/snitch-protos/build/go/protos/steps\
+    J\xce\x1d\n\x06\x12\x04\0\0W\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\
+    \x0b\x12\x03\x04\0O\n5\n\x02\x05\0\x12\x04\x06\0P\x01\")\x201000-1999\
+    \x20reserved\x20for\x20core\x20match\x20types\n\n\n\n\x03\x05\0\x01\x12\
+    \x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\t\x02\x1d\n\x0c\n\x05\
+    \x05\0\x02\0\x01\x12\x03\t\x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\t\
+    \x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\n\x02!\n\x0c\n\x05\x05\0\x02\
+    \x01\x01\x12\x03\n\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\n\x1c\
+    \x20\n\x0b\n\x04\x05\0\x02\x02\x12\x03\x0b\x02\"\n\x0c\n\x05\x05\0\x02\
+    \x02\x01\x12\x03\x0b\x02\x1a\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x0b\
+    \x1d!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0c\x02\x20\n\x0c\n\x05\x05\0\
+    \x02\x03\x01\x12\x03\x0c\x02\x18\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\
     \x0c\x1b\x1f\n\x0b\n\x04\x05\0\x02\x04\x12\x03\r\x02,\n\x0c\n\x05\x05\0\
     \x02\x04\x01\x12\x03\r\x02$\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\r'+\n\
     \x0b\n\x04\x05\0\x02\x05\x12\x03\x0e\x02,\n\x0c\n\x05\x05\0\x02\x05\x01\
@@ -651,18 +652,20 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05\0\x02.\x02\x12\x03N\x1f#\n\x0b\n\x04\x05\0\x02/\x12\x03O\x02$\n\x0c\
     \n\x05\x05\0\x02/\x01\x12\x03O\x02\x1c\n\x0c\n\x05\x05\0\x02/\x02\x12\
     \x03O\x1f#\n\n\n\x02\x04\0\x12\x04R\0W\x01\n\n\n\x03\x04\0\x01\x12\x03R\
-    \x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03S\x02\x12\n\x0c\n\x05\x04\0\x02\
-    \0\x05\x12\x03S\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03S\t\r\n\x0c\n\
-    \x05\x04\0\x02\0\x03\x12\x03S\x10\x11\n,\n\x04\x04\0\x02\x01\x12\x03T\
-    \x02\x1b\"\x1f\x20args\x20determined\x20by\x20match_type\n\n\x0c\n\x05\
-    \x04\0\x02\x01\x04\x12\x03T\x02\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03T\
-    \x0b\x11\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03T\x12\x16\n\x0c\n\x05\x04\
-    \0\x02\x01\x03\x12\x03T\x19\x1a\n\x0b\n\x04\x04\0\x02\x02\x12\x03U\x02\
-    \x12\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03U\x02\x06\n\x0c\n\x05\x04\0\
-    \x02\x02\x01\x12\x03U\x07\r\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03U\x10\
-    \x11\n\x0b\n\x04\x04\0\x02\x03\x12\x03V\x02\x19\n\x0c\n\x05\x04\0\x02\
-    \x03\x06\x12\x03V\x02\x0f\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03V\x10\x14\
-    \n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03V\x17\x18b\x06proto3\
+    \x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03S\x02\x1b\n\x0c\n\x05\x04\0\x02\
+    \0\x04\x12\x03S\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03S\x0b\x11\n\x0c\
+    \n\x05\x04\0\x02\0\x01\x12\x03S\x12\x16\n\x0c\n\x05\x04\0\x02\0\x03\x12\
+    \x03S\x19\x1a\n,\n\x04\x04\0\x02\x01\x12\x03T\x02\x1b\"\x1f\x20args\x20d\
+    etermined\x20by\x20match_type\n\n\x0c\n\x05\x04\0\x02\x01\x04\x12\x03T\
+    \x02\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03T\x0b\x11\n\x0c\n\x05\x04\0\
+    \x02\x01\x01\x12\x03T\x12\x16\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03T\x19\
+    \x1a\n\x0b\n\x04\x04\0\x02\x02\x12\x03U\x02\x1b\n\x0c\n\x05\x04\0\x02\
+    \x02\x04\x12\x03U\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03U\x0b\x0f\n\
+    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03U\x10\x16\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03U\x19\x1a\n\x0b\n\x04\x04\0\x02\x03\x12\x03V\x02\x19\n\x0c\n\
+    \x05\x04\0\x02\x03\x06\x12\x03V\x02\x0f\n\x0c\n\x05\x04\0\x02\x03\x01\
+    \x12\x03V\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03V\x17\x18b\x06pro\
+    to3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
