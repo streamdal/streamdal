@@ -53,7 +53,7 @@ export const isNumeric = (num: any) =>
   !isNaN(num as number);
 
 export const logFormData = (data: FormData) => {
-  for (var pair of data) {
+  for (const pair of data) {
     console.log(pair[0] + ", " + pair[1]);
   }
 };

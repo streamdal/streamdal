@@ -1,4 +1,4 @@
-import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import { ErrorType, parsePath, updateData } from "./validate.ts";
 import { isNumeric, titleCase } from "../../lib/utils.ts";
 
 export type CheckboxGroupProps = {
@@ -48,13 +48,14 @@ export const CheckboxGroup = ({
                 name={path}
                 className={`w-4 h-4 rounded border mx-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 ${inputClass}`}
                 value={k}
-                onChange={(e) =>
+                onChange={(e) => {
                   updateData(
                     data,
                     setData,
                     parsePath(path),
-                    e.target.value,
-                  )}
+                    e.target.checked ? e.target.value : null,
+                  );
+                }}
               />
               <label class="text-web font-medium text-[14px]">
                 {titleCase(v)}

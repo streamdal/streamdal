@@ -8,10 +8,7 @@ import { Layout } from "../../../components/layout.tsx";
 import Flow from "../../../islands/flow.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";
 import { getPipelines, getServiceMap } from "../../../lib/fetch.ts";
-import { ErrorType, validate } from "../../../components/form/validate.ts";
-import { pipelineSchema } from "../../../islands/pipeline.tsx";
-import { ResponseCode } from "snitch-protos/protos/common.ts";
-import { upsertPipeline } from "../../../lib/mutation.ts";
+import { SuccessType } from "./delete.tsx";
 
 export const handler: Handlers<any> = {
   async GET(_req, ctx) {
@@ -20,39 +17,25 @@ export const handler: Handlers<any> = {
       serviceMap: await getServiceMap(),
     });
   },
-  async POST(req, ctx) {
-    const formData = await req.formData();
-
-    const { data: pipeline, errors }: {
-      pipeline: Pipeline;
-      errors: ErrorType;
-    } = validate(
-      pipelineSchema,
-      formData,
-    );
-
-    const response = await upsertPipeline(pipeline);
-
-    return ctx.render({
-      errors: {
-        ...errors,
-        ...response.code !== ResponseCode.OK ? { response } : {},
-      },
-      success: response.code === ResponseCode.OK,
-      pipelines: await getPipelines(),
-      serviceMap: await getServiceMap(),
-    });
-  },
 };
 
 export default function PipelinesRoute(
   props: PageProps<
-    { pipelines: Pipeline[]; serviceMap: GetServiceMapResponse; id: string }
+    {
+      pipelines: Pipeline[];
+      serviceMap: GetServiceMapResponse;
+      id: string;
+      success: SuccessType;
+    }
   >,
 ) {
   return (
     <Layout>
-      <Pipelines id={props?.params?.id} pipelines={props?.data?.pipelines} />
+      <Pipelines
+        id={props?.params?.id}
+        pipelines={props?.data?.pipelines}
+        success={props?.data?.success}
+      />
       <ReactFlowProvider>
         <Flow data={props?.data?.serviceMap} />
       </ReactFlowProvider>

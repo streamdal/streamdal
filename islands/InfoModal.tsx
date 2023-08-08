@@ -53,8 +53,7 @@ export default function InfoModal(
                   </h3>
                   {/* janky uppercase stuff */}
                   <p class="text-xs text-gray-500">
-                    {`${titleCase(params.operationType)
-                    }`}
+                    {`${titleCase(params.operationType)}`}
                   </p>
                 </div>
               </div>

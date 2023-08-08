@@ -3,14 +3,28 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import PipelineDetail from "./pipeline.tsx";
-import { DeleteModal } from "../components/modals/deleteModal.tsx";
+import PipelineDetail, { newPipeline } from "./pipeline.tsx";
+import { SuccessType } from "../routes/pipelines/[id]/delete.tsx";
 
 const Pipelines = (
-  { id, pipelines }: { id?: string; pipelines?: Pipeline[] },
+  { id, pipelines, success }: {
+    id?: string;
+    pipelines?: Pipeline[];
+    success: SuccessType;
+  },
 ) => {
-  const index = id && pipelines?.findIndex((p) => p.id === id);
+  //
+  // wrapper for adding
+  const [wrapper, setWrapper] = useState(
+    pipelines.length > 0 ? pipelines : [newPipeline],
+  );
+  const index = id && wrapper?.findIndex((p) => p.id === id);
   const [selected, setSelected] = useState(index > -1 ? index : 0);
+
+  const add = () => {
+    setWrapper([...wrapper, newPipeline]);
+    setSelected(wrapper.length);
+  };
 
   return (
     <div
@@ -28,10 +42,11 @@ const Pipelines = (
                 <IconPlus
                   data-tooltip-target="pipeline-add"
                   class="w-5 h-5 cursor-pointer"
+                  onClick={add}
                 />
                 <Tooltip targetId="pipeline-add" message="Add a new pipeline" />
               </div>
-              {pipelines?.map((p: Pipeline, i: number) => (
+              {wrapper?.map((p: Pipeline, i: number) => (
                 <div
                   class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
                     i === selected && "bg-sunset"
@@ -44,7 +59,7 @@ const Pipelines = (
               ))}
             </div>
             <div class="w-full max-h-[80vh] overflow-y-auto">
-              <PipelineDetail pipeline={pipelines[selected]} />
+              <PipelineDetail pipeline={wrapper[selected]} />
             </div>
           </div>
         </div>

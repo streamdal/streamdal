@@ -8,7 +8,7 @@ export type ObjectType = Record<number | string, any>;
 export const validate = <T>(
   schema: ZodSchema<T>,
   data: FormData,
-): { data: z.infer<typeof schema>; errors: ErrorType | null } => {
+): { data: z.infer<typeof schema> | null; errors: ErrorType | null } => {
   try {
     const validated = schema.parse(data);
     return { data: validated, errors: null };
