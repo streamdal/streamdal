@@ -56,11 +56,6 @@ class PipelineStepCondition(betterproto.Enum):
     PIPELINE_STEP_CONDITION_NOTIFY = 2
 
 
-class PipelineState(betterproto.Enum):
-    PIPELINE_STATE_UNSET = 0
-    PIPELINE_STATE_PAUSED = 1
-
-
 class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
     CLIENT_TYPE_SDK = 1
@@ -197,10 +192,13 @@ class LiveInfo(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class PipelineInfo(betterproto.Message):
     audiences: List["Audience"] = betterproto.message_field(1)
-    """If empty, pipeline is not attached to any audience"""
+    """What audience(s) this pipeline is attached to (none if empty)"""
 
     pipeline: "Pipeline" = betterproto.message_field(2)
-    state: "PipelineState" = betterproto.enum_field(3)
+    """Pipeline config"""
+
+    paused: List["Audience"] = betterproto.message_field(3)
+    """For what audiences this pipeline is paused (none if empty)"""
 
 
 @dataclass(eq=False, repr=False)

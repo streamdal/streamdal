@@ -13,16 +13,15 @@ message LiveInfo {
   ClientInfo client = 2;
 }
 
-enum PipelineState {
-  PIPELINE_STATE_UNSET = 0;
-  PIPELINE_STATE_PAUSED = 1;
-}
-
 message PipelineInfo {
-  // If empty, pipeline is not attached to any audience
+  // What audience(s) this pipeline is attached to (none if empty)
   repeated protos.Audience audiences = 1;
+
+  // Pipeline config
   protos.Pipeline pipeline = 2;
-  PipelineState state = 3;
+
+  // For what audiences this pipeline is paused (none if empty)
+  repeated protos.Audience paused = 3;
 }
 
 enum ClientType {
