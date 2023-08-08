@@ -26,37 +26,37 @@
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetServiceMapRequest)
-pub struct GetServiceMapRequest {
+// @@protoc_insertion_point(message:protos.GetAllRequest)
+pub struct GetAllRequest {
     // special fields
-    // @@protoc_insertion_point(special_field:protos.GetServiceMapRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.GetAllRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a GetServiceMapRequest {
-    fn default() -> &'a GetServiceMapRequest {
-        <GetServiceMapRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a GetAllRequest {
+    fn default() -> &'a GetAllRequest {
+        <GetAllRequest as ::protobuf::Message>::default_instance()
     }
 }
 
-impl GetServiceMapRequest {
-    pub fn new() -> GetServiceMapRequest {
+impl GetAllRequest {
+    pub fn new() -> GetAllRequest {
         ::std::default::Default::default()
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(0);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetServiceMapRequest>(
-            "GetServiceMapRequest",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAllRequest>(
+            "GetAllRequest",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for GetServiceMapRequest {
-    const NAME: &'static str = "GetServiceMapRequest";
+impl ::protobuf::Message for GetAllRequest {
+    const NAME: &'static str = "GetAllRequest";
 
     fn is_initialized(&self) -> bool {
         true
@@ -95,80 +95,98 @@ impl ::protobuf::Message for GetServiceMapRequest {
         &mut self.special_fields
     }
 
-    fn new() -> GetServiceMapRequest {
-        GetServiceMapRequest::new()
+    fn new() -> GetAllRequest {
+        GetAllRequest::new()
     }
 
     fn clear(&mut self) {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static GetServiceMapRequest {
-        static instance: GetServiceMapRequest = GetServiceMapRequest {
+    fn default_instance() -> &'static GetAllRequest {
+        static instance: GetAllRequest = GetAllRequest {
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
     }
 }
 
-impl ::protobuf::MessageFull for GetServiceMapRequest {
+impl ::protobuf::MessageFull for GetAllRequest {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetServiceMapRequest").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAllRequest").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for GetServiceMapRequest {
+impl ::std::fmt::Display for GetAllRequest {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for GetServiceMapRequest {
+impl ::protobuf::reflect::ProtobufValue for GetAllRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetServiceMapResponse)
-pub struct GetServiceMapResponse {
+// @@protoc_insertion_point(message:protos.GetAllResponse)
+pub struct GetAllResponse {
     // message fields
-    ///  Key == service name
-    // @@protoc_insertion_point(field:protos.GetServiceMapResponse.service_map)
-    pub service_map: ::std::collections::HashMap<::std::string::String, super::info::ServiceInfo>,
+    ///  Clients currently connected to the server
+    // @@protoc_insertion_point(field:protos.GetAllResponse.live)
+    pub live: ::std::vec::Vec<super::info::LiveInfo>,
+    ///  All of the audiences that are known to the server
+    // @@protoc_insertion_point(field:protos.GetAllResponse.audiences)
+    pub audiences: ::std::vec::Vec<super::common::Audience>,
+    ///  All of the pipelines known to the server + pipeline <-> audience mappings
+    ///  key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+    ///  to any audience.
+    // @@protoc_insertion_point(field:protos.GetAllResponse.pipelines)
+    pub pipelines: ::std::collections::HashMap<::std::string::String, super::info::PipelineInfo>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.GetServiceMapResponse.special_fields)
+    // @@protoc_insertion_point(special_field:protos.GetAllResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a GetServiceMapResponse {
-    fn default() -> &'a GetServiceMapResponse {
-        <GetServiceMapResponse as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a GetAllResponse {
+    fn default() -> &'a GetAllResponse {
+        <GetAllResponse as ::protobuf::Message>::default_instance()
     }
 }
 
-impl GetServiceMapResponse {
-    pub fn new() -> GetServiceMapResponse {
+impl GetAllResponse {
+    pub fn new() -> GetAllResponse {
         ::std::default::Default::default()
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
-            "service_map",
-            |m: &GetServiceMapResponse| { &m.service_map },
-            |m: &mut GetServiceMapResponse| { &mut m.service_map },
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "live",
+            |m: &GetAllResponse| { &m.live },
+            |m: &mut GetAllResponse| { &mut m.live },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetServiceMapResponse>(
-            "GetServiceMapResponse",
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "audiences",
+            |m: &GetAllResponse| { &m.audiences },
+            |m: &mut GetAllResponse| { &mut m.audiences },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "pipelines",
+            |m: &GetAllResponse| { &m.pipelines },
+            |m: &mut GetAllResponse| { &mut m.pipelines },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAllResponse>(
+            "GetAllResponse",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for GetServiceMapResponse {
-    const NAME: &'static str = "GetServiceMapResponse";
+impl ::protobuf::Message for GetAllResponse {
+    const NAME: &'static str = "GetAllResponse";
 
     fn is_initialized(&self) -> bool {
         true
@@ -178,6 +196,12 @@ impl ::protobuf::Message for GetServiceMapResponse {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
+                    self.live.push(is.read_message()?);
+                },
+                18 => {
+                    self.audiences.push(is.read_message()?);
+                },
+                26 => {
                     let len = is.read_raw_varint32()?;
                     let old_limit = is.push_limit(len as u64)?;
                     let mut key = ::std::default::Default::default();
@@ -190,7 +214,7 @@ impl ::protobuf::Message for GetServiceMapResponse {
                         };
                     }
                     is.pop_limit(old_limit);
-                    self.service_map.insert(key, value);
+                    self.pipelines.insert(key, value);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -204,7 +228,15 @@ impl ::protobuf::Message for GetServiceMapResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        for (k, v) in &self.service_map {
+        for value in &self.live {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        for value in &self.audiences {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        for (k, v) in &self.pipelines {
             let mut entry_size = 0;
             entry_size += ::protobuf::rt::string_size(1, &k);
             let len = v.compute_size();
@@ -217,12 +249,18 @@ impl ::protobuf::Message for GetServiceMapResponse {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        for (k, v) in &self.service_map {
+        for v in &self.live {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        };
+        for v in &self.audiences {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        };
+        for (k, v) in &self.pipelines {
             let mut entry_size = 0;
             entry_size += ::protobuf::rt::string_size(1, &k);
             let len = v.cached_size() as u64;
             entry_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-            os.write_raw_varint32(10)?; // Tag.
+            os.write_raw_varint32(26)?; // Tag.
             os.write_raw_varint32(entry_size as u32)?;
             os.write_string(1, &k)?;
             ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
@@ -239,35 +277,37 @@ impl ::protobuf::Message for GetServiceMapResponse {
         &mut self.special_fields
     }
 
-    fn new() -> GetServiceMapResponse {
-        GetServiceMapResponse::new()
+    fn new() -> GetAllResponse {
+        GetAllResponse::new()
     }
 
     fn clear(&mut self) {
-        self.service_map.clear();
+        self.live.clear();
+        self.audiences.clear();
+        self.pipelines.clear();
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static GetServiceMapResponse {
-        static instance: ::protobuf::rt::Lazy<GetServiceMapResponse> = ::protobuf::rt::Lazy::new();
-        instance.get(GetServiceMapResponse::new)
+    fn default_instance() -> &'static GetAllResponse {
+        static instance: ::protobuf::rt::Lazy<GetAllResponse> = ::protobuf::rt::Lazy::new();
+        instance.get(GetAllResponse::new)
     }
 }
 
-impl ::protobuf::MessageFull for GetServiceMapResponse {
+impl ::protobuf::MessageFull for GetAllResponse {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetServiceMapResponse").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAllResponse").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for GetServiceMapResponse {
+impl ::std::fmt::Display for GetAllResponse {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for GetServiceMapResponse {
+impl ::protobuf::reflect::ProtobufValue for GetAllResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -1920,142 +1960,165 @@ impl ::protobuf::reflect::ProtobufValue for TestResponse {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0eexternal.proto\x12\x06protos\x1a\x0ccommon.proto\x1a\ninfo.proto\
-    \x1a\x0epipeline.proto\"\x16\n\x14GetServiceMapRequest\"\xbb\x01\n\x15Ge\
-    tServiceMapResponse\x12N\n\x0bservice_map\x18\x01\x20\x03(\x0b2-.protos.\
-    GetServiceMapResponse.ServiceMapEntryR\nserviceMap\x1aR\n\x0fServiceMapE\
-    ntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12)\n\x05value\x18\x02\
-    \x20\x01(\x0b2\x13.protos.ServiceInfoR\x05value:\x028\x01\"\x15\n\x13Get\
-    PipelinesRequest\"F\n\x14GetPipelinesResponse\x12.\n\tpipelines\x18\x01\
-    \x20\x03(\x0b2\x10.protos.PipelineR\tpipelines\"5\n\x12GetPipelineReques\
-    t\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"C\n\x13GetPi\
-    pelineResponse\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.Pipel\
-    ineR\x08pipeline\"E\n\x15CreatePipelineRequest\x12,\n\x08pipeline\x18\
-    \x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15UpdatePipeli\
-    neRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\
-    \x08pipeline\"8\n\x15DeletePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
-    \x01\x20\x01(\tR\npipelineId\"f\n\x15AttachPipelineRequest\x12\x1f\n\x0b\
-    pipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\
-    \x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"f\n\x15DetachPipelineRe\
-    quest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\
-    \x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"e\n\
-    \x14PausePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\np\
-    ipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\
-    \x08audience\"f\n\x15ResumePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
+    \x1a\x0epipeline.proto\"\x0f\n\rGetAllRequest\"\xff\x01\n\x0eGetAllRespo\
+    nse\x12$\n\x04live\x18\x01\x20\x03(\x0b2\x10.protos.LiveInfoR\x04live\
+    \x12.\n\taudiences\x18\x02\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\
+    \x12C\n\tpipelines\x18\x03\x20\x03(\x0b2%.protos.GetAllResponse.Pipeline\
+    sEntryR\tpipelines\x1aR\n\x0ePipelinesEntry\x12\x10\n\x03key\x18\x01\x20\
+    \x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.Pipelin\
+    eInfoR\x05value:\x028\x01\"\x15\n\x13GetPipelinesRequest\"F\n\x14GetPipe\
+    linesResponse\x12.\n\tpipelines\x18\x01\x20\x03(\x0b2\x10.protos.Pipelin\
+    eR\tpipelines\"5\n\x12GetPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
+    \x01\x20\x01(\tR\npipelineId\"C\n\x13GetPipelineResponse\x12,\n\x08pipel\
+    ine\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15Creat\
+    ePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.Pip\
+    elineR\x08pipeline\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\
+    \x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DeletePipeli\
+    neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"f\n\
+    \x15AttachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
+    pipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\
+    \x08audience\"f\n\x15DetachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
     \x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\
-    \x10.protos.AudienceR\x08audience\"#\n\x0bTestRequest\x12\x14\n\x05input\
-    \x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResponse\x12\x16\n\x06output\
-    \x18\x02\x20\x01(\tR\x06output2\xa9\x06\n\x08External\x12L\n\rGetService\
-    Map\x12\x1c.protos.GetServiceMapRequest\x1a\x1d.protos.GetServiceMapResp\
-    onse\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.p\
-    rotos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipel\
-    ineRequest\x1a\x1b.protos.GetPipelineResponse\x12I\n\x0eCreatePipeline\
-    \x12\x1d.protos.CreatePipelineRequest\x1a\x18.protos.StandardResponse\
-    \x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRequest\x1a\x18.p\
-    rotos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.protos.DeletePip\
-    elineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eAttachPipeline\
-    \x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.StandardResponse\
-    \x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\x1a\x18.p\
-    rotos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.PausePipelin\
-    eRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipeline\x12\
-    \x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardResponse\x121\n\
-    \x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB4Z2githu\
-    b.com/streamdal/snitch-protos/build/go/protosJ\xf9\x10\n\x06\x12\x04\0\0\
-    \\\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\
-    \n\t\n\x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\x05\0\x14\n\
-    \t\n\x02\x03\x02\x12\x03\x06\0\x18\n\x08\n\x01\x08\x12\x03\x08\0I\n\t\n\
-    \x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0\x1b\x01\n\n\n\
-    \x03\x06\0\x01\x12\x03\n\x08\x10\n\"\n\x04\x06\0\x02\0\x12\x03\x0c\x02J\
-    \x1a\x15\x20Build\x20a\x20service\x20map\n\n\x0c\n\x05\x06\0\x02\0\x01\
-    \x12\x03\x0c\x06\x13\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x0c\x14(\n\x0c\
-    \n\x05\x06\0\x02\0\x03\x12\x03\x0c3H\n\x0b\n\x04\x06\0\x02\x01\x12\x03\
-    \x0e\x02G\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x0e\x06\x12\n\x0c\n\x05\
-    \x06\0\x02\x01\x02\x12\x03\x0e\x13&\n\x0c\n\x05\x06\0\x02\x01\x03\x12\
-    \x03\x0e1E\n\x0b\n\x04\x06\0\x02\x02\x12\x03\x0f\x02D\n\x0c\n\x05\x06\0\
-    \x02\x02\x01\x12\x03\x0f\x06\x11\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\
-    \x0f\x12$\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x0f/B\n\x0b\n\x04\x06\0\
-    \x02\x03\x12\x03\x10\x02N\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x10\x06\
-    \x14\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\x10\x15*\n\x0c\n\x05\x06\0\
-    \x02\x03\x03\x12\x03\x105L\n\x0b\n\x04\x06\0\x02\x04\x12\x03\x11\x02N\n\
-    \x0c\n\x05\x06\0\x02\x04\x01\x12\x03\x11\x06\x14\n\x0c\n\x05\x06\0\x02\
-    \x04\x02\x12\x03\x11\x15*\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x115L\n\
-    \x0b\n\x04\x06\0\x02\x05\x12\x03\x12\x02N\n\x0c\n\x05\x06\0\x02\x05\x01\
-    \x12\x03\x12\x06\x14\n\x0c\n\x05\x06\0\x02\x05\x02\x12\x03\x12\x15*\n\
-    \x0c\n\x05\x06\0\x02\x05\x03\x12\x03\x125L\n\x0b\n\x04\x06\0\x02\x06\x12\
-    \x03\x14\x02N\n\x0c\n\x05\x06\0\x02\x06\x01\x12\x03\x14\x06\x14\n\x0c\n\
-    \x05\x06\0\x02\x06\x02\x12\x03\x14\x15*\n\x0c\n\x05\x06\0\x02\x06\x03\
-    \x12\x03\x145L\n\x0b\n\x04\x06\0\x02\x07\x12\x03\x15\x02N\n\x0c\n\x05\
-    \x06\0\x02\x07\x01\x12\x03\x15\x06\x14\n\x0c\n\x05\x06\0\x02\x07\x02\x12\
-    \x03\x15\x15*\n\x0c\n\x05\x06\0\x02\x07\x03\x12\x03\x155L\n\x0b\n\x04\
-    \x06\0\x02\x08\x12\x03\x16\x02L\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03\
-    \x16\x06\x13\n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03\x16\x14(\n\x0c\n\x05\
-    \x06\0\x02\x08\x03\x12\x03\x163J\n\x0b\n\x04\x06\0\x02\t\x12\x03\x17\x02\
-    N\n\x0c\n\x05\x06\0\x02\t\x01\x12\x03\x17\x06\x14\n\x0c\n\x05\x06\0\x02\
-    \t\x02\x12\x03\x17\x15*\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03\x175L\n\x1a\
-    \n\x04\x06\0\x02\n\x12\x03\x1a\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\
-    \x05\x06\0\x02\n\x01\x12\x03\x1a\x06\n\n\x0c\n\x05\x06\0\x02\n\x02\x12\
-    \x03\x1a\x0b\x16\n\x0c\n\x05\x06\0\x02\n\x03\x12\x03\x1a!-\n=\n\x02\x04\
-    \0\x12\x04\x1d\0\x1f\x01\"1\x20Don't\x20think\x20there\x20is\x20anything\
-    \x20to\x20pass\x20in\x20(yet)?\n\n\n\n\x03\x04\0\x01\x12\x03\x1d\x08\x1c\
-    \n\n\n\x02\x04\x01\x12\x04!\0$\x01\n\n\n\x03\x04\x01\x01\x12\x03!\x08\
-    \x1d\n\"\n\x04\x04\x01\x02\0\x12\x03#\x022\x1a\x15\x20Key\x20==\x20servi\
-    ce\x20name\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03#\x02!\n\x0c\n\x05\x04\
-    \x01\x02\0\x01\x12\x03#\"-\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03#01\n/\n\
-    \x02\x04\x02\x12\x04&\0(\x01\"#\x20Don't\x20think\x20we\x20need\x20anyth\
-    ing\x20here\n\n\n\n\x03\x04\x02\x01\x12\x03&\x08\x1b\n\n\n\x02\x04\x03\
-    \x12\x04*\0,\x01\n\n\n\x03\x04\x03\x01\x12\x03*\x08\x1c\n\x0b\n\x04\x04\
-    \x03\x02\0\x12\x03+\x02)\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03+\x02\n\n\
-    \x0c\n\x05\x04\x03\x02\0\x06\x12\x03+\x0b\x1a\n\x0c\n\x05\x04\x03\x02\0\
-    \x01\x12\x03+\x1b$\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03+'(\n\n\n\x02\
-    \x04\x04\x12\x04.\00\x01\n\n\n\x03\x04\x04\x01\x12\x03.\x08\x1a\n\x0b\n\
-    \x04\x04\x04\x02\0\x12\x03/\x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\
-    \x03/\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03/\t\x14\n\x0c\n\x05\
-    \x04\x04\x02\0\x03\x12\x03/\x17\x18\n\n\n\x02\x04\x05\x12\x042\04\x01\n\
-    \n\n\x03\x04\x05\x01\x12\x032\x08\x1b\n\x0b\n\x04\x04\x05\x02\0\x12\x033\
-    \x02\x1f\n\x0c\n\x05\x04\x05\x02\0\x06\x12\x033\x02\x11\n\x0c\n\x05\x04\
-    \x05\x02\0\x01\x12\x033\x12\x1a\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x033\
-    \x1d\x1e\n\n\n\x02\x04\x06\x12\x046\08\x01\n\n\n\x03\x04\x06\x01\x12\x03\
-    6\x08\x1d\n\x0b\n\x04\x04\x06\x02\0\x12\x037\x02\x1f\n\x0c\n\x05\x04\x06\
-    \x02\0\x06\x12\x037\x02\x11\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x037\x12\
-    \x1a\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x037\x1d\x1e\n\n\n\x02\x04\x07\
-    \x12\x04:\0<\x01\n\n\n\x03\x04\x07\x01\x12\x03:\x08\x1d\n\x0b\n\x04\x04\
-    \x07\x02\0\x12\x03;\x02\x1f\n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03;\x02\
-    \x11\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03;\x12\x1a\n\x0c\n\x05\x04\x07\
-    \x02\0\x03\x12\x03;\x1d\x1e\n\n\n\x02\x04\x08\x12\x04>\0@\x01\n\n\n\x03\
-    \x04\x08\x01\x12\x03>\x08\x1d\n\x0b\n\x04\x04\x08\x02\0\x12\x03?\x02\x19\
-    \n\x0c\n\x05\x04\x08\x02\0\x05\x12\x03?\x02\x08\n\x0c\n\x05\x04\x08\x02\
-    \0\x01\x12\x03?\t\x14\n\x0c\n\x05\x04\x08\x02\0\x03\x12\x03?\x17\x18\n\n\
-    \n\x02\x04\t\x12\x04B\0E\x01\n\n\n\x03\x04\t\x01\x12\x03B\x08\x1d\n\x0b\
-    \n\x04\x04\t\x02\0\x12\x03C\x02\x19\n\x0c\n\x05\x04\t\x02\0\x05\x12\x03C\
-    \x02\x08\n\x0c\n\x05\x04\t\x02\0\x01\x12\x03C\t\x14\n\x0c\n\x05\x04\t\
-    \x02\0\x03\x12\x03C\x17\x18\n\x0b\n\x04\x04\t\x02\x01\x12\x03D\x02\x1f\n\
-    \x0c\n\x05\x04\t\x02\x01\x06\x12\x03D\x02\x11\n\x0c\n\x05\x04\t\x02\x01\
-    \x01\x12\x03D\x12\x1a\n\x0c\n\x05\x04\t\x02\x01\x03\x12\x03D\x1d\x1e\n\n\
-    \n\x02\x04\n\x12\x04G\0J\x01\n\n\n\x03\x04\n\x01\x12\x03G\x08\x1d\n\x0b\
-    \n\x04\x04\n\x02\0\x12\x03H\x02\x19\n\x0c\n\x05\x04\n\x02\0\x05\x12\x03H\
-    \x02\x08\n\x0c\n\x05\x04\n\x02\0\x01\x12\x03H\t\x14\n\x0c\n\x05\x04\n\
-    \x02\0\x03\x12\x03H\x17\x18\n\x0b\n\x04\x04\n\x02\x01\x12\x03I\x02\x1f\n\
-    \x0c\n\x05\x04\n\x02\x01\x06\x12\x03I\x02\x11\n\x0c\n\x05\x04\n\x02\x01\
-    \x01\x12\x03I\x12\x1a\n\x0c\n\x05\x04\n\x02\x01\x03\x12\x03I\x1d\x1e\n\n\
-    \n\x02\x04\x0b\x12\x04L\0O\x01\n\n\n\x03\x04\x0b\x01\x12\x03L\x08\x1c\n\
-    \x0b\n\x04\x04\x0b\x02\0\x12\x03M\x02\x19\n\x0c\n\x05\x04\x0b\x02\0\x05\
-    \x12\x03M\x02\x08\n\x0c\n\x05\x04\x0b\x02\0\x01\x12\x03M\t\x14\n\x0c\n\
-    \x05\x04\x0b\x02\0\x03\x12\x03M\x17\x18\n\x0b\n\x04\x04\x0b\x02\x01\x12\
-    \x03N\x02\x1f\n\x0c\n\x05\x04\x0b\x02\x01\x06\x12\x03N\x02\x11\n\x0c\n\
-    \x05\x04\x0b\x02\x01\x01\x12\x03N\x12\x1a\n\x0c\n\x05\x04\x0b\x02\x01\
-    \x03\x12\x03N\x1d\x1e\n\n\n\x02\x04\x0c\x12\x04Q\0T\x01\n\n\n\x03\x04\
-    \x0c\x01\x12\x03Q\x08\x1d\n\x0b\n\x04\x04\x0c\x02\0\x12\x03R\x02\x19\n\
-    \x0c\n\x05\x04\x0c\x02\0\x05\x12\x03R\x02\x08\n\x0c\n\x05\x04\x0c\x02\0\
-    \x01\x12\x03R\t\x14\n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03R\x17\x18\n\x0b\
-    \n\x04\x04\x0c\x02\x01\x12\x03S\x02\x1f\n\x0c\n\x05\x04\x0c\x02\x01\x06\
-    \x12\x03S\x02\x11\n\x0c\n\x05\x04\x0c\x02\x01\x01\x12\x03S\x12\x1a\n\x0c\
-    \n\x05\x04\x0c\x02\x01\x03\x12\x03S\x1d\x1e\n\n\n\x02\x04\r\x12\x04V\0X\
-    \x01\n\n\n\x03\x04\r\x01\x12\x03V\x08\x13\n\x0b\n\x04\x04\r\x02\0\x12\
-    \x03W\x02\x13\n\x0c\n\x05\x04\r\x02\0\x05\x12\x03W\x02\x08\n\x0c\n\x05\
-    \x04\r\x02\0\x01\x12\x03W\t\x0e\n\x0c\n\x05\x04\r\x02\0\x03\x12\x03W\x11\
-    \x12\n\n\n\x02\x04\x0e\x12\x04Z\0\\\x01\n\n\n\x03\x04\x0e\x01\x12\x03Z\
-    \x08\x14\n\x0b\n\x04\x04\x0e\x02\0\x12\x03[\x02\x14\n\x0c\n\x05\x04\x0e\
-    \x02\0\x05\x12\x03[\x02\x08\n\x0c\n\x05\x04\x0e\x02\0\x01\x12\x03[\t\x0f\
-    \n\x0c\n\x05\x04\x0e\x02\0\x03\x12\x03[\x12\x13b\x06proto3\
+    \x10.protos.AudienceR\x08audience\"e\n\x14PausePipelineRequest\x12\x1f\n\
+    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\
+    \x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"f\n\x15ResumePipeli\
+    neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\
+    \n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"#\
+    \n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\
+    \x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\x94\
+    \x06\n\x08External\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16\
+    .protos.GetAllResponse\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipeline\
+    sRequest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\
+    \x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12I\n\
+    \x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x18.protos.S\
+    tandardResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRe\
+    quest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.p\
+    rotos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eAt\
+    tachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.Standar\
+    dResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\
+    \x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.Pa\
+    usePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipel\
+    ine\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardResponse\
+    \x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB4\
+    Z2github.com/streamdal/snitch-protos/build/go/protosJ\xe3\x17\n\x06\x12\
+    \x04\0\0t\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
+    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\
+    \x05\0\x14\n\t\n\x02\x03\x02\x12\x03\x06\0\x18\n\x08\n\x01\x08\x12\x03\
+    \x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0+\
+    \x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n_\n\x04\x06\0\x02\0\x12\x03\
+    \x0c\x025\x1aR\x20Should\x20return\x20everything\x20that\x20is\x20needed\
+    \x20to\x20build\x20the\x20initial\x20view\x20in\x20the\x20console\n\n\
+    \x0c\n\x05\x06\0\x02\0\x01\x12\x03\x0c\x06\x0c\n\x0c\n\x05\x06\0\x02\0\
+    \x02\x12\x03\x0c\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x0c%3\n@\n\
+    \x04\x06\0\x02\x01\x12\x03\x0f\x02G\x1a3\x20Returns\x20pipelines\x20(_wa\
+    sm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\
+    \x03\x0f\x06\x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x0f\x13&\n\x0c\n\
+    \x05\x06\0\x02\x01\x03\x12\x03\x0f1E\nH\n\x04\x06\0\x02\x02\x12\x03\x12\
+    \x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wasm_bytes\x20fiel\
+    d\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x12\x06\x11\
+    \n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x12\x12$\n\x0c\n\x05\x06\0\x02\
+    \x02\x03\x12\x03\x12/B\nE\n\x04\x06\0\x02\x03\x12\x03\x15\x02N\x1a8\x20C\
+    reate\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20left\x20empty\x20o\
+    n\x20create\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x15\x06\x14\n\x0c\n\
+    \x05\x06\0\x02\x03\x02\x12\x03\x15\x15*\n\x0c\n\x05\x06\0\x02\x03\x03\
+    \x12\x03\x155L\n:\n\x04\x06\0\x02\x04\x12\x03\x18\x02N\x1a-\x20Update\
+    \x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\n\x0c\n\x05\
+    \x06\0\x02\x04\x01\x12\x03\x18\x06\x14\n\x0c\n\x05\x06\0\x02\x04\x02\x12\
+    \x03\x18\x15*\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x185L\n\x20\n\x04\
+    \x06\0\x02\x05\x12\x03\x1b\x02N\x1a\x13\x20Delete\x20a\x20pipeline\n\n\
+    \x0c\n\x05\x06\0\x02\x05\x01\x12\x03\x1b\x06\x14\n\x0c\n\x05\x06\0\x02\
+    \x05\x02\x12\x03\x1b\x15*\n\x0c\n\x05\x06\0\x02\x05\x03\x12\x03\x1b5L\n/\
+    \n\x04\x06\0\x02\x06\x12\x03\x1e\x02N\x1a\"\x20Attach\x20a\x20pipeline\
+    \x20to\x20an\x20audience\n\n\x0c\n\x05\x06\0\x02\x06\x01\x12\x03\x1e\x06\
+    \x14\n\x0c\n\x05\x06\0\x02\x06\x02\x12\x03\x1e\x15*\n\x0c\n\x05\x06\0\
+    \x02\x06\x03\x12\x03\x1e5L\n1\n\x04\x06\0\x02\x07\x12\x03!\x02N\x1a$\x20\
+    Detach\x20a\x20pipeline\x20from\x20an\x20audience\n\n\x0c\n\x05\x06\0\
+    \x02\x07\x01\x12\x03!\x06\x14\n\x0c\n\x05\x06\0\x02\x07\x02\x12\x03!\x15\
+    *\n\x0c\n\x05\x06\0\x02\x07\x03\x12\x03!5L\nC\n\x04\x06\0\x02\x08\x12\
+    \x03$\x02L\x1a6\x20Pause\x20a\x20pipeline;\x20noop\x20if\x20pipeline\x20\
+    is\x20already\x20paused\n\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03$\x06\x13\
+    \n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03$\x14(\n\x0c\n\x05\x06\0\x02\x08\
+    \x03\x12\x03$3J\n@\n\x04\x06\0\x02\t\x12\x03'\x02N\x1a3\x20Resume\x20a\
+    \x20pipeline;\x20noop\x20if\x20pipeline\x20is\x20not\x20paused\n\n\x0c\n\
+    \x05\x06\0\x02\t\x01\x12\x03'\x06\x14\n\x0c\n\x05\x06\0\x02\t\x02\x12\
+    \x03'\x15*\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03'5L\n\x1a\n\x04\x06\0\x02\
+    \n\x12\x03*\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\x05\x06\0\x02\n\x01\
+    \x12\x03*\x06\n\n\x0c\n\x05\x06\0\x02\n\x02\x12\x03*\x0b\x16\n\x0c\n\x05\
+    \x06\0\x02\n\x03\x12\x03*!-\n=\n\x02\x04\0\x12\x04-\0/\x01\"1\x20Don't\
+    \x20think\x20there\x20is\x20anything\x20to\x20pass\x20in\x20(yet)?\n\n\n\
+    \n\x03\x04\0\x01\x12\x03-\x08\x15\n\n\n\x02\x04\x01\x12\x041\0<\x01\n\n\
+    \n\x03\x04\x01\x01\x12\x031\x08\x16\n8\n\x04\x04\x01\x02\0\x12\x033\x02$\
+    \x1a+\x20Clients\x20currently\x20connected\x20to\x20the\x20server\n\n\
+    \x0c\n\x05\x04\x01\x02\0\x04\x12\x033\x02\n\n\x0c\n\x05\x04\x01\x02\0\
+    \x06\x12\x033\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x033\x1b\x1f\n\
+    \x0c\n\x05\x04\x01\x02\0\x03\x12\x033\"#\n@\n\x04\x04\x01\x02\x01\x12\
+    \x036\x02)\x1a3\x20All\x20of\x20the\x20audiences\x20that\x20are\x20known\
+    \x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x036\x02\n\
+    \n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x036\x0b\x1a\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x036\x1b$\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x036'(\n\
+    \xbb\x01\n\x04\x04\x01\x02\x02\x12\x03;\x022\x1a\xad\x01\x20All\x20of\
+    \x20the\x20pipelines\x20known\x20to\x20the\x20server\x20+\x20pipeline\
+    \x20<->\x20audience\x20mappings\n\x20key\x20==\x20pipeline_id;\x20if\x20\
+    \"Audience\"\x20is\x20not\x20filled\x20out\x20-\x20pipeline\x20is\x20not\
+    \x20attached\n\x20to\x20any\x20audience.\n\n\x0c\n\x05\x04\x01\x02\x02\
+    \x06\x12\x03;\x02#\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03;$-\n\x0c\n\
+    \x05\x04\x01\x02\x02\x03\x12\x03;01\n/\n\x02\x04\x02\x12\x04>\0@\x01\"#\
+    \x20Don't\x20think\x20we\x20need\x20anything\x20here\n\n\n\n\x03\x04\x02\
+    \x01\x12\x03>\x08\x1b\n\n\n\x02\x04\x03\x12\x04B\0D\x01\n\n\n\x03\x04\
+    \x03\x01\x12\x03B\x08\x1c\n\x0b\n\x04\x04\x03\x02\0\x12\x03C\x02)\n\x0c\
+    \n\x05\x04\x03\x02\0\x04\x12\x03C\x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\
+    \x12\x03C\x0b\x1a\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03C\x1b$\n\x0c\n\
+    \x05\x04\x03\x02\0\x03\x12\x03C'(\n\n\n\x02\x04\x04\x12\x04F\0H\x01\n\n\
+    \n\x03\x04\x04\x01\x12\x03F\x08\x1a\n\x0b\n\x04\x04\x04\x02\0\x12\x03G\
+    \x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03G\x02\x08\n\x0c\n\x05\x04\
+    \x04\x02\0\x01\x12\x03G\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03G\x17\
+    \x18\n\n\n\x02\x04\x05\x12\x04J\0L\x01\n\n\n\x03\x04\x05\x01\x12\x03J\
+    \x08\x1b\n\x0b\n\x04\x04\x05\x02\0\x12\x03K\x02\x1f\n\x0c\n\x05\x04\x05\
+    \x02\0\x06\x12\x03K\x02\x11\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03K\x12\
+    \x1a\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03K\x1d\x1e\n\n\n\x02\x04\x06\
+    \x12\x04N\0P\x01\n\n\n\x03\x04\x06\x01\x12\x03N\x08\x1d\n\x0b\n\x04\x04\
+    \x06\x02\0\x12\x03O\x02\x1f\n\x0c\n\x05\x04\x06\x02\0\x06\x12\x03O\x02\
+    \x11\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x03O\x12\x1a\n\x0c\n\x05\x04\x06\
+    \x02\0\x03\x12\x03O\x1d\x1e\n\n\n\x02\x04\x07\x12\x04R\0T\x01\n\n\n\x03\
+    \x04\x07\x01\x12\x03R\x08\x1d\n\x0b\n\x04\x04\x07\x02\0\x12\x03S\x02\x1f\
+    \n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03S\x02\x11\n\x0c\n\x05\x04\x07\x02\
+    \0\x01\x12\x03S\x12\x1a\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03S\x1d\x1e\n\
+    \n\n\x02\x04\x08\x12\x04V\0X\x01\n\n\n\x03\x04\x08\x01\x12\x03V\x08\x1d\
+    \n\x0b\n\x04\x04\x08\x02\0\x12\x03W\x02\x19\n\x0c\n\x05\x04\x08\x02\0\
+    \x05\x12\x03W\x02\x08\n\x0c\n\x05\x04\x08\x02\0\x01\x12\x03W\t\x14\n\x0c\
+    \n\x05\x04\x08\x02\0\x03\x12\x03W\x17\x18\n\n\n\x02\x04\t\x12\x04Z\0]\
+    \x01\n\n\n\x03\x04\t\x01\x12\x03Z\x08\x1d\n\x0b\n\x04\x04\t\x02\0\x12\
+    \x03[\x02\x19\n\x0c\n\x05\x04\t\x02\0\x05\x12\x03[\x02\x08\n\x0c\n\x05\
+    \x04\t\x02\0\x01\x12\x03[\t\x14\n\x0c\n\x05\x04\t\x02\0\x03\x12\x03[\x17\
+    \x18\n\x0b\n\x04\x04\t\x02\x01\x12\x03\\\x02\x1f\n\x0c\n\x05\x04\t\x02\
+    \x01\x06\x12\x03\\\x02\x11\n\x0c\n\x05\x04\t\x02\x01\x01\x12\x03\\\x12\
+    \x1a\n\x0c\n\x05\x04\t\x02\x01\x03\x12\x03\\\x1d\x1e\n\n\n\x02\x04\n\x12\
+    \x04_\0b\x01\n\n\n\x03\x04\n\x01\x12\x03_\x08\x1d\n\x0b\n\x04\x04\n\x02\
+    \0\x12\x03`\x02\x19\n\x0c\n\x05\x04\n\x02\0\x05\x12\x03`\x02\x08\n\x0c\n\
+    \x05\x04\n\x02\0\x01\x12\x03`\t\x14\n\x0c\n\x05\x04\n\x02\0\x03\x12\x03`\
+    \x17\x18\n\x0b\n\x04\x04\n\x02\x01\x12\x03a\x02\x1f\n\x0c\n\x05\x04\n\
+    \x02\x01\x06\x12\x03a\x02\x11\n\x0c\n\x05\x04\n\x02\x01\x01\x12\x03a\x12\
+    \x1a\n\x0c\n\x05\x04\n\x02\x01\x03\x12\x03a\x1d\x1e\n\n\n\x02\x04\x0b\
+    \x12\x04d\0g\x01\n\n\n\x03\x04\x0b\x01\x12\x03d\x08\x1c\n\x0b\n\x04\x04\
+    \x0b\x02\0\x12\x03e\x02\x19\n\x0c\n\x05\x04\x0b\x02\0\x05\x12\x03e\x02\
+    \x08\n\x0c\n\x05\x04\x0b\x02\0\x01\x12\x03e\t\x14\n\x0c\n\x05\x04\x0b\
+    \x02\0\x03\x12\x03e\x17\x18\n\x0b\n\x04\x04\x0b\x02\x01\x12\x03f\x02\x1f\
+    \n\x0c\n\x05\x04\x0b\x02\x01\x06\x12\x03f\x02\x11\n\x0c\n\x05\x04\x0b\
+    \x02\x01\x01\x12\x03f\x12\x1a\n\x0c\n\x05\x04\x0b\x02\x01\x03\x12\x03f\
+    \x1d\x1e\n\n\n\x02\x04\x0c\x12\x04i\0l\x01\n\n\n\x03\x04\x0c\x01\x12\x03\
+    i\x08\x1d\n\x0b\n\x04\x04\x0c\x02\0\x12\x03j\x02\x19\n\x0c\n\x05\x04\x0c\
+    \x02\0\x05\x12\x03j\x02\x08\n\x0c\n\x05\x04\x0c\x02\0\x01\x12\x03j\t\x14\
+    \n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03j\x17\x18\n\x0b\n\x04\x04\x0c\x02\
+    \x01\x12\x03k\x02\x1f\n\x0c\n\x05\x04\x0c\x02\x01\x06\x12\x03k\x02\x11\n\
+    \x0c\n\x05\x04\x0c\x02\x01\x01\x12\x03k\x12\x1a\n\x0c\n\x05\x04\x0c\x02\
+    \x01\x03\x12\x03k\x1d\x1e\n\n\n\x02\x04\r\x12\x04n\0p\x01\n\n\n\x03\x04\
+    \r\x01\x12\x03n\x08\x13\n\x0b\n\x04\x04\r\x02\0\x12\x03o\x02\x13\n\x0c\n\
+    \x05\x04\r\x02\0\x05\x12\x03o\x02\x08\n\x0c\n\x05\x04\r\x02\0\x01\x12\
+    \x03o\t\x0e\n\x0c\n\x05\x04\r\x02\0\x03\x12\x03o\x11\x12\n\n\n\x02\x04\
+    \x0e\x12\x04r\0t\x01\n\n\n\x03\x04\x0e\x01\x12\x03r\x08\x14\n\x0b\n\x04\
+    \x04\x0e\x02\0\x12\x03s\x02\x14\n\x0c\n\x05\x04\x0e\x02\0\x05\x12\x03s\
+    \x02\x08\n\x0c\n\x05\x04\x0e\x02\0\x01\x12\x03s\t\x0f\n\x0c\n\x05\x04\
+    \x0e\x02\0\x03\x12\x03s\x12\x13b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -2077,8 +2140,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::info::file_descriptor().clone());
             deps.push(super::pipeline::file_descriptor().clone());
             let mut messages = ::std::vec::Vec::with_capacity(15);
-            messages.push(GetServiceMapRequest::generated_message_descriptor_data());
-            messages.push(GetServiceMapResponse::generated_message_descriptor_data());
+            messages.push(GetAllRequest::generated_message_descriptor_data());
+            messages.push(GetAllResponse::generated_message_descriptor_data());
             messages.push(GetPipelinesRequest::generated_message_descriptor_data());
             messages.push(GetPipelinesResponse::generated_message_descriptor_data());
             messages.push(GetPipelineRequest::generated_message_descriptor_data());

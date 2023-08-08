@@ -12,15 +12,17 @@ export class ExternalClient {
         this._transport = _transport;
     }
     /**
-     * Build a service map
+     * Should return everything that is needed to build the initial view in the console
      *
-     * @generated from protobuf rpc: GetServiceMap(protos.GetServiceMapRequest) returns (protos.GetServiceMapResponse);
+     * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
-    getServiceMap(input, options) {
+    getAll(input, options) {
         const method = this.methods[0], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns pipelines (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipelines(protos.GetPipelinesRequest) returns (protos.GetPipelinesResponse);
      */
     getPipelines(input, options) {
@@ -28,6 +30,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns a single pipeline (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipeline(protos.GetPipelineRequest) returns (protos.GetPipelineResponse);
      */
     getPipeline(input, options) {
@@ -35,6 +39,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Create a new pipeline; id must be left empty on create
+     *
      * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
      */
     createPipeline(input, options) {
@@ -42,6 +48,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Update an existing pipeline; id must be set
+     *
      * @generated from protobuf rpc: UpdatePipeline(protos.UpdatePipelineRequest) returns (protos.StandardResponse);
      */
     updatePipeline(input, options) {
@@ -49,6 +57,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a pipeline
+     *
      * @generated from protobuf rpc: DeletePipeline(protos.DeletePipelineRequest) returns (protos.StandardResponse);
      */
     deletePipeline(input, options) {
@@ -56,6 +66,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Attach a pipeline to an audience
+     *
      * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
      */
     attachPipeline(input, options) {
@@ -63,6 +75,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Detach a pipeline from an audience
+     *
      * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
      */
     detachPipeline(input, options) {
@@ -70,6 +84,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Pause a pipeline; noop if pipeline is already paused
+     *
      * @generated from protobuf rpc: PausePipeline(protos.PausePipelineRequest) returns (protos.StandardResponse);
      */
     pausePipeline(input, options) {
@@ -77,6 +93,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Resume a pipeline; noop if pipeline is not paused
+     *
      * @generated from protobuf rpc: ResumePipeline(protos.ResumePipelineRequest) returns (protos.StandardResponse);
      */
     resumePipeline(input, options) {

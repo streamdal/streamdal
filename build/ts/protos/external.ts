@@ -4,27 +4,42 @@
 import { StandardResponse } from "./common.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
-import { ServiceInfo } from "./info.js";
+import { PipelineInfo } from "./info.js";
+import { Audience } from "./common.js";
+import { LiveInfo } from "./info.js";
 /**
  * Don't think there is anything to pass in (yet)?
  *
- * @generated from protobuf message protos.GetServiceMapRequest
+ * @generated from protobuf message protos.GetAllRequest
  */
-export interface GetServiceMapRequest {
+export interface GetAllRequest {
 }
 /**
- * @generated from protobuf message protos.GetServiceMapResponse
+ * @generated from protobuf message protos.GetAllResponse
  */
-export interface GetServiceMapResponse {
+export interface GetAllResponse {
     /**
-     * Key == service name
+     * Clients currently connected to the server
      *
-     * @generated from protobuf field: map<string, protos.ServiceInfo> service_map = 1;
+     * @generated from protobuf field: repeated protos.LiveInfo live = 1;
      */
-    serviceMap: {
-        [key: string]: ServiceInfo;
+    live: LiveInfo[];
+    /**
+     * All of the audiences that are known to the server
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     */
+    audiences: Audience[];
+    /**
+     * All of the pipelines known to the server + pipeline <-> audience mappings
+     * key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+     * to any audience.
+     *
+     * @generated from protobuf field: map<string, protos.PipelineInfo> pipelines = 3;
+     */
+    pipelines: {
+        [key: string]: PipelineInfo;
     };
 }
 /**
@@ -159,27 +174,29 @@ export interface TestResponse {
     output: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
-class GetServiceMapRequest$Type extends MessageType<GetServiceMapRequest> {
+class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor() {
-        super("protos.GetServiceMapRequest", []);
+        super("protos.GetAllRequest", []);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapRequest
+ * @generated MessageType for protobuf message protos.GetAllRequest
  */
-export const GetServiceMapRequest = new GetServiceMapRequest$Type();
+export const GetAllRequest = new GetAllRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetServiceMapResponse$Type extends MessageType<GetServiceMapResponse> {
+class GetAllResponse$Type extends MessageType<GetAllResponse> {
     constructor() {
-        super("protos.GetServiceMapResponse", [
-            { no: 1, name: "service_map", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => ServiceInfo } }
+        super("protos.GetAllResponse", [
+            { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapResponse
+ * @generated MessageType for protobuf message protos.GetAllResponse
  */
-export const GetServiceMapResponse = new GetServiceMapResponse$Type();
+export const GetAllResponse = new GetAllResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor() {
@@ -342,7 +359,7 @@ export const TestResponse = new TestResponse$Type();
  * @generated ServiceType for protobuf service protos.External
  */
 export const External = new ServiceType("protos.External", [
-    { name: "GetServiceMap", options: {}, I: GetServiceMapRequest, O: GetServiceMapResponse },
+    { name: "GetAll", options: {}, I: GetAllRequest, O: GetAllResponse },
     { name: "GetPipelines", options: {}, I: GetPipelinesRequest, O: GetPipelinesResponse },
     { name: "GetPipeline", options: {}, I: GetPipelineRequest, O: GetPipelineResponse },
     { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: StandardResponse },

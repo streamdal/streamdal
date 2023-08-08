@@ -96,6 +96,12 @@ export interface PipelineStep {
         oneofKind: undefined;
     };
     /**
+     * ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
+     *
+     * @generated from protobuf field: optional string _wasm_id = 10000;
+     */
+    WasmId?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
      * WASM module bytes (set by snitch-server)
      *
      * @generated from protobuf field: optional bytes _wasm_bytes = 10001;
@@ -155,6 +161,7 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => EncodeStep },
             { no: 1003, name: "decode", kind: "message", oneof: "step", T: () => DecodeStep },
             { no: 1004, name: "custom", kind: "message", oneof: "step", T: () => CustomStep },
+            { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);

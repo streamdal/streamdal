@@ -4,31 +4,34 @@
 import { StandardResponse } from "./common.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
-import { ServiceInfo } from "./info.js";
+import { PipelineInfo } from "./info.js";
+import { Audience } from "./common.js";
+import { LiveInfo } from "./info.js";
 // @generated message type with reflection information, may provide speed optimized methods
-class GetServiceMapRequest$Type extends MessageType {
+class GetAllRequest$Type extends MessageType {
     constructor() {
-        super("protos.GetServiceMapRequest", []);
+        super("protos.GetAllRequest", []);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapRequest
+ * @generated MessageType for protobuf message protos.GetAllRequest
  */
-export const GetServiceMapRequest = new GetServiceMapRequest$Type();
+export const GetAllRequest = new GetAllRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetServiceMapResponse$Type extends MessageType {
+class GetAllResponse$Type extends MessageType {
     constructor() {
-        super("protos.GetServiceMapResponse", [
-            { no: 1, name: "service_map", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => ServiceInfo } }
+        super("protos.GetAllResponse", [
+            { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapResponse
+ * @generated MessageType for protobuf message protos.GetAllResponse
  */
-export const GetServiceMapResponse = new GetServiceMapResponse$Type();
+export const GetAllResponse = new GetAllResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetPipelinesRequest$Type extends MessageType {
     constructor() {
@@ -191,7 +194,7 @@ export const TestResponse = new TestResponse$Type();
  * @generated ServiceType for protobuf service protos.External
  */
 export const External = new ServiceType("protos.External", [
-    { name: "GetServiceMap", options: {}, I: GetServiceMapRequest, O: GetServiceMapResponse },
+    { name: "GetAll", options: {}, I: GetAllRequest, O: GetAllResponse },
     { name: "GetPipelines", options: {}, I: GetPipelinesRequest, O: GetPipelinesResponse },
     { name: "GetPipeline", options: {}, I: GetPipelineRequest, O: GetPipelineResponse },
     { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: StandardResponse },

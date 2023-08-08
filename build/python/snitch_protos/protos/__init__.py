@@ -56,6 +56,11 @@ class PipelineStepCondition(betterproto.Enum):
     PIPELINE_STEP_CONDITION_NOTIFY = 2
 
 
+class PipelineState(betterproto.Enum):
+    PIPELINE_STATE_UNSET = 0
+    PIPELINE_STATE_PAUSED = 1
+
+
 class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
     CLIENT_TYPE_SDK = 1
@@ -146,6 +151,11 @@ class PipelineStep(betterproto.Message):
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
     decode: "steps.DecodeStep" = betterproto.message_field(1003, group="step")
     custom: "steps.CustomStep" = betterproto.message_field(1004, group="step")
+    wasm_id: Optional[str] = betterproto.string_field(
+        10000, optional=True, group="X_wasm_id"
+    )
+    """ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server"""
+
     wasm_bytes: Optional[bytes] = betterproto.bytes_field(
         10001, optional=True, group="X_wasm_bytes"
     )
@@ -158,34 +168,28 @@ class PipelineStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class ServiceInfo(betterproto.Message):
-    name: str = betterproto.string_field(1)
-    description: str = betterproto.string_field(2)
-    pipelines: List["PipelineInfo"] = betterproto.message_field(100)
-    consumers: List["ConsumerInfo"] = betterproto.message_field(101)
-    producers: List["ProducerInfo"] = betterproto.message_field(102)
-    clients: List["ClientInfo"] = betterproto.message_field(103)
+class LiveInfo(betterproto.Message):
+    audience: List["Audience"] = betterproto.message_field(1)
+    """If empty, client has not announced any audiences"""
+
+    client: "ClientInfo" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
 class PipelineInfo(betterproto.Message):
-    audience: "Audience" = betterproto.message_field(1)
+    audiences: List["Audience"] = betterproto.message_field(1)
+    """If empty, pipeline is not attached to any audience"""
+
     pipeline: "Pipeline" = betterproto.message_field(2)
-
-
-@dataclass(eq=False, repr=False)
-class ConsumerInfo(betterproto.Message):
-    pass
-
-
-@dataclass(eq=False, repr=False)
-class ProducerInfo(betterproto.Message):
-    pass
+    state: "PipelineState" = betterproto.enum_field(3)
 
 
 @dataclass(eq=False, repr=False)
 class ClientInfo(betterproto.Message):
-    """This should come from the register call"""
+    """
+    Most of this is constructed by client SDKs and provided during Register
+    call
+    """
 
     client_type: "ClientType" = betterproto.enum_field(1)
     library_name: str = betterproto.string_field(2)
@@ -193,19 +197,40 @@ class ClientInfo(betterproto.Message):
     language: str = betterproto.string_field(4)
     arch: str = betterproto.string_field(5)
     os: str = betterproto.string_field(6)
+    session_id: Optional[str] = betterproto.string_field(
+        7, optional=True, group="X_session_id"
+    )
+    """Filled out by snitch_server on GetAll()"""
+
+    service_name: Optional[str] = betterproto.string_field(
+        8, optional=True, group="X_service_name"
+    )
+    node_name: Optional[str] = betterproto.string_field(
+        9, optional=True, group="X_node_name"
+    )
 
 
 @dataclass(eq=False, repr=False)
-class GetServiceMapRequest(betterproto.Message):
+class GetAllRequest(betterproto.Message):
     pass
 
 
 @dataclass(eq=False, repr=False)
-class GetServiceMapResponse(betterproto.Message):
-    service_map: Dict[str, "ServiceInfo"] = betterproto.map_field(
-        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+class GetAllResponse(betterproto.Message):
+    live: List["LiveInfo"] = betterproto.message_field(1)
+    """Clients currently connected to the server"""
+
+    audiences: List["Audience"] = betterproto.message_field(2)
+    """All of the audiences that are known to the server"""
+
+    pipelines: Dict[str, "PipelineInfo"] = betterproto.map_field(
+        3, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
-    """Key == service name"""
+    """
+    All of the pipelines known to the server + pipeline <-> audience mappings
+    key == pipeline_id; if "Audience" is not filled out - pipeline is not
+    attached to any audience.
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -470,18 +495,18 @@ class WasmResponse(betterproto.Message):
 
 
 class ExternalStub(betterproto.ServiceStub):
-    async def get_service_map(
+    async def get_all(
         self,
-        get_service_map_request: "GetServiceMapRequest",
+        get_all_request: "GetAllRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "GetServiceMapResponse":
+    ) -> "GetAllResponse":
         return await self._unary_unary(
-            "/protos.External/GetServiceMap",
-            get_service_map_request,
-            GetServiceMapResponse,
+            "/protos.External/GetAll",
+            get_all_request,
+            GetAllResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -747,9 +772,7 @@ class InternalStub(betterproto.ServiceStub):
 
 
 class ExternalBase(ServiceBase):
-    async def get_service_map(
-        self, get_service_map_request: "GetServiceMapRequest"
-    ) -> "GetServiceMapResponse":
+    async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def get_pipelines(
@@ -800,12 +823,11 @@ class ExternalBase(ServiceBase):
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_get_service_map(
-        self,
-        stream: "grpclib.server.Stream[GetServiceMapRequest, GetServiceMapResponse]",
+    async def __rpc_get_all(
+        self, stream: "grpclib.server.Stream[GetAllRequest, GetAllResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.get_service_map(request)
+        response = await self.get_all(request)
         await stream.send_message(response)
 
     async def __rpc_get_pipelines(
@@ -880,11 +902,11 @@ class ExternalBase(ServiceBase):
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
-            "/protos.External/GetServiceMap": grpclib.const.Handler(
-                self.__rpc_get_service_map,
+            "/protos.External/GetAll": grpclib.const.Handler(
+                self.__rpc_get_all,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                GetServiceMapRequest,
-                GetServiceMapResponse,
+                GetAllRequest,
+                GetAllResponse,
             ),
             "/protos.External/GetPipelines": grpclib.const.Handler(
                 self.__rpc_get_pipelines,

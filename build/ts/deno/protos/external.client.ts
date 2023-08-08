@@ -19,8 +19,8 @@ import type { GetPipelineRequest } from "./external.ts";
 import type { GetPipelinesResponse } from "./external.ts";
 import type { GetPipelinesRequest } from "./external.ts";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
-import type { GetServiceMapResponse } from "./external.ts";
-import type { GetServiceMapRequest } from "./external.ts";
+import type { GetAllResponse } from "./external.ts";
+import type { GetAllRequest } from "./external.ts";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 /**
@@ -28,44 +28,62 @@ import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
  */
 export interface IExternalClient {
     /**
-     * Build a service map
+     * Should return everything that is needed to build the initial view in the console
      *
-     * @generated from protobuf rpc: GetServiceMap(protos.GetServiceMapRequest) returns (protos.GetServiceMapResponse);
+     * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
-    getServiceMap(input: GetServiceMapRequest, options?: RpcOptions): UnaryCall<GetServiceMapRequest, GetServiceMapResponse>;
+    getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
     /**
+     * Returns pipelines (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipelines(protos.GetPipelinesRequest) returns (protos.GetPipelinesResponse);
      */
     getPipelines(input: GetPipelinesRequest, options?: RpcOptions): UnaryCall<GetPipelinesRequest, GetPipelinesResponse>;
     /**
+     * Returns a single pipeline (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipeline(protos.GetPipelineRequest) returns (protos.GetPipelineResponse);
      */
     getPipeline(input: GetPipelineRequest, options?: RpcOptions): UnaryCall<GetPipelineRequest, GetPipelineResponse>;
     /**
+     * Create a new pipeline; id must be left empty on create
+     *
      * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
      */
     createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, StandardResponse>;
     /**
+     * Update an existing pipeline; id must be set
+     *
      * @generated from protobuf rpc: UpdatePipeline(protos.UpdatePipelineRequest) returns (protos.StandardResponse);
      */
     updatePipeline(input: UpdatePipelineRequest, options?: RpcOptions): UnaryCall<UpdatePipelineRequest, StandardResponse>;
     /**
+     * Delete a pipeline
+     *
      * @generated from protobuf rpc: DeletePipeline(protos.DeletePipelineRequest) returns (protos.StandardResponse);
      */
     deletePipeline(input: DeletePipelineRequest, options?: RpcOptions): UnaryCall<DeletePipelineRequest, StandardResponse>;
     /**
+     * Attach a pipeline to an audience
+     *
      * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
      */
     attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse>;
     /**
+     * Detach a pipeline from an audience
+     *
      * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
     /**
+     * Pause a pipeline; noop if pipeline is already paused
+     *
      * @generated from protobuf rpc: PausePipeline(protos.PausePipelineRequest) returns (protos.StandardResponse);
      */
     pausePipeline(input: PausePipelineRequest, options?: RpcOptions): UnaryCall<PausePipelineRequest, StandardResponse>;
     /**
+     * Resume a pipeline; noop if pipeline is not paused
+     *
      * @generated from protobuf rpc: ResumePipeline(protos.ResumePipelineRequest) returns (protos.StandardResponse);
      */
     resumePipeline(input: ResumePipelineRequest, options?: RpcOptions): UnaryCall<ResumePipelineRequest, StandardResponse>;
@@ -86,15 +104,17 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
     constructor(private readonly _transport: RpcTransport) {
     }
     /**
-     * Build a service map
+     * Should return everything that is needed to build the initial view in the console
      *
-     * @generated from protobuf rpc: GetServiceMap(protos.GetServiceMapRequest) returns (protos.GetServiceMapResponse);
+     * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
-    getServiceMap(input: GetServiceMapRequest, options?: RpcOptions): UnaryCall<GetServiceMapRequest, GetServiceMapResponse> {
+    getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse> {
         const method = this.methods[0], opt = this._transport.mergeOptions(options);
-        return stackIntercept<GetServiceMapRequest, GetServiceMapResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<GetAllRequest, GetAllResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns pipelines (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipelines(protos.GetPipelinesRequest) returns (protos.GetPipelinesResponse);
      */
     getPipelines(input: GetPipelinesRequest, options?: RpcOptions): UnaryCall<GetPipelinesRequest, GetPipelinesResponse> {
@@ -102,6 +122,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetPipelinesRequest, GetPipelinesResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns a single pipeline (_wasm_bytes field is stripped)
+     *
      * @generated from protobuf rpc: GetPipeline(protos.GetPipelineRequest) returns (protos.GetPipelineResponse);
      */
     getPipeline(input: GetPipelineRequest, options?: RpcOptions): UnaryCall<GetPipelineRequest, GetPipelineResponse> {
@@ -109,6 +131,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetPipelineRequest, GetPipelineResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Create a new pipeline; id must be left empty on create
+     *
      * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
      */
     createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, StandardResponse> {
@@ -116,6 +140,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<CreatePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Update an existing pipeline; id must be set
+     *
      * @generated from protobuf rpc: UpdatePipeline(protos.UpdatePipelineRequest) returns (protos.StandardResponse);
      */
     updatePipeline(input: UpdatePipelineRequest, options?: RpcOptions): UnaryCall<UpdatePipelineRequest, StandardResponse> {
@@ -123,6 +149,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<UpdatePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a pipeline
+     *
      * @generated from protobuf rpc: DeletePipeline(protos.DeletePipelineRequest) returns (protos.StandardResponse);
      */
     deletePipeline(input: DeletePipelineRequest, options?: RpcOptions): UnaryCall<DeletePipelineRequest, StandardResponse> {
@@ -130,6 +158,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DeletePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Attach a pipeline to an audience
+     *
      * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
      */
     attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse> {
@@ -137,6 +167,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<AttachPipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Detach a pipeline from an audience
+     *
      * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse> {
@@ -144,6 +176,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DetachPipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Pause a pipeline; noop if pipeline is already paused
+     *
      * @generated from protobuf rpc: PausePipeline(protos.PausePipelineRequest) returns (protos.StandardResponse);
      */
     pausePipeline(input: PausePipelineRequest, options?: RpcOptions): UnaryCall<PausePipelineRequest, StandardResponse> {
@@ -151,6 +185,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<PausePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Resume a pipeline; noop if pipeline is not paused
+     *
      * @generated from protobuf rpc: ResumePipeline(protos.ResumePipelineRequest) returns (protos.StandardResponse);
      */
     resumePipeline(input: ResumePipelineRequest, options?: RpcOptions): UnaryCall<ResumePipelineRequest, StandardResponse> {

@@ -1,26 +1,41 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
-import { ServiceInfo } from "./info.js";
+import { PipelineInfo } from "./info.js";
+import { Audience } from "./common.js";
+import { LiveInfo } from "./info.js";
 /**
  * Don't think there is anything to pass in (yet)?
  *
- * @generated from protobuf message protos.GetServiceMapRequest
+ * @generated from protobuf message protos.GetAllRequest
  */
-export interface GetServiceMapRequest {
+export interface GetAllRequest {
 }
 /**
- * @generated from protobuf message protos.GetServiceMapResponse
+ * @generated from protobuf message protos.GetAllResponse
  */
-export interface GetServiceMapResponse {
+export interface GetAllResponse {
     /**
-     * Key == service name
+     * Clients currently connected to the server
      *
-     * @generated from protobuf field: map<string, protos.ServiceInfo> service_map = 1;
+     * @generated from protobuf field: repeated protos.LiveInfo live = 1;
      */
-    serviceMap: {
-        [key: string]: ServiceInfo;
+    live: LiveInfo[];
+    /**
+     * All of the audiences that are known to the server
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     */
+    audiences: Audience[];
+    /**
+     * All of the pipelines known to the server + pipeline <-> audience mappings
+     * key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+     * to any audience.
+     *
+     * @generated from protobuf field: map<string, protos.PipelineInfo> pipelines = 3;
+     */
+    pipelines: {
+        [key: string]: PipelineInfo;
     };
 }
 /**
@@ -154,20 +169,20 @@ export interface TestResponse {
      */
     output: string;
 }
-declare class GetServiceMapRequest$Type extends MessageType<GetServiceMapRequest> {
+declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapRequest
+ * @generated MessageType for protobuf message protos.GetAllRequest
  */
-export declare const GetServiceMapRequest: GetServiceMapRequest$Type;
-declare class GetServiceMapResponse$Type extends MessageType<GetServiceMapResponse> {
+export declare const GetAllRequest: GetAllRequest$Type;
+declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.GetServiceMapResponse
+ * @generated MessageType for protobuf message protos.GetAllResponse
  */
-export declare const GetServiceMapResponse: GetServiceMapResponse$Type;
+export declare const GetAllResponse: GetAllResponse$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
 }
