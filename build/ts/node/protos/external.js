@@ -7,6 +7,102 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
 import { ServiceInfo } from "./info.js";
+import { NotifyConfig } from "./notify.js";
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateNotificationRequest$Type extends MessageType {
+    constructor() {
+        super("protos.CreateNotificationRequest", [
+            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateNotificationRequest
+ */
+export const CreateNotificationRequest = new CreateNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UpdateNotificationRequest$Type extends MessageType {
+    constructor() {
+        super("protos.UpdateNotificationRequest", [
+            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.UpdateNotificationRequest
+ */
+export const UpdateNotificationRequest = new UpdateNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeleteNotificationRequest$Type extends MessageType {
+    constructor() {
+        super("protos.DeleteNotificationRequest", [
+            { no: 1, name: "notification_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteNotificationRequest
+ */
+export const DeleteNotificationRequest = new DeleteNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetNotificationsRequest$Type extends MessageType {
+    constructor() {
+        super("protos.GetNotificationsRequest", []);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetNotificationsRequest
+ */
+export const GetNotificationsRequest = new GetNotificationsRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetNotificationsResponse$Type extends MessageType {
+    constructor() {
+        super("protos.GetNotificationsResponse", [
+            { no: 1, name: "notifications", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => NotifyConfig } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetNotificationsResponse
+ */
+export const GetNotificationsResponse = new GetNotificationsResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetNotificationRequest$Type extends MessageType {
+    constructor() {
+        super("protos.GetNotificationRequest", [
+            { no: 1, name: "notification_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetNotificationRequest
+ */
+export const GetNotificationRequest = new GetNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetNotificationResponse$Type extends MessageType {
+    constructor() {
+        super("protos.GetNotificationResponse", [
+            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetNotificationResponse
+ */
+export const GetNotificationResponse = new GetNotificationResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AttachNotificationRequest$Type extends MessageType {
+    constructor() {
+        super("protos.AttachNotificationRequest", [
+            { no: 1, name: "notification_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AttachNotificationRequest
+ */
+export const AttachNotificationRequest = new AttachNotificationRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetServiceMapRequest$Type extends MessageType {
     constructor() {
@@ -201,6 +297,12 @@ export const External = new ServiceType("protos.External", [
     { name: "DetachPipeline", options: {}, I: DetachPipelineRequest, O: StandardResponse },
     { name: "PausePipeline", options: {}, I: PausePipelineRequest, O: StandardResponse },
     { name: "ResumePipeline", options: {}, I: ResumePipelineRequest, O: StandardResponse },
+    { name: "CreateNotification", options: {}, I: CreateNotificationRequest, O: StandardResponse },
+    { name: "UpdateNotification", options: {}, I: UpdateNotificationRequest, O: StandardResponse },
+    { name: "DeleteNotification", options: {}, I: DeleteNotificationRequest, O: StandardResponse },
+    { name: "GetNotifications", options: {}, I: GetNotificationsRequest, O: GetNotificationsResponse },
+    { name: "GetNotification", options: {}, I: GetNotificationRequest, O: GetNotificationResponse },
+    { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);
 //# sourceMappingURL=external.js.map

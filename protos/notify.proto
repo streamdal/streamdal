@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+enum NotifyType {
+  NOTIFY_TYPE_UNSET = 0;
+  NOTIFY_TYPE_SLACK = 1;
+  NOTIFY_TYPE_EMAIL = 2;
+  NOTIFY_TYPE_PAGERDUTY = 3;
+}
+
+message NotifyConfig {
+  string id = 1;
+
+  string name = 2;
+
+  NotifyType type = 3;
+
+  repeated string pipelines = 4;
+
+  oneof config {
+    NotifySlack slack = 1000;
+    NotifyEmail email = 1001;
+    NotifyPagerDuty pagerduty = 1002;
+  }
+}
+
+message NotifySlack {
+  optional string bot_token = 1;
+  optional string channel = 2;
+}
+
+message NotifyEmail {
+  repeated string recipients = 1;
+}
+
+message NotifyPagerDuty {
+  enum Urgency {
+    URGENCY_UNSET = 0;
+    URGENCY_LOW = 1;
+    URGENCY_HIGH = 2;
+  }
+
+  // Auth token
+  string token = 1;
+
+  // Must be a valid email for a PagerDuty user
+  string email = 2;
+
+  // Must be a valid PagerDuty service
+  string service_id = 3;
+
+  Urgency urgency = 4;
+}
