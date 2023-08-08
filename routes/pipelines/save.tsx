@@ -4,7 +4,8 @@ import { ErrorType, validate } from "../../components/form/validate.ts";
 import { pipelineSchema } from "../../islands/pipeline.tsx";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { upsertPipeline } from "../../lib/mutation.ts";
-import { SuccessType } from "./[id]/delete.tsx";
+import { SuccessType } from "../_middleware.ts";
+import { getPipelines } from "../../lib/fetch.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
@@ -52,9 +53,7 @@ export const handler: Handlers<SuccessType> = {
       {
         status: 307,
         headers: {
-          Location: `/pipelines/${
-            response.id ? response.id : pipeline.id ? pipeline.id : ""
-          }`,
+          Location: `/pipelines/${response.pipelineId}`,
         },
       },
     );

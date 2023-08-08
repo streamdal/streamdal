@@ -3,7 +3,13 @@ import {
   cookieSession,
   WithSession,
 } from "https://deno.land/x/fresh_session@0.2.2/mod.ts";
-import { SuccessType } from "./pipelines/[id]/delete.tsx";
+import { ErrorType } from "../components/form/validate.ts";
+
+export type SuccessType = {
+  status: boolean;
+  message: string;
+  errors?: ErrorType;
+};
 
 //
 // TODO; move to env

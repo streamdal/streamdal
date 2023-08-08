@@ -31,7 +31,7 @@ import {
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { Toast } from "../components/toasts/toast.tsx";
-import { SuccessType } from "../routes/pipelines/[id]/delete.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
 
 export const newStep = {
   name: "",
@@ -222,7 +222,7 @@ const PipelineDetail = (
       <Toast
         open={toastOpen}
         setOpen={setToastOpen}
-        type={!!success?.status ? "success" : "error"}
+        type={success?.status === true ? "success" : "error"}
         message={success?.message || ""}
       />
 
@@ -239,7 +239,7 @@ const PipelineDetail = (
                 errors={errors}
               />
             </div>
-            {<PipelineMenu id={pipeline.id} />}
+            {<PipelineMenu id={pipeline?.id} />}
           </div>
           <div>
             <a href="/">

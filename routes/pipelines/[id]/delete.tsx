@@ -17,13 +17,13 @@ import { DeleteModal } from "../../../components/modals/deleteModal.tsx";
 import { ErrorType } from "../../../components/form/validate.ts";
 import Pipelines from "../../../islands/pipelines.tsx";
 
-export type SuccessType = {
-  status: boolean;
-  message: string;
-  errors?: ErrorType;
+export type DeletePipeline = {
+  pipeline: Pipeline;
+  pipelines: Pipeline[];
+  serviceMap: GetServiceMapResponse;
 };
 
-export const handler: Handlers = {
+export const handler: Handlers<DeletePipeline> = {
   async GET(req, ctx) {
     const pipeline = await getPipeline(ctx.params.id);
     if (!pipeline) {
@@ -52,13 +52,7 @@ export const handler: Handlers = {
 };
 
 export default function DeletePipelineRoute(
-  props: PageProps<
-    {
-      pipeline: Pipeline;
-      pipelines: Pipeline[];
-      serviceMap: GetServiceMapResponse;
-    }
-  >,
+  props: PageProps<DeletePipeline>,
 ) {
   return (
     <>
