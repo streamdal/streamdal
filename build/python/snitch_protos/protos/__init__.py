@@ -69,6 +69,12 @@ class NotificationType(betterproto.Enum):
     NOTIFICATION_TYPE_PAGERDUTY = 3
 
 
+class NotificationEmailType(betterproto.Enum):
+    TYPE_UNSET = 0
+    TYPE_SMTP = 1
+    TYPE_SES = 2
+
+
 class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_UNSET = 0
     URGENCY_LOW = 1
@@ -230,6 +236,38 @@ class NotificationSlack(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class NotificationEmail(betterproto.Message):
     recipients: List[str] = betterproto.string_field(1)
+    smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
+    ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
+
+
+@dataclass(eq=False, repr=False)
+class NotificationEmailSmtp(betterproto.Message):
+    smtp_host: Optional[str] = betterproto.string_field(
+        1, optional=True, group="_smtp_host"
+    )
+    smtp_port: Optional[int] = betterproto.int32_field(
+        2, optional=True, group="_smtp_port"
+    )
+    smtp_user: Optional[str] = betterproto.string_field(
+        3, optional=True, group="_smtp_user"
+    )
+    smtp_password: Optional[str] = betterproto.string_field(
+        4, optional=True, group="_smtp_password"
+    )
+    use_tls: bool = betterproto.bool_field(5)
+
+
+@dataclass(eq=False, repr=False)
+class NotificationEmailSes(betterproto.Message):
+    ses_region: Optional[str] = betterproto.string_field(
+        1, optional=True, group="_ses_region"
+    )
+    ses_access_key_id: Optional[str] = betterproto.string_field(
+        2, optional=True, group="_ses_access_key_id"
+    )
+    ses_secret_access_key: Optional[str] = betterproto.string_field(
+        3, optional=True, group="_ses_secret_access_key"
+    )
 
 
 @dataclass(eq=False, repr=False)
@@ -244,51 +282,6 @@ class NotificationPagerDuty(betterproto.Message):
     """Must be a valid PagerDuty service"""
 
     urgency: "NotificationPagerDutyUrgency" = betterproto.enum_field(4)
-
-
-@dataclass(eq=False, repr=False)
-class CreateNotificationRequest(betterproto.Message):
-    """Notifications"""
-
-    notification: "NotificationConfig" = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class UpdateNotificationRequest(betterproto.Message):
-    notification: "NotificationConfig" = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class DeleteNotificationRequest(betterproto.Message):
-    notification_id: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class GetNotificationsRequest(betterproto.Message):
-    pass
-
-
-@dataclass(eq=False, repr=False)
-class GetNotificationsResponse(betterproto.Message):
-    notifications: Dict[str, "NotificationConfig"] = betterproto.map_field(
-        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
-    )
-
-
-@dataclass(eq=False, repr=False)
-class GetNotificationRequest(betterproto.Message):
-    notification_id: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class GetNotificationResponse(betterproto.Message):
-    notification: "NotificationConfig" = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class AttachNotificationRequest(betterproto.Message):
-    notification_id: str = betterproto.string_field(1)
-    pipeline_id: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -361,6 +354,51 @@ class PausePipelineRequest(betterproto.Message):
 class ResumePipelineRequest(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
     audience: "Audience" = betterproto.message_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class CreateNotificationRequest(betterproto.Message):
+    """Notifications"""
+
+    notification: "NotificationConfig" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class UpdateNotificationRequest(betterproto.Message):
+    notification: "NotificationConfig" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class DeleteNotificationRequest(betterproto.Message):
+    notification_id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetNotificationsRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class GetNotificationsResponse(betterproto.Message):
+    notifications: Dict[str, "NotificationConfig"] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass(eq=False, repr=False)
+class GetNotificationRequest(betterproto.Message):
+    notification_id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetNotificationResponse(betterproto.Message):
+    notification: "NotificationConfig" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class AttachNotificationRequest(betterproto.Message):
+    notification_id: str = betterproto.string_field(1)
+    pipeline_id: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)

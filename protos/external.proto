@@ -35,41 +35,6 @@ service External {
   rpc Test(TestRequest) returns (TestResponse);
 }
 
-
-// Notifications
-message CreateNotificationRequest {
-  protos.NotificationConfig notification = 1;
-}
-
-message UpdateNotificationRequest {
-  protos.NotificationConfig notification = 1;
-}
-
-message DeleteNotificationRequest {
-  string notification_id = 1;
-}
-
-message GetNotificationsRequest {
-  // Don't think we need anything here
-}
-
-message GetNotificationsResponse {
-  map<string,protos.NotificationConfig> notifications = 1;
-}
-
-message GetNotificationRequest {
-  string notification_id = 1;
-}
-
-message GetNotificationResponse {
-  protos.NotificationConfig notification = 1;
-}
-
-message AttachNotificationRequest {
-  string notification_id = 1;
-  string pipeline_id = 2;
-}
-
 message GetServiceMapRequest {
   // Don't think there is anything to pass in (yet)?
 }
@@ -125,6 +90,40 @@ message PausePipelineRequest {
 message ResumePipelineRequest {
   string pipeline_id = 1;
   protos.Audience audience = 2;
+}
+
+// Notifications
+message CreateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message UpdateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message DeleteNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationsRequest {
+  // Don't think we need anything here
+}
+
+message GetNotificationsResponse {
+  map<string,protos.NotificationConfig> notifications = 1;
+}
+
+message GetNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationResponse {
+  protos.NotificationConfig notification = 1;
+}
+
+message AttachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
 }
 
 message TestRequest {

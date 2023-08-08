@@ -20,382 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Notifications
-type CreateNotificationRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
-}
-
-func (x *CreateNotificationRequest) Reset() {
-	*x = CreateNotificationRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CreateNotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateNotificationRequest) ProtoMessage() {}
-
-func (x *CreateNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateNotificationRequest.ProtoReflect.Descriptor instead.
-func (*CreateNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *CreateNotificationRequest) GetNotification() *NotificationConfig {
-	if x != nil {
-		return x.Notification
-	}
-	return nil
-}
-
-type UpdateNotificationRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
-}
-
-func (x *UpdateNotificationRequest) Reset() {
-	*x = UpdateNotificationRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UpdateNotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateNotificationRequest) ProtoMessage() {}
-
-func (x *UpdateNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateNotificationRequest.ProtoReflect.Descriptor instead.
-func (*UpdateNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *UpdateNotificationRequest) GetNotification() *NotificationConfig {
-	if x != nil {
-		return x.Notification
-	}
-	return nil
-}
-
-type DeleteNotificationRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
-}
-
-func (x *DeleteNotificationRequest) Reset() {
-	*x = DeleteNotificationRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeleteNotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteNotificationRequest) ProtoMessage() {}
-
-func (x *DeleteNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteNotificationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *DeleteNotificationRequest) GetNotificationId() string {
-	if x != nil {
-		return x.NotificationId
-	}
-	return ""
-}
-
-type GetNotificationsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetNotificationsRequest) Reset() {
-	*x = GetNotificationsRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetNotificationsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNotificationsRequest) ProtoMessage() {}
-
-func (x *GetNotificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNotificationsRequest.ProtoReflect.Descriptor instead.
-func (*GetNotificationsRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{3}
-}
-
-type GetNotificationsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Notifications map[string]*NotificationConfig `protobuf:"bytes,1,rep,name=notifications,proto3" json:"notifications,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-}
-
-func (x *GetNotificationsResponse) Reset() {
-	*x = GetNotificationsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetNotificationsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNotificationsResponse) ProtoMessage() {}
-
-func (x *GetNotificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNotificationsResponse.ProtoReflect.Descriptor instead.
-func (*GetNotificationsResponse) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetNotificationsResponse) GetNotifications() map[string]*NotificationConfig {
-	if x != nil {
-		return x.Notifications
-	}
-	return nil
-}
-
-type GetNotificationRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
-}
-
-func (x *GetNotificationRequest) Reset() {
-	*x = GetNotificationRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetNotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNotificationRequest) ProtoMessage() {}
-
-func (x *GetNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNotificationRequest.ProtoReflect.Descriptor instead.
-func (*GetNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetNotificationRequest) GetNotificationId() string {
-	if x != nil {
-		return x.NotificationId
-	}
-	return ""
-}
-
-type GetNotificationResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
-}
-
-func (x *GetNotificationResponse) Reset() {
-	*x = GetNotificationResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetNotificationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNotificationResponse) ProtoMessage() {}
-
-func (x *GetNotificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNotificationResponse.ProtoReflect.Descriptor instead.
-func (*GetNotificationResponse) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *GetNotificationResponse) GetNotification() *NotificationConfig {
-	if x != nil {
-		return x.Notification
-	}
-	return nil
-}
-
-type AttachNotificationRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
-	PipelineId     string `protobuf:"bytes,2,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
-}
-
-func (x *AttachNotificationRequest) Reset() {
-	*x = AttachNotificationRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *AttachNotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AttachNotificationRequest) ProtoMessage() {}
-
-func (x *AttachNotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AttachNotificationRequest.ProtoReflect.Descriptor instead.
-func (*AttachNotificationRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *AttachNotificationRequest) GetNotificationId() string {
-	if x != nil {
-		return x.NotificationId
-	}
-	return ""
-}
-
-func (x *AttachNotificationRequest) GetPipelineId() string {
-	if x != nil {
-		return x.PipelineId
-	}
-	return ""
-}
-
 type GetServiceMapRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -405,7 +29,7 @@ type GetServiceMapRequest struct {
 func (x *GetServiceMapRequest) Reset() {
 	*x = GetServiceMapRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[8]
+		mi := &file_external_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -418,7 +42,7 @@ func (x *GetServiceMapRequest) String() string {
 func (*GetServiceMapRequest) ProtoMessage() {}
 
 func (x *GetServiceMapRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[8]
+	mi := &file_external_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -431,7 +55,7 @@ func (x *GetServiceMapRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServiceMapRequest.ProtoReflect.Descriptor instead.
 func (*GetServiceMapRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{8}
+	return file_external_proto_rawDescGZIP(), []int{0}
 }
 
 type GetServiceMapResponse struct {
@@ -446,7 +70,7 @@ type GetServiceMapResponse struct {
 func (x *GetServiceMapResponse) Reset() {
 	*x = GetServiceMapResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[9]
+		mi := &file_external_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -459,7 +83,7 @@ func (x *GetServiceMapResponse) String() string {
 func (*GetServiceMapResponse) ProtoMessage() {}
 
 func (x *GetServiceMapResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[9]
+	mi := &file_external_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -472,7 +96,7 @@ func (x *GetServiceMapResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServiceMapResponse.ProtoReflect.Descriptor instead.
 func (*GetServiceMapResponse) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{9}
+	return file_external_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetServiceMapResponse) GetServiceMap() map[string]*ServiceInfo {
@@ -491,7 +115,7 @@ type GetPipelinesRequest struct {
 func (x *GetPipelinesRequest) Reset() {
 	*x = GetPipelinesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[10]
+		mi := &file_external_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -504,7 +128,7 @@ func (x *GetPipelinesRequest) String() string {
 func (*GetPipelinesRequest) ProtoMessage() {}
 
 func (x *GetPipelinesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[10]
+	mi := &file_external_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -517,7 +141,7 @@ func (x *GetPipelinesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPipelinesRequest.ProtoReflect.Descriptor instead.
 func (*GetPipelinesRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{10}
+	return file_external_proto_rawDescGZIP(), []int{2}
 }
 
 type GetPipelinesResponse struct {
@@ -531,7 +155,7 @@ type GetPipelinesResponse struct {
 func (x *GetPipelinesResponse) Reset() {
 	*x = GetPipelinesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[11]
+		mi := &file_external_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -544,7 +168,7 @@ func (x *GetPipelinesResponse) String() string {
 func (*GetPipelinesResponse) ProtoMessage() {}
 
 func (x *GetPipelinesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[11]
+	mi := &file_external_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -557,7 +181,7 @@ func (x *GetPipelinesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPipelinesResponse.ProtoReflect.Descriptor instead.
 func (*GetPipelinesResponse) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{11}
+	return file_external_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetPipelinesResponse) GetPipelines() []*Pipeline {
@@ -578,7 +202,7 @@ type GetPipelineRequest struct {
 func (x *GetPipelineRequest) Reset() {
 	*x = GetPipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[12]
+		mi := &file_external_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -591,7 +215,7 @@ func (x *GetPipelineRequest) String() string {
 func (*GetPipelineRequest) ProtoMessage() {}
 
 func (x *GetPipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[12]
+	mi := &file_external_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +228,7 @@ func (x *GetPipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPipelineRequest.ProtoReflect.Descriptor instead.
 func (*GetPipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{12}
+	return file_external_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetPipelineRequest) GetPipelineId() string {
@@ -625,7 +249,7 @@ type GetPipelineResponse struct {
 func (x *GetPipelineResponse) Reset() {
 	*x = GetPipelineResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[13]
+		mi := &file_external_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -638,7 +262,7 @@ func (x *GetPipelineResponse) String() string {
 func (*GetPipelineResponse) ProtoMessage() {}
 
 func (x *GetPipelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[13]
+	mi := &file_external_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -651,7 +275,7 @@ func (x *GetPipelineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPipelineResponse.ProtoReflect.Descriptor instead.
 func (*GetPipelineResponse) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{13}
+	return file_external_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetPipelineResponse) GetPipeline() *Pipeline {
@@ -672,7 +296,7 @@ type CreatePipelineRequest struct {
 func (x *CreatePipelineRequest) Reset() {
 	*x = CreatePipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[14]
+		mi := &file_external_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -685,7 +309,7 @@ func (x *CreatePipelineRequest) String() string {
 func (*CreatePipelineRequest) ProtoMessage() {}
 
 func (x *CreatePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[14]
+	mi := &file_external_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +322,7 @@ func (x *CreatePipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePipelineRequest.ProtoReflect.Descriptor instead.
 func (*CreatePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{14}
+	return file_external_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreatePipelineRequest) GetPipeline() *Pipeline {
@@ -719,7 +343,7 @@ type UpdatePipelineRequest struct {
 func (x *UpdatePipelineRequest) Reset() {
 	*x = UpdatePipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[15]
+		mi := &file_external_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -732,7 +356,7 @@ func (x *UpdatePipelineRequest) String() string {
 func (*UpdatePipelineRequest) ProtoMessage() {}
 
 func (x *UpdatePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[15]
+	mi := &file_external_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,7 +369,7 @@ func (x *UpdatePipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePipelineRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{15}
+	return file_external_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdatePipelineRequest) GetPipeline() *Pipeline {
@@ -766,7 +390,7 @@ type DeletePipelineRequest struct {
 func (x *DeletePipelineRequest) Reset() {
 	*x = DeletePipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[16]
+		mi := &file_external_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -779,7 +403,7 @@ func (x *DeletePipelineRequest) String() string {
 func (*DeletePipelineRequest) ProtoMessage() {}
 
 func (x *DeletePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[16]
+	mi := &file_external_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +416,7 @@ func (x *DeletePipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePipelineRequest.ProtoReflect.Descriptor instead.
 func (*DeletePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{16}
+	return file_external_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeletePipelineRequest) GetPipelineId() string {
@@ -814,7 +438,7 @@ type AttachPipelineRequest struct {
 func (x *AttachPipelineRequest) Reset() {
 	*x = AttachPipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[17]
+		mi := &file_external_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -827,7 +451,7 @@ func (x *AttachPipelineRequest) String() string {
 func (*AttachPipelineRequest) ProtoMessage() {}
 
 func (x *AttachPipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[17]
+	mi := &file_external_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -840,7 +464,7 @@ func (x *AttachPipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachPipelineRequest.ProtoReflect.Descriptor instead.
 func (*AttachPipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{17}
+	return file_external_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AttachPipelineRequest) GetPipelineId() string {
@@ -869,7 +493,7 @@ type DetachPipelineRequest struct {
 func (x *DetachPipelineRequest) Reset() {
 	*x = DetachPipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[18]
+		mi := &file_external_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -882,7 +506,7 @@ func (x *DetachPipelineRequest) String() string {
 func (*DetachPipelineRequest) ProtoMessage() {}
 
 func (x *DetachPipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[18]
+	mi := &file_external_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -895,7 +519,7 @@ func (x *DetachPipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetachPipelineRequest.ProtoReflect.Descriptor instead.
 func (*DetachPipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{18}
+	return file_external_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DetachPipelineRequest) GetPipelineId() string {
@@ -924,7 +548,7 @@ type PausePipelineRequest struct {
 func (x *PausePipelineRequest) Reset() {
 	*x = PausePipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[19]
+		mi := &file_external_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -937,7 +561,7 @@ func (x *PausePipelineRequest) String() string {
 func (*PausePipelineRequest) ProtoMessage() {}
 
 func (x *PausePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[19]
+	mi := &file_external_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -950,7 +574,7 @@ func (x *PausePipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PausePipelineRequest.ProtoReflect.Descriptor instead.
 func (*PausePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{19}
+	return file_external_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PausePipelineRequest) GetPipelineId() string {
@@ -979,7 +603,7 @@ type ResumePipelineRequest struct {
 func (x *ResumePipelineRequest) Reset() {
 	*x = ResumePipelineRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_proto_msgTypes[20]
+		mi := &file_external_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -992,7 +616,7 @@ func (x *ResumePipelineRequest) String() string {
 func (*ResumePipelineRequest) ProtoMessage() {}
 
 func (x *ResumePipelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_external_proto_msgTypes[20]
+	mi := &file_external_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1005,7 +629,7 @@ func (x *ResumePipelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResumePipelineRequest.ProtoReflect.Descriptor instead.
 func (*ResumePipelineRequest) Descriptor() ([]byte, []int) {
-	return file_external_proto_rawDescGZIP(), []int{20}
+	return file_external_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ResumePipelineRequest) GetPipelineId() string {
@@ -1020,6 +644,382 @@ func (x *ResumePipelineRequest) GetAudience() *Audience {
 		return x.Audience
 	}
 	return nil
+}
+
+// Notifications
+type CreateNotificationRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
+}
+
+func (x *CreateNotificationRequest) Reset() {
+	*x = CreateNotificationRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateNotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateNotificationRequest) ProtoMessage() {}
+
+func (x *CreateNotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateNotificationRequest.ProtoReflect.Descriptor instead.
+func (*CreateNotificationRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateNotificationRequest) GetNotification() *NotificationConfig {
+	if x != nil {
+		return x.Notification
+	}
+	return nil
+}
+
+type UpdateNotificationRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
+}
+
+func (x *UpdateNotificationRequest) Reset() {
+	*x = UpdateNotificationRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateNotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNotificationRequest) ProtoMessage() {}
+
+func (x *UpdateNotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNotificationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateNotificationRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *UpdateNotificationRequest) GetNotification() *NotificationConfig {
+	if x != nil {
+		return x.Notification
+	}
+	return nil
+}
+
+type DeleteNotificationRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+}
+
+func (x *DeleteNotificationRequest) Reset() {
+	*x = DeleteNotificationRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteNotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteNotificationRequest) ProtoMessage() {}
+
+func (x *DeleteNotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteNotificationRequest.ProtoReflect.Descriptor instead.
+func (*DeleteNotificationRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *DeleteNotificationRequest) GetNotificationId() string {
+	if x != nil {
+		return x.NotificationId
+	}
+	return ""
+}
+
+type GetNotificationsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetNotificationsRequest) Reset() {
+	*x = GetNotificationsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNotificationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationsRequest) ProtoMessage() {}
+
+func (x *GetNotificationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationsRequest.ProtoReflect.Descriptor instead.
+func (*GetNotificationsRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{16}
+}
+
+type GetNotificationsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Notifications map[string]*NotificationConfig `protobuf:"bytes,1,rep,name=notifications,proto3" json:"notifications,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *GetNotificationsResponse) Reset() {
+	*x = GetNotificationsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNotificationsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationsResponse) ProtoMessage() {}
+
+func (x *GetNotificationsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationsResponse.ProtoReflect.Descriptor instead.
+func (*GetNotificationsResponse) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetNotificationsResponse) GetNotifications() map[string]*NotificationConfig {
+	if x != nil {
+		return x.Notifications
+	}
+	return nil
+}
+
+type GetNotificationRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+}
+
+func (x *GetNotificationRequest) Reset() {
+	*x = GetNotificationRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationRequest) ProtoMessage() {}
+
+func (x *GetNotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationRequest.ProtoReflect.Descriptor instead.
+func (*GetNotificationRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetNotificationRequest) GetNotificationId() string {
+	if x != nil {
+		return x.NotificationId
+	}
+	return ""
+}
+
+type GetNotificationResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Notification *NotificationConfig `protobuf:"bytes,1,opt,name=notification,proto3" json:"notification,omitempty"`
+}
+
+func (x *GetNotificationResponse) Reset() {
+	*x = GetNotificationResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNotificationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationResponse) ProtoMessage() {}
+
+func (x *GetNotificationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationResponse.ProtoReflect.Descriptor instead.
+func (*GetNotificationResponse) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetNotificationResponse) GetNotification() *NotificationConfig {
+	if x != nil {
+		return x.Notification
+	}
+	return nil
+}
+
+type AttachNotificationRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+	PipelineId     string `protobuf:"bytes,2,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
+}
+
+func (x *AttachNotificationRequest) Reset() {
+	*x = AttachNotificationRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AttachNotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AttachNotificationRequest) ProtoMessage() {}
+
+func (x *AttachNotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_external_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AttachNotificationRequest.ProtoReflect.Descriptor instead.
+func (*AttachNotificationRequest) Descriptor() ([]byte, []int) {
+	return file_external_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *AttachNotificationRequest) GetNotificationId() string {
+	if x != nil {
+		return x.NotificationId
+	}
+	return ""
+}
+
+func (x *AttachNotificationRequest) GetPipelineId() string {
+	if x != nil {
+		return x.PipelineId
+	}
+	return ""
 }
 
 type TestRequest struct {
@@ -1124,119 +1124,119 @@ var file_external_proto_rawDesc = []byte{
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x0a, 0x69, 0x6e, 0x66, 0x6f, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x0e, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0x5b, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69,
-	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a,
-	0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74,
-	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52,
-	0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x5b, 0x0a,
-	0x19, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0c, 0x6e, 0x6f,
-	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69,
-	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x0c, 0x6e, 0x6f,
-	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x44, 0x0a, 0x19, 0x44, 0x65,
-	0x6c, 0x65, 0x74, 0x65, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x6e, 0x6f, 0x74, 0x69, 0x66,
-	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x0e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64,
-	0x22, 0x19, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xd3, 0x01, 0x0a, 0x18,
-	0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x59, 0x0a, 0x0d, 0x6e, 0x6f, 0x74, 0x69,
-	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
-	0x33, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69,
-	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x45,
-	0x6e, 0x74, 0x72, 0x79, 0x52, 0x0d, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x73, 0x1a, 0x5c, 0x0a, 0x12, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x30, 0x0a, 0x05, 0x76,
-	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
-	0x01, 0x22, 0x41, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x6e,
-	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x49, 0x64, 0x22, 0x59, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66,
-	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x3e, 0x0a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e,
-	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69,
-	0x67, 0x52, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22,
-	0x65, 0x0a, 0x19, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f,
-	0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65,
-	0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22, 0x16, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xbb,
-	0x01, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4e, 0x0a, 0x0b, 0x73, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x5f, 0x6d, 0x61, 0x70, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2d, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x4d, 0x61, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0a, 0x73, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x1a, 0x52, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
-	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x29, 0x0a,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x49, 0x6e, 0x66,
-	0x6f, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x15, 0x0a, 0x13,
-	0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x22, 0x46, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69,
-	0x6e, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x09, 0x70,
-	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x52, 0x09, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x22, 0x35, 0x0a, 0x12, 0x47,
-	0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x49, 0x64, 0x22, 0x43, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69, 0x70,
-	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x70,
-	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x45, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74,
-	0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65,
-	0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x45,
-	0x0a, 0x15, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x70, 0x69, 0x70,
-	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x38, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50,
-	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f,
-	0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22,
-	0x66, 0x0a, 0x15, 0x41, 0x74, 0x74, 0x61, 0x63, 0x68, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x22, 0x16, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61,
+	0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xbb, 0x01, 0x0a, 0x15, 0x47, 0x65, 0x74,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x4e, 0x0a, 0x0b, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x6d, 0x61,
+	0x70, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73,
+	0x2e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61,
+	0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0a, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d,
+	0x61, 0x70, 0x1a, 0x52, 0x0a, 0x0f, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x4d, 0x61, 0x70,
+	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x29, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x05, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x15, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x46, 0x0a,
+	0x14, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x09, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x09, 0x70, 0x69, 0x70, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x73, 0x22, 0x35, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65,
+	0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70,
+	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22, 0x43, 0x0a, 0x13,
+	0x47, 0x65, 0x74, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50,
+	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x22, 0x45, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c,
+	0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69,
+	0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08,
+	0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x45, 0x0a, 0x15, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x2c, 0x0a, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x22,
+	0x38, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
 	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65,
 	0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70,
-	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64,
-	0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61,
-	0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x66, 0x0a, 0x15, 0x44, 0x65, 0x74, 0x61, 0x63,
-	0x68, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49,
-	0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64,
-	0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22,
-	0x65, 0x0a, 0x14, 0x50, 0x61, 0x75, 0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69,
-	0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69,
-	0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75,
-	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x66, 0x0a, 0x15, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65,
-	0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64,
-	0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69,
-	0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x23,
+	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22, 0x66, 0x0a, 0x15, 0x41, 0x74, 0x74,
+	0x61, 0x63, 0x68, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
+	0x65, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41,
+	0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63,
+	0x65, 0x22, 0x66, 0x0a, 0x15, 0x44, 0x65, 0x74, 0x61, 0x63, 0x68, 0x50, 0x69, 0x70, 0x65, 0x6c,
+	0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69,
+	0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61,
+	0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52,
+	0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x65, 0x0a, 0x14, 0x50, 0x61, 0x75,
+	0x73, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
+	0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75,
+	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65,
+	0x22, 0x66, 0x0a, 0x15, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75,
+	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08,
+	0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x5b, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x5b, 0x0a, 0x19, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4e,
+	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x52, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x22, 0x44, 0x0a, 0x19, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4e, 0x6f, 0x74, 0x69,
+	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x27, 0x0a, 0x0f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x19, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x4e,
+	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x22, 0xd3, 0x01, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x59, 0x0a, 0x0d, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x33, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73,
+	0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0d, 0x6e, 0x6f,
+	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x5c, 0x0a, 0x12, 0x4e,
+	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72,
+	0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x6b, 0x65, 0x79, 0x12, 0x30, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69,
+	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x05,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x41, 0x0a, 0x16, 0x47, 0x65, 0x74,
+	0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6e, 0x6f,
+	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x59, 0x0a, 0x17,
+	0x47, 0x65, 0x74, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x65, 0x0a, 0x19, 0x41, 0x74, 0x74, 0x61, 0x63,
+	0x68, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6e,
+	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1f, 0x0a,
+	0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22, 0x23,
 	0x0a, 0x0b, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a,
 	0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e,
 	0x70, 0x75, 0x74, 0x22, 0x26, 0x0a, 0x0c, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
@@ -1344,73 +1344,73 @@ func file_external_proto_rawDescGZIP() []byte {
 
 var file_external_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_external_proto_goTypes = []interface{}{
-	(*CreateNotificationRequest)(nil), // 0: protos.CreateNotificationRequest
-	(*UpdateNotificationRequest)(nil), // 1: protos.UpdateNotificationRequest
-	(*DeleteNotificationRequest)(nil), // 2: protos.DeleteNotificationRequest
-	(*GetNotificationsRequest)(nil),   // 3: protos.GetNotificationsRequest
-	(*GetNotificationsResponse)(nil),  // 4: protos.GetNotificationsResponse
-	(*GetNotificationRequest)(nil),    // 5: protos.GetNotificationRequest
-	(*GetNotificationResponse)(nil),   // 6: protos.GetNotificationResponse
-	(*AttachNotificationRequest)(nil), // 7: protos.AttachNotificationRequest
-	(*GetServiceMapRequest)(nil),      // 8: protos.GetServiceMapRequest
-	(*GetServiceMapResponse)(nil),     // 9: protos.GetServiceMapResponse
-	(*GetPipelinesRequest)(nil),       // 10: protos.GetPipelinesRequest
-	(*GetPipelinesResponse)(nil),      // 11: protos.GetPipelinesResponse
-	(*GetPipelineRequest)(nil),        // 12: protos.GetPipelineRequest
-	(*GetPipelineResponse)(nil),       // 13: protos.GetPipelineResponse
-	(*CreatePipelineRequest)(nil),     // 14: protos.CreatePipelineRequest
-	(*UpdatePipelineRequest)(nil),     // 15: protos.UpdatePipelineRequest
-	(*DeletePipelineRequest)(nil),     // 16: protos.DeletePipelineRequest
-	(*AttachPipelineRequest)(nil),     // 17: protos.AttachPipelineRequest
-	(*DetachPipelineRequest)(nil),     // 18: protos.DetachPipelineRequest
-	(*PausePipelineRequest)(nil),      // 19: protos.PausePipelineRequest
-	(*ResumePipelineRequest)(nil),     // 20: protos.ResumePipelineRequest
+	(*GetServiceMapRequest)(nil),      // 0: protos.GetServiceMapRequest
+	(*GetServiceMapResponse)(nil),     // 1: protos.GetServiceMapResponse
+	(*GetPipelinesRequest)(nil),       // 2: protos.GetPipelinesRequest
+	(*GetPipelinesResponse)(nil),      // 3: protos.GetPipelinesResponse
+	(*GetPipelineRequest)(nil),        // 4: protos.GetPipelineRequest
+	(*GetPipelineResponse)(nil),       // 5: protos.GetPipelineResponse
+	(*CreatePipelineRequest)(nil),     // 6: protos.CreatePipelineRequest
+	(*UpdatePipelineRequest)(nil),     // 7: protos.UpdatePipelineRequest
+	(*DeletePipelineRequest)(nil),     // 8: protos.DeletePipelineRequest
+	(*AttachPipelineRequest)(nil),     // 9: protos.AttachPipelineRequest
+	(*DetachPipelineRequest)(nil),     // 10: protos.DetachPipelineRequest
+	(*PausePipelineRequest)(nil),      // 11: protos.PausePipelineRequest
+	(*ResumePipelineRequest)(nil),     // 12: protos.ResumePipelineRequest
+	(*CreateNotificationRequest)(nil), // 13: protos.CreateNotificationRequest
+	(*UpdateNotificationRequest)(nil), // 14: protos.UpdateNotificationRequest
+	(*DeleteNotificationRequest)(nil), // 15: protos.DeleteNotificationRequest
+	(*GetNotificationsRequest)(nil),   // 16: protos.GetNotificationsRequest
+	(*GetNotificationsResponse)(nil),  // 17: protos.GetNotificationsResponse
+	(*GetNotificationRequest)(nil),    // 18: protos.GetNotificationRequest
+	(*GetNotificationResponse)(nil),   // 19: protos.GetNotificationResponse
+	(*AttachNotificationRequest)(nil), // 20: protos.AttachNotificationRequest
 	(*TestRequest)(nil),               // 21: protos.TestRequest
 	(*TestResponse)(nil),              // 22: protos.TestResponse
-	nil,                               // 23: protos.GetNotificationsResponse.NotificationsEntry
-	nil,                               // 24: protos.GetServiceMapResponse.ServiceMapEntry
-	(*NotificationConfig)(nil),        // 25: protos.NotificationConfig
-	(*Pipeline)(nil),                  // 26: protos.Pipeline
-	(*Audience)(nil),                  // 27: protos.Audience
+	nil,                               // 23: protos.GetServiceMapResponse.ServiceMapEntry
+	nil,                               // 24: protos.GetNotificationsResponse.NotificationsEntry
+	(*Pipeline)(nil),                  // 25: protos.Pipeline
+	(*Audience)(nil),                  // 26: protos.Audience
+	(*NotificationConfig)(nil),        // 27: protos.NotificationConfig
 	(*ServiceInfo)(nil),               // 28: protos.ServiceInfo
 	(*StandardResponse)(nil),          // 29: protos.StandardResponse
 }
 var file_external_proto_depIdxs = []int32{
-	25, // 0: protos.CreateNotificationRequest.notification:type_name -> protos.NotificationConfig
-	25, // 1: protos.UpdateNotificationRequest.notification:type_name -> protos.NotificationConfig
-	23, // 2: protos.GetNotificationsResponse.notifications:type_name -> protos.GetNotificationsResponse.NotificationsEntry
-	25, // 3: protos.GetNotificationResponse.notification:type_name -> protos.NotificationConfig
-	24, // 4: protos.GetServiceMapResponse.service_map:type_name -> protos.GetServiceMapResponse.ServiceMapEntry
-	26, // 5: protos.GetPipelinesResponse.pipelines:type_name -> protos.Pipeline
-	26, // 6: protos.GetPipelineResponse.pipeline:type_name -> protos.Pipeline
-	26, // 7: protos.CreatePipelineRequest.pipeline:type_name -> protos.Pipeline
-	26, // 8: protos.UpdatePipelineRequest.pipeline:type_name -> protos.Pipeline
-	27, // 9: protos.AttachPipelineRequest.audience:type_name -> protos.Audience
-	27, // 10: protos.DetachPipelineRequest.audience:type_name -> protos.Audience
-	27, // 11: protos.PausePipelineRequest.audience:type_name -> protos.Audience
-	27, // 12: protos.ResumePipelineRequest.audience:type_name -> protos.Audience
-	25, // 13: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
-	28, // 14: protos.GetServiceMapResponse.ServiceMapEntry.value:type_name -> protos.ServiceInfo
-	8,  // 15: protos.External.GetServiceMap:input_type -> protos.GetServiceMapRequest
-	10, // 16: protos.External.GetPipelines:input_type -> protos.GetPipelinesRequest
-	12, // 17: protos.External.GetPipeline:input_type -> protos.GetPipelineRequest
-	14, // 18: protos.External.CreatePipeline:input_type -> protos.CreatePipelineRequest
-	15, // 19: protos.External.UpdatePipeline:input_type -> protos.UpdatePipelineRequest
-	16, // 20: protos.External.DeletePipeline:input_type -> protos.DeletePipelineRequest
-	17, // 21: protos.External.AttachPipeline:input_type -> protos.AttachPipelineRequest
-	18, // 22: protos.External.DetachPipeline:input_type -> protos.DetachPipelineRequest
-	19, // 23: protos.External.PausePipeline:input_type -> protos.PausePipelineRequest
-	20, // 24: protos.External.ResumePipeline:input_type -> protos.ResumePipelineRequest
-	0,  // 25: protos.External.CreateNotification:input_type -> protos.CreateNotificationRequest
-	1,  // 26: protos.External.UpdateNotification:input_type -> protos.UpdateNotificationRequest
-	2,  // 27: protos.External.DeleteNotification:input_type -> protos.DeleteNotificationRequest
-	3,  // 28: protos.External.GetNotifications:input_type -> protos.GetNotificationsRequest
-	5,  // 29: protos.External.GetNotification:input_type -> protos.GetNotificationRequest
-	7,  // 30: protos.External.AttachNotification:input_type -> protos.AttachNotificationRequest
+	23, // 0: protos.GetServiceMapResponse.service_map:type_name -> protos.GetServiceMapResponse.ServiceMapEntry
+	25, // 1: protos.GetPipelinesResponse.pipelines:type_name -> protos.Pipeline
+	25, // 2: protos.GetPipelineResponse.pipeline:type_name -> protos.Pipeline
+	25, // 3: protos.CreatePipelineRequest.pipeline:type_name -> protos.Pipeline
+	25, // 4: protos.UpdatePipelineRequest.pipeline:type_name -> protos.Pipeline
+	26, // 5: protos.AttachPipelineRequest.audience:type_name -> protos.Audience
+	26, // 6: protos.DetachPipelineRequest.audience:type_name -> protos.Audience
+	26, // 7: protos.PausePipelineRequest.audience:type_name -> protos.Audience
+	26, // 8: protos.ResumePipelineRequest.audience:type_name -> protos.Audience
+	27, // 9: protos.CreateNotificationRequest.notification:type_name -> protos.NotificationConfig
+	27, // 10: protos.UpdateNotificationRequest.notification:type_name -> protos.NotificationConfig
+	24, // 11: protos.GetNotificationsResponse.notifications:type_name -> protos.GetNotificationsResponse.NotificationsEntry
+	27, // 12: protos.GetNotificationResponse.notification:type_name -> protos.NotificationConfig
+	28, // 13: protos.GetServiceMapResponse.ServiceMapEntry.value:type_name -> protos.ServiceInfo
+	27, // 14: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
+	0,  // 15: protos.External.GetServiceMap:input_type -> protos.GetServiceMapRequest
+	2,  // 16: protos.External.GetPipelines:input_type -> protos.GetPipelinesRequest
+	4,  // 17: protos.External.GetPipeline:input_type -> protos.GetPipelineRequest
+	6,  // 18: protos.External.CreatePipeline:input_type -> protos.CreatePipelineRequest
+	7,  // 19: protos.External.UpdatePipeline:input_type -> protos.UpdatePipelineRequest
+	8,  // 20: protos.External.DeletePipeline:input_type -> protos.DeletePipelineRequest
+	9,  // 21: protos.External.AttachPipeline:input_type -> protos.AttachPipelineRequest
+	10, // 22: protos.External.DetachPipeline:input_type -> protos.DetachPipelineRequest
+	11, // 23: protos.External.PausePipeline:input_type -> protos.PausePipelineRequest
+	12, // 24: protos.External.ResumePipeline:input_type -> protos.ResumePipelineRequest
+	13, // 25: protos.External.CreateNotification:input_type -> protos.CreateNotificationRequest
+	14, // 26: protos.External.UpdateNotification:input_type -> protos.UpdateNotificationRequest
+	15, // 27: protos.External.DeleteNotification:input_type -> protos.DeleteNotificationRequest
+	16, // 28: protos.External.GetNotifications:input_type -> protos.GetNotificationsRequest
+	18, // 29: protos.External.GetNotification:input_type -> protos.GetNotificationRequest
+	20, // 30: protos.External.AttachNotification:input_type -> protos.AttachNotificationRequest
 	21, // 31: protos.External.Test:input_type -> protos.TestRequest
-	9,  // 32: protos.External.GetServiceMap:output_type -> protos.GetServiceMapResponse
-	11, // 33: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
-	13, // 34: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
+	1,  // 32: protos.External.GetServiceMap:output_type -> protos.GetServiceMapResponse
+	3,  // 33: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
+	5,  // 34: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
 	29, // 35: protos.External.CreatePipeline:output_type -> protos.StandardResponse
 	29, // 36: protos.External.UpdatePipeline:output_type -> protos.StandardResponse
 	29, // 37: protos.External.DeletePipeline:output_type -> protos.StandardResponse
@@ -1421,8 +1421,8 @@ var file_external_proto_depIdxs = []int32{
 	29, // 42: protos.External.CreateNotification:output_type -> protos.StandardResponse
 	29, // 43: protos.External.UpdateNotification:output_type -> protos.StandardResponse
 	29, // 44: protos.External.DeleteNotification:output_type -> protos.StandardResponse
-	4,  // 45: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
-	6,  // 46: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
+	17, // 45: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
+	19, // 46: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
 	29, // 47: protos.External.AttachNotification:output_type -> protos.StandardResponse
 	22, // 48: protos.External.Test:output_type -> protos.TestResponse
 	32, // [32:49] is the sub-list for method output_type
@@ -1443,102 +1443,6 @@ func file_external_proto_init() {
 	file_pipeline_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_external_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateNotificationRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateNotificationRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteNotificationRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetNotificationsRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetNotificationsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetNotificationRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetNotificationResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AttachNotificationRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetServiceMapRequest); i {
 			case 0:
 				return &v.state
@@ -1550,7 +1454,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetServiceMapResponse); i {
 			case 0:
 				return &v.state
@@ -1562,7 +1466,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetPipelinesRequest); i {
 			case 0:
 				return &v.state
@@ -1574,7 +1478,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetPipelinesResponse); i {
 			case 0:
 				return &v.state
@@ -1586,7 +1490,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetPipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1598,7 +1502,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetPipelineResponse); i {
 			case 0:
 				return &v.state
@@ -1610,7 +1514,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreatePipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1622,7 +1526,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdatePipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1634,7 +1538,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeletePipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1646,7 +1550,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AttachPipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1658,7 +1562,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DetachPipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1670,7 +1574,7 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PausePipelineRequest); i {
 			case 0:
 				return &v.state
@@ -1682,8 +1586,104 @@ func file_external_proto_init() {
 				return nil
 			}
 		}
-		file_external_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_external_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ResumePipelineRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateNotificationRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateNotificationRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteNotificationRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNotificationsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNotificationsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNotificationRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNotificationResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AttachNotificationRequest); i {
 			case 0:
 				return &v.state
 			case 1:

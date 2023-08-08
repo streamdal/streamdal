@@ -31,7 +31,32 @@ message NotificationSlack {
 }
 
 message NotificationEmail {
+  enum Type {
+    TYPE_UNSET = 0;
+    TYPE_SMTP = 1;
+    TYPE_SES = 2;
+  }
+
   repeated string recipients = 1;
+
+  oneof config {
+    NotificationEmailSMTP smtp = 1000;
+    NotificationEmailSES ses = 1001;
+  }
+}
+
+message NotificationEmailSMTP {
+  optional string smtp_host = 1;
+  optional int32 smtp_port = 2;
+  optional string smtp_user = 3;
+  optional string smtp_password = 4;
+  bool use_tls = 5;
+}
+
+message NotificationEmailSES {
+  optional string ses_region = 1;
+  optional string ses_access_key_id = 2;
+  optional string ses_secret_access_key = 3;
 }
 
 message NotificationPagerDuty {

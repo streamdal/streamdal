@@ -64,6 +64,83 @@ export interface NotificationEmail {
      * @generated from protobuf field: repeated string recipients = 1;
      */
     recipients: string[];
+    /**
+     * @generated from protobuf oneof: config
+     */
+    config: {
+        oneofKind: "smtp";
+        /**
+         * @generated from protobuf field: protos.NotificationEmailSMTP smtp = 1000;
+         */
+        smtp: NotificationEmailSMTP;
+    } | {
+        oneofKind: "ses";
+        /**
+         * @generated from protobuf field: protos.NotificationEmailSES ses = 1001;
+         */
+        ses: NotificationEmailSES;
+    } | {
+        oneofKind: undefined;
+    };
+}
+/**
+ * @generated from protobuf enum protos.NotificationEmail.Type
+ */
+export enum NotificationEmail_Type {
+    /**
+     * @generated from protobuf enum value: TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TYPE_SMTP = 1;
+     */
+    SMTP = 1,
+    /**
+     * @generated from protobuf enum value: TYPE_SES = 2;
+     */
+    SES = 2
+}
+/**
+ * @generated from protobuf message protos.NotificationEmailSMTP
+ */
+export interface NotificationEmailSMTP {
+    /**
+     * @generated from protobuf field: optional string smtp_host = 1;
+     */
+    smtpHost?: string;
+    /**
+     * @generated from protobuf field: optional int32 smtp_port = 2;
+     */
+    smtpPort?: number;
+    /**
+     * @generated from protobuf field: optional string smtp_user = 3;
+     */
+    smtpUser?: string;
+    /**
+     * @generated from protobuf field: optional string smtp_password = 4;
+     */
+    smtpPassword?: string;
+    /**
+     * @generated from protobuf field: bool use_tls = 5;
+     */
+    useTls: boolean;
+}
+/**
+ * @generated from protobuf message protos.NotificationEmailSES
+ */
+export interface NotificationEmailSES {
+    /**
+     * @generated from protobuf field: optional string ses_region = 1;
+     */
+    sesRegion?: string;
+    /**
+     * @generated from protobuf field: optional string ses_access_key_id = 2;
+     */
+    sesAccessKeyId?: string;
+    /**
+     * @generated from protobuf field: optional string ses_secret_access_key = 3;
+     */
+    sesSecretAccessKey?: string;
 }
 /**
  * @generated from protobuf message protos.NotificationPagerDuty
@@ -164,7 +241,9 @@ export const NotificationSlack = new NotificationSlack$Type();
 class NotificationEmail$Type extends MessageType<NotificationEmail> {
     constructor() {
         super("protos.NotificationEmail", [
-            { no: 1, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "smtp", kind: "message", oneof: "config", T: () => NotificationEmailSMTP },
+            { no: 1001, name: "ses", kind: "message", oneof: "config", T: () => NotificationEmailSES }
         ]);
     }
 }
@@ -172,6 +251,36 @@ class NotificationEmail$Type extends MessageType<NotificationEmail> {
  * @generated MessageType for protobuf message protos.NotificationEmail
  */
 export const NotificationEmail = new NotificationEmail$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSMTP> {
+    constructor() {
+        super("protos.NotificationEmailSMTP", [
+            { no: 1, name: "smtp_host", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "smtp_port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "smtp_user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "smtp_password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "use_tls", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.NotificationEmailSMTP
+ */
+export const NotificationEmailSMTP = new NotificationEmailSMTP$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class NotificationEmailSES$Type extends MessageType<NotificationEmailSES> {
+    constructor() {
+        super("protos.NotificationEmailSES", [
+            { no: 1, name: "ses_region", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "ses_access_key_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "ses_secret_access_key", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.NotificationEmailSES
+ */
+export const NotificationEmailSES = new NotificationEmailSES$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class NotificationPagerDuty$Type extends MessageType<NotificationPagerDuty> {
     constructor() {

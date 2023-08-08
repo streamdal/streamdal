@@ -61,6 +61,83 @@ export interface NotificationEmail {
      * @generated from protobuf field: repeated string recipients = 1;
      */
     recipients: string[];
+    /**
+     * @generated from protobuf oneof: config
+     */
+    config: {
+        oneofKind: "smtp";
+        /**
+         * @generated from protobuf field: protos.NotificationEmailSMTP smtp = 1000;
+         */
+        smtp: NotificationEmailSMTP;
+    } | {
+        oneofKind: "ses";
+        /**
+         * @generated from protobuf field: protos.NotificationEmailSES ses = 1001;
+         */
+        ses: NotificationEmailSES;
+    } | {
+        oneofKind: undefined;
+    };
+}
+/**
+ * @generated from protobuf enum protos.NotificationEmail.Type
+ */
+export declare enum NotificationEmail_Type {
+    /**
+     * @generated from protobuf enum value: TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TYPE_SMTP = 1;
+     */
+    SMTP = 1,
+    /**
+     * @generated from protobuf enum value: TYPE_SES = 2;
+     */
+    SES = 2
+}
+/**
+ * @generated from protobuf message protos.NotificationEmailSMTP
+ */
+export interface NotificationEmailSMTP {
+    /**
+     * @generated from protobuf field: optional string smtp_host = 1;
+     */
+    smtpHost?: string;
+    /**
+     * @generated from protobuf field: optional int32 smtp_port = 2;
+     */
+    smtpPort?: number;
+    /**
+     * @generated from protobuf field: optional string smtp_user = 3;
+     */
+    smtpUser?: string;
+    /**
+     * @generated from protobuf field: optional string smtp_password = 4;
+     */
+    smtpPassword?: string;
+    /**
+     * @generated from protobuf field: bool use_tls = 5;
+     */
+    useTls: boolean;
+}
+/**
+ * @generated from protobuf message protos.NotificationEmailSES
+ */
+export interface NotificationEmailSES {
+    /**
+     * @generated from protobuf field: optional string ses_region = 1;
+     */
+    sesRegion?: string;
+    /**
+     * @generated from protobuf field: optional string ses_access_key_id = 2;
+     */
+    sesAccessKeyId?: string;
+    /**
+     * @generated from protobuf field: optional string ses_secret_access_key = 3;
+     */
+    sesSecretAccessKey?: string;
 }
 /**
  * @generated from protobuf message protos.NotificationPagerDuty
@@ -148,6 +225,20 @@ declare class NotificationEmail$Type extends MessageType<NotificationEmail> {
  * @generated MessageType for protobuf message protos.NotificationEmail
  */
 export declare const NotificationEmail: NotificationEmail$Type;
+declare class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSMTP> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.NotificationEmailSMTP
+ */
+export declare const NotificationEmailSMTP: NotificationEmailSMTP$Type;
+declare class NotificationEmailSES$Type extends MessageType<NotificationEmailSES> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.NotificationEmailSES
+ */
+export declare const NotificationEmailSES: NotificationEmailSES$Type;
 declare class NotificationPagerDuty$Type extends MessageType<NotificationPagerDuty> {
     constructor();
 }
