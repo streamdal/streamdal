@@ -228,7 +228,7 @@ var _ = Describe("Internal gRPC API", func() {
 			defer registerCancel() // JIC
 
 			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
-			startHeartbeat(heartbeatCtx, internalClient, registerRequest)
+			startHeartbeat(heartbeatCtx, internalClient, registerRequest.SessionId)
 
 			// Wait for everything to startup
 			time.Sleep(time.Second)
@@ -265,7 +265,7 @@ var _ = Describe("Internal gRPC API", func() {
 			defer heartbeatCancel()
 
 			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
-			startHeartbeat(heartbeatCtx, internalClient, registerRequest)
+			startHeartbeat(heartbeatCtx, internalClient, registerRequest.SessionId)
 
 			// Wait for everything to startup
 			time.Sleep(time.Second)
@@ -289,7 +289,7 @@ var _ = Describe("Internal gRPC API", func() {
 	})
 
 	Describe("NewAudience", func() {
-		FIt("should create a new audience in live bucket", func() {
+		It("should create a new audience in live bucket", func() {
 			sessionID := util.GenerateUUID()
 			audience := &protos.Audience{
 				ServiceName:   "test-service",
@@ -335,8 +335,66 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(audienceData).ToNot(BeNil())
 		})
 
-		It("audience should disappear without heartbeat", func() {
+		It("audience depends on heartbeat", func() {
+			sessionID := util.GenerateUUID()
+			audience := &protos.Audience{
+				ServiceName:   "test-service",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "main",
+			}
 
+			Expect(sessionID).ToNot(BeEmpty())
+
+			// Launch heartbeat
+			cancelCtx, cancel := context.WithCancel(ctxWithGoodAuth)
+
+			startHeartbeat(cancelCtx, internalClient, sessionID)
+
+			resp, err := internalClient.NewAudience(ctxWithGoodAuth, &protos.NewAudienceRequest{
+				SessionId: sessionID,
+				Audience:  audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+
+			time.Sleep(2 * time.Second)
+
+			// Audience is still in live bucket
+			liveData, err := natsClient.Get(
+				context.Background(),
+				store.NATSLiveBucket,
+				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+			)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(liveData).ToNot(BeNil())
+
+			// Audience is still in audience bucket
+			audienceData, err := natsClient.Get(
+				context.Background(),
+				store.NATSAudienceBucket,
+				store.NATSAudienceKey(util.AudienceToStr(audience)),
+			)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(audienceData).ToNot(BeNil())
+
+			// Stop heartbeat
+			cancel()
+
+			time.Sleep(2 * time.Second)
+
+			// Audience should no longer be in live bucket
+			liveData, err = natsClient.Get(
+				context.Background(),
+				store.NATSLiveBucket,
+				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+			)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("nats: key not found"))
 		})
 	})
 
@@ -423,7 +481,7 @@ func startRegister(ctx context.Context, client protos.InternalClient, req *proto
 }
 
 // Send heartbeat every 200ms
-func startHeartbeat(ctx context.Context, client protos.InternalClient, req *protos.RegisterRequest) {
+func startHeartbeat(ctx context.Context, client protos.InternalClient, sessionID string) {
 	go func() {
 		defer GinkgoRecover()
 
@@ -439,7 +497,7 @@ func startHeartbeat(ctx context.Context, client protos.InternalClient, req *prot
 
 			// NOTE: The ctx might've gotten cancelled mid-flight so we need to
 			// check for that err condition
-			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: req.SessionId})
+			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: sessionID})
 			if err != nil {
 				if strings.Contains(err.Error(), "context canceled") {
 					break MAIN
