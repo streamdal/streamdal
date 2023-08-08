@@ -12,7 +12,8 @@ import * as $6 from "./routes/pipelines/[id]/index.tsx";
 import * as $7 from "./routes/pipelines/index.tsx";
 import * as $8 from "./routes/pipelines/save.tsx";
 import * as $9 from "./routes/rules.tsx";
-import * as $10 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx";
+import * as $10 from "./routes/service/[service]/component/[component]/[operationType]/all.tsx";
+import * as $11 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx";
 import * as $$0 from "./islands/InfoModal.tsx";
 import * as $$1 from "./islands/flow.tsx";
 import * as $$2 from "./islands/pipeline.tsx";
@@ -30,8 +31,10 @@ const manifest = {
     "./routes/pipelines/index.tsx": $7,
     "./routes/pipelines/save.tsx": $8,
     "./routes/rules.tsx": $9,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/all.tsx":
       $10,
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx":
+      $11,
   },
   islands: {
     "./islands/InfoModal.tsx": $$0,
