@@ -21,19 +21,23 @@ export interface LiveInfo {
  */
 export interface PipelineInfo {
     /**
-     * If empty, pipeline is not attached to any audience
+     * What audience(s) this pipeline is attached to (none if empty)
      *
      * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
     audiences: Audience[];
     /**
+     * Pipeline config
+     *
      * @generated from protobuf field: protos.Pipeline pipeline = 2;
      */
     pipeline?: Pipeline;
     /**
-     * @generated from protobuf field: protos.PipelineState state = 3;
+     * For what audiences this pipeline is paused (none if empty)
+     *
+     * @generated from protobuf field: repeated protos.Audience paused = 3;
      */
-    state: PipelineState;
+    paused: Audience[];
 }
 /**
  * Most of this is constructed by client SDKs and provided during Register call
@@ -79,19 +83,6 @@ export interface ClientInfo {
      * @generated from protobuf field: optional string _node_name = 9;
      */
     NodeName?: string;
-}
-/**
- * @generated from protobuf enum protos.PipelineState
- */
-export declare enum PipelineState {
-    /**
-     * @generated from protobuf enum value: PIPELINE_STATE_UNSET = 0;
-     */
-    UNSET = 0,
-    /**
-     * @generated from protobuf enum value: PIPELINE_STATE_PAUSED = 1;
-     */
-    PAUSED = 1
 }
 /**
  * @generated from protobuf enum protos.ClientType

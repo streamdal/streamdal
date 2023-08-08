@@ -5,20 +5,6 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Pipeline } from "./pipeline.js";
 import { Audience } from "./common.js";
 /**
- * @generated from protobuf enum protos.PipelineState
- */
-export var PipelineState;
-(function (PipelineState) {
-    /**
-     * @generated from protobuf enum value: PIPELINE_STATE_UNSET = 0;
-     */
-    PipelineState[PipelineState["UNSET"] = 0] = "UNSET";
-    /**
-     * @generated from protobuf enum value: PIPELINE_STATE_PAUSED = 1;
-     */
-    PipelineState[PipelineState["PAUSED"] = 1] = "PAUSED";
-})(PipelineState || (PipelineState = {}));
-/**
  * @generated from protobuf enum protos.ClientType
  */
 export var ClientType;
@@ -55,7 +41,7 @@ class PipelineInfo$Type extends MessageType {
         super("protos.PipelineInfo", [
             { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 2, name: "pipeline", kind: "message", T: () => Pipeline },
-            { no: 3, name: "state", kind: "enum", T: () => ["protos.PipelineState", PipelineState, "PIPELINE_STATE_"] }
+            { no: 3, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
         ]);
     }
 }

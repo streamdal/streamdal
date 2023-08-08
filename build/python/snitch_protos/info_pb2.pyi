@@ -10,8 +10,6 @@ CLIENT_TYPE_SDK: ClientType
 CLIENT_TYPE_SHIM: ClientType
 CLIENT_TYPE_UNSET: ClientType
 DESCRIPTOR: _descriptor.FileDescriptor
-PIPELINE_STATE_PAUSED: PipelineState
-PIPELINE_STATE_UNSET: PipelineState
 
 class ClientInfo(_message.Message):
     __slots__ = ["_node_name", "_service_name", "_session_id", "arch", "client_type", "language", "library_name", "library_version", "os"]
@@ -44,17 +42,14 @@ class LiveInfo(_message.Message):
     def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., client: _Optional[_Union[ClientInfo, _Mapping]] = ...) -> None: ...
 
 class PipelineInfo(_message.Message):
-    __slots__ = ["audiences", "pipeline", "state"]
+    __slots__ = ["audiences", "paused", "pipeline"]
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    PAUSED_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
     audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
+    paused: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
     pipeline: _pipeline_pb2.Pipeline
-    state: PipelineState
-    def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., pipeline: _Optional[_Union[_pipeline_pb2.Pipeline, _Mapping]] = ..., state: _Optional[_Union[PipelineState, str]] = ...) -> None: ...
-
-class PipelineState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., pipeline: _Optional[_Union[_pipeline_pb2.Pipeline, _Mapping]] = ..., paused: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class ClientType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
