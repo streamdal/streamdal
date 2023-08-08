@@ -58,7 +58,11 @@ export interface NotificationSlack {
  */
 export interface NotificationEmail {
     /**
-     * @generated from protobuf field: repeated string recipients = 1;
+     * @generated from protobuf field: optional protos.NotificationEmail.Type type = 1;
+     */
+    type?: NotificationEmail_Type;
+    /**
+     * @generated from protobuf field: repeated string recipients = 2;
      */
     recipients: string[];
     /**

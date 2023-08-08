@@ -253,7 +253,10 @@ class NotificationSlack(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotificationEmail(betterproto.Message):
-    recipients: List[str] = betterproto.string_field(1)
+    type: Optional["NotificationEmailType"] = betterproto.enum_field(
+        1, optional=True, group="_type"
+    )
+    recipients: List[str] = betterproto.string_field(2)
     smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
     ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
 

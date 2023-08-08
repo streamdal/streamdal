@@ -61,7 +61,11 @@ export interface NotificationSlack {
  */
 export interface NotificationEmail {
     /**
-     * @generated from protobuf field: repeated string recipients = 1;
+     * @generated from protobuf field: optional protos.NotificationEmail.Type type = 1;
+     */
+    type?: NotificationEmail_Type;
+    /**
+     * @generated from protobuf field: repeated string recipients = 2;
      */
     recipients: string[];
     /**
@@ -241,7 +245,8 @@ export const NotificationSlack = new NotificationSlack$Type();
 class NotificationEmail$Type extends MessageType<NotificationEmail> {
     constructor() {
         super("protos.NotificationEmail", [
-            { no: 1, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "type", kind: "enum", opt: true, T: () => ["protos.NotificationEmail.Type", NotificationEmail_Type, "TYPE_"] },
+            { no: 2, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "smtp", kind: "message", oneof: "config", T: () => NotificationEmailSMTP },
             { no: 1001, name: "ses", kind: "message", oneof: "config", T: () => NotificationEmailSES }
         ]);
