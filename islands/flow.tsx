@@ -39,7 +39,7 @@ export type Node = {
   };
 };
 
-const flowKey: string = "flow-storage";
+const flowKey = "flow-storage";
 
 export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -99,26 +99,26 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     //       setEdges(flow.edges || []);
     //     }
     // } else {
-    // let nodes = [
-    //   {
-    //     id: "1",
-    //     type: "service",
-    //     dragHandle: "#dragHandle",
-    //     position: { x: 150, y: 0 },
-    //     data: { label: `${serviceMap[keys[0]].name}` },
-    //   },
-    //   {
-    //     id: "10",
-    //     type: "component",
-    //     sourcePosition: "right",
-    //     targetPosition: "left",
-    //     position: { x: 215, y: 350 },
-    //     data: {
-    //       label: `${serviceMap[keys[0]].pipelines[0].audience
-    //         ?.componentName}`,
-    //     },
-    //   },
-    // ];
+    const nodes = [
+      {
+        id: "1",
+        type: "service",
+        dragHandle: "#dragHandle",
+        position: { x: 150, y: 0 },
+        data: { label: `${serviceMap[keys[0]].name}` },
+      },
+      {
+        id: "10",
+        type: "component",
+        sourcePosition: "right",
+        targetPosition: "left",
+        position: { x: 215, y: 350 },
+        data: {
+          label: `${serviceMap[keys[0]].pipelines[0].audience
+            ?.componentName}`,
+        },
+      },
+    ];
     // console.log([...nodes, ...getOperation(example)]);
 
     setNodes([
