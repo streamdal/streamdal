@@ -212,7 +212,6 @@ class NotificationConfig(betterproto.Message):
     id: str = betterproto.string_field(1)
     name: str = betterproto.string_field(2)
     type: "NotificationType" = betterproto.enum_field(3)
-    pipeline_id: str = betterproto.string_field(4)
     slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
     email: "NotificationEmail" = betterproto.message_field(1001, group="config")
     pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")

@@ -36,7 +36,6 @@ service External {
 }
 
 
-
 // Notifications
 message CreateNotificationRequest {
   protos.NotificationConfig notification = 1;

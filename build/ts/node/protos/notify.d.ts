@@ -16,10 +16,6 @@ export interface NotificationConfig {
      */
     type: NotificationType;
     /**
-     * @generated from protobuf field: string pipeline_id = 4;
-     */
-    pipelineId: string;
-    /**
      * @generated from protobuf oneof: config
      */
     config: {

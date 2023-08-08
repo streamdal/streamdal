@@ -18,8 +18,6 @@ message NotificationConfig {
 
   NotificationType type = 3;
 
-  string pipeline_id = 4;
-
   oneof config {
     NotificationSlack slack = 1000;
     NotificationEmail email = 1001;

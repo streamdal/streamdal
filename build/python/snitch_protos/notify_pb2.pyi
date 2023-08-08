@@ -11,22 +11,20 @@ NOTIFICATION_TYPE_SLACK: NotificationType
 NOTIFICATION_TYPE_UNSET: NotificationType
 
 class NotificationConfig(_message.Message):
-    __slots__ = ["email", "id", "name", "pagerduty", "pipeline_id", "slack", "type"]
+    __slots__ = ["email", "id", "name", "pagerduty", "slack", "type"]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     PAGERDUTY_FIELD_NUMBER: _ClassVar[int]
-    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     SLACK_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     email: NotificationEmail
     id: str
     name: str
     pagerduty: NotificationPagerDuty
-    pipeline_id: str
     slack: NotificationSlack
     type: NotificationType
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[NotificationType, str]] = ..., pipeline_id: _Optional[str] = ..., slack: _Optional[_Union[NotificationSlack, _Mapping]] = ..., email: _Optional[_Union[NotificationEmail, _Mapping]] = ..., pagerduty: _Optional[_Union[NotificationPagerDuty, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[NotificationType, str]] = ..., slack: _Optional[_Union[NotificationSlack, _Mapping]] = ..., email: _Optional[_Union[NotificationEmail, _Mapping]] = ..., pagerduty: _Optional[_Union[NotificationPagerDuty, _Mapping]] = ...) -> None: ...
 
 class NotificationEmail(_message.Message):
     __slots__ = ["recipients"]

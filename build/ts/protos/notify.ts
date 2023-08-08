@@ -19,10 +19,6 @@ export interface NotificationConfig {
      */
     type: NotificationType;
     /**
-     * @generated from protobuf field: string pipeline_id = 4;
-     */
-    pipelineId: string;
-    /**
      * @generated from protobuf oneof: config
      */
     config: {
@@ -141,7 +137,6 @@ class NotificationConfig$Type extends MessageType<NotificationConfig> {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "type", kind: "enum", T: () => ["protos.NotificationType", NotificationType, "NOTIFICATION_TYPE_"] },
-            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "slack", kind: "message", oneof: "config", T: () => NotificationSlack },
             { no: 1001, name: "email", kind: "message", oneof: "config", T: () => NotificationEmail },
             { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => NotificationPagerDuty }
