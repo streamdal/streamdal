@@ -12,3 +12,9 @@ type LiveEntry struct {
 	Audience  *protos.Audience
 	Register  bool
 }
+
+type PausedEntry struct {
+	Key        string
+	Audience   *protos.Audience
+	PipelineID string
+}

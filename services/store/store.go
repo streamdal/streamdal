@@ -48,6 +48,7 @@ type IStore interface {
 	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
+	GetPaused(ctx context.Context) ([]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineId string) error
@@ -566,5 +567,64 @@ func (o *Options) validate() error {
 func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	audiences := make([]*protos.Audience, 0)
 
-	return nil, nil
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSAudienceBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return audiences, nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching audience keys from NATS")
+	}
+
+	for _, key := range keys {
+		aud := util.AudienceFromStr(key)
+		if aud == nil {
+			return nil, errors.Errorf("invalid audience key '%s'", key)
+		}
+
+		audiences = append(audiences, aud)
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) GetPaused(ctx context.Context) ([]*types.PausedEntry, error) {
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSPausedBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return make([]*types.PausedEntry, 0), nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching paused keys from NATS")
+	}
+
+	paused := make([]*types.PausedEntry, 0)
+
+	for _, key := range keys {
+		entry := &types.PausedEntry{
+			Key:        key,
+			Audience:   nil,
+			PipelineID: "",
+		}
+
+		parts := strings.SplitN(key, "/", 2)
+		if len(parts) != 2 {
+			return nil, errors.Errorf("invalid paused key '%s' (incorrect number of parts '%d')", key, len(parts))
+		}
+
+		pipelineID := parts[0]
+		audStr := parts[1]
+
+		aud := util.AudienceFromStr(audStr)
+		if aud == nil {
+			return nil, errors.Errorf("invalid paused key '%s' (unable to convert audience str '%s' to *Audience)", key, audStr)
+		}
+
+		entry.Audience = aud
+		entry.PipelineID = pipelineID
+
+		paused = append(paused, entry)
+	}
+
+	return paused, nil
 }

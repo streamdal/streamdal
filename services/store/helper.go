@@ -22,7 +22,7 @@ const (
 	NATSConfigKeyFormat = "%s" // K: $audience V: $pipeline_id (string)
 
 	NATSPausedBucket    = "snitch_paused"
-	NATSPausedKeyFormat = "%s/%s" // K: $audience:$pipeline_id V: NONE
+	NATSPausedKeyFormat = "%s/%s" // K: $pipeline_id:$audience V: NONE
 )
 
 func NATSRegisterKey(session, node string) string {
@@ -46,5 +46,5 @@ func NATSConfigKey(audience string) string {
 }
 
 func NATSPausedKey(audience, pipelineId string) string {
-	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, audience, pipelineId))
+	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, pipelineId, audience))
 }

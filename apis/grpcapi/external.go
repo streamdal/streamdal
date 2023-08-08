@@ -99,9 +99,48 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 
 // TODO: Implement
 func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
-	pipelines := make(map[string]*protos.PipelineInfo)
+	gen := make(map[string]*protos.PipelineInfo)
 
-	return pipelines, nil
+	// Get all pipelines
+	allPipelines, err := s.Deps.StoreService.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	for pipelineID, pipeline := range allPipelines {
+		gen[pipelineID] = &protos.PipelineInfo{
+			Audiences: make([]*protos.Audience, 0),
+			Pipeline:  pipeline,
+			Paused:    make([]*protos.Audience, 0),
+		}
+	}
+
+	// Get audience <-> pipeline mappings
+	pipelineConfig, err := s.Deps.StoreService.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline config")
+	}
+
+	// Update pipeline info with info about attached pipelines
+	for aud, pipelineID := range pipelineConfig {
+		if _, ok := gen[pipelineID]; !ok {
+			gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
+		}
+	}
+
+	// Update pipeline info with state info
+	pausedPipelines, err := s.Deps.StoreService.GetPaused(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get paused pipelines")
+	}
+
+	for _, p := range pausedPipelines {
+		if _, ok := gen[p.PipelineID]; ok {
+			gen[p.PipelineID].Paused = append(gen[p.PipelineID].Paused, p.Audience)
+		}
+	}
+
+	return gen, nil
 }
 
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {

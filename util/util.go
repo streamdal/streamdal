@@ -133,7 +133,7 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 			return errors.Wrapf(err, "error loading '%T' WASM mapping", s.Step)
 		}
 
-		s.XWasmFunction = mapping.FuncName
+		s.XWasmFunction = &mapping.FuncName
 		s.XWasmBytes = mapping.Contents
 	}
 
@@ -146,7 +146,7 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 
 	for _, s := range pipeline.Steps {
-		s.XWasmFunction = ""
+		s.XWasmFunction = nil
 		s.XWasmBytes = nil
 	}
 }
