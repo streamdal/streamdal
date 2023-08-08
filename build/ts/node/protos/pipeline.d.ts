@@ -93,23 +93,17 @@ export interface PipelineStep {
         oneofKind: undefined;
     };
     /**
-     * WASM module ID (set by snitch-server)
-     *
-     * @generated from protobuf field: string _wasm_id = 10000;
-     */
-    WasmId: string;
-    /**
      * WASM module bytes (set by snitch-server)
      *
-     * @generated from protobuf field: bytes _wasm_bytes = 10001;
+     * @generated from protobuf field: optional bytes _wasm_bytes = 10001;
      */
-    WasmBytes: Uint8Array;
+    WasmBytes?: Uint8Array;
     /**
      * WASM function name to execute (set by snitch-server)
      *
-     * @generated from protobuf field: string _wasm_function = 10002;
+     * @generated from protobuf field: optional string _wasm_function = 10002;
      */
-    WasmFunction: string;
+    WasmFunction?: string;
 }
 /**
  * A condition defines how the SDK should handle a step response -- should it

@@ -81,8 +81,8 @@ enum DetectiveType {
 }
 
 message DetectiveStep {
-  string path = 1;
+  optional string path = 1;
   repeated string args = 2; // args determined by match_type
-  bool negate = 3;
+  optional bool negate = 3;
   DetectiveType type = 4;
 }
