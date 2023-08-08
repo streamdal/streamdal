@@ -4,17 +4,17 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface NotificationConfig {
     /**
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: optional string id = 1;
      */
-    id: string;
+    id?: string;
     /**
-     * @generated from protobuf field: string name = 2;
+     * @generated from protobuf field: optional string name = 2;
      */
-    name: string;
+    name?: string;
     /**
-     * @generated from protobuf field: protos.NotificationType type = 3;
+     * @generated from protobuf field: optional protos.NotificationType type = 3;
      */
-    type: NotificationType;
+    type?: NotificationType;
     /**
      * @generated from protobuf oneof: config
      */
@@ -118,9 +118,9 @@ export interface NotificationEmailSMTP {
      */
     smtpPassword?: string;
     /**
-     * @generated from protobuf field: bool use_tls = 5;
+     * @generated from protobuf field: optional bool use_tls = 5;
      */
-    useTls: boolean;
+    useTls?: boolean;
 }
 /**
  * @generated from protobuf message protos.NotificationEmailSES
@@ -146,21 +146,21 @@ export interface NotificationPagerDuty {
     /**
      * Auth token
      *
-     * @generated from protobuf field: string token = 1;
+     * @generated from protobuf field: optional string token = 1;
      */
-    token: string;
+    token?: string;
     /**
      * Must be a valid email for a PagerDuty user
      *
-     * @generated from protobuf field: string email = 2;
+     * @generated from protobuf field: optional string email = 2;
      */
-    email: string;
+    email?: string;
     /**
      * Must be a valid PagerDuty service
      *
-     * @generated from protobuf field: string service_id = 3;
+     * @generated from protobuf field: optional string service_id = 3;
      */
-    serviceId: string;
+    serviceId?: string;
     /**
      * @generated from protobuf field: protos.NotificationPagerDuty.Urgency urgency = 4;
      */

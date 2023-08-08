@@ -7,17 +7,17 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface NotificationConfig {
     /**
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: optional string id = 1;
      */
-    id: string;
+    id?: string;
     /**
-     * @generated from protobuf field: string name = 2;
+     * @generated from protobuf field: optional string name = 2;
      */
-    name: string;
+    name?: string;
     /**
-     * @generated from protobuf field: protos.NotificationType type = 3;
+     * @generated from protobuf field: optional protos.NotificationType type = 3;
      */
-    type: NotificationType;
+    type?: NotificationType;
     /**
      * @generated from protobuf oneof: config
      */
@@ -121,9 +121,9 @@ export interface NotificationEmailSMTP {
      */
     smtpPassword?: string;
     /**
-     * @generated from protobuf field: bool use_tls = 5;
+     * @generated from protobuf field: optional bool use_tls = 5;
      */
-    useTls: boolean;
+    useTls?: boolean;
 }
 /**
  * @generated from protobuf message protos.NotificationEmailSES
@@ -149,21 +149,21 @@ export interface NotificationPagerDuty {
     /**
      * Auth token
      *
-     * @generated from protobuf field: string token = 1;
+     * @generated from protobuf field: optional string token = 1;
      */
-    token: string;
+    token?: string;
     /**
      * Must be a valid email for a PagerDuty user
      *
-     * @generated from protobuf field: string email = 2;
+     * @generated from protobuf field: optional string email = 2;
      */
-    email: string;
+    email?: string;
     /**
      * Must be a valid PagerDuty service
      *
-     * @generated from protobuf field: string service_id = 3;
+     * @generated from protobuf field: optional string service_id = 3;
      */
-    serviceId: string;
+    serviceId?: string;
     /**
      * @generated from protobuf field: protos.NotificationPagerDuty.Urgency urgency = 4;
      */
@@ -211,9 +211,9 @@ export enum NotificationType {
 class NotificationConfig$Type extends MessageType<NotificationConfig> {
     constructor() {
         super("protos.NotificationConfig", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "type", kind: "enum", T: () => ["protos.NotificationType", NotificationType, "NOTIFICATION_TYPE_"] },
+            { no: 1, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "type", kind: "enum", opt: true, T: () => ["protos.NotificationType", NotificationType, "NOTIFICATION_TYPE_"] },
             { no: 1000, name: "slack", kind: "message", oneof: "config", T: () => NotificationSlack },
             { no: 1001, name: "email", kind: "message", oneof: "config", T: () => NotificationEmail },
             { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => NotificationPagerDuty }
@@ -259,7 +259,7 @@ class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSMTP> {
             { no: 2, name: "smtp_port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "smtp_user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "smtp_password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "use_tls", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "use_tls", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
@@ -285,9 +285,9 @@ export const NotificationEmailSES = new NotificationEmailSES$Type();
 class NotificationPagerDuty$Type extends MessageType<NotificationPagerDuty> {
     constructor() {
         super("protos.NotificationPagerDuty", [
-            { no: 1, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "service_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "token", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "email", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "service_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "urgency", kind: "enum", T: () => ["protos.NotificationPagerDuty.Urgency", NotificationPagerDuty_Urgency, "URGENCY_"] }
         ]);
     }
