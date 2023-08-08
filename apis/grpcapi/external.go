@@ -25,8 +25,83 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
-func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) (*protos.GetAllResponse, error) {
+	if err := validate.GetAllRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get all request")
+	}
+
+	liveInfo, err := s.getAllLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get live info")
+	}
+
+	audiences, err := s.Deps.StoreService.GetAudiences(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get audiences")
+	}
+
+	pipelines, err := s.getAllPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	return &protos.GetAllResponse{
+		Live:      liveInfo,
+		Audiences: audiences,
+		Pipelines: pipelines,
+	}, nil
+}
+
+func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
+	liveInfo := make([]*protos.LiveInfo, 0)
+
+	liveData, err := s.Deps.StoreService.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get live data")
+	}
+
+	for _, v := range liveData {
+		live := &protos.LiveInfo{
+			Audiences: make([]*protos.Audience, 0),
+		}
+
+		// If register entry, fill out client info
+		if v.Register {
+			if err := validate.ClientInfo(v.Value); err != nil {
+				s.log.Errorf("getAllLive: unable to validate client info for session id '%s': %v", v.SessionID, err)
+				continue
+			}
+
+			live.Client = v.Value
+			live.Client.XSessionId = &v.SessionID
+			live.Client.XServiceName = &v.Audience.ServiceName
+			live.Client.XNodeName = &v.NodeName
+		}
+	}
+
+	// No register entries == no one connected to any instances of snitch server
+	if len(liveData) == 0 {
+		return liveInfo, nil
+	}
+
+	// Have register entries - fill out audiences for each
+	for _, li := range liveInfo {
+		// Find all live entry audiences with same session ID
+		for _, ld := range liveData {
+			if *li.Client.XSessionId == ld.SessionID {
+				li.Audiences = append(li.Audiences, ld.Audience)
+			}
+		}
+	}
+
+	return liveInfo, nil
+}
+
+// TODO: Implement
+func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
+	pipelines := make(map[string]*protos.PipelineInfo)
+
+	return pipelines, nil
 }
 
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {

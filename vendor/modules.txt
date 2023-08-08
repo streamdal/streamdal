@@ -162,7 +162,7 @@ github.com/sirupsen/logrus
 # github.com/streamdal/natty v0.0.38
 ## explicit; go 1.18
 github.com/streamdal/natty
-# github.com/streamdal/snitch-protos v0.0.56
+# github.com/streamdal/snitch-protos v0.0.59
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
 github.com/streamdal/snitch-protos/build/go/protos/steps
