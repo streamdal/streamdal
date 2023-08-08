@@ -15,10 +15,10 @@ import (
 
 func (s *Snitch) register(looper director.Looper) {
 	req := &protos.RegisterRequest{
-		ServiceName: s.ServiceName,
+		ServiceName: s.config.ServiceName,
 		SessionId:   s.sessionID,
 		ClientInfo: &protos.ClientInfo{
-			ClientType:     protos.ClientType(s.ClientType),
+			ClientType:     protos.ClientType(s.config.ClientType),
 			LibraryName:    "snitch-go-client",
 			LibraryVersion: "0.0.1", // TODO: inject via build tag
 			Language:       "go",
@@ -26,14 +26,14 @@ func (s *Snitch) register(looper director.Looper) {
 			Os:             runtime.GOOS,
 		},
 		Audiences: nil, // TODO
-		DryRun:    s.DryRun,
+		DryRun:    s.config.DryRun,
 	}
 
 	var stream protos.Internal_RegisterClient
 	var err error
 	var quit bool
 
-	srv, err := s.serverClient.Register(s.ShutdownCtx, req)
+	srv, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 	if err != nil && !strings.Contains(err.Error(), context.Canceled.Error()) {
 		panic("Failed to register with snitch server: " + err.Error())
 	}
@@ -46,16 +46,16 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if stream == nil {
-			newStream, err := s.serverClient.Register(s.ShutdownCtx, req)
+			newStream, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 			if err != nil {
 				if strings.Contains(err.Error(), context.Canceled.Error()) {
-					s.Logger.Debug("context cancelled during connect")
+					s.config.Logger.Debug("context cancelled during connect")
 					quit = true
 					looper.Quit()
 					return nil
 				}
 
-				s.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 				return nil
 			}
@@ -67,7 +67,7 @@ func (s *Snitch) register(looper director.Looper) {
 		cmd, err := stream.Recv()
 		if err != nil {
 			if err.Error() == "rpc error: code = Canceled desc = context canceled" {
-				s.Logger.Errorf("context cancelled during recv: %s", err)
+				s.config.Logger.Errorf("context cancelled during recv: %s", err)
 				quit = true
 				looper.Quit()
 				return nil
@@ -75,11 +75,11 @@ func (s *Snitch) register(looper director.Looper) {
 
 			if errors.Is(err, io.EOF) {
 				// Nicer reconnect messages
-				s.Logger.Warnf("dProxy server is unavailable, retrying in %s...", ReconnectSleep.String())
+				s.config.Logger.Warnf("dProxy server is unavailable, retrying in %s...", ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 				return nil
 			} else {
-				s.Logger.Warnf("Error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
+				s.config.Logger.Warnf("Error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
 			}
 
 			return nil
@@ -87,33 +87,33 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if cmd.GetKeepAlive() != nil {
-			s.Logger.Debug("Received keep alive")
+			s.config.Logger.Debug("Received keep alive")
 			return nil
 		}
 
-		if cmd.Audience.ServiceName != s.ServiceName {
-			s.Logger.Debugf("Received command for different service name: %s, ignoring command", cmd.Audience.ServiceName)
+		if cmd.Audience.ServiceName != s.config.ServiceName {
+			s.config.Logger.Debugf("Received command for different service name: %s, ignoring command", cmd.Audience.ServiceName)
 			return nil
 		}
 
 		if attach := cmd.GetAttachPipeline(); attach != nil {
 			if err := s.attachPipeline(context.Background(), cmd); err != nil {
-				s.Logger.Errorf("Failed to attach pipeline: %s", err)
+				s.config.Logger.Errorf("Failed to attach pipeline: %s", err)
 				return nil
 			}
 		} else if detach := cmd.GetDetachPipeline(); detach != nil {
 			if err := s.detachPipeline(context.Background(), cmd); err != nil {
-				s.Logger.Errorf("Failed to detach pipeline: %s", err)
+				s.config.Logger.Errorf("Failed to detach pipeline: %s", err)
 				return nil
 			}
 		} else if pause := cmd.GetPausePipeline(); pause != nil {
 			if err := s.pausePipeline(context.Background(), cmd); err != nil {
-				s.Logger.Errorf("Failed to pause pipeline: %s", err)
+				s.config.Logger.Errorf("Failed to pause pipeline: %s", err)
 				return nil
 			}
 		} else if resume := cmd.GetResumePipeline(); resume != nil {
 			if err := s.resumePipeline(context.Background(), cmd); err != nil {
-				s.Logger.Errorf("Failed to resume pipeline: %s", err)
+				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
 				return nil
 			}
 		}
@@ -136,7 +136,7 @@ func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {
 
 	s.pipelines[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
 
-	s.Logger.Debugf("Attached pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
+	s.config.Logger.Debugf("Attached pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
 
 	return nil
 }
@@ -155,7 +155,7 @@ func (s *Snitch) detachPipeline(_ context.Context, cmd *protos.Command) error {
 
 	delete(s.pipelines[audToStr(cmd.Audience)], cmd.GetDetachPipeline().PipelineId)
 
-	s.Logger.Debugf("Detached pipeline %s", cmd.GetDetachPipeline().PipelineId)
+	s.config.Logger.Debugf("Detached pipeline %s", cmd.GetDetachPipeline().PipelineId)
 
 	return nil
 }

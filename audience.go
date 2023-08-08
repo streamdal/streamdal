@@ -25,7 +25,7 @@ func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
 	// Run as goroutine to avoid blocking processing
 	go func() {
 		if err := s.serverClient.NewAudience(ctx, aud); err != nil {
-			s.Logger.Errorf("failed to add audience: %s", err)
+			s.config.Logger.Errorf("failed to add audience: %s", err)
 		}
 	}()
 }

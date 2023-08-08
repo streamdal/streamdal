@@ -84,7 +84,7 @@ type ISnitch interface {
 }
 
 type Snitch struct {
-	*Config
+	config             *Config
 	functions          map[string]*function
 	pipelines          map[string]map[string]*protos.Command
 	pipelinesPaused    map[string]map[string]*protos.Command
@@ -108,6 +108,14 @@ type Config struct {
 	ShutdownCtx     context.Context
 	Logger          logger.Logger
 	ClientType      ClientType
+	Audiences       []*Audience
+}
+
+type Audience struct {
+	ServiceName   string
+	ComponentName string
+	OperationType OperationType
+	OperationName string
 }
 
 type SnitchRequest struct {
@@ -157,7 +165,7 @@ func New(cfg *Config) (*Snitch, error) {
 		pipelinesMtx:       &sync.RWMutex{},
 		pipelinesPaused:    make(map[string]map[string]*protos.Command),
 		pipelinesPausedMtx: &sync.RWMutex{},
-		Config:             cfg,
+		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
 	}
@@ -169,6 +177,8 @@ func New(cfg *Config) (*Snitch, error) {
 	// Start register
 	loop := director.NewFreeLooper(director.FOREVER, make(chan error, 1))
 	go s.register(loop)
+
+	go s.initAudiences(cfg.Audiences)
 
 	return s, nil
 }
@@ -240,6 +250,23 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
+// initAudiences
+func (s *Snitch) initAudiences(audiences []*Audience) {
+	for _, a := range audiences {
+		aud := &protos.Audience{
+			ServiceName:   a.ServiceName,
+			ComponentName: a.ComponentName,
+			OperationType: protos.OperationType(a.OperationType),
+			OperationName: a.OperationName,
+		}
+
+		s.addAudience(context.Background(), aud)
+	}
+
+	// Don't need this data anymore
+	s.config.Audiences = nil
+}
+
 func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
 	// Get WASM module
 	f, err := s.getFunction(ctx, step)
@@ -299,7 +326,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 	payloadSize := len(data)
 
 	aud := &protos.Audience{
-		ServiceName:   s.ServiceName,
+		ServiceName:   s.config.ServiceName,
 		ComponentName: req.ComponentName,
 		OperationType: protos.OperationType(req.OperationType),
 		OperationName: req.OperationName,
@@ -319,7 +346,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 		//	Value:  1,
 		//})
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
-		s.Logger.Warn(msg)
+		s.config.Logger.Warn(msg)
 		return &SnitchResponse{Data: data, Error: true, Message: msg}, nil
 	}
 
@@ -368,7 +395,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly
-	if s.DryRun {
+	if s.config.DryRun {
 		data = req.Data
 	}
 
@@ -390,18 +417,18 @@ func (s *Snitch) handleConditions(
 	for _, condition := range conditions {
 		switch condition {
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
-			s.Logger.Debugf("Step '%s' failed, notifying", step.Name)
-			if !s.DryRun {
+			s.config.Logger.Debugf("Step '%s' failed, notifying", step.Name)
+			if !s.config.DryRun {
 				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
-					s.Logger.Errorf("failed to notify condition: %v", err)
+					s.config.Logger.Errorf("failed to notify condition: %v", err)
 				}
 			}
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT:
-			s.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
+			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
 			shouldContinue = false
 		default:
 			// Assume continue
-			s.Logger.Debugf("Step '%s' failed, continuing to next step", step.Name)
+			s.config.Logger.Debugf("Step '%s' failed, continuing to next step", step.Name)
 		}
 	}
 

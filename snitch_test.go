@@ -172,7 +172,7 @@ func TestHandleConditions(t *testing.T) {
 
 	s := &Snitch{
 		serverClient: fakeClient,
-		Config: &Config{
+		config: &Config{
 			Logger: &loggerfakes.FakeLogger{},
 			DryRun: false,
 		},
@@ -255,7 +255,7 @@ func TestProcess_success(t *testing.T) {
 		functions:    map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
-		Config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
@@ -333,7 +333,7 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 		functions:    map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
-		Config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
@@ -459,7 +459,7 @@ func setup(funcID, wasmFile string) (*Snitch, error) {
 	d := &Snitch{
 		functions:    map[string]*function{},
 		functionsMtx: &sync.RWMutex{},
-		Config:       &Config{StepTimeout: time.Second},
+		config:       &Config{StepTimeout: time.Second},
 	}
 
 	wasmFile = path.Join("src", wasmFile+".wasm")
@@ -523,7 +523,7 @@ func setup(funcID, wasmFile string) (*Snitch, error) {
 //		functions:    map[string]*function{},
 //		functionsMtx: &sync.RWMutex{},
 //		pipelinesMtx: &sync.RWMutex{},
-//		Config:       &Config{ServiceName: "mysvc1"},
+//		config:       &Config{ServiceName: "mysvc1"},
 //		metrics:      &metricsfakes.FakeIMetrics{},
 //		pipelines: map[string]map[string]*protos.Command{
 //			audToStr(aud): map[string]*protos.Command{
