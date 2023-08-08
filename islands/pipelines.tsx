@@ -47,19 +47,20 @@ const Pipelines = (
                 <Tooltip targetId="pipeline-add" message="Add a new pipeline" />
               </div>
               {wrapper?.map((p: Pipeline, i: number) => (
-                <div
-                  class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
-                    i === selected && "bg-sunset"
-                  } cursor-pointer hover:bg-sunset`}
-                  onClick={() => setSelected(i)}
-                >
-                  {p.name}
-                  {selected === i && <IconPencil class="w-4 h-4 text-web" />}
-                </div>
+                <a href={`/pipelines/${p.id}`}>
+                  <div
+                    class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
+                      i === selected && "bg-sunset"
+                    } cursor-pointer hover:bg-sunset`}
+                  >
+                    {p.name}
+                    {selected === i && <IconPencil class="w-4 h-4 text-web" />}
+                  </div>
+                </a>
               ))}
             </div>
             <div class="w-full max-h-[80vh] overflow-y-auto">
-              <PipelineDetail pipeline={wrapper[selected]} />
+              <PipelineDetail pipeline={wrapper[selected]} success={success} />
             </div>
           </div>
         </div>

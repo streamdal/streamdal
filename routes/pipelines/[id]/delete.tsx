@@ -15,6 +15,7 @@ import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { DeleteModal } from "../../../components/modals/deleteModal.tsx";
 import { ErrorType } from "../../../components/form/validate.ts";
+import Pipelines from "../../../islands/pipelines.tsx";
 
 export type SuccessType = {
   status: boolean;
@@ -61,14 +62,15 @@ export default function DeletePipelineRoute(
 ) {
   return (
     <>
-      <DeleteModal
-        id={props?.params?.id}
-        message={`Delete Pipeline ${props?.data?.pipeline?.name}?`}
-      />
+      <div>
+        <Pipelines pipelines={props?.data?.pipelines} />
+        <DeleteModal
+          id={props?.params?.id}
+          entityType="pipeline"
+          entityName={props?.data?.pipeline?.name}
+        />
+      </div>
       <Layout>
-        {/*I want to draw this below the modal but I can't because there is something*/}
-        {/*strange going on with our react flow z-index.*/}
-        {/*<Pipelines pipelines={props?.data?.pipelines} />*/}
         <ReactFlowProvider>
           <Flow data={props?.data?.serviceMap} />
         </ReactFlowProvider>

@@ -3,15 +3,16 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./routes/[name].tsx";
-import * as $1 from "./routes/api/joke.ts";
-import * as $2 from "./routes/index.tsx";
-import * as $3 from "./routes/login.tsx";
-import * as $4 from "./routes/pipelines/[id]/delete.tsx";
-import * as $5 from "./routes/pipelines/[id]/index.tsx";
-import * as $6 from "./routes/pipelines/index.tsx";
-import * as $7 from "./routes/pipelines/save.tsx";
-import * as $8 from "./routes/rules.tsx";
-import * as $9 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx";
+import * as $1 from "./routes/_middleware.ts";
+import * as $2 from "./routes/api/joke.ts";
+import * as $3 from "./routes/index.tsx";
+import * as $4 from "./routes/login.tsx";
+import * as $5 from "./routes/pipelines/[id]/delete.tsx";
+import * as $6 from "./routes/pipelines/[id]/index.tsx";
+import * as $7 from "./routes/pipelines/index.tsx";
+import * as $8 from "./routes/pipelines/save.tsx";
+import * as $9 from "./routes/rules.tsx";
+import * as $10 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx";
 import * as $$0 from "./islands/InfoModal.tsx";
 import * as $$1 from "./islands/flow.tsx";
 import * as $$2 from "./islands/pipeline.tsx";
@@ -20,16 +21,17 @@ import * as $$3 from "./islands/pipelines.tsx";
 const manifest = {
   routes: {
     "./routes/[name].tsx": $0,
-    "./routes/api/joke.ts": $1,
-    "./routes/index.tsx": $2,
-    "./routes/login.tsx": $3,
-    "./routes/pipelines/[id]/delete.tsx": $4,
-    "./routes/pipelines/[id]/index.tsx": $5,
-    "./routes/pipelines/index.tsx": $6,
-    "./routes/pipelines/save.tsx": $7,
-    "./routes/rules.tsx": $8,
+    "./routes/_middleware.ts": $1,
+    "./routes/api/joke.ts": $2,
+    "./routes/index.tsx": $3,
+    "./routes/login.tsx": $4,
+    "./routes/pipelines/[id]/delete.tsx": $5,
+    "./routes/pipelines/[id]/index.tsx": $6,
+    "./routes/pipelines/index.tsx": $7,
+    "./routes/pipelines/save.tsx": $8,
+    "./routes/rules.tsx": $9,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName].tsx":
-      $9,
+      $10,
   },
   islands: {
     "./islands/InfoModal.tsx": $$0,
