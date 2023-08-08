@@ -289,19 +289,20 @@ var _ = Describe("Internal gRPC API", func() {
 	})
 
 	Describe("NewAudience", func() {
-		It("should create a new audience in live bucket", func() {
+		FIt("should create a new audience in live bucket", func() {
 			sessionID := util.GenerateUUID()
+			audience := &protos.Audience{
+				ServiceName:   "test-service",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "main",
+			}
 
 			Expect(sessionID).ToNot(BeEmpty())
 
 			resp, err := internalClient.NewAudience(ctxWithGoodAuth, &protos.NewAudienceRequest{
 				SessionId: sessionID,
-				Audience: &protos.Audience{
-					ServiceName:   "test-service",
-					ComponentName: "kafka",
-					OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-					OperationName: "main",
-				},
+				Audience:  audience,
 			})
 
 			Expect(err).ToNot(HaveOccurred())
@@ -309,21 +310,32 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(resp.Message).To(ContainSubstring("Audience created"))
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// TODO: Discovered a minor issue -- the audience key is created in
-			// the live audience because we are assuming that NewAudience() will
-			// only be called by the SDK when it is registered!
-			// This means that if the audience is not assigned to a pipeline, it
-			// will disappear when the SDK disconnects.
-			// Solution: Should store audience in both live and a separate bucket.
-			// That way we know what audiences are available LIVE and which
-			// audiences are available for assignment but are NOT live.
+			liveKeys, err := natsClient.Keys(context.Background(), store.NATSLiveBucket)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(liveKeys).ToNot(BeEmpty())
+
+			// Verify that K/V is created in `snitch_live` bucket
+			liveData, err := natsClient.Get(
+				context.Background(),
+				store.NATSLiveBucket,
+				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+			)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(liveData).ToNot(BeNil())
+
+			// Verify that entry is created in `snitch_audience` bucket
+			audienceData, err := natsClient.Get(
+				context.Background(),
+				store.NATSAudienceBucket,
+				store.NATSAudienceKey(util.AudienceToStr(audience)),
+			)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(audienceData).ToNot(BeNil())
 		})
 
 		It("audience should disappear without heartbeat", func() {
-
-		})
-
-		It("audience should remain if heartbeat is received", func() {
 
 		})
 	})
