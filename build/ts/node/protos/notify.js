@@ -110,10 +110,10 @@ export const NotificationEmail = new NotificationEmail$Type();
 class NotificationEmailSMTP$Type extends MessageType {
     constructor() {
         super("protos.NotificationEmailSMTP", [
-            { no: 1, name: "smtp_host", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "smtp_port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "smtp_user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "smtp_password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "host", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "use_tls", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }

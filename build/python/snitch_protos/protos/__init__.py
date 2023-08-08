@@ -266,17 +266,11 @@ class NotificationEmail(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotificationEmailSmtp(betterproto.Message):
-    smtp_host: Optional[str] = betterproto.string_field(
-        1, optional=True, group="_smtp_host"
-    )
-    smtp_port: Optional[int] = betterproto.int32_field(
-        2, optional=True, group="_smtp_port"
-    )
-    smtp_user: Optional[str] = betterproto.string_field(
-        3, optional=True, group="_smtp_user"
-    )
-    smtp_password: Optional[str] = betterproto.string_field(
-        4, optional=True, group="_smtp_password"
+    host: Optional[str] = betterproto.string_field(1, optional=True, group="_host")
+    port: Optional[int] = betterproto.int32_field(2, optional=True, group="_port")
+    user: Optional[str] = betterproto.string_field(3, optional=True, group="_user")
+    password: Optional[str] = betterproto.string_field(
+        4, optional=True, group="_password"
     )
     use_tls: Optional[bool] = betterproto.bool_field(5, optional=True, group="_use_tls")
 

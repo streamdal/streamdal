@@ -56,18 +56,18 @@ class NotificationEmailSES(_message.Message):
     def __init__(self, ses_region: _Optional[str] = ..., ses_access_key_id: _Optional[str] = ..., ses_secret_access_key: _Optional[str] = ...) -> None: ...
 
 class NotificationEmailSMTP(_message.Message):
-    __slots__ = ["smtp_host", "smtp_password", "smtp_port", "smtp_user", "use_tls"]
-    SMTP_HOST_FIELD_NUMBER: _ClassVar[int]
-    SMTP_PASSWORD_FIELD_NUMBER: _ClassVar[int]
-    SMTP_PORT_FIELD_NUMBER: _ClassVar[int]
-    SMTP_USER_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["host", "password", "port", "use_tls", "user"]
+    HOST_FIELD_NUMBER: _ClassVar[int]
+    PASSWORD_FIELD_NUMBER: _ClassVar[int]
+    PORT_FIELD_NUMBER: _ClassVar[int]
+    USER_FIELD_NUMBER: _ClassVar[int]
     USE_TLS_FIELD_NUMBER: _ClassVar[int]
-    smtp_host: str
-    smtp_password: str
-    smtp_port: int
-    smtp_user: str
+    host: str
+    password: str
+    port: int
     use_tls: bool
-    def __init__(self, smtp_host: _Optional[str] = ..., smtp_port: _Optional[int] = ..., smtp_user: _Optional[str] = ..., smtp_password: _Optional[str] = ..., use_tls: bool = ...) -> None: ...
+    user: str
+    def __init__(self, host: _Optional[str] = ..., port: _Optional[int] = ..., user: _Optional[str] = ..., password: _Optional[str] = ..., use_tls: bool = ...) -> None: ...
 
 class NotificationPagerDuty(_message.Message):
     __slots__ = ["email", "service_id", "token", "urgency"]

@@ -50,10 +50,10 @@ message NotificationEmail {
 }
 
 message NotificationEmailSMTP {
-  optional string smtp_host = 1;
-  optional int32 smtp_port = 2;
-  optional string smtp_user = 3;
-  optional string smtp_password = 4;
+  optional string host = 1;
+  optional int32 port = 2;
+  optional string user = 3;
+  optional string password = 4;
   optional bool use_tls = 5;
 }
 

@@ -113,21 +113,21 @@ export enum NotificationEmail_Type {
  */
 export interface NotificationEmailSMTP {
     /**
-     * @generated from protobuf field: optional string smtp_host = 1;
+     * @generated from protobuf field: optional string host = 1;
      */
-    smtpHost?: string;
+    host?: string;
     /**
-     * @generated from protobuf field: optional int32 smtp_port = 2;
+     * @generated from protobuf field: optional int32 port = 2;
      */
-    smtpPort?: number;
+    port?: number;
     /**
-     * @generated from protobuf field: optional string smtp_user = 3;
+     * @generated from protobuf field: optional string user = 3;
      */
-    smtpUser?: string;
+    user?: string;
     /**
-     * @generated from protobuf field: optional string smtp_password = 4;
+     * @generated from protobuf field: optional string password = 4;
      */
-    smtpPassword?: string;
+    password?: string;
     /**
      * @generated from protobuf field: optional bool use_tls = 5;
      */
@@ -265,10 +265,10 @@ export const NotificationEmail = new NotificationEmail$Type();
 class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSMTP> {
     constructor() {
         super("protos.NotificationEmailSMTP", [
-            { no: 1, name: "smtp_host", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "smtp_port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "smtp_user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "smtp_password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "host", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "port", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "user", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "password", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "use_tls", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
