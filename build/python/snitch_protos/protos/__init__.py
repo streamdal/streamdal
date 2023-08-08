@@ -169,7 +169,7 @@ class PipelineStep(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class LiveInfo(betterproto.Message):
-    audience: List["Audience"] = betterproto.message_field(1)
+    audiences: List["Audience"] = betterproto.message_field(1)
     """If empty, client has not announced any audiences"""
 
     client: "ClientInfo" = betterproto.message_field(2)

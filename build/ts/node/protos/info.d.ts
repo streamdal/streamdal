@@ -8,9 +8,9 @@ export interface LiveInfo {
     /**
      * If empty, client has not announced any audiences
      *
-     * @generated from protobuf field: repeated protos.Audience audience = 1;
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
-    audience: Audience[];
+    audiences: Audience[];
     /**
      * @generated from protobuf field: protos.ClientInfo client = 2;
      */

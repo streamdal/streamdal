@@ -11,9 +11,9 @@ export interface LiveInfo {
     /**
      * If empty, client has not announced any audiences
      *
-     * @generated from protobuf field: repeated protos.Audience audience = 1;
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
-    audience: Audience[];
+    audiences: Audience[];
     /**
      * @generated from protobuf field: protos.ClientInfo client = 2;
      */
@@ -117,7 +117,7 @@ export enum ClientType {
 class LiveInfo$Type extends MessageType<LiveInfo> {
     constructor() {
         super("protos.LiveInfo", [
-            { no: 1, name: "audience", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 2, name: "client", kind: "message", T: () => ClientInfo }
         ]);
     }

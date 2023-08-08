@@ -9,7 +9,7 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
 message LiveInfo {
   // If empty, client has not announced any audiences
-  repeated Audience audience = 1;
+  repeated Audience audiences = 1;
   ClientInfo client = 2;
 }
 

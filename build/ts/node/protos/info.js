@@ -40,7 +40,7 @@ export var ClientType;
 class LiveInfo$Type extends MessageType {
     constructor() {
         super("protos.LiveInfo", [
-            { no: 1, name: "audience", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 2, name: "client", kind: "message", T: () => ClientInfo }
         ]);
     }

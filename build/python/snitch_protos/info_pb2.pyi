@@ -36,12 +36,12 @@ class ClientInfo(_message.Message):
     def __init__(self, client_type: _Optional[_Union[ClientType, str]] = ..., library_name: _Optional[str] = ..., library_version: _Optional[str] = ..., language: _Optional[str] = ..., arch: _Optional[str] = ..., os: _Optional[str] = ..., _session_id: _Optional[str] = ..., _service_name: _Optional[str] = ..., _node_name: _Optional[str] = ...) -> None: ...
 
 class LiveInfo(_message.Message):
-    __slots__ = ["audience", "client"]
-    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["audiences", "client"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     CLIENT_FIELD_NUMBER: _ClassVar[int]
-    audience: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
+    audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
     client: ClientInfo
-    def __init__(self, audience: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., client: _Optional[_Union[ClientInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., client: _Optional[_Union[ClientInfo, _Mapping]] = ...) -> None: ...
 
 class PipelineInfo(_message.Message):
     __slots__ = ["audiences", "pipeline", "state"]
