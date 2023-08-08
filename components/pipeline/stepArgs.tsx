@@ -12,6 +12,8 @@ export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "STRING_LENGTH_MIN",
   "STRING_LENGTH_MAX",
   "NUMERIC_EQUAL_TO",
+  "STRING_CONTAINS_ANY",
+  "STRING_CONTAINS_ALL",
   "NUMERIC_GREATER_THAN",
   "NUMERIC_GREATER_EQUAL",
   "NUMERIC_LESS_THAN",
@@ -21,8 +23,6 @@ export const oneArgTypes: (keyof typeof DetectiveType)[] = [
 ];
 
 export const nArgTypes: (keyof typeof DetectiveType)[] = [
-  "STRING_CONTAINS_ANY",
-  "STRING_CONTAINS_ALL",
   "STRING_LENGTH_RANGE",
   "NUMERIC_RANGE",
 ];
@@ -49,7 +49,7 @@ export const StepArg = (
   { stepIndex, argIndex, data, setData, errors }: StepArgType,
 ) => (
   <FormInput
-    name={`steps[${stepIndex}].step.detective.args[${argIndex}]`}
+    name={`steps.${stepIndex}.step.detective.args.${argIndex}`}
     data={data}
     setData={setData}
     label="Arg"

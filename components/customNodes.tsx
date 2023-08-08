@@ -79,7 +79,9 @@ export const Producer = ({ data }: { data: ActorNodeData }) => {
         <ProducerIcon />
         {data.pipeline.audience && (
           <a
-            href={`/service/${encodeURIComponent(data.pipeline.audience.serviceName)}/component/${
+            href={`/service/${
+              encodeURIComponent(data.pipeline.audience.serviceName)
+            }/component/${
               encodeURIComponent(data.pipeline.audience.componentName)
             }/${
               data.pipeline.audience.operationType === 1
@@ -156,7 +158,9 @@ export const Consumer = ({ data }: { data: ActorNodeData }) => {
         <ConsumerIcon className={"mx-2"} />
         {data.pipeline.audience && (
           <a
-            href={`/service/${encodeURIComponent(data.pipeline.audience.serviceName)}/component/${
+            href={`/service/${
+              encodeURIComponent(data.pipeline.audience.serviceName)
+            }/component/${
               encodeURIComponent(data.pipeline.audience.componentName)
             }/${
               data.pipeline.audience.operationType === 1

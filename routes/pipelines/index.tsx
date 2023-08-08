@@ -8,7 +8,7 @@ import { Layout } from "../../components/layout.tsx";
 import Flow from "../../islands/flow.tsx";
 import Pipelines from "../../islands/pipelines.tsx";
 import { getPipelines, getServiceMap } from "../../lib/fetch.ts";
-import { Success } from "./[id]/delete.tsx";
+import { SuccessType } from "./[id]/delete.tsx";
 
 export const handler: Handlers<any> = {
   async GET(_req, ctx) {
@@ -31,13 +31,16 @@ export default function PipelinesRoute(
     {
       pipelines: Pipeline[];
       serviceMap: GetServiceMapResponse;
-      success: Success;
+      success: SuccessType;
     }
   >,
 ) {
   return (
     <Layout>
-      <Pipelines pipelines={props?.data?.pipelines} />
+      <Pipelines
+        pipelines={props?.data?.pipelines}
+        success={props?.data?.success}
+      />
       <ReactFlowProvider>
         <Flow data={props?.data?.serviceMap} />
       </ReactFlowProvider>

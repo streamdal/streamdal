@@ -14,11 +14,12 @@ import {
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { DeleteModal } from "../../../components/modals/deleteModal.tsx";
-import Pipelines from "../../../islands/pipelines.tsx";
+import { ErrorType } from "../../../components/form/validate.ts";
 
-export type Success = {
+export type SuccessType = {
   status: boolean;
   message: string;
+  errors?: ErrorType;
 };
 
 export const handler: Handlers = {
@@ -35,11 +36,14 @@ export const handler: Handlers = {
   },
   async POST(req, ctx) {
     const response = await deletePipeline(ctx.params.id);
+
     return new Response("", {
       status: 307,
       success: {
         status: response.code === ResponseCode.OK,
-        successMessage: "Successfully deleted",
+        message: response.code === ResponseCode.OK
+          ? "Successfully deleted"
+          : response.message,
       },
       headers: { Location: "/pipelines" },
     });
