@@ -39,14 +39,18 @@ export const newStep = {
   onFailure: [],
   step: {
     oneofKind: "detective",
-    detective: { type: DetectiveType.BOOLEAN_TRUE, path: "", args: [""] },
+    detective: {
+      type: DetectiveType.BOOLEAN_TRUE,
+      path: "",
+      args: [""],
+    },
   },
 };
 
-export const newPipeline = {
+export const newPipeline: Pipeline = {
   id: "",
   name: "",
-  steps: [newStep],
+  steps: [newStep as PipelineStep],
 };
 
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
@@ -176,21 +180,22 @@ export const pipelineSchema = zfd.formData({
 export type PipelineType = z.infer<typeof pipelineSchema>;
 
 const PipelineDetail = (
-  { pipeline, success: successProp }: {
+  { pipeline, success }: {
     pipeline: Pipeline;
     success: SuccessType;
   },
 ) => {
   const [open, setOpen] = useState([0]);
-  const [success, setSuccess] = useState(successProp);
 
   //
   // typing the initializer to force preact useState hooks to
   // properly type this since it doesn't support useState<type>
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState(pipeline);
+  const [data, setData] = useState({});
   const [toastOpen, setToastOpen] = useState(false);
+  const [dragId, setDragId] = useState(null);
+  const [canDrag, setCanDrag] = useState(false);
 
   useEffect(() => {
     if (success?.message) {
@@ -199,11 +204,25 @@ const PipelineDetail = (
   }, [success]);
 
   useEffect(() => {
-    setData(pipeline);
+    setData({
+      ...pipeline,
+      steps: pipeline.steps.map((s, i) => ({
+        ...s,
+        dragId: crypto.randomUUID(),
+        dragOrder: i,
+      })),
+    });
   }, [pipeline]);
 
   const addStep = () => {
-    setData({ ...data, steps: [...data.steps, ...[newStep]] });
+    setData({
+      ...data,
+      steps: [...data.steps, ...[{
+        ...newStep,
+        dragId: crypto.randomUUID(),
+        dragOrder: data.steps.length,
+      }]],
+    });
   };
 
   const onSubmit = async (e: any) => {
@@ -215,6 +234,32 @@ const PipelineDetail = (
       e.preventDefault();
       return;
     }
+  };
+
+  const handleDrag = (ev: React.DragEvent<HTMLDivElement>) => {
+    setDragId(ev.currentTarget.id);
+  };
+
+  const handleDrop = (ev: React.DragEvent<HTMLDivElement>) => {
+    const dragStep = data.steps.find((s) => s.dragId === dragId);
+    const dropStep = data.steps.find((s) => s.dragId === ev.currentTarget.id);
+    const dragOrder = dragStep.dragOrder;
+    const dropOrder = dropStep.dragOrder;
+
+    setData(
+      {
+        ...data,
+        steps: data.steps.map((s) => ({
+          ...s,
+          dragOrder: s.dragId === dragId
+            ? dropOrder
+            : s.dragId === ev.currentTarget.id
+            ? dragOrder
+            : s.dragOrder,
+        })),
+      },
+    );
+    setDragId(null);
   };
 
   return (
@@ -284,8 +329,8 @@ const PipelineDetail = (
             />
             <Tooltip targetId="step-add" message="Add a new step" />
           </div>
-          {data?.steps?.map((
-            step: PipelineStep,
+          {{ ...data }?.steps?.sort((a, b) => a.dragOrder - b.dragOrder).map((
+            step: PipelineStep & { dragId: string },
             i: number,
           ) => (
             <div class="flex flex-row items-start mb-6">
@@ -293,10 +338,21 @@ const PipelineDetail = (
                 {i + 1}
               </div>
               <div class="rounded-md border border-twilight w-full">
-                <div class="flex flex-row w-full justify-between px-[9px] py-[13px]">
+                <div
+                  class="flex flex-row w-full justify-between px-[9px] py-[13px]"
+                  id={step.dragId}
+                  draggable={canDrag}
+                  onDragOver={(ev) => ev.preventDefault()}
+                  onDragStart={handleDrag}
+                  onDrop={handleDrop}
+                >
                   <div class="flex flex-row">
                     <div class="mr-2">
-                      <IconGripVertical class="w-6 h-6 text-twilight cursor-pointer" />
+                      <IconGripVertical
+                        class="w-6 h-6 text-twilight cursor-grab"
+                        onMouseEnter={() => setCanDrag(true)}
+                        onMouseLeave={() => setCanDrag(true)}
+                      />
                     </div>
                     <div class="text-[16px] font-medium mr-2">
                       <InlineInput
@@ -401,7 +457,6 @@ const PipelineDetail = (
           ))}
         </div>
         <div class="flex flex-row justify-end mr-6 mb-6">
-          <button className="btn-secondary mr-2">Cancel</button>
           <button class="btn-heimdal" type="submit">Save</button>
         </div>
       </form>
