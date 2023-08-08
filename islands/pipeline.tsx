@@ -30,8 +30,7 @@ import {
   StepArgs,
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
-import { SuccessToast } from "../components/toasts/success.tsx";
-import { ErrorToast } from "../components/toasts/error.tsx";
+import { Toast } from "../components/toasts/toast.tsx";
 
 export const newStep = {
   name: "",
@@ -185,15 +184,20 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState(pipeline);
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    if (success?.message) {
+      setToastOpen(true);
+    }
+  }, [success]);
 
   useEffect(() => {
     setData(pipeline);
   }, [pipeline]);
 
   const addStep = () => {
-    const n = { ...data, steps: [...data.steps, ...[newStep]] };
-    console.log("new", n);
-    setData(n);
+    setData({ ...data, steps: [...data.steps, ...[newStep]] });
   };
 
   const onSubmit = async (e: any) => {
@@ -224,14 +228,13 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
 
   return (
     <>
-      <div class="relative">
-        {success?.message && success.status && (
-          <SuccessToast message={success.message} />
-        )}
-        {success?.message && !success.status && (
-          <ErrorToast message={success.message} />
-        )}
-      </div>
+      <Toast
+        open={toastOpen}
+        setOpen={setToastOpen}
+        type={success.status ? "success" : "error"}
+        message={success.message}
+      />
+
       <form onSubmit={onSubmit} action="/pipelines/add" method="post">
         <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
           <div class="flex flex-row items-center">

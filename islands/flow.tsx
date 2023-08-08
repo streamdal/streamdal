@@ -39,6 +39,8 @@ export type Node = {
   };
 };
 
+const flowKey: string = "flow-storage";
+
 export default function Flow({ data }: { data: GetServiceMapResponse }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgeChange] = useEdgesState([]);
@@ -185,7 +187,6 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
     );
     const consumerNodes = consumers.map(
       (component: PipelineInfo, i: number) => {
-        console.log(component);
         const isCovered = i !== 0 ? true : false;
         return {
           id: `${2000 + i}`,
