@@ -16,7 +16,7 @@ export const getServiceMap = async () => {
 export const getPipelines = async () => {
   const { response } = await client.getPipelines({}, meta);
 
-  return response?.pipelines;
+  return response?.pipelines?.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 export const getPipeline = async (pipelineId: string) => {

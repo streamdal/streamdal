@@ -5,6 +5,9 @@ import { useEffect } from "preact/hooks";
 
 export type ToastType = "error" | "success";
 
+//
+// TODO: maybe move to a proper react context
+//  provider so state doesn't have to be passed ind
 export const Toast = (
   { message, type, open, setOpen, autoClose = true, closeDuration = 3000 }: {
     message: string;
