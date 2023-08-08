@@ -37,7 +37,9 @@ message NotificationEmail {
     TYPE_SES = 2;
   }
 
-  repeated string recipients = 1;
+  optional Type type = 1;
+
+  repeated string recipients = 2;
 
   oneof config {
     NotificationEmailSMTP smtp = 1000;
