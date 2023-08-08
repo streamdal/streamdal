@@ -31,6 +31,7 @@ import {
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { Toast } from "../components/toasts/toast.tsx";
+import { SuccessType } from "../routes/pipelines/[id]/delete.tsx";
 
 export const newStep = {
   name: "",
@@ -174,9 +175,14 @@ export const pipelineSchema = zfd.formData({
 
 export type PipelineType = z.infer<typeof pipelineSchema>;
 
-const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
+const PipelineDetail = (
+  { pipeline, success: successProp }: {
+    pipeline: Pipeline;
+    success: SuccessType;
+  },
+) => {
   const [open, setOpen] = useState([0]);
-  const [success, setSuccess] = useState({});
+  const [success, setSuccess] = useState(successProp);
 
   //
   // typing the initializer to force preact useState hooks to
@@ -201,29 +207,14 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
   };
 
   const onSubmit = async (e: any) => {
-    e.preventDefault();
     const formData = new FormData(e.target);
-
     const { errors } = validate(pipelineSchema, formData);
     setErrors(errors || {});
 
     if (errors) {
+      e.preventDefault();
       return;
     }
-
-    //
-    // TODO: prefer to simply submit the form so this
-    // can work without JS
-    const response = await fetch(
-      `/pipelines/save`,
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
-
-    const { success } = await response.json();
-    setSuccess(success);
   };
 
   return (
@@ -231,11 +222,11 @@ const PipelineDetail = ({ pipeline }: { pipeline: Pipeline }) => {
       <Toast
         open={toastOpen}
         setOpen={setToastOpen}
-        type={success.status ? "success" : "error"}
-        message={success.message}
+        type={!!success?.status ? "success" : "error"}
+        message={success?.message || ""}
       />
 
-      <form onSubmit={onSubmit} action="/pipelines/add" method="post">
+      <form onSubmit={onSubmit} action="/pipelines/save" method="post">
         <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
           <div class="flex flex-row items-center">
             <div class="text-[30px] font-medium mr-2 h-[54px]">
