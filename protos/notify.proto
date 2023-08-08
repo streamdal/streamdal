@@ -41,6 +41,8 @@ message NotificationEmail {
 
   repeated string recipients = 2;
 
+  optional string from_address = 3;
+
   oneof config {
     NotificationEmailSMTP smtp = 1000;
     NotificationEmailSES ses = 1001;
