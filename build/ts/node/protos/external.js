@@ -7,12 +7,12 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Audience } from "./common.js";
 import { Pipeline } from "./pipeline.js";
 import { ServiceInfo } from "./info.js";
-import { NotifyConfig } from "./notify.js";
+import { NotificationConfig } from "./notify.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class CreateNotificationRequest$Type extends MessageType {
     constructor() {
         super("protos.CreateNotificationRequest", [
-            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+            { no: 1, name: "notification", kind: "message", T: () => NotificationConfig }
         ]);
     }
 }
@@ -24,7 +24,7 @@ export const CreateNotificationRequest = new CreateNotificationRequest$Type();
 class UpdateNotificationRequest$Type extends MessageType {
     constructor() {
         super("protos.UpdateNotificationRequest", [
-            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+            { no: 1, name: "notification", kind: "message", T: () => NotificationConfig }
         ]);
     }
 }
@@ -58,7 +58,7 @@ export const GetNotificationsRequest = new GetNotificationsRequest$Type();
 class GetNotificationsResponse$Type extends MessageType {
     constructor() {
         super("protos.GetNotificationsResponse", [
-            { no: 1, name: "notifications", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => NotifyConfig } }
+            { no: 1, name: "notifications", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => NotificationConfig } }
         ]);
     }
 }
@@ -82,7 +82,7 @@ export const GetNotificationRequest = new GetNotificationRequest$Type();
 class GetNotificationResponse$Type extends MessageType {
     constructor() {
         super("protos.GetNotificationResponse", [
-            { no: 1, name: "notification", kind: "message", T: () => NotifyConfig }
+            { no: 1, name: "notification", kind: "message", T: () => NotificationConfig }
         ]);
     }
 }

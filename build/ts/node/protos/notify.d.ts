@@ -1,8 +1,8 @@
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf message protos.NotifyConfig
+ * @generated from protobuf message protos.NotificationConfig
  */
-export interface NotifyConfig {
+export interface NotificationConfig {
     /**
      * @generated from protobuf field: string id = 1;
      */
@@ -12,42 +12,42 @@ export interface NotifyConfig {
      */
     name: string;
     /**
-     * @generated from protobuf field: protos.NotifyType type = 3;
+     * @generated from protobuf field: protos.NotificationType type = 3;
      */
-    type: NotifyType;
+    type: NotificationType;
     /**
-     * @generated from protobuf field: repeated string pipelines = 4;
+     * @generated from protobuf field: string pipeline_id = 4;
      */
-    pipelines: string[];
+    pipelineId: string;
     /**
      * @generated from protobuf oneof: config
      */
     config: {
         oneofKind: "slack";
         /**
-         * @generated from protobuf field: protos.NotifySlack slack = 1000;
+         * @generated from protobuf field: protos.NotificationSlack slack = 1000;
          */
-        slack: NotifySlack;
+        slack: NotificationSlack;
     } | {
         oneofKind: "email";
         /**
-         * @generated from protobuf field: protos.NotifyEmail email = 1001;
+         * @generated from protobuf field: protos.NotificationEmail email = 1001;
          */
-        email: NotifyEmail;
+        email: NotificationEmail;
     } | {
         oneofKind: "pagerduty";
         /**
-         * @generated from protobuf field: protos.NotifyPagerDuty pagerduty = 1002;
+         * @generated from protobuf field: protos.NotificationPagerDuty pagerduty = 1002;
          */
-        pagerduty: NotifyPagerDuty;
+        pagerduty: NotificationPagerDuty;
     } | {
         oneofKind: undefined;
     };
 }
 /**
- * @generated from protobuf message protos.NotifySlack
+ * @generated from protobuf message protos.NotificationSlack
  */
-export interface NotifySlack {
+export interface NotificationSlack {
     /**
      * @generated from protobuf field: optional string bot_token = 1;
      */
@@ -58,18 +58,18 @@ export interface NotifySlack {
     channel?: string;
 }
 /**
- * @generated from protobuf message protos.NotifyEmail
+ * @generated from protobuf message protos.NotificationEmail
  */
-export interface NotifyEmail {
+export interface NotificationEmail {
     /**
      * @generated from protobuf field: repeated string recipients = 1;
      */
     recipients: string[];
 }
 /**
- * @generated from protobuf message protos.NotifyPagerDuty
+ * @generated from protobuf message protos.NotificationPagerDuty
  */
-export interface NotifyPagerDuty {
+export interface NotificationPagerDuty {
     /**
      * Auth token
      *
@@ -89,14 +89,14 @@ export interface NotifyPagerDuty {
      */
     serviceId: string;
     /**
-     * @generated from protobuf field: protos.NotifyPagerDuty.Urgency urgency = 4;
+     * @generated from protobuf field: protos.NotificationPagerDuty.Urgency urgency = 4;
      */
-    urgency: NotifyPagerDuty_Urgency;
+    urgency: NotificationPagerDuty_Urgency;
 }
 /**
- * @generated from protobuf enum protos.NotifyPagerDuty.Urgency
+ * @generated from protobuf enum protos.NotificationPagerDuty.Urgency
  */
-export declare enum NotifyPagerDuty_Urgency {
+export declare enum NotificationPagerDuty_Urgency {
     /**
      * @generated from protobuf enum value: URGENCY_UNSET = 0;
      */
@@ -111,52 +111,52 @@ export declare enum NotifyPagerDuty_Urgency {
     HIGH = 2
 }
 /**
- * @generated from protobuf enum protos.NotifyType
+ * @generated from protobuf enum protos.NotificationType
  */
-export declare enum NotifyType {
+export declare enum NotificationType {
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_UNSET = 0;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_SLACK = 1;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_SLACK = 1;
      */
     SLACK = 1,
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_EMAIL = 2;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_EMAIL = 2;
      */
     EMAIL = 2,
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_PAGERDUTY = 3;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_PAGERDUTY = 3;
      */
     PAGERDUTY = 3
 }
-declare class NotifyConfig$Type extends MessageType<NotifyConfig> {
+declare class NotificationConfig$Type extends MessageType<NotificationConfig> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyConfig
+ * @generated MessageType for protobuf message protos.NotificationConfig
  */
-export declare const NotifyConfig: NotifyConfig$Type;
-declare class NotifySlack$Type extends MessageType<NotifySlack> {
+export declare const NotificationConfig: NotificationConfig$Type;
+declare class NotificationSlack$Type extends MessageType<NotificationSlack> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.NotifySlack
+ * @generated MessageType for protobuf message protos.NotificationSlack
  */
-export declare const NotifySlack: NotifySlack$Type;
-declare class NotifyEmail$Type extends MessageType<NotifyEmail> {
+export declare const NotificationSlack: NotificationSlack$Type;
+declare class NotificationEmail$Type extends MessageType<NotificationEmail> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyEmail
+ * @generated MessageType for protobuf message protos.NotificationEmail
  */
-export declare const NotifyEmail: NotifyEmail$Type;
-declare class NotifyPagerDuty$Type extends MessageType<NotifyPagerDuty> {
+export declare const NotificationEmail: NotificationEmail$Type;
+declare class NotificationPagerDuty$Type extends MessageType<NotificationPagerDuty> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyPagerDuty
+ * @generated MessageType for protobuf message protos.NotificationPagerDuty
  */
-export declare const NotifyPagerDuty: NotifyPagerDuty$Type;
+export declare const NotificationPagerDuty: NotificationPagerDuty$Type;
 export {};

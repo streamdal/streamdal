@@ -28,8 +28,8 @@ class AttachPipelineRequest(_message.Message):
 class CreateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
-    notification: _notify_pb2.NotifyConfig
-    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotifyConfig, _Mapping]] = ...) -> None: ...
+    notification: _notify_pb2.NotificationConfig
+    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class CreatePipelineRequest(_message.Message):
     __slots__ = ["pipeline"]
@@ -66,8 +66,8 @@ class GetNotificationRequest(_message.Message):
 class GetNotificationResponse(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
-    notification: _notify_pb2.NotifyConfig
-    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotifyConfig, _Mapping]] = ...) -> None: ...
+    notification: _notify_pb2.NotificationConfig
+    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class GetNotificationsRequest(_message.Message):
     __slots__ = []
@@ -80,11 +80,11 @@ class GetNotificationsResponse(_message.Message):
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: _notify_pb2.NotifyConfig
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_notify_pb2.NotifyConfig, _Mapping]] = ...) -> None: ...
+        value: _notify_pb2.NotificationConfig
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
     NOTIFICATIONS_FIELD_NUMBER: _ClassVar[int]
-    notifications: _containers.MessageMap[str, _notify_pb2.NotifyConfig]
-    def __init__(self, notifications: _Optional[_Mapping[str, _notify_pb2.NotifyConfig]] = ...) -> None: ...
+    notifications: _containers.MessageMap[str, _notify_pb2.NotificationConfig]
+    def __init__(self, notifications: _Optional[_Mapping[str, _notify_pb2.NotificationConfig]] = ...) -> None: ...
 
 class GetPipelineRequest(_message.Message):
     __slots__ = ["pipeline_id"]
@@ -156,8 +156,8 @@ class TestResponse(_message.Message):
 class UpdateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
-    notification: _notify_pb2.NotifyConfig
-    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotifyConfig, _Mapping]] = ...) -> None: ...
+    notification: _notify_pb2.NotificationConfig
+    def __init__(self, notification: _Optional[_Union[_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class UpdatePipelineRequest(_message.Message):
     __slots__ = ["pipeline"]

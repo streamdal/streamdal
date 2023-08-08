@@ -39,11 +39,11 @@ service External {
 
 // Notifications
 message CreateNotificationRequest {
-  protos.NotifyConfig notification = 1;
+  protos.NotificationConfig notification = 1;
 }
 
 message UpdateNotificationRequest {
-  protos.NotifyConfig notification = 1;
+  protos.NotificationConfig notification = 1;
 }
 
 message DeleteNotificationRequest {
@@ -55,7 +55,7 @@ message GetNotificationsRequest {
 }
 
 message GetNotificationsResponse {
-  map<string,protos.NotifyConfig> notifications = 1;
+  map<string,protos.NotificationConfig> notifications = 1;
 }
 
 message GetNotificationRequest {
@@ -63,7 +63,7 @@ message GetNotificationRequest {
 }
 
 message GetNotificationResponse {
-  protos.NotifyConfig notification = 1;
+  protos.NotificationConfig notification = 1;
 }
 
 message AttachNotificationRequest {

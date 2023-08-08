@@ -4,39 +4,39 @@ package protos;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-enum NotifyType {
-  NOTIFY_TYPE_UNSET = 0;
-  NOTIFY_TYPE_SLACK = 1;
-  NOTIFY_TYPE_EMAIL = 2;
-  NOTIFY_TYPE_PAGERDUTY = 3;
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSET = 0;
+  NOTIFICATION_TYPE_SLACK = 1;
+  NOTIFICATION_TYPE_EMAIL = 2;
+  NOTIFICATION_TYPE_PAGERDUTY = 3;
 }
 
-message NotifyConfig {
+message NotificationConfig {
   string id = 1;
 
   string name = 2;
 
-  NotifyType type = 3;
+  NotificationType type = 3;
 
-  repeated string pipelines = 4;
+  string pipeline_id = 4;
 
   oneof config {
-    NotifySlack slack = 1000;
-    NotifyEmail email = 1001;
-    NotifyPagerDuty pagerduty = 1002;
+    NotificationSlack slack = 1000;
+    NotificationEmail email = 1001;
+    NotificationPagerDuty pagerduty = 1002;
   }
 }
 
-message NotifySlack {
+message NotificationSlack {
   optional string bot_token = 1;
   optional string channel = 2;
 }
 
-message NotifyEmail {
+message NotificationEmail {
   repeated string recipients = 1;
 }
 
-message NotifyPagerDuty {
+message NotificationPagerDuty {
   enum Urgency {
     URGENCY_UNSET = 0;
     URGENCY_LOW = 1;

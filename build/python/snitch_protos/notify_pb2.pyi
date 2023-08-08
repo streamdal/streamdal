@@ -5,36 +5,36 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
-NOTIFY_TYPE_EMAIL: NotifyType
-NOTIFY_TYPE_PAGERDUTY: NotifyType
-NOTIFY_TYPE_SLACK: NotifyType
-NOTIFY_TYPE_UNSET: NotifyType
+NOTIFICATION_TYPE_EMAIL: NotificationType
+NOTIFICATION_TYPE_PAGERDUTY: NotificationType
+NOTIFICATION_TYPE_SLACK: NotificationType
+NOTIFICATION_TYPE_UNSET: NotificationType
 
-class NotifyConfig(_message.Message):
-    __slots__ = ["email", "id", "name", "pagerduty", "pipelines", "slack", "type"]
+class NotificationConfig(_message.Message):
+    __slots__ = ["email", "id", "name", "pagerduty", "pipeline_id", "slack", "type"]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     PAGERDUTY_FIELD_NUMBER: _ClassVar[int]
-    PIPELINES_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     SLACK_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    email: NotifyEmail
+    email: NotificationEmail
     id: str
     name: str
-    pagerduty: NotifyPagerDuty
-    pipelines: _containers.RepeatedScalarFieldContainer[str]
-    slack: NotifySlack
-    type: NotifyType
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[NotifyType, str]] = ..., pipelines: _Optional[_Iterable[str]] = ..., slack: _Optional[_Union[NotifySlack, _Mapping]] = ..., email: _Optional[_Union[NotifyEmail, _Mapping]] = ..., pagerduty: _Optional[_Union[NotifyPagerDuty, _Mapping]] = ...) -> None: ...
+    pagerduty: NotificationPagerDuty
+    pipeline_id: str
+    slack: NotificationSlack
+    type: NotificationType
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[NotificationType, str]] = ..., pipeline_id: _Optional[str] = ..., slack: _Optional[_Union[NotificationSlack, _Mapping]] = ..., email: _Optional[_Union[NotificationEmail, _Mapping]] = ..., pagerduty: _Optional[_Union[NotificationPagerDuty, _Mapping]] = ...) -> None: ...
 
-class NotifyEmail(_message.Message):
+class NotificationEmail(_message.Message):
     __slots__ = ["recipients"]
     RECIPIENTS_FIELD_NUMBER: _ClassVar[int]
     recipients: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, recipients: _Optional[_Iterable[str]] = ...) -> None: ...
 
-class NotifyPagerDuty(_message.Message):
+class NotificationPagerDuty(_message.Message):
     __slots__ = ["email", "service_id", "token", "urgency"]
     class Urgency(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
@@ -42,16 +42,16 @@ class NotifyPagerDuty(_message.Message):
     SERVICE_ID_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     URGENCY_FIELD_NUMBER: _ClassVar[int]
-    URGENCY_HIGH: NotifyPagerDuty.Urgency
-    URGENCY_LOW: NotifyPagerDuty.Urgency
-    URGENCY_UNSET: NotifyPagerDuty.Urgency
+    URGENCY_HIGH: NotificationPagerDuty.Urgency
+    URGENCY_LOW: NotificationPagerDuty.Urgency
+    URGENCY_UNSET: NotificationPagerDuty.Urgency
     email: str
     service_id: str
     token: str
-    urgency: NotifyPagerDuty.Urgency
-    def __init__(self, token: _Optional[str] = ..., email: _Optional[str] = ..., service_id: _Optional[str] = ..., urgency: _Optional[_Union[NotifyPagerDuty.Urgency, str]] = ...) -> None: ...
+    urgency: NotificationPagerDuty.Urgency
+    def __init__(self, token: _Optional[str] = ..., email: _Optional[str] = ..., service_id: _Optional[str] = ..., urgency: _Optional[_Union[NotificationPagerDuty.Urgency, str]] = ...) -> None: ...
 
-class NotifySlack(_message.Message):
+class NotificationSlack(_message.Message):
     __slots__ = ["bot_token", "channel"]
     BOT_TOKEN_FIELD_NUMBER: _ClassVar[int]
     CHANNEL_FIELD_NUMBER: _ClassVar[int]
@@ -59,5 +59,5 @@ class NotifySlack(_message.Message):
     channel: str
     def __init__(self, bot_token: _Optional[str] = ..., channel: _Optional[str] = ...) -> None: ...
 
-class NotifyType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class NotificationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

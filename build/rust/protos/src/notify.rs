@@ -26,41 +26,41 @@
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.NotifyConfig)
-pub struct NotifyConfig {
+// @@protoc_insertion_point(message:protos.NotificationConfig)
+pub struct NotificationConfig {
     // message fields
-    // @@protoc_insertion_point(field:protos.NotifyConfig.id)
+    // @@protoc_insertion_point(field:protos.NotificationConfig.id)
     pub id: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.NotifyConfig.name)
+    // @@protoc_insertion_point(field:protos.NotificationConfig.name)
     pub name: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.NotifyConfig.type)
-    pub type_: ::protobuf::EnumOrUnknown<NotifyType>,
-    // @@protoc_insertion_point(field:protos.NotifyConfig.pipelines)
-    pub pipelines: ::std::vec::Vec<::std::string::String>,
+    // @@protoc_insertion_point(field:protos.NotificationConfig.type)
+    pub type_: ::protobuf::EnumOrUnknown<NotificationType>,
+    // @@protoc_insertion_point(field:protos.NotificationConfig.pipeline_id)
+    pub pipeline_id: ::std::string::String,
     // message oneof groups
-    pub config: ::std::option::Option<notify_config::Config>,
+    pub config: ::std::option::Option<notification_config::Config>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.NotifyConfig.special_fields)
+    // @@protoc_insertion_point(special_field:protos.NotificationConfig.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a NotifyConfig {
-    fn default() -> &'a NotifyConfig {
-        <NotifyConfig as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a NotificationConfig {
+    fn default() -> &'a NotificationConfig {
+        <NotificationConfig as ::protobuf::Message>::default_instance()
     }
 }
 
-impl NotifyConfig {
-    pub fn new() -> NotifyConfig {
+impl NotificationConfig {
+    pub fn new() -> NotificationConfig {
         ::std::default::Default::default()
     }
 
-    // .protos.NotifySlack slack = 1000;
+    // .protos.NotificationSlack slack = 1000;
 
-    pub fn slack(&self) -> &NotifySlack {
+    pub fn slack(&self) -> &NotificationSlack {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Slack(ref v)) => v,
-            _ => <NotifySlack as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(notification_config::Config::Slack(ref v)) => v,
+            _ => <NotificationSlack as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -70,46 +70,46 @@ impl NotifyConfig {
 
     pub fn has_slack(&self) -> bool {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Slack(..)) => true,
+            ::std::option::Option::Some(notification_config::Config::Slack(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_slack(&mut self, v: NotifySlack) {
-        self.config = ::std::option::Option::Some(notify_config::Config::Slack(v))
+    pub fn set_slack(&mut self, v: NotificationSlack) {
+        self.config = ::std::option::Option::Some(notification_config::Config::Slack(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_slack(&mut self) -> &mut NotifySlack {
-        if let ::std::option::Option::Some(notify_config::Config::Slack(_)) = self.config {
+    pub fn mut_slack(&mut self) -> &mut NotificationSlack {
+        if let ::std::option::Option::Some(notification_config::Config::Slack(_)) = self.config {
         } else {
-            self.config = ::std::option::Option::Some(notify_config::Config::Slack(NotifySlack::new()));
+            self.config = ::std::option::Option::Some(notification_config::Config::Slack(NotificationSlack::new()));
         }
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Slack(ref mut v)) => v,
+            ::std::option::Option::Some(notification_config::Config::Slack(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_slack(&mut self) -> NotifySlack {
+    pub fn take_slack(&mut self) -> NotificationSlack {
         if self.has_slack() {
             match self.config.take() {
-                ::std::option::Option::Some(notify_config::Config::Slack(v)) => v,
+                ::std::option::Option::Some(notification_config::Config::Slack(v)) => v,
                 _ => panic!(),
             }
         } else {
-            NotifySlack::new()
+            NotificationSlack::new()
         }
     }
 
-    // .protos.NotifyEmail email = 1001;
+    // .protos.NotificationEmail email = 1001;
 
-    pub fn email(&self) -> &NotifyEmail {
+    pub fn email(&self) -> &NotificationEmail {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Email(ref v)) => v,
-            _ => <NotifyEmail as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(notification_config::Config::Email(ref v)) => v,
+            _ => <NotificationEmail as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -119,46 +119,46 @@ impl NotifyConfig {
 
     pub fn has_email(&self) -> bool {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Email(..)) => true,
+            ::std::option::Option::Some(notification_config::Config::Email(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_email(&mut self, v: NotifyEmail) {
-        self.config = ::std::option::Option::Some(notify_config::Config::Email(v))
+    pub fn set_email(&mut self, v: NotificationEmail) {
+        self.config = ::std::option::Option::Some(notification_config::Config::Email(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_email(&mut self) -> &mut NotifyEmail {
-        if let ::std::option::Option::Some(notify_config::Config::Email(_)) = self.config {
+    pub fn mut_email(&mut self) -> &mut NotificationEmail {
+        if let ::std::option::Option::Some(notification_config::Config::Email(_)) = self.config {
         } else {
-            self.config = ::std::option::Option::Some(notify_config::Config::Email(NotifyEmail::new()));
+            self.config = ::std::option::Option::Some(notification_config::Config::Email(NotificationEmail::new()));
         }
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Email(ref mut v)) => v,
+            ::std::option::Option::Some(notification_config::Config::Email(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_email(&mut self) -> NotifyEmail {
+    pub fn take_email(&mut self) -> NotificationEmail {
         if self.has_email() {
             match self.config.take() {
-                ::std::option::Option::Some(notify_config::Config::Email(v)) => v,
+                ::std::option::Option::Some(notification_config::Config::Email(v)) => v,
                 _ => panic!(),
             }
         } else {
-            NotifyEmail::new()
+            NotificationEmail::new()
         }
     }
 
-    // .protos.NotifyPagerDuty pagerduty = 1002;
+    // .protos.NotificationPagerDuty pagerduty = 1002;
 
-    pub fn pagerduty(&self) -> &NotifyPagerDuty {
+    pub fn pagerduty(&self) -> &NotificationPagerDuty {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Pagerduty(ref v)) => v,
-            _ => <NotifyPagerDuty as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(notification_config::Config::Pagerduty(ref v)) => v,
+            _ => <NotificationPagerDuty as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -168,37 +168,37 @@ impl NotifyConfig {
 
     pub fn has_pagerduty(&self) -> bool {
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Pagerduty(..)) => true,
+            ::std::option::Option::Some(notification_config::Config::Pagerduty(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_pagerduty(&mut self, v: NotifyPagerDuty) {
-        self.config = ::std::option::Option::Some(notify_config::Config::Pagerduty(v))
+    pub fn set_pagerduty(&mut self, v: NotificationPagerDuty) {
+        self.config = ::std::option::Option::Some(notification_config::Config::Pagerduty(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_pagerduty(&mut self) -> &mut NotifyPagerDuty {
-        if let ::std::option::Option::Some(notify_config::Config::Pagerduty(_)) = self.config {
+    pub fn mut_pagerduty(&mut self) -> &mut NotificationPagerDuty {
+        if let ::std::option::Option::Some(notification_config::Config::Pagerduty(_)) = self.config {
         } else {
-            self.config = ::std::option::Option::Some(notify_config::Config::Pagerduty(NotifyPagerDuty::new()));
+            self.config = ::std::option::Option::Some(notification_config::Config::Pagerduty(NotificationPagerDuty::new()));
         }
         match self.config {
-            ::std::option::Option::Some(notify_config::Config::Pagerduty(ref mut v)) => v,
+            ::std::option::Option::Some(notification_config::Config::Pagerduty(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_pagerduty(&mut self) -> NotifyPagerDuty {
+    pub fn take_pagerduty(&mut self) -> NotificationPagerDuty {
         if self.has_pagerduty() {
             match self.config.take() {
-                ::std::option::Option::Some(notify_config::Config::Pagerduty(v)) => v,
+                ::std::option::Option::Some(notification_config::Config::Pagerduty(v)) => v,
                 _ => panic!(),
             }
         } else {
-            NotifyPagerDuty::new()
+            NotificationPagerDuty::new()
         }
     }
 
@@ -207,56 +207,56 @@ impl NotifyConfig {
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "id",
-            |m: &NotifyConfig| { &m.id },
-            |m: &mut NotifyConfig| { &mut m.id },
+            |m: &NotificationConfig| { &m.id },
+            |m: &mut NotificationConfig| { &mut m.id },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "name",
-            |m: &NotifyConfig| { &m.name },
-            |m: &mut NotifyConfig| { &mut m.name },
+            |m: &NotificationConfig| { &m.name },
+            |m: &mut NotificationConfig| { &mut m.name },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
-            |m: &NotifyConfig| { &m.type_ },
-            |m: &mut NotifyConfig| { &mut m.type_ },
+            |m: &NotificationConfig| { &m.type_ },
+            |m: &mut NotificationConfig| { &mut m.type_ },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
-            "pipelines",
-            |m: &NotifyConfig| { &m.pipelines },
-            |m: &mut NotifyConfig| { &mut m.pipelines },
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &NotificationConfig| { &m.pipeline_id },
+            |m: &mut NotificationConfig| { &mut m.pipeline_id },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotifySlack>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotificationSlack>(
             "slack",
-            NotifyConfig::has_slack,
-            NotifyConfig::slack,
-            NotifyConfig::mut_slack,
-            NotifyConfig::set_slack,
+            NotificationConfig::has_slack,
+            NotificationConfig::slack,
+            NotificationConfig::mut_slack,
+            NotificationConfig::set_slack,
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotifyEmail>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotificationEmail>(
             "email",
-            NotifyConfig::has_email,
-            NotifyConfig::email,
-            NotifyConfig::mut_email,
-            NotifyConfig::set_email,
+            NotificationConfig::has_email,
+            NotificationConfig::email,
+            NotificationConfig::mut_email,
+            NotificationConfig::set_email,
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotifyPagerDuty>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, NotificationPagerDuty>(
             "pagerduty",
-            NotifyConfig::has_pagerduty,
-            NotifyConfig::pagerduty,
-            NotifyConfig::mut_pagerduty,
-            NotifyConfig::set_pagerduty,
+            NotificationConfig::has_pagerduty,
+            NotificationConfig::pagerduty,
+            NotificationConfig::mut_pagerduty,
+            NotificationConfig::set_pagerduty,
         ));
-        oneofs.push(notify_config::Config::generated_oneof_descriptor_data());
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotifyConfig>(
-            "NotifyConfig",
+        oneofs.push(notification_config::Config::generated_oneof_descriptor_data());
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotificationConfig>(
+            "NotificationConfig",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for NotifyConfig {
-    const NAME: &'static str = "NotifyConfig";
+impl ::protobuf::Message for NotificationConfig {
+    const NAME: &'static str = "NotificationConfig";
 
     fn is_initialized(&self) -> bool {
         true
@@ -275,16 +275,16 @@ impl ::protobuf::Message for NotifyConfig {
                     self.type_ = is.read_enum_or_unknown()?;
                 },
                 34 => {
-                    self.pipelines.push(is.read_string()?);
+                    self.pipeline_id = is.read_string()?;
                 },
                 8002 => {
-                    self.config = ::std::option::Option::Some(notify_config::Config::Slack(is.read_message()?));
+                    self.config = ::std::option::Option::Some(notification_config::Config::Slack(is.read_message()?));
                 },
                 8010 => {
-                    self.config = ::std::option::Option::Some(notify_config::Config::Email(is.read_message()?));
+                    self.config = ::std::option::Option::Some(notification_config::Config::Email(is.read_message()?));
                 },
                 8018 => {
-                    self.config = ::std::option::Option::Some(notify_config::Config::Pagerduty(is.read_message()?));
+                    self.config = ::std::option::Option::Some(notification_config::Config::Pagerduty(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -304,23 +304,23 @@ impl ::protobuf::Message for NotifyConfig {
         if !self.name.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.name);
         }
-        if self.type_ != ::protobuf::EnumOrUnknown::new(NotifyType::NOTIFY_TYPE_UNSET) {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET) {
             my_size += ::protobuf::rt::int32_size(3, self.type_.value());
         }
-        for value in &self.pipelines {
-            my_size += ::protobuf::rt::string_size(4, &value);
-        };
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.pipeline_id);
+        }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
-                &notify_config::Config::Slack(ref v) => {
+                &notification_config::Config::Slack(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &notify_config::Config::Email(ref v) => {
+                &notification_config::Config::Email(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &notify_config::Config::Pagerduty(ref v) => {
+                &notification_config::Config::Pagerduty(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -338,21 +338,21 @@ impl ::protobuf::Message for NotifyConfig {
         if !self.name.is_empty() {
             os.write_string(2, &self.name)?;
         }
-        if self.type_ != ::protobuf::EnumOrUnknown::new(NotifyType::NOTIFY_TYPE_UNSET) {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET) {
             os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
-        for v in &self.pipelines {
-            os.write_string(4, &v)?;
-        };
+        if !self.pipeline_id.is_empty() {
+            os.write_string(4, &self.pipeline_id)?;
+        }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
-                &notify_config::Config::Slack(ref v) => {
+                &notification_config::Config::Slack(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(1000, v, os)?;
                 },
-                &notify_config::Config::Email(ref v) => {
+                &notification_config::Config::Email(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(1001, v, os)?;
                 },
-                &notify_config::Config::Pagerduty(ref v) => {
+                &notification_config::Config::Pagerduty(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(1002, v, os)?;
                 },
             };
@@ -369,27 +369,27 @@ impl ::protobuf::Message for NotifyConfig {
         &mut self.special_fields
     }
 
-    fn new() -> NotifyConfig {
-        NotifyConfig::new()
+    fn new() -> NotificationConfig {
+        NotificationConfig::new()
     }
 
     fn clear(&mut self) {
         self.id.clear();
         self.name.clear();
-        self.type_ = ::protobuf::EnumOrUnknown::new(NotifyType::NOTIFY_TYPE_UNSET);
-        self.pipelines.clear();
+        self.type_ = ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET);
+        self.pipeline_id.clear();
         self.config = ::std::option::Option::None;
         self.config = ::std::option::Option::None;
         self.config = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static NotifyConfig {
-        static instance: NotifyConfig = NotifyConfig {
+    fn default_instance() -> &'static NotificationConfig {
+        static instance: NotificationConfig = NotificationConfig {
             id: ::std::string::String::new(),
             name: ::std::string::String::new(),
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
-            pipelines: ::std::vec::Vec::new(),
+            pipeline_id: ::std::string::String::new(),
             config: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -397,36 +397,36 @@ impl ::protobuf::Message for NotifyConfig {
     }
 }
 
-impl ::protobuf::MessageFull for NotifyConfig {
+impl ::protobuf::MessageFull for NotificationConfig {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotifyConfig").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotificationConfig").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for NotifyConfig {
+impl ::std::fmt::Display for NotificationConfig {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for NotifyConfig {
+impl ::protobuf::reflect::ProtobufValue for NotificationConfig {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-/// Nested message and enums of message `NotifyConfig`
-pub mod notify_config {
+/// Nested message and enums of message `NotificationConfig`
+pub mod notification_config {
 
     #[derive(Clone,PartialEq,Debug)]
     #[non_exhaustive]
-    // @@protoc_insertion_point(oneof:protos.NotifyConfig.config)
+    // @@protoc_insertion_point(oneof:protos.NotificationConfig.config)
     pub enum Config {
-        // @@protoc_insertion_point(oneof_field:protos.NotifyConfig.slack)
-        Slack(super::NotifySlack),
-        // @@protoc_insertion_point(oneof_field:protos.NotifyConfig.email)
-        Email(super::NotifyEmail),
-        // @@protoc_insertion_point(oneof_field:protos.NotifyConfig.pagerduty)
-        Pagerduty(super::NotifyPagerDuty),
+        // @@protoc_insertion_point(oneof_field:protos.NotificationConfig.slack)
+        Slack(super::NotificationSlack),
+        // @@protoc_insertion_point(oneof_field:protos.NotificationConfig.email)
+        Email(super::NotificationEmail),
+        // @@protoc_insertion_point(oneof_field:protos.NotificationConfig.pagerduty)
+        Pagerduty(super::NotificationPagerDuty),
     }
 
     impl ::protobuf::Oneof for Config {
@@ -435,7 +435,7 @@ pub mod notify_config {
     impl ::protobuf::OneofFull for Config {
         fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
             static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| <super::NotifyConfig as ::protobuf::MessageFull>::descriptor().oneof_by_name("config").unwrap()).clone()
+            descriptor.get(|| <super::NotificationConfig as ::protobuf::MessageFull>::descriptor().oneof_by_name("config").unwrap()).clone()
         }
     }
 
@@ -447,26 +447,26 @@ pub mod notify_config {
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.NotifySlack)
-pub struct NotifySlack {
+// @@protoc_insertion_point(message:protos.NotificationSlack)
+pub struct NotificationSlack {
     // message fields
-    // @@protoc_insertion_point(field:protos.NotifySlack.bot_token)
+    // @@protoc_insertion_point(field:protos.NotificationSlack.bot_token)
     pub bot_token: ::std::option::Option<::std::string::String>,
-    // @@protoc_insertion_point(field:protos.NotifySlack.channel)
+    // @@protoc_insertion_point(field:protos.NotificationSlack.channel)
     pub channel: ::std::option::Option<::std::string::String>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.NotifySlack.special_fields)
+    // @@protoc_insertion_point(special_field:protos.NotificationSlack.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a NotifySlack {
-    fn default() -> &'a NotifySlack {
-        <NotifySlack as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a NotificationSlack {
+    fn default() -> &'a NotificationSlack {
+        <NotificationSlack as ::protobuf::Message>::default_instance()
     }
 }
 
-impl NotifySlack {
-    pub fn new() -> NotifySlack {
+impl NotificationSlack {
+    pub fn new() -> NotificationSlack {
         ::std::default::Default::default()
     }
 
@@ -475,24 +475,24 @@ impl NotifySlack {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "bot_token",
-            |m: &NotifySlack| { &m.bot_token },
-            |m: &mut NotifySlack| { &mut m.bot_token },
+            |m: &NotificationSlack| { &m.bot_token },
+            |m: &mut NotificationSlack| { &mut m.bot_token },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "channel",
-            |m: &NotifySlack| { &m.channel },
-            |m: &mut NotifySlack| { &mut m.channel },
+            |m: &NotificationSlack| { &m.channel },
+            |m: &mut NotificationSlack| { &mut m.channel },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotifySlack>(
-            "NotifySlack",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotificationSlack>(
+            "NotificationSlack",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for NotifySlack {
-    const NAME: &'static str = "NotifySlack";
+impl ::protobuf::Message for NotificationSlack {
+    const NAME: &'static str = "NotificationSlack";
 
     fn is_initialized(&self) -> bool {
         true
@@ -549,8 +549,8 @@ impl ::protobuf::Message for NotifySlack {
         &mut self.special_fields
     }
 
-    fn new() -> NotifySlack {
-        NotifySlack::new()
+    fn new() -> NotificationSlack {
+        NotificationSlack::new()
     }
 
     fn clear(&mut self) {
@@ -559,8 +559,8 @@ impl ::protobuf::Message for NotifySlack {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static NotifySlack {
-        static instance: NotifySlack = NotifySlack {
+    fn default_instance() -> &'static NotificationSlack {
+        static instance: NotificationSlack = NotificationSlack {
             bot_token: ::std::option::Option::None,
             channel: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
@@ -569,42 +569,42 @@ impl ::protobuf::Message for NotifySlack {
     }
 }
 
-impl ::protobuf::MessageFull for NotifySlack {
+impl ::protobuf::MessageFull for NotificationSlack {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotifySlack").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotificationSlack").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for NotifySlack {
+impl ::std::fmt::Display for NotificationSlack {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for NotifySlack {
+impl ::protobuf::reflect::ProtobufValue for NotificationSlack {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.NotifyEmail)
-pub struct NotifyEmail {
+// @@protoc_insertion_point(message:protos.NotificationEmail)
+pub struct NotificationEmail {
     // message fields
-    // @@protoc_insertion_point(field:protos.NotifyEmail.recipients)
+    // @@protoc_insertion_point(field:protos.NotificationEmail.recipients)
     pub recipients: ::std::vec::Vec<::std::string::String>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.NotifyEmail.special_fields)
+    // @@protoc_insertion_point(special_field:protos.NotificationEmail.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a NotifyEmail {
-    fn default() -> &'a NotifyEmail {
-        <NotifyEmail as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a NotificationEmail {
+    fn default() -> &'a NotificationEmail {
+        <NotificationEmail as ::protobuf::Message>::default_instance()
     }
 }
 
-impl NotifyEmail {
-    pub fn new() -> NotifyEmail {
+impl NotificationEmail {
+    pub fn new() -> NotificationEmail {
         ::std::default::Default::default()
     }
 
@@ -613,19 +613,19 @@ impl NotifyEmail {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "recipients",
-            |m: &NotifyEmail| { &m.recipients },
-            |m: &mut NotifyEmail| { &mut m.recipients },
+            |m: &NotificationEmail| { &m.recipients },
+            |m: &mut NotificationEmail| { &mut m.recipients },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotifyEmail>(
-            "NotifyEmail",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotificationEmail>(
+            "NotificationEmail",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for NotifyEmail {
-    const NAME: &'static str = "NotifyEmail";
+impl ::protobuf::Message for NotificationEmail {
+    const NAME: &'static str = "NotificationEmail";
 
     fn is_initialized(&self) -> bool {
         true
@@ -673,8 +673,8 @@ impl ::protobuf::Message for NotifyEmail {
         &mut self.special_fields
     }
 
-    fn new() -> NotifyEmail {
-        NotifyEmail::new()
+    fn new() -> NotificationEmail {
+        NotificationEmail::new()
     }
 
     fn clear(&mut self) {
@@ -682,8 +682,8 @@ impl ::protobuf::Message for NotifyEmail {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static NotifyEmail {
-        static instance: NotifyEmail = NotifyEmail {
+    fn default_instance() -> &'static NotificationEmail {
+        static instance: NotificationEmail = NotificationEmail {
             recipients: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -691,51 +691,51 @@ impl ::protobuf::Message for NotifyEmail {
     }
 }
 
-impl ::protobuf::MessageFull for NotifyEmail {
+impl ::protobuf::MessageFull for NotificationEmail {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotifyEmail").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotificationEmail").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for NotifyEmail {
+impl ::std::fmt::Display for NotificationEmail {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for NotifyEmail {
+impl ::protobuf::reflect::ProtobufValue for NotificationEmail {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.NotifyPagerDuty)
-pub struct NotifyPagerDuty {
+// @@protoc_insertion_point(message:protos.NotificationPagerDuty)
+pub struct NotificationPagerDuty {
     // message fields
     ///  Auth token
-    // @@protoc_insertion_point(field:protos.NotifyPagerDuty.token)
+    // @@protoc_insertion_point(field:protos.NotificationPagerDuty.token)
     pub token: ::std::string::String,
     ///  Must be a valid email for a PagerDuty user
-    // @@protoc_insertion_point(field:protos.NotifyPagerDuty.email)
+    // @@protoc_insertion_point(field:protos.NotificationPagerDuty.email)
     pub email: ::std::string::String,
     ///  Must be a valid PagerDuty service
-    // @@protoc_insertion_point(field:protos.NotifyPagerDuty.service_id)
+    // @@protoc_insertion_point(field:protos.NotificationPagerDuty.service_id)
     pub service_id: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.NotifyPagerDuty.urgency)
-    pub urgency: ::protobuf::EnumOrUnknown<notify_pager_duty::Urgency>,
+    // @@protoc_insertion_point(field:protos.NotificationPagerDuty.urgency)
+    pub urgency: ::protobuf::EnumOrUnknown<notification_pager_duty::Urgency>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.NotifyPagerDuty.special_fields)
+    // @@protoc_insertion_point(special_field:protos.NotificationPagerDuty.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a NotifyPagerDuty {
-    fn default() -> &'a NotifyPagerDuty {
-        <NotifyPagerDuty as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a NotificationPagerDuty {
+    fn default() -> &'a NotificationPagerDuty {
+        <NotificationPagerDuty as ::protobuf::Message>::default_instance()
     }
 }
 
-impl NotifyPagerDuty {
-    pub fn new() -> NotifyPagerDuty {
+impl NotificationPagerDuty {
+    pub fn new() -> NotificationPagerDuty {
         ::std::default::Default::default()
     }
 
@@ -744,34 +744,34 @@ impl NotifyPagerDuty {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "token",
-            |m: &NotifyPagerDuty| { &m.token },
-            |m: &mut NotifyPagerDuty| { &mut m.token },
+            |m: &NotificationPagerDuty| { &m.token },
+            |m: &mut NotificationPagerDuty| { &mut m.token },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "email",
-            |m: &NotifyPagerDuty| { &m.email },
-            |m: &mut NotifyPagerDuty| { &mut m.email },
+            |m: &NotificationPagerDuty| { &m.email },
+            |m: &mut NotificationPagerDuty| { &mut m.email },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "service_id",
-            |m: &NotifyPagerDuty| { &m.service_id },
-            |m: &mut NotifyPagerDuty| { &mut m.service_id },
+            |m: &NotificationPagerDuty| { &m.service_id },
+            |m: &mut NotificationPagerDuty| { &mut m.service_id },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "urgency",
-            |m: &NotifyPagerDuty| { &m.urgency },
-            |m: &mut NotifyPagerDuty| { &mut m.urgency },
+            |m: &NotificationPagerDuty| { &m.urgency },
+            |m: &mut NotificationPagerDuty| { &mut m.urgency },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotifyPagerDuty>(
-            "NotifyPagerDuty",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotificationPagerDuty>(
+            "NotificationPagerDuty",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for NotifyPagerDuty {
-    const NAME: &'static str = "NotifyPagerDuty";
+impl ::protobuf::Message for NotificationPagerDuty {
+    const NAME: &'static str = "NotificationPagerDuty";
 
     fn is_initialized(&self) -> bool {
         true
@@ -813,7 +813,7 @@ impl ::protobuf::Message for NotifyPagerDuty {
         if !self.service_id.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.service_id);
         }
-        if self.urgency != ::protobuf::EnumOrUnknown::new(notify_pager_duty::Urgency::URGENCY_UNSET) {
+        if self.urgency != ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET) {
             my_size += ::protobuf::rt::int32_size(4, self.urgency.value());
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -831,7 +831,7 @@ impl ::protobuf::Message for NotifyPagerDuty {
         if !self.service_id.is_empty() {
             os.write_string(3, &self.service_id)?;
         }
-        if self.urgency != ::protobuf::EnumOrUnknown::new(notify_pager_duty::Urgency::URGENCY_UNSET) {
+        if self.urgency != ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET) {
             os.write_enum(4, ::protobuf::EnumOrUnknown::value(&self.urgency))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -846,20 +846,20 @@ impl ::protobuf::Message for NotifyPagerDuty {
         &mut self.special_fields
     }
 
-    fn new() -> NotifyPagerDuty {
-        NotifyPagerDuty::new()
+    fn new() -> NotificationPagerDuty {
+        NotificationPagerDuty::new()
     }
 
     fn clear(&mut self) {
         self.token.clear();
         self.email.clear();
         self.service_id.clear();
-        self.urgency = ::protobuf::EnumOrUnknown::new(notify_pager_duty::Urgency::URGENCY_UNSET);
+        self.urgency = ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET);
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static NotifyPagerDuty {
-        static instance: NotifyPagerDuty = NotifyPagerDuty {
+    fn default_instance() -> &'static NotificationPagerDuty {
+        static instance: NotificationPagerDuty = NotificationPagerDuty {
             token: ::std::string::String::new(),
             email: ::std::string::String::new(),
             service_id: ::std::string::String::new(),
@@ -870,33 +870,33 @@ impl ::protobuf::Message for NotifyPagerDuty {
     }
 }
 
-impl ::protobuf::MessageFull for NotifyPagerDuty {
+impl ::protobuf::MessageFull for NotificationPagerDuty {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotifyPagerDuty").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("NotificationPagerDuty").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for NotifyPagerDuty {
+impl ::std::fmt::Display for NotificationPagerDuty {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for NotifyPagerDuty {
+impl ::protobuf::reflect::ProtobufValue for NotificationPagerDuty {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-/// Nested message and enums of message `NotifyPagerDuty`
-pub mod notify_pager_duty {
+/// Nested message and enums of message `NotificationPagerDuty`
+pub mod notification_pager_duty {
     #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-    // @@protoc_insertion_point(enum:protos.NotifyPagerDuty.Urgency)
+    // @@protoc_insertion_point(enum:protos.NotificationPagerDuty.Urgency)
     pub enum Urgency {
-        // @@protoc_insertion_point(enum_value:protos.NotifyPagerDuty.Urgency.URGENCY_UNSET)
+        // @@protoc_insertion_point(enum_value:protos.NotificationPagerDuty.Urgency.URGENCY_UNSET)
         URGENCY_UNSET = 0,
-        // @@protoc_insertion_point(enum_value:protos.NotifyPagerDuty.Urgency.URGENCY_LOW)
+        // @@protoc_insertion_point(enum_value:protos.NotificationPagerDuty.Urgency.URGENCY_LOW)
         URGENCY_LOW = 1,
-        // @@protoc_insertion_point(enum_value:protos.NotifyPagerDuty.Urgency.URGENCY_HIGH)
+        // @@protoc_insertion_point(enum_value:protos.NotificationPagerDuty.Urgency.URGENCY_HIGH)
         URGENCY_HIGH = 2,
     }
 
@@ -926,7 +926,7 @@ pub mod notify_pager_duty {
     impl ::protobuf::EnumFull for Urgency {
         fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
             static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| super::file_descriptor().enum_by_package_relative_name("NotifyPagerDuty.Urgency").unwrap()).clone()
+            descriptor.get(|| super::file_descriptor().enum_by_package_relative_name("NotificationPagerDuty.Urgency").unwrap()).clone()
         }
 
         fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -943,53 +943,53 @@ pub mod notify_pager_duty {
 
     impl Urgency {
         pub(in super) fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-            ::protobuf::reflect::GeneratedEnumDescriptorData::new::<Urgency>("NotifyPagerDuty.Urgency")
+            ::protobuf::reflect::GeneratedEnumDescriptorData::new::<Urgency>("NotificationPagerDuty.Urgency")
         }
     }
 }
 
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.NotifyType)
-pub enum NotifyType {
-    // @@protoc_insertion_point(enum_value:protos.NotifyType.NOTIFY_TYPE_UNSET)
-    NOTIFY_TYPE_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.NotifyType.NOTIFY_TYPE_SLACK)
-    NOTIFY_TYPE_SLACK = 1,
-    // @@protoc_insertion_point(enum_value:protos.NotifyType.NOTIFY_TYPE_EMAIL)
-    NOTIFY_TYPE_EMAIL = 2,
-    // @@protoc_insertion_point(enum_value:protos.NotifyType.NOTIFY_TYPE_PAGERDUTY)
-    NOTIFY_TYPE_PAGERDUTY = 3,
+// @@protoc_insertion_point(enum:protos.NotificationType)
+pub enum NotificationType {
+    // @@protoc_insertion_point(enum_value:protos.NotificationType.NOTIFICATION_TYPE_UNSET)
+    NOTIFICATION_TYPE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.NotificationType.NOTIFICATION_TYPE_SLACK)
+    NOTIFICATION_TYPE_SLACK = 1,
+    // @@protoc_insertion_point(enum_value:protos.NotificationType.NOTIFICATION_TYPE_EMAIL)
+    NOTIFICATION_TYPE_EMAIL = 2,
+    // @@protoc_insertion_point(enum_value:protos.NotificationType.NOTIFICATION_TYPE_PAGERDUTY)
+    NOTIFICATION_TYPE_PAGERDUTY = 3,
 }
 
-impl ::protobuf::Enum for NotifyType {
-    const NAME: &'static str = "NotifyType";
+impl ::protobuf::Enum for NotificationType {
+    const NAME: &'static str = "NotificationType";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<NotifyType> {
+    fn from_i32(value: i32) -> ::std::option::Option<NotificationType> {
         match value {
-            0 => ::std::option::Option::Some(NotifyType::NOTIFY_TYPE_UNSET),
-            1 => ::std::option::Option::Some(NotifyType::NOTIFY_TYPE_SLACK),
-            2 => ::std::option::Option::Some(NotifyType::NOTIFY_TYPE_EMAIL),
-            3 => ::std::option::Option::Some(NotifyType::NOTIFY_TYPE_PAGERDUTY),
+            0 => ::std::option::Option::Some(NotificationType::NOTIFICATION_TYPE_UNSET),
+            1 => ::std::option::Option::Some(NotificationType::NOTIFICATION_TYPE_SLACK),
+            2 => ::std::option::Option::Some(NotificationType::NOTIFICATION_TYPE_EMAIL),
+            3 => ::std::option::Option::Some(NotificationType::NOTIFICATION_TYPE_PAGERDUTY),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [NotifyType] = &[
-        NotifyType::NOTIFY_TYPE_UNSET,
-        NotifyType::NOTIFY_TYPE_SLACK,
-        NotifyType::NOTIFY_TYPE_EMAIL,
-        NotifyType::NOTIFY_TYPE_PAGERDUTY,
+    const VALUES: &'static [NotificationType] = &[
+        NotificationType::NOTIFICATION_TYPE_UNSET,
+        NotificationType::NOTIFICATION_TYPE_SLACK,
+        NotificationType::NOTIFICATION_TYPE_EMAIL,
+        NotificationType::NOTIFICATION_TYPE_PAGERDUTY,
     ];
 }
 
-impl ::protobuf::EnumFull for NotifyType {
+impl ::protobuf::EnumFull for NotificationType {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("NotifyType").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("NotificationType").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -998,107 +998,108 @@ impl ::protobuf::EnumFull for NotifyType {
     }
 }
 
-impl ::std::default::Default for NotifyType {
+impl ::std::default::Default for NotificationType {
     fn default() -> Self {
-        NotifyType::NOTIFY_TYPE_UNSET
+        NotificationType::NOTIFICATION_TYPE_UNSET
     }
 }
 
-impl NotifyType {
+impl NotificationType {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<NotifyType>("NotifyType")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<NotificationType>("NotificationType")
     }
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0cnotify.proto\x12\x06protos\"\x98\x02\n\x0cNotifyConfig\x12\x0e\n\
-    \x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\
-    \x04name\x12&\n\x04type\x18\x03\x20\x01(\x0e2\x12.protos.NotifyTypeR\x04\
-    type\x12\x1c\n\tpipelines\x18\x04\x20\x03(\tR\tpipelines\x12,\n\x05slack\
-    \x18\xe8\x07\x20\x01(\x0b2\x13.protos.NotifySlackH\0R\x05slack\x12,\n\
-    \x05email\x18\xe9\x07\x20\x01(\x0b2\x13.protos.NotifyEmailH\0R\x05email\
-    \x128\n\tpagerduty\x18\xea\x07\x20\x01(\x0b2\x17.protos.NotifyPagerDutyH\
-    \0R\tpagerdutyB\x08\n\x06config\"h\n\x0bNotifySlack\x12\x20\n\tbot_token\
-    \x18\x01\x20\x01(\tH\0R\x08botToken\x88\x01\x01\x12\x1d\n\x07channel\x18\
-    \x02\x20\x01(\tH\x01R\x07channel\x88\x01\x01B\x0c\n\n_bot_tokenB\n\n\x08\
-    _channel\"-\n\x0bNotifyEmail\x12\x1e\n\nrecipients\x18\x01\x20\x03(\tR\n\
-    recipients\"\xd8\x01\n\x0fNotifyPagerDuty\x12\x14\n\x05token\x18\x01\x20\
-    \x01(\tR\x05token\x12\x14\n\x05email\x18\x02\x20\x01(\tR\x05email\x12\
-    \x1d\n\nservice_id\x18\x03\x20\x01(\tR\tserviceId\x129\n\x07urgency\x18\
-    \x04\x20\x01(\x0e2\x1f.protos.NotifyPagerDuty.UrgencyR\x07urgency\"?\n\
-    \x07Urgency\x12\x11\n\rURGENCY_UNSET\x10\0\x12\x0f\n\x0bURGENCY_LOW\x10\
-    \x01\x12\x10\n\x0cURGENCY_HIGH\x10\x02*l\n\nNotifyType\x12\x15\n\x11NOTI\
-    FY_TYPE_UNSET\x10\0\x12\x15\n\x11NOTIFY_TYPE_SLACK\x10\x01\x12\x15\n\x11\
-    NOTIFY_TYPE_EMAIL\x10\x02\x12\x19\n\x15NOTIFY_TYPE_PAGERDUTY\x10\x03B4Z2\
-    github.com/streamdal/snitch-protos/build/go/protosJ\xad\x0b\n\x06\x12\
-    \x04\0\07\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\
-    \0I\n\n\n\x02\x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\
-    \x06\x05\x0f\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02\x18\n\x0c\n\x05\x05\
-    \0\x02\0\x01\x12\x03\x07\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\
-    \x16\x17\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02\x18\n\x0c\n\x05\x05\0\
-    \x02\x01\x01\x12\x03\x08\x02\x13\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\
-    \x08\x16\x17\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\x02\x18\n\x0c\n\x05\x05\
-    \0\x02\x02\x01\x12\x03\t\x02\x13\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\
-    \x16\x17\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02\x1c\n\x0c\n\x05\x05\0\
-    \x02\x03\x01\x12\x03\n\x02\x17\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n\
-    \x1a\x1b\n\n\n\x02\x04\0\x12\x04\r\0\x1b\x01\n\n\n\x03\x04\0\x01\x12\x03\
-    \r\x08\x14\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0e\x02\x10\n\x0c\n\x05\x04\0\
-    \x02\0\x05\x12\x03\x0e\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\t\
-    \x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x0e\x0f\n\x0b\n\x04\x04\0\
-    \x02\x01\x12\x03\x10\x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\
-    \x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\t\r\n\x0c\n\x05\x04\0\
-    \x02\x01\x03\x12\x03\x10\x10\x11\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x12\
-    \x02\x16\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x12\x02\x0c\n\x0c\n\x05\
-    \x04\0\x02\x02\x01\x12\x03\x12\r\x11\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
-    \x03\x12\x14\x15\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x14\x02\x20\n\x0c\n\
-    \x05\x04\0\x02\x03\x04\x12\x03\x14\x02\n\n\x0c\n\x05\x04\0\x02\x03\x05\
-    \x12\x03\x14\x0b\x11\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x14\x12\x1b\n\
-    \x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x14\x1e\x1f\n\x0c\n\x04\x04\0\x08\0\
-    \x12\x04\x16\x02\x1a\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x16\x08\x0e\
-    \n\x0b\n\x04\x04\0\x02\x04\x12\x03\x17\x04\x1d\n\x0c\n\x05\x04\0\x02\x04\
-    \x06\x12\x03\x17\x04\x0f\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17\x10\
-    \x15\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x17\x18\x1c\n\x0b\n\x04\x04\0\
-    \x02\x05\x12\x03\x18\x04\x1d\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x18\
-    \x04\x0f\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x18\x10\x15\n\x0c\n\x05\
-    \x04\0\x02\x05\x03\x12\x03\x18\x18\x1c\n\x0b\n\x04\x04\0\x02\x06\x12\x03\
-    \x19\x04%\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\x19\x04\x13\n\x0c\n\x05\
-    \x04\0\x02\x06\x01\x12\x03\x19\x14\x1d\n\x0c\n\x05\x04\0\x02\x06\x03\x12\
-    \x03\x19\x20$\n\n\n\x02\x04\x01\x12\x04\x1d\0\x20\x01\n\n\n\x03\x04\x01\
-    \x01\x12\x03\x1d\x08\x13\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1e\x02\x20\n\
-    \x0c\n\x05\x04\x01\x02\0\x04\x12\x03\x1e\x02\n\n\x0c\n\x05\x04\x01\x02\0\
-    \x05\x12\x03\x1e\x0b\x11\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x1e\x12\
-    \x1b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1e\x1e\x1f\n\x0b\n\x04\x04\
-    \x01\x02\x01\x12\x03\x1f\x02\x1e\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x03\
-    \x1f\x02\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x1f\x0b\x11\n\x0c\n\
-    \x05\x04\x01\x02\x01\x01\x12\x03\x1f\x12\x19\n\x0c\n\x05\x04\x01\x02\x01\
-    \x03\x12\x03\x1f\x1c\x1d\n\n\n\x02\x04\x02\x12\x04\"\0$\x01\n\n\n\x03\
-    \x04\x02\x01\x12\x03\"\x08\x13\n\x0b\n\x04\x04\x02\x02\0\x12\x03#\x02!\n\
-    \x0c\n\x05\x04\x02\x02\0\x04\x12\x03#\x02\n\n\x0c\n\x05\x04\x02\x02\0\
-    \x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03#\x12\x1c\n\
-    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03#\x1f\x20\n\n\n\x02\x04\x03\x12\x04&\
-    \07\x01\n\n\n\x03\x04\x03\x01\x12\x03&\x08\x17\n\x0c\n\x04\x04\x03\x04\0\
-    \x12\x04'\x02+\x03\n\x0c\n\x05\x04\x03\x04\0\x01\x12\x03'\x07\x0e\n\r\n\
-    \x06\x04\x03\x04\0\x02\0\x12\x03(\x04\x16\n\x0e\n\x07\x04\x03\x04\0\x02\
-    \0\x01\x12\x03(\x04\x11\n\x0e\n\x07\x04\x03\x04\0\x02\0\x02\x12\x03(\x14\
-    \x15\n\r\n\x06\x04\x03\x04\0\x02\x01\x12\x03)\x04\x14\n\x0e\n\x07\x04\
-    \x03\x04\0\x02\x01\x01\x12\x03)\x04\x0f\n\x0e\n\x07\x04\x03\x04\0\x02\
-    \x01\x02\x12\x03)\x12\x13\n\r\n\x06\x04\x03\x04\0\x02\x02\x12\x03*\x04\
-    \x15\n\x0e\n\x07\x04\x03\x04\0\x02\x02\x01\x12\x03*\x04\x10\n\x0e\n\x07\
-    \x04\x03\x04\0\x02\x02\x02\x12\x03*\x13\x14\n\x19\n\x04\x04\x03\x02\0\
-    \x12\x03.\x02\x13\x1a\x0c\x20Auth\x20token\n\n\x0c\n\x05\x04\x03\x02\0\
-    \x05\x12\x03.\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03.\t\x0e\n\x0c\
-    \n\x05\x04\x03\x02\0\x03\x12\x03.\x11\x12\n9\n\x04\x04\x03\x02\x01\x12\
-    \x031\x02\x13\x1a,\x20Must\x20be\x20a\x20valid\x20email\x20for\x20a\x20P\
-    agerDuty\x20user\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x031\x02\x08\n\
-    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x031\t\x0e\n\x0c\n\x05\x04\x03\x02\
-    \x01\x03\x12\x031\x11\x12\n0\n\x04\x04\x03\x02\x02\x12\x034\x02\x18\x1a#\
-    \x20Must\x20be\x20a\x20valid\x20PagerDuty\x20service\n\n\x0c\n\x05\x04\
-    \x03\x02\x02\x05\x12\x034\x02\x08\n\x0c\n\x05\x04\x03\x02\x02\x01\x12\
-    \x034\t\x13\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x034\x16\x17\n\x0b\n\x04\
-    \x04\x03\x02\x03\x12\x036\x02\x16\n\x0c\n\x05\x04\x03\x02\x03\x06\x12\
-    \x036\x02\t\n\x0c\n\x05\x04\x03\x02\x03\x01\x12\x036\n\x11\n\x0c\n\x05\
-    \x04\x03\x02\x03\x03\x12\x036\x14\x15b\x06proto3\
+    \n\x0cnotify.proto\x12\x06protos\"\xb9\x02\n\x12NotificationConfig\x12\
+    \x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01\
+    (\tR\x04name\x12,\n\x04type\x18\x03\x20\x01(\x0e2\x18.protos.Notificatio\
+    nTypeR\x04type\x12\x1f\n\x0bpipeline_id\x18\x04\x20\x01(\tR\npipelineId\
+    \x122\n\x05slack\x18\xe8\x07\x20\x01(\x0b2\x19.protos.NotificationSlackH\
+    \0R\x05slack\x122\n\x05email\x18\xe9\x07\x20\x01(\x0b2\x19.protos.Notifi\
+    cationEmailH\0R\x05email\x12>\n\tpagerduty\x18\xea\x07\x20\x01(\x0b2\x1d\
+    .protos.NotificationPagerDutyH\0R\tpagerdutyB\x08\n\x06config\"n\n\x11No\
+    tificationSlack\x12\x20\n\tbot_token\x18\x01\x20\x01(\tH\0R\x08botToken\
+    \x88\x01\x01\x12\x1d\n\x07channel\x18\x02\x20\x01(\tH\x01R\x07channel\
+    \x88\x01\x01B\x0c\n\n_bot_tokenB\n\n\x08_channel\"3\n\x11NotificationEma\
+    il\x12\x1e\n\nrecipients\x18\x01\x20\x03(\tR\nrecipients\"\xe4\x01\n\x15\
+    NotificationPagerDuty\x12\x14\n\x05token\x18\x01\x20\x01(\tR\x05token\
+    \x12\x14\n\x05email\x18\x02\x20\x01(\tR\x05email\x12\x1d\n\nservice_id\
+    \x18\x03\x20\x01(\tR\tserviceId\x12?\n\x07urgency\x18\x04\x20\x01(\x0e2%\
+    .protos.NotificationPagerDuty.UrgencyR\x07urgency\"?\n\x07Urgency\x12\
+    \x11\n\rURGENCY_UNSET\x10\0\x12\x0f\n\x0bURGENCY_LOW\x10\x01\x12\x10\n\
+    \x0cURGENCY_HIGH\x10\x02*\x8a\x01\n\x10NotificationType\x12\x1b\n\x17NOT\
+    IFICATION_TYPE_UNSET\x10\0\x12\x1b\n\x17NOTIFICATION_TYPE_SLACK\x10\x01\
+    \x12\x1b\n\x17NOTIFICATION_TYPE_EMAIL\x10\x02\x12\x1f\n\x1bNOTIFICATION_\
+    TYPE_PAGERDUTY\x10\x03B4Z2github.com/streamdal/snitch-protos/build/go/pr\
+    otosJ\x9f\x0b\n\x06\x12\x04\0\07\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
+    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\
+    \x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x05\0\x12\x04\x06\0\x0b\x01\n\n\n\
+    \x03\x05\0\x01\x12\x03\x06\x05\x15\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\
+    \x02\x1e\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x19\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x07\x1c\x1d\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\
+    \x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x19\n\x0c\n\x05\
+    \x05\0\x02\x01\x02\x12\x03\x08\x1c\x1d\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
+    \t\x02\x1e\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x19\n\x0c\n\x05\
+    \x05\0\x02\x02\x02\x12\x03\t\x1c\x1d\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\
+    \x02\"\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x1d\n\x0c\n\x05\x05\0\
+    \x02\x03\x02\x12\x03\n\x20!\n\n\n\x02\x04\0\x12\x04\r\0\x1b\x01\n\n\n\
+    \x03\x04\0\x01\x12\x03\r\x08\x1a\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0e\x02\
+    \x10\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x02\x08\n\x0c\n\x05\x04\0\
+    \x02\0\x01\x12\x03\x0e\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x0e\
+    \x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x10\x02\x12\n\x0c\n\x05\x04\0\x02\
+    \x01\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\t\
+    \r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x10\x10\x11\n\x0b\n\x04\x04\0\
+    \x02\x02\x12\x03\x12\x02\x1c\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x12\
+    \x02\x12\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x12\x13\x17\n\x0c\n\x05\
+    \x04\0\x02\x02\x03\x12\x03\x12\x1a\x1b\n\x0b\n\x04\x04\0\x02\x03\x12\x03\
+    \x14\x02\x19\n\x0c\n\x05\x04\0\x02\x03\x05\x12\x03\x14\x02\x08\n\x0c\n\
+    \x05\x04\0\x02\x03\x01\x12\x03\x14\t\x14\n\x0c\n\x05\x04\0\x02\x03\x03\
+    \x12\x03\x14\x17\x18\n\x0c\n\x04\x04\0\x08\0\x12\x04\x16\x02\x1a\x03\n\
+    \x0c\n\x05\x04\0\x08\0\x01\x12\x03\x16\x08\x0e\n\x0b\n\x04\x04\0\x02\x04\
+    \x12\x03\x17\x04#\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x17\x04\x15\n\
+    \x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17\x16\x1b\n\x0c\n\x05\x04\0\x02\
+    \x04\x03\x12\x03\x17\x1e\"\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x18\x04#\n\
+    \x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x15\n\x0c\n\x05\x04\0\x02\
+    \x05\x01\x12\x03\x18\x16\x1b\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x18\
+    \x1e\"\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x19\x04+\n\x0c\n\x05\x04\0\x02\
+    \x06\x06\x12\x03\x19\x04\x19\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\
+    \x1a#\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x19&*\n\n\n\x02\x04\x01\x12\
+    \x04\x1d\0\x20\x01\n\n\n\x03\x04\x01\x01\x12\x03\x1d\x08\x19\n\x0b\n\x04\
+    \x04\x01\x02\0\x12\x03\x1e\x02\x20\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03\
+    \x1e\x02\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1e\x0b\x11\n\x0c\n\x05\
+    \x04\x01\x02\0\x01\x12\x03\x1e\x12\x1b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\
+    \x03\x1e\x1e\x1f\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x1f\x02\x1e\n\x0c\n\
+    \x05\x04\x01\x02\x01\x04\x12\x03\x1f\x02\n\n\x0c\n\x05\x04\x01\x02\x01\
+    \x05\x12\x03\x1f\x0b\x11\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x1f\x12\
+    \x19\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03\x1f\x1c\x1d\n\n\n\x02\x04\
+    \x02\x12\x04\"\0$\x01\n\n\n\x03\x04\x02\x01\x12\x03\"\x08\x19\n\x0b\n\
+    \x04\x04\x02\x02\0\x12\x03#\x02!\n\x0c\n\x05\x04\x02\x02\0\x04\x12\x03#\
+    \x02\n\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\
+    \x02\x02\0\x01\x12\x03#\x12\x1c\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03#\
+    \x1f\x20\n\n\n\x02\x04\x03\x12\x04&\07\x01\n\n\n\x03\x04\x03\x01\x12\x03\
+    &\x08\x1d\n\x0c\n\x04\x04\x03\x04\0\x12\x04'\x02+\x03\n\x0c\n\x05\x04\
+    \x03\x04\0\x01\x12\x03'\x07\x0e\n\r\n\x06\x04\x03\x04\0\x02\0\x12\x03(\
+    \x04\x16\n\x0e\n\x07\x04\x03\x04\0\x02\0\x01\x12\x03(\x04\x11\n\x0e\n\
+    \x07\x04\x03\x04\0\x02\0\x02\x12\x03(\x14\x15\n\r\n\x06\x04\x03\x04\0\
+    \x02\x01\x12\x03)\x04\x14\n\x0e\n\x07\x04\x03\x04\0\x02\x01\x01\x12\x03)\
+    \x04\x0f\n\x0e\n\x07\x04\x03\x04\0\x02\x01\x02\x12\x03)\x12\x13\n\r\n\
+    \x06\x04\x03\x04\0\x02\x02\x12\x03*\x04\x15\n\x0e\n\x07\x04\x03\x04\0\
+    \x02\x02\x01\x12\x03*\x04\x10\n\x0e\n\x07\x04\x03\x04\0\x02\x02\x02\x12\
+    \x03*\x13\x14\n\x19\n\x04\x04\x03\x02\0\x12\x03.\x02\x13\x1a\x0c\x20Auth\
+    \x20token\n\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03.\x02\x08\n\x0c\n\x05\
+    \x04\x03\x02\0\x01\x12\x03.\t\x0e\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03.\
+    \x11\x12\n9\n\x04\x04\x03\x02\x01\x12\x031\x02\x13\x1a,\x20Must\x20be\
+    \x20a\x20valid\x20email\x20for\x20a\x20PagerDuty\x20user\n\n\x0c\n\x05\
+    \x04\x03\x02\x01\x05\x12\x031\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\
+    \x12\x031\t\x0e\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x031\x11\x12\n0\n\
+    \x04\x04\x03\x02\x02\x12\x034\x02\x18\x1a#\x20Must\x20be\x20a\x20valid\
+    \x20PagerDuty\x20service\n\n\x0c\n\x05\x04\x03\x02\x02\x05\x12\x034\x02\
+    \x08\n\x0c\n\x05\x04\x03\x02\x02\x01\x12\x034\t\x13\n\x0c\n\x05\x04\x03\
+    \x02\x02\x03\x12\x034\x16\x17\n\x0b\n\x04\x04\x03\x02\x03\x12\x036\x02\
+    \x16\n\x0c\n\x05\x04\x03\x02\x03\x06\x12\x036\x02\t\n\x0c\n\x05\x04\x03\
+    \x02\x03\x01\x12\x036\n\x11\n\x0c\n\x05\x04\x03\x02\x03\x03\x12\x036\x14\
+    \x15b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1117,13 +1118,13 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
             let mut messages = ::std::vec::Vec::with_capacity(4);
-            messages.push(NotifyConfig::generated_message_descriptor_data());
-            messages.push(NotifySlack::generated_message_descriptor_data());
-            messages.push(NotifyEmail::generated_message_descriptor_data());
-            messages.push(NotifyPagerDuty::generated_message_descriptor_data());
+            messages.push(NotificationConfig::generated_message_descriptor_data());
+            messages.push(NotificationSlack::generated_message_descriptor_data());
+            messages.push(NotificationEmail::generated_message_descriptor_data());
+            messages.push(NotificationPagerDuty::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(2);
-            enums.push(NotifyType::generated_enum_descriptor_data());
-            enums.push(notify_pager_duty::Urgency::generated_enum_descriptor_data());
+            enums.push(NotificationType::generated_enum_descriptor_data());
+            enums.push(notification_pager_duty::Urgency::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

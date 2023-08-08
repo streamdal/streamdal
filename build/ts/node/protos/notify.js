@@ -3,101 +3,101 @@
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf enum protos.NotifyPagerDuty.Urgency
+ * @generated from protobuf enum protos.NotificationPagerDuty.Urgency
  */
-export var NotifyPagerDuty_Urgency;
-(function (NotifyPagerDuty_Urgency) {
+export var NotificationPagerDuty_Urgency;
+(function (NotificationPagerDuty_Urgency) {
     /**
      * @generated from protobuf enum value: URGENCY_UNSET = 0;
      */
-    NotifyPagerDuty_Urgency[NotifyPagerDuty_Urgency["UNSET"] = 0] = "UNSET";
+    NotificationPagerDuty_Urgency[NotificationPagerDuty_Urgency["UNSET"] = 0] = "UNSET";
     /**
      * @generated from protobuf enum value: URGENCY_LOW = 1;
      */
-    NotifyPagerDuty_Urgency[NotifyPagerDuty_Urgency["LOW"] = 1] = "LOW";
+    NotificationPagerDuty_Urgency[NotificationPagerDuty_Urgency["LOW"] = 1] = "LOW";
     /**
      * @generated from protobuf enum value: URGENCY_HIGH = 2;
      */
-    NotifyPagerDuty_Urgency[NotifyPagerDuty_Urgency["HIGH"] = 2] = "HIGH";
-})(NotifyPagerDuty_Urgency || (NotifyPagerDuty_Urgency = {}));
+    NotificationPagerDuty_Urgency[NotificationPagerDuty_Urgency["HIGH"] = 2] = "HIGH";
+})(NotificationPagerDuty_Urgency || (NotificationPagerDuty_Urgency = {}));
 /**
- * @generated from protobuf enum protos.NotifyType
+ * @generated from protobuf enum protos.NotificationType
  */
-export var NotifyType;
-(function (NotifyType) {
+export var NotificationType;
+(function (NotificationType) {
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_UNSET = 0;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_UNSET = 0;
      */
-    NotifyType[NotifyType["UNSET"] = 0] = "UNSET";
+    NotificationType[NotificationType["UNSET"] = 0] = "UNSET";
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_SLACK = 1;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_SLACK = 1;
      */
-    NotifyType[NotifyType["SLACK"] = 1] = "SLACK";
+    NotificationType[NotificationType["SLACK"] = 1] = "SLACK";
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_EMAIL = 2;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_EMAIL = 2;
      */
-    NotifyType[NotifyType["EMAIL"] = 2] = "EMAIL";
+    NotificationType[NotificationType["EMAIL"] = 2] = "EMAIL";
     /**
-     * @generated from protobuf enum value: NOTIFY_TYPE_PAGERDUTY = 3;
+     * @generated from protobuf enum value: NOTIFICATION_TYPE_PAGERDUTY = 3;
      */
-    NotifyType[NotifyType["PAGERDUTY"] = 3] = "PAGERDUTY";
-})(NotifyType || (NotifyType = {}));
+    NotificationType[NotificationType["PAGERDUTY"] = 3] = "PAGERDUTY";
+})(NotificationType || (NotificationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class NotifyConfig$Type extends MessageType {
+class NotificationConfig$Type extends MessageType {
     constructor() {
-        super("protos.NotifyConfig", [
+        super("protos.NotificationConfig", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "type", kind: "enum", T: () => ["protos.NotifyType", NotifyType, "NOTIFY_TYPE_"] },
-            { no: 4, name: "pipelines", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 1000, name: "slack", kind: "message", oneof: "config", T: () => NotifySlack },
-            { no: 1001, name: "email", kind: "message", oneof: "config", T: () => NotifyEmail },
-            { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => NotifyPagerDuty }
+            { no: 3, name: "type", kind: "enum", T: () => ["protos.NotificationType", NotificationType, "NOTIFICATION_TYPE_"] },
+            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "slack", kind: "message", oneof: "config", T: () => NotificationSlack },
+            { no: 1001, name: "email", kind: "message", oneof: "config", T: () => NotificationEmail },
+            { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => NotificationPagerDuty }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyConfig
+ * @generated MessageType for protobuf message protos.NotificationConfig
  */
-export const NotifyConfig = new NotifyConfig$Type();
+export const NotificationConfig = new NotificationConfig$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class NotifySlack$Type extends MessageType {
+class NotificationSlack$Type extends MessageType {
     constructor() {
-        super("protos.NotifySlack", [
+        super("protos.NotificationSlack", [
             { no: 1, name: "bot_token", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "channel", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.NotifySlack
+ * @generated MessageType for protobuf message protos.NotificationSlack
  */
-export const NotifySlack = new NotifySlack$Type();
+export const NotificationSlack = new NotificationSlack$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class NotifyEmail$Type extends MessageType {
+class NotificationEmail$Type extends MessageType {
     constructor() {
-        super("protos.NotifyEmail", [
+        super("protos.NotificationEmail", [
             { no: 1, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyEmail
+ * @generated MessageType for protobuf message protos.NotificationEmail
  */
-export const NotifyEmail = new NotifyEmail$Type();
+export const NotificationEmail = new NotificationEmail$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class NotifyPagerDuty$Type extends MessageType {
+class NotificationPagerDuty$Type extends MessageType {
     constructor() {
-        super("protos.NotifyPagerDuty", [
+        super("protos.NotificationPagerDuty", [
             { no: 1, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "service_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "urgency", kind: "enum", T: () => ["protos.NotifyPagerDuty.Urgency", NotifyPagerDuty_Urgency, "URGENCY_"] }
+            { no: 4, name: "urgency", kind: "enum", T: () => ["protos.NotificationPagerDuty.Urgency", NotificationPagerDuty_Urgency, "URGENCY_"] }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.NotifyPagerDuty
+ * @generated MessageType for protobuf message protos.NotificationPagerDuty
  */
-export const NotifyPagerDuty = new NotifyPagerDuty$Type();
+export const NotificationPagerDuty = new NotificationPagerDuty$Type();
 //# sourceMappingURL=notify.js.map

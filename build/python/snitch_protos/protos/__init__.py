@@ -62,14 +62,14 @@ class ClientType(betterproto.Enum):
     CLIENT_TYPE_SHIM = 2
 
 
-class NotifyType(betterproto.Enum):
-    NOTIFY_TYPE_UNSET = 0
-    NOTIFY_TYPE_SLACK = 1
-    NOTIFY_TYPE_EMAIL = 2
-    NOTIFY_TYPE_PAGERDUTY = 3
+class NotificationType(betterproto.Enum):
+    NOTIFICATION_TYPE_UNSET = 0
+    NOTIFICATION_TYPE_SLACK = 1
+    NOTIFICATION_TYPE_EMAIL = 2
+    NOTIFICATION_TYPE_PAGERDUTY = 3
 
 
-class NotifyPagerDutyUrgency(betterproto.Enum):
+class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_UNSET = 0
     URGENCY_LOW = 1
     URGENCY_HIGH = 2
@@ -208,18 +208,18 @@ class ClientInfo(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class NotifyConfig(betterproto.Message):
+class NotificationConfig(betterproto.Message):
     id: str = betterproto.string_field(1)
     name: str = betterproto.string_field(2)
-    type: "NotifyType" = betterproto.enum_field(3)
-    pipelines: List[str] = betterproto.string_field(4)
-    slack: "NotifySlack" = betterproto.message_field(1000, group="config")
-    email: "NotifyEmail" = betterproto.message_field(1001, group="config")
-    pagerduty: "NotifyPagerDuty" = betterproto.message_field(1002, group="config")
+    type: "NotificationType" = betterproto.enum_field(3)
+    pipeline_id: str = betterproto.string_field(4)
+    slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
+    email: "NotificationEmail" = betterproto.message_field(1001, group="config")
+    pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")
 
 
 @dataclass(eq=False, repr=False)
-class NotifySlack(betterproto.Message):
+class NotificationSlack(betterproto.Message):
     bot_token: Optional[str] = betterproto.string_field(
         1, optional=True, group="_bot_token"
     )
@@ -229,12 +229,12 @@ class NotifySlack(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class NotifyEmail(betterproto.Message):
+class NotificationEmail(betterproto.Message):
     recipients: List[str] = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class NotifyPagerDuty(betterproto.Message):
+class NotificationPagerDuty(betterproto.Message):
     token: str = betterproto.string_field(1)
     """Auth token"""
 
@@ -244,19 +244,19 @@ class NotifyPagerDuty(betterproto.Message):
     service_id: str = betterproto.string_field(3)
     """Must be a valid PagerDuty service"""
 
-    urgency: "NotifyPagerDutyUrgency" = betterproto.enum_field(4)
+    urgency: "NotificationPagerDutyUrgency" = betterproto.enum_field(4)
 
 
 @dataclass(eq=False, repr=False)
 class CreateNotificationRequest(betterproto.Message):
     """Notifications"""
 
-    notification: "NotifyConfig" = betterproto.message_field(1)
+    notification: "NotificationConfig" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class UpdateNotificationRequest(betterproto.Message):
-    notification: "NotifyConfig" = betterproto.message_field(1)
+    notification: "NotificationConfig" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -271,7 +271,7 @@ class GetNotificationsRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetNotificationsResponse(betterproto.Message):
-    notifications: Dict[str, "NotifyConfig"] = betterproto.map_field(
+    notifications: Dict[str, "NotificationConfig"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
 
@@ -283,7 +283,7 @@ class GetNotificationRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetNotificationResponse(betterproto.Message):
-    notification: "NotifyConfig" = betterproto.message_field(1)
+    notification: "NotificationConfig" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
