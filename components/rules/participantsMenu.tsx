@@ -5,15 +5,10 @@ import {useState} from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
 
 export const NodeMenu = ({data}: { data: PipelineInfo }) => {
     const [isOpen, setIsOpen] = useState();
-    console.log(data.pipeline?.id)
 
     const handleClick = () => {
         setIsOpen(!isOpen);
     };
-    //todo: pass down envars to browser/move call to route handler
-    //   const pause = (id: string | undefined) => {
-    //     pausePipeline(id);
-    //   };
 
     return (
         <div className={"rounded bg-purple-50 ml-4"}>
@@ -49,13 +44,13 @@ export const NodeMenu = ({data}: { data: PipelineInfo }) => {
                     </a>
                     {data?.audience && (
                         <a
-                            href={`/${encodeURIComponent(data.audience.serviceName)}/${
+                            href={`/service/${encodeURIComponent(data.audience.serviceName)}/component/${
                                 encodeURIComponent(data.audience.componentName)
                             }/${
                                 data.audience.operationType === 1
-                                    ? encodeURIComponent("consumer")
-                                    : encodeURIComponent("producer")
-                            }/${encodeURIComponent(data.audience.operationName)}`}
+                                    ? "consumer"
+                                    : "producer"
+                            }/op/${encodeURIComponent(data.audience.operationName)}`}
                         >
                             <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
                                 <Info className="w-4 text-web mx-1"/>
