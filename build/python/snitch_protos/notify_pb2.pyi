@@ -27,9 +27,10 @@ class NotificationConfig(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[NotificationType, str]] = ..., slack: _Optional[_Union[NotificationSlack, _Mapping]] = ..., email: _Optional[_Union[NotificationEmail, _Mapping]] = ..., pagerduty: _Optional[_Union[NotificationPagerDuty, _Mapping]] = ...) -> None: ...
 
 class NotificationEmail(_message.Message):
-    __slots__ = ["recipients", "ses", "smtp", "type"]
+    __slots__ = ["from_address", "recipients", "ses", "smtp", "type"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
+    FROM_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     RECIPIENTS_FIELD_NUMBER: _ClassVar[int]
     SES_FIELD_NUMBER: _ClassVar[int]
     SMTP_FIELD_NUMBER: _ClassVar[int]
@@ -37,11 +38,12 @@ class NotificationEmail(_message.Message):
     TYPE_SES: NotificationEmail.Type
     TYPE_SMTP: NotificationEmail.Type
     TYPE_UNSET: NotificationEmail.Type
+    from_address: str
     recipients: _containers.RepeatedScalarFieldContainer[str]
     ses: NotificationEmailSES
     smtp: NotificationEmailSMTP
     type: NotificationEmail.Type
-    def __init__(self, type: _Optional[_Union[NotificationEmail.Type, str]] = ..., recipients: _Optional[_Iterable[str]] = ..., smtp: _Optional[_Union[NotificationEmailSMTP, _Mapping]] = ..., ses: _Optional[_Union[NotificationEmailSES, _Mapping]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[NotificationEmail.Type, str]] = ..., recipients: _Optional[_Iterable[str]] = ..., from_address: _Optional[str] = ..., smtp: _Optional[_Union[NotificationEmailSMTP, _Mapping]] = ..., ses: _Optional[_Union[NotificationEmailSES, _Mapping]] = ...) -> None: ...
 
 class NotificationEmailSES(_message.Message):
     __slots__ = ["ses_access_key_id", "ses_region", "ses_secret_access_key"]

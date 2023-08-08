@@ -66,6 +66,10 @@ export interface NotificationEmail {
      */
     recipients: string[];
     /**
+     * @generated from protobuf field: optional string from_address = 3;
+     */
+    fromAddress?: string;
+    /**
      * @generated from protobuf oneof: config
      */
     config: {

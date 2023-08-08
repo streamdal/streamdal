@@ -257,6 +257,9 @@ class NotificationEmail(betterproto.Message):
         1, optional=True, group="_type"
     )
     recipients: List[str] = betterproto.string_field(2)
+    from_address: Optional[str] = betterproto.string_field(
+        3, optional=True, group="_from_address"
+    )
     smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
     ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
 

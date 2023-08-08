@@ -69,6 +69,10 @@ export interface NotificationEmail {
      */
     recipients: string[];
     /**
+     * @generated from protobuf field: optional string from_address = 3;
+     */
+    fromAddress?: string;
+    /**
      * @generated from protobuf oneof: config
      */
     config: {
@@ -247,6 +251,7 @@ class NotificationEmail$Type extends MessageType<NotificationEmail> {
         super("protos.NotificationEmail", [
             { no: 1, name: "type", kind: "enum", opt: true, T: () => ["protos.NotificationEmail.Type", NotificationEmail_Type, "TYPE_"] },
             { no: 2, name: "recipients", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "from_address", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "smtp", kind: "message", oneof: "config", T: () => NotificationEmailSMTP },
             { no: 1001, name: "ses", kind: "message", oneof: "config", T: () => NotificationEmailSES }
         ]);
