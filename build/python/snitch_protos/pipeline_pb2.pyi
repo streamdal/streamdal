@@ -25,7 +25,7 @@ class Pipeline(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
-    __slots__ = ["_wasm_bytes", "_wasm_function", "custom", "decode", "detective", "encode", "name", "on_failure", "on_success", "transform"]
+    __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "encode", "name", "on_failure", "on_success", "transform"]
     CUSTOM_FIELD_NUMBER: _ClassVar[int]
     DECODE_FIELD_NUMBER: _ClassVar[int]
     DETECTIVE_FIELD_NUMBER: _ClassVar[int]
@@ -36,8 +36,10 @@ class PipelineStep(_message.Message):
     TRANSFORM_FIELD_NUMBER: _ClassVar[int]
     _WASM_BYTES_FIELD_NUMBER: _ClassVar[int]
     _WASM_FUNCTION_FIELD_NUMBER: _ClassVar[int]
+    _WASM_ID_FIELD_NUMBER: _ClassVar[int]
     _wasm_bytes: bytes
     _wasm_function: str
+    _wasm_id: str
     custom: _custom_pb2.CustomStep
     decode: _decode_pb2.DecodeStep
     detective: _detective_pb2.DetectiveStep
@@ -46,7 +48,7 @@ class PipelineStep(_message.Message):
     on_failure: _containers.RepeatedScalarFieldContainer[PipelineStepCondition]
     on_success: _containers.RepeatedScalarFieldContainer[PipelineStepCondition]
     transform: _transform_pb2.TransformStep
-    def __init__(self, name: _Optional[str] = ..., on_success: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., on_failure: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., detective: _Optional[_Union[_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_custom_pb2.CustomStep, _Mapping]] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., on_success: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., on_failure: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., detective: _Optional[_Union[_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_custom_pb2.CustomStep, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
 
 class PipelineStepCondition(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

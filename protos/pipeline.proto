@@ -53,6 +53,9 @@ message PipelineStep {
     steps.CustomStep custom = 1004;
   }
 
+  // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
+  optional string _wasm_id = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
   // WASM module bytes (set by snitch-server)
   optional bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 

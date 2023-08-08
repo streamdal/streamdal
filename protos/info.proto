@@ -7,29 +7,22 @@ import "pipeline.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-message ServiceInfo {
-  string name = 1;
-  string description = 2;
+message LiveInfo {
+  // If empty, client has not announced any audiences
+  repeated Audience audience = 1;
+  ClientInfo client = 2;
+}
 
-  repeated PipelineInfo pipelines = 100;
-  repeated ConsumerInfo consumers = 101;
-  repeated ProducerInfo producers = 102;
-  repeated ClientInfo clients = 103; // number of entries == num instances?
-
-  // We can probably include stats in here as well?
+enum PipelineState {
+  PIPELINE_STATE_UNSET = 0;
+  PIPELINE_STATE_PAUSED = 1;
 }
 
 message PipelineInfo {
-  protos.Audience audience = 1;
+  // If empty, pipeline is not attached to any audience
+  repeated protos.Audience audiences = 1;
   protos.Pipeline pipeline = 2;
-}
-
-message ConsumerInfo {
-  // TBD
-}
-
-message ProducerInfo {
-  // TBD
+  PipelineState state = 3;
 }
 
 enum ClientType {
@@ -38,7 +31,7 @@ enum ClientType {
   CLIENT_TYPE_SHIM = 2;
 }
 
-// This should come from the register call
+// Most of this is constructed by client SDKs and provided during Register call
 message ClientInfo {
   ClientType client_type = 1;
   string library_name = 2;
@@ -46,4 +39,9 @@ message ClientInfo {
   string language = 4;
   string arch = 5;
   string os = 6;
+
+  // Filled out by snitch_server on GetAll()
+  optional string _session_id = 7; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional string _service_name = 8; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional string _node_name = 9; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
