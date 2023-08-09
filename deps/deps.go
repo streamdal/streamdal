@@ -4,13 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
@@ -236,27 +234,4 @@ func (c *customCheck) Status() (interface{}, error) {
 	// You can return additional information pertaining to the check as long
 	// as it can be JSON marshalled
 	return map[string]int{}, nil
-}
-
-func (d *Dependencies) PreCreateBuckets(ctx context.Context, cfg *config.Config) error {
-	buckets := map[string]time.Duration{
-		store.NATSAudienceBucket:           0,
-		store.NATSLiveBucket:               0,
-		store.NATSPipelineBucket:           0,
-		store.NATSPausedBucket:             0,
-		store.NATSNotificationConfigBucket: 0,
-		store.NATSNotificationAssocBucket:  0,
-	}
-
-	for bucketName, ttl := range buckets {
-		if err := d.NATSBackend.CreateBucket(ctx, bucketName, ttl, cfg.NATSNumBucketReplicas); err != nil {
-			if err == nats.ErrStreamNameAlreadyInUse {
-				continue
-			}
-
-			return fmt.Errorf("unable to create bucket '%s': %s", bucketName, err)
-		}
-	}
-
-	return nil
 }
