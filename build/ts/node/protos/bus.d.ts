@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { MetricsRequest } from "./internal.js";
 import { ResumePipelineRequest } from "./external.js";
 import { PausePipelineRequest } from "./external.js";
 import { DetachPipelineRequest } from "./external.js";
@@ -75,6 +76,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.ResumePipelineRequest resume_pipeline_request = 108;
          */
         resumePipelineRequest: ResumePipelineRequest;
+    } | {
+        oneofKind: "metricsRequest";
+        /**
+         * @generated from protobuf field: protos.MetricsRequest metrics_request = 109;
+         */
+        metricsRequest: MetricsRequest;
     } | {
         oneofKind: undefined;
     };
