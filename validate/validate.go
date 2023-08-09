@@ -505,3 +505,15 @@ func GetNotificationRequest(req *protos.GetNotificationRequest) error {
 
 	return nil
 }
+
+func MetricsRequest(req *protos.MetricsRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.Metrics == nil {
+		return ErrNilField("Metrics")
+	}
+
+	return nil
+}

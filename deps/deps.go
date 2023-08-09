@@ -19,6 +19,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/wasm"
@@ -40,6 +41,7 @@ type Dependencies struct {
 	// Services
 	BusService      bus.IBus
 	NotifyService   notify.INotifier
+	MetricsService  metrics.IMetrics
 	StoreService    store.IStore
 	CmdService      cmd.ICmd
 	Health          health.IHealth
@@ -208,6 +210,12 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	}
 
 	d.NotifyService = notifyService
+
+	metricsService, err := metrics.New(&metrics.Config{})
+	if err != nil {
+		return errors.Wrap(err, "unable to create new metrics service")
+	}
+	d.MetricsService = metricsService
 
 	return nil
 }

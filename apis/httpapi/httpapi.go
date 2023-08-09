@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 
@@ -36,6 +37,7 @@ func (a *HTTPAPI) Run() error {
 
 	router.HandlerFunc("GET", "/health-check", a.healthCheckHandler)
 	router.HandlerFunc("GET", "/version", a.versionHandler)
+	router.Handler("GET", "/metrics", promhttp.Handler())
 
 	llog.Infof("HTTPAPI server running on %v", a.Deps.Config.HTTPAPIListenAddress)
 
