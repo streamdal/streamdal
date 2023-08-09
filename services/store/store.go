@@ -598,9 +598,6 @@ func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.Create
 		return errors.Wrap(err, "error marshaling notification config")
 	}
 
-	// TODO: do elsewhere
-	//req.Notification.Id = uuid.New().String()
-
 	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, *req.Notification.Id, data, 0); err != nil {
 		return errors.Wrap(err, "error saving notification config to NATS")
 	}
