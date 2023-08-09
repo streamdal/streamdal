@@ -45,12 +45,12 @@ type IStore interface {
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
-	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
+	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
-	DeletePipeline(ctx context.Context, pipelineId string) error
+	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
 	DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
@@ -58,6 +58,7 @@ type IStore interface {
 	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
+	GetNotifyConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
 }
 
 type Options struct {
@@ -183,7 +184,7 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	}
 
 	// k == pipelineId
-	pipelines := make(map[string]*protos.Pipeline, 0)
+	pipelines := make(map[string]*protos.Pipeline)
 
 	for _, pipelineId := range pipelineIds {
 		pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
@@ -508,6 +509,97 @@ func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audien
 	}
 
 	return string(pipelineID), nil
+}
+
+func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error {
+	data, err := proto.Marshal(req.Notification)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling notification config")
+	}
+
+	// TODO: do elsewhere
+	//req.Notification.Id = uuid.New().String()
+
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, req.Notification.Id, data, 0); err != nil {
+		return errors.Wrap(err, "error saving notification config to NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error {
+	data, err := proto.Marshal(req.Notification)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling notification config")
+	}
+
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, req.Notification.Id, data, 0); err != nil {
+		return errors.Wrap(err, "error saving notification config to NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error {
+	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationConfigBucket, req.NotificationId); err != nil {
+		return errors.Wrap(err, "error deleting notification config from NATS")
+	}
+
+	// Delete all associations
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
+	if err != nil {
+		return errors.Wrap(err, "error fetching notification assoc keys from NATS")
+	}
+
+	for _, key := range keys {
+		if !strings.HasSuffix(key, "/"+req.NotificationId) {
+			continue
+		}
+
+		if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
+			return errors.Wrap(err, "error deleting notification association from NATS")
+		}
+	}
+
+	return nil
+}
+
+func (s *Store) GetNotifyConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
+	notifyConfigs := make([]*protos.NotificationConfig, 0)
+
+	// Fetch all notify config keys from NATS
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching notify config keys from NATS")
+	}
+
+	for _, key := range keys {
+		if !strings.HasPrefix(key, pipelineID+"/") {
+			continue
+		}
+
+		parts := strings.Split(key, "/")
+		if len(parts) != 2 {
+			return nil, errors.Errorf("invalid notify config key '%s'", key)
+		}
+
+		configID := parts[1]
+
+		// Fetch key so we get the notify config
+		data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, configID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from NATS", configID)
+		}
+
+		notifyConfig := &protos.NotificationConfig{}
+		if err := proto.Unmarshal(data, notifyConfig); err != nil {
+			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
+		}
+
+		notifyConfigs = append(notifyConfigs, notifyConfig)
+	}
+
+	return notifyConfigs, nil
 }
 
 func (o *Options) validate() error {

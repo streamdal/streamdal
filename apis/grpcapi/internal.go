@@ -235,9 +235,13 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 	}, nil
 }
 
-// TODO: implement me
 func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyRequest) (*protos.StandardResponse, error) {
-	return nil, nil
+	s.Deps.NotifyService.Queue(request)
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification queued",
+	}, nil
 }
 
 // TODO: Implement

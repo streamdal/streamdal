@@ -20,6 +20,12 @@ const (
 
 	NATSPausedBucket    = "snitch_paused"
 	NATSPausedKeyFormat = "%s/%s" // K: $audience:$pipeline_id V: NONE
+
+	NATSNotificationConfigBucket    = "snitch_notification_config"
+	NATSNotificationConfigKeyFormat = "%s" // K: $config_id V: serialized protos.NotificationConfig
+
+	NATSNotificationAssocBucket = "snitch_notification"
+	NATSNotificationAssocFormat = "%s/%s" // K: $pipeline_id/$config_id V: NONE
 )
 
 func NATSRegisterKey(session, node string) string {
