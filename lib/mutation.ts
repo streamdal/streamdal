@@ -4,8 +4,10 @@ import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 
 export const upsertPipeline = async (
   pipeline: Pipeline,
-): Promise<StandardResponse> => {
-  const { _, response }: { _; response: StandardResponse } = pipeline.id
+): Promise<StandardResponse & { pipelineId: string }> => {
+  let pipelineId = pipeline.id ? pipeline.id : crypto.randomUUID();
+
+  const { response }: { response: StandardResponse } = pipeline.id
     ? await client
       .updatePipeline(
         { pipeline },
@@ -13,17 +15,28 @@ export const upsertPipeline = async (
       )
     : await client
       .createPipeline(
-        { pipeline },
+        { pipeline: { ...pipeline, id: pipelineId } },
         meta,
       );
 
-  return response;
+  //
+  // XXX/TODO: stop doing this once createPipeline respects
+  // provided id
+  if (!pipeline.id) {
+    const start = response?.message.indexOf("'");
+    pipelineId = response?.message?.substring(
+      start + 1,
+      response?.message.indexOf("'", start + 1),
+    );
+  }
+
+  return { ...response, pipelineId: pipelineId };
 };
 
 export const deletePipeline = async (
   pipelineId: string,
 ): Promise<StandardResponse> => {
-  const { _, response }: { _; response: StandardResponse } = await client
+  const { response }: { response: StandardResponse } = await client
     .deletePipeline(
       { pipelineId },
       meta,

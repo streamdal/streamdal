@@ -34,11 +34,7 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
         rel="stylesheet"
         href="https://esm.sh/reactflow@11.7.4/dist/style.css"
       />
-      <link rel="stylesheet" href="style.css" />
-      {/*<link*/}
-      {/*  href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css"*/}
-      {/*  rel="stylesheet"*/}
-      {/*/>*/}
+      <link rel="stylesheet" type="text/css" href="/style.css" />
     </Head>
     <body className="h-screen bg-purple-50 m-0">
       <div className="flex flex-col w-screen h-screen text-web">

@@ -2,7 +2,6 @@ import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/i
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
-import { pausePipeline } from "../../lib/fetch.ts";
 
 export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
   const [isOpen, setIsOpen] = useState();
@@ -10,10 +9,6 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  //todo: pass down envars to browser/move call to route handler
-  //   const pause = (id: string | undefined) => {
-  //     pausePipeline(id);
-  //   };
 
   return (
     <div className={"rounded bg-purple-50 ml-4"}>
@@ -49,13 +44,11 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
           </a>
           {data?.audience && (
             <a
-              href={`/${encodeURIComponent(data.audience.serviceName)}/${
-                encodeURIComponent(data.audience.componentName)
-              }/${
-                data.audience.operationType === 1
-                  ? encodeURIComponent("consumer")
-                  : encodeURIComponent("producer")
-              }/${encodeURIComponent(data.audience.operationName)}`}
+              href={`/service/${
+                encodeURIComponent(data.audience.serviceName)
+              }/component/${encodeURIComponent(data.audience.componentName)}/${
+                data.audience.operationType === 1 ? "consumer" : "producer"
+              }/op/${encodeURIComponent(data.audience.operationName)}`}
             >
               <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
                 <Info className="w-4 text-web mx-1" />
@@ -63,14 +56,22 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
               </li>
             </a>
           )}
-          <button class="w-full" //todo: pass down envars to browser/move call to route handler
-            //   onClick={() => pause(data.pipeline?.id)}
+          <a
+            href={`/service/${
+              encodeURIComponent(data.audience.serviceName)
+            }/component/${encodeURIComponent(data.audience.componentName)}/${
+              data.audience.operationType === 1 ? "consumer" : "producer"
+            }/op/${
+              encodeURIComponent(data.audience.operationName)
+            }/pipeline/${data.pipeline?.id}/pause`}
           >
-            <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
-              <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
-              Pause
-            </li>
-          </button>
+            <button className="w-full">
+              <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
+                <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
+                Pause
+              </li>
+            </button>
+          </a>
         </ul>
       </div>
     </div>

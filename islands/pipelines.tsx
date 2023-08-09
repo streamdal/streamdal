@@ -1,30 +1,28 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import PipelineDetail, { newPipeline } from "./pipeline.tsx";
-import { SuccessType } from "../routes/pipelines/[id]/delete.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
 
 const Pipelines = (
-  { id, pipelines, success }: {
+  { id, pipelines, success, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
     success: SuccessType;
+    add?: boolean;
   },
 ) => {
   //
-  // wrapper for adding
-  const [wrapper, setWrapper] = useState(
-    pipelines.length > 0 ? pipelines : [newPipeline],
-  );
-  const index = id && wrapper?.findIndex((p) => p.id === id);
-  const [selected, setSelected] = useState(index > -1 ? index : 0);
+  // wrapper supports adding an new entry
+  const wrapper = [
+    ...pipelines,
+    ...pipelines.length === 0 || add ? [newPipeline] : [],
+  ];
 
-  const add = () => {
-    setWrapper([...wrapper, newPipeline]);
-    setSelected(wrapper.length);
-  };
+  const index = id && wrapper?.findIndex((p) => p.id === id);
+  const selected = add ? wrapper.length - 1 : index > -1 ? index : 0;
 
   return (
     <div
@@ -39,11 +37,12 @@ const Pipelines = (
             <div class="border-r w-1/3 flex flex-col pb-[16px] max-h-[80vh] overflow-y-auto">
               <div class="flex justify-between items-center pt-[26px] pb-[16px] px-[14px]">
                 <div class="text-[16px] font-bold">Pipelines</div>
-                <IconPlus
-                  data-tooltip-target="pipeline-add"
-                  class="w-5 h-5 cursor-pointer"
-                  onClick={add}
-                />
+                <a href="/pipelines/add">
+                  <IconPlus
+                    data-tooltip-target="pipeline-add"
+                    class="w-5 h-5 cursor-pointer"
+                  />
+                </a>
                 <Tooltip targetId="pipeline-add" message="Add a new pipeline" />
               </div>
               {wrapper?.map((p: Pipeline, i: number) => (

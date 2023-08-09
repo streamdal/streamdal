@@ -13,17 +13,16 @@ import {
 } from "../../../lib/fetch.ts";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
-import { DeleteModal } from "../../../components/modals/deleteModal.tsx";
-import { ErrorType } from "../../../components/form/validate.ts";
+import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";
 
-export type SuccessType = {
-  status: boolean;
-  message: string;
-  errors?: ErrorType;
+export type DeletePipeline = {
+  pipeline: Pipeline;
+  pipelines: Pipeline[];
+  serviceMap: GetServiceMapResponse;
 };
 
-export const handler: Handlers = {
+export const handler: Handlers<DeletePipeline> = {
   async GET(req, ctx) {
     const pipeline = await getPipeline(ctx.params.id);
     if (!pipeline) {
@@ -52,22 +51,17 @@ export const handler: Handlers = {
 };
 
 export default function DeletePipelineRoute(
-  props: PageProps<
-    {
-      pipeline: Pipeline;
-      pipelines: Pipeline[];
-      serviceMap: GetServiceMapResponse;
-    }
-  >,
+  props: PageProps<DeletePipeline>,
 ) {
   return (
     <>
       <div>
         <Pipelines pipelines={props?.data?.pipelines} />
-        <DeleteModal
+        <RoutedDeleteModal
           id={props?.params?.id}
           entityType="pipeline"
           entityName={props?.data?.pipeline?.name}
+          redirect={`/pipelines/${props?.params?.id}`}
         />
       </div>
       <Layout>
