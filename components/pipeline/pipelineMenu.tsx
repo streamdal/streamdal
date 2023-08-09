@@ -1,7 +1,6 @@
 import IconCopy from "tabler-icons/tsx/copy.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { RoutedDeleteModal } from "../modals/routedDeleteModal.tsx";
 
 export const PipelineMenu = ({ id }: { id?: string }) => (
   <>

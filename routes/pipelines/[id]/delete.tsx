@@ -14,7 +14,6 @@ import {
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
-import { ErrorType } from "../../../components/form/validate.ts";
 import Pipelines from "../../../islands/pipelines.tsx";
 
 export type DeletePipeline = {
@@ -62,6 +61,7 @@ export default function DeletePipelineRoute(
           id={props?.params?.id}
           entityType="pipeline"
           entityName={props?.data?.pipeline?.name}
+          redirect={`/pipelines/${props?.params?.id}`}
         />
       </div>
       <Layout>
