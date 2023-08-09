@@ -199,7 +199,10 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.BusService = busService
 
-	notifyService, err := notify.New(&notify.Config{})
+	notifyService, err := notify.New(&notify.Config{
+		Store:       storeService,
+		ShutdownCtx: d.ShutdownContext,
+	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new notify service")
 	}
@@ -237,7 +240,12 @@ func (c *customCheck) Status() (interface{}, error) {
 
 func (d *Dependencies) PreCreateBuckets(ctx context.Context, cfg *config.Config) error {
 	buckets := map[string]time.Duration{
-		//BucketNameHere:      0,
+		store.NATSAudienceBucket:           0,
+		store.NATSLiveBucket:               0,
+		store.NATSPipelineBucket:           0,
+		store.NATSPausedBucket:             0,
+		store.NATSNotificationConfigBucket: 0,
+		store.NATSNotificationAssocBucket:  0,
 	}
 
 	for bucketName, ttl := range buckets {

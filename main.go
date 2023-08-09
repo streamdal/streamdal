@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/pkg/errors"
@@ -45,6 +46,10 @@ func main() {
 	d, err := deps.New(version, cfg)
 	if err != nil {
 		log.WithError(err).Fatal("could not setup dependencies")
+	}
+
+	if err := d.PreCreateBuckets(context.Background(), cfg); err != nil {
+		log.WithError(err).Fatal("could not create buckets")
 	}
 
 	if err := run(d); err != nil {

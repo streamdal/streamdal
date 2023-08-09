@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	ErrMissingStorageService = errors.New("StorageService cannot be nil")
+	ErrMissingStorageService = errors.New("Store cannot be nil")
 	ErrMissingShutdownCtx    = errors.New("ShutdownCtx cannot be nil")
 )
 
@@ -43,8 +43,8 @@ type INotifier interface {
 }
 
 type Config struct {
-	StorageService store.IStore
-	ShutdownCtx    context.Context
+	Store       store.IStore
+	ShutdownCtx context.Context
 }
 
 type Notify struct {
@@ -77,7 +77,7 @@ func New(cfg *Config) (*Notify, error) {
 }
 
 func validateConfig(cfg *Config) error {
-	if cfg.StorageService == nil {
+	if cfg.Store == nil {
 		return ErrMissingStorageService
 	}
 
@@ -119,12 +119,12 @@ func (n *Notify) runWorker(looper director.Looper) {
 
 func (n *Notify) Queue(ctx context.Context, req *protos.NotifyRequest) error {
 	// Look up pipeline
-	pipeline, err := n.StorageService.GetPipeline(ctx, req.PipelineId)
+	pipeline, err := n.Store.GetPipeline(ctx, req.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "pipeline not found")
 	}
 
-	configs, err := n.StorageService.GetNotifyConfigsByPipeline(ctx, req.PipelineId)
+	configs, err := n.Store.GetNotifyConfigsByPipeline(ctx, req.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "notify config not found")
 	}
