@@ -86,6 +86,19 @@ export interface CreatePipelineRequest {
     pipeline?: Pipeline;
 }
 /**
+ * @generated from protobuf message protos.CreatePipelineResponse
+ */
+export interface CreatePipelineResponse {
+    /**
+     * @generated from protobuf field: string message = 1;
+     */
+    message: string;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
  * @generated from protobuf message protos.UpdatePipelineRequest
  */
 export interface UpdatePipelineRequest {
@@ -256,6 +269,19 @@ class CreatePipelineRequest$Type extends MessageType<CreatePipelineRequest> {
  */
 export const CreatePipelineRequest = new CreatePipelineRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class CreatePipelineResponse$Type extends MessageType<CreatePipelineResponse> {
+    constructor() {
+        super("protos.CreatePipelineResponse", [
+            { no: 1, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreatePipelineResponse
+ */
+export const CreatePipelineResponse = new CreatePipelineResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class UpdatePipelineRequest$Type extends MessageType<UpdatePipelineRequest> {
     constructor() {
         super("protos.UpdatePipelineRequest", [
@@ -362,7 +388,7 @@ export const External = new ServiceType("protos.External", [
     { name: "GetAll", options: {}, I: GetAllRequest, O: GetAllResponse },
     { name: "GetPipelines", options: {}, I: GetPipelinesRequest, O: GetPipelinesResponse },
     { name: "GetPipeline", options: {}, I: GetPipelineRequest, O: GetPipelineResponse },
-    { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: StandardResponse },
+    { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: CreatePipelineResponse },
     { name: "UpdatePipeline", options: {}, I: UpdatePipelineRequest, O: StandardResponse },
     { name: "DeletePipeline", options: {}, I: DeletePipelineRequest, O: StandardResponse },
     { name: "AttachPipeline", options: {}, I: AttachPipelineRequest, O: StandardResponse },
