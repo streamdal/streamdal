@@ -103,9 +103,6 @@ func (n *Notify) runWorker(looper director.Looper) {
 			quit = true
 			return nil
 		case event := <-n.eventChan:
-			// TODO: Do something
-			_ = event
-
 			for _, cfg := range event.Configs {
 				if err := n.handle(context.Background(), event, cfg); err != nil {
 					n.log.WithError(err).Error("unable to handle notification")
