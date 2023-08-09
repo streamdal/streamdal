@@ -10,7 +10,7 @@ export const ExpandedNodes = ({ nodes, params }) => {
     return {
       label: actor.audience.operationName,
       pipeline: actor,
-      flow: false,
+      params: params,
     };
   });
 
@@ -24,7 +24,7 @@ export const ExpandedNodes = ({ nodes, params }) => {
       <div
         class={"absolute z-50 h-1/2 flex flex-col justify-center items-center"}
       >
-        <div class={"w-full flex justify-end mr-[-50px]"}>
+        <div class={"w-[520px] flex justify-end mr-[-50px]"}>
           <a href="/">
             <button
               type="button"
@@ -34,9 +34,14 @@ export const ExpandedNodes = ({ nodes, params }) => {
             </button>
           </a>
         </div>
-        <div class={"grid grid-cols-2 w-fit gap-4 z-50"} ref={toClose}>
+        <div
+          class={`w-[520px] flex ${
+            filteredNodes.length > 1 ? "justify-between" : "justify-center"
+          } items-center z-50 flex-wrap`}
+          ref={toClose}
+        >
           {filteredNodes.map((item) => {
-            return actorType === "consumer"
+            return actorType === 1
               ? <Consumer data={item} />
               : <Producer data={item} />;
           })}
