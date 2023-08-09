@@ -595,6 +595,7 @@ class BusEvent(betterproto.Message):
     resume_pipeline_request: "ResumePipelineRequest" = betterproto.message_field(
         108, group="event"
     )
+    metrics_request: "MetricsRequest" = betterproto.message_field(109, group="event")
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
