@@ -119,7 +119,10 @@ class Pipeline(betterproto.Message):
     """
 
     id: str = betterproto.string_field(1)
-    """Set by snitch-server on Create; must be present on Update calls"""
+    """
+    ID should NOT be set by external gRPC client on CreatePipelineRequest - it
+    will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+    """
 
     name: str = betterproto.string_field(2)
     """Friendly name for the pipeline"""

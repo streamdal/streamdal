@@ -16,7 +16,8 @@ import { DetectiveStep } from "./steps/detective.js";
  */
 export interface Pipeline {
     /**
-     * Set by snitch-server on Create; must be present on Update calls
+     * ID should NOT be set by external gRPC client on CreatePipelineRequest - it
+     * will be ignored; it _does_ need to be set on UpdatePipelineRequest.
      *
      * @generated from protobuf field: string id = 1;
      */
