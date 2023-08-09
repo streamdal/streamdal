@@ -140,6 +140,7 @@ message GetNotificationsRequest {
 }
 
 message GetNotificationsResponse {
+  // Key == id of the notification config
   map<string,protos.NotificationConfig> notifications = 1;
 }
 
