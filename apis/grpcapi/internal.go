@@ -251,7 +251,6 @@ func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyReque
 	}, nil
 }
 
-// TODO: Implement
 func (s *InternalServer) Metrics(ctx context.Context, req *protos.MetricsRequest) (*protos.StandardResponse, error) {
 	if err := validate.MetricsRequest(req); err != nil {
 		return &protos.StandardResponse{
@@ -261,7 +260,7 @@ func (s *InternalServer) Metrics(ctx context.Context, req *protos.MetricsRequest
 		}, nil
 	}
 
-	if err := s.Deps.MetricsService.HandleMetricsRequest(ctx, req); err != nil {
+	if err := s.Deps.BusService.BroadcastMetrics(ctx, req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
 			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,

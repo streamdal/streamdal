@@ -173,6 +173,12 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.CmdService = c
 
+	metricsService, err := metrics.New(&metrics.Config{})
+	if err != nil {
+		return errors.Wrap(err, "unable to create new metrics service")
+	}
+	d.MetricsService = metricsService
+
 	storeService, err := store.New(&store.Options{
 		NATSBackend: d.NATSBackend,
 		ShutdownCtx: d.ShutdownContext,
@@ -192,6 +198,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		NodeName:    d.Config.NodeName,
 		ShutdownCtx: d.ShutdownContext,
 		WASMDir:     d.Config.WASMDir,
+		Metrics:     d.MetricsService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")
@@ -208,12 +215,6 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	}
 
 	d.NotifyService = notifyService
-
-	metricsService, err := metrics.New(&metrics.Config{})
-	if err != nil {
-		return errors.Wrap(err, "unable to create new metrics service")
-	}
-	d.MetricsService = metricsService
 
 	return nil
 }

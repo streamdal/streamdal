@@ -55,7 +55,7 @@ var defaultCounters = []*defaultCounter{
 	{
 		Name:        "counter_notify",
 		Description: "Number of errors encountered by produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name", "config_id", "config_name"},
 	},
 }
 

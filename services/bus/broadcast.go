@@ -34,6 +34,10 @@ func (b *Bus) BroadcastResumePipeline(ctx context.Context, req *protos.ResumePip
 	return b.broadcast(ctx, "resume_pipeline", &protos.BusEvent{Event: &protos.BusEvent_ResumePipelineRequest{ResumePipelineRequest: req}})
 }
 
+func (b *Bus) BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error {
+	return b.broadcast(ctx, "metrics", &protos.BusEvent{Event: &protos.BusEvent_MetricsRequest{MetricsRequest: req}})
+}
+
 // TODO: Use generics
 func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.BusEvent) error {
 	// Need to translate metadata from ctx -> metadata in event
