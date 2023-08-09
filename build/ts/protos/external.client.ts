@@ -6,6 +6,7 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./external.js";
 import type { TestResponse } from "./external.js";
 import type { TestRequest } from "./external.js";
+import type { DetachNotificationRequest } from "./external.js";
 import type { AttachNotificationRequest } from "./external.js";
 import type { GetNotificationResponse } from "./external.js";
 import type { GetNotificationRequest } from "./external.js";
@@ -120,6 +121,10 @@ export interface IExternalClient {
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input: AttachNotificationRequest, options?: RpcOptions): UnaryCall<AttachNotificationRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
+     */
+    detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
      * Test method
      *
@@ -269,12 +274,19 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<AttachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
+     */
+    detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse> {
+        const method = this.methods[16], opt = this._transport.mergeOptions(options);
+        return stackIntercept<DetachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[16], opt = this._transport.mergeOptions(options);
+        const method = this.methods[17], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

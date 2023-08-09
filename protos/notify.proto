@@ -14,9 +14,9 @@ enum NotificationType {
 message NotificationConfig {
   optional string id = 1;
 
-  optional string name = 2;
+  string name = 2;
 
-  optional NotificationType type = 3;
+  NotificationType type = 3;
 
   oneof config {
     NotificationSlack slack = 1000;
@@ -26,8 +26,8 @@ message NotificationConfig {
 }
 
 message NotificationSlack {
-  optional string bot_token = 1;
-  optional string channel = 2;
+  string bot_token = 1;
+  string channel = 2;
 }
 
 message NotificationEmail {
@@ -37,11 +37,11 @@ message NotificationEmail {
     TYPE_SES = 2;
   }
 
-  optional Type type = 1;
+  Type type = 1;
 
   repeated string recipients = 2;
 
-  optional string from_address = 3;
+  string from_address = 3;
 
   oneof config {
     NotificationEmailSMTP smtp = 1000;
@@ -50,17 +50,17 @@ message NotificationEmail {
 }
 
 message NotificationEmailSMTP {
-  optional string host = 1;
-  optional int32 port = 2;
-  optional string user = 3;
-  optional string password = 4;
-  optional bool use_tls = 5;
+  string host = 1;
+  int32 port = 2;
+  string user = 3;
+  string password = 4;
+  bool use_tls = 5;
 }
 
 message NotificationEmailSES {
-  optional string ses_region = 1;
-  optional string ses_access_key_id = 2;
-  optional string ses_secret_access_key = 3;
+  string ses_region = 1;
+  string ses_access_key_id = 2;
+  string ses_secret_access_key = 3;
 }
 
 message NotificationPagerDuty {
@@ -71,13 +71,13 @@ message NotificationPagerDuty {
   }
 
   // Auth token
-  optional string token = 1;
+  string token = 1;
 
   // Must be a valid email for a PagerDuty user
-  optional string email = 2;
+  string email = 2;
 
   // Must be a valid PagerDuty service
-  optional string service_id = 3;
+  string service_id = 3;
 
   Urgency urgency = 4;
 }

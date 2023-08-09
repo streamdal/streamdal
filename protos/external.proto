@@ -46,6 +46,7 @@ service External {
   rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
   rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
   rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
+  rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -151,6 +152,11 @@ message GetNotificationResponse {
 }
 
 message AttachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
+}
+
+message DetachNotificationRequest {
   string notification_id = 1;
   string pipeline_id = 2;
 }

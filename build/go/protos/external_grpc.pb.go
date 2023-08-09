@@ -48,6 +48,7 @@ type ExternalClient interface {
 	GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
 	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
 	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -204,6 +205,15 @@ func (c *externalClient) AttachNotification(ctx context.Context, in *AttachNotif
 	return out, nil
 }
 
+func (c *externalClient) DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/DetachNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -243,6 +253,7 @@ type ExternalServer interface {
 	GetNotifications(context.Context, *GetNotificationsRequest) (*GetNotificationsResponse, error)
 	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
 	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
+	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -299,6 +310,9 @@ func (UnimplementedExternalServer) GetNotification(context.Context, *GetNotifica
 }
 func (UnimplementedExternalServer) AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AttachNotification not implemented")
+}
+func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DetachNotification not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -604,6 +618,24 @@ func _External_AttachNotification_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_DetachNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetachNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DetachNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/DetachNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DetachNotification(ctx, req.(*DetachNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -692,6 +724,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AttachNotification",
 			Handler:    _External_AttachNotification_Handler,
+		},
+		{
+			MethodName: "DetachNotification",
+			Handler:    _External_DetachNotification_Handler,
 		},
 		{
 			MethodName: "Test",

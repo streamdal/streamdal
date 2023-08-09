@@ -244,6 +244,19 @@ export interface AttachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.DetachNotificationRequest
+ */
+export interface DetachNotificationRequest {
+    /**
+     * @generated from protobuf field: string notification_id = 1;
+     */
+    notificationId: string;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -415,6 +428,13 @@ declare class AttachNotificationRequest$Type extends MessageType<AttachNotificat
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
  */
 export declare const AttachNotificationRequest: AttachNotificationRequest$Type;
+declare class DetachNotificationRequest$Type extends MessageType<DetachNotificationRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.DetachNotificationRequest
+ */
+export declare const DetachNotificationRequest: DetachNotificationRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
 }

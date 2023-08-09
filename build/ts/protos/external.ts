@@ -248,6 +248,19 @@ export interface AttachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.DetachNotificationRequest
+ */
+export interface DetachNotificationRequest {
+    /**
+     * @generated from protobuf field: string notification_id = 1;
+     */
+    notificationId: string;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -532,6 +545,19 @@ class AttachNotificationRequest$Type extends MessageType<AttachNotificationReque
  */
 export const AttachNotificationRequest = new AttachNotificationRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class DetachNotificationRequest$Type extends MessageType<DetachNotificationRequest> {
+    constructor() {
+        super("protos.DetachNotificationRequest", [
+            { no: 1, name: "notification_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DetachNotificationRequest
+ */
+export const DetachNotificationRequest = new DetachNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -575,5 +601,6 @@ export const External = new ServiceType("protos.External", [
     { name: "GetNotifications", options: {}, I: GetNotificationsRequest, O: GetNotificationsResponse },
     { name: "GetNotification", options: {}, I: GetNotificationRequest, O: GetNotificationResponse },
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
+    { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

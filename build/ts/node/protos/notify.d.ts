@@ -8,13 +8,13 @@ export interface NotificationConfig {
      */
     id?: string;
     /**
-     * @generated from protobuf field: optional string name = 2;
+     * @generated from protobuf field: string name = 2;
      */
-    name?: string;
+    name: string;
     /**
-     * @generated from protobuf field: optional protos.NotificationType type = 3;
+     * @generated from protobuf field: protos.NotificationType type = 3;
      */
-    type?: NotificationType;
+    type: NotificationType;
     /**
      * @generated from protobuf oneof: config
      */
@@ -45,30 +45,30 @@ export interface NotificationConfig {
  */
 export interface NotificationSlack {
     /**
-     * @generated from protobuf field: optional string bot_token = 1;
+     * @generated from protobuf field: string bot_token = 1;
      */
-    botToken?: string;
+    botToken: string;
     /**
-     * @generated from protobuf field: optional string channel = 2;
+     * @generated from protobuf field: string channel = 2;
      */
-    channel?: string;
+    channel: string;
 }
 /**
  * @generated from protobuf message protos.NotificationEmail
  */
 export interface NotificationEmail {
     /**
-     * @generated from protobuf field: optional protos.NotificationEmail.Type type = 1;
+     * @generated from protobuf field: protos.NotificationEmail.Type type = 1;
      */
-    type?: NotificationEmail_Type;
+    type: NotificationEmail_Type;
     /**
      * @generated from protobuf field: repeated string recipients = 2;
      */
     recipients: string[];
     /**
-     * @generated from protobuf field: optional string from_address = 3;
+     * @generated from protobuf field: string from_address = 3;
      */
-    fromAddress?: string;
+    fromAddress: string;
     /**
      * @generated from protobuf oneof: config
      */
@@ -110,42 +110,42 @@ export declare enum NotificationEmail_Type {
  */
 export interface NotificationEmailSMTP {
     /**
-     * @generated from protobuf field: optional string host = 1;
+     * @generated from protobuf field: string host = 1;
      */
-    host?: string;
+    host: string;
     /**
-     * @generated from protobuf field: optional int32 port = 2;
+     * @generated from protobuf field: int32 port = 2;
      */
-    port?: number;
+    port: number;
     /**
-     * @generated from protobuf field: optional string user = 3;
+     * @generated from protobuf field: string user = 3;
      */
-    user?: string;
+    user: string;
     /**
-     * @generated from protobuf field: optional string password = 4;
+     * @generated from protobuf field: string password = 4;
      */
-    password?: string;
+    password: string;
     /**
-     * @generated from protobuf field: optional bool use_tls = 5;
+     * @generated from protobuf field: bool use_tls = 5;
      */
-    useTls?: boolean;
+    useTls: boolean;
 }
 /**
  * @generated from protobuf message protos.NotificationEmailSES
  */
 export interface NotificationEmailSES {
     /**
-     * @generated from protobuf field: optional string ses_region = 1;
+     * @generated from protobuf field: string ses_region = 1;
      */
-    sesRegion?: string;
+    sesRegion: string;
     /**
-     * @generated from protobuf field: optional string ses_access_key_id = 2;
+     * @generated from protobuf field: string ses_access_key_id = 2;
      */
-    sesAccessKeyId?: string;
+    sesAccessKeyId: string;
     /**
-     * @generated from protobuf field: optional string ses_secret_access_key = 3;
+     * @generated from protobuf field: string ses_secret_access_key = 3;
      */
-    sesSecretAccessKey?: string;
+    sesSecretAccessKey: string;
 }
 /**
  * @generated from protobuf message protos.NotificationPagerDuty
@@ -154,21 +154,21 @@ export interface NotificationPagerDuty {
     /**
      * Auth token
      *
-     * @generated from protobuf field: optional string token = 1;
+     * @generated from protobuf field: string token = 1;
      */
-    token?: string;
+    token: string;
     /**
      * Must be a valid email for a PagerDuty user
      *
-     * @generated from protobuf field: optional string email = 2;
+     * @generated from protobuf field: string email = 2;
      */
-    email?: string;
+    email: string;
     /**
      * Must be a valid PagerDuty service
      *
-     * @generated from protobuf field: optional string service_id = 3;
+     * @generated from protobuf field: string service_id = 3;
      */
-    serviceId?: string;
+    serviceId: string;
     /**
      * @generated from protobuf field: protos.NotificationPagerDuty.Urgency urgency = 4;
      */

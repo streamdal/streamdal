@@ -233,10 +233,8 @@ class ClientInfo(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class NotificationConfig(betterproto.Message):
     id: Optional[str] = betterproto.string_field(1, optional=True, group="_id")
-    name: Optional[str] = betterproto.string_field(2, optional=True, group="_name")
-    type: Optional["NotificationType"] = betterproto.enum_field(
-        3, optional=True, group="_type"
-    )
+    name: str = betterproto.string_field(2)
+    type: "NotificationType" = betterproto.enum_field(3)
     slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
     email: "NotificationEmail" = betterproto.message_field(1001, group="config")
     pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")
@@ -244,62 +242,44 @@ class NotificationConfig(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotificationSlack(betterproto.Message):
-    bot_token: Optional[str] = betterproto.string_field(
-        1, optional=True, group="_bot_token"
-    )
-    channel: Optional[str] = betterproto.string_field(
-        2, optional=True, group="_channel"
-    )
+    bot_token: str = betterproto.string_field(1)
+    channel: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)
 class NotificationEmail(betterproto.Message):
-    type: Optional["NotificationEmailType"] = betterproto.enum_field(
-        1, optional=True, group="_type"
-    )
+    type: "NotificationEmailType" = betterproto.enum_field(1)
     recipients: List[str] = betterproto.string_field(2)
-    from_address: Optional[str] = betterproto.string_field(
-        3, optional=True, group="_from_address"
-    )
+    from_address: str = betterproto.string_field(3)
     smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
     ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
 
 
 @dataclass(eq=False, repr=False)
 class NotificationEmailSmtp(betterproto.Message):
-    host: Optional[str] = betterproto.string_field(1, optional=True, group="_host")
-    port: Optional[int] = betterproto.int32_field(2, optional=True, group="_port")
-    user: Optional[str] = betterproto.string_field(3, optional=True, group="_user")
-    password: Optional[str] = betterproto.string_field(
-        4, optional=True, group="_password"
-    )
-    use_tls: Optional[bool] = betterproto.bool_field(5, optional=True, group="_use_tls")
+    host: str = betterproto.string_field(1)
+    port: int = betterproto.int32_field(2)
+    user: str = betterproto.string_field(3)
+    password: str = betterproto.string_field(4)
+    use_tls: bool = betterproto.bool_field(5)
 
 
 @dataclass(eq=False, repr=False)
 class NotificationEmailSes(betterproto.Message):
-    ses_region: Optional[str] = betterproto.string_field(
-        1, optional=True, group="_ses_region"
-    )
-    ses_access_key_id: Optional[str] = betterproto.string_field(
-        2, optional=True, group="_ses_access_key_id"
-    )
-    ses_secret_access_key: Optional[str] = betterproto.string_field(
-        3, optional=True, group="_ses_secret_access_key"
-    )
+    ses_region: str = betterproto.string_field(1)
+    ses_access_key_id: str = betterproto.string_field(2)
+    ses_secret_access_key: str = betterproto.string_field(3)
 
 
 @dataclass(eq=False, repr=False)
 class NotificationPagerDuty(betterproto.Message):
-    token: Optional[str] = betterproto.string_field(1, optional=True, group="_token")
+    token: str = betterproto.string_field(1)
     """Auth token"""
 
-    email: Optional[str] = betterproto.string_field(2, optional=True, group="_email")
+    email: str = betterproto.string_field(2)
     """Must be a valid email for a PagerDuty user"""
 
-    service_id: Optional[str] = betterproto.string_field(
-        3, optional=True, group="_service_id"
-    )
+    service_id: str = betterproto.string_field(3)
     """Must be a valid PagerDuty service"""
 
     urgency: "NotificationPagerDutyUrgency" = betterproto.enum_field(4)
@@ -434,6 +414,12 @@ class GetNotificationResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class AttachNotificationRequest(betterproto.Message):
+    notification_id: str = betterproto.string_field(1)
+    pipeline_id: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class DetachNotificationRequest(betterproto.Message):
     notification_id: str = betterproto.string_field(1)
     pipeline_id: str = betterproto.string_field(2)
 
@@ -913,6 +899,23 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def detach_notification(
+        self,
+        detach_notification_request: "DetachNotificationRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/DetachNotification",
+            detach_notification_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1098,6 +1101,11 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def detach_notification(
+        self, detach_notification_request: "DetachNotificationRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -1220,6 +1228,14 @@ class ExternalBase(ServiceBase):
         response = await self.attach_notification(request)
         await stream.send_message(response)
 
+    async def __rpc_detach_notification(
+        self,
+        stream: "grpclib.server.Stream[DetachNotificationRequest, StandardResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.detach_notification(request)
+        await stream.send_message(response)
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1323,6 +1339,12 @@ class ExternalBase(ServiceBase):
                 self.__rpc_attach_notification,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 AttachNotificationRequest,
+                StandardResponse,
+            ),
+            "/protos.External/DetachNotification": grpclib.const.Handler(
+                self.__rpc_detach_notification,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                DetachNotificationRequest,
                 StandardResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(

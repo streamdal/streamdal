@@ -32,9 +32,9 @@ pub struct NotificationConfig {
     // @@protoc_insertion_point(field:protos.NotificationConfig.id)
     pub id: ::std::option::Option<::std::string::String>,
     // @@protoc_insertion_point(field:protos.NotificationConfig.name)
-    pub name: ::std::option::Option<::std::string::String>,
+    pub name: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationConfig.type)
-    pub type_: ::std::option::Option<::protobuf::EnumOrUnknown<NotificationType>>,
+    pub type_: ::protobuf::EnumOrUnknown<NotificationType>,
     // message oneof groups
     pub config: ::std::option::Option<notification_config::Config>,
     // special fields
@@ -208,12 +208,12 @@ impl NotificationConfig {
             |m: &NotificationConfig| { &m.id },
             |m: &mut NotificationConfig| { &mut m.id },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "name",
             |m: &NotificationConfig| { &m.name },
             |m: &mut NotificationConfig| { &mut m.name },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
             |m: &NotificationConfig| { &m.type_ },
             |m: &mut NotificationConfig| { &mut m.type_ },
@@ -262,10 +262,10 @@ impl ::protobuf::Message for NotificationConfig {
                     self.id = ::std::option::Option::Some(is.read_string()?);
                 },
                 18 => {
-                    self.name = ::std::option::Option::Some(is.read_string()?);
+                    self.name = is.read_string()?;
                 },
                 24 => {
-                    self.type_ = ::std::option::Option::Some(is.read_enum_or_unknown()?);
+                    self.type_ = is.read_enum_or_unknown()?;
                 },
                 8002 => {
                     self.config = ::std::option::Option::Some(notification_config::Config::Slack(is.read_message()?));
@@ -291,11 +291,11 @@ impl ::protobuf::Message for NotificationConfig {
         if let Some(v) = self.id.as_ref() {
             my_size += ::protobuf::rt::string_size(1, &v);
         }
-        if let Some(v) = self.name.as_ref() {
-            my_size += ::protobuf::rt::string_size(2, &v);
+        if !self.name.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.name);
         }
-        if let Some(v) = self.type_ {
-            my_size += ::protobuf::rt::int32_size(3, v.value());
+        if self.type_ != ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(3, self.type_.value());
         }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
@@ -322,11 +322,11 @@ impl ::protobuf::Message for NotificationConfig {
         if let Some(v) = self.id.as_ref() {
             os.write_string(1, v)?;
         }
-        if let Some(v) = self.name.as_ref() {
-            os.write_string(2, v)?;
+        if !self.name.is_empty() {
+            os.write_string(2, &self.name)?;
         }
-        if let Some(v) = self.type_ {
-            os.write_enum(3, ::protobuf::EnumOrUnknown::value(&v))?;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET) {
+            os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
@@ -359,8 +359,8 @@ impl ::protobuf::Message for NotificationConfig {
 
     fn clear(&mut self) {
         self.id = ::std::option::Option::None;
-        self.name = ::std::option::Option::None;
-        self.type_ = ::std::option::Option::None;
+        self.name.clear();
+        self.type_ = ::protobuf::EnumOrUnknown::new(NotificationType::NOTIFICATION_TYPE_UNSET);
         self.config = ::std::option::Option::None;
         self.config = ::std::option::Option::None;
         self.config = ::std::option::Option::None;
@@ -370,8 +370,8 @@ impl ::protobuf::Message for NotificationConfig {
     fn default_instance() -> &'static NotificationConfig {
         static instance: NotificationConfig = NotificationConfig {
             id: ::std::option::Option::None,
-            name: ::std::option::Option::None,
-            type_: ::std::option::Option::None,
+            name: ::std::string::String::new(),
+            type_: ::protobuf::EnumOrUnknown::from_i32(0),
             config: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -433,9 +433,9 @@ pub mod notification_config {
 pub struct NotificationSlack {
     // message fields
     // @@protoc_insertion_point(field:protos.NotificationSlack.bot_token)
-    pub bot_token: ::std::option::Option<::std::string::String>,
+    pub bot_token: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationSlack.channel)
-    pub channel: ::std::option::Option<::std::string::String>,
+    pub channel: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.NotificationSlack.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -455,12 +455,12 @@ impl NotificationSlack {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "bot_token",
             |m: &NotificationSlack| { &m.bot_token },
             |m: &mut NotificationSlack| { &mut m.bot_token },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "channel",
             |m: &NotificationSlack| { &m.channel },
             |m: &mut NotificationSlack| { &mut m.channel },
@@ -484,10 +484,10 @@ impl ::protobuf::Message for NotificationSlack {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.bot_token = ::std::option::Option::Some(is.read_string()?);
+                    self.bot_token = is.read_string()?;
                 },
                 18 => {
-                    self.channel = ::std::option::Option::Some(is.read_string()?);
+                    self.channel = is.read_string()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -501,11 +501,11 @@ impl ::protobuf::Message for NotificationSlack {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.bot_token.as_ref() {
-            my_size += ::protobuf::rt::string_size(1, &v);
+        if !self.bot_token.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.bot_token);
         }
-        if let Some(v) = self.channel.as_ref() {
-            my_size += ::protobuf::rt::string_size(2, &v);
+        if !self.channel.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.channel);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -513,11 +513,11 @@ impl ::protobuf::Message for NotificationSlack {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.bot_token.as_ref() {
-            os.write_string(1, v)?;
+        if !self.bot_token.is_empty() {
+            os.write_string(1, &self.bot_token)?;
         }
-        if let Some(v) = self.channel.as_ref() {
-            os.write_string(2, v)?;
+        if !self.channel.is_empty() {
+            os.write_string(2, &self.channel)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -536,15 +536,15 @@ impl ::protobuf::Message for NotificationSlack {
     }
 
     fn clear(&mut self) {
-        self.bot_token = ::std::option::Option::None;
-        self.channel = ::std::option::Option::None;
+        self.bot_token.clear();
+        self.channel.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static NotificationSlack {
         static instance: NotificationSlack = NotificationSlack {
-            bot_token: ::std::option::Option::None,
-            channel: ::std::option::Option::None,
+            bot_token: ::std::string::String::new(),
+            channel: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -573,11 +573,11 @@ impl ::protobuf::reflect::ProtobufValue for NotificationSlack {
 pub struct NotificationEmail {
     // message fields
     // @@protoc_insertion_point(field:protos.NotificationEmail.type)
-    pub type_: ::std::option::Option<::protobuf::EnumOrUnknown<notification_email::Type>>,
+    pub type_: ::protobuf::EnumOrUnknown<notification_email::Type>,
     // @@protoc_insertion_point(field:protos.NotificationEmail.recipients)
     pub recipients: ::std::vec::Vec<::std::string::String>,
     // @@protoc_insertion_point(field:protos.NotificationEmail.from_address)
-    pub from_address: ::std::option::Option<::std::string::String>,
+    pub from_address: ::std::string::String,
     // message oneof groups
     pub config: ::std::option::Option<notification_email::Config>,
     // special fields
@@ -697,7 +697,7 @@ impl NotificationEmail {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
             |m: &NotificationEmail| { &m.type_ },
             |m: &mut NotificationEmail| { &mut m.type_ },
@@ -707,7 +707,7 @@ impl NotificationEmail {
             |m: &NotificationEmail| { &m.recipients },
             |m: &mut NotificationEmail| { &mut m.recipients },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "from_address",
             |m: &NotificationEmail| { &m.from_address },
             |m: &mut NotificationEmail| { &mut m.from_address },
@@ -746,13 +746,13 @@ impl ::protobuf::Message for NotificationEmail {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 8 => {
-                    self.type_ = ::std::option::Option::Some(is.read_enum_or_unknown()?);
+                    self.type_ = is.read_enum_or_unknown()?;
                 },
                 18 => {
                     self.recipients.push(is.read_string()?);
                 },
                 26 => {
-                    self.from_address = ::std::option::Option::Some(is.read_string()?);
+                    self.from_address = is.read_string()?;
                 },
                 8002 => {
                     self.config = ::std::option::Option::Some(notification_email::Config::Smtp(is.read_message()?));
@@ -772,14 +772,14 @@ impl ::protobuf::Message for NotificationEmail {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.type_ {
-            my_size += ::protobuf::rt::int32_size(1, v.value());
+        if self.type_ != ::protobuf::EnumOrUnknown::new(notification_email::Type::TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.type_.value());
         }
         for value in &self.recipients {
             my_size += ::protobuf::rt::string_size(2, &value);
         };
-        if let Some(v) = self.from_address.as_ref() {
-            my_size += ::protobuf::rt::string_size(3, &v);
+        if !self.from_address.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.from_address);
         }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
@@ -799,14 +799,14 @@ impl ::protobuf::Message for NotificationEmail {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.type_ {
-            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&v))?;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(notification_email::Type::TYPE_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
         for v in &self.recipients {
             os.write_string(2, &v)?;
         };
-        if let Some(v) = self.from_address.as_ref() {
-            os.write_string(3, v)?;
+        if !self.from_address.is_empty() {
+            os.write_string(3, &self.from_address)?;
         }
         if let ::std::option::Option::Some(ref v) = self.config {
             match v {
@@ -835,9 +835,9 @@ impl ::protobuf::Message for NotificationEmail {
     }
 
     fn clear(&mut self) {
-        self.type_ = ::std::option::Option::None;
+        self.type_ = ::protobuf::EnumOrUnknown::new(notification_email::Type::TYPE_UNSET);
         self.recipients.clear();
-        self.from_address = ::std::option::Option::None;
+        self.from_address.clear();
         self.config = ::std::option::Option::None;
         self.config = ::std::option::Option::None;
         self.special_fields.clear();
@@ -845,9 +845,9 @@ impl ::protobuf::Message for NotificationEmail {
 
     fn default_instance() -> &'static NotificationEmail {
         static instance: NotificationEmail = NotificationEmail {
-            type_: ::std::option::Option::None,
+            type_: ::protobuf::EnumOrUnknown::from_i32(0),
             recipients: ::std::vec::Vec::new(),
-            from_address: ::std::option::Option::None,
+            from_address: ::std::string::String::new(),
             config: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -964,15 +964,15 @@ pub mod notification_email {
 pub struct NotificationEmailSMTP {
     // message fields
     // @@protoc_insertion_point(field:protos.NotificationEmailSMTP.host)
-    pub host: ::std::option::Option<::std::string::String>,
+    pub host: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationEmailSMTP.port)
-    pub port: ::std::option::Option<i32>,
+    pub port: i32,
     // @@protoc_insertion_point(field:protos.NotificationEmailSMTP.user)
-    pub user: ::std::option::Option<::std::string::String>,
+    pub user: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationEmailSMTP.password)
-    pub password: ::std::option::Option<::std::string::String>,
+    pub password: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationEmailSMTP.use_tls)
-    pub use_tls: ::std::option::Option<bool>,
+    pub use_tls: bool,
     // special fields
     // @@protoc_insertion_point(special_field:protos.NotificationEmailSMTP.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -992,27 +992,27 @@ impl NotificationEmailSMTP {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "host",
             |m: &NotificationEmailSMTP| { &m.host },
             |m: &mut NotificationEmailSMTP| { &mut m.host },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "port",
             |m: &NotificationEmailSMTP| { &m.port },
             |m: &mut NotificationEmailSMTP| { &mut m.port },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "user",
             |m: &NotificationEmailSMTP| { &m.user },
             |m: &mut NotificationEmailSMTP| { &mut m.user },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "password",
             |m: &NotificationEmailSMTP| { &m.password },
             |m: &mut NotificationEmailSMTP| { &mut m.password },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "use_tls",
             |m: &NotificationEmailSMTP| { &m.use_tls },
             |m: &mut NotificationEmailSMTP| { &mut m.use_tls },
@@ -1036,19 +1036,19 @@ impl ::protobuf::Message for NotificationEmailSMTP {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.host = ::std::option::Option::Some(is.read_string()?);
+                    self.host = is.read_string()?;
                 },
                 16 => {
-                    self.port = ::std::option::Option::Some(is.read_int32()?);
+                    self.port = is.read_int32()?;
                 },
                 26 => {
-                    self.user = ::std::option::Option::Some(is.read_string()?);
+                    self.user = is.read_string()?;
                 },
                 34 => {
-                    self.password = ::std::option::Option::Some(is.read_string()?);
+                    self.password = is.read_string()?;
                 },
                 40 => {
-                    self.use_tls = ::std::option::Option::Some(is.read_bool()?);
+                    self.use_tls = is.read_bool()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -1062,19 +1062,19 @@ impl ::protobuf::Message for NotificationEmailSMTP {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.host.as_ref() {
-            my_size += ::protobuf::rt::string_size(1, &v);
+        if !self.host.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.host);
         }
-        if let Some(v) = self.port {
-            my_size += ::protobuf::rt::int32_size(2, v);
+        if self.port != 0 {
+            my_size += ::protobuf::rt::int32_size(2, self.port);
         }
-        if let Some(v) = self.user.as_ref() {
-            my_size += ::protobuf::rt::string_size(3, &v);
+        if !self.user.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.user);
         }
-        if let Some(v) = self.password.as_ref() {
-            my_size += ::protobuf::rt::string_size(4, &v);
+        if !self.password.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.password);
         }
-        if let Some(v) = self.use_tls {
+        if self.use_tls != false {
             my_size += 1 + 1;
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -1083,20 +1083,20 @@ impl ::protobuf::Message for NotificationEmailSMTP {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.host.as_ref() {
-            os.write_string(1, v)?;
+        if !self.host.is_empty() {
+            os.write_string(1, &self.host)?;
         }
-        if let Some(v) = self.port {
-            os.write_int32(2, v)?;
+        if self.port != 0 {
+            os.write_int32(2, self.port)?;
         }
-        if let Some(v) = self.user.as_ref() {
-            os.write_string(3, v)?;
+        if !self.user.is_empty() {
+            os.write_string(3, &self.user)?;
         }
-        if let Some(v) = self.password.as_ref() {
-            os.write_string(4, v)?;
+        if !self.password.is_empty() {
+            os.write_string(4, &self.password)?;
         }
-        if let Some(v) = self.use_tls {
-            os.write_bool(5, v)?;
+        if self.use_tls != false {
+            os.write_bool(5, self.use_tls)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1115,21 +1115,21 @@ impl ::protobuf::Message for NotificationEmailSMTP {
     }
 
     fn clear(&mut self) {
-        self.host = ::std::option::Option::None;
-        self.port = ::std::option::Option::None;
-        self.user = ::std::option::Option::None;
-        self.password = ::std::option::Option::None;
-        self.use_tls = ::std::option::Option::None;
+        self.host.clear();
+        self.port = 0;
+        self.user.clear();
+        self.password.clear();
+        self.use_tls = false;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static NotificationEmailSMTP {
         static instance: NotificationEmailSMTP = NotificationEmailSMTP {
-            host: ::std::option::Option::None,
-            port: ::std::option::Option::None,
-            user: ::std::option::Option::None,
-            password: ::std::option::Option::None,
-            use_tls: ::std::option::Option::None,
+            host: ::std::string::String::new(),
+            port: 0,
+            user: ::std::string::String::new(),
+            password: ::std::string::String::new(),
+            use_tls: false,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1158,11 +1158,11 @@ impl ::protobuf::reflect::ProtobufValue for NotificationEmailSMTP {
 pub struct NotificationEmailSES {
     // message fields
     // @@protoc_insertion_point(field:protos.NotificationEmailSES.ses_region)
-    pub ses_region: ::std::option::Option<::std::string::String>,
+    pub ses_region: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationEmailSES.ses_access_key_id)
-    pub ses_access_key_id: ::std::option::Option<::std::string::String>,
+    pub ses_access_key_id: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationEmailSES.ses_secret_access_key)
-    pub ses_secret_access_key: ::std::option::Option<::std::string::String>,
+    pub ses_secret_access_key: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.NotificationEmailSES.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -1182,17 +1182,17 @@ impl NotificationEmailSES {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "ses_region",
             |m: &NotificationEmailSES| { &m.ses_region },
             |m: &mut NotificationEmailSES| { &mut m.ses_region },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "ses_access_key_id",
             |m: &NotificationEmailSES| { &m.ses_access_key_id },
             |m: &mut NotificationEmailSES| { &mut m.ses_access_key_id },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "ses_secret_access_key",
             |m: &NotificationEmailSES| { &m.ses_secret_access_key },
             |m: &mut NotificationEmailSES| { &mut m.ses_secret_access_key },
@@ -1216,13 +1216,13 @@ impl ::protobuf::Message for NotificationEmailSES {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.ses_region = ::std::option::Option::Some(is.read_string()?);
+                    self.ses_region = is.read_string()?;
                 },
                 18 => {
-                    self.ses_access_key_id = ::std::option::Option::Some(is.read_string()?);
+                    self.ses_access_key_id = is.read_string()?;
                 },
                 26 => {
-                    self.ses_secret_access_key = ::std::option::Option::Some(is.read_string()?);
+                    self.ses_secret_access_key = is.read_string()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -1236,14 +1236,14 @@ impl ::protobuf::Message for NotificationEmailSES {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.ses_region.as_ref() {
-            my_size += ::protobuf::rt::string_size(1, &v);
+        if !self.ses_region.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.ses_region);
         }
-        if let Some(v) = self.ses_access_key_id.as_ref() {
-            my_size += ::protobuf::rt::string_size(2, &v);
+        if !self.ses_access_key_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.ses_access_key_id);
         }
-        if let Some(v) = self.ses_secret_access_key.as_ref() {
-            my_size += ::protobuf::rt::string_size(3, &v);
+        if !self.ses_secret_access_key.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.ses_secret_access_key);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -1251,14 +1251,14 @@ impl ::protobuf::Message for NotificationEmailSES {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.ses_region.as_ref() {
-            os.write_string(1, v)?;
+        if !self.ses_region.is_empty() {
+            os.write_string(1, &self.ses_region)?;
         }
-        if let Some(v) = self.ses_access_key_id.as_ref() {
-            os.write_string(2, v)?;
+        if !self.ses_access_key_id.is_empty() {
+            os.write_string(2, &self.ses_access_key_id)?;
         }
-        if let Some(v) = self.ses_secret_access_key.as_ref() {
-            os.write_string(3, v)?;
+        if !self.ses_secret_access_key.is_empty() {
+            os.write_string(3, &self.ses_secret_access_key)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1277,17 +1277,17 @@ impl ::protobuf::Message for NotificationEmailSES {
     }
 
     fn clear(&mut self) {
-        self.ses_region = ::std::option::Option::None;
-        self.ses_access_key_id = ::std::option::Option::None;
-        self.ses_secret_access_key = ::std::option::Option::None;
+        self.ses_region.clear();
+        self.ses_access_key_id.clear();
+        self.ses_secret_access_key.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static NotificationEmailSES {
         static instance: NotificationEmailSES = NotificationEmailSES {
-            ses_region: ::std::option::Option::None,
-            ses_access_key_id: ::std::option::Option::None,
-            ses_secret_access_key: ::std::option::Option::None,
+            ses_region: ::std::string::String::new(),
+            ses_access_key_id: ::std::string::String::new(),
+            ses_secret_access_key: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1317,13 +1317,13 @@ pub struct NotificationPagerDuty {
     // message fields
     ///  Auth token
     // @@protoc_insertion_point(field:protos.NotificationPagerDuty.token)
-    pub token: ::std::option::Option<::std::string::String>,
+    pub token: ::std::string::String,
     ///  Must be a valid email for a PagerDuty user
     // @@protoc_insertion_point(field:protos.NotificationPagerDuty.email)
-    pub email: ::std::option::Option<::std::string::String>,
+    pub email: ::std::string::String,
     ///  Must be a valid PagerDuty service
     // @@protoc_insertion_point(field:protos.NotificationPagerDuty.service_id)
-    pub service_id: ::std::option::Option<::std::string::String>,
+    pub service_id: ::std::string::String,
     // @@protoc_insertion_point(field:protos.NotificationPagerDuty.urgency)
     pub urgency: ::protobuf::EnumOrUnknown<notification_pager_duty::Urgency>,
     // special fields
@@ -1345,17 +1345,17 @@ impl NotificationPagerDuty {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(4);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "token",
             |m: &NotificationPagerDuty| { &m.token },
             |m: &mut NotificationPagerDuty| { &mut m.token },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "email",
             |m: &NotificationPagerDuty| { &m.email },
             |m: &mut NotificationPagerDuty| { &mut m.email },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "service_id",
             |m: &NotificationPagerDuty| { &m.service_id },
             |m: &mut NotificationPagerDuty| { &mut m.service_id },
@@ -1384,13 +1384,13 @@ impl ::protobuf::Message for NotificationPagerDuty {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.token = ::std::option::Option::Some(is.read_string()?);
+                    self.token = is.read_string()?;
                 },
                 18 => {
-                    self.email = ::std::option::Option::Some(is.read_string()?);
+                    self.email = is.read_string()?;
                 },
                 26 => {
-                    self.service_id = ::std::option::Option::Some(is.read_string()?);
+                    self.service_id = is.read_string()?;
                 },
                 32 => {
                     self.urgency = is.read_enum_or_unknown()?;
@@ -1407,14 +1407,14 @@ impl ::protobuf::Message for NotificationPagerDuty {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.token.as_ref() {
-            my_size += ::protobuf::rt::string_size(1, &v);
+        if !self.token.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.token);
         }
-        if let Some(v) = self.email.as_ref() {
-            my_size += ::protobuf::rt::string_size(2, &v);
+        if !self.email.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.email);
         }
-        if let Some(v) = self.service_id.as_ref() {
-            my_size += ::protobuf::rt::string_size(3, &v);
+        if !self.service_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.service_id);
         }
         if self.urgency != ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET) {
             my_size += ::protobuf::rt::int32_size(4, self.urgency.value());
@@ -1425,14 +1425,14 @@ impl ::protobuf::Message for NotificationPagerDuty {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.token.as_ref() {
-            os.write_string(1, v)?;
+        if !self.token.is_empty() {
+            os.write_string(1, &self.token)?;
         }
-        if let Some(v) = self.email.as_ref() {
-            os.write_string(2, v)?;
+        if !self.email.is_empty() {
+            os.write_string(2, &self.email)?;
         }
-        if let Some(v) = self.service_id.as_ref() {
-            os.write_string(3, v)?;
+        if !self.service_id.is_empty() {
+            os.write_string(3, &self.service_id)?;
         }
         if self.urgency != ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET) {
             os.write_enum(4, ::protobuf::EnumOrUnknown::value(&self.urgency))?;
@@ -1454,18 +1454,18 @@ impl ::protobuf::Message for NotificationPagerDuty {
     }
 
     fn clear(&mut self) {
-        self.token = ::std::option::Option::None;
-        self.email = ::std::option::Option::None;
-        self.service_id = ::std::option::Option::None;
+        self.token.clear();
+        self.email.clear();
+        self.service_id.clear();
         self.urgency = ::protobuf::EnumOrUnknown::new(notification_pager_duty::Urgency::URGENCY_UNSET);
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static NotificationPagerDuty {
         static instance: NotificationPagerDuty = NotificationPagerDuty {
-            token: ::std::option::Option::None,
-            email: ::std::option::Option::None,
-            service_id: ::std::option::Option::None,
+            token: ::std::string::String::new(),
+            email: ::std::string::String::new(),
+            service_id: ::std::string::String::new(),
             urgency: ::protobuf::EnumOrUnknown::from_i32(0),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -1614,166 +1614,146 @@ impl NotificationType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0cnotify.proto\x12\x06protos\"\xc0\x02\n\x12NotificationConfig\x12\
-    \x13\n\x02id\x18\x01\x20\x01(\tH\x01R\x02id\x88\x01\x01\x12\x17\n\x04nam\
-    e\x18\x02\x20\x01(\tH\x02R\x04name\x88\x01\x01\x121\n\x04type\x18\x03\
-    \x20\x01(\x0e2\x18.protos.NotificationTypeH\x03R\x04type\x88\x01\x01\x12\
-    2\n\x05slack\x18\xe8\x07\x20\x01(\x0b2\x19.protos.NotificationSlackH\0R\
-    \x05slack\x122\n\x05email\x18\xe9\x07\x20\x01(\x0b2\x19.protos.Notificat\
-    ionEmailH\0R\x05email\x12>\n\tpagerduty\x18\xea\x07\x20\x01(\x0b2\x1d.pr\
-    otos.NotificationPagerDutyH\0R\tpagerdutyB\x08\n\x06configB\x05\n\x03_id\
-    B\x07\n\x05_nameB\x07\n\x05_type\"n\n\x11NotificationSlack\x12\x20\n\tbo\
-    t_token\x18\x01\x20\x01(\tH\0R\x08botToken\x88\x01\x01\x12\x1d\n\x07chan\
-    nel\x18\x02\x20\x01(\tH\x01R\x07channel\x88\x01\x01B\x0c\n\n_bot_tokenB\
-    \n\n\x08_channel\"\xd6\x02\n\x11NotificationEmail\x127\n\x04type\x18\x01\
-    \x20\x01(\x0e2\x1e.protos.NotificationEmail.TypeH\x01R\x04type\x88\x01\
-    \x01\x12\x1e\n\nrecipients\x18\x02\x20\x03(\tR\nrecipients\x12&\n\x0cfro\
-    m_address\x18\x03\x20\x01(\tH\x02R\x0bfromAddress\x88\x01\x01\x124\n\x04\
-    smtp\x18\xe8\x07\x20\x01(\x0b2\x1d.protos.NotificationEmailSMTPH\0R\x04s\
-    mtp\x121\n\x03ses\x18\xe9\x07\x20\x01(\x0b2\x1c.protos.NotificationEmail\
-    SESH\0R\x03ses\"3\n\x04Type\x12\x0e\n\nTYPE_UNSET\x10\0\x12\r\n\tTYPE_SM\
-    TP\x10\x01\x12\x0c\n\x08TYPE_SES\x10\x02B\x08\n\x06configB\x07\n\x05_typ\
-    eB\x0f\n\r_from_address\"\xd5\x01\n\x15NotificationEmailSMTP\x12\x17\n\
-    \x04host\x18\x01\x20\x01(\tH\0R\x04host\x88\x01\x01\x12\x17\n\x04port\
-    \x18\x02\x20\x01(\x05H\x01R\x04port\x88\x01\x01\x12\x17\n\x04user\x18\
-    \x03\x20\x01(\tH\x02R\x04user\x88\x01\x01\x12\x1f\n\x08password\x18\x04\
-    \x20\x01(\tH\x03R\x08password\x88\x01\x01\x12\x1c\n\x07use_tls\x18\x05\
-    \x20\x01(\x08H\x04R\x06useTls\x88\x01\x01B\x07\n\x05_hostB\x07\n\x05_por\
-    tB\x07\n\x05_userB\x0b\n\t_passwordB\n\n\x08_use_tls\"\xe1\x01\n\x14Noti\
-    ficationEmailSES\x12\"\n\nses_region\x18\x01\x20\x01(\tH\0R\tsesRegion\
-    \x88\x01\x01\x12.\n\x11ses_access_key_id\x18\x02\x20\x01(\tH\x01R\x0eses\
-    AccessKeyId\x88\x01\x01\x126\n\x15ses_secret_access_key\x18\x03\x20\x01(\
-    \tH\x02R\x12sesSecretAccessKey\x88\x01\x01B\r\n\x0b_ses_regionB\x14\n\
-    \x12_ses_access_key_idB\x18\n\x16_ses_secret_access_key\"\x96\x02\n\x15N\
-    otificationPagerDuty\x12\x19\n\x05token\x18\x01\x20\x01(\tH\0R\x05token\
-    \x88\x01\x01\x12\x19\n\x05email\x18\x02\x20\x01(\tH\x01R\x05email\x88\
-    \x01\x01\x12\"\n\nservice_id\x18\x03\x20\x01(\tH\x02R\tserviceId\x88\x01\
-    \x01\x12?\n\x07urgency\x18\x04\x20\x01(\x0e2%.protos.NotificationPagerDu\
-    ty.UrgencyR\x07urgency\"?\n\x07Urgency\x12\x11\n\rURGENCY_UNSET\x10\0\
-    \x12\x0f\n\x0bURGENCY_LOW\x10\x01\x12\x10\n\x0cURGENCY_HIGH\x10\x02B\x08\
-    \n\x06_tokenB\x08\n\x06_emailB\r\n\x0b_service_id*\x8a\x01\n\x10Notifica\
-    tionType\x12\x1b\n\x17NOTIFICATION_TYPE_UNSET\x10\0\x12\x1b\n\x17NOTIFIC\
-    ATION_TYPE_SLACK\x10\x01\x12\x1b\n\x17NOTIFICATION_TYPE_EMAIL\x10\x02\
-    \x12\x1f\n\x1bNOTIFICATION_TYPE_PAGERDUTY\x10\x03B4Z2github.com/streamda\
-    l/snitch-protos/build/go/protosJ\xd1\x13\n\x06\x12\x04\0\0R\x01\n\x08\n\
-    \x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
-    \x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x05\0\x12\
-    \x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x15\n\x0b\n\x04\
-    \x05\0\x02\0\x12\x03\x07\x02\x1e\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1c\x1d\n\x0b\n\x04\x05\
-    \0\x02\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08\x1c\x1d\n\x0b\n\x04\
-    \x05\0\x02\x02\x12\x03\t\x02\x1e\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x1c\x1d\n\x0b\n\x04\x05\
-    \0\x02\x03\x12\x03\n\x02\"\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\
-    \x1d\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n\x20!\n\n\n\x02\x04\0\x12\
-    \x04\r\0\x19\x01\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x1a\n\x0b\n\x04\x04\0\
-    \x02\0\x12\x03\x0e\x02\x19\n\x0c\n\x05\x04\0\x02\0\x04\x12\x03\x0e\x02\n\
-    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0e\x0b\x11\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\x0e\x12\x14\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x17\x18\
-    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\x10\x02\x1b\n\x0c\n\x05\x04\0\x02\x01\
-    \x04\x12\x03\x10\x02\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x0b\x11\
-    \n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\x12\x16\n\x0c\n\x05\x04\0\x02\
-    \x01\x03\x12\x03\x10\x19\x1a\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x12\x02%\
-    \n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03\x12\x02\n\n\x0c\n\x05\x04\0\x02\
-    \x02\x06\x12\x03\x12\x0b\x1b\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x12\
-    \x1c\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x12#$\n\x0c\n\x04\x04\0\
-    \x08\0\x12\x04\x14\x02\x18\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x14\
-    \x08\x0e\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x15\x04#\n\x0c\n\x05\x04\0\
-    \x02\x03\x06\x12\x03\x15\x04\x15\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
-    \x15\x16\x1b\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x15\x1e\"\n\x0b\n\x04\
-    \x04\0\x02\x04\x12\x03\x16\x04#\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\
-    \x16\x04\x15\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x16\x16\x1b\n\x0c\n\
-    \x05\x04\0\x02\x04\x03\x12\x03\x16\x1e\"\n\x0b\n\x04\x04\0\x02\x05\x12\
-    \x03\x17\x04+\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x17\x04\x19\n\x0c\n\
-    \x05\x04\0\x02\x05\x01\x12\x03\x17\x1a#\n\x0c\n\x05\x04\0\x02\x05\x03\
-    \x12\x03\x17&*\n\n\n\x02\x04\x01\x12\x04\x1b\0\x1e\x01\n\n\n\x03\x04\x01\
-    \x01\x12\x03\x1b\x08\x19\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1c\x02\x20\n\
-    \x0c\n\x05\x04\x01\x02\0\x04\x12\x03\x1c\x02\n\n\x0c\n\x05\x04\x01\x02\0\
-    \x05\x12\x03\x1c\x0b\x11\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x1c\x12\
-    \x1b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1c\x1e\x1f\n\x0b\n\x04\x04\
-    \x01\x02\x01\x12\x03\x1d\x02\x1e\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x03\
-    \x1d\x02\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x1d\x0b\x11\n\x0c\n\
-    \x05\x04\x01\x02\x01\x01\x12\x03\x1d\x12\x19\n\x0c\n\x05\x04\x01\x02\x01\
-    \x03\x12\x03\x1d\x1c\x1d\n\n\n\x02\x04\x02\x12\x04\x20\01\x01\n\n\n\x03\
-    \x04\x02\x01\x12\x03\x20\x08\x19\n\x0c\n\x04\x04\x02\x04\0\x12\x04!\x02%\
-    \x03\n\x0c\n\x05\x04\x02\x04\0\x01\x12\x03!\x07\x0b\n\r\n\x06\x04\x02\
-    \x04\0\x02\0\x12\x03\"\x04\x13\n\x0e\n\x07\x04\x02\x04\0\x02\0\x01\x12\
-    \x03\"\x04\x0e\n\x0e\n\x07\x04\x02\x04\0\x02\0\x02\x12\x03\"\x11\x12\n\r\
-    \n\x06\x04\x02\x04\0\x02\x01\x12\x03#\x04\x12\n\x0e\n\x07\x04\x02\x04\0\
-    \x02\x01\x01\x12\x03#\x04\r\n\x0e\n\x07\x04\x02\x04\0\x02\x01\x02\x12\
-    \x03#\x10\x11\n\r\n\x06\x04\x02\x04\0\x02\x02\x12\x03$\x04\x11\n\x0e\n\
-    \x07\x04\x02\x04\0\x02\x02\x01\x12\x03$\x04\x0c\n\x0e\n\x07\x04\x02\x04\
-    \0\x02\x02\x02\x12\x03$\x0f\x10\n\x0b\n\x04\x04\x02\x02\0\x12\x03'\x02\
-    \x19\n\x0c\n\x05\x04\x02\x02\0\x04\x12\x03'\x02\n\n\x0c\n\x05\x04\x02\
-    \x02\0\x06\x12\x03'\x0b\x0f\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03'\x10\
-    \x14\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03'\x17\x18\n\x0b\n\x04\x04\x02\
-    \x02\x01\x12\x03)\x02!\n\x0c\n\x05\x04\x02\x02\x01\x04\x12\x03)\x02\n\n\
-    \x0c\n\x05\x04\x02\x02\x01\x05\x12\x03)\x0b\x11\n\x0c\n\x05\x04\x02\x02\
-    \x01\x01\x12\x03)\x12\x1c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03)\x1f\
-    \x20\n\x0b\n\x04\x04\x02\x02\x02\x12\x03+\x02#\n\x0c\n\x05\x04\x02\x02\
-    \x02\x04\x12\x03+\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x05\x12\x03+\x0b\x11\
-    \n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03+\x12\x1e\n\x0c\n\x05\x04\x02\
-    \x02\x02\x03\x12\x03+!\"\n\x0c\n\x04\x04\x02\x08\0\x12\x04-\x020\x03\n\
-    \x0c\n\x05\x04\x02\x08\0\x01\x12\x03-\x08\x0e\n\x0b\n\x04\x04\x02\x02\
-    \x03\x12\x03.\x04&\n\x0c\n\x05\x04\x02\x02\x03\x06\x12\x03.\x04\x19\n\
-    \x0c\n\x05\x04\x02\x02\x03\x01\x12\x03.\x1a\x1e\n\x0c\n\x05\x04\x02\x02\
-    \x03\x03\x12\x03.!%\n\x0b\n\x04\x04\x02\x02\x04\x12\x03/\x04$\n\x0c\n\
-    \x05\x04\x02\x02\x04\x06\x12\x03/\x04\x18\n\x0c\n\x05\x04\x02\x02\x04\
-    \x01\x12\x03/\x19\x1c\n\x0c\n\x05\x04\x02\x02\x04\x03\x12\x03/\x1f#\n\n\
-    \n\x02\x04\x03\x12\x043\09\x01\n\n\n\x03\x04\x03\x01\x12\x033\x08\x1d\n\
-    \x0b\n\x04\x04\x03\x02\0\x12\x034\x02\x1b\n\x0c\n\x05\x04\x03\x02\0\x04\
-    \x12\x034\x02\n\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x034\x0b\x11\n\x0c\n\
-    \x05\x04\x03\x02\0\x01\x12\x034\x12\x16\n\x0c\n\x05\x04\x03\x02\0\x03\
-    \x12\x034\x19\x1a\n\x0b\n\x04\x04\x03\x02\x01\x12\x035\x02\x1a\n\x0c\n\
-    \x05\x04\x03\x02\x01\x04\x12\x035\x02\n\n\x0c\n\x05\x04\x03\x02\x01\x05\
-    \x12\x035\x0b\x10\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x035\x11\x15\n\x0c\
-    \n\x05\x04\x03\x02\x01\x03\x12\x035\x18\x19\n\x0b\n\x04\x04\x03\x02\x02\
-    \x12\x036\x02\x1b\n\x0c\n\x05\x04\x03\x02\x02\x04\x12\x036\x02\n\n\x0c\n\
-    \x05\x04\x03\x02\x02\x05\x12\x036\x0b\x11\n\x0c\n\x05\x04\x03\x02\x02\
-    \x01\x12\x036\x12\x16\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x036\x19\x1a\n\
-    \x0b\n\x04\x04\x03\x02\x03\x12\x037\x02\x1f\n\x0c\n\x05\x04\x03\x02\x03\
-    \x04\x12\x037\x02\n\n\x0c\n\x05\x04\x03\x02\x03\x05\x12\x037\x0b\x11\n\
-    \x0c\n\x05\x04\x03\x02\x03\x01\x12\x037\x12\x1a\n\x0c\n\x05\x04\x03\x02\
-    \x03\x03\x12\x037\x1d\x1e\n\x0b\n\x04\x04\x03\x02\x04\x12\x038\x02\x1c\n\
-    \x0c\n\x05\x04\x03\x02\x04\x04\x12\x038\x02\n\n\x0c\n\x05\x04\x03\x02\
-    \x04\x05\x12\x038\x0b\x0f\n\x0c\n\x05\x04\x03\x02\x04\x01\x12\x038\x10\
-    \x17\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\x038\x1a\x1b\n\n\n\x02\x04\x04\
-    \x12\x04;\0?\x01\n\n\n\x03\x04\x04\x01\x12\x03;\x08\x1c\n\x0b\n\x04\x04\
-    \x04\x02\0\x12\x03<\x02!\n\x0c\n\x05\x04\x04\x02\0\x04\x12\x03<\x02\n\n\
-    \x0c\n\x05\x04\x04\x02\0\x05\x12\x03<\x0b\x11\n\x0c\n\x05\x04\x04\x02\0\
-    \x01\x12\x03<\x12\x1c\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03<\x1f\x20\n\
-    \x0b\n\x04\x04\x04\x02\x01\x12\x03=\x02(\n\x0c\n\x05\x04\x04\x02\x01\x04\
-    \x12\x03=\x02\n\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03=\x0b\x11\n\x0c\n\
-    \x05\x04\x04\x02\x01\x01\x12\x03=\x12#\n\x0c\n\x05\x04\x04\x02\x01\x03\
-    \x12\x03=&'\n\x0b\n\x04\x04\x04\x02\x02\x12\x03>\x02,\n\x0c\n\x05\x04\
-    \x04\x02\x02\x04\x12\x03>\x02\n\n\x0c\n\x05\x04\x04\x02\x02\x05\x12\x03>\
-    \x0b\x11\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\x03>\x12'\n\x0c\n\x05\x04\
-    \x04\x02\x02\x03\x12\x03>*+\n\n\n\x02\x04\x05\x12\x04A\0R\x01\n\n\n\x03\
-    \x04\x05\x01\x12\x03A\x08\x1d\n\x0c\n\x04\x04\x05\x04\0\x12\x04B\x02F\
-    \x03\n\x0c\n\x05\x04\x05\x04\0\x01\x12\x03B\x07\x0e\n\r\n\x06\x04\x05\
-    \x04\0\x02\0\x12\x03C\x04\x16\n\x0e\n\x07\x04\x05\x04\0\x02\0\x01\x12\
-    \x03C\x04\x11\n\x0e\n\x07\x04\x05\x04\0\x02\0\x02\x12\x03C\x14\x15\n\r\n\
-    \x06\x04\x05\x04\0\x02\x01\x12\x03D\x04\x14\n\x0e\n\x07\x04\x05\x04\0\
-    \x02\x01\x01\x12\x03D\x04\x0f\n\x0e\n\x07\x04\x05\x04\0\x02\x01\x02\x12\
-    \x03D\x12\x13\n\r\n\x06\x04\x05\x04\0\x02\x02\x12\x03E\x04\x15\n\x0e\n\
-    \x07\x04\x05\x04\0\x02\x02\x01\x12\x03E\x04\x10\n\x0e\n\x07\x04\x05\x04\
-    \0\x02\x02\x02\x12\x03E\x13\x14\n\x19\n\x04\x04\x05\x02\0\x12\x03I\x02\
-    \x1c\x1a\x0c\x20Auth\x20token\n\n\x0c\n\x05\x04\x05\x02\0\x04\x12\x03I\
-    \x02\n\n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03I\x0b\x11\n\x0c\n\x05\x04\
-    \x05\x02\0\x01\x12\x03I\x12\x17\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03I\
-    \x1a\x1b\n9\n\x04\x04\x05\x02\x01\x12\x03L\x02\x1c\x1a,\x20Must\x20be\
-    \x20a\x20valid\x20email\x20for\x20a\x20PagerDuty\x20user\n\n\x0c\n\x05\
-    \x04\x05\x02\x01\x04\x12\x03L\x02\n\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\
-    \x03L\x0b\x11\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03L\x12\x17\n\x0c\n\
-    \x05\x04\x05\x02\x01\x03\x12\x03L\x1a\x1b\n0\n\x04\x04\x05\x02\x02\x12\
-    \x03O\x02!\x1a#\x20Must\x20be\x20a\x20valid\x20PagerDuty\x20service\n\n\
-    \x0c\n\x05\x04\x05\x02\x02\x04\x12\x03O\x02\n\n\x0c\n\x05\x04\x05\x02\
-    \x02\x05\x12\x03O\x0b\x11\n\x0c\n\x05\x04\x05\x02\x02\x01\x12\x03O\x12\
-    \x1c\n\x0c\n\x05\x04\x05\x02\x02\x03\x12\x03O\x1f\x20\n\x0b\n\x04\x04\
-    \x05\x02\x03\x12\x03Q\x02\x16\n\x0c\n\x05\x04\x05\x02\x03\x06\x12\x03Q\
-    \x02\t\n\x0c\n\x05\x04\x05\x02\x03\x01\x12\x03Q\n\x11\n\x0c\n\x05\x04\
-    \x05\x02\x03\x03\x12\x03Q\x14\x15b\x06proto3\
+    \n\x0cnotify.proto\x12\x06protos\"\xa4\x02\n\x12NotificationConfig\x12\
+    \x13\n\x02id\x18\x01\x20\x01(\tH\x01R\x02id\x88\x01\x01\x12\x12\n\x04nam\
+    e\x18\x02\x20\x01(\tR\x04name\x12,\n\x04type\x18\x03\x20\x01(\x0e2\x18.p\
+    rotos.NotificationTypeR\x04type\x122\n\x05slack\x18\xe8\x07\x20\x01(\x0b\
+    2\x19.protos.NotificationSlackH\0R\x05slack\x122\n\x05email\x18\xe9\x07\
+    \x20\x01(\x0b2\x19.protos.NotificationEmailH\0R\x05email\x12>\n\tpagerdu\
+    ty\x18\xea\x07\x20\x01(\x0b2\x1d.protos.NotificationPagerDutyH\0R\tpager\
+    dutyB\x08\n\x06configB\x05\n\x03_id\"J\n\x11NotificationSlack\x12\x1b\n\
+    \tbot_token\x18\x01\x20\x01(\tR\x08botToken\x12\x18\n\x07channel\x18\x02\
+    \x20\x01(\tR\x07channel\"\xb2\x02\n\x11NotificationEmail\x122\n\x04type\
+    \x18\x01\x20\x01(\x0e2\x1e.protos.NotificationEmail.TypeR\x04type\x12\
+    \x1e\n\nrecipients\x18\x02\x20\x03(\tR\nrecipients\x12!\n\x0cfrom_addres\
+    s\x18\x03\x20\x01(\tR\x0bfromAddress\x124\n\x04smtp\x18\xe8\x07\x20\x01(\
+    \x0b2\x1d.protos.NotificationEmailSMTPH\0R\x04smtp\x121\n\x03ses\x18\xe9\
+    \x07\x20\x01(\x0b2\x1c.protos.NotificationEmailSESH\0R\x03ses\"3\n\x04Ty\
+    pe\x12\x0e\n\nTYPE_UNSET\x10\0\x12\r\n\tTYPE_SMTP\x10\x01\x12\x0c\n\x08T\
+    YPE_SES\x10\x02B\x08\n\x06config\"\x88\x01\n\x15NotificationEmailSMTP\
+    \x12\x12\n\x04host\x18\x01\x20\x01(\tR\x04host\x12\x12\n\x04port\x18\x02\
+    \x20\x01(\x05R\x04port\x12\x12\n\x04user\x18\x03\x20\x01(\tR\x04user\x12\
+    \x1a\n\x08password\x18\x04\x20\x01(\tR\x08password\x12\x17\n\x07use_tls\
+    \x18\x05\x20\x01(\x08R\x06useTls\"\x93\x01\n\x14NotificationEmailSES\x12\
+    \x1d\n\nses_region\x18\x01\x20\x01(\tR\tsesRegion\x12)\n\x11ses_access_k\
+    ey_id\x18\x02\x20\x01(\tR\x0esesAccessKeyId\x121\n\x15ses_secret_access_\
+    key\x18\x03\x20\x01(\tR\x12sesSecretAccessKey\"\xe4\x01\n\x15Notificatio\
+    nPagerDuty\x12\x14\n\x05token\x18\x01\x20\x01(\tR\x05token\x12\x14\n\x05\
+    email\x18\x02\x20\x01(\tR\x05email\x12\x1d\n\nservice_id\x18\x03\x20\x01\
+    (\tR\tserviceId\x12?\n\x07urgency\x18\x04\x20\x01(\x0e2%.protos.Notifica\
+    tionPagerDuty.UrgencyR\x07urgency\"?\n\x07Urgency\x12\x11\n\rURGENCY_UNS\
+    ET\x10\0\x12\x0f\n\x0bURGENCY_LOW\x10\x01\x12\x10\n\x0cURGENCY_HIGH\x10\
+    \x02*\x8a\x01\n\x10NotificationType\x12\x1b\n\x17NOTIFICATION_TYPE_UNSET\
+    \x10\0\x12\x1b\n\x17NOTIFICATION_TYPE_SLACK\x10\x01\x12\x1b\n\x17NOTIFIC\
+    ATION_TYPE_EMAIL\x10\x02\x12\x1f\n\x1bNOTIFICATION_TYPE_PAGERDUTY\x10\
+    \x03B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xe3\x11\n\
+    \x06\x12\x04\0\0R\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    \x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\
+    \x03\x04\0I\n\n\n\x02\x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\
+    \x12\x03\x06\x05\x15\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02\x1e\n\x0c\n\
+    \x05\x05\0\x02\0\x01\x12\x03\x07\x02\x19\n\x0c\n\x05\x05\0\x02\0\x02\x12\
+    \x03\x07\x1c\x1d\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02\x1e\n\x0c\n\
+    \x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\
+    \x12\x03\x08\x1c\x1d\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\x02\x1e\n\x0c\n\
+    \x05\x05\0\x02\x02\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\x02\x02\x02\
+    \x12\x03\t\x1c\x1d\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02\"\n\x0c\n\x05\
+    \x05\0\x02\x03\x01\x12\x03\n\x02\x1d\n\x0c\n\x05\x05\0\x02\x03\x02\x12\
+    \x03\n\x20!\n\n\n\x02\x04\0\x12\x04\r\0\x19\x01\n\n\n\x03\x04\0\x01\x12\
+    \x03\r\x08\x1a\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0e\x02\x19\n\x0c\n\x05\
+    \x04\0\x02\0\x04\x12\x03\x0e\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\
+    \x0e\x0b\x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\x12\x14\n\x0c\n\x05\
+    \x04\0\x02\0\x03\x12\x03\x0e\x17\x18\n\x0b\n\x04\x04\0\x02\x01\x12\x03\
+    \x10\x02\x12\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x02\x08\n\x0c\n\
+    \x05\x04\0\x02\x01\x01\x12\x03\x10\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\
+    \x03\x10\x10\x11\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x12\x02\x1c\n\x0c\n\
+    \x05\x04\0\x02\x02\x06\x12\x03\x12\x02\x12\n\x0c\n\x05\x04\0\x02\x02\x01\
+    \x12\x03\x12\x13\x17\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x12\x1a\x1b\n\
+    \x0c\n\x04\x04\0\x08\0\x12\x04\x14\x02\x18\x03\n\x0c\n\x05\x04\0\x08\0\
+    \x01\x12\x03\x14\x08\x0e\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x15\x04#\n\
+    \x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x15\x04\x15\n\x0c\n\x05\x04\0\x02\
+    \x03\x01\x12\x03\x15\x16\x1b\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x15\
+    \x1e\"\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x16\x04#\n\x0c\n\x05\x04\0\x02\
+    \x04\x06\x12\x03\x16\x04\x15\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x16\
+    \x16\x1b\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x16\x1e\"\n\x0b\n\x04\x04\
+    \0\x02\x05\x12\x03\x17\x04+\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x17\
+    \x04\x19\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x17\x1a#\n\x0c\n\x05\x04\
+    \0\x02\x05\x03\x12\x03\x17&*\n\n\n\x02\x04\x01\x12\x04\x1b\0\x1e\x01\n\n\
+    \n\x03\x04\x01\x01\x12\x03\x1b\x08\x19\n\x0b\n\x04\x04\x01\x02\0\x12\x03\
+    \x1c\x02\x17\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1c\x02\x08\n\x0c\n\
+    \x05\x04\x01\x02\0\x01\x12\x03\x1c\t\x12\n\x0c\n\x05\x04\x01\x02\0\x03\
+    \x12\x03\x1c\x15\x16\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x1d\x02\x15\n\
+    \x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x1d\x02\x08\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x03\x1d\t\x10\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03\
+    \x1d\x13\x14\n\n\n\x02\x04\x02\x12\x04\x20\01\x01\n\n\n\x03\x04\x02\x01\
+    \x12\x03\x20\x08\x19\n\x0c\n\x04\x04\x02\x04\0\x12\x04!\x02%\x03\n\x0c\n\
+    \x05\x04\x02\x04\0\x01\x12\x03!\x07\x0b\n\r\n\x06\x04\x02\x04\0\x02\0\
+    \x12\x03\"\x04\x13\n\x0e\n\x07\x04\x02\x04\0\x02\0\x01\x12\x03\"\x04\x0e\
+    \n\x0e\n\x07\x04\x02\x04\0\x02\0\x02\x12\x03\"\x11\x12\n\r\n\x06\x04\x02\
+    \x04\0\x02\x01\x12\x03#\x04\x12\n\x0e\n\x07\x04\x02\x04\0\x02\x01\x01\
+    \x12\x03#\x04\r\n\x0e\n\x07\x04\x02\x04\0\x02\x01\x02\x12\x03#\x10\x11\n\
+    \r\n\x06\x04\x02\x04\0\x02\x02\x12\x03$\x04\x11\n\x0e\n\x07\x04\x02\x04\
+    \0\x02\x02\x01\x12\x03$\x04\x0c\n\x0e\n\x07\x04\x02\x04\0\x02\x02\x02\
+    \x12\x03$\x0f\x10\n\x0b\n\x04\x04\x02\x02\0\x12\x03'\x02\x10\n\x0c\n\x05\
+    \x04\x02\x02\0\x06\x12\x03'\x02\x06\n\x0c\n\x05\x04\x02\x02\0\x01\x12\
+    \x03'\x07\x0b\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03'\x0e\x0f\n\x0b\n\x04\
+    \x04\x02\x02\x01\x12\x03)\x02!\n\x0c\n\x05\x04\x02\x02\x01\x04\x12\x03)\
+    \x02\n\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03)\x0b\x11\n\x0c\n\x05\x04\
+    \x02\x02\x01\x01\x12\x03)\x12\x1c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\
+    \x03)\x1f\x20\n\x0b\n\x04\x04\x02\x02\x02\x12\x03+\x02\x1a\n\x0c\n\x05\
+    \x04\x02\x02\x02\x05\x12\x03+\x02\x08\n\x0c\n\x05\x04\x02\x02\x02\x01\
+    \x12\x03+\t\x15\n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x03+\x18\x19\n\x0c\n\
+    \x04\x04\x02\x08\0\x12\x04-\x020\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\
+    \x03-\x08\x0e\n\x0b\n\x04\x04\x02\x02\x03\x12\x03.\x04&\n\x0c\n\x05\x04\
+    \x02\x02\x03\x06\x12\x03.\x04\x19\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\
+    \x03.\x1a\x1e\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\x03.!%\n\x0b\n\x04\x04\
+    \x02\x02\x04\x12\x03/\x04$\n\x0c\n\x05\x04\x02\x02\x04\x06\x12\x03/\x04\
+    \x18\n\x0c\n\x05\x04\x02\x02\x04\x01\x12\x03/\x19\x1c\n\x0c\n\x05\x04\
+    \x02\x02\x04\x03\x12\x03/\x1f#\n\n\n\x02\x04\x03\x12\x043\09\x01\n\n\n\
+    \x03\x04\x03\x01\x12\x033\x08\x1d\n\x0b\n\x04\x04\x03\x02\0\x12\x034\x02\
+    \x12\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x034\x02\x08\n\x0c\n\x05\x04\x03\
+    \x02\0\x01\x12\x034\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x034\x10\x11\n\
+    \x0b\n\x04\x04\x03\x02\x01\x12\x035\x02\x11\n\x0c\n\x05\x04\x03\x02\x01\
+    \x05\x12\x035\x02\x07\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x035\x08\x0c\n\
+    \x0c\n\x05\x04\x03\x02\x01\x03\x12\x035\x0f\x10\n\x0b\n\x04\x04\x03\x02\
+    \x02\x12\x036\x02\x12\n\x0c\n\x05\x04\x03\x02\x02\x05\x12\x036\x02\x08\n\
+    \x0c\n\x05\x04\x03\x02\x02\x01\x12\x036\t\r\n\x0c\n\x05\x04\x03\x02\x02\
+    \x03\x12\x036\x10\x11\n\x0b\n\x04\x04\x03\x02\x03\x12\x037\x02\x16\n\x0c\
+    \n\x05\x04\x03\x02\x03\x05\x12\x037\x02\x08\n\x0c\n\x05\x04\x03\x02\x03\
+    \x01\x12\x037\t\x11\n\x0c\n\x05\x04\x03\x02\x03\x03\x12\x037\x14\x15\n\
+    \x0b\n\x04\x04\x03\x02\x04\x12\x038\x02\x13\n\x0c\n\x05\x04\x03\x02\x04\
+    \x05\x12\x038\x02\x06\n\x0c\n\x05\x04\x03\x02\x04\x01\x12\x038\x07\x0e\n\
+    \x0c\n\x05\x04\x03\x02\x04\x03\x12\x038\x11\x12\n\n\n\x02\x04\x04\x12\
+    \x04;\0?\x01\n\n\n\x03\x04\x04\x01\x12\x03;\x08\x1c\n\x0b\n\x04\x04\x04\
+    \x02\0\x12\x03<\x02\x18\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03<\x02\x08\n\
+    \x0c\n\x05\x04\x04\x02\0\x01\x12\x03<\t\x13\n\x0c\n\x05\x04\x04\x02\0\
+    \x03\x12\x03<\x16\x17\n\x0b\n\x04\x04\x04\x02\x01\x12\x03=\x02\x1f\n\x0c\
+    \n\x05\x04\x04\x02\x01\x05\x12\x03=\x02\x08\n\x0c\n\x05\x04\x04\x02\x01\
+    \x01\x12\x03=\t\x1a\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x03=\x1d\x1e\n\
+    \x0b\n\x04\x04\x04\x02\x02\x12\x03>\x02#\n\x0c\n\x05\x04\x04\x02\x02\x05\
+    \x12\x03>\x02\x08\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\x03>\t\x1e\n\x0c\n\
+    \x05\x04\x04\x02\x02\x03\x12\x03>!\"\n\n\n\x02\x04\x05\x12\x04A\0R\x01\n\
+    \n\n\x03\x04\x05\x01\x12\x03A\x08\x1d\n\x0c\n\x04\x04\x05\x04\0\x12\x04B\
+    \x02F\x03\n\x0c\n\x05\x04\x05\x04\0\x01\x12\x03B\x07\x0e\n\r\n\x06\x04\
+    \x05\x04\0\x02\0\x12\x03C\x04\x16\n\x0e\n\x07\x04\x05\x04\0\x02\0\x01\
+    \x12\x03C\x04\x11\n\x0e\n\x07\x04\x05\x04\0\x02\0\x02\x12\x03C\x14\x15\n\
+    \r\n\x06\x04\x05\x04\0\x02\x01\x12\x03D\x04\x14\n\x0e\n\x07\x04\x05\x04\
+    \0\x02\x01\x01\x12\x03D\x04\x0f\n\x0e\n\x07\x04\x05\x04\0\x02\x01\x02\
+    \x12\x03D\x12\x13\n\r\n\x06\x04\x05\x04\0\x02\x02\x12\x03E\x04\x15\n\x0e\
+    \n\x07\x04\x05\x04\0\x02\x02\x01\x12\x03E\x04\x10\n\x0e\n\x07\x04\x05\
+    \x04\0\x02\x02\x02\x12\x03E\x13\x14\n\x19\n\x04\x04\x05\x02\0\x12\x03I\
+    \x02\x13\x1a\x0c\x20Auth\x20token\n\n\x0c\n\x05\x04\x05\x02\0\x05\x12\
+    \x03I\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03I\t\x0e\n\x0c\n\x05\
+    \x04\x05\x02\0\x03\x12\x03I\x11\x12\n9\n\x04\x04\x05\x02\x01\x12\x03L\
+    \x02\x13\x1a,\x20Must\x20be\x20a\x20valid\x20email\x20for\x20a\x20PagerD\
+    uty\x20user\n\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03L\x02\x08\n\x0c\n\
+    \x05\x04\x05\x02\x01\x01\x12\x03L\t\x0e\n\x0c\n\x05\x04\x05\x02\x01\x03\
+    \x12\x03L\x11\x12\n0\n\x04\x04\x05\x02\x02\x12\x03O\x02\x18\x1a#\x20Must\
+    \x20be\x20a\x20valid\x20PagerDuty\x20service\n\n\x0c\n\x05\x04\x05\x02\
+    \x02\x05\x12\x03O\x02\x08\n\x0c\n\x05\x04\x05\x02\x02\x01\x12\x03O\t\x13\
+    \n\x0c\n\x05\x04\x05\x02\x02\x03\x12\x03O\x16\x17\n\x0b\n\x04\x04\x05\
+    \x02\x03\x12\x03Q\x02\x16\n\x0c\n\x05\x04\x05\x02\x03\x06\x12\x03Q\x02\t\
+    \n\x0c\n\x05\x04\x05\x02\x03\x01\x12\x03Q\n\x11\n\x0c\n\x05\x04\x05\x02\
+    \x03\x03\x12\x03Q\x14\x15b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
