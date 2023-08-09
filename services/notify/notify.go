@@ -124,7 +124,7 @@ func (n *Notify) Queue(ctx context.Context, req *protos.NotifyRequest) error {
 		return errors.Wrap(err, "pipeline not found")
 	}
 
-	configs, err := n.Store.GetNotifyConfigsByPipeline(ctx, req.PipelineId)
+	configs, err := n.Store.GetNotificationConfigsByPipeline(ctx, req.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "notify config not found")
 	}

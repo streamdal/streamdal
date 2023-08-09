@@ -63,7 +63,7 @@ type IStore interface {
 
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
-	GetNotifyConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
+	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
 	CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error
 	UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
@@ -661,8 +661,8 @@ func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.Detach
 	return nil
 }
 
-func (s *Store) GetNotifyConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
-	notifyConfigs := make([]*protos.NotificationConfig, 0)
+func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
+	cfgs := make([]*protos.NotificationConfig, 0)
 
 	// Fetch all notify config keys from NATS
 	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
@@ -693,10 +693,10 @@ func (s *Store) GetNotifyConfigsByPipeline(ctx context.Context, pipelineID strin
 			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
 		}
 
-		notifyConfigs = append(notifyConfigs, notifyConfig)
+		cfgs = append(cfgs, notifyConfig)
 	}
 
-	return notifyConfigs, nil
+	return cfgs, nil
 }
 
 func (o *Options) validate() error {
