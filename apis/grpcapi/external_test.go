@@ -3,7 +3,6 @@ package grpcapi
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -211,14 +210,10 @@ var _ = Describe("External gRPC API", func() {
 			// Verify that resp is correct
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp).ToNot(BeNil())
-			Expect(resp.Message).To(ContainSubstring("created"))
-			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+			Expect(resp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(resp.PipelineId).ToNot(BeEmpty())
 
-			// Verify that we wrote pipeline to bucket
-			expectedPipelineID := getPipelineIDFromMessage(resp.Message)
-			Expect(expectedPipelineID).ToNot(BeEmpty())
-
-			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, expectedPipelineID)
+			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, resp.PipelineId)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeNil())
 
@@ -226,7 +221,7 @@ var _ = Describe("External gRPC API", func() {
 			pipeline := &protos.Pipeline{}
 			err = proto.Unmarshal(data, pipeline)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(pipeline.Id).To(Equal(expectedPipelineID))
+			Expect(pipeline.Id).To(Equal(resp.PipelineId))
 		})
 	})
 
@@ -239,19 +234,19 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createResp.Message)
+			Expect(createResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createResp.PipelineId).ToNot(BeEmpty())
 
 			// Fetch the pipeline using GetPipeline()
 			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createResp.PipelineId,
 			})
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(getResp).ToNot(BeNil())
 
 			// Fetch pipeline directly from bucket
-			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createResp.PipelineId)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeNil())
 		})
@@ -279,11 +274,10 @@ var _ = Describe("External gRPC API", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(createResp).ToNot(BeNil())
+				Expect(createResp.Message).To(ContainSubstring("Pipeline created successfully"))
+				Expect(createResp.PipelineId).ToNot(BeEmpty())
 
-				pipelineID := getPipelineIDFromMessage(createResp.Message)
-				Expect(pipelineID).ToNot(BeEmpty())
-
-				createdPipelineIDs = append(createdPipelineIDs, pipelineID)
+				createdPipelineIDs = append(createdPipelineIDs, createResp.PipelineId)
 			}
 
 			// Fetch all pipelines
@@ -320,13 +314,11 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Fetch it from bucket, verify has correct name
-			createdPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			createdPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdPipeline).ToNot(BeNil())
 
@@ -335,10 +327,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(createdPipelineProto.Name).To(Equal(pipeline.Name))
-			Expect(createdPipelineProto.Id).To(Equal(createdPipelineID))
+			Expect(createdPipelineProto.Id).To(Equal(createdResp.PipelineId))
 
 			// Update its name
-			pipeline.Id = createdPipelineID
+			pipeline.Id = createdResp.PipelineId
 			pipeline.Name = "new-name"
 
 			updatedResponse, err := externalClient.UpdatePipeline(ctxWithGoodAuth, &protos.UpdatePipelineRequest{Pipeline: pipeline})
@@ -349,7 +341,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(updatedResponse.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Fetch it from the bucket
-			updatedPipelineData, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			updatedPipelineData, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(updatedPipelineData).ToNot(BeNil())
@@ -374,32 +366,32 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Get the pipeline
-			fetchedPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			fetchedPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fetchedPipeline).ToNot(BeNil())
 
 			// Delete the pipeline
 			resp, err := externalClient.DeletePipeline(ctxWithGoodAuth, &protos.DeletePipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 			})
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("deleted"))
 
 			// Get the pipeline again - should fail
-			shouldNotExist, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdPipelineID)
+			shouldNotExist, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(nats.ErrKeyNotFound))
 			Expect(shouldNotExist).To(BeNil())
 
 			// Get pipeline via external API - should fail
 			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 			})
 
 			Expect(err).To(HaveOccurred())
@@ -424,13 +416,12 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Attach it to an audience
 			attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -443,7 +434,7 @@ var _ = Describe("External gRPC API", func() {
 			storedPipelineID, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(storedPipelineID).ToNot(BeNil())
-			Expect(string(storedPipelineID)).To(Equal(createdPipelineID))
+			Expect(string(storedPipelineID)).To(Equal(createdResp.PipelineId))
 		})
 	})
 
@@ -463,13 +454,12 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Attach it to an audience
 			attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -482,11 +472,11 @@ var _ = Describe("External gRPC API", func() {
 			storedPipelineID, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(storedPipelineID).ToNot(BeNil())
-			Expect(string(storedPipelineID)).To(Equal(createdPipelineID))
+			Expect(string(storedPipelineID)).To(Equal(createdResp.PipelineId))
 
 			// Now detach it
 			detachResp, err := externalClient.DetachPipeline(ctxWithGoodAuth, &protos.DetachPipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -520,13 +510,12 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Pause it
 			pauseResp, err := externalClient.PausePipeline(ctxWithGoodAuth, &protos.PausePipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -535,7 +524,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdPipelineID)
+			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
 			// Should have an entry in snitch_paused
 			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
@@ -561,13 +550,12 @@ var _ = Describe("External gRPC API", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdResp).ToNot(BeNil())
-
-			createdPipelineID := getPipelineIDFromMessage(createdResp.Message)
-			Expect(createdPipelineID).ToNot(BeEmpty())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Pause it
 			pauseResp, err := externalClient.PausePipeline(ctxWithGoodAuth, &protos.PausePipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -576,7 +564,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdPipelineID)
+			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
 			// Should have an entry in snitch_paused
 			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
@@ -585,7 +573,7 @@ var _ = Describe("External gRPC API", func() {
 
 			// Resume it
 			resumeResp, err := externalClient.ResumePipeline(ctxWithGoodAuth, &protos.ResumePipelineRequest{
-				PipelineId: createdPipelineID,
+				PipelineId: createdResp.PipelineId,
 				Audience:   audience,
 			})
 
@@ -646,17 +634,6 @@ func newNATSClient() (natty.INatty, error) {
 	return natty.New(&natty.Config{
 		NatsURL: []string{NATSAddress},
 	})
-}
-
-// Parse pipelineID from "created '...' pipeline" message
-func getPipelineIDFromMessage(msg string) string {
-	idRegex := regexp.MustCompile(`^pipeline '(.+)' created$`)
-	matches := idRegex.FindStringSubmatch(msg)
-	if len(matches) != 2 {
-		return ""
-	}
-
-	return matches[1]
 }
 
 func newPipeline() *protos.Pipeline {

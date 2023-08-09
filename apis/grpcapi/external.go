@@ -97,7 +97,6 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
-// TODO: Implement
 func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
 	gen := make(map[string]*protos.PipelineInfo)
 
@@ -189,9 +188,9 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
-func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+		return nil, errors.Wrap(err, "invalid create pipeline request")
 	}
 
 	// Create ID for pipeline
@@ -199,17 +198,16 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 
 	// Populate WASM fields
 	if err := util.PopulateWASMFields(req.Pipeline, s.Deps.Config.WASMDir); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
 	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' created", req.Pipeline.Id),
+	return &protos.CreatePipelineResponse{
+		Message:    "Pipeline created successfully",
+		PipelineId: req.Pipeline.Id,
 	}, nil
 }
 
