@@ -21,7 +21,7 @@ import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { isNumeric, titleCase } from "../lib/utils.ts";
+import { gooseFlowbite, isNumeric, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -32,6 +32,8 @@ import {
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { Toast } from "../components/toasts/toast.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
+import { initFlowbite } from "https://esm.sh/v129/flowbite@1.7.0/denonext/flowbite.mjs";
+import { DeleteModal } from "../components/modals/deleteModal.tsx";
 
 export const newStep = {
   name: "",
@@ -186,6 +188,7 @@ const PipelineDetail = (
   },
 ) => {
   const [open, setOpen] = useState([0]);
+  const [deleteOpen, setDeleteOpen] = useState(null);
 
   //
   // typing the initializer to force preact useState hooks to
@@ -223,6 +226,13 @@ const PipelineDetail = (
         dragOrder: data.steps.length,
       }]],
     });
+    setOpen([...open, data.steps.length]);
+    setTimeout(() => initFlowbite(), 1000);
+  };
+
+  const deleteStep = (stepIndex: number) => {
+    setData({ ...data, steps: data.steps.filter((_, i) => i !== stepIndex) });
+    setDeleteOpen(null);
   };
 
   const onSubmit = async (e: any) => {
@@ -364,8 +374,21 @@ const PipelineDetail = (
                       />
                     </div>
                     <StepMenu
-                      onDelete={() => console.log("delete coming soon...")}
+                      index={i}
+                      step={step}
+                      onDelete={() => setDeleteOpen(i)}
                     />
+                    {deleteOpen === i
+                      ? (
+                        <DeleteModal
+                          id={i}
+                          entityType="Pipeline step"
+                          entityName={step.name}
+                          onClose={() => setDeleteOpen(null)}
+                          onDelete={() => deleteStep(i)}
+                        />
+                      )
+                      : null}
                   </div>
                   {open.includes(i)
                     ? (
