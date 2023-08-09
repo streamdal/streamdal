@@ -22,6 +22,14 @@ class CreatePipelineRequest(_message.Message):
     pipeline: _pipeline_pb2.Pipeline
     def __init__(self, pipeline: _Optional[_Union[_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
 
+class CreatePipelineResponse(_message.Message):
+    __slots__ = ["message", "pipeline_id"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    pipeline_id: str
+    def __init__(self, message: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
+
 class DeletePipelineRequest(_message.Message):
     __slots__ = ["pipeline_id"]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]

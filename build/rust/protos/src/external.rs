@@ -906,6 +906,146 @@ impl ::protobuf::reflect::ProtobufValue for CreatePipelineRequest {
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.CreatePipelineResponse)
+pub struct CreatePipelineResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.CreatePipelineResponse.message)
+    pub message: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.CreatePipelineResponse.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.CreatePipelineResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a CreatePipelineResponse {
+    fn default() -> &'a CreatePipelineResponse {
+        <CreatePipelineResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CreatePipelineResponse {
+    pub fn new() -> CreatePipelineResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "message",
+            |m: &CreatePipelineResponse| { &m.message },
+            |m: &mut CreatePipelineResponse| { &mut m.message },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &CreatePipelineResponse| { &m.pipeline_id },
+            |m: &mut CreatePipelineResponse| { &mut m.pipeline_id },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreatePipelineResponse>(
+            "CreatePipelineResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for CreatePipelineResponse {
+    const NAME: &'static str = "CreatePipelineResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.message = is.read_string()?;
+                },
+                18 => {
+                    self.pipeline_id = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.message.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.message);
+        }
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.pipeline_id);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.message.is_empty() {
+            os.write_string(1, &self.message)?;
+        }
+        if !self.pipeline_id.is_empty() {
+            os.write_string(2, &self.pipeline_id)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> CreatePipelineResponse {
+        CreatePipelineResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.message.clear();
+        self.pipeline_id.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static CreatePipelineResponse {
+        static instance: CreatePipelineResponse = CreatePipelineResponse {
+            message: ::std::string::String::new(),
+            pipeline_id: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for CreatePipelineResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CreatePipelineResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for CreatePipelineResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CreatePipelineResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.UpdatePipelineRequest)
 pub struct UpdatePipelineRequest {
     // message fields
@@ -1972,7 +2112,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x20\x01(\tR\npipelineId\"C\n\x13GetPipelineResponse\x12,\n\x08pipel\
     ine\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15Creat\
     ePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.Pip\
-    elineR\x08pipeline\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\
+    elineR\x08pipeline\"S\n\x16CreatePipelineResponse\x12\x18\n\x07message\
+    \x18\x01\x20\x01(\tR\x07message\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01\
+    (\tR\npipelineId\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\
     \x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DeletePipeli\
     neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"f\n\
     \x15AttachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
@@ -1985,27 +2127,27 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\
     \n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"#\
     \n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\
-    \x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\x94\
+    \x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\x9a\
     \x06\n\x08External\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16\
     .protos.GetAllResponse\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipeline\
     sRequest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\
-    \x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12I\n\
-    \x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x18.protos.S\
-    tandardResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRe\
-    quest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.p\
-    rotos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eAt\
-    tachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.Standar\
-    dResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\
-    \x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.Pa\
-    usePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipel\
-    ine\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardResponse\
-    \x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB4\
-    Z2github.com/streamdal/snitch-protos/build/go/protosJ\xe3\x17\n\x06\x12\
-    \x04\0\0t\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\
-    \x05\0\x14\n\t\n\x02\x03\x02\x12\x03\x06\0\x18\n\x08\n\x01\x08\x12\x03\
-    \x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0+\
-    \x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n_\n\x04\x06\0\x02\0\x12\x03\
+    \x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\
+    \x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.C\
+    reatePipelineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipe\
+    lineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\
+    \x1d.protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\
+    \x0eAttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.S\
+    tandardResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRe\
+    quest\x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.prot\
+    os.PausePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResume\
+    Pipeline\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardRes\
+    ponse\x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestRespo\
+    nseB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xe9\x18\n\x06\
+    \x12\x04\0\0y\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
+    \x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\
+    \x03\x05\0\x14\n\t\n\x02\x03\x02\x12\x03\x06\0\x18\n\x08\n\x01\x08\x12\
+    \x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0\
+    +\x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n_\n\x04\x06\0\x02\0\x12\x03\
     \x0c\x025\x1aR\x20Should\x20return\x20everything\x20that\x20is\x20needed\
     \x20to\x20build\x20the\x20initial\x20view\x20in\x20the\x20console\n\n\
     \x0c\n\x05\x06\0\x02\0\x01\x12\x03\x0c\x06\x0c\n\x0c\n\x05\x06\0\x02\0\
@@ -2017,11 +2159,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wasm_bytes\x20fiel\
     d\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x12\x06\x11\
     \n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x12\x12$\n\x0c\n\x05\x06\0\x02\
-    \x02\x03\x12\x03\x12/B\nE\n\x04\x06\0\x02\x03\x12\x03\x15\x02N\x1a8\x20C\
+    \x02\x03\x12\x03\x12/B\nE\n\x04\x06\0\x02\x03\x12\x03\x15\x02M\x1a8\x20C\
     reate\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20left\x20empty\x20o\
     n\x20create\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x15\x06\x14\n\x0c\n\
     \x05\x06\0\x02\x03\x02\x12\x03\x15\x15*\n\x0c\n\x05\x06\0\x02\x03\x03\
-    \x12\x03\x155L\n:\n\x04\x06\0\x02\x04\x12\x03\x18\x02N\x1a-\x20Update\
+    \x12\x03\x155K\n:\n\x04\x06\0\x02\x04\x12\x03\x18\x02N\x1a-\x20Update\
     \x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\n\x0c\n\x05\
     \x06\0\x02\x04\x01\x12\x03\x18\x06\x14\n\x0c\n\x05\x06\0\x02\x04\x02\x12\
     \x03\x18\x15*\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x185L\n\x20\n\x04\
@@ -2079,46 +2221,53 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x04N\0P\x01\n\n\n\x03\x04\x06\x01\x12\x03N\x08\x1d\n\x0b\n\x04\x04\
     \x06\x02\0\x12\x03O\x02\x1f\n\x0c\n\x05\x04\x06\x02\0\x06\x12\x03O\x02\
     \x11\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x03O\x12\x1a\n\x0c\n\x05\x04\x06\
-    \x02\0\x03\x12\x03O\x1d\x1e\n\n\n\x02\x04\x07\x12\x04R\0T\x01\n\n\n\x03\
-    \x04\x07\x01\x12\x03R\x08\x1d\n\x0b\n\x04\x04\x07\x02\0\x12\x03S\x02\x1f\
-    \n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03S\x02\x11\n\x0c\n\x05\x04\x07\x02\
-    \0\x01\x12\x03S\x12\x1a\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03S\x1d\x1e\n\
-    \n\n\x02\x04\x08\x12\x04V\0X\x01\n\n\n\x03\x04\x08\x01\x12\x03V\x08\x1d\
-    \n\x0b\n\x04\x04\x08\x02\0\x12\x03W\x02\x19\n\x0c\n\x05\x04\x08\x02\0\
-    \x05\x12\x03W\x02\x08\n\x0c\n\x05\x04\x08\x02\0\x01\x12\x03W\t\x14\n\x0c\
-    \n\x05\x04\x08\x02\0\x03\x12\x03W\x17\x18\n\n\n\x02\x04\t\x12\x04Z\0]\
-    \x01\n\n\n\x03\x04\t\x01\x12\x03Z\x08\x1d\n\x0b\n\x04\x04\t\x02\0\x12\
-    \x03[\x02\x19\n\x0c\n\x05\x04\t\x02\0\x05\x12\x03[\x02\x08\n\x0c\n\x05\
-    \x04\t\x02\0\x01\x12\x03[\t\x14\n\x0c\n\x05\x04\t\x02\0\x03\x12\x03[\x17\
-    \x18\n\x0b\n\x04\x04\t\x02\x01\x12\x03\\\x02\x1f\n\x0c\n\x05\x04\t\x02\
-    \x01\x06\x12\x03\\\x02\x11\n\x0c\n\x05\x04\t\x02\x01\x01\x12\x03\\\x12\
-    \x1a\n\x0c\n\x05\x04\t\x02\x01\x03\x12\x03\\\x1d\x1e\n\n\n\x02\x04\n\x12\
-    \x04_\0b\x01\n\n\n\x03\x04\n\x01\x12\x03_\x08\x1d\n\x0b\n\x04\x04\n\x02\
-    \0\x12\x03`\x02\x19\n\x0c\n\x05\x04\n\x02\0\x05\x12\x03`\x02\x08\n\x0c\n\
-    \x05\x04\n\x02\0\x01\x12\x03`\t\x14\n\x0c\n\x05\x04\n\x02\0\x03\x12\x03`\
-    \x17\x18\n\x0b\n\x04\x04\n\x02\x01\x12\x03a\x02\x1f\n\x0c\n\x05\x04\n\
-    \x02\x01\x06\x12\x03a\x02\x11\n\x0c\n\x05\x04\n\x02\x01\x01\x12\x03a\x12\
-    \x1a\n\x0c\n\x05\x04\n\x02\x01\x03\x12\x03a\x1d\x1e\n\n\n\x02\x04\x0b\
-    \x12\x04d\0g\x01\n\n\n\x03\x04\x0b\x01\x12\x03d\x08\x1c\n\x0b\n\x04\x04\
-    \x0b\x02\0\x12\x03e\x02\x19\n\x0c\n\x05\x04\x0b\x02\0\x05\x12\x03e\x02\
-    \x08\n\x0c\n\x05\x04\x0b\x02\0\x01\x12\x03e\t\x14\n\x0c\n\x05\x04\x0b\
-    \x02\0\x03\x12\x03e\x17\x18\n\x0b\n\x04\x04\x0b\x02\x01\x12\x03f\x02\x1f\
-    \n\x0c\n\x05\x04\x0b\x02\x01\x06\x12\x03f\x02\x11\n\x0c\n\x05\x04\x0b\
-    \x02\x01\x01\x12\x03f\x12\x1a\n\x0c\n\x05\x04\x0b\x02\x01\x03\x12\x03f\
-    \x1d\x1e\n\n\n\x02\x04\x0c\x12\x04i\0l\x01\n\n\n\x03\x04\x0c\x01\x12\x03\
-    i\x08\x1d\n\x0b\n\x04\x04\x0c\x02\0\x12\x03j\x02\x19\n\x0c\n\x05\x04\x0c\
-    \x02\0\x05\x12\x03j\x02\x08\n\x0c\n\x05\x04\x0c\x02\0\x01\x12\x03j\t\x14\
-    \n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03j\x17\x18\n\x0b\n\x04\x04\x0c\x02\
-    \x01\x12\x03k\x02\x1f\n\x0c\n\x05\x04\x0c\x02\x01\x06\x12\x03k\x02\x11\n\
-    \x0c\n\x05\x04\x0c\x02\x01\x01\x12\x03k\x12\x1a\n\x0c\n\x05\x04\x0c\x02\
-    \x01\x03\x12\x03k\x1d\x1e\n\n\n\x02\x04\r\x12\x04n\0p\x01\n\n\n\x03\x04\
-    \r\x01\x12\x03n\x08\x13\n\x0b\n\x04\x04\r\x02\0\x12\x03o\x02\x13\n\x0c\n\
-    \x05\x04\r\x02\0\x05\x12\x03o\x02\x08\n\x0c\n\x05\x04\r\x02\0\x01\x12\
-    \x03o\t\x0e\n\x0c\n\x05\x04\r\x02\0\x03\x12\x03o\x11\x12\n\n\n\x02\x04\
-    \x0e\x12\x04r\0t\x01\n\n\n\x03\x04\x0e\x01\x12\x03r\x08\x14\n\x0b\n\x04\
-    \x04\x0e\x02\0\x12\x03s\x02\x14\n\x0c\n\x05\x04\x0e\x02\0\x05\x12\x03s\
-    \x02\x08\n\x0c\n\x05\x04\x0e\x02\0\x01\x12\x03s\t\x0f\n\x0c\n\x05\x04\
-    \x0e\x02\0\x03\x12\x03s\x12\x13b\x06proto3\
+    \x02\0\x03\x12\x03O\x1d\x1e\n\n\n\x02\x04\x07\x12\x04R\0U\x01\n\n\n\x03\
+    \x04\x07\x01\x12\x03R\x08\x1e\n\x0b\n\x04\x04\x07\x02\0\x12\x03S\x02\x15\
+    \n\x0c\n\x05\x04\x07\x02\0\x05\x12\x03S\x02\x08\n\x0c\n\x05\x04\x07\x02\
+    \0\x01\x12\x03S\t\x10\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03S\x13\x14\n\
+    \x0b\n\x04\x04\x07\x02\x01\x12\x03T\x02\x19\n\x0c\n\x05\x04\x07\x02\x01\
+    \x05\x12\x03T\x02\x08\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03T\t\x14\n\
+    \x0c\n\x05\x04\x07\x02\x01\x03\x12\x03T\x17\x18\n\n\n\x02\x04\x08\x12\
+    \x04W\0Y\x01\n\n\n\x03\x04\x08\x01\x12\x03W\x08\x1d\n\x0b\n\x04\x04\x08\
+    \x02\0\x12\x03X\x02\x1f\n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03X\x02\x11\n\
+    \x0c\n\x05\x04\x08\x02\0\x01\x12\x03X\x12\x1a\n\x0c\n\x05\x04\x08\x02\0\
+    \x03\x12\x03X\x1d\x1e\n\n\n\x02\x04\t\x12\x04[\0]\x01\n\n\n\x03\x04\t\
+    \x01\x12\x03[\x08\x1d\n\x0b\n\x04\x04\t\x02\0\x12\x03\\\x02\x19\n\x0c\n\
+    \x05\x04\t\x02\0\x05\x12\x03\\\x02\x08\n\x0c\n\x05\x04\t\x02\0\x01\x12\
+    \x03\\\t\x14\n\x0c\n\x05\x04\t\x02\0\x03\x12\x03\\\x17\x18\n\n\n\x02\x04\
+    \n\x12\x04_\0b\x01\n\n\n\x03\x04\n\x01\x12\x03_\x08\x1d\n\x0b\n\x04\x04\
+    \n\x02\0\x12\x03`\x02\x19\n\x0c\n\x05\x04\n\x02\0\x05\x12\x03`\x02\x08\n\
+    \x0c\n\x05\x04\n\x02\0\x01\x12\x03`\t\x14\n\x0c\n\x05\x04\n\x02\0\x03\
+    \x12\x03`\x17\x18\n\x0b\n\x04\x04\n\x02\x01\x12\x03a\x02\x1f\n\x0c\n\x05\
+    \x04\n\x02\x01\x06\x12\x03a\x02\x11\n\x0c\n\x05\x04\n\x02\x01\x01\x12\
+    \x03a\x12\x1a\n\x0c\n\x05\x04\n\x02\x01\x03\x12\x03a\x1d\x1e\n\n\n\x02\
+    \x04\x0b\x12\x04d\0g\x01\n\n\n\x03\x04\x0b\x01\x12\x03d\x08\x1d\n\x0b\n\
+    \x04\x04\x0b\x02\0\x12\x03e\x02\x19\n\x0c\n\x05\x04\x0b\x02\0\x05\x12\
+    \x03e\x02\x08\n\x0c\n\x05\x04\x0b\x02\0\x01\x12\x03e\t\x14\n\x0c\n\x05\
+    \x04\x0b\x02\0\x03\x12\x03e\x17\x18\n\x0b\n\x04\x04\x0b\x02\x01\x12\x03f\
+    \x02\x1f\n\x0c\n\x05\x04\x0b\x02\x01\x06\x12\x03f\x02\x11\n\x0c\n\x05\
+    \x04\x0b\x02\x01\x01\x12\x03f\x12\x1a\n\x0c\n\x05\x04\x0b\x02\x01\x03\
+    \x12\x03f\x1d\x1e\n\n\n\x02\x04\x0c\x12\x04i\0l\x01\n\n\n\x03\x04\x0c\
+    \x01\x12\x03i\x08\x1c\n\x0b\n\x04\x04\x0c\x02\0\x12\x03j\x02\x19\n\x0c\n\
+    \x05\x04\x0c\x02\0\x05\x12\x03j\x02\x08\n\x0c\n\x05\x04\x0c\x02\0\x01\
+    \x12\x03j\t\x14\n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03j\x17\x18\n\x0b\n\
+    \x04\x04\x0c\x02\x01\x12\x03k\x02\x1f\n\x0c\n\x05\x04\x0c\x02\x01\x06\
+    \x12\x03k\x02\x11\n\x0c\n\x05\x04\x0c\x02\x01\x01\x12\x03k\x12\x1a\n\x0c\
+    \n\x05\x04\x0c\x02\x01\x03\x12\x03k\x1d\x1e\n\n\n\x02\x04\r\x12\x04n\0q\
+    \x01\n\n\n\x03\x04\r\x01\x12\x03n\x08\x1d\n\x0b\n\x04\x04\r\x02\0\x12\
+    \x03o\x02\x19\n\x0c\n\x05\x04\r\x02\0\x05\x12\x03o\x02\x08\n\x0c\n\x05\
+    \x04\r\x02\0\x01\x12\x03o\t\x14\n\x0c\n\x05\x04\r\x02\0\x03\x12\x03o\x17\
+    \x18\n\x0b\n\x04\x04\r\x02\x01\x12\x03p\x02\x1f\n\x0c\n\x05\x04\r\x02\
+    \x01\x06\x12\x03p\x02\x11\n\x0c\n\x05\x04\r\x02\x01\x01\x12\x03p\x12\x1a\
+    \n\x0c\n\x05\x04\r\x02\x01\x03\x12\x03p\x1d\x1e\n\n\n\x02\x04\x0e\x12\
+    \x04s\0u\x01\n\n\n\x03\x04\x0e\x01\x12\x03s\x08\x13\n\x0b\n\x04\x04\x0e\
+    \x02\0\x12\x03t\x02\x13\n\x0c\n\x05\x04\x0e\x02\0\x05\x12\x03t\x02\x08\n\
+    \x0c\n\x05\x04\x0e\x02\0\x01\x12\x03t\t\x0e\n\x0c\n\x05\x04\x0e\x02\0\
+    \x03\x12\x03t\x11\x12\n\n\n\x02\x04\x0f\x12\x04w\0y\x01\n\n\n\x03\x04\
+    \x0f\x01\x12\x03w\x08\x14\n\x0b\n\x04\x04\x0f\x02\0\x12\x03x\x02\x14\n\
+    \x0c\n\x05\x04\x0f\x02\0\x05\x12\x03x\x02\x08\n\x0c\n\x05\x04\x0f\x02\0\
+    \x01\x12\x03x\t\x0f\n\x0c\n\x05\x04\x0f\x02\0\x03\x12\x03x\x12\x13b\x06p\
+    roto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -2139,7 +2288,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::common::file_descriptor().clone());
             deps.push(super::info::file_descriptor().clone());
             deps.push(super::pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(15);
+            let mut messages = ::std::vec::Vec::with_capacity(16);
             messages.push(GetAllRequest::generated_message_descriptor_data());
             messages.push(GetAllResponse::generated_message_descriptor_data());
             messages.push(GetPipelinesRequest::generated_message_descriptor_data());
@@ -2147,6 +2296,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(GetPipelineRequest::generated_message_descriptor_data());
             messages.push(GetPipelineResponse::generated_message_descriptor_data());
             messages.push(CreatePipelineRequest::generated_message_descriptor_data());
+            messages.push(CreatePipelineResponse::generated_message_descriptor_data());
             messages.push(UpdatePipelineRequest::generated_message_descriptor_data());
             messages.push(DeletePipelineRequest::generated_message_descriptor_data());
             messages.push(AttachPipelineRequest::generated_message_descriptor_data());

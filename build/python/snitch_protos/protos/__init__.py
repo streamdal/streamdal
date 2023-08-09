@@ -257,6 +257,12 @@ class CreatePipelineRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class CreatePipelineResponse(betterproto.Message):
+    message: str = betterproto.string_field(1)
+    pipeline_id: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
 class UpdatePipelineRequest(betterproto.Message):
     pipeline: "Pipeline" = betterproto.message_field(1)
 
@@ -551,11 +557,11 @@ class ExternalStub(betterproto.ServiceStub):
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "StandardResponse":
+    ) -> "CreatePipelineResponse":
         return await self._unary_unary(
             "/protos.External/CreatePipeline",
             create_pipeline_request,
-            StandardResponse,
+            CreatePipelineResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -785,7 +791,7 @@ class ExternalBase(ServiceBase):
 
     async def create_pipeline(
         self, create_pipeline_request: "CreatePipelineRequest"
-    ) -> "StandardResponse":
+    ) -> "CreatePipelineResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def update_pipeline(
@@ -843,7 +849,8 @@ class ExternalBase(ServiceBase):
         await stream.send_message(response)
 
     async def __rpc_create_pipeline(
-        self, stream: "grpclib.server.Stream[CreatePipelineRequest, StandardResponse]"
+        self,
+        stream: "grpclib.server.Stream[CreatePipelineRequest, CreatePipelineResponse]",
     ) -> None:
         request = await stream.recv_message()
         response = await self.create_pipeline(request)
@@ -922,7 +929,7 @@ class ExternalBase(ServiceBase):
                 self.__rpc_create_pipeline,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 CreatePipelineRequest,
-                StandardResponse,
+                CreatePipelineResponse,
             ),
             "/protos.External/UpdatePipeline": grpclib.const.Handler(
                 self.__rpc_update_pipeline,
