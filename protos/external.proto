@@ -4,6 +4,7 @@ package protos;
 
 import "common.proto";
 import "info.proto";
+import "notify.proto";
 import "pipeline.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
@@ -38,6 +39,14 @@ service External {
 
   // Resume a pipeline; noop if pipeline is not paused
   rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
+
+  rpc CreateNotification(CreateNotificationRequest) returns (protos.StandardResponse);
+  rpc UpdateNotification(UpdateNotificationRequest) returns (protos.StandardResponse);
+  rpc DeleteNotification(DeleteNotificationRequest) returns (protos.StandardResponse);
+  rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+  rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
+  rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -111,6 +120,46 @@ message PausePipelineRequest {
 message ResumePipelineRequest {
   string pipeline_id = 1;
   protos.Audience audience = 2;
+}
+
+// Notifications
+message CreateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message UpdateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message DeleteNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationsRequest {
+  // Don't think we need anything here
+}
+
+message GetNotificationsResponse {
+  // Key == id of the notification config
+  map<string,protos.NotificationConfig> notifications = 1;
+}
+
+message GetNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationResponse {
+  protos.NotificationConfig notification = 1;
+}
+
+message AttachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
+}
+
+message DetachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
 }
 
 message TestRequest {
