@@ -21,8 +21,7 @@ const (
 	NATSConfigBucket    = "snitch_config"
 	NATSConfigKeyFormat = "%s" // K: $audience V: $pipeline_id (string)
 
-	NATSPausedBucket = "snitch_paused"
-
+	NATSPausedBucket    = "snitch_paused"
 	NATSPausedKeyFormat = "%s/%s" // K: $pipeline_id:$audience V: NONE
 
 	NATSNotificationConfigBucket    = "snitch_notification_config"
