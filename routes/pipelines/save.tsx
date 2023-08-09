@@ -5,7 +5,6 @@ import { pipelineSchema } from "../../islands/pipeline.tsx";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { upsertPipeline } from "../../lib/mutation.ts";
 import { SuccessType } from "../_middleware.ts";
-import { getPipelines } from "../../lib/fetch.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
