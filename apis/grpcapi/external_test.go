@@ -503,7 +503,7 @@ var _ = Describe("External gRPC API", func() {
 		})
 	})
 
-	FDescribe("PausePipeline", func() {
+	Describe("PausePipeline", func() {
 		It("should pause the pipeline", func() {
 			// Create pipeline
 			audience := &protos.Audience{
