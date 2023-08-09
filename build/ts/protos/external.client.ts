@@ -19,8 +19,9 @@ import type { PausePipelineRequest } from "./external.js";
 import type { DetachPipelineRequest } from "./external.js";
 import type { AttachPipelineRequest } from "./external.js";
 import type { DeletePipelineRequest } from "./external.js";
-import type { UpdatePipelineRequest } from "./external.js";
 import type { StandardResponse } from "./common.js";
+import type { UpdatePipelineRequest } from "./external.js";
+import type { CreatePipelineResponse } from "./external.js";
 import type { CreatePipelineRequest } from "./external.js";
 import type { GetPipelineResponse } from "./external.js";
 import type { GetPipelineRequest } from "./external.js";
@@ -56,9 +57,9 @@ export interface IExternalClient {
     /**
      * Create a new pipeline; id must be left empty on create
      *
-     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.CreatePipelineResponse);
      */
-    createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, StandardResponse>;
+    createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, CreatePipelineResponse>;
     /**
      * Update an existing pipeline; id must be set
      *
@@ -165,11 +166,11 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
     /**
      * Create a new pipeline; id must be left empty on create
      *
-     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.CreatePipelineResponse);
      */
-    createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, StandardResponse> {
+    createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, CreatePipelineResponse> {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreatePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreatePipelineRequest, CreatePipelineResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Update an existing pipeline; id must be set

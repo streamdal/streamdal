@@ -14,7 +14,8 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 // is intended to be immutable; clients are expected to generate WASMRequest's
 // that contain a pipeline step.
 message Pipeline {
-  // Set by snitch-server on Create; must be present on Update calls
+  // ID should NOT be set by external gRPC client on CreatePipelineRequest - it
+  // will be ignored; it _does_ need to be set on UpdatePipelineRequest.
   string id = 1;
 
   // Friendly name for the pipeline

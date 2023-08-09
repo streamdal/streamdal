@@ -41,7 +41,7 @@ export class ExternalClient {
     /**
      * Create a new pipeline; id must be left empty on create
      *
-     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.CreatePipelineResponse);
      */
     createPipeline(input, options) {
         const method = this.methods[3], opt = this._transport.mergeOptions(options);

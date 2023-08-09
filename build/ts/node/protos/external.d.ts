@@ -83,6 +83,19 @@ export interface CreatePipelineRequest {
     pipeline?: Pipeline;
 }
 /**
+ * @generated from protobuf message protos.CreatePipelineResponse
+ */
+export interface CreatePipelineResponse {
+    /**
+     * @generated from protobuf field: string message = 1;
+     */
+    message: string;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
  * @generated from protobuf message protos.UpdatePipelineRequest
  */
 export interface UpdatePipelineRequest {
@@ -297,6 +310,13 @@ declare class CreatePipelineRequest$Type extends MessageType<CreatePipelineReque
  * @generated MessageType for protobuf message protos.CreatePipelineRequest
  */
 export declare const CreatePipelineRequest: CreatePipelineRequest$Type;
+declare class CreatePipelineResponse$Type extends MessageType<CreatePipelineResponse> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.CreatePipelineResponse
+ */
+export declare const CreatePipelineResponse: CreatePipelineResponse$Type;
 declare class UpdatePipelineRequest$Type extends MessageType<UpdatePipelineRequest> {
     constructor();
 }

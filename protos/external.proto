@@ -20,7 +20,7 @@ service External {
   rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse);
 
   // Create a new pipeline; id must be left empty on create
-  rpc CreatePipeline(CreatePipelineRequest) returns (protos.StandardResponse);
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse);
 
   // Update an existing pipeline; id must be set
   rpc UpdatePipeline(UpdatePipelineRequest) returns (protos.StandardResponse);
@@ -86,6 +86,11 @@ message GetPipelineResponse {
 
 message CreatePipelineRequest {
   protos.Pipeline pipeline = 1;
+}
+
+message CreatePipelineResponse {
+  string message = 1;
+  string pipeline_id = 2;
 }
 
 message UpdatePipelineRequest {

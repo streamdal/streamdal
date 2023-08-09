@@ -29,7 +29,7 @@ type ExternalClient interface {
 	// Returns a single pipeline (_wasm_bytes field is stripped)
 	GetPipeline(ctx context.Context, in *GetPipelineRequest, opts ...grpc.CallOption) (*GetPipelineResponse, error)
 	// Create a new pipeline; id must be left empty on create
-	CreatePipeline(ctx context.Context, in *CreatePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreatePipeline(ctx context.Context, in *CreatePipelineRequest, opts ...grpc.CallOption) (*CreatePipelineResponse, error)
 	// Update an existing pipeline; id must be set
 	UpdatePipeline(ctx context.Context, in *UpdatePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete a pipeline
@@ -87,8 +87,8 @@ func (c *externalClient) GetPipeline(ctx context.Context, in *GetPipelineRequest
 	return out, nil
 }
 
-func (c *externalClient) CreatePipeline(ctx context.Context, in *CreatePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
+func (c *externalClient) CreatePipeline(ctx context.Context, in *CreatePipelineRequest, opts ...grpc.CallOption) (*CreatePipelineResponse, error) {
+	out := new(CreatePipelineResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/CreatePipeline", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -224,7 +224,7 @@ type ExternalServer interface {
 	// Returns a single pipeline (_wasm_bytes field is stripped)
 	GetPipeline(context.Context, *GetPipelineRequest) (*GetPipelineResponse, error)
 	// Create a new pipeline; id must be left empty on create
-	CreatePipeline(context.Context, *CreatePipelineRequest) (*StandardResponse, error)
+	CreatePipeline(context.Context, *CreatePipelineRequest) (*CreatePipelineResponse, error)
 	// Update an existing pipeline; id must be set
 	UpdatePipeline(context.Context, *UpdatePipelineRequest) (*StandardResponse, error)
 	// Delete a pipeline
@@ -261,7 +261,7 @@ func (UnimplementedExternalServer) GetPipelines(context.Context, *GetPipelinesRe
 func (UnimplementedExternalServer) GetPipeline(context.Context, *GetPipelineRequest) (*GetPipelineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPipeline not implemented")
 }
-func (UnimplementedExternalServer) CreatePipeline(context.Context, *CreatePipelineRequest) (*StandardResponse, error) {
+func (UnimplementedExternalServer) CreatePipeline(context.Context, *CreatePipelineRequest) (*CreatePipelineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePipeline not implemented")
 }
 func (UnimplementedExternalServer) UpdatePipeline(context.Context, *UpdatePipelineRequest) (*StandardResponse, error) {

@@ -906,6 +906,146 @@ impl ::protobuf::reflect::ProtobufValue for CreatePipelineRequest {
 }
 
 #[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.CreatePipelineResponse)
+pub struct CreatePipelineResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.CreatePipelineResponse.message)
+    pub message: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.CreatePipelineResponse.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.CreatePipelineResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a CreatePipelineResponse {
+    fn default() -> &'a CreatePipelineResponse {
+        <CreatePipelineResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CreatePipelineResponse {
+    pub fn new() -> CreatePipelineResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "message",
+            |m: &CreatePipelineResponse| { &m.message },
+            |m: &mut CreatePipelineResponse| { &mut m.message },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &CreatePipelineResponse| { &m.pipeline_id },
+            |m: &mut CreatePipelineResponse| { &mut m.pipeline_id },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreatePipelineResponse>(
+            "CreatePipelineResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for CreatePipelineResponse {
+    const NAME: &'static str = "CreatePipelineResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.message = is.read_string()?;
+                },
+                18 => {
+                    self.pipeline_id = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.message.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.message);
+        }
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.pipeline_id);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.message.is_empty() {
+            os.write_string(1, &self.message)?;
+        }
+        if !self.pipeline_id.is_empty() {
+            os.write_string(2, &self.pipeline_id)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> CreatePipelineResponse {
+        CreatePipelineResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.message.clear();
+        self.pipeline_id.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static CreatePipelineResponse {
+        static instance: CreatePipelineResponse = CreatePipelineResponse {
+            message: ::std::string::String::new(),
+            pipeline_id: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for CreatePipelineResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CreatePipelineResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for CreatePipelineResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CreatePipelineResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.UpdatePipelineRequest)
 pub struct UpdatePipelineRequest {
     // message fields
@@ -1714,1005 +1854,6 @@ impl ::protobuf::reflect::ProtobufValue for ResumePipelineRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  Notifications
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.CreateNotificationRequest)
-pub struct CreateNotificationRequest {
-    // message fields
-    // @@protoc_insertion_point(field:protos.CreateNotificationRequest.notification)
-    pub notification: ::protobuf::MessageField<super::notify::NotificationConfig>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.CreateNotificationRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a CreateNotificationRequest {
-    fn default() -> &'a CreateNotificationRequest {
-        <CreateNotificationRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl CreateNotificationRequest {
-    pub fn new() -> CreateNotificationRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::notify::NotificationConfig>(
-            "notification",
-            |m: &CreateNotificationRequest| { &m.notification },
-            |m: &mut CreateNotificationRequest| { &mut m.notification },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreateNotificationRequest>(
-            "CreateNotificationRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for CreateNotificationRequest {
-    const NAME: &'static str = "CreateNotificationRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.notification)?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let Some(v) = self.notification.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.notification.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> CreateNotificationRequest {
-        CreateNotificationRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static CreateNotificationRequest {
-        static instance: CreateNotificationRequest = CreateNotificationRequest {
-            notification: ::protobuf::MessageField::none(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for CreateNotificationRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("CreateNotificationRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for CreateNotificationRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for CreateNotificationRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.UpdateNotificationRequest)
-pub struct UpdateNotificationRequest {
-    // message fields
-    // @@protoc_insertion_point(field:protos.UpdateNotificationRequest.notification)
-    pub notification: ::protobuf::MessageField<super::notify::NotificationConfig>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.UpdateNotificationRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a UpdateNotificationRequest {
-    fn default() -> &'a UpdateNotificationRequest {
-        <UpdateNotificationRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl UpdateNotificationRequest {
-    pub fn new() -> UpdateNotificationRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::notify::NotificationConfig>(
-            "notification",
-            |m: &UpdateNotificationRequest| { &m.notification },
-            |m: &mut UpdateNotificationRequest| { &mut m.notification },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<UpdateNotificationRequest>(
-            "UpdateNotificationRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for UpdateNotificationRequest {
-    const NAME: &'static str = "UpdateNotificationRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.notification)?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let Some(v) = self.notification.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.notification.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> UpdateNotificationRequest {
-        UpdateNotificationRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static UpdateNotificationRequest {
-        static instance: UpdateNotificationRequest = UpdateNotificationRequest {
-            notification: ::protobuf::MessageField::none(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for UpdateNotificationRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("UpdateNotificationRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for UpdateNotificationRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for UpdateNotificationRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.DeleteNotificationRequest)
-pub struct DeleteNotificationRequest {
-    // message fields
-    // @@protoc_insertion_point(field:protos.DeleteNotificationRequest.notification_id)
-    pub notification_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.DeleteNotificationRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a DeleteNotificationRequest {
-    fn default() -> &'a DeleteNotificationRequest {
-        <DeleteNotificationRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl DeleteNotificationRequest {
-    pub fn new() -> DeleteNotificationRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "notification_id",
-            |m: &DeleteNotificationRequest| { &m.notification_id },
-            |m: &mut DeleteNotificationRequest| { &mut m.notification_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<DeleteNotificationRequest>(
-            "DeleteNotificationRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for DeleteNotificationRequest {
-    const NAME: &'static str = "DeleteNotificationRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.notification_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.notification_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.notification_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.notification_id.is_empty() {
-            os.write_string(1, &self.notification_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> DeleteNotificationRequest {
-        DeleteNotificationRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static DeleteNotificationRequest {
-        static instance: DeleteNotificationRequest = DeleteNotificationRequest {
-            notification_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for DeleteNotificationRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("DeleteNotificationRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for DeleteNotificationRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for DeleteNotificationRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetNotificationsRequest)
-pub struct GetNotificationsRequest {
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.GetNotificationsRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a GetNotificationsRequest {
-    fn default() -> &'a GetNotificationsRequest {
-        <GetNotificationsRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl GetNotificationsRequest {
-    pub fn new() -> GetNotificationsRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(0);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetNotificationsRequest>(
-            "GetNotificationsRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for GetNotificationsRequest {
-    const NAME: &'static str = "GetNotificationsRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> GetNotificationsRequest {
-        GetNotificationsRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static GetNotificationsRequest {
-        static instance: GetNotificationsRequest = GetNotificationsRequest {
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for GetNotificationsRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetNotificationsRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for GetNotificationsRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for GetNotificationsRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetNotificationsResponse)
-pub struct GetNotificationsResponse {
-    // message fields
-    // @@protoc_insertion_point(field:protos.GetNotificationsResponse.notifications)
-    pub notifications: ::std::collections::HashMap<::std::string::String, super::notify::NotificationConfig>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.GetNotificationsResponse.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a GetNotificationsResponse {
-    fn default() -> &'a GetNotificationsResponse {
-        <GetNotificationsResponse as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl GetNotificationsResponse {
-    pub fn new() -> GetNotificationsResponse {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
-            "notifications",
-            |m: &GetNotificationsResponse| { &m.notifications },
-            |m: &mut GetNotificationsResponse| { &mut m.notifications },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetNotificationsResponse>(
-            "GetNotificationsResponse",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for GetNotificationsResponse {
-    const NAME: &'static str = "GetNotificationsResponse";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    let len = is.read_raw_varint32()?;
-                    let old_limit = is.push_limit(len as u64)?;
-                    let mut key = ::std::default::Default::default();
-                    let mut value = ::std::default::Default::default();
-                    while let Some(tag) = is.read_raw_tag_or_eof()? {
-                        match tag {
-                            10 => key = is.read_string()?,
-                            18 => value = is.read_message()?,
-                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
-                        };
-                    }
-                    is.pop_limit(old_limit);
-                    self.notifications.insert(key, value);
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        for (k, v) in &self.notifications {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            let len = v.compute_size();
-            entry_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
-        };
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        for (k, v) in &self.notifications {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            let len = v.cached_size() as u64;
-            entry_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-            os.write_raw_varint32(10)?; // Tag.
-            os.write_raw_varint32(entry_size as u32)?;
-            os.write_string(1, &k)?;
-            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
-        };
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> GetNotificationsResponse {
-        GetNotificationsResponse::new()
-    }
-
-    fn clear(&mut self) {
-        self.notifications.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static GetNotificationsResponse {
-        static instance: ::protobuf::rt::Lazy<GetNotificationsResponse> = ::protobuf::rt::Lazy::new();
-        instance.get(GetNotificationsResponse::new)
-    }
-}
-
-impl ::protobuf::MessageFull for GetNotificationsResponse {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetNotificationsResponse").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for GetNotificationsResponse {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for GetNotificationsResponse {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetNotificationRequest)
-pub struct GetNotificationRequest {
-    // message fields
-    // @@protoc_insertion_point(field:protos.GetNotificationRequest.notification_id)
-    pub notification_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.GetNotificationRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a GetNotificationRequest {
-    fn default() -> &'a GetNotificationRequest {
-        <GetNotificationRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl GetNotificationRequest {
-    pub fn new() -> GetNotificationRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "notification_id",
-            |m: &GetNotificationRequest| { &m.notification_id },
-            |m: &mut GetNotificationRequest| { &mut m.notification_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetNotificationRequest>(
-            "GetNotificationRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for GetNotificationRequest {
-    const NAME: &'static str = "GetNotificationRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.notification_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.notification_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.notification_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.notification_id.is_empty() {
-            os.write_string(1, &self.notification_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> GetNotificationRequest {
-        GetNotificationRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static GetNotificationRequest {
-        static instance: GetNotificationRequest = GetNotificationRequest {
-            notification_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for GetNotificationRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetNotificationRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for GetNotificationRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for GetNotificationRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.GetNotificationResponse)
-pub struct GetNotificationResponse {
-    // message fields
-    // @@protoc_insertion_point(field:protos.GetNotificationResponse.notification)
-    pub notification: ::protobuf::MessageField<super::notify::NotificationConfig>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.GetNotificationResponse.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a GetNotificationResponse {
-    fn default() -> &'a GetNotificationResponse {
-        <GetNotificationResponse as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl GetNotificationResponse {
-    pub fn new() -> GetNotificationResponse {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::notify::NotificationConfig>(
-            "notification",
-            |m: &GetNotificationResponse| { &m.notification },
-            |m: &mut GetNotificationResponse| { &mut m.notification },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetNotificationResponse>(
-            "GetNotificationResponse",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for GetNotificationResponse {
-    const NAME: &'static str = "GetNotificationResponse";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.notification)?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let Some(v) = self.notification.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.notification.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> GetNotificationResponse {
-        GetNotificationResponse::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static GetNotificationResponse {
-        static instance: GetNotificationResponse = GetNotificationResponse {
-            notification: ::protobuf::MessageField::none(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for GetNotificationResponse {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetNotificationResponse").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for GetNotificationResponse {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for GetNotificationResponse {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.AttachNotificationRequest)
-pub struct AttachNotificationRequest {
-    // message fields
-    // @@protoc_insertion_point(field:protos.AttachNotificationRequest.notification_id)
-    pub notification_id: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.AttachNotificationRequest.pipeline_id)
-    pub pipeline_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.AttachNotificationRequest.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a AttachNotificationRequest {
-    fn default() -> &'a AttachNotificationRequest {
-        <AttachNotificationRequest as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl AttachNotificationRequest {
-    pub fn new() -> AttachNotificationRequest {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "notification_id",
-            |m: &AttachNotificationRequest| { &m.notification_id },
-            |m: &mut AttachNotificationRequest| { &mut m.notification_id },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "pipeline_id",
-            |m: &AttachNotificationRequest| { &m.pipeline_id },
-            |m: &mut AttachNotificationRequest| { &mut m.pipeline_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<AttachNotificationRequest>(
-            "AttachNotificationRequest",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for AttachNotificationRequest {
-    const NAME: &'static str = "AttachNotificationRequest";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.notification_id = is.read_string()?;
-                },
-                18 => {
-                    self.pipeline_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.notification_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.notification_id);
-        }
-        if !self.pipeline_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.pipeline_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.notification_id.is_empty() {
-            os.write_string(1, &self.notification_id)?;
-        }
-        if !self.pipeline_id.is_empty() {
-            os.write_string(2, &self.pipeline_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> AttachNotificationRequest {
-        AttachNotificationRequest::new()
-    }
-
-    fn clear(&mut self) {
-        self.notification_id.clear();
-        self.pipeline_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static AttachNotificationRequest {
-        static instance: AttachNotificationRequest = AttachNotificationRequest {
-            notification_id: ::std::string::String::new(),
-            pipeline_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for AttachNotificationRequest {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("AttachNotificationRequest").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for AttachNotificationRequest {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for AttachNotificationRequest {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.TestRequest)
 pub struct TestRequest {
@@ -2959,238 +2100,174 @@ impl ::protobuf::reflect::ProtobufValue for TestResponse {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0eexternal.proto\x12\x06protos\x1a\x0ccommon.proto\x1a\ninfo.proto\
-    \x1a\x0cnotify.proto\x1a\x0epipeline.proto\"\x0f\n\rGetAllRequest\"\xff\
-    \x01\n\x0eGetAllResponse\x12$\n\x04live\x18\x01\x20\x03(\x0b2\x10.protos\
-    .LiveInfoR\x04live\x12.\n\taudiences\x18\x02\x20\x03(\x0b2\x10.protos.Au\
-    dienceR\taudiences\x12C\n\tpipelines\x18\x03\x20\x03(\x0b2%.protos.GetAl\
-    lResponse.PipelinesEntryR\tpipelines\x1aR\n\x0ePipelinesEntry\x12\x10\n\
-    \x03key\x18\x01\x20\x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\
-    \x14.protos.PipelineInfoR\x05value:\x028\x01\"\x15\n\x13GetPipelinesRequ\
-    est\"F\n\x14GetPipelinesResponse\x12.\n\tpipelines\x18\x01\x20\x03(\x0b2\
-    \x10.protos.PipelineR\tpipelines\"5\n\x12GetPipelineRequest\x12\x1f\n\
-    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"C\n\x13GetPipelineRespo\
-    nse\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pip\
-    eline\"E\n\x15CreatePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\
-    \x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15UpdatePipelineRequest\x12\
-    ,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"\
-    8\n\x15DeletePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\t\
-    R\npipelineId\"f\n\x15AttachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
-    \x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\
-    \x10.protos.AudienceR\x08audience\"f\n\x15DetachPipelineRequest\x12\x1f\
-    \n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\
-    \x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"e\n\x14PausePipelin\
-    eRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\
-    \x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"f\n\
-    \x15ResumePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
+    \x1a\x0epipeline.proto\"\x0f\n\rGetAllRequest\"\xff\x01\n\x0eGetAllRespo\
+    nse\x12$\n\x04live\x18\x01\x20\x03(\x0b2\x10.protos.LiveInfoR\x04live\
+    \x12.\n\taudiences\x18\x02\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\
+    \x12C\n\tpipelines\x18\x03\x20\x03(\x0b2%.protos.GetAllResponse.Pipeline\
+    sEntryR\tpipelines\x1aR\n\x0ePipelinesEntry\x12\x10\n\x03key\x18\x01\x20\
+    \x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.Pipelin\
+    eInfoR\x05value:\x028\x01\"\x15\n\x13GetPipelinesRequest\"F\n\x14GetPipe\
+    linesResponse\x12.\n\tpipelines\x18\x01\x20\x03(\x0b2\x10.protos.Pipelin\
+    eR\tpipelines\"5\n\x12GetPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
+    \x01\x20\x01(\tR\npipelineId\"C\n\x13GetPipelineResponse\x12,\n\x08pipel\
+    ine\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15Creat\
+    ePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.Pip\
+    elineR\x08pipeline\"S\n\x16CreatePipelineResponse\x12\x18\n\x07message\
+    \x18\x01\x20\x01(\tR\x07message\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01\
+    (\tR\npipelineId\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\
+    \x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DeletePipeli\
+    neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"f\n\
+    \x15AttachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
     pipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\
-    \x08audience\"[\n\x19CreateNotificationRequest\x12>\n\x0cnotification\
-    \x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x0cnotification\"[\
-    \n\x19UpdateNotificationRequest\x12>\n\x0cnotification\x18\x01\x20\x01(\
-    \x0b2\x1a.protos.NotificationConfigR\x0cnotification\"D\n\x19DeleteNotif\
-    icationRequest\x12'\n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotifica\
-    tionId\"\x19\n\x17GetNotificationsRequest\"\xd3\x01\n\x18GetNotification\
-    sResponse\x12Y\n\rnotifications\x18\x01\x20\x03(\x0b23.protos.GetNotific\
-    ationsResponse.NotificationsEntryR\rnotifications\x1a\\\n\x12Notificatio\
-    nsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x120\n\x05value\x18\
-    \x02\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x05value:\x028\x01\"A\
-    \n\x16GetNotificationRequest\x12'\n\x0fnotification_id\x18\x01\x20\x01(\
-    \tR\x0enotificationId\"Y\n\x17GetNotificationResponse\x12>\n\x0cnotifica\
-    tion\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x0cnotificatio\
-    n\"e\n\x19AttachNotificationRequest\x12'\n\x0fnotification_id\x18\x01\
-    \x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\
-    \tR\npipelineId\"#\n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\
-    \tR\x05input\"&\n\x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\t\
-    R\x06output2\x8b\n\n\x08External\x127\n\x06GetAll\x12\x15.protos.GetAllR\
-    equest\x1a\x16.protos.GetAllResponse\x12I\n\x0cGetPipelines\x12\x1b.prot\
-    os.GetPipelinesRequest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGet\
-    Pipeline\x12\x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineRes\
-    ponse\x12I\n\x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\
-    \x18.protos.StandardResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.Upd\
-    atePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipel\
-    ine\x12\x1d.protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\
-    \x12I\n\x0eAttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.p\
-    rotos.StandardResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPip\
-    elineRequest\x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\
-    \x1c.protos.PausePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\
-    \x0eResumePipeline\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.S\
-    tandardResponse\x12Q\n\x12CreateNotification\x12!.protos.CreateNotificat\
-    ionRequest\x1a\x18.protos.StandardResponse\x12Q\n\x12UpdateNotification\
-    \x12!.protos.UpdateNotificationRequest\x1a\x18.protos.StandardResponse\
-    \x12Q\n\x12DeleteNotification\x12!.protos.DeleteNotificationRequest\x1a\
-    \x18.protos.StandardResponse\x12U\n\x10GetNotifications\x12\x1f.protos.G\
-    etNotificationsRequest\x1a\x20.protos.GetNotificationsResponse\x12R\n\
-    \x0fGetNotification\x12\x1e.protos.GetNotificationRequest\x1a\x1f.protos\
-    .GetNotificationResponse\x12Q\n\x12AttachNotification\x12!.protos.Attach\
-    NotificationRequest\x1a\x18.protos.StandardResponse\x121\n\x04Test\x12\
-    \x13.protos.TestRequest\x1a\x14.protos.TestResponseB4Z2github.com/stream\
-    dal/snitch-protos/build/go/protosJ\x9d\x20\n\x07\x12\x05\0\0\x9e\x01\x01\
-    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
-    \x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\x05\0\x14\n\t\n\
-    \x02\x03\x02\x12\x03\x06\0\x16\n\t\n\x02\x03\x03\x12\x03\x07\0\x18\n\x08\
-    \n\x01\x08\x12\x03\t\0I\n\t\n\x02\x08\x0b\x12\x03\t\0I\n\n\n\x02\x06\0\
-    \x12\x04\x0b\03\x01\n\n\n\x03\x06\0\x01\x12\x03\x0b\x08\x10\n_\n\x04\x06\
-    \0\x02\0\x12\x03\r\x025\x1aR\x20Should\x20return\x20everything\x20that\
-    \x20is\x20needed\x20to\x20build\x20the\x20initial\x20view\x20in\x20the\
-    \x20console\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\r\x06\x0c\n\x0c\n\x05\
-    \x06\0\x02\0\x02\x12\x03\r\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\r%3\
-    \n@\n\x04\x06\0\x02\x01\x12\x03\x10\x02G\x1a3\x20Returns\x20pipelines\
-    \x20(_wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x01\
-    \x01\x12\x03\x10\x06\x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x10\x13&\
-    \n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\x101E\nH\n\x04\x06\0\x02\x02\x12\
-    \x03\x13\x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wasm_bytes\
-    \x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x13\
-    \x06\x11\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x13\x12$\n\x0c\n\x05\x06\
-    \0\x02\x02\x03\x12\x03\x13/B\nE\n\x04\x06\0\x02\x03\x12\x03\x16\x02N\x1a\
-    8\x20Create\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20left\x20empt\
-    y\x20on\x20create\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x16\x06\x14\n\
-    \x0c\n\x05\x06\0\x02\x03\x02\x12\x03\x16\x15*\n\x0c\n\x05\x06\0\x02\x03\
-    \x03\x12\x03\x165L\n:\n\x04\x06\0\x02\x04\x12\x03\x19\x02N\x1a-\x20Updat\
-    e\x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\n\x0c\n\
-    \x05\x06\0\x02\x04\x01\x12\x03\x19\x06\x14\n\x0c\n\x05\x06\0\x02\x04\x02\
-    \x12\x03\x19\x15*\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x195L\n\x20\n\
-    \x04\x06\0\x02\x05\x12\x03\x1c\x02N\x1a\x13\x20Delete\x20a\x20pipeline\n\
-    \n\x0c\n\x05\x06\0\x02\x05\x01\x12\x03\x1c\x06\x14\n\x0c\n\x05\x06\0\x02\
-    \x05\x02\x12\x03\x1c\x15*\n\x0c\n\x05\x06\0\x02\x05\x03\x12\x03\x1c5L\n/\
-    \n\x04\x06\0\x02\x06\x12\x03\x1f\x02N\x1a\"\x20Attach\x20a\x20pipeline\
-    \x20to\x20an\x20audience\n\n\x0c\n\x05\x06\0\x02\x06\x01\x12\x03\x1f\x06\
-    \x14\n\x0c\n\x05\x06\0\x02\x06\x02\x12\x03\x1f\x15*\n\x0c\n\x05\x06\0\
-    \x02\x06\x03\x12\x03\x1f5L\n1\n\x04\x06\0\x02\x07\x12\x03\"\x02N\x1a$\
-    \x20Detach\x20a\x20pipeline\x20from\x20an\x20audience\n\n\x0c\n\x05\x06\
-    \0\x02\x07\x01\x12\x03\"\x06\x14\n\x0c\n\x05\x06\0\x02\x07\x02\x12\x03\"\
-    \x15*\n\x0c\n\x05\x06\0\x02\x07\x03\x12\x03\"5L\nC\n\x04\x06\0\x02\x08\
-    \x12\x03%\x02L\x1a6\x20Pause\x20a\x20pipeline;\x20noop\x20if\x20pipeline\
-    \x20is\x20already\x20paused\n\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03%\x06\
-    \x13\n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03%\x14(\n\x0c\n\x05\x06\0\x02\
-    \x08\x03\x12\x03%3J\n@\n\x04\x06\0\x02\t\x12\x03(\x02N\x1a3\x20Resume\
-    \x20a\x20pipeline;\x20noop\x20if\x20pipeline\x20is\x20not\x20paused\n\n\
-    \x0c\n\x05\x06\0\x02\t\x01\x12\x03(\x06\x14\n\x0c\n\x05\x06\0\x02\t\x02\
-    \x12\x03(\x15*\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03(5L\n\x0b\n\x04\x06\0\
-    \x02\n\x12\x03*\x02V\n\x0c\n\x05\x06\0\x02\n\x01\x12\x03*\x06\x18\n\x0c\
-    \n\x05\x06\0\x02\n\x02\x12\x03*\x192\n\x0c\n\x05\x06\0\x02\n\x03\x12\x03\
-    *=T\n\x0b\n\x04\x06\0\x02\x0b\x12\x03+\x02V\n\x0c\n\x05\x06\0\x02\x0b\
-    \x01\x12\x03+\x06\x18\n\x0c\n\x05\x06\0\x02\x0b\x02\x12\x03+\x192\n\x0c\
-    \n\x05\x06\0\x02\x0b\x03\x12\x03+=T\n\x0b\n\x04\x06\0\x02\x0c\x12\x03,\
-    \x02V\n\x0c\n\x05\x06\0\x02\x0c\x01\x12\x03,\x06\x18\n\x0c\n\x05\x06\0\
-    \x02\x0c\x02\x12\x03,\x192\n\x0c\n\x05\x06\0\x02\x0c\x03\x12\x03,=T\n\
-    \x0b\n\x04\x06\0\x02\r\x12\x03-\x02S\n\x0c\n\x05\x06\0\x02\r\x01\x12\x03\
-    -\x06\x16\n\x0c\n\x05\x06\0\x02\r\x02\x12\x03-\x17.\n\x0c\n\x05\x06\0\
-    \x02\r\x03\x12\x03-9Q\n\x0b\n\x04\x06\0\x02\x0e\x12\x03.\x02P\n\x0c\n\
-    \x05\x06\0\x02\x0e\x01\x12\x03.\x06\x15\n\x0c\n\x05\x06\0\x02\x0e\x02\
-    \x12\x03.\x16,\n\x0c\n\x05\x06\0\x02\x0e\x03\x12\x03.7N\n\x0b\n\x04\x06\
-    \0\x02\x0f\x12\x03/\x02V\n\x0c\n\x05\x06\0\x02\x0f\x01\x12\x03/\x06\x18\
-    \n\x0c\n\x05\x06\0\x02\x0f\x02\x12\x03/\x192\n\x0c\n\x05\x06\0\x02\x0f\
-    \x03\x12\x03/=T\n\x1a\n\x04\x06\0\x02\x10\x12\x032\x02/\x1a\r\x20Test\
-    \x20method\n\n\x0c\n\x05\x06\0\x02\x10\x01\x12\x032\x06\n\n\x0c\n\x05\
-    \x06\0\x02\x10\x02\x12\x032\x0b\x16\n\x0c\n\x05\x06\0\x02\x10\x03\x12\
-    \x032!-\n=\n\x02\x04\0\x12\x045\07\x01\"1\x20Don't\x20think\x20there\x20\
-    is\x20anything\x20to\x20pass\x20in\x20(yet)?\n\n\n\n\x03\x04\0\x01\x12\
-    \x035\x08\x15\n\n\n\x02\x04\x01\x12\x049\0D\x01\n\n\n\x03\x04\x01\x01\
-    \x12\x039\x08\x16\n8\n\x04\x04\x01\x02\0\x12\x03;\x02$\x1a+\x20Clients\
-    \x20currently\x20connected\x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\
-    \x02\0\x04\x12\x03;\x02\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03;\x0b\x1a\
-    \n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03;\x1b\x1f\n\x0c\n\x05\x04\x01\x02\
-    \0\x03\x12\x03;\"#\n@\n\x04\x04\x01\x02\x01\x12\x03>\x02)\x1a3\x20All\
-    \x20of\x20the\x20audiences\x20that\x20are\x20known\x20to\x20the\x20serve\
-    r\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x03>\x02\n\n\x0c\n\x05\x04\x01\
-    \x02\x01\x06\x12\x03>\x0b\x1a\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03>\
-    \x1b$\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03>'(\n\xbb\x01\n\x04\x04\x01\
-    \x02\x02\x12\x03C\x022\x1a\xad\x01\x20All\x20of\x20the\x20pipelines\x20k\
-    nown\x20to\x20the\x20server\x20+\x20pipeline\x20<->\x20audience\x20mappi\
-    ngs\n\x20key\x20==\x20pipeline_id;\x20if\x20\"Audience\"\x20is\x20not\
-    \x20filled\x20out\x20-\x20pipeline\x20is\x20not\x20attached\n\x20to\x20a\
-    ny\x20audience.\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03C\x02#\n\x0c\n\
-    \x05\x04\x01\x02\x02\x01\x12\x03C$-\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\
-    \x03C01\n/\n\x02\x04\x02\x12\x04F\0H\x01\"#\x20Don't\x20think\x20we\x20n\
-    eed\x20anything\x20here\n\n\n\n\x03\x04\x02\x01\x12\x03F\x08\x1b\n\n\n\
-    \x02\x04\x03\x12\x04J\0L\x01\n\n\n\x03\x04\x03\x01\x12\x03J\x08\x1c\n\
-    \x0b\n\x04\x04\x03\x02\0\x12\x03K\x02)\n\x0c\n\x05\x04\x03\x02\0\x04\x12\
-    \x03K\x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\x12\x03K\x0b\x1a\n\x0c\n\x05\
-    \x04\x03\x02\0\x01\x12\x03K\x1b$\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03K'\
-    (\n\n\n\x02\x04\x04\x12\x04N\0P\x01\n\n\n\x03\x04\x04\x01\x12\x03N\x08\
-    \x1a\n\x0b\n\x04\x04\x04\x02\0\x12\x03O\x02\x19\n\x0c\n\x05\x04\x04\x02\
-    \0\x05\x12\x03O\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03O\t\x14\n\
-    \x0c\n\x05\x04\x04\x02\0\x03\x12\x03O\x17\x18\n\n\n\x02\x04\x05\x12\x04R\
-    \0T\x01\n\n\n\x03\x04\x05\x01\x12\x03R\x08\x1b\n\x0b\n\x04\x04\x05\x02\0\
-    \x12\x03S\x02\x1f\n\x0c\n\x05\x04\x05\x02\0\x06\x12\x03S\x02\x11\n\x0c\n\
-    \x05\x04\x05\x02\0\x01\x12\x03S\x12\x1a\n\x0c\n\x05\x04\x05\x02\0\x03\
-    \x12\x03S\x1d\x1e\n\n\n\x02\x04\x06\x12\x04V\0X\x01\n\n\n\x03\x04\x06\
-    \x01\x12\x03V\x08\x1d\n\x0b\n\x04\x04\x06\x02\0\x12\x03W\x02\x1f\n\x0c\n\
-    \x05\x04\x06\x02\0\x06\x12\x03W\x02\x11\n\x0c\n\x05\x04\x06\x02\0\x01\
-    \x12\x03W\x12\x1a\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03W\x1d\x1e\n\n\n\
-    \x02\x04\x07\x12\x04Z\0\\\x01\n\n\n\x03\x04\x07\x01\x12\x03Z\x08\x1d\n\
-    \x0b\n\x04\x04\x07\x02\0\x12\x03[\x02\x1f\n\x0c\n\x05\x04\x07\x02\0\x06\
-    \x12\x03[\x02\x11\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03[\x12\x1a\n\x0c\n\
-    \x05\x04\x07\x02\0\x03\x12\x03[\x1d\x1e\n\n\n\x02\x04\x08\x12\x04^\0`\
-    \x01\n\n\n\x03\x04\x08\x01\x12\x03^\x08\x1d\n\x0b\n\x04\x04\x08\x02\0\
-    \x12\x03_\x02\x19\n\x0c\n\x05\x04\x08\x02\0\x05\x12\x03_\x02\x08\n\x0c\n\
-    \x05\x04\x08\x02\0\x01\x12\x03_\t\x14\n\x0c\n\x05\x04\x08\x02\0\x03\x12\
-    \x03_\x17\x18\n\n\n\x02\x04\t\x12\x04b\0e\x01\n\n\n\x03\x04\t\x01\x12\
-    \x03b\x08\x1d\n\x0b\n\x04\x04\t\x02\0\x12\x03c\x02\x19\n\x0c\n\x05\x04\t\
-    \x02\0\x05\x12\x03c\x02\x08\n\x0c\n\x05\x04\t\x02\0\x01\x12\x03c\t\x14\n\
-    \x0c\n\x05\x04\t\x02\0\x03\x12\x03c\x17\x18\n\x0b\n\x04\x04\t\x02\x01\
-    \x12\x03d\x02\x1f\n\x0c\n\x05\x04\t\x02\x01\x06\x12\x03d\x02\x11\n\x0c\n\
-    \x05\x04\t\x02\x01\x01\x12\x03d\x12\x1a\n\x0c\n\x05\x04\t\x02\x01\x03\
-    \x12\x03d\x1d\x1e\n\n\n\x02\x04\n\x12\x04g\0j\x01\n\n\n\x03\x04\n\x01\
-    \x12\x03g\x08\x1d\n\x0b\n\x04\x04\n\x02\0\x12\x03h\x02\x19\n\x0c\n\x05\
-    \x04\n\x02\0\x05\x12\x03h\x02\x08\n\x0c\n\x05\x04\n\x02\0\x01\x12\x03h\t\
-    \x14\n\x0c\n\x05\x04\n\x02\0\x03\x12\x03h\x17\x18\n\x0b\n\x04\x04\n\x02\
-    \x01\x12\x03i\x02\x1f\n\x0c\n\x05\x04\n\x02\x01\x06\x12\x03i\x02\x11\n\
-    \x0c\n\x05\x04\n\x02\x01\x01\x12\x03i\x12\x1a\n\x0c\n\x05\x04\n\x02\x01\
-    \x03\x12\x03i\x1d\x1e\n\n\n\x02\x04\x0b\x12\x04l\0o\x01\n\n\n\x03\x04\
-    \x0b\x01\x12\x03l\x08\x1c\n\x0b\n\x04\x04\x0b\x02\0\x12\x03m\x02\x19\n\
-    \x0c\n\x05\x04\x0b\x02\0\x05\x12\x03m\x02\x08\n\x0c\n\x05\x04\x0b\x02\0\
-    \x01\x12\x03m\t\x14\n\x0c\n\x05\x04\x0b\x02\0\x03\x12\x03m\x17\x18\n\x0b\
-    \n\x04\x04\x0b\x02\x01\x12\x03n\x02\x1f\n\x0c\n\x05\x04\x0b\x02\x01\x06\
-    \x12\x03n\x02\x11\n\x0c\n\x05\x04\x0b\x02\x01\x01\x12\x03n\x12\x1a\n\x0c\
-    \n\x05\x04\x0b\x02\x01\x03\x12\x03n\x1d\x1e\n\n\n\x02\x04\x0c\x12\x04q\0\
-    t\x01\n\n\n\x03\x04\x0c\x01\x12\x03q\x08\x1d\n\x0b\n\x04\x04\x0c\x02\0\
-    \x12\x03r\x02\x19\n\x0c\n\x05\x04\x0c\x02\0\x05\x12\x03r\x02\x08\n\x0c\n\
-    \x05\x04\x0c\x02\0\x01\x12\x03r\t\x14\n\x0c\n\x05\x04\x0c\x02\0\x03\x12\
-    \x03r\x17\x18\n\x0b\n\x04\x04\x0c\x02\x01\x12\x03s\x02\x1f\n\x0c\n\x05\
-    \x04\x0c\x02\x01\x06\x12\x03s\x02\x11\n\x0c\n\x05\x04\x0c\x02\x01\x01\
-    \x12\x03s\x12\x1a\n\x0c\n\x05\x04\x0c\x02\x01\x03\x12\x03s\x1d\x1e\n\x1b\
-    \n\x02\x04\r\x12\x04w\0y\x01\x1a\x0f\x20Notifications\n\n\n\n\x03\x04\r\
-    \x01\x12\x03w\x08!\n\x0b\n\x04\x04\r\x02\0\x12\x03x\x02-\n\x0c\n\x05\x04\
-    \r\x02\0\x06\x12\x03x\x02\x1b\n\x0c\n\x05\x04\r\x02\0\x01\x12\x03x\x1c(\
-    \n\x0c\n\x05\x04\r\x02\0\x03\x12\x03x+,\n\n\n\x02\x04\x0e\x12\x04{\0}\
-    \x01\n\n\n\x03\x04\x0e\x01\x12\x03{\x08!\n\x0b\n\x04\x04\x0e\x02\0\x12\
-    \x03|\x02-\n\x0c\n\x05\x04\x0e\x02\0\x06\x12\x03|\x02\x1b\n\x0c\n\x05\
-    \x04\x0e\x02\0\x01\x12\x03|\x1c(\n\x0c\n\x05\x04\x0e\x02\0\x03\x12\x03|+\
-    ,\n\x0b\n\x02\x04\x0f\x12\x05\x7f\0\x81\x01\x01\n\n\n\x03\x04\x0f\x01\
-    \x12\x03\x7f\x08!\n\x0c\n\x04\x04\x0f\x02\0\x12\x04\x80\x01\x02\x1d\n\r\
-    \n\x05\x04\x0f\x02\0\x05\x12\x04\x80\x01\x02\x08\n\r\n\x05\x04\x0f\x02\0\
-    \x01\x12\x04\x80\x01\t\x18\n\r\n\x05\x04\x0f\x02\0\x03\x12\x04\x80\x01\
-    \x1b\x1c\n1\n\x02\x04\x10\x12\x06\x83\x01\0\x85\x01\x01\"#\x20Don't\x20t\
-    hink\x20we\x20need\x20anything\x20here\n\n\x0b\n\x03\x04\x10\x01\x12\x04\
-    \x83\x01\x08\x1f\n\x0c\n\x02\x04\x11\x12\x06\x87\x01\0\x89\x01\x01\n\x0b\
-    \n\x03\x04\x11\x01\x12\x04\x87\x01\x08\x20\n\x0c\n\x04\x04\x11\x02\0\x12\
-    \x04\x88\x01\x02:\n\r\n\x05\x04\x11\x02\0\x06\x12\x04\x88\x01\x02'\n\r\n\
-    \x05\x04\x11\x02\0\x01\x12\x04\x88\x01(5\n\r\n\x05\x04\x11\x02\0\x03\x12\
-    \x04\x88\x0189\n\x0c\n\x02\x04\x12\x12\x06\x8b\x01\0\x8d\x01\x01\n\x0b\n\
-    \x03\x04\x12\x01\x12\x04\x8b\x01\x08\x1e\n\x0c\n\x04\x04\x12\x02\0\x12\
-    \x04\x8c\x01\x02\x1d\n\r\n\x05\x04\x12\x02\0\x05\x12\x04\x8c\x01\x02\x08\
-    \n\r\n\x05\x04\x12\x02\0\x01\x12\x04\x8c\x01\t\x18\n\r\n\x05\x04\x12\x02\
-    \0\x03\x12\x04\x8c\x01\x1b\x1c\n\x0c\n\x02\x04\x13\x12\x06\x8f\x01\0\x91\
-    \x01\x01\n\x0b\n\x03\x04\x13\x01\x12\x04\x8f\x01\x08\x1f\n\x0c\n\x04\x04\
-    \x13\x02\0\x12\x04\x90\x01\x02-\n\r\n\x05\x04\x13\x02\0\x06\x12\x04\x90\
-    \x01\x02\x1b\n\r\n\x05\x04\x13\x02\0\x01\x12\x04\x90\x01\x1c(\n\r\n\x05\
-    \x04\x13\x02\0\x03\x12\x04\x90\x01+,\n\x0c\n\x02\x04\x14\x12\x06\x93\x01\
-    \0\x96\x01\x01\n\x0b\n\x03\x04\x14\x01\x12\x04\x93\x01\x08!\n\x0c\n\x04\
-    \x04\x14\x02\0\x12\x04\x94\x01\x02\x1d\n\r\n\x05\x04\x14\x02\0\x05\x12\
-    \x04\x94\x01\x02\x08\n\r\n\x05\x04\x14\x02\0\x01\x12\x04\x94\x01\t\x18\n\
-    \r\n\x05\x04\x14\x02\0\x03\x12\x04\x94\x01\x1b\x1c\n\x0c\n\x04\x04\x14\
-    \x02\x01\x12\x04\x95\x01\x02\x19\n\r\n\x05\x04\x14\x02\x01\x05\x12\x04\
-    \x95\x01\x02\x08\n\r\n\x05\x04\x14\x02\x01\x01\x12\x04\x95\x01\t\x14\n\r\
-    \n\x05\x04\x14\x02\x01\x03\x12\x04\x95\x01\x17\x18\n\x0c\n\x02\x04\x15\
-    \x12\x06\x98\x01\0\x9a\x01\x01\n\x0b\n\x03\x04\x15\x01\x12\x04\x98\x01\
-    \x08\x13\n\x0c\n\x04\x04\x15\x02\0\x12\x04\x99\x01\x02\x13\n\r\n\x05\x04\
-    \x15\x02\0\x05\x12\x04\x99\x01\x02\x08\n\r\n\x05\x04\x15\x02\0\x01\x12\
-    \x04\x99\x01\t\x0e\n\r\n\x05\x04\x15\x02\0\x03\x12\x04\x99\x01\x11\x12\n\
-    \x0c\n\x02\x04\x16\x12\x06\x9c\x01\0\x9e\x01\x01\n\x0b\n\x03\x04\x16\x01\
-    \x12\x04\x9c\x01\x08\x14\n\x0c\n\x04\x04\x16\x02\0\x12\x04\x9d\x01\x02\
-    \x14\n\r\n\x05\x04\x16\x02\0\x05\x12\x04\x9d\x01\x02\x08\n\r\n\x05\x04\
-    \x16\x02\0\x01\x12\x04\x9d\x01\t\x0f\n\r\n\x05\x04\x16\x02\0\x03\x12\x04\
-    \x9d\x01\x12\x13b\x06proto3\
+    \x08audience\"f\n\x15DetachPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\
+    \x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\
+    \x10.protos.AudienceR\x08audience\"e\n\x14PausePipelineRequest\x12\x1f\n\
+    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\
+    \x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"f\n\x15ResumePipeli\
+    neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\
+    \n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"#\
+    \n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\
+    \x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\x9a\
+    \x06\n\x08External\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16\
+    .protos.GetAllResponse\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipeline\
+    sRequest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\
+    \x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\
+    \x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.C\
+    reatePipelineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipe\
+    lineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\
+    \x1d.protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\
+    \x0eAttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.S\
+    tandardResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRe\
+    quest\x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.prot\
+    os.PausePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResume\
+    Pipeline\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardRes\
+    ponse\x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestRespo\
+    nseB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xe9\x18\n\x06\
+    \x12\x04\0\0y\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
+    \x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\
+    \x03\x05\0\x14\n\t\n\x02\x03\x02\x12\x03\x06\0\x18\n\x08\n\x01\x08\x12\
+    \x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0\
+    +\x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n_\n\x04\x06\0\x02\0\x12\x03\
+    \x0c\x025\x1aR\x20Should\x20return\x20everything\x20that\x20is\x20needed\
+    \x20to\x20build\x20the\x20initial\x20view\x20in\x20the\x20console\n\n\
+    \x0c\n\x05\x06\0\x02\0\x01\x12\x03\x0c\x06\x0c\n\x0c\n\x05\x06\0\x02\0\
+    \x02\x12\x03\x0c\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x0c%3\n@\n\
+    \x04\x06\0\x02\x01\x12\x03\x0f\x02G\x1a3\x20Returns\x20pipelines\x20(_wa\
+    sm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\
+    \x03\x0f\x06\x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x0f\x13&\n\x0c\n\
+    \x05\x06\0\x02\x01\x03\x12\x03\x0f1E\nH\n\x04\x06\0\x02\x02\x12\x03\x12\
+    \x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wasm_bytes\x20fiel\
+    d\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x12\x06\x11\
+    \n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x12\x12$\n\x0c\n\x05\x06\0\x02\
+    \x02\x03\x12\x03\x12/B\nE\n\x04\x06\0\x02\x03\x12\x03\x15\x02M\x1a8\x20C\
+    reate\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20left\x20empty\x20o\
+    n\x20create\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x15\x06\x14\n\x0c\n\
+    \x05\x06\0\x02\x03\x02\x12\x03\x15\x15*\n\x0c\n\x05\x06\0\x02\x03\x03\
+    \x12\x03\x155K\n:\n\x04\x06\0\x02\x04\x12\x03\x18\x02N\x1a-\x20Update\
+    \x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\n\x0c\n\x05\
+    \x06\0\x02\x04\x01\x12\x03\x18\x06\x14\n\x0c\n\x05\x06\0\x02\x04\x02\x12\
+    \x03\x18\x15*\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x185L\n\x20\n\x04\
+    \x06\0\x02\x05\x12\x03\x1b\x02N\x1a\x13\x20Delete\x20a\x20pipeline\n\n\
+    \x0c\n\x05\x06\0\x02\x05\x01\x12\x03\x1b\x06\x14\n\x0c\n\x05\x06\0\x02\
+    \x05\x02\x12\x03\x1b\x15*\n\x0c\n\x05\x06\0\x02\x05\x03\x12\x03\x1b5L\n/\
+    \n\x04\x06\0\x02\x06\x12\x03\x1e\x02N\x1a\"\x20Attach\x20a\x20pipeline\
+    \x20to\x20an\x20audience\n\n\x0c\n\x05\x06\0\x02\x06\x01\x12\x03\x1e\x06\
+    \x14\n\x0c\n\x05\x06\0\x02\x06\x02\x12\x03\x1e\x15*\n\x0c\n\x05\x06\0\
+    \x02\x06\x03\x12\x03\x1e5L\n1\n\x04\x06\0\x02\x07\x12\x03!\x02N\x1a$\x20\
+    Detach\x20a\x20pipeline\x20from\x20an\x20audience\n\n\x0c\n\x05\x06\0\
+    \x02\x07\x01\x12\x03!\x06\x14\n\x0c\n\x05\x06\0\x02\x07\x02\x12\x03!\x15\
+    *\n\x0c\n\x05\x06\0\x02\x07\x03\x12\x03!5L\nC\n\x04\x06\0\x02\x08\x12\
+    \x03$\x02L\x1a6\x20Pause\x20a\x20pipeline;\x20noop\x20if\x20pipeline\x20\
+    is\x20already\x20paused\n\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03$\x06\x13\
+    \n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03$\x14(\n\x0c\n\x05\x06\0\x02\x08\
+    \x03\x12\x03$3J\n@\n\x04\x06\0\x02\t\x12\x03'\x02N\x1a3\x20Resume\x20a\
+    \x20pipeline;\x20noop\x20if\x20pipeline\x20is\x20not\x20paused\n\n\x0c\n\
+    \x05\x06\0\x02\t\x01\x12\x03'\x06\x14\n\x0c\n\x05\x06\0\x02\t\x02\x12\
+    \x03'\x15*\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03'5L\n\x1a\n\x04\x06\0\x02\
+    \n\x12\x03*\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\x05\x06\0\x02\n\x01\
+    \x12\x03*\x06\n\n\x0c\n\x05\x06\0\x02\n\x02\x12\x03*\x0b\x16\n\x0c\n\x05\
+    \x06\0\x02\n\x03\x12\x03*!-\n=\n\x02\x04\0\x12\x04-\0/\x01\"1\x20Don't\
+    \x20think\x20there\x20is\x20anything\x20to\x20pass\x20in\x20(yet)?\n\n\n\
+    \n\x03\x04\0\x01\x12\x03-\x08\x15\n\n\n\x02\x04\x01\x12\x041\0<\x01\n\n\
+    \n\x03\x04\x01\x01\x12\x031\x08\x16\n8\n\x04\x04\x01\x02\0\x12\x033\x02$\
+    \x1a+\x20Clients\x20currently\x20connected\x20to\x20the\x20server\n\n\
+    \x0c\n\x05\x04\x01\x02\0\x04\x12\x033\x02\n\n\x0c\n\x05\x04\x01\x02\0\
+    \x06\x12\x033\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x033\x1b\x1f\n\
+    \x0c\n\x05\x04\x01\x02\0\x03\x12\x033\"#\n@\n\x04\x04\x01\x02\x01\x12\
+    \x036\x02)\x1a3\x20All\x20of\x20the\x20audiences\x20that\x20are\x20known\
+    \x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x036\x02\n\
+    \n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x036\x0b\x1a\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x036\x1b$\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x036'(\n\
+    \xbb\x01\n\x04\x04\x01\x02\x02\x12\x03;\x022\x1a\xad\x01\x20All\x20of\
+    \x20the\x20pipelines\x20known\x20to\x20the\x20server\x20+\x20pipeline\
+    \x20<->\x20audience\x20mappings\n\x20key\x20==\x20pipeline_id;\x20if\x20\
+    \"Audience\"\x20is\x20not\x20filled\x20out\x20-\x20pipeline\x20is\x20not\
+    \x20attached\n\x20to\x20any\x20audience.\n\n\x0c\n\x05\x04\x01\x02\x02\
+    \x06\x12\x03;\x02#\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03;$-\n\x0c\n\
+    \x05\x04\x01\x02\x02\x03\x12\x03;01\n/\n\x02\x04\x02\x12\x04>\0@\x01\"#\
+    \x20Don't\x20think\x20we\x20need\x20anything\x20here\n\n\n\n\x03\x04\x02\
+    \x01\x12\x03>\x08\x1b\n\n\n\x02\x04\x03\x12\x04B\0D\x01\n\n\n\x03\x04\
+    \x03\x01\x12\x03B\x08\x1c\n\x0b\n\x04\x04\x03\x02\0\x12\x03C\x02)\n\x0c\
+    \n\x05\x04\x03\x02\0\x04\x12\x03C\x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\
+    \x12\x03C\x0b\x1a\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03C\x1b$\n\x0c\n\
+    \x05\x04\x03\x02\0\x03\x12\x03C'(\n\n\n\x02\x04\x04\x12\x04F\0H\x01\n\n\
+    \n\x03\x04\x04\x01\x12\x03F\x08\x1a\n\x0b\n\x04\x04\x04\x02\0\x12\x03G\
+    \x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03G\x02\x08\n\x0c\n\x05\x04\
+    \x04\x02\0\x01\x12\x03G\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03G\x17\
+    \x18\n\n\n\x02\x04\x05\x12\x04J\0L\x01\n\n\n\x03\x04\x05\x01\x12\x03J\
+    \x08\x1b\n\x0b\n\x04\x04\x05\x02\0\x12\x03K\x02\x1f\n\x0c\n\x05\x04\x05\
+    \x02\0\x06\x12\x03K\x02\x11\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03K\x12\
+    \x1a\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03K\x1d\x1e\n\n\n\x02\x04\x06\
+    \x12\x04N\0P\x01\n\n\n\x03\x04\x06\x01\x12\x03N\x08\x1d\n\x0b\n\x04\x04\
+    \x06\x02\0\x12\x03O\x02\x1f\n\x0c\n\x05\x04\x06\x02\0\x06\x12\x03O\x02\
+    \x11\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x03O\x12\x1a\n\x0c\n\x05\x04\x06\
+    \x02\0\x03\x12\x03O\x1d\x1e\n\n\n\x02\x04\x07\x12\x04R\0U\x01\n\n\n\x03\
+    \x04\x07\x01\x12\x03R\x08\x1e\n\x0b\n\x04\x04\x07\x02\0\x12\x03S\x02\x15\
+    \n\x0c\n\x05\x04\x07\x02\0\x05\x12\x03S\x02\x08\n\x0c\n\x05\x04\x07\x02\
+    \0\x01\x12\x03S\t\x10\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03S\x13\x14\n\
+    \x0b\n\x04\x04\x07\x02\x01\x12\x03T\x02\x19\n\x0c\n\x05\x04\x07\x02\x01\
+    \x05\x12\x03T\x02\x08\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03T\t\x14\n\
+    \x0c\n\x05\x04\x07\x02\x01\x03\x12\x03T\x17\x18\n\n\n\x02\x04\x08\x12\
+    \x04W\0Y\x01\n\n\n\x03\x04\x08\x01\x12\x03W\x08\x1d\n\x0b\n\x04\x04\x08\
+    \x02\0\x12\x03X\x02\x1f\n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03X\x02\x11\n\
+    \x0c\n\x05\x04\x08\x02\0\x01\x12\x03X\x12\x1a\n\x0c\n\x05\x04\x08\x02\0\
+    \x03\x12\x03X\x1d\x1e\n\n\n\x02\x04\t\x12\x04[\0]\x01\n\n\n\x03\x04\t\
+    \x01\x12\x03[\x08\x1d\n\x0b\n\x04\x04\t\x02\0\x12\x03\\\x02\x19\n\x0c\n\
+    \x05\x04\t\x02\0\x05\x12\x03\\\x02\x08\n\x0c\n\x05\x04\t\x02\0\x01\x12\
+    \x03\\\t\x14\n\x0c\n\x05\x04\t\x02\0\x03\x12\x03\\\x17\x18\n\n\n\x02\x04\
+    \n\x12\x04_\0b\x01\n\n\n\x03\x04\n\x01\x12\x03_\x08\x1d\n\x0b\n\x04\x04\
+    \n\x02\0\x12\x03`\x02\x19\n\x0c\n\x05\x04\n\x02\0\x05\x12\x03`\x02\x08\n\
+    \x0c\n\x05\x04\n\x02\0\x01\x12\x03`\t\x14\n\x0c\n\x05\x04\n\x02\0\x03\
+    \x12\x03`\x17\x18\n\x0b\n\x04\x04\n\x02\x01\x12\x03a\x02\x1f\n\x0c\n\x05\
+    \x04\n\x02\x01\x06\x12\x03a\x02\x11\n\x0c\n\x05\x04\n\x02\x01\x01\x12\
+    \x03a\x12\x1a\n\x0c\n\x05\x04\n\x02\x01\x03\x12\x03a\x1d\x1e\n\n\n\x02\
+    \x04\x0b\x12\x04d\0g\x01\n\n\n\x03\x04\x0b\x01\x12\x03d\x08\x1d\n\x0b\n\
+    \x04\x04\x0b\x02\0\x12\x03e\x02\x19\n\x0c\n\x05\x04\x0b\x02\0\x05\x12\
+    \x03e\x02\x08\n\x0c\n\x05\x04\x0b\x02\0\x01\x12\x03e\t\x14\n\x0c\n\x05\
+    \x04\x0b\x02\0\x03\x12\x03e\x17\x18\n\x0b\n\x04\x04\x0b\x02\x01\x12\x03f\
+    \x02\x1f\n\x0c\n\x05\x04\x0b\x02\x01\x06\x12\x03f\x02\x11\n\x0c\n\x05\
+    \x04\x0b\x02\x01\x01\x12\x03f\x12\x1a\n\x0c\n\x05\x04\x0b\x02\x01\x03\
+    \x12\x03f\x1d\x1e\n\n\n\x02\x04\x0c\x12\x04i\0l\x01\n\n\n\x03\x04\x0c\
+    \x01\x12\x03i\x08\x1c\n\x0b\n\x04\x04\x0c\x02\0\x12\x03j\x02\x19\n\x0c\n\
+    \x05\x04\x0c\x02\0\x05\x12\x03j\x02\x08\n\x0c\n\x05\x04\x0c\x02\0\x01\
+    \x12\x03j\t\x14\n\x0c\n\x05\x04\x0c\x02\0\x03\x12\x03j\x17\x18\n\x0b\n\
+    \x04\x04\x0c\x02\x01\x12\x03k\x02\x1f\n\x0c\n\x05\x04\x0c\x02\x01\x06\
+    \x12\x03k\x02\x11\n\x0c\n\x05\x04\x0c\x02\x01\x01\x12\x03k\x12\x1a\n\x0c\
+    \n\x05\x04\x0c\x02\x01\x03\x12\x03k\x1d\x1e\n\n\n\x02\x04\r\x12\x04n\0q\
+    \x01\n\n\n\x03\x04\r\x01\x12\x03n\x08\x1d\n\x0b\n\x04\x04\r\x02\0\x12\
+    \x03o\x02\x19\n\x0c\n\x05\x04\r\x02\0\x05\x12\x03o\x02\x08\n\x0c\n\x05\
+    \x04\r\x02\0\x01\x12\x03o\t\x14\n\x0c\n\x05\x04\r\x02\0\x03\x12\x03o\x17\
+    \x18\n\x0b\n\x04\x04\r\x02\x01\x12\x03p\x02\x1f\n\x0c\n\x05\x04\r\x02\
+    \x01\x06\x12\x03p\x02\x11\n\x0c\n\x05\x04\r\x02\x01\x01\x12\x03p\x12\x1a\
+    \n\x0c\n\x05\x04\r\x02\x01\x03\x12\x03p\x1d\x1e\n\n\n\x02\x04\x0e\x12\
+    \x04s\0u\x01\n\n\n\x03\x04\x0e\x01\x12\x03s\x08\x13\n\x0b\n\x04\x04\x0e\
+    \x02\0\x12\x03t\x02\x13\n\x0c\n\x05\x04\x0e\x02\0\x05\x12\x03t\x02\x08\n\
+    \x0c\n\x05\x04\x0e\x02\0\x01\x12\x03t\t\x0e\n\x0c\n\x05\x04\x0e\x02\0\
+    \x03\x12\x03t\x11\x12\n\n\n\x02\x04\x0f\x12\x04w\0y\x01\n\n\n\x03\x04\
+    \x0f\x01\x12\x03w\x08\x14\n\x0b\n\x04\x04\x0f\x02\0\x12\x03x\x02\x14\n\
+    \x0c\n\x05\x04\x0f\x02\0\x05\x12\x03x\x02\x08\n\x0c\n\x05\x04\x0f\x02\0\
+    \x01\x12\x03x\t\x0f\n\x0c\n\x05\x04\x0f\x02\0\x03\x12\x03x\x12\x13b\x06p\
+    roto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -3207,12 +2284,11 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     static file_descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::FileDescriptor> = ::protobuf::rt::Lazy::new();
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
-            let mut deps = ::std::vec::Vec::with_capacity(4);
+            let mut deps = ::std::vec::Vec::with_capacity(3);
             deps.push(super::common::file_descriptor().clone());
             deps.push(super::info::file_descriptor().clone());
-            deps.push(super::notify::file_descriptor().clone());
             deps.push(super::pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(23);
+            let mut messages = ::std::vec::Vec::with_capacity(16);
             messages.push(GetAllRequest::generated_message_descriptor_data());
             messages.push(GetAllResponse::generated_message_descriptor_data());
             messages.push(GetPipelinesRequest::generated_message_descriptor_data());
@@ -3220,20 +2296,13 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(GetPipelineRequest::generated_message_descriptor_data());
             messages.push(GetPipelineResponse::generated_message_descriptor_data());
             messages.push(CreatePipelineRequest::generated_message_descriptor_data());
+            messages.push(CreatePipelineResponse::generated_message_descriptor_data());
             messages.push(UpdatePipelineRequest::generated_message_descriptor_data());
             messages.push(DeletePipelineRequest::generated_message_descriptor_data());
             messages.push(AttachPipelineRequest::generated_message_descriptor_data());
             messages.push(DetachPipelineRequest::generated_message_descriptor_data());
             messages.push(PausePipelineRequest::generated_message_descriptor_data());
             messages.push(ResumePipelineRequest::generated_message_descriptor_data());
-            messages.push(CreateNotificationRequest::generated_message_descriptor_data());
-            messages.push(UpdateNotificationRequest::generated_message_descriptor_data());
-            messages.push(DeleteNotificationRequest::generated_message_descriptor_data());
-            messages.push(GetNotificationsRequest::generated_message_descriptor_data());
-            messages.push(GetNotificationsResponse::generated_message_descriptor_data());
-            messages.push(GetNotificationRequest::generated_message_descriptor_data());
-            messages.push(GetNotificationResponse::generated_message_descriptor_data());
-            messages.push(AttachNotificationRequest::generated_message_descriptor_data());
             messages.push(TestRequest::generated_message_descriptor_data());
             messages.push(TestResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(0);
