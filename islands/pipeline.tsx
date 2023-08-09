@@ -21,7 +21,7 @@ import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { gooseFlowbite, isNumeric, titleCase } from "../lib/utils.ts";
+import { isNumeric, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,

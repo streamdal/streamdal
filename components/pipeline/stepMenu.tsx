@@ -1,7 +1,5 @@
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { PipelineStep } from "snitch-protos/protos/pipeline.ts";
-import { DeleteModal } from "../modals/deleteModal.tsx";
 
 export const StepMenu = (
   { index, onDelete }: {
