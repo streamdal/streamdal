@@ -306,3 +306,11 @@ func NewAudienceRequest(req *protos.NewAudienceRequest) error {
 
 	return Audience(req.Audience)
 }
+
+func GetAllRequest(req *protos.GetAllRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	return nil
+}

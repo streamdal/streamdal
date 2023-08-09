@@ -25,8 +25,123 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
-func (s *ExternalServer) GetServiceMap(ctx context.Context, req *protos.GetServiceMapRequest) (*protos.GetServiceMapResponse, error) {
-	return nil, errors.New("not implemented")
+func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) (*protos.GetAllResponse, error) {
+	if err := validate.GetAllRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get all request")
+	}
+
+	liveInfo, err := s.getAllLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get live info")
+	}
+
+	audiences, err := s.Deps.StoreService.GetAudiences(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get audiences")
+	}
+
+	pipelines, err := s.getAllPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	return &protos.GetAllResponse{
+		Live:      liveInfo,
+		Audiences: audiences,
+		Pipelines: pipelines,
+	}, nil
+}
+
+func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
+	liveInfo := make([]*protos.LiveInfo, 0)
+
+	liveData, err := s.Deps.StoreService.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get live data")
+	}
+
+	for _, v := range liveData {
+		live := &protos.LiveInfo{
+			Audiences: make([]*protos.Audience, 0),
+		}
+
+		// If register entry, fill out client info
+		if v.Register {
+			if err := validate.ClientInfo(v.Value); err != nil {
+				s.log.Errorf("getAllLive: unable to validate client info for session id '%s': %v", v.SessionID, err)
+				continue
+			}
+
+			live.Client = v.Value
+			live.Client.XSessionId = &v.SessionID
+			live.Client.XServiceName = &v.Audience.ServiceName
+			live.Client.XNodeName = &v.NodeName
+		}
+	}
+
+	// No register entries == no one connected to any instances of snitch server
+	if len(liveData) == 0 {
+		return liveInfo, nil
+	}
+
+	// Have register entries - fill out audiences for each
+	for _, li := range liveInfo {
+		// Find all live entry audiences with same session ID
+		for _, ld := range liveData {
+			if *li.Client.XSessionId == ld.SessionID {
+				li.Audiences = append(li.Audiences, ld.Audience)
+			}
+		}
+	}
+
+	return liveInfo, nil
+}
+
+func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
+	gen := make(map[string]*protos.PipelineInfo)
+
+	// Get all pipelines
+	allPipelines, err := s.Deps.StoreService.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	for pipelineID, pipeline := range allPipelines {
+		util.StripWASMFields(pipeline)
+
+		gen[pipelineID] = &protos.PipelineInfo{
+			Audiences: make([]*protos.Audience, 0),
+			Pipeline:  pipeline,
+			Paused:    make([]*protos.Audience, 0),
+		}
+	}
+
+	// Get audience <-> pipeline mappings
+	pipelineConfig, err := s.Deps.StoreService.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline config")
+	}
+
+	// Update pipeline info with info about attached pipelines
+	for aud, pipelineID := range pipelineConfig {
+		if _, ok := gen[pipelineID]; !ok {
+			gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
+		}
+	}
+
+	// Update pipeline info with state info
+	pausedPipelines, err := s.Deps.StoreService.GetPaused(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get paused pipelines")
+	}
+
+	for _, p := range pausedPipelines {
+		if _, ok := gen[p.PipelineID]; ok {
+			gen[p.PipelineID].Paused = append(gen[p.PipelineID].Paused, p.Audience)
+		}
+	}
+
+	return gen, nil
 }
 
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
@@ -73,9 +188,9 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
-func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+		return nil, errors.Wrap(err, "invalid create pipeline request")
 	}
 
 	// Create ID for pipeline
@@ -83,17 +198,16 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 
 	// Populate WASM fields
 	if err := util.PopulateWASMFields(req.Pipeline, s.Deps.Config.WASMDir); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
 	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' created", req.Pipeline.Id),
+	return &protos.CreatePipelineResponse{
+		Message:    "Pipeline created successfully",
+		PipelineId: req.Pipeline.Id,
 	}, nil
 }
 
