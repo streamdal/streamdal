@@ -210,6 +210,8 @@ export interface GetNotificationsRequest {
  */
 export interface GetNotificationsResponse {
     /**
+     * Key == id of the notification config
+     *
      * @generated from protobuf field: map<string, protos.NotificationConfig> notifications = 1;
      */
     notifications: {

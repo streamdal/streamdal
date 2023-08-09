@@ -906,6 +906,7 @@ type GetNotificationsResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Key == id of the notification config
 	Notifications map[string]*NotificationConfig `protobuf:"bytes,1,rep,name=notifications,proto3" json:"notifications,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

@@ -400,6 +400,7 @@ class GetNotificationsResponse(betterproto.Message):
     notifications: Dict[str, "NotificationConfig"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
+    """Key == id of the notification config"""
 
 
 @dataclass(eq=False, repr=False)
