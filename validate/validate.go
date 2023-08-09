@@ -314,3 +314,194 @@ func GetAllRequest(req *protos.GetAllRequest) error {
 
 	return nil
 }
+
+func CreateNotificationRequest(req *protos.CreateNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.Notification == nil {
+		return errors.New(".Notification cannot be nil")
+	}
+
+	if req.Notification.Name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if req.Notification.Type == protos.NotificationType_NOTIFICATION_TYPE_UNSET {
+		return ErrUnsetEnum("Type")
+	}
+
+	switch req.Notification.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		if err := validateNotificationEmail(req.Notification.GetEmail()); err != nil {
+			return err
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		if err := validateNotificationSlack(req.Notification.GetSlack()); err != nil {
+			return err
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		if err := validateNotificationPagerDuty(req.Notification.GetPagerduty()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func UpdateNotificationRequest(req *protos.UpdateNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.Notification == nil {
+		return errors.New(".Notification cannot be nil")
+	}
+
+	if req.Notification.Name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if req.Notification.Type == protos.NotificationType_NOTIFICATION_TYPE_UNSET {
+		return ErrUnsetEnum("Type")
+	}
+
+	switch req.Notification.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		if err := validateNotificationEmail(req.Notification.GetEmail()); err != nil {
+			return err
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		if err := validateNotificationSlack(req.Notification.GetSlack()); err != nil {
+			return err
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		if err := validateNotificationPagerDuty(req.Notification.GetPagerduty()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func validateNotificationEmail(email *protos.NotificationEmail) error {
+	if email.GetFromAddress() == "" {
+		return ErrEmptyField("Email.FromAddress")
+	}
+
+	if len(email.GetRecipients()) == 0 {
+		return ErrEmptyField("Email.Recipients")
+	}
+
+	switch email.GetType() {
+	case protos.NotificationEmail_TYPE_SMTP:
+		if email.GetSmtp().GetHost() == "" {
+			return ErrEmptyField("Email.Smtp.Host")
+		}
+		if email.GetSmtp().GetPort() == 0 {
+			return ErrEmptyField("Email.Smtp.Port")
+		}
+		if email.GetSmtp().GetUser() == "" {
+			return ErrEmptyField("Email.Smtp.User")
+		}
+		if email.GetSmtp().GetPassword() == "" {
+			return ErrEmptyField("Email.Smtp.Password")
+		}
+	case protos.NotificationEmail_TYPE_SES:
+		if email.GetSes().GetSesRegion() == "" {
+			return ErrEmptyField("Email.Ses.Region")
+		}
+		if email.GetSes().GetSesAccessKeyId() == "" {
+			return ErrEmptyField("Email.Ses.AccessKeyId")
+		}
+		if email.GetSes().GetSesSecretAccessKey() == "" {
+			return ErrEmptyField("Email.Ses.SecretAccessKey")
+		}
+	}
+
+	return nil
+}
+
+func validateNotificationSlack(slack *protos.NotificationSlack) error {
+	if slack.BotToken == "" {
+		return ErrEmptyField("Slack.BotToken")
+	}
+	if slack.Channel == "" {
+		return ErrEmptyField("Slack.Channel")
+	}
+
+	return nil
+}
+
+func validateNotificationPagerDuty(pagerduty *protos.NotificationPagerDuty) error {
+	if pagerduty.Token == "" {
+		return ErrEmptyField("PagerDuty.Token")
+	}
+
+	if pagerduty.ServiceId == "" {
+		return ErrEmptyField("PagerDuty.ServiceId")
+	}
+
+	if pagerduty.Email == "" {
+		return ErrEmptyField("PagerDuty.Email")
+	}
+
+	return nil
+}
+
+func DeleteNotificationRequest(req *protos.DeleteNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.NotificationId == "" {
+		return ErrEmptyField("NotificationId")
+	}
+
+	return nil
+}
+
+func AttachNotificationRequest(req *protos.AttachNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.NotificationId == "" {
+		return ErrEmptyField("NotificationId")
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
+}
+
+func DetachNotificationRequest(req *protos.DetachNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.NotificationId == "" {
+		return ErrEmptyField("NotificationId")
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return nil
+}
+
+func GetNotificationRequest(req *protos.GetNotificationRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.NotificationId == "" {
+		return ErrEmptyField("NotificationId")
+	}
+
+	return nil
+}

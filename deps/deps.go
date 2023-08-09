@@ -4,13 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
@@ -19,6 +17,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -38,6 +37,7 @@ type Dependencies struct {
 
 	// Services
 	BusService      bus.IBus
+	NotifyService   notify.INotifier
 	StoreService    store.IStore
 	CmdService      cmd.ICmd
 	Health          health.IHealth
@@ -197,6 +197,16 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.BusService = busService
 
+	notifyService, err := notify.New(&notify.Config{
+		Store:       storeService,
+		ShutdownCtx: d.ShutdownContext,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to create new notify service")
+	}
+
+	d.NotifyService = notifyService
+
 	return nil
 }
 
@@ -224,22 +234,4 @@ func (c *customCheck) Status() (interface{}, error) {
 	// You can return additional information pertaining to the check as long
 	// as it can be JSON marshalled
 	return map[string]int{}, nil
-}
-
-func (d *Dependencies) PreCreateBuckets(ctx context.Context, cfg *config.Config) error {
-	buckets := map[string]time.Duration{
-		//BucketNameHere:      0,
-	}
-
-	for bucketName, ttl := range buckets {
-		if err := d.NATSBackend.CreateBucket(ctx, bucketName, ttl, cfg.NATSNumBucketReplicas); err != nil {
-			if err == nats.ErrStreamNameAlreadyInUse {
-				continue
-			}
-
-			return fmt.Errorf("unable to create bucket '%s': %s", bucketName, err)
-		}
-	}
-
-	return nil
 }

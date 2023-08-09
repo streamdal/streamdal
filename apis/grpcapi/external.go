@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -394,6 +395,109 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: fmt.Sprintf("pipeline '%s' deleted", req.PipelineId),
+	}, nil
+}
+
+func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.CreateNotificationRequest) (*protos.StandardResponse, error) {
+	if err := validate.CreateNotificationRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	req.Notification.Id = util.StringPtr(uuid.New().String())
+
+	if err := s.Deps.StoreService.CreateNotificationConfig(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification config created",
+	}, nil
+}
+func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.UpdateNotificationRequest) (*protos.StandardResponse, error) {
+	if err := validate.UpdateNotificationRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Deps.StoreService.UpdateNotificationConfig(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification config update",
+	}, nil
+}
+
+func (s *ExternalServer) DeleteNotification(ctx context.Context, req *protos.DeleteNotificationRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteNotificationRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Deps.StoreService.DeleteNotificationConfig(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification config deleted",
+	}, nil
+}
+
+func (s *ExternalServer) GetNotifications(ctx context.Context, req *protos.GetNotificationsRequest) (*protos.GetNotificationsResponse, error) {
+	cfgs, err := s.Deps.StoreService.GetNotificationConfigs(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get notification configs")
+	}
+
+	return &protos.GetNotificationsResponse{Notifications: cfgs}, nil
+}
+
+func (s *ExternalServer) GetNotification(ctx context.Context, req *protos.GetNotificationRequest) (*protos.GetNotificationResponse, error) {
+	if err := validate.GetNotificationRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid request")
+	}
+
+	cfg, err := s.Deps.StoreService.GetNotificationConfig(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get notification config")
+	}
+
+	return &protos.GetNotificationResponse{Notification: cfg}, nil
+}
+
+func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.AttachNotificationRequest) (*protos.StandardResponse, error) {
+	if err := validate.AttachNotificationRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Deps.StoreService.AttachNotificationConfig(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification config attached",
+	}, nil
+}
+
+func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.DetachNotificationRequest) (*protos.StandardResponse, error) {
+	if err := validate.DetachNotificationRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Deps.StoreService.DetachNotificationConfig(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Notification config detached",
 	}, nil
 }
 

@@ -150,3 +150,7 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 		s.XWasmBytes = nil
 	}
 }
+
+func StringPtr(in string) *string {
+	return &in
+}

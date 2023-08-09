@@ -42,6 +42,13 @@ type ExternalClient interface {
 	PausePipeline(ctx context.Context, in *PausePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(ctx context.Context, in *ResumePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteNotification(ctx context.Context, in *DeleteNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
+	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
+	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -144,6 +151,69 @@ func (c *externalClient) ResumePipeline(ctx context.Context, in *ResumePipelineR
 	return out, nil
 }
 
+func (c *externalClient) CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/CreateNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/UpdateNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) DeleteNotification(ctx context.Context, in *DeleteNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/DeleteNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*GetNotificationsResponse, error) {
+	out := new(GetNotificationsResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/GetNotifications", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error) {
+	out := new(GetNotificationResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/GetNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/AttachNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/DetachNotification", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -177,6 +247,13 @@ type ExternalServer interface {
 	PausePipeline(context.Context, *PausePipelineRequest) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error)
+	CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error)
+	UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error)
+	DeleteNotification(context.Context, *DeleteNotificationRequest) (*StandardResponse, error)
+	GetNotifications(context.Context, *GetNotificationsRequest) (*GetNotificationsResponse, error)
+	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
+	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
+	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -215,6 +292,27 @@ func (UnimplementedExternalServer) PausePipeline(context.Context, *PausePipeline
 }
 func (UnimplementedExternalServer) ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResumePipeline not implemented")
+}
+func (UnimplementedExternalServer) CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNotification not implemented")
+}
+func (UnimplementedExternalServer) UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNotification not implemented")
+}
+func (UnimplementedExternalServer) DeleteNotification(context.Context, *DeleteNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteNotification not implemented")
+}
+func (UnimplementedExternalServer) GetNotifications(context.Context, *GetNotificationsRequest) (*GetNotificationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNotifications not implemented")
+}
+func (UnimplementedExternalServer) GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNotification not implemented")
+}
+func (UnimplementedExternalServer) AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AttachNotification not implemented")
+}
+func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DetachNotification not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -412,6 +510,132 @@ func _External_ResumePipeline_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_CreateNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).CreateNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/CreateNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).CreateNotification(ctx, req.(*CreateNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_UpdateNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).UpdateNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/UpdateNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).UpdateNotification(ctx, req.(*UpdateNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_DeleteNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DeleteNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/DeleteNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DeleteNotification(ctx, req.(*DeleteNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_GetNotifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNotificationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetNotifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/GetNotifications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetNotifications(ctx, req.(*GetNotificationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_GetNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/GetNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetNotification(ctx, req.(*GetNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_AttachNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AttachNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).AttachNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/AttachNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).AttachNotification(ctx, req.(*AttachNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_DetachNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetachNotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DetachNotification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/DetachNotification",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DetachNotification(ctx, req.(*DetachNotificationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -476,6 +700,34 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResumePipeline",
 			Handler:    _External_ResumePipeline_Handler,
+		},
+		{
+			MethodName: "CreateNotification",
+			Handler:    _External_CreateNotification_Handler,
+		},
+		{
+			MethodName: "UpdateNotification",
+			Handler:    _External_UpdateNotification_Handler,
+		},
+		{
+			MethodName: "DeleteNotification",
+			Handler:    _External_DeleteNotification_Handler,
+		},
+		{
+			MethodName: "GetNotifications",
+			Handler:    _External_GetNotifications_Handler,
+		},
+		{
+			MethodName: "GetNotification",
+			Handler:    _External_GetNotification_Handler,
+		},
+		{
+			MethodName: "AttachNotification",
+			Handler:    _External_AttachNotification_Handler,
+		},
+		{
+			MethodName: "DetachNotification",
+			Handler:    _External_DetachNotification_Handler,
 		},
 		{
 			MethodName: "Test",

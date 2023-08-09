@@ -23,6 +23,12 @@ const (
 
 	NATSPausedBucket    = "snitch_paused"
 	NATSPausedKeyFormat = "%s/%s" // K: $pipeline_id:$audience V: NONE
+
+	NATSNotificationConfigBucket    = "snitch_notification_config"
+	NATSNotificationConfigKeyFormat = "%s" // K: $config_id V: serialized protos.NotificationConfig
+
+	NATSNotificationAssocBucket = "snitch_notification"
+	NATSNotificationAssocFormat = "%s/%s" // K: $pipeline_id/$config_id V: NONE
 )
 
 func NATSRegisterKey(session, node string) string {
@@ -37,14 +43,22 @@ func NATSLiveKey(session, node, audience string) string {
 	return strings.ToLower(fmt.Sprintf(NATSLiveFormat, session, node, audience))
 }
 
-func NATSPipelineKey(pipelineId string) string {
-	return strings.ToLower(fmt.Sprintf(NATSPipelineKeyFormat, pipelineId))
+func NATSPipelineKey(pipelineID string) string {
+	return strings.ToLower(fmt.Sprintf(NATSPipelineKeyFormat, pipelineID))
 }
 
 func NATSConfigKey(audience string) string {
 	return strings.ToLower(fmt.Sprintf(NATSConfigKeyFormat, audience))
 }
 
-func NATSPausedKey(audience, pipelineId string) string {
-	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, pipelineId, audience))
+func NATSPausedKey(audience, pipelineID string) string {
+	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, pipelineID, audience))
+}
+
+func NATSNotificationConfigKey(configID string) string {
+	return strings.ToLower(fmt.Sprintf(NATSNotificationConfigKeyFormat, configID))
+}
+
+func NATSNotificationAssocKey(pipelineID, configID string) string {
+	return strings.ToLower(fmt.Sprintf(NATSNotificationAssocFormat, pipelineID, configID))
 }

@@ -45,13 +45,13 @@ type IStore interface {
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
-	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
+	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	GetPaused(ctx context.Context) ([]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
-	DeletePipeline(ctx context.Context, pipelineId string) error
+	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
 	DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
@@ -60,6 +60,15 @@ type IStore interface {
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
+
+	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
+	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
+	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
+	CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error
+	UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error
+	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
+	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
+	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
 }
 
 type Options struct {
@@ -190,7 +199,7 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	}
 
 	// k == pipelineId
-	pipelines := make(map[string]*protos.Pipeline, 0)
+	pipelines := make(map[string]*protos.Pipeline)
 
 	for _, pipelineId := range pipelineIds {
 		pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
@@ -538,6 +547,164 @@ func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audien
 	}
 
 	return string(pipelineID), nil
+}
+
+func (s *Store) GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error) {
+	data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, req.NotificationId)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", req.NotificationId)
+	}
+
+	cfg := &protos.NotificationConfig{}
+	if err := proto.Unmarshal(data, cfg); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", req.NotificationId)
+	}
+
+	return cfg, nil
+}
+
+func (s *Store) GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error) {
+	notificationConfigs := make(map[string]*protos.NotificationConfig)
+
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return notificationConfigs, nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching notification config keys from NATS")
+	}
+
+	for _, key := range keys {
+		data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, key)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", key)
+		}
+
+		notificationConfig := &protos.NotificationConfig{}
+		if err := proto.Unmarshal(data, notificationConfig); err != nil {
+			return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", key)
+		}
+
+		notificationConfigs[key] = notificationConfig
+	}
+
+	return notificationConfigs, nil
+}
+
+func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error {
+	data, err := proto.Marshal(req.Notification)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling notification config")
+	}
+
+	key := NATSNotificationConfigKey(*req.Notification.Id)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
+		return errors.Wrap(err, "error saving notification config to NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error {
+	data, err := proto.Marshal(req.Notification)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling notification config")
+	}
+
+	key := NATSNotificationConfigKey(*req.Notification.Id)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
+		return errors.Wrap(err, "error saving notification config to NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error {
+	key := NATSNotificationConfigKey(req.NotificationId)
+	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationConfigBucket, key); err != nil {
+		return errors.Wrap(err, "error deleting notification config from NATS")
+	}
+
+	// Delete all associations
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
+	if err != nil {
+		if errors.Is(err, nats.ErrBucketNotFound) {
+			return nil
+		}
+		return errors.Wrap(err, "error fetching notification assoc keys from NATS")
+	}
+
+	for _, key := range keys {
+		if !strings.HasSuffix(key, "/"+req.NotificationId) {
+			continue
+		}
+
+		if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
+			return errors.Wrap(err, "error deleting notification association from NATS")
+		}
+	}
+
+	return nil
+}
+
+func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error {
+	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationAssocBucket, key, nil, 0); err != nil {
+		return errors.Wrap(err, "error saving notification association to NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error {
+	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
+	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
+		return errors.Wrap(err, "error deleting notification association from NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
+	cfgs := make([]*protos.NotificationConfig, 0)
+
+	// Fetch all notify config keys from NATS
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return cfgs, nil
+		}
+		return nil, errors.Wrap(err, "error fetching notify config keys from NATS")
+	}
+
+	for _, key := range keys {
+		if !strings.HasPrefix(key, pipelineID+"/") {
+			continue
+		}
+
+		parts := strings.Split(key, "/")
+		if len(parts) != 2 {
+			return nil, errors.Errorf("invalid notify config key '%s'", key)
+		}
+
+		configID := parts[1]
+
+		// Fetch key so we get the notify config
+		data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, configID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from NATS", configID)
+		}
+
+		notifyConfig := &protos.NotificationConfig{}
+		if err := proto.Unmarshal(data, notifyConfig); err != nil {
+			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
+		}
+
+		cfgs = append(cfgs, notifyConfig)
+	}
+
+	return cfgs, nil
 }
 
 func (o *Options) validate() error {
