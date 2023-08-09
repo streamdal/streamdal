@@ -108,6 +108,8 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	}
 
 	for pipelineID, pipeline := range allPipelines {
+		util.StripWASMFields(pipeline)
+
 		gen[pipelineID] = &protos.PipelineInfo{
 			Audiences: make([]*protos.Audience, 0),
 			Pipeline:  pipeline,
