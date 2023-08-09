@@ -173,7 +173,7 @@ var _ = Describe("External gRPC API", func() {
 				{
 					Name: "External.GetServiceMap without auth",
 					Func: func() error {
-						_, err := externalClient.GetServiceMap(ctxWithNoAuth, &protos.GetServiceMapRequest{})
+						_, err := externalClient.GetAll(ctxWithNoAuth, &protos.GetAllRequest{})
 						return err
 					},
 					ShouldError:        true,
@@ -660,6 +660,9 @@ func getPipelineIDFromMessage(msg string) string {
 }
 
 func newPipeline() *protos.Pipeline {
+	path := "object.field"
+	negate := false
+
 	return &protos.Pipeline{
 		Name: "Pipeline_Name",
 		Steps: []*protos.PipelineStep{
@@ -673,15 +676,15 @@ func newPipeline() *protos.Pipeline {
 				},
 				Step: &protos.PipelineStep_Detective{
 					Detective: &steps.DetectiveStep{
-						Path:   "object.field",
+						Path:   &path,
 						Args:   nil,
-						Negate: false,
+						Negate: &negate,
 						Type:   steps.DetectiveType_DETECTIVE_TYPE_BOOLEAN_TRUE,
 					},
 				},
-				XWasmId:       "", // TODO: Remember to fill this in
+				XWasmId:       nil,
 				XWasmBytes:    nil,
-				XWasmFunction: "",
+				XWasmFunction: nil,
 			},
 		},
 	}

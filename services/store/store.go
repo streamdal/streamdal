@@ -48,6 +48,7 @@ type IStore interface {
 	GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
+	GetPaused(ctx context.Context) ([]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineId string) error
@@ -58,6 +59,7 @@ type IStore interface {
 	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
+	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 }
 
 type Options struct {
@@ -89,6 +91,11 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 
 	registrationKey := NATSLiveKey(req.SessionId, s.options.NodeName, "register")
 
+	clientInfoBytes, err := proto.Marshal(req.ClientInfo)
+	if err != nil {
+		return errors.Wrap(err, "error marshalling client info")
+	}
+
 	s.log.Debugf("attempting to save registration under key '%s'", registrationKey)
 
 	// Add registration in snitch_live bucket
@@ -96,7 +103,7 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 		ctx,
 		NATSLiveBucket,
 		registrationKey,
-		nil,
+		clientInfoBytes,
 		s.options.SessionTTL,
 	); err != nil {
 		return errors.Wrap(err, "error adding registration to K/V")
@@ -491,6 +498,18 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 
 		if maybeAud == "register" {
 			entry.Register = true
+
+			registerData, err := s.options.NATSBackend.Get(ctx, NATSLiveBucket, key)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error fetching register data for live key '%s'", key)
+			}
+
+			clientInfo := &protos.ClientInfo{}
+			if err := proto.Unmarshal(registerData, clientInfo); err != nil {
+				return nil, errors.Wrapf(err, "error unmarshaling register data for live key '%s'", key)
+			}
+
+			entry.Value = clientInfo
 		} else {
 			aud := util.AudienceFromStr(maybeAud)
 			if aud == nil {
@@ -543,4 +562,69 @@ func (o *Options) validate() error {
 	}
 
 	return nil
+}
+
+func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
+	audiences := make([]*protos.Audience, 0)
+
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSAudienceBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return audiences, nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching audience keys from NATS")
+	}
+
+	for _, key := range keys {
+		aud := util.AudienceFromStr(key)
+		if aud == nil {
+			return nil, errors.Errorf("invalid audience key '%s'", key)
+		}
+
+		audiences = append(audiences, aud)
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) GetPaused(ctx context.Context) ([]*types.PausedEntry, error) {
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSPausedBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return make([]*types.PausedEntry, 0), nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching paused keys from NATS")
+	}
+
+	paused := make([]*types.PausedEntry, 0)
+
+	for _, key := range keys {
+		entry := &types.PausedEntry{
+			Key:        key,
+			Audience:   nil,
+			PipelineID: "",
+		}
+
+		parts := strings.SplitN(key, "/", 2)
+		if len(parts) != 2 {
+			return nil, errors.Errorf("invalid paused key '%s' (incorrect number of parts '%d')", key, len(parts))
+		}
+
+		pipelineID := parts[0]
+		audStr := parts[1]
+
+		aud := util.AudienceFromStr(audStr)
+		if aud == nil {
+			return nil, errors.Errorf("invalid paused key '%s' (unable to convert audience str '%s' to *Audience)", key, audStr)
+		}
+
+		entry.Audience = aud
+		entry.PipelineID = pipelineID
+
+		paused = append(paused, entry)
+	}
+
+	return paused, nil
 }
