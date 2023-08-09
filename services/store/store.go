@@ -598,7 +598,8 @@ func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.Create
 		return errors.Wrap(err, "error marshaling notification config")
 	}
 
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, *req.Notification.Id, data, 0); err != nil {
+	key := NATSNotificationConfigKey(*req.Notification.Id)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
 		return errors.Wrap(err, "error saving notification config to NATS")
 	}
 
@@ -611,7 +612,8 @@ func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.Update
 		return errors.Wrap(err, "error marshaling notification config")
 	}
 
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, *req.Notification.Id, data, 0); err != nil {
+	key := NATSNotificationConfigKey(*req.Notification.Id)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
 		return errors.Wrap(err, "error saving notification config to NATS")
 	}
 
@@ -619,13 +621,17 @@ func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.Update
 }
 
 func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error {
-	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationConfigBucket, req.NotificationId); err != nil {
+	key := NATSNotificationConfigKey(req.NotificationId)
+	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationConfigBucket, key); err != nil {
 		return errors.Wrap(err, "error deleting notification config from NATS")
 	}
 
 	// Delete all associations
 	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
 	if err != nil {
+		if errors.Is(err, nats.ErrBucketNotFound) {
+			return nil
+		}
 		return errors.Wrap(err, "error fetching notification assoc keys from NATS")
 	}
 
@@ -643,7 +649,8 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 }
 
 func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error {
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationAssocBucket, req.PipelineId+"/"+req.NotificationId, nil, 0); err != nil {
+	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationAssocBucket, key, nil, 0); err != nil {
 		return errors.Wrap(err, "error saving notification association to NATS")
 	}
 
@@ -651,7 +658,8 @@ func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.Attach
 }
 
 func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error {
-	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, req.PipelineId+"/"+req.NotificationId); err != nil {
+	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
+	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
 		return errors.Wrap(err, "error deleting notification association from NATS")
 	}
 
@@ -664,6 +672,9 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 	// Fetch all notify config keys from NATS
 	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
 	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return cfgs, nil
+		}
 		return nil, errors.Wrap(err, "error fetching notify config keys from NATS")
 	}
 
