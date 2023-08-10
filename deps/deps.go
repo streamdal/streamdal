@@ -44,7 +44,7 @@ type Dependencies struct {
 	CmdService      cmd.ICmd
 	Health          health.IHealth
 	ShutdownContext context.Context
-	ShutdownCancel  context.CancelFunc
+	ShutdownFunc    context.CancelFunc
 }
 
 func New(version string, cfg *config.Config) (*Dependencies, error) {
@@ -61,7 +61,7 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		Config:          cfg,
 		Health:          gohealth,
 		ShutdownContext: ctx,
-		ShutdownCancel:  cancel,
+		ShutdownFunc:    cancel,
 	}
 
 	if err := d.validateWASM(); err != nil {
@@ -173,7 +173,10 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.CmdService = c
 
-	metricsService, err := metrics.New(&metrics.Config{})
+	metricsService, err := metrics.New(&metrics.Config{
+		NATSBackend: d.NATSBackend,
+		ShutdownCtx: d.ShutdownContext,
+	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new metrics service")
 	}

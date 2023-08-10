@@ -69,6 +69,8 @@ type IStore interface {
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
+
+	//StoreMetrics(ctx context.Context, content string) error
 }
 
 type Options struct {
