@@ -203,6 +203,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
             target: "top",
             instances: i === 0 && consumers.length,
             pipeline: component,
+            flow: true,
           },
         };
       },
@@ -229,6 +230,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
             target: "top",
             instances: i === 0 && producers.length,
             pipeline: component,
+            flow: true,
           },
         };
       },
@@ -246,7 +248,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
   return (
     <div
       style={{ width: "100%", height: "100vh" }}
-      class="m-0 z-10"
+      class="mt-[-64px] z-10"
     >
       <ReactFlow
         nodes={nodes}
@@ -261,7 +263,7 @@ export default function Flow({ data }: { data: GetServiceMapResponse }) {
         }}
       >
         <Background style={{ height: "100vh" }} />
-        <Controls position="top-right" style={{ marginTop: "30px" }} />
+        <Controls position="top-right" style={{ marginTop: "90px" }} />
       </ReactFlow>
     </div>
   );

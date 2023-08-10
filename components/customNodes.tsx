@@ -8,12 +8,20 @@ import { ConsumerIcon } from "./icons/consumer.tsx";
 import { ProducerIcon } from "./icons/producer.tsx";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
 
+type ExtendedParams = {
+  service: string;
+  component: string;
+  operationType: string;
+};
+
 type ActorNodeData = {
   label: string;
   source?: string;
   target?: string;
-  instances: number;
+  instances?: number;
   pipeline: PipelineInfo;
+  flow?: boolean;
+  params?: ExtendedParams;
 };
 
 export const Service = ({ data }: { data: { label: string } }) => {
@@ -73,10 +81,10 @@ export const Producer = ({ data }: { data: ActorNodeData }) => {
         className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
       >
         <IconGripVertical
-          class="w-6 h-6 text-purple-100 cursor-grab"
+          class={`w-6 h-6 text-purple-100 ${!data.params && "cursor-grab"}`}
           id="dragHandle"
         />
-        <ProducerIcon />
+        <ProducerIcon className={"mr-2"} />
         {data.pipeline.audience && (
           <a
             href={`/service/${
@@ -87,7 +95,13 @@ export const Producer = ({ data }: { data: ActorNodeData }) => {
               data.pipeline.audience.operationType === 1
                 ? "consumer"
                 : "producer"
-            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
+            }/${
+              data?.params
+                ? `op/${
+                  encodeURIComponent(data.pipeline.audience.operationName)
+                }`
+                : "all"
+            }`}
           >
             <div className={"flex flex-col p-1"}>
               <h2 className={"text-[16px]"}>
@@ -99,37 +113,43 @@ export const Producer = ({ data }: { data: ActorNodeData }) => {
         )}
         <NodeMenu data={data.pipeline} />
       </div>
-      <div
-        data-popover
-        id="popover"
-        role="tooltip"
-        class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-      >
-        <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Popover no arrow
-          </h3>
+      {!data.params && (
+        <div
+          data-popover
+          id="popover"
+          role="tooltip"
+          class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
+        >
+          <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              Popover no arrow
+            </h3>
+          </div>
+          <div class="px-3 py-2">
+            <p>And here's some amazing content. It's very engaging. Right?</p>
+          </div>
         </div>
-        <div class="px-3 py-2">
-          <p>And here's some amazing content. It's very engaging. Right?</p>
-        </div>
-      </div>
+      )}
       <span class="sr-only">Notifications</span>
       {data.instances && (
         <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
           {data.instances}
         </div>
       )}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        style={{ opacity: 0 }}
-      />
-      <Handle
-        type="target"
-        position={Position.Top}
-        style={{ opacity: 0 }}
-      />
+      {!data.params && (
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          style={{ opacity: 0 }}
+        />
+      )}
+      {!data.params && (
+        <Handle
+          type="target"
+          position={Position.Top}
+          style={{ opacity: 0 }}
+        />
+      )}
     </div>
   );
 };
@@ -151,11 +171,11 @@ export const Consumer = ({ data }: { data: ActorNodeData }) => {
         className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
       >
         <IconGripVertical
-          class="w-6 h-6 text-purple-100 cursor-grab"
+          class={`w-6 h-6 text-purple-100 ${!data.params && "cursor-grab"}`}
           id="dragHandle"
         />
 
-        <ConsumerIcon className={"mx-2"} />
+        <ConsumerIcon className={"mr-2"} />
         {data.pipeline.audience && (
           <a
             href={`/service/${
@@ -166,7 +186,13 @@ export const Consumer = ({ data }: { data: ActorNodeData }) => {
               data.pipeline.audience.operationType === 1
                 ? "consumer"
                 : "producer"
-            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
+            }/${
+              data?.params
+                ? `op/${
+                  encodeURIComponent(data.pipeline.audience.operationName)
+                }`
+                : "all"
+            }`}
           >
             <div className={"flex flex-col p-1"}>
               <h2 className={"text-[16px] text-center"}>
@@ -178,37 +204,43 @@ export const Consumer = ({ data }: { data: ActorNodeData }) => {
         )}
         <NodeMenu data={data.pipeline} />
       </div>
-      <div
-        data-popover
-        id="popover"
-        role="tooltip"
-        class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-      >
-        <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Popover no arrow
-          </h3>
+      {!data?.params && (
+        <div
+          data-popover
+          id="popover"
+          role="tooltip"
+          class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
+        >
+          <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              Popover no arrow
+            </h3>
+          </div>
+          <div class="px-3 py-2">
+            <p>And here's some amazing content. It's very engaging. Right?</p>
+          </div>
         </div>
-        <div class="px-3 py-2">
-          <p>And here's some amazing content. It's very engaging. Right?</p>
-        </div>
-      </div>
+      )}
       <span class="sr-only">Notifications</span>
       {data.instances && (
         <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
           {data.instances}
         </div>
       )}
-      <Handle
-        type="source"
-        position={Position.Top}
-        style={{ opacity: 0 }}
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        style={{ opacity: 0 }}
-      />
+      {!data.params && (
+        <Handle
+          type="source"
+          position={Position.Top}
+          style={{ opacity: 0 }}
+        />
+      )}
+      {!data.params && (
+        <Handle
+          type="target"
+          position={Position.Bottom}
+          style={{ opacity: 0 }}
+        />
+      )}
     </div>
   );
 };
