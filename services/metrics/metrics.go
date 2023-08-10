@@ -150,7 +150,13 @@ func (m *Metrics) loadCountersFromStore() error {
 	}
 
 	for _, counter := range counters {
-		c, err := m.getVecCounter(context.Background(), counter.Name).GetMetricWith(counter.Labels)
+		c := m.getVecCounter(context.Background(), counter.Name)
+		if c == nil {
+			m.log.Errorf("unable to find counter: %s", counter.Name)
+			continue
+		}
+
+		withLabels, err := c.GetMetricWith(counter.Labels)
 		if err != nil {
 			m.log.Errorf("unable to get metric with labels: %v", counter.Labels)
 			continue
@@ -158,7 +164,7 @@ func (m *Metrics) loadCountersFromStore() error {
 
 		m.log.Debugf("loaded counter '%s' from store with value '%2f'", counter.Name, counter.Value)
 
-		c.Add(counter.Value)
+		withLabels.Add(counter.Value)
 	}
 
 	m.log.Debug("loaded counters from store")
