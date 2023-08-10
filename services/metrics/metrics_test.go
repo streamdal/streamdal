@@ -12,7 +12,7 @@ var _ = Describe("Metrics", func() {
 
 			metrics, err := parseMetricString(input)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(metrics.Name).To(Equal("streamdal_snitch_counter_consume_bytes"))
+			Expect(metrics.Name).To(Equal("counter_consume_bytes"))
 			Expect(metrics.Value).To(Equal(float64(1)))
 			Expect(metrics.Labels).To(Equal(map[string]string{
 				"component_name": "1",

@@ -25,7 +25,7 @@ require (
 	github.com/aws/aws-sdk-go v1.34.28
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/google/uuid v1.3.0
-	github.com/prometheus/client_golang v0.9.2
+	github.com/prometheus/client_golang v1.16.0
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
 	github.com/slack-go/slack v0.12.2
 	google.golang.org/protobuf v1.31.0
@@ -54,17 +54,18 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt/v2 v2.4.1 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.0.0-20181126121408-4724e9255275 // indirect
-	github.com/prometheus/procfs v0.0.8 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.42.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/relistan/rubberneck v1.3.0 // indirect
+	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tinylib/msgp v1.1.2 // indirect
 	golang.org/x/net v0.12.0 // indirect

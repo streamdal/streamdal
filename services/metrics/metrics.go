@@ -29,6 +29,9 @@ const (
 
 	// subsystem is the prometheus subsystem for all metrics
 	subsystem = "snitch"
+
+	// counterDumperInterval is how often we will dump metrics to NATS
+	counterDumperInterval = time.Second * 10
 )
 
 // defaultCounter is used to define counters
@@ -38,7 +41,7 @@ type defaultCounter struct {
 	Labels      []string
 }
 
-// storeCouter is used to cache counters in NATS
+// storeCounter is used to cache counters in NATS
 type storeCounter struct {
 	Name   string            `json:"name"`
 	Labels map[string]string `json:"labels"`
@@ -125,16 +128,6 @@ func New(cfg *Config) (*Metrics, error) {
 		m.log.Error(err)
 	}
 
-	go func() {
-		time.Sleep(5 * time.Second)
-		m.VecCounters["counter_consume_bytes"].WithLabelValues("test", "test", "test", "test", "test").Add(1)
-		println("increased counter")
-
-		if err := m.dumpCounters(); err != nil {
-			m.log.Error(err)
-		}
-	}()
-
 	go m.runCounterDumper(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
 
 	return m, nil
@@ -217,6 +210,7 @@ func (m *Metrics) getVecCounter(_ context.Context, name string) *prometheus.Coun
 func (m *Metrics) runCounterDumper(looper director.Looper) {
 	var quit bool
 	looper.Loop(func() error {
+		time.Sleep(counterDumperInterval)
 		if quit {
 			time.Sleep(time.Millisecond * 50)
 			return nil
@@ -287,6 +281,7 @@ func (m *Metrics) dumpCounters() error {
 	return nil
 }
 
+// parseMetricString parses a prometheus metric string into a storeCounter struct for caching in NATS
 func parseMetricString(input string) (*storeCounter, error) {
 	// Get key-value pairs
 	r := regexp.MustCompile(`(\w+)="([^"]+)"`)
@@ -315,7 +310,7 @@ func parseMetricString(input string) (*storeCounter, error) {
 	name := input[:strings.Index(input, "{")]
 
 	return &storeCounter{
-		Name:   name,
+		Name:   strings.Replace(name, "streamdal_snitch_", "", 1),
 		Labels: labels,
 		Value:  value,
 	}, nil

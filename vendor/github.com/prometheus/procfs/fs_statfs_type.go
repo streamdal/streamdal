@@ -1,4 +1,4 @@
-// Copyright 2017 The Prometheus Authors
+// Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,34 +11,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !go1.8
+//go:build !netbsd && !openbsd && !solaris && !windows
+// +build !netbsd,!openbsd,!solaris,!windows
 
-package promhttp
+package procfs
 
 import (
-	"io"
-	"net/http"
+	"syscall"
 )
 
-func newDelegator(w http.ResponseWriter, observeWriteHeaderFunc func(int)) delegator {
-	d := &responseWriterDelegator{
-		ResponseWriter:     w,
-		observeWriteHeader: observeWriteHeaderFunc,
+// isRealProc determines whether supplied mountpoint is really a proc filesystem.
+func isRealProc(mountPoint string) (bool, error) {
+	stat := syscall.Statfs_t{}
+	err := syscall.Statfs(mountPoint, &stat)
+	if err != nil {
+		return false, err
 	}
 
-	id := 0
-	if _, ok := w.(http.CloseNotifier); ok {
-		id += closeNotifier
-	}
-	if _, ok := w.(http.Flusher); ok {
-		id += flusher
-	}
-	if _, ok := w.(http.Hijacker); ok {
-		id += hijacker
-	}
-	if _, ok := w.(io.ReaderFrom); ok {
-		id += readerFrom
-	}
-
-	return pickDelegator[id](d)
+	// 0x9fa0 is PROC_SUPER_MAGIC: https://elixir.bootlin.com/linux/v6.1/source/include/uapi/linux/magic.h#L87
+	return stat.Type == 0x9fa0, nil
 }
