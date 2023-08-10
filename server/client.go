@@ -16,6 +16,8 @@ import (
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IServerClient
 type IServerClient interface {
+	HeartBeat(ctx context.Context, sessionID string) error
+
 	// Notify sends a command to the snitch server which triggers the configured notification
 	// rules for the specified pipeline
 	Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error
@@ -118,5 +120,12 @@ func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
 	_, err := c.Server.NewAudience(ctx, &protos.NewAudienceRequest{Audience: aud})
+	return err
+}
+
+func (c *Client) HeartBeat(ctx context.Context, sessionID string) error {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
+
+	_, err := c.Server.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: sessionID})
 	return err
 }

@@ -11,6 +11,18 @@ import (
 )
 
 type FakeIServerClient struct {
+	HeartBeatStub        func(context.Context, string) error
+	heartBeatMutex       sync.RWMutex
+	heartBeatArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	heartBeatReturns struct {
+		result1 error
+	}
+	heartBeatReturnsOnCall map[int]struct {
+		result1 error
+	}
 	NewAudienceStub        func(context.Context, *protos.Audience) error
 	newAudienceMutex       sync.RWMutex
 	newAudienceArgsForCall []struct {
@@ -65,6 +77,68 @@ type FakeIServerClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeIServerClient) HeartBeat(arg1 context.Context, arg2 string) error {
+	fake.heartBeatMutex.Lock()
+	ret, specificReturn := fake.heartBeatReturnsOnCall[len(fake.heartBeatArgsForCall)]
+	fake.heartBeatArgsForCall = append(fake.heartBeatArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.HeartBeatStub
+	fakeReturns := fake.heartBeatReturns
+	fake.recordInvocation("HeartBeat", []interface{}{arg1, arg2})
+	fake.heartBeatMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeIServerClient) HeartBeatCallCount() int {
+	fake.heartBeatMutex.RLock()
+	defer fake.heartBeatMutex.RUnlock()
+	return len(fake.heartBeatArgsForCall)
+}
+
+func (fake *FakeIServerClient) HeartBeatCalls(stub func(context.Context, string) error) {
+	fake.heartBeatMutex.Lock()
+	defer fake.heartBeatMutex.Unlock()
+	fake.HeartBeatStub = stub
+}
+
+func (fake *FakeIServerClient) HeartBeatArgsForCall(i int) (context.Context, string) {
+	fake.heartBeatMutex.RLock()
+	defer fake.heartBeatMutex.RUnlock()
+	argsForCall := fake.heartBeatArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeIServerClient) HeartBeatReturns(result1 error) {
+	fake.heartBeatMutex.Lock()
+	defer fake.heartBeatMutex.Unlock()
+	fake.HeartBeatStub = nil
+	fake.heartBeatReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIServerClient) HeartBeatReturnsOnCall(i int, result1 error) {
+	fake.heartBeatMutex.Lock()
+	defer fake.heartBeatMutex.Unlock()
+	fake.HeartBeatStub = nil
+	if fake.heartBeatReturnsOnCall == nil {
+		fake.heartBeatReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.heartBeatReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeIServerClient) NewAudience(arg1 context.Context, arg2 *protos.Audience) error {
@@ -323,6 +397,8 @@ func (fake *FakeIServerClient) SendMetricsReturnsOnCall(i int, result1 error) {
 func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.heartBeatMutex.RLock()
+	defer fake.heartBeatMutex.RUnlock()
 	fake.newAudienceMutex.RLock()
 	defer fake.newAudienceMutex.RUnlock()
 	fake.notifyMutex.RLock()

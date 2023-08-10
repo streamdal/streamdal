@@ -175,8 +175,10 @@ func New(cfg *Config) (*Snitch, error) {
 	}
 
 	// Start register
-	loop := director.NewFreeLooper(director.FOREVER, make(chan error, 1))
-	go s.register(loop)
+	go s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
+
+	// Start heartbeat
+	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
 
 	return s, nil
 }
@@ -246,6 +248,31 @@ func validateConfig(cfg *Config) error {
 	}
 
 	return nil
+}
+
+func (s *Snitch) heartbeat(loop *director.TimedLooper) {
+	var quit bool
+	loop.Loop(func() error {
+		if quit {
+			time.Sleep(time.Millisecond * 50)
+			return nil
+		}
+
+		select {
+		case <-s.config.ShutdownCtx.Done():
+			quit = true
+			loop.Quit()
+			return nil
+		default:
+			// NOOP
+		}
+
+		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+			s.config.Logger.Errorf("failed to send heartbeat: %s", err)
+		}
+
+		return nil
+	})
 }
 
 func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
