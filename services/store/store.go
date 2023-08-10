@@ -70,7 +70,7 @@ type IStore interface {
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
 
-	//StoreMetrics(ctx context.Context, content string) error
+	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 }
 
 type Options struct {
@@ -549,6 +549,57 @@ func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audien
 	}
 
 	return string(pipelineID), nil
+}
+
+func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
+	cmds := make([]*protos.Command, 0)
+
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
+	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return cmds, nil
+		}
+
+		return nil, errors.Wrap(err, "error fetching config keys from NATS")
+	}
+
+	for _, key := range keys {
+		aud := util.AudienceFromStr(key)
+		if aud.ServiceName != serviceName {
+			continue
+		}
+
+		data, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, key)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching config for audience '%s'", key)
+		}
+
+		// TODO: Kinda janky, we make these a JSON array instead
+		pipelines := strings.Split(strings.Trim(string(data), "\n"), "\n")
+
+		for _, pipelineID := range pipelines {
+			// Just in case
+			if pipelineID == "" {
+				continue
+			}
+
+			pipeline, err := s.GetPipeline(ctx, pipelineID)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error fetching pipeline '%s'", pipelineID)
+			}
+
+			cmds = append(cmds, &protos.Command{
+				Audience: aud,
+				Command: &protos.Command_AttachPipeline{
+					AttachPipeline: &protos.AttachPipelineCommand{
+						Pipeline: pipeline,
+					},
+				},
+			})
+		}
+	}
+
+	return cmds, nil
 }
 
 func (s *Store) GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error) {
