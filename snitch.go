@@ -176,6 +176,13 @@ func New(cfg *Config) (*Snitch, error) {
 		cfg.Logger.Warn("data pipelines running in dry run mode")
 	}
 
+	cmds, err := s.serverClient.GetAttachCommandsByService(context.Background(), cfg.ServiceName)
+	for _, cmd := range cmds {
+		if err := s.attachPipeline(context.Background(), cmd); err != nil {
+			cfg.Logger.Errorf("failed to attach pipeline: %s", err)
+		}
+	}
+
 	// Start register
 	go s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
 
