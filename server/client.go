@@ -57,6 +57,8 @@ func New(plumberAddress, plumberToken string) (*Client, error) {
 }
 
 func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error {
+	ctx = context.WithValue(ctx, "auth-token", c.Token)
+
 	req := &protos.NotifyRequest{
 		PipelineId:          pipeline.Id,
 		Audience:            aud,
@@ -72,6 +74,8 @@ func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *pr
 }
 
 func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) error {
+	ctx = context.WithValue(ctx, "auth-token", c.Token)
+
 	labels := make(map[string]string)
 	for k, v := range counter.Labels {
 		labels[k] = v
@@ -104,10 +108,14 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 }
 
 func (c *Client) Register(ctx context.Context, req *protos.RegisterRequest) (protos.Internal_RegisterClient, error) {
+	ctx = context.WithValue(ctx, "auth-token", c.Token)
+
 	return c.Server.Register(ctx, req)
 }
 
 func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience) error {
+	ctx = context.WithValue(ctx, "auth-token", c.Token)
+
 	_, err := c.Server.NewAudience(ctx, &protos.NewAudienceRequest{Audience: aud})
 	return err
 }

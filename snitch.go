@@ -178,8 +178,6 @@ func New(cfg *Config) (*Snitch, error) {
 	loop := director.NewFreeLooper(director.FOREVER, make(chan error, 1))
 	go s.register(loop)
 
-	go s.initAudiences(cfg.Audiences)
-
 	return s, nil
 }
 
@@ -248,23 +246,6 @@ func validateConfig(cfg *Config) error {
 	}
 
 	return nil
-}
-
-// initAudiences
-func (s *Snitch) initAudiences(audiences []*Audience) {
-	for _, a := range audiences {
-		aud := &protos.Audience{
-			ServiceName:   a.ServiceName,
-			ComponentName: a.ComponentName,
-			OperationType: protos.OperationType(a.OperationType),
-			OperationName: a.OperationName,
-		}
-
-		s.addAudience(context.Background(), aud)
-	}
-
-	// Don't need this data anymore
-	s.config.Audiences = nil
 }
 
 func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
@@ -433,4 +414,13 @@ func (s *Snitch) handleConditions(
 	}
 
 	return shouldContinue
+}
+
+func (a *Audience) ToProto() *protos.Audience {
+	return &protos.Audience{
+		ServiceName:   a.ServiceName,
+		ComponentName: a.ComponentName,
+		OperationType: protos.OperationType(a.OperationType),
+		OperationName: a.OperationName,
+	}
 }

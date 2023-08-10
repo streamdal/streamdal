@@ -25,8 +25,12 @@ func (s *Snitch) register(looper director.Looper) {
 			Arch:           runtime.GOARCH,
 			Os:             runtime.GOOS,
 		},
-		Audiences: nil, // TODO
+		Audiences: make([]*protos.Audience, 0),
 		DryRun:    s.config.DryRun,
+	}
+
+	for _, aud := range s.config.Audiences {
+		req.Audiences = append(req.Audiences, aud.ToProto())
 	}
 
 	var stream protos.Internal_RegisterClient
