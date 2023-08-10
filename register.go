@@ -79,7 +79,8 @@ func (s *Snitch) register(looper director.Looper) {
 
 			if errors.Is(err, io.EOF) {
 				// Nicer reconnect messages
-				s.config.Logger.Warnf("dProxy server is unavailable, retrying in %s...", ReconnectSleep.String())
+				stream = nil
+				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 				return nil
 			} else {
