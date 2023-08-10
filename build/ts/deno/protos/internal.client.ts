@@ -4,6 +4,8 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Internal } from "./internal.ts";
+import type { GetAttachCommandsByServiceResponse } from "./internal.ts";
+import type { GetAttachCommandsByServiceRequest } from "./internal.ts";
 import type { MetricsRequest } from "./internal.ts";
 import type { NotifyRequest } from "./internal.ts";
 import type { HeartbeatRequest } from "./internal.ts";
@@ -57,6 +59,13 @@ export interface IInternalClient {
      * @generated from protobuf rpc: Metrics(protos.MetricsRequest) returns (protos.StandardResponse);
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
+    /**
+     * Used to pull all pipeline configs for the service name in the SDK's constructor
+     * This is needed because Register() is async
+     *
+     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     */
+    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -119,5 +128,15 @@ export class InternalClient implements IInternalClient, ServiceInfo {
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse> {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<MetricsRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * Used to pull all pipeline configs for the service name in the SDK's constructor
+     * This is needed because Register() is async
+     *
+     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     */
+    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse> {
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>("unary", this._transport, method, opt, input);
     }
 }

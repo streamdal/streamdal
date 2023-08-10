@@ -2,9 +2,9 @@
 // @generated from protobuf file "internal.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { StandardResponse } from "./common.js";
-import { Command } from "./command.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Command } from "./command.js";
 import { ClientInfo } from "./info.js";
 import { Audience } from "./common.js";
 /**
@@ -143,6 +143,24 @@ export interface DeregisterRequest {
      */
     sessionId: string;
 }
+/**
+ * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
+ */
+export interface GetAttachCommandsByServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+}
+/**
+ * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
+ */
+export interface GetAttachCommandsByServiceResponse {
+    /**
+     * @generated from protobuf field: repeated protos.Command configs = 1;
+     */
+    configs: Command[];
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor() {
@@ -238,6 +256,30 @@ class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
  * @generated MessageType for protobuf message protos.DeregisterRequest
  */
 export const DeregisterRequest = new DeregisterRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
+    constructor() {
+        super("protos.GetAttachCommandsByServiceRequest", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
+ */
+export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachCommandsByServiceResponse> {
+    constructor() {
+        super("protos.GetAttachCommandsByServiceResponse", [
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
+ */
+export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();
 /**
  * @generated ServiceType for protobuf service protos.Internal
  */
@@ -246,5 +288,6 @@ export const Internal = new ServiceType("protos.Internal", [
     { name: "NewAudience", options: {}, I: NewAudienceRequest, O: StandardResponse },
     { name: "Heartbeat", options: {}, I: HeartbeatRequest, O: StandardResponse },
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
-    { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse }
+    { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse },
+    { name: "GetAttachCommandsByService", options: {}, I: GetAttachCommandsByServiceRequest, O: GetAttachCommandsByServiceResponse }
 ]);
