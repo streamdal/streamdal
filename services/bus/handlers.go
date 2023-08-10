@@ -450,3 +450,19 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 
 	return nil
 }
+
+func (b *Bus) handleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error {
+	b.log.Debugf("handling metrics request bus event: %v", req)
+
+	if err := validate.MetricsRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	if err := b.options.Metrics.HandleMetricsRequest(ctx, req); err != nil {
+		return errors.Wrap(err, "error handling metrics request")
+	}
+
+	b.log.Debug("handled metrics request bus event")
+
+	return nil
+}

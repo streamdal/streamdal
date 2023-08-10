@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -42,6 +43,7 @@ type IBus interface {
 	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
 	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
 }
 
 type Bus struct {
@@ -52,6 +54,7 @@ type Bus struct {
 type Options struct {
 	Store       store.IStore
 	NATS        natty.INatty
+	Metrics     metrics.IMetrics
 	Cmd         cmd.ICmd
 	NodeName    string
 	WASMDir     string
@@ -110,6 +113,10 @@ func (o *Options) validate() error {
 
 	if o.WASMDir == "" {
 		return errors.New("wasm dir must be provided")
+	}
+
+	if o.Metrics == nil {
+		return errors.New("metrics service must be provided")
 	}
 
 	return nil

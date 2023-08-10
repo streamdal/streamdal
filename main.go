@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -46,6 +48,17 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("could not setup dependencies")
 	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM)
+
+	go func() {
+		sig := <-c
+		logrus.Debugf("Received system call: %+v", sig)
+		logrus.Info("Shutting down plumber...")
+		d.ShutdownFunc()
+	}()
 
 	if err := run(d); err != nil {
 		log.WithError(err).Fatal("error during run")

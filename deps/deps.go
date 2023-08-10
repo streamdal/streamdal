@@ -17,6 +17,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/wasm"
@@ -38,11 +39,12 @@ type Dependencies struct {
 	// Services
 	BusService      bus.IBus
 	NotifyService   notify.INotifier
+	MetricsService  metrics.IMetrics
 	StoreService    store.IStore
 	CmdService      cmd.ICmd
 	Health          health.IHealth
 	ShutdownContext context.Context
-	ShutdownCancel  context.CancelFunc
+	ShutdownFunc    context.CancelFunc
 }
 
 func New(version string, cfg *config.Config) (*Dependencies, error) {
@@ -59,7 +61,7 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		Config:          cfg,
 		Health:          gohealth,
 		ShutdownContext: ctx,
-		ShutdownCancel:  cancel,
+		ShutdownFunc:    cancel,
 	}
 
 	if err := d.validateWASM(); err != nil {
@@ -171,6 +173,15 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.CmdService = c
 
+	metricsService, err := metrics.New(&metrics.Config{
+		NATSBackend: d.NATSBackend,
+		ShutdownCtx: d.ShutdownContext,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to create new metrics service")
+	}
+	d.MetricsService = metricsService
+
 	storeService, err := store.New(&store.Options{
 		NATSBackend: d.NATSBackend,
 		ShutdownCtx: d.ShutdownContext,
@@ -190,6 +201,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		NodeName:    d.Config.NodeName,
 		ShutdownCtx: d.ShutdownContext,
 		WASMDir:     d.Config.WASMDir,
+		Metrics:     d.MetricsService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")

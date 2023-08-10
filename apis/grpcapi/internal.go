@@ -251,9 +251,28 @@ func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyReque
 	}, nil
 }
 
-// TODO: Implement
-func (s *InternalServer) Metrics(ctx context.Context, request *protos.MetricsRequest) (*protos.StandardResponse, error) {
-	return nil, nil
+func (s *InternalServer) Metrics(ctx context.Context, req *protos.MetricsRequest) (*protos.StandardResponse, error) {
+	if err := validate.MetricsRequest(req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			Message: fmt.Sprintf("invalid metrics req: %s", err.Error()),
+		}, nil
+	}
+
+	if err := s.Deps.BusService.BroadcastMetrics(ctx, req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: fmt.Sprintf("unable to handle metrics request: %s", err.Error()),
+		}, nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Metrics handled",
+	}, nil
 }
 
 func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienceRequest) (*protos.StandardResponse, error) {
