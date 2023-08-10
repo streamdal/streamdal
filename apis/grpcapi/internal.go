@@ -302,3 +302,17 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		Message: "Audience created",
 	}, nil
 }
+
+func (s *InternalServer) GetAttachCommandsByService(
+	ctx context.Context,
+	req *protos.GetAttachCommandsByServiceRequest,
+) (*protos.GetAttachCommandsByServiceResponse, error) {
+	cmds, err := s.Deps.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get attach commands by service")
+	}
+
+	return &protos.GetAttachCommandsByServiceResponse{
+		Commands: cmds,
+	}, nil
+}
