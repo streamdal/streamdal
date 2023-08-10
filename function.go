@@ -71,7 +71,7 @@ func (s *Snitch) setFunctionCache(wasmID string, f *function) {
 
 func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*function, error) {
 	// check cache
-	fc, ok := s.getFunctionFromCache(*step.XWasmId)
+	fc, ok := s.getFunctionFromCache(step.GetXWasmId())
 	if ok {
 		return fc, nil
 	}
@@ -82,7 +82,7 @@ func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*fun
 	}
 
 	// Cache function
-	s.setFunctionCache(*step.XWasmId, fi)
+	s.setFunctionCache(step.GetXWasmId(), fi)
 
 	return fi, nil
 }
@@ -96,13 +96,13 @@ func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
 }
 
 func createFunction(step *protos.PipelineStep) (*function, error) {
-	inst, err := createWASMInstance(step.XWasmBytes)
+	inst, err := createWASMInstance(step.GetXWasmBytes())
 	if err != nil {
 		return nil, err
 	}
 
 	// This is the actual function we'll be executing
-	f := inst.ExportedFunction(*step.XWasmFunction)
+	f := inst.ExportedFunction(step.GetXWasmFunction())
 	if f == nil {
 		return nil, fmt.Errorf("unable to get exported function '%s'", step.XWasmFunction)
 	}
@@ -120,7 +120,7 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	}
 
 	return &function{
-		ID:      *step.XWasmId,
+		ID:      step.GetXWasmId(),
 		Inst:    inst,
 		entry:   f,
 		alloc:   alloc,
