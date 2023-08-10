@@ -31,6 +31,10 @@ service Internal {
 
   // Send periodic metrics to the server
   rpc Metrics(MetricsRequest) returns (StandardResponse);
+
+  // Used to pull all pipeline configs for the service name in the SDK's constructor
+  // This is needed because Register() is async
+  rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
 }
 
 message NewAudienceRequest {
@@ -92,4 +96,12 @@ message RegisterRequest {
 message DeregisterRequest {
   string service_name = 1;
   string session_id = 2;
+}
+
+message GetAttachCommandsByServiceRequest {
+  string service_name = 1;
+}
+
+message GetAttachCommandsByServiceResponse {
+  repeated protos.Command configs = 1;
 }

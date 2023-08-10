@@ -564,6 +564,16 @@ class DeregisterRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetAttachCommandsByServiceRequest(betterproto.Message):
+    service_name: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetAttachCommandsByServiceResponse(betterproto.Message):
+    configs: List["Command"] = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class BusEvent(betterproto.Message):
     """
     Type used by `snitch-server` for broadcasting events to other snitch nodes
@@ -1023,6 +1033,23 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def get_attach_commands_by_service(
+        self,
+        get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetAttachCommandsByServiceResponse":
+        return await self._unary_unary(
+            "/protos.Internal/GetAttachCommandsByService",
+            get_attach_commands_by_service_request,
+            GetAttachCommandsByServiceResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
 
 class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
@@ -1381,6 +1408,12 @@ class InternalBase(ServiceBase):
     async def metrics(self, metrics_request: "MetricsRequest") -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_attach_commands_by_service(
+        self,
+        get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
+    ) -> "GetAttachCommandsByServiceResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def __rpc_register(
         self, stream: "grpclib.server.Stream[RegisterRequest, Command]"
     ) -> None:
@@ -1419,6 +1452,14 @@ class InternalBase(ServiceBase):
         response = await self.metrics(request)
         await stream.send_message(response)
 
+    async def __rpc_get_attach_commands_by_service(
+        self,
+        stream: "grpclib.server.Stream[GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_attach_commands_by_service(request)
+        await stream.send_message(response)
+
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
             "/protos.Internal/Register": grpclib.const.Handler(
@@ -1450,5 +1491,11 @@ class InternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 MetricsRequest,
                 StandardResponse,
+            ),
+            "/protos.Internal/GetAttachCommandsByService": grpclib.const.Handler(
+                self.__rpc_get_attach_commands_by_service,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetAttachCommandsByServiceRequest,
+                GetAttachCommandsByServiceResponse,
             ),
         }

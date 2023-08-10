@@ -1115,6 +1115,251 @@ impl ::protobuf::reflect::ProtobufValue for DeregisterRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.GetAttachCommandsByServiceRequest)
+pub struct GetAttachCommandsByServiceRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetAttachCommandsByServiceRequest.service_name)
+    pub service_name: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetAttachCommandsByServiceRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetAttachCommandsByServiceRequest {
+    fn default() -> &'a GetAttachCommandsByServiceRequest {
+        <GetAttachCommandsByServiceRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetAttachCommandsByServiceRequest {
+    pub fn new() -> GetAttachCommandsByServiceRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "service_name",
+            |m: &GetAttachCommandsByServiceRequest| { &m.service_name },
+            |m: &mut GetAttachCommandsByServiceRequest| { &mut m.service_name },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAttachCommandsByServiceRequest>(
+            "GetAttachCommandsByServiceRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetAttachCommandsByServiceRequest {
+    const NAME: &'static str = "GetAttachCommandsByServiceRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.service_name = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.service_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.service_name);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.service_name.is_empty() {
+            os.write_string(1, &self.service_name)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetAttachCommandsByServiceRequest {
+        GetAttachCommandsByServiceRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.service_name.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetAttachCommandsByServiceRequest {
+        static instance: GetAttachCommandsByServiceRequest = GetAttachCommandsByServiceRequest {
+            service_name: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetAttachCommandsByServiceRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAttachCommandsByServiceRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetAttachCommandsByServiceRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetAttachCommandsByServiceRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.GetAttachCommandsByServiceResponse)
+pub struct GetAttachCommandsByServiceResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetAttachCommandsByServiceResponse.configs)
+    pub configs: ::std::vec::Vec<super::command::Command>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetAttachCommandsByServiceResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetAttachCommandsByServiceResponse {
+    fn default() -> &'a GetAttachCommandsByServiceResponse {
+        <GetAttachCommandsByServiceResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetAttachCommandsByServiceResponse {
+    pub fn new() -> GetAttachCommandsByServiceResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "configs",
+            |m: &GetAttachCommandsByServiceResponse| { &m.configs },
+            |m: &mut GetAttachCommandsByServiceResponse| { &mut m.configs },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAttachCommandsByServiceResponse>(
+            "GetAttachCommandsByServiceResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetAttachCommandsByServiceResponse {
+    const NAME: &'static str = "GetAttachCommandsByServiceResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.configs.push(is.read_message()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        for value in &self.configs {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        for v in &self.configs {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetAttachCommandsByServiceResponse {
+        GetAttachCommandsByServiceResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.configs.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetAttachCommandsByServiceResponse {
+        static instance: GetAttachCommandsByServiceResponse = GetAttachCommandsByServiceResponse {
+            configs: ::std::vec::Vec::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetAttachCommandsByServiceResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAttachCommandsByServiceResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetAttachCommandsByServiceResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetAttachCommandsByServiceResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0einternal.proto\x12\x06protos\x1a\rcommand.proto\x1a\x0ccommon.prot\
     o\x1a\ninfo.proto\"a\n\x12NewAudienceRequest\x12\x1d\n\nsession_id\x18\
@@ -1137,125 +1382,142 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x03(\x0b2\x10.protos.AudienceR\taudiences\x12\x17\n\x07dry_run\x18\x05\
     \x20\x01(\x08R\x06dryRun\"U\n\x11DeregisterRequest\x12!\n\x0cservice_nam\
     e\x18\x01\x20\x01(\tR\x0bserviceName\x12\x1d\n\nsession_id\x18\x02\x20\
-    \x01(\tR\tsessionId2\xc0\x02\n\x08Internal\x126\n\x08Register\x12\x17.pr\
-    otos.RegisterRequest\x1a\x0f.protos.Command0\x01\x12C\n\x0bNewAudience\
-    \x12\x1a.protos.NewAudienceRequest\x1a\x18.protos.StandardResponse\x12?\
-    \n\tHeartbeat\x12\x18.protos.HeartbeatRequest\x1a\x18.protos.StandardRes\
-    ponse\x129\n\x06Notify\x12\x15.protos.NotifyRequest\x1a\x18.protos.Stand\
-    ardResponse\x12;\n\x07Metrics\x12\x16.protos.MetricsRequest\x1a\x18.prot\
-    os.StandardResponseB4Z2github.com/streamdal/snitch-protos/build/go/proto\
-    sJ\xcd\x19\n\x06\x12\x04\0\0^\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
-    \n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x17\n\t\n\x02\
-    \x03\x01\x12\x03\x05\0\x16\n\t\n\x02\x03\x02\x12\x03\x06\0\x14\n\x08\n\
-    \x01\x08\x12\x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\
-    \x12\x04\n\0!\x01\n\n\n\x03\x06\0\x01\x12\x03\n\x08\x10\n\xbc\x02\n\x04\
-    \x06\0\x02\0\x12\x03\x10\x02@\x1a\xae\x02\x20Initial\x20method\x20that\
-    \x20an\x20SDK\x20should\x20call\x20to\x20register\x20itself\x20with\x20t\
-    he\x20server.\n\x20The\x20server\x20will\x20use\x20this\x20stream\x20to\
-    \x20send\x20commands\x20to\x20the\x20SDK\x20via\x20the\n\x20`CommandResp\
-    onse`\x20message.\x20Clients\x20should\x20continuously\x20listen\x20for\
-    \n\x20CommandResponse\x20messages\x20and\x20re-establish\x20registration\
-    \x20if\x20the\x20stream\x20gets\n\x20disconnected.\n\n\x0c\n\x05\x06\0\
-    \x02\0\x01\x12\x03\x10\x06\x0e\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x10\
-    \x0f\x1e\n\x0c\n\x05\x06\0\x02\0\x06\x12\x03\x10)/\n\x0c\n\x05\x06\0\x02\
-    \0\x03\x12\x03\x100>\n\xb0\x01\n\x04\x06\0\x02\x01\x12\x03\x15\x02A\x1a\
-    \xa2\x01\x20Declare\x20a\x20new\x20audience\x20that\x20the\x20SDK\x20is\
-    \x20able\x20to\x20accept\x20commands\x20for.\n\x20An\x20SDK\x20would\x20\
-    use\x20this\x20method\x20when\x20a\x20new\x20audience\x20is\x20declared\
-    \x20by\x20the\x20user\n\x20via\x20`.Process()`.\n\n\x0c\n\x05\x06\0\x02\
-    \x01\x01\x12\x03\x15\x06\x11\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x15\
-    \x12$\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\x15/?\n\x84\x01\n\x04\x06\0\
-    \x02\x02\x12\x03\x19\x02=\x1aw\x20SDK\x20is\x20responsible\x20for\x20sen\
-    ding\x20heartbeats\x20to\x20the\x20server\x20to\x20let\x20the\x20server\
-    \n\x20know\x20about\x20active\x20consumers\x20and\x20producers.\n\n\x0c\
-    \n\x05\x06\0\x02\x02\x01\x12\x03\x19\x06\x0f\n\x0c\n\x05\x06\0\x02\x02\
-    \x02\x12\x03\x19\x10\x20\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x19+;\n\
-    \x86\x01\n\x04\x06\0\x02\x03\x12\x03\x1d\x027\x1ay\x20Use\x20this\x20met\
-    hod\x20when\x20Notify\x20condition\x20has\x20been\x20triggered;\x20the\
-    \x20server\x20will\n\x20decide\x20on\x20what\x20to\x20do\x20about\x20the\
-    \x20notification.\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x1d\x06\x0c\n\
-    \x0c\n\x05\x06\0\x02\x03\x02\x12\x03\x1d\r\x1a\n\x0c\n\x05\x06\0\x02\x03\
-    \x03\x12\x03\x1d%5\n2\n\x04\x06\0\x02\x04\x12\x03\x20\x029\x1a%\x20Send\
-    \x20periodic\x20metrics\x20to\x20the\x20server\n\n\x0c\n\x05\x06\0\x02\
-    \x04\x01\x12\x03\x20\x06\r\n\x0c\n\x05\x06\0\x02\x04\x02\x12\x03\x20\x0e\
-    \x1c\n\x0c\n\x05\x06\0\x02\x04\x03\x12\x03\x20'7\n\n\n\x02\x04\0\x12\x04\
-    #\0)\x01\n\n\n\x03\x04\0\x01\x12\x03#\x08\x1a\n7\n\x04\x04\0\x02\0\x12\
-    \x03%\x02\x18\x1a*\x20The\x20session\x20that\x20is\x20performing\x20this\
-    \x20call\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03%\x02\x08\n\x0c\n\x05\x04\
-    \0\x02\0\x01\x12\x03%\t\x13\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03%\x16\x17\
-    \n&\n\x04\x04\0\x02\x01\x12\x03(\x02\x18\x1a\x19\x20Newly\x20created\x20\
-    audience.\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03(\x02\n\n\x0c\n\x05\x04\
-    \0\x02\x01\x01\x12\x03(\x0b\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03(\
-    \x16\x17\n\x8a\x01\n\x02\x04\x01\x12\x04-\00\x01\x1a~\x20Each\x20consume\
-    r\x20and\x20producer\x20should\x20send\x20periodic\x20heartbeats\x20to\
+    \x01(\tR\tsessionId\"F\n!GetAttachCommandsByServiceRequest\x12!\n\x0cser\
+    vice_name\x18\x01\x20\x01(\tR\x0bserviceName\"O\n\"GetAttachCommandsBySe\
+    rviceResponse\x12)\n\x07configs\x18\x01\x20\x03(\x0b2\x0f.protos.Command\
+    R\x07configs2\xb5\x03\n\x08Internal\x126\n\x08Register\x12\x17.protos.Re\
+    gisterRequest\x1a\x0f.protos.Command0\x01\x12C\n\x0bNewAudience\x12\x1a.\
+    protos.NewAudienceRequest\x1a\x18.protos.StandardResponse\x12?\n\tHeartb\
+    eat\x12\x18.protos.HeartbeatRequest\x1a\x18.protos.StandardResponse\x129\
+    \n\x06Notify\x12\x15.protos.NotifyRequest\x1a\x18.protos.StandardRespons\
+    e\x12;\n\x07Metrics\x12\x16.protos.MetricsRequest\x1a\x18.protos.Standar\
+    dResponse\x12s\n\x1aGetAttachCommandsByService\x12).protos.GetAttachComm\
+    andsByServiceRequest\x1a*.protos.GetAttachCommandsByServiceResponseB4Z2g\
+    ithub.com/streamdal/snitch-protos/build/go/protosJ\xb0\x1c\n\x06\x12\x04\
+    \0\0j\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\
+    \x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x17\n\t\n\x02\x03\x01\x12\x03\x05\0\
+    \x16\n\t\n\x02\x03\x02\x12\x03\x06\0\x14\n\x08\n\x01\x08\x12\x03\x08\0I\
+    \n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\x12\x04\n\0%\x01\n\n\n\
+    \x03\x06\0\x01\x12\x03\n\x08\x10\n\xbc\x02\n\x04\x06\0\x02\0\x12\x03\x10\
+    \x02@\x1a\xae\x02\x20Initial\x20method\x20that\x20an\x20SDK\x20should\
+    \x20call\x20to\x20register\x20itself\x20with\x20the\x20server.\n\x20The\
+    \x20server\x20will\x20use\x20this\x20stream\x20to\x20send\x20commands\
+    \x20to\x20the\x20SDK\x20via\x20the\n\x20`CommandResponse`\x20message.\
+    \x20Clients\x20should\x20continuously\x20listen\x20for\n\x20CommandRespo\
+    nse\x20messages\x20and\x20re-establish\x20registration\x20if\x20the\x20s\
+    tream\x20gets\n\x20disconnected.\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\
+    \x10\x06\x0e\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x10\x0f\x1e\n\x0c\n\x05\
+    \x06\0\x02\0\x06\x12\x03\x10)/\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03\x100>\
+    \n\xb0\x01\n\x04\x06\0\x02\x01\x12\x03\x15\x02A\x1a\xa2\x01\x20Declare\
+    \x20a\x20new\x20audience\x20that\x20the\x20SDK\x20is\x20able\x20to\x20ac\
+    cept\x20commands\x20for.\n\x20An\x20SDK\x20would\x20use\x20this\x20metho\
+    d\x20when\x20a\x20new\x20audience\x20is\x20declared\x20by\x20the\x20user\
+    \n\x20via\x20`.Process()`.\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x15\
+    \x06\x11\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x15\x12$\n\x0c\n\x05\x06\
+    \0\x02\x01\x03\x12\x03\x15/?\n\x84\x01\n\x04\x06\0\x02\x02\x12\x03\x19\
+    \x02=\x1aw\x20SDK\x20is\x20responsible\x20for\x20sending\x20heartbeats\
+    \x20to\x20the\x20server\x20to\x20let\x20the\x20server\n\x20know\x20about\
+    \x20active\x20consumers\x20and\x20producers.\n\n\x0c\n\x05\x06\0\x02\x02\
+    \x01\x12\x03\x19\x06\x0f\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x19\x10\
+    \x20\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x19+;\n\x86\x01\n\x04\x06\0\
+    \x02\x03\x12\x03\x1d\x027\x1ay\x20Use\x20this\x20method\x20when\x20Notif\
+    y\x20condition\x20has\x20been\x20triggered;\x20the\x20server\x20will\n\
+    \x20decide\x20on\x20what\x20to\x20do\x20about\x20the\x20notification.\n\
+    \n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x1d\x06\x0c\n\x0c\n\x05\x06\0\x02\
+    \x03\x02\x12\x03\x1d\r\x1a\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\x1d%5\n\
+    2\n\x04\x06\0\x02\x04\x12\x03\x20\x029\x1a%\x20Send\x20periodic\x20metri\
+    cs\x20to\x20the\x20server\n\n\x0c\n\x05\x06\0\x02\x04\x01\x12\x03\x20\
+    \x06\r\n\x0c\n\x05\x06\0\x02\x04\x02\x12\x03\x20\x0e\x1c\n\x0c\n\x05\x06\
+    \0\x02\x04\x03\x12\x03\x20'7\n\x8a\x01\n\x04\x06\0\x02\x05\x12\x03$\x02q\
+    \x1a}\x20Used\x20to\x20pull\x20all\x20pipeline\x20configs\x20for\x20the\
+    \x20service\x20name\x20in\x20the\x20SDK's\x20constructor\n\x20This\x20is\
+    \x20needed\x20because\x20Register()\x20is\x20async\n\n\x0c\n\x05\x06\0\
+    \x02\x05\x01\x12\x03$\x06\x20\n\x0c\n\x05\x06\0\x02\x05\x02\x12\x03$!B\n\
+    \x0c\n\x05\x06\0\x02\x05\x03\x12\x03$Mo\n\n\n\x02\x04\0\x12\x04'\0-\x01\
+    \n\n\n\x03\x04\0\x01\x12\x03'\x08\x1a\n7\n\x04\x04\0\x02\0\x12\x03)\x02\
+    \x18\x1a*\x20The\x20session\x20that\x20is\x20performing\x20this\x20call\
+    \n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03)\x02\x08\n\x0c\n\x05\x04\0\x02\0\
+    \x01\x12\x03)\t\x13\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03)\x16\x17\n&\n\
+    \x04\x04\0\x02\x01\x12\x03,\x02\x18\x1a\x19\x20Newly\x20created\x20audie\
+    nce.\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03,\x02\n\n\x0c\n\x05\x04\0\
+    \x02\x01\x01\x12\x03,\x0b\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03,\x16\
+    \x17\n\x8a\x01\n\x02\x04\x01\x12\x041\04\x01\x1a~\x20Each\x20consumer\
+    \x20and\x20producer\x20should\x20send\x20periodic\x20heartbeats\x20to\
     \x20the\x20server\n\x20to\x20let\x20the\x20server\x20know\x20that\x20the\
-    y\x20are\x20still\x20active.\n\n\n\n\x03\x04\x01\x01\x12\x03-\x08\x18\n7\
-    \n\x04\x04\x01\x02\0\x12\x03/\x02\x18\x1a*\x20Session\x20ID\x20for\x20th\
+    y\x20are\x20still\x20active.\n\n\n\n\x03\x04\x01\x01\x12\x031\x08\x18\n7\
+    \n\x04\x04\x01\x02\0\x12\x033\x02\x18\x1a*\x20Session\x20ID\x20for\x20th\
     is\x20instance\x20of\x20the\x20SDK.\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\
-    \x03/\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03/\t\x13\n\x0c\n\x05\
-    \x04\x01\x02\0\x03\x12\x03/\x16\x17\n\n\n\x02\x04\x02\x12\x042\07\x01\n\
-    \n\n\x03\x04\x02\x01\x12\x032\x08\x15\n\x0b\n\x04\x04\x02\x02\0\x12\x033\
-    \x02\x19\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x033\x02\x08\n\x0c\n\x05\x04\
-    \x02\x02\0\x01\x12\x033\t\x14\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x033\x17\
-    \x18\n\x0b\n\x04\x04\x02\x02\x01\x12\x034\x02\x17\n\x0c\n\x05\x04\x02\
-    \x02\x01\x05\x12\x034\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x034\t\
-    \x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x034\x15\x16\n\x0b\n\x04\x04\
-    \x02\x02\x02\x12\x035\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x035\
-    \x02\n\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x035\x0b\x13\n\x0c\n\x05\x04\
-    \x02\x02\x02\x03\x12\x035\x16\x17\n\x0b\n\x04\x04\x02\x02\x03\x12\x036\
-    \x02$\n\x0c\n\x05\x04\x02\x02\x03\x05\x12\x036\x02\x07\n\x0c\n\x05\x04\
-    \x02\x02\x03\x01\x12\x036\x08\x1f\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\
-    \x036\"#\n\n\n\x02\x04\x03\x12\x049\0=\x01\n\n\n\x03\x04\x03\x01\x12\x03\
-    9\x08\x0f\n\x0b\n\x04\x04\x03\x02\0\x12\x03:\x02\x12\n\x0c\n\x05\x04\x03\
-    \x02\0\x05\x12\x03:\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03:\t\r\n\
-    \x0c\n\x05\x04\x03\x02\0\x03\x12\x03:\x10\x11\n\x0b\n\x04\x04\x03\x02\
-    \x01\x12\x03;\x02!\n\x0c\n\x05\x04\x03\x02\x01\x06\x12\x03;\x02\x15\n\
-    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x03;\x16\x1c\n\x0c\n\x05\x04\x03\x02\
-    \x01\x03\x12\x03;\x1f\x20\n\x0b\n\x04\x04\x03\x02\x02\x12\x03<\x02\x13\n\
-    \x0c\n\x05\x04\x03\x02\x02\x05\x12\x03<\x02\x08\n\x0c\n\x05\x04\x03\x02\
-    \x02\x01\x12\x03<\t\x0e\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x03<\x11\x12\
-    \n\n\n\x02\x04\x04\x12\x04?\0A\x01\n\n\n\x03\x04\x04\x01\x12\x03?\x08\
-    \x16\n\x0b\n\x04\x04\x04\x02\0\x12\x03@\x02\x1f\n\x0c\n\x05\x04\x04\x02\
-    \0\x04\x12\x03@\x02\n\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03@\x0b\x12\n\
-    \x0c\n\x05\x04\x04\x02\0\x01\x12\x03@\x13\x1a\n\x0c\n\x05\x04\x04\x02\0\
-    \x03\x12\x03@\x1d\x1e\n\n\n\x02\x04\x05\x12\x04C\0X\x01\n\n\n\x03\x04\
-    \x05\x01\x12\x03C\x08\x17\nC\n\x04\x04\x05\x02\0\x12\x03E\x02\x1a\x1a6\
+    \x033\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x033\t\x13\n\x0c\n\x05\
+    \x04\x01\x02\0\x03\x12\x033\x16\x17\n\n\n\x02\x04\x02\x12\x046\0;\x01\n\
+    \n\n\x03\x04\x02\x01\x12\x036\x08\x15\n\x0b\n\x04\x04\x02\x02\0\x12\x037\
+    \x02\x19\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x037\x02\x08\n\x0c\n\x05\x04\
+    \x02\x02\0\x01\x12\x037\t\x14\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x037\x17\
+    \x18\n\x0b\n\x04\x04\x02\x02\x01\x12\x038\x02\x17\n\x0c\n\x05\x04\x02\
+    \x02\x01\x05\x12\x038\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x038\t\
+    \x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x038\x15\x16\n\x0b\n\x04\x04\
+    \x02\x02\x02\x12\x039\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x039\
+    \x02\n\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x039\x0b\x13\n\x0c\n\x05\x04\
+    \x02\x02\x02\x03\x12\x039\x16\x17\n\x0b\n\x04\x04\x02\x02\x03\x12\x03:\
+    \x02$\n\x0c\n\x05\x04\x02\x02\x03\x05\x12\x03:\x02\x07\n\x0c\n\x05\x04\
+    \x02\x02\x03\x01\x12\x03:\x08\x1f\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\
+    \x03:\"#\n\n\n\x02\x04\x03\x12\x04=\0A\x01\n\n\n\x03\x04\x03\x01\x12\x03\
+    =\x08\x0f\n\x0b\n\x04\x04\x03\x02\0\x12\x03>\x02\x12\n\x0c\n\x05\x04\x03\
+    \x02\0\x05\x12\x03>\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03>\t\r\n\
+    \x0c\n\x05\x04\x03\x02\0\x03\x12\x03>\x10\x11\n\x0b\n\x04\x04\x03\x02\
+    \x01\x12\x03?\x02!\n\x0c\n\x05\x04\x03\x02\x01\x06\x12\x03?\x02\x15\n\
+    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x03?\x16\x1c\n\x0c\n\x05\x04\x03\x02\
+    \x01\x03\x12\x03?\x1f\x20\n\x0b\n\x04\x04\x03\x02\x02\x12\x03@\x02\x13\n\
+    \x0c\n\x05\x04\x03\x02\x02\x05\x12\x03@\x02\x08\n\x0c\n\x05\x04\x03\x02\
+    \x02\x01\x12\x03@\t\x0e\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x03@\x11\x12\
+    \n\n\n\x02\x04\x04\x12\x04C\0E\x01\n\n\n\x03\x04\x04\x01\x12\x03C\x08\
+    \x16\n\x0b\n\x04\x04\x04\x02\0\x12\x03D\x02\x1f\n\x0c\n\x05\x04\x04\x02\
+    \0\x04\x12\x03D\x02\n\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03D\x0b\x12\n\
+    \x0c\n\x05\x04\x04\x02\0\x01\x12\x03D\x13\x1a\n\x0c\n\x05\x04\x04\x02\0\
+    \x03\x12\x03D\x1d\x1e\n\n\n\x02\x04\x05\x12\x04G\0\\\x01\n\n\n\x03\x04\
+    \x05\x01\x12\x03G\x08\x17\nC\n\x04\x04\x05\x02\0\x12\x03I\x02\x1a\x1a6\
     \x20REQUIRED\x20--\x20Name\x20of\x20the\x20service\x20that\x20is\x20regi\
-    stering.\n\n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03E\x02\x08\n\x0c\n\x05\
-    \x04\x05\x02\0\x01\x12\x03E\t\x15\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03E\
-    \x18\x19\n\xad\x01\n\x04\x04\x05\x02\x01\x12\x03K\x02\x18\x1a\x9f\x01\
+    stering.\n\n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03I\x02\x08\n\x0c\n\x05\
+    \x04\x05\x02\0\x01\x12\x03I\t\x15\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03I\
+    \x18\x19\n\xad\x01\n\x04\x04\x05\x02\x01\x12\x03O\x02\x18\x1a\x9f\x01\
     \x20REQUIRED\x20--\x20Unique\x20ID\x20for\x20this\x20SDK\x20instance.\n\
     \n\x20This\x20should\x20be\x20generated\x20every\x20time\x20the\x20SDK\
     \x20is\x20instantiated\x20(oe.\x20every\n\x20time\x20a\x20NEW\x20registr\
-    ation\x20is\x20performed).\n\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03K\
-    \x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03K\t\x13\n\x0c\n\x05\x04\
-    \x05\x02\x01\x03\x12\x03K\x16\x17\nQ\n\x04\x04\x05\x02\x02\x12\x03N\x02$\
+    ation\x20is\x20performed).\n\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03O\
+    \x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03O\t\x13\n\x0c\n\x05\x04\
+    \x05\x02\x01\x03\x12\x03O\x16\x17\nQ\n\x04\x04\x05\x02\x02\x12\x03R\x02$\
     \x1aD\x20REQUIRED\x20--\x20Info\x20about\x20the\x20client\x20(lib\x20nam\
     e,\x20lang,\x20os,\x20arch,\x20etc.)\n\n\x0c\n\x05\x04\x05\x02\x02\x06\
-    \x12\x03N\x02\x13\n\x0c\n\x05\x04\x05\x02\x02\x01\x12\x03N\x14\x1f\n\x0c\
-    \n\x05\x04\x05\x02\x02\x03\x12\x03N\"#\n\x87\x01\n\x04\x04\x05\x02\x03\
-    \x12\x03R\x02)\x1az\x20OPTIONAL\x20--\x20if\x20these\x20are\x20defined,\
+    \x12\x03R\x02\x13\n\x0c\n\x05\x04\x05\x02\x02\x01\x12\x03R\x14\x1f\n\x0c\
+    \n\x05\x04\x05\x02\x02\x03\x12\x03R\"#\n\x87\x01\n\x04\x04\x05\x02\x03\
+    \x12\x03V\x02)\x1az\x20OPTIONAL\x20--\x20if\x20these\x20are\x20defined,\
     \x20these\x20will\x20show\x20up\x20in\x20the\x20UI\x20even\x20if\n\x20th\
     ere\x20is\x20no\x20active\x20.Process()\x20call\x20from\x20the\x20SDK.\n\
-    \n\x0c\n\x05\x04\x05\x02\x03\x04\x12\x03R\x02\n\n\x0c\n\x05\x04\x05\x02\
-    \x03\x06\x12\x03R\x0b\x1a\n\x0c\n\x05\x04\x05\x02\x03\x01\x12\x03R\x1b$\
-    \n\x0c\n\x05\x04\x05\x02\x03\x03\x12\x03R'(\n\xd9\x01\n\x04\x04\x05\x02\
-    \x04\x12\x03W\x02\x13\x1a\xcb\x01\x20OPTIONAL\x20--\x20If\x20set,\x20we\
+    \n\x0c\n\x05\x04\x05\x02\x03\x04\x12\x03V\x02\n\n\x0c\n\x05\x04\x05\x02\
+    \x03\x06\x12\x03V\x0b\x1a\n\x0c\n\x05\x04\x05\x02\x03\x01\x12\x03V\x1b$\
+    \n\x0c\n\x05\x04\x05\x02\x03\x03\x12\x03V'(\n\xd9\x01\n\x04\x04\x05\x02\
+    \x04\x12\x03[\x02\x13\x1a\xcb\x01\x20OPTIONAL\x20--\x20If\x20set,\x20we\
     \x20know\x20that\x20any\x20pipelines\x20or\x20steps\x20executed\x20in\
     \x20this\n\x20SDK\x20will\x20NOT\x20modify\x20the\x20input/output\x20dat\
     a.\x20As\x20in,\x20the\x20SDK\x20will\x20log\x20what\x20it\n\x20_would_\
     \x20do\x20and\x20always\x20return\x20the\x20original\x20data\x20set.\n\n\
-    \x0c\n\x05\x04\x05\x02\x04\x05\x12\x03W\x02\x06\n\x0c\n\x05\x04\x05\x02\
-    \x04\x01\x12\x03W\x07\x0e\n\x0c\n\x05\x04\x05\x02\x04\x03\x12\x03W\x11\
-    \x12\nT\n\x02\x04\x06\x12\x04[\0^\x01\x1aH\x20Same\x20as\x20RegisterRequ\
+    \x0c\n\x05\x04\x05\x02\x04\x05\x12\x03[\x02\x06\n\x0c\n\x05\x04\x05\x02\
+    \x04\x01\x12\x03[\x07\x0e\n\x0c\n\x05\x04\x05\x02\x04\x03\x12\x03[\x11\
+    \x12\nT\n\x02\x04\x06\x12\x04_\0b\x01\x1aH\x20Same\x20as\x20RegisterRequ\
     est\x20-\x20used\x20for\x20broadcasting\x20a\x20deregistration\x20event\
-    \n\n\n\n\x03\x04\x06\x01\x12\x03[\x08\x19\n\x0b\n\x04\x04\x06\x02\0\x12\
-    \x03\\\x02\x1a\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03\\\x02\x08\n\x0c\n\
-    \x05\x04\x06\x02\0\x01\x12\x03\\\t\x15\n\x0c\n\x05\x04\x06\x02\0\x03\x12\
-    \x03\\\x18\x19\n\x0b\n\x04\x04\x06\x02\x01\x12\x03]\x02\x18\n\x0c\n\x05\
-    \x04\x06\x02\x01\x05\x12\x03]\x02\x08\n\x0c\n\x05\x04\x06\x02\x01\x01\
-    \x12\x03]\t\x13\n\x0c\n\x05\x04\x06\x02\x01\x03\x12\x03]\x16\x17b\x06pro\
-    to3\
+    \n\n\n\n\x03\x04\x06\x01\x12\x03_\x08\x19\n\x0b\n\x04\x04\x06\x02\0\x12\
+    \x03`\x02\x1a\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03`\x02\x08\n\x0c\n\x05\
+    \x04\x06\x02\0\x01\x12\x03`\t\x15\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03`\
+    \x18\x19\n\x0b\n\x04\x04\x06\x02\x01\x12\x03a\x02\x18\n\x0c\n\x05\x04\
+    \x06\x02\x01\x05\x12\x03a\x02\x08\n\x0c\n\x05\x04\x06\x02\x01\x01\x12\
+    \x03a\t\x13\n\x0c\n\x05\x04\x06\x02\x01\x03\x12\x03a\x16\x17\n\n\n\x02\
+    \x04\x07\x12\x04d\0f\x01\n\n\n\x03\x04\x07\x01\x12\x03d\x08)\n\x0b\n\x04\
+    \x04\x07\x02\0\x12\x03e\x02\x1a\n\x0c\n\x05\x04\x07\x02\0\x05\x12\x03e\
+    \x02\x08\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03e\t\x15\n\x0c\n\x05\x04\
+    \x07\x02\0\x03\x12\x03e\x18\x19\n\n\n\x02\x04\x08\x12\x04h\0j\x01\n\n\n\
+    \x03\x04\x08\x01\x12\x03h\x08*\n\x0b\n\x04\x04\x08\x02\0\x12\x03i\x02&\n\
+    \x0c\n\x05\x04\x08\x02\0\x04\x12\x03i\x02\n\n\x0c\n\x05\x04\x08\x02\0\
+    \x06\x12\x03i\x0b\x19\n\x0c\n\x05\x04\x08\x02\0\x01\x12\x03i\x1a!\n\x0c\
+    \n\x05\x04\x08\x02\0\x03\x12\x03i$%b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1276,7 +1538,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::command::file_descriptor().clone());
             deps.push(super::common::file_descriptor().clone());
             deps.push(super::info::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(7);
+            let mut messages = ::std::vec::Vec::with_capacity(9);
             messages.push(NewAudienceRequest::generated_message_descriptor_data());
             messages.push(HeartbeatRequest::generated_message_descriptor_data());
             messages.push(NotifyRequest::generated_message_descriptor_data());
@@ -1284,6 +1546,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(MetricsRequest::generated_message_descriptor_data());
             messages.push(RegisterRequest::generated_message_descriptor_data());
             messages.push(DeregisterRequest::generated_message_descriptor_data());
+            messages.push(GetAttachCommandsByServiceRequest::generated_message_descriptor_data());
+            messages.push(GetAttachCommandsByServiceResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(0);
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),

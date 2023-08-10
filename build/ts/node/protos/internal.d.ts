@@ -1,5 +1,6 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Command } from "./command.js";
 import { ClientInfo } from "./info.js";
 import { Audience } from "./common.js";
 /**
@@ -138,6 +139,24 @@ export interface DeregisterRequest {
      */
     sessionId: string;
 }
+/**
+ * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
+ */
+export interface GetAttachCommandsByServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+}
+/**
+ * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
+ */
+export interface GetAttachCommandsByServiceResponse {
+    /**
+     * @generated from protobuf field: repeated protos.Command configs = 1;
+     */
+    configs: Command[];
+}
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();
 }
@@ -187,6 +206,20 @@ declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
  * @generated MessageType for protobuf message protos.DeregisterRequest
  */
 export declare const DeregisterRequest: DeregisterRequest$Type;
+declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
+ */
+export declare const GetAttachCommandsByServiceRequest: GetAttachCommandsByServiceRequest$Type;
+declare class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachCommandsByServiceResponse> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
+ */
+export declare const GetAttachCommandsByServiceResponse: GetAttachCommandsByServiceResponse$Type;
 /**
  * @generated ServiceType for protobuf service protos.Internal
  */

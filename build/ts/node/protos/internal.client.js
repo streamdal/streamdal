@@ -64,5 +64,15 @@ export class InternalClient {
         const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
+    /**
+     * Used to pull all pipeline configs for the service name in the SDK's constructor
+     * This is needed because Register() is async
+     *
+     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     */
+    getAttachCommandsByService(input, options) {
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept("unary", this._transport, method, opt, input);
+    }
 }
 //# sourceMappingURL=internal.client.js.map

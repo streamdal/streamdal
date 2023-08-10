@@ -40,6 +40,9 @@ type InternalClient interface {
 	Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Send periodic metrics to the server
 	Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Used to pull all pipeline configs for the service name in the SDK's constructor
+	// This is needed because Register() is async
+	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
 }
 
 type internalClient struct {
@@ -118,6 +121,15 @@ func (c *internalClient) Metrics(ctx context.Context, in *MetricsRequest, opts .
 	return out, nil
 }
 
+func (c *internalClient) GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error) {
+	out := new(GetAttachCommandsByServiceResponse)
+	err := c.cc.Invoke(ctx, "/protos.Internal/GetAttachCommandsByService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InternalServer is the server API for Internal service.
 // All implementations must embed UnimplementedInternalServer
 // for forward compatibility
@@ -140,6 +152,9 @@ type InternalServer interface {
 	Notify(context.Context, *NotifyRequest) (*StandardResponse, error)
 	// Send periodic metrics to the server
 	Metrics(context.Context, *MetricsRequest) (*StandardResponse, error)
+	// Used to pull all pipeline configs for the service name in the SDK's constructor
+	// This is needed because Register() is async
+	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
 	mustEmbedUnimplementedInternalServer()
 }
 
@@ -161,6 +176,9 @@ func (UnimplementedInternalServer) Notify(context.Context, *NotifyRequest) (*Sta
 }
 func (UnimplementedInternalServer) Metrics(context.Context, *MetricsRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Metrics not implemented")
+}
+func (UnimplementedInternalServer) GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAttachCommandsByService not implemented")
 }
 func (UnimplementedInternalServer) mustEmbedUnimplementedInternalServer() {}
 
@@ -268,6 +286,24 @@ func _Internal_Metrics_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Internal_GetAttachCommandsByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAttachCommandsByServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InternalServer).GetAttachCommandsByService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.Internal/GetAttachCommandsByService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InternalServer).GetAttachCommandsByService(ctx, req.(*GetAttachCommandsByServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Internal_ServiceDesc is the grpc.ServiceDesc for Internal service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -290,6 +326,10 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Metrics",
 			Handler:    _Internal_Metrics_Handler,
+		},
+		{
+			MethodName: "GetAttachCommandsByService",
+			Handler:    _Internal_GetAttachCommandsByService_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

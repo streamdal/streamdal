@@ -1,5 +1,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
+import type { GetAttachCommandsByServiceResponse } from "./internal.js";
+import type { GetAttachCommandsByServiceRequest } from "./internal.js";
 import type { MetricsRequest } from "./internal.js";
 import type { NotifyRequest } from "./internal.js";
 import type { HeartbeatRequest } from "./internal.js";
@@ -52,6 +54,13 @@ export interface IInternalClient {
      * @generated from protobuf rpc: Metrics(protos.MetricsRequest) returns (protos.StandardResponse);
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
+    /**
+     * Used to pull all pipeline configs for the service name in the SDK's constructor
+     * This is needed because Register() is async
+     *
+     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     */
+    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -102,4 +111,11 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: Metrics(protos.MetricsRequest) returns (protos.StandardResponse);
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
+    /**
+     * Used to pull all pipeline configs for the service name in the SDK's constructor
+     * This is needed because Register() is async
+     *
+     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     */
+    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
 }
