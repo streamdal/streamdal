@@ -118,7 +118,7 @@ export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceR
 class GetAttachCommandsByServiceResponse$Type extends MessageType {
     constructor() {
         super("protos.GetAttachCommandsByServiceResponse", [
-            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
+            { no: 1, name: "commands", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
         ]);
     }
 }

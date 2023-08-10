@@ -103,5 +103,5 @@ message GetAttachCommandsByServiceRequest {
 }
 
 message GetAttachCommandsByServiceResponse {
-  repeated protos.Command configs = 1;
+  repeated protos.Command commands = 1;
 }

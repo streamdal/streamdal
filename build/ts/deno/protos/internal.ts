@@ -157,9 +157,9 @@ export interface GetAttachCommandsByServiceRequest {
  */
 export interface GetAttachCommandsByServiceResponse {
     /**
-     * @generated from protobuf field: repeated protos.Command configs = 1;
+     * @generated from protobuf field: repeated protos.Command commands = 1;
      */
-    configs: Command[];
+    commands: Command[];
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
@@ -272,7 +272,7 @@ export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceR
 class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachCommandsByServiceResponse> {
     constructor() {
         super("protos.GetAttachCommandsByServiceResponse", [
-            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
+            { no: 1, name: "commands", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
         ]);
     }
 }

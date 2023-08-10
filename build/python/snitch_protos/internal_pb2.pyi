@@ -23,10 +23,10 @@ class GetAttachCommandsByServiceRequest(_message.Message):
     def __init__(self, service_name: _Optional[str] = ...) -> None: ...
 
 class GetAttachCommandsByServiceResponse(_message.Message):
-    __slots__ = ["configs"]
-    CONFIGS_FIELD_NUMBER: _ClassVar[int]
-    configs: _containers.RepeatedCompositeFieldContainer[_command_pb2.Command]
-    def __init__(self, configs: _Optional[_Iterable[_Union[_command_pb2.Command, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["commands"]
+    COMMANDS_FIELD_NUMBER: _ClassVar[int]
+    commands: _containers.RepeatedCompositeFieldContainer[_command_pb2.Command]
+    def __init__(self, commands: _Optional[_Iterable[_Union[_command_pb2.Command, _Mapping]]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["session_id"]

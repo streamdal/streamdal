@@ -153,9 +153,9 @@ export interface GetAttachCommandsByServiceRequest {
  */
 export interface GetAttachCommandsByServiceResponse {
     /**
-     * @generated from protobuf field: repeated protos.Command configs = 1;
+     * @generated from protobuf field: repeated protos.Command commands = 1;
      */
-    configs: Command[];
+    commands: Command[];
 }
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();
