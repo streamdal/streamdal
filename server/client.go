@@ -29,7 +29,7 @@ type IServerClient interface {
 	Register(ctx context.Context, req *protos.RegisterRequest) (protos.Internal_RegisterClient, error)
 
 	// NewAudience signals a new audience to the snitch server
-	NewAudience(ctx context.Context, aud *protos.Audience) error
+	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 }
 
 const (
@@ -116,10 +116,13 @@ func (c *Client) Register(ctx context.Context, req *protos.RegisterRequest) (pro
 	return c.Server.Register(ctx, req)
 }
 
-func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience) error {
+func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
-	_, err := c.Server.NewAudience(ctx, &protos.NewAudienceRequest{Audience: aud})
+	_, err := c.Server.NewAudience(ctx, &protos.NewAudienceRequest{
+		Audience:  aud,
+		SessionId: sessionID,
+	})
 	return err
 }
 

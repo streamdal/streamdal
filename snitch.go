@@ -118,14 +118,14 @@ type Audience struct {
 	OperationName string
 }
 
-type SnitchRequest struct {
+type ProcessRequest struct {
 	ComponentName string
 	OperationType OperationType
 	OperationName string
 	Data          []byte
 }
 
-type SnitchResponse struct {
+type ProcessResponse struct {
 	Data    []byte
 	Error   bool
 	Message string
@@ -165,6 +165,8 @@ func New(cfg *Config) (*Snitch, error) {
 		pipelinesMtx:       &sync.RWMutex{},
 		pipelinesPaused:    make(map[string]map[string]*protos.Command),
 		pipelinesPausedMtx: &sync.RWMutex{},
+		audiences:          map[string]struct{}{},
+		audiencesMtx:       &sync.RWMutex{},
 		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
@@ -325,7 +327,7 @@ func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[str
 	return pipelines
 }
 
-func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchResponse, error) {
+func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
 	if req == nil {
 		return nil, errors.New("request cannot be nil")
 	}
@@ -343,7 +345,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 	pipelines := s.getPipelines(ctx, aud)
 	if len(pipelines) == 0 {
 		// No pipelines for this mode, nothing to do
-		return &SnitchResponse{Data: data, Message: "No pipelines, message ignored"}, nil
+		return &ProcessResponse{Data: data, Message: "No pipelines, message ignored"}, nil
 	}
 
 	if payloadSize > MaxPayloadSize {
@@ -355,7 +357,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 		//})
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
 		s.config.Logger.Warn(msg)
-		return &SnitchResponse{Data: data, Error: true, Message: msg}, nil
+		return &ProcessResponse{Data: data, Error: true, Message: msg}, nil
 	}
 
 	for _, pipeline := range pipelines {
@@ -364,7 +366,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 			if err != nil {
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
-					return &SnitchResponse{
+					return &ProcessResponse{
 						Data:    req.Data,
 						Error:   true,
 						Message: err.Error(),
@@ -380,7 +382,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
-					return &SnitchResponse{
+					return &ProcessResponse{
 						Data:    wasmResp.Output,
 						Error:   false,
 						Message: "",
@@ -389,7 +391,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
-					return &SnitchResponse{
+					return &ProcessResponse{
 						Data:    wasmResp.Output,
 						Error:   true,
 						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
@@ -407,7 +409,7 @@ func (s *Snitch) Process(ctx context.Context, req *SnitchRequest) (*SnitchRespon
 		data = req.Data
 	}
 
-	return &SnitchResponse{
+	return &ProcessResponse{
 		Data:    data,
 		Error:   false,
 		Message: "",

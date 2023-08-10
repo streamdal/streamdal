@@ -272,7 +272,7 @@ func TestProcess_success(t *testing.T) {
 		},
 	}
 
-	resp, err := s.Process(context.Background(), &SnitchRequest{
+	resp, err := s.Process(context.Background(), &ProcessRequest{
 		ComponentName: aud.ComponentName,
 		OperationType: OperationType(aud.OperationType),
 		OperationName: aud.OperationName,
@@ -350,7 +350,7 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 		},
 	}
 
-	resp, err := s.Process(context.Background(), &SnitchRequest{
+	resp, err := s.Process(context.Background(), &ProcessRequest{
 		ComponentName: aud.ComponentName,
 		OperationType: OperationType(aud.OperationType),
 		OperationName: aud.OperationName,
@@ -361,11 +361,11 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 	}
 
 	if !resp.Error {
-		t.Error("expected SnitchResponse.Error = true")
+		t.Error("expected ProcessResponse.Error = true")
 	}
 
 	if resp.Message != "detective step failed" {
-		t.Error("Expected SnitchResponse.Message = 'detective step failed'")
+		t.Error("Expected ProcessResponse.Message = 'detective step failed'")
 	}
 }
 
