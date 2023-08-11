@@ -104,7 +104,7 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	// This is the actual function we'll be executing
 	f := inst.ExportedFunction(step.GetXWasmFunction())
 	if f == nil {
-		return nil, fmt.Errorf("unable to get exported function '%s'", step.XWasmFunction)
+		return nil, fmt.Errorf("unable to get exported function '%s'", step.GetXWasmFunction())
 	}
 
 	// alloc allows us to pre-allocate memory in order to pass data to the WASM module

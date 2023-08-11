@@ -4,7 +4,6 @@ import (
 	"context"
 	"net"
 	"os"
-	"path"
 	"strings"
 	"sync"
 	"testing"
@@ -232,16 +231,16 @@ func TestProcess_success(t *testing.T) {
 		Steps: []*protos.PipelineStep{
 			{
 				Name:          "Step 1",
-				XWasmId:       uuid.New().String(),
+				XWasmId:       stringPtr(uuid.New().String()),
 				XWasmBytes:    wasmData,
-				XWasmFunction: "f",
+				XWasmFunction: stringPtr("f"),
 				OnSuccess:     make([]protos.PipelineStepCondition, 0),
 				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
 				Step: &protos.PipelineStep_Detective{
 					Detective: &steps.DetectiveStep{
-						Path:   "object.payload",
+						Path:   stringPtr("object.payload"),
 						Args:   []string{"gmail.com"},
-						Negate: false,
+						Negate: boolPtr(false),
 						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
 					},
 				},
@@ -310,16 +309,16 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 		Steps: []*protos.PipelineStep{
 			{
 				Name:          "Step 1",
-				XWasmId:       uuid.New().String(),
+				XWasmId:       stringPtr(uuid.New().String()),
 				XWasmBytes:    wasmData,
-				XWasmFunction: "f",
+				XWasmFunction: stringPtr("f"),
 				OnSuccess:     make([]protos.PipelineStepCondition, 0),
 				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
 				Step: &protos.PipelineStep_Detective{
 					Detective: &steps.DetectiveStep{
-						Path:   "object.payload",
+						Path:   stringPtr("object.payload"),
 						Args:   []string{"gmail.com"},
-						Negate: false,
+						Negate: boolPtr(false),
 						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
 					},
 				},
@@ -367,6 +366,14 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 	if resp.Message != "detective step failed" {
 		t.Error("Expected ProcessResponse.Message = 'detective step failed'")
 	}
+}
+
+func stringPtr(in string) *string {
+	return &in
+}
+
+func boolPtr(in bool) *bool {
+	return &in
 }
 
 //func BenchmarkMatchSmallJSON(b *testing.B) {
@@ -454,102 +461,3 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 //		}
 //	}
 //}
-
-func setup(funcID, wasmFile string) (*Snitch, error) {
-	d := &Snitch{
-		functions:    map[string]*function{},
-		functionsMtx: &sync.RWMutex{},
-		config:       &Config{StepTimeout: time.Second},
-	}
-
-	wasmFile = path.Join("src", wasmFile+".wasm")
-
-	data, err := os.ReadFile(wasmFile)
-	if err != nil {
-		return nil, errors.New("unable to read wasm file: " + err.Error())
-	}
-
-	if len(data) == 0 {
-		return nil, errors.New("empty wasm file")
-	}
-
-	step := &protos.PipelineStep{
-		XWasmId:       uuid.New().String(),
-		XWasmFunction: "f",
-		XWasmBytes:    data,
-	}
-
-	inst, err := createFunction(step)
-	if err != nil {
-		return nil, err
-	}
-
-	d.functions[step.XWasmId] = inst
-
-	return d, nil
-}
-
-//func setupForFailure(funcID, wasmFile string) *Snitch {
-//	aud := &protos.Audience{
-//		ServiceName:   "mysvc1",
-//		ComponentName: "kafka",
-//		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-//		OperationName: "mytopic",
-//	}
-//
-//	pipeline := &protos.Pipeline{
-//		Id:   uuid.New().String(),
-//		Name: "Test Pipeline",
-//		Steps: []*protos.PipelineStep{
-//			{
-//				Name:          "Step 1",
-//				XWasmId:       "", // TODO
-//				XWasmBytes:    make([]byte, 0),
-//				XWasmFunction: "entry",
-//				Step: &protos.PipelineStep_Detective{
-//					Detective: &steps.DetectiveStep{
-//						Path:   "object.payload",
-//						Args:   []string{"gmail.com"},
-//						Negate: false,
-//						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-//					},
-//				},
-//			},
-//		},
-//	}
-//
-//	return &Snitch{
-//		serverClient: getFakeClient(),
-//		functions:    map[string]*function{},
-//		functionsMtx: &sync.RWMutex{},
-//		pipelinesMtx: &sync.RWMutex{},
-//		config:       &Config{ServiceName: "mysvc1"},
-//		metrics:      &metricsfakes.FakeIMetrics{},
-//		pipelines: map[string]map[string]*protos.Command{
-//			audToStr(aud): map[string]*protos.Command{
-//				funcID: &protos.Command{
-//					Audience: aud,
-//					Command: &protos.Command_AttachPipeline{
-//						AttachPipeline: &protos.AttachPipelineCommand{
-//							Pipeline: pipeline,
-//						},
-//					},
-//				},
-//			},
-//		},
-//	}
-//}
-
-func getFakeClient() *serverfakes.FakeIServerClient {
-	fakePlumber := &serverfakes.FakeIServerClient{}
-	//fakePlumber.GetWasmFileStub = func(ctx context.Context, file string) ([]byte, error) {
-	//	data, err := os.ReadFile("src/" + file)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	return data, nil
-	//}
-
-	return fakePlumber
-}

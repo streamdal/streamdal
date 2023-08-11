@@ -400,7 +400,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 					}, nil
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
-				s.config.Logger.Debugf("Step '%s' returned exit code failure", step.Name)
+				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -410,7 +410,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 					}, nil
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
-				s.config.Logger.Debugf("Step '%s' returned exit code internal error", step.Name)
+				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &ProcessResponse{

@@ -11,6 +11,20 @@ import (
 )
 
 type FakeIServerClient struct {
+	GetAttachCommandsByServiceStub        func(context.Context, string) ([]*protos.Command, error)
+	getAttachCommandsByServiceMutex       sync.RWMutex
+	getAttachCommandsByServiceArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getAttachCommandsByServiceReturns struct {
+		result1 []*protos.Command
+		result2 error
+	}
+	getAttachCommandsByServiceReturnsOnCall map[int]struct {
+		result1 []*protos.Command
+		result2 error
+	}
 	HeartBeatStub        func(context.Context, string) error
 	heartBeatMutex       sync.RWMutex
 	heartBeatArgsForCall []struct {
@@ -23,11 +37,12 @@ type FakeIServerClient struct {
 	heartBeatReturnsOnCall map[int]struct {
 		result1 error
 	}
-	NewAudienceStub        func(context.Context, *protos.Audience) error
+	NewAudienceStub        func(context.Context, *protos.Audience, string) error
 	newAudienceMutex       sync.RWMutex
 	newAudienceArgsForCall []struct {
 		arg1 context.Context
 		arg2 *protos.Audience
+		arg3 string
 	}
 	newAudienceReturns struct {
 		result1 error
@@ -77,6 +92,71 @@ type FakeIServerClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByService(arg1 context.Context, arg2 string) ([]*protos.Command, error) {
+	fake.getAttachCommandsByServiceMutex.Lock()
+	ret, specificReturn := fake.getAttachCommandsByServiceReturnsOnCall[len(fake.getAttachCommandsByServiceArgsForCall)]
+	fake.getAttachCommandsByServiceArgsForCall = append(fake.getAttachCommandsByServiceArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetAttachCommandsByServiceStub
+	fakeReturns := fake.getAttachCommandsByServiceReturns
+	fake.recordInvocation("GetAttachCommandsByService", []interface{}{arg1, arg2})
+	fake.getAttachCommandsByServiceMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByServiceCallCount() int {
+	fake.getAttachCommandsByServiceMutex.RLock()
+	defer fake.getAttachCommandsByServiceMutex.RUnlock()
+	return len(fake.getAttachCommandsByServiceArgsForCall)
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByServiceCalls(stub func(context.Context, string) ([]*protos.Command, error)) {
+	fake.getAttachCommandsByServiceMutex.Lock()
+	defer fake.getAttachCommandsByServiceMutex.Unlock()
+	fake.GetAttachCommandsByServiceStub = stub
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByServiceArgsForCall(i int) (context.Context, string) {
+	fake.getAttachCommandsByServiceMutex.RLock()
+	defer fake.getAttachCommandsByServiceMutex.RUnlock()
+	argsForCall := fake.getAttachCommandsByServiceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByServiceReturns(result1 []*protos.Command, result2 error) {
+	fake.getAttachCommandsByServiceMutex.Lock()
+	defer fake.getAttachCommandsByServiceMutex.Unlock()
+	fake.GetAttachCommandsByServiceStub = nil
+	fake.getAttachCommandsByServiceReturns = struct {
+		result1 []*protos.Command
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, result1 []*protos.Command, result2 error) {
+	fake.getAttachCommandsByServiceMutex.Lock()
+	defer fake.getAttachCommandsByServiceMutex.Unlock()
+	fake.GetAttachCommandsByServiceStub = nil
+	if fake.getAttachCommandsByServiceReturnsOnCall == nil {
+		fake.getAttachCommandsByServiceReturnsOnCall = make(map[int]struct {
+			result1 []*protos.Command
+			result2 error
+		})
+	}
+	fake.getAttachCommandsByServiceReturnsOnCall[i] = struct {
+		result1 []*protos.Command
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeIServerClient) HeartBeat(arg1 context.Context, arg2 string) error {
@@ -141,19 +221,20 @@ func (fake *FakeIServerClient) HeartBeatReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIServerClient) NewAudience(arg1 context.Context, arg2 *protos.Audience) error {
+func (fake *FakeIServerClient) NewAudience(arg1 context.Context, arg2 *protos.Audience, arg3 string) error {
 	fake.newAudienceMutex.Lock()
 	ret, specificReturn := fake.newAudienceReturnsOnCall[len(fake.newAudienceArgsForCall)]
 	fake.newAudienceArgsForCall = append(fake.newAudienceArgsForCall, struct {
 		arg1 context.Context
 		arg2 *protos.Audience
-	}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
 	stub := fake.NewAudienceStub
 	fakeReturns := fake.newAudienceReturns
-	fake.recordInvocation("NewAudience", []interface{}{arg1, arg2})
+	fake.recordInvocation("NewAudience", []interface{}{arg1, arg2, arg3})
 	fake.newAudienceMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
@@ -167,17 +248,17 @@ func (fake *FakeIServerClient) NewAudienceCallCount() int {
 	return len(fake.newAudienceArgsForCall)
 }
 
-func (fake *FakeIServerClient) NewAudienceCalls(stub func(context.Context, *protos.Audience) error) {
+func (fake *FakeIServerClient) NewAudienceCalls(stub func(context.Context, *protos.Audience, string) error) {
 	fake.newAudienceMutex.Lock()
 	defer fake.newAudienceMutex.Unlock()
 	fake.NewAudienceStub = stub
 }
 
-func (fake *FakeIServerClient) NewAudienceArgsForCall(i int) (context.Context, *protos.Audience) {
+func (fake *FakeIServerClient) NewAudienceArgsForCall(i int) (context.Context, *protos.Audience, string) {
 	fake.newAudienceMutex.RLock()
 	defer fake.newAudienceMutex.RUnlock()
 	argsForCall := fake.newAudienceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeIServerClient) NewAudienceReturns(result1 error) {
@@ -397,6 +478,8 @@ func (fake *FakeIServerClient) SendMetricsReturnsOnCall(i int, result1 error) {
 func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.getAttachCommandsByServiceMutex.RLock()
+	defer fake.getAttachCommandsByServiceMutex.RUnlock()
 	fake.heartBeatMutex.RLock()
 	defer fake.heartBeatMutex.RUnlock()
 	fake.newAudienceMutex.RLock()
