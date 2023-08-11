@@ -194,6 +194,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
 	case *protos.BusEvent_ResumePipelineRequest:
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
+	case *protos.BusEvent_MetricsRequest:
+		err = b.handleMetricsRequest(shutdownCtx, busEvent.GetMetricsRequest())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}

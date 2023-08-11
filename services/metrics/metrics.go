@@ -82,7 +82,7 @@ var defaultCounters = []*defaultCounter{
 	{
 		Name:        "counter_notify",
 		Description: "Number of errors encountered by produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name", "config_id", "config_name"},
+		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
 	},
 }
 
@@ -185,6 +185,7 @@ func validateConfig(cfg *Config) error {
 }
 
 func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error {
+	m.log.Debugf("received metrics request: %v", req.Metrics)
 	for _, metric := range req.Metrics {
 		counter := m.getVecCounter(ctx, metric.Name)
 		if counter == nil {

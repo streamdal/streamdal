@@ -723,7 +723,7 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 	cfgs := make([]*protos.NotificationConfig, 0)
 
 	// Fetch all notify config keys from NATS
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
+	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
 	if err != nil {
 		if err == nats.ErrBucketNotFound {
 			return cfgs, nil

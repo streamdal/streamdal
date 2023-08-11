@@ -126,6 +126,8 @@ func (n *Notify) Queue(ctx context.Context, req *protos.NotifyRequest) error {
 		return errors.Wrap(err, "notify config not found")
 	}
 
+	fmt.Printf("GOT configs for pipeline %s: %+v\n", req.PipelineId, configs)
+
 	n.eventChan <- &Notification{
 		Req:      req,
 		Pipeline: pipeline,
@@ -269,9 +271,9 @@ func (n *Notify) handleSlack(ctx context.Context, event *Notification, cfg *prot
 	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Snitch Alert", false, false))
 
 	sectionBlock := slack.NewSectionBlock(nil, []*slack.TextBlockObject{
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline ID*: \n%s\n", event.Pipeline.Id), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("Pipeline Name*: \n%s\n", event.Pipeline.Name), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("Step Name*: \n%s\n", event.Req.StepName), false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline ID*: %s\n", event.Pipeline.Id), false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline Name*: %s\n", event.Pipeline.Name), false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Step Name*: %s\n", event.Req.StepName), false, false),
 	}, nil)
 
 	// Divider before buttons
