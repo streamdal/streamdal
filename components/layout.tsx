@@ -1,6 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { NavBar } from "./nav/nav.tsx";
 import { ComponentChildren } from "https://esm.sh/v128/preact@10.15.1/src/index.d.ts";
+import { ReactFlowProvider } from "reactflow";
 
 export type MetaProps = {
   title?: string;
@@ -40,7 +41,9 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
       <div className="flex flex-col w-screen h-screen text-web">
         {hideNav ? null : <NavBar />}
         <div className="h-screen w-screen">
-          {children}
+          <ReactFlowProvider>
+            {children}
+          </ReactFlowProvider>
         </div>
       </div>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js">

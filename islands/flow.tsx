@@ -1,259 +1,203 @@
-import ReactFlow, { Background, Controls, useEdgesState } from "reactflow";
+import ReactFlow, {
+  Background,
+  Controls,
+  MarkerType,
+  useEdgesState,
+  useNodesState,
+} from "reactflow";
 import {
   Component,
-  Consumer,
-  Producer,
+  Group,
+  Operation,
   Service,
 } from "../components/customNodes.tsx";
-import {
-  MarkerType,
-  useNodesState,
-} from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
 import "flowbite";
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "https://esm.sh/preact@10.15.1/hooks";
-import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
+import { Audience, OperationType } from "snitch-protos/protos/common.ts";
+import { ServiceMap } from "../routes/index.tsx";
+import { titleCase } from "../lib/utils.ts";
 
 const nodeTypes = {
-  component: Component,
-  producer: Producer,
-  consumer: Consumer,
   service: Service,
+  component: Component,
+  consumerGroup: Group,
+  producerGroup: Group,
+  producer: Operation,
+  consumer: Operation,
+};
+
+export type NodeData = {
+  label: string;
+  audience: Audience;
 };
 
 export type Node = {
   id: string;
-  type: string;
+  type?: string;
   dragHandle: string;
   position: {
     x: number;
     y: number;
   };
-  zIndex?: number;
-  data: {
-    label: string;
-  };
+  sourcePosition?: string;
+  targetPosition?: string;
+  data: NodeData;
+  parentNode?: string;
+  extent?: string;
+  style?: any;
 };
 
-const flowKey = "flow-storage";
+export type Edge = {
+  id: string;
+  source: string;
+  target: string;
+  markerEnd: any;
+  style: any;
+};
 
-export default function Flow({ data }: { data: GetServiceMapResponse }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgeChange] = useEdgesState([]);
-  const [rfInstance, setRfInstance] = useState<any>();
-
-  const example = [
-    {
-      audience: {
-        serviceName: "Test Service Name",
-        componentName: "kafka",
-        operationType: 1,
-      },
+export const mapOperation = (
+  nodesMap: Map<string, Node>,
+  a: Audience,
+) => {
+  const op = OperationType[a.operationType].toLowerCase();
+  nodesMap.set(`${a.serviceName}-${a.componentName}-${op}`, {
+    id: `${a.serviceName}-${a.componentName}-${op}`,
+    type: `${op}Group`,
+    sourcePosition: "right",
+    targetPosition: "left",
+    dragHandle: "#dragHandle",
+    position: { x: op === "consumer" ? 25 : 350, y: 200 },
+    data: {
+      label: `${titleCase(op)} group`,
+      audience: a,
     },
-    {
-      audience: {
-        serviceName: "Test Service Name",
-        componentName: "kafka",
-        operationType: 2,
-      },
-    },
-    {
-      audience: {
-        serviceName: "Test Service Name",
-        componentName: "kafka",
-        operationType: 2,
-      },
-    },
-    {
-      audience: {
-        serviceName: "Test Service Name",
-        componentName: "kafka",
-        operationType: 1,
-      },
-    },
-    {
-      audience: {
-        serviceName: "Test Service Name",
-        componentName: "kafka",
-        operationType: 2,
-      },
-    },
-  ];
+  });
 
-  useEffect(() => {
-    //todo: add functionality for more than one service and component
-    // console.log(localStorage[flowKey]);
-    const keys = Object.keys(data.serviceMap);
-    const serviceMap = data.serviceMap;
-    //toDo: wire up localStorage (sort of working but need to refine)
-    // if (localStorage[flowKey]) {
-    //     const flow = JSON.parse(localStorage[flowKey]);
+  nodesMap.set(a.operationName, {
+    id: a.operationName,
+    type: op,
+    dragHandle: "#dragHandle",
+    position: { x: 15, y: a.operationName.includes("two") ? 96 : 24 },
+    parentNode: `${a.serviceName}-${a.componentName}-${op}`,
+    extent: "parent",
+    data: {
+      label: a.operationName,
+      instances: 0,
+      pipeline: {},
+      audience: a,
+    },
+  });
+};
 
-    //     if (flow) {
-    //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-    //       setNodes(flow.nodes || []);
-    //       setEdges(flow.edges || []);
-    //     }
-    // } else {
-    const nodes = [
-      {
-        id: "1",
-        type: "service",
-        dragHandle: "#dragHandle",
-        position: { x: 150, y: 0 },
-        data: { label: `${serviceMap[keys[0]].name}` },
-      },
-      {
-        id: "10",
-        type: "component",
-        sourcePosition: "right",
-        targetPosition: "left",
-        position: { x: 215, y: 350 },
-        data: {
-          label: `${serviceMap[keys[0]].pipelines[0].audience
-            ?.componentName}`,
-        },
-      },
-    ];
-    // console.log([...nodes, ...getOperation(example)]);
+export const mapNodes = (audiences: Audience[]): Map<string, Node> => {
+  const nodesMap = new Map<string, Node>();
 
-    setNodes([
-      ...nodes,
-      ...getOperation(serviceMap[keys[0]].pipelines),
-      // ...getOperation(example),
-    ]);
-    // }
-  }, []);
-
-  useEffect(() => {
-    //edges created based off the nodes created
-    const unique = nodes.reduce((acc: [], node: Node) => {
-      if (!acc.length || !acc.find((item: Node) => item.type === node.type)) {
-        return [...acc, node];
-      } else {
-        return acc;
-      }
-    }, []);
-    const newEdges = unique.map((node: Node, i: number) => {
-      let targetNode;
-      switch (node.type) {
-        case ("service"):
-          targetNode = nodes.find((node: Node) => node.type === "producer");
-          break;
-        case ("producer"):
-          targetNode = nodes.find((node: Node) => node.type === "component");
-          break;
-        case ("component"):
-          targetNode = nodes.find((node: Node) => node.type === "consumer");
-          break;
-        case ("consumer"):
-          targetNode = nodes.find((node: Node) => node.type === "service");
-          break;
-      }
-      return {
-        id: i,
-        source: node.id,
-        target: `${targetNode?.id}`,
-        markerEnd: {
-          type: MarkerType.Arrow,
-          width: 20,
-          height: 20,
-          color: "#956CFF",
-        },
-        style: {
-          strokeWidth: 1.5,
-          stroke: "#956CFF",
-        },
-      };
+  audiences.forEach((a: Audience, i: number) => {
+    nodesMap.set(a.serviceName, {
+      id: a.serviceName,
+      type: "service",
+      dragHandle: "#dragHandle",
+      position: { x: 150, y: 0 },
+      data: { label: a.serviceName, audience: a },
     });
-    setEdges(newEdges);
-  }, [nodes]);
 
-  useEffect(() => {
-    if (nodes) {
-      setStorage();
-    }
-  }, [edges, nodes]);
+    nodesMap.set(a.componentName, {
+      id: a.componentName,
+      type: "component",
+      sourcePosition: "right",
+      targetPosition: "left",
+      dragHandle: "#dragHandle",
+      position: { x: 215, y: 440 },
+      data: { label: a.componentName, audience: a },
+    });
 
-  const getOperation = (pipeline: PipelineInfo[]) => {
-    //creates producer and consumer nodes based on audience data. Messy and seperated because node groupings based on seperate consumers and producers
-    //had to hack in the zIndex as the reactFlow native zIndex wasn't working
-    const consumers = pipeline.filter((info) =>
-      info.audience?.operationType === 1
-    );
-    const consumerNodes = consumers.map(
-      (component: PipelineInfo, i: number) => {
-        const isCovered = i !== 0 ? true : false;
-        return {
-          id: `${2000 + i}`,
-          type: "consumer",
-          dragHandle: "#dragHandle",
-          position: isCovered
-            ? { x: 0 - (i * 4), y: 0 + (i * 4) }
-            : { x: 50, y: 200 },
-          style: { zIndex: isCovered ? 20 - i : 20 },
-          ...(isCovered && { parentNode: "2000" }),
-          data: {
-            label: component.audience?.operationName,
-            source: "bottom",
-            target: "top",
-            instances: i === 0 && consumers.length,
-            pipeline: component,
-          },
-        };
+    mapOperation(nodesMap, a);
+  });
+
+  return nodesMap;
+};
+
+//
+// There each audience there are a pair of edges, one for each arrow:
+// consumers: component -> consumer group -> service
+// producers: service -> producer group -> component
+export const mapEdgePair = (
+  edgesMap: Map<string, Edge>,
+  a: Audience,
+): Map<string, Edge> => {
+  const op = OperationType[a.operationType].toLowerCase();
+  edgesMap.set(`${a.componentName}-${op}`, {
+    id: `${a.componentName}-${op}`,
+    ...op === "consumer"
+      ? {
+        source: a.componentName,
+        target: `${a.serviceName}-${a.componentName}-${op}`,
+      }
+      : {
+        source: `${a.serviceName}-${a.componentName}-${op}`,
+        target: a.componentName,
       },
-    );
+    markerEnd: {
+      type: MarkerType.Arrow,
+      width: 20,
+      height: 20,
+      color: "#956CFF",
+    },
+    style: {
+      strokeWidth: 1.5,
+      stroke: "#956CFF",
+    },
+  });
 
-    const producers = pipeline.filter((info) =>
-      info.audience?.operationType === 2
-    );
-    const producerNodes = producers.map(
-      (component: PipelineInfo, i: number) => {
-        const isCovered = i !== 0 ? true : false;
-        return {
-          id: `${1000 + i}`,
-          type: "producer",
-          dragHandle: "#dragHandle",
-          position: isCovered
-            ? { x: 0 - (i * 4), y: 0 + (i * 4) }
-            : { x: 325, y: 200 },
-          style: { zIndex: isCovered ? 20 - i : 20 },
-          ...(i > 0 && { parentNode: "1000" }),
-          data: {
-            label: component.audience?.operationName,
-            source: "bottom",
-            target: "top",
-            instances: i === 0 && producers.length,
-            pipeline: component,
-          },
-        };
+  edgesMap.set(`${a.serviceName}-${op}`, {
+    id: `${a.serviceName}-${op}`,
+    ...op === "consumer"
+      ? {
+        source: `${a.serviceName}-${a.componentName}-${op}`,
+        target: a.serviceName,
+      }
+      : {
+        source: a.serviceName,
+        target: `${a.serviceName}-${a.componentName}-${op}`,
       },
-    );
-    return [consumerNodes, producerNodes].flat();
-  };
+    markerEnd: {
+      type: MarkerType.Arrow,
+      width: 20,
+      height: 20,
+      color: "#956CFF",
+    },
+    style: {
+      strokeWidth: 1.5,
+      stroke: "#956CFF",
+    },
+  });
 
-  const setStorage = useCallback(() => {
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-      localStorage.setItem(flowKey, JSON.stringify(flow));
-    }
-  }, [rfInstance]);
+  return edgesMap;
+};
+
+export const mapEdges = (audiences: Audience[]): Map<string, Edge> => {
+  const edgesMap = new Map<string, Edge>();
+  audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a));
+  return edgesMap;
+};
+
+export default function Flow({ audiences, pipes }: ServiceMap) {
+  const [edges, setEdges] = useEdgesState(
+    Array.from(mapEdges(audiences).values()),
+  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    Array.from(mapNodes(audiences).values()),
+  );
 
   return (
     <div
       style={{ width: "100%", height: "100vh" }}
-      class="m-0 z-10"
+      class="m-0"
     >
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}
         edges={edges}
         nodeTypes={nodeTypes}
-        onInit={setRfInstance}
         defaultViewport={{
           x: 0,
           y: 150,

@@ -1,25 +1,19 @@
 import { Handle, Position } from "reactflow";
-import { NodeMenu, ServiceNodeMenu } from "./rules/participantsMenu.tsx";
-import IconGripVertical from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/grip-vertical.tsx";
+import { ServiceNodeMenu } from "./rules/participantsMenu.tsx";
+import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import "flowbite";
 import "twind";
-import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import { useState } from "preact/hooks";
 import { ConsumerIcon } from "./icons/consumer.tsx";
 import { ProducerIcon } from "./icons/producer.tsx";
-import { PipelineInfo } from "snitch-protos/protos/info.ts";
-
-type ActorNodeData = {
-  label: string;
-  source?: string;
-  target?: string;
-  instances: number;
-  pipeline: PipelineInfo;
-};
+import { NodeData } from "../islands/flow.tsx";
+import { OperationType } from "snitch-protos/protos/common.ts";
+import { titleCase } from "../lib/utils.ts";
 
 export const Service = ({ data }: { data: { label: string } }) => {
   return (
-    <div class="h-[100px]">
-      <div class="h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
+    <div>
+      <div class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
         <IconGripVertical
           class="w-6 h-6 text-purple-100 cursor-grab"
           id="dragHandle"
@@ -56,127 +50,107 @@ export const Service = ({ data }: { data: { label: string } }) => {
   );
 };
 
-export const Producer = ({ data }: { data: ActorNodeData }) => {
+export const Group = ({ data }: { data: NodeData }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const producer = OperationType[data.audience.operationType] ==
+    OperationType[OperationType.PRODUCER];
 
   const handleModalOpen = () => {
     setIsOpen(true);
   };
 
   return (
-    <div className="h-[96px] flex items-center z-40">
+    <div
+      class={`rounded-lg shadow-lg border-1 border-purple-200 min-w-[280px] ${
+        producer ? "min-h-[200px]" : "min-h-[140px]"
+      }`}
+    >
+      {/*<NodeResizeControl minWidth={100} minHeight={50}>*/}
+      {/*  <IconResize class="w-6 h-6" />*/}
+      {/*</NodeResizeControl>*/}
       <div
         data-popover-target="popover"
         data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
-        className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
+        class="flex flex-row items-center my-2"
       >
         <IconGripVertical
-          class="w-6 h-6 text-purple-100 cursor-grab"
+          class="w-6 h-6 ml-2 text-purple-100 cursor-grab bg-white border border-purple-200"
           id="dragHandle"
         />
-        <ProducerIcon />
-        {data.pipeline.audience && (
-          <a
-            href={`/service/${
-              encodeURIComponent(data.pipeline.audience.serviceName)
-            }/component/${
-              encodeURIComponent(data.pipeline.audience.componentName)
-            }/${
-              data.pipeline.audience.operationType === 1
-                ? "consumer"
-                : "producer"
-            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
-          >
-            <div className={"flex flex-col p-1"}>
-              <h2 className={"text-[16px]"}>
-                {data.label}
-              </h2>
-              <h3 class="text-xs text-gray-500">Producer</h3>
-            </div>
-          </a>
-        )}
-        <NodeMenu data={data.pipeline} />
+        <div class="ml-2">{data.label}</div>
       </div>
-      <div
-        data-popover
-        id="popover"
-        role="tooltip"
-        class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-      >
-        <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-          <h3 class="font-semibold text-gray-900 dark:text-white">
-            Popover no arrow
-          </h3>
-        </div>
-        <div class="px-3 py-2">
-          <p>And here's some amazing content. It's very engaging. Right?</p>
-        </div>
-      </div>
-      <span class="sr-only">Notifications</span>
-      {data.instances && (
-        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-          {data.instances}
-        </div>
-      )}
+
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={producer ? Position.Bottom : Position.Top}
         style={{ opacity: 0 }}
       />
       <Handle
         type="target"
-        position={Position.Top}
+        position={producer ? Position.Top : Position.Bottom}
         style={{ opacity: 0 }}
       />
     </div>
   );
 };
 
-export const Consumer = ({ data }: { data: ActorNodeData }) => {
+export const Operation = ({ data }: { data: NodeData }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const producer = OperationType[data.audience.operationType] ==
+    OperationType[OperationType.PRODUCER];
 
   const handleModalOpen = () => {
     setIsOpen(true);
   };
 
   return (
-    <div className="h-[96px] flex items-center">
+    <div className="h-[96px] flex flex-row justify-start items-center">
       <div
         data-popover-target="popover"
         data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
-        className="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
+        class="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
       >
-        <IconGripVertical
-          class="w-6 h-6 text-purple-100 cursor-grab"
-          id="dragHandle"
-        />
+        <div class="w-[12%]">
+          <IconGripVertical
+            class="w-6 h-6 text-purple-100 cursor-grab"
+            id="dragHandle"
+          />
+        </div>
 
-        <ConsumerIcon className={"mx-2"} />
-        {data.pipeline.audience && (
-          <a
-            href={`/service/${
-              encodeURIComponent(data.pipeline.audience.serviceName)
-            }/component/${
-              encodeURIComponent(data.pipeline.audience.componentName)
-            }/${
-              data.pipeline.audience.operationType === 1
-                ? "consumer"
-                : "producer"
-            }/op/${encodeURIComponent(data.pipeline.audience.operationName)}`}
-          >
-            <div className={"flex flex-col p-1"}>
-              <h2 className={"text-[16px] text-center"}>
-                {data.label}
-              </h2>
-              <h3 class="text-xs text-gray-500">Consumer</h3>
-            </div>
-          </a>
-        )}
-        <NodeMenu data={data.pipeline} />
+        <div class="w-[12%]">
+          {producer
+            ? <ProducerIcon class="w-5 h-5" />
+            : <ConsumerIcon class="w-5 h-5" />}
+        </div>
+        <div class="w-[76%]">
+          {data.audience && (
+            <a
+              href={`/service/${
+                encodeURIComponent(data.audience.serviceName)
+              }/component/${encodeURIComponent(data.audience.componentName)}/${
+                OperationType[data.audience.operationType]
+              }/op/${encodeURIComponent(data.audience.operationName)}`}
+            >
+              <div
+                class={"flex flex-col justify-start p-1"}
+              >
+                <h2
+                  class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
+                >
+                  {data.label}
+                </h2>
+                <h3 class="text-xs text-gray-500">
+                  {titleCase(OperationType[data.audience.operationType])}
+                </h3>
+              </div>
+            </a>
+          )}
+        </div>
+        {/*<NodeMenu data={data.pipeline} />*/}
       </div>
       <div
         data-popover
@@ -194,11 +168,11 @@ export const Consumer = ({ data }: { data: ActorNodeData }) => {
         </div>
       </div>
       <span class="sr-only">Notifications</span>
-      {data.instances && (
-        <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">
-          {data.instances}
-        </div>
-      )}
+      {/*{data.instances && (*/}
+      {/*  <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">*/}
+      {/*    {data.instances}*/}
+      {/*  </div>*/}
+      {/*)}*/}
       <Handle
         type="source"
         position={Position.Top}

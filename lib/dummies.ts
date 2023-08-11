@@ -1,3 +1,7 @@
+import { GetAllResponse } from "snitch-protos/protos/external.ts";
+import { OperationType } from "snitch-protos/protos/common.ts";
+import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
+
 export const dummyPipelines = [{
   id: "1234-1234-123456",
   name: "Best pipeline",
@@ -78,109 +82,72 @@ export const dummyPipelines = [{
   ],
 }];
 
-export const dummyServiceMap = {
-  serviceMap: {
-    "Test Service Name": {
-      name: "Test Service Name",
-      description: "This is a test service",
-      pipelines: [
-        {
-          audience: {
-            serviceName: "Test Service Name",
-            componentName: "kafka",
-            operationType: 1,
-            operationName: "consumer-name",
-          },
-          pipeline: {
-            id: "1234-1234-123456",
-            name: "Best pipeline",
-            steps: [
-              {
-                name: "Best step",
-                onSuccess: [],
-                onFailure: [1],
-                step: {
-                  oneofKind: "detective",
-                  detective: {
-                    path: "object.field",
-                    args: [],
-                    negate: false,
-                    type: 1006,
-                  },
-                },
-                WasmId: "",
-                WasmBytes: [],
-                WasmFunction: "",
+export const audiences = [{
+  serviceName: "Test Service Name",
+  componentName: "kafka",
+  operationType: OperationType.CONSUMER,
+  operationName: "consume-kafka",
+}, {
+  serviceName: "Test Service Name",
+  componentName: "kafka",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce-kafka",
+}, {
+  serviceName: "Test Service Name",
+  componentName: "kafka",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce-kafka-two",
+}];
+
+export const dummyServiceMap: GetAllResponse = {
+  audiences,
+  live: [],
+  pipelines: {
+    "1234-1234-123456": {
+      audiences,
+      paused: audiences,
+      pipeline: {
+        id: "1234-1234-123456",
+        name: "Best pipeline",
+        steps: [
+          {
+            name: "Best step",
+            onSuccess: [],
+            onFailure: [1],
+            step: {
+              oneofKind: "detective",
+              detective: {
+                path: "object.field",
+                args: [],
+                type: DetectiveType.NUMERIC_EQUAL_TO,
               },
-            ],
+            },
           },
-        },
-        {
-          audience: {
-            serviceName: "Test Service Name",
-            componentName: "kafka",
-            operationType: 2,
-            operationName: "producer-name",
-          },
-          pipeline: {
-            id: "1234-1234-123456",
-            name: "Best pipeline",
-            steps: [
-              {
-                name: "Best step",
-                onSuccess: [],
-                onFailure: [1],
-                step: {
-                  oneofKind: "detective",
-                  detective: {
-                    path: "object.field",
-                    args: [],
-                    negate: false,
-                    type: 1006,
-                  },
-                },
-                WasmId: "",
-                WasmBytes: [],
-                WasmFunction: "",
+        ],
+      },
+    },
+    "5555-4444-3333": {
+      audiences,
+      paused: audiences,
+      pipeline: {
+        id: "5555-4444-3333",
+        name: "Substandard pipeline",
+        steps: [
+          {
+            name: "Ok pipeline step",
+            onSuccess: [],
+            onFailure: [1],
+            step: {
+              oneofKind: "detective",
+              detective: {
+                path: "object.field",
+                args: [],
+                type: DetectiveType.HOSTNAME,
               },
-            ],
+            },
           },
-        },
-        {
-          audience: {
-            serviceName: "Test Service Name",
-            componentName: "kafka",
-            operationType: 1,
-            operationName: "consumer-billing",
-          },
-          pipeline: {
-            id: "1234-1234-123456",
-            name: "Best pipeline",
-            steps: [
-              {
-                name: "Best step",
-                onSuccess: [],
-                onFailure: [1],
-                step: {
-                  oneofKind: "detective",
-                  detective: {
-                    path: "object.field",
-                    args: [],
-                    negate: false,
-                    type: 1006,
-                  },
-                },
-                WasmId: "",
-                WasmBytes: [],
-                WasmFunction: "",
-              },
-            ],
-          },
-        },
-      ],
-      consumers: [],
-      producers: [],
-      clients: [],
+        ],
+      },
     },
   },
 };

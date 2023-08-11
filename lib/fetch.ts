@@ -1,21 +1,20 @@
-import { dummyServiceMap } from "./dummies.ts";
 import { client, meta } from "./grpc.ts";
+import { GetAllResponse } from "snitch-protos/protos/external.ts";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import { dummyServiceMap } from "./dummies.ts";
 
-export const getServiceMap = async () => {
-  try {
-    const { response } = await client.getServiceMap({}, meta);
+export type ServiceMap = GetAllResponse & { pipes: PipelineInfo[] };
 
-    return response;
-  } catch (error) {
-    console.error("error fetching service map", error);
-    console.log("returning dummy data instead");
-    return dummyServiceMap;
-  }
+export const getServiceMap = async (): Promise<ServiceMap> => {
+  // const { response } = await client.getAll({}, meta);
+  return {
+    ...dummyServiceMap,
+    pipes: Object.values(dummyServiceMap?.pipelines),
+  };
 };
 
 export const getPipelines = async () => {
   const { response } = await client.getPipelines({}, meta);
-
   return response?.pipelines?.sort((a, b) => a.name.localeCompare(b.name));
 };
 
