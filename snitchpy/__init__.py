@@ -120,6 +120,9 @@ class SnitchClient:
         for aud in self.cfg.audiences:
             self.add_audience(aud)
 
+        # Pull initial pipelines
+        self._pull_initial_pipelines()
+
         # Start heartbeat
         heartbeat = Thread(target=self._heartbeat, daemon=False)
         heartbeat.start()
@@ -131,6 +134,20 @@ class SnitchClient:
         self.workers.append(register)
 
         self.log.debug("Client started")
+
+    def _pull_initial_pipelines(self):
+        async def call():
+            req = protos.GetAttachCommandsByServiceRequest(
+                service_name=self.cfg.service_name
+            )
+            cmds = await self.grpc_stub.get_attach_commands_by_service(
+                req, metadata=self._get_metadata()
+            )
+
+            for cmd in cmds.commands:
+                self._attach_pipeline(cmd)
+
+        self.grpc_loop.run_until_complete(call())
 
     @staticmethod
     def _validate_config(cfg: SnitchConfig) -> None:
@@ -173,7 +190,7 @@ class SnitchClient:
             return
 
         async def call():
-            req = protos.NewAudienceRequest(audience=aud)
+            req = protos.NewAudienceRequest(audience=aud, session_id=self.session_id)
             await self.grpc_stub.new_audience(
                 req, timeout=self.grpc_timeout, metadata=self._get_metadata()
             )
