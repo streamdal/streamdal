@@ -473,7 +473,7 @@ func (s *Snitch) handleConditions(
 	for _, condition := range conditions {
 		switch condition {
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
-			s.config.Logger.Debugf("Step '%s' failed, notifying", step.Name)
+			s.config.Logger.Debugf("Step '%s' condition triggered, notifying", step.Name)
 			if !s.config.DryRun {
 				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
 					s.config.Logger.Errorf("failed to notify condition: %v", err)
