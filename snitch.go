@@ -404,6 +404,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
 				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
+
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -414,6 +415,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
+
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -424,6 +428,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
 				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
+
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -433,6 +440,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 					}, nil
 				}
 			default:
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
