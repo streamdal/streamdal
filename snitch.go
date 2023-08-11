@@ -409,6 +409,18 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
 					}, nil
 				}
+			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
+				s.config.Logger.Debugf("Step '%s' returned exit code internal error", step.Name)
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
+				if !shouldContinue {
+					return &ProcessResponse{
+						Data:    wasmResp.Output,
+						Error:   true,
+						Message: "detective step failed:" + wasmResp.ExitMsg,
+					}, nil
+				}
+			default:
+				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
 			data = wasmResp.Output
