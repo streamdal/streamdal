@@ -151,12 +151,14 @@ func (m *Metrics) newCounter(e *types.CounterEntry) *counter {
 	m.counterMapMutex.Lock()
 	defer m.counterMapMutex.Unlock()
 
-	m.counterMap[CompositeID(e)] = &counter{
+	c := &counter{
 		entry:      e,
 		countMutex: &sync.RWMutex{},
 	}
 
-	return m.counterMap[CompositeID(e)]
+	m.counterMap[CompositeID(e)] = c
+
+	return c
 }
 
 func (m *Metrics) getCounter(e *types.CounterEntry) (*counter, bool) {
@@ -175,7 +177,7 @@ func (m *Metrics) getCounters() map[string]*counter {
 	m.counterMapMutex.RLock()
 	defer m.counterMapMutex.RUnlock()
 
-	localCounters := make(map[string]*counter, 0)
+	localCounters := make(map[string]*counter)
 
 	for counterID, counter := range m.counterMap {
 		localCounters[counterID] = counter
@@ -187,10 +189,12 @@ func (m *Metrics) getCounters() map[string]*counter {
 func (m *Metrics) incr(_ context.Context, entry *types.CounterEntry) error {
 	// No need to validate - no way to reach here without validation
 	c, ok := m.getCounter(entry)
-	if !ok {
-		c = m.newCounter(entry)
+	if ok {
+		c.incr(entry)
+		return nil
 	}
 
+	c = m.newCounter(entry)
 	c.incr(entry)
 
 	return nil
