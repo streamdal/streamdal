@@ -86,15 +86,6 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 		labels[k] = v
 	}
 
-	// Only pass these labels if set.
-	// Prometheus is not able to handle variable labels.
-	if counter.RuleID != "" {
-		labels["rule_id"] = counter.RuleID
-		labels["ruleset_id"] = counter.RuleSetID
-	}
-
-	labels["type"] = string(counter.Type)
-
 	req := &protos.MetricsRequest{
 		Metrics: []*protos.Metrics{
 			{

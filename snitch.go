@@ -30,10 +30,8 @@ import (
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
+	"github.com/streamdal/snitch-go-client/types"
 )
-
-// Module is a constant that represents which type of WASM module we will run the pipelines against
-type Module string
 
 // OperationType is a constant that represents whether we are publishing or consuming,
 // it must match the protobuf enum of the rule
@@ -54,12 +52,6 @@ const (
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to snitch server
 	ReconnectSleep = time.Second * 5
 
-	// Match is the name of the WASM module that contains the match function
-	Match Module = "match"
-
-	// Transform is the name of the WASM module that contains the transform function
-	Transform Module = "transform"
-
 	// MaxPayloadSize is the maximum size of data that can be sent to the WASM module
 	MaxPayloadSize = 1024 * 1024 // 1Mi
 
@@ -74,7 +66,7 @@ var (
 
 	// ErrMessageDropped is returned when a message is dropped by the plumber data pipelines
 	// An end user may check for this error and handle it accordingly in their code
-	ErrMessageDropped = errors.New("message dropped by plumber data pipelines")
+	//ErrMessageDropped = errors.New("message dropped by plumber data pipelines")
 
 	ErrEmptyCommand = errors.New("command cannot be empty")
 )
@@ -342,13 +334,30 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	data := req.Data
-	payloadSize := len(data)
+	payloadSize := int64(len(data))
 
 	aud := &protos.Audience{
 		ServiceName:   s.config.ServiceName,
 		ComponentName: req.ComponentName,
 		OperationType: protos.OperationType(req.OperationType),
 		OperationName: req.OperationName,
+	}
+
+	labels := map[string]string{
+		"service":        s.config.ServiceName,
+		"component_name": req.ComponentName,
+		"operation_name": req.OperationName,
+		"pipeline_name":  "",
+		"pipeline_id":    "",
+	}
+
+	counterError := types.ConsumeErrorCount
+	counterProcessed := types.ConsumeProcessedCount
+	counterBytes := types.ConsumeBytes
+	if req.OperationType == Produce {
+		counterError = types.ProduceErrorCount
+		counterProcessed = types.ProduceProcessedCount
+		counterBytes = types.ProduceBytes
 	}
 
 	pipelines := s.getPipelines(ctx, aud)
@@ -358,23 +367,27 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	if payloadSize > MaxPayloadSize {
-		//_ = s.metrics.Incr(ctx, &types.CounterEntry{
-		//	Name:   types.CounterSizeExceeded,
-		//	Type:   types.CounterTypeCount,
-		//	Labels: map[string]string{"service_name": s.ServiceName, "audience": audToStr(aud)},
-		//	Value:  1,
-		//})
+
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
 		s.config.Logger.Warn(msg)
 		return &ProcessResponse{Data: data, Error: true, Message: msg}, nil
 	}
 
-	for _, pipeline := range pipelines {
-		for _, step := range pipeline.GetAttachPipeline().GetPipeline().Steps {
+	for _, p := range pipelines {
+		pipeline := p.GetAttachPipeline().GetPipeline()
+		labels["pipeline_name"] = pipeline.Name
+		labels["pipeline_id"] = pipeline.Id
+
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize})
+
+		for _, step := range pipeline.Steps {
 			wasmResp, err := s.runStep(ctx, step, data)
 			if err != nil {
 				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
-				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
 						Data:    req.Data,
@@ -391,7 +404,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
 				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
-				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
+				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
@@ -401,7 +414,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
-				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
@@ -411,7 +424,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
 				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
-				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
@@ -446,6 +459,7 @@ func (s *Snitch) handleConditions(
 	pipeline *protos.Pipeline,
 	step *protos.PipelineStep,
 	aud *protos.Audience,
+	req *ProcessRequest,
 ) bool {
 	shouldContinue := true
 	for _, condition := range conditions {
@@ -456,6 +470,15 @@ func (s *Snitch) handleConditions(
 				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
 					s.config.Logger.Errorf("failed to notify condition: %v", err)
 				}
+
+				labels := map[string]string{
+					"service":        s.config.ServiceName,
+					"component_name": req.ComponentName,
+					"operation_name": req.OperationName,
+					"pipeline_name":  pipeline.Name,
+					"pipeline_id":    pipeline.Id,
+				}
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1})
 			}
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT:
 			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)

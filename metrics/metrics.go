@@ -29,7 +29,7 @@ const (
 var (
 	ErrMissingPlumberClient = errors.New("PlumberClient cannot be nil")
 	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
-	ErrEmptyEntryType       = errors.New("Type must be set")
+	ErrEmptyName            = errors.New("Name must be set")
 	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
 )
 
@@ -140,8 +140,8 @@ func (m *Metrics) validateCounterEntry(entry *types.CounterEntry) error {
 		return ErrMissingEntry
 	}
 
-	if entry.Type == "" {
-		return ErrEmptyEntryType
+	if entry.Name == "" {
+		return ErrEmptyName
 	}
 
 	return nil

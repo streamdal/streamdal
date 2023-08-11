@@ -171,6 +171,7 @@ func TestHandleConditions(t *testing.T) {
 
 	s := &Snitch{
 		serverClient: fakeClient,
+		metrics:      &metricsfakes.FakeIMetrics{},
 		config: &Config{
 			Logger: &loggerfakes.FakeLogger{},
 			DryRun: false,
@@ -180,11 +181,12 @@ func TestHandleConditions(t *testing.T) {
 	aud := &protos.Audience{}
 	pipeline := &protos.Pipeline{}
 	step := &protos.PipelineStep{}
+	req := &ProcessRequest{}
 
 	t.Run("notify condition", func(t *testing.T) {
 		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
 
-		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud)
+		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
 		if got != true {
 			t.Error("handleConditions() should return true")
 		}
@@ -196,7 +198,7 @@ func TestHandleConditions(t *testing.T) {
 	t.Run("abort condition", func(t *testing.T) {
 		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT}
 
-		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud)
+		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
 		if got != false {
 			t.Error("handleConditions() should return false")
 		}
