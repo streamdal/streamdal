@@ -40,11 +40,11 @@ type OperationType int
 type ClientType int
 
 const (
-	// Produce tells Process to run the pipelines against the produce ruleset
-	Produce OperationType = 1
+	// Producer tells Process to run the pipelines against the produce ruleset
+	Producer OperationType = 1
 
-	// Consume tells Process to run the pipelines against the consume ruleset
-	Consume OperationType = 2
+	// Consumer tells Process to run the pipelines against the consume ruleset
+	Consumer OperationType = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
@@ -354,7 +354,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
 	counterBytes := types.ConsumeBytes
-	if req.OperationType == Produce {
+	if req.OperationType == Producer {
 		counterError = types.ProduceErrorCount
 		counterProcessed = types.ProduceProcessedCount
 		counterBytes = types.ProduceBytes
