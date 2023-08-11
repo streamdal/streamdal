@@ -178,6 +178,7 @@ func New(cfg *Config) (*Snitch, error) {
 
 	cmds, err := s.serverClient.GetAttachCommandsByService(context.Background(), cfg.ServiceName)
 	for _, cmd := range cmds {
+		cfg.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
 		if err := s.attachPipeline(context.Background(), cmd); err != nil {
 			cfg.Logger.Errorf("failed to attach pipeline: %s", err)
 		}
@@ -285,6 +286,7 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 }
 
 func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
+	s.config.Logger.Debugf("Running step '%s'", step.Name)
 	// Get WASM module
 	f, err := s.getFunction(ctx, step)
 	if err != nil {
@@ -371,6 +373,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		for _, step := range pipeline.GetAttachPipeline().GetPipeline().Steps {
 			wasmResp, err := s.runStep(ctx, step, data)
 			if err != nil {
+				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -387,6 +390,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 			// Check on success and on-failures
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
+				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &ProcessResponse{
@@ -396,6 +400,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 					}, nil
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
+				s.config.Logger.Debugf("Step '%s' returned exit code failure", step.Name)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline.GetAttachPipeline().GetPipeline(), step, aud)
 				if !shouldContinue {
 					return &ProcessResponse{
