@@ -97,6 +97,16 @@ export const audiences = [{
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "produce kafka two long name",
+}, {
+  serviceName: "Test Service Name",
+  componentName: "kafka",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce kafka three",
+}, {
+  serviceName: "Test Service Name",
+  componentName: "kafka",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce kafka four",
 }];
 
 export const dummyServiceMap: GetAllResponse = {

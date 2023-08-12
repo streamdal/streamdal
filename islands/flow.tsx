@@ -17,6 +17,9 @@ import type { ServiceMap } from "../routes/index.tsx";
 import { titleCase } from "../lib/utils.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import {
+  group,
+} from "https://esm.sh/v128/@types/d3-array@3.0.5/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/index.d.ts";
 
 const nodeTypes = {
   service: Service,
@@ -32,6 +35,7 @@ export type AudiencePipeline = Audience & { pipeline?: Pipeline };
 export type NodeData = {
   label: string;
   audience: AudiencePipeline;
+  groupCount?: number;
 };
 
 export type Node = {
@@ -50,6 +54,17 @@ export type Node = {
   style?: any;
 };
 
+export type GroupCount = {
+  producer: number;
+  consumer: number;
+};
+//
+// group counts per service are used for vertical offset layout positions
+export type NodesMap = {
+  nodes: Map<string, Node>;
+  groupCount: Map<string, GroupCount>;
+};
+
 export type Edge = {
   id: string;
   source: string;
@@ -59,11 +74,16 @@ export type Edge = {
 };
 
 export const mapOperation = (
-  nodesMap: Map<string, Node>,
+  nodesMap: NodesMap,
   a: Audience,
 ) => {
   const op = OperationType[a.operationType].toLowerCase();
-  nodesMap.set(`${a.serviceName}-${a.componentName}-${op}`, {
+  const groupCount = nodesMap.groupCount.get(a.serviceName);
+  groupCount.producer = groupCount.producer + (op === "producer" ? 1 : 0);
+  groupCount.consumer = groupCount.consumer + (op === "consumer" ? 1 : 0);
+  nodesMap.groupCount.set(a.serviceName, groupCount);
+
+  nodesMap.nodes.set(`${a.serviceName}-${a.componentName}-${op}`, {
     id: `${a.serviceName}-${a.componentName}-${op}`,
     type: `${op}Group`,
     sourcePosition: "right",
@@ -73,14 +93,18 @@ export const mapOperation = (
     data: {
       label: `${titleCase(op)} group`,
       audience: a,
+      groupCount: groupCount[op],
     },
   });
 
-  nodesMap.set(a.operationName, {
+  nodesMap.nodes.set(a.operationName, {
     id: a.operationName,
     type: op,
     dragHandle: "#dragHandle",
-    position: { x: 15, y: a.operationName.includes("two") ? 96 : 24 },
+    position: {
+      x: 15,
+      y: 24 + (groupCount[op] === 1 ? 0 : (groupCount[op] - 1) * 70),
+    },
     parentNode: `${a.serviceName}-${a.componentName}-${op}`,
     extent: "parent",
     data: {
@@ -94,11 +118,14 @@ export const mapOperation = (
 
 export const mapNodes = (
   audiences: AudiencePipeline[],
-): Map<string, Node> => {
-  const nodesMap = new Map<string, Node>();
+): NodesMap => {
+  const nodesMap = {
+    nodes: new Map<string, Node>(),
+    groupCount: new Map<string, GroupCount>(),
+  };
 
   audiences.forEach((a: Audience, i: number) => {
-    nodesMap.set(a.serviceName, {
+    nodesMap.nodes.set(a.serviceName, {
       id: a.serviceName,
       type: "service",
       dragHandle: "#dragHandle",
@@ -106,17 +133,30 @@ export const mapNodes = (
       data: { label: a.serviceName, audience: a },
     });
 
-    nodesMap.set(a.componentName, {
+    if (!nodesMap.groupCount.has(a.serviceName)) {
+      nodesMap.groupCount.set(a.serviceName, { producer: 0, consumer: 0 });
+    }
+
+    mapOperation(nodesMap, a);
+
+    const groupCount = nodesMap.groupCount.get(a.serviceName);
+    const count = Math.max(
+      groupCount["producer"] || 1,
+      groupCount["consumer"] || 1,
+    );
+
+    nodesMap.nodes.set(a.componentName, {
       id: a.componentName,
       type: "component",
       sourcePosition: "right",
       targetPosition: "left",
       dragHandle: "#dragHandle",
-      position: { x: 215, y: 440 },
+      position: {
+        x: 215,
+        y: 350 + (count === 1 ? 0 : count - 1) * 70,
+      },
       data: { label: a.componentName, audience: a },
     });
-
-    mapOperation(nodesMap, a);
   });
 
   return nodesMap;
@@ -200,10 +240,10 @@ export default function Flow({ audiences, pipes }: ServiceMap) {
   const [edges, setEdges] = useEdgesState(
     Array.from(mapEdges(audiences).values()),
   );
+
+  const audiencePipelines = mapAudiencePipelines(audiences, pipes);
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    Array.from(
-      mapNodes(mapAudiencePipelines(audiences, pipes)).values(),
-    ),
+    Array.from(mapNodes(audiencePipelines).nodes.values()),
   );
 
   return (

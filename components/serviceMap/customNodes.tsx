@@ -9,6 +9,7 @@ import { NodeData } from "../../islands/flow.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
 import { removeWhitespace, titleCase } from "../../lib/utils.ts";
+import { audiences } from "../../lib/dummies.ts";
 
 export const Service = ({ data }: { data: { label: string } }) => {
   return (
@@ -59,11 +60,11 @@ export const Group = ({ data }: { data: NodeData }) => {
     setIsOpen(true);
   };
 
+  const height = 132 + ((data.groupCount - 1) * 64);
+
   return (
     <div
-      class={`rounded-lg shadow-lg border-1 border-purple-200 min-w-[280px] ${
-        producer ? "min-h-[200px]" : "min-h-[140px]"
-      }`}
+      class={`rounded-lg shadow-lg border-1 border-purple-200 min-w-[280px] min-h-[${height}px]`}
     >
       {/*<NodeResizeControl minWidth={100} minHeight={50}>*/}
       {/*  <IconResize class="w-6 h-6" />*/}
