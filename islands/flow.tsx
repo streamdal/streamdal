@@ -10,11 +10,13 @@ import {
   Group,
   Operation,
   Service,
-} from "../components/customNodes.tsx";
+} from "../components/serviceMap/customNodes.tsx";
 import "flowbite";
 import { Audience, OperationType } from "snitch-protos/protos/common.ts";
-import { ServiceMap } from "../routes/index.tsx";
+import type { ServiceMap } from "../routes/index.tsx";
 import { titleCase } from "../lib/utils.ts";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 
 const nodeTypes = {
   service: Service,
@@ -25,16 +27,18 @@ const nodeTypes = {
   consumer: Operation,
 };
 
+export type AudiencePipeline = Audience & { pipeline?: Pipeline };
+
 export type NodeData = {
   label: string;
-  audience: Audience;
+  audience: AudiencePipeline;
 };
 
 export type Node = {
   id: string;
   type?: string;
   dragHandle: string;
-  position: {
+  position?: {
     x: number;
     y: number;
   };
@@ -88,7 +92,9 @@ export const mapOperation = (
   });
 };
 
-export const mapNodes = (audiences: Audience[]): Map<string, Node> => {
+export const mapNodes = (
+  audiences: AudiencePipeline[],
+): Map<string, Node> => {
   const nodesMap = new Map<string, Node>();
 
   audiences.forEach((a: Audience, i: number) => {
@@ -117,7 +123,7 @@ export const mapNodes = (audiences: Audience[]): Map<string, Node> => {
 };
 
 //
-// There each audience there are a pair of edges, one for each arrow:
+// For each audience there are a pair of edges, one for each arrow:
 // consumers: component -> consumer group -> service
 // producers: service -> producer group -> component
 export const mapEdgePair = (
@@ -180,12 +186,24 @@ export const mapEdges = (audiences: Audience[]): Map<string, Edge> => {
   return edgesMap;
 };
 
+export const mapAudiencePipelines = (
+  audiences: Audience[],
+  pipelines: PipelineInfo[],
+): AudiencePipeline[] =>
+  audiences.map((a: Audience) => ({
+    ...a,
+    pipeline: pipelines.find((p: PipelineInfo) => p.audiences.includes(a))
+      ?.pipeline,
+  }));
+
 export default function Flow({ audiences, pipes }: ServiceMap) {
   const [edges, setEdges] = useEdgesState(
     Array.from(mapEdges(audiences).values()),
   );
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    Array.from(mapNodes(audiences).values()),
+    Array.from(
+      mapNodes(mapAudiencePipelines(audiences, pipes)).values(),
+    ),
   );
 
   return (

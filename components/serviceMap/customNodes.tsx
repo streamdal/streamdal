@@ -1,14 +1,14 @@
 import { Handle, Position } from "reactflow";
-import { ServiceNodeMenu } from "./rules/participantsMenu.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import "flowbite";
 import "twind";
 import { useState } from "preact/hooks";
-import { ConsumerIcon } from "./icons/consumer.tsx";
-import { ProducerIcon } from "./icons/producer.tsx";
-import { NodeData } from "../islands/flow.tsx";
 import { OperationType } from "snitch-protos/protos/common.ts";
-import { titleCase } from "../lib/utils.ts";
+import { NodeMenu, NodeMenuButton, ServiceNodeMenu } from "./nodeMenu.tsx";
+import { NodeData } from "../../islands/flow.tsx";
+import { ProducerIcon } from "../icons/producer.tsx";
+import { ConsumerIcon } from "../icons/consumer.tsx";
+import { removeWhitespace, titleCase } from "../../lib/utils.ts";
 
 export const Service = ({ data }: { data: { label: string } }) => {
   return (
@@ -112,45 +112,41 @@ export const Operation = ({ data }: { data: NodeData }) => {
         data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
-        class="w-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 flex items-center justify-between px-1"
+        class="flex items-center justify-betweenw-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2"
       >
-        <div class="w-[12%]">
+        <div class="flex flex-row items-center">
           <IconGripVertical
-            class="w-6 h-6 text-purple-100 cursor-grab"
+            class="w-6 h-6 text-purple-100 cursor-grab mr-1"
             id="dragHandle"
           />
-        </div>
 
-        <div class="w-[12%]">
           {producer
-            ? <ProducerIcon class="w-5 h-5" />
-            : <ConsumerIcon class="w-5 h-5" />}
+            ? <ProducerIcon class="w-5 h-5 mr-2" />
+            : <ConsumerIcon class="w-5 h-5 mr-2" />}
         </div>
-        <div class="w-[76%]">
-          {data.audience && (
-            <a
-              href={`/service/${
-                encodeURIComponent(data.audience.serviceName)
-              }/component/${encodeURIComponent(data.audience.componentName)}/${
-                OperationType[data.audience.operationType]
-              }/op/${encodeURIComponent(data.audience.operationName)}`}
+        <div class="w-[145px] whitespace-nowrap text-ellipsis overflow-hidden">
+          <a
+            href={`/service/${
+              encodeURIComponent(data.audience.serviceName)
+            }/component/${encodeURIComponent(data.audience.componentName)}/${
+              OperationType[data.audience.operationType]
+            }/op/${encodeURIComponent(data.audience.operationName)}`}
+          >
+            <div
+              class={"flex flex-col justify-start p-1"}
             >
-              <div
-                class={"flex flex-col justify-start p-1"}
+              <h2
+                class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
               >
-                <h2
-                  class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
-                >
-                  {data.label}
-                </h2>
-                <h3 class="text-xs text-gray-500">
-                  {titleCase(OperationType[data.audience.operationType])}
-                </h3>
-              </div>
-            </a>
-          )}
+                {data.label}
+              </h2>
+              <h3 class="text-xs text-gray-500">
+                {titleCase(OperationType[data.audience.operationType])}
+              </h3>
+            </div>
+          </a>
         </div>
-        {/*<NodeMenu data={data.pipeline} />*/}
+        <NodeMenu audience={data.audience} />
       </div>
       <div
         data-popover

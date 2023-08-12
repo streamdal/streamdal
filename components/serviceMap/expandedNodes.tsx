@@ -1,6 +1,6 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import { useRef } from "preact/denonext/hooks.js";
-import { Operation } from "../customNodes.tsx";
+import { Operation } from "./customNodes.tsx";
 
 export const ExpandedNodes = ({ nodes, params }) => {
   const actorType = params.operationType === "consumer" ? 1 : 2;

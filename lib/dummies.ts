@@ -96,7 +96,7 @@ export const audiences = [{
   serviceName: "Test Service Name",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce-kafka-two",
+  operationName: "produce kafka two long name",
 }];
 
 export const dummyServiceMap: GetAllResponse = {
@@ -105,7 +105,7 @@ export const dummyServiceMap: GetAllResponse = {
   pipelines: {
     "1234-1234-123456": {
       audiences,
-      paused: audiences,
+      paused: [audiences[0]],
       pipeline: {
         id: "1234-1234-123456",
         name: "Best pipeline",
@@ -128,7 +128,7 @@ export const dummyServiceMap: GetAllResponse = {
     },
     "5555-4444-3333": {
       audiences,
-      paused: audiences,
+      paused: [audiences[2]],
       pipeline: {
         id: "5555-4444-3333",
         name: "Substandard pipeline",
