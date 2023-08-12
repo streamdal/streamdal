@@ -103,7 +103,7 @@ export const mapOperation = (
     dragHandle: "#dragHandle",
     position: {
       x: 15,
-      y: 24 + (groupCount[op] === 1 ? 0 : (groupCount[op] - 1) * 70),
+      y: 24 + ((groupCount[op] - 1) * 70),
     },
     parentNode: `${a.serviceName}-${a.componentName}-${op}`,
     extent: "parent",
@@ -153,7 +153,7 @@ export const mapNodes = (
       dragHandle: "#dragHandle",
       position: {
         x: 215,
-        y: 350 + (count === 1 ? 0 : count - 1) * 70,
+        y: 350 + (count - 1) * 70,
       },
       data: { label: a.componentName, audience: a },
     });
