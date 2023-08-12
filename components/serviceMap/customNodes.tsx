@@ -277,10 +277,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
       {/*  <IconResize class="w-6 h-6" />*/}
       {/*</NodeResizeControl>*/}
       <div
-        data-popover-target="popover"
-        data-popover-trigger="hover"
-        type="button"
-        onClick={handleModalOpen}
+        id="dragHandle"
         class="flex flex-row items-center my-2"
       >
         <IconGripVertical
@@ -316,8 +313,6 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
   return (
     <div className="h-[96px] flex flex-row justify-start items-center">
       <div
-        data-popover-target="popover"
-        data-popover-trigger="hover"
         type="button"
         onClick={handleModalOpen}
         class="flex items-center justify-betweenw-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2"
