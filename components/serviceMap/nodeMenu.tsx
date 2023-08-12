@@ -1,8 +1,8 @@
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import { useState } from "preact/hooks";
-import { AudiencePipeline } from "../../islands/flow.tsx";
 import { removeWhitespace } from "../../lib/utils.ts";
+import { AudiencePipeline } from "./customNodes.tsx";
 
 export const NodeMenu = (
   { audience }: { audience: AudiencePipeline },

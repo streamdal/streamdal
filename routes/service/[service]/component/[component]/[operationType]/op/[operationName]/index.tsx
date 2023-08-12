@@ -1,35 +1,44 @@
 import { Layout } from "../../../../../../../../components/layout.tsx";
-import Flow from "../../../../../../../../islands/flow.tsx";
+import ServiceMap from "../../../../../../../../islands/serviceMap.tsx";
 import InfoModal from "../../../../../../../../islands/InfoModal.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import {
-  getPipelines,
   getServiceMap,
+  getServiceNodes,
+  ServiceMapType,
+  ServiceNodes,
 } from "../../../../../../../../lib/fetch.ts";
 
-interface ServiceMap {
-  serviceMap: any;
-}
+export type ServicePipelines = {
+  serviceNodes: ServiceNodes;
+  serviceMap: ServiceMapType;
+};
 
-export const handler: Handlers<any> = {
+export const handler: Handlers<ServicePipelines> = {
   async GET(_req, ctx) {
     return ctx.render({
-      pipelines: await getPipelines(),
+      serviceNodes: await getServiceNodes(),
       serviceMap: await getServiceMap(),
     });
   },
 };
 
-export default function FlowRoute(props: PageProps) {
-  console.dir(props, { depth: 20 });
+export default function FlowRoute(
+  props: PageProps<
+    ServicePipelines
+  >,
+) {
   return (
     <Layout>
       <InfoModal
-        params={props.params}
-        pipelines={props.data.pipelines}
-        serviceMap={props.data.serviceMap.serviceMap[props.params.service]}
+        params={props.params as any}
+        pipelines={props.data.serviceMap.pipes}
+        serviceMap={props.data.serviceMap[props.params.service]}
       />
-      <Flow data={props.data.serviceMap} />
+      <ServiceMap
+        nodesData={props.data.serviceNodes.nodes}
+        edgesData={props.data.serviceNodes.edges}
+      />
     </Layout>
   );
 }

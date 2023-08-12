@@ -1,20 +1,20 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Layout } from "../components/layout.tsx";
-import Flow from "../islands/flow.tsx";
-import { getServiceMap, ServiceMap } from "../lib/fetch.ts";
+import ServiceMap from "../islands/serviceMap.tsx";
+import { getServiceNodes, ServiceNodes } from "../lib/fetch.ts";
 
-export const handler: Handlers<ServiceMap> = {
+export const handler: Handlers<ServiceNodes> = {
   async GET(_req, ctx) {
-    return ctx.render(await getServiceMap());
+    return ctx.render(await getServiceNodes());
   },
 };
 
 export default function IndexRoute(
-  props: PageProps<ServiceMap>,
+  props: PageProps<ServiceNodes>,
 ) {
   return (
     <Layout>
-      <Flow audiences={props.data.audiences} pipes={props.data.pipes} />
+      <ServiceMap nodesData={props.data.nodes} edgesData={props.data.edges} />
     </Layout>
   );
 }

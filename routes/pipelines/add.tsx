@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Layout } from "../../components/layout.tsx";
-import Flow from "../../islands/flow.tsx";
+import ServiceMap from "../../islands/serviceMap.tsx";
 import Pipelines from "../../islands/pipelines.tsx";
 
 import { handler as pipelineHandler, PipelineRoute } from "./index.tsx";
@@ -18,7 +18,10 @@ export default function PipelinesRoute(
         pipelines={props?.data?.pipelines}
         add={true}
       />
-      <Flow data={props?.data?.serviceMap} />
+      <ServiceMap
+        nodesData={props.data.serviceNodes.nodes}
+        edgesData={props.data.serviceNodes.edges}
+      />
     </Layout>
   );
 }

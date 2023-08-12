@@ -2,12 +2,9 @@ import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
 import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
-import { attachPipeline } from "../lib/fetch.ts";
-import {
-  PipelineInfo,
-  ServiceInfo,
-} from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
+
 import { titleCase } from "../lib/utils.ts";
+import { ServiceMapType } from "../lib/fetch.ts";
 
 type Params = {
   service: string;
@@ -17,14 +14,13 @@ type Params = {
 };
 
 export default function InfoModal(
-  { params, pipelines, serviceMap }: {
+  { params, serviceMap }: {
     params: Params;
-    pipelines: PipelineInfo[];
-    serviceMap: ServiceInfo;
+    serviceMap: ServiceMapType;
   },
 ) {
   const associatedPipeline = serviceMap
-    .pipelines.find(
+    .pipes.find(
       (item: any) => item.audience.operationName === params.operationName,
     );
   const attachedPipeline = associatedPipeline?.pipeline;
@@ -121,7 +117,7 @@ export default function InfoModal(
                   class="py-2 text-sm text-gray-700 dark:text-gray-200"
                   aria-labelledby="dropdownDefaultButton"
                 >
-                  {pipelines.map((pipeline: any) => (
+                  {serviceMap.pipes.map((pipeline: any) => (
                     <li>
                       <button
                         data-tooltip-target={pipeline.id !==

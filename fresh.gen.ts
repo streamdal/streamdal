@@ -17,9 +17,9 @@ import * as $11 from "./routes/service/[service]/component/[component]/[operatio
 import * as $12 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
 import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
 import * as $$0 from "./islands/InfoModal.tsx";
-import * as $$1 from "./islands/flow.tsx";
-import * as $$2 from "./islands/pipeline.tsx";
-import * as $$3 from "./islands/pipelines.tsx";
+import * as $$1 from "./islands/pipeline.tsx";
+import * as $$2 from "./islands/pipelines.tsx";
+import * as $$3 from "./islands/serviceMap.tsx";
 
 const manifest = {
   routes: {
@@ -43,9 +43,9 @@ const manifest = {
   },
   islands: {
     "./islands/InfoModal.tsx": $$0,
-    "./islands/flow.tsx": $$1,
-    "./islands/pipeline.tsx": $$2,
-    "./islands/pipelines.tsx": $$3,
+    "./islands/pipeline.tsx": $$1,
+    "./islands/pipelines.tsx": $$2,
+    "./islands/serviceMap.tsx": $$3,
   },
   baseUrl: import.meta.url,
 };
