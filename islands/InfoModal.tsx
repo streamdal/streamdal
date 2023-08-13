@@ -5,6 +5,7 @@ import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
 
 import { titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
 
 type Params = {
   service: string;
@@ -20,8 +21,9 @@ export default function InfoModal(
   },
 ) {
   const associatedPipeline = serviceMap
-    .pipes.find(
-      (item: any) => item.audience.operationName === params.operationName,
+    ?.pipes.find(
+      (p: PipelineInfo) =>
+        p.audiences.find((a) => a.operationName === params.operationName),
     );
   const attachedPipeline = associatedPipeline?.pipeline;
 
@@ -45,7 +47,7 @@ export default function InfoModal(
                   : <ProducerIcon className={"mx-2"} />}
                 <div class="flex flex-col">
                   <h3 class="text-lg text-white dark:text-white">
-                    {params.operationName}
+                    {titleCase(params.operationName)}
                   </h3>
                   {/* janky uppercase stuff */}
                   <p class="text-xs text-gray-500">
@@ -117,7 +119,7 @@ export default function InfoModal(
                   class="py-2 text-sm text-gray-700 dark:text-gray-200"
                   aria-labelledby="dropdownDefaultButton"
                 >
-                  {serviceMap.pipes.map((pipeline: any) => (
+                  {serviceMap?.pipes.map(({ pipeline }: PipelineInfo) => (
                     <li>
                       <button
                         data-tooltip-target={pipeline.id !==

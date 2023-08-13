@@ -30,10 +30,7 @@ export default function ServiceMap(
   const [nodes, _, onNodesChange] = useNodesState(nodesData);
 
   return (
-    <div
-      style={{ width: "100%", height: "100vh" }}
-      class="m-0"
-    >
+    <div class="w-full h-screen m-0">
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}
