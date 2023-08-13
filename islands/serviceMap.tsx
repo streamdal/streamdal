@@ -27,7 +27,6 @@ export default function ServiceMap(
   { nodesData, edgesData }: { nodesData: FlowNode[]; edgesData: FlowEdge[] },
 ) {
   const [edges] = useEdgesState(edgesData);
-
   const [nodes, _, onNodesChange] = useNodesState(nodesData);
 
   return (

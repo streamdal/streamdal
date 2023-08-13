@@ -82,32 +82,61 @@ export const dummyPipelines = [{
   ],
 }];
 
-export const audiences = [{
-  serviceName: "Test Service Name",
+export const testKafkaAudiences = [{
+  serviceName: "Test Kafka Service",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
-  operationName: "consume-kafka",
+  operationName: "consume kafka",
 }, {
-  serviceName: "Test Service Name",
+  serviceName: "Test Kafka Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce-kafka",
+  operationName: "produce kafka",
 }, {
-  serviceName: "Test Service Name",
+  serviceName: "Test Kafka Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "produce kafka two long name",
 }, {
-  serviceName: "Test Service Name",
+  serviceName: "Test Kafka Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "produce kafka three",
 }, {
-  serviceName: "Test Service Name",
+  serviceName: "Test Kafka Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "produce kafka four",
 }];
+
+export const testPostgreSQLAudiences = [{
+  serviceName: "Test PostgreSQL",
+  componentName: "postgresql",
+  operationType: OperationType.CONSUMER,
+  operationName: "consume postgresql",
+}, {
+  serviceName: "Test PostgreSQL",
+  componentName: "postgresql",
+  operationType: OperationType.CONSUMER,
+  operationName: "consume postgresql two",
+}, {
+  serviceName: "Test PostgreSQL",
+  componentName: "postgresql",
+  operationType: OperationType.CONSUMER,
+  operationName: "consume postgresql three",
+}, {
+  serviceName: "Test PostgreSQL",
+  componentName: "postgresql",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce postgresql",
+}, {
+  serviceName: "Test PostgreSQL",
+  componentName: "postgresql",
+  operationType: OperationType.PRODUCER,
+  operationName: "produce postgresql another",
+}];
+
+export const audiences = [...testKafkaAudiences, ...testPostgreSQLAudiences];
 
 export const dummyServiceMap: GetAllResponse = {
   audiences,

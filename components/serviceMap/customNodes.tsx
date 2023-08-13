@@ -1,5 +1,6 @@
 import { Handle, MarkerType, Position } from "reactflow";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
+import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "flowbite";
 import "twind";
 import { useState } from "preact/hooks";
@@ -55,6 +56,8 @@ export type FlowEdge = {
   style: any;
 };
 
+export const xOffset = (serviceCount: number) => serviceCount > 1 ? 800 : 0;
+
 export const mapOperation = (
   nodesMap: NodesMap,
   a: Audience,
@@ -71,7 +74,10 @@ export const mapOperation = (
     sourcePosition: "right",
     targetPosition: "left",
     dragHandle: "#dragHandle",
-    position: { x: op === "consumer" ? 25 : 350, y: 200 },
+    position: {
+      x: (op === "consumer" ? 25 : 350) + xOffset(nodesMap.groupCount.size),
+      y: 200,
+    },
     data: {
       label: `${titleCase(op)} group`,
       audience: a,
@@ -107,17 +113,17 @@ export const mapNodes = (
   };
 
   audiences.forEach((a: Audience, i: number) => {
+    if (!nodesMap.groupCount.has(a.serviceName)) {
+      nodesMap.groupCount.set(a.serviceName, { producer: 0, consumer: 0 });
+    }
+
     nodesMap.nodes.set(a.serviceName, {
       id: a.serviceName,
       type: "service",
       dragHandle: "#dragHandle",
-      position: { x: 150, y: 0 },
+      position: { x: 150 + xOffset(nodesMap.groupCount.size), y: 0 },
       data: { label: a.serviceName, audience: a },
     });
-
-    if (!nodesMap.groupCount.has(a.serviceName)) {
-      nodesMap.groupCount.set(a.serviceName, { producer: 0, consumer: 0 });
-    }
 
     mapOperation(nodesMap, a);
 
@@ -134,7 +140,7 @@ export const mapNodes = (
       targetPosition: "left",
       dragHandle: "#dragHandle",
       position: {
-        x: 215,
+        x: 215 + xOffset(nodesMap.groupCount.size),
         y: 350 + (count - 1) * 70,
       },
       data: { label: a.componentName, audience: a },
@@ -386,6 +392,28 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
   );
 };
 
+export const ComponentImage = ({ name }: { name: string }) => {
+  if (name.toLowerCase().includes("kafka")) {
+    return (
+      <img
+        src={"/images/kafka-dark.svg"}
+        className="w-[30px]"
+      />
+    );
+  }
+
+  if (name.toLowerCase().includes("postgres")) {
+    return (
+      <img
+        src={"/images/postgresql.svg"}
+        className="w-[30px]"
+      />
+    );
+  }
+
+  return <IconDatabase class="w-6 h-6" />;
+};
+
 export const ComponentNode = ({ data }: { data: { label: string } }) => {
   return (
     <div
@@ -393,8 +421,8 @@ export const ComponentNode = ({ data }: { data: { label: string } }) => {
         " items-center"}
     >
       <div className={"flex justify-center flex-col items-center"}>
-        <img src={"/images/kafka-dark.svg"} className="w-[30px]" />
-        <p className={"z-10 mt-2 text-white"}>{data?.label}</p>
+        <ComponentImage name={data.label} />
+        <p class={"z-10 mt-2 text-white"}>{data?.label}</p>
       </div>
       <Handle
         type="source"
