@@ -15,13 +15,13 @@ export const NodeMenu = (
         data-dropdown-toggle={`${id}-menu`}
         data-dropdown-placement="top"
         type="button"
-        class="z-40 cursor-pointer"
+        class="cursor-pointer"
       >
-        <IconDots class="w-6 h-6 text-gray-400 z-40" aria-hidden="true" />
+        <IconDots class="w-6 h-6 text-gray-400" aria-hidden="true" />
       </div>
       <div
         id={`${id}-menu`}
-        className={`z-40 bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] hidden`}
+        className={`z-[1002] left-[-100px] top=[-10px] bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] hidden`}
       >
         <ul
           class="py-2 text-sm text-gray-700"
