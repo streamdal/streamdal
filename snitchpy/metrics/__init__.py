@@ -14,11 +14,13 @@ DEFAULT_COUNTER_REAPER_INTERVAL = 10
 DEFAULT_COUNTER_TTL = 10
 
 # Counter type constants
-COUNTER_PUBLISH = "publish"
-COUNTER_CONSUME = "consume"
-COUNTER_SIZE_EXCEEDED = "size_exceeded"
-COUNTER_RULE = "rule"
-COUNTER_FAILURE_TRIGGER = "failure_trigger"
+COUNTER_CONSUME_BYTES = "counter_consume_bytes"
+COUNTER_CONSUME_PROCESSED = "counter_consume_processed"
+COUNTER_CONSUME_ERRORS = "counter_consume_errors"
+COUNTER_PRODUCE_BYTES = "counter_produce_bytes"
+COUNTER_PRODUCE_PROCESSED = "counter_produce_processed"
+COUNTER_PRODUCE_ERRORS = "counter_produce_errors"
+COUNTER_NOTIFY = "counter_notify"
 
 
 @dataclass
@@ -31,8 +33,6 @@ class CounterEntry:
     """
 
     name: str
-    pipeline_id: str
-    audience: protos.Audience
     labels: dict = field(default_factory=dict)
     value: float = 0.0
 
@@ -97,14 +97,10 @@ class Metrics:
 
         self.stub = kwargs.get("stub")
         self.log = log
-        self.counters = {
-            "somename": Counter(
-                CounterEntry(
-                    name="somename", pipeline_id="someid", audience=protos.Audience()
-                )
-            )
-        }
+        self.counters = {}
         self.lock = Lock()
+        self.loop = kwargs.get("loop")
+        self.auth_token = kwargs.get("auth_token")
 
         # TODO: remove after testing
         if kwargs.get("exit") is None:
@@ -163,7 +159,7 @@ class Metrics:
         return c
 
     def incr(self, entry: CounterEntry) -> None:
-        # DODO: validate
+        # TODO: validate
         self.incr_queue.put_nowait(entry)
 
     def shutdown(self, *args) -> None:
@@ -183,16 +179,15 @@ class Metrics:
 
     def publish_metrics(self, entry: CounterEntry) -> None:
         async def call(request: protos.MetricsRequest):
-            await self.stub.metrics(request)
+            await self.stub.metrics(request, metadata={"auth-token": self.auth_token})
 
         req = protos.MetricsRequest()
-        req.pipeline_id = entry.pipeline_id
-        req.rule_name = entry.name
-        req.audience = entry.audience  # TODO: implement
-        req.metadata = None  # TODO: what is this?
+        req.metrics = [
+            protos.Metrics(name=entry.name, value=entry.value, labels=entry.labels)
+        ]
 
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(call(req))
+        self.log.debug("Publishing metrics: {}".format(req))
+        self.loop.create_task(call(req))
         self.log.debug("Published metrics: {}".format(req))
 
     def run_publisher_worker(self, id: int) -> None:

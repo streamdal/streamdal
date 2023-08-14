@@ -445,8 +445,6 @@ class SnitchClient:
                 req, timeout=self.grpc_timeout, metadata=self._get_metadata()
             )
 
-        # Send at least once
-        # try:
         asyncio.set_event_loop(self.grpc_loop)
         while not self.cfg.exit.is_set():
             self.grpc_loop.run_until_complete(call())
