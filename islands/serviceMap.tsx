@@ -13,6 +13,7 @@ import {
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
 import "flowbite";
+import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 
 export const nodeTypes = {
   service: ServiceNode,
@@ -31,6 +32,7 @@ export default function ServiceMap(
 
   return (
     <div class="w-full h-screen m-0">
+      {nodesData.length === 0 ? <EmptyService /> : null}
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}

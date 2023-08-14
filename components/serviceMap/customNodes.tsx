@@ -6,12 +6,12 @@ import "twind";
 import { useState } from "preact/hooks";
 import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
-import { NodeData } from "../../islands/serviceMap.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { titleCase } from "../../lib/utils.ts";
+import { removeWhitespace, titleCase } from "../../lib/utils.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import { Tooltip } from "../tooltip/tooltip.tsx";
 
 export type AudiencePipeline = Audience & { pipeline?: Pipeline };
 
@@ -24,7 +24,8 @@ export type NodeData = {
 export type FlowNode = {
   id: string;
   type?: string;
-  dragHandle: string;
+  dragHandle?: string;
+  draggable?: boolean;
   position?: {
     x: number;
     y: number;
@@ -56,7 +57,8 @@ export type FlowEdge = {
   style: any;
 };
 
-export const xOffset = (serviceCount: number) => serviceCount > 1 ? 800 : 0;
+export const xOffset = (serviceCount: number) =>
+  serviceCount > 1 ? (serviceCount - 1) * 800 : 0;
 
 export const mapOperation = (
   nodesMap: NodesMap,
@@ -79,7 +81,7 @@ export const mapOperation = (
       y: 200,
     },
     data: {
-      label: `${titleCase(op)} group`,
+      label: `${titleCase(op)}s`,
       audience: a,
       groupCount: groupCount[op],
     },
@@ -87,11 +89,11 @@ export const mapOperation = (
 
   nodesMap.nodes.set(a.operationName, {
     id: a.operationName,
+    draggable: false,
     type: op,
-    dragHandle: "#dragHandle",
     position: {
-      x: 15,
-      y: 24 + ((groupCount[op] - 1) * 70),
+      x: 10,
+      y: 38 + ((groupCount[op] - 1) * 70),
     },
     parentNode: `${a.serviceName}-${a.componentName}-${op}`,
     extent: "parent",
@@ -229,7 +231,7 @@ export const ServiceNode = ({ data }: { data: { label: string } }) => {
     <div>
       <div class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
         <IconGripVertical
-          class="w-6 h-6 text-purple-100 cursor-grab"
+          class="w-6 h-6 text-purple-100"
           id="dragHandle"
         />
         <img
@@ -273,23 +275,14 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
     setIsOpen(true);
   };
 
-  const height = 132 + ((data.groupCount - 1) * 64);
+  const height = 124 + ((data.groupCount - 1) * 68);
 
   return (
     <div
       class={`rounded-lg shadow-lg border-1 border-purple-200 min-w-[280px] min-h-[${height}px]`}
     >
-      {/*<NodeResizeControl minWidth={100} minHeight={50}>*/}
-      {/*  <IconResize class="w-6 h-6" />*/}
-      {/*</NodeResizeControl>*/}
-      <div
-        id="dragHandle"
-        class="flex flex-row items-center my-2"
-      >
-        <IconGripVertical
-          class="w-6 h-6 ml-2 text-purple-100 cursor-grab bg-white border border-purple-200"
-          id="dragHandle"
-        />
+      <div id="dragHandle" class="flex flex-row items-center mt-2">
+        <IconGripVertical class="w-6 h-6 ml-2 text-purple-100 bg-white border border-purple-200" />
         <div class="ml-2">{data.label}</div>
       </div>
 
@@ -308,32 +301,22 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 };
 
 export const OperationNode = ({ data }: { data: NodeData }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const producer = OperationType[data.audience.operationType] ==
     OperationType[OperationType.PRODUCER];
-
-  const handleModalOpen = () => {
-    setIsOpen(true);
-  };
+  const toolTipId = removeWhitespace(data.label);
 
   return (
-    <div className="h-[96px] flex flex-row justify-start items-center">
+    <div class="h-[96px]">
       <div
         type="button"
-        onClick={handleModalOpen}
         class="flex items-center justify-betweenw-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2"
       >
         <div class="flex flex-row items-center">
-          <IconGripVertical
-            class="w-6 h-6 text-purple-100 cursor-grab mr-1"
-            id="dragHandle"
-          />
-
           {producer
-            ? <ProducerIcon class="w-5 h-5 mr-2" />
-            : <ConsumerIcon class="w-5 h-5 mr-2" />}
+            ? <ProducerIcon class="w-5 h-5 mx-2" />
+            : <ConsumerIcon class="w-5 h-5 mx-2" />}
         </div>
-        <div class="w-[145px] whitespace-nowrap text-ellipsis overflow-hidden">
+        <div class="w-[170px] whitespace-nowrap text-ellipsis overflow-hidden">
           <a
             href={`/service/${
               encodeURIComponent(data.audience.serviceName)
@@ -345,10 +328,15 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
               class={"flex flex-col justify-start p-1"}
             >
               <h2
+                data-tooltip-target={toolTipId}
                 class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
               >
                 {data.label}
               </h2>
+              <Tooltip
+                targetId={toolTipId}
+                message={"Click to attach, detach and pause pipelines"}
+              />
               <h3 class="text-xs text-gray-500">
                 {titleCase(OperationType[data.audience.operationType])}
               </h3>
@@ -357,27 +345,6 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
         </div>
         <NodeMenu audience={data.audience} />
       </div>
-      {/*<div*/}
-      {/*  data-popover*/}
-      {/*  id="popover"*/}
-      {/*  role="tooltip"*/}
-      {/*  class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"*/}
-      {/*>*/}
-      {/*  <div class="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">*/}
-      {/*    <h3 class="font-semibold text-gray-900 dark:text-white">*/}
-      {/*      Popover no arrow*/}
-      {/*    </h3>*/}
-      {/*  </div>*/}
-      {/*  <div class="px-3 py-2">*/}
-      {/*    <p>And here's some amazing content. It's very engaging. Right?</p>*/}
-      {/*  </div>*/}
-      {/*</div>*/}
-      <span class="sr-only">Notifications</span>
-      {/*{data.instances && (*/}
-      {/*  <div class="absolute inline-flex items-center justify-evenly w-7 h-7 text-xs text-white bg-purple-500 rounded-full top-1 -right-2 dark:border-gray-900">*/}
-      {/*    {data.instances}*/}
-      {/*  </div>*/}
-      {/*)}*/}
       <Handle
         type="source"
         position={Position.Top}
