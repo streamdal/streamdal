@@ -28,10 +28,10 @@ const Pipelines = (
     <div
       id="pipelinesModal"
       aria-modal="true"
-      class="fixed top-0 left-0 right-0 z-50 w-full p-4 inset-0 max-h-full justify-center items-center flex"
+      class="absolute mt-20 z-40 w-full px-4 py-2 overflow-x-hidden overflow-y-hidden max-h-full justify-center items-center flex"
       role="dialog"
     >
-      <div class="relative w-full max-w-5xl">
+      <div class="relative w-full max-w-5xl shadow-2xl shadow-stormCloud">
         <div class="relative bg-white rounded-lg shadow">
           <div class="flex justify-start">
             <div class="border-r w-1/3 flex flex-col pb-[16px] max-h-[80vh] overflow-y-auto">
