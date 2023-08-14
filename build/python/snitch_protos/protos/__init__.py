@@ -307,6 +307,14 @@ class GetAllResponse(betterproto.Message):
     attached to any audience.
     """
 
+    config: Dict[str, str] = betterproto.map_field(
+        4, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+    """
+    Audience to pipeline ID config/mapping. key == $audience_as_string, value =
+    $pipeline_id
+    """
+
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesRequest(betterproto.Message):

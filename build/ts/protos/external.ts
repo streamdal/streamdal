@@ -42,6 +42,15 @@ export interface GetAllResponse {
     pipelines: {
         [key: string]: PipelineInfo;
     };
+    /**
+     * Audience to pipeline ID config/mapping.
+     * key == $audience_as_string, value = $pipeline_id
+     *
+     * @generated from protobuf field: map<string, string> config = 4;
+     */
+    config: {
+        [key: string]: string;
+    };
 }
 /**
  * Don't think we need anything here
@@ -296,7 +305,8 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
         super("protos.GetAllResponse", [
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
-            { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } }
+            { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
+            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
 }
