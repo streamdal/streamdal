@@ -154,3 +154,17 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 func StringPtr(in string) *string {
 	return &in
 }
+
+func ConvertConfigStrAudience(config map[*protos.Audience]string) map[string]string {
+	if config == nil {
+		return nil
+	}
+
+	m := map[string]string{}
+
+	for k, v := range config {
+		m[AudienceToStr(k)] = v
+	}
+
+	return m
+}
