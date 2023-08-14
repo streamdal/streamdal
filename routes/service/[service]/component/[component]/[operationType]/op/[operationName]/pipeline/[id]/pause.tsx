@@ -1,22 +1,23 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import {
-  getServiceMap,
+  getServiceNodes,
   pausePipeline,
+  ServiceNodes,
 } from "../../../../../../../../../../lib/fetch.ts";
-import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
-import { SuccessType } from "../../../../../../../../../pipelines/[id]/delete.tsx";
 import { Layout } from "../../../../../../../../../../components/layout.tsx";
-import {
-  ReactFlowProvider,
-} from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
-import Flow from "../../../../../../../../../../islands/flow.tsx";
+import ServiceMap from "../../../../../../../../../../islands/serviceMap.tsx";
 import { PauseModal } from "../../../../../../../../../../components/modals/pauseModal.tsx";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
+import { SuccessType } from "../../../../../../../../../_middleware.ts";
 
-export const handler: Handlers<any> = {
+export type ServiceNodesSuccess = {
+  serviceNodes?: ServiceNodes;
+  success?: SuccessType;
+};
+export const handler: Handlers<ServiceNodesSuccess> = {
   async GET(_req, ctx) {
     return ctx.render({
-      serviceMap: await getServiceMap(),
+      serviceNodes: await getServiceNodes(),
     });
   },
   async POST(req, ctx) {
@@ -36,10 +37,7 @@ export const handler: Handlers<any> = {
 
 export default function PausePipelineRoute(
   props: PageProps<
-    {
-      serviceMap: GetServiceMapResponse;
-      success: SuccessType;
-    }
+    ServiceNodesSuccess
   >,
 ) {
   return (
@@ -48,9 +46,10 @@ export default function PausePipelineRoute(
         id={props?.params.id}
         message={`Pipeline ${props?.params.id} has been paused`}
       />
-      <ReactFlowProvider>
-        <Flow data={props?.data?.serviceMap} />
-      </ReactFlowProvider>
+      <ServiceMap
+        nodesData={props.data.serviceNodes.nodes}
+        edgesData={props.data.serviceNodes.edges}
+      />
     </Layout>
   );
 }

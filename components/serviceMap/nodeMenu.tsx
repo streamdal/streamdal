@@ -1,33 +1,30 @@
-import { PipelineInfo } from "https://deno.land/x/snitch_protos@v0.0.56/protos/info.ts";
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
-import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import { useState } from "preact/hooks";
+import { removeWhitespace } from "../../lib/utils.ts";
+import { AudiencePipeline } from "./customNodes.tsx";
 
-export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
-  const [isOpen, setIsOpen] = useState();
-
-  const handleClick = () => {
-    setIsOpen(!isOpen);
-  };
-
+export const NodeMenu = (
+  { audience }: { audience: AudiencePipeline },
+) => {
+  const id = removeWhitespace(audience.operationName);
   return (
     <div className={"rounded bg-purple-50 ml-4"}>
       <div
-        id="dropdownButton"
+        id={`${id}-button}`}
+        data-dropdown-toggle={`${id}-menu`}
+        data-dropdown-placement="top"
         type="button"
         class="cursor-pointer"
-        onClick={handleClick}
       >
         <IconDots class="w-6 h-6 text-gray-400" aria-hidden="true" />
       </div>
       <div
-        id={`flow-${data?.audience?.operationName}`}
-        className={`z-40 bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] dark:bg-gray-700 top-20 absolute ${
-          isOpen ? null : "hidden"
-        }`}
+        id={`${id}-menu`}
+        className={`z-[1002] left-[-100px] top=[-10px] bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] hidden`}
       >
         <ul
-          class="py-2 text-sm text-gray-700 dark:text-gray-200"
+          class="py-2 text-sm text-gray-700"
           aria-labelledby="dropdownButton"
         >
           <a href="/pipelines">
@@ -42,28 +39,27 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
               Silence Notifications
             </li>
           </a>
-          {data?.audience && (
-            <a
-              href={`/service/${
-                encodeURIComponent(data.audience.serviceName)
-              }/component/${encodeURIComponent(data.audience.componentName)}/${
-                data.audience.operationType === 1 ? "consumer" : "producer"
-              }/op/${encodeURIComponent(data.audience.operationName)}`}
-            >
-              <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
-                <Info className="w-4 text-web mx-1" />
-                More Information
-              </li>
-            </a>
-          )}
           <a
             href={`/service/${
-              encodeURIComponent(data.audience.serviceName)
-            }/component/${encodeURIComponent(data.audience.componentName)}/${
-              data.audience.operationType === 1 ? "consumer" : "producer"
+              encodeURIComponent(audience.serviceName)
+            }/component/${encodeURIComponent(audience.componentName)}/${
+              audience.operationType === 1 ? "consumer" : "producer"
+            }/op/${encodeURIComponent(audience.operationName)}`}
+          >
+            <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
+              <Info className="w-4 text-web mx-1" />
+              More Information
+            </li>
+          </a>
+
+          <a
+            href={`/service/${
+              encodeURIComponent(audience.serviceName)
+            }/component/${encodeURIComponent(audience.componentName)}/${
+              audience.operationType === 1 ? "consumer" : "producer"
             }/op/${
-              encodeURIComponent(data.audience.operationName)
-            }/pipeline/${data.pipeline?.id}/pause`}
+              encodeURIComponent(audience.operationName)
+            }/pipeline/${audience.pipeline?.id}/pause`}
           >
             <button className="w-full">
               <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
@@ -79,7 +75,7 @@ export const NodeMenu = ({ data }: { data: PipelineInfo }) => {
 };
 
 export const ServiceNodeMenu = () => {
-  const [isOpen, setIsOpen] = useState();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = () => {
     setIsOpen(!isOpen);
@@ -97,7 +93,7 @@ export const ServiceNodeMenu = () => {
       </div>
       <div
         id={"flow-service"}
-        className={`z-40 bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] dark:bg-gray-700 top-20 absolute ${
+        className={`relative z-40 bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px] top-20 absolute ${
           isOpen ? null : "hidden"
         }`}
       >

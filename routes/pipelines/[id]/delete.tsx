@@ -1,15 +1,12 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import {
-  ReactFlowProvider,
-} from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
-import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Layout } from "../../../components/layout.tsx";
-import Flow from "../../../islands/flow.tsx";
+import ServiceMap from "../../../islands/serviceMap.tsx";
 import {
   getPipeline,
   getPipelines,
-  getServiceMap,
+  getServiceNodes,
+  ServiceNodes,
 } from "../../../lib/fetch.ts";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
@@ -19,7 +16,7 @@ import Pipelines from "../../../islands/pipelines.tsx";
 export type DeletePipeline = {
   pipeline: Pipeline;
   pipelines: Pipeline[];
-  serviceMap: GetServiceMapResponse;
+  serviceNodes: ServiceNodes;
 };
 
 export const handler: Handlers<DeletePipeline> = {
@@ -30,7 +27,7 @@ export const handler: Handlers<DeletePipeline> = {
     }
     return ctx.render({
       pipeline,
-      serviceMap: await getServiceMap(),
+      serviceNodes: await getServiceNodes(),
       pipelines: await getPipelines(),
     });
   },
@@ -65,9 +62,10 @@ export default function DeletePipelineRoute(
         />
       </div>
       <Layout>
-        <ReactFlowProvider>
-          <Flow data={props?.data?.serviceMap} />
-        </ReactFlowProvider>
+        <ServiceMap
+          nodesData={props.data.serviceNodes.nodes}
+          edgesData={props.data.serviceNodes.edges}
+        />
       </Layout>
     </>
   );

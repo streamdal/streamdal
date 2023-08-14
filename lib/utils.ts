@@ -52,6 +52,8 @@ export const isNumeric = (num: any) =>
   (typeof num === "number" || (typeof num === "string" && num.trim() !== "")) &&
   !isNaN(num as number);
 
+export const removeWhitespace = (s: string) => s.replace(/ /g, "");
+
 export const logFormData = (data: FormData) => {
   for (const pair of data) {
     console.log(pair[0] + ", " + pair[1]);

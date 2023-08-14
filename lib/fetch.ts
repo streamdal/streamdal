@@ -1,21 +1,42 @@
-import { dummyServiceMap } from "./dummies.ts";
 import { client, meta } from "./grpc.ts";
+import { GetAllResponse } from "snitch-protos/protos/external.ts";
+import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import { dummyServiceMap } from "./dummies.ts";
+import {
+  FlowEdge,
+  FlowNode,
+  mapAudiencePipelines,
+  mapEdges,
+  mapNodes,
+} from "../components/serviceMap/customNodes.tsx";
 
-export const getServiceMap = async () => {
-  try {
-    const { response } = await client.getServiceMap({}, meta);
+export type ServiceMapType = GetAllResponse & { pipes: PipelineInfo[] };
 
-    return response;
-  } catch (error) {
-    console.error("error fetching service map", error);
-    console.log("returning dummy data instead");
-    return dummyServiceMap;
-  }
+export const getServiceMap = async (): Promise<ServiceMapType> => {
+  // const { response } = await client.getAll({}, meta);
+  return {
+    ...dummyServiceMap,
+    pipes: Object.values(dummyServiceMap?.pipelines),
+  };
+};
+
+export type ServiceNodes = { nodes: FlowNode[]; edges: FlowEdge[] };
+
+export const getServiceNodes = async (): Promise<ServiceNodes> => {
+  const serviveMap = await getServiceMap();
+  const edges = Array.from(mapEdges(serviveMap.audiences).values());
+  const audiencePipelines = mapAudiencePipelines(
+    serviveMap.audiences,
+    serviveMap.pipes,
+  );
+  const nodes = Array.from(
+    mapNodes(audiencePipelines).nodes.values(),
+  );
+  return { nodes, edges };
 };
 
 export const getPipelines = async () => {
   const { response } = await client.getPipelines({}, meta);
-
   return response?.pipelines?.sort((a, b) => a.name.localeCompare(b.name));
 };
 

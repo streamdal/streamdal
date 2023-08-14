@@ -17,7 +17,7 @@
     "@protobuf-ts/runtime": "https://esm.sh/@protobuf-ts/runtime@^2.9.0",
     "@protobuf-ts/runtime-rpc": "https://esm.sh/@protobuf-ts/runtime-rpc@^2.9.0",
     "@protobuf-ts/grpcweb-transport": "https://esm.sh/@protobuf-ts/grpcweb-transport@^2.9.0",
-    "snitch-protos/": "https://deno.land/x/snitch_protos@v0.0.56/",
+    "snitch-protos/": "https://deno.land/x/snitch_protos@v0.0.62/",
     "zod": "https://deno.land/x/zod@v3.21.4",
     "zod/": "https://deno.land/x/zod@v3.21.4/",
     "zod-form-data": "https://esm.sh/zod-form-data@^2.0.1",

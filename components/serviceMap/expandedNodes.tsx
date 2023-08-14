@@ -1,6 +1,6 @@
-import { Consumer, Producer } from "../customNodes.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import { useRef } from "preact/denonext/hooks.js";
+import { OperationNode } from "./customNodes.tsx";
 
 export const ExpandedNodes = ({ nodes, params }) => {
   const actorType = params.operationType === "consumer" ? 1 : 2;
@@ -41,9 +41,7 @@ export const ExpandedNodes = ({ nodes, params }) => {
           ref={toClose}
         >
           {filteredNodes.map((item) => {
-            return actorType === 1
-              ? <Consumer data={item} />
-              : <Producer data={item} />;
+            <OperationNode data={item} />;
           })}
         </div>
       </div>

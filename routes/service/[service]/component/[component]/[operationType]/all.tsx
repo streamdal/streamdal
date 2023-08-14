@@ -1,30 +1,32 @@
-import { Handlers } from "$fresh/src/server/types.ts";
-import { getServiceMap } from "../../../../../../lib/fetch.ts";
-import {
-  ReactFlowProvider,
-} from "https://esm.sh/v128/@reactflow/core@11.7.4/X-YS9AdHlwZXMvcmVhY3Q6cHJlYWN0L2NvbXBhdCxyZWFjdC1kb206cHJlYWN0L2NvbXBhdCxyZWFjdDpwcmVhY3QvY29tcGF0CmUvcHJlYWN0L2NvbXBhdA/denonext/core.mjs";
-import Flow from "../../../../../../islands/flow.tsx";
+import { Handlers, PageProps } from "$fresh/src/server/types.ts";
+import { getPipelines, getServiceNodes } from "../../../../../../lib/fetch.ts";
+import ServiceMap from "../../../../../../islands/serviceMap.tsx";
 import { Layout } from "../../../../../../components/layout.tsx";
-import { ExpandedNodes } from "../../../../../../components/expandedNodes/expandedNodes.tsx";
+import { ExpandedNodes } from "../../../../../../components/serviceMap/expandedNodes.tsx";
+import { PipelineRoute } from "../../../../../pipelines/index.tsx";
 
-export const handler: Handlers<ServiceMap> = {
+export const handler: Handlers<PipelineRoute> = {
   async GET(_req, ctx) {
-    return ctx.render(await getServiceMap());
+    return ctx.render({
+      pipelines: await getPipelines(),
+      serviceNodes: await getServiceNodes(),
+    });
   },
 };
 
-export default function expandedNodes(
-  { data, params }: { data: getServiceMapResponse; params: any },
+export default function DeletePipelineRoute(
+  props: PageProps<PipelineRoute>,
 ) {
   return (
     <Layout>
       <ExpandedNodes
-        nodes={data.serviceMap[params.service].pipelines}
-        params={params}
+        nodes={props?.data.pipelines}
+        params={props.params}
       />
-      <ReactFlowProvider>
-        <Flow data={data} />
-      </ReactFlowProvider>
+      <ServiceMap
+        nodesData={props.data.serviceNodes.nodes}
+        edgesData={props.data.serviceNodes.edges}
+      />
     </Layout>
   );
 }
