@@ -420,7 +420,7 @@ class SnitchClient:
     def shutdown(self, *args):
         """Shutdown the service"""
         self.log.debug("called shutdown()")
-        self.cfg.exit.set()
+        self.exit.set()
         self.metrics.shutdown(args)
 
         for worker in self.workers:
@@ -447,9 +447,9 @@ class SnitchClient:
             )
 
         asyncio.set_event_loop(self.grpc_loop)
-        while not self.cfg.exit.is_set():
+        while not self.exit.is_set():
             self.grpc_loop.run_until_complete(call())
-            self.cfg.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
+            self.exit.wait(DEFAULT_HEARTBEAT_INTERVAL)
 
         # Wait for all pending tasks to complete before exiting thread, to avoid exception
         self.grpc_loop.run_until_complete(
@@ -466,11 +466,9 @@ class SnitchClient:
             service_name=self.cfg.service_name,
             session_id=self.session_id,
             client_info=protos.ClientInfo(
-                client_type=protos.ClientType(
-                    self.cfg.client_type
-                ),  # TODO: this needs to be passed in config
+                client_type=protos.ClientType(self.cfg.client_type),
                 library_name="snitch-python-client",
-                library_version="0.0.1",  # TODO: how to inject via github CI?
+                library_version="0.0.0",
                 language="python",
                 arch=platform.processor(),
                 os=platform.system(),
@@ -483,7 +481,7 @@ class SnitchClient:
             async for cmd in self.register_stub.register(
                 req, timeout=None, metadata=self._get_metadata()
             ):
-                if self.cfg.exit.is_set():
+                if self.exit.is_set():
                     return
 
                 # Log except for keep-alives
