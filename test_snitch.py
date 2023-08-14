@@ -43,7 +43,7 @@ class TestSnitchClient:
         payload = bytearray(snitchpy.MAX_PAYLOAD_SIZE + 1)
         payload_bytes = bytes(payload)
 
-        req = snitchpy.SnitchRequest(
+        req = snitchpy.ProcessRequest(
             data=payload_bytes,
             operation_type=1,
             component_name="kafka",
@@ -136,7 +136,7 @@ class TestSnitchClient:
         self.client._attach_pipeline(cmd)
 
         resp = self.client.process(
-            snitchpy.SnitchRequest(
+            snitchpy.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
                 operation_type=snitchpy.MODE_PRODUCER,
                 component_name="kafka",
@@ -195,7 +195,7 @@ class TestSnitchClient:
         client._attach_pipeline(cmd)
 
         resp = client.process(
-            snitchpy.SnitchRequest(
+            snitchpy.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
                 operation_type=snitchpy.MODE_PRODUCER,
                 component_name="kafka",
@@ -251,7 +251,7 @@ class TestSnitchClient:
         client._attach_pipeline(cmd)
 
         resp = client.process(
-            snitchpy.SnitchRequest(
+            snitchpy.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
                 operation_type=snitchpy.MODE_PRODUCER,
                 component_name="kafka",

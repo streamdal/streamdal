@@ -32,7 +32,7 @@ CLIENT_TYPE_SHIM = 2
 
 
 @dataclass(frozen=True)
-class SnitchRequest:
+class ProcessRequest:
     operation_type: int
     operation_name: str
     component_name: str
@@ -40,7 +40,7 @@ class SnitchRequest:
 
 
 @dataclass(frozen=True)
-class SnitchResponse:
+class ProcessResponse:
     data: bytes
     error: bool
     message: str
@@ -107,7 +107,13 @@ class SnitchClient:
         self.paused_pipelines = {}
         self.audiences = {}
         self.log = log
-        self.metrics = Metrics(stub=self.grpc_stub, log=self.log, event=self.cfg.exit)
+        self.metrics = Metrics(
+            stub=self.grpc_stub,
+            log=self.log,
+            event=self.cfg.exit,
+            loop=grpc_loop,
+            auth_token=self.auth_token,
+        )
         self.functions = {}
         self.session_id = uuid.uuid4().__str__()
         self.workers = []
@@ -199,7 +205,7 @@ class SnitchClient:
         self.audiences[self.aud_to_str(aud)] = aud
         self.grpc_loop.run_until_complete(call())
 
-    def process(self, req: SnitchRequest) -> SnitchResponse:
+    def process(self, req: ProcessRequest) -> ProcessResponse:
         """Apply pipelines to a component+operation"""
         if req is None:
             raise ValueError("req is required")
@@ -213,28 +219,31 @@ class SnitchClient:
             component_name=req.component_name,
         )
 
+        labels = {
+            "service": self.cfg.service_name,
+            "component_name": req.component_name,
+            "operation_name": req.operation_name,
+            "pipeline_name": "",
+            "pipeline_id": "",
+        }
+
         if payload_size > MAX_PAYLOAD_SIZE:
             self.metrics.incr(
                 metrics.CounterEntry(
-                    name=metrics.COUNTER_FAILURE_TRIGGER,
+                    name=metrics.COUNTER_PRODUCE_ERRORS,
                     value=1.0,
-                    pipeline_id="",
-                    audience=aud,
-                    labels={
-                        "type": "count",
-                        "component_name": req.component_name,
-                        "operation": self.op_to_string(
-                            protos.OperationType(req.operation_type)
-                        ),
-                    },
+                    labels=labels,
                 )
             )
-            return SnitchResponse(data=req.data, error=False, message="")
+            return ProcessResponse(data=req.data, error=False, message="")
 
-        if req.operation_type == MODE_CONSUMER:
-            counter = metrics.COUNTER_CONSUME
-        else:
-            counter = metrics.COUNTER_PUBLISH
+        bytes_counter = metrics.COUNTER_CONSUME_BYTES
+        errors_counter = metrics.COUNTER_CONSUME_ERRORS
+        total_counter = metrics.COUNTER_CONSUME_PROCESSED
+        if req.operation_type == MODE_PRODUCER:
+            bytes_counter = metrics.COUNTER_PRODUCE_BYTES
+            errors_counter = metrics.COUNTER_PRODUCE_ERRORS
+            total_counter = metrics.COUNTER_PRODUCE_PROCESSED
 
         # Ensure no side-effects are propagated to outside the library
         data = copy(req.data)
@@ -246,23 +255,16 @@ class SnitchClient:
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
+            labels["pipeline_id"] = pipeline.id
+            labels["pipeline_name"] = pipeline.name
+
             self.metrics.incr(
-                metrics.CounterEntry(
-                    name=counter,
-                    value=1.0,
-                    audience=cmd.audience,
-                    pipeline_id=pipeline.id,
-                    labels={"type": "count", "component_name": req.component_name},
-                )
+                metrics.CounterEntry(name=total_counter, value=1.0, labels=labels)
             )
 
             self.metrics.incr(
                 metrics.CounterEntry(
-                    name=counter,
-                    value=payload_size,
-                    audience=cmd.audience,
-                    pipeline_id=pipeline.id,
-                    labels={"type": "bytes", "component_name": req.component_name},
+                    name=bytes_counter, value=payload_size, labels=labels
                 )
             )
 
@@ -315,7 +317,7 @@ class SnitchClient:
 
                     # Not continuing, exit function early
                     if should_continue is False and self.cfg.dry_run is False:
-                        return SnitchResponse(
+                        return ProcessResponse(
                             data=data, error=True, message=wasm_resp.exit_msg
                         )
 
@@ -349,7 +351,7 @@ class SnitchClient:
 
                 # Not continuing, exit function early
                 if should_continue is False and self.cfg.dry_run is False:
-                    return SnitchResponse(
+                    return ProcessResponse(
                         data=data, error=True, message=wasm_resp.exit_msg
                     )
 
@@ -358,23 +360,22 @@ class SnitchClient:
         if self.cfg.dry_run:
             data = req.data
 
-        return SnitchResponse(data=data, error=False, message="")
+        return ProcessResponse(data=data, error=False, message="")
 
     def _notify_condition(
         self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience
     ):
         async def call():
-            op_str = self.op_to_string(aud.operation_type)
             self.metrics.incr(
                 metrics.CounterEntry(
-                    name=metrics.COUNTER_FAILURE_TRIGGER,
+                    name=metrics.COUNTER_NOTIFY,
                     value=1.0,
-                    audience=aud,
-                    pipeline_id=pipeline.id,
                     labels={
-                        "type": "count",
+                        "service": self.cfg.service_name,
                         "component_name": aud.component_name,
-                        "operation": op_str,
+                        "pipeline_name": pipeline.name,
+                        "pipeline_id": pipeline.id,
+                        "operation_name": aud.operation_name,
                     },
                 )
             )
