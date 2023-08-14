@@ -26,7 +26,7 @@ type ResponseJSON struct {
 func New(d *deps.Dependencies) *HTTPAPI {
 	return &HTTPAPI{
 		Deps: d,
-		log:  logrus.WithField("pkg", "api"),
+		log:  logrus.WithField("pkg", "httpapi"),
 	}
 }
 
@@ -35,11 +35,22 @@ func (a *HTTPAPI) Run() error {
 
 	router := httprouter.New()
 
+	server := &http.Server{
+		Addr: a.Deps.Config.HTTPAPIListenAddress,
+	}
+
 	router.HandlerFunc("GET", "/health-check", a.healthCheckHandler)
 	router.HandlerFunc("GET", "/version", a.versionHandler)
 	router.Handler("GET", "/metrics", promhttp.Handler())
 
 	llog.Infof("HTTPAPI server running on %v", a.Deps.Config.HTTPAPIListenAddress)
+
+	// Graceful shutdown
+	go func() {
+		<-a.Deps.ShutdownContext.Done()
+		llog.Debug("context cancellation detected")
+		server.Close()
+	}()
 
 	return http.ListenAndServe(a.Deps.Config.HTTPAPIListenAddress, router)
 }

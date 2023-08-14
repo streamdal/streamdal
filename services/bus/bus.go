@@ -153,7 +153,7 @@ MAIN:
 		}
 	}
 
-	b.log.Debug("msg consumer exiting")
+	b.log.Debug("consumer exiting")
 
 	return nil
 }
