@@ -38,6 +38,15 @@ export interface GetAllResponse {
     pipelines: {
         [key: string]: PipelineInfo;
     };
+    /**
+     * Audience to pipeline ID config/mapping.
+     * key == $audience_as_string, value = $pipeline_id
+     *
+     * @generated from protobuf field: map<string, string> config = 4;
+     */
+    config: {
+        [key: string]: string;
+    };
 }
 /**
  * Don't think we need anything here

@@ -78,7 +78,14 @@ class GetAllRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAllResponse(_message.Message):
-    __slots__ = ["audiences", "live", "pipelines"]
+    __slots__ = ["audiences", "config", "live", "pipelines"]
+    class ConfigEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     class PipelinesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -87,12 +94,14 @@ class GetAllResponse(_message.Message):
         value: _info_pb2.PipelineInfo
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_info_pb2.PipelineInfo, _Mapping]] = ...) -> None: ...
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
     LIVE_FIELD_NUMBER: _ClassVar[int]
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
     audiences: _containers.RepeatedCompositeFieldContainer[_common_pb2.Audience]
+    config: _containers.ScalarMap[str, str]
     live: _containers.RepeatedCompositeFieldContainer[_info_pb2.LiveInfo]
     pipelines: _containers.MessageMap[str, _info_pb2.PipelineInfo]
-    def __init__(self, live: _Optional[_Iterable[_Union[_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _info_pb2.PipelineInfo]] = ...) -> None: ...
+    def __init__(self, live: _Optional[_Iterable[_Union[_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class GetNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]

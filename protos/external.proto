@@ -67,6 +67,10 @@ message GetAllResponse {
   // key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
   // to any audience.
   map <string, protos.PipelineInfo> pipelines = 3;
+
+  // Audience to pipeline ID config/mapping.
+  // key == $audience_as_string, value = $pipeline_id
+  map <string, string> config = 4;
 }
 
 message GetPipelinesRequest {
