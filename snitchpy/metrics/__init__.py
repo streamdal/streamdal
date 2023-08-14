@@ -1,3 +1,5 @@
+import json
+import pprint
 import time
 from dataclasses import dataclass, field
 import snitch_protos.protos as protos
@@ -260,16 +262,16 @@ class Metrics:
             #   if value > 0, continue
             #   if now() - last_updated > 10 seconds, remove counter
             self.lock.acquire(blocking=True)
-            items = self.counters.items()
+            items = self.counters.copy()
             self.lock.release()
-            for name, counter in items:
+
+            for name in items:
+                counter = items[name]
                 if counter.val() > 0:
                     continue
 
                 if (datetime.utcnow() - counter.last_updated).total_seconds() > 10:
-                    self.lock.acquire(blocking=True)
                     self.remove_counter(name)
-                    self.lock.release()
 
                     self.log.debug("reaped stale counter '{}'".format(id))
 
