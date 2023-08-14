@@ -83,6 +83,7 @@ def composite_id(entry: CounterEntry) -> str:
 class Metrics:
     """Class Metrics is used to manage counter metrics, and ship them to Snitch server asynchronously"""
 
+    loop: asyncio.AbstractEventLoop
     log: logging.Logger
     exit: Event
     counters: dict = field(default_factory=dict)
@@ -101,13 +102,14 @@ class Metrics:
         self.lock = Lock()
         self.loop = kwargs.get("loop")
         self.auth_token = kwargs.get("auth_token")
+        self.exit = kwargs.get("exit")
 
         # TODO: remove after testing
-        if kwargs.get("exit") is None:
-            self.exit = Event()
-            events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
-            for e in events:
-                signal.signal(e, self.shutdown)
+        # if kwargs.get("exit") is None:
+        #     self.exit = Event()
+        #     events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
+        #     for e in events:
+        #         signal.signal(e, self.shutdown)
 
         self.__start()
 

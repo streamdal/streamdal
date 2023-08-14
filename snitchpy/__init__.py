@@ -107,10 +107,11 @@ class SnitchClient:
         self.paused_pipelines = {}
         self.audiences = {}
         self.log = log
+        self.exit = cfg.exit
         self.metrics = Metrics(
             stub=self.grpc_stub,
             log=self.log,
-            event=self.cfg.exit,
+            exit=cfg.exit,
             loop=grpc_loop,
             auth_token=self.auth_token,
         )
