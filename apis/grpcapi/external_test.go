@@ -65,14 +65,20 @@ type AuthTest struct {
 
 var _ = Describe("External gRPC API", func() {
 	var (
-		err            error
-		externalClient protos.ExternalClient
+		externalClientErr error
+		externalClient    protos.ExternalClient
+		internalClientErr error
+		internalClient    protos.InternalClient
 	)
 
 	BeforeEach(func() {
-		externalClient, err = newExternalClient()
-		Expect(err).ToNot(HaveOccurred())
+		externalClient, externalClientErr = newExternalClient()
+		Expect(externalClientErr).ToNot(HaveOccurred())
 		Expect(externalClient).ToNot(BeNil())
+
+		internalClient, internalClientErr = newInternalClient()
+		Expect(internalClientErr).ToNot(HaveOccurred())
+		Expect(internalClient).ToNot(BeNil())
 	})
 
 	Describe("Auth", func() {
@@ -298,6 +304,77 @@ var _ = Describe("External gRPC API", func() {
 				}
 
 				Expect(found).To(BeTrue(), "pipeline %s not found in response", pipelineID)
+			}
+		})
+	})
+
+	Describe("GetAll", func() {
+		It("returns correct data", func() {
+			// Create multiple pipelines
+			createdPipelineIDs := make([]string, 0)
+
+			for i := 0; i < 5; i++ {
+				createResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+					Pipeline: newPipeline(),
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(createResp).ToNot(BeNil())
+				Expect(createResp.Message).To(ContainSubstring("Pipeline created successfully"))
+				Expect(createResp.PipelineId).ToNot(BeEmpty())
+
+				createdPipelineIDs = append(createdPipelineIDs, createResp.PipelineId)
+			}
+
+			// Create multiple audiences
+			createdAudienceIDs := make([]string, 0)
+
+			for i := 0; i < 5; i++ {
+				aud := &protos.Audience{
+					ServiceName:   "test-service",
+					ComponentName: fmt.Sprintf("test-component-%d", i),
+					OperationType: 1,
+					OperationName: "kafka",
+				}
+
+				resp, err := internalClient.NewAudience(ctxWithGoodAuth, &protos.NewAudienceRequest{
+					SessionId: "test-session-id",
+					Audience:  aud,
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resp).ToNot(BeNil())
+
+				createdAudienceIDs = append(createdAudienceIDs, util.AudienceToStr(aud))
+			}
+
+			config := make(map[string]string, 0)
+
+			// Attach pipelines to audiences
+			for i := 0; i < len(createdPipelineIDs); i++ {
+				attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
+					PipelineId: createdPipelineIDs[i],
+					Audience:   util.AudienceFromStr(createdAudienceIDs[i]),
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(attachResp).ToNot(BeNil())
+
+				// Record our desired mapping
+				config[createdAudienceIDs[i]] = createdPipelineIDs[i]
+			}
+
+			// Finally, perform GetAll() to verify that we get the correct data
+			getAllResp, err := externalClient.GetAll(ctxWithGoodAuth, &protos.GetAllRequest{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(getAllResp).ToNot(BeNil())
+
+			// We do >= because there may be other pipelines in the bucket but
+			// there should be at least len(config)
+			Expect(len(getAllResp.Config)).To(BeNumerically(">=", len(config)))
+
+			for aud, pipelineID := range getAllResp.Config {
+				Expect(config).To(HaveKeyWithValue(aud, pipelineID))
 			}
 		})
 	})
