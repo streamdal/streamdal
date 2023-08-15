@@ -44,8 +44,6 @@ func Load(name string, prefix ...string) (*Mapping, error) {
 		return nil, errors.Wrapf(err, "unable to read wasm file '%s'", fullPath)
 	}
 
-	// TODO: Testing
-
 	return &Mapping{
 		Filename: mapping.Filename,
 		FuncName: mapping.FuncName,

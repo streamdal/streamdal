@@ -74,7 +74,6 @@ func (g *GRPCAPI) Run() error {
 
 	llog.Infof("GRPCAPI server listening on %v", g.Deps.Config.GRPCAPIListenAddress)
 
-	// TODO: Implement listening to ctx
 	return grpcServer.Serve(lis)
 }
 
