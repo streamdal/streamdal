@@ -44,3 +44,17 @@ export const deletePipeline = async (
 
   return response;
 };
+
+export const attachPipeline = async (
+  pipelineId: string,
+) => {
+  const { response } = await client.attachPipeline({ pipelineId }, meta);
+  return response;
+};
+
+export const detachPipeline = async (
+  pipelineId: string,
+) => {
+  const { response } = await client.deletePipeline({ pipelineId }, meta);
+  return response;
+};

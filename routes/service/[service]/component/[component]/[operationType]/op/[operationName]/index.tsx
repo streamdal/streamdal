@@ -33,6 +33,7 @@ export default function FlowRoute(
       <InfoModal
         params={props.params as any}
         serviceMap={props.data.serviceMap}
+        success={props.data.success}
       />
       <ServiceMap
         nodesData={props.data.serviceNodes.nodes}

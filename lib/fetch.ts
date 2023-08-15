@@ -9,6 +9,7 @@ import {
   mapEdges,
   mapNodes,
 } from "../components/serviceMap/customNodes.tsx";
+import { Audience } from "snitch-protos/protos/common.ts";
 
 export type ServiceMapType = GetAllResponse & { pipes: PipelineInfo[] };
 
@@ -53,10 +54,13 @@ export const pausePipeline = async (pipeline: any) => {
   return response;
 };
 
-export const attachPipeline = async (pipeline: string) => {
-  const { response } = await client.attachPipeline(
-    { pipelineId: pipeline },
-    meta,
+export const getAttachedPipeline = async (name: string) => {
+  const { response } = await client.getAll({}, meta);
+  const attachedPipelineName = Object.keys(response.pipelines).find((
+    pipeline,
+  ) =>
+    response.pipelines[pipeline].audiences.find((audience: Audience) =>
+      audience.operationName === name
+    )
   );
-  return response;
 };
