@@ -1,14 +1,15 @@
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
-import IconPlus from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/plus.tsx";
-import IconX from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/x.tsx";
-import IconUnlink from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/unlink.tsx";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
+import IconX from "tabler-icons/tsx/x.tsx";
+import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 
 import { titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { useEffect, useState } from "preact/denonext/hooks.js";
+import { useEffect, useState } from "preact/hooks";
 import { Toast } from "../components/toasts/toast.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
 
 type Params = {
   service: string;
@@ -21,7 +22,7 @@ export default function InfoModal(
   { params, serviceMap, success }: {
     params: Params;
     serviceMap: ServiceMapType;
-    success: successType;
+    success?: SuccessType;
   },
 ) {
   const associatedPipeline = serviceMap

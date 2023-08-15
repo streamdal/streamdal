@@ -8,10 +8,12 @@ import {
   ServiceMapType,
   ServiceNodes,
 } from "../../../../../../../../lib/fetch.ts";
+import { SuccessType } from "../../../../../../../_middleware.ts";
 
 export type ServicePipelines = {
   serviceNodes: ServiceNodes;
   serviceMap: ServiceMapType;
+  success?: SuccessType;
 };
 
 export const handler: Handlers<ServicePipelines> = {
