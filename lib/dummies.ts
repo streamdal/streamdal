@@ -136,15 +136,18 @@ export const testPostgreSQLAudiences = [{
   operationName: "produce postgresql another",
 }];
 
-export const audiences = [...testKafkaAudiences, ...testPostgreSQLAudiences];
+export const dummyAudiences = [
+  ...testKafkaAudiences,
+  ...testPostgreSQLAudiences,
+];
 
 export const dummyServiceMap: GetAllResponse = {
-  audiences,
+  audiences: dummyAudiences,
   live: [],
   pipelines: {
     "1234-1234-123456": {
-      audiences,
-      paused: [audiences[0]],
+      audiences: dummyAudiences,
+      paused: [dummyAudiences[0]],
       pipeline: {
         id: "1234-1234-123456",
         name: "Best pipeline",
@@ -166,8 +169,8 @@ export const dummyServiceMap: GetAllResponse = {
       },
     },
     "5555-4444-3333": {
-      audiences,
-      paused: [audiences[2]],
+      audiences: dummyAudiences,
+      paused: [dummyAudiences[2]],
       pipeline: {
         id: "5555-4444-3333",
         name: "Substandard pipeline",
