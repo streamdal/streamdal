@@ -21,12 +21,10 @@ export const PipelineMenu = ({ id }: { id?: string }) => (
         class="py-2 text-sm text-gray-700 dark:text-gray-200"
         aria-labelledby="pipelineMenuButton"
       >
-        <a href="#">
-          <li className="flex flex-start items-center px-2 py-2 hover:bg-sunset text-sm">
-            <IconCopy class="w-4 h-4 mr-2" />
-            Duplicate Pipeline
-          </li>
-        </a>
+        <li className="flex flex-start items-center px-2 py-2 hover:bg-sunset text-sm cursor-not-allowed">
+          <IconCopy class="w-4 h-4 mr-2" />
+          Duplicate Pipeline
+        </li>
         <a href={`/pipelines/${id}/delete`}>
           <li className="cursor-pointer group flex w-full items-center py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
             <IconTrash class="w-4 h-4 mr-2 text-eyelid group-hover:text-white" />

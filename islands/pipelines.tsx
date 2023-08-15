@@ -15,7 +15,7 @@ const Pipelines = (
   },
 ) => {
   //
-  // wrapper supports adding an new entry
+  // wrapper supports adding a new entry
   const wrapper = [
     ...pipelines,
     ...pipelines.length === 0 || add ? [newPipeline] : [],
@@ -28,7 +28,7 @@ const Pipelines = (
     <div
       id="pipelinesModal"
       aria-modal="true"
-      class="absolute mt-20 z-40 w-full px-4 py-2 overflow-x-hidden overflow-y-hidden max-h-full justify-center items-center flex"
+      class="absolute mt-12 z-40 w-full px-4 py-2 overflow-x-hidden overflow-y-hidden max-h-full justify-center items-center flex"
       role="dialog"
     >
       <div class="relative w-full max-w-5xl shadow-2xl shadow-stormCloud">

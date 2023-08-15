@@ -40,11 +40,9 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
     <body className="h-screen bg-purple-50 m-0">
       {hideNav ? null : <NavBar />}
       <div className="flex flex-col w-screen h-screen text-web">
-        <div className="h-screen w-screen">
-          <ReactFlowProvider>
-            {children}
-          </ReactFlowProvider>
-        </div>
+        <ReactFlowProvider>
+          {children}
+        </ReactFlowProvider>
       </div>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js">
       </script>

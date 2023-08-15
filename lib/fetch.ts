@@ -10,7 +10,9 @@ import {
   mapNodes,
 } from "../components/serviceMap/customNodes.tsx";
 
-export type ServiceMapType = GetAllResponse & { pipes: PipelineInfo[] };
+export type ServiceMapType = GetAllResponse & {
+  pipes: PipelineInfo[];
+};
 
 export const getServiceMap = async (): Promise<ServiceMapType> => {
   const { response } = await client.getAll({}, meta);

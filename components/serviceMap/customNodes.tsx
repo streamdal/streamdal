@@ -10,10 +10,17 @@ import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
 import { removeWhitespace, titleCase } from "../../lib/utils.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
-import { PipelineInfo } from "snitch-protos/protos/info.ts";
+import {
+  ClientInfo,
+  LiveInfo,
+  PipelineInfo,
+} from "snitch-protos/protos/info.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 
-export type AudiencePipeline = Audience & { pipeline?: Pipeline };
+export type AudiencePipeline = Audience & {
+  pipeline?: Pipeline;
+  clients?: ClientInfo[];
+};
 
 export type NodeData = {
   label: string;
@@ -219,11 +226,15 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
 export const mapAudiencePipelines = (
   audiences: Audience[],
   pipelines: PipelineInfo[],
+  liveInfo: LiveInfo[],
 ): AudiencePipeline[] =>
   audiences.map((a: Audience) => ({
     ...a,
     pipeline: pipelines.find((p: PipelineInfo) => p.audiences.includes(a))
       ?.pipeline,
+    clients: liveInfo?.filter((l: LiveInfo) => l.audiences.includes(a))?.map((
+      l: LiveInfo,
+    ) => l.client),
   }));
 
 export const ServiceNode = ({ data }: { data: { label: string } }) => {
