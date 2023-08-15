@@ -16,6 +16,7 @@ import {
   PipelineInfo,
 } from "snitch-protos/protos/info.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
+import { ConfigType, PipelinesType } from "../../lib/fetch.ts";
 
 export type AudiencePipeline = Audience & {
   pipeline?: Pipeline;
@@ -225,35 +226,40 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
 
 export const mapAudiencePipelines = (
   audiences: Audience[],
-  pipelines: PipelineInfo[],
+  pipelines: PipelinesType,
   liveInfo: LiveInfo[],
+  config: ConfigType,
 ): AudiencePipeline[] =>
   audiences.map((a: Audience) => ({
     ...a,
-    pipeline: pipelines.find((p: PipelineInfo) => p.audiences.includes(a))
+    pipeline: pipelines[config[JSON.stringify(a)]]
       ?.pipeline,
-    clients: liveInfo?.filter((l: LiveInfo) => l.audiences.includes(a))?.map((
+    clients: liveInfo?.filter((l: LiveInfo) => l.audiences?.includes(a))?.map((
       l: LiveInfo,
     ) => l.client),
   }));
 
-export const ServiceNode = ({ data }: { data: { label: string } }) => {
+export const ServiceNode = ({ data }: { data: NodeData }) => {
   return (
     <div>
       <div class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
-        <IconGripVertical
-          class="w-6 h-6 text-purple-100"
-          id="dragHandle"
-        />
-        <img
-          src={"/images/placeholder-icon.png"}
-          className={"h-[40px]"}
-        />
-        <div>
-          <h2 className={"text-lg mr-3 ml-2"}>{data.label}</h2>
-          <p class="text-streamdalPurple text-xs font-semibold mt-1">
-            4 instances
-          </p>
+        <div class="flex flex-row items-center">
+          <IconGripVertical
+            class="w-6 h-6 text-purple-100 mr-1"
+            id="dragHandle"
+          />
+          <img
+            src={"/images/placeholder-icon.png"}
+            className={"h-[40px]"}
+          />
+          <div class="flex flex-col ml-2">
+            <h2 className={"text-lg"}>{data.label}</h2>
+            <div class="text-streamdalPurple text-xs font-semibold ml-1 mt-1">
+              {data.audience?.clients?.length
+                ? data.audience?.clients?.length
+                : "No "} clients
+            </div>
+          </div>
         </div>
         <ServiceNodeMenu />
       </div>
