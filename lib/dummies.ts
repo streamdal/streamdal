@@ -1,6 +1,7 @@
 import { GetAllResponse } from "snitch-protos/protos/external.ts";
 import { OperationType } from "snitch-protos/protos/common.ts";
 import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
+import { ClientType } from "snitch-protos/protos/info.ts";
 
 export const dummyPipelines = [{
   id: "1234-1234-123456",
@@ -136,15 +137,35 @@ export const testPostgreSQLAudiences = [{
   operationName: "produce postgresql another",
 }];
 
-export const audiences = [...testKafkaAudiences, ...testPostgreSQLAudiences];
+export const dummyAudiences = [
+  ...testKafkaAudiences,
+  ...testPostgreSQLAudiences,
+];
+
+export const dummyLive = [{
+  audiences: [dummyAudiences[0]],
+  client: {
+    clientType: ClientType.SDK,
+    libraryName: "snitch-node-client",
+    libraryVersion: "0.0.1",
+    language: "typescript",
+    arch: "m1",
+    os: "osx",
+  },
+}];
+
+export const dummyConfig = {
+  [JSON.stringify(dummyAudiences[0])]: "86ecfa45-dc2e-4035-bdad-c285ad13cc8e",
+};
 
 export const dummyServiceMap: GetAllResponse = {
-  audiences,
-  live: [],
+  audiences: dummyAudiences,
+  live: dummyLive,
+  config: dummyConfig,
   pipelines: {
     "1234-1234-123456": {
-      audiences,
-      paused: [audiences[0]],
+      audiences: dummyAudiences,
+      paused: [dummyAudiences[0]],
       pipeline: {
         id: "1234-1234-123456",
         name: "Best pipeline",
@@ -166,8 +187,8 @@ export const dummyServiceMap: GetAllResponse = {
       },
     },
     "5555-4444-3333": {
-      audiences,
-      paused: [audiences[2]],
+      audiences: dummyAudiences,
+      paused: [dummyAudiences[2]],
       pipeline: {
         id: "5555-4444-3333",
         name: "Substandard pipeline",
