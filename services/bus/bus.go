@@ -3,6 +3,7 @@ package bus
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -125,7 +126,15 @@ func (o *Options) validate() error {
 // RunConsumer is used for consuming message from the snitch NATS stream and
 // executing a message handler.
 func (b *Bus) RunConsumer() error {
+MAIN:
 	for {
+		// Hack since natty.Consume() should return err (but doesn't right now)
+		select {
+		case <-b.options.ShutdownCtx.Done():
+			b.log.Debug("context cancellation detected")
+			break MAIN
+		}
+
 		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
 			Subject:      FullSubject,
 			StreamName:   StreamName,
@@ -135,18 +144,16 @@ func (b *Bus) RunConsumer() error {
 		// NOTE: Consumer won't exit on handler err - err is passed errorCh by
 		// natty - error reading should occur elsewhere
 		if err != nil {
-			fmt.Println("Do we hit this error check?")
-
-			if err == context.Canceled {
+			if err == context.Canceled || strings.Contains(err.Error(), "context deadline exceeded") {
 				b.log.Debug("context cancellation detected")
-				break
+				break MAIN
 			}
 
 			b.log.WithError(err).Error("error consuming messages")
 		}
 	}
 
-	b.log.Debug("msg consumer exiting")
+	b.log.Debug("consumer exiting")
 
 	return nil
 }

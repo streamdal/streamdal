@@ -160,7 +160,7 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 	}
 
 	// Determine active pipeline usage
-	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId) // TODO: Should update this
+	usage, err := b.getActivePipelineUsage(ctx, req.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "error getting pipeline usage")
 	}

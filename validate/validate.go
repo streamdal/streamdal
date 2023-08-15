@@ -222,7 +222,7 @@ func PipelineStep(s *protos.PipelineStep) error {
 		return errors.New(".Step cannot be nil")
 	}
 
-	// TODO: OK if OnSuccess or OnFailure empty? ~DS
+	// OK if OnSuccess and OnFailure are nil/empty; nil/empty == implicit continue
 
 	return nil
 }

@@ -46,10 +46,18 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
+	config, err := s.Deps.StoreService.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get config")
+	}
+
+	configStrAudience := util.ConvertConfigStrAudience(config)
+
 	return &protos.GetAllResponse{
 		Live:      liveInfo,
 		Audiences: audiences,
 		Pipelines: pipelines,
+		Config:    configStrAudience,
 	}, nil
 }
 

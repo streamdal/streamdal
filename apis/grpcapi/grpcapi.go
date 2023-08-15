@@ -64,9 +64,16 @@ func (g *GRPCAPI) Run() error {
 
 	reflection.Register(grpcServer)
 
+	// Watch for cancellation
+	go func() {
+		<-g.Deps.ShutdownContext.Done()
+		llog.Debug("context cancellation detected")
+
+		grpcServer.Stop()
+	}()
+
 	llog.Infof("GRPCAPI server listening on %v", g.Deps.Config.GRPCAPIListenAddress)
 
-	// TODO: Implement listening to ctx
 	return grpcServer.Serve(lis)
 }
 

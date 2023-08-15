@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -56,12 +57,12 @@ func main() {
 	go func() {
 		sig := <-c
 		logrus.Debugf("Received system call: %+v", sig)
-		logrus.Info("Shutting down plumber...")
+		logrus.Info("Shutting down snitch...")
 		d.ShutdownFunc()
 	}()
 
 	if err := run(d); err != nil {
-		log.WithError(err).Fatal("error during run")
+		log.Fatal(err)
 	}
 }
 
@@ -91,7 +92,15 @@ func run(d *deps.Dependencies) error {
 
 	displayInfo(d)
 
-	return <-errChan
+	// If shutting down, no need to listen for errCh
+	select {
+	case err := <-errChan:
+		return err
+	case <-d.ShutdownContext.Done():
+		// Give components a moment to shutdown
+		time.Sleep(5 * time.Second)
+		return errors.New("shutting down")
+	}
 }
 
 func displayInfo(d *deps.Dependencies) {
