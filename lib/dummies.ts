@@ -1,6 +1,7 @@
 import { GetAllResponse } from "snitch-protos/protos/external.ts";
 import { OperationType } from "snitch-protos/protos/common.ts";
 import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
+import { ClientType } from "snitch-protos/protos/info.ts";
 
 export const dummyPipelines = [{
   id: "1234-1234-123456",
@@ -141,9 +142,26 @@ export const dummyAudiences = [
   ...testPostgreSQLAudiences,
 ];
 
+export const dummyLive = [{
+  audiences: [dummyAudiences[0]],
+  client: {
+    clientType: ClientType.SDK,
+    libraryName: "snitch-node-client",
+    libraryVersion: "0.0.1",
+    language: "typescript",
+    arch: "m1",
+    os: "osx",
+  },
+}];
+
+export const dummyConfig = {
+  [JSON.stringify(dummyAudiences[0])]: "86ecfa45-dc2e-4035-bdad-c285ad13cc8e",
+};
+
 export const dummyServiceMap: GetAllResponse = {
   audiences: dummyAudiences,
-  live: [],
+  live: dummyLive,
+  config: dummyConfig,
   pipelines: {
     "1234-1234-123456": {
       audiences: dummyAudiences,
