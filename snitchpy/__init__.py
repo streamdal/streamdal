@@ -7,6 +7,7 @@ import signal
 import snitch_protos.protos as protos
 import socket
 import uuid
+from betterproto import which_one_of
 from .exceptions import SnitchException, SnitchRegisterException
 from copy import copy
 from dataclasses import dataclass, field
@@ -151,8 +152,22 @@ class SnitchClient:
                 req, metadata=self._get_metadata()
             )
 
-            for cmd in cmds.commands:
+            for cmd in cmds.active:
                 self._attach_pipeline(cmd)
+
+            for cmd in cmds.paused:
+                aud_str = self.aud_to_str(cmd.audience)
+
+                if self.paused_pipelines.get(aud_str) is None:
+                    self.paused_pipelines[aud_str] = {}
+
+                self.paused_pipelines[aud_str][cmd.attach_pipeline.pipeline.id] = cmd
+
+                self.log.debug(
+                    "Adding pipeline {} to paused pipelines".format(
+                        cmd.attach_pipeline.pipeline.id
+                    )
+                )
 
         self.grpc_loop.run_until_complete(call())
 
@@ -484,20 +499,20 @@ class SnitchClient:
                 if self.exit.is_set():
                     return
 
-                # Log except for keep-alives
-                if cmd.keep_alive is None:
-                    self.log.debug("received command: {}".format(cmd))
-                else:
-                    continue
+                self.log.debug("received command: {}".format(cmd))
 
-                if cmd.attach_pipeline is not None:
+                (command, _) = which_one_of(cmd, "command")
+
+                if command == "attach_pipeline":
                     self._attach_pipeline(cmd)
-                elif cmd.detach_pipeline is not None:
+                elif command == "detach_pipeline":
                     self._detach_pipeline(cmd)
-                elif cmd.pause_pipeline is not None:
+                elif command == "pause_pipeline":
                     self._pause_pipeline(cmd)
-                elif cmd.resume_pipeline is not None:
+                elif command == "resume_pipeline":
                     self._resume_pipeline(cmd)
+                elif command == "keep_alive":
+                    print("keep alive")
                 else:
                     self.log.error("Unknown response type: {}".format(cmd))
 

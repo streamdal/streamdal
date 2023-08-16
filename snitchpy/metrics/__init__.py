@@ -273,7 +273,7 @@ class Metrics:
                 if (datetime.utcnow() - counter.last_updated).total_seconds() > 10:
                     self.remove_counter(name)
 
-                    self.log.debug("reaped stale counter '{}'".format(id))
+                    self.log.debug("reaped stale counter '{}'".format(name))
 
         self.log.debug("Exiting reaper")
 
