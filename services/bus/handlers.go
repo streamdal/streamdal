@@ -211,7 +211,7 @@ func (b *Bus) getActiveSessionIDs(ctx context.Context, audience *protos.Audience
 	sessionIDs := make([]string, 0)
 
 	for _, e := range entries {
-		if e.Audience != audience {
+		if !util.AudienceEquals(e.Audience, audience) {
 			continue
 		}
 

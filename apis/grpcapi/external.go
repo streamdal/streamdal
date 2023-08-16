@@ -338,7 +338,7 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 	// Give time for all snitch server instances to receive detach command and send it to active sessions
 	// before removing the config entry, otherwise getActivePipelineUsage() will return incorrect results
 	go func() {
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 5)
 		// Remove config entry
 		if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
 			s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
