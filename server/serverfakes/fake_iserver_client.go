@@ -11,18 +11,18 @@ import (
 )
 
 type FakeIServerClient struct {
-	GetAttachCommandsByServiceStub        func(context.Context, string) ([]*protos.Command, error)
+	GetAttachCommandsByServiceStub        func(context.Context, string) (*protos.GetAttachCommandsByServiceResponse, error)
 	getAttachCommandsByServiceMutex       sync.RWMutex
 	getAttachCommandsByServiceArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
 	getAttachCommandsByServiceReturns struct {
-		result1 []*protos.Command
+		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}
 	getAttachCommandsByServiceReturnsOnCall map[int]struct {
-		result1 []*protos.Command
+		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}
 	HeartBeatStub        func(context.Context, string) error
@@ -94,7 +94,7 @@ type FakeIServerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByService(arg1 context.Context, arg2 string) ([]*protos.Command, error) {
+func (fake *FakeIServerClient) GetAttachCommandsByService(arg1 context.Context, arg2 string) (*protos.GetAttachCommandsByServiceResponse, error) {
 	fake.getAttachCommandsByServiceMutex.Lock()
 	ret, specificReturn := fake.getAttachCommandsByServiceReturnsOnCall[len(fake.getAttachCommandsByServiceArgsForCall)]
 	fake.getAttachCommandsByServiceArgsForCall = append(fake.getAttachCommandsByServiceArgsForCall, struct {
@@ -120,7 +120,7 @@ func (fake *FakeIServerClient) GetAttachCommandsByServiceCallCount() int {
 	return len(fake.getAttachCommandsByServiceArgsForCall)
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceCalls(stub func(context.Context, string) ([]*protos.Command, error)) {
+func (fake *FakeIServerClient) GetAttachCommandsByServiceCalls(stub func(context.Context, string) (*protos.GetAttachCommandsByServiceResponse, error)) {
 	fake.getAttachCommandsByServiceMutex.Lock()
 	defer fake.getAttachCommandsByServiceMutex.Unlock()
 	fake.GetAttachCommandsByServiceStub = stub
@@ -133,28 +133,28 @@ func (fake *FakeIServerClient) GetAttachCommandsByServiceArgsForCall(i int) (con
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceReturns(result1 []*protos.Command, result2 error) {
+func (fake *FakeIServerClient) GetAttachCommandsByServiceReturns(result1 *protos.GetAttachCommandsByServiceResponse, result2 error) {
 	fake.getAttachCommandsByServiceMutex.Lock()
 	defer fake.getAttachCommandsByServiceMutex.Unlock()
 	fake.GetAttachCommandsByServiceStub = nil
 	fake.getAttachCommandsByServiceReturns = struct {
-		result1 []*protos.Command
+		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, result1 []*protos.Command, result2 error) {
+func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, result1 *protos.GetAttachCommandsByServiceResponse, result2 error) {
 	fake.getAttachCommandsByServiceMutex.Lock()
 	defer fake.getAttachCommandsByServiceMutex.Unlock()
 	fake.GetAttachCommandsByServiceStub = nil
 	if fake.getAttachCommandsByServiceReturnsOnCall == nil {
 		fake.getAttachCommandsByServiceReturnsOnCall = make(map[int]struct {
-			result1 []*protos.Command
+			result1 *protos.GetAttachCommandsByServiceResponse
 			result2 error
 		})
 	}
 	fake.getAttachCommandsByServiceReturnsOnCall[i] = struct {
-		result1 []*protos.Command
+		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}{result1, result2}
 }

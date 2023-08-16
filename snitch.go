@@ -168,12 +168,8 @@ func New(cfg *Config) (*Snitch, error) {
 		cfg.Logger.Warn("data pipelines running in dry run mode")
 	}
 
-	cmds, err := s.serverClient.GetAttachCommandsByService(context.Background(), cfg.ServiceName)
-	for _, cmd := range cmds {
-		cfg.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
-		if err := s.attachPipeline(context.Background(), cmd); err != nil {
-			cfg.Logger.Errorf("failed to attach pipeline: %s", err)
-		}
+	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
+		return nil, err
 	}
 
 	// Start register
@@ -184,7 +180,6 @@ func New(cfg *Config) (*Snitch, error) {
 
 	return s, nil
 }
-
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
 		return ErrEmptyConfig
@@ -247,6 +242,31 @@ func validateConfig(cfg *Config) error {
 	// Default to NOOP logger if none is provided
 	if cfg.Logger == nil {
 		cfg.Logger = &logger.NoOpLogger{}
+	}
+
+	return nil
+}
+
+func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
+	cmds, err := s.serverClient.GetAttachCommandsByService(ctx, s.config.ServiceName)
+	if err != nil {
+		return errors.Wrap(err, "unable to pull initial pipelines")
+	}
+
+	for _, cmd := range cmds.Active {
+		s.config.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
+		if err := s.attachPipeline(ctx, cmd); err != nil {
+			s.config.Logger.Errorf("failed to attach pipeline: %s", err)
+		}
+	}
+
+	for _, cmd := range cmds.Paused {
+		s.config.Logger.Debugf("Pipeline '%s' is paused", cmd.GetAttachPipeline().Pipeline.Name)
+		if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
+			s.pipelinesPaused[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
+		}
+
+		s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
 	}
 
 	return nil

@@ -31,7 +31,7 @@ type IServerClient interface {
 	// NewAudience signals a new audience to the snitch server
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 
-	GetAttachCommandsByService(ctx context.Context, service string) ([]*protos.Command, error)
+	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
 }
 
 const (
@@ -126,7 +126,7 @@ func (c *Client) HeartBeat(ctx context.Context, sessionID string) error {
 	return err
 }
 
-func (c *Client) GetAttachCommandsByService(ctx context.Context, service string) ([]*protos.Command, error) {
+func (c *Client) GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
 	resp, err := c.Server.GetAttachCommandsByService(ctx, &protos.GetAttachCommandsByServiceRequest{ServiceName: service})
@@ -134,5 +134,5 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 		return nil, errors.Wrap(err, "unable to get attach commands by service")
 	}
 
-	return resp.Commands, nil
+	return resp, nil
 }
