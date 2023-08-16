@@ -326,8 +326,24 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	if err := s.options.NATSBackend.Delete(ctx, NATSConfigBucket, NATSConfigKey(util.AudienceToStr(req.Audience))); err != nil {
+	// Delete audience association
+	if err := s.options.NATSBackend.Delete(
+		ctx,
+		NATSConfigBucket,
+		NATSConfigKey(util.AudienceToStr(req.Audience)),
+	); err != nil {
 		return errors.Wrap(err, "error deleting pipeline attachment from NATS")
+	}
+
+	// Delete from paused
+	if err := s.options.NATSBackend.Delete(
+		ctx,
+		NATSPausedBucket,
+		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
+	); err != nil {
+		if !errors.Is(err, nats.ErrKeyNotFound) {
+			return errors.Wrap(err, "error deleting pipeline pause state")
+		}
 	}
 
 	return nil

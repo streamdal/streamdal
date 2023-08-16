@@ -336,6 +336,7 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 
 	// TODO: figure out a better method for this
 	// Give time for all snitch server instances to receive detach command and send it to active sessions
+	// before removing the config entry, otherwise getActivePipelineUsage() will return incorrect results
 	go func() {
 		time.Sleep(time.Second * 10)
 		// Remove config entry
