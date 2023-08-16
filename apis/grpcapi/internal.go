@@ -307,12 +307,40 @@ func (s *InternalServer) GetAttachCommandsByService(
 	ctx context.Context,
 	req *protos.GetAttachCommandsByServiceRequest,
 ) (*protos.GetAttachCommandsByServiceResponse, error) {
-	cmds, err := s.Deps.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
+	attaches, err := s.Deps.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get attach commands by service")
 	}
 
+	pausedMap, err := s.Deps.StoreService.GetPaused(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get paused pipelines")
+	}
+
+	active := make([]*protos.Command, 0)
+	paused := make([]*protos.Command, 0)
+
+	for _, a := range attaches {
+		pausedEntry, ok := pausedMap[a.GetAttachPipeline().Pipeline.Id]
+		if !ok {
+			// Pipeline ID is not present in map, it is not paused
+			active = append(active, a)
+			continue
+		}
+
+		// Found pipeline id in paused, check if audience matches
+		if util.AudienceEquals(pausedEntry.Audience, a.Audience) {
+			// This is paused
+			paused = append(paused, a)
+			continue
+		}
+
+		// Audience dos not match, this is active
+		active = append(active, a)
+	}
+
 	return &protos.GetAttachCommandsByServiceResponse{
-		Commands: cmds,
+		Active: active,
+		Paused: paused,
 	}, nil
 }

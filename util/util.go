@@ -168,3 +168,11 @@ func ConvertConfigStrAudience(config map[*protos.Audience]string) map[string]str
 
 	return m
 }
+
+func AudienceEquals(a, b *protos.Audience) bool {
+	if a == nil || b == nil {
+		return false
+	}
+
+	return AudienceToStr(a) == AudienceToStr(b)
+}

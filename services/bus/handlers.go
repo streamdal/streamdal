@@ -2,7 +2,6 @@ package bus
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -50,7 +49,7 @@ func (b *Bus) getPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
 
 		// Check if this pipeline is "active"
 		for _, l := range live {
-			if reflect.DeepEqual(l.Audience, aud) {
+			if util.AudienceEquals(l.Audience, aud) {
 				pu.Active = true
 				pu.NodeName = l.NodeName
 				pu.SessionId = l.SessionID

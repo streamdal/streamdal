@@ -11,6 +11,7 @@ services:
       - SNITCH_SERVER_NODE_NAME=node1
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_NATSURL=natsjs:4222
+      - SNITCH_SERVER_DEBUG=true
     container_name: snitch-server
     ports:
       - "8080:8080"
