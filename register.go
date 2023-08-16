@@ -194,6 +194,8 @@ func (s *Snitch) pausePipeline(_ context.Context, cmd *protos.Command) error {
 
 	s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetPausePipeline().PipelineId] = pipeline
 
+	delete(s.pipelines[audToStr(cmd.Audience)], cmd.GetPausePipeline().PipelineId)
+
 	return nil
 }
 
@@ -221,6 +223,8 @@ func (s *Snitch) resumePipeline(_ context.Context, cmd *protos.Command) error {
 	}
 
 	s.pipelines[audToStr(cmd.Audience)][cmd.GetResumePipeline().PipelineId] = pipeline
+
+	delete(s.pipelinesPaused[audToStr(cmd.Audience)], cmd.GetResumePipeline().PipelineId)
 
 	return nil
 }
