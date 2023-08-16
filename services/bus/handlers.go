@@ -385,6 +385,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 		}
 
 		ch <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_PausePipeline{
 				PausePipeline: &protos.PausePipelineCommand{
 					PipelineId: req.PipelineId,
@@ -436,6 +437,7 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 		}
 
 		ch <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_ResumePipeline{
 				ResumePipeline: &protos.ResumePipelineCommand{
 					PipelineId: req.PipelineId,
