@@ -3,6 +3,7 @@ package grpcapi
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -328,15 +329,20 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Remove config entry
-	if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
 	// Pipeline exists, broadcast delete
 	if err := s.Deps.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
+
+	// TODO: figure out a better method for this
+	// Give time for all snitch server instances to receive detach command and send it to active sessions
+	go func() {
+		time.Sleep(time.Second * 10)
+		// Remove config entry
+		if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
+			s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
+		}
+	}()
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
