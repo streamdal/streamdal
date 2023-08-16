@@ -91,9 +91,6 @@ func (i *InternalServer) GetAttachCommandsByService(ctx context.Context, req *pr
 }
 
 func TestNew(t *testing.T) {
-
-	//srv := protos.Internal_RegisterServer()
-
 	lis, err := net.Listen("tcp", ":9090")
 	if err != nil {
 		t.Fatalf("failed to listen: %v", err)

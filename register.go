@@ -102,21 +102,25 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if attach := cmd.GetAttachPipeline(); attach != nil {
+			s.config.Logger.Debugf("Received attach pipeline command: %s", attach.Pipeline.Id)
 			if err := s.attachPipeline(context.Background(), cmd); err != nil {
 				s.config.Logger.Errorf("Failed to attach pipeline: %s", err)
 				return nil
 			}
 		} else if detach := cmd.GetDetachPipeline(); detach != nil {
+			s.config.Logger.Debugf("Received detach pipeline command: %s", detach.PipelineId)
 			if err := s.detachPipeline(context.Background(), cmd); err != nil {
 				s.config.Logger.Errorf("Failed to detach pipeline: %s", err)
 				return nil
 			}
 		} else if pause := cmd.GetPausePipeline(); pause != nil {
+			s.config.Logger.Debugf("Received pause pipeline command: %s", pause.PipelineId)
 			if err := s.pausePipeline(context.Background(), cmd); err != nil {
 				s.config.Logger.Errorf("Failed to pause pipeline: %s", err)
 				return nil
 			}
 		} else if resume := cmd.GetResumePipeline(); resume != nil {
+			s.config.Logger.Debugf("Received resume pipeline command: %s", resume.PipelineId)
 			if err := s.resumePipeline(context.Background(), cmd); err != nil {
 				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
 				return nil
