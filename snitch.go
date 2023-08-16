@@ -40,11 +40,11 @@ type OperationType int
 type ClientType int
 
 const (
-	// Producer tells Process to run the pipelines against the produce ruleset
-	Producer OperationType = 1
-
 	// Consumer tells Process to run the pipelines against the consume ruleset
-	Consumer OperationType = 2
+	Consumer OperationType = 1
+
+	// Producer tells Process to run the pipelines against the produce ruleset
+	Producer OperationType = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
