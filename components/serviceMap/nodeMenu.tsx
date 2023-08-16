@@ -1,8 +1,9 @@
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import { useState } from "preact/hooks";
-import { removeWhitespace } from "../../lib/utils.ts";
+import { getAudienceOpRoute, removeWhitespace } from "../../lib/utils.ts";
 import { AudiencePipeline } from "./customNodes.tsx";
+import { opModal } from "./opModalSignal.ts";
 
 export const NodeMenu = (
   { audience }: { audience: AudiencePipeline },
@@ -30,7 +31,7 @@ export const NodeMenu = (
           <a href="/pipelines">
             <li className="flex w-full flex-start px-2 py-2 hover:bg-sunset text-sm">
               <Edit className="text-red mx-2" />
-              Edit Rules
+              Edit Pipelines
             </li>
           </a>
           <a href="/slack">
@@ -39,26 +40,18 @@ export const NodeMenu = (
               Silence Notifications
             </li>
           </a>
-          <a
-            href={`/service/${
-              encodeURIComponent(audience.serviceName)
-            }/component/${encodeURIComponent(audience.componentName)}/${
-              audience.operationType === 1 ? "consumer" : "producer"
-            }/op/${encodeURIComponent(audience.operationName)}`}
+
+          <li
+            className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm cursor-pointer"
+            onClick={() => opModal.value = audience}
           >
-            <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
-              <Info className="w-4 text-web mx-1" />
-              More Information
-            </li>
-          </a>
+            <Info className="w-4 text-web mx-1" />
+            More Information
+          </li>
 
           <a
-            href={`/service/${
-              encodeURIComponent(audience.serviceName)
-            }/component/${encodeURIComponent(audience.componentName)}/${
-              audience.operationType === 1 ? "consumer" : "producer"
-            }/op/${
-              encodeURIComponent(audience.operationName)
+            href={`${
+              getAudienceOpRoute(audience)
             }/pipeline/${audience.pipeline?.id}/pause`}
           >
             <button className="w-full">

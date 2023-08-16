@@ -9,6 +9,7 @@ import {
   mapEdges,
   mapNodes,
 } from "../components/serviceMap/customNodes.tsx";
+import { Audience } from "snitch-protos/protos/common.ts";
 
 export type ServiceMapType = GetAllResponse & {
   pipes: PipelineInfo[];
@@ -30,7 +31,11 @@ export const getServiceMap = async (): Promise<ServiceMapType> => {
   };
 };
 
-export type ServiceNodes = { nodes: FlowNode[]; edges: FlowEdge[] };
+export type ServiceNodes = {
+  serviceMap: ServiceMapType;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+};
 
 export const getServiceNodes = async (): Promise<ServiceNodes> => {
   const serviceMap = await getServiceMap();
@@ -44,7 +49,7 @@ export const getServiceNodes = async (): Promise<ServiceNodes> => {
   const nodes = Array.from(
     mapNodes(audiencePipelines).nodes.values(),
   );
-  return { nodes, edges };
+  return { serviceMap, nodes, edges };
 };
 
 export const getPipelines = async () => {
@@ -65,10 +70,14 @@ export const pausePipeline = async (pipeline: any) => {
   return response;
 };
 
-export const attachPipeline = async (pipeline: string) => {
-  const { response } = await client.attachPipeline(
-    { pipelineId: pipeline },
-    meta,
+export const getAttachedPipeline = async (name: string) => {
+  const { response } = await client.getAll({}, meta);
+  const attachedPipelineName = Object.keys(response.pipelines).find((
+    pipeline,
+  ) =>
+    response.pipelines[pipeline].audiences.find((audience: Audience) =>
+      audience.operationName === name
+    )
   );
-  return response;
+  return attachedPipelineName;
 };

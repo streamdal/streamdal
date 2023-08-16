@@ -1,3 +1,7 @@
+import { Audience, OperationType } from "snitch-protos/protos/common.ts";
+import { ConfigType, PipelinesType } from "./fetch.ts";
+import { AudiencePipeline } from "../components/serviceMap/customNodes.tsx";
+
 const UNITS = [
   "byte",
   "kilobyte",
@@ -9,9 +13,11 @@ const UNITS = [
 const BYTES_PER_KB = 1000;
 
 export const titleCase = (str: any) =>
-  str.replace(/\w\S*/g, (t: any) => {
-    return t.charAt(0).toUpperCase() + t.substring(1).toLowerCase();
-  });
+  str
+    ? str.replace(/\w\S*/g, (t: any) => {
+      return t.charAt(0).toUpperCase() + t.substring(1).toLowerCase();
+    })
+    : str;
 
 /**
  * Format bytes as human-readable text.
@@ -59,3 +65,41 @@ export const logFormData = (data: FormData) => {
     console.log(pair[0] + ", " + pair[1]);
   }
 };
+
+export const getAudienceOpRoute = (
+  audience: Audience,
+) =>
+  `/service/${encodeURIComponent(audience.serviceName)}/component/${
+    encodeURIComponent(audience.componentName)
+  }/${OperationType[audience.operationType]}/op/${
+    encodeURIComponent(audience.operationName)
+  }`;
+
+export const getOpRoute = (
+  service: string,
+  component: string,
+  opType: OperationType,
+  opName: string,
+) =>
+  `/service/${encodeURIComponent(service)}/component/${
+    encodeURIComponent(component)
+  }/${OperationType[opType]}/op/${encodeURIComponent(opName)}`;
+
+export const audienceKey = (audience: Audience | AudiencePipeline) =>
+  Object.values(
+    (({ serviceName, componentName, operationType, operationName }) => ({
+      serviceName,
+      componentName,
+      operationType,
+      operationName,
+    }))(audience),
+  ).map((
+    v: string | number,
+  ) => new String(v).toLowerCase())
+    .join("");
+
+export const getAudiencePipeline = (
+  audience: Audience,
+  pipelines: PipelinesType,
+  config: ConfigType,
+) => pipelines[config[audienceKey(audience)]]?.pipeline;

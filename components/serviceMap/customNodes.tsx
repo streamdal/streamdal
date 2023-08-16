@@ -8,15 +8,16 @@ import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { removeWhitespace, titleCase } from "../../lib/utils.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import {
-  ClientInfo,
-  LiveInfo,
-  PipelineInfo,
-} from "snitch-protos/protos/info.ts";
+  getAudiencePipeline,
+  removeWhitespace,
+  titleCase,
+} from "../../lib/utils.ts";
+import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { ConfigType, PipelinesType } from "../../lib/fetch.ts";
+import { opModal } from "./opModalSignal.ts";
 
 export type AudiencePipeline = Audience & {
   pipeline?: Pipeline;
@@ -232,8 +233,7 @@ export const mapAudiencePipelines = (
 ): AudiencePipeline[] =>
   audiences.map((a: Audience) => ({
     ...a,
-    pipeline: pipelines[config[JSON.stringify(a)]]
-      ?.pipeline,
+    pipeline: getAudiencePipeline(a, pipelines, config),
     clients: liveInfo?.filter((l: LiveInfo) => l.audiences?.includes(a))?.map((
       l: LiveInfo,
     ) => l.client),
@@ -334,31 +334,24 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
             : <ConsumerIcon class="w-5 h-5 mx-2" />}
         </div>
         <div class="w-[170px] whitespace-nowrap text-ellipsis overflow-hidden">
-          <a
-            href={`/service/${
-              encodeURIComponent(data.audience.serviceName)
-            }/component/${encodeURIComponent(data.audience.componentName)}/${
-              OperationType[data.audience.operationType]
-            }/op/${encodeURIComponent(data.audience.operationName)}`}
+          <div
+            class={"flex flex-col justify-start p-1 cursor-pointer"}
+            onClick={() => opModal.value = data.audience}
           >
-            <div
-              class={"flex flex-col justify-start p-1"}
+            <h2
+              data-tooltip-target={toolTipId}
+              class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
             >
-              <h2
-                data-tooltip-target={toolTipId}
-                class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
-              >
-                {data.label}
-              </h2>
-              <Tooltip
-                targetId={toolTipId}
-                message={"Click to attach, detach and pause pipelines"}
-              />
-              <h3 class="text-xs text-gray-500">
-                {titleCase(OperationType[data.audience.operationType])}
-              </h3>
-            </div>
-          </a>
+              {data.label}
+            </h2>
+            <Tooltip
+              targetId={toolTipId}
+              message={"Click to attach, detach and pause pipelines"}
+            />
+            <h3 class="text-xs text-gray-500">
+              {titleCase(OperationType[data.audience.operationType])}
+            </h3>
+          </div>
         </div>
         <NodeMenu audience={data.audience} />
       </div>

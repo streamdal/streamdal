@@ -1,36 +1,43 @@
-import { StandardResponse } from "snitch-protos/protos/common.ts";
+import {
+  Audience,
+  ResponseCode,
+  StandardResponse,
+} from "snitch-protos/protos/common.ts";
 import { client, meta } from "./grpc.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import {
+  AttachPipelineRequest,
+  DetachPipelineRequest,
+} from "snitch-protos/protos/external.ts";
 
+export type PatchedPipelineResponse = StandardResponse & {
+  pipelineId?: string;
+};
 export const upsertPipeline = async (
   pipeline: Pipeline,
-): Promise<StandardResponse & { pipelineId: string }> => {
-  let pipelineId = pipeline.id ? pipeline.id : crypto.randomUUID();
-
-  const { response }: { response: StandardResponse } = pipeline.id
-    ? await client
+): Promise<PatchedPipelineResponse> => {
+  if (pipeline.id) {
+    const { response: updateResponse } = await client
       .updatePipeline(
         { pipeline },
         meta,
-      )
-    : await client
-      .createPipeline(
-        { pipeline: { ...pipeline, id: pipelineId } },
-        meta,
       );
-
-  //
-  // XXX/TODO: stop doing this once createPipeline respects
-  // provided id
-  if (!pipeline.id) {
-    const start = response?.message.indexOf("'");
-    pipelineId = response?.message?.substring(
-      start + 1,
-      response?.message.indexOf("'", start + 1),
-    );
+    return updateResponse;
   }
 
-  return { ...response, pipelineId: pipelineId };
+  const { response: createResponse } = await client
+    .createPipeline({ pipeline }, meta);
+
+  //
+  // Create pipeline returns a non-standard response with no code so
+  // we have to handle it specifically
+  return {
+    ...createResponse,
+    id: createResponse.pipelineId,
+    code: createResponse.pipelineId
+      ? ResponseCode.OK
+      : ResponseCode.INTERNAL_SERVER_ERROR,
+  };
 };
 
 export const deletePipeline = async (
@@ -43,4 +50,46 @@ export const deletePipeline = async (
     );
 
   return response;
+};
+
+export const attachPipeline = async (
+  pipelineId: string,
+  audience: Audience,
+) => {
+  try {
+    const request: AttachPipelineRequest = { audience, pipelineId };
+    const { response } = await client.attachPipeline(
+      request,
+      meta,
+    );
+    return response;
+  } catch (error) {
+    console.error("error attaching pipeline", error);
+    return {
+      id: "attachRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const detachPipeline = async (
+  pipelineId: string,
+  audience: Audience,
+) => {
+  try {
+    const request: DetachPipelineRequest = { audience, pipelineId };
+    const { response } = await client.detachPipeline(
+      request,
+      meta,
+    );
+    return response;
+  } catch (error) {
+    console.error("error attaching pipeline", error);
+    return {
+      id: "detachRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
 };

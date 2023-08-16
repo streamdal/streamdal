@@ -2,6 +2,7 @@ import { GetAllResponse } from "snitch-protos/protos/external.ts";
 import { OperationType } from "snitch-protos/protos/common.ts";
 import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
 import { ClientType } from "snitch-protos/protos/info.ts";
+import { audienceKey } from "./utils.ts";
 
 export const dummyPipelines = [{
   id: "1234-1234-123456",
@@ -84,57 +85,57 @@ export const dummyPipelines = [{
 }];
 
 export const testKafkaAudiences = [{
-  serviceName: "Test Kafka Service",
+  serviceName: "Test-Kafka-Service",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
-  operationName: "consume kafka",
+  operationName: "consume-kafka",
 }, {
-  serviceName: "Test Kafka Service",
+  serviceName: "Test-Kafka-Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce kafka",
+  operationName: "produce-kafka",
 }, {
-  serviceName: "Test Kafka Service",
+  serviceName: "Test-Kafka-Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce kafka two long name",
+  operationName: "produce-kafka-two-long-name",
 }, {
-  serviceName: "Test Kafka Service",
+  serviceName: "Test-Kafka-Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce kafka three",
+  operationName: "produce-kafka-three",
 }, {
-  serviceName: "Test Kafka Service",
+  serviceName: "Test-Kafka-Service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
-  operationName: "produce kafka four",
+  operationName: "produce-kafka-four",
 }];
 
 export const testPostgreSQLAudiences = [{
-  serviceName: "Test PostgreSQL",
+  serviceName: "Test-PostgreSQL",
   componentName: "postgresql",
   operationType: OperationType.CONSUMER,
-  operationName: "consume postgresql",
+  operationName: "consume-postgresql",
 }, {
-  serviceName: "Test PostgreSQL",
+  serviceName: "Test-PostgreSQL",
   componentName: "postgresql",
   operationType: OperationType.CONSUMER,
-  operationName: "consume postgresql two",
+  operationName: "consume-postgresql-two",
 }, {
-  serviceName: "Test PostgreSQL",
+  serviceName: "Test-PostgreSQL",
   componentName: "postgresql",
   operationType: OperationType.CONSUMER,
-  operationName: "consume postgresql three",
+  operationName: "consume-postgresql-three",
 }, {
-  serviceName: "Test PostgreSQL",
+  serviceName: "Test-PostgreSQL",
   componentName: "postgresql",
   operationType: OperationType.PRODUCER,
-  operationName: "produce postgresql",
+  operationName: "produce-postgresql",
 }, {
-  serviceName: "Test PostgreSQL",
+  serviceName: "Test-PostgreSQL",
   componentName: "postgresql",
   operationType: OperationType.PRODUCER,
-  operationName: "produce postgresql another",
+  operationName: "produce-postgresql-another",
 }];
 
 export const dummyAudiences = [
@@ -155,7 +156,7 @@ export const dummyLive = [{
 }];
 
 export const dummyConfig = {
-  [JSON.stringify(dummyAudiences[0])]: "86ecfa45-dc2e-4035-bdad-c285ad13cc8e",
+  [audienceKey(dummyAudiences[0])]: "86ecfa45-dc2e-4035-bdad-c285ad13cc8e",
 };
 
 export const dummyServiceMap: GetAllResponse = {

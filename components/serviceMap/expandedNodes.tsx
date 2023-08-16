@@ -18,7 +18,7 @@ export const ExpandedNodes = ({ nodes, params }) => {
 
   return (
     <div
-      class={"w-screen h-screen absolute top-0 bottom-0 scroll-none inset-0 flex justify-center items-center"}
+      class={"w-screen absolute top-0 bottom-0 scroll-none inset-0 flex justify-center items-center"}
     >
       <div class={"z-50 bg-gray-900 opacity-30 absolute w-full h-full"}></div>
       <div
