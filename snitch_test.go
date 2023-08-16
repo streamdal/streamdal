@@ -81,11 +81,16 @@ func TestValidateConfig(t *testing.T) {
 	})
 }
 
+type InternalServer struct {
+	// Must be implemented in order to satisfy the protos InternalServer interface
+	protos.UnimplementedInternalServer
+}
+
+func (i *InternalServer) GetAttachCommandsByService(ctx context.Context, req *protos.GetAttachCommandsByServiceRequest) (*protos.GetAttachCommandsByServiceResponse, error) {
+	return &protos.GetAttachCommandsByServiceResponse{}, nil
+}
+
 func TestNew(t *testing.T) {
-	type InternalServer struct {
-		// Must be implemented in order to satisfy the protos InternalServer interface
-		protos.UnimplementedInternalServer
-	}
 
 	//srv := protos.Internal_RegisterServer()
 
