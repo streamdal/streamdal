@@ -133,6 +133,8 @@ MAIN:
 		case <-b.options.ShutdownCtx.Done():
 			b.log.Debug("context cancellation detected")
 			break MAIN
+		default:
+			// NOOP
 		}
 
 		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
