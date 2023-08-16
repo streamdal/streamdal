@@ -82,9 +82,9 @@ func (s *Snitch) register(looper director.Looper) {
 				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
-				return nil
 			} else {
 				s.config.Logger.Warnf("Error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
+				time.Sleep(ReconnectSleep)
 			}
 
 			return nil
