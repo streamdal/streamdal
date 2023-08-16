@@ -19,7 +19,7 @@ import { useCallback, useState } from "preact/hooks";
 import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
-const MODAL_ROUTES = ["pipeline", "component"];
+const MODAL_ROUTES = ["pipeline"];
 
 export const nodeTypes = {
   service: ServiceNode,

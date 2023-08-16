@@ -2,6 +2,7 @@ import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Layout } from "../components/layout.tsx";
 import ServiceMap from "../islands/serviceMap.tsx";
 import { getServiceNodes, ServiceNodes } from "../lib/fetch.ts";
+import OpModal from "../islands/opModal.tsx";
 
 export const handler: Handlers<ServiceNodes> = {
   async GET(_req, ctx) {
@@ -15,6 +16,9 @@ export default function IndexRoute(
   return (
     <Layout>
       <ServiceMap nodesData={props.data.nodes} edgesData={props.data.edges} />
+      <OpModal
+        serviceMap={props.data.serviceMap}
+      />
     </Layout>
   );
 }

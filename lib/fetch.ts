@@ -31,7 +31,11 @@ export const getServiceMap = async (): Promise<ServiceMapType> => {
   };
 };
 
-export type ServiceNodes = { nodes: FlowNode[]; edges: FlowEdge[] };
+export type ServiceNodes = {
+  serviceMap: ServiceMapType;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+};
 
 export const getServiceNodes = async (): Promise<ServiceNodes> => {
   const serviceMap = await getServiceMap();
@@ -45,7 +49,7 @@ export const getServiceNodes = async (): Promise<ServiceNodes> => {
   const nodes = Array.from(
     mapNodes(audiencePipelines).nodes.values(),
   );
-  return { nodes, edges };
+  return { serviceMap, nodes, edges };
 };
 
 export const getPipelines = async () => {
@@ -75,4 +79,5 @@ export const getAttachedPipeline = async (name: string) => {
       audience.operationName === name
     )
   );
+  return attachedPipelineName;
 };

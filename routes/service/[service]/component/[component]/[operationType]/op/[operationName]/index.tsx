@@ -1,6 +1,6 @@
 import { Layout } from "../../../../../../../../components/layout.tsx";
 import ServiceMap from "../../../../../../../../islands/serviceMap.tsx";
-import InfoModal from "../../../../../../../../islands/InfoModal.tsx";
+import OpModal from "../../../../../../../../islands/opModal.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import {
   getServiceMap,
@@ -32,7 +32,8 @@ export default function FlowRoute(
 ) {
   return (
     <Layout>
-      <InfoModal
+      <OpModal
+        modalOpen={true}
         params={props.params as any}
         serviceMap={props.data.serviceMap}
         success={props.data.success}

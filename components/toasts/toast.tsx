@@ -32,7 +32,7 @@ export const Toast = (
         <div class="relative">
           <div
             id="toast-x"
-            class={`fixed top-[8%] left-[40%] z-50 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg border border-${
+            class={`fixed top-[10%] left-[40%] z-50 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg border border-${
               type === "error" ? "streamdalRed" : "streamdalGreen"
             }`}
             role="alert"
