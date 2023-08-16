@@ -10,7 +10,7 @@ import (
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/plumber"
+	"github.com/streamdal/snitch-go-client/server"
 	"github.com/streamdal/snitch-go-client/types"
 )
 
@@ -29,8 +29,7 @@ const (
 var (
 	ErrMissingPlumberClient = errors.New("PlumberClient cannot be nil")
 	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
-	ErrEmptyEntryID         = errors.New("ID must be set")
-	ErrEmptyEntryType       = errors.New("Type must be set")
+	ErrEmptyName            = errors.New("Name must be set")
 	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
 )
 
@@ -51,7 +50,7 @@ type Config struct {
 	ReaperCounterInterval time.Duration
 	ReaperCounterTTL      time.Duration
 	CounterWorkerPoolSize int
-	Plumber               plumber.IPlumberClient
+	ServerClient          server.IServerClient
 	ShutdownCtx           context.Context
 	Log                   logger.Logger
 }
@@ -93,7 +92,7 @@ func New(cfg *Config) (*Metrics, error) {
 }
 
 func validateConfig(cfg *Config) error {
-	if cfg.Plumber == nil {
+	if cfg.ServerClient == nil {
 		return ErrMissingPlumberClient
 	}
 
@@ -141,8 +140,8 @@ func (m *Metrics) validateCounterEntry(entry *types.CounterEntry) error {
 		return ErrMissingEntry
 	}
 
-	if entry.Type == "" {
-		return ErrEmptyEntryType
+	if entry.Name == "" {
+		return ErrEmptyName
 	}
 
 	return nil
@@ -152,12 +151,14 @@ func (m *Metrics) newCounter(e *types.CounterEntry) *counter {
 	m.counterMapMutex.Lock()
 	defer m.counterMapMutex.Unlock()
 
-	m.counterMap[CompositeID(e)] = &counter{
+	c := &counter{
 		entry:      e,
 		countMutex: &sync.RWMutex{},
 	}
 
-	return m.counterMap[CompositeID(e)]
+	m.counterMap[CompositeID(e)] = c
+
+	return c
 }
 
 func (m *Metrics) getCounter(e *types.CounterEntry) (*counter, bool) {
@@ -176,7 +177,7 @@ func (m *Metrics) getCounters() map[string]*counter {
 	m.counterMapMutex.RLock()
 	defer m.counterMapMutex.RUnlock()
 
-	localCounters := make(map[string]*counter, 0)
+	localCounters := make(map[string]*counter)
 
 	for counterID, counter := range m.counterMap {
 		localCounters[counterID] = counter
@@ -188,10 +189,12 @@ func (m *Metrics) getCounters() map[string]*counter {
 func (m *Metrics) incr(_ context.Context, entry *types.CounterEntry) error {
 	// No need to validate - no way to reach here without validation
 	c, ok := m.getCounter(entry)
-	if !ok {
-		c = m.newCounter(entry)
+	if ok {
+		c.incr(entry)
+		return nil
 	}
 
+	c = m.newCounter(entry)
 	c.incr(entry)
 
 	return nil
@@ -219,7 +222,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
 			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Name, entry.Value)
-			err = m.Plumber.SendMetrics(context.Background(), entry)
+			err = m.ServerClient.SendMetrics(context.Background(), entry)
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()

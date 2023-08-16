@@ -1,13 +1,13 @@
-// Package dataqual is a library that allows running of Plumber data rules against data
+// Package snitch is a library that allows running of Client data pipelines against data
 // This package is designed to be included in golang message bus libraries. The only public
-// method is ApplyRules() which is used to run rules against data.
+// method is Process() which is used to run pipelines against data.
 //
-// Use of this package requires a running instance of Plumber.
-// Plumber can be downloaded at https://github.com/streamdal/plumber
+// Use of this package requires a running instance of a snitch server.
+// The server can be downloaded at https://github.com/streamdal/snitch
 //
 // The following environment variables must be set:
-// - PLUMBER_ADDRESS: The address of the Plumber server
-// - PLUMBER_TOKEN: The token to use when connecting to the Plumber server
+// - SNITCH_URL: The address of the Client server
+// - SNITCH_TOKEN: The token to use when connecting to the Client server
 //
 // Optional parameters:
 // - SNITCH_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
@@ -20,81 +20,107 @@ import (
 	"sync"
 	"time"
 
-	protos "github.com/batchcorp/plumber-schemas/build/go/protos/common"
+	"github.com/golang/protobuf/proto"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/snitch-go-client/common"
-	"github.com/streamdal/snitch-go-client/detective"
+	"github.com/streamdal/snitch-protos/build/go/protos"
+
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
-	"github.com/streamdal/snitch-go-client/plumber"
+	"github.com/streamdal/snitch-go-client/server"
 	"github.com/streamdal/snitch-go-client/types"
 )
 
-// Module is a constant that represents which type of WASM module we will run the rules against
-type Module string
-
-// Mode is a constant that represents whether we are publishing or consuming,
+// OperationType is a constant that represents whether we are publishing or consuming,
 // it must match the protobuf enum of the rule
-type Mode int
+type OperationType int
+
+type ClientType int
 
 const (
-	// Publish tells ApplyRules to run the rules against the publish ruleset
-	Publish Mode = 1
+	// Consumer tells Process to run the pipelines against the consume ruleset
+	Consumer OperationType = 1
 
-	// Consume tells ApplyRules to run the rules against the consume ruleset
-	Consume Mode = 2
+	// Producer tells Process to run the pipelines against the produce ruleset
+	Producer OperationType = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
 
-	// Match is the name of the WASM module that contains the match function
-	Match Module = "match"
+	// ReconnectSleep determines the length of time to wait between reconnect attempts to snitch server
+	ReconnectSleep = time.Second * 5
 
-	// Transform is the name of the WASM module that contains the transform function
-	Transform Module = "transform"
+	// MaxPayloadSize is the maximum size of data that can be sent to the WASM module
+	MaxPayloadSize = 1024 * 1024 // 1Mi
 
-	// DefaultMaxDataSize is the maximum size of data that can be sent to the WASM module
-	DefaultMaxDataSize = 1024 * 1024 // 1Mi
-
-	// Default sources for use in shim libs, to keep things standardized
-	SourceKafka  = "kafka"
-	SourceRabbit = "rabbitmq"
+	ClientTypeSDK  ClientType = 1
+	ClientTypeShim ClientType = 2
 )
 
 var (
 	ErrEmptyConfig        = errors.New("config cannot be empty")
-	ErrEmptyDataSource    = errors.New("data source cannot be empty")
+	ErrEmptyServiceName   = errors.New("data source cannot be empty")
 	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
 
-	// ErrMessageDropped is returned when a message is dropped by the plumber data rules
+	// ErrMessageDropped is returned when a message is dropped by the plumber data pipelines
 	// An end user may check for this error and handle it accordingly in their code
-	ErrMessageDropped = errors.New("message dropped by plumber data rules")
+	//ErrMessageDropped = errors.New("message dropped by plumber data pipelines")
+
+	ErrEmptyCommand = errors.New("command cannot be empty")
 )
 
 type ISnitch interface {
-	ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error)
+	ApplyRules(ctx context.Context, mode OperationType, key string, data []byte) ([]byte, error)
 }
 
 type Snitch struct {
-	*Config
-	functions    map[Module]*function
-	rules        map[Mode]map[string][]*protos.Rule
-	functionsMtx *sync.RWMutex
-	rulesMtx     *sync.RWMutex
-	Plumber      plumber.IPlumberClient
-	metrics      metrics.IMetrics
+	config             *Config
+	functions          map[string]*function
+	pipelines          map[string]map[string]*protos.Command
+	pipelinesPaused    map[string]map[string]*protos.Command
+	functionsMtx       *sync.RWMutex
+	pipelinesMtx       *sync.RWMutex
+	pipelinesPausedMtx *sync.RWMutex
+	serverClient       server.IServerClient
+	metrics            metrics.IMetrics
+	audiences          map[string]struct{}
+	audiencesMtx       *sync.RWMutex
+	sessionID          string
 }
 
 type Config struct {
-	PlumberURL   string
-	PlumberToken string
-	WasmTimeout  time.Duration
-	DryRun       bool
-	DataSource   string
-	ShutdownCtx  context.Context
-	Logger       logger.Logger
+	SnitchURL       string
+	SnitchToken     string
+	ServiceName     string
+	PipelineTimeout time.Duration
+	StepTimeout     time.Duration
+	DryRun          bool
+	ShutdownCtx     context.Context
+	Logger          logger.Logger
+	ClientType      ClientType
+	Audiences       []*Audience
+}
+
+type Audience struct {
+	ServiceName   string
+	ComponentName string
+	OperationType OperationType
+	OperationName string
+}
+
+type ProcessRequest struct {
+	ComponentName string
+	OperationType OperationType
+	OperationName string
+	Data          []byte
+}
+
+type ProcessResponse struct {
+	Data    []byte
+	Error   bool
+	Message string
 }
 
 func New(cfg *Config) (*Snitch, error) {
@@ -102,73 +128,82 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
 
-	// We instantiate this library based on whether or not we have a Plumber URL+token
+	// We instantiate this library based on whether or not we have a Client URL+token
 	// If these are not provided, the wrapper library will not perform rule checks and
 	// will act as normal
-	if cfg.PlumberURL == "" || cfg.PlumberToken == "" {
+	if cfg.SnitchURL == "" || cfg.SnitchToken == "" {
 		return nil, nil
 	}
 
-	plumber, err := plumber.New(cfg.PlumberURL, cfg.PlumberToken)
+	serverClient, err := server.New(cfg.SnitchURL, cfg.SnitchToken)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to plumber")
+		return nil, errors.Wrapf(err, "failed to connect to snitch server '%s'", cfg.SnitchURL)
 	}
 
 	m, err := metrics.New(&metrics.Config{
-		Plumber:     plumber,
-		ShutdownCtx: cfg.ShutdownCtx,
-		Log:         cfg.Logger,
+		ServerClient: serverClient,
+		ShutdownCtx:  cfg.ShutdownCtx,
+		Log:          cfg.Logger,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
 
-	dq := &Snitch{
-		functions:    make(map[Module]*function),
-		functionsMtx: &sync.RWMutex{},
-		Plumber:      plumber,
-		rules:        make(map[Mode]map[string][]*protos.Rule),
-		rulesMtx:     &sync.RWMutex{},
-		Config:       cfg,
-		metrics:      m,
+	s := &Snitch{
+		functions:          make(map[string]*function),
+		functionsMtx:       &sync.RWMutex{},
+		serverClient:       serverClient,
+		pipelines:          make(map[string]map[string]*protos.Command),
+		pipelinesMtx:       &sync.RWMutex{},
+		pipelinesPaused:    make(map[string]map[string]*protos.Command),
+		pipelinesPausedMtx: &sync.RWMutex{},
+		audiences:          map[string]struct{}{},
+		audiencesMtx:       &sync.RWMutex{},
+		config:             cfg,
+		metrics:            m,
+		sessionID:          uuid.New().String(),
 	}
 
 	if cfg.DryRun {
-		cfg.Logger.Info("Plumber data rules running in dry run mode")
+		cfg.Logger.Warn("data pipelines running in dry run mode")
 	}
 
-	// Force rule pull on startup
-	if err := dq.getRuleUpdates(); err != nil {
-		return nil, errors.Wrap(err, "failed to get data quality rules")
+	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
+		return nil, err
 	}
 
-	ruleUpdateLooper := director.NewTimedLooper(director.FOREVER, RuleUpdateInterval, make(chan error, 1))
-	go dq.watchForRuleUpdates(ruleUpdateLooper)
+	// Start register
+	go s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
 
-	return dq, nil
+	// Start heartbeat
+	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
+
+	return s, nil
 }
-
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
 		return ErrEmptyConfig
-	}
-
-	if cfg.DataSource == "" {
-		return ErrEmptyDataSource
 	}
 
 	if cfg.ShutdownCtx == nil {
 		return ErrMissingShutdownCtx
 	}
 
-	// Can be specified in config for lib use, or via envar for shim use
-	if cfg.PlumberURL == "" {
-		cfg.PlumberURL = os.Getenv("PLUMBER_URL")
+	if cfg.ServiceName == "" {
+		cfg.ServiceName = os.Getenv("SNITCH_SERVICE_NAME")
+		if cfg.ServiceName == "" {
+			return ErrEmptyServiceName
+		}
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if cfg.PlumberToken == "" {
-		cfg.PlumberToken = os.Getenv("PLUMBER_TOKEN")
+	if cfg.SnitchURL == "" {
+		cfg.SnitchURL = os.Getenv("SNITCH_URL")
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if cfg.SnitchToken == "" {
+		cfg.SnitchToken = os.Getenv("SNITCH_TOKEN")
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
@@ -177,17 +212,31 @@ func validateConfig(cfg *Config) error {
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if cfg.WasmTimeout == 0 {
-		to := os.Getenv("SNITCH_WASM_TIMEOUT")
+	if cfg.StepTimeout == 0 {
+		to := os.Getenv("SNITCH_STEP_TIMEOUT")
 		if to == "" {
 			to = "1s"
 		}
 
 		timeout, err := time.ParseDuration(to)
 		if err != nil {
-			return errors.Wrap(err, "unable to parse SNITCH_WASM_TIMEOUT")
+			return errors.Wrap(err, "unable to parse SNITCH_STEP_TIMEOUT")
 		}
-		cfg.WasmTimeout = timeout
+		cfg.StepTimeout = timeout
+	}
+
+	// Can be specified in config for lib use, or via envar for shim use
+	if cfg.PipelineTimeout == 0 {
+		to := os.Getenv("SNITCH_PIPELINE_TIMEOUT")
+		if to == "" {
+			to = "1s"
+		}
+
+		timeout, err := time.ParseDuration(to)
+		if err != nil {
+			return errors.Wrap(err, "unable to parse SNITCH_PIPELINE_TIMEOUT")
+		}
+		cfg.PipelineTimeout = timeout
 	}
 
 	// Default to NOOP logger if none is provided
@@ -198,374 +247,284 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
-func (d *Snitch) failTransform(ctx context.Context, data []byte, cfg *protos.FailureModeTransform) ([]byte, error) {
-	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
-	defer cancel()
-
-	// Get WASM module
-	f, err := d.getFunction(Transform)
+func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
+	cmds, err := s.serverClient.GetAttachCommandsByService(ctx, s.config.ServiceName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get wasm data")
+		return errors.Wrap(err, "unable to pull initial pipelines")
 	}
 
-	var del bool
-	switch cfg.Type {
-	case protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE:
-		del = false
-	case protos.FailureModeTransform_TRANSFORM_TYPE_DELETE:
-		del = true
-	default:
-		return nil, errors.Errorf("unknown transform type: %s", cfg.Type)
-	}
-
-	request := &common.TransformRequest{
-		Path:   cfg.Path,
-		Value:  cfg.Value,
-		Data:   data,
-		Delete: del,
-	}
-
-	req, err := request.MarshalJSON()
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to generate request")
-	}
-
-	returnData, err := f.Exec(timeoutCtx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "error during wasm exec")
-	}
-
-	resp := &common.TransformResponse{}
-
-	if err := resp.UnmarshalJSON(returnData); err != nil {
-		return nil, errors.Wrap(err, "error during tinyjson.Unmarshal")
-	}
-
-	if resp.Error != "" {
-		return nil, errors.New(resp.Error)
-	}
-
-	return resp.Data, nil
-}
-
-func (d *Snitch) runMatch(ctx context.Context, data []byte, cfg *protos.RuleConfigMatch) (bool, error) {
-	timeoutCtx, cancel := context.WithTimeout(ctx, d.WasmTimeout)
-	defer cancel()
-
-	// Get WASM module
-	f, err := d.getFunction(Match)
-	if err != nil {
-		return false, errors.Wrap(err, "failed to get wasm data")
-	}
-
-	request := &common.MatchRequest{
-		MatchType:     detective.MatchType(cfg.Type),
-		MatchOperator: matchOperatorFromProto(cfg.Operator),
-		Path:          cfg.Path,
-		Data:          data,
-		Args:          cfg.Args,
-	}
-
-	req, err := request.MarshalJSON()
-	if err != nil {
-		return false, fmt.Errorf("unable to generate request: %s", err.Error())
-	}
-
-	returnData, err := f.Exec(timeoutCtx, req)
-	if err != nil {
-		return false, errors.Wrap(err, "error during wasm exec")
-	}
-
-	resp := &common.MatchResponse{}
-
-	if err := resp.UnmarshalJSON(returnData); err != nil {
-		return false, errors.Wrap(err, "error during tinyjson.Unmarshal")
-	}
-
-	if resp.Error != "" {
-		return false, errors.New(resp.Error)
-	}
-
-	return resp.IsMatch, nil
-}
-
-func (d *Snitch) getRules(mode Mode, key string) []*protos.Rule {
-	d.rulesMtx.RLock()
-	defer d.rulesMtx.RUnlock()
-
-	// Main map will have 2 Mode keys: Publish and Consume
-	modeSets, ok := d.rules[mode]
-
-	// Check if we have rules for this key
-	// Key = kafka topic or rabbit routing/binding key
-	rules, ok := modeSets[key]
-	if !ok {
-		// No rules for this key, nothing to do
-		return make([]*protos.Rule, 0)
-	}
-
-	return rules
-}
-
-func (d *Snitch) ApplyRules(ctx context.Context, mode Mode, key string, data []byte) ([]byte, error) {
-	rules := d.getRules(mode, key)
-	if len(rules) == 0 {
-		// No rules for this mode, nothing to do
-		return data, nil
-	}
-
-	if len(data) > DefaultMaxDataSize {
-		_ = d.metrics.Incr(ctx, &types.CounterEntry{
-			Name:   types.CounterSizeExceeded,
-			Type:   types.CounterTypeCount,
-			Labels: map[string]string{"data_source": d.DataSource, "mode": mode.String()},
-			Value:  1,
-		})
-		d.Logger.Warnf("data size exceeds maximum, skipping %s rules on key %s", mode.String(), key)
-		return data, nil
-	}
-
-	var counterName types.CounterName
-	if mode == Publish {
-		counterName = types.CounterPublish
-	} else {
-		counterName = types.CounterConsume
-	}
-
-	// Counter for data source/mode calls total
-	_ = d.metrics.Incr(ctx, &types.CounterEntry{
-		Name:   counterName,
-		Type:   types.CounterTypeCount,
-		Labels: map[string]string{"data_source": d.DataSource},
-		Value:  1,
-	})
-
-	// Counter for data source/mode bytes total
-	_ = d.metrics.Incr(ctx, &types.CounterEntry{
-		Name:   counterName,
-		Type:   types.CounterTypeBytes,
-		Labels: map[string]string{"data_source": d.DataSource},
-		Value:  int64(len(data)),
-	})
-
-	for _, rule := range rules {
-		// Rule counter total
-		_ = d.metrics.Incr(ctx, &types.CounterEntry{
-			Name:      types.CounterRule,
-			Type:      types.CounterTypeCount,
-			RuleID:    rule.Id,
-			RuleSetID: rule.XRulesetId,
-			Value:     1,
-		})
-
-		// Rule counter bytes
-		_ = d.metrics.Incr(ctx, &types.CounterEntry{
-			Name:      types.CounterRule,
-			Type:      types.CounterTypeBytes,
-			RuleID:    rule.Id,
-			RuleSetID: rule.XRulesetId,
-			Value:     int64(len(data)),
-		})
-
-		switch rule.Type {
-		case protos.RuleType_RULE_TYPE_MATCH:
-			cfg := rule.GetMatchConfig()
-			if cfg == nil {
-				return nil, errors.New("BUG: match rule is missing match config")
-			}
-
-			isMatch, err := d.runMatch(ctx, data, cfg)
-			if err != nil {
-				return nil, errors.Wrapf(err, "failed to run match '%s' on field '%s'", cfg.Type, cfg.Path)
-			}
-
-			// Didn't hit, nothing further to do
-			if !isMatch {
-				continue
-			}
-
-			// Dry run, do nothing but log and continue on to the next rule
-			if d.DryRun {
-				d.logDryRun(rule)
-				continue
-			}
-
-			var shouldDrop bool
-
-			// There can me multiple failure modes per rule
-			for _, failCfg := range rule.GetFailureModeConfigs() {
-				var strMode string
-				switch failCfg.Mode {
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-					strMode = "reject"
-					shouldDrop = true
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-					strMode = "transform"
-					transformed, err := d.failTransform(ctx, data, failCfg.GetTransform())
-					if err != nil {
-						return nil, errors.Wrap(err, "failed to run transform")
-					}
-
-					data = transformed
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-					strMode = "alert_slack"
-					fallthrough
-				case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-					strMode = "dlq"
-					if err := d.Plumber.SendRuleNotification(ctx, data, rule, rule.XRulesetId); err != nil {
-						return nil, errors.Wrap(err, "failed to send rule notification")
-					}
-				default:
-					return nil, errors.Errorf("unknown rule failure mode: %s", failCfg.Mode)
-				}
-
-				// Count of failures per rule
-				_ = d.metrics.Incr(ctx, &types.CounterEntry{
-					Name:      types.CounterFailureTrigger,
-					RuleID:    rule.Id,
-					RuleSetID: rule.XRulesetId,
-					Type:      types.CounterTypeCount,
-					Value:     1,
-					Labels:    map[string]string{"failure_mode": strMode},
-				})
-
-				// Count of data that failed per rule
-				_ = d.metrics.Incr(ctx, &types.CounterEntry{
-					Name:      types.CounterFailureTrigger,
-					RuleID:    rule.Id,
-					RuleSetID: rule.XRulesetId,
-					Type:      types.CounterTypeBytes,
-					Value:     int64(len(data)),
-					Labels:    map[string]string{"failure_mode": strMode},
-				})
-			}
-
-			if shouldDrop {
-				return nil, ErrMessageDropped
-			}
-
-			return data, nil
-
-		case protos.RuleType_RULE_TYPE_CUSTOM:
-			// TODO: implement eventually
-			return data, nil
-		default:
-			return nil, errors.Errorf("unknown rule type: %s", rule.Type)
+	for _, cmd := range cmds.Active {
+		s.config.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
+		if err := s.attachPipeline(ctx, cmd); err != nil {
+			s.config.Logger.Errorf("failed to attach pipeline: %s", err)
 		}
 	}
 
-	return data, nil
-}
-
-func (d *Snitch) logDryRun(rule *protos.Rule) {
-	cfg := rule.GetMatchConfig()
-	for _, failCfg := range rule.FailureModeConfigs {
-		switch failCfg.Mode {
-		case protos.RuleFailureMode_RULE_FAILURE_MODE_REJECT:
-			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have rejected the message", rule.Id, rule.Type, cfg.Path)
-		case protos.RuleFailureMode_RULE_FAILURE_MODE_TRANSFORM:
-			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have transformed the message", rule.Id, rule.Type, cfg.Path)
-		case protos.RuleFailureMode_RULE_FAILURE_MODE_ALERT_SLACK:
-			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent a slack alert", rule.Id, rule.Type, cfg.Path)
-		case protos.RuleFailureMode_RULE_FAILURE_MODE_DLQ:
-			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have sent the message to the DLQ", rule.Id, rule.Type, cfg.Path)
-		default:
-			d.Logger.Infof("DRY RUN: Matched rule '%s' with type '%s' on path '%s' and would have done nothing", rule.Id, rule.Type, cfg.Path)
+	for _, cmd := range cmds.Paused {
+		s.config.Logger.Debugf("Pipeline '%s' is paused", cmd.GetAttachPipeline().Pipeline.Name)
+		if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
+			s.pipelinesPaused[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
 		}
+
+		s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
 	}
+
+	return nil
 }
 
-func (d *Snitch) watchForRuleUpdates(looper director.Looper) {
+func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 	var quit bool
-
-	looper.Loop(func() error {
+	loop.Loop(func() error {
 		if quit {
-			// Give looper time to exit
 			time.Sleep(time.Millisecond * 50)
 			return nil
 		}
 
 		select {
-		case <-d.ShutdownCtx.Done():
+		case <-s.config.ShutdownCtx.Done():
 			quit = true
-			looper.Quit()
+			loop.Quit()
 			return nil
 		default:
 			// NOOP
 		}
 
-		if err := d.getRuleUpdates(); err != nil {
-			d.Logger.Error("failed to get rule updates:", err)
-			return nil
+		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+			s.config.Logger.Errorf("failed to send heartbeat: %s", err)
 		}
-
-		d.Logger.Debug("Pulled rule updates")
 
 		return nil
 	})
 }
 
-func (d *Snitch) getRuleUpdates() error {
-	ruleSets, err := d.Plumber.GetRules(context.Background(), d.DataSource)
+func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
+	s.config.Logger.Debugf("Running step '%s'", step.Name)
+	// Get WASM module
+	f, err := s.getFunction(ctx, step)
 	if err != nil {
-		return errors.Wrap(err, "failed to get rules")
+		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
 
-	// First key is mode: producer, consumer
-	// Second map key is rule key: kafka topic, rabbit routing/binding key
-	// We need a way to look these up O(1)
-	rules := make(map[Mode]map[string][]*protos.Rule)
+	// Don't need this anymore, and don't want to send it to the wasm function
+	step.XWasmBytes = nil
 
-	for _, set := range ruleSets {
-		if _, ok := rules[Mode(set.Mode)]; !ok {
-			rules[Mode(set.Mode)] = make(map[string][]*protos.Rule)
-		}
+	req := &protos.WASMRequest{
+		Input: data,
+		Step:  step,
+	}
 
-		for ruleID, rule := range set.Rules {
-			rule.XRulesetId = set.Id // Needed for metrics and alerting
-			rule.Id = ruleID
+	reqBytes, err := proto.Marshal(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal WASM request")
+	}
 
-			if _, ok := rules[Mode(set.Mode)][set.Key]; !ok {
-				rules[Mode(set.Mode)][set.Key] = make([]*protos.Rule, 0)
+	// Run WASM module
+	respBytes, err := f.Exec(ctx, reqBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute wasm module")
+	}
+
+	resp := &protos.WASMResponse{}
+	if err := proto.Unmarshal(respBytes, resp); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal WASM response")
+	}
+
+	return resp, nil
+}
+
+func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
+	s.pipelinesMtx.RLock()
+	defer s.pipelinesMtx.RUnlock()
+
+	pipelines, ok := s.pipelines[audToStr(aud)]
+	if !ok {
+		// No pipelines for this audience key
+		// But we should notify snitch server we've seen it
+		s.addAudience(ctx, aud)
+
+		return make(map[string]*protos.Command)
+	}
+
+	return pipelines
+}
+
+func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
+	if req == nil {
+		return nil, errors.New("request cannot be nil")
+	}
+
+	data := req.Data
+	payloadSize := int64(len(data))
+
+	aud := &protos.Audience{
+		ServiceName:   s.config.ServiceName,
+		ComponentName: req.ComponentName,
+		OperationType: protos.OperationType(req.OperationType),
+		OperationName: req.OperationName,
+	}
+
+	labels := map[string]string{
+		"service":        s.config.ServiceName,
+		"component_name": req.ComponentName,
+		"operation_name": req.OperationName,
+		"pipeline_name":  "",
+		"pipeline_id":    "",
+	}
+
+	counterError := types.ConsumeErrorCount
+	counterProcessed := types.ConsumeProcessedCount
+	counterBytes := types.ConsumeBytes
+	if req.OperationType == Producer {
+		counterError = types.ProduceErrorCount
+		counterProcessed = types.ProduceProcessedCount
+		counterBytes = types.ProduceBytes
+	}
+
+	pipelines := s.getPipelines(ctx, aud)
+	if len(pipelines) == 0 {
+		// No pipelines for this mode, nothing to do
+		return &ProcessResponse{Data: data, Message: "No pipelines, message ignored"}, nil
+	}
+
+	if payloadSize > MaxPayloadSize {
+
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
+		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
+		s.config.Logger.Warn(msg)
+		return &ProcessResponse{Data: data, Error: true, Message: msg}, nil
+	}
+
+	for _, p := range pipelines {
+		pipeline := p.GetAttachPipeline().GetPipeline()
+		labels["pipeline_name"] = pipeline.Name
+		labels["pipeline_id"] = pipeline.Id
+
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize})
+
+		for _, step := range pipeline.Steps {
+			wasmResp, err := s.runStep(ctx, step, data)
+			if err != nil {
+				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
+				if !shouldContinue {
+					return &ProcessResponse{
+						Data:    req.Data,
+						Error:   true,
+						Message: err.Error(),
+					}, nil
+				}
+
+				// wasmResp will be nil, so don't allow code below to execute
+				continue
 			}
 
-			rules[Mode(set.Mode)][set.Key] = append(rules[Mode(set.Mode)][set.Key], rule)
+			// Check on success and on-failures
+			switch wasmResp.ExitCode {
+			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
+				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
+
+				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
+				if !shouldContinue {
+					return &ProcessResponse{
+						Data:    wasmResp.Output,
+						Error:   false,
+						Message: "",
+					}, nil
+				}
+			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
+				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
+
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
+				if !shouldContinue {
+					return &ProcessResponse{
+						Data:    wasmResp.Output,
+						Error:   true,
+						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
+					}, nil
+				}
+			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
+				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
+
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+
+				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
+				if !shouldContinue {
+					return &ProcessResponse{
+						Data:    wasmResp.Output,
+						Error:   true,
+						Message: "detective step failed:" + wasmResp.ExitMsg,
+					}, nil
+				}
+			default:
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
+			}
+
+			data = wasmResp.Output
 		}
 	}
 
-	d.rulesMtx.Lock()
-	d.rules = rules
-	d.rulesMtx.Unlock()
-
-	return nil
-}
-
-func (m Mode) String() string {
-	switch m {
-	case Publish:
-		return "publish"
-	case Consume:
-		return "consume"
-	default:
-		return "unknown"
+	// Dry run should not modify anything, but we must allow pipeline to
+	// mutate internal state in order to function properly
+	if s.config.DryRun {
+		data = req.Data
 	}
+
+	return &ProcessResponse{
+		Data:    data,
+		Error:   false,
+		Message: "",
+	}, nil
 }
 
-func matchOperatorFromProto(m protos.MatchOperator) detective.MatchOperator {
-	switch m {
-	case protos.MatchOperator_MATCH_OPERATOR_EQUALS:
-		return detective.EqualTo
-	case protos.MatchOperator_MATCH_OPERATOR_GREATER_THAN:
-		return detective.GreaterThan
-	case protos.MatchOperator_MATCH_OPERATOR_LESS_THAN:
-		return detective.LessThan
-	case protos.MatchOperator_MATCH_OPERATOR_GREATER_THAN_OR_EQUAL:
-		return detective.GreaterEqual
-	case protos.MatchOperator_MATCH_OPERATOR_LESS_THAN_OR_EQUAL:
-		return detective.LessEqual
-	case protos.MatchOperator_MATCH_OPERATOR_OLDER_THAN_SECONDS:
-		return detective.OlderThanSeconds
-	default:
-		return detective.IsMatch
+func (s *Snitch) handleConditions(
+	ctx context.Context,
+	conditions []protos.PipelineStepCondition,
+	pipeline *protos.Pipeline,
+	step *protos.PipelineStep,
+	aud *protos.Audience,
+	req *ProcessRequest,
+) bool {
+	shouldContinue := true
+	for _, condition := range conditions {
+		switch condition {
+		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
+			s.config.Logger.Debugf("Step '%s' condition triggered, notifying", step.Name)
+			if !s.config.DryRun {
+				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
+					s.config.Logger.Errorf("failed to notify condition: %v", err)
+				}
+
+				labels := map[string]string{
+					"service":        s.config.ServiceName,
+					"component_name": req.ComponentName,
+					"operation_name": req.OperationName,
+					"pipeline_name":  pipeline.Name,
+					"pipeline_id":    pipeline.Id,
+				}
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1})
+			}
+		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT:
+			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
+			shouldContinue = false
+		default:
+			// Assume continue
+			s.config.Logger.Debugf("Step '%s' failed, continuing to next step", step.Name)
+		}
+	}
+
+	return shouldContinue
+}
+
+func (a *Audience) ToProto() *protos.Audience {
+	return &protos.Audience{
+		ServiceName:   a.ServiceName,
+		ComponentName: a.ComponentName,
+		OperationType: protos.OperationType(a.OperationType),
+		OperationName: a.OperationName,
 	}
 }
