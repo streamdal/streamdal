@@ -3,30 +3,25 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "flowbite";
 import "twind";
-import { useState } from "preact/hooks";
 import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
 import {
-  getAudiencePipeline,
+  getAttachedPipeline,
   removeWhitespace,
   titleCase,
 } from "../../lib/utils.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
-import { ConfigType, PipelinesType } from "../../lib/fetch.ts";
+import { ServiceMapType } from "../../lib/fetch.ts";
 import { opModal } from "./opModalSignal.ts";
 
-export type AudiencePipeline = Audience & {
-  pipeline?: Pipeline;
-  clients?: ClientInfo[];
-};
-
 export type NodeData = {
-  label: string;
-  audience: AudiencePipeline;
+  audience: Audience;
+  attachedPipeline?: Pipeline;
+  clients?: ClientInfo[];
   groupCount?: number;
 };
 
@@ -72,6 +67,7 @@ export const xOffset = (serviceCount: number) =>
 export const mapOperation = (
   nodesMap: NodesMap,
   a: Audience,
+  serviceMap: ServiceMapType,
 ) => {
   const op = OperationType[a.operationType].toLowerCase();
   const groupCount = nodesMap.groupCount.get(a.serviceName);
@@ -90,7 +86,6 @@ export const mapOperation = (
       y: 200,
     },
     data: {
-      label: `${titleCase(op)}s`,
       audience: a,
       groupCount: groupCount[op],
     },
@@ -102,28 +97,37 @@ export const mapOperation = (
     type: op,
     position: {
       x: 10,
-      y: 38 + ((groupCount[op] - 1) * 70),
+      y: 38 + ((groupCount[op] - 1) * 80),
     },
     parentNode: `${a.serviceName}-${a.componentName}-${op}`,
     extent: "parent",
     data: {
-      label: a.operationName,
-      instances: 0,
-      pipeline: {},
       audience: a,
+      clients: serviceMap.live?.filter((l: LiveInfo) =>
+        l.audiences?.includes(a)
+      )?.map(
+        (
+          l: LiveInfo,
+        ) => l.client,
+      ),
+      attachedPipeline: getAttachedPipeline(
+        a,
+        serviceMap.pipelines,
+        serviceMap.config,
+      ),
     },
   });
 };
 
 export const mapNodes = (
-  audiences: AudiencePipeline[],
+  serviceMap: ServiceMapType,
 ): NodesMap => {
   const nodesMap = {
     nodes: new Map<string, FlowNode>(),
     groupCount: new Map<string, GroupCount>(),
   };
 
-  audiences.forEach((a: Audience, i: number) => {
+  serviceMap.audiences.forEach((a: Audience, i: number) => {
     if (!nodesMap.groupCount.has(a.serviceName)) {
       nodesMap.groupCount.set(a.serviceName, { producer: 0, consumer: 0 });
     }
@@ -133,10 +137,10 @@ export const mapNodes = (
       type: "service",
       dragHandle: "#dragHandle",
       position: { x: 150 + xOffset(nodesMap.groupCount.size), y: 0 },
-      data: { label: a.serviceName, audience: a },
+      data: { audience: a },
     });
 
-    mapOperation(nodesMap, a);
+    mapOperation(nodesMap, a, serviceMap);
 
     const groupCount = nodesMap.groupCount.get(a.serviceName);
     const count = Math.max(
@@ -151,10 +155,10 @@ export const mapNodes = (
       targetPosition: "left",
       dragHandle: "#dragHandle",
       position: {
-        x: 215 + xOffset(nodesMap.groupCount.size),
-        y: 350 + (count - 1) * 70,
+        x: 240 + xOffset(nodesMap.groupCount.size),
+        y: 350 + (count - 1) * 76,
       },
-      data: { label: a.componentName, audience: a },
+      data: { audience: a },
     });
   });
 
@@ -225,20 +229,6 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
   return edgesMap;
 };
 
-export const mapAudiencePipelines = (
-  audiences: Audience[],
-  pipelines: PipelinesType,
-  liveInfo: LiveInfo[],
-  config: ConfigType,
-): AudiencePipeline[] =>
-  audiences.map((a: Audience) => ({
-    ...a,
-    pipeline: getAudiencePipeline(a, pipelines, config),
-    clients: liveInfo?.filter((l: LiveInfo) => l.audiences?.includes(a))?.map((
-      l: LiveInfo,
-    ) => l.client),
-  }));
-
 export const ServiceNode = ({ data }: { data: NodeData }) => {
   return (
     <div>
@@ -253,12 +243,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
             className={"h-[40px]"}
           />
           <div class="flex flex-col ml-2">
-            <h2 className={"text-lg"}>{data.label}</h2>
-            <div class="text-streamdalPurple text-xs font-semibold ml-1 mt-1">
-              {data.audience?.clients?.length
-                ? data.audience?.clients?.length
-                : "No "} clients
-            </div>
+            <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>
         </div>
         <ServiceNodeMenu />
@@ -284,15 +269,10 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
 };
 
 export const GroupNode = ({ data }: { data: NodeData }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const producer = OperationType[data.audience.operationType] ==
-    OperationType[OperationType.PRODUCER];
+  const op = OperationType[data.audience.operationType];
+  const producer = op === OperationType[OperationType.PRODUCER];
 
-  const handleModalOpen = () => {
-    setIsOpen(true);
-  };
-
-  const height = 124 + ((data.groupCount - 1) * 68);
+  const height = 124 + ((data.groupCount - 1) * 76);
 
   return (
     <div
@@ -300,7 +280,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
     >
       <div id="dragHandle" class="flex flex-row items-center mt-2">
         <IconGripVertical class="w-6 h-6 ml-2 text-purple-100 bg-white border border-purple-200" />
-        <div class="ml-2">{data.label}</div>
+        <div class="ml-2">{`${titleCase(op)}s`}</div>
       </div>
 
       <Handle
@@ -320,7 +300,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 export const OperationNode = ({ data }: { data: NodeData }) => {
   const producer = OperationType[data.audience.operationType] ==
     OperationType[OperationType.PRODUCER];
-  const toolTipId = removeWhitespace(data.label);
+  const toolTipId = removeWhitespace(data.audience.operationName);
 
   return (
     <div class="h-[96px]">
@@ -342,19 +322,32 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
               data-tooltip-target={toolTipId}
               class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
             >
-              {data.label}
+              {data.audience.operationName}
             </h2>
             <Tooltip
               targetId={toolTipId}
-              message={"Click to attach, detach and pause pipelines"}
+              message={"Click to attach and detach pipelines"}
             />
             <h3 class="text-xs text-gray-500">
               {titleCase(OperationType[data.audience.operationType])}
             </h3>
           </div>
         </div>
-        <NodeMenu audience={data.audience} />
+        <NodeMenu
+          audience={data.audience}
+          attachedPipeline={data.attachedPipeline}
+        />
       </div>
+      <div
+        data-tooltip-target={`${toolTipId}-clients`}
+        class="absolute inline-flex items-center justify-evenly w-6 h-6 text-xs text-white bg-purple-500 rounded-full -top-2 -right-1 cursor-default"
+      >
+        {data.clients?.length || 0}
+      </div>
+      <Tooltip
+        targetId={`${toolTipId}-clients`}
+        message={`${data.clients?.length || 0} SDK clients`}
+      />
       <Handle
         type="source"
         position={Position.Top}
@@ -369,8 +362,10 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
   );
 };
 
-export const ComponentImage = ({ name }: { name: string }) => {
-  if (name.toLowerCase().includes("kafka")) {
+export const ComponentImage = (
+  { componentName }: { componentName: string },
+) => {
+  if (componentName.toLowerCase().includes("kafka")) {
     return (
       <img
         src={"/images/kafka-dark.svg"}
@@ -379,7 +374,7 @@ export const ComponentImage = ({ name }: { name: string }) => {
     );
   }
 
-  if (name.toLowerCase().includes("postgres")) {
+  if (componentName.toLowerCase().includes("postgres")) {
     return (
       <img
         src={"/images/postgresql.svg"}
@@ -391,15 +386,12 @@ export const ComponentImage = ({ name }: { name: string }) => {
   return <IconDatabase class="w-6 h-6" />;
 };
 
-export const ComponentNode = ({ data }: { data: { label: string } }) => {
+export const ComponentNode = ({ data }: { data: NodeData }) => {
   return (
-    <div
-      className={"z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center" +
-        " items-center"}
-    >
-      <div className={"flex justify-center flex-col items-center"}>
-        <ComponentImage name={data.label} />
-        <p class={"z-10 mt-2 text-white"}>{data?.label}</p>
+    <div class="z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center items-center">
+      <div class="flex justify-center flex-col items-center">
+        <ComponentImage componentName={data.audience.componentName} />
+        <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
       </div>
       <Handle
         type="source"

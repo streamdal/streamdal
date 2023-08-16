@@ -37,7 +37,7 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
       />
       <link rel="stylesheet" type="text/css" href="/style.css" />
     </Head>
-    <body className="h-screen bg-purple-50 m-0">
+    <body className="h-screen bg-purple-50 m-0 overflow-hidden">
       {hideNav ? null : <NavBar />}
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>

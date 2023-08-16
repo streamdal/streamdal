@@ -1,13 +1,15 @@
 import { Edit, Info, Pause, Silence } from "../icons/crud.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import { useState } from "preact/hooks";
-import { getAudienceOpRoute, removeWhitespace } from "../../lib/utils.ts";
-import { AudiencePipeline } from "./customNodes.tsx";
+import { removeWhitespace } from "../../lib/utils.ts";
 import { opModal } from "./opModalSignal.ts";
+import { Audience } from "snitch-protos/protos/common.ts";
+import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 
-export const NodeMenu = (
-  { audience }: { audience: AudiencePipeline },
-) => {
+export const NodeMenu = ({ audience, attachedPipeline }: {
+  audience: Audience;
+  attachedPipeline: Pipeline;
+}) => {
   const id = removeWhitespace(audience.operationName);
   return (
     <div className={"rounded bg-purple-50 ml-4"}>
@@ -34,12 +36,10 @@ export const NodeMenu = (
               Edit Pipelines
             </li>
           </a>
-          <a href="/slack">
-            <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm">
-              <Silence className="text-web mx-2" />
-              Silence Notifications
-            </li>
-          </a>
+          <li className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm cursor-not-allowed">
+            <Silence className="text-web mx-2" />
+            Silence Notifications
+          </li>
 
           <li
             className="flex w-full flex-start py-2 px-2 hover:bg-sunset text-sm cursor-pointer"
@@ -49,18 +49,16 @@ export const NodeMenu = (
             More Information
           </li>
 
-          <a
-            href={`${
-              getAudienceOpRoute(audience)
-            }/pipeline/${audience.pipeline?.id}/pause`}
+          <button
+            class={`w-full ${
+              attachedPipeline ? "cursor-pointer" : "cursor-not-allowed"
+            }`}
           >
-            <button className="w-full">
-              <li className="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
-                <Pause className="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
-                Pause
-              </li>
-            </button>
-          </a>
+            <li class="group flex w-full flex-start py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
+              <Pause class="w-4 mx-1 text-eyelid group-hover:text-white fill-current" />
+              Pause
+            </li>
+          </button>
         </ul>
       </div>
     </div>
