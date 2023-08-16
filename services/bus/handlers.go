@@ -128,6 +128,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 
 		// Send DetachPipeline cmd to client
 		cmdCh <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_DetachPipeline{
 				DetachPipeline: &protos.DetachPipelineCommand{
 					PipelineId: u.PipelineId,
@@ -139,6 +140,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 
 		// Send AttachPipeline cmd to client
 		cmdCh <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_AttachPipeline{
 				AttachPipeline: &protos.AttachPipelineCommand{
 					Pipeline: req.Pipeline,
@@ -183,6 +185,7 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 		}
 
 		ch <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_DetachPipeline{
 				DetachPipeline: &protos.DetachPipelineCommand{
 					PipelineId: req.PipelineId,
@@ -285,6 +288,7 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 		}
 
 		ch <- &protos.Command{
+			Audience: req.Audience,
 			Command: &protos.Command_AttachPipeline{
 				AttachPipeline: &protos.AttachPipelineCommand{
 					Pipeline: pipeline,
@@ -334,6 +338,7 @@ func (b *Bus) handleDetachPipelineRequest(ctx context.Context, req *protos.Detac
 		}
 
 		ch <- &protos.Command{
+			Audience: u.Audience,
 			Command: &protos.Command_DetachPipeline{
 				DetachPipeline: &protos.DetachPipelineCommand{
 					PipelineId: req.PipelineId,
