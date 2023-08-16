@@ -247,22 +247,24 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 		return errors.Wrapf(err, "error getting pipeline '%s' from store", req.PipelineId)
 	}
 
+	// TODO: commented out by MG 2023-08-16. This prevents broadcast commands from being emitted
+	// TODO: not sure this is even needed
 	// Is this audience already attached to a pipeline?
-	attachedPipelineID, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
-	if err != nil {
-		if err == store.ErrConfigNotFound {
-			b.log.Debugf("config for audience '%s' not found - nothing to do", req.Audience)
-			return nil
-		}
-
-		b.log.Errorf("error getting audience '%s' config from store: %v", req.Audience, err)
-		return errors.Wrapf(err, "error getting audience '%s' config from store", req.Audience)
-	}
-
-	if attachedPipelineID != "" {
-		b.log.Debugf("audience '%s' is already attached to pipeline '%s'", req.Audience, attachedPipelineID)
-		return nil
-	}
+	//attachedPipelineID, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
+	//if err != nil {
+	//	if err == store.ErrConfigNotFound {
+	//		b.log.Debugf("config for audience '%s' not found - nothing to do", req.Audience)
+	//		return nil
+	//	}
+	//
+	//	b.log.Errorf("error getting audience '%s' config from store: %v", req.Audience, err)
+	//	return errors.Wrapf(err, "error getting audience '%s' config from store", req.Audience)
+	//}
+	//
+	//if attachedPipelineID != "" {
+	//	b.log.Debugf("audience '%s' is already attached to pipeline '%s'", req.Audience, attachedPipelineID)
+	//	return nil
+	//}
 
 	sessionIDs, err := b.getActiveSessionIDs(ctx, req.Audience)
 	if err != nil {
