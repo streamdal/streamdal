@@ -578,7 +578,8 @@ class GetAttachCommandsByServiceRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetAttachCommandsByServiceResponse(betterproto.Message):
-    commands: List["Command"] = betterproto.message_field(1)
+    active: List["Command"] = betterproto.message_field(1)
+    paused: List["Command"] = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
