@@ -1,6 +1,5 @@
 import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { ConfigType, PipelinesType } from "./fetch.ts";
-import { AudiencePipeline } from "../components/serviceMap/customNodes.tsx";
 
 const UNITS = [
   "byte",
@@ -85,7 +84,7 @@ export const getOpRoute = (
     encodeURIComponent(component)
   }/${OperationType[opType]}/op/${encodeURIComponent(opName)}`;
 
-export const audienceKey = (audience: Audience | AudiencePipeline) =>
+export const audienceKey = (audience: Audience) =>
   Object.values(
     (({ serviceName, componentName, operationType, operationName }) => ({
       serviceName,
@@ -98,7 +97,7 @@ export const audienceKey = (audience: Audience | AudiencePipeline) =>
   ) => new String(v).toLowerCase())
     .join("");
 
-export const getAudiencePipeline = (
+export const getAttachedPipeline = (
   audience: Audience,
   pipelines: PipelinesType,
   config: ConfigType,

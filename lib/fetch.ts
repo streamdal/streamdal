@@ -5,7 +5,6 @@ import { dummyAudiences, dummyConfig, dummyLive } from "./dummies.ts";
 import {
   FlowEdge,
   FlowNode,
-  mapAudiencePipelines,
   mapEdges,
   mapNodes,
 } from "../components/serviceMap/customNodes.tsx";
@@ -40,14 +39,8 @@ export type ServiceNodes = {
 export const getServiceNodes = async (): Promise<ServiceNodes> => {
   const serviceMap = await getServiceMap();
   const edges = Array.from(mapEdges(serviceMap.audiences).values());
-  const audiencePipelines = mapAudiencePipelines(
-    serviceMap.audiences,
-    serviceMap.pipelines,
-    serviceMap.live,
-    serviceMap.config,
-  );
   const nodes = Array.from(
-    mapNodes(audiencePipelines).nodes.values(),
+    mapNodes(serviceMap).nodes.values(),
   );
   return { serviceMap, nodes, edges };
 };

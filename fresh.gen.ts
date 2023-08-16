@@ -15,10 +15,9 @@ import * as $9 from "./routes/pipelines/save.tsx";
 import * as $10 from "./routes/rules.tsx";
 import * as $11 from "./routes/service/[service]/component/[component]/[operationType]/all.tsx";
 import * as $12 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
-import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach-detach.tsx";
-import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
-import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
-import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
+import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
+import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
+import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
 import * as $$0 from "./islands/opModal.tsx";
 import * as $$1 from "./islands/pipeline.tsx";
 import * as $$2 from "./islands/pipelines.tsx";
@@ -41,14 +40,12 @@ const manifest = {
       $11,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx":
       $12,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach-detach.tsx":
-      $13,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
-      $14,
+      $13,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
-      $15,
+      $14,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
-      $16,
+      $15,
   },
   islands: {
     "./islands/opModal.tsx": $$0,

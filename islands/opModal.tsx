@@ -5,8 +5,8 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 
 import {
+  getAttachedPipeline,
   getAudienceOpRoute,
-  getAudiencePipeline,
   titleCase,
 } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
@@ -34,7 +34,7 @@ export default function OpModal(
   const [attachedPipeline, setAttachedPipeline] = useState(null);
 
   useEffect(() => {
-    setAttachedPipeline(getAudiencePipeline(
+    setAttachedPipeline(getAttachedPipeline(
       opModal.value,
       serviceMap.pipelines,
       serviceMap.config,
