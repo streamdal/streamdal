@@ -1,6 +1,5 @@
 # Snitch Go Client
 
----
 
 [![Master build status](https://github.com/streamdal/snitch-go-client/workflows/main/badge.svg)](https://github.com/streamdal/snitch-go-client/actions/workflows/main-test.yml)
 
@@ -11,35 +10,24 @@ are designed to allow usage if this SDK with minimal changes to your existing co
 
 To use these shims, you can specify the following environment variables, which will be read by the SDK at runtime
 
-| Envar                 | Required | Description | Default |
-|-----------------------| --- | --- |----|
-| `PLUMBER_URL`         | Yes | URL to a running plumber server instance in your infrastructure | `localhost:9090` |
-| `PLUMBER_TOKEN`       | No | Token to use when authenticating with the plumber server, configured via plumber server | `streamdal` |
-| `SNITCH_DRY_RUN`      | No | `true` or `false`. Dry run mode will simply log the rules that would have been applied to the message, but will not actually apply them | `false` |
-| `SNITCH_WASM_TIMEOUT` | No | Timeout for wasm execution in milliseconds | `1s` |
-
-When using these shims, message rules which cause a message to be dropped during publish or consumption will return
-the error `snitch.ErrMessageDropped`. This should be handled by your code if necessary.
-
-### Golang Shims
-
-* Kafka
-  * `segmentio/kafka-go`: https://github.com/streamdal/segmentio-kafka-go
-  * `Shopify/sarama`: https://github.com/streamdal/shopify-sarama
+| Envar                     | Required | Description                                                                                                                             | Default          |
+|---------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| `SNITCH_URL`              | Yes      | URL to a running Snitch server instance in your infrastructure                                                                          | `localhost:9090` |
+| `SNITCH_TOKEN`            | Yes      | Token to use when authenticating with the plumber server, configured via plumber server                                                 | `streamdal`      |
+| `SNITCH_DRY_RUN`          | No       | `true` or `false`. Dry run mode will simply log the rules that would have been applied to the message, but will not actually apply them | `false`          |
+| `SNITCH_STEP_TIMEOUT`     | No       | Timeout for wasm execution in milliseconds                                                                                              | `10`             |
+| `SNITCH_PIPELINE_TIMEOUT` | No       | Timeout for entire pipeline execution in milliseconds                                                                                   | `100`            |
+| `SNITCH_DATA_SOURCE`      | No       | Data source to use when applying rules. This is used to determine which rulesets to apply to the message.                               | `kafka`          |
 
 
-* RabbitMQ
-  * `streadway/amqp`: https://github.com/streamdal/rabbitmq-amqp091-go
-  * `rabbitmq/amqp091-go`: https://github.com/streamdal/rabbitmq-amqp091-go
-
-
-### Direct library usage
+### Example Usage
 
 ```go
 package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/streamdal/snitch-go-client"
@@ -50,9 +38,10 @@ func main() {
 	defer cancel()
 
 	sc, err := snitch.New(&snitch.Config{
-		PlumberURL:   "localhost:9090",
-		PlumberToken: "streadmal",
-		WasmTimeout:  time.Millisecond * 200,
+		SnitchURL:   "localhost:9090",
+		SnitchToken: "streadmal",
+		StepTimeout:  time.Millisecond * 10,
+		PipelineTimeout: time.Millisecond * 100,
 		DryRun:       false,
 		DataSource:   "kafka",
 		ShutdownCtx:  ctx,
@@ -61,7 +50,12 @@ func main() {
 		panic(err)
 	}
 
-	modifiedData, err := sc.ApplyRules(ctx, snitch.Publish, "my-kafka-topic", []byte(`{"payload": {...}}`))
+	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
+		OperationType:   snitch.Consumer,
+        OperationName:   "new-order-topic",
+        ComponentName:   "kafka",
+        Data:            []byte(`{"object": {"field": true}}`),
+    })
 	if err != nil {
 		if err == snitch.ErrMessageDropped {
 			// message was dropped, perform some logging
@@ -70,20 +64,20 @@ func main() {
 		}
 	}
 
-	// Publish message to Kafka here
-	// ...
+	fmt.Printf("%#v\n", resp)
 }
 ```
 
 ### Metrics
 
+Metrics are published to snitch server and are available in Prometheus format at http://snitch_server_url:8080/v1/metrics
 
-| Metric                           | Description                                                    | Labels                                                                |
-|----------------------------------|----------------------------------------------------------------|-----------------------------------------------------------------------|
-| `plumber_snitch_pubish`          | Total number of messages published                             | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
-| `plumber_snitch_consume`         | Total number of messages consumed                              | `type` = "bytes" OR "count", `data_source` = "kafka", "rabbitmq" ,etc |
-| `plumber_snitch_size_exceeded`   | Total number of messages ignored due to exceeding size limit   | `data_source` = "kafka", "rabbitmq" ,etc                              |
-| `plumber_snitch_rule`            | Number of events and bytes count for each rule ran             | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
-| `plumber_snitch_failure_trigger` | Number of events and bytes count that triggered a failure mode | `type` = "bytes" OR "count", `ruleset_id` = UUID, `rule_id` = UUID    |
-
-The SDK ships metrics to Plumber which are then exposed via promethus endpoint at `http://<plumber>:9191/metrics`
+| Metric                                       | Description                                           | Labels                                                                        |
+|----------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
+| `streamdal_snitch_counter_consume_bytes`     | Number of bytes consumed by the snitch client         | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_consume_errors`    | Number of errors encountered while consuming payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_consume_processed` | Number of payloads processed by the snitch client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_produce_bytes`     | Number of bytes produced by the snitch client         | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_produce_errors`    | Number of errors encountered while producing payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_produce_processed` | Number of payloads processed by the snitch client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_snitch_counter_notify`            | Number of notifications sent to the snitch server     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
