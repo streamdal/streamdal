@@ -11,7 +11,7 @@ See https://docs.snitch.build
 
 ### Installation
 ```
-pip install snitchpy
+python -m pip install snitchpy
 ```
 
 ### Requirements
