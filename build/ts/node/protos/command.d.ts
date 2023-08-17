@@ -104,6 +104,37 @@ export interface ResumePipelineCommand {
 export interface KeepAliveCommand {
 }
 /**
+ * @generated from protobuf message protos.KVObject
+ */
+export interface KVObject {
+    /**
+     * Key regex: /^[a-zA-Z0-9_-:]+$/)
+     *
+     * @generated from protobuf field: string key = 1;
+     */
+    key: string;
+    /**
+     * KV value
+     *
+     * @generated from protobuf field: bytes value = 2;
+     */
+    value: Uint8Array;
+    /**
+     * When was this object created
+     *
+     * @generated from protobuf field: int64 created_at_unix_ts_nano_utc = 3;
+     */
+    createdAtUnixTsNanoUtc: bigint;
+    /**
+     * Last time the object was updated
+     *
+     * @generated from protobuf field: int64 updated_at_unix_ts_nano_utc = 4;
+     */
+    updatedAtUnixTsNanoUtc: bigint;
+}
+/**
+ * Used in KVCommand to indicate a series of KV-related actions - ie. create, update, delete
+ *
  * @generated from protobuf message protos.KVInstruction
  */
 export interface KVInstruction {
@@ -120,21 +151,15 @@ export interface KVInstruction {
      */
     action: KVAction;
     /**
-     * Key (valid re: /^[a-zA-Z0-9_-]+$/)
+     * KV object
      *
-     * @generated from protobuf field: string key = 3;
+     * @generated from protobuf field: protos.KVObject object = 3;
      */
-    key: string;
-    /**
-     * Value
-     *
-     * @generated from protobuf field: bytes value = 4;
-     */
-    value: Uint8Array;
+    object?: KVObject;
     /**
      * When this instruction was requested (usually will be the HTTP API request time)
      *
-     * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 5;
+     * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 4;
      */
     requestedAtUnixTsNanoUtc: bigint;
 }
@@ -218,6 +243,13 @@ declare class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
  * @generated MessageType for protobuf message protos.KeepAliveCommand
  */
 export declare const KeepAliveCommand: KeepAliveCommand$Type;
+declare class KVObject$Type extends MessageType<KVObject> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.KVObject
+ */
+export declare const KVObject: KVObject$Type;
 declare class KVInstruction$Type extends MessageType<KVInstruction> {
     constructor();
 }

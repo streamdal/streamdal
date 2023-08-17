@@ -49,18 +49,28 @@ class KVCommand(_message.Message):
     def __init__(self, instructions: _Optional[_Iterable[_Union[KVInstruction, _Mapping]]] = ...) -> None: ...
 
 class KVInstruction(_message.Message):
-    __slots__ = ["action", "id", "key", "requested_at_unix_ts_nano_utc", "value"]
+    __slots__ = ["action", "id", "object", "requested_at_unix_ts_nano_utc"]
     ACTION_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
-    KEY_FIELD_NUMBER: _ClassVar[int]
+    OBJECT_FIELD_NUMBER: _ClassVar[int]
     REQUESTED_AT_UNIX_TS_NANO_UTC_FIELD_NUMBER: _ClassVar[int]
-    VALUE_FIELD_NUMBER: _ClassVar[int]
     action: KVAction
     id: str
-    key: str
+    object: KVObject
     requested_at_unix_ts_nano_utc: int
+    def __init__(self, id: _Optional[str] = ..., action: _Optional[_Union[KVAction, str]] = ..., object: _Optional[_Union[KVObject, _Mapping]] = ..., requested_at_unix_ts_nano_utc: _Optional[int] = ...) -> None: ...
+
+class KVObject(_message.Message):
+    __slots__ = ["created_at_unix_ts_nano_utc", "key", "updated_at_unix_ts_nano_utc", "value"]
+    CREATED_AT_UNIX_TS_NANO_UTC_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_UNIX_TS_NANO_UTC_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    created_at_unix_ts_nano_utc: int
+    key: str
+    updated_at_unix_ts_nano_utc: int
     value: bytes
-    def __init__(self, id: _Optional[str] = ..., action: _Optional[_Union[KVAction, str]] = ..., key: _Optional[str] = ..., value: _Optional[bytes] = ..., requested_at_unix_ts_nano_utc: _Optional[int] = ...) -> None: ...
+    def __init__(self, key: _Optional[str] = ..., value: _Optional[bytes] = ..., created_at_unix_ts_nano_utc: _Optional[int] = ..., updated_at_unix_ts_nano_utc: _Optional[int] = ...) -> None: ...
 
 class KeepAliveCommand(_message.Message):
     __slots__ = []

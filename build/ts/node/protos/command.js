@@ -111,14 +111,28 @@ class KeepAliveCommand$Type extends MessageType {
  */
 export const KeepAliveCommand = new KeepAliveCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class KVObject$Type extends MessageType {
+    constructor() {
+        super("protos.KVObject", [
+            { no: 1, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "created_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 4, name: "updated_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVObject
+ */
+export const KVObject = new KVObject$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class KVInstruction$Type extends MessageType {
     constructor() {
         super("protos.KVInstruction", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
-            { no: 3, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 5, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 3, name: "object", kind: "message", T: () => KVObject },
+            { no: 4, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
 }

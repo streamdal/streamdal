@@ -506,20 +506,37 @@ class KeepAliveCommand(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class KvObject(betterproto.Message):
+    key: str = betterproto.string_field(1)
+    """Key regex: /^[a-zA-Z0-9_-:]+$/)"""
+
+    value: bytes = betterproto.bytes_field(2)
+    """KV value"""
+
+    created_at_unix_ts_nano_utc: int = betterproto.int64_field(3)
+    """When was this object created"""
+
+    updated_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
+    """Last time the object was updated"""
+
+
+@dataclass(eq=False, repr=False)
 class KvInstruction(betterproto.Message):
+    """
+    Used in KVCommand to indicate a series of KV-related actions - ie. create,
+    update, delete
+    """
+
     id: str = betterproto.string_field(1)
     """Unique ID for this instruction"""
 
     action: "KvAction" = betterproto.enum_field(2)
     """What kind of an action is this?"""
 
-    key: str = betterproto.string_field(3)
-    """Key (valid re: /^[a-zA-Z0-9_-]+$/)"""
+    object: "KvObject" = betterproto.message_field(3)
+    """KV object"""
 
-    value: bytes = betterproto.bytes_field(4)
-    """Value"""
-
-    requested_at_unix_ts_nano_utc: int = betterproto.int64_field(5)
+    requested_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
     """
     When this instruction was requested (usually will be the HTTP API request
     time)
