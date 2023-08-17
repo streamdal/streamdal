@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/InVisionApp/go-health/v2"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
@@ -18,6 +19,7 @@ type Options struct {
 	HTTPAPIListenAddress string
 	Version              string
 	ShutdownContext      context.Context
+	Health               health.IHealth
 }
 type HTTPAPI struct {
 	Options *Options
@@ -112,6 +114,10 @@ func validate(o *Options) error {
 
 	if o.ShutdownContext == nil {
 		return errors.New("shutdown context cannot be nil")
+	}
+
+	if o.Health == nil {
+		return errors.New("health cannot be nil")
 	}
 
 	return nil

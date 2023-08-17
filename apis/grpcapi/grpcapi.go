@@ -34,7 +34,7 @@ type GRPCAPI struct {
 }
 
 func New(d *deps.Dependencies) (*GRPCAPI, error) {
-	if err := validate(d); err != nil {
+	if err := validateOptions(d); err != nil {
 		return nil, errors.Wrap(err, "could not validate dependencies")
 	}
 
@@ -163,7 +163,7 @@ func (g *GRPCAPI) setRequestID(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-func validate(d *deps.Dependencies) error {
+func validateOptions(d *deps.Dependencies) error {
 	if d == nil {
 		return errors.New("dependencies cannot be nil")
 	}
