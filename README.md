@@ -1,7 +1,7 @@
 # snitchpy
 
 
-[![Master build status](https://github.com/streamdal/snitch-python-client/workflows/main/badge.svg)](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml)
+[![Master build status](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml)
 
 snitchpy is the python client SDK for Streamdal's open source Snitch server https://github.com/streamdal/snitch
 
@@ -30,8 +30,8 @@ def main():
         cfg=SnitchConfig(
             service_name="order-ingest",
             dry_run=True,
-            grpc_url="snitch-server.dev.svc.cluster.local",
-            grpc_token="1234",
+            snitch_url="snitch-server.dev.svc.cluster.local:9090",
+            snitch_token="1234",
         )
     )
 

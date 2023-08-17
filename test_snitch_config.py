@@ -8,9 +8,8 @@ class TestSnitchConfig:
         # A valid config should not raise any exception
         config = SnitchConfig(
             service_name="MyService",
-            grpc_url="localhost",
-            grpc_port=9090,
-            grpc_token="fake token",
+            snitch_url="localhost:9090",
+            snitch_token="fake token",
         )
         assert SnitchClient._validate_config(config) is None
 
@@ -20,42 +19,28 @@ class TestSnitchConfig:
             SnitchClient._validate_config(
                 SnitchConfig(
                     service_name="",
-                    grpc_url="localhost",
-                    grpc_port=9090,
-                    grpc_token="fake token",
+                    snitch_url="localhost:9090",
+                    snitch_token="fake token",
                 )
             )
 
-        # Test when grpc_url is missing
-        with pytest.raises(ValueError, match="grpc_url is required"):
+        # Test when snitch_url is missing
+        with pytest.raises(ValueError, match="snitch_url is required"):
             SnitchClient._validate_config(
                 SnitchConfig(
                     service_name="writer",
-                    grpc_url="",
-                    grpc_port=9090,
-                    grpc_token="fake token",
+                    snitch_url="",
+                    snitch_token="fake token",
                 )
             )
 
-        # Test when grpc_port is missing
-        with pytest.raises(ValueError, match="grpc_port is required"):
+        # Test when snitch_token is missing
+        with pytest.raises(ValueError, match="snitch_token is required"):
             SnitchClient._validate_config(
                 SnitchConfig(
                     service_name="writer",
-                    grpc_url="localhost",
-                    grpc_port=0,
-                    grpc_token="fake token",
-                )
-            )
-
-        # Test when grpc_token is missing
-        with pytest.raises(ValueError, match="grpc_token is required"):
-            SnitchClient._validate_config(
-                SnitchConfig(
-                    service_name="writer",
-                    grpc_url="localhost",
-                    grpc_port=9090,
-                    grpc_token="",
+                    snitch_url="localhost:9090",
+                    snitch_token="",
                 )
             )
 

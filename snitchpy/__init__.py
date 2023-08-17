@@ -13,10 +13,10 @@ from dataclasses import dataclass, field
 from grpclib.client import Channel
 from .metrics import Metrics
 from threading import Thread, Event
+from urllib.parse import urlparse
 from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, Instance
 
-DEFAULT_SNITCH_PORT = 9090
-DEFAULT_SNITCH_URL = "localhost"
+DEFAULT_SNITCH_URL = "localhost:9090"
 DEFAULT_SNITCH_TOKEN = "1234"
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10  # 100 milliseconds
 DEFAULT_STEP_TIMEOUT = 1 / 100  # 10 milliseconds
@@ -75,9 +75,8 @@ class Audience:
 class SnitchConfig:
     """SnitchConfig is a dataclass that holds configuration for the SnitchClient"""
 
-    grpc_url: str = os.getenv("SNITCH_URL", DEFAULT_SNITCH_URL)
-    grpc_port: int = os.getenv("SNITCH_PORT", DEFAULT_SNITCH_PORT)
-    grpc_token: str = os.getenv("SNITCH_TOKEN", DEFAULT_SNITCH_TOKEN)
+    snitch_url: str = os.getenv("SNITCH_URL", DEFAULT_SNITCH_URL)
+    snitch_token: str = os.getenv("SNITCH_TOKEN", DEFAULT_SNITCH_TOKEN)
     grpc_timeout: int = os.getenv("SNITCH_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
     pipeline_timeout: int = os.getenv("SNITCH_PIPELINE_TIMEOUT", 1 / 10)
     step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", 1 / 100)
@@ -112,21 +111,19 @@ class SnitchClient:
         log = logging.getLogger("snitch-client")
         log.setLevel(logging.DEBUG)
 
+        (host, port) = cfg.snitch_url.split(":")
+
         register_loop = asyncio.new_event_loop()
-        self.register_channel = Channel(
-            host=cfg.grpc_url, port=cfg.grpc_port, loop=register_loop
-        )
+        self.register_channel = Channel(host=host, port=port, loop=register_loop)
         self.register_stub = protos.InternalStub(channel=self.register_channel)
         self.register_loop = register_loop
 
         grpc_loop = asyncio.new_event_loop()
-        self.grpc_channel = Channel(
-            host=cfg.grpc_url, port=cfg.grpc_port, loop=grpc_loop
-        )
+        self.grpc_channel = Channel(host=host, port=port, loop=grpc_loop)
         self.grpc_stub = protos.InternalStub(channel=self.grpc_channel)
         self.grpc_loop = grpc_loop
 
-        self.auth_token = cfg.grpc_token
+        self.auth_token = cfg.snitch_token
         self.grpc_timeout = 5
         self.pipelines = {}
         self.paused_pipelines = {}
@@ -207,12 +204,10 @@ class SnitchClient:
             raise ValueError("cfg is required")
         elif cfg.service_name == "":
             raise ValueError("service_name is required")
-        elif cfg.grpc_url == "":
-            raise ValueError("grpc_url is required")
-        elif cfg.grpc_port == 0:
-            raise ValueError("grpc_port is required")
-        elif cfg.grpc_token == "":
-            raise ValueError("grpc_token is required")
+        elif cfg.snitch_url == "":
+            raise ValueError("snitch_url is required")
+        elif cfg.snitch_token == "":
+            raise ValueError("snitch_token is required")
 
     @staticmethod
     def aud_to_str(aud: protos.Audience) -> str:

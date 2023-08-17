@@ -16,9 +16,8 @@ def main():
         cfg=SnitchConfig(
             service_name="snitchtest",
             dry_run=True,
-            grpc_url="localhost",
-            grpc_port=9090,
-            grpc_token="1234",
+            snitch_url="snitch-server.dev.svc.cluster.local:9090",
+            snitch_token="1234",
             audiences=[
                 Audience(
                     service_name="snitchtest",
