@@ -33,6 +33,9 @@ jobs:
     name: Upload release to PyPI
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
       - name: Build python dist
         run: |
           python3 setup.py sdist
