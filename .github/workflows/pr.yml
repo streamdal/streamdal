@@ -35,7 +35,6 @@ jobs:
     steps:
       - name: Build python dist
         run: |
-          cd build/python
           python3 setup.py sdist
 
       - name: Publish package distributions to PyPI
