@@ -23,6 +23,8 @@ export default {
         stream: "#C1AAFD",
         lunar: "#8E84AD",
         twilight: "#E6DDFE",
+        drab: "#F7E7CC",
+        burnt: "#AF8E3A",
       },
       fontFamily: {
         sans: ["Inter"],

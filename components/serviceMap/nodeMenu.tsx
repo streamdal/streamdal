@@ -8,12 +8,16 @@ import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconLink from "tabler-icons/tsx/link.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
+import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 
-export const NodeMenu = ({ audience, attachedPipeline }: {
-  audience: Audience;
-  attachedPipeline: Pipeline;
-}) => {
+export const NodeMenu = (
+  { audience, attachedPipeline }: {
+    audience: Audience;
+    attachedPipeline: Pipeline;
+  },
+) => {
   const id = removeWhitespace(audience.operationName);
+
   return (
     <div className={"rounded bg-purple-50 ml-4"}>
       <div
@@ -44,39 +48,61 @@ export const NodeMenu = ({ audience, attachedPipeline }: {
             <Info className="w-4 text-web mr-2" />
             More Information
           </li>
-          <button class="w-full">
-            {attachedPipeline
-              ? (
-                <li className="group flex w-full flex-start items-center py-2 px-2 text-eyelid hover:text-white hover:bg-eyelid text-sm">
-                  <IconPlayerPause class="w-4 mr-2 text-eyelid group-hover:text-white fill-current" />
-                  Pause Pipeline
-                </li>
-              )
-              : (
-                <li
-                  className="group flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm"
-                  onClick={() =>
-                    opModal.value = {
-                      audience,
-                      attachedPipeline,
-                    }}
-                >
-                  <IconLink class="w-4 mr-2 text-web" />
-                  Attach Pipeline
-                </li>
-              )}
-          </button>
           {attachedPipeline
             ? (
-              <a href={`/pipelines/${attachedPipeline}`}>
-                <li className="flex w-full flex-start items-center px-2 py-2 hover:bg-sunset text-sm">
-                  <Edit className="text-red mr-2" />
-                  Edit Rules
-                </li>
-              </a>
+              <>
+                <button
+                  className="w-full"
+                  onClick={() =>
+                    opModal.value = {
+                      audience: audience,
+                      attachedPipeline: attachedPipeline,
+                      pause: true,
+                    }}
+                >
+                  <li className="group flex w-full flex-start items-center py-2 px-2 text-burnt text-sm">
+                    <IconPlayerPause class="w-4 mr-2 text-burnt" />
+                    Pause Pipeline
+                  </li>
+                </button>
+                <button
+                  className="w-full"
+                  onClick={() =>
+                    opModal.value = {
+                      audience: audience,
+                      attachedPipeline: attachedPipeline,
+                      detach: true,
+                    }}
+                >
+                  <li className="group flex w-full flex-start items-center py-2 px-2 text-burnt text-sm">
+                    <IconUnlink class="w-4 mr-2 text-burnt" />
+                    Detach Pipeline
+                  </li>
+                </button>
+                <a href={`/pipelines/${attachedPipeline}`}>
+                  <li className="flex w-full flex-start items-center px-2 py-2 hover:bg-sunset text-sm">
+                    <Edit className="text-red mr-2" />
+                    Edit Rules
+                  </li>
+                </a>
+              </>
             )
             : (
               <>
+                <button className="w-full">
+                  <li
+                    className="group flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm"
+                    onClick={() =>
+                      opModal.value = {
+                        audience,
+                        attachedPipeline,
+                        attach: true,
+                      }}
+                  >
+                    <IconLink class="w-4 mr-2 text-web" />
+                    Attach Pipeline
+                  </li>
+                </button>
                 <li
                   data-tooltip-target={`${id}-rule-warning`}
                   className="flex w-full flex-start items-center px-2 py-2 hover:bg-sunset text-sm cursor-not-allowed"
