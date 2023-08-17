@@ -2,8 +2,6 @@ package deps
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"os"
 	"time"
 
@@ -17,6 +15,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/kv"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
@@ -42,6 +41,7 @@ type Dependencies struct {
 	MetricsService  metrics.IMetrics
 	StoreService    store.IStore
 	CmdService      cmd.ICmd
+	KVService       kv.IKV
 	Health          health.IHealth
 	ShutdownContext context.Context
 	ShutdownFunc    context.CancelFunc
@@ -219,22 +219,16 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.NotifyService = notifyService
 
-	return nil
-}
-
-func createTLSConfig(caCert, clientCert, clientKey string) (*tls.Config, error) {
-	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	kvService, err := kv.New(&kv.Options{
+		NATS: d.NATSBackend,
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to load cert + key")
+		return errors.Wrap(err, "unable to create new kv service")
 	}
 
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM([]byte(caCert))
+	d.KVService = kvService
 
-	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		RootCAs:      caCertPool,
-	}, nil
+	return nil
 }
 
 // Status satisfies the go-health.ICheckable interface

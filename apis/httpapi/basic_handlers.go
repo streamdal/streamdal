@@ -8,7 +8,7 @@ func (a *HTTPAPI) healthCheckHandler(wr http.ResponseWriter, r *http.Request) {
 	status := http.StatusOK
 	body := "ok"
 
-	if a.Deps.Health.Failed() {
+	if a.Options.Health.Failed() {
 		status = http.StatusInternalServerError
 		body = "failed"
 	}
@@ -25,7 +25,7 @@ func (a *HTTPAPI) versionHandler(rw http.ResponseWriter, r *http.Request) {
 
 	response := &ResponseJSON{
 		Status:  http.StatusOK,
-		Message: "streamdal/snitch-server " + a.Deps.Config.GetVersion(),
+		Message: "streamdal/snitch-server " + a.Options.Config.GetVersion(),
 	}
 
 	WriteJSON(rw, response, http.StatusOK)

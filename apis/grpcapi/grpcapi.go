@@ -33,11 +33,15 @@ type GRPCAPI struct {
 	log  *logrus.Entry
 }
 
-func New(d *deps.Dependencies) *GRPCAPI {
+func New(d *deps.Dependencies) (*GRPCAPI, error) {
+	if err := validate(d); err != nil {
+		return nil, errors.Wrap(err, "could not validate dependencies")
+	}
+
 	return &GRPCAPI{
 		Deps: d,
 		log:  logrus.WithField("pkg", "grpcapi"),
-	}
+	}, nil
 }
 
 func (g *GRPCAPI) Run() error {
@@ -157,4 +161,20 @@ func (g *GRPCAPI) setRequestID(ctx context.Context) (context.Context, error) {
 	}
 
 	return ctx, nil
+}
+
+func validate(d *deps.Dependencies) error {
+	if d == nil {
+		return errors.New("dependencies cannot be nil")
+	}
+
+	if d.Config == nil {
+		return errors.New("deps.Config cannot be nil")
+	}
+
+	if d.Config.GRPCAPIListenAddress == "" {
+		return errors.New("deps.Config.GRPCAPIListenAddress cannot be empty")
+	}
+
+	return nil
 }

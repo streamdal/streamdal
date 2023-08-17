@@ -517,3 +517,28 @@ func MetricsRequest(req *protos.MetricsRequest) error {
 
 	return nil
 }
+
+// KVObject validates a KVObject; checkTimestamps is exposed because in some
+// cases we might not have a TS yet (ie. Create KV)
+func KVObject(obj *protos.KVObject, checkTimestamps bool) error {
+	if obj == nil {
+		return ErrNilInput
+	}
+
+	if obj.Key == "" {
+		return ErrEmptyField("Key")
+	}
+
+	if len(obj.Value) == 0 {
+		return ErrEmptyField("Value")
+	}
+
+	if checkTimestamps {
+		// Should at least have created_at
+		if obj.CreatedAtUnixTsNanoUtc == 0 {
+			return ErrEmptyField("CreatedAtUnixTsNanoUtc")
+		}
+	}
+
+	return nil
+}

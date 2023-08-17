@@ -71,15 +71,34 @@ func run(d *deps.Dependencies) error {
 
 	// Run gRPC server
 	go func() {
-		if err := grpcapi.New(d).Run(); err != nil {
-			errChan <- errors.Wrap(err, "error during gRPC server run")
+		// TODO: This should have the same setup/instantiation procedure as the HTTP API
+		api, err := grpcapi.New(d)
+		if err != nil {
+			errChan <- errors.Wrap(err, "error during gRPC API setup")
+			return
+		}
+
+		if err := api.Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during gRPC API run")
+			return
 		}
 	}()
 
 	// Run REST server
 	go func() {
-		if err := httpapi.New(d).Run(); err != nil {
-			errChan <- errors.Wrap(err, "error during REST server run")
+		api, err := httpapi.New(&httpapi.Options{
+			KVService:            d.KVService,
+			HTTPAPIListenAddress: d.Config.HTTPAPIListenAddress,
+			Version:              d.Config.GetVersion(),
+			ShutdownContext:      d.ShutdownContext,
+		})
+		if err != nil {
+			errChan <- errors.Wrap(err, "error during HTTP API setup")
+			return
+		}
+
+		if err := api.Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during HTTP API run")
 		}
 	}()
 

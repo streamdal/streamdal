@@ -20,6 +20,7 @@ var _ = Describe("HTTPAPI", func() {
 		d           *deps.Dependencies
 		api         *HTTPAPI
 		testVersion = "1.0.1"
+		apiErr      error
 	)
 
 	BeforeEach(func() {
@@ -30,7 +31,10 @@ var _ = Describe("HTTPAPI", func() {
 			Health: health.New(),
 		}
 
-		api = New(d)
+		api, apiErr = New(d)
+
+		Expect(apiErr).ToNot(HaveOccurred())
+		Expect(api).ToNot(BeNil())
 
 		response = httptest.NewRecorder()
 	})
@@ -38,8 +42,8 @@ var _ = Describe("HTTPAPI", func() {
 	Describe("New", func() {
 		Context("when instantiating an api", func() {
 			It("should have correct attributes", func() {
-				Expect(api.Deps.Config).ToNot(BeNil())
-				Expect(api.Deps.Config.GetVersion()).To(Equal(testVersion))
+				Expect(api.Options.Config).ToNot(BeNil())
+				Expect(api.Options.Config.GetVersion()).To(Equal(testVersion))
 			})
 		})
 	})
