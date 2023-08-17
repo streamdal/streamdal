@@ -1,5 +1,4 @@
 import { Layout } from "../../../../../../../../components/layout.tsx";
-import ServiceMap from "../../../../../../../../islands/serviceMap.tsx";
 import OpModal from "../../../../../../../../islands/opModal.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import {
@@ -9,6 +8,7 @@ import {
   ServiceNodes,
 } from "../../../../../../../../lib/fetch.ts";
 import { SuccessType } from "../../../../../../../_middleware.ts";
+import ServiceMap from "../../../../../../../../islands/serviceMap.tsx";
 
 export type ServicePipelines = {
   serviceNodes: ServiceNodes;

@@ -1,13 +1,9 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Layout } from "../../../components/layout.tsx";
-import ServiceMap from "../../../islands/serviceMap.tsx";
-import Pipelines from "../../../islands/pipelines.tsx";
-import {
-  getPipelines,
-  getServiceMap,
-  getServiceNodes,
-} from "../../../lib/fetch.ts";
+import { Layout } from "root/components/layout.tsx";
+import Pipelines from "root/islands/pipelines.tsx";
+import { getPipelines, getServiceNodes } from "root/lib/fetch.ts";
 import { PipelineRoute } from "../index.tsx";
+import ServiceMap from "root/islands/serviceMap.tsx";
 
 export const handler: Handlers<PipelineRoute> = {
   async GET(_req, ctx) {
@@ -49,6 +45,7 @@ export default function PipelinesRoute(
       <ServiceMap
         nodesData={props.data.serviceNodes.nodes}
         edgesData={props.data.serviceNodes.edges}
+        blur={true}
       />
     </Layout>
   );

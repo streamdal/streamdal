@@ -5,6 +5,9 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
+import "flowbite";
+import { useCallback, useState } from "preact/hooks";
+import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 import {
   ComponentNode,
   FlowEdge,
@@ -13,13 +16,8 @@ import {
   OperationNode,
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
-import "flowbite";
-import { EmptyService } from "../components/serviceMap/emptyService.tsx";
-import { useCallback, useState } from "preact/hooks";
-import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
-const MODAL_ROUTES = ["pipeline"];
 
 export const nodeTypes = {
   service: ServiceNode,
@@ -31,7 +29,11 @@ export const nodeTypes = {
 };
 
 export default function ServiceMap(
-  { nodesData, edgesData }: { nodesData: FlowNode[]; edgesData: FlowEdge[] },
+  { nodesData, edgesData, blur = false }: {
+    nodesData: FlowNode[];
+    edgesData: FlowEdge[];
+    blur?: boolean;
+  },
 ) {
   const savedFlow = JSON.parse(localStorage.getItem(LAYOUT_KEY));
   const [edges, setEdges, onEdgesChange] = useEdgesState(
@@ -53,10 +55,6 @@ export default function ServiceMap(
       localStorage.setItem(LAYOUT_KEY, JSON.stringify(flow));
     }
   }, [rfInstance]);
-
-  const blur = MODAL_ROUTES.some((r: string) =>
-    window.location?.href?.includes(r)
-  );
 
   return (
     <div

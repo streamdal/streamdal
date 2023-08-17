@@ -1,7 +1,6 @@
 import { Handle, MarkerType, Position } from "reactflow";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
-import "flowbite";
 import "twind";
 import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
@@ -246,9 +245,8 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
             <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>
         </div>
-        <ServiceNodeMenu />
+        <ServiceNodeMenu data={data} />
       </div>
-      <span class="sr-only">Notifications</span>
 
       <div className={"flex justify-evenly w-1/2 mt-2"}>
         <Handle
@@ -316,7 +314,11 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
         <div class="w-[170px] whitespace-nowrap text-ellipsis overflow-hidden">
           <div
             class={"flex flex-col justify-start p-1 cursor-pointer"}
-            onClick={() => opModal.value = data.audience}
+            onClick={() =>
+              opModal.value = {
+                audience: data.audience,
+                attachedPipeline: data.attachedPipeline,
+              }}
           >
             <h2
               data-tooltip-target={toolTipId}

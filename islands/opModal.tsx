@@ -4,25 +4,15 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 
-import {
-  getAttachedPipeline,
-  getAudienceOpRoute,
-  titleCase,
-} from "../lib/utils.ts";
+import { getAudienceOpRoute, titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { useEffect, useState } from "preact/hooks";
-import { Toast } from "../components/toasts/toast.tsx";
+import { useState } from "preact/hooks";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "snitch-protos/protos/common.ts";
-import { zfd } from "zod-form-data";
-import * as z from "zod/index.ts";
-
-export const attachPipelineSchema = zfd.formData({
-  pipelineId: z.string().min(1, { message: "Required" }),
-});
-
-export type AttachPipelineType = z.infer<typeof attachPipelineSchema>;
+import IconLink from "tabler-icons/tsx/link.tsx";
+import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 
 export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -31,18 +21,7 @@ export default function OpModal(
     return;
   }
 
-  const [attachedPipeline, setAttachedPipeline] = useState(null);
-
-  useEffect(() => {
-    setAttachedPipeline(getAttachedPipeline(
-      opModal.value,
-      serviceMap.pipelines,
-      serviceMap.config,
-    ));
-  }, [opModal.value]);
-
   const [attachOpen, setAttachOpen] = useState(false);
-  const [success, setSuccess] = useState(null);
 
   const attachPipeline = async (e: any) => {
     const response = await fetch(
@@ -53,15 +32,23 @@ export default function OpModal(
     );
 
     const { success } = await response.json();
-    setSuccess(success);
 
-    if (success.status) {
-      setAttachedPipeline(serviceMap.pipelines[e.target.value]?.pipeline);
+    if (success.message) {
+      toastSignal.value = {
+        id: "attachPipeline",
+        type: success.status ? "success" : "error",
+        message: success.message,
+      };
+      opModal.value = {
+        ...opModal.value,
+        attachedPipeline: serviceMap.pipelines[e.target.value]?.pipeline,
+      };
       setAttachOpen(false);
     }
   };
 
-  const audience = opModal.value;
+  const audience = opModal.value.audience;
+  const attachedPipeline = opModal.value.attachedPipeline;
   const opType = OperationType[audience.operationType];
 
   const sortPipelines = (pipes: PipelineInfo[]) =>
@@ -166,28 +153,42 @@ export default function OpModal(
                 )
                 : attachedPipeline
                 ? (
-                  <button
-                    id="attached-pipeline"
-                    className={`text-white border border-gray-600 font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-centerfocus:ring-1 focus:outline-none focus:ring-purple-600 ${
+                  <div
+                    className={`flex justify-between items-center text-white border border-gray-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
                       attachOpen &&
                       "ring-1 outline-none active:ring-purple-600"
                     }`}
-                    type="button"
-                    onClick={() => setAttachOpen(!attachOpen)}
                   >
                     {attachedPipeline?.name}
-                    <IconUnlink class="w-4 h-4 text-gray-400" />
-                  </button>
+
+                    <div class="flex flex-row items-center">
+                      <button
+                        data-tooltip-target="pipeline-pause"
+                        type="button"
+                        onClick={() => setAttachOpen(!attachOpen)}
+                        class="mr-2"
+                      >
+                        <IconPlayerPause class="w-4 h-4 text-gray-400" />
+                      </button>
+                      <button
+                        data-tooltip-target="pipeline-unlink"
+                        type="button"
+                        onClick={() => setAttachOpen(!attachOpen)}
+                      >
+                        <IconUnlink class="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  </div>
                 )
                 : (
                   <button
-                    id="attached-pipeline"
+                    id="attach-pipeline"
                     className="text-[#8E84AD] border border-gray-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
                     type="button"
                     onClick={() => setAttachOpen(!attachOpen)}
                   >
-                    {"Attach a pipeline"}
-                    <IconPlus class="w-4 h-4" />
+                    Attach a pipeline
+                    <IconLink class="w-4" />
                   </button>
                 )}
             </div>
@@ -281,12 +282,7 @@ export default function OpModal(
           </div>
         </div>
       </div>
-      <Toast
-        open={success != null}
-        setOpen={() => setSuccess(null)}
-        type={success?.status === true ? "success" : "error"}
-        message={success?.message || ""}
-      />
+      <Toast id="attachPipeline" />
     </>
   );
 }

@@ -10,7 +10,7 @@ export const RoutedDeleteModal = (
   },
 ) => {
   return (
-    <div class="fixed top-[8%] left-[35%]  z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-h-[80vh]">
+    <div class="absolute top-[8%] left-[35%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-h-[80vh]">
       <div class="relative w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg border border-streamdalRed shadow-2xl shadow-streamdalRed">
           <a href={redirect}>
