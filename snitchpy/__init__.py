@@ -262,8 +262,8 @@ class SnitchClient:
 
         labels = {
             "service": self.cfg.service_name,
-            "component_name": req.component_name,
-            "operation_name": req.operation_name,
+            "component": req.component_name,
+            "operation": req.operation_name,
             "pipeline_name": "",
             "pipeline_id": "",
         }
