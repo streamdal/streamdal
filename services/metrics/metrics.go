@@ -52,37 +52,37 @@ var defaultCounters = []*defaultCounter{
 	{
 		Name:        "counter_consume_bytes",
 		Description: "Total number of bytes passed through consume pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_consume_processed",
 		Description: "Total number of payloads processed by consume pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_consume_errors",
 		Description: "Number of errors encountered by consume pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_produce_bytes",
 		Description: "Total number of bytes passed through produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_produce_processed",
 		Description: "Total number of payloads processed by produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_produce_errors",
 		Description: "Number of errors encountered by produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 	{
 		Name:        "counter_notify",
 		Description: "Number of errors encountered by produce pipelines",
-		Labels:      []string{"service", "component_name", "pipeline_name", "pipeline_id", "operation_name"},
+		Labels:      []string{"service", "component", "pipeline_name", "pipeline_id", "operation"},
 	},
 }
 
