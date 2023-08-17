@@ -31,6 +31,7 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 pub struct Command {
     // message fields
     ///  Who is this command intended for?
+    ///  NOTE: Some commands (such as KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
     // @@protoc_insertion_point(field:protos.Command.audience)
     pub audience: ::protobuf::MessageField<super::common::Audience>,
     // message oneof groups
@@ -296,8 +297,57 @@ impl Command {
         }
     }
 
+    // .protos.KVCommand kv = 105;
+
+    pub fn kv(&self) -> &KVCommand {
+        match self.command {
+            ::std::option::Option::Some(command::Command::Kv(ref v)) => v,
+            _ => <KVCommand as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_kv(&mut self) {
+        self.command = ::std::option::Option::None;
+    }
+
+    pub fn has_kv(&self) -> bool {
+        match self.command {
+            ::std::option::Option::Some(command::Command::Kv(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_kv(&mut self, v: KVCommand) {
+        self.command = ::std::option::Option::Some(command::Command::Kv(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_kv(&mut self) -> &mut KVCommand {
+        if let ::std::option::Option::Some(command::Command::Kv(_)) = self.command {
+        } else {
+            self.command = ::std::option::Option::Some(command::Command::Kv(KVCommand::new()));
+        }
+        match self.command {
+            ::std::option::Option::Some(command::Command::Kv(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_kv(&mut self) -> KVCommand {
+        if self.has_kv() {
+            match self.command.take() {
+                ::std::option::Option::Some(command::Command::Kv(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            KVCommand::new()
+        }
+    }
+
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(6);
+        let mut fields = ::std::vec::Vec::with_capacity(7);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::common::Audience>(
             "audience",
@@ -339,6 +389,13 @@ impl Command {
             Command::mut_keep_alive,
             Command::set_keep_alive,
         ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, KVCommand>(
+            "kv",
+            Command::has_kv,
+            Command::kv,
+            Command::mut_kv,
+            Command::set_kv,
+        ));
         oneofs.push(command::Command::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Command>(
             "Command",
@@ -375,6 +432,9 @@ impl ::protobuf::Message for Command {
                 },
                 834 => {
                     self.command = ::std::option::Option::Some(command::Command::KeepAlive(is.read_message()?));
+                },
+                842 => {
+                    self.command = ::std::option::Option::Some(command::Command::Kv(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -414,6 +474,10 @@ impl ::protobuf::Message for Command {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
+                &command::Command::Kv(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
             };
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -442,6 +506,9 @@ impl ::protobuf::Message for Command {
                 &command::Command::KeepAlive(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
                 },
+                &command::Command::Kv(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
+                },
             };
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -462,6 +529,7 @@ impl ::protobuf::Message for Command {
 
     fn clear(&mut self) {
         self.audience.clear();
+        self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
@@ -514,6 +582,8 @@ pub mod command {
         ResumePipeline(super::ResumePipelineCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.keep_alive)
         KeepAlive(super::KeepAliveCommand),
+        // @@protoc_insertion_point(oneof_field:protos.Command.kv)
+        Kv(super::KVCommand),
     }
 
     impl ::protobuf::Oneof for Command {
@@ -1125,9 +1195,556 @@ impl ::protobuf::reflect::ProtobufValue for KeepAliveCommand {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.KVObject)
+pub struct KVObject {
+    // message fields
+    ///  Key regex: /^[a-zA-Z0-9_-:]+$/)
+    // @@protoc_insertion_point(field:protos.KVObject.key)
+    pub key: ::std::string::String,
+    ///  KV value
+    // @@protoc_insertion_point(field:protos.KVObject.value)
+    pub value: ::std::vec::Vec<u8>,
+    ///  When was this object created
+    // @@protoc_insertion_point(field:protos.KVObject.created_at_unix_ts_nano_utc)
+    pub created_at_unix_ts_nano_utc: i64,
+    ///  Last time the object was updated
+    // @@protoc_insertion_point(field:protos.KVObject.updated_at_unix_ts_nano_utc)
+    pub updated_at_unix_ts_nano_utc: i64,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.KVObject.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a KVObject {
+    fn default() -> &'a KVObject {
+        <KVObject as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl KVObject {
+    pub fn new() -> KVObject {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "key",
+            |m: &KVObject| { &m.key },
+            |m: &mut KVObject| { &mut m.key },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "value",
+            |m: &KVObject| { &m.value },
+            |m: &mut KVObject| { &mut m.value },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "created_at_unix_ts_nano_utc",
+            |m: &KVObject| { &m.created_at_unix_ts_nano_utc },
+            |m: &mut KVObject| { &mut m.created_at_unix_ts_nano_utc },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "updated_at_unix_ts_nano_utc",
+            |m: &KVObject| { &m.updated_at_unix_ts_nano_utc },
+            |m: &mut KVObject| { &mut m.updated_at_unix_ts_nano_utc },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVObject>(
+            "KVObject",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for KVObject {
+    const NAME: &'static str = "KVObject";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.key = is.read_string()?;
+                },
+                18 => {
+                    self.value = is.read_bytes()?;
+                },
+                24 => {
+                    self.created_at_unix_ts_nano_utc = is.read_int64()?;
+                },
+                32 => {
+                    self.updated_at_unix_ts_nano_utc = is.read_int64()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.key.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.key);
+        }
+        if !self.value.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(2, &self.value);
+        }
+        if self.created_at_unix_ts_nano_utc != 0 {
+            my_size += ::protobuf::rt::int64_size(3, self.created_at_unix_ts_nano_utc);
+        }
+        if self.updated_at_unix_ts_nano_utc != 0 {
+            my_size += ::protobuf::rt::int64_size(4, self.updated_at_unix_ts_nano_utc);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.key.is_empty() {
+            os.write_string(1, &self.key)?;
+        }
+        if !self.value.is_empty() {
+            os.write_bytes(2, &self.value)?;
+        }
+        if self.created_at_unix_ts_nano_utc != 0 {
+            os.write_int64(3, self.created_at_unix_ts_nano_utc)?;
+        }
+        if self.updated_at_unix_ts_nano_utc != 0 {
+            os.write_int64(4, self.updated_at_unix_ts_nano_utc)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> KVObject {
+        KVObject::new()
+    }
+
+    fn clear(&mut self) {
+        self.key.clear();
+        self.value.clear();
+        self.created_at_unix_ts_nano_utc = 0;
+        self.updated_at_unix_ts_nano_utc = 0;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static KVObject {
+        static instance: KVObject = KVObject {
+            key: ::std::string::String::new(),
+            value: ::std::vec::Vec::new(),
+            created_at_unix_ts_nano_utc: 0,
+            updated_at_unix_ts_nano_utc: 0,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for KVObject {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVObject").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for KVObject {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for KVObject {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  Used in KVCommand to indicate a series of KV-related actions - ie. create, update, delete
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.KVInstruction)
+pub struct KVInstruction {
+    // message fields
+    ///  Unique ID for this instruction
+    // @@protoc_insertion_point(field:protos.KVInstruction.id)
+    pub id: ::std::string::String,
+    ///  What kind of an action is this?
+    // @@protoc_insertion_point(field:protos.KVInstruction.action)
+    pub action: ::protobuf::EnumOrUnknown<KVAction>,
+    ///  KV object
+    // @@protoc_insertion_point(field:protos.KVInstruction.object)
+    pub object: ::protobuf::MessageField<KVObject>,
+    ///  When this instruction was requested (usually will be the HTTP API request time)
+    // @@protoc_insertion_point(field:protos.KVInstruction.requested_at_unix_ts_nano_utc)
+    pub requested_at_unix_ts_nano_utc: i64,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.KVInstruction.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a KVInstruction {
+    fn default() -> &'a KVInstruction {
+        <KVInstruction as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl KVInstruction {
+    pub fn new() -> KVInstruction {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &KVInstruction| { &m.id },
+            |m: &mut KVInstruction| { &mut m.id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "action",
+            |m: &KVInstruction| { &m.action },
+            |m: &mut KVInstruction| { &mut m.action },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, KVObject>(
+            "object",
+            |m: &KVInstruction| { &m.object },
+            |m: &mut KVInstruction| { &mut m.object },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "requested_at_unix_ts_nano_utc",
+            |m: &KVInstruction| { &m.requested_at_unix_ts_nano_utc },
+            |m: &mut KVInstruction| { &mut m.requested_at_unix_ts_nano_utc },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVInstruction>(
+            "KVInstruction",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for KVInstruction {
+    const NAME: &'static str = "KVInstruction";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.id = is.read_string()?;
+                },
+                16 => {
+                    self.action = is.read_enum_or_unknown()?;
+                },
+                26 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.object)?;
+                },
+                32 => {
+                    self.requested_at_unix_ts_nano_utc = is.read_int64()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
+        }
+        if self.action != ::protobuf::EnumOrUnknown::new(KVAction::KV_ACTION_UNSET) {
+            my_size += ::protobuf::rt::int32_size(2, self.action.value());
+        }
+        if let Some(v) = self.object.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        if self.requested_at_unix_ts_nano_utc != 0 {
+            my_size += ::protobuf::rt::int64_size(4, self.requested_at_unix_ts_nano_utc);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
+        }
+        if self.action != ::protobuf::EnumOrUnknown::new(KVAction::KV_ACTION_UNSET) {
+            os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.action))?;
+        }
+        if let Some(v) = self.object.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
+        }
+        if self.requested_at_unix_ts_nano_utc != 0 {
+            os.write_int64(4, self.requested_at_unix_ts_nano_utc)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> KVInstruction {
+        KVInstruction::new()
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.action = ::protobuf::EnumOrUnknown::new(KVAction::KV_ACTION_UNSET);
+        self.object.clear();
+        self.requested_at_unix_ts_nano_utc = 0;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static KVInstruction {
+        static instance: KVInstruction = KVInstruction {
+            id: ::std::string::String::new(),
+            action: ::protobuf::EnumOrUnknown::from_i32(0),
+            object: ::protobuf::MessageField::none(),
+            requested_at_unix_ts_nano_utc: 0,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for KVInstruction {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVInstruction").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for KVInstruction {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for KVInstruction {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.KVCommand)
+pub struct KVCommand {
+    // message fields
+    // @@protoc_insertion_point(field:protos.KVCommand.instructions)
+    pub instructions: ::std::vec::Vec<KVInstruction>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.KVCommand.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a KVCommand {
+    fn default() -> &'a KVCommand {
+        <KVCommand as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl KVCommand {
+    pub fn new() -> KVCommand {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "instructions",
+            |m: &KVCommand| { &m.instructions },
+            |m: &mut KVCommand| { &mut m.instructions },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVCommand>(
+            "KVCommand",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for KVCommand {
+    const NAME: &'static str = "KVCommand";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.instructions.push(is.read_message()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        for value in &self.instructions {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        for v in &self.instructions {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> KVCommand {
+        KVCommand::new()
+    }
+
+    fn clear(&mut self) {
+        self.instructions.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static KVCommand {
+        static instance: KVCommand = KVCommand {
+            instructions: ::std::vec::Vec::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for KVCommand {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVCommand").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for KVCommand {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for KVCommand {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.KVAction)
+pub enum KVAction {
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_UNSET)
+    KV_ACTION_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_CREATE)
+    KV_ACTION_CREATE = 1,
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_UPDATE)
+    KV_ACTION_UPDATE = 2,
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_DELETE)
+    KV_ACTION_DELETE = 3,
+}
+
+impl ::protobuf::Enum for KVAction {
+    const NAME: &'static str = "KVAction";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<KVAction> {
+        match value {
+            0 => ::std::option::Option::Some(KVAction::KV_ACTION_UNSET),
+            1 => ::std::option::Option::Some(KVAction::KV_ACTION_CREATE),
+            2 => ::std::option::Option::Some(KVAction::KV_ACTION_UPDATE),
+            3 => ::std::option::Option::Some(KVAction::KV_ACTION_DELETE),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [KVAction] = &[
+        KVAction::KV_ACTION_UNSET,
+        KVAction::KV_ACTION_CREATE,
+        KVAction::KV_ACTION_UPDATE,
+        KVAction::KV_ACTION_DELETE,
+    ];
+}
+
+impl ::protobuf::EnumFull for KVAction {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("KVAction").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for KVAction {
+    fn default() -> Self {
+        KVAction::KV_ACTION_UNSET
+    }
+}
+
+impl KVAction {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<KVAction>("KVAction")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\rcommand.proto\x12\x06protos\x1a\x0ccommon.proto\x1a\x0epipeline.prot\
-    o\"\xa2\x03\n\x07Command\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.pr\
+    o\"\xc7\x03\n\x07Command\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.pr\
     otos.AudienceR\x08audience\x12H\n\x0fattach_pipeline\x18d\x20\x01(\x0b2\
     \x1d.protos.AttachPipelineCommandH\0R\x0eattachPipeline\x12H\n\x0fdetach\
     _pipeline\x18e\x20\x01(\x0b2\x1d.protos.DetachPipelineCommandH\0R\x0edet\
@@ -1135,54 +1752,120 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     PipelineCommandH\0R\rpausePipeline\x12H\n\x0fresume_pipeline\x18g\x20\
     \x01(\x0b2\x1d.protos.ResumePipelineCommandH\0R\x0eresumePipeline\x129\n\
     \nkeep_alive\x18h\x20\x01(\x0b2\x18.protos.KeepAliveCommandH\0R\tkeepAli\
-    veB\t\n\x07command\"E\n\x15AttachPipelineCommand\x12,\n\x08pipeline\x18\
-    \x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DetachPipeli\
-    neCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"7\n\
-    \x14PausePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\np\
-    ipelineId\"8\n\x15ResumePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\
-    \x20\x01(\tR\npipelineId\"\x12\n\x10KeepAliveCommandB4Z2github.com/strea\
-    mdal/snitch-protos/build/go/protosJ\xb9\x07\n\x06\x12\x04\0\0)\x01\n\x08\
-    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\
-    \x03\0\x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\
-    \x08\x12\x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\nK\n\x02\x04\0\x12\
-    \x04\n\0\x15\x01\x1a?\x20Command\x20is\x20used\x20by\x20snitch-server\
-    \x20for\x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\
-    \x03\n\x08\x0f\n0\n\x04\x04\0\x02\0\x12\x03\x0c\x02\x1f\x1a#\x20Who\x20i\
-    s\x20this\x20command\x20intended\x20for?\n\n\x0c\n\x05\x04\0\x02\0\x06\
-    \x12\x03\x0c\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0c\x12\x1a\n\
-    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0c\x1d\x1e\n\x0c\n\x04\x04\0\x08\0\
-    \x12\x04\x0e\x02\x14\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x0e\x08\x0f\
-    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\x0f\x047\n\x0c\n\x05\x04\0\x02\x01\
-    \x06\x12\x03\x0f\x04\x20\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x0f!0\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x0f36\n\x0b\n\x04\x04\0\x02\x02\x12\
-    \x03\x10\x047\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x10\x04\x20\n\x0c\n\
-    \x05\x04\0\x02\x02\x01\x12\x03\x10!0\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
-    \x03\x1036\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x11\x045\n\x0c\n\x05\x04\0\
-    \x02\x03\x06\x12\x03\x11\x04\x1f\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
-    \x11\x20.\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1114\n\x0b\n\x04\x04\0\
-    \x02\x04\x12\x03\x12\x047\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x12\x04\
-    \x20\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x12!0\n\x0c\n\x05\x04\0\x02\
-    \x04\x03\x12\x03\x1236\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x13\x04-\n\x0c\
-    \n\x05\x04\0\x02\x05\x06\x12\x03\x13\x04\x1b\n\x0c\n\x05\x04\0\x02\x05\
-    \x01\x12\x03\x13\x1c&\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x13),\n\n\n\
-    \x02\x04\x01\x12\x04\x17\0\x19\x01\n\n\n\x03\x04\x01\x01\x12\x03\x17\x08\
-    \x1d\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x18\x02\x1f\n\x0c\n\x05\x04\x01\
-    \x02\0\x06\x12\x03\x18\x02\x11\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x18\
-    \x12\x1a\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x18\x1d\x1e\n\n\n\x02\x04\
-    \x02\x12\x04\x1b\0\x1d\x01\n\n\n\x03\x04\x02\x01\x12\x03\x1b\x08\x1d\n\
-    \x0b\n\x04\x04\x02\x02\0\x12\x03\x1c\x02\x19\n\x0c\n\x05\x04\x02\x02\0\
-    \x05\x12\x03\x1c\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03\x1c\t\x14\
-    \n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03\x1c\x17\x18\n\n\n\x02\x04\x03\x12\
-    \x04\x1f\0!\x01\n\n\n\x03\x04\x03\x01\x12\x03\x1f\x08\x1c\n\x0b\n\x04\
-    \x04\x03\x02\0\x12\x03\x20\x02\x19\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03\
-    \x20\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03\x20\t\x14\n\x0c\n\x05\
-    \x04\x03\x02\0\x03\x12\x03\x20\x17\x18\n\n\n\x02\x04\x04\x12\x04#\0%\x01\
-    \n\n\n\x03\x04\x04\x01\x12\x03#\x08\x1d\n\x0b\n\x04\x04\x04\x02\0\x12\
-    \x03$\x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03$\x02\x08\n\x0c\n\x05\
-    \x04\x04\x02\0\x01\x12\x03$\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03$\
-    \x17\x18\nD\n\x02\x04\x05\x12\x04'\0)\x01\"8\x20Nothing\x20needed\x20in\
-    \x20here,\x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\
-    \x03\x04\x05\x01\x12\x03'\x08\x18b\x06proto3\
+    ve\x12#\n\x02kv\x18i\x20\x01(\x0b2\x11.protos.KVCommandH\0R\x02kvB\t\n\
+    \x07command\"E\n\x15AttachPipelineCommand\x12,\n\x08pipeline\x18\x01\x20\
+    \x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DetachPipelineComman\
+    d\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"7\n\x14Pause\
+    PipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\
+    \"8\n\x15ResumePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\
+    \tR\npipelineId\"\x12\n\x10KeepAliveCommand\"\xac\x01\n\x08KVObject\x12\
+    \x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\
+    \x01(\x0cR\x05value\x12;\n\x1bcreated_at_unix_ts_nano_utc\x18\x03\x20\
+    \x01(\x03R\x16createdAtUnixTsNanoUtc\x12;\n\x1bupdated_at_unix_ts_nano_u\
+    tc\x18\x04\x20\x01(\x03R\x16updatedAtUnixTsNanoUtc\"\xb4\x01\n\rKVInstru\
+    ction\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x06action\x18\x02\
+    \x20\x01(\x0e2\x10.protos.KVActionR\x06action\x12(\n\x06object\x18\x03\
+    \x20\x01(\x0b2\x10.protos.KVObjectR\x06object\x12?\n\x1drequested_at_uni\
+    x_ts_nano_utc\x18\x04\x20\x01(\x03R\x18requestedAtUnixTsNanoUtc\"F\n\tKV\
+    Command\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVInstru\
+    ctionR\x0cinstructions*a\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\
+    \0\x12\x14\n\x10KV_ACTION_CREATE\x10\x01\x12\x14\n\x10KV_ACTION_UPDATE\
+    \x10\x02\x12\x14\n\x10KV_ACTION_DELETE\x10\x03B4Z2github.com/streamdal/s\
+    nitch-protos/build/go/protosJ\xf2\x13\n\x06\x12\x04\0\0Y\x01\n\x08\n\x01\
+    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
+    \x12\x03\x04\0\x16\n\t\n\x02\x03\x01\x12\x03\x05\0\x18\n\x08\n\x01\x08\
+    \x12\x03\x07\0I\n\t\n\x02\x08\x0b\x12\x03\x07\0I\nK\n\x02\x04\0\x12\x04\
+    \n\0\x1a\x01\x1a?\x20Command\x20is\x20used\x20by\x20snitch-server\x20for\
+    \x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\n\
+    \x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\x03\r\x02\x1f\x1a\x85\x01\x20Wh\
+    o\x20is\x20this\x20command\x20intended\x20for?\n\x20NOTE:\x20Some\x20com\
+    mands\x20(such\x20as\x20KeepAliveCommand,\x20KVCommand)\x20do\x20NOT\x20\
+    use\x20audience\x20and\x20will\x20ignore\x20it\n\n\x0c\n\x05\x04\0\x02\0\
+    \x06\x12\x03\r\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\r\x12\x1a\n\
+    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\r\x1d\x1e\n\x0c\n\x04\x04\0\x08\0\x12\
+    \x04\x0f\x02\x19\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x0f\x08\x0f\n\
+    \x0b\n\x04\x04\0\x02\x01\x12\x03\x10\x040\n\x0c\n\x05\x04\0\x02\x01\x06\
+    \x12\x03\x10\x04\x19\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\x1a)\n\
+    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x10,/\n\x0b\n\x04\x04\0\x02\x02\x12\
+    \x03\x11\x040\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x11\x04\x19\n\x0c\n\
+    \x05\x04\0\x02\x02\x01\x12\x03\x11\x1a)\n\x0c\n\x05\x04\0\x02\x02\x03\
+    \x12\x03\x11,/\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x12\x04.\n\x0c\n\x05\
+    \x04\0\x02\x03\x06\x12\x03\x12\x04\x18\n\x0c\n\x05\x04\0\x02\x03\x01\x12\
+    \x03\x12\x19'\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x12*-\n\x0b\n\x04\
+    \x04\0\x02\x04\x12\x03\x13\x040\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\
+    \x13\x04\x19\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x13\x1a)\n\x0c\n\x05\
+    \x04\0\x02\x04\x03\x12\x03\x13,/\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x14\
+    \x04&\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x14\x04\x14\n\x0c\n\x05\x04\
+    \0\x02\x05\x01\x12\x03\x14\x15\x1f\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\
+    \x14\"%\nk\n\x04\x04\0\x02\x06\x12\x03\x18\x04\x17\x1a^\x20snitch-server\
+    \x20will\x20emit\x20this\x20when\x20a\x20user\x20makes\x20changes\x20to\
+    \x20the\x20KV\x20store\n\x20via\x20the\x20KV\x20HTTP\x20API.\n\n\x0c\n\
+    \x05\x04\0\x02\x06\x06\x12\x03\x18\x04\r\n\x0c\n\x05\x04\0\x02\x06\x01\
+    \x12\x03\x18\x0e\x10\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x18\x13\x16\n\
+    \n\n\x02\x04\x01\x12\x04\x1c\0\x1e\x01\n\n\n\x03\x04\x01\x01\x12\x03\x1c\
+    \x08\x1d\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1d\x02\x1f\n\x0c\n\x05\x04\
+    \x01\x02\0\x06\x12\x03\x1d\x02\x11\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\
+    \x1d\x12\x1a\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1d\x1d\x1e\n\n\n\x02\
+    \x04\x02\x12\x04\x20\0\"\x01\n\n\n\x03\x04\x02\x01\x12\x03\x20\x08\x1d\n\
+    \x0b\n\x04\x04\x02\x02\0\x12\x03!\x02\x19\n\x0c\n\x05\x04\x02\x02\0\x05\
+    \x12\x03!\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03!\t\x14\n\x0c\n\
+    \x05\x04\x02\x02\0\x03\x12\x03!\x17\x18\n\n\n\x02\x04\x03\x12\x04$\0&\
+    \x01\n\n\n\x03\x04\x03\x01\x12\x03$\x08\x1c\n\x0b\n\x04\x04\x03\x02\0\
+    \x12\x03%\x02\x19\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03%\x02\x08\n\x0c\n\
+    \x05\x04\x03\x02\0\x01\x12\x03%\t\x14\n\x0c\n\x05\x04\x03\x02\0\x03\x12\
+    \x03%\x17\x18\n\n\n\x02\x04\x04\x12\x04(\0*\x01\n\n\n\x03\x04\x04\x01\
+    \x12\x03(\x08\x1d\n\x0b\n\x04\x04\x04\x02\0\x12\x03)\x02\x19\n\x0c\n\x05\
+    \x04\x04\x02\0\x05\x12\x03)\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\
+    \x03)\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03)\x17\x18\nD\n\x02\x04\
+    \x05\x12\x04,\0.\x01\"8\x20Nothing\x20needed\x20in\x20here,\x20just\x20a\
+    \x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\x05\x01\x12\x03,\
+    \x08\x18\n\n\n\x02\x05\0\x12\x040\05\x01\n\n\n\x03\x05\0\x01\x12\x030\
+    \x05\r\n=\n\x04\x05\0\x02\0\x12\x031\x02\x16\"0\x20protolint:disable:thi\
+    s\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\0\x01\x12\x031\x02\
+    \x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\x031\x14\x15\n=\n\x04\x05\0\x02\x01\
+    \x12\x032\x02\x17\"0\x20protolint:disable:this\x20ENUM_FIELD_NAMES_PREFI\
+    X\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x032\x02\x12\n\x0c\n\x05\x05\0\x02\
+    \x01\x02\x12\x032\x15\x16\n=\n\x04\x05\0\x02\x02\x12\x033\x02\x17\"0\x20\
+    protolint:disable:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\
+    \x02\x02\x01\x12\x033\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x033\x15\
+    \x16\n=\n\x04\x05\0\x02\x03\x12\x034\x02\x17\"0\x20protolint:disable:thi\
+    s\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x034\
+    \x02\x12\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x034\x15\x16\n\n\n\x02\x04\
+    \x06\x12\x047\0C\x01\n\n\n\x03\x04\x06\x01\x12\x037\x08\x10\n.\n\x04\x04\
+    \x06\x02\0\x12\x039\x02\x11\x1a!\x20Key\x20regex:\x20/^[a-zA-Z0-9_-:]+$/\
+    )\n\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x039\x02\x08\n\x0c\n\x05\x04\x06\
+    \x02\0\x01\x12\x039\t\x0c\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x039\x0f\x10\
+    \n\x17\n\x04\x04\x06\x02\x01\x12\x03<\x02\x12\x1a\n\x20KV\x20value\n\n\
+    \x0c\n\x05\x04\x06\x02\x01\x05\x12\x03<\x02\x07\n\x0c\n\x05\x04\x06\x02\
+    \x01\x01\x12\x03<\x08\r\n\x0c\n\x05\x04\x06\x02\x01\x03\x12\x03<\x10\x11\
+    \n+\n\x04\x04\x06\x02\x02\x12\x03?\x02(\x1a\x1e\x20When\x20was\x20this\
+    \x20object\x20created\n\n\x0c\n\x05\x04\x06\x02\x02\x05\x12\x03?\x02\x07\
+    \n\x0c\n\x05\x04\x06\x02\x02\x01\x12\x03?\x08#\n\x0c\n\x05\x04\x06\x02\
+    \x02\x03\x12\x03?&'\n/\n\x04\x04\x06\x02\x03\x12\x03B\x02(\x1a\"\x20Last\
+    \x20time\x20the\x20object\x20was\x20updated\n\n\x0c\n\x05\x04\x06\x02\
+    \x03\x05\x12\x03B\x02\x07\n\x0c\n\x05\x04\x06\x02\x03\x01\x12\x03B\x08#\
+    \n\x0c\n\x05\x04\x06\x02\x03\x03\x12\x03B&'\ng\n\x02\x04\x07\x12\x04F\0U\
+    \x01\x1a[\x20Used\x20in\x20KVCommand\x20to\x20indicate\x20a\x20series\
+    \x20of\x20KV-related\x20actions\x20-\x20ie.\x20create,\x20update,\x20del\
+    ete\n\n\n\n\x03\x04\x07\x01\x12\x03F\x08\x15\n-\n\x04\x04\x07\x02\0\x12\
+    \x03H\x02\x10\x1a\x20\x20Unique\x20ID\x20for\x20this\x20instruction\n\n\
+    \x0c\n\x05\x04\x07\x02\0\x05\x12\x03H\x02\x08\n\x0c\n\x05\x04\x07\x02\0\
+    \x01\x12\x03H\t\x0b\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03H\x0e\x0f\n.\n\
+    \x04\x04\x07\x02\x01\x12\x03K\x02\x16\x1a!\x20What\x20kind\x20of\x20an\
+    \x20action\x20is\x20this?\n\n\x0c\n\x05\x04\x07\x02\x01\x06\x12\x03K\x02\
+    \n\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03K\x0b\x11\n\x0c\n\x05\x04\x07\
+    \x02\x01\x03\x12\x03K\x14\x15\n\x18\n\x04\x04\x07\x02\x02\x12\x03N\x02\
+    \x16\x1a\x0b\x20KV\x20object\n\n\x0c\n\x05\x04\x07\x02\x02\x06\x12\x03N\
+    \x02\n\n\x0c\n\x05\x04\x07\x02\x02\x01\x12\x03N\x0b\x11\n\x0c\n\x05\x04\
+    \x07\x02\x02\x03\x12\x03N\x14\x15\n^\n\x04\x04\x07\x02\x03\x12\x03Q\x02*\
+    \x1aQ\x20When\x20this\x20instruction\x20was\x20requested\x20(usually\x20\
+    will\x20be\x20the\x20HTTP\x20API\x20request\x20time)\n\n\x0c\n\x05\x04\
+    \x07\x02\x03\x05\x12\x03Q\x02\x07\n\x0c\n\x05\x04\x07\x02\x03\x01\x12\
+    \x03Q\x08%\n\x0c\n\x05\x04\x07\x02\x03\x03\x12\x03Q()\n\n\n\x02\x04\x08\
+    \x12\x04W\0Y\x01\n\n\n\x03\x04\x08\x01\x12\x03W\x08\x11\n\x0b\n\x04\x04\
+    \x08\x02\0\x12\x03X\x02*\n\x0c\n\x05\x04\x08\x02\0\x04\x12\x03X\x02\n\n\
+    \x0c\n\x05\x04\x08\x02\0\x06\x12\x03X\x0b\x18\n\x0c\n\x05\x04\x08\x02\0\
+    \x01\x12\x03X\x19%\n\x0c\n\x05\x04\x08\x02\0\x03\x12\x03X()b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1202,14 +1885,18 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut deps = ::std::vec::Vec::with_capacity(2);
             deps.push(super::common::file_descriptor().clone());
             deps.push(super::pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(6);
+            let mut messages = ::std::vec::Vec::with_capacity(9);
             messages.push(Command::generated_message_descriptor_data());
             messages.push(AttachPipelineCommand::generated_message_descriptor_data());
             messages.push(DetachPipelineCommand::generated_message_descriptor_data());
             messages.push(PausePipelineCommand::generated_message_descriptor_data());
             messages.push(ResumePipelineCommand::generated_message_descriptor_data());
             messages.push(KeepAliveCommand::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(0);
+            messages.push(KVObject::generated_message_descriptor_data());
+            messages.push(KVInstruction::generated_message_descriptor_data());
+            messages.push(KVCommand::generated_message_descriptor_data());
+            let mut enums = ::std::vec::Vec::with_capacity(1);
+            enums.push(KVAction::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
