@@ -364,11 +364,11 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	labels := map[string]string{
-		"service":        s.config.ServiceName,
-		"component_name": req.ComponentName,
-		"operation_name": req.OperationName,
-		"pipeline_name":  "",
-		"pipeline_id":    "",
+		"service":       s.config.ServiceName,
+		"component":     req.ComponentName,
+		"operation":     req.OperationName,
+		"pipeline_name": "",
+		"pipeline_id":   "",
 	}
 
 	counterError := types.ConsumeErrorCount
@@ -500,11 +500,11 @@ func (s *Snitch) handleConditions(
 				}
 
 				labels := map[string]string{
-					"service":        s.config.ServiceName,
-					"component_name": req.ComponentName,
-					"operation_name": req.OperationName,
-					"pipeline_name":  pipeline.Name,
-					"pipeline_id":    pipeline.Id,
+					"service":       s.config.ServiceName,
+					"component":     req.ComponentName,
+					"operation":     req.OperationName,
+					"pipeline_name": pipeline.Name,
+					"pipeline_id":   pipeline.Id,
 				}
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1})
 			}
