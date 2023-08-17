@@ -1,16 +1,14 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { GetServiceMapResponse } from "snitch-protos/protos/external.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Layout } from "../../components/layout.tsx";
-import ServiceMap from "../../islands/serviceMap.tsx";
 import Pipelines from "../../islands/pipelines.tsx";
 import {
   getPipelines,
-  getServiceMap,
   getServiceNodes,
   ServiceNodes,
 } from "../../lib/fetch.ts";
 import { SuccessType } from "../_middleware.ts";
+import ServiceMap from "../../islands/serviceMap.tsx";
 
 export type PipelineRoute = {
   pipelines?: Pipeline[];
@@ -48,6 +46,7 @@ export default function PipelinesRoute(
       <ServiceMap
         nodesData={props.data.serviceNodes.nodes}
         edgesData={props.data.serviceNodes.edges}
+        blur={true}
       />
     </Layout>
   );

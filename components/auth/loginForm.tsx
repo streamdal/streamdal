@@ -1,6 +1,5 @@
 import { Github, Google } from "../icons/social.tsx";
-import { z } from "https://deno.land/x/zod/mod.ts";
-import { useState } from "https://esm.sh/stable/preact@10.15.1/denonext/hooks.js";
+import { useState } from "preact/hooks";
 import { LoginFormInput } from "./loginFormInput.tsx";
 
 export const LoginForm = () => {

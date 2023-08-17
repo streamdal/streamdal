@@ -30,9 +30,7 @@ import {
   StepArgs,
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
-import { Toast } from "../components/toasts/toast.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
-import { initFlowbite } from "https://esm.sh/v129/flowbite@1.7.0/denonext/flowbite.mjs";
+import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 
 export const newStep = {
@@ -68,9 +66,6 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       path: z.string().min(1, { message: "Required" }),
       args: zfd.repeatable(z.array(z.string()).default([])),
       type: zfd.numeric(DetectiveTypeEnum),
-      //
-      // TODO: these can go away once they are marked as optional in the protos
-      negate: z.string().default(""),
     }).superRefine((detective, ctx) => {
       if (
         oneArgTypes.includes(DetectiveType[detective.type]) &&
@@ -157,11 +152,6 @@ const stepSchema = z.object({
     ),
   ),
   step: stepKindSchema,
-  //
-  // TODO: these can go away once they are marked as optional in the protos
-  WasmId: z.string().default(""),
-  WasmFunction: z.string().default(""),
-  WasmBytes: z.string().default(""),
 });
 
 export type StepType = z.infer<typeof stepSchema>;
@@ -182,9 +172,8 @@ export const pipelineSchema = zfd.formData({
 export type PipelineType = z.infer<typeof pipelineSchema>;
 
 const PipelineDetail = (
-  { pipeline, success }: {
+  { pipeline }: {
     pipeline: Pipeline;
-    success: SuccessType;
   },
 ) => {
   const [open, setOpen] = useState([0]);
@@ -195,27 +184,16 @@ const PipelineDetail = (
   // properly type this since it doesn't support useState<type>
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState({});
-  const [toastOpen, setToastOpen] = useState(false);
+  const [data, setData] = useState({
+    ...pipeline,
+    steps: pipeline.steps.map((s, i) => ({
+      ...s,
+      dragId: crypto.randomUUID(),
+      dragOrder: i,
+    })),
+  });
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);
-
-  useEffect(() => {
-    if (success?.message) {
-      setToastOpen(true);
-    }
-  }, [success]);
-
-  useEffect(() => {
-    setData({
-      ...pipeline,
-      steps: pipeline.steps.map((s, i) => ({
-        ...s,
-        dragId: crypto.randomUUID(),
-        dragOrder: i,
-      })),
-    });
-  }, [pipeline]);
 
   const addStep = () => {
     setData({
@@ -274,13 +252,6 @@ const PipelineDetail = (
 
   return (
     <>
-      <Toast
-        open={toastOpen}
-        setOpen={setToastOpen}
-        type={success?.status === true ? "success" : "error"}
-        message={success?.message || ""}
-      />
-
       <form onSubmit={onSubmit} action="/pipelines/save" method="post">
         <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
           <div class="flex flex-row items-center">
@@ -335,7 +306,9 @@ const PipelineDetail = (
             <IconPlus
               data-tooltip-target="step-add"
               class="w-5 h-5 cursor-pointer"
-              onClick={() => addStep()}
+              onClick={() => {
+                addStep();
+              }}
             />
             <Tooltip targetId="step-add" message="Add a new step" />
           </div>
@@ -376,7 +349,9 @@ const PipelineDetail = (
                     <StepMenu
                       index={i}
                       step={step}
-                      onDelete={() => setDeleteOpen(i)}
+                      onDelete={() => {
+                        setDeleteOpen(i);
+                      }}
                     />
                     {deleteOpen === i
                       ? (

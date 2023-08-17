@@ -1,7 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
 import { NavBar } from "./nav/nav.tsx";
-import { ComponentChildren } from "https://esm.sh/v128/preact@10.15.1/src/index.d.ts";
+import { ComponentChildren } from "preact";
 import { ReactFlowProvider } from "reactflow";
+import "flowbite";
 
 export type MetaProps = {
   title?: string;
@@ -14,7 +15,9 @@ export type LayoutProps = {
   meta?: MetaProps;
   hideNav?: boolean;
 };
-export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
+export const Layout = (
+  { children, hideNav, ...meta }: LayoutProps & MetaProps,
+) => (
   <html lang="en">
     <Head>
       <title>{meta.title || "Snitch Console"}</title>
@@ -29,11 +32,11 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
       />
       <link
         rel="stylesheet"
-        href="https://esm.sh/reactflow@11.7.4/dist/base.css"
+        href="https://esm.sh/reactflow@11.8.2/dist/base.css"
       />
       <link
         rel="stylesheet"
-        href="https://esm.sh/reactflow@11.7.4/dist/style.css"
+        href="https://esm.sh/reactflow@11.8.2/dist/style.css"
       />
       <link rel="stylesheet" type="text/css" href="/style.css" />
     </Head>
@@ -44,8 +47,6 @@ export const Layout = ({ children, hideNav, ...meta }: LayoutProps) => (
           {children}
         </ReactFlowProvider>
       </div>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js">
-      </script>
     </body>
   </html>
 );

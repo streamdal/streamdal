@@ -1,7 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { Layout } from "../../../components/layout.tsx";
-import ServiceMap from "../../../islands/serviceMap.tsx";
 import {
   getPipeline,
   getPipelines,
@@ -12,6 +11,7 @@ import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";
+import ServiceMap from "../../../islands/serviceMap.tsx";
 
 export type DeletePipeline = {
   pipeline: Pipeline;
@@ -51,22 +51,19 @@ export default function DeletePipelineRoute(
   props: PageProps<DeletePipeline>,
 ) {
   return (
-    <>
-      <div>
-        <Pipelines pipelines={props?.data?.pipelines} />
-        <RoutedDeleteModal
-          id={props?.params?.id}
-          entityType="pipeline"
-          entityName={props?.data?.pipeline?.name}
-          redirect={`/pipelines/${props?.params?.id}`}
-        />
-      </div>
-      <Layout>
-        <ServiceMap
-          nodesData={props.data.serviceNodes.nodes}
-          edgesData={props.data.serviceNodes.edges}
-        />
-      </Layout>
-    </>
+    <Layout>
+      <RoutedDeleteModal
+        id={props?.params?.id}
+        entityType="pipeline"
+        entityName={props?.data?.pipeline?.name}
+        redirect={`/pipelines/${props?.params?.id}`}
+      />
+      <Pipelines pipelines={props?.data?.pipelines} />
+      <ServiceMap
+        nodesData={props.data.serviceNodes.nodes}
+        edgesData={props.data.serviceNodes.edges}
+        blur={true}
+      />
+    </Layout>
   );
 }

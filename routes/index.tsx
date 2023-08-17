@@ -14,11 +14,15 @@ export default function IndexRoute(
   props: PageProps<ServiceNodes>,
 ) {
   return (
-    <Layout>
-      <ServiceMap nodesData={props.data.nodes} edgesData={props.data.edges} />
-      <OpModal
-        serviceMap={props.data.serviceMap}
-      />
-    </Layout>
+    <>
+      <link rel="prefetch" href="/pipelines" as="document" />
+      <Layout>
+        <ServiceMap nodesData={props.data.nodes} edgesData={props.data.edges} />
+
+        <OpModal
+          serviceMap={props.data.serviceMap}
+        />
+      </Layout>
+    </>
   );
 }

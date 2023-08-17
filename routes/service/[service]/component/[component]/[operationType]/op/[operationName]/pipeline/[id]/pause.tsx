@@ -5,10 +5,10 @@ import {
   ServiceNodes,
 } from "../../../../../../../../../../lib/fetch.ts";
 import { Layout } from "../../../../../../../../../../components/layout.tsx";
-import ServiceMap from "../../../../../../../../../../islands/serviceMap.tsx";
 import { PauseModal } from "../../../../../../../../../../components/modals/pauseModal.tsx";
 import { ResponseCode } from "snitch-protos/protos/common.ts";
 import { SuccessType } from "../../../../../../../../../_middleware.ts";
+import ServiceMap from "../../../../../../../../../../islands/serviceMap.tsx";
 
 export type ServiceNodesSuccess = {
   serviceNodes?: ServiceNodes;

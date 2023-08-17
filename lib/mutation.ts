@@ -22,7 +22,7 @@ export const upsertPipeline = async (
         { pipeline },
         meta,
       );
-    return updateResponse;
+    return { ...updateResponse, pipelineId: pipeline.id };
   }
 
   const { response: createResponse } = await client
@@ -33,7 +33,8 @@ export const upsertPipeline = async (
   // we have to handle it specifically
   return {
     ...createResponse,
-    id: createResponse.pipelineId,
+    id: "createPipelineRequest",
+    pipelineId: createResponse.pipelineId,
     code: createResponse.pipelineId
       ? ResponseCode.OK
       : ResponseCode.INTERNAL_SERVER_ERROR,
