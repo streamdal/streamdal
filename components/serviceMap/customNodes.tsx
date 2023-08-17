@@ -16,6 +16,9 @@ import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { ServiceMapType } from "../../lib/fetch.ts";
 import { opModal } from "./opModalSignal.ts";
+import { useState } from "preact/hooks";
+import { PausePipelineModal } from "../modals/pausePipelineModal.tsx";
+import { DetachPipelineModal } from "../modals/detachPipelineModal.tsx";
 
 export type NodeData = {
   audience: Audience;

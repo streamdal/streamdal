@@ -8,6 +8,7 @@ import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import {
   AttachPipelineRequest,
   DetachPipelineRequest,
+  PausePipelineRequest,
 } from "snitch-protos/protos/external.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
@@ -67,7 +68,7 @@ export const attachPipeline = async (
   } catch (error) {
     console.error("error attaching pipeline", error);
     return {
-      id: "attachRequest",
+      id: "attachPipelineRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };
@@ -86,9 +87,30 @@ export const detachPipeline = async (
     );
     return response;
   } catch (error) {
-    console.error("error attaching pipeline", error);
+    console.error("error detaching pipeline", error);
     return {
-      id: "detachRequest",
+      id: "detachPipelineRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const papusePipeline = async (
+  pipelineId: string,
+  audience: Audience,
+) => {
+  try {
+    const request: PausePipelineRequest = { audience, pipelineId };
+    const { response } = await client.pausePipeline(
+      request,
+      meta,
+    );
+    return response;
+  } catch (error) {
+    console.error("error pausing pipeline", error);
+    return {
+      id: "pausePipelineRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };

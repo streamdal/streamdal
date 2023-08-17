@@ -4,15 +4,17 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 
-import { getAudienceOpRoute, titleCase } from "../lib/utils.ts";
+import { titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
-import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { useState } from "preact/hooks";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "snitch-protos/protos/common.ts";
 import IconLink from "tabler-icons/tsx/link.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
+import { Toast } from "../components/toasts/toast.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
+import { PausePipelineModal } from "../components/modals/pausePipelineModal.tsx";
+import { DetachPipelineModal } from "../components/modals/detachPipelineModal.tsx";
+import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 
 export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -21,99 +23,26 @@ export default function OpModal(
     return;
   }
 
-  const [attachOpen, setAttachOpen] = useState(false);
-
-  const attachPipeline = async (e: any) => {
-    const response = await fetch(
-      `${getAudienceOpRoute(audience)}/pipeline/${e.target.value}/attach`,
-      {
-        method: "POST",
-      },
-    );
-
-    const { success } = await response.json();
-
-    if (success.message) {
-      toastSignal.value = {
-        id: "attachPipeline",
-        type: success.status ? "success" : "error",
-        message: success.message,
-      };
-      opModal.value = {
-        ...opModal.value,
-        attachedPipeline: serviceMap.pipelines[e.target.value]?.pipeline,
-      };
-      setAttachOpen(false);
-    }
-  };
-
   const audience = opModal.value.audience;
   const attachedPipeline = opModal.value.attachedPipeline;
   const opType = OperationType[audience.operationType];
 
-  const sortPipelines = (pipes: PipelineInfo[]) =>
-    pipes?.sort((a, b) => a.pipeline.name.localeCompare(b.pipeline.name));
-
-  const sorted = attachedPipeline?.id
-    ? [
-      ...[serviceMap.pipes.find((p: PipelineInfo) =>
-        p.pipeline.id === attachedPipeline.id
-      )],
-      ...sortPipelines(serviceMap.pipes.filter((p: PipelineInfo) =>
-        p.pipeline.id !== attachedPipeline?.id
-      )),
-    ]
-    : sortPipelines(serviceMap.pipes);
-
   return (
     <>
+      {opModal.value?.pause && (
+        <PausePipelineModal
+          audience={audience}
+          pipeline={attachedPipeline}
+        />
+      )}
+      {opModal.value?.detach && (
+        <DetachPipelineModal
+          audience={audience}
+          pipeline={attachedPipeline}
+        />
+      )}
       <div class="absolute z-50 top-0 right-0 pt-[100px] pr-[14px] max-h-[600px] overflow-hidden flex flex-row justify-end items-start ">
-        {attachOpen && (
-          <div class="mt-[100px]">
-            <div class="w-[200px] bg-white divide-gray-100 rounded-md shadow-lg border max-h-[400px] overflow-auto">
-              <form onSumbit={attachPipeline}>
-                <ul
-                  class="pt-2 text-sm text-gray-700 divide-y"
-                  aria-labelledby="dropdownDefaultButton"
-                >
-                  {sorted?.map((
-                    p: PipelineInfo,
-                    i: number,
-                  ) => (
-                    <div class="flex items-center py-2 px-2 hover:bg-purple-50">
-                      <input
-                        id={`default-radio-${i}`}
-                        type="radio"
-                        value={p.pipeline.id}
-                        onChange={attachPipeline}
-                        checked={p.pipeline.id ===
-                          attachedPipeline?.id}
-                        name="pipelineId"
-                        className={`w-4 h-4 bg-gray-100 checked:bg-purple-500 cursor-pointer`}
-                      />
-                      <label
-                        htmlFor={`default-radio-${i}`}
-                        className="ml-2 text-xs font-medium text-gray-900"
-                      >
-                        {p.pipeline.name}
-                      </label>
-                    </div>
-                  ))}
-                  <div class="flex items-center justify-center hover:bg-purple-50 py-2">
-                    <a href="/pipelines">
-                      <div class={"flex justify-between items-center"}>
-                        <p class={"text-xs text-gray-600"}>
-                          Create new pipeline
-                        </p>
-                        <IconPlus class={"w-3 h-3 ml-3"} />
-                      </div>
-                    </a>
-                  </div>
-                </ul>
-              </form>
-            </div>
-          </div>
-        )}
+        {opModal.value?.attach && <OddAttachModal serviceMap={serviceMap} />}
         <div class="w-[308px] ml-2 overflow-hidden">
           <div class="bg-[#28203F] rounded-lg shadow dark:bg-gray-700">
             <div class="rounded-t flex justify-between">
@@ -155,7 +84,7 @@ export default function OpModal(
                 ? (
                   <div
                     className={`flex justify-between items-center text-white border border-gray-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
-                      attachOpen &&
+                      opModal.value?.attach &&
                       "ring-1 outline-none active:ring-purple-600"
                     }`}
                   >
@@ -165,18 +94,28 @@ export default function OpModal(
                       <button
                         data-tooltip-target="pipeline-pause"
                         type="button"
-                        onClick={() => setAttachOpen(!attachOpen)}
+                        onClick={() =>
+                          opModal.value = { ...opModal.value, pause: true }}
                         class="mr-2"
                       >
                         <IconPlayerPause class="w-4 h-4 text-gray-400" />
                       </button>
+                      <Tooltip
+                        targetId="pipeline-pause"
+                        message={"Click to pause pipelines"}
+                      />
                       <button
                         data-tooltip-target="pipeline-unlink"
                         type="button"
-                        onClick={() => setAttachOpen(!attachOpen)}
+                        onClick={() =>
+                          opModal.value = { ...opModal.value, detach: true }}
                       >
                         <IconUnlink class="w-4 h-4 text-gray-400" />
                       </button>
+                      <Tooltip
+                        targetId="pipeline-unlink"
+                        message={"Click to detach pipeline"}
+                      />
                     </div>
                   </div>
                 )
@@ -185,7 +124,8 @@ export default function OpModal(
                     id="attach-pipeline"
                     className="text-[#8E84AD] border border-gray-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
                     type="button"
-                    onClick={() => setAttachOpen(!attachOpen)}
+                    onClick={() =>
+                      opModal.value = { ...opModal.value, attach: true }}
                   >
                     Attach a pipeline
                     <IconLink class="w-4" />
@@ -282,7 +222,7 @@ export default function OpModal(
           </div>
         </div>
       </div>
-      <Toast id="attachPipeline" />
+      <Toast id="pipelineCrud" />
     </>
   );
 }
