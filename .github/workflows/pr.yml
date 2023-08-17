@@ -33,8 +33,6 @@ jobs:
     needs: python-build-dist
     name: Upload release to PyPI
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - name: Build python dist
         run: |
