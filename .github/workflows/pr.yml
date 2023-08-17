@@ -30,7 +30,6 @@ jobs:
           pytest
 
   pypi-publish:
-    needs: python-build-dist
     name: Upload release to PyPI
     runs-on: ubuntu-latest
     steps:
