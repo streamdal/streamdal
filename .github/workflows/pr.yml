@@ -36,8 +36,6 @@ jobs:
       - name: Build python dist
         run: |
           cd build/python
-#          sed -i "s/version=\".*\"/version=\"${{ steps.get_new_version.outputs.new_version }}\"/" snitchpy/__init__.py
-#          sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
           python3 setup.py sdist
 
       - name: Publish package distributions to PyPI
