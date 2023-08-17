@@ -8,7 +8,6 @@ import snitch_protos.protos as protos
 import socket
 import uuid
 from betterproto import which_one_of
-from .exceptions import SnitchException, SnitchRegisterException
 from copy import copy
 from dataclasses import dataclass, field
 from grpclib.client import Channel
@@ -32,6 +31,18 @@ CLIENT_TYPE_SDK = 1
 CLIENT_TYPE_SHIM = 2
 
 
+class SnitchException(Exception):
+    """Raised for any exception caused by snitch"""
+
+    pass
+
+
+class SnitchRegisterException(SnitchException):
+    """Raised when a service fails to register with snitch"""
+
+    pass
+
+
 @dataclass(frozen=True)
 class ProcessRequest:
     operation_type: int
@@ -45,6 +56,19 @@ class ProcessResponse:
     data: bytes
     error: bool
     message: str
+
+
+@dataclass(frozen=True)
+class Audience:
+    """Audience is a dataclass that holds information about an audience. It is passed into the config when
+    creating a new instance of SnitchClient, in order to pre-announce audiences to the snitch server.
+    We use a dataclass here instead of the protobuf Audience in order to keep the public interface clean
+    """
+
+    service_name: str
+    operation_type: int
+    operation_name: str
+    component_name: str
 
 
 @dataclass(frozen=True)
@@ -126,6 +150,12 @@ class SnitchClient:
 
         # Add audiences passed on config
         for aud in self.cfg.audiences:
+            aud = protos.Audience(
+                service_name=cfg.service_name,
+                operation_type=protos.OperationType(aud.operation_type),
+                operation_name=aud.operation_name,
+                component_name=aud.component_name,
+            )
             self.add_audience(aud)
 
         # Pull initial pipelines

@@ -1,20 +1,17 @@
 import pprint
-import time
 import logging
 
-import snitchpy
 from snitchpy import (
+    Audience,
     SnitchClient,
     SnitchConfig,
     ProcessRequest,
     MODE_CONSUMER,
 )
-from snitch_protos import protos
 
 
 def main():
     logging.basicConfig()
-    print("starting")
     client = SnitchClient(
         cfg=SnitchConfig(
             service_name="snitchtest",
@@ -23,7 +20,7 @@ def main():
             grpc_port=9090,
             grpc_token="1234",
             audiences=[
-                protos.Audience(
+                Audience(
                     service_name="snitchtest",
                     operation_name="opname",
                     component_name="comname",
@@ -44,22 +41,17 @@ def main():
 
     pprint.pprint(res)
 
-    i = 0
-    while not client.cfg.exit.is_set():
-        if i % 2 == 0:
-            req = ProcessRequest(
-                operation_type=MODE_CONSUMER,
-                operation_name="opname",
-                component_name="comname",
-                data=b'{"object": {"field": true}}',
-            )
-            res = client.process(req)
-
-            print("processed message")
-
-        # print("waiting")
-        time.sleep(1)
-        i += 1
+    # while not client.cfg.exit.is_set():
+    #     time.sleep(2)
+    #     req = ProcessRequest(
+    #         operation_type=MODE_CONSUMER,
+    #         operation_name="opname",
+    #         component_name="comname",
+    #         data=b'{"object": {"field": true}}',
+    #     )
+    #     res = client.process(req)
+    #
+    #     pprint.pprint(res)
 
     print("done")
 
