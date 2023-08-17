@@ -16,8 +16,15 @@ import {
   OperationNode,
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
+import { signal } from "https://esm.sh/v128/@preact/signals@1.1.3/X-ZS8q/denonext/signals.mjs";
+import { ServiceNodes } from "../lib/fetch.ts";
+import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
+
+export const serviceSignal = signal<ServiceNodes | null>(
+  null,
+);
 
 export const nodeTypes = {
   service: ServiceNode,
@@ -58,9 +65,9 @@ export default function ServiceMap(
 
   return (
     <div
-      class={`w-full h-screen m-0 ${blur ? "filter blur-md" : ""}`}
+      class={`w-full h-screen m-0 ${blur ? "filter blur-sm" : ""}`}
     >
-      {nodesData.length === 0 ? <EmptyService /> : null}
+      {nodes.length === 0 ? <EmptyService /> : null}
       <ReactFlow
         nodes={nodes}
         onNodesChange={(nodesChange) => {

@@ -2,13 +2,8 @@ import { client, meta } from "./grpc.ts";
 import { GetAllResponse } from "snitch-protos/protos/external.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
 import { dummyAudiences, dummyConfig, dummyLive } from "./dummies.ts";
-import {
-  FlowEdge,
-  FlowNode,
-  mapEdges,
-  mapNodes,
-} from "../components/serviceMap/customNodes.tsx";
 import { Audience } from "snitch-protos/protos/common.ts";
+import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
 
 export type ServiceMapType = GetAllResponse & {
   pipes: PipelineInfo[];
@@ -36,8 +31,9 @@ export type ServiceNodes = {
   edges: FlowEdge[];
 };
 
-export const getServiceNodes = async (): Promise<ServiceNodes> => {
-  const serviceMap = await getServiceMap();
+export const getServiceNodes = async (
+  serviceMap: ServiceMapType,
+): Promise<ServiceNodes> => {
   const edges = Array.from(mapEdges(serviceMap.audiences).values());
   const nodes = Array.from(
     mapNodes(serviceMap).nodes.values(),
