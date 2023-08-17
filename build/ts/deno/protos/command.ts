@@ -12,6 +12,7 @@ import { Audience } from "./common.ts";
 export interface Command {
     /**
      * Who is this command intended for?
+     * NOTE: Some commands (such as KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
      *
      * @generated from protobuf field: protos.Audience audience = 1;
      */
@@ -49,6 +50,15 @@ export interface Command {
          * @generated from protobuf field: protos.KeepAliveCommand keep_alive = 104;
          */
         keepAlive: KeepAliveCommand;
+    } | {
+        oneofKind: "kv";
+        /**
+         * snitch-server will emit this when a user makes changes to the KV store
+         * via the KV HTTP API.
+         *
+         * @generated from protobuf field: protos.KVCommand kv = 105;
+         */
+        kv: KVCommand;
     } | {
         oneofKind: undefined;
     };
@@ -96,6 +106,79 @@ export interface ResumePipelineCommand {
  */
 export interface KeepAliveCommand {
 }
+/**
+ * @generated from protobuf message protos.KVInstruction
+ */
+export interface KVInstruction {
+    /**
+     * Unique ID for this instruction
+     *
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * What kind of an action is this?
+     *
+     * @generated from protobuf field: protos.KVAction action = 2;
+     */
+    action: KVAction;
+    /**
+     * Key (valid re: /^[a-zA-Z0-9_-]+$/)
+     *
+     * @generated from protobuf field: string key = 3;
+     */
+    key: string;
+    /**
+     * Value
+     *
+     * @generated from protobuf field: bytes value = 4;
+     */
+    value: Uint8Array;
+    /**
+     * When this instruction was requested (usually will be the HTTP API request time)
+     *
+     * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 5;
+     */
+    requestedAtUnixTsNanoUtc: bigint;
+}
+/**
+ * @generated from protobuf message protos.KVCommand
+ */
+export interface KVCommand {
+    /**
+     * @generated from protobuf field: repeated protos.KVInstruction instructions = 1;
+     */
+    instructions: KVInstruction[];
+}
+/**
+ * @generated from protobuf enum protos.KVAction
+ */
+export enum KVAction {
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
+     */
+    KV_ACTION_UNSET = 0,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
+     */
+    KV_ACTION_CREATE = 1,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
+     */
+    KV_ACTION_UPDATE = 2,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
+     */
+    KV_ACTION_DELETE = 3
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType<Command> {
     constructor() {
@@ -105,7 +188,8 @@ class Command$Type extends MessageType<Command> {
             { no: 101, name: "detach_pipeline", kind: "message", oneof: "command", T: () => DetachPipelineCommand },
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
-            { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand }
+            { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
+            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand }
         ]);
     }
 }
@@ -171,3 +255,31 @@ class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
  * @generated MessageType for protobuf message protos.KeepAliveCommand
  */
 export const KeepAliveCommand = new KeepAliveCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVInstruction$Type extends MessageType<KVInstruction> {
+    constructor() {
+        super("protos.KVInstruction", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
+            { no: 3, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 5, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVInstruction
+ */
+export const KVInstruction = new KVInstruction$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVCommand$Type extends MessageType<KVCommand> {
+    constructor() {
+        super("protos.KVCommand", [
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCommand
+ */
+export const KVCommand = new KVCommand$Type();

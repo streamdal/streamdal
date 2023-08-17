@@ -9,6 +9,7 @@ import { Audience } from "./common.js";
 export interface Command {
     /**
      * Who is this command intended for?
+     * NOTE: Some commands (such as KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
      *
      * @generated from protobuf field: protos.Audience audience = 1;
      */
@@ -46,6 +47,15 @@ export interface Command {
          * @generated from protobuf field: protos.KeepAliveCommand keep_alive = 104;
          */
         keepAlive: KeepAliveCommand;
+    } | {
+        oneofKind: "kv";
+        /**
+         * snitch-server will emit this when a user makes changes to the KV store
+         * via the KV HTTP API.
+         *
+         * @generated from protobuf field: protos.KVCommand kv = 105;
+         */
+        kv: KVCommand;
     } | {
         oneofKind: undefined;
     };
@@ -93,6 +103,79 @@ export interface ResumePipelineCommand {
  */
 export interface KeepAliveCommand {
 }
+/**
+ * @generated from protobuf message protos.KVInstruction
+ */
+export interface KVInstruction {
+    /**
+     * Unique ID for this instruction
+     *
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * What kind of an action is this?
+     *
+     * @generated from protobuf field: protos.KVAction action = 2;
+     */
+    action: KVAction;
+    /**
+     * Key (valid re: /^[a-zA-Z0-9_-]+$/)
+     *
+     * @generated from protobuf field: string key = 3;
+     */
+    key: string;
+    /**
+     * Value
+     *
+     * @generated from protobuf field: bytes value = 4;
+     */
+    value: Uint8Array;
+    /**
+     * When this instruction was requested (usually will be the HTTP API request time)
+     *
+     * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 5;
+     */
+    requestedAtUnixTsNanoUtc: bigint;
+}
+/**
+ * @generated from protobuf message protos.KVCommand
+ */
+export interface KVCommand {
+    /**
+     * @generated from protobuf field: repeated protos.KVInstruction instructions = 1;
+     */
+    instructions: KVInstruction[];
+}
+/**
+ * @generated from protobuf enum protos.KVAction
+ */
+export declare enum KVAction {
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
+     */
+    KV_ACTION_UNSET = 0,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
+     */
+    KV_ACTION_CREATE = 1,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
+     */
+    KV_ACTION_UPDATE = 2,
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
+     */
+    KV_ACTION_DELETE = 3
+}
 declare class Command$Type extends MessageType<Command> {
     constructor();
 }
@@ -135,4 +218,18 @@ declare class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
  * @generated MessageType for protobuf message protos.KeepAliveCommand
  */
 export declare const KeepAliveCommand: KeepAliveCommand$Type;
+declare class KVInstruction$Type extends MessageType<KVInstruction> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.KVInstruction
+ */
+export declare const KVInstruction: KVInstruction$Type;
+declare class KVCommand$Type extends MessageType<KVCommand> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCommand
+ */
+export declare const KVCommand: KVCommand$Type;
 export {};

@@ -4,6 +4,36 @@
 import { MessageType } from "@protobuf-ts/runtime";
 import { Pipeline } from "./pipeline.js";
 import { Audience } from "./common.js";
+/**
+ * @generated from protobuf enum protos.KVAction
+ */
+export var KVAction;
+(function (KVAction) {
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
+     */
+    KVAction[KVAction["KV_ACTION_UNSET"] = 0] = "KV_ACTION_UNSET";
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
+     */
+    KVAction[KVAction["KV_ACTION_CREATE"] = 1] = "KV_ACTION_CREATE";
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
+     */
+    KVAction[KVAction["KV_ACTION_UPDATE"] = 2] = "KV_ACTION_UPDATE";
+    /**
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
+     */
+    KVAction[KVAction["KV_ACTION_DELETE"] = 3] = "KV_ACTION_DELETE";
+})(KVAction || (KVAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType {
     constructor() {
@@ -13,7 +43,8 @@ class Command$Type extends MessageType {
             { no: 101, name: "detach_pipeline", kind: "message", oneof: "command", T: () => DetachPipelineCommand },
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
-            { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand }
+            { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
+            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand }
         ]);
     }
 }
@@ -79,4 +110,32 @@ class KeepAliveCommand$Type extends MessageType {
  * @generated MessageType for protobuf message protos.KeepAliveCommand
  */
 export const KeepAliveCommand = new KeepAliveCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVInstruction$Type extends MessageType {
+    constructor() {
+        super("protos.KVInstruction", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
+            { no: 3, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 5, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVInstruction
+ */
+export const KVInstruction = new KVInstruction$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVCommand$Type extends MessageType {
+    constructor() {
+        super("protos.KVCommand", [
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCommand
+ */
+export const KVCommand = new KVCommand$Type();
 //# sourceMappingURL=command.js.map

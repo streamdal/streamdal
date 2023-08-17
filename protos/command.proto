@@ -10,14 +10,19 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 // Command is used by snitch-server for sending commands to SDKs
 message Command {
   // Who is this command intended for?
+  // NOTE: Some commands (such as KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
   protos.Audience audience = 1;
 
   oneof command {
-    protos.AttachPipelineCommand attach_pipeline = 100;
-    protos.DetachPipelineCommand detach_pipeline = 101;
-    protos.PausePipelineCommand pause_pipeline = 102;
-    protos.ResumePipelineCommand resume_pipeline = 103;
-    protos.KeepAliveCommand keep_alive = 104;
+    AttachPipelineCommand attach_pipeline = 100;
+    DetachPipelineCommand detach_pipeline = 101;
+    PausePipelineCommand pause_pipeline = 102;
+    ResumePipelineCommand resume_pipeline = 103;
+    KeepAliveCommand keep_alive = 104;
+
+    // snitch-server will emit this when a user makes changes to the KV store
+    // via the KV HTTP API.
+    KVCommand kv = 105;
   }
 }
 
@@ -39,4 +44,35 @@ message ResumePipelineCommand {
 
 message KeepAliveCommand {
   // Nothing needed in here, just a ping from server to SDK
+}
+
+enum KVAction {
+  KV_ACTION_UNSET = 0; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_CREATE = 1; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_UPDATE = 2; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_DELETE = 3; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+}
+
+message KVInstruction {
+  // Unique ID for this instruction
+  string id = 1;
+
+  // What kind of an action is this?
+  KVAction action = 2;
+
+  // Key (valid re: /^[a-zA-Z0-9_-]+$/)
+  string key = 3;
+
+  // Value
+  bytes value = 4;
+
+  // When this instruction was requested (usually will be the HTTP API request time)
+  int64 requested_at_unix_ts_nano_utc = 5;
+
+  // NOTE: We will _probably_ need to be able to pass additional args depending
+  // on action - will add that when the requirement comes up.
+}
+
+message KVCommand {
+  repeated KVInstruction instructions = 1;
 }

@@ -81,6 +81,13 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_HIGH = 2
 
 
+class KvAction(betterproto.Enum):
+    KV_ACTION_UNSET = 0
+    KV_ACTION_CREATE = 1
+    KV_ACTION_UPDATE = 2
+    KV_ACTION_DELETE = 3
+
+
 class WasmExitCode(betterproto.Enum):
     """
     Included in WASM response; SDK is responsible for interpreting the response
@@ -448,7 +455,10 @@ class Command(betterproto.Message):
     """Command is used by snitch-server for sending commands to SDKs"""
 
     audience: "Audience" = betterproto.message_field(1)
-    """Who is this command intended for?"""
+    """
+    Who is this command intended for? NOTE: Some commands (such as
+    KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
+    """
 
     attach_pipeline: "AttachPipelineCommand" = betterproto.message_field(
         100, group="command"
@@ -463,6 +473,11 @@ class Command(betterproto.Message):
         103, group="command"
     )
     keep_alive: "KeepAliveCommand" = betterproto.message_field(104, group="command")
+    kv: "KvCommand" = betterproto.message_field(105, group="command")
+    """
+    snitch-server will emit this when a user makes changes to the KV store via
+    the KV HTTP API.
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -488,6 +503,32 @@ class ResumePipelineCommand(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class KeepAliveCommand(betterproto.Message):
     pass
+
+
+@dataclass(eq=False, repr=False)
+class KvInstruction(betterproto.Message):
+    id: str = betterproto.string_field(1)
+    """Unique ID for this instruction"""
+
+    action: "KvAction" = betterproto.enum_field(2)
+    """What kind of an action is this?"""
+
+    key: str = betterproto.string_field(3)
+    """Key (valid re: /^[a-zA-Z0-9_-]+$/)"""
+
+    value: bytes = betterproto.bytes_field(4)
+    """Value"""
+
+    requested_at_unix_ts_nano_utc: int = betterproto.int64_field(5)
+    """
+    When this instruction was requested (usually will be the HTTP API request
+    time)
+    """
+
+
+@dataclass(eq=False, repr=False)
+class KvCommand(betterproto.Message):
+    instructions: List["KvInstruction"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
