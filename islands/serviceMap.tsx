@@ -6,7 +6,6 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 import "flowbite";
-import { useCallback, useState } from "preact/hooks";
 import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 import {
   ComponentNode,
@@ -14,12 +13,12 @@ import {
   OperationNode,
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
-import { effect, signal } from "@preact/signals";
+import { signal, useSignalEffect } from "@preact/signals";
 import { ServiceNodes } from "../lib/fetch.ts";
-import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import { Audience } from "snitch-protos/protos/common.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
+import { useEffect, useState } from "preact/hooks";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -43,6 +42,10 @@ export const nodeTypes = {
   consumer: OperationNode,
 };
 
+const serialize = async (instance: any) => {
+  localStorage.setItem(LAYOUT_KEY, JSON.stringify(instance.toObject()));
+};
+
 export default function ServiceMap(
   { nodesData, edgesData, blur = false }: {
     nodesData: FlowNode[];
@@ -51,43 +54,43 @@ export default function ServiceMap(
   },
 ) {
   const savedFlow = JSON.parse(localStorage.getItem(LAYOUT_KEY));
+  const [instance, setInstance] = useState(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    savedFlow?.nodes?.length > 0 ? savedFlow.nodes : nodesData,
+  );
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     savedFlow?.edges?.length > 0 ? savedFlow.edges : edgesData,
   );
 
-  //
-  // TODO: update nodes with any changes made in modals
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    savedFlow?.nodes?.length > 0 ? savedFlow.nodes : nodesData,
-  );
-
-  const [rfInstance, setRfInstance] = useState(null);
   const defaultViewport = savedFlow?.viewport ? savedFlow.viewport : {
     x: 0,
     y: 150,
     zoom: .85,
   };
 
-  const onChange = useCallback(() => {
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-      localStorage.setItem(LAYOUT_KEY, JSON.stringify(flow));
+  useEffect(async () => {
+    if (instance) {
+      serialize(instance);
     }
-  }, [rfInstance]);
+  }, nodes);
+
+  useSignalEffect(() => {
+    if (opUpdateSignal.value) {
+      const updated = updateNode(nodes, opUpdateSignal.value);
+      setNodes(updated);
+    }
+  });
 
   return (
     <div
       class={`w-full h-screen m-0 ${blur ? "filter blur-sm" : ""}`}
     >
-      {nodes.length === 0 ? <EmptyService /> : null}
       <ReactFlow
+        onInit={setInstance}
         nodes={nodes}
-        onNodesChange={(nodesChange) => {
-          onChange();
-          onNodesChange(nodesChange);
-        }}
         edges={edges}
-        onInit={setRfInstance}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
       >
