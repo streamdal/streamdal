@@ -45,7 +45,7 @@ func main() {
 
 	log := logrus.WithField("method", "main")
 
-	d, err := deps.New(version, cfg)
+	d, err := deps.New(cfg)
 	if err != nil {
 		log.WithError(err).Fatal("could not setup dependencies")
 	}
@@ -71,15 +71,44 @@ func run(d *deps.Dependencies) error {
 
 	// Run gRPC server
 	go func() {
-		if err := grpcapi.New(d).Run(); err != nil {
-			errChan <- errors.Wrap(err, "error during gRPC server run")
+		api, err := grpcapi.New(&grpcapi.Options{
+			Config:          d.Config,
+			StoreService:    d.StoreService,
+			BusService:      d.BusService,
+			ShutdownContext: d.ShutdownContext,
+			CmdService:      d.CmdService,
+			NotifyService:   d.NotifyService,
+			NATSBackend:     d.NATSBackend,
+		})
+		if err != nil {
+			errChan <- errors.Wrap(err, "error during gRPC API setup")
+			return
+		}
+
+		if err := api.Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during gRPC API run")
+			return
 		}
 	}()
 
 	// Run REST server
 	go func() {
-		if err := httpapi.New(d).Run(); err != nil {
-			errChan <- errors.Wrap(err, "error during REST server run")
+		api, err := httpapi.New(&httpapi.Options{
+			KVService:            d.KVService,
+			HTTPAPIListenAddress: d.Config.HTTPAPIListenAddress,
+			Version:              d.Config.GetVersion(),
+			ShutdownContext:      d.ShutdownContext,
+			Health:               d.Health,
+			BusService:           d.BusService,
+			AuthToken:            d.Config.AuthToken,
+		})
+		if err != nil {
+			errChan <- errors.Wrap(err, "error during HTTP API setup")
+			return
+		}
+
+		if err := api.Run(); err != nil {
+			errChan <- errors.Wrap(err, "error during HTTP API run")
 		}
 	}()
 

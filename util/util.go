@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -175,4 +176,26 @@ func AudienceEquals(a, b *protos.Audience) bool {
 	}
 
 	return AudienceToStr(a) == AudienceToStr(b)
+}
+
+// GenerateKVRequest is used for converting from plain KVObjects to instructions.
+// This func is used to simplify transforming KV HTTP requests -> KV broadcast requests.
+func GenerateKVRequest(action protos.KVAction, kvs []*protos.KVObject, overwrite bool) *protos.KVRequest {
+	instructions := make([]*protos.KVInstruction, 0)
+
+	for _, kv := range kvs {
+		i := &protos.KVInstruction{
+			Id:                       GenerateUUID(),
+			Action:                   action,
+			Object:                   kv,
+			RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
+		}
+
+		instructions = append(instructions, i)
+	}
+
+	return &protos.KVRequest{
+		Instructions: instructions,
+		Overwrite:    overwrite,
+	}
 }

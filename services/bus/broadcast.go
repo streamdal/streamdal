@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -36,6 +37,63 @@ func (b *Bus) BroadcastResumePipeline(ctx context.Context, req *protos.ResumePip
 
 func (b *Bus) BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error {
 	return b.broadcast(ctx, "metrics", &protos.BusEvent{Event: &protos.BusEvent_MetricsRequest{MetricsRequest: req}})
+}
+
+// BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
+// it to other snitch-server nodes.
+func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {
+	kvRequest := util.GenerateKVRequest(protos.KVAction_KV_ACTION_CREATE, kvs, overwrite)
+
+	return b.broadcast(ctx, "kv_create", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: kvRequest,
+		},
+	})
+}
+
+// BroadcastKVUpdate will transform the req into a generic KVRequest and broadcast
+// it to other snitch-server nodes.
+func (b *Bus) BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error {
+	kvRequest := util.GenerateKVRequest(protos.KVAction_KV_ACTION_UPDATE, kvs, false)
+
+	return b.broadcast(ctx, "kv_update", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: kvRequest,
+		},
+	})
+}
+
+func (b *Bus) BroadcastKVDelete(ctx context.Context, key string) error {
+	return b.broadcast(ctx, "kv_delete", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: &protos.KVRequest{
+				Instructions: []*protos.KVInstruction{
+					{
+						Id:                       util.GenerateUUID(),
+						Action:                   protos.KVAction_KV_ACTION_DELETE,
+						Object:                   &protos.KVObject{Key: key},
+						RequestedAtUnixTsNanoUtc: 0,
+					},
+				},
+			},
+		},
+	})
+}
+
+func (b *Bus) BroadcastKVDeleteAll(ctx context.Context) error {
+	return b.broadcast(ctx, "kv_delete_all", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: &protos.KVRequest{
+				Instructions: []*protos.KVInstruction{
+					{
+						Id:                       util.GenerateUUID(),
+						Action:                   protos.KVAction_KV_ACTION_DELETE_ALL,
+						RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
+					},
+				},
+			},
+		},
+	})
 }
 
 // TODO: Use generics

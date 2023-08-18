@@ -107,6 +107,9 @@ type INatty interface {
 	// does not match, it will return an error.
 	Refresh(ctx context.Context, bucket, key string) error
 
+	// Status queries the status of the KV bucket
+	Status(ctx context.Context, bucket string) (nats.KeyValueStatus, error)
+
 	// AsLeader enables simple leader election by using NATS k/v functionality.
 	//
 	// AsLeader will execute opts.Func if and only if the node executing AsLeader

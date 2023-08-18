@@ -50,7 +50,7 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 	lastHeartbeat := time.Now()
 
 	// Start heartbeat watcher
-	kw, err := s.Deps.NATSBackend.WatchKey(serverCtx, store.NATSLiveBucket, store.NATSRegisterKey(sessionId, s.Deps.Config.NodeName))
+	kw, err := s.Options.NATSBackend.WatchKey(serverCtx, store.NATSLiveBucket, store.NATSRegisterKey(sessionId, s.Options.Config.NodeName))
 	if err != nil {
 		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
 	}
@@ -62,7 +62,7 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-serverCtx.Done():
 				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
 				break MAIN
-			case <-s.Deps.ShutdownContext.Done():
+			case <-s.Options.ShutdownContext.Done():
 				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
 				break MAIN
 			case key := <-kw.Updates():
@@ -80,8 +80,8 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 				}
 			case <-time.After(time.Second):
 				// Check if heartbeat is older than session TTL
-				if time.Now().Sub(lastHeartbeat) > s.Deps.Config.SessionTTL {
-					llog.Debugf("no heartbeat received during the last '%v'; sending disconnect cmd and exiting", s.Deps.Config.SessionTTL)
+				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
+					llog.Debugf("no heartbeat received during the last '%v'; sending disconnect cmd and exiting", s.Options.Config.SessionTTL)
 					noHeartbeatCh <- struct{}{}
 					break MAIN
 				}
@@ -106,12 +106,12 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	})
 
 	// Store registration
-	if err := s.Deps.StoreService.AddRegistration(server.Context(), request); err != nil {
+	if err := s.Options.StoreService.AddRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")
 	}
 
 	// Create a new command channel
-	ch, newCh := s.Deps.CmdService.AddChannel(request.SessionId)
+	ch, newCh := s.Options.CmdService.AddChannel(request.SessionId)
 
 	if newCh {
 		llog.Debugf("new channel created for session id '%s'", request.SessionId)
@@ -144,7 +144,7 @@ MAIN:
 		case <-server.Context().Done():
 			llog.Debug("register handler detected client disconnect")
 			break MAIN
-		case <-s.Deps.ShutdownContext.Done():
+		case <-s.Options.ShutdownContext.Done():
 			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
@@ -191,13 +191,13 @@ MAIN:
 	}
 
 	// Remove command channel
-	if ok := s.Deps.CmdService.RemoveChannel(request.SessionId); ok {
+	if ok := s.Options.CmdService.RemoveChannel(request.SessionId); ok {
 		llog.Debugf("removed channel for session id '%s'", request.SessionId)
 	} else {
 		llog.Debugf("no channel found for session id '%s'", request.SessionId)
 	}
 
-	if err := s.Deps.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
+	if err := s.Options.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
 		ServiceName: request.ServiceName,
 		SessionId:   request.SessionId,
 	}); err != nil {
@@ -218,7 +218,7 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	if err := s.Deps.StoreService.AddHeartbeat(ctx, req); err != nil {
+	if err := s.Options.StoreService.AddHeartbeat(ctx, req); err != nil {
 		s.log.Errorf("unable to save heartbeat: %s", err.Error())
 
 		return &protos.StandardResponse{
@@ -236,7 +236,7 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 }
 
 func (s *InternalServer) Notify(ctx context.Context, request *protos.NotifyRequest) (*protos.StandardResponse, error) {
-	if err := s.Deps.NotifyService.Queue(ctx, request); err != nil {
+	if err := s.Options.NotifyService.Queue(ctx, request); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
 			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
@@ -260,7 +260,7 @@ func (s *InternalServer) Metrics(ctx context.Context, req *protos.MetricsRequest
 		}, nil
 	}
 
-	if err := s.Deps.BusService.BroadcastMetrics(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastMetrics(ctx, req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
 			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
@@ -286,7 +286,7 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		}, nil
 	}
 
-	if err := s.Deps.StoreService.AddAudience(ctx, req); err != nil {
+	if err := s.Options.StoreService.AddAudience(ctx, req); err != nil {
 		s.log.Errorf("unable to save audience: %s", err.Error())
 
 		return &protos.StandardResponse{
@@ -307,12 +307,12 @@ func (s *InternalServer) GetAttachCommandsByService(
 	ctx context.Context,
 	req *protos.GetAttachCommandsByServiceRequest,
 ) (*protos.GetAttachCommandsByServiceResponse, error) {
-	attaches, err := s.Deps.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
+	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get attach commands by service")
 	}
 
-	pausedMap, err := s.Deps.StoreService.GetPaused(ctx)
+	pausedMap, err := s.Options.StoreService.GetPaused(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get paused pipelines")
 	}

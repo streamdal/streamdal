@@ -45,6 +45,10 @@ type IBus interface {
 	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
+	BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error
+	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
+	BroadcastKVDelete(ctx context.Context, key string) error
+	BroadcastKVDeleteAll(ctx context.Context) error
 }
 
 type Bus struct {
@@ -205,6 +209,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	case *protos.BusEvent_MetricsRequest:
 		err = b.handleMetricsRequest(shutdownCtx, busEvent.GetMetricsRequest())
+	case *protos.BusEvent_KvRequest:
+		err = b.handleKVRequest(shutdownCtx, busEvent.GetKvRequest())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}

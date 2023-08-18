@@ -517,3 +517,99 @@ func MetricsRequest(req *protos.MetricsRequest) error {
 
 	return nil
 }
+
+func KVCreateHTTPRequest(r *protos.KVCreateHTTPRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if len(r.Kvs) == 0 {
+		return ErrEmptyField("Kvs")
+	}
+
+	for _, kv := range r.Kvs {
+		if err := KVObject(kv, false, true); err != nil {
+			return errors.Wrapf(err, "KVObject validation failed for key '%s'", kv.Key)
+		}
+	}
+
+	return nil
+}
+
+// KVObject validates a KVObject; checkTimestamps is exposed because in some
+// cases we might not have a TS yet (ie. Create KV)
+func KVObject(obj *protos.KVObject, checkTimestamps, checkValue bool) error {
+	if obj == nil {
+		return ErrNilInput
+	}
+
+	if obj.Key == "" {
+		return ErrEmptyField("Key")
+	}
+
+	if checkValue && obj.Value == nil {
+		return ErrNilField("Value")
+	}
+
+	if checkTimestamps {
+		// Should at least have created_at
+		if obj.CreatedAtUnixTsNanoUtc == 0 {
+			return ErrEmptyField("CreatedAtUnixTsNanoUtc")
+		}
+	}
+
+	return nil
+}
+
+func KVUpdateHTTPRequest(r *protos.KVUpdateHTTPRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	for _, kv := range r.Kvs {
+		if err := KVObject(kv, false, true); err != nil {
+			return errors.Wrapf(err, "KVObject validation failed for key '%s'", kv.Key)
+		}
+	}
+
+	return nil
+}
+
+func KVInstruction(i *protos.KVInstruction) error {
+	if i == nil {
+		return ErrNilInput
+	}
+
+	if i.Action == 0 {
+		return errors.New("action must be set")
+	}
+
+	checkValue := true
+
+	if i.Action == protos.KVAction_KV_ACTION_DELETE {
+		checkValue = false
+	}
+
+	// Delete all doesn't contain an object - no need to validate
+	if i.Action == protos.KVAction_KV_ACTION_DELETE {
+		if err := KVObject(i.Object, false, checkValue); err != nil {
+			return errors.Wrapf(err, "KVObject validation failed for kv '%s'", i.Object)
+		}
+	}
+
+	return nil
+}
+
+func KVRequest(r *protos.KVRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	for _, v := range r.Instructions {
+		if err := KVInstruction(v); err != nil {
+			return errors.Wrapf(err, "instruction validation failed for kv '%v'", v.Object)
+		}
+	}
+
+	return nil
+}
