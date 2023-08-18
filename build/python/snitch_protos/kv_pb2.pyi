@@ -7,6 +7,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 KV_ACTION_CREATE: KVAction
 KV_ACTION_DELETE: KVAction
+KV_ACTION_DELETE_ALL: KVAction
 KV_ACTION_UNSET: KVAction
 KV_ACTION_UPDATE: KVAction
 

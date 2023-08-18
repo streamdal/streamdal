@@ -8,7 +8,12 @@ enum KVAction {
   KV_ACTION_UNSET = 0; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
   KV_ACTION_CREATE = 1; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
   KV_ACTION_UPDATE = 2; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+
+  // Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
   KV_ACTION_DELETE = 3; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+
+  // Only "requested_at_*" needs to be set in *protos.KVInstruction
+  KV_ACTION_DELETE_ALL = 4; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
 }
 
 // Represents a single KV object

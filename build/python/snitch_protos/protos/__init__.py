@@ -86,6 +86,12 @@ class KvAction(betterproto.Enum):
     KV_ACTION_CREATE = 1
     KV_ACTION_UPDATE = 2
     KV_ACTION_DELETE = 3
+    """
+    Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
+    """
+
+    KV_ACTION_DELETE_ALL = 4
+    """Only "requested_at_*" needs to be set in *protos.KVInstruction"""
 
 
 class WasmExitCode(betterproto.Enum):
