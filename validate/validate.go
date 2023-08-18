@@ -566,8 +566,10 @@ func KVUpdateHTTPRequest(r *protos.KVUpdateHTTPRequest) error {
 		return ErrNilInput
 	}
 
-	if err := KVObject(r.Kv, false); err != nil {
-		return errors.Wrapf(err, "KVObject validation failed for key '%s'", r.Kv.Key)
+	for _, kv := range r.Kvs {
+		if err := KVObject(kv, false); err != nil {
+			return errors.Wrapf(err, "KVObject validation failed for key '%s'", kv.Key)
+		}
 	}
 
 	return nil

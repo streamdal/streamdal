@@ -45,8 +45,8 @@ type IBus interface {
 	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
-	BroadcastKVCreate(ctx context.Context, req *protos.KVCreateHTTPRequest) error
-	BroadcastKVUpdate(ctx context.Context, req *protos.KVUpdateHTTPRequest) error
+	BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error
+	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
 	BroadcastKVDelete(ctx context.Context, key string) error
 	BroadcastKVDeleteAll(ctx context.Context) error
 }

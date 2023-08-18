@@ -23,10 +23,5 @@ func (a *HTTPAPI) versionHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	rw.WriteHeader(http.StatusOK)
 
-	response := &ResponseJSON{
-		Status:  http.StatusOK,
-		Message: "streamdal/snitch-server " + a.Options.Version,
-	}
-
-	WriteJSON(rw, response, http.StatusOK)
+	Write(rw, http.StatusOK, "streamdal/snitch-server "+a.Options.Version)
 }

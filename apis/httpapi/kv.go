@@ -114,7 +114,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	// TODO: create broadcast handlers for emitting commands on KV updates
-	if err := a.Options.BusService.BroadcastKVCreate(r.Context(), createHTTPRequest); err != nil {
+	if err := a.Options.BusService.BroadcastKVCreate(r.Context(), createHTTPRequest.Kvs, createHTTPRequest.Overwrite); err != nil {
 		Write(rw, http.StatusInternalServerError, "unable to broadcast kv command: %v", err)
 		return
 	}
@@ -122,8 +122,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 	WriteJSON(rw, createHTTPRequest.Kvs, http.StatusOK)
 }
 
-// Update a single KV object. Input: *protos.KVObject as JSON
-// Returns updated *protos.KVObject as JSON
+// Update one or more KV objects; returns (updated) []*protos.KVObject as JSON
 func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -149,41 +148,40 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch existing object
-	existing, err := a.Options.KVService.Get(r.Context(), updateHTTPRequest.Kv.Key)
-	if err != nil {
-		Write(rw, http.StatusInternalServerError, "unable to fetch existing kv object: %v", err)
-		return
-	}
+	updateList := make([]*protos.KVObject, 0)
 
-	// Validate existing - just in case
-	if err := validate.KVObject(existing, true); err != nil {
-		Write(rw, http.StatusInternalServerError, "bug? invalid existing kv object (existing object should pass validation!): %v", err)
-		return
-	}
+	for _, kv := range updateHTTPRequest.Kvs {
+		// Exist check + we need existing to get created_at TS
+		existing, err := a.Options.KVService.Get(r.Context(), kv.Key)
+		if err != nil {
+			Write(rw, http.StatusInternalServerError, "unable to fetch existing kv object '%s': %v", kv.Key, err)
+			return
+		}
 
-	// Overwrite requested object's timestamps
-	updateHTTPRequest.Kv.CreatedAtUnixTsNanoUtc = existing.CreatedAtUnixTsNanoUtc
+		// Overwrite requested object's timestamps
+		kv.CreatedAtUnixTsNanoUtc = existing.CreatedAtUnixTsNanoUtc
+		kv.UpdatedAtUnixTsNanoUtc = time.Now().UTC().UnixNano()
 
-	// Add updated timestamp
-	updateHTTPRequest.Kv.UpdatedAtUnixTsNanoUtc = time.Now().UTC().UnixNano()
+		// Attempt to update in KV service
+		updated, err := a.Options.KVService.Update(r.Context(), kv)
+		if err != nil {
+			Write(rw, http.StatusInternalServerError, "unable to complete update request: %v", err)
+			return
+		}
 
-	// Attempt to update in KV service
-	updated, err := a.Options.KVService.Update(r.Context(), updateHTTPRequest.Kv)
-	if err != nil {
-		Write(rw, http.StatusInternalServerError, "unable to complete update request: %v", err)
-		return
+		// Add to update list
+		updateList = append(updateList, updated)
 	}
 
 	// Broadcast KV changes to other snitch-server nodes (reminder: we do this
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
-	if err := a.Options.BusService.BroadcastKVUpdate(r.Context(), updateHTTPRequest); err != nil {
+	if err := a.Options.BusService.BroadcastKVUpdate(r.Context(), updateList); err != nil {
 		Write(rw, http.StatusInternalServerError, "unable to broadcast update kv command: %v", err)
 		return
 	}
 
-	WriteJSON(rw, updated, http.StatusOK)
+	WriteJSON(rw, updateList, http.StatusOK)
 }
 
 // Returns *ResponseJSON; status code 200 - ok; 400 - bad input; 404 - not found; 500 - internal server error

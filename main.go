@@ -100,6 +100,7 @@ func run(d *deps.Dependencies) error {
 			ShutdownContext:      d.ShutdownContext,
 			Health:               d.Health,
 			BusService:           d.BusService,
+			AuthToken:            d.Config.AuthToken,
 		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during HTTP API setup")

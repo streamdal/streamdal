@@ -29,8 +29,13 @@ type IKV interface {
 }
 
 type Usage struct {
-	NumItems int
-	NumBytes int
+	// This does NOT include history -- we get this value by doing Keys() on the
+	// bucket
+	NumItems int `json:"num_items"`
+
+	// This includes history entries (ie. when you delete a KV, a copy of it is
+	// kept around until the key is purged or the bucket is compacted)
+	NumBytes int `json:"num_bytes"`
 }
 
 type KV struct {
@@ -60,6 +65,10 @@ func (k *KV) GetAll(ctx context.Context) ([]*protos.KVObject, error) {
 	// Fetch all keys in bucket
 	keys, err := k.Options.NATS.Keys(ctx, BucketName)
 	if err != nil {
+		if err == nats.ErrBucketNotFound {
+			return objects, nil
+		}
+
 		return nil, errors.Wrap(err, "failed to fetch keys")
 	}
 
@@ -79,7 +88,7 @@ func (k *KV) GetAll(ctx context.Context) ([]*protos.KVObject, error) {
 		objects = append(objects, object)
 	}
 
-	return objects, errors.New("not implemented")
+	return objects, nil
 }
 
 func (k *KV) Get(ctx context.Context, key string) (*protos.KVObject, error) {
@@ -192,11 +201,17 @@ func (k *KV) DeleteAll(ctx context.Context) error {
 func (k *KV) GetUsage(ctx context.Context) (*Usage, error) {
 	status, err := k.Options.NATS.Status(ctx, BucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch usage")
+		return nil, errors.Wrap(err, "failed to fetch status")
+	}
+
+	// We have to do this because .Values() includes historical entries as well
+	keys, err := k.Options.NATS.Keys(ctx, BucketName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to fetch keys (for status)")
 	}
 
 	return &Usage{
-		NumItems: int(status.Values()),
+		NumItems: len(keys),
 		NumBytes: int(status.Bytes()),
 	}, nil
 }

@@ -23,6 +23,7 @@ type Options struct {
 	ShutdownContext      context.Context
 	Health               health.IHealth
 	BusService           bus.IBus
+	AuthToken            string
 }
 type HTTPAPI struct {
 	Options *Options
@@ -55,13 +56,13 @@ func (a *HTTPAPI) Run() error {
 	}
 
 	// KV-related handlers
-	router.HandlerFunc("GET", "/api/v1/kv/usage", a.getUsageKVHandler)
-	router.HandlerFunc("GET", "/api/v1/kv", a.getAllKVHandler)
-	router.HandlerFunc("GET", "/api/v1/kv/:key", a.getKVHandler)
-	router.HandlerFunc("POST", "/api/v1/kv", a.createKVHandler)
-	router.HandlerFunc("PUT", "/api/v1/kv/:key", a.updateKVHandler)
-	router.HandlerFunc("DELETE", "/api/v1/kv/:key", a.deleteKVHandler)
-	router.HandlerFunc("DELETE", "/api/v1/kv", a.deleteAllKVHandler)
+	router.HandlerFunc("GET", "/api/v1/kv", a.Auth(a.getAllKVHandler))
+	router.HandlerFunc("GET", "/api/v1/kv/:key", a.Auth(a.getKVHandler))
+	router.HandlerFunc("GET", "/api/v1/kv-usage", a.Auth(a.getUsageKVHandler))
+	router.HandlerFunc("POST", "/api/v1/kv", a.Auth(a.createKVHandler))
+	router.HandlerFunc("PUT", "/api/v1/kv", a.Auth(a.updateKVHandler))
+	router.HandlerFunc("DELETE", "/api/v1/kv", a.Auth(a.deleteAllKVHandler))
+	router.HandlerFunc("DELETE", "/api/v1/kv/:key", a.Auth(a.deleteKVHandler))
 
 	router.HandlerFunc("GET", "/health-check", a.healthCheckHandler)
 	router.HandlerFunc("GET", "/version", a.versionHandler)
@@ -77,6 +78,18 @@ func (a *HTTPAPI) Run() error {
 	}()
 
 	return http.ListenAndServe(a.Options.HTTPAPIListenAddress, router)
+}
+
+// Auth is an auth middleware
+func (a *HTTPAPI) Auth(handler http.HandlerFunc) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer "+a.Options.AuthToken {
+			Write(rw, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+
+		handler(rw, r)
+	}
 }
 
 func WriteJSON(rw http.ResponseWriter, payload interface{}, status int) {
@@ -130,6 +143,10 @@ func validateOptions(o *Options) error {
 
 	if o.BusService == nil {
 		return errors.New("bus service cannot be nil")
+	}
+
+	if o.AuthToken == "" {
+		return errors.New("auth token cannot be empty")
 	}
 
 	return nil
