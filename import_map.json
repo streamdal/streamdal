@@ -1,7 +1,7 @@
 {
   "imports": {
     "root/": "./",
-    "$fresh/": "https://deno.land/x/fresh@1.2.0/",
+    "$fresh/": "https://deno.land/x/fresh@1.4.2/",
     "preact": "https://esm.sh/preact@10.17.0",
     "preact/": "https://esm.sh/preact@10.17.0/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.1.0?alias=react:preact/compat,react-dom:preact/compat,@types/react:preact/compat&external=preact/compat&deps=preact@10.17.0",

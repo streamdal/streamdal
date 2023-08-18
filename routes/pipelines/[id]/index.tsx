@@ -1,15 +1,12 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Layout } from "root/components/layout.tsx";
 import Pipelines from "root/islands/pipelines.tsx";
-import { getPipelines, getServiceNodes } from "root/lib/fetch.ts";
+import { getPipelines } from "root/lib/fetch.ts";
 import { PipelineRoute } from "../index.tsx";
-import ServiceMap from "root/islands/serviceMap.tsx";
 
 export const handler: Handlers<PipelineRoute> = {
   async GET(_req, ctx) {
     return ctx.render({
       pipelines: await getPipelines(),
-      serviceNodes: await getServiceNodes(),
     });
   },
   async POST(req, ctx) {
@@ -22,7 +19,6 @@ export const handler: Handlers<PipelineRoute> = {
     return ctx.render({
       success,
       pipelines: await getPipelines(),
-      serviceNodes: await getServiceNodes(),
     });
   },
 };
@@ -36,17 +32,10 @@ export default function PipelinesRoute(
   >,
 ) {
   return (
-    <Layout>
-      <Pipelines
-        id={props?.params?.id}
-        pipelines={props?.data?.pipelines}
-        success={props?.data?.success}
-      />
-      <ServiceMap
-        nodesData={props.data.serviceNodes.nodes}
-        edgesData={props.data.serviceNodes.edges}
-        blur={true}
-      />
-    </Layout>
+    <Pipelines
+      id={props?.params?.id}
+      pipelines={props?.data?.pipelines}
+      success={props?.data?.success}
+    />
   );
 }

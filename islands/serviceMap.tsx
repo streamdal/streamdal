@@ -10,14 +10,29 @@ import { useCallback, useState } from "preact/hooks";
 import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 import {
   ComponentNode,
-  FlowEdge,
-  FlowNode,
   GroupNode,
   OperationNode,
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
+import { effect, signal } from "@preact/signals";
+import { ServiceNodes } from "../lib/fetch.ts";
+import { EmptyService } from "../components/serviceMap/emptyService.tsx";
+import { Audience } from "snitch-protos/protos/common.ts";
+import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 
 const LAYOUT_KEY = "service-map-layout";
+
+export const serviceSignal = signal<ServiceNodes | null>(
+  null,
+);
+
+export type OpUpdate = {
+  audience: Audience;
+  attachedPipeline?: Pipeline;
+};
+
+export const opUpdateSignal = signal<OpUpdate | null>(null);
 
 export const nodeTypes = {
   service: ServiceNode,
@@ -39,9 +54,13 @@ export default function ServiceMap(
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     savedFlow?.edges?.length > 0 ? savedFlow.edges : edgesData,
   );
+
+  //
+  // TODO: update nodes with any changes made in modals
   const [nodes, setNodes, onNodesChange] = useNodesState(
     savedFlow?.nodes?.length > 0 ? savedFlow.nodes : nodesData,
   );
+
   const [rfInstance, setRfInstance] = useState(null);
   const defaultViewport = savedFlow?.viewport ? savedFlow.viewport : {
     x: 0,
@@ -58,9 +77,9 @@ export default function ServiceMap(
 
   return (
     <div
-      class={`w-full h-screen m-0 ${blur ? "filter blur-md" : ""}`}
+      class={`w-full h-screen m-0 ${blur ? "filter blur-sm" : ""}`}
     >
-      {nodesData.length === 0 ? <EmptyService /> : null}
+      {nodes.length === 0 ? <EmptyService /> : null}
       <ReactFlow
         nodes={nodes}
         onNodesChange={(nodesChange) => {
