@@ -26,11 +26,21 @@ export var KVAction;
      */
     KVAction[KVAction["KV_ACTION_UPDATE"] = 2] = "KV_ACTION_UPDATE";
     /**
+     * Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
+     *
      * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
      *
      * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
      */
     KVAction[KVAction["KV_ACTION_DELETE"] = 3] = "KV_ACTION_DELETE";
+    /**
+     * Only "requested_at_*" needs to be set in *protos.KVInstruction
+     *
+     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 4;
+     */
+    KVAction[KVAction["KV_ACTION_DELETE_ALL"] = 4] = "KV_ACTION_DELETE_ALL";
 })(KVAction || (KVAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class KVObject$Type extends MessageType {
