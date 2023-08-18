@@ -672,16 +672,16 @@ var _ = Describe("External gRPC API", func() {
 
 func runServer() {
 	d, err := deps.New("", &config.Config{
-		Debug:                 true,
-		NodeName:              TestNodeName,
-		AuthToken:             AuthToken,
-		HTTPAPIListenAddress:  HTTPAPIAddress,
-		GRPCAPIListenAddress:  GRPCAPIAddress,
-		NATSURL:               []string{"localhost:4222"},
-		NATSTLSSkipVerify:     true,
-		NATSNumBucketReplicas: 1,
-		SessionTTL:            time.Second, // Override TTL to improve test speed
-		WASMDir:               "./assets/wasm",
+		Debug:                true,
+		NodeName:             TestNodeName,
+		AuthToken:            AuthToken,
+		HTTPAPIListenAddress: HTTPAPIAddress,
+		GRPCAPIListenAddress: GRPCAPIAddress,
+		NATSURL:              []string{"localhost:4222"},
+		NATSTLSSkipVerify:    true,
+		NATSNumKVReplicas:    1,
+		SessionTTL:           time.Second, // Override TTL to improve test speed
+		WASMDir:              "./assets/wasm",
 	})
 
 	if err != nil {
