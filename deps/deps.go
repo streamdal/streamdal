@@ -220,7 +220,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.NotifyService = notifyService
 
 	kvService, err := kv.New(&kv.Options{
-		NATS: d.NATSBackend,
+		NATS:        d.NATSBackend,
+		NumReplicas: cfg.NATSNumBucketReplicas,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new kv service")

@@ -25,6 +25,7 @@ type IKV interface {
 	Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error
 	Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject, error)
 	Delete(ctx context.Context, key string) error
+	DeleteAll(ctx context.Context) error
 }
 
 type Usage struct {
@@ -33,12 +34,13 @@ type Usage struct {
 }
 
 type KV struct {
-	NATS natty.INatty
-	log  *logrus.Entry
+	Options *Options
+	log     *logrus.Entry
 }
 
 type Options struct {
-	NATS natty.INatty
+	NATS        natty.INatty
+	NumReplicas int
 }
 
 func New(o *Options) (*KV, error) {
@@ -47,8 +49,8 @@ func New(o *Options) (*KV, error) {
 	}
 
 	return &KV{
-		NATS: o.NATS,
-		log:  logrus.WithField("pkg", "kv"),
+		Options: o,
+		log:     logrus.WithField("pkg", "kv"),
 	}, nil
 }
 
@@ -56,14 +58,14 @@ func (k *KV) GetAll(ctx context.Context) ([]*protos.KVObject, error) {
 	objects := make([]*protos.KVObject, 0)
 
 	// Fetch all keys in bucket
-	keys, err := k.NATS.Keys(ctx, BucketName)
+	keys, err := k.Options.NATS.Keys(ctx, BucketName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch keys")
 	}
 
 	// Fetch every returned key
 	for _, key := range keys {
-		value, err := k.NATS.Get(ctx, BucketName, key)
+		value, err := k.Options.NATS.Get(ctx, BucketName, key)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to fetch kv '%s'", key)
 		}
@@ -85,7 +87,7 @@ func (k *KV) Get(ctx context.Context, key string) (*protos.KVObject, error) {
 		return nil, errors.New("key cannot be empty")
 	}
 
-	value, err := k.NATS.Get(ctx, BucketName, key)
+	value, err := k.Options.NATS.Get(ctx, BucketName, key)
 	if err != nil {
 		if err == nats.ErrKeyNotFound || err == nats.ErrBucketNotFound {
 			return nil, nats.ErrKeyNotFound
@@ -127,9 +129,9 @@ func (k *KV) Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool)
 		}
 
 		if overwrite {
-			err = k.NATS.Put(ctx, BucketName, kv.Key, serialized)
+			err = k.Options.NATS.Put(ctx, BucketName, kv.Key, serialized)
 		} else {
-			err = k.NATS.Create(ctx, BucketName, kv.Key, serialized)
+			err = k.Options.NATS.Create(ctx, BucketName, kv.Key, serialized)
 		}
 
 		if err != nil {
@@ -147,7 +149,7 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 	}
 
 	// Key should exist
-	_, err := k.NATS.Get(ctx, BucketName, kv.Key)
+	_, err := k.Options.NATS.Get(ctx, BucketName, kv.Key)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to fetch key '%s'", kv.Key)
 	}
@@ -160,7 +162,7 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 		return nil, errors.Wrapf(err, "failed to marshal kv '%s' to protobuf", kv.Key)
 	}
 
-	if err := k.NATS.Put(ctx, BucketName, kv.Key, serialized); err != nil {
+	if err := k.Options.NATS.Put(ctx, BucketName, kv.Key, serialized); err != nil {
 		return nil, errors.Wrapf(err, "failed to update kv '%s'", kv.Key)
 	}
 
@@ -169,11 +171,26 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 
 func (k *KV) Delete(ctx context.Context, key string) error {
 	// Delete no-ops if bucket or key does not exist so we can just use this as-is
-	return k.NATS.Delete(ctx, BucketName, key)
+	return k.Options.NATS.Delete(ctx, BucketName, key)
+}
+
+// DeleteAll will delete all kv entries by deleting and re-creating the bucket
+func (k *KV) DeleteAll(ctx context.Context) error {
+	// Delete & re-create bucket
+	if err := k.Options.NATS.DeleteBucket(ctx, BucketName); err != nil {
+		return errors.Wrap(err, "failed to delete bucket during delete all")
+	}
+
+	// Re-create bucket
+	if err := k.Options.NATS.CreateBucket(ctx, BucketName, 0, k.Options.NumReplicas); err != nil {
+		return errors.Wrap(err, "failed to re-create bucket during delete all")
+	}
+
+	return nil
 }
 
 func (k *KV) GetUsage(ctx context.Context) (*Usage, error) {
-	status, err := k.NATS.Status(ctx, BucketName)
+	status, err := k.Options.NATS.Status(ctx, BucketName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch usage")
 	}
@@ -187,6 +204,10 @@ func (k *KV) GetUsage(ctx context.Context) (*Usage, error) {
 func validateOptions(o *Options) error {
 	if o.NATS == nil {
 		return errors.New("options.NATS cannot be nil")
+	}
+
+	if o.NumReplicas == 0 {
+		return errors.New("options.NumReplicas cannot be 0")
 	}
 
 	return nil

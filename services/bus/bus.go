@@ -46,6 +46,9 @@ type IBus interface {
 	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
 	BroadcastKVCreate(ctx context.Context, req *protos.KVCreateHTTPRequest) error
+	BroadcastKVUpdate(ctx context.Context, req *protos.KVUpdateHTTPRequest) error
+	BroadcastKVDelete(ctx context.Context, key string) error
+	BroadcastKVDeleteAll(ctx context.Context) error
 }
 
 type Bus struct {

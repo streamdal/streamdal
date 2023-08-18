@@ -560,3 +560,15 @@ func KVObject(obj *protos.KVObject, checkTimestamps bool) error {
 
 	return nil
 }
+
+func KVUpdateHTTPRequest(r *protos.KVUpdateHTTPRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if err := KVObject(r.Kv, false); err != nil {
+		return errors.Wrapf(err, "KVObject validation failed for key '%s'", r.Kv.Key)
+	}
+
+	return nil
+}

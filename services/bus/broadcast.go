@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -51,12 +52,54 @@ func (b *Bus) BroadcastKVCreate(ctx context.Context, req *protos.KVCreateHTTPReq
 // BroadcastKVUpdate will transform the req into a generic KVRequest and broadcast
 // it to other snitch-server nodes.
 func (b *Bus) BroadcastKVUpdate(ctx context.Context, req *protos.KVUpdateHTTPRequest) error {
-	return nil
+	return b.broadcast(ctx, "kv_update", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+
+			KvRequest: &protos.KVRequest{
+				Instructions: []*protos.KVInstruction{
+					{
+						Id:                       util.GenerateUUID(),
+						Action:                   protos.KVAction_KV_ACTION_UPDATE,
+						Object:                   req.Kv,
+						RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
+					},
+				},
+			},
+		},
+	})
 }
 
-// TODO: Implement
 func (b *Bus) BroadcastKVDelete(ctx context.Context, key string) error {
-	return nil
+	return b.broadcast(ctx, "kv_delete", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: &protos.KVRequest{
+				Instructions: []*protos.KVInstruction{
+					{
+						Id:                       util.GenerateUUID(),
+						Action:                   protos.KVAction_KV_ACTION_DELETE,
+						Object:                   &protos.KVObject{Key: key},
+						RequestedAtUnixTsNanoUtc: 0,
+					},
+				},
+			},
+		},
+	})
+}
+
+func (b *Bus) BroadcastKVDeleteAll(ctx context.Context) error {
+	return b.broadcast(ctx, "kv_delete_all", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: &protos.KVRequest{
+				Instructions: []*protos.KVInstruction{
+					{
+						Id:                       util.GenerateUUID(),
+						Action:                   protos.KVAction_KV_ACTION_DELETE_ALL,
+						RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
+					},
+				},
+			},
+		},
+	})
 }
 
 // TODO: Use generics
