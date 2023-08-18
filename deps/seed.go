@@ -44,7 +44,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 		return errors.Wrap(err, "unable to create pipeline1")
 	}
 
-	pipelineID2 := "83c8c633-005d-4f6c-ad52-1619c0a92cef"
+	pipelineID2 := "db5ae548-73a2-4e2d-9c0b-380d9a67ade2"
 	pipeline2 := &protos.Pipeline{
 		Id:   pipelineID2,
 		Name: "Test String Contains Pipeline",
@@ -73,7 +73,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	}
 
 	if err := d.StoreService.CreatePipeline(ctx, pipeline2); err != nil {
-		return errors.Wrap(err, "unable to create pipeline1")
+		return errors.Wrap(err, "unable to create pipeline2")
 	}
 
 	// Then create a bunch of audiences
