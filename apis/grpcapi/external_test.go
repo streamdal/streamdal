@@ -562,6 +562,9 @@ var _ = Describe("External gRPC API", func() {
 			Expect(detachResp.Message).To(ContainSubstring("detached"))
 			Expect(detachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
+			// There is a 5s sleep before nats key is deleted
+			time.Sleep(time.Second * 7)
+
 			// Key should be gone from snitch_config
 			shouldBeNil, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
 			Expect(err).To(HaveOccurred())
