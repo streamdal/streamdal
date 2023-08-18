@@ -3,6 +3,7 @@ syntax = "proto3";
 package protos;
 
 import "common.proto";
+import "kv.proto";
 import "pipeline.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
@@ -46,45 +47,10 @@ message KeepAliveCommand {
   // Nothing needed in here, just a ping from server to SDK
 }
 
-enum KVAction {
-  KV_ACTION_UNSET = 0; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-  KV_ACTION_CREATE = 1; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-  KV_ACTION_UPDATE = 2; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-  KV_ACTION_DELETE = 3; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-}
-
-message KVObject {
-  // Key regex: /^[a-zA-Z0-9_-:]+$/)
-  string key = 1;
-
-  // KV value
-  bytes value = 2;
-
-  // When was this object created
-  int64 created_at_unix_ts_nano_utc = 3;
-
-  // Last time the object was updated
-  int64 updated_at_unix_ts_nano_utc = 4;
-}
-
-// Used in KVCommand to indicate a series of KV-related actions - ie. create, update, delete
-message KVInstruction {
-  // Unique ID for this instruction
-  string id = 1;
-
-  // What kind of an action is this?
-  KVAction action = 2;
-
-  // KV object
-  KVObject object = 3;
-
-  // When this instruction was requested (usually will be the HTTP API request time)
-  int64 requested_at_unix_ts_nano_utc = 4;
-
-  // NOTE: We will _probably_ need to be able to pass additional args depending
-  // on action - will add that when the requirement comes up.
-}
-
 message KVCommand {
-  repeated KVInstruction instructions = 1;
+  repeated protos.KVInstruction instructions = 1;
+
+  // Create & Update specific setting that will cause the Create or Update to
+  // work as an upsert.
+  bool overwrite = 2;
 }
