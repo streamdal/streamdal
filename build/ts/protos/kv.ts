@@ -111,9 +111,9 @@ export interface KVCreateHTTPRequest {
  */
 export interface KVUpdateHTTPRequest {
     /**
-     * @generated from protobuf field: protos.KVObject kv = 1;
+     * @generated from protobuf field: repeated protos.KVObject kvs = 1;
      */
-    kv?: KVObject;
+    kvs: KVObject[];
 }
 /**
  * @generated from protobuf enum protos.KVAction
@@ -214,7 +214,7 @@ export const KVCreateHTTPRequest = new KVCreateHTTPRequest$Type();
 class KVUpdateHTTPRequest$Type extends MessageType<KVUpdateHTTPRequest> {
     constructor() {
         super("protos.KVUpdateHTTPRequest", [
-            { no: 1, name: "kv", kind: "message", T: () => KVObject }
+            { no: 1, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject }
         ]);
     }
 }

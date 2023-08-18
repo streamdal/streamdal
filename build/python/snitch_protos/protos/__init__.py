@@ -528,7 +528,7 @@ class KvCreateHttpRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvUpdateHttpRequest(betterproto.Message):
-    kv: "KvObject" = betterproto.message_field(1)
+    kvs: List["KvObject"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

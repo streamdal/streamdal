@@ -685,8 +685,8 @@ impl ::protobuf::reflect::ProtobufValue for KVCreateHTTPRequest {
 // @@protoc_insertion_point(message:protos.KVUpdateHTTPRequest)
 pub struct KVUpdateHTTPRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.KVUpdateHTTPRequest.kv)
-    pub kv: ::protobuf::MessageField<KVObject>,
+    // @@protoc_insertion_point(field:protos.KVUpdateHTTPRequest.kvs)
+    pub kvs: ::std::vec::Vec<KVObject>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.KVUpdateHTTPRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -706,10 +706,10 @@ impl KVUpdateHTTPRequest {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, KVObject>(
-            "kv",
-            |m: &KVUpdateHTTPRequest| { &m.kv },
-            |m: &mut KVUpdateHTTPRequest| { &mut m.kv },
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "kvs",
+            |m: &KVUpdateHTTPRequest| { &m.kvs },
+            |m: &mut KVUpdateHTTPRequest| { &mut m.kvs },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVUpdateHTTPRequest>(
             "KVUpdateHTTPRequest",
@@ -730,7 +730,7 @@ impl ::protobuf::Message for KVUpdateHTTPRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.kv)?;
+                    self.kvs.push(is.read_message()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -744,19 +744,19 @@ impl ::protobuf::Message for KVUpdateHTTPRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.kv.as_ref() {
-            let len = v.compute_size();
+        for value in &self.kvs {
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.kv.as_ref() {
+        for v in &self.kvs {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -774,13 +774,13 @@ impl ::protobuf::Message for KVUpdateHTTPRequest {
     }
 
     fn clear(&mut self) {
-        self.kv.clear();
+        self.kvs.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static KVUpdateHTTPRequest {
         static instance: KVUpdateHTTPRequest = KVUpdateHTTPRequest {
-            kv: ::protobuf::MessageField::none(),
+            kvs: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -884,12 +884,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     structions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"W\n\
     \x13KVCreateHTTPRequest\x12\"\n\x03kvs\x18\x01\x20\x03(\x0b2\x10.protos.\
     KVObjectR\x03kvs\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"\
-    7\n\x13KVUpdateHTTPRequest\x12\x20\n\x02kv\x18\x01\x20\x01(\x0b2\x10.pro\
-    tos.KVObjectR\x02kv*{\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\
+    9\n\x13KVUpdateHTTPRequest\x12\"\n\x03kvs\x18\x01\x20\x03(\x0b2\x10.prot\
+    os.KVObjectR\x03kvs*{\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\
     \x12\x14\n\x10KV_ACTION_CREATE\x10\x01\x12\x14\n\x10KV_ACTION_UPDATE\x10\
     \x02\x12\x14\n\x10KV_ACTION_DELETE\x10\x03\x12\x18\n\x14KV_ACTION_DELETE\
-    _ALL\x10\x04B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xfa\
-    \x14\n\x06\x12\x04\0\0J\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\
+    _ALL\x10\x04B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\x88\
+    \x15\n\x06\x12\x04\0\0J\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\
     \x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\
     \x12\x03\x04\0I\n\n\n\x02\x05\0\x12\x04\x06\0\x10\x01\n\n\n\x03\x05\0\
     \x01\x12\x03\x06\x05\r\n=\n\x04\x05\0\x02\0\x12\x03\x07\x02\x16\"0\x20pr\
@@ -972,9 +972,10 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x03\x02\x01\x05\x12\x03E\x02\x06\n\x0c\n\x05\x04\x03\x02\x01\x01\
     \x12\x03E\x07\x10\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03E\x13\x14\n\n\n\
     \x02\x04\x04\x12\x04H\0J\x01\n\n\n\x03\x04\x04\x01\x12\x03H\x08\x1b\n\
-    \x0b\n\x04\x04\x04\x02\0\x12\x03I\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x06\
-    \x12\x03I\x02\n\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03I\x0b\r\n\x0c\n\x05\
-    \x04\x04\x02\0\x03\x12\x03I\x10\x11b\x06proto3\
+    \x0b\n\x04\x04\x04\x02\0\x12\x03I\x02\x1c\n\x0c\n\x05\x04\x04\x02\0\x04\
+    \x12\x03I\x02\n\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03I\x0b\x13\n\x0c\n\
+    \x05\x04\x04\x02\0\x01\x12\x03I\x14\x17\n\x0c\n\x05\x04\x04\x02\0\x03\
+    \x12\x03I\x1a\x1bb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

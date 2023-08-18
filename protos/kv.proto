@@ -71,6 +71,6 @@ message KVCreateHTTPRequest {
 }
 
 message KVUpdateHTTPRequest {
-  KVObject kv = 1;
+  repeated KVObject kvs = 1;
 }
 
