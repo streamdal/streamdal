@@ -4,7 +4,7 @@ import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { ServiceMapType } from "./fetch.ts";
 import { getAttachedPipeline } from "./utils.ts";
 import { MarkerType } from "reactflow";
-import { OpUpdate, opUpdateSignal } from "../islands/serviceMap.tsx";
+import { OpUpdate } from "../islands/serviceMap.tsx";
 
 export type NodeData = {
   audience: Audience;
@@ -223,17 +223,15 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
 // unrouted modals client-side and those changes need to be reflected
 // in the already rendered nodes
 export const updateNode = (nodes: FlowNode[], update: OpUpdate) =>
-  update
-    ? nodes.map((n: FlowNode) =>
-      n.id ===
-          `${update.audience.serviceName}-${update.audience.operationName}`
-        ? {
-          ...n,
-          data: {
-            ...n.data,
-            attachedPipeline: update.attachedPipeline,
-          },
-        }
-        : n
-    )
-    : nodes;
+  nodes.map((n: FlowNode) =>
+    n.id ===
+        `${update.audience.serviceName}-${update.audience.operationName}`
+      ? {
+        ...n,
+        data: {
+          ...n.data,
+          attachedPipeline: update.attachedPipeline,
+        },
+      }
+      : n
+  );

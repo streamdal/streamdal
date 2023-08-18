@@ -1,5 +1,5 @@
 import IconX from "tabler-icons/tsx/x.tsx";
-import { useRef } from "preact/denonext/hooks.js";
+import { useRef } from "preact/hooks";
 import { OperationNode } from "./customNodes.tsx";
 
 export const ExpandedNodes = ({ nodes, params }) => {
