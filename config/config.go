@@ -30,7 +30,7 @@ type Config struct {
 	HealthFreqSec         int              `help:"How often to perform health checks on dependencies" default:"60"`
 	SessionTTL            time.Duration    `help:"TTL for session keys in NATS live K/V bucket" default:"5s"`
 	WASMDir               string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
-	Seed                  bool             `help:"Seed NATS with initial data" default:"false"`
+	SeedDummyData         bool             `help:"Seed NATS with dummy data for testing" default:"false"`
 
 	KongContext *kong.Context `kong:"-"`
 }

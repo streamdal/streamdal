@@ -92,7 +92,7 @@ func run(d *deps.Dependencies) error {
 
 	displayInfo(d)
 
-	if d.Config.Seed {
+	if d.Config.SeedDummyData {
 		if err := d.Seed(d.ShutdownContext); err != nil {
 			return errors.Wrap(err, "error during seed")
 		}

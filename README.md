@@ -71,4 +71,4 @@ We should settle on `ID` as described here: https://github.com/golang/go/wiki/Co
 Make sure to run tests via `make test`. This is necessary as we have to set
 certain environment variables for the tests to run properly.
 
-Use `go run main.go --seed` to seed NATS with test data for use with development and hand-testing
+Use `go run main.go --seed-dummy-data` to seed NATS with test data for use with development and hand-testing
