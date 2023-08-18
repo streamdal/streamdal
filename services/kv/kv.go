@@ -125,7 +125,7 @@ func (k *KV) Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool)
 	}
 
 	for _, kv := range kvs {
-		if err := validate.KVObject(kv, false); err != nil {
+		if err := validate.KVObject(kv, false, true); err != nil {
 			return errors.Wrapf(err, "invalid kv object '%s'", kv.Key)
 		}
 
@@ -153,7 +153,7 @@ func (k *KV) Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool)
 
 // Update updates a KV object. It WILL error if the key does not already exist.
 func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject, error) {
-	if err := validate.KVObject(kv, true); err != nil {
+	if err := validate.KVObject(kv, true, true); err != nil {
 		return nil, errors.Wrapf(err, "invalid kv object '%s'", kv.Key)
 	}
 
