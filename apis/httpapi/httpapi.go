@@ -3,6 +3,7 @@ package httpapi
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/InVisionApp/go-health/v2"
@@ -29,10 +30,8 @@ type HTTPAPI struct {
 }
 
 type ResponseJSON struct {
-	Status  int               `json:"status"`
 	Message string            `json:"message"`
 	Values  map[string]string `json:"values,omitempty"`
-	Errors  string            `json:"errors,omitempty"`
 }
 
 func New(o *Options) (*HTTPAPI, error) {
@@ -95,6 +94,13 @@ func WriteJSON(rw http.ResponseWriter, payload interface{}, status int) {
 		logrus.Errorf("unable to write resp in WriteJSON: %s", err)
 		return
 	}
+}
+
+// Write is a helper for writing ResponseJSON to response writer
+func Write(rw http.ResponseWriter, status int, message string, args ...interface{}) {
+	WriteJSON(rw, ResponseJSON{
+		Message: fmt.Sprintf(message, args...),
+	}, status)
 }
 
 func validateOptions(o *Options) error {

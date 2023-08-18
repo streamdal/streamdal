@@ -19,11 +19,7 @@ func (a *HTTPAPI) getUsageKVHandler(rw http.ResponseWriter, r *http.Request) {
 
 	usage, err := a.Options.KVService.GetUsage(r.Context())
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to fetch kv usage: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to fetch kv usage: %v", err)
 		return
 	}
 
@@ -36,11 +32,7 @@ func (a *HTTPAPI) getAllKVHandler(rw http.ResponseWriter, r *http.Request) {
 
 	kvs, err := a.Options.KVService.GetAll(r.Context())
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to fetch all kv objects: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to fetch all kv objects: %v", err)
 		return
 	}
 
@@ -55,28 +47,21 @@ func (a *HTTPAPI) getKVHandler(rw http.ResponseWriter, r *http.Request) {
 	key := params.ByName("key")
 
 	if key == "" {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: "bug? got a request for fetching a KV but kv is emtpty",
-		}, http.StatusInternalServerError)
+		Write(rw, http.StatusInternalServerError, "bug? got a request for fetching a KV but key is empty")
 		return
 	}
 
 	object, err := a.Options.KVService.Get(r.Context(), key)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
-		statusMsg := fmt.Sprintf("unable to fetch kv object '%s': %s", key, err.Error())
+		statusMsg := fmt.Sprintf("unable to fetch kv object '%s': %s", key, err)
 
 		if err == nats.ErrKeyNotFound {
 			statusCode = http.StatusNotFound
 			statusMsg = fmt.Sprintf("kv object '%s' not found", key)
 		}
 
-		WriteJSON(rw, &ResponseJSON{
-			Status:  statusCode,
-			Message: statusMsg,
-		}, statusCode)
-
+		Write(rw, statusCode, statusMsg)
 		return
 	}
 
@@ -96,11 +81,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("unable to read request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "unable to read request body: %v", err)
 		return
 	}
 
@@ -110,21 +91,13 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 	createHTTPRequest := &protos.KVCreateHTTPRequest{}
 
 	if err := protojson.Unmarshal(body, createHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("unable to unmarshal request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "unable to unmarshal request body: %v", err)
 		return
 	}
 
 	// Validate the input
 	if err := validate.KVCreateHTTPRequest(createHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("invalid request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "invalid request body: %v", err)
 		return
 	}
 
@@ -133,11 +106,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// TODO: This should be updated to pass this data to the KV service via a chan;
 	// this should be good enough for now though.
 	if err := a.Options.KVService.Create(r.Context(), createHTTPRequest.Kvs, createHTTPRequest.Overwrite); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to complete create request: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to complete create KV request: %v", err)
 		return
 	}
 
@@ -146,11 +115,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// SDKs can update their local KV state)
 	// TODO: create broadcast handlers for emitting commands on KV updates
 	if err := a.Options.BusService.BroadcastKVCreate(r.Context(), createHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to broadcast kv command: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to broadcast kv command: %v", err)
 		return
 	}
 
@@ -164,11 +129,7 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("unable to read request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "unable to read request body: %v", err)
 		return
 	}
 
@@ -178,42 +139,26 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 	updateHTTPRequest := &protos.KVUpdateHTTPRequest{}
 
 	if err := protojson.Unmarshal(body, updateHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("unable to unmarshal request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "unable to unmarshal request body: %v", err)
 		return
 	}
 
 	// Validate the input
 	if err := validate.KVUpdateHTTPRequest(updateHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: fmt.Sprintf("invalid request body: %s", err.Error()),
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "invalid request body: %v", err)
 		return
 	}
 
 	// Fetch existing object
 	existing, err := a.Options.KVService.Get(r.Context(), updateHTTPRequest.Kv.Key)
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to fetch existing kv object: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to fetch existing kv object: %v", err)
 		return
 	}
 
 	// Validate existing - just in case
 	if err := validate.KVObject(existing, true); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("bug? invalid existing kv object (existing object should pass validation!): %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "bug? invalid existing kv object (existing object should pass validation!): %v", err)
 		return
 	}
 
@@ -226,11 +171,7 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// Attempt to update in KV service
 	updated, err := a.Options.KVService.Update(r.Context(), updateHTTPRequest.Kv)
 	if err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to complete update request: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to complete update request: %v", err)
 		return
 	}
 
@@ -238,11 +179,7 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	if err := a.Options.BusService.BroadcastKVUpdate(r.Context(), updateHTTPRequest); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to broadcast update kv command: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to broadcast update kv command: %v", err)
 		return
 	}
 
@@ -258,39 +195,24 @@ func (a *HTTPAPI) deleteKVHandler(rw http.ResponseWriter, r *http.Request) {
 	key := params.ByName("key")
 
 	if key == "" {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: "bug? got a request for fetching a KV but kv is emtpty",
-		}, http.StatusInternalServerError)
+		Write(rw, http.StatusInternalServerError, "bug? matched delete route for key but key is empty")
 		return
 	}
 
 	// Does this kv exist?
 	if _, err := a.Options.KVService.Get(r.Context(), key); err != nil {
 		if err == nats.ErrKeyNotFound {
-			WriteJSON(rw, &ResponseJSON{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("kv with key %s not found", key),
-			}, http.StatusNotFound)
-
+			Write(rw, http.StatusNotFound, "kv with key '%s' not found", key)
 			return
 		}
 
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to fetch existing kv object: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to fetch existing kv object: %s", err)
 		return
 	}
 
 	// Key exists; attempt to delete in KV
 	if err := a.Options.KVService.Delete(r.Context(), key); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to complete delete request: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to complete delete request: %s", err)
 		return
 	}
 
@@ -298,18 +220,11 @@ func (a *HTTPAPI) deleteKVHandler(rw http.ResponseWriter, r *http.Request) {
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	if err := a.Options.BusService.BroadcastKVDelete(r.Context(), key); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to broadcast delete kv command: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to broadcast delete kv command: %s", err)
 		return
 	}
 
-	WriteJSON(rw, &ResponseJSON{
-		Status:  http.StatusOK,
-		Message: "kv deleted",
-	}, http.StatusOK)
+	Write(rw, http.StatusOK, "kv deleted")
 }
 
 // Returns *ResponseJSON; status code 200 - ok; 500 - internal server error
@@ -322,36 +237,21 @@ func (a *HTTPAPI) deleteAllKVHandler(rw http.ResponseWriter, r *http.Request) {
 	yes := r.URL.Query().Get("yes")
 
 	if yes != "please" {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusBadRequest,
-			Message: "please pass ?yes=please to confirm you want to delete all kv objects",
-		}, http.StatusBadRequest)
-
+		Write(rw, http.StatusBadRequest, "please pass ?yes=please to confirm you want to delete all kv objects")
 		return
 	}
 
 	// Delete all kv objects
 	if err := a.Options.KVService.DeleteAll(r.Context()); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to complete delete all request: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to complete delete all request: %s", err)
 		return
 	}
 
 	// Broadcast the delete all change
 	if err := a.Options.BusService.BroadcastKVDeleteAll(r.Context()); err != nil {
-		WriteJSON(rw, &ResponseJSON{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("unable to broadcast delete all kv command: %s", err.Error()),
-		}, http.StatusInternalServerError)
-
+		Write(rw, http.StatusInternalServerError, "unable to broadcast delete all kv command: %s", err)
 		return
 	}
 
-	WriteJSON(rw, &ResponseJSON{
-		Status:  http.StatusOK,
-		Message: "deletion request issued; please wait a few seconds for the change to propagate",
-	}, http.StatusOK)
+	Write(rw, http.StatusOK, "deletion request issued; please wait a few seconds for the change to propagate")
 }
