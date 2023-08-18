@@ -38,6 +38,27 @@ func (b *Bus) BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) 
 	return b.broadcast(ctx, "metrics", &protos.BusEvent{Event: &protos.BusEvent_MetricsRequest{MetricsRequest: req}})
 }
 
+// BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
+// it to other snitch-server nodes.
+func (b *Bus) BroadcastKVCreate(ctx context.Context, req *protos.KVCreateHTTPRequest) error {
+	return b.broadcast(ctx, "kv_create", &protos.BusEvent{
+		Event: &protos.BusEvent_KvRequest{
+			KvRequest: util.GenerateKVRequest(protos.KVAction_KV_ACTION_CREATE, req.Kvs, req.Overwrite),
+		},
+	})
+}
+
+// BroadcastKVUpdate will transform the req into a generic KVRequest and broadcast
+// it to other snitch-server nodes.
+func (b *Bus) BroadcastKVUpdate(ctx context.Context, req *protos.KVUpdateHTTPRequest) error {
+	return nil
+}
+
+// TODO: Implement
+func (b *Bus) BroadcastKVDelete(ctx context.Context, key string) error {
+	return nil
+}
+
 // TODO: Use generics
 func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.BusEvent) error {
 	// Need to translate metadata from ctx -> metadata in event

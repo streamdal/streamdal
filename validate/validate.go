@@ -518,6 +518,24 @@ func MetricsRequest(req *protos.MetricsRequest) error {
 	return nil
 }
 
+func KVCreateHTTPRequest(r *protos.KVCreateHTTPRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if len(r.Kvs) == 0 {
+		return ErrEmptyField("Kvs")
+	}
+
+	for _, kv := range r.Kvs {
+		if err := KVObject(kv, false); err != nil {
+			return errors.Wrapf(err, "KVObject validation failed for key '%s'", kv.Key)
+		}
+	}
+
+	return nil
+}
+
 // KVObject validates a KVObject; checkTimestamps is exposed because in some
 // cases we might not have a TS yet (ie. Create KV)
 func KVObject(obj *protos.KVObject, checkTimestamps bool) error {

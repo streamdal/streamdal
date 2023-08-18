@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 
+	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/kv"
 )
 
@@ -20,6 +21,7 @@ type Options struct {
 	Version              string
 	ShutdownContext      context.Context
 	Health               health.IHealth
+	BusService           bus.IBus
 }
 type HTTPAPI struct {
 	Options *Options
@@ -34,7 +36,7 @@ type ResponseJSON struct {
 }
 
 func New(o *Options) (*HTTPAPI, error) {
-	if err := validate(o); err != nil {
+	if err := validateOptions(o); err != nil {
 		return nil, errors.Wrap(err, "could not validate dependencies")
 	}
 
@@ -95,7 +97,7 @@ func WriteJSON(rw http.ResponseWriter, payload interface{}, status int) {
 	}
 }
 
-func validate(o *Options) error {
+func validateOptions(o *Options) error {
 	if o == nil {
 		return errors.New("options cannot be nil")
 	}
@@ -118,6 +120,10 @@ func validate(o *Options) error {
 
 	if o.Health == nil {
 		return errors.New("health cannot be nil")
+	}
+
+	if o.BusService == nil {
+		return errors.New("bus service cannot be nil")
 	}
 
 	return nil
