@@ -10,13 +10,13 @@ KV_ACTION_DELETE: KVAction
 KV_ACTION_UNSET: KVAction
 KV_ACTION_UPDATE: KVAction
 
-class KVCreateRequest(_message.Message):
+class KVCreateHTTPRequest(_message.Message):
     __slots__ = ["kvs", "overwrite"]
     KVS_FIELD_NUMBER: _ClassVar[int]
     OVERWRITE_FIELD_NUMBER: _ClassVar[int]
     kvs: _containers.RepeatedCompositeFieldContainer[KVObject]
     overwrite: bool
-    def __init__(self, overwrite: bool = ..., kvs: _Optional[_Iterable[_Union[KVObject, _Mapping]]] = ...) -> None: ...
+    def __init__(self, kvs: _Optional[_Iterable[_Union[KVObject, _Mapping]]] = ..., overwrite: bool = ...) -> None: ...
 
 class KVInstruction(_message.Message):
     __slots__ = ["action", "id", "object", "requested_at_unix_ts_nano_utc"]
@@ -41,6 +41,20 @@ class KVObject(_message.Message):
     updated_at_unix_ts_nano_utc: int
     value: bytes
     def __init__(self, key: _Optional[str] = ..., value: _Optional[bytes] = ..., created_at_unix_ts_nano_utc: _Optional[int] = ..., updated_at_unix_ts_nano_utc: _Optional[int] = ...) -> None: ...
+
+class KVRequest(_message.Message):
+    __slots__ = ["instructions", "overwrite"]
+    INSTRUCTIONS_FIELD_NUMBER: _ClassVar[int]
+    OVERWRITE_FIELD_NUMBER: _ClassVar[int]
+    instructions: _containers.RepeatedCompositeFieldContainer[KVInstruction]
+    overwrite: bool
+    def __init__(self, instructions: _Optional[_Iterable[_Union[KVInstruction, _Mapping]]] = ..., overwrite: bool = ...) -> None: ...
+
+class KVUpdateHTTPRequest(_message.Message):
+    __slots__ = ["kv"]
+    KV_FIELD_NUMBER: _ClassVar[int]
+    kv: KVObject
+    def __init__(self, kv: _Optional[_Union[KVObject, _Mapping]] = ...) -> None: ...
 
 class KVAction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

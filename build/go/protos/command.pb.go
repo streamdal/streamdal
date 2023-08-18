@@ -396,6 +396,7 @@ func (*KeepAliveCommand) Descriptor() ([]byte, []int) {
 	return file_command_proto_rawDescGZIP(), []int{5}
 }
 
+// Sent by snitch-server on Register channel(s) to live SDKs
 type KVCommand struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

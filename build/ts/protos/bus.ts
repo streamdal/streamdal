@@ -2,6 +2,7 @@
 // @generated from protobuf file "bus.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVRequest } from "./kv.js";
 import { MetricsRequest } from "./internal.js";
 import { ResumePipelineRequest } from "./external.js";
 import { PausePipelineRequest } from "./external.js";
@@ -86,6 +87,12 @@ export interface BusEvent {
          */
         metricsRequest: MetricsRequest;
     } | {
+        oneofKind: "kvRequest";
+        /**
+         * @generated from protobuf field: protos.KVRequest kv_request = 110;
+         */
+        kvRequest: KVRequest;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -121,6 +128,7 @@ class BusEvent$Type extends MessageType<BusEvent> {
             { no: 107, name: "pause_pipeline_request", kind: "message", oneof: "event", T: () => PausePipelineRequest },
             { no: 108, name: "resume_pipeline_request", kind: "message", oneof: "event", T: () => ResumePipelineRequest },
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => MetricsRequest },
+            { no: 110, name: "kv_request", kind: "message", oneof: "event", T: () => KVRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }

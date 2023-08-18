@@ -47,6 +47,7 @@ message KeepAliveCommand {
   // Nothing needed in here, just a ping from server to SDK
 }
 
+// Sent by snitch-server on Register channel(s) to live SDKs
 message KVCommand {
   repeated protos.KVInstruction instructions = 1;
 

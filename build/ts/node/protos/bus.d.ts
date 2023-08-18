@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVRequest } from "./kv.js";
 import { MetricsRequest } from "./internal.js";
 import { ResumePipelineRequest } from "./external.js";
 import { PausePipelineRequest } from "./external.js";
@@ -82,6 +83,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.MetricsRequest metrics_request = 109;
          */
         metricsRequest: MetricsRequest;
+    } | {
+        oneofKind: "kvRequest";
+        /**
+         * @generated from protobuf field: protos.KVRequest kv_request = 110;
+         */
+        kvRequest: KVRequest;
     } | {
         oneofKind: undefined;
     };

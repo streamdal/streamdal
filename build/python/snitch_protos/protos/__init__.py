@@ -492,14 +492,37 @@ class KvInstruction(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class KvCreateRequest(betterproto.Message):
+class KvRequest(betterproto.Message):
+    """
+    Used for broadcasting KV instructions to other snitch-server nodes. NOTE:
+    While this data structure is similar to KVCommand it makes sense to keep
+    them separate. It would cause more confusion if we tried to re-use
+    KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+    This request structure is used for including all updates -
+    create/update/delete.
+    """
+
+    instructions: List["KvInstruction"] = betterproto.message_field(1)
+    overwrite: bool = betterproto.bool_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class KvCreateHttpRequest(betterproto.Message):
     """
     "POST /api/v1/kv" accepts JSON of this type for it's request payload. This
     is converted by BroadcastKV() to a KVCommand
     """
 
-    overwrite: bool = betterproto.bool_field(1)
-    kvs: List["KvObject"] = betterproto.message_field(2)
+    kvs: List["KvObject"] = betterproto.message_field(1)
+    overwrite: bool = betterproto.bool_field(2)
+    """
+    Whether to treat create as upsert -- ie. do not error if key already exists
+    """
+
+
+@dataclass(eq=False, repr=False)
+class KvUpdateHttpRequest(betterproto.Message):
+    kv: "KvObject" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -559,6 +582,8 @@ class KeepAliveCommand(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvCommand(betterproto.Message):
+    """Sent by snitch-server on Register channel(s) to live SDKs"""
+
     instructions: List["KvInstruction"] = betterproto.message_field(1)
     overwrite: bool = betterproto.bool_field(2)
     """
@@ -692,6 +717,7 @@ class BusEvent(betterproto.Message):
         108, group="event"
     )
     metrics_request: "MetricsRequest" = betterproto.message_field(109, group="event")
+    kv_request: "KvRequest" = betterproto.message_field(110, group="event")
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
