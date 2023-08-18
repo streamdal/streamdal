@@ -92,6 +92,12 @@ func run(d *deps.Dependencies) error {
 
 	displayInfo(d)
 
+	if d.Config.Seed {
+		if err := d.Seed(d.ShutdownContext); err != nil {
+			return errors.Wrap(err, "error during seed")
+		}
+	}
+
 	// If shutting down, no need to listen for errCh
 	select {
 	case err := <-errChan:

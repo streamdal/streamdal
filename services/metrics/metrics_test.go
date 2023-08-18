@@ -8,7 +8,7 @@ import (
 var _ = Describe("Metrics", func() {
 	Context("parseMetricsString", func() {
 		It("should parse a valid prometheus string", func() {
-			input := `streamdal_snitch_counter_consume_bytes{component_name="1",operation_name="2",pipeline_id="3",pipeline_name="4",service="5"} 1`
+			input := `streamdal_snitch_counter_consume_bytes{component_name="1",operation_name="2",pipeline_id="3",pipeline_name="some pipeline",service="5"} 1`
 
 			metrics, err := parseMetricString(input)
 			Expect(err).ToNot(HaveOccurred())
@@ -18,7 +18,7 @@ var _ = Describe("Metrics", func() {
 				"component_name": "1",
 				"operation_name": "2",
 				"pipeline_id":    "3",
-				"pipeline_name":  "4",
+				"pipeline_name":  "some pipeline",
 				"service":        "5",
 			}))
 		})

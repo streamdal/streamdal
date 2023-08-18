@@ -135,6 +135,7 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 
 		s.XWasmFunction = &mapping.FuncName
 		s.XWasmBytes = mapping.Contents
+		s.XWasmId = &mapping.ID
 	}
 
 	return nil
