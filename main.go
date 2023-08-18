@@ -71,8 +71,15 @@ func run(d *deps.Dependencies) error {
 
 	// Run gRPC server
 	go func() {
-		// TODO: This should have the same setup/instantiation procedure as the HTTP API
-		api, err := grpcapi.New(d)
+		api, err := grpcapi.New(&grpcapi.Options{
+			Config:          d.Config,
+			StoreService:    d.StoreService,
+			BusService:      d.BusService,
+			ShutdownContext: d.ShutdownContext,
+			CmdService:      d.CmdService,
+			NotifyService:   d.NotifyService,
+			NATSBackend:     d.NATSBackend,
+		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API setup")
 			return

@@ -6,13 +6,18 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	_ "google.golang.org/grpc/reflection"
 
-	"github.com/streamdal/snitch-server/deps"
+	"github.com/streamdal/snitch-server/config"
+	"github.com/streamdal/snitch-server/services/bus"
+	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/notify"
+	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 )
 
@@ -29,27 +34,37 @@ var (
 )
 
 type GRPCAPI struct {
-	Deps *deps.Dependencies
-	log  *logrus.Entry
+	Options *Options
+	log     *logrus.Entry
 }
 
-func New(d *deps.Dependencies) (*GRPCAPI, error) {
-	if err := validateOptions(d); err != nil {
-		return nil, errors.Wrap(err, "could not validate dependencies")
+type Options struct {
+	Config          *config.Config
+	StoreService    store.IStore
+	BusService      bus.IBus
+	ShutdownContext context.Context
+	CmdService      cmd.ICmd
+	NotifyService   notify.INotifier
+	NATSBackend     natty.INatty
+}
+
+func New(o *Options) (*GRPCAPI, error) {
+	if err := validateOptions(o); err != nil {
+		return nil, errors.Wrap(err, "could not validate options")
 	}
 
 	return &GRPCAPI{
-		Deps: d,
-		log:  logrus.WithField("pkg", "grpcapi"),
+		Options: o,
+		log:     logrus.WithField("pkg", "grpcapi"),
 	}, nil
 }
 
 func (g *GRPCAPI) Run() error {
 	llog := g.log.WithField("method", "Run")
 
-	lis, err := net.Listen("tcp", g.Deps.Config.GRPCAPIListenAddress)
+	lis, err := net.Listen("tcp", g.Options.Config.GRPCAPIListenAddress)
 	if err != nil {
-		return errors.Wrapf(err, "unable to listen on %s", g.Deps.Config.GRPCAPIListenAddress)
+		return errors.Wrapf(err, "unable to listen on %s", g.Options.Config.GRPCAPIListenAddress)
 	}
 
 	grpcServer := grpc.NewServer(
@@ -70,13 +85,13 @@ func (g *GRPCAPI) Run() error {
 
 	// Watch for cancellation
 	go func() {
-		<-g.Deps.ShutdownContext.Done()
+		<-g.Options.ShutdownContext.Done()
 		llog.Debug("context cancellation detected")
 
 		grpcServer.Stop()
 	}()
 
-	llog.Infof("GRPCAPI server listening on %v", g.Deps.Config.GRPCAPIListenAddress)
+	llog.Infof("GRPCAPI server listening on %v", g.Options.Config.GRPCAPIListenAddress)
 
 	return grpcServer.Serve(lis)
 }
@@ -129,7 +144,7 @@ func (g *GRPCAPI) validateAuth(ctx context.Context) error {
 		return GRPCMissingAuthError
 	}
 
-	if auth[0] != g.Deps.Config.AuthToken {
+	if auth[0] != g.Options.Config.AuthToken {
 		return GRPCInvalidAuthError
 	}
 
@@ -163,17 +178,41 @@ func (g *GRPCAPI) setRequestID(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-func validateOptions(d *deps.Dependencies) error {
-	if d == nil {
-		return errors.New("dependencies cannot be nil")
+func validateOptions(o *Options) error {
+	if o == nil {
+		return errors.New("options cannot be nil")
 	}
 
-	if d.Config == nil {
-		return errors.New("deps.Config cannot be nil")
+	if o.Config == nil {
+		return errors.New("options.Config cannot be nil")
 	}
 
-	if d.Config.GRPCAPIListenAddress == "" {
-		return errors.New("deps.Config.GRPCAPIListenAddress cannot be empty")
+	if o.Config.GRPCAPIListenAddress == "" {
+		return errors.New("options.Config.GRPCAPIListenAddress cannot be empty")
+	}
+
+	if o.BusService == nil {
+		return errors.New("options.BusService cannot be nil")
+	}
+
+	if o.StoreService == nil {
+		return errors.New("options.StoreService cannot be nil")
+	}
+
+	if o.ShutdownContext == nil {
+		return errors.New("options.ShutdownContext cannot be nil")
+	}
+
+	if o.CmdService == nil {
+		return errors.New("options.CmdService cannot be nil")
+	}
+
+	if o.NotifyService == nil {
+		return errors.New("options.NotifyService cannot be nil")
+	}
+
+	if o.NATSBackend == nil {
+		return errors.New("options.NATSBackend cannot be nil")
 	}
 
 	return nil
