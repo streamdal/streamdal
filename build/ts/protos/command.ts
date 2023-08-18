@@ -2,6 +2,7 @@
 // @generated from protobuf file "command.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVInstruction } from "./kv.js";
 import { Pipeline } from "./pipeline.js";
 import { Audience } from "./common.js";
 /**
@@ -107,66 +108,6 @@ export interface ResumePipelineCommand {
 export interface KeepAliveCommand {
 }
 /**
- * @generated from protobuf message protos.KVObject
- */
-export interface KVObject {
-    /**
-     * Key regex: /^[a-zA-Z0-9_-:]+$/)
-     *
-     * @generated from protobuf field: string key = 1;
-     */
-    key: string;
-    /**
-     * KV value
-     *
-     * @generated from protobuf field: bytes value = 2;
-     */
-    value: Uint8Array;
-    /**
-     * When was this object created
-     *
-     * @generated from protobuf field: int64 created_at_unix_ts_nano_utc = 3;
-     */
-    createdAtUnixTsNanoUtc: bigint;
-    /**
-     * Last time the object was updated
-     *
-     * @generated from protobuf field: int64 updated_at_unix_ts_nano_utc = 4;
-     */
-    updatedAtUnixTsNanoUtc: bigint;
-}
-/**
- * Used in KVCommand to indicate a series of KV-related actions - ie. create, update, delete
- *
- * @generated from protobuf message protos.KVInstruction
- */
-export interface KVInstruction {
-    /**
-     * Unique ID for this instruction
-     *
-     * @generated from protobuf field: string id = 1;
-     */
-    id: string;
-    /**
-     * What kind of an action is this?
-     *
-     * @generated from protobuf field: protos.KVAction action = 2;
-     */
-    action: KVAction;
-    /**
-     * KV object
-     *
-     * @generated from protobuf field: protos.KVObject object = 3;
-     */
-    object?: KVObject;
-    /**
-     * When this instruction was requested (usually will be the HTTP API request time)
-     *
-     * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 4;
-     */
-    requestedAtUnixTsNanoUtc: bigint;
-}
-/**
  * @generated from protobuf message protos.KVCommand
  */
 export interface KVCommand {
@@ -174,35 +115,13 @@ export interface KVCommand {
      * @generated from protobuf field: repeated protos.KVInstruction instructions = 1;
      */
     instructions: KVInstruction[];
-}
-/**
- * @generated from protobuf enum protos.KVAction
- */
-export enum KVAction {
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+     * Create & Update specific setting that will cause the Create or Update to
+     * work as an upsert.
      *
-     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
+     * @generated from protobuf field: bool overwrite = 2;
      */
-    KV_ACTION_UNSET = 0,
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
-     */
-    KV_ACTION_CREATE = 1,
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
-     */
-    KV_ACTION_UPDATE = 2,
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
-     */
-    KV_ACTION_DELETE = 3
+    overwrite: boolean;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType<Command> {
@@ -281,40 +200,11 @@ class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
  */
 export const KeepAliveCommand = new KeepAliveCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class KVObject$Type extends MessageType<KVObject> {
-    constructor() {
-        super("protos.KVObject", [
-            { no: 1, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "created_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 4, name: "updated_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.KVObject
- */
-export const KVObject = new KVObject$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class KVInstruction$Type extends MessageType<KVInstruction> {
-    constructor() {
-        super("protos.KVInstruction", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
-            { no: 3, name: "object", kind: "message", T: () => KVObject },
-            { no: 4, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.KVInstruction
- */
-export const KVInstruction = new KVInstruction$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class KVCommand$Type extends MessageType<KVCommand> {
     constructor() {
         super("protos.KVCommand", [
-            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction }
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }

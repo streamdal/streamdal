@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+enum KVAction {
+  KV_ACTION_UNSET = 0; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_CREATE = 1; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_UPDATE = 2; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_DELETE = 3; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+}
+
+// Represents a single KV object
+message KVObject {
+  // Key regex: /^[a-zA-Z0-9_-:]+$/)
+  string key = 1;
+
+  // KV value
+  bytes value = 2;
+
+  // When was this object created
+  int64 created_at_unix_ts_nano_utc = 3;
+
+  // Last time the object was updated
+  int64 updated_at_unix_ts_nano_utc = 4;
+}
+
+// Container for one or more KVObject's; snitch-server broadcasts KVCommand that
+// contains one or more of these instructions when a "POST /api/v1/kv" request
+// is made.
+message KVInstruction {
+  // Unique ID for this instruction
+  string id = 1;
+
+  // What kind of an action is this?
+  KVAction action = 2;
+
+  // KV object
+  KVObject object = 3;
+
+  // When this instruction was requested (usually will be the HTTP API request time)
+  int64 requested_at_unix_ts_nano_utc = 4;
+}
+
+// "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
+// converted by BroadcastKV() to a KVCommand
+message KVCreateRequest {
+  bool overwrite = 1;
+  repeated KVObject kvs = 2;
+}

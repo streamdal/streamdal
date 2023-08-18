@@ -2,38 +2,9 @@
 // @generated from protobuf file "command.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVInstruction } from "./kv.js";
 import { Pipeline } from "./pipeline.js";
 import { Audience } from "./common.js";
-/**
- * @generated from protobuf enum protos.KVAction
- */
-export var KVAction;
-(function (KVAction) {
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
-     */
-    KVAction[KVAction["KV_ACTION_UNSET"] = 0] = "KV_ACTION_UNSET";
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
-     */
-    KVAction[KVAction["KV_ACTION_CREATE"] = 1] = "KV_ACTION_CREATE";
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
-     */
-    KVAction[KVAction["KV_ACTION_UPDATE"] = 2] = "KV_ACTION_UPDATE";
-    /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
-     */
-    KVAction[KVAction["KV_ACTION_DELETE"] = 3] = "KV_ACTION_DELETE";
-})(KVAction || (KVAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType {
     constructor() {
@@ -111,40 +82,11 @@ class KeepAliveCommand$Type extends MessageType {
  */
 export const KeepAliveCommand = new KeepAliveCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class KVObject$Type extends MessageType {
-    constructor() {
-        super("protos.KVObject", [
-            { no: 1, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "created_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 4, name: "updated_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.KVObject
- */
-export const KVObject = new KVObject$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class KVInstruction$Type extends MessageType {
-    constructor() {
-        super("protos.KVInstruction", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
-            { no: 3, name: "object", kind: "message", T: () => KVObject },
-            { no: 4, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.KVInstruction
- */
-export const KVInstruction = new KVInstruction$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class KVCommand$Type extends MessageType {
     constructor() {
         super("protos.KVCommand", [
-            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction }
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
