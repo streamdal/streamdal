@@ -43,9 +43,29 @@ message KVInstruction {
   int64 requested_at_unix_ts_nano_utc = 4;
 }
 
+// Used for broadcasting KV instructions to other snitch-server nodes.
+// NOTE: While this data structure is similar to KVCommand it makes sense to
+// keep them separate. It would cause more confusion if we tried to re-use
+// KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+//
+// This request structure is used for including all updates - create/update/delete.
+message KVRequest {
+  repeated KVInstruction instructions = 1;
+  bool overwrite = 2;
+}
+
+///////////////////////// Data Types Used in APIs /////////////////////////////
+
 // "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
 // converted by BroadcastKV() to a KVCommand
-message KVCreateRequest {
-  bool overwrite = 1;
-  repeated KVObject kvs = 2;
+message KVCreateHTTPRequest {
+  repeated KVObject kvs = 1;
+
+  // Whether to treat create as upsert -- ie. do not error if key already exists
+  bool overwrite = 2;
 }
+
+message KVUpdateHTTPRequest {
+  KVObject kv = 1;
+}
+

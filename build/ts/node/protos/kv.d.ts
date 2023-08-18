@@ -64,20 +64,51 @@ export interface KVInstruction {
     requestedAtUnixTsNanoUtc: bigint;
 }
 /**
+ * Used for broadcasting KV instructions to other snitch-server nodes.
+ * NOTE: While this data structure is similar to KVCommand it makes sense to
+ * keep them separate. It would cause more confusion if we tried to re-use
+ * KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+ *
+ * This request structure is used for including all updates - create/update/delete.
+ *
+ * @generated from protobuf message protos.KVRequest
+ */
+export interface KVRequest {
+    /**
+     * @generated from protobuf field: repeated protos.KVInstruction instructions = 1;
+     */
+    instructions: KVInstruction[];
+    /**
+     * @generated from protobuf field: bool overwrite = 2;
+     */
+    overwrite: boolean;
+}
+/**
  * "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
  * converted by BroadcastKV() to a KVCommand
  *
- * @generated from protobuf message protos.KVCreateRequest
+ * @generated from protobuf message protos.KVCreateHTTPRequest
  */
-export interface KVCreateRequest {
+export interface KVCreateHTTPRequest {
     /**
-     * @generated from protobuf field: bool overwrite = 1;
-     */
-    overwrite: boolean;
-    /**
-     * @generated from protobuf field: repeated protos.KVObject kvs = 2;
+     * @generated from protobuf field: repeated protos.KVObject kvs = 1;
      */
     kvs: KVObject[];
+    /**
+     * Whether to treat create as upsert -- ie. do not error if key already exists
+     *
+     * @generated from protobuf field: bool overwrite = 2;
+     */
+    overwrite: boolean;
+}
+/**
+ * @generated from protobuf message protos.KVUpdateHTTPRequest
+ */
+export interface KVUpdateHTTPRequest {
+    /**
+     * @generated from protobuf field: protos.KVObject kv = 1;
+     */
+    kv?: KVObject;
 }
 /**
  * @generated from protobuf enum protos.KVAction
@@ -122,11 +153,25 @@ declare class KVInstruction$Type extends MessageType<KVInstruction> {
  * @generated MessageType for protobuf message protos.KVInstruction
  */
 export declare const KVInstruction: KVInstruction$Type;
-declare class KVCreateRequest$Type extends MessageType<KVCreateRequest> {
+declare class KVRequest$Type extends MessageType<KVRequest> {
     constructor();
 }
 /**
- * @generated MessageType for protobuf message protos.KVCreateRequest
+ * @generated MessageType for protobuf message protos.KVRequest
  */
-export declare const KVCreateRequest: KVCreateRequest$Type;
+export declare const KVRequest: KVRequest$Type;
+declare class KVCreateHTTPRequest$Type extends MessageType<KVCreateHTTPRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCreateHTTPRequest
+ */
+export declare const KVCreateHTTPRequest: KVCreateHTTPRequest$Type;
+declare class KVUpdateHTTPRequest$Type extends MessageType<KVUpdateHTTPRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.KVUpdateHTTPRequest
+ */
+export declare const KVUpdateHTTPRequest: KVUpdateHTTPRequest$Type;
 export {};

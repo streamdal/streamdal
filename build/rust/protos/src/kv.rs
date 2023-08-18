@@ -390,55 +390,59 @@ impl ::protobuf::reflect::ProtobufValue for KVInstruction {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
-///  converted by BroadcastKV() to a KVCommand
+///  Used for broadcasting KV instructions to other snitch-server nodes.
+///  NOTE: While this data structure is similar to KVCommand it makes sense to
+///  keep them separate. It would cause more confusion if we tried to re-use
+///  KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+///
+///  This request structure is used for including all updates - create/update/delete.
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.KVCreateRequest)
-pub struct KVCreateRequest {
+// @@protoc_insertion_point(message:protos.KVRequest)
+pub struct KVRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.KVCreateRequest.overwrite)
+    // @@protoc_insertion_point(field:protos.KVRequest.instructions)
+    pub instructions: ::std::vec::Vec<KVInstruction>,
+    // @@protoc_insertion_point(field:protos.KVRequest.overwrite)
     pub overwrite: bool,
-    // @@protoc_insertion_point(field:protos.KVCreateRequest.kvs)
-    pub kvs: ::std::vec::Vec<KVObject>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.KVCreateRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.KVRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a KVCreateRequest {
-    fn default() -> &'a KVCreateRequest {
-        <KVCreateRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a KVRequest {
+    fn default() -> &'a KVRequest {
+        <KVRequest as ::protobuf::Message>::default_instance()
     }
 }
 
-impl KVCreateRequest {
-    pub fn new() -> KVCreateRequest {
+impl KVRequest {
+    pub fn new() -> KVRequest {
         ::std::default::Default::default()
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "instructions",
+            |m: &KVRequest| { &m.instructions },
+            |m: &mut KVRequest| { &mut m.instructions },
+        ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "overwrite",
-            |m: &KVCreateRequest| { &m.overwrite },
-            |m: &mut KVCreateRequest| { &mut m.overwrite },
+            |m: &KVRequest| { &m.overwrite },
+            |m: &mut KVRequest| { &mut m.overwrite },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
-            "kvs",
-            |m: &KVCreateRequest| { &m.kvs },
-            |m: &mut KVCreateRequest| { &mut m.kvs },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVCreateRequest>(
-            "KVCreateRequest",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVRequest>(
+            "KVRequest",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for KVCreateRequest {
-    const NAME: &'static str = "KVCreateRequest";
+impl ::protobuf::Message for KVRequest {
+    const NAME: &'static str = "KVRequest";
 
     fn is_initialized(&self) -> bool {
         true
@@ -447,11 +451,11 @@ impl ::protobuf::Message for KVCreateRequest {
     fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
-                8 => {
-                    self.overwrite = is.read_bool()?;
+                10 => {
+                    self.instructions.push(is.read_message()?);
                 },
-                18 => {
-                    self.kvs.push(is.read_message()?);
+                16 => {
+                    self.overwrite = is.read_bool()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -465,25 +469,25 @@ impl ::protobuf::Message for KVCreateRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if self.overwrite != false {
-            my_size += 1 + 1;
-        }
-        for value in &self.kvs {
+        for value in &self.instructions {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         };
+        if self.overwrite != false {
+            my_size += 1 + 1;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if self.overwrite != false {
-            os.write_bool(1, self.overwrite)?;
-        }
-        for v in &self.kvs {
-            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        for v in &self.instructions {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
         };
+        if self.overwrite != false {
+            os.write_bool(2, self.overwrite)?;
+        }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -496,40 +500,307 @@ impl ::protobuf::Message for KVCreateRequest {
         &mut self.special_fields
     }
 
-    fn new() -> KVCreateRequest {
-        KVCreateRequest::new()
+    fn new() -> KVRequest {
+        KVRequest::new()
     }
 
     fn clear(&mut self) {
+        self.instructions.clear();
         self.overwrite = false;
-        self.kvs.clear();
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static KVCreateRequest {
-        static instance: KVCreateRequest = KVCreateRequest {
+    fn default_instance() -> &'static KVRequest {
+        static instance: KVRequest = KVRequest {
+            instructions: ::std::vec::Vec::new(),
             overwrite: false,
-            kvs: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
     }
 }
 
-impl ::protobuf::MessageFull for KVCreateRequest {
+impl ::protobuf::MessageFull for KVRequest {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVCreateRequest").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVRequest").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for KVCreateRequest {
+impl ::std::fmt::Display for KVRequest {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for KVCreateRequest {
+impl ::protobuf::reflect::ProtobufValue for KVRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
+///  converted by BroadcastKV() to a KVCommand
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.KVCreateHTTPRequest)
+pub struct KVCreateHTTPRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.KVCreateHTTPRequest.kvs)
+    pub kvs: ::std::vec::Vec<KVObject>,
+    ///  Whether to treat create as upsert -- ie. do not error if key already exists
+    // @@protoc_insertion_point(field:protos.KVCreateHTTPRequest.overwrite)
+    pub overwrite: bool,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.KVCreateHTTPRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a KVCreateHTTPRequest {
+    fn default() -> &'a KVCreateHTTPRequest {
+        <KVCreateHTTPRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl KVCreateHTTPRequest {
+    pub fn new() -> KVCreateHTTPRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "kvs",
+            |m: &KVCreateHTTPRequest| { &m.kvs },
+            |m: &mut KVCreateHTTPRequest| { &mut m.kvs },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "overwrite",
+            |m: &KVCreateHTTPRequest| { &m.overwrite },
+            |m: &mut KVCreateHTTPRequest| { &mut m.overwrite },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVCreateHTTPRequest>(
+            "KVCreateHTTPRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for KVCreateHTTPRequest {
+    const NAME: &'static str = "KVCreateHTTPRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.kvs.push(is.read_message()?);
+                },
+                16 => {
+                    self.overwrite = is.read_bool()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        for value in &self.kvs {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        if self.overwrite != false {
+            my_size += 1 + 1;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        for v in &self.kvs {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        };
+        if self.overwrite != false {
+            os.write_bool(2, self.overwrite)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> KVCreateHTTPRequest {
+        KVCreateHTTPRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.kvs.clear();
+        self.overwrite = false;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static KVCreateHTTPRequest {
+        static instance: KVCreateHTTPRequest = KVCreateHTTPRequest {
+            kvs: ::std::vec::Vec::new(),
+            overwrite: false,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for KVCreateHTTPRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVCreateHTTPRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for KVCreateHTTPRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for KVCreateHTTPRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.KVUpdateHTTPRequest)
+pub struct KVUpdateHTTPRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.KVUpdateHTTPRequest.kv)
+    pub kv: ::protobuf::MessageField<KVObject>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.KVUpdateHTTPRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a KVUpdateHTTPRequest {
+    fn default() -> &'a KVUpdateHTTPRequest {
+        <KVUpdateHTTPRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl KVUpdateHTTPRequest {
+    pub fn new() -> KVUpdateHTTPRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, KVObject>(
+            "kv",
+            |m: &KVUpdateHTTPRequest| { &m.kv },
+            |m: &mut KVUpdateHTTPRequest| { &mut m.kv },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVUpdateHTTPRequest>(
+            "KVUpdateHTTPRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for KVUpdateHTTPRequest {
+    const NAME: &'static str = "KVUpdateHTTPRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.kv)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.kv.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.kv.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> KVUpdateHTTPRequest {
+        KVUpdateHTTPRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.kv.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static KVUpdateHTTPRequest {
+        static instance: KVUpdateHTTPRequest = KVUpdateHTTPRequest {
+            kv: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for KVUpdateHTTPRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVUpdateHTTPRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for KVUpdateHTTPRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for KVUpdateHTTPRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -604,70 +875,96 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x06action\x18\x02\x20\x01(\x0e\
     2\x10.protos.KVActionR\x06action\x12(\n\x06object\x18\x03\x20\x01(\x0b2\
     \x10.protos.KVObjectR\x06object\x12?\n\x1drequested_at_unix_ts_nano_utc\
-    \x18\x04\x20\x01(\x03R\x18requestedAtUnixTsNanoUtc\"S\n\x0fKVCreateReque\
-    st\x12\x1c\n\toverwrite\x18\x01\x20\x01(\x08R\toverwrite\x12\"\n\x03kvs\
-    \x18\x02\x20\x03(\x0b2\x10.protos.KVObjectR\x03kvs*a\n\x08KVAction\x12\
-    \x13\n\x0fKV_ACTION_UNSET\x10\0\x12\x14\n\x10KV_ACTION_CREATE\x10\x01\
-    \x12\x14\n\x10KV_ACTION_UPDATE\x10\x02\x12\x14\n\x10KV_ACTION_DELETE\x10\
-    \x03B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\x91\r\n\x06\
-    \x12\x04\0\02\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
-    \x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\
-    \x04\0I\n\n\n\x02\x05\0\x12\x04\x06\0\x0b\x01\n\n\n\x03\x05\0\x01\x12\
-    \x03\x06\x05\r\n=\n\x04\x05\0\x02\0\x12\x03\x07\x02\x16\"0\x20protolint:\
-    disable:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\0\x01\
-    \x12\x03\x07\x02\x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x14\x15\n=\
-    \n\x04\x05\0\x02\x01\x12\x03\x08\x02\x17\"0\x20protolint:disable:this\
-    \x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\
-    \x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08\x15\x16\n=\n\x04\x05\
-    \0\x02\x02\x12\x03\t\x02\x17\"0\x20protolint:disable:this\x20ENUM_FIELD_\
-    NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x12\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\t\x15\x16\n=\n\x04\x05\0\x02\x03\x12\x03\
-    \n\x02\x17\"0\x20protolint:disable:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\
-    \x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x12\n\x0c\n\x05\x05\0\x02\x03\
-    \x02\x12\x03\n\x15\x16\n+\n\x02\x04\0\x12\x04\x0e\0\x1a\x01\x1a\x1f\x20R\
-    epresents\x20a\x20single\x20KV\x20object\n\n\n\n\x03\x04\0\x01\x12\x03\
-    \x0e\x08\x10\n.\n\x04\x04\0\x02\0\x12\x03\x10\x02\x11\x1a!\x20Key\x20reg\
-    ex:\x20/^[a-zA-Z0-9_-:]+$/)\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x10\
-    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x10\t\x0c\n\x0c\n\x05\x04\0\
-    \x02\0\x03\x12\x03\x10\x0f\x10\n\x17\n\x04\x04\0\x02\x01\x12\x03\x13\x02\
-    \x12\x1a\n\x20KV\x20value\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x13\
-    \x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x13\x08\r\n\x0c\n\x05\x04\
-    \0\x02\x01\x03\x12\x03\x13\x10\x11\n+\n\x04\x04\0\x02\x02\x12\x03\x16\
-    \x02(\x1a\x1e\x20When\x20was\x20this\x20object\x20created\n\n\x0c\n\x05\
-    \x04\0\x02\x02\x05\x12\x03\x16\x02\x07\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
-    \x03\x16\x08#\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x16&'\n/\n\x04\x04\0\
-    \x02\x03\x12\x03\x19\x02(\x1a\"\x20Last\x20time\x20the\x20object\x20was\
-    \x20updated\n\n\x0c\n\x05\x04\0\x02\x03\x05\x12\x03\x19\x02\x07\n\x0c\n\
-    \x05\x04\0\x02\x03\x01\x12\x03\x19\x08#\n\x0c\n\x05\x04\0\x02\x03\x03\
-    \x12\x03\x19&'\n\xb3\x01\n\x02\x04\x01\x12\x04\x1f\0+\x01\x1a\xa6\x01\
-    \x20Container\x20for\x20one\x20or\x20more\x20KVObject's;\x20snitch-serve\
-    r\x20broadcasts\x20KVCommand\x20that\n\x20contains\x20one\x20or\x20more\
-    \x20of\x20these\x20instructions\x20when\x20a\x20\"POST\x20/api/v1/kv\"\
-    \x20request\n\x20is\x20made.\n\n\n\n\x03\x04\x01\x01\x12\x03\x1f\x08\x15\
-    \n-\n\x04\x04\x01\x02\0\x12\x03!\x02\x10\x1a\x20\x20Unique\x20ID\x20for\
-    \x20this\x20instruction\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03!\x02\x08\
-    \n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03!\t\x0b\n\x0c\n\x05\x04\x01\x02\0\
-    \x03\x12\x03!\x0e\x0f\n.\n\x04\x04\x01\x02\x01\x12\x03$\x02\x16\x1a!\x20\
-    What\x20kind\x20of\x20an\x20action\x20is\x20this?\n\n\x0c\n\x05\x04\x01\
-    \x02\x01\x06\x12\x03$\x02\n\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03$\x0b\
-    \x11\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03$\x14\x15\n\x18\n\x04\x04\
-    \x01\x02\x02\x12\x03'\x02\x16\x1a\x0b\x20KV\x20object\n\n\x0c\n\x05\x04\
-    \x01\x02\x02\x06\x12\x03'\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03'\
-    \x0b\x11\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03'\x14\x15\n^\n\x04\x04\
-    \x01\x02\x03\x12\x03*\x02*\x1aQ\x20When\x20this\x20instruction\x20was\
-    \x20requested\x20(usually\x20will\x20be\x20the\x20HTTP\x20API\x20request\
-    \x20time)\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03*\x02\x07\n\x0c\n\x05\
-    \x04\x01\x02\x03\x01\x12\x03*\x08%\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\
-    \x03*()\n\x86\x01\n\x02\x04\x02\x12\x04/\02\x01\x1az\x20\"POST\x20/api/v\
-    1/kv\"\x20accepts\x20JSON\x20of\x20this\x20type\x20for\x20it's\x20reques\
-    t\x20payload.\x20This\x20is\n\x20converted\x20by\x20BroadcastKV()\x20to\
-    \x20a\x20KVCommand\n\n\n\n\x03\x04\x02\x01\x12\x03/\x08\x17\n\x0b\n\x04\
-    \x04\x02\x02\0\x12\x030\x02\x15\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x030\
-    \x02\x06\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x030\x07\x10\n\x0c\n\x05\x04\
-    \x02\x02\0\x03\x12\x030\x13\x14\n\x0b\n\x04\x04\x02\x02\x01\x12\x031\x02\
-    \x1c\n\x0c\n\x05\x04\x02\x02\x01\x04\x12\x031\x02\n\n\x0c\n\x05\x04\x02\
-    \x02\x01\x06\x12\x031\x0b\x13\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x031\
-    \x14\x17\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x031\x1a\x1bb\x06proto3\
+    \x18\x04\x20\x01(\x03R\x18requestedAtUnixTsNanoUtc\"d\n\tKVRequest\x129\
+    \n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVInstructionR\x0cin\
+    structions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"W\n\
+    \x13KVCreateHTTPRequest\x12\"\n\x03kvs\x18\x01\x20\x03(\x0b2\x10.protos.\
+    KVObjectR\x03kvs\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"\
+    7\n\x13KVUpdateHTTPRequest\x12\x20\n\x02kv\x18\x01\x20\x01(\x0b2\x10.pro\
+    tos.KVObjectR\x02kv*a\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\
+    \x12\x14\n\x10KV_ACTION_CREATE\x10\x01\x12\x14\n\x10KV_ACTION_UPDATE\x10\
+    \x02\x12\x14\n\x10KV_ACTION_DELETE\x10\x03B4Z2github.com/streamdal/snitc\
+    h-protos/build/go/protosJ\x90\x13\n\x06\x12\x04\0\0E\x01\n\x08\n\x01\x0c\
+    \x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\
+    \x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x05\0\x12\x04\x06\
+    \0\x0b\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\r\n=\n\x04\x05\0\x02\0\
+    \x12\x03\x07\x02\x16\"0\x20protolint:disable:this\x20ENUM_FIELD_NAMES_PR\
+    EFIX\n\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x11\n\x0c\n\x05\x05\0\
+    \x02\0\x02\x12\x03\x07\x14\x15\n=\n\x04\x05\0\x02\x01\x12\x03\x08\x02\
+    \x17\"0\x20protolint:disable:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\
+    \x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\
+    \x12\x03\x08\x15\x16\n=\n\x04\x05\0\x02\x02\x12\x03\t\x02\x17\"0\x20prot\
+    olint:disable:this\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\
+    \x02\x01\x12\x03\t\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x15\
+    \x16\n=\n\x04\x05\0\x02\x03\x12\x03\n\x02\x17\"0\x20protolint:disable:th\
+    is\x20ENUM_FIELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\
+    \x02\x12\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n\x15\x16\n+\n\x02\x04\0\
+    \x12\x04\x0e\0\x1a\x01\x1a\x1f\x20Represents\x20a\x20single\x20KV\x20obj\
+    ect\n\n\n\n\x03\x04\0\x01\x12\x03\x0e\x08\x10\n.\n\x04\x04\0\x02\0\x12\
+    \x03\x10\x02\x11\x1a!\x20Key\x20regex:\x20/^[a-zA-Z0-9_-:]+$/)\n\n\x0c\n\
+    \x05\x04\0\x02\0\x05\x12\x03\x10\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
+    \x03\x10\t\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x10\x0f\x10\n\x17\n\
+    \x04\x04\0\x02\x01\x12\x03\x13\x02\x12\x1a\n\x20KV\x20value\n\n\x0c\n\
+    \x05\x04\0\x02\x01\x05\x12\x03\x13\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\
+    \x12\x03\x13\x08\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x13\x10\x11\n+\
+    \n\x04\x04\0\x02\x02\x12\x03\x16\x02(\x1a\x1e\x20When\x20was\x20this\x20\
+    object\x20created\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x16\x02\x07\n\
+    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x16\x08#\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03\x16&'\n/\n\x04\x04\0\x02\x03\x12\x03\x19\x02(\x1a\"\x20Last\
+    \x20time\x20the\x20object\x20was\x20updated\n\n\x0c\n\x05\x04\0\x02\x03\
+    \x05\x12\x03\x19\x02\x07\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x19\x08#\
+    \n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x19&'\n\xb3\x01\n\x02\x04\x01\x12\
+    \x04\x1f\0+\x01\x1a\xa6\x01\x20Container\x20for\x20one\x20or\x20more\x20\
+    KVObject's;\x20snitch-server\x20broadcasts\x20KVCommand\x20that\n\x20con\
+    tains\x20one\x20or\x20more\x20of\x20these\x20instructions\x20when\x20a\
+    \x20\"POST\x20/api/v1/kv\"\x20request\n\x20is\x20made.\n\n\n\n\x03\x04\
+    \x01\x01\x12\x03\x1f\x08\x15\n-\n\x04\x04\x01\x02\0\x12\x03!\x02\x10\x1a\
+    \x20\x20Unique\x20ID\x20for\x20this\x20instruction\n\n\x0c\n\x05\x04\x01\
+    \x02\0\x05\x12\x03!\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03!\t\x0b\
+    \n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03!\x0e\x0f\n.\n\x04\x04\x01\x02\x01\
+    \x12\x03$\x02\x16\x1a!\x20What\x20kind\x20of\x20an\x20action\x20is\x20th\
+    is?\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03$\x02\n\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x03$\x0b\x11\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03$\
+    \x14\x15\n\x18\n\x04\x04\x01\x02\x02\x12\x03'\x02\x16\x1a\x0b\x20KV\x20o\
+    bject\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03'\x02\n\n\x0c\n\x05\x04\
+    \x01\x02\x02\x01\x12\x03'\x0b\x11\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\
+    \x03'\x14\x15\n^\n\x04\x04\x01\x02\x03\x12\x03*\x02*\x1aQ\x20When\x20thi\
+    s\x20instruction\x20was\x20requested\x20(usually\x20will\x20be\x20the\
+    \x20HTTP\x20API\x20request\x20time)\n\n\x0c\n\x05\x04\x01\x02\x03\x05\
+    \x12\x03*\x02\x07\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03*\x08%\n\x0c\n\
+    \x05\x04\x01\x02\x03\x03\x12\x03*()\n\x86\x03\n\x02\x04\x02\x12\x043\06\
+    \x01\x1a\xf9\x02\x20Used\x20for\x20broadcasting\x20KV\x20instructions\
+    \x20to\x20other\x20snitch-server\x20nodes.\n\x20NOTE:\x20While\x20this\
+    \x20data\x20structure\x20is\x20similar\x20to\x20KVCommand\x20it\x20makes\
+    \x20sense\x20to\n\x20keep\x20them\x20separate.\x20It\x20would\x20cause\
+    \x20more\x20confusion\x20if\x20we\x20tried\x20to\x20re-use\n\x20KVComman\
+    d\x20for\x20the\x20purpose\x20of\x20broadcasting\x20AND\x20for\x20sendin\
+    g\x20SDK\x20commands.\x20~DS\n\n\x20This\x20request\x20structure\x20is\
+    \x20used\x20for\x20including\x20all\x20updates\x20-\x20create/update/del\
+    ete.\n\n\n\n\x03\x04\x02\x01\x12\x033\x08\x11\n\x0b\n\x04\x04\x02\x02\0\
+    \x12\x034\x02*\n\x0c\n\x05\x04\x02\x02\0\x04\x12\x034\x02\n\n\x0c\n\x05\
+    \x04\x02\x02\0\x06\x12\x034\x0b\x18\n\x0c\n\x05\x04\x02\x02\0\x01\x12\
+    \x034\x19%\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x034()\n\x0b\n\x04\x04\x02\
+    \x02\x01\x12\x035\x02\x15\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x035\x02\
+    \x06\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x035\x07\x10\n\x0c\n\x05\x04\
+    \x02\x02\x01\x03\x12\x035\x13\x14\n\xd6\x01\n\x02\x04\x03\x12\x04<\0A\
+    \x01\x1az\x20\"POST\x20/api/v1/kv\"\x20accepts\x20JSON\x20of\x20this\x20\
+    type\x20for\x20it's\x20request\x20payload.\x20This\x20is\n\x20converted\
+    \x20by\x20BroadcastKV()\x20to\x20a\x20KVCommand\n2N/////////////////////\
+    //\x20Data\x20Types\x20Used\x20in\x20APIs\x20///////////////////////////\
+    //\n\n\n\n\x03\x04\x03\x01\x12\x03<\x08\x1b\n\x0b\n\x04\x04\x03\x02\0\
+    \x12\x03=\x02\x1c\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03=\x02\n\n\x0c\n\
+    \x05\x04\x03\x02\0\x06\x12\x03=\x0b\x13\n\x0c\n\x05\x04\x03\x02\0\x01\
+    \x12\x03=\x14\x17\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03=\x1a\x1b\nZ\n\
+    \x04\x04\x03\x02\x01\x12\x03@\x02\x15\x1aM\x20Whether\x20to\x20treat\x20\
+    create\x20as\x20upsert\x20--\x20ie.\x20do\x20not\x20error\x20if\x20key\
+    \x20already\x20exists\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03@\x02\x06\
+    \n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x03@\x07\x10\n\x0c\n\x05\x04\x03\
+    \x02\x01\x03\x12\x03@\x13\x14\n\n\n\x02\x04\x04\x12\x04C\0E\x01\n\n\n\
+    \x03\x04\x04\x01\x12\x03C\x08\x1b\n\x0b\n\x04\x04\x04\x02\0\x12\x03D\x02\
+    \x12\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03D\x02\n\n\x0c\n\x05\x04\x04\
+    \x02\0\x01\x12\x03D\x0b\r\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03D\x10\x11\
+    b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -685,10 +982,12 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(3);
+            let mut messages = ::std::vec::Vec::with_capacity(5);
             messages.push(KVObject::generated_message_descriptor_data());
             messages.push(KVInstruction::generated_message_descriptor_data());
-            messages.push(KVCreateRequest::generated_message_descriptor_data());
+            messages.push(KVRequest::generated_message_descriptor_data());
+            messages.push(KVCreateHTTPRequest::generated_message_descriptor_data());
+            messages.push(KVUpdateHTTPRequest::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(KVAction::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

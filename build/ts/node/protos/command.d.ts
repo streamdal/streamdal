@@ -105,6 +105,8 @@ export interface ResumePipelineCommand {
 export interface KeepAliveCommand {
 }
 /**
+ * Sent by snitch-server on Register channel(s) to live SDKs
+ *
  * @generated from protobuf message protos.KVCommand
  */
 export interface KVCommand {

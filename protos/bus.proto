@@ -4,6 +4,7 @@ package protos;
 
 import "external.proto";
 import "internal.proto";
+import "kv.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
@@ -28,6 +29,7 @@ message BusEvent {
     protos.PausePipelineRequest pause_pipeline_request = 107;
     protos.ResumePipelineRequest resume_pipeline_request = 108;
     protos.MetricsRequest metrics_request = 109;
+    protos.KVRequest kv_request = 110;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC

@@ -63,16 +63,41 @@ class KVInstruction$Type extends MessageType {
  */
 export const KVInstruction = new KVInstruction$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class KVCreateRequest$Type extends MessageType {
+class KVRequest$Type extends MessageType {
     constructor() {
-        super("protos.KVCreateRequest", [
-            { no: 1, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject }
+        super("protos.KVRequest", [
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.KVCreateRequest
+ * @generated MessageType for protobuf message protos.KVRequest
  */
-export const KVCreateRequest = new KVCreateRequest$Type();
+export const KVRequest = new KVRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVCreateHTTPRequest$Type extends MessageType {
+    constructor() {
+        super("protos.KVCreateHTTPRequest", [
+            { no: 1, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCreateHTTPRequest
+ */
+export const KVCreateHTTPRequest = new KVCreateHTTPRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVUpdateHTTPRequest$Type extends MessageType {
+    constructor() {
+        super("protos.KVUpdateHTTPRequest", [
+            { no: 1, name: "kv", kind: "message", T: () => KVObject }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVUpdateHTTPRequest
+ */
+export const KVUpdateHTTPRequest = new KVUpdateHTTPRequest$Type();
 //# sourceMappingURL=kv.js.map

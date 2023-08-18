@@ -67,20 +67,53 @@ export interface KVInstruction {
     requestedAtUnixTsNanoUtc: bigint;
 }
 /**
+ * Used for broadcasting KV instructions to other snitch-server nodes.
+ * NOTE: While this data structure is similar to KVCommand it makes sense to
+ * keep them separate. It would cause more confusion if we tried to re-use
+ * KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+ *
+ * This request structure is used for including all updates - create/update/delete.
+ *
+ * @generated from protobuf message protos.KVRequest
+ */
+export interface KVRequest {
+    /**
+     * @generated from protobuf field: repeated protos.KVInstruction instructions = 1;
+     */
+    instructions: KVInstruction[];
+    /**
+     * @generated from protobuf field: bool overwrite = 2;
+     */
+    overwrite: boolean;
+}
+// /////////////////////// Data Types Used in APIs /////////////////////////////
+
+/**
  * "POST /api/v1/kv" accepts JSON of this type for it's request payload. This is
  * converted by BroadcastKV() to a KVCommand
  *
- * @generated from protobuf message protos.KVCreateRequest
+ * @generated from protobuf message protos.KVCreateHTTPRequest
  */
-export interface KVCreateRequest {
+export interface KVCreateHTTPRequest {
     /**
-     * @generated from protobuf field: bool overwrite = 1;
-     */
-    overwrite: boolean;
-    /**
-     * @generated from protobuf field: repeated protos.KVObject kvs = 2;
+     * @generated from protobuf field: repeated protos.KVObject kvs = 1;
      */
     kvs: KVObject[];
+    /**
+     * Whether to treat create as upsert -- ie. do not error if key already exists
+     *
+     * @generated from protobuf field: bool overwrite = 2;
+     */
+    overwrite: boolean;
+}
+/**
+ * @generated from protobuf message protos.KVUpdateHTTPRequest
+ */
+export interface KVUpdateHTTPRequest {
+    /**
+     * @generated from protobuf field: protos.KVObject kv = 1;
+     */
+    kv?: KVObject;
 }
 /**
  * @generated from protobuf enum protos.KVAction
@@ -142,15 +175,40 @@ class KVInstruction$Type extends MessageType<KVInstruction> {
  */
 export const KVInstruction = new KVInstruction$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class KVCreateRequest$Type extends MessageType<KVCreateRequest> {
+class KVRequest$Type extends MessageType<KVRequest> {
     constructor() {
-        super("protos.KVCreateRequest", [
-            { no: 1, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject }
+        super("protos.KVRequest", [
+            { no: 1, name: "instructions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVInstruction },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
 }
 /**
- * @generated MessageType for protobuf message protos.KVCreateRequest
+ * @generated MessageType for protobuf message protos.KVRequest
  */
-export const KVCreateRequest = new KVCreateRequest$Type();
+export const KVRequest = new KVRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVCreateHTTPRequest$Type extends MessageType<KVCreateHTTPRequest> {
+    constructor() {
+        super("protos.KVCreateHTTPRequest", [
+            { no: 1, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject },
+            { no: 2, name: "overwrite", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVCreateHTTPRequest
+ */
+export const KVCreateHTTPRequest = new KVCreateHTTPRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class KVUpdateHTTPRequest$Type extends MessageType<KVUpdateHTTPRequest> {
+    constructor() {
+        super("protos.KVUpdateHTTPRequest", [
+            { no: 1, name: "kv", kind: "message", T: () => KVObject }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.KVUpdateHTTPRequest
+ */
+export const KVUpdateHTTPRequest = new KVUpdateHTTPRequest$Type();
