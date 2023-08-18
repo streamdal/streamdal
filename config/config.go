@@ -27,7 +27,6 @@ type Config struct {
 	NATSTLSKeyFile       string           `help:"TLS key file"`
 	NATSTLSCaFile        string           `help:"TLS ca file"`
 	NATSNumKVReplicas    int              `help:"Number of replicas NATS K/V buckets should use" default:"1"`
-	NATSNumKVHistory     int              `help:"How many historical copies to keep per KV object"`
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
 	SessionTTL           time.Duration    `help:"TTL for session keys in NATS live K/V bucket" default:"5s"`
 	WASMDir              string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
