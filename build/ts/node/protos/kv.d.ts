@@ -106,9 +106,9 @@ export interface KVCreateHTTPRequest {
  */
 export interface KVUpdateHTTPRequest {
     /**
-     * @generated from protobuf field: protos.KVObject kv = 1;
+     * @generated from protobuf field: repeated protos.KVObject kvs = 1;
      */
-    kv?: KVObject;
+    kvs: KVObject[];
 }
 /**
  * @generated from protobuf enum protos.KVAction

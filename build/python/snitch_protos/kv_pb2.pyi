@@ -52,10 +52,10 @@ class KVRequest(_message.Message):
     def __init__(self, instructions: _Optional[_Iterable[_Union[KVInstruction, _Mapping]]] = ..., overwrite: bool = ...) -> None: ...
 
 class KVUpdateHTTPRequest(_message.Message):
-    __slots__ = ["kv"]
-    KV_FIELD_NUMBER: _ClassVar[int]
-    kv: KVObject
-    def __init__(self, kv: _Optional[_Union[KVObject, _Mapping]] = ...) -> None: ...
+    __slots__ = ["kvs"]
+    KVS_FIELD_NUMBER: _ClassVar[int]
+    kvs: _containers.RepeatedCompositeFieldContainer[KVObject]
+    def __init__(self, kvs: _Optional[_Iterable[_Union[KVObject, _Mapping]]] = ...) -> None: ...
 
 class KVAction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

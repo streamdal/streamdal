@@ -102,7 +102,7 @@ export const KVCreateHTTPRequest = new KVCreateHTTPRequest$Type();
 class KVUpdateHTTPRequest$Type extends MessageType {
     constructor() {
         super("protos.KVUpdateHTTPRequest", [
-            { no: 1, name: "kv", kind: "message", T: () => KVObject }
+            { no: 1, name: "kvs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => KVObject }
         ]);
     }
 }
