@@ -1,9 +1,7 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Layout } from "root/components/layout.tsx";
 import Pipelines from "root/islands/pipelines.tsx";
-import { getPipelines, getServiceNodes } from "root/lib/fetch.ts";
+import { getPipelines } from "root/lib/fetch.ts";
 import { PipelineRoute } from "../index.tsx";
-import ServiceMap from "../../../islands/serviceMap.tsx";
 
 export const handler: Handlers<PipelineRoute> = {
   async GET(_req, ctx) {

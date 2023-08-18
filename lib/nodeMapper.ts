@@ -4,6 +4,7 @@ import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { ServiceMapType } from "./fetch.ts";
 import { getAttachedPipeline } from "./utils.ts";
 import { MarkerType } from "reactflow";
+import { OpUpdate, opUpdateSignal } from "../islands/serviceMap.tsx";
 
 export type NodeData = {
   audience: Audience;
@@ -78,7 +79,7 @@ export const mapOperation = (
   });
 
   nodesMap.nodes.set(a.operationName, {
-    id: a.operationName,
+    id: `${a.serviceName}-${a.operationName}`,
     draggable: false,
     type: op,
     position: {
@@ -216,3 +217,23 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
   audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a));
   return edgesMap;
 };
+
+//
+// Because reactflow doesn't work with ssr, some updates are made in
+// unrouted modals client-side and those changes need to be reflected
+// in the already rendered nodes
+export const updateNode = (nodes: FlowNode[], update: OpUpdate) =>
+  update
+    ? nodes.map((n: FlowNode) =>
+      n.id ===
+          `${update.audience.serviceName}-${update.audience.operationName}`
+        ? {
+          ...n,
+          data: {
+            ...n.data,
+            attachedPipeline: update.attachedPipeline,
+          },
+        }
+        : n
+    )
+    : nodes;

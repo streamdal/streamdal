@@ -26,19 +26,18 @@ export const getServiceMap = async (): Promise<ServiceMapType> => {
 };
 
 export type ServiceNodes = {
-  serviceMap: ServiceMapType;
   nodes: FlowNode[];
   edges: FlowEdge[];
 };
 
-export const getServiceNodes = async (
+export const getDisplayNodes = async (
   serviceMap: ServiceMapType,
 ): Promise<ServiceNodes> => {
   const edges = Array.from(mapEdges(serviceMap.audiences).values());
   const nodes = Array.from(
     mapNodes(serviceMap).nodes.values(),
   );
-  return { serviceMap, nodes, edges };
+  return { nodes, edges };
 };
 
 export const getPipelines = async () => {

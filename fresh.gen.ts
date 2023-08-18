@@ -3,15 +3,15 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./routes/_app.tsx";
-import * as $1 from "./routes/_middleware.ts";
-import * as $2 from "./routes/index.tsx";
-import * as $3 from "./routes/login.tsx";
-import * as $4 from "./routes/pipelines/[id]/delete.tsx";
-import * as $5 from "./routes/pipelines/[id]/index.tsx";
-import * as $6 from "./routes/pipelines/add.tsx";
-import * as $7 from "./routes/pipelines/index.tsx";
-import * as $8 from "./routes/pipelines/save.tsx";
-import * as $9 from "./routes/rules.tsx";
+import * as $1 from "./routes/_layout.tsx";
+import * as $2 from "./routes/_middleware.ts";
+import * as $3 from "./routes/index.tsx";
+import * as $4 from "./routes/login.tsx";
+import * as $5 from "./routes/pipelines/[id]/delete.tsx";
+import * as $6 from "./routes/pipelines/[id]/index.tsx";
+import * as $7 from "./routes/pipelines/add.tsx";
+import * as $8 from "./routes/pipelines/index.tsx";
+import * as $9 from "./routes/pipelines/save.tsx";
 import * as $10 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
 import * as $11 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
 import * as $12 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
@@ -24,15 +24,15 @@ import * as $$3 from "./islands/serviceMap.tsx";
 const manifest = {
   routes: {
     "./routes/_app.tsx": $0,
-    "./routes/_middleware.ts": $1,
-    "./routes/index.tsx": $2,
-    "./routes/login.tsx": $3,
-    "./routes/pipelines/[id]/delete.tsx": $4,
-    "./routes/pipelines/[id]/index.tsx": $5,
-    "./routes/pipelines/add.tsx": $6,
-    "./routes/pipelines/index.tsx": $7,
-    "./routes/pipelines/save.tsx": $8,
-    "./routes/rules.tsx": $9,
+    "./routes/_layout.tsx": $1,
+    "./routes/_middleware.ts": $2,
+    "./routes/index.tsx": $3,
+    "./routes/login.tsx": $4,
+    "./routes/pipelines/[id]/delete.tsx": $5,
+    "./routes/pipelines/[id]/index.tsx": $6,
+    "./routes/pipelines/add.tsx": $7,
+    "./routes/pipelines/index.tsx": $8,
+    "./routes/pipelines/save.tsx": $9,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx":
       $10,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":

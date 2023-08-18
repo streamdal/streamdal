@@ -4,6 +4,7 @@ import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { ServiceMapType } from "../../lib/fetch.ts";
+import { opUpdateSignal, serviceSignal } from "../../islands/serviceMap.tsx";
 
 export const OddAttachModal = (
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -41,10 +42,16 @@ export const OddAttachModal = (
         type: success.status ? "success" : "error",
         message: success.message,
       };
+      const newPipeline = serviceMap.pipelines[e.target.value]?.pipeline;
       opModal.value = {
         ...opModal.value,
-        attachedPipeline: serviceMap.pipelines[e.target.value]?.pipeline,
+        attachedPipeline: newPipeline,
         attach: false,
+      };
+
+      opUpdateSignal.value = {
+        audience,
+        attachedPipeline: newPipeline,
       };
     }
   };

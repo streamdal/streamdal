@@ -4,7 +4,7 @@ import { serviceSignal } from "../islands/serviceMap.tsx";
 export default function IndexRoute() {
   return (
     <OpModal
-      serviceMap={serviceSignal.value?.serviceMap}
+      serviceMap={serviceSignal.value}
     />
   );
 }
