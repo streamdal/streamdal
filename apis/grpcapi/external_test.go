@@ -671,7 +671,7 @@ var _ = Describe("External gRPC API", func() {
 })
 
 func runServer() {
-	d, err := deps.New("", &config.Config{
+	d, err := deps.New(&config.Config{
 		Debug:                true,
 		NodeName:             TestNodeName,
 		AuthToken:            AuthToken,

@@ -49,7 +49,7 @@ type Dependencies struct {
 	ShutdownFunc    context.CancelFunc
 }
 
-func New(version string, cfg *config.Config) (*Dependencies, error) {
+func New(cfg *config.Config) (*Dependencies, error) {
 	gohealth := health.New()
 	gohealth.Logger = gllogrus.New(nil)
 

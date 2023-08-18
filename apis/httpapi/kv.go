@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -43,10 +44,13 @@ func (a *HTTPAPI) getAllKVHandler(rw http.ResponseWriter, r *http.Request) {
 func (a *HTTPAPI) getKVHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	params := httprouter.ParamsFromContext(r.Context())
-	key := params.ByName("key")
+	key := strings.TrimPrefix(r.URL.Path, "/api/v1/kv/")
+
+	// instead of doing this: params := httprouter.ParamsFromContext(r.Context())
+	// because tests might not have a router started
 
 	if key == "" {
+		// Get the key from the path
 		Write(rw, http.StatusInternalServerError, "bug? got a request for fetching a KV but key is empty")
 		return
 	}

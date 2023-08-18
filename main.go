@@ -45,7 +45,7 @@ func main() {
 
 	log := logrus.WithField("method", "main")
 
-	d, err := deps.New(version, cfg)
+	d, err := deps.New(cfg)
 	if err != nil {
 		log.WithError(err).Fatal("could not setup dependencies")
 	}
