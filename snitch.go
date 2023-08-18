@@ -72,7 +72,7 @@ var (
 )
 
 type ISnitch interface {
-	ApplyRules(ctx context.Context, mode OperationType, key string, data []byte) ([]byte, error)
+	Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error)
 }
 
 type Snitch struct {
