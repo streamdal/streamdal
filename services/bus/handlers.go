@@ -201,8 +201,28 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 	return nil
 }
 
-// Get session id's (by audience and node)
-func (b *Bus) getActiveSessionIDs(ctx context.Context, audience *protos.Audience) ([]string, error) {
+// Get session id's on this node
+func (b *Bus) getSessionIDs(ctx context.Context) ([]string, error) {
+	entries, err := b.options.Store.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range entries {
+		if e.NodeName != b.options.NodeName {
+			continue
+		}
+
+		sessionIDs = append(sessionIDs, e.SessionID)
+	}
+
+	return sessionIDs, nil
+}
+
+// Get session id's by audience (and current node)
+func (b *Bus) getSessionIDsByAudience(ctx context.Context, audience *protos.Audience) ([]string, error) {
 	entries, err := b.options.Store.GetLive(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting live entries")
@@ -266,7 +286,7 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 	//	return nil
 	//}
 
-	sessionIDs, err := b.getActiveSessionIDs(ctx, req.Audience)
+	sessionIDs, err := b.getSessionIDsByAudience(ctx, req.Audience)
 	if err != nil {
 		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
 		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
@@ -472,6 +492,48 @@ func (b *Bus) handleMetricsRequest(ctx context.Context, req *protos.MetricsReque
 	}
 
 	b.log.Debug("handled metrics request bus event")
+
+	return nil
+}
+
+func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error {
+	b.log.Debugf("handling kv request bus event: %v", req)
+
+	if err := validate.KVRequest(req); err != nil {
+		return errors.Wrap(err, "validation error")
+	}
+
+	// Get all session ID's on this node
+	sessionIDs, err := b.getSessionIDs(ctx)
+	if err != nil {
+		return errors.Wrap(err, "error getting session ids")
+	}
+
+	if len(sessionIDs) == 0 {
+		b.log.Debugf("no active sessions on node '%s' - skipping KV handling", b.options.NodeName)
+		return nil
+	}
+
+	// For each session id, get it's channel and send KV instructions
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			// ch is no longer there - the client probably disconnected; should we error or just skip?
+			b.log.Debugf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		// Send KV instructions to session
+		ch <- &protos.Command{
+			Command: &protos.Command_Kv{
+				Kv: &protos.KVCommand{
+					Instructions: req.Instructions,
+				},
+			},
+		}
+	}
+
+	b.log.Debug("handled kv request bus event")
 
 	return nil
 }

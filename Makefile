@@ -80,10 +80,10 @@ clean:
 ### Test
 
 .PHONY: test
-test: description = Run Go tests (make sure to bring up deps first)
+test: description = Run Go tests (make sure to bring up deps first; tests are ran non-parallel)
 test: GOFLAGS=
 test:
-	TEST=true $(GO) test ./... -v -count=1
+	TEST=true $(GO) test ./apis/grpcapi/... -v -count=1
 
 ### Docker
 

@@ -37,7 +37,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get live info")
 	}
 
-	audiences, err := s.Deps.StoreService.GetAudiences(ctx)
+	audiences, err := s.Options.StoreService.GetAudiences(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get audiences")
 	}
@@ -47,7 +47,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	config, err := s.Deps.StoreService.GetConfig(ctx)
+	config, err := s.Options.StoreService.GetConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
@@ -65,7 +65,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
 	liveInfo := make([]*protos.LiveInfo, 0)
 
-	liveData, err := s.Deps.StoreService.GetLive(ctx)
+	liveData, err := s.Options.StoreService.GetLive(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get live data")
 	}
@@ -111,7 +111,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	gen := make(map[string]*protos.PipelineInfo)
 
 	// Get all pipelines
-	allPipelines, err := s.Deps.StoreService.GetPipelines(ctx)
+	allPipelines, err := s.Options.StoreService.GetPipelines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
@@ -127,7 +127,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	}
 
 	// Get audience <-> pipeline mappings
-	pipelineConfig, err := s.Deps.StoreService.GetConfig(ctx)
+	pipelineConfig, err := s.Options.StoreService.GetConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipeline config")
 	}
@@ -140,7 +140,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	}
 
 	// Update pipeline info with state info
-	pausedPipelines, err := s.Deps.StoreService.GetPaused(ctx)
+	pausedPipelines, err := s.Options.StoreService.GetPaused(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get paused pipelines")
 	}
@@ -160,7 +160,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 	}
 
 	// Read all keys in "snitch_pipelines"
-	pipelines, err := s.Deps.StoreService.GetPipelines(ctx)
+	pipelines, err := s.Options.StoreService.GetPipelines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
@@ -185,7 +185,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 		return nil, errors.Wrap(err, "invalid get pipeline request")
 	}
 
-	pipeline, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId)
+	pipeline, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
@@ -207,11 +207,11 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	req.Pipeline.Id = util.GenerateUUID()
 
 	// Populate WASM fields
-	if err := util.PopulateWASMFields(req.Pipeline, s.Deps.Config.WASMDir); err != nil {
+	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
 		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
-	if err := s.Deps.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
@@ -227,7 +227,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Is this a known pipeline?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.Pipeline.Id); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.Pipeline.Id); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -236,14 +236,14 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Update pipeline in storage
-	if err := s.Deps.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Pipeline exists - broadcast it as there might be snitch-servers that have
 	// a client that has an active registration using this pipeline (and it should
 	// get updated)
-	if err := s.Deps.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -260,7 +260,7 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -269,12 +269,12 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	}
 
 	// Pipeline exists, delete it
-	if err := s.Deps.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
+	if err := s.Options.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Now broadcast delete
-	if err := s.Deps.BusService.BroadcastDeletePipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastDeletePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -291,7 +291,7 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -299,12 +299,12 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	if err := s.Deps.StoreService.AttachPipeline(ctx, req); err != nil {
+	if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Pipeline exists, broadcast attach
-	if err := s.Deps.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -321,7 +321,7 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -330,7 +330,7 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 	}
 
 	// Pipeline exists, broadcast delete
-	if err := s.Deps.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -340,7 +340,7 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 	go func() {
 		time.Sleep(time.Second * 5)
 		// Remove config entry
-		if err := s.Deps.StoreService.DetachPipeline(ctx, req); err != nil {
+		if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
 			s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
 		}
 	}()
@@ -358,7 +358,7 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -367,11 +367,11 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 	}
 
 	// Can attempt to pause; PausePipeline() will noop if pipeline is already paused
-	if err := s.Deps.StoreService.PausePipeline(ctx, req); err != nil {
+	if err := s.Options.StoreService.PausePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	if err := s.Deps.BusService.BroadcastPausePipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastPausePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -388,7 +388,7 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Deps.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
@@ -397,12 +397,12 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 	}
 
 	// Can attempt to resume; ResumePipeline() will noop if pipeline is already running
-	if err := s.Deps.StoreService.ResumePipeline(ctx, req); err != nil {
+	if err := s.Options.StoreService.ResumePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Pipeline exists, broadcast resume
-	if err := s.Deps.BusService.BroadcastResumePipeline(ctx, req); err != nil {
+	if err := s.Options.BusService.BroadcastResumePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -420,7 +420,7 @@ func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.Cre
 
 	req.Notification.Id = util.StringPtr(uuid.New().String())
 
-	if err := s.Deps.StoreService.CreateNotificationConfig(ctx, req); err != nil {
+	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -435,7 +435,7 @@ func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.Upd
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if err := s.Deps.StoreService.UpdateNotificationConfig(ctx, req); err != nil {
+	if err := s.Options.StoreService.UpdateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -451,7 +451,7 @@ func (s *ExternalServer) DeleteNotification(ctx context.Context, req *protos.Del
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if err := s.Deps.StoreService.DeleteNotificationConfig(ctx, req); err != nil {
+	if err := s.Options.StoreService.DeleteNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -463,7 +463,7 @@ func (s *ExternalServer) DeleteNotification(ctx context.Context, req *protos.Del
 }
 
 func (s *ExternalServer) GetNotifications(ctx context.Context, req *protos.GetNotificationsRequest) (*protos.GetNotificationsResponse, error) {
-	cfgs, err := s.Deps.StoreService.GetNotificationConfigs(ctx)
+	cfgs, err := s.Options.StoreService.GetNotificationConfigs(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get notification configs")
 	}
@@ -476,7 +476,7 @@ func (s *ExternalServer) GetNotification(ctx context.Context, req *protos.GetNot
 		return nil, errors.Wrap(err, "invalid request")
 	}
 
-	cfg, err := s.Deps.StoreService.GetNotificationConfig(ctx, req)
+	cfg, err := s.Options.StoreService.GetNotificationConfig(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get notification config")
 	}
@@ -489,7 +489,7 @@ func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.Att
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if err := s.Deps.StoreService.AttachNotificationConfig(ctx, req); err != nil {
+	if err := s.Options.StoreService.AttachNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
@@ -505,7 +505,7 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if err := s.Deps.StoreService.DetachNotificationConfig(ctx, req); err != nil {
+	if err := s.Options.StoreService.DetachNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 

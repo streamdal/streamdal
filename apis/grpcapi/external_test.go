@@ -671,7 +671,7 @@ var _ = Describe("External gRPC API", func() {
 })
 
 func runServer() {
-	d, err := deps.New("", &config.Config{
+	d, err := deps.New(&config.Config{
 		Debug:                true,
 		NodeName:             TestNodeName,
 		AuthToken:            AuthToken,
@@ -679,6 +679,7 @@ func runServer() {
 		GRPCAPIListenAddress: GRPCAPIAddress,
 		NATSURL:              []string{"localhost:4222"},
 		NATSTLSSkipVerify:    true,
+		NATSNumKVReplicas:    1,
 		SessionTTL:           time.Second, // Override TTL to improve test speed
 		WASMDir:              "./assets/wasm",
 	})
@@ -687,7 +688,21 @@ func runServer() {
 		panic("error creating deps: " + err.Error())
 	}
 
-	if err := New(d).Run(); err != nil {
+	grpcAPI, err := New(&Options{
+		Config:          d.Config,
+		StoreService:    d.StoreService,
+		BusService:      d.BusService,
+		ShutdownContext: d.ShutdownContext,
+		CmdService:      d.CmdService,
+		NotifyService:   d.NotifyService,
+		NATSBackend:     d.NATSBackend,
+	})
+
+	if err != nil {
+		panic("error creating grpcapi: " + err.Error())
+	}
+
+	if err := grpcAPI.Run(); err != nil {
 		panic("error running grpcapi: " + err.Error())
 	}
 }

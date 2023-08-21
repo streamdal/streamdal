@@ -2,13 +2,13 @@ package deps
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
+	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/natty"
@@ -17,6 +17,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/kv"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
@@ -42,12 +43,13 @@ type Dependencies struct {
 	MetricsService  metrics.IMetrics
 	StoreService    store.IStore
 	CmdService      cmd.ICmd
+	KVService       kv.IKV
 	Health          health.IHealth
 	ShutdownContext context.Context
 	ShutdownFunc    context.CancelFunc
 }
 
-func New(version string, cfg *config.Config) (*Dependencies, error) {
+func New(cfg *config.Config) (*Dependencies, error) {
 	gohealth := health.New()
 	gohealth.Logger = gllogrus.New(nil)
 
@@ -84,7 +86,34 @@ func New(version string, cfg *config.Config) (*Dependencies, error) {
 		return nil, errors.Wrap(err, "unable to setup services")
 	}
 
+	if err := d.preCreateBuckets(); err != nil {
+		return nil, errors.Wrap(err, "unable to pre-create buckets in NATS")
+	}
+
 	return d, nil
+}
+
+func (d *Dependencies) preCreateBuckets() error {
+	buckets := map[string]time.Duration{
+		store.NATSAudienceBucket:           0,
+		store.NATSLiveBucket:               d.Config.SessionTTL,
+		store.NATSPipelineBucket:           0,
+		store.NATSPausedBucket:             0,
+		store.NATSNotificationConfigBucket: 0,
+		store.NATSNotificationAssocBucket:  0,
+	}
+
+	for bucketName, ttl := range buckets {
+		if err := d.NATSBackend.CreateBucket(d.ShutdownContext, bucketName, ttl, d.Config.NATSNumKVReplicas); err != nil {
+			if err == nats.ErrStreamNameAlreadyInUse {
+				continue
+			}
+
+			return fmt.Errorf("unable to pre-create bucket '%s': %s", bucketName, err)
+		}
+	}
+
+	return nil
 }
 
 func (d *Dependencies) validateWASM() error {
@@ -219,22 +248,17 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.NotifyService = notifyService
 
-	return nil
-}
-
-func createTLSConfig(caCert, clientCert, clientKey string) (*tls.Config, error) {
-	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	kvService, err := kv.New(&kv.Options{
+		NATS:        d.NATSBackend,
+		NumReplicas: cfg.NATSNumKVReplicas,
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to load cert + key")
+		return errors.Wrap(err, "unable to create new kv service")
 	}
 
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM([]byte(caCert))
+	d.KVService = kvService
 
-	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		RootCAs:      caCertPool,
-	}, nil
+	return nil
 }
 
 // Status satisfies the go-health.ICheckable interface
