@@ -1,9 +1,4 @@
-import {
-  Audience,
-  OperationType,
-} from "@streamdal/snitch-protos/protos/common.js";
-
-import { Snitch, SnitchConfigs } from "../snitch.js";
+import { Audience, OperationType, Snitch, SnitchConfigs } from "../snitch.js";
 
 const exampleData = {
   boolean_t: true,

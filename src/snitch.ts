@@ -1,6 +1,10 @@
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { GrpcTransport } from "@protobuf-ts/grpc-transport";
-import { Audience } from "@streamdal/snitch-protos/protos/common.js";
+import {
+  Audience,
+  OperationType,
+} from "@streamdal/snitch-protos/protos/common.js";
+export { Audience, OperationType };
 import {
   IInternalClient,
   InternalClient,
