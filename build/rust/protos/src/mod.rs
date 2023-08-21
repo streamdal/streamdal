@@ -4,6 +4,7 @@ pub mod sp_bus;
 pub mod sp_command;
 pub mod sp_common;
 pub mod sp_external;
+pub mod sp_hostfunc;
 pub mod sp_info;
 pub mod sp_internal;
 pub mod sp_kv;
