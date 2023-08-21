@@ -9,12 +9,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
-	"github.com/streamdal/natty"
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/natty"
+	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/deps"
@@ -508,10 +509,67 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Should have an entry in snitch_config
-			storedPipelineID, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
+			key := store.NATSConfigKey(audience, createdResp.PipelineId)
+			_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, key)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(storedPipelineID).ToNot(BeNil())
-			Expect(string(storedPipelineID)).To(Equal(createdResp.PipelineId))
+
+			_, storedPipelineID := util.ParseConfigKey(key)
+			Expect(storedPipelineID).ToNot(BeEmpty())
+			Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
+		})
+
+		It("should allow multiple pipelines for a single audience", func() {
+			audience := &protos.Audience{
+				ServiceName:   "secret-service",
+				ComponentName: "sqlite",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "multi-pipeline",
+			}
+
+			for i := 0; i < 5; i++ {
+				createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+					Pipeline: newPipeline(),
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(createdResp).ToNot(BeNil())
+				Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+				Expect(createdResp.PipelineId).ToNot(BeEmpty())
+
+				// Attach it to an audience
+				attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
+					PipelineId: createdResp.PipelineId,
+					Audience:   audience,
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(attachResp).ToNot(BeNil())
+				Expect(attachResp.Message).To(ContainSubstring("attached"))
+				Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+			}
+
+			getAllResp, err := externalClient.GetAll(ctxWithGoodAuth, &protos.GetAllRequest{})
+			Expect(err).ToNot(HaveOccurred())
+
+			var total int
+			for _, pipe := range getAllResp.Pipelines {
+				for _, aud := range pipe.Audiences {
+					if util.AudienceEquals(aud, audience) {
+						total++
+					}
+				}
+			}
+
+			Expect(total).To(Equal(5))
+
+			// Should have an entry in snitch_config
+			//key := store.NATSConfigKey(audience, createdResp.PipelineId)
+			//_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, key)
+			//Expect(err).ToNot(HaveOccurred())
+			//
+			//_, storedPipelineID := util.ParseConfigKey(key)
+			//Expect(storedPipelineID).ToNot(BeEmpty())
+			//Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
 		})
 	})
 
@@ -546,10 +604,8 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Key should be in snitch_config
-			storedPipelineID, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
+			_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, store.NATSConfigKey(audience, createdResp.PipelineId))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(storedPipelineID).ToNot(BeNil())
-			Expect(string(storedPipelineID)).To(Equal(createdResp.PipelineId))
 
 			// Now detach it
 			detachResp, err := externalClient.DetachPipeline(ctxWithGoodAuth, &protos.DetachPipelineRequest{
@@ -566,7 +622,7 @@ var _ = Describe("External gRPC API", func() {
 			time.Sleep(time.Second * 7)
 
 			// Key should be gone from snitch_config
-			shouldBeNil, err := natsClient.Get(context.Background(), store.NATSConfigBucket, util.AudienceToStr(audience))
+			shouldBeNil, err := natsClient.Get(context.Background(), store.NATSConfigBucket, store.NATSConfigKey(audience, createdResp.PipelineId))
 			Expect(err).To(HaveOccurred())
 			Expect(shouldBeNil).To(BeNil())
 			Expect(err).To(Equal(nats.ErrKeyNotFound))

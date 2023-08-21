@@ -134,7 +134,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 
 	// Update pipeline info with info about attached pipelines
 	for aud, pipelineID := range pipelineConfig {
-		if _, ok := gen[pipelineID]; !ok {
+		if _, ok := gen[pipelineID]; ok {
 			gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
 		}
 	}

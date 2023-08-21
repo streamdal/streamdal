@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/onsi/gomega"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
@@ -84,4 +85,20 @@ func TestAudienceToStr(t *testing.T) {
 		testAud := AudienceToStr(entry.Audience)
 		g.Expect(testAud).To(gomega.Equal(entry.StrAudience), "test audience '%+v' does not equal expected audience '%+v'", testAud, entry.StrAudience)
 	}
+}
+
+func TestParseConfigKey(t *testing.T) {
+	g := gomega.NewWithT(t)
+
+	aud := &protos.Audience{
+		ServiceName:   "secret-service",
+		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+		OperationName: "multi-pipeline",
+		ComponentName: "sqlite",
+	}
+
+	configKey := "secret-service/operation_type_consumer/multi-pipeline/sqlite/0fd3dcc1-c2f1-42d9-af78-9060588fc652"
+	audience, pipelineID := ParseConfigKey(configKey)
+	g.Expect(pipelineID).To(gomega.Equal("0fd3dcc1-c2f1-42d9-af78-9060588fc652"))
+	g.Expect(AudienceEquals(audience, aud)).To(gomega.BeTrue())
 }
