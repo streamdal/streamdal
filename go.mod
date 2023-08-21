@@ -24,7 +24,6 @@ require (
 	github.com/alecthomas/kong v0.8.0
 	github.com/aws/aws-sdk-go v1.34.28
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/google/uuid v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
@@ -49,6 +48,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect

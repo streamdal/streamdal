@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
@@ -418,7 +418,7 @@ func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.Cre
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	req.Notification.Id = util.StringPtr(uuid.New().String())
+	req.Notification.Id = util.StringPtr(util.GenerateUUID())
 
 	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
