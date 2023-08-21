@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package protos;
+
+import "sp_common.proto";
+import "sp_pipeline.proto";
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+
+message LiveInfo {
+  // If empty, client has not announced any audiences
+  repeated Audience audiences = 1;
+  ClientInfo client = 2;
+}
+
+message PipelineInfo {
+  // What audience(s) this pipeline is attached to (none if empty)
+  repeated protos.Audience audiences = 1;
+
+  // Pipeline config
+  protos.Pipeline pipeline = 2;
+
+  // For what audiences this pipeline is paused (none if empty)
+  repeated protos.Audience paused = 3;
+}
+
+enum ClientType {
+  CLIENT_TYPE_UNSET = 0;
+  CLIENT_TYPE_SDK = 1;
+  CLIENT_TYPE_SHIM = 2;
+}
+
+// Most of this is constructed by client SDKs and provided during Register call
+message ClientInfo {
+  ClientType client_type = 1;
+  string library_name = 2;
+  string library_version = 3;
+  string language = 4;
+  string arch = 5;
+  string os = 6;
+
+  // Filled out by snitch_server on GetAll()
+  optional string _session_id = 7; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional string _service_name = 8; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional string _node_name = 9; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
