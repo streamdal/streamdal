@@ -19,7 +19,7 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `sp_wasm.proto`
+//! Generated file from `sp_wsm.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
@@ -395,10 +395,10 @@ impl WASMExitCode {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\rsp_wasm.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"M\n\x0bWASMReq\
-    uest\x12(\n\x04step\x18\x01\x20\x01(\x0b2\x14.protos.PipelineStepR\x04st\
-    ep\x12\x14\n\x05input\x18\x02\x20\x01(\x0cR\x05input\"t\n\x0cWASMRespons\
-    e\x12\x16\n\x06output\x18\x01\x20\x01(\x0cR\x06output\x121\n\texit_code\
+    \n\x0csp_wsm.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"M\n\x0bWASMRe\
+    quest\x12(\n\x04step\x18\x01\x20\x01(\x0b2\x14.protos.PipelineStepR\x04s\
+    tep\x12\x14\n\x05input\x18\x02\x20\x01(\x0cR\x05input\"t\n\x0cWASMRespon\
+    se\x12\x16\n\x06output\x18\x01\x20\x01(\x0cR\x06output\x121\n\texit_code\
     \x18\x02\x20\x01(\x0e2\x14.protos.WASMExitCodeR\x08exitCode\x12\x19\n\
     \x08exit_msg\x18\x03\x20\x01(\tR\x07exitMsg*\x83\x01\n\x0cWASMExitCode\
     \x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\x1a\n\x16WASM_EXIT_CODE_SUC\
