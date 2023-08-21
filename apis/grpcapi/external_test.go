@@ -561,15 +561,6 @@ var _ = Describe("External gRPC API", func() {
 			}
 
 			Expect(total).To(Equal(5))
-
-			// Should have an entry in snitch_config
-			//key := store.NATSConfigKey(audience, createdResp.PipelineId)
-			//_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, key)
-			//Expect(err).ToNot(HaveOccurred())
-			//
-			//_, storedPipelineID := util.ParseConfigKey(key)
-			//Expect(storedPipelineID).ToNot(BeEmpty())
-			//Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
 		})
 	})
 
