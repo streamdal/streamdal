@@ -9,10 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
