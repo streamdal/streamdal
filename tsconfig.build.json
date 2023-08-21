@@ -1,4 +1,15 @@
 {
-  "extends": "./tsconfig.json",
-  "exclude": ["./src/**/__tests__"]
+  "include": ["./src/snitch.ts"],
+  "compilerOptions": {
+    "outDir": "build",
+    "declaration": true,
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+  },
+  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
 }

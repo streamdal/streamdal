@@ -1,4 +1,5 @@
-import { grpcClient, sessionId } from "./index.js";
+import { grpcClient } from "./index.js";
+import { sessionId } from "./register.js";
 
 export const HEARTBEAT_INTERVAL = 30000;
 

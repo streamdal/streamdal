@@ -6,7 +6,6 @@ import {
   IInternalClient,
   InternalClient,
 } from "@streamdal/snitch-protos/protos/internal.client.js";
-import { v4 as uuidv4 } from "uuid";
 
 import { heartbeat, HEARTBEAT_INTERVAL } from "./heartbeat.js";
 import { METRIC_INTERVAL, sendMetrics } from "./metrics.js";
@@ -19,11 +18,8 @@ const transport = new GrpcTransport({
 
 export const grpcClient: IInternalClient = new InternalClient(transport);
 
-export const sessionId = uuidv4();
-export const serviceName = "snitch-node-client";
-
 const start = () => {
-  void register();
+  void register({ grpcClient, serviceName: "test-service" });
 
   setInterval(() => {
     void heartbeat();

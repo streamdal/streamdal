@@ -10,6 +10,7 @@ import {
 import * as fs from "fs";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
+
 import { readResponse } from "./wasm.js";
 
 const wasi = new WASI({

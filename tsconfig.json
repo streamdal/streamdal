@@ -2,15 +2,14 @@
   "include": ["./src/**/*.ts"],
   "compilerOptions": {
     "outDir": "build",
-
+    "declaration": false,
     "strict": true,
     "sourceMap": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
     "module": "nodenext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
   },
   "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
 }

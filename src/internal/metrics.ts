@@ -1,6 +1,7 @@
-import { grpcClient } from "./index.js";
 import { Metrics } from "@streamdal/snitch-protos/protos/internal.js";
 import ReadWriteLock from "rwlock";
+
+import { grpcClient } from "./index.js";
 
 export const METRIC_INTERVAL = 1000;
 

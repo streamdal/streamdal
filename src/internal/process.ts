@@ -1,23 +1,18 @@
 import {
-  EnhancedStep,
-  InternalPipeline,
-  internalPipelines,
-} from "./pipeline.js";
-
-import { runWasm } from "./wasm.js";
-import { grpcClient } from "./index.js";
-import { Audience } from "@streamdal/snitch-protos/protos/common.js";
-import {
   PipelineStep,
   PipelineStepCondition,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
-import { lock, metrics } from "./metrics.js";
 
-export interface SnitchRequest {
-  audience: Audience;
-  data: Uint8Array;
-}
+import { SnitchRequest, SnitchResponse } from "../snitch.js";
+import { grpcClient } from "./index.js";
+import { lock, metrics } from "./metrics.js";
+import {
+  EnhancedStep,
+  InternalPipeline,
+  internalPipelines,
+} from "./pipeline.js";
+import { runWasm } from "./wasm.js";
 
 export interface StepStatus {
   stepName: string;
@@ -31,13 +26,6 @@ export interface StepStatus {
 export interface PipelinesStatus {
   data: Uint8Array;
   stepStatuses: StepStatus[];
-}
-
-export interface SnitchResponse {
-  data: Uint8Array;
-  error: boolean;
-  message?: string;
-  stepStatuses?: StepStatus[];
 }
 
 //
@@ -159,6 +147,9 @@ export const runStep = async ({
   let data = pipeline.data;
 
   try {
+    if (!step.WasmBytes || !step.WasmFunction) {
+      throw Error(`No wasm function found for step ${step.name}`);
+    }
     const { output, exitCode, exitMsg } = await runWasm({
       wasmBytes: step.WasmBytes,
       wasmFunction: step.WasmFunction,
@@ -180,7 +171,6 @@ export const runStep = async ({
     stepStatus.error ? step.onFailure : step.onSuccess,
     stepStatus
   );
-
   void stepMetrics(stepStatus);
 
   return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };

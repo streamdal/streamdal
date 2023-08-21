@@ -1,9 +1,26 @@
 import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
+import { v4 as uuidv4 } from "uuid";
 
-import { grpcClient, serviceName, sessionId } from "./index.js";
+// import { version } from "../../package.json";
+import { Audience } from "../snitch.js";
 import { processResponse } from "./pipeline.js";
 
-export const register = async () => {
+export interface RegisterConfigs {
+  grpcClient: IInternalClient;
+  serviceName: string;
+  dryRun?: boolean;
+  audiences?: Audience[];
+}
+
+export const sessionId = uuidv4();
+
+export const register = async ({
+  grpcClient,
+  serviceName,
+  dryRun,
+  audiences,
+}: RegisterConfigs) => {
   try {
     console.info(`### registering with grpc server...`);
 
@@ -11,16 +28,16 @@ export const register = async () => {
       {
         sessionId,
         serviceName,
-        dryRun: false,
+        dryRun: dryRun ? true : false,
         clientInfo: {
           clientType: ClientType.SDK,
           libraryName: "snitch-node-client",
-          libraryVersion: "1234",
+          libraryVersion: "0.0.1",
           language: "Typescript",
           arch: process.arch,
           os: process.platform,
         },
-        audiences: [],
+        ...(audiences ? { audiences } : { audiences: [] }),
       },
       { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
     );
