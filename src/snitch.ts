@@ -1,5 +1,6 @@
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { GrpcTransport } from "@protobuf-ts/grpc-transport";
+import { Audience } from "@streamdal/snitch-protos/protos/common.js";
 import {
   IInternalClient,
   InternalClient,
@@ -10,18 +11,6 @@ import {
   StepStatus,
 } from "./internal/process.js";
 import { register } from "./internal/register.js";
-
-export declare enum OperationType {
-  CONSUMER = 1,
-  PRODUCER = 2,
-}
-
-export interface Audience {
-  serviceName: string;
-  componentName: string;
-  operationType: OperationType;
-  operationName: string;
-}
 
 export interface SnitchConfigs {
   snitchUrl?: string;

@@ -1,9 +1,9 @@
+import { Audience } from "@streamdal/snitch-protos/protos/common.js";
 import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
 import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
 import { v4 as uuidv4 } from "uuid";
 
 // import { version } from "../../package.json";
-import { Audience } from "../snitch.js";
 import { processResponse } from "./pipeline.js";
 
 export interface RegisterConfigs {
