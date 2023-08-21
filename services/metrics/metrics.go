@@ -233,7 +233,7 @@ func (m *Metrics) runCounterDumper(looper director.Looper) {
 		}
 
 		if err := m.dumpCounters(); err != nil {
-			m.log.Error(err)
+			m.log.Error(errors.Wrap(err, "failed to dump counters"))
 		}
 
 		return nil
@@ -306,8 +306,8 @@ func parseMetricString(input string) (*storeCounter, error) {
 		return nil, errors.New("value not found in prometheus metric")
 	}
 
-	if _, err := fmt.Sscanf(parts[1], "%g", &value); err != nil {
-		return nil, err
+	if _, err := fmt.Sscanf(parts[len(parts)-1], "%g", &value); err != nil {
+		return nil, errors.Wrapf(err, "unable to parse value '%v'", parts)
 	}
 
 	if value == 0 {

@@ -1,12 +1,16 @@
 package wasm
 
 import (
+	"crypto/sha256"
 	"os"
+
+	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
 )
 
 type Mapping struct {
+	ID       string
 	Filename string
 	FuncName string
 	Contents []byte // Filled out by Load
@@ -44,9 +48,27 @@ func Load(name string, prefix ...string) (*Mapping, error) {
 		return nil, errors.Wrapf(err, "unable to read wasm file '%s'", fullPath)
 	}
 
+	// Generate ID
+	wasmID := determinativeUUID(data)
+	if wasmID == "" {
+		return nil, errors.Errorf("unable to generate UUID for wasm file '%s'", fullPath)
+	}
+
 	return &Mapping{
+		ID:       "",
 		Filename: mapping.Filename,
 		FuncName: mapping.FuncName,
 		Contents: data,
 	}, nil
+}
+
+func determinativeUUID(data []byte) string {
+	hash := sha256.Sum256(data)
+
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		return ""
+	}
+
+	return id.String()
 }
