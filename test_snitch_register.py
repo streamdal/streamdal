@@ -27,7 +27,7 @@ class TestSnitchRegisterMethods:
         )
 
         pipeline_id = uuid.uuid4().__str__()
-        aud_str = SnitchClient.aud_to_str(aud)
+        aud_str = SnitchClient._aud_to_str(aud)
         self.client.paused_pipelines[aud_str] = {}
         self.client.paused_pipelines[aud_str][pipeline_id] = protos.Command
 
@@ -53,7 +53,7 @@ class TestSnitchRegisterMethods:
 
         self.client._attach_pipeline(cmd)
 
-        aud_str = SnitchClient.aud_to_str(cmd.audience)
+        aud_str = SnitchClient._aud_to_str(cmd.audience)
         assert self.client.pipelines[aud_str] is not None
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
@@ -114,7 +114,7 @@ class TestSnitchRegisterMethods:
         res = self.client._pause_pipeline(pause_cmd)
         assert res is True
 
-        aud_str = SnitchClient.aud_to_str(cmd.audience)
+        aud_str = SnitchClient._aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 1
         assert len(self.client.pipelines) == 0
         assert self.client.paused_pipelines[aud_str] is not None
@@ -137,7 +137,7 @@ class TestSnitchRegisterMethods:
         res = self.client._resume_pipeline(resume_cmd)
         assert res is True
 
-        aud_str = SnitchClient.aud_to_str(cmd.audience)
+        aud_str = SnitchClient._aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 0
         assert len(self.client.pipelines) == 1
         assert self.client.pipelines[aud_str] is not None

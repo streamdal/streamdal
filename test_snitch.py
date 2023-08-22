@@ -28,6 +28,7 @@ class TestSnitchClient:
         client.session_id = uuid.uuid4().__str__()
         client.pipelines = {}
         client.paused_pipelines = {}
+        client.audiences = {}
 
         self.client = client
 
@@ -272,7 +273,7 @@ class TestSnitchClient:
             operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
-        assert self.client.aud_to_str(aud) == "testing.kafka.2.test-topic"
+        assert self.client._aud_to_str(aud) == "testing.kafka.2.test-topic"
 
     def test_str_to_aud(self):
         aud = protos.Audience(
@@ -282,7 +283,7 @@ class TestSnitchClient:
             operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
-        parsed = self.client.str_to_aud("testing.kafka.2.test-topic")
+        parsed = self.client._str_to_aud("testing.kafka.2.test-topic")
         assert parsed.component_name == aud.component_name
         assert parsed.service_name == aud.service_name
         assert parsed.operation_name == aud.operation_name

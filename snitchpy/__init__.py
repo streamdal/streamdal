@@ -153,7 +153,7 @@ class SnitchClient:
                 operation_name=aud.operation_name,
                 component_name=aud.component_name,
             )
-            self.add_audience(aud)
+            self._add_audience(aud)
 
         # Pull initial pipelines
         self._pull_initial_pipelines()
@@ -183,7 +183,7 @@ class SnitchClient:
                 self._attach_pipeline(cmd)
 
             for cmd in cmds.paused:
-                aud_str = self.aud_to_str(cmd.audience)
+                aud_str = self._aud_to_str(cmd.audience)
 
                 if self.paused_pipelines.get(aud_str) is None:
                     self.paused_pipelines[aud_str] = {}
@@ -210,14 +210,14 @@ class SnitchClient:
             raise ValueError("snitch_token is required")
 
     @staticmethod
-    def aud_to_str(aud: protos.Audience) -> str:
+    def _aud_to_str(aud: protos.Audience) -> str:
         """Convert an Audience to a string"""
         return "{}.{}.{}.{}".format(
             aud.service_name, aud.component_name, aud.operation_type, aud.operation_name
         )
 
     @staticmethod
-    def str_to_aud(aud: str) -> protos.Audience:
+    def _str_to_aud(aud: str) -> protos.Audience:
         """Convert a string to an Audience"""
         parts = aud.split(".")
         return protos.Audience(
@@ -229,9 +229,9 @@ class SnitchClient:
 
     def seen_audience(self, aud: protos.Audience) -> bool:
         """Have we seen this audience before?"""
-        return self.audiences.get(self.aud_to_str(aud)) is not None
+        return self.audiences.get(self._aud_to_str(aud)) is not None
 
-    def add_audience(self, aud: protos.Audience) -> None:
+    def _add_audience(self, aud: protos.Audience) -> None:
         """Add an audience to the local map and send to snitch-server"""
         if self.seen_audience(aud):
             return
@@ -243,7 +243,7 @@ class SnitchClient:
             )
 
         # We haven't seen it yet, add to local map and send to snitch-server
-        self.audiences[self.aud_to_str(aud)] = aud
+        self.audiences[self._aud_to_str(aud)] = aud
         self.grpc_loop.run_until_complete(call())
 
     def process(self, req: ProcessRequest) -> ProcessResponse:
@@ -259,6 +259,7 @@ class SnitchClient:
             operation_name=req.operation_name,
             component_name=req.component_name,
         )
+        self._add_audience(aud)
 
         labels = {
             "service": self.cfg.service_name,
@@ -445,7 +446,7 @@ class SnitchClient:
 
         :return: dict of pipelines in format dict[str:protos.Command]
         """
-        aud_str = self.aud_to_str(aud)
+        aud_str = self._aud_to_str(aud)
 
         pipelines = self.pipelines.get(aud_str)
         if pipelines is None:
@@ -560,7 +561,7 @@ class SnitchClient:
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
         """Set pipeline in internal map of pipelines"""
-        aud_str = SnitchClient.aud_to_str(cmd.audience)
+        aud_str = SnitchClient._aud_to_str(cmd.audience)
 
         # Create audience key if it doesn't exist
         if pipes_map.get(aud_str) is None:
@@ -573,7 +574,7 @@ class SnitchClient:
         pipes_map: dict, cmd: protos.Command, pipeline_id: str
     ) -> protos.Command:
         """Grab pipeline in internal map of pipelines and remove it"""
-        aud_str = SnitchClient.aud_to_str(cmd.audience)
+        aud_str = SnitchClient._aud_to_str(cmd.audience)
 
         if pipes_map.get(aud_str) is None:
             return None
@@ -601,7 +602,7 @@ class SnitchClient:
             self.log.debug("Service name does not match, ignoring")
             return False
 
-        aud_str = self.aud_to_str(cmd.audience)
+        aud_str = self._aud_to_str(cmd.audience)
 
         self.log.debug(
             "Deleting pipeline {} for audience {}".format(
@@ -693,7 +694,7 @@ class SnitchClient:
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
         """Check if a pipeline is paused"""
-        aud_str = self.aud_to_str(aud)
+        aud_str = self._aud_to_str(aud)
 
         if self.paused_pipelines.get(aud_str) is None:
             return False
