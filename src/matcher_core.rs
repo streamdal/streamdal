@@ -4,7 +4,7 @@ use chrono::TimeZone;
 
 use crate::detective::{parse_number, Request};
 use gjson::Value;
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 use regex::Regex;
 use std::net::IpAddr;
 use std::str;

@@ -1,7 +1,7 @@
 use crate::detective::parse_number;
 use crate::detective::Request;
 use crate::error::CustomError;
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 
 pub fn common(request: &Request) -> Result<bool, CustomError> {
     let mut required_len = 1;

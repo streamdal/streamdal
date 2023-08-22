@@ -1,6 +1,6 @@
 extern crate test;
 use crate::test_utils::generate_request_for_bench;
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 use test::Bencher;
 
 #[bench]

@@ -1,7 +1,7 @@
 use crate::detective::Request;
 use crate::test_utils;
 #[cfg(test)]
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 
 // Q: Is there a community-agreed-upon test framework that people use?
 // Q: How do folks feel about table driven tests?
