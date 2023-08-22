@@ -1,0 +1,284 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "The template used to create an ECS Service from the ECS Console."
+Parameters:
+  SecurityGroupIDs:
+    Type: CommaDelimitedList
+    Default: sg-075fce0b4612bd7dd
+  SubnetID:
+    Type: String
+    Default: subnet-01cda062b1298504f
+  VpcID:
+    Type: String
+    Default: vpc-0ad11cd6c0291c485
+  LoadBalancerName:
+    Type: String
+    Default: ""
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: snitch-stack
+  ServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties: 
+      Description: "Namespace for ECS services"
+      Name: "local"
+      Vpc: !Ref VpcID
+
+  NatsjsServiceDiscovery:
+      Type: 'AWS::ServiceDiscovery::Service'
+      Properties:
+        Description: Service discovery for Natsjs
+        DnsConfig:
+          DnsRecords:
+            - Type: A
+              TTL: 60
+          RoutingPolicy: WEIGHTED
+        Name: natsjs
+        NamespaceId: !Ref ServiceDiscoveryNamespace
+
+  EnvoyServiceDiscovery:
+    Type: 'AWS::ServiceDiscovery::Service'
+    Properties:
+      Description: Service discovery for Envoy
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        RoutingPolicy: WEIGHTED
+      Name: envoy
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+   
+  EFSTaskExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Policy to allow ECS tasks to mount and write to EFS"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "elasticfilesystem:DescribeFileSystems"
+              - "elasticfilesystem:DescribeAccessPoints"
+              - "elasticfilesystem:ClientMount"
+              - "elasticfilesystem:ClientWrite"
+            Resource: "*"
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: deployment-example-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Ref EFSTaskExecutionPolicy
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcID
+      GroupName: ContainerSecurityGroup
+      GroupDescription: Security group for NGINX container
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 4222
+          ToPort: 4222
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 6222
+          ToPort: 6222
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8222
+          ToPort: 8222
+          CidrIp: 0.0.0.0/0
+        # snitch-server specific rules
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9090
+          ToPort: 9090
+          CidrIp: 0.0.0.0/0
+        # envoy specific rules
+        - IpProtocol: tcp
+          FromPort: 9091
+          ToPort: 9091
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  EFSFileSystem:
+      Type: AWS::EFS::FileSystem
+      Properties:
+        PerformanceMode: generalPurpose
+        Encrypted: true
+        LifecyclePolicies:
+          - TransitionToIA: AFTER_7_DAYS
+        ThroughputMode: bursting
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS Security Group
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '2049'
+          ToPort: '2049'
+          SourceSecurityGroupId: !GetAtt ContainerSecurityGroup.GroupId
+  EFSMountTarget:
+    Type: "AWS::EFS::MountTarget"
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref SubnetID
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+    # Task definition for natsjs
+  NatsjsTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: natsjs-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      Volumes: 
+        - Name: jetstream-data
+          EfsVolumeConfiguration:
+            FileSystemId: !Ref EFSFileSystem
+            RootDirectory: /
+      ContainerDefinitions:
+        - Name: natsjs-container
+          Image: nats:2.9.20-alpine3.18
+          Command:
+            - "-js"
+            - "-sd"
+            - "/data/jetstream"
+            - "-m"
+            - "8222"
+          PortMappings:
+            - ContainerPort: 4222
+            - ContainerPort: 6222
+            - ContainerPort: 8222
+          MountPoints:
+            - ContainerPath: /data/jetstream
+              SourceVolume: jetstream-data
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Task definition for snitch-server-1
+  SnitchServerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: snitch-server-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: snitch-server-container
+          Image: streamdal/snitch-server:latest
+          Environment:
+            - Name: SNITCH_SERVER_NODE_NAME
+              Value: node1
+            - Name: SNITCH_SERVER_AUTH_TOKEN
+              Value: 1234
+            - Name: SNITCH_SERVER_NATSURL
+              Value: natsjs.local:4222
+          PortMappings:
+            - ContainerPort: 8080
+            - ContainerPort: 9090
+        - Name: envoy-sidecar
+          Image: streamdal/envoy-side-car
+          PortMappings:
+            - ContainerPort: 9091
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # ECS Service for natsjs
+  NatsjsService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: natsjs-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref NatsjsTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt NatsjsServiceDiscovery.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # ECS Service for snitch-server-1
+  SnitchServerService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: snitch-server-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref SnitchServerTaskDefinition
+      DesiredCount: 3
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  SnitchConsoleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: snitch-console-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: snitch-console-container
+          Image: streamdal/snitch-console:latest
+          Environment:
+            - Name: SNITCH_GRPC_WEB_URL
+              Value: http://envoy.local:9091
+          PortMappings:
+            - ContainerPort: 3000
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  SnitchConsoleService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: snitch-console-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref SnitchConsoleTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
