@@ -181,6 +181,7 @@ class PipelineStep(betterproto.Message):
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
     decode: "steps.DecodeStep" = betterproto.message_field(1003, group="step")
     custom: "steps.CustomStep" = betterproto.message_field(1004, group="step")
+    http_request: "steps.HttpRequest" = betterproto.message_field(1005, group="step")
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
