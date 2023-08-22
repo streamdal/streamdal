@@ -14,12 +14,12 @@ import { opModal } from "./opModalSignal.ts";
 export const ServiceNode = ({ data }: { data: NodeData }) => {
   return (
     <div>
-      <div class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2">
+      <div
+        class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2"
+        id="dragHandle"
+      >
         <div class="flex flex-row items-center">
-          <IconGripVertical
-            class="w-6 h-6 text-purple-100 mr-1"
-            id="dragHandle"
-          />
+          <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
           <img
             src={"/images/placeholder-icon.png"}
             className={"h-[40px]"}
@@ -60,8 +60,11 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
       class={`rounded-lg shadow-lg border-1 border-purple-200 min-w-[280px] min-h-[${height}px]`}
     >
       <div id="dragHandle" class="flex flex-row items-center mt-2">
-        <IconGripVertical class="w-6 h-6 ml-2 text-purple-100 bg-white border border-purple-200" />
-        <div class="ml-2">{`${titleCase(op)}s`}</div>
+        <IconGripVertical class="w-6 h-6 mx-2 text-purple-100 bg-white border border-purple-200" />
+        {producer
+          ? <ProducerIcon class="w-5 h-5 mr-2" />
+          : <ConsumerIcon class="w-5 h-5 mr-2" />}
+        {`${titleCase(op)}s`}
       </div>
 
       <Handle
@@ -79,21 +82,14 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 };
 
 export const OperationNode = ({ data }: { data: NodeData }) => {
-  const producer = OperationType[data.audience.operationType] ==
-    OperationType[OperationType.PRODUCER];
   const toolTipId = removeWhitespace(data.audience.operationName);
 
   return (
     <div class="h-[96px]">
       <div
         type="button"
-        class="flex items-center justify-betweenw-[250px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2"
+        class="flex items-center justify-between w-[260px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2"
       >
-        <div class="flex flex-row items-center">
-          {producer
-            ? <ProducerIcon class="w-5 h-5 mx-2" />
-            : <ConsumerIcon class="w-5 h-5 mx-2" />}
-        </div>
         <div class="w-[170px] whitespace-nowrap text-ellipsis overflow-hidden">
           <div
             class={"flex flex-col justify-start p-1 cursor-pointer"}
@@ -113,8 +109,10 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
               targetId={toolTipId}
               message={"Click to attach and detach pipelines"}
             />
-            <h3 class="text-xs text-gray-500">
-              {titleCase(OperationType[data.audience.operationType])}
+            <h3 class="text-xs text-streamdalPurple font-semibold">
+              {`${data.clients?.length || 0} attached client${
+                data.clients?.length === 0 ? "s" : ""
+              }`}
             </h3>
           </div>
         </div>
@@ -123,16 +121,23 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
           attachedPipeline={data.attachedPipeline}
         />
       </div>
-      <div
-        data-tooltip-target={`${toolTipId}-clients`}
-        class="absolute inline-flex items-center justify-evenly w-6 h-6 text-xs text-white bg-purple-500 rounded-full -top-2 -right-1 cursor-default"
-      >
-        {data.clients?.length || 0}
-      </div>
-      <Tooltip
-        targetId={`${toolTipId}-clients`}
-        message={`${data.clients?.length || 0} SDK clients`}
-      />
+      {data.clients?.length > 0
+        ? (
+          <>
+            <div
+              data-tooltip-target={`${toolTipId}-notifications`}
+              class="absolute inline-flex items-center justify-evenly w-6 h-6 text-xs text-white bg-purple-500 rounded-full -top-2 -right-1 cursor-default"
+            >
+              {data.clients?.length || 0}
+            </div>
+            <Tooltip
+              targetId={`${toolTipId}-notifications`}
+              message={`${data.clients?.length || 0} notifications`}
+            />
+          </>
+        )
+        : null}
+
       <Handle
         type="source"
         position={Position.Top}
@@ -173,7 +178,10 @@ export const ComponentImage = (
 
 export const ComponentNode = ({ data }: { data: NodeData }) => {
   return (
-    <div class="z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center items-center">
+    <div
+      id="dragHandle"
+      class="z-0 bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl flex justify-center items-center"
+    >
       <div class="flex justify-center flex-col items-center">
         <ComponentImage componentName={data.audience.componentName} />
         <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
