@@ -19,26 +19,26 @@
 #![allow(unused_results)]
 #![allow(unused_mut)]
 
-//! Generated file from `sp_hostfunc.proto`
+//! Generated file from `steps/sp_steps_httprequest.proto`
 
 /// Generated files are compatible only with the same version
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.HttpRequest)
+// @@protoc_insertion_point(message:protos.steps.HttpRequest)
 pub struct HttpRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.HttpRequest.method)
-    pub method: ::protobuf::EnumOrUnknown<http_request::Method>,
-    // @@protoc_insertion_point(field:protos.HttpRequest.url)
+    // @@protoc_insertion_point(field:protos.steps.HttpRequest.method)
+    pub method: ::protobuf::EnumOrUnknown<HttpRequestMethod>,
+    // @@protoc_insertion_point(field:protos.steps.HttpRequest.url)
     pub url: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.HttpRequest.body)
+    // @@protoc_insertion_point(field:protos.steps.HttpRequest.body)
     pub body: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:protos.HttpRequest.headers)
+    // @@protoc_insertion_point(field:protos.steps.HttpRequest.headers)
     pub headers: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.HttpRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.steps.HttpRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -130,7 +130,7 @@ impl ::protobuf::Message for HttpRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if self.method != ::protobuf::EnumOrUnknown::new(http_request::Method::METHOD_UNSET) {
+        if self.method != ::protobuf::EnumOrUnknown::new(HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET) {
             my_size += ::protobuf::rt::int32_size(1, self.method.value());
         }
         if !self.url.is_empty() {
@@ -151,7 +151,7 @@ impl ::protobuf::Message for HttpRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if self.method != ::protobuf::EnumOrUnknown::new(http_request::Method::METHOD_UNSET) {
+        if self.method != ::protobuf::EnumOrUnknown::new(HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET) {
             os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.method))?;
         }
         if !self.url.is_empty() {
@@ -186,7 +186,7 @@ impl ::protobuf::Message for HttpRequest {
     }
 
     fn clear(&mut self) {
-        self.method = ::protobuf::EnumOrUnknown::new(http_request::Method::METHOD_UNSET);
+        self.method = ::protobuf::EnumOrUnknown::new(HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET);
         self.url.clear();
         self.body.clear();
         self.headers.clear();
@@ -216,87 +216,18 @@ impl ::protobuf::reflect::ProtobufValue for HttpRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-/// Nested message and enums of message `HttpRequest`
-pub mod http_request {
-    #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-    // @@protoc_insertion_point(enum:protos.HttpRequest.Method)
-    pub enum Method {
-        // @@protoc_insertion_point(enum_value:protos.HttpRequest.Method.METHOD_UNSET)
-        METHOD_UNSET = 0,
-        // @@protoc_insertion_point(enum_value:protos.HttpRequest.Method.METHOD_GET)
-        METHOD_GET = 1,
-        // @@protoc_insertion_point(enum_value:protos.HttpRequest.Method.METHOD_POST)
-        METHOD_POST = 2,
-        // @@protoc_insertion_point(enum_value:protos.HttpRequest.Method.METHOD_PUT)
-        METHOD_PUT = 3,
-        // @@protoc_insertion_point(enum_value:protos.HttpRequest.Method.METHOD_DELETE)
-        METHOD_DELETE = 4,
-    }
-
-    impl ::protobuf::Enum for Method {
-        const NAME: &'static str = "Method";
-
-        fn value(&self) -> i32 {
-            *self as i32
-        }
-
-        fn from_i32(value: i32) -> ::std::option::Option<Method> {
-            match value {
-                0 => ::std::option::Option::Some(Method::METHOD_UNSET),
-                1 => ::std::option::Option::Some(Method::METHOD_GET),
-                2 => ::std::option::Option::Some(Method::METHOD_POST),
-                3 => ::std::option::Option::Some(Method::METHOD_PUT),
-                4 => ::std::option::Option::Some(Method::METHOD_DELETE),
-                _ => ::std::option::Option::None
-            }
-        }
-
-        const VALUES: &'static [Method] = &[
-            Method::METHOD_UNSET,
-            Method::METHOD_GET,
-            Method::METHOD_POST,
-            Method::METHOD_PUT,
-            Method::METHOD_DELETE,
-        ];
-    }
-
-    impl ::protobuf::EnumFull for Method {
-        fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
-            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| super::file_descriptor().enum_by_package_relative_name("HttpRequest.Method").unwrap()).clone()
-        }
-
-        fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
-            let index = *self as usize;
-            Self::enum_descriptor().value_by_index(index)
-        }
-    }
-
-    impl ::std::default::Default for Method {
-        fn default() -> Self {
-            Method::METHOD_UNSET
-        }
-    }
-
-    impl Method {
-        pub(in super) fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-            ::protobuf::reflect::GeneratedEnumDescriptorData::new::<Method>("HttpRequest.Method")
-        }
-    }
-}
-
 #[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.HttpResponse)
+// @@protoc_insertion_point(message:protos.steps.HttpResponse)
 pub struct HttpResponse {
     // message fields
-    // @@protoc_insertion_point(field:protos.HttpResponse.code)
+    // @@protoc_insertion_point(field:protos.steps.HttpResponse.code)
     pub code: i32,
-    // @@protoc_insertion_point(field:protos.HttpResponse.body)
+    // @@protoc_insertion_point(field:protos.steps.HttpResponse.body)
     pub body: ::std::vec::Vec<u8>,
-    // @@protoc_insertion_point(field:protos.HttpResponse.headers)
+    // @@protoc_insertion_point(field:protos.steps.HttpResponse.headers)
     pub headers: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.HttpResponse.special_fields)
+    // @@protoc_insertion_point(special_field:protos.steps.HttpResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
@@ -459,50 +390,241 @@ impl ::protobuf::reflect::ProtobufValue for HttpResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.steps.HttpRequestStep)
+pub struct HttpRequestStep {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.HttpRequestStep.request)
+    pub request: ::protobuf::MessageField<HttpRequest>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.HttpRequestStep.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a HttpRequestStep {
+    fn default() -> &'a HttpRequestStep {
+        <HttpRequestStep as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl HttpRequestStep {
+    pub fn new() -> HttpRequestStep {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, HttpRequest>(
+            "request",
+            |m: &HttpRequestStep| { &m.request },
+            |m: &mut HttpRequestStep| { &mut m.request },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<HttpRequestStep>(
+            "HttpRequestStep",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for HttpRequestStep {
+    const NAME: &'static str = "HttpRequestStep";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.request)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.request.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.request.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> HttpRequestStep {
+        HttpRequestStep::new()
+    }
+
+    fn clear(&mut self) {
+        self.request.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static HttpRequestStep {
+        static instance: HttpRequestStep = HttpRequestStep {
+            request: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for HttpRequestStep {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("HttpRequestStep").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for HttpRequestStep {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for HttpRequestStep {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.steps.HttpRequestMethod)
+pub enum HttpRequestMethod {
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_UNSET)
+    HTTP_REQUEST_METHOD_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET)
+    HTTP_REQUEST_METHOD_GET = 1,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST)
+    HTTP_REQUEST_METHOD_POST = 2,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT)
+    HTTP_REQUEST_METHOD_PUT = 3,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE)
+    HTTP_REQUEST_METHOD_DELETE = 4,
+}
+
+impl ::protobuf::Enum for HttpRequestMethod {
+    const NAME: &'static str = "HttpRequestMethod";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<HttpRequestMethod> {
+        match value {
+            0 => ::std::option::Option::Some(HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET),
+            1 => ::std::option::Option::Some(HttpRequestMethod::HTTP_REQUEST_METHOD_GET),
+            2 => ::std::option::Option::Some(HttpRequestMethod::HTTP_REQUEST_METHOD_POST),
+            3 => ::std::option::Option::Some(HttpRequestMethod::HTTP_REQUEST_METHOD_PUT),
+            4 => ::std::option::Option::Some(HttpRequestMethod::HTTP_REQUEST_METHOD_DELETE),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [HttpRequestMethod] = &[
+        HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET,
+        HttpRequestMethod::HTTP_REQUEST_METHOD_GET,
+        HttpRequestMethod::HTTP_REQUEST_METHOD_POST,
+        HttpRequestMethod::HTTP_REQUEST_METHOD_PUT,
+        HttpRequestMethod::HTTP_REQUEST_METHOD_DELETE,
+    ];
+}
+
+impl ::protobuf::EnumFull for HttpRequestMethod {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("HttpRequestMethod").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for HttpRequestMethod {
+    fn default() -> Self {
+        HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET
+    }
+}
+
+impl HttpRequestMethod {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<HttpRequestMethod>("HttpRequestMethod")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x11sp_hostfunc.proto\x12\x06protos\"\xbf\x02\n\x0bHttpRequest\x122\n\
-    \x06method\x18\x01\x20\x01(\x0e2\x1a.protos.HttpRequest.MethodR\x06metho\
-    d\x12\x10\n\x03url\x18\x02\x20\x01(\tR\x03url\x12\x12\n\x04body\x18\x03\
-    \x20\x01(\x0cR\x04body\x12:\n\x07headers\x18\x04\x20\x03(\x0b2\x20.proto\
-    s.HttpRequest.HeadersEntryR\x07headers\x1a:\n\x0cHeadersEntry\x12\x10\n\
-    \x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\t\
-    R\x05value:\x028\x01\"^\n\x06Method\x12\x10\n\x0cMETHOD_UNSET\x10\0\x12\
-    \x0e\n\nMETHOD_GET\x10\x01\x12\x0f\n\x0bMETHOD_POST\x10\x02\x12\x0e\n\nM\
-    ETHOD_PUT\x10\x03\x12\x11\n\rMETHOD_DELETE\x10\x04\"\xaf\x01\n\x0cHttpRe\
-    sponse\x12\x12\n\x04code\x18\x01\x20\x01(\x05R\x04code\x12\x12\n\x04body\
-    \x18\x02\x20\x01(\x0cR\x04body\x12;\n\x07headers\x18\x03\x20\x03(\x0b2!.\
-    protos.HttpResponse.HeadersEntryR\x07headers\x1a:\n\x0cHeadersEntry\x12\
-    \x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\
-    \x01(\tR\x05value:\x028\x01B4Z2github.com/streamdal/snitch-protos/build/\
-    go/protosJ\xe9\x05\n\x06\x12\x04\0\0\x19\x01\n\x08\n\x01\x0c\x12\x03\0\0\
-    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\
-    \t\n\x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x04\0\x12\x04\x06\0\x13\x01\n\
-    \n\n\x03\x04\0\x01\x12\x03\x06\x08\x13\n\x0c\n\x04\x04\0\x04\0\x12\x04\
-    \x07\x02\r\x03\n\x0c\n\x05\x04\0\x04\0\x01\x12\x03\x07\x07\r\n\r\n\x06\
-    \x04\0\x04\0\x02\0\x12\x03\x08\x04\x15\n\x0e\n\x07\x04\0\x04\0\x02\0\x01\
-    \x12\x03\x08\x04\x10\n\x0e\n\x07\x04\0\x04\0\x02\0\x02\x12\x03\x08\x13\
-    \x14\n\r\n\x06\x04\0\x04\0\x02\x01\x12\x03\t\x04\x13\n\x0e\n\x07\x04\0\
-    \x04\0\x02\x01\x01\x12\x03\t\x04\x0e\n\x0e\n\x07\x04\0\x04\0\x02\x01\x02\
-    \x12\x03\t\x11\x12\n\r\n\x06\x04\0\x04\0\x02\x02\x12\x03\n\x04\x14\n\x0e\
-    \n\x07\x04\0\x04\0\x02\x02\x01\x12\x03\n\x04\x0f\n\x0e\n\x07\x04\0\x04\0\
-    \x02\x02\x02\x12\x03\n\x12\x13\n\r\n\x06\x04\0\x04\0\x02\x03\x12\x03\x0b\
-    \x04\x13\n\x0e\n\x07\x04\0\x04\0\x02\x03\x01\x12\x03\x0b\x04\x0e\n\x0e\n\
-    \x07\x04\0\x04\0\x02\x03\x02\x12\x03\x0b\x11\x12\n\r\n\x06\x04\0\x04\0\
-    \x02\x04\x12\x03\x0c\x04\x16\n\x0e\n\x07\x04\0\x04\0\x02\x04\x01\x12\x03\
-    \x0c\x04\x11\n\x0e\n\x07\x04\0\x04\0\x02\x04\x02\x12\x03\x0c\x14\x15\n\
-    \x0b\n\x04\x04\0\x02\0\x12\x03\x0f\x02\x14\n\x0c\n\x05\x04\0\x02\0\x06\
-    \x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0f\t\x0f\n\x0c\
-    \n\x05\x04\0\x02\0\x03\x12\x03\x0f\x12\x13\n\x0b\n\x04\x04\0\x02\x01\x12\
-    \x03\x10\x02\x11\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x02\x08\n\x0c\
-    \n\x05\x04\0\x02\x01\x01\x12\x03\x10\t\x0c\n\x0c\n\x05\x04\0\x02\x01\x03\
-    \x12\x03\x10\x0f\x10\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x11\x02\x11\n\x0c\
-    \n\x05\x04\0\x02\x02\x05\x12\x03\x11\x02\x07\n\x0c\n\x05\x04\0\x02\x02\
-    \x01\x12\x03\x11\x08\x0c\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x11\x0f\
-    \x10\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x12\x02!\n\x0c\n\x05\x04\0\x02\
-    \x03\x06\x12\x03\x12\x02\x14\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x12\
-    \x15\x1c\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x12\x1f\x20\n\n\n\x02\x04\
-    \x01\x12\x04\x15\0\x19\x01\n\n\n\x03\x04\x01\x01\x12\x03\x15\x08\x14\n\
-    \x0b\n\x04\x04\x01\x02\0\x12\x03\x16\x02\x11\n\x0c\n\x05\x04\x01\x02\0\
+    \n\x20steps/sp_steps_httprequest.proto\x12\x0cprotos.steps\"\xea\x01\n\
+    \x0bHttpRequest\x127\n\x06method\x18\x01\x20\x01(\x0e2\x1f.protos.steps.\
+    HttpRequestMethodR\x06method\x12\x10\n\x03url\x18\x02\x20\x01(\tR\x03url\
+    \x12\x12\n\x04body\x18\x03\x20\x01(\x0cR\x04body\x12@\n\x07headers\x18\
+    \x04\x20\x03(\x0b2&.protos.steps.HttpRequest.HeadersEntryR\x07headers\
+    \x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\
+    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\xb5\x01\n\x0cHt\
+    tpResponse\x12\x12\n\x04code\x18\x01\x20\x01(\x05R\x04code\x12\x12\n\x04\
+    body\x18\x02\x20\x01(\x0cR\x04body\x12A\n\x07headers\x18\x03\x20\x03(\
+    \x0b2'.protos.steps.HttpResponse.HeadersEntryR\x07headers\x1a:\n\x0cHead\
+    ersEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\
+    \x18\x02\x20\x01(\tR\x05value:\x028\x01\"F\n\x0fHttpRequestStep\x123\n\
+    \x07request\x18\x01\x20\x01(\x0b2\x19.protos.steps.HttpRequestR\x07reque\
+    st*\xaa\x01\n\x11HttpRequestMethod\x12\x1d\n\x19HTTP_REQUEST_METHOD_UNSE\
+    T\x10\0\x12\x1b\n\x17HTTP_REQUEST_METHOD_GET\x10\x01\x12\x1c\n\x18HTTP_R\
+    EQUEST_METHOD_POST\x10\x02\x12\x1b\n\x17HTTP_REQUEST_METHOD_PUT\x10\x03\
+    \x12\x1e\n\x1aHTTP_REQUEST_METHOD_DELETE\x10\x04B:Z8github.com/streamdal\
+    /snitch-protos/build/go/protos/stepsJ\x96\x06\n\x06\x12\x04\0\0\x1d\x01\
+    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\
+    \n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\x05\
+    \0\x12\x04\x06\0\x0c\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x16\n\x0b\n\
+    \x04\x05\0\x02\0\x12\x03\x07\x02\x20\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\
+    \x07\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1e\x1f\n\x0b\n\x04\
+    \x05\0\x02\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\
+    \x08\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08\x1c\x1d\n\x0b\n\
+    \x04\x05\0\x02\x02\x12\x03\t\x02\x1f\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
+    \x03\t\x02\x1a\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x1d\x1e\n\x0b\n\
+    \x04\x05\0\x02\x03\x12\x03\n\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\
+    \x03\n\x02\x19\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n\x1c\x1d\n\x0b\n\
+    \x04\x05\0\x02\x04\x12\x03\x0b\x02!\n\x0c\n\x05\x05\0\x02\x04\x01\x12\
+    \x03\x0b\x02\x1c\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x0b\x1f\x20\n\n\n\
+    \x02\x04\0\x12\x04\x0e\0\x13\x01\n\n\n\x03\x04\0\x01\x12\x03\x0e\x08\x13\
+    \n\x0b\n\x04\x04\0\x02\0\x12\x03\x0f\x02\x1f\n\x0c\n\x05\x04\0\x02\0\x06\
+    \x12\x03\x0f\x02\x13\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0f\x14\x1a\n\
+    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0f\x1d\x1e\n\x0b\n\x04\x04\0\x02\x01\
+    \x12\x03\x10\x02\x11\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x02\x08\n\
+    \x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\t\x0c\n\x0c\n\x05\x04\0\x02\x01\
+    \x03\x12\x03\x10\x0f\x10\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x11\x02\x11\n\
+    \x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x11\x02\x07\n\x0c\n\x05\x04\0\x02\
+    \x02\x01\x12\x03\x11\x08\x0c\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x11\
+    \x0f\x10\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x12\x02!\n\x0c\n\x05\x04\0\
+    \x02\x03\x06\x12\x03\x12\x02\x14\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
+    \x12\x15\x1c\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x12\x1f\x20\n\n\n\x02\
+    \x04\x01\x12\x04\x15\0\x19\x01\n\n\n\x03\x04\x01\x01\x12\x03\x15\x08\x14\
+    \n\x0b\n\x04\x04\x01\x02\0\x12\x03\x16\x02\x11\n\x0c\n\x05\x04\x01\x02\0\
     \x05\x12\x03\x16\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\x16\x08\
     \x0c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x16\x0f\x10\n\x0b\n\x04\x04\
     \x01\x02\x01\x12\x03\x17\x02\x11\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\
@@ -510,7 +632,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05\x04\x01\x02\x01\x03\x12\x03\x17\x0f\x10\n\x0b\n\x04\x04\x01\x02\x02\
     \x12\x03\x18\x02!\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03\x18\x02\x14\n\
     \x0c\n\x05\x04\x01\x02\x02\x01\x12\x03\x18\x15\x1c\n\x0c\n\x05\x04\x01\
-    \x02\x02\x03\x12\x03\x18\x1f\x20b\x06proto3\
+    \x02\x02\x03\x12\x03\x18\x1f\x20\n\n\n\x02\x04\x02\x12\x04\x1b\0\x1d\x01\
+    \n\n\n\x03\x04\x02\x01\x12\x03\x1b\x08\x17\n\x0b\n\x04\x04\x02\x02\0\x12\
+    \x03\x1c\x02\x1a\n\x0c\n\x05\x04\x02\x02\0\x06\x12\x03\x1c\x02\r\n\x0c\n\
+    \x05\x04\x02\x02\0\x01\x12\x03\x1c\x0e\x15\n\x0c\n\x05\x04\x02\x02\0\x03\
+    \x12\x03\x1c\x18\x19b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -528,11 +654,12 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(2);
+            let mut messages = ::std::vec::Vec::with_capacity(3);
             messages.push(HttpRequest::generated_message_descriptor_data());
             messages.push(HttpResponse::generated_message_descriptor_data());
+            messages.push(HttpRequestStep::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
-            enums.push(http_request::Method::generated_enum_descriptor_data());
+            enums.push(HttpRequestMethod::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
