@@ -2,7 +2,7 @@
   "include": ["./src/**/*.ts"],
   "compilerOptions": {
     "outDir": "build",
-    "declaration": false,
+    "declaration": true,
     "strict": true,
     "sourceMap": true,
     "esModuleInterop": true,
@@ -10,11 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
-  },
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"],
-  "references": [
-    {
-      "path": "./examples"
-    },
-  ]
+    "composite": true
+  }
 }

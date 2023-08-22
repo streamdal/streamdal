@@ -1,4 +1,4 @@
-# Streamdal's Snitch Node Data Quality SDK
+# Streamdal's Snitch Node Client SDK
 
 ## Getting started
 
@@ -8,7 +8,7 @@ To use the sdk in your node app:
 
 `npm install @streamdal/node-sdk-client`
 
-Then construct and instance `"@streamdal/snitch-node-client/snitch.js"` and use that
+Then construct an instance of `"@streamdal/snitch-node-client/snitch.js"` and use that
 to process your data:
 
 ```typescript
@@ -41,7 +41,7 @@ export const example = async () => {
 };
 
 ```
-*see ./src/example for complete example*
+*see ./examples for a runnable example that can be used as a starter*
 
 ## Development  
 

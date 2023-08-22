@@ -6,18 +6,20 @@ import { v4 as uuidv4 } from "uuid";
 // import { version } from "../../package.json";
 import { processResponse } from "./pipeline.js";
 
+export const sessionId = uuidv4();
+
 export interface RegisterConfigs {
   grpcClient: IInternalClient;
+  snitchToken: string;
   serviceName: string;
-  dryRun?: boolean;
+  dryRun: boolean;
   audiences?: Audience[];
 }
-
-export const sessionId = uuidv4();
 
 export const register = async ({
   grpcClient,
   serviceName,
+  snitchToken,
   dryRun,
   audiences,
 }: RegisterConfigs) => {
@@ -28,7 +30,7 @@ export const register = async ({
       {
         sessionId,
         serviceName,
-        dryRun: dryRun ? true : false,
+        dryRun,
         clientInfo: {
           clientType: ClientType.SDK,
           libraryName: "snitch-node-client",
@@ -39,7 +41,7 @@ export const register = async ({
         },
         ...(audiences ? { audiences } : { audiences: [] }),
       },
-      { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
+      { meta: { "auth-token": snitchToken } }
     );
 
     console.info(`### registered with grpc server`);

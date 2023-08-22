@@ -1,3 +1,4 @@
+import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
 import {
   PipelineStep,
   PipelineStepCondition,
@@ -5,7 +6,6 @@ import {
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
-import { grpcClient } from "./index.js";
 import { lock, metrics } from "./metrics.js";
 import {
   EnhancedStep,
@@ -28,6 +28,12 @@ export interface PipelinesStatus {
   stepStatuses: StepStatus[];
 }
 
+export interface PipelineConfigs {
+  grpcClient: IInternalClient;
+  snitchToken: string;
+  dryRun: boolean;
+}
+
 //
 // add pipeline information to the steps so we can log/notify
 // appropriately as we go
@@ -39,9 +45,10 @@ const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
   })) as EnhancedStep[];
 
 export const processPipeline = async ({
+  configs,
   audience,
   data,
-}: SnitchRequest): Promise<SnitchResponse> => {
+}: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
   const pipeline = internalPipelines.get(audience);
 
   if (!pipeline) {
@@ -65,10 +72,7 @@ export const processPipeline = async ({
       `running pipeline step ${step.pipelineName} - ${step.name}...`
     );
 
-    pipelineStatus = await runStep({
-      step,
-      pipeline: pipelineStatus,
-    });
+    pipelineStatus = await runStep({ configs, step, pipeline: pipelineStatus });
 
     console.info(`pipeline step ${step.pipelineName} - ${step.name} complete`);
 
@@ -84,28 +88,29 @@ export const processPipeline = async ({
   return {
     ...pipelineStatus,
     error: !!finalStatus?.error,
-    message: finalStatus?.message || "Success",
+    message: finalStatus?.message ?? "Success",
   };
 };
 
-const notifyStep = async (step: StepStatus) => {
+const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
   console.info("notifying error step", step);
-  await grpcClient.notify(
+  await configs.grpcClient.notify(
     {
       pipelineId: step.pipelineId,
       stepName: step.stepName,
       occurredAtUnixTsUtc: BigInt(Date.now()),
     },
-    { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
+    { meta: { "auth-token": configs.snitchToken } }
   );
 };
 
 export const resultCondition = (
+  configs: PipelineConfigs,
   conditions: PipelineStepCondition[],
   stepStatus: StepStatus
 ) => {
   if (conditions.includes(PipelineStepCondition.NOTIFY)) {
-    void notifyStep(stepStatus);
+    void notifyStep(configs, stepStatus);
   }
 
   if (conditions.includes(PipelineStepCondition.ABORT)) {
@@ -130,9 +135,11 @@ export const stepMetrics = async (stepStatus: StepStatus) => {
 };
 
 export const runStep = async ({
+  configs,
   step,
   pipeline,
 }: {
+  configs: PipelineConfigs;
   step: EnhancedStep;
   pipeline: PipelinesStatus;
 }): Promise<PipelinesStatus> => {
@@ -168,6 +175,7 @@ export const runStep = async ({
   }
 
   resultCondition(
+    configs,
     stepStatus.error ? step.onFailure : step.onSuccess,
     stepStatus
   );

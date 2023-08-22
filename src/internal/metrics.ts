@@ -1,7 +1,6 @@
+import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
 import { Metrics } from "@streamdal/snitch-protos/protos/internal.js";
 import ReadWriteLock from "rwlock";
-
-import { grpcClient } from "./index.js";
 
 export const METRIC_INTERVAL = 1000;
 
@@ -11,8 +10,13 @@ export const metrics: Metrics[] = [
 
 export const lock = new ReadWriteLock();
 
+export interface MetricsConfigs {
+  grpcClient: IInternalClient;
+  snitchToken: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/require-await
-export const sendMetrics = async () => {
+export const sendMetrics = async (configs: MetricsConfigs) => {
   console.debug(`### sending metrics to grpc server...`);
   if (!metrics.length) {
     console.debug(`### no metrics found, skipping`);
@@ -20,11 +24,11 @@ export const sendMetrics = async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   lock.writeLock(async (release) => {
-    const call = grpcClient.metrics(
+    const call = configs.grpcClient.metrics(
       {
         metrics,
       },
-      { meta: { "auth-token": process.env.SNITCH_TOKEN || "1234" } }
+      { meta: { "auth-token": configs.snitchToken } }
     );
     console.debug(`### metrics sent`);
 

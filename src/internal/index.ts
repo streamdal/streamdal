@@ -16,17 +16,22 @@ const transport = new GrpcTransport({
   channelCredentials: ChannelCredentials.createInsecure(),
 });
 
-export const grpcClient: IInternalClient = new InternalClient(transport);
+const grpcClient: IInternalClient = new InternalClient(transport);
 
 const start = () => {
-  void register({ grpcClient, serviceName: "test-service" });
+  void register({
+    grpcClient,
+    serviceName: "test-service",
+    snitchToken: "1234",
+    dryRun: false,
+  });
 
   setInterval(() => {
-    void heartbeat();
+    void heartbeat({ grpcClient, snitchToken: "1234" });
   }, HEARTBEAT_INTERVAL);
 
   setInterval(() => {
-    void sendMetrics();
+    void sendMetrics({ grpcClient, snitchToken: "1234" });
   }, METRIC_INTERVAL);
 };
 

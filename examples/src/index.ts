@@ -1,4 +1,9 @@
-import { Audience, OperationType, Snitch, SnitchConfigs } from "../snitch.js";
+import {
+  Audience,
+  OperationType,
+  Snitch,
+  SnitchConfigs,
+} from "@streamdal/snitch-node-client/snitch.js";
 
 const exampleData = {
   boolean_t: true,
@@ -52,3 +57,5 @@ export const example = async () => {
   console.log("snitch response");
   console.dir(result, { depth: 20 });
 };
+
+void example();
