@@ -95,7 +95,10 @@ export default function ServiceMap(
         defaultViewport={defaultViewport}
       >
         <Background style={{ height: "100vh" }} />
-        <Controls position="top-right" style={{ marginTop: "60px" }}>
+        <Controls
+          position="top-right"
+          className="absolute top-[100px]"
+        >
           <ControlButton
             onClick={() => {
               setNodes(nodesData), setEdges(edges);
