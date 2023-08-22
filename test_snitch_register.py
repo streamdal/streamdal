@@ -1,6 +1,5 @@
 import pytest
 import snitch_protos.protos as protos
-import snitchpy
 import uuid
 import unittest.mock as mock
 from snitchpy import SnitchClient, SnitchConfig
