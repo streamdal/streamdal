@@ -1,6 +1,6 @@
 use crate::detective::Request;
 use lazy_static::lazy_static;
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 
 pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,

@@ -1,4 +1,4 @@
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 use snitch_detective::detective;
 use snitch_detective::detective::Request;
 

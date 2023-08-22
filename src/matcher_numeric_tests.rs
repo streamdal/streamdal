@@ -1,6 +1,6 @@
 use crate::detective::Request;
 #[cfg(test)]
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 
 #[test]
 fn test_numeric() {

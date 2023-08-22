@@ -3,7 +3,7 @@ use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use crate::{matcher_core as core, FromValue};
 
-use protos::detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveType;
 use std::str;
 
 pub struct Detective {}
