@@ -11,11 +11,12 @@ import {
 
 import { addAudience, addAudiences } from "./internal/audience.js";
 import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
+import { initPipelines } from "./internal/pipeline.js";
 import {
   processPipeline as internalProcessPipeline,
   StepStatus,
 } from "./internal/process.js";
-import { register } from "./internal/register.js";
+import { internal, register } from "./internal/register.js";
 
 export { Audience, OperationType };
 
@@ -65,6 +66,10 @@ export class Snitch {
     dryRun,
     audiences,
   }: SnitchConfigs) {
+    if (process.env.NODE_ENV === "production") {
+      console.debug = () => null;
+    }
+
     const url = snitchUrl ? snitchUrl : process.env.SNITCH_URL;
     const token = snitchToken ? snitchToken : process.env.SNITCH_TOKEN;
     const name = serviceName ? serviceName : process.env.SNITCH_SERVICE_NAME;
@@ -105,6 +110,9 @@ export class Snitch {
     audience,
     data,
   }: SnitchRequest): Promise<SnitchResponse> {
+    if (!internal.pipelineInitialized) {
+      await initPipelines(this.configs);
+    }
     await addAudience({ configs: this.configs, audience });
     return internalProcessPipeline({ configs: this.configs, audience, data });
   }

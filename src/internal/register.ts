@@ -4,7 +4,7 @@ import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client
 import { v4 as uuidv4 } from "uuid";
 
 // import { version } from "../../package.json";
-import { processResponse } from "./pipeline.js";
+import { InternalPipeline, processResponse } from "./pipeline.js";
 
 export const sessionId = uuidv4();
 
@@ -15,6 +15,15 @@ export interface RegisterConfigs {
   dryRun: boolean;
   audiences?: Audience[];
 }
+
+//
+// fyi, the init flag is because we can't await pipeline initialization
+// in our constructor so we do it on processPipeline only if needed
+export const internal = {
+  pipelineInitialized: false,
+  pipelines: new Map<string, InternalPipeline>(),
+  audiences: new Set<string>(),
+};
 
 export const register = async ({
   grpcClient,
@@ -41,25 +50,27 @@ export const register = async ({
         },
         ...(audiences ? { audiences } : { audiences: [] }),
       },
-      { meta: { "auth-token": snitchToken } }
+      {
+        meta: { "auth-token": snitchToken },
+      }
     );
 
     console.info(`### registered with grpc server`);
 
     const headers = await call.headers;
-    console.info("got response headers: ", headers);
+    console.debug("got response headers: ", headers);
 
     for await (const response of call.responses) {
-      console.info("got response message: ", response.command);
-      console.info("processing response command...");
+      //
+      // console.debug("processing response command...", response);
       processResponse(response);
     }
 
     const status = await call.status;
-    console.info("got status: ", status);
+    console.debug("got status: ", status);
 
     const trailers = await call.trailers;
-    console.info("got trailers: ", trailers);
+    console.debug("got trailers: ", trailers);
   } catch (error) {
     console.error("Error registering with grpc server", error);
   }

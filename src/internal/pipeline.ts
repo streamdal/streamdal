@@ -5,6 +5,9 @@ import {
   PipelineStep,
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 
+import { Configs } from "../snitch.js";
+import { internal } from "./register.js";
+
 export type InternalPipeline = Pipeline & {
   paused: boolean;
 };
@@ -14,55 +17,71 @@ export type EnhancedStep = PipelineStep & {
   pipelineName: string;
 };
 
-export const internalPipelines = new Map<Audience, InternalPipeline>();
+export const initPipelines = async (configs: Configs) => {
+  const { response } = await configs.grpcClient.getAttachCommandsByService(
+    {
+      serviceName: configs.serviceName,
+    },
+    { meta: { "auth-token": configs.snitchToken } }
+  );
 
-export const processResponse = (command: Command) => {
-  if (!command.audience) {
-    console.error("command response has no audience, ignoring");
+  for (const command of response.active) {
+    processResponse(command);
+  }
+  internal.pipelineInitialized = true;
+  return;
+};
+
+export const processResponse = (response: Command) => {
+  if (!response.audience) {
+    // console.debug("command response has no audience, ignoring");
     return;
   }
 
-  console.info("processing grpc server command...");
+  // console.debug("processing grpc server response command...", response);
 
-  switch (command.command.oneofKind) {
+  switch (response.command.oneofKind) {
     case "attachPipeline":
-      command.command.attachPipeline.pipeline &&
+      response.command.attachPipeline.pipeline &&
         attachPipeline(
-          command.audience,
-          command.command.attachPipeline.pipeline
+          response.audience,
+          response.command.attachPipeline.pipeline
         );
       break;
     case "detachPipeline":
       detachPipeline(
-        command.audience,
-        command.command.detachPipeline.pipelineId
+        response.audience,
+        response.command.detachPipeline.pipelineId
       );
       break;
     case "pausePipeline":
       togglePausePipeline(
-        command.audience,
-        command.command.pausePipeline.pipelineId,
+        response.audience,
+        response.command.pausePipeline.pipelineId,
         true
       );
       break;
     case "resumePipeline":
       togglePausePipeline(
-        command.audience,
-        command.command.resumePipeline.pipelineId,
+        response.audience,
+        response.command.resumePipeline.pipelineId,
         false
       );
       break;
   }
 
-  console.info("grpc server command processed");
+  // console.debug("grpc server command processed");
 };
 
 export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
-  internalPipelines.set(audience, { ...pipeline, paused: false });
+  internal.pipelines.set(JSON.stringify(audience), {
+    ...pipeline,
+    paused: false,
+  });
 
 export const detachPipeline = (audience: Audience, pipelineId: string) => {
-  const p = internalPipelines.get(audience);
-  pipelineId === p?.id && internalPipelines.delete(audience);
+  const p = internal.pipelines.get(JSON.stringify(audience));
+  pipelineId === p?.id && internal.pipelines.delete(JSON.stringify(audience));
 };
 
 export const togglePausePipeline = (
@@ -70,6 +89,7 @@ export const togglePausePipeline = (
   pipelineId: string,
   paused: boolean
 ) => {
-  const p = internalPipelines.get(audience);
-  pipelineId === p?.id && internalPipelines.set(audience, { ...p, paused });
+  const p = internal.pipelines.get(JSON.stringify(audience));
+  pipelineId === p?.id &&
+    internal.pipelines.set(JSON.stringify(audience), { ...p, paused });
 };

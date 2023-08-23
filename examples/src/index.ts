@@ -37,7 +37,7 @@ const config: SnitchConfigs = {
   serviceName: "test-service-name",
   pipelineTimeout: "100",
   stepTimeout: "10",
-  dryRun: "false",
+  dryRun: false,
 };
 
 const audience: Audience = {

@@ -4,14 +4,12 @@ import {
 } from "@streamdal/snitch-protos/protos/common.js";
 
 import { Configs } from "../snitch.js";
-import { sessionId } from "./register.js";
+import { internal, sessionId } from "./register.js";
 
 export interface AddAudience {
   configs: Configs;
   audience: Audience;
 }
-
-export const internalAudiences = new Set<Audience>();
 
 export const addAudiences = async (configs: Configs) => {
   if (!configs.audiences || configs.audiences.length === 0) {
@@ -25,11 +23,10 @@ export const addAudiences = async (configs: Configs) => {
 
 export const addAudience = async ({ configs, audience }: AddAudience) => {
   try {
-    if (internalAudiences.has(audience)) {
+    if (internal.audiences.has(JSON.stringify(audience))) {
       return;
     }
-    internalAudiences.add(audience);
-    console.info("adding audience", audience);
+    internal.audiences.add(JSON.stringify(audience));
     const { response } = await configs.grpcClient.newAudience(
       {
         sessionId,
@@ -38,7 +35,7 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
       { meta: { "auth-token": configs.snitchToken } }
     );
 
-    if (response.code === ResponseCode.OK) {
+    if (response.code !== ResponseCode.OK) {
       console.error("error adding audience", response.message);
     }
   } catch (error) {

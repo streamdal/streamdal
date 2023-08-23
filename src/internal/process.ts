@@ -7,11 +7,8 @@ import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";
-import {
-  EnhancedStep,
-  InternalPipeline,
-  internalPipelines,
-} from "./pipeline.js";
+import { EnhancedStep, InternalPipeline } from "./pipeline.js";
+import { internal } from "./register.js";
 import { runWasm } from "./wasm.js";
 
 export interface StepStatus {
@@ -49,11 +46,11 @@ export const processPipeline = async ({
   audience,
   data,
 }: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
-  const pipeline = internalPipelines.get(audience);
+  const pipeline = internal.pipelines.get(JSON.stringify(audience));
 
   if (!pipeline) {
     const message = "no pipeline found for this audience, returning data";
-    console.info(message);
+    console.debug(message);
     return { data, error: true, message };
   }
 
@@ -68,13 +65,13 @@ export const processPipeline = async ({
   };
 
   for (const step of allSteps) {
-    console.info(
+    console.debug(
       `running pipeline step ${step.pipelineName} - ${step.name}...`
     );
 
     pipelineStatus = await runStep({ configs, step, pipeline: pipelineStatus });
 
-    console.info(`pipeline step ${step.pipelineName} - ${step.name} complete`);
+    console.debug(`pipeline step ${step.pipelineName} - ${step.name} complete`);
 
     if (pipelineStatus.stepStatuses.at(-1)?.abort) {
       break;
@@ -93,7 +90,7 @@ export const processPipeline = async ({
 };
 
 const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
-  console.info("notifying error step", step);
+  console.debug("notifying error step", step);
   await configs.grpcClient.notify(
     {
       pipelineId: step.pipelineId,
@@ -154,13 +151,9 @@ export const runStep = async ({
   let data = pipeline.data;
 
   try {
-    if (!step.WasmBytes || !step.WasmFunction) {
-      throw Error(`No wasm function found for step ${step.name}`);
-    }
     const { output, exitCode, exitMsg } = await runWasm({
-      wasmBytes: step.WasmBytes,
-      wasmFunction: step.WasmFunction,
-      data: pipeline.data,
+      step,
+      data,
     });
 
     //

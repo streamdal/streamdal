@@ -1,5 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
-import { WASMResponse } from "@streamdal/snitch-protos/protos/wasm.js";
+import { PipelineStep } from "@streamdal/snitch-protos/protos/pipeline.js";
+import {
+  WASMRequest,
+  WASMResponse,
+} from "@streamdal/snitch-protos/protos/wasm.js";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 
@@ -35,28 +39,42 @@ export const readResponse = (pointer: number, buffer: Uint8Array) => {
 };
 
 export const runWasm = async ({
-  wasmBytes,
-  wasmFunction,
+  step,
   data,
 }: {
-  wasmBytes: Uint8Array;
-  wasmFunction: string;
+  step: PipelineStep;
   data: Uint8Array;
 }) => {
-  const wasm = await WebAssembly.compile(wasmBytes);
+  if (!step.WasmBytes || !step.WasmFunction) {
+    throw Error(`No wasm function found for step ${step.name}`);
+  }
+
+  const wasm = await WebAssembly.compile(step.WasmBytes);
   const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
   const instance: any = await WebAssembly.instantiate(wasm, importObject);
   const { exports } = instance;
-  const { memory, alloc, [wasmFunction]: f } = exports;
+  const { memory, alloc, [step.WasmFunction]: f } = exports;
 
-  const ptr = alloc(data.length);
-  const mem = new Uint8Array(memory.buffer, ptr, data.length);
-  mem.set(data);
+  const request = WASMRequest.create({
+    step: {
+      name: step.name,
+      onSuccess: step.onSuccess,
+      onFailure: step.onFailure,
+      step: step.step,
+    },
+    input: data,
+  });
 
-  const returnPtr = f(ptr, data.length);
+  const requestBytes = WASMRequest.toBinary(request);
+
+  const ptr = alloc(requestBytes.length);
+  const mem = new Uint8Array(memory.buffer, ptr, requestBytes.length);
+  mem.set(requestBytes);
+
+  const returnPtr = f(ptr, requestBytes.length);
 
   const completeBufferFromMemory = new Uint8Array(memory.buffer);
   const response = readResponse(returnPtr, completeBufferFromMemory);
-
-  return WASMResponse.fromBinary(response);
+  const decodedResponse = WASMResponse.fromBinary(response);
+  return decodedResponse;
 };
