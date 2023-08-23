@@ -6,7 +6,7 @@ import {
 } from "@streamdal/snitch-protos/protos/pipeline.js";
 
 import { Configs } from "../snitch.js";
-import { internal } from "./register.js";
+import { audienceKey, internal } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
   paused: boolean;
@@ -20,7 +20,7 @@ export type EnhancedStep = PipelineStep & {
 export const initPipelines = async (configs: Configs) => {
   const { response } = await configs.grpcClient.getAttachCommandsByService(
     {
-      serviceName: configs.serviceName,
+      serviceName: configs.serviceName.toLowerCase(),
     },
     { meta: { "auth-token": configs.snitchToken } }
   );
@@ -34,11 +34,10 @@ export const initPipelines = async (configs: Configs) => {
 
 export const processResponse = (response: Command) => {
   if (!response.audience) {
-    // console.debug("command response has no audience, ignoring");
+    response.command.oneofKind !== "keepAlive" &&
+      console.debug("command response has no audience, ignoring");
     return;
   }
-
-  // console.debug("processing grpc server response command...", response);
 
   switch (response.command.oneofKind) {
     case "attachPipeline":
@@ -69,19 +68,18 @@ export const processResponse = (response: Command) => {
       );
       break;
   }
-
-  // console.debug("grpc server command processed");
 };
 
 export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
-  internal.pipelines.set(JSON.stringify(audience), {
+  internal.pipelines.set(audienceKey(audience), {
     ...pipeline,
     paused: false,
   });
 
 export const detachPipeline = (audience: Audience, pipelineId: string) => {
-  const p = internal.pipelines.get(JSON.stringify(audience));
-  pipelineId === p?.id && internal.pipelines.delete(JSON.stringify(audience));
+  const key = audienceKey(audience);
+  const p = internal.pipelines.get(key);
+  pipelineId === p?.id && internal.pipelines.delete(key);
 };
 
 export const togglePausePipeline = (
@@ -89,7 +87,7 @@ export const togglePausePipeline = (
   pipelineId: string,
   paused: boolean
 ) => {
-  const p = internal.pipelines.get(JSON.stringify(audience));
-  pipelineId === p?.id &&
-    internal.pipelines.set(JSON.stringify(audience), { ...p, paused });
+  const key = audienceKey(audience);
+  const p = internal.pipelines.get(key);
+  pipelineId === p?.id && internal.pipelines.set(key, { ...p, paused });
 };

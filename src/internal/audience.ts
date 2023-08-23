@@ -4,7 +4,7 @@ import {
 } from "@streamdal/snitch-protos/protos/common.js";
 
 import { Configs } from "../snitch.js";
-import { internal, sessionId } from "./register.js";
+import { audienceKey, internal, sessionId } from "./register.js";
 
 export interface AddAudience {
   configs: Configs;
@@ -23,10 +23,10 @@ export const addAudiences = async (configs: Configs) => {
 
 export const addAudience = async ({ configs, audience }: AddAudience) => {
   try {
-    if (internal.audiences.has(JSON.stringify(audience))) {
+    if (internal.audiences.has(audienceKey(audience))) {
       return;
     }
-    internal.audiences.add(JSON.stringify(audience));
+    internal.audiences.add(audienceKey(audience));
     const { response } = await configs.grpcClient.newAudience(
       {
         sessionId,

@@ -8,7 +8,7 @@ import { WASMExitCode } from "@streamdal/snitch-protos/protos/wasm.js";
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";
 import { EnhancedStep, InternalPipeline } from "./pipeline.js";
-import { internal } from "./register.js";
+import { audienceKey, internal } from "./register.js";
 import { runWasm } from "./wasm.js";
 
 export interface StepStatus {
@@ -46,10 +46,11 @@ export const processPipeline = async ({
   audience,
   data,
 }: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
-  const pipeline = internal.pipelines.get(JSON.stringify(audience));
+  const pipeline = internal.pipelines.get(audienceKey(audience));
 
-  if (!pipeline) {
-    const message = "no pipeline found for this audience, returning data";
+  if (!pipeline || pipeline.paused) {
+    const message =
+      "no active pipeline found for this audience, returning data";
     console.debug(message);
     return { data, error: true, message };
   }

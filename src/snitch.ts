@@ -102,6 +102,12 @@ export class Snitch {
       void heartbeat(this.configs);
     }, HEARTBEAT_INTERVAL);
 
+    //
+    // TODO: sort out what this sends
+    // setInterval(() => {
+    //   void sendMetrics(this.configs);
+    // }, METRIC_INTERVAL);
+
     void addAudiences(this.configs);
     void register(this.configs);
   }

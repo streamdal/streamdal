@@ -25,6 +25,9 @@ export const internal = {
   audiences: new Set<string>(),
 };
 
+export const audienceKey = (audience: Audience) =>
+  JSON.stringify(audience).toLowerCase();
+
 export const register = async ({
   grpcClient,
   serviceName,
@@ -56,21 +59,11 @@ export const register = async ({
     );
 
     console.info(`### registered with grpc server`);
-
-    const headers = await call.headers;
-    console.debug("got response headers: ", headers);
-
     for await (const response of call.responses) {
-      //
-      // console.debug("processing response command...", response);
+      response.command.oneofKind !== "keepAlive" &&
+        console.debug("processing response command...", response);
       processResponse(response);
     }
-
-    const status = await call.status;
-    console.debug("got status: ", status);
-
-    const trailers = await call.trailers;
-    console.debug("got trailers: ", trailers);
   } catch (error) {
     console.error("Error registering with grpc server", error);
   }

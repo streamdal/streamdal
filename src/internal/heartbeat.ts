@@ -1,3 +1,4 @@
+import { ResponseCode } from "@streamdal/snitch-protos/protos/common.js";
 import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
 
 import { sessionId } from "./register.js";
@@ -10,7 +11,6 @@ export interface HearbeatConfigs {
 }
 
 export const heartbeat = async (configs: HearbeatConfigs) => {
-  console.debug(`### sending heartbeat to grpc server...`);
   const call = configs.grpcClient.heartbeat(
     {
       sessionId,
@@ -19,8 +19,7 @@ export const heartbeat = async (configs: HearbeatConfigs) => {
   );
 
   const response = await call.response;
-  console.debug("got heartbeat response message: ", response);
-
-  const status = await call.status;
-  console.debug("got heartbeat status: ", status);
+  if (response.code !== ResponseCode.OK) {
+    console.error("Heartbeat error", response.message);
+  }
 };
