@@ -1,7 +1,6 @@
 import { client, meta } from "./grpc.ts";
 import { GetAllResponse } from "snitch-protos/protos/external.ts";
 import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { dummyAudiences, dummyConfig, dummyLive } from "./dummies.ts";
 import { Audience } from "snitch-protos/protos/common.ts";
 import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
 
@@ -16,11 +15,6 @@ export const getServiceMap = async (): Promise<ServiceMapType> => {
   const { response } = await client.getAll({}, meta);
   return {
     ...response,
-    //
-    // TODO: remove dummy data
-    ...response.audiences.length === 0 ? { audiences: dummyAudiences } : {},
-    ...response.live.length === 0 ? { live: dummyLive } : {},
-    ...Object.keys(response.config).length === 0 ? { config: dummyConfig } : {},
     pipes: Object.values(response?.pipelines),
   };
 };
