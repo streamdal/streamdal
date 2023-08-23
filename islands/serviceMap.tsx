@@ -1,12 +1,10 @@
 import ReactFlow, {
   Background,
-  ControlButton,
   Controls,
   useEdgesState,
   useNodesState,
 } from "reactflow";
 import "flowbite";
-import IconArrowBackUp from "tabler-icons/tsx/arrow-back-up.tsx";
 import {
   ComponentNode,
   GroupNode,
@@ -18,7 +16,6 @@ import { ServiceNodes } from "../lib/fetch.ts";
 import { Audience } from "snitch-protos/protos/common.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
-import { useEffect, useState } from "preact/hooks";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -53,26 +50,18 @@ export default function ServiceMap(
     blur?: boolean;
   },
 ) {
-  const savedFlow = JSON.parse(localStorage.getItem(LAYOUT_KEY));
-  const [instance, setInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    savedFlow?.nodes?.length > 0 ? savedFlow.nodes : nodesData,
+    nodesData,
   );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(
-    savedFlow?.edges?.length > 0 ? savedFlow.edges : edgesData,
+  const [edges, onEdgesChange] = useEdgesState(
+    edgesData,
   );
 
-  const defaultViewport = savedFlow?.viewport ? savedFlow.viewport : {
+  const defaultViewport = {
     x: 0,
     y: 150,
     zoom: .85,
   };
-
-  useEffect(async () => {
-    if (instance) {
-      serialize(instance);
-    }
-  }, nodes);
 
   useSignalEffect(() => {
     if (opUpdateSignal.value) {
@@ -86,7 +75,6 @@ export default function ServiceMap(
       class={`w-full h-screen m-0 ${blur ? "filter blur-sm" : ""}`}
     >
       <ReactFlow
-        onInit={setInstance}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -98,17 +86,7 @@ export default function ServiceMap(
         <Controls
           position="top-right"
           className="absolute top-[100px]"
-        >
-          <ControlButton
-            onClick={() => {
-              setNodes(nodesData), setEdges(edges);
-              localStorage.setItem(LAYOUT_KEY, null);
-            }}
-            title="reset view"
-          >
-            <IconArrowBackUp class="w-5 h-5" />
-          </ControlButton>
-        </Controls>
+        />
       </ReactFlow>
     </div>
   );

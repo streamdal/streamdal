@@ -2,7 +2,7 @@ import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { ServiceMapType } from "./fetch.ts";
-import { getAttachedPipeline } from "./utils.ts";
+import { audienceKey, getAttachedPipeline } from "./utils.ts";
 import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
 
@@ -63,7 +63,7 @@ export const mapOperation = (
   nodesMap.groupCount.set(a.serviceName, groupCount);
 
   nodesMap.nodes.set(`${a.serviceName}-${a.componentName}-${op}`, {
-    id: `${a.serviceName}-${a.componentName}-${op}`,
+    id: `${audienceKey(a)}-group`,
     type: `${op}Group`,
     sourcePosition: "right",
     targetPosition: "left",
@@ -79,14 +79,14 @@ export const mapOperation = (
   });
 
   nodesMap.nodes.set(a.operationName, {
-    id: `${a.serviceName}-${a.operationName}`,
+    id: `${audienceKey(a)}-operation`,
     draggable: false,
     type: op,
     position: {
       x: 10,
       y: 38 + ((groupCount[op] - 1) * 80),
     },
-    parentNode: `${a.serviceName}-${a.componentName}-${op}`,
+    parentNode: `${audienceKey(a)}-group`,
     extent: "parent",
     data: {
       audience: a,
@@ -120,7 +120,7 @@ export const mapNodes = (
     }
 
     nodesMap.nodes.set(a.serviceName, {
-      id: a.serviceName,
+      id: `${audienceKey(a)}-service`,
       type: "service",
       dragHandle: "#dragHandle",
       position: { x: 150 + xOffset(nodesMap.groupCount.size), y: 0 },
@@ -138,7 +138,7 @@ export const mapNodes = (
     );
 
     nodesMap.nodes.set(a.componentName, {
-      id: a.componentName,
+      id: `${audienceKey(a)}-component`,
       type: "component",
       sourcePosition: "right",
       targetPosition: "left",
@@ -163,16 +163,16 @@ export const mapEdgePair = (
   a: Audience,
 ): Map<string, FlowEdge> => {
   const op = OperationType[a.operationType].toLowerCase();
-  edgesMap.set(`${a.componentName}-${op}`, {
-    id: `${a.componentName}-${op}`,
+  edgesMap.set(`${audienceKey(a)}-component-edge`, {
+    id: `${audienceKey(a)}-component-edge`,
     ...op === "consumer"
       ? {
-        source: a.componentName,
-        target: `${a.serviceName}-${a.componentName}-${op}`,
+        source: `${audienceKey(a)}-component`,
+        target: `${audienceKey(a)}-group`,
       }
       : {
-        source: `${a.serviceName}-${a.componentName}-${op}`,
-        target: a.componentName,
+        source: `${audienceKey(a)}-group`,
+        target: `${audienceKey(a)}-component`,
       },
     markerEnd: {
       type: MarkerType.Arrow,
@@ -186,16 +186,16 @@ export const mapEdgePair = (
     },
   });
 
-  edgesMap.set(`${a.serviceName}-${op}`, {
-    id: `${a.serviceName}-${op}`,
+  edgesMap.set(`${audienceKey(a)}-service-edge`, {
+    id: `${audienceKey(a)}-services-edge`,
     ...op === "consumer"
       ? {
-        source: `${a.serviceName}-${a.componentName}-${op}`,
-        target: a.serviceName,
+        source: `${audienceKey(a)}-group`,
+        target: `${audienceKey(a)}-service`,
       }
       : {
-        source: a.serviceName,
-        target: `${a.serviceName}-${a.componentName}-${op}`,
+        source: `${audienceKey(a)}-service`,
+        target: `${audienceKey(a)}-group`,
       },
     markerEnd: {
       type: MarkerType.Arrow,

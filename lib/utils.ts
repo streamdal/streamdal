@@ -84,18 +84,13 @@ export const getOpRoute = (
     encodeURIComponent(component)
   }/${OperationType[opType]}/op/${encodeURIComponent(opName)}`;
 
+//
+//snitch server serialized audiences a bit oddly
+//and we need to do the same to interpret config keys
 export const audienceKey = (audience: Audience) =>
-  Object.values(
-    (({ serviceName, componentName, operationType, operationName }) => ({
-      serviceName,
-      componentName,
-      operationType,
-      operationName,
-    }))(audience),
-  ).map((
-    v: string | number,
-  ) => new String(v).toLowerCase())
-    .join("");
+  `${audience.serviceName}/operation_type_${
+    OperationType[audience.operationType]
+  }/${audience.operationName}/${audience.componentName}`.toLowerCase();
 
 export const getAttachedPipeline = (
   audience: Audience,

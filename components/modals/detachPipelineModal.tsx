@@ -5,6 +5,7 @@ import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
+import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 
 export const DetachPipelineModal = (
   { audience, pipeline }: {
@@ -29,6 +30,11 @@ export const DetachPipelineModal = (
         id: "pipelineCrud",
         type: success.status ? "success" : "error",
         message: success.message,
+      };
+      opModal.value.attachedPipeline = null;
+      opUpdateSignal.value = {
+        audience,
+        attachedPipeline: null,
       };
     }
     close();
