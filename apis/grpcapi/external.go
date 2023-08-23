@@ -82,6 +82,11 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 				continue
 			}
 
+			if v.Audience == nil {
+				s.log.Errorf("getAllLive: audience is nil for session id '%s'", v.SessionID)
+				continue
+			}
+
 			live.Client = v.Value
 			live.Client.XSessionId = &v.SessionID
 			live.Client.XServiceName = &v.Audience.ServiceName
