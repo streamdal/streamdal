@@ -55,7 +55,7 @@ func Load(name string, prefix ...string) (*Mapping, error) {
 	}
 
 	return &Mapping{
-		ID:       "",
+		ID:       wasmID,
 		Filename: mapping.Filename,
 		FuncName: mapping.FuncName,
 		Contents: data,
