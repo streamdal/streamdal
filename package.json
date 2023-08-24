@@ -18,7 +18,7 @@
     "build:main": "tsc",
     "clean": "rimraf build",
     "copy": "cp README.md ./build/README.md && rm ./build/internal/*.ts && cp package.json ./build/package.json",
-    "example": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/example/index.js\"",
+    "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
     "start": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/internal/index.js\"",
     "test": "vitest run",
