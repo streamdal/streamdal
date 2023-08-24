@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -12,6 +13,11 @@ func main() {
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)
+	}
+
+	if cfg.Debug {
+		fmt.Println("Set debug level")
+		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	switch cfg.Ctx.Command() {
