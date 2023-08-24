@@ -82,15 +82,13 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 				continue
 			}
 
-			if v.Audience == nil {
-				s.log.Errorf("getAllLive: audience is nil for session id '%s'", v.SessionID)
-				continue
-			}
+			// There might be no audience - service name + node name etc. should be in ClientInfo though!
 
 			live.Client = v.Value
-			live.Client.XSessionId = &v.SessionID
-			live.Client.XServiceName = &v.Audience.ServiceName
-			live.Client.XNodeName = &v.NodeName
+
+			liveInfo = append(liveInfo, live)
+
+			// Audiences will get filled out later
 		}
 	}
 
@@ -101,9 +99,9 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 
 	// Have register entries - fill out audiences for each
 	for _, li := range liveInfo {
-		// Find all live entry audiences with same session ID
+		// Find all live entry audiences with same session ID (and are NOT register)
 		for _, ld := range liveData {
-			if *li.Client.XSessionId == ld.SessionID {
+			if *li.Client.XSessionId == ld.SessionID && !ld.Register {
 				li.Audiences = append(li.Audiences, ld.Audience)
 			}
 		}
@@ -238,6 +236,11 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		}
 
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Re-populate WASM bytes (since they are stripped for UI)
+	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, errors.Wrap(err, "unable to repopulate WASM data").Error()), nil
 	}
 
 	// Update pipeline in storage

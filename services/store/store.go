@@ -102,6 +102,11 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 
 	registrationKey := NATSLiveKey(req.SessionId, s.options.NodeName, "register")
 
+	// Populate these so we can save them in K/V; needed for GetAll()
+	req.ClientInfo.XSessionId = &req.SessionId
+	req.ClientInfo.XServiceName = &req.ServiceName
+	req.ClientInfo.XNodeName = &s.options.NodeName
+
 	clientInfoBytes, err := proto.Marshal(req.ClientInfo)
 	if err != nil {
 		return errors.Wrap(err, "error marshalling client info")
@@ -502,7 +507,7 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 
 	// key is of the format:
 	//
-	// <sessionID>/<nodeName>/<<service>/<operation_type>/<component>>
+	// <sessionID>/<nodeName>/<<service>/<operation_type>/<operation_name>/<component_name>>
 	// OR
 	// <sessionID>/<nodeName>/register
 

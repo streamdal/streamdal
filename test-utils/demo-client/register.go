@@ -99,7 +99,7 @@ func (r *Register) runFileReader() error {
 
 		for scanner.Scan() {
 			r.inputCh <- scanner.Bytes()
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Second)
 		}
 
 		llog.Debug("reached end of file; restarting")
