@@ -143,7 +143,7 @@ func (r *Register) runClient() error {
 
 		_, err := sc.Process(context.Background(), &snitch.ProcessRequest{
 			ComponentName: r.config.Register.ComponentName,
-			OperationType: 1,
+			OperationType: snitch.OperationType(r.config.Register.OperationType),
 			OperationName: r.config.Register.OperationName,
 			Data:          input,
 		})
