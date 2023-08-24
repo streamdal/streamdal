@@ -92,6 +92,14 @@ export const audienceKey = (audience: Audience) =>
     OperationType[audience.operationType]
   }/${audience.operationName}/${audience.componentName}`.toLowerCase();
 
+export const serviceKey = (audience: Audience) =>
+  lower(`${audience.serviceName}`.toLowerCase());
+
+export const componentKey = (audience: Audience) =>
+  lower(`${audience.serviceName}`);
+
+export const lower = (s: string) => s.toLowerCase();
+
 export const getAttachedPipeline = (
   audience: Audience,
   pipelines: PipelinesType,

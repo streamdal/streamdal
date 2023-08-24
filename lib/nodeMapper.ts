@@ -2,7 +2,12 @@ import { Audience, OperationType } from "snitch-protos/protos/common.ts";
 import { Pipeline } from "snitch-protos/protos/pipeline.ts";
 import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
 import { ServiceMapType } from "./fetch.ts";
-import { audienceKey, getAttachedPipeline } from "./utils.ts";
+import {
+  audienceKey,
+  componentKey,
+  getAttachedPipeline,
+  serviceKey,
+} from "./utils.ts";
 import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
 
@@ -120,7 +125,7 @@ export const mapNodes = (
     }
 
     nodesMap.nodes.set(a.serviceName, {
-      id: `${audienceKey(a)}-service`,
+      id: `${serviceKey(a)}-service`,
       type: "service",
       dragHandle: "#dragHandle",
       position: { x: 150 + xOffset(nodesMap.groupCount.size), y: 0 },
@@ -138,7 +143,7 @@ export const mapNodes = (
     );
 
     nodesMap.nodes.set(a.componentName, {
-      id: `${audienceKey(a)}-component`,
+      id: `${componentKey(a)}-component`,
       type: "component",
       sourcePosition: "right",
       targetPosition: "left",
@@ -157,7 +162,7 @@ export const mapNodes = (
 //
 // For each audience there are a pair of edges, one for each arrow:
 // consumers: component -> consumer group -> service
-// producers: service -> producer group -> component
+// producers: component <- producer group <- service
 export const mapEdgePair = (
   edgesMap: Map<string, FlowEdge>,
   a: Audience,
@@ -167,12 +172,12 @@ export const mapEdgePair = (
     id: `${audienceKey(a)}-component-edge`,
     ...op === "consumer"
       ? {
-        source: `${audienceKey(a)}-component`,
+        source: `${componentKey(a)}-component`,
         target: `${audienceKey(a)}-group`,
       }
       : {
         source: `${audienceKey(a)}-group`,
-        target: `${audienceKey(a)}-component`,
+        target: `${componentKey(a)}-component`,
       },
     markerEnd: {
       type: MarkerType.Arrow,
@@ -187,14 +192,14 @@ export const mapEdgePair = (
   });
 
   edgesMap.set(`${audienceKey(a)}-service-edge`, {
-    id: `${audienceKey(a)}-services-edge`,
+    id: `${audienceKey(a)}-service-edge`,
     ...op === "consumer"
       ? {
         source: `${audienceKey(a)}-group`,
-        target: `${audienceKey(a)}-service`,
+        target: `${serviceKey(a)}-service`,
       }
       : {
-        source: `${audienceKey(a)}-service`,
+        source: `${serviceKey(a)}-service`,
         target: `${audienceKey(a)}-group`,
       },
     markerEnd: {

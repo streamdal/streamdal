@@ -13,6 +13,7 @@ export type PipelinesType = { [key: string]: PipelineInfo };
 
 export const getServiceMap = async (): Promise<ServiceMapType> => {
   const { response } = await client.getAll({}, meta);
+
   return {
     ...response,
     pipes: Object.values(response?.pipelines),
