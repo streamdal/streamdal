@@ -1,11 +1,12 @@
-import { Audience, OperationType } from "snitch-protos/protos/common.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
-import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
+import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { ClientInfo, LiveInfo } from "snitch-protos/protos/sp_info.ts";
 import { ServiceMapType } from "./fetch.ts";
 import {
-  audienceKey,
   componentKey,
   getAttachedPipeline,
+  groupKey,
+  operationKey,
   serviceKey,
 } from "./utils.ts";
 import { MarkerType } from "reactflow";
@@ -39,10 +40,11 @@ type GroupCountKey = "producer" | "consumer";
 export type GroupCount = { [key in GroupCountKey]: number };
 
 //
-// group counts per service are used for vertical offset layout positions
+// the service map is used for x-axis offset layout positions and
+// group counts per service are used for y-axix offset layout positions
 export type NodesMap = {
   nodes: Map<string, FlowNode>;
-  groupCount: Map<string, GroupCount>;
+  services: Map<string, GroupCount>;
 };
 
 export type FlowEdge = {
@@ -53,8 +55,10 @@ export type FlowEdge = {
   style: any;
 };
 
-export const xOffset = (serviceCount: number) =>
-  serviceCount > 1 ? (serviceCount - 1) * 800 : 0;
+export const xOffset = (
+  audience: Audience,
+  services: Map<string, GroupCount>,
+) => Array.from(services.keys()).indexOf(serviceKey(audience)) * 800;
 
 export const mapOperation = (
   nodesMap: NodesMap,
@@ -62,19 +66,19 @@ export const mapOperation = (
   serviceMap: ServiceMapType,
 ) => {
   const op = OperationType[a.operationType].toLowerCase() as GroupCountKey;
-  const groupCount = nodesMap.groupCount.get(a.serviceName)!;
+  const groupCount = nodesMap.services.get(serviceKey(a))!;
   groupCount.producer = groupCount.producer + (op === "producer" ? 1 : 0);
   groupCount.consumer = groupCount.consumer + (op === "consumer" ? 1 : 0);
-  nodesMap.groupCount.set(a.serviceName, groupCount);
+  nodesMap.services.set(serviceKey(a), groupCount);
 
-  nodesMap.nodes.set(`${a.serviceName}-${a.componentName}-${op}`, {
-    id: `${audienceKey(a)}-group`,
+  nodesMap.nodes.set(groupKey(a), {
+    id: groupKey(a),
     type: `${op}Group`,
     sourcePosition: "right",
     targetPosition: "left",
     dragHandle: "#dragHandle",
     position: {
-      x: (op === "consumer" ? 25 : 350) + xOffset(nodesMap.groupCount.size),
+      x: (op === "consumer" ? 25 : 350) + xOffset(a, nodesMap.services),
       y: 200,
     },
     data: {
@@ -83,15 +87,15 @@ export const mapOperation = (
     },
   });
 
-  nodesMap.nodes.set(a.operationName, {
-    id: `${audienceKey(a)}-operation`,
+  nodesMap.nodes.set(operationKey(a), {
+    id: operationKey(a),
     draggable: false,
     type: op,
     position: {
       x: 10,
       y: 38 + ((groupCount[op] - 1) * 80),
     },
-    parentNode: `${audienceKey(a)}-group`,
+    parentNode: groupKey(a),
     extent: "parent",
     data: {
       audience: a,
@@ -116,19 +120,19 @@ export const mapNodes = (
 ): NodesMap => {
   const nodesMap = {
     nodes: new Map<string, FlowNode>(),
-    groupCount: new Map<string, GroupCount>(),
+    services: new Map<string, GroupCount>(),
   };
 
   serviceMap.audiences.forEach((a: Audience) => {
-    if (!nodesMap.groupCount.has(a.serviceName)) {
-      nodesMap.groupCount.set(a.serviceName, { producer: 0, consumer: 0 });
+    if (!nodesMap.services.has(serviceKey(a))) {
+      nodesMap.services.set(serviceKey(a), { producer: 0, consumer: 0 });
     }
 
-    nodesMap.nodes.set(a.serviceName, {
-      id: `${serviceKey(a)}-service`,
+    nodesMap.nodes.set(serviceKey(a), {
+      id: serviceKey(a),
       type: "service",
       dragHandle: "#dragHandle",
-      position: { x: 150 + xOffset(nodesMap.groupCount.size), y: 0 },
+      position: { x: 150 + xOffset(a, nodesMap.services), y: 0 },
       data: { audience: a },
     });
 
@@ -136,20 +140,20 @@ export const mapNodes = (
 
     //
     // guaranteed to be initialized above
-    const groupCount = nodesMap.groupCount.get(a.serviceName)!;
+    const groupCount = nodesMap.services.get(serviceKey(a))!;
     const count = Math.max(
       groupCount["producer"] || 1,
       groupCount["consumer"] || 1,
     );
 
     nodesMap.nodes.set(a.componentName, {
-      id: `${componentKey(a)}-component`,
+      id: componentKey(a),
       type: "component",
       sourcePosition: "right",
       targetPosition: "left",
       dragHandle: "#dragHandle",
       position: {
-        x: 240 + xOffset(nodesMap.groupCount.size),
+        x: 240 + xOffset(a, nodesMap.services),
         y: 350 + (count - 1) * 76,
       },
       data: { audience: a },
@@ -168,16 +172,16 @@ export const mapEdgePair = (
   a: Audience,
 ): Map<string, FlowEdge> => {
   const op = OperationType[a.operationType].toLowerCase();
-  edgesMap.set(`${audienceKey(a)}-component-edge`, {
-    id: `${audienceKey(a)}-component-edge`,
+  edgesMap.set(`${componentKey(a)}-${op}-edge`, {
+    id: `${componentKey(a)}-${op}-edge`,
     ...op === "consumer"
       ? {
-        source: `${componentKey(a)}-component`,
-        target: `${audienceKey(a)}-group`,
+        source: componentKey(a),
+        target: groupKey(a),
       }
       : {
-        source: `${audienceKey(a)}-group`,
-        target: `${componentKey(a)}-component`,
+        source: groupKey(a),
+        target: componentKey(a),
       },
     markerEnd: {
       type: MarkerType.Arrow,
@@ -191,16 +195,16 @@ export const mapEdgePair = (
     },
   });
 
-  edgesMap.set(`${audienceKey(a)}-service-edge`, {
-    id: `${audienceKey(a)}-service-edge`,
+  edgesMap.set(`${serviceKey(a)}-${op}-edge`, {
+    id: `${serviceKey(a)}-${op}-edge`,
     ...op === "consumer"
       ? {
-        source: `${audienceKey(a)}-group`,
-        target: `${serviceKey(a)}-service`,
+        source: groupKey(a),
+        target: serviceKey(a),
       }
       : {
-        source: `${serviceKey(a)}-service`,
-        target: `${audienceKey(a)}-group`,
+        source: serviceKey(a),
+        target: groupKey(a),
       },
     markerEnd: {
       type: MarkerType.Arrow,
@@ -230,7 +234,7 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
 export const updateNode = (nodes: FlowNode[], update: OpUpdate) =>
   nodes.map((n: FlowNode) =>
     n.id ===
-        `${update.audience.serviceName}-${update.audience.operationName}`
+        operationKey(update.audience)
       ? {
         ...n,
         data: {

@@ -7,7 +7,7 @@ import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import { titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
-import { OperationType } from "snitch-protos/protos/common.ts";
+import { OperationType } from "snitch-protos/protos/sp_common.ts";
 import IconLink from "tabler-icons/tsx/link.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import { Toast } from "../components/toasts/toast.tsx";

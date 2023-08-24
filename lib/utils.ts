@@ -1,4 +1,4 @@
-import { Audience, OperationType } from "snitch-protos/protos/common.ts";
+import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { ConfigType, PipelinesType } from "./fetch.ts";
 
 const UNITS = [
@@ -93,10 +93,20 @@ export const audienceKey = (audience: Audience) =>
   }/${audience.operationName}/${audience.componentName}`.toLowerCase();
 
 export const serviceKey = (audience: Audience) =>
-  lower(`${audience.serviceName}`.toLowerCase());
+  lower(`${audience.serviceName}-service`.toLowerCase());
 
 export const componentKey = (audience: Audience) =>
-  lower(`${audience.serviceName}`);
+  lower(`${audience.componentName}-component`);
+
+export const operationKey = (audience: Audience) =>
+  lower(`${audienceKey(audience)}-operation`);
+
+export const groupKey = (audience: Audience) =>
+  lower(
+    `${audience.serviceName}-${
+      OperationType[audience.operationType]
+    }-${audience.componentName}-group`,
+  );
 
 export const lower = (s: string) => s.toLowerCase();
 

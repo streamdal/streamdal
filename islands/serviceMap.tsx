@@ -13,8 +13,8 @@ import {
 } from "../components/serviceMap/customNodes.tsx";
 import { signal, useSignalEffect } from "@preact/signals";
 import { ServiceNodes } from "../lib/fetch.ts";
-import { Audience } from "snitch-protos/protos/common.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { Audience } from "snitch-protos/protos/sp_common.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 
 const LAYOUT_KEY = "service-map-layout";

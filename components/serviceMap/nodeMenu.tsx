@@ -1,8 +1,8 @@
 import { Edit, Info, Silence } from "../icons/crud.tsx";
 import { removeWhitespace } from "../../lib/utils.ts";
 import { opModal } from "./opModalSignal.ts";
-import { Audience } from "snitch-protos/protos/common.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { Audience } from "snitch-protos/protos/sp_common.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { NodeData } from "./customNodes.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";

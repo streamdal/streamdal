@@ -1,7 +1,7 @@
 import { client, meta } from "./grpc.ts";
-import { GetAllResponse } from "snitch-protos/protos/external.ts";
-import { PipelineInfo } from "snitch-protos/protos/info.ts";
-import { Audience } from "snitch-protos/protos/common.ts";
+import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
+import { PipelineInfo } from "snitch-protos/protos/sp_info.ts";
+import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
 
 export type ServiceMapType = GetAllResponse & {

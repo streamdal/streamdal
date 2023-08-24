@@ -2,14 +2,14 @@ import {
   Audience,
   ResponseCode,
   StandardResponse,
-} from "snitch-protos/protos/common.ts";
+} from "snitch-protos/protos/sp_common.ts";
 import { client, meta } from "./grpc.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import {
   AttachPipelineRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
-} from "snitch-protos/protos/external.ts";
+} from "snitch-protos/protos/sp_external.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;

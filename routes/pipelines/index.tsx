@@ -1,5 +1,5 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import Pipelines from "../../islands/pipelines.tsx";
 import { getPipelines } from "../../lib/fetch.ts";
 import { SuccessType } from "../_middleware.ts";
