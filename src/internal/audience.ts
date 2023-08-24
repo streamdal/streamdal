@@ -1,10 +1,10 @@
 import {
   Audience,
   ResponseCode,
-} from "@streamdal/snitch-protos/protos/common.js";
+} from "@streamdal/snitch-protos/protos/sp_common.js";
 
 import { Configs } from "../snitch.js";
-import { audienceKey, internal, sessionId } from "./register.js";
+import { audienceKey, internal } from "./register.js";
 
 export interface AddAudience {
   configs: Configs;
@@ -29,7 +29,7 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
     internal.audiences.add(audienceKey(audience));
     const { response } = await configs.grpcClient.newAudience(
       {
-        sessionId,
+        sessionId: configs.sessionId,
         audience,
       },
       { meta: { "auth-token": configs.snitchToken } }

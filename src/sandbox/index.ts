@@ -1,4 +1,4 @@
-import { Audience } from "@streamdal/snitch-protos/protos/common.js";
+import { Audience } from "@streamdal/snitch-protos/protos/sp_common.js";
 
 import { OperationType, Snitch, SnitchConfigs } from "../snitch.js";
 
@@ -74,33 +74,38 @@ const audienceBProducer: Audience = {
   operationName: "test-kafka-producer",
 };
 
+const logTest = async (snitch: any, audience: Audience, input: any) => {
+  console.log("--------------------------------");
+  console.log(new Date());
+  console.log(
+    `sending pipeline request for ${audience.serviceName} - ${OperationType[
+      audience.operationType
+    ].toLowerCase()}`
+  );
+  const { error, message, data } = await snitch.processPipeline({
+    audience: audience,
+    data: new TextEncoder().encode(JSON.stringify(input)),
+  });
+  console.log("error", error);
+  console.log("message", message);
+  console.log("data:");
+  console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 });
+  console.log("pipeline request done");
+  console.log("--------------------------------");
+  console.log("\n");
+};
+
 export const example = async () => {
   const snitchA = new Snitch(serviceAConfig);
   const snitchB = new Snitch(serviceBConfig);
 
-  const aConsumer = await snitchA.processPipeline({
-    audience: audienceAConsumer,
-    data: new TextEncoder().encode(JSON.stringify(exampleData)),
-  });
-  console.log("a consumer pipeline", aConsumer);
+  setInterval(() => {
+    void logTest(snitchA, audienceAConsumer, exampleData);
+  }, 4000);
 
-  const aProducer = await snitchA.processPipeline({
-    audience: audienceAProducer,
-    data: new TextEncoder().encode(JSON.stringify(exampleData)),
-  });
-  console.log("a producer pipeline", aProducer);
-
-  const bConsumer = await snitchB.processPipeline({
-    audience: audienceBConsumer,
-    data: new TextEncoder().encode(JSON.stringify(exampleData)),
-  });
-  console.log("b consumer pipeline", bConsumer);
-
-  const bProducer = await snitchB.processPipeline({
-    audience: audienceBProducer,
-    data: new TextEncoder().encode(JSON.stringify(exampleData)),
-  });
-  console.log("b producer pipeline", bProducer);
+  await logTest(snitchA, audienceAProducer, exampleData);
+  await logTest(snitchB, audienceBConsumer, exampleData);
+  await logTest(snitchB, audienceBProducer, exampleData);
 };
 
 void example();

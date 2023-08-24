@@ -29,7 +29,7 @@
     }
   },
 
-  "ignorePatterns": ["/proto", "src/**/*.test.tsx", "src/**/*.test.ts"],
+  "ignorePatterns": ["/proto"],
   "rules": {
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",

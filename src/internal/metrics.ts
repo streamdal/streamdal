@@ -1,5 +1,5 @@
-import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
-import { Metrics } from "@streamdal/snitch-protos/protos/internal.js";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
+import { Metrics } from "@streamdal/snitch-protos/protos/sp_internal.js";
 import ReadWriteLock from "rwlock";
 
 export const METRIC_INTERVAL = 1000;

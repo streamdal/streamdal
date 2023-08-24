@@ -1,15 +1,13 @@
-import { Audience } from "@streamdal/snitch-protos/protos/common.js";
-import { ClientType } from "@streamdal/snitch-protos/protos/info.js";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
-import { v4 as uuidv4 } from "uuid";
+import { Audience } from "@streamdal/snitch-protos/protos/sp_common.js";
+import { ClientType } from "@streamdal/snitch-protos/protos/sp_info.js";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
 
 // import { version } from "../../package.json";
 import { InternalPipeline, processResponse } from "./pipeline.js";
 
-export const sessionId = uuidv4();
-
 export interface RegisterConfigs {
   grpcClient: IInternalClient;
+  sessionId: string;
   snitchToken: string;
   serviceName: string;
   dryRun: boolean;
@@ -30,6 +28,7 @@ export const audienceKey = (audience: Audience) =>
 
 export const register = async ({
   grpcClient,
+  sessionId,
   serviceName,
   snitchToken,
   dryRun,

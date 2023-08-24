@@ -20,7 +20,6 @@
     "copy": "cp README.md ./build/README.md && rm ./build/internal/*.ts && cp package.json ./build/package.json",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
-    "start": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/internal/index.js\"",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
@@ -40,10 +39,12 @@
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
     "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@streamdal/snitch-protos": "^0.0.71",
+    "@streamdal/snitch-protos": "^0.0.77",
     "@types/rwlock": "^5.0.3",
+    "@types/sinon": "^10.0.16",
     "dotenv": "^16.3.1",
     "rwlock": "^5.0.0",
+    "sinon": "^15.2.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

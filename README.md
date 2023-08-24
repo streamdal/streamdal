@@ -48,9 +48,9 @@ export const example = async () => {
 To do development on the `snitch-node-client`, you can run it locally:
 
 `npm install`
-`npm start`
+`npm run sandbox`
 
-See `./src/interanl/index.ts` for an entry point for local dev.
+See `./src/sandbox/index.ts` for an entry point for local dev.
 
 Optionally install and run the [snitch-server](https://github.com/streamdal/snitch-server)
 

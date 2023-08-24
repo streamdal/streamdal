@@ -1,9 +1,9 @@
-import { Command } from "@streamdal/snitch-protos/protos/command.js";
-import { Audience } from "@streamdal/snitch-protos/protos/common.js";
+import { Command } from "@streamdal/snitch-protos/protos/sp_command.js";
+import { Audience } from "@streamdal/snitch-protos/protos/sp_common.js";
 import {
   Pipeline,
   PipelineStep,
-} from "@streamdal/snitch-protos/protos/pipeline.js";
+} from "@streamdal/snitch-protos/protos/sp_pipeline.js";
 
 import { Configs } from "../snitch.js";
 import { audienceKey, internal } from "./register.js";

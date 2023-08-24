@@ -1,21 +1,24 @@
-import { ResponseCode } from "@streamdal/snitch-protos/protos/common.js";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/internal.client.js";
-
-import { sessionId } from "./register.js";
+import { ResponseCode } from "@streamdal/snitch-protos/protos/sp_common.js";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
 
 export const HEARTBEAT_INTERVAL = 1000;
 
 export interface HearbeatConfigs {
   grpcClient: IInternalClient;
+  sessionId: string;
   snitchToken: string;
 }
 
-export const heartbeat = async (configs: HearbeatConfigs) => {
-  const call = configs.grpcClient.heartbeat(
+export const heartbeat = async ({
+  grpcClient,
+  sessionId,
+  snitchToken,
+}: HearbeatConfigs) => {
+  const call = grpcClient.heartbeat(
     {
       sessionId,
     },
-    { meta: { "auth-token": configs.snitchToken } }
+    { meta: { "auth-token": snitchToken } }
   );
 
   const response = await call.response;

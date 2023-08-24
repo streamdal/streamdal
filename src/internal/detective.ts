@@ -1,12 +1,12 @@
-import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/pipeline.js";
-import {
-  TransformStep,
-  TransformType,
-} from "@streamdal/snitch-protos/protos/steps/transform.js";
+import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/sp_pipeline.js";
 import {
   WASMRequest,
   WASMResponse,
-} from "@streamdal/snitch-protos/protos/wasm.js";
+} from "@streamdal/snitch-protos/protos/sp_wsm.js";
+import {
+  TransformStep,
+  TransformType,
+} from "@streamdal/snitch-protos/protos/steps/sp_steps_transform.js";
 import * as fs from "fs";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
