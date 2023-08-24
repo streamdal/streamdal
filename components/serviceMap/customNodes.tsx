@@ -6,7 +6,7 @@ import { OperationType } from "snitch-protos/protos/common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { removeWhitespace, titleCase } from "../../lib/utils.ts";
+import { removeWhitespace, serviceKey, titleCase } from "../../lib/utils.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { NodeData } from "../../lib/nodeMapper.ts";
 import { opModal } from "./opModalSignal.ts";
@@ -34,15 +34,13 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
       <div className={"flex justify-evenly w-1/2 mt-2"}>
         <Handle
           type="target"
-          id="c"
           position={Position.Bottom}
-          style={{ opacity: 0, background: "#FFFFFF", position: "relative" }}
+          className="opacity-0 relative"
         />
         <Handle
           type="source"
-          id="d"
           position={Position.Bottom}
-          style={{ opacity: 0, background: "#FFFFFF", position: "relative" }}
+          className="opacity-0 relative"
         />
       </div>
     </div>
@@ -70,12 +68,12 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
       <Handle
         type="source"
         position={producer ? Position.Bottom : Position.Top}
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
       <Handle
         type="target"
         position={producer ? Position.Top : Position.Bottom}
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
     </div>
   );
@@ -141,12 +139,12 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
       <Handle
         type="source"
         position={Position.Top}
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
       <Handle
         type="target"
         position={Position.Bottom}
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
     </div>
   );
@@ -189,14 +187,12 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
       <Handle
         type="source"
         position={Position.Left}
-        id="a"
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
       <Handle
         type="target"
         position={Position.Right}
-        id="b"
-        style={{ opacity: 0 }}
+        className="opacity-0"
       />
     </div>
   );
