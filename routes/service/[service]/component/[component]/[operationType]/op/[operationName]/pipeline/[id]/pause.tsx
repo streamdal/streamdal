@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/src/server/types.ts";
 import { SuccessType } from "../../../../../../../../../_middleware.ts";
-import { OperationType, ResponseCode } from "snitch-protos/protos/common.ts";
+import { OperationType, ResponseCode } from "snitch-protos/protos/sp_common.ts";
 import { HandlerContext } from "$fresh/server.ts";
 import { pausePipeline } from "../../../../../../../../../../lib/fetch.ts";
 

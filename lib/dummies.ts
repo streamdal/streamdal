@@ -1,7 +1,7 @@
-import { GetAllResponse } from "snitch-protos/protos/external.ts";
-import { OperationType } from "snitch-protos/protos/common.ts";
-import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
-import { ClientType } from "snitch-protos/protos/info.ts";
+import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
+import { OperationType } from "snitch-protos/protos/sp_common.ts";
+import { DetectiveType } from "snitch-protos/protos/steps/sp_steps_detective.ts";
+import { ClientType } from "snitch-protos/protos/sp_info.ts";
 import { audienceKey } from "./utils.ts";
 
 export const dummyPipelines = [{

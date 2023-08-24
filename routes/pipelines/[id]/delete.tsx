@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { getPipeline, getPipelines } from "../../../lib/fetch.ts";
-import { ResponseCode } from "snitch-protos/protos/common.ts";
+import { ResponseCode } from "snitch-protos/protos/sp_common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";

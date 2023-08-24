@@ -2,7 +2,7 @@ import { Handle, Position } from "reactflow";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "twind";
-import { OperationType } from "snitch-protos/protos/common.ts";
+import { OperationType } from "snitch-protos/protos/sp_common.ts";
 import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";

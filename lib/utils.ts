@@ -1,4 +1,4 @@
-import { Audience, OperationType } from "snitch-protos/protos/common.ts";
+import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { ConfigType, PipelinesType } from "./fetch.ts";
 
 const UNITS = [

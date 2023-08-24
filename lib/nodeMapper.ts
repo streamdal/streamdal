@@ -1,6 +1,6 @@
-import { Audience, OperationType } from "snitch-protos/protos/common.ts";
-import { Pipeline } from "snitch-protos/protos/pipeline.ts";
-import { ClientInfo, LiveInfo } from "snitch-protos/protos/info.ts";
+import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
+import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { ClientInfo, LiveInfo } from "snitch-protos/protos/sp_info.ts";
 import { ServiceMapType } from "./fetch.ts";
 import {
   componentKey,

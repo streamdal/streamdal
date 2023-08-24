@@ -1,5 +1,4 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
-import { DetectiveType } from "snitch-protos/protos/steps/detective.ts";
 import { isNumeric } from "../../lib/utils.ts";
 
 export type FormSelectProps = {
