@@ -1,5 +1,5 @@
-use protos::transform::TransformType;
-use protos::wasm::{WASMExitCode, WASMRequest};
+use protos::sp_steps_transform::TransformType;
+use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use snitch_transform::transform;
 
 #[no_mangle]

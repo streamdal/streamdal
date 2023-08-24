@@ -1,5 +1,5 @@
 use protobuf;
-use protos::wasm::{WASMExitCode, WASMRequest, WASMResponse};
+use protos::sp_wsm::{WASMExitCode, WASMRequest, WASMResponse};
 use std::mem;
 
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.

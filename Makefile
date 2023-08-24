@@ -51,6 +51,18 @@ clean/transform: description = Remove transform WASM artifacts
 clean/transform:
 	rm -rf transform/target build/transform.wasm
 
+.PHONY: build/httprequest
+build/httprequest: description = Build WASM target for httprequest
+build/httprequest: clean/httprequest
+	cd httprequest && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/httprequest.wasm target/wasm32-wasi/release/httprequest.wasm
+
+.PHONY: clean/httprequest
+clean/httprequest: description = Remove httprequest WASM artifacts
+clean/httprequest:
+	rm -rf httprequest/target build/httprequest.wasm
+
 .PHONY: clean
 clean: description = Remove all build artifacts
 clean: clean/detective clean/transform
