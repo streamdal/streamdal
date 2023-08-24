@@ -81,7 +81,8 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-time.After(time.Second):
 				// Check if heartbeat is older than session TTL
 				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
-					llog.Debugf("no heartbeat received during the last '%v'; sending disconnect cmd and exiting", s.Options.Config.SessionTTL)
+					llog.Debugf("no heartbeat received for session id '%s' during the last '%v'; sending disconnect cmd and exiting",
+						sessionId, s.Options.Config.SessionTTL)
 					noHeartbeatCh <- struct{}{}
 					break MAIN
 				}

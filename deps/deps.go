@@ -104,13 +104,33 @@ func (d *Dependencies) preCreateBuckets() error {
 	}
 
 	for bucketName, ttl := range buckets {
+		logrus.Debugf("attempting to pre-create NATS bucket '%s' with TTL '%s'", bucketName, ttl)
+
 		if err := d.NATSBackend.CreateBucket(d.ShutdownContext, bucketName, ttl, d.Config.NATSNumKVReplicas); err != nil {
 			if err == nats.ErrStreamNameAlreadyInUse {
+				// Bucket already exists, verify its settings
+				if err := d.verifyBucketSettings(d.ShutdownContext, bucketName, ttl); err != nil {
+					return errors.Wrap(err, "bucket settings verification failed")
+				}
+
 				continue
 			}
 
 			return fmt.Errorf("unable to pre-create bucket '%s': %s", bucketName, err)
 		}
+	}
+
+	return nil
+}
+
+func (d *Dependencies) verifyBucketSettings(ctx context.Context, bucketName string, ttl time.Duration) error {
+	status, err := d.NATSBackend.Status(ctx, bucketName)
+	if err != nil {
+		return errors.Wrapf(err, "unable to get status for bucket '%s'", bucketName)
+	}
+
+	if status.TTL() != ttl {
+		return errors.Errorf("bucket '%s' has incorrect TTL: '%s' (expected '%s')", bucketName, status.TTL(), d.Config.SessionTTL)
 	}
 
 	return nil
