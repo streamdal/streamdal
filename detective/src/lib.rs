@@ -1,12 +1,12 @@
 use protobuf::EnumOrUnknown;
-use protos::detective::DetectiveType;
-use protos::wasm::{WASMExitCode, WASMRequest};
+use protos::sp_steps_detective::DetectiveType;
+use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use snitch_detective::detective::{Detective, Request};
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
-    let wasm_request = match common::read_request(ptr, length) {
+    let wasm_request = match common::read_request(ptr, length, true) {
         Ok(req) => req,
         Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
     };
@@ -40,11 +40,11 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 
 fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
     Request {
-        match_type: wasm_request.step.detective().type_.unwrap(),
+        match_type: wasm_request.step.detective().type_.clone().unwrap(),
         data: &wasm_request.input,
-        path: wasm_request.step.detective().path.clone(),
+        path: wasm_request.step.detective().path.clone().unwrap(),
         args: wasm_request.step.detective().args.clone(),
-        negate: wasm_request.step.detective().negate.clone(),
+        negate: wasm_request.step.detective().negate.clone().unwrap(),
     }
 }
 
@@ -61,7 +61,7 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("detective type cannot be unknown".to_string());
     }
 
-    if req.step.detective().path == "" {
+    if req.step.detective().path.clone().unwrap() == "" {
         return Err("detective path cannot be empty".to_string());
     }
 
