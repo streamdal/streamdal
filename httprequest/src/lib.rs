@@ -71,7 +71,7 @@ pub extern "C" fn f(ptr: *mut u8,length: usize) -> *mut u8 {
             common::write_response(
                 output,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-                format!("nable to parse response: {}", e.to_string()),
+                format!("unable to parse response: {}", e.to_string()),
             )
         }
     };
