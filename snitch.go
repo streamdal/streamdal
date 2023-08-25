@@ -41,10 +41,10 @@ type ClientType int
 
 const (
 	// Consumer tells Process to run the pipelines against the consume ruleset
-	Consumer OperationType = 1
+	OperationTypeConsumer OperationType = 1
 
-	// Producer tells Process to run the pipelines against the produce ruleset
-	Producer OperationType = 2
+	// OperationTypeProducer tells Process to run the pipelines against the produce ruleset
+	OperationTypeProducer OperationType = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
@@ -215,7 +215,7 @@ func validateConfig(cfg *Config) error {
 	if cfg.StepTimeout == 0 {
 		to := os.Getenv("SNITCH_STEP_TIMEOUT")
 		if to == "" {
-			to = "1s"
+			to = "10ms"
 		}
 
 		timeout, err := time.ParseDuration(to)
@@ -229,7 +229,7 @@ func validateConfig(cfg *Config) error {
 	if cfg.PipelineTimeout == 0 {
 		to := os.Getenv("SNITCH_PIPELINE_TIMEOUT")
 		if to == "" {
-			to = "1s"
+			to = "100ms"
 		}
 
 		timeout, err := time.ParseDuration(to)
@@ -318,8 +318,11 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 		return nil, errors.Wrap(err, "failed to marshal WASM request")
 	}
 
+	timeoutCtx, cancel := context.WithTimeout(ctx, s.config.StepTimeout)
+	defer cancel()
+
 	// Run WASM module
-	respBytes, err := f.Exec(ctx, reqBytes)
+	respBytes, err := f.Exec(timeoutCtx, reqBytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute wasm module")
 	}
@@ -374,7 +377,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
 	counterBytes := types.ConsumeBytes
-	if req.OperationType == Producer {
+	if req.OperationType == OperationTypeProducer {
 		counterError = types.ProduceErrorCount
 		counterProcessed = types.ProduceProcessedCount
 		counterBytes = types.ProduceBytes
@@ -403,12 +406,29 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1})
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize})
 
+		// If a step
+		timeoutCtx, timeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
+
 		for _, step := range pipeline.Steps {
-			wasmResp, err := s.runStep(ctx, step, data)
+
+			select {
+			case <-timeoutCtx.Done():
+				timeoutCxl()
+				return &ProcessResponse{
+					Data:    req.Data,
+					Error:   true,
+					Message: "pipeline timeout exceeded",
+				}, nil
+			default:
+				// NOOP
+			}
+
+			wasmResp, err := s.runStep(timeoutCtx, step, data)
 			if err != nil {
 				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
 						Data:    req.Data,
 						Error:   true,
@@ -427,6 +447,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
 						Error:   false,
@@ -440,6 +461,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
 						Error:   true,
@@ -453,6 +475,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
 						Data:    wasmResp.Output,
 						Error:   true,
@@ -466,6 +489,8 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 			data = wasmResp.Output
 		}
+
+		timeoutCxl()
 	}
 
 	// Dry run should not modify anything, but we must allow pipeline to

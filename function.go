@@ -1,16 +1,21 @@
 package snitch
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"net/http"
+	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 )
 
 type function struct {
@@ -57,9 +62,9 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	}
 
 	// Read memory starting from result ptr
-	bytes, err := f.ReadMemory(resultPtr, -1)
+	resBytes, err := f.ReadMemory(resultPtr, -1)
 
-	return bytes, nil
+	return resBytes, nil
 }
 
 func (s *Snitch) setFunctionCache(wasmID string, f *function) {
@@ -137,6 +142,7 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	r := wazero.NewRuntime(ctx)
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
+
 	cfg := wazero.NewModuleConfig().
 		WithStderr(io.Discard).
 		WithStdout(io.Discard).
@@ -145,10 +151,110 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		WithSysWalltime().
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
 
+	// TODO: module name probably needs to be unique
+	_, err := r.NewHostModuleBuilder("env").
+		NewFunctionBuilder().
+		WithFunc(httpRequest).
+		Export("httpRequest").
+		Instantiate(ctx)
+
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to instantiate wasm module")
 	}
 
 	return mod, nil
+}
+
+// httpRequest is function that is exported to and called from the Rust WASM module
+func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 {
+	// Read memory starting from ptr
+	data, ok := module.Memory().Read(uint32(ptr), uint32(length))
+	if !ok {
+		return httpResponse(module, http.StatusInternalServerError, "unable to read memory", nil)
+	}
+
+	wasmRequest := &protos.WASMRequest{}
+	if err := proto.Unmarshal(data, wasmRequest); err != nil {
+		// fmt.Sprintf("length of data: %d", uint32(length))
+		return httpResponse(module, 500, string(data), nil)
+	}
+
+	request := wasmRequest.Step.GetHttpRequest()
+
+	httpReq, err := http.NewRequest(methodFromProto(request.Method), request.Url, bytes.NewReader(request.Body))
+	if err != nil {
+		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	resp, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode > 299 {
+		return httpResponse(module, resp.StatusCode, resp.Status, nil)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	// Get all headers from the response
+	headers := make(map[string]string)
+	for k, v := range resp.Header {
+		headers[k] = strings.Join(v, ", ")
+	}
+
+	return httpResponse(module, resp.StatusCode, string(body), headers)
+}
+
+func httpResponse(module api.Module, code int, body string, headers map[string]string) int32 {
+	if headers == nil {
+		headers = make(map[string]string)
+	}
+
+	resp := &steps.HttpResponse{
+		Code:    int32(code),
+		Body:    []byte(body),
+		Headers: headers,
+	}
+
+	out, err := proto.Marshal(resp)
+	if err != nil {
+		panic("can't marshal")
+	}
+
+	// Apply terminator to end of response
+	out = append(out, 166, 166, 166)
+
+	alloc := module.ExportedFunction("alloc")
+
+	allocRes, err := alloc.Call(context.Background(), uint64(len(out)))
+	if err != nil {
+		panic(fmt.Sprintf("failed to allocate memory for http response: %s", err.Error()))
+	}
+
+	ok := module.Memory().Write(uint32(allocRes[0]), out)
+	if !ok {
+		panic("unable to write host function results to memory")
+	}
+
+	return int32(allocRes[0])
+}
+
+func methodFromProto(m steps.HttpRequestMethod) string {
+	switch m {
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_POST:
+		return http.MethodPost
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_PUT:
+		return http.MethodPut
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_DELETE:
+		return http.MethodDelete
+	default:
+		return http.MethodGet
+	}
 }
