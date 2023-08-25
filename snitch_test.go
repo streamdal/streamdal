@@ -2,6 +2,7 @@ package snitch
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -257,7 +259,12 @@ func TestProcess_success(t *testing.T) {
 		functions:    map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
-		config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		config: &Config{
+			ServiceName:     "mysvc1",
+			Logger:          &logger.NoOpLogger{},
+			StepTimeout:     time.Millisecond * 10,
+			PipelineTimeout: time.Millisecond * 100,
+		},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
@@ -335,7 +342,12 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 		functions:    map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
-		config:       &Config{ServiceName: "mysvc1", Logger: &logger.NoOpLogger{}},
+		config: &Config{
+			ServiceName:     "mysvc1",
+			Logger:          &logger.NoOpLogger{},
+			StepTimeout:     time.Millisecond * 10,
+			PipelineTimeout: time.Millisecond * 100,
+		},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
@@ -377,6 +389,58 @@ func stringPtr(in string) *string {
 
 func boolPtr(in bool) *bool {
 	return &in
+}
+
+func TestHttpRequest(t *testing.T) {
+	wasmData, err := os.ReadFile("src/httprequest.wasm")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req := &protos.WASMRequest{
+		Step: &protos.PipelineStep{
+			Step: &protos.PipelineStep_HttpRequest{
+				HttpRequest: &steps.HttpRequest{
+					Url:    "https://www.streamdal.com",
+					Method: steps.HttpRequestMethod_HTTP_REQUEST_METHOD_GET,
+					Body:   []byte(``),
+				},
+			},
+			XWasmId:       stringPtr(uuid.New().String()),
+			XWasmFunction: stringPtr("f"),
+			XWasmBytes:    wasmData,
+		},
+		Input: []byte(``),
+	}
+
+	f, err := createFunction(req.Step)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+	}
+
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+	}
+
+	fmt.Printf("wasmResp: %+v\n", wasmResp)
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+		t.Error("expected ExitCode = 0")
+	}
 }
 
 //func BenchmarkMatchSmallJSON(b *testing.B) {
