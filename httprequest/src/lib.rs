@@ -44,6 +44,11 @@ pub extern "C" fn f(ptr: *mut u8,length: usize) -> *mut u8 {
     // Need to read memory at res_ptr and return a response
     let data = read_memory(res_ptr, 0);
 
+    // Deallocate request memory
+    unsafe {
+        dealloc(ptr, length as i32);
+    }
+
     let result = http_response(data);
     return match result {
         Ok(res) => {
