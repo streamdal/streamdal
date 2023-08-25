@@ -39,7 +39,7 @@ setup/darwin:
 run/dev: description = Run service & deps for dev
 run/dev:
 	docker-compose -f docker-compose.dev.yaml build && \
-	docker-compose -f docker-compose.dev.yaml up
+	docker-compose -f docker-compose.dev.yaml up -d
 
 ### Build
 
