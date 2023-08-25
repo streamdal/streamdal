@@ -168,8 +168,6 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 
 // httpRequest is function that is exported to and called from the Rust WASM module
 func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 {
-	//return httpResponse(module, http.StatusInternalServerError, "omgwtf", nil)
-
 	// Read memory starting from ptr
 	data, ok := module.Memory().Read(uint32(ptr), uint32(length))
 	if !ok {
@@ -211,7 +209,6 @@ func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 
 		headers[k] = strings.Join(v, ", ")
 	}
 
-	// TODO: build response, marshal, and return pointer
 	return httpResponse(module, resp.StatusCode, string(body), headers)
 }
 
@@ -238,12 +235,9 @@ func httpResponse(module api.Module, code int, body string, headers map[string]s
 
 	allocRes, err := alloc.Call(context.Background(), uint64(len(out)))
 	if err != nil {
-		// TODO: do we need to dealloc here?
-		panic(err)
+		panic(fmt.Sprintf("failed to allocate memory for http response: %s", err.Error()))
 	}
 
-	// TODO: how to figure out which offset to write at?
-	// TODO: for now, just write at 0
 	ok := module.Memory().Write(uint32(allocRes[0]), out)
 	if !ok {
 		panic("unable to write host function results to memory")
