@@ -51,17 +51,13 @@ func main() {
 	}
 
 	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
-		OperationType:   snitch.Consumer,
+		OperationType:   snitch.OperationTypeConsumer,
         OperationName:   "new-order-topic",
         ComponentName:   "kafka",
         Data:            []byte(`{"object": {"field": true}}`),
     })
 	if err != nil {
-		if err == snitch.ErrMessageDropped {
-			// message was dropped, perform some logging
-		} else {
-			panic(err)
-		}
+		panic(err)
 	}
 
 	fmt.Printf("%#v\n", resp)

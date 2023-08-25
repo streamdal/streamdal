@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -145,10 +144,8 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
 
 	cfg := wazero.NewModuleConfig().
-		//WithStderr(io.Discard).
-		//WithStdout(io.Discard).
-		WithStdout(os.Stdout).
-		WithStderr(os.Stderr).
+		WithStderr(io.Discard).
+		WithStdout(io.Discard).
 		WithSysNanotime().
 		WithSysNanosleep().
 		WithSysWalltime().
