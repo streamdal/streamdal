@@ -2,18 +2,18 @@ package snitch
 
 import (
 	"context"
-	"errors"
 	"io"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
-func (s *Snitch) register(looper director.Looper) {
+func (s *Snitch) register(looper director.Looper) error {
 	req := &protos.RegisterRequest{
 		ServiceName: s.config.ServiceName,
 		SessionId:   s.sessionID,
@@ -39,8 +39,9 @@ func (s *Snitch) register(looper director.Looper) {
 
 	srv, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 	if err != nil && !strings.Contains(err.Error(), context.Canceled.Error()) {
-		panic("Failed to register with snitch server: " + err.Error())
+		return errors.Wrap(err, "unable to complete initial registration with snitch server")
 	}
+
 	stream = srv
 
 	looper.Loop(func() error {
@@ -50,6 +51,8 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if stream == nil {
+			s.config.Logger.Debug("stream is nil, attempting to register")
+
 			newStream, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 			if err != nil {
 				if strings.Contains(err.Error(), context.Canceled.Error()) {
@@ -61,6 +64,7 @@ func (s *Snitch) register(looper director.Looper) {
 
 				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
+
 				return nil
 			}
 
@@ -77,13 +81,13 @@ func (s *Snitch) register(looper director.Looper) {
 				return nil
 			}
 
-			if errors.Is(err, io.EOF) {
+			if errors.Is(err, io.EOF) || strings.Contains(err.Error(), "reading from server: EOF") {
 				// Nicer reconnect messages
 				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 			} else {
-				s.config.Logger.Warnf("Error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
+				s.config.Logger.Warnf("error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
 				time.Sleep(ReconnectSleep)
 			}
 
@@ -129,6 +133,8 @@ func (s *Snitch) register(looper director.Looper) {
 
 		return nil
 	})
+
+	return nil
 }
 
 func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {

@@ -172,13 +172,25 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, err
 	}
 
+	errCh := make(chan error, 0)
+
 	// Start register
-	go s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
+	go func() {
+		if err := s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1))); err != nil {
+			errCh <- errors.Wrap(err, "register error")
+		}
+	}()
 
 	// Start heartbeat
 	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
 
-	return s, nil
+	// Make sure we were able to start without issues
+	select {
+	case err := <-errCh:
+		return nil, errors.Wrap(err, "received error on startup")
+	case <-time.After(time.Second * 5):
+		return s, nil
+	}
 }
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
