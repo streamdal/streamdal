@@ -6,7 +6,7 @@ use snitch_detective::detective::{Detective, Request};
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
-    let wasm_request = match common::read_request(ptr, length) {
+    let wasm_request = match common::read_request(ptr, length, true) {
         Ok(req) => req,
         Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
     };
@@ -61,7 +61,7 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("detective type cannot be unknown".to_string());
     }
 
-    if req.step.detective().path.unwrap() == "" {
+    if req.step.detective().path.clone().unwrap() == "" {
         return Err("detective path cannot be empty".to_string());
     }
 

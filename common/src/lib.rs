@@ -3,7 +3,7 @@ use protos::sp_wsm::{WASMExitCode, WASMRequest, WASMResponse};
 use std::mem;
 
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
-pub fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> {
+pub fn read_request(ptr: *mut u8, length: usize, deallocate: bool) -> Result<WASMRequest, String> {
     let request_bytes = read_memory(ptr, length);
 
     // Decode read request
@@ -11,8 +11,10 @@ pub fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> 
         protobuf::Message::parse_from_bytes(request_bytes.as_slice()).map_err(|e| e.to_string())?;
 
     // Dealloc request bytes
-    unsafe {
-        dealloc(ptr, length as i32);
+    if deallocate {
+        unsafe {
+            dealloc(ptr, length as i32);
+        }
     }
 
     Ok(request)
