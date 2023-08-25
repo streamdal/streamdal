@@ -2,15 +2,17 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-server/services/store/types"
 	"github.com/streamdal/snitch-server/util"
@@ -308,9 +310,9 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 	}
 
 	// Store attachment in NATS
-	natsKey := NATSConfigKey(util.AudienceToStr(req.Audience))
+	natsKey := NATSConfigKey(req.Audience, req.PipelineId)
 
-	if err := s.options.NATSBackend.Put(ctx, NATSConfigBucket, natsKey, []byte(req.PipelineId)); err != nil {
+	if err := s.options.NATSBackend.Put(ctx, NATSConfigBucket, natsKey, []byte(``)); err != nil {
 		return errors.Wrap(err, "error saving pipeline attachment to NATS")
 	}
 
@@ -335,7 +337,7 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 	if err := s.options.NATSBackend.Delete(
 		ctx,
 		NATSConfigBucket,
-		NATSConfigKey(util.AudienceToStr(req.Audience)),
+		NATSConfigKey(req.Audience, req.PipelineId),
 	); err != nil {
 		return errors.Wrap(err, "error deleting pipeline attachment from NATS")
 	}
@@ -474,18 +476,12 @@ func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience]string, err
 	}
 
 	for _, aud := range audienceKeys {
-		// Fetch key so we get the pipeline ID
-		pipelineID, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, aud)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching config key '%s' from NATS", aud)
+		audience, pipelineID := util.ParseConfigKey(aud)
+		if audience == nil {
+			return nil, fmt.Errorf("invalid config key '%s'", aud)
 		}
 
-		fullAudience := util.AudienceFromStr(aud)
-		if fullAudience == nil {
-			return nil, errors.Errorf("error converting string audience '%s' to struct", aud)
-		}
-
-		cfgs[fullAudience] = string(pipelineID)
+		cfgs[audience] = pipelineID
 	}
 
 	return cfgs, nil
@@ -585,39 +581,24 @@ func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName stri
 	}
 
 	for _, key := range keys {
-		aud := util.AudienceFromStr(key)
+		aud, pipelineID := util.ParseConfigKey(key)
 		if aud.ServiceName != serviceName {
 			continue
 		}
 
-		data, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, key)
+		pipeline, err := s.GetPipeline(ctx, pipelineID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching config for audience '%s'", key)
+			return nil, errors.Wrapf(err, "error fetching pipeline '%s'", pipelineID)
 		}
 
-		// TODO: Kinda janky, we make these a JSON array instead
-		pipelines := strings.Split(strings.Trim(string(data), "\n"), "\n")
-
-		for _, pipelineID := range pipelines {
-			// Just in case
-			if pipelineID == "" {
-				continue
-			}
-
-			pipeline, err := s.GetPipeline(ctx, pipelineID)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error fetching pipeline '%s'", pipelineID)
-			}
-
-			cmds = append(cmds, &protos.Command{
-				Audience: aud,
-				Command: &protos.Command_AttachPipeline{
-					AttachPipeline: &protos.AttachPipelineCommand{
-						Pipeline: pipeline,
-					},
+		cmds = append(cmds, &protos.Command{
+			Audience: aud,
+			Command: &protos.Command_AttachPipeline{
+				AttachPipeline: &protos.AttachPipelineCommand{
+					Pipeline: pipeline,
 				},
-			})
-		}
+			},
+		})
 	}
 
 	return cmds, nil

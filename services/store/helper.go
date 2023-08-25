@@ -3,6 +3,10 @@ package store
 import (
 	"fmt"
 	"strings"
+
+	"github.com/streamdal/snitch-server/util"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
 const (
@@ -19,7 +23,7 @@ const (
 	NATSPipelineKeyFormat = "%s" // K: $pipeline_id V: serialized protos.Pipeline
 
 	NATSConfigBucket    = "snitch_config"
-	NATSConfigKeyFormat = "%s" // K: $audience V: $pipeline_id (string)
+	NATSConfigKeyFormat = "%s/%s" // K: $audience V: $pipeline_id (string)
 
 	NATSPausedBucket    = "snitch_paused"
 	NATSPausedKeyFormat = "%s/%s" // K: $pipeline_id:$audience V: NONE
@@ -47,8 +51,9 @@ func NATSPipelineKey(pipelineID string) string {
 	return strings.ToLower(fmt.Sprintf(NATSPipelineKeyFormat, pipelineID))
 }
 
-func NATSConfigKey(audience string) string {
-	return strings.ToLower(fmt.Sprintf(NATSConfigKeyFormat, audience))
+func NATSConfigKey(audience *protos.Audience, pipelineID string) string {
+	audStr := util.AudienceToStr(audience)
+	return strings.ToLower(fmt.Sprintf(NATSConfigKeyFormat, audStr, pipelineID))
 }
 
 func NATSPausedKey(audience, pipelineID string) string {

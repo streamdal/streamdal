@@ -8,8 +8,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -63,6 +64,16 @@ func CtxStringValue(ctx context.Context, key string) string {
 
 func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
+}
+
+func ParseConfigKey(key string) (*protos.Audience, string) {
+	parts := strings.Split(key, "/")
+	if len(parts) < 5 {
+		return nil, ""
+	}
+
+	audStr := strings.Join(parts[:len(parts)-1], "/")
+	return AudienceFromStr(audStr), parts[len(parts)-1]
 }
 
 func AudienceToStr(audience *protos.Audience) string {
