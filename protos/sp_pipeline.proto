@@ -53,7 +53,7 @@ message PipelineStep {
     steps.EncodeStep encode = 1002;
     steps.DecodeStep decode = 1003;
     steps.CustomStep custom = 1004;
-    steps.HttpRequest http_request = 1005;
+    steps.HttpRequestStep http_request = 1005;
   }
 
   // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server

@@ -1,5 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
-import { HttpRequest } from "./steps/sp_steps_httprequest.js";
+import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
 import { CustomStep } from "./steps/sp_steps_custom.js";
 import { DecodeStep } from "./steps/sp_steps_decode.js";
 import { EncodeStep } from "./steps/sp_steps_encode.js";
@@ -94,9 +94,9 @@ export interface PipelineStep {
     } | {
         oneofKind: "httpRequest";
         /**
-         * @generated from protobuf field: protos.steps.HttpRequest http_request = 1005;
+         * @generated from protobuf field: protos.steps.HttpRequestStep http_request = 1005;
          */
-        httpRequest: HttpRequest;
+        httpRequest: HttpRequestStep;
     } | {
         oneofKind: undefined;
     };

@@ -2,7 +2,7 @@
 // @generated from protobuf file "sp_pipeline.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
-import { HttpRequest } from "./steps/sp_steps_httprequest.ts";
+import { HttpRequestStep } from "./steps/sp_steps_httprequest.ts";
 import { CustomStep } from "./steps/sp_steps_custom.ts";
 import { DecodeStep } from "./steps/sp_steps_decode.ts";
 import { EncodeStep } from "./steps/sp_steps_encode.ts";
@@ -97,9 +97,9 @@ export interface PipelineStep {
     } | {
         oneofKind: "httpRequest";
         /**
-         * @generated from protobuf field: protos.steps.HttpRequest http_request = 1005;
+         * @generated from protobuf field: protos.steps.HttpRequestStep http_request = 1005;
          */
-        httpRequest: HttpRequest;
+        httpRequest: HttpRequestStep;
     } | {
         oneofKind: undefined;
     };
@@ -169,7 +169,7 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => EncodeStep },
             { no: 1003, name: "decode", kind: "message", oneof: "step", T: () => DecodeStep },
             { no: 1004, name: "custom", kind: "message", oneof: "step", T: () => CustomStep },
-            { no: 1005, name: "http_request", kind: "message", oneof: "step", T: () => HttpRequest },
+            { no: 1005, name: "http_request", kind: "message", oneof: "step", T: () => HttpRequestStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
