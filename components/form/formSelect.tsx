@@ -59,7 +59,7 @@ export const FormSelect = ({
 export const optionsFromEnum = (optionsEnum: any) =>
   Object.entries(optionsEnum).filter((
     [k, _],
-  ) => isNumeric(k))
+  ) => isNumeric(k) && k > 0)
     .map(([
       k,
       v,
@@ -67,6 +67,6 @@ export const optionsFromEnum = (optionsEnum: any) =>
       <option
         key={`option-type-key-${i}-${k}`}
         value={k}
-        label={v}
+        label={v as string}
       />
     ));
