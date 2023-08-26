@@ -46,12 +46,12 @@ class PipelineStep(_message.Message):
     decode: _sp_steps_decode_pb2.DecodeStep
     detective: _sp_steps_detective_pb2.DetectiveStep
     encode: _sp_steps_encode_pb2.EncodeStep
-    http_request: _sp_steps_httprequest_pb2.HttpRequest
+    http_request: _sp_steps_httprequest_pb2.HttpRequestStep
     name: str
     on_failure: _containers.RepeatedScalarFieldContainer[PipelineStepCondition]
     on_success: _containers.RepeatedScalarFieldContainer[PipelineStepCondition]
     transform: _sp_steps_transform_pb2.TransformStep
-    def __init__(self, name: _Optional[str] = ..., on_success: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., on_failure: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., detective: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_sp_steps_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_sp_steps_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_sp_steps_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_sp_steps_custom_pb2.CustomStep, _Mapping]] = ..., http_request: _Optional[_Union[_sp_steps_httprequest_pb2.HttpRequest, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., on_success: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., on_failure: _Optional[_Iterable[_Union[PipelineStepCondition, str]]] = ..., detective: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_sp_steps_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_sp_steps_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_sp_steps_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_sp_steps_custom_pb2.CustomStep, _Mapping]] = ..., http_request: _Optional[_Union[_sp_steps_httprequest_pb2.HttpRequestStep, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
 
 class PipelineStepCondition(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

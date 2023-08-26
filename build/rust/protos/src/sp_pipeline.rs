@@ -478,12 +478,12 @@ impl PipelineStep {
         }
     }
 
-    // .protos.steps.HttpRequest http_request = 1005;
+    // .protos.steps.HttpRequestStep http_request = 1005;
 
-    pub fn http_request(&self) -> &super::sp_steps_httprequest::HttpRequest {
+    pub fn http_request(&self) -> &super::sp_steps_httprequest::HttpRequestStep {
         match self.step {
             ::std::option::Option::Some(pipeline_step::Step::HttpRequest(ref v)) => v,
-            _ => <super::sp_steps_httprequest::HttpRequest as ::protobuf::Message>::default_instance(),
+            _ => <super::sp_steps_httprequest::HttpRequestStep as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -499,15 +499,15 @@ impl PipelineStep {
     }
 
     // Param is passed by value, moved
-    pub fn set_http_request(&mut self, v: super::sp_steps_httprequest::HttpRequest) {
+    pub fn set_http_request(&mut self, v: super::sp_steps_httprequest::HttpRequestStep) {
         self.step = ::std::option::Option::Some(pipeline_step::Step::HttpRequest(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_http_request(&mut self) -> &mut super::sp_steps_httprequest::HttpRequest {
+    pub fn mut_http_request(&mut self) -> &mut super::sp_steps_httprequest::HttpRequestStep {
         if let ::std::option::Option::Some(pipeline_step::Step::HttpRequest(_)) = self.step {
         } else {
-            self.step = ::std::option::Option::Some(pipeline_step::Step::HttpRequest(super::sp_steps_httprequest::HttpRequest::new()));
+            self.step = ::std::option::Option::Some(pipeline_step::Step::HttpRequest(super::sp_steps_httprequest::HttpRequestStep::new()));
         }
         match self.step {
             ::std::option::Option::Some(pipeline_step::Step::HttpRequest(ref mut v)) => v,
@@ -516,14 +516,14 @@ impl PipelineStep {
     }
 
     // Take field
-    pub fn take_http_request(&mut self) -> super::sp_steps_httprequest::HttpRequest {
+    pub fn take_http_request(&mut self) -> super::sp_steps_httprequest::HttpRequestStep {
         if self.has_http_request() {
             match self.step.take() {
                 ::std::option::Option::Some(pipeline_step::Step::HttpRequest(v)) => v,
                 _ => panic!(),
             }
         } else {
-            super::sp_steps_httprequest::HttpRequest::new()
+            super::sp_steps_httprequest::HttpRequestStep::new()
         }
     }
 
@@ -580,7 +580,7 @@ impl PipelineStep {
             PipelineStep::mut_custom,
             PipelineStep::set_custom,
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_steps_httprequest::HttpRequest>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_steps_httprequest::HttpRequestStep>(
             "http_request",
             PipelineStep::has_http_request,
             PipelineStep::http_request,
@@ -849,7 +849,7 @@ pub mod pipeline_step {
         // @@protoc_insertion_point(oneof_field:protos.PipelineStep.custom)
         Custom(super::super::sp_steps_custom::CustomStep),
         // @@protoc_insertion_point(oneof_field:protos.PipelineStep.http_request)
-        HttpRequest(super::super::sp_steps_httprequest::HttpRequest),
+        HttpRequest(super::super::sp_steps_httprequest::HttpRequestStep),
     }
 
     impl ::protobuf::Oneof for Step {
@@ -937,7 +937,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     roto\x1a\x1esteps/sp_steps_transform.proto\"Z\n\x08Pipeline\x12\x0e\n\
     \x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\
     \x04name\x12*\n\x05steps\x18\x03\x20\x03(\x0b2\x14.protos.PipelineStepR\
-    \x05steps\"\xa4\x05\n\x0cPipelineStep\x12\x12\n\x04name\x18\x01\x20\x01(\
+    \x05steps\"\xa8\x05\n\x0cPipelineStep\x12\x12\n\x04name\x18\x01\x20\x01(\
     \tR\x04name\x12<\n\non_success\x18\x02\x20\x03(\x0e2\x1d.protos.Pipeline\
     StepConditionR\tonSuccess\x12<\n\non_failure\x18\x03\x20\x03(\x0e2\x1d.p\
     rotos.PipelineStepConditionR\tonFailure\x12<\n\tdetective\x18\xe8\x07\
@@ -946,12 +946,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     nsform\x123\n\x06encode\x18\xea\x07\x20\x01(\x0b2\x18.protos.steps.Encod\
     eStepH\0R\x06encode\x123\n\x06decode\x18\xeb\x07\x20\x01(\x0b2\x18.proto\
     s.steps.DecodeStepH\0R\x06decode\x123\n\x06custom\x18\xec\x07\x20\x01(\
-    \x0b2\x18.protos.steps.CustomStepH\0R\x06custom\x12?\n\x0chttp_request\
-    \x18\xed\x07\x20\x01(\x0b2\x19.protos.steps.HttpRequestH\0R\x0bhttpReque\
-    st\x12\x1e\n\x08_wasm_id\x18\x90N\x20\x01(\tH\x01R\x06WasmId\x88\x01\x01\
-    \x12$\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBytes\x88\x01\
-    \x01\x12*\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWasmFunction\
-    \x88\x01\x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm_bytesB\
+    \x0b2\x18.protos.steps.CustomStepH\0R\x06custom\x12C\n\x0chttp_request\
+    \x18\xed\x07\x20\x01(\x0b2\x1d.protos.steps.HttpRequestStepH\0R\x0bhttpR\
+    equest\x12\x1e\n\x08_wasm_id\x18\x90N\x20\x01(\tH\x01R\x06WasmId\x88\x01\
+    \x01\x12$\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBytes\x88\
+    \x01\x01\x12*\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWasmFunct\
+    ion\x88\x01\x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm_bytesB\
     \x11\n\x0fX_wasm_function*\x81\x01\n\x15PipelineStepCondition\x12!\n\x1d\
     PIPELINE_STEP_CONDITION_UNSET\x10\0\x12!\n\x1dPIPELINE_STEP_CONDITION_AB\
     ORT\x10\x01\x12\"\n\x1ePIPELINE_STEP_CONDITION_NOTIFY\x10\x02B4Z2github.\
@@ -1018,9 +1018,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x01\x02\x06\x03\x12\x035\x1e\"\n\x0b\n\x04\x04\x01\x02\x07\x12\x036\
     \x04#\n\x0c\n\x05\x04\x01\x02\x07\x06\x12\x036\x04\x14\n\x0c\n\x05\x04\
     \x01\x02\x07\x01\x12\x036\x15\x1b\n\x0c\n\x05\x04\x01\x02\x07\x03\x12\
-    \x036\x1e\"\n\x0b\n\x04\x04\x01\x02\x08\x12\x037\x04*\n\x0c\n\x05\x04\
-    \x01\x02\x08\x06\x12\x037\x04\x15\n\x0c\n\x05\x04\x01\x02\x08\x01\x12\
-    \x037\x16\"\n\x0c\n\x05\x04\x01\x02\x08\x03\x12\x037%)\n\x84\x01\n\x04\
+    \x036\x1e\"\n\x0b\n\x04\x04\x01\x02\x08\x12\x037\x04.\n\x0c\n\x05\x04\
+    \x01\x02\x08\x06\x12\x037\x04\x19\n\x0c\n\x05\x04\x01\x02\x08\x01\x12\
+    \x037\x1a&\n\x0c\n\x05\x04\x01\x02\x08\x03\x12\x037)-\n\x84\x01\n\x04\
     \x04\x01\x02\t\x12\x03;\x02#\x1a@\x20ID\x20is\x20a\x20uuid(sha256(_wasm_\
     bytes))\x20that\x20is\x20set\x20by\x20snitch-server\n\"5\x20protolint:di\
     sable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\t\
