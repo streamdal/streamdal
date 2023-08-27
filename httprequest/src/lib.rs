@@ -1,4 +1,4 @@
-use protobuf::EnumOrUnknown;
+use protobuf::{EnumOrUnknown, Message};
 use protos::sp_steps_httprequest::HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use protos::sp_steps_httprequest::HttpResponse;
@@ -36,17 +36,22 @@ pub extern "C" fn f(ptr: *mut u8,length: usize) -> *mut u8 {
         )
     }
 
+    // Serialize request
+    let mut bytes = wasm_request.step.http_request().request.write_to_bytes().unwrap();
+
+    let req_ptr = bytes.as_mut_ptr();
+
     let res_ptr: *mut u8;
     unsafe {
-       res_ptr = httpRequest(ptr, length.clone());
+       res_ptr = httpRequest(req_ptr, bytes.len());
     }
 
     // Need to read memory at res_ptr and return a response
     let data = read_memory(res_ptr, 0);
 
-    // Deallocate request memory
+    // // Deallocate request memory
     unsafe {
-        dealloc(ptr, length as i32);
+        dealloc(req_ptr, length as i32);
     }
 
     let result = http_response(data);
@@ -126,11 +131,11 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("httprequest is required".to_string());
     }
 
-    if req.step.http_request().url == "".to_string() {
+    if req.step.http_request().request.url == "".to_string() {
         return Err("http request url cannot be empty".to_string());
     }
 
-    if req.step.http_request().method == EnumOrUnknown::from(HTTP_REQUEST_METHOD_UNSET) {
+    if req.step.http_request().request.method == EnumOrUnknown::from(HTTP_REQUEST_METHOD_UNSET) {
         return Err("http request method cannot be unset".to_string());
     }
 
