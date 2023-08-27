@@ -174,13 +174,10 @@ func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 
 		return httpResponse(module, http.StatusInternalServerError, "unable to read memory", nil)
 	}
 
-	wasmRequest := &protos.WASMRequest{}
-	if err := proto.Unmarshal(data, wasmRequest); err != nil {
-		// fmt.Sprintf("length of data: %d", uint32(length))
+	request := &steps.HttpRequest{}
+	if err := proto.Unmarshal(data, request); err != nil {
 		return httpResponse(module, 500, string(data), nil)
 	}
-
-	request := wasmRequest.Step.GetHttpRequest()
 
 	httpReq, err := http.NewRequest(methodFromProto(request.Method), request.Url, bytes.NewReader(request.Body))
 	if err != nil {

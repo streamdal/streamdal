@@ -399,10 +399,12 @@ func TestHttpRequest(t *testing.T) {
 	req := &protos.WASMRequest{
 		Step: &protos.PipelineStep{
 			Step: &protos.PipelineStep_HttpRequest{
-				HttpRequest: &steps.HttpRequest{
-					Url:    "https://www.google.com",
-					Method: steps.HttpRequestMethod_HTTP_REQUEST_METHOD_GET,
-					Body:   []byte(``),
+				HttpRequest: &steps.HttpRequestStep{
+					Request: &steps.HttpRequest{
+						Url:    "https://www.google.com",
+						Method: steps.HttpRequestMethod_HTTP_REQUEST_METHOD_GET,
+						Body:   []byte(``),
+					},
 				},
 			},
 			XWasmId:       stringPtr(uuid.New().String()),
@@ -436,7 +438,7 @@ func TestHttpRequest(t *testing.T) {
 	}
 
 	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
-		t.Error("expected ExitCode = 0")
+		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
 	}
 }
 
