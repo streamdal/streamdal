@@ -176,28 +176,30 @@ func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 
 
 	request := &steps.HttpRequest{}
 	if err := proto.Unmarshal(data, request); err != nil {
-		return httpResponse(module, 500, string(data), nil)
+		err = errors.Wrap(err, "unable to unmarshal HttpRequest")
+		return httpResponse(module, 500, err.Error(), nil)
 	}
 
 	httpReq, err := http.NewRequest(methodFromProto(request.Method), request.Url, bytes.NewReader(request.Body))
 	if err != nil {
+		err = errors.Wrap(err, "unable to create http request")
 		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
+		err = errors.Wrap(err, "unable to perform http request")
 		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	defer resp.Body.Close()
-
-	if resp.StatusCode > 299 {
-		return httpResponse(module, resp.StatusCode, resp.Status, nil)
-	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	if resp.StatusCode > 299 {
+		return httpResponse(module, resp.StatusCode, string(body), nil)
 	}
 
 	// Get all headers from the response
