@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/hokaccha/go-prettyjson"
+	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/snitch-go-client"
@@ -142,8 +143,6 @@ func (r *Register) runClient() error {
 		// Consumer will have input - read input data
 		input := <-r.inputCh
 
-		r.displayPre(input)
-
 		resp, err := sc.Process(context.Background(), &snitch.ProcessRequest{
 			ComponentName: r.config.Register.ComponentName,
 			OperationType: snitch.OperationType(r.config.Register.OperationType),
@@ -151,59 +150,63 @@ func (r *Register) runClient() error {
 			Data:          input,
 		})
 
-		if err != nil {
-			r.displayPost(resp, err)
-			return errors.Wrap(err, "failed to process data")
-		}
-
-		r.displayPost(resp, nil)
+		r.display(input, resp, err)
 	}
 }
 
-func (r *Register) displayPre(data []byte) {
-	now := time.Now()
+func (r *Register) display(pre []byte, post *snitch.ProcessResponse, err error) {
+	tw := gopretty.NewWriter()
+	tw.Style().Box = gopretty.StyleBoxDouble
+	now := time.Now().Format(time.RFC1123)
+
 	bold := color.New(color.Bold).SprintFunc()
+	underline := color.New(color.Underline).SprintFunc()
 
-	fmt.Printf("========================== [%s] =========================\n\n", now.Format(time.RFC1123))
-	fmt.Println(bold(">> DATA PRE-SNITCH:"))
-
-	formatted, err := prettyjson.Format(data)
-	if err != nil {
-		r.log.Debugf("failed to format data: %s", err)
-
-		// Format failed, just print raw data
-		formatted = data
-	}
-
-	fmt.Printf("%s\n\n", formatted)
-}
-
-func (r *Register) displayPost(resp *snitch.ProcessResponse, err error) {
+	// Set status and msg
 	status := color.GreenString("SUCCESS")
-	statusMessage := color.GreenString(resp.Message)
-
-	bold := color.New(color.Bold).SprintFunc()
+	message := color.GreenString(post.Message)
 
 	if err != nil {
 		status = color.RedString("FAILURE")
-		statusMessage = color.RedString(err.Error())
+		message = color.RedString("Snitch error: " + err.Error())
 	}
 
-	if resp.Error {
+	if post.Error {
 		status = color.RedString("FAILURE")
-		statusMessage = color.RedString(resp.Message)
+		message = color.RedString(post.Message)
 	}
 
-	fmt.Printf(bold(">> STATUS: ")+"%s\n", status)
-	fmt.Printf(bold(">> MESSAGE: ")+"%s\n", statusMessage)
-
-	formatted, err := prettyjson.Format(resp.Data)
+	// Format pre data
+	preFormatted, err := prettyjson.Format(pre)
 	if err != nil {
 		r.log.Debugf("failed to format data: %s", err)
 
 		// Format failed, just print raw data
-		formatted = resp.Data
+		preFormatted = pre
 	}
 
-	fmt.Printf(bold(">> DATA POST-SNITCH: ")+"\n%s\n\n", formatted)
+	// Format post data
+	postFormatted, err := prettyjson.Format(post.Data)
+	if err != nil {
+		r.log.Debugf("failed to format data: %s", err)
+
+		// Format failed, just print raw data
+		postFormatted = post.Data
+	}
+
+	// Determine post-title
+	postTitle := "Post-Snitch (unchanged)"
+
+	if err == nil && !post.Error && string(pre) != string(post.Data) {
+		postTitle = "Post-Snitch " + underline("(changed)")
+	}
+
+	tw.AppendRow(gopretty.Row{bold("Date"), now})
+	tw.AppendRow(gopretty.Row{bold("Status"), status})
+	tw.AppendRow(gopretty.Row{bold("Message"), message})
+	tw.AppendSeparator()
+	tw.AppendRow(gopretty.Row{bold("Pre-Snitch"), bold(postTitle)})
+	tw.AppendSeparator()
+	tw.AppendRow(gopretty.Row{string(preFormatted), string(postFormatted)})
+	fmt.Printf(tw.Render() + "\n")
 }
