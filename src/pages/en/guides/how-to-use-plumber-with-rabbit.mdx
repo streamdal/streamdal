@@ -1,0 +1,34 @@
+---
+title: Monitoring RabbitMQ
+metaTitle: "Plumber: How To Use With RabbitMQ"
+description: Monitor and alert on data passing through RabbitMQ
+layout: ../../../layouts/MainLayout.astro
+---
+
+Plumber supports reading/writing/relay from RabbitMQ
+
+## RabbitMQ
+
+### Reading
+
+`plumber read rabbitmq --url "amqp://guest:guest@localhost:5672/" --queue my_queue`
+
+### Writing
+
+```plumber write rabbitmq \
+  --url "amqp://guest:guest@rabbitmq.test.io:5672/" \
+  --exchange my_exchange \
+  --routing-key my_routing_key \
+  --input '{"id": "1224", "name": "John Q Customer"}'
+```
+
+### Relaying
+
+```docker run --name plumber-rabbitmq -p 8080:8080 \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-STREAMDAL-TOKEN-HERE \
+    -e PLUMBER_RELAY_RABBITMQ_URL="amqp://guest:guest@rabbitmq.test.io:5672/" \
+    -e PLUMBER_RELAY_RABBITMQ_QUEUE="my_queue" \
+    streamdal/plumber relay rabbitmq
+```
+
+Remember to replace placeholders such as `my_queue`, `my_exchange`, `my_routing_key`, and `amqp://guest:guest@rabbitmq.test.io:5672/` with your actual RabbitMQ configuration. The Docker command assumes you have a Docker image called `streamdal/plumber` that is configured to relay messages from RabbitMQ. Be sure to replace the placeholder `$YOUR-STREAMDAL-TOKEN-HERE` with your actual Streamdal.com token.

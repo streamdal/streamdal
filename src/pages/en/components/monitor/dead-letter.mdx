@@ -1,0 +1,25 @@
+---
+title: Dead Letter Monitors
+metaTitle: "Dead Letter Monitors: Set Up & Configuration"
+description: Monitors for tracking events with bad schemas or encodings
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import dead_letter_monitor from "@images/monitor/dead_letter_monitor.gif";
+
+Dead Letter Monitors serve an essential role in event-driven systems by tracking events that have incorrect or incompatible schemas, as well as those with bad encodings. Such events are typically routed to a "dead letter" queue for further analysis and resolution.
+
+## Monitor Rules
+
+### Message Sent to Dead Letter
+
+The 'Message Sent to Dead Letter' rule triggers whenever an event with a bad schema or encoding is detected and sent to the Dead Letter. It serves as an important alert to identify issues with event schemas or encodings that might need correction.
+
+## Dead Letter Monitor Configuration
+
+1. Navigate to [Monitor](https://console.streamdal.com/monitor) in the console, and click the `+` button to create a new monitor.
+2. Name the monitor.
+3. Select the monitor type 'dead letter'.
+4. Attach an alert to the monitor using the rule `Message Sent to Dead Letter`.
+
+<img src={dead_letter_monitor} alt="dead_letter_monitor" />

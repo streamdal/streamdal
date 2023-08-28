@@ -1,0 +1,47 @@
+---
+title: Semantic Data Monitors
+metaTitle: "Semantic Data Monitoring"
+description: Monitors for validating data semantics
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import semantic_data_monitor from "@images/monitor/semantic_data_monitor.gif";
+
+Semantic Data Monitors play a critical role in ensuring data quality by validating the semantics of the data. They are used to check the consistency and validity of specific fields in the data, based on the collection schema.
+
+## Data Rule: Field
+
+The 'field' rule allows you to monitor specific fields in the data. You can check for several conditions, such as if the field contains a particular string, if it is empty, if it equals to a certain value, if it's a boolean true, or if it matches patterns like credit card numbers or social security numbers.
+
+## Semantic Data Monitor Types
+
+### String Contains
+
+This type of monitor can be used to verify if a field contains a certain string. This is helpful for text validation and can be used to check if a certain keyword or phrase is present in the text.
+
+### Is Empty
+
+This monitor checks if a field is empty. This is crucial for ensuring that mandatory fields in the data are always populated.
+
+### Equal To
+
+This monitor can be used to check if a field is equal to a specific value. This is useful for data validation and ensuring data consistency.
+
+### Boolean True
+
+This monitor checks if a field is boolean true. This can be used to validate boolean fields in the data.
+
+### PII Field Values
+
+This monitor can validate whether a field matches patterns such as credit card numbers or social security numbers. This is crucial for data privacy and compliance with regulations like GDPR.
+
+## Semantic Data Monitor Configuration
+
+1. Navigate to [Monitor](https://console.streamdal.com/monitor) in the console, and click the `+` button to create a new monitor.
+1. Name the monitor.
+1. Attach an alert to the monitor.
+1. Select the Rule `Field`.
+1. Specify the `Field` in the collection schema that you wish to monitor.
+1. Select the condition to check for the field - 'String Contains', 'Is Empty', 'Equal To', 'Boolean True', or 'PII Field Values'.
+
+<img src={semantic_data_monitor} alt="semantic_data_monitor" />

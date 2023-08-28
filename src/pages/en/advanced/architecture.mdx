@@ -1,0 +1,96 @@
+---
+title: Architecture
+metaTitle: "Streamdal Architecture"
+description: "Explaining Streamdal's entire architecture"
+layout: ../../../layouts/MainLayout.astro
+---
+
+Our infrastructure is designed to be highly scalable, asynchronous, secure, and put data privacy first. We built our infrastructure from the ground up and out of many different components to create a best-in-class experience around these objectives.
+
+## Client Architecture
+
+Before we get into our architecture it may be helpful to go over an example client application. For this example, we will cover a small event-driven application.
+
+Typically, event-driven systems consist of:
+
+- a message bus
+- event producers
+- event consumers
+
+![](files/undefined)
+
+The message bus layer can be anything from Kafka, Rabbit, SQS, and many more. The order, payment, and shipping applications represent event producers that generate information for consumers which are typically backend applications that execute tasks based on the generated messages.
+
+## Connecting to Streamdal
+
+In order to integrate with Streamdal, clients can run [plumber](https://app.gitbook.com/@batch-1/s/docs/open-source/oss-plumber), use the HTTP <font size="2">(link coming soon!)</font> or gRPC API's <font size="2">(link coming soon!)</font> or run our [kafka sink connector](https://app.gitbook.com/@batch-1/s/docs/api/kafka-sink-connector).
+
+![](files/undefined)
+
+The [plumber](https://app.gitbook.com/@batch-1/s/docs/open-source/oss-plumber) client is then configured to consume a copy of the message queue and deliver them to Streamdal.
+
+**Collections:**
+
+Once the [plumber ](https://app.gitbook.com/@batch-1/s/docs/open-source/oss-plumber)client is connected to the application message bus. The event collection process begins.
+
+![](files/undefined)
+
+[Plumber](https://app.gitbook.com/@batch-1/s/docs/open-source/oss-plumber) pulls events off the message bus and then sends them into Streamdal's infrastructure where they are processed by the writer and eventually collected into an S3 bucket.
+
+## Search
+
+All collected events are searchable via our search API and [dashboard](https://console.streamdal.com).
+
+![](files/undefined)
+
+## Replay
+
+The replay process allows clients to use the search API to filter and replay specific events or all events they have stored in a collection.
+
+![](files/undefined)
+
+Client destinations can range from simple HTTP endpoints to Kafka, RabbitMQ, or SQS.
+
+## Streamdal Architecture Overview
+
+Below is the full overview of our architecture. From the client-side plumber deployment all the way down to our replay service.
+
+![](files/undefined)
+
+- The [collectors](https://app.gitbook.com/@batch-1/s/docs/what-are/what-are-collections) are highly scalable endpoints. Designed to collect events/messages over [gRPC](https://app.gitbook.com/@batch-1/s/docs/api/grpc-api) or [HTTP](https://app.gitbook.com/@batch-1/s/docs/~/drafts/-MUEoQXvaG1BNHyQD_HF/api/http-api).
+- The _writers_ do a lot of heavy lifting:
+
+  - It pulls messages off our cache (Kafka)
+  - Discovers the [schema](https://app.gitbook.com/@batch-1/s/docs/what-are/what-are-schemas) of inbound messages/events
+  - Generates optimally formatted parquet data
+  - Write the messages to _search_
+  - Writes (partitioned) parquet data to S3
+  - Updates our internal _metrics_ service on the statistics about the collected messages/events
+
+- Our S3 storage are highly optimized data lakes storing a copy of all messages and formatted as parquet files.
+- SearchCache is a large cluster of servers designed to return quick results of your most recent data.
+- Replayer pulls the original formatted message off of S3 and [replays](https://app.gitbook.com/@batch-1/s/docs/what-are/what-are-replays) to your desired endpoint.
+
+## Stack
+
+This is some of the tech that Streamdal uses:
+
+- [Docker](https://www.docker.com/) for container runtime
+- [Kubernetes](https://kubernetes.io) for container orchestration
+- [RabbitMQ](https://www.rabbitmq.com/) for internal service messaging
+- [Kafka](https://kafka.apache.org/) for event collection buffer
+- [ElasticSearch](https://www.elastic.co/) for short-term storage & search
+- [PostgreSQL](https://www.postgresql.org/) for traditional, relational data storage
+- [Timescale](https://www.timescale.com/) for metrics
+- [Etcd](https://github.com/etcd-io/etcd) for long-term cache
+- AWS [S3](https://aws.amazon.com/s3/) & [Athena](https://aws.amazon.com/athena) for long-term storage & replay
+
+We [❤️](https://emojipedia.org/red-heart/) Golang and are a **proud** Go shop - Go is _perfectly_ suited for building reliable and performant distributed systems. Our backend is 100% Go.
+
+We utilize event driven systems architecture (with a pinch of event sourcing) to further increase service reliability.
+
+Finally, we use Streamdal for our internal message system which allows us to rebuild state if things ever go wrong.
+
+The excellent folks over at [Community](https://community.com) do something very similar (except using Elixir) and they've had awesome success.
+
+> NOTE: If this sounds interesting to you and something you'd like to work on - shoot us a message [careers@streamdal.com](mailto:careers@streamdal.com).

@@ -1,0 +1,63 @@
+---
+title: Snowflake Destination
+metaTitle: "Snowflake Destination"
+description: Export your data to Snowflake
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import { Notification } from "accessible-astro-components";
+import tip from "@images/icons/tip.png";
+import snowflake from "@images/components/snowflake_export.mp4";
+
+Data ingested by Streamdal can also be sent to Snowflake. We currently support
+batch exports directly from your [search](/en/components/collections/search/)
+queries. When importing from Streamdal, tables do not need to be pre-created in
+Snowflake as they will be defined by the incoming data.
+
+<Notification type="tip">
+  <img src={tip} alt="tip" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+      Your data is always available as parquet files in AWS S3. You can always
+      [load directly from your bucket](/en/advanced/data-science/) to support
+      other data science tasks.
+    </p>
+  </div>
+</Notification>
+
+## Exporting to Snowflake
+
+1. Navigate to the general tab of the
+   [collection](/en/components/collections/overview/) that contains the data you
+   would like to send
+2. Search/query your data
+3. Click the export button to the right of your query
+4. Fill out the export form, _optionally_ applying one or more
+   [functions](/en/components/functions/overview/) to operate on data
+5. Click export
+
+After initiating the export, you are taken to the export tab of your
+collection where you can view the status. Your data should now be available in
+Snowflake.
+
+#### Export Example:
+
+<video
+  src={snowflake}
+  type="video/mp4"
+  alt="Streamdal Snowflake Export"
+  controls
+></video>
+
+### Troubleshooting
+
+If you do not see your data in Snowflake, or if the export tab of your
+collection shows `status | Aborted` next to your export, then you can drill
+into the export and view the logs for errors. You can also view these from the
+audit log in the [console dashboard](https://console.streamdal.com/).
+
+For 403 errors, ensure that your credentials are correct. This error usually
+occurs when improperly entering the organization
+([Snowflake Account
+identifier](https://docs.snowflake.com/en/user-guide/admin-account-identifier))
+field incorrectly in the export form.

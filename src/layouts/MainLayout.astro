@@ -1,0 +1,140 @@
+---
+import HeadCommon from "../components/HeadCommon.astro";
+import HeadSEO from "../components/HeadSEO.astro";
+import Header from "../components/Header/Header.astro";
+import PageContent from "../components/PageContent/PageContent.astro";
+import LeftSidebar from "../components/LeftSidebar/LeftSidebar.astro";
+import RightSidebar from "../components/RightSidebar/RightSidebar.astro";
+import * as CONFIG from "../config";
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+  frontmatter: CONFIG.Frontmatter;
+  headings: MarkdownHeading[];
+};
+
+const { frontmatter, headings } = Astro.props as Props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const currentPage = Astro.url.pathname;
+// const currentFile = `src/pages${currentPage.replace(/\/$/, '')}.md`;
+---
+
+<html
+  dir={frontmatter.dir ?? "ltr"}
+  lang={frontmatter.lang ?? "en-us"}
+  class="initial"
+>
+  <head>
+    <HeadCommon />
+    <HeadSEO frontmatter={frontmatter} canonicalUrl={canonicalURL} />
+    <title>
+      {
+        frontmatter.metaTitle
+          ? `${frontmatter.metaTitle} | ${CONFIG.SITE.title}`
+          : CONFIG.SITE.title
+      }
+    </title>
+  </head>
+
+  <body class="bg-purple-background-light">
+    <Header currentPage={currentPage} />
+    <main class="layout">
+      <aside id="left-sidebar" class="sidebar" title="Site Navigation">
+        <LeftSidebar currentPage={currentPage} />
+      </aside>
+      <div id="main-content">
+        <PageContent
+          frontmatter={frontmatter}
+          headings={headings}
+          currentPage={currentPage}
+        >
+          <slot />
+        </PageContent>
+      </div>
+      <aside id="right-sidebar" class="sidebar" title="Table of Contents">
+        <RightSidebar headings={headings} />
+      </aside>
+    </main>
+    <style>
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        padding-bottom: 5%;
+      }
+      #left-sidebar {
+        display: none;
+        background: var(--theme-bg-gradient);
+        z-index: 10;
+        inset-inline-start: 0;
+      }
+      #right-sidebar {
+        display: none;
+        top: var(--theme-navbar-height);
+        inset-inline-end: 0;
+        width: var(--theme-right-sidebar-width);
+      }
+      #main-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-width: 0;
+        line-height: 150%;
+        letter-spacing: 0.25px;
+        font-size: 16px;
+        font-weight: 300;
+      }
+
+      /* Allow showing left sidebar as an overlay, but only while viewport stays narrow */
+      @media not screen and (min-width: 50em) {
+        /* Make the left sidebar visible and fill the entire viewport below the navbar */
+        :global(.mobile-sidebar-toggle #left-sidebar) {
+          display: block;
+          top: var(--theme-navbar-height);
+          inset-inline-end: 0;
+        }
+        /*
+			Try to prevent the rest of the page from scrolling,
+			and the main content from being visible below the overlay.
+
+			Unfortunately, iOS Safari doesn't currently play well with this
+			and will sometimes still scroll the page even though it shouldn't.
+
+			Once overscroll-behavior is properly supported, this should be fixed.
+		*/
+        :global(.mobile-sidebar-toggle) {
+          overflow: hidden;
+        }
+        :global(.mobile-sidebar-toggle #main-content) {
+          visibility: hidden;
+        }
+        :global(.mobile-sidebar-toggle #left-sidebar ul) {
+          overscroll-behavior: contain;
+        }
+      }
+
+      @media (min-width: 50em) {
+        #main-content {
+          margin-inline-start: var(--theme-left-sidebar-width);
+        }
+        #left-sidebar {
+          display: flex;
+          padding-inline-start: var(--min-spacing-inline);
+          padding-inline-end: 1rem;
+          top: var(--theme-navbar-height);
+          width: var(--theme-left-sidebar-width);
+          background: transparent;
+        }
+      }
+
+      @media (min-width: 72em) {
+        #main-content {
+          margin-inline-end: var(--theme-right-sidebar-width);
+        }
+        #right-sidebar {
+          display: flex;
+        }
+      }
+    </style>
+  </body>
+</html>

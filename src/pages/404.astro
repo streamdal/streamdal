@@ -1,0 +1,19 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { MarkdownHeading } from "astro";
+import PageNotFound from "@components/404/PageNotFound";
+
+const frontmatter = {
+  title: "",
+  description: "Page Not Found",
+  layout: "../layouts/MainLayout.astro",
+};
+
+const headings = [{ depth: 1, slug: "404", text: "404 Error" }];
+---
+
+<div class="prose-h1:no-underline">
+  <MainLayout frontmatter={frontmatter} headings={headings}>
+    <PageNotFound />
+  </MainLayout>
+</div>

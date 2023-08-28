@@ -1,0 +1,87 @@
+---
+title: PostgreSQL Change Data Capture
+metaTitle: "Plumber: Relay PostgreSQL CDC Data To Streamdal"
+description: Ingest changes from your PostgreSQL database
+layout: ../../../../layouts/MainLayout.astro
+---
+
+## Postgres Setup
+
+Your postgres server must be started with the option `wal_level=logical` and have at least one available replication slot for plumber to read from
+
+Ensure postgres is started with the correct Write Ahead Log level, and has at least 1 replication slot
+
+```sql
+postgres=# show wal_level;
+ wal_level
+-----------
+ logical
+(1 row)
+
+postgres=# show max_replication_slots;
+ max_replication_slots
+-----------------------
+ 10
+(1 row)
+
+```
+
+## Create a publication
+
+A publication is required for postgres to know which changes to ship to a replication slot. See postgres documentation for options: [https://www.postgresql.org/docs/current/sql-createpublication.html](https://www.postgresql.org/docs/current/sql-createpublication.html)
+
+You may name the publication anything you wish. In this example, we'll use batchsh_plumber.
+
+```bash
+CREATE PUBLICATION batchsh_plumber FOR ALL TABLES;
+```
+
+## Create a replication slot
+
+For this example, we'll name ours `plumber_slot`.
+
+The most important thing to note here is that `pgoutput` is the output plugin.
+
+```bash
+SELECT * FROM pg_create_logical_replication_slot('plumber_slot', 'pgoutput');
+
+    slot_name   |    lsn
+--------------+-----------
+ plumber_slot | 0/168A3B8
+(1 row)
+```
+
+## Relay events to your Streamdal collection
+
+Relay via plumber docker container
+
+```bash
+docker run -d --name postgres -p 8080:8080 \
+    -e PLUMBER_RELAY_CDCPOSTGRES_HOSTNAME=localhost \
+    -e PLUMBER_RELAY_CDCPOSTGRES_USERNAME=postgres \
+    -e PLUMBER_RELAY_CDCPOSTGRES_PASSWORD=postgres \
+    -e PLUMBER_RELAY_CDCPOSTGRES_DATABASE=mydb \
+    -e PLUMBER_RELAY_CDCPOSTGRES_SLOT=plumber_slot \
+    -e PLUMBER_RELAY_CDCPOSTGRES_PUBLISHER=batchsh_plumber \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    streamdal/plumber postgres
+```
+
+Relay via plumber binary
+
+```bash
+PLUMBER_RELAY_CDCPOSTGRES_HOSTNAME=localhost \
+PLUMBER_RELAY_CDCPOSTGRES_USERNAME=postgres \
+PLUMBER_RELAY_CDCPOSTGRES_PASSWORD=postgres \
+PLUMBER_RELAY_CDCPOSTGRES_DATABASE=mydb \
+PLUMBER_RELAY_CDCPOSTGRES_SLOT=plumber_slot \
+PLUMBER_RELAY_CDCPOSTGRES_PUBLISHER=batchsh_plumber \
+PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+plumber relay postgres
+```
+
+## View events in your Streamdal collection\*\*
+
+Change events should start appearing in your Streamdal collection within seconds of them being made in your postgresql database.
+
+![](files/undefined)

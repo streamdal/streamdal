@@ -1,0 +1,100 @@
+---
+title: gRPC Quickstart
+metaTitle: "gRPC Quickstart: Communicating With Plumber’s gRPC API"
+description: Simple guide for managing plumber with gRPC
+layout: ../../../../layouts/MainLayout.astro
+---
+
+In this brief quickstart guide, we will demonstrate how to communicate with `plumber`'s gRPC API using [`grpcurl`](https://github.com/fullstorydev/grpcurl).
+
+If you prefer a graphical interface, you can use something like [Insomnia](https://github.com/Kong/insomnia) or [RPCBloom](https://github.com/bloomrpc/bloomrpc).
+
+## Install grpcurl
+
+First install `grpcurl` (if you don't already have it).
+
+```bash
+$ brew install grpcurl
+```
+
+## Start server
+
+```bash
+$ plumber server
+```
+
+It will take a few moments for `plumber` to initialize.
+
+## Clone plumber-schemas Repo
+
+Now `git clone` the Plumber protobuf repository:
+
+Plumber server protobuf definitions
+
+Open a terminal and navigate to `plumber-schemas/protos/` directory:
+
+```bash
+$ git clone git@github.com:streamdal/plumber-schemas.git
+$ cd plumber-schemas/protos
+```
+
+## Verify
+
+Execute our first command calling the `GetAllConnections()` method:
+
+```bash
+$ grpcurl -import-path . -proto ps_base.proto -d '{"auth":{"token": "streamdal"}}' -plaintext localhost:9090 protos.PlumberServer/GetAllConnections
+{
+
+}
+```
+
+Great! Plumber server is running correctly!
+
+## Create a New Connection
+
+Add a connection to our local Kafka server using the `CreateConnection()`method. We will use the returned `connectionId` for creating a `relay`.
+
+```bash
+$ grpcurl -import-path . -proto ps_base.proto \
+    -d '{"auth": {"token": "streamdal"}, "options": {"name": "Local kafka", "kafka": {"address": ["localhost"], "timeout_seconds": 10}}}' \
+    -plaintext localhost:9090 protos.PlumberServer/CreateConnection
+{
+  "connectionId": "946b0400-a272-42a5-b883-154a1b1d0f1d"
+}
+```
+
+## Create a Relay
+
+Now that we've created our first stored connection, we can start relaying messages from it into a streamdal.com collection using the `CreateRelay()` method.
+
+The important fields to specify here are `collection_token`, `connection_id`, and topics.
+
+You will need to copy the connection ID from the previous call into the request's `connection_id` field, and fill in `collection_token` with a [streamdal.com collection](https://docs.streamdal.com/platform/components/what-are-collections) token.
+
+```bash
+$ grpcurl -import-path . -proto ps_base.proto \
+  -d '{"auth": {"token": "streamdal"}, "opts": {"collection_token": "8d60e930-d18e-463b-863d-5b511fe03598", "connection_id": "946b0400-a272-42a5-b883-154a1b1d0f1d", "kafka": {"args": {"topics": ["exampletopic"]}}}}' \
+  -plaintext localhost:9090 protos.PlumberServer/CreateRelay
+{
+  "relayId": "a48500d5-bdac-4b82-9f7c-3f056b54656d",
+  "status": {
+    "message": "Relay started",
+    "requestId": "be90cd32-79b2-47cd-bda7-4045e07aa60b"
+  }
+}
+```
+
+**Success!** 🎉.
+
+We are now relaying all events from `exampletopic` topic in our local Kafka instance to our [streamdal.com collection](https://docs.streamdal.com/platform/components/what-are-collections)!
+
+## Stop the Relay
+
+Now let's stop our relay and conclude this quick start:
+
+```bash
+$ grpcurl -import-path . -proto ps_base.proto \
+  -d '{"auth": {"token": "streamdal"}, "relay_id": "a48500d5-bdac-4b82-9f7c-3f056b54656d"}' \
+  -plaintext localhost:9090 protos.PlumberServer/StopRelay
+```

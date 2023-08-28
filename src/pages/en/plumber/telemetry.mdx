@@ -1,0 +1,58 @@
+---
+title: Plumber Telemetry
+metaTitle: "Plumber: Telemetry"
+description: Telemetry for plumber clusters
+layout: ../../../layouts/MainLayout.astro
+---
+
+By default, plumber does **NOT** collect any telemetry data.
+
+When first starting `plumber` via the CLI, plumber will ask if you would like to enable telemetry. These metrics help us improve plumber by letting us know what features or functionality we need to focus on.
+
+If telemetry is enabled, plumber will collect the following anonymous telemetry data:
+
+## General
+
+- PlumberID (a unique, randomly generated ID for this plumber instance)
+- Plumber version
+- OS and architecture
+- Plumber mode (server or CLI)
+
+## For CLI
+
+- Plumber action (read, write, relay, etc.)
+- Backend used (kafka, rabbitmq, nats, etc.)
+- Data format used for read or write (json, protobuf, etc.)
+- If reading, whether continuous mode is used
+- If using protobuf, whether file descriptors are used
+
+## For server
+
+- Number of connections, relays, tunnels
+- Server uptime
+- ClusterID
+- gRPC methods used (create relay, stop tunnel, etc.)
+
+## Telemetry Data
+
+Telemetry data is _only_ sent to Streamdal's servers and will look similar to this:
+
+```json
+POST https://api.streamdal.com/capture/
+Content-Type: application/json
+Body:
+{
+    "api_key": "[api key]",
+    "event": "[event name]",
+    "properties": {
+        "distinct_id": "[plumber id]",
+        "key1": "value1",
+        "key2": "value2"
+    },
+    "timestamp": "[optional timestamp in ISO 8601 format]"
+}
+```
+
+The `distinct_id` is your plumber instance ID and is a randomly generated uuid when `plumber` is first launched.
+
+The `api_key` is embedded in `plumber`.

@@ -1,0 +1,34 @@
+---
+title: Monitor Functions
+metaTitle: "Monitor Functions"
+description: Working with external APIs and performing custom checks with Streamdal's Monitor Functions
+layout: ../../../../layouts/MainLayout.astro
+---
+
+Monitor functions are used to work with external APIs and perform custom checks against data values or fields. These functions enhance the flexibility of your data processing, allowing for additional verifications and actions based on your specific requirements.
+
+## How Monitor Functions Work
+
+When data is processed, Monitor Functions can be triggered based on specific conditions or events. These functions can interact with external APIs, retrieve additional data, or perform custom checks against the data values or fields.
+
+Monitor functions can be written in various languages, including JavaScript, TypeScript, Rust, and Golang. These functions are executed using WebAssembly (Wasm), ensuring maximum speed and efficiency.
+
+## Creating a Monitor Function
+
+To create a Monitor function, you will need to write the function in the language of your choice and compile it to WebAssembly. Once you have compiled the function, you can upload it to Streamdal and configure it to run based on your specific triggers or conditions.
+
+1. Navigate to the Streamdal console and select 'Functions' from the side navigation.
+2. Click on the `+` button to create a new function.
+3. Choose 'Monitor Function' as the type.
+4. Write your function code in the provided editor. This code should include the logic for interacting with the external API or performing the custom checks.
+5. In the test section, paste in a sample payload that your function will be working with.
+6. Build
+7. Run test and confirm no errors
+8. Deploy
+9. Associate to collection or monitor (comming soon)
+
+By implementing Monitor Functions, you can add a new layer of flexibility and control to your data processing workflow. This allows for a more tailored approach to data validation, external interactions, and other custom actions based on your specific needs.
+
+## Conclusion
+
+Monitor Functions are a versatile tool for expanding the capabilities of your data processing in Streamdal. By integrating with external APIs and enabling custom checks, you can ensure that your data processing is more flexible, robust, and aligned with your specific business requirements.

@@ -1,0 +1,62 @@
+---
+title: AWS Kinesis Firehose
+metaTitle: "Plumber: Relay AWS Kinesis Firehose Data To Streamdal"
+description: Ingest data from AWS Kinesis Firehose
+layout: ../../../../layouts/MainLayout.astro
+---
+
+Integrating Streamdal with Kinesis Data Firehose provides a powerful and efficient interface for searching and storing events. In this example, we will demonstrate integrating with Amazon AWS SES service.
+
+## Create a JSON collection
+
+1. Login into [https://console.streamdal.com](https://console.streamdal.com)
+2. Navigate to '**Collections**'
+3. Click '**New Collection**' at the top right
+4. Name your collection and select JSON format
+
+{/* Need link to file */}
+{/* ![Json Collection](files/undefined) */}
+
+## Create Kinesis Data Firehose
+
+These steps are specific to SES integration but you can adjust most to your use case
+
+1. Navigate to Kinesis in AWS console
+2. Under '**Data Firehose**' select '**Create delivery stream**'
+3. Enter a '**Delivery stream name**'
+4. Select '**Direct PUT or other sources**'
+5. Enable '**Enable server-side encryption for source records in delivery stream**' if desired
+6. At the bottom of the page select **Next**
+7. On the next page, _Processing Records_ leave defaults and select **Next**
+8. Under '**Choose a destination**' select **'HTTP Endpoint**'
+9. Set '**HTTP endpoint URL**' to [https://http-collector.dev.streamdal.com/v1/kinesis](https://http-collector.dev.streamdal.com/v1/kinesis)
+10. Set '**Access key**' to the '**Collection Token**' found under the Collection we created earlier in https://console.streamdal.com under the collections tab
+11. Configure an S3 bucket for failed records and select **Next**
+12. On the next page leave the defaults and select **Next**
+13. Review and select '**Create delivery stream**'
+
+## Tie Kinesis Data Firehose to SES
+
+Follow the guide [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/event-publishing-add-event-destination-firehose.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/event-publishing-add-event-destination-firehose.html) to create an SES set and tie it to the Kinesis data firehose you created earlier.
+
+## Configure your application so use the SES
+
+Follow the guide [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/event-publishing-send-email.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/event-publishing-send-email.html) to associate your email to an SES set
+
+## Use Streamdal to view SES Data
+
+1. Trigger an SES email that uses the SES set we created earlier
+2. Wait a few minutes for Kinesis to send the event to Streamdal
+3. Navigate to the collection we created earlier at [https://console.streamdal.com](https://console.streamdal.com)
+
+![](files/undefined)
+
+4. Click on a message to view the JSON and all searchable fields
+
+![](files/undefined)
+
+In the image above I clicked on the field '**eventType**' on the right-hand side. You can see the search field was automatically updated with the correct search syntax to find more SNS event types that match the value '**Open'**
+
+## Summary
+
+You now have a much better and simpler way of dealing with Kinesis data than dumping to an S3 bucket or managing your own Elasticsearch cluster. You also get access to many more features such as being able to [replay ](https://docs.streamdal.com/what-are/what-are-replays)these events into other [destinations ](https://docs.streamdal.com/what-are/what-are-destinations)for further processing.

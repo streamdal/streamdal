@@ -1,0 +1,225 @@
+---
+title: Quickstart
+metaTitle: "Streamdal Quickstart Guide"
+description: Quickstart Streamdal
+layout: ../../../layouts/MainLayout.astro
+---
+
+import { Notification } from "accessible-astro-components";
+import info from "@images/icons/info.png";
+import tip from "@images/icons/tip.png";
+
+import step1_create from "@images/getting-started/step1_create.gif";
+import plumber from "@images/getting-started/plumber.gif";
+import token from "@images/getting-started/token.gif";
+
+This guide will cover the basics for getting started using Streamdal.
+
+Before we begin, let's familiarize ourselves with a couple of terms that are
+used throughout our platform.
+
+## Terminology
+
+### `Collections`
+
+Streamdal hooks directly into your message broker or CDC stream as a polite
+consumer, and relays all of the event data/streams to our platform. All of the
+data captured is indexed in a logical grouping called a _Collection_. Before we
+can tap into any data, a _Collection_ needs to be created and scoped within the
+console UI. This is the first step in getting started.
+
+Read more about Collections [here](/en/components/collections/overview/).
+
+### `Plumber`
+
+`plumber` is an open-source Swiss Army Knife CLI tool used for interacting with
+messaging and streaming systems like Kafka, RabbitMQ, NATS, SQS, and many
+others. It also acts as the Streamdal agent. Whether you are working locally,
+on-prem, or in the cloud, you can deploy plumber in a variety of ways to
+interact with and connect to your systems.
+
+Read more about _Plumber_ [here](/en/plumber/overview/).
+
+---
+
+## Step 1: Create your First Collection
+
+After registration, you are put directly into the dashboard view. This is where
+you get a holistic view of all data, monitors, and associated logs.
+
+From here you can:
+
+1. Select either the plus icon next to your avatar and username and select
+   'Add Collection,' or you can click on the Collections button in the left nav
+   pane to create new collections
+1. Select schema type
+1. Enter a name for the collection
+1. Upload schemas (note that plaintext and JSON are inferred, so no upload is
+   required!)
+1. Configure data lake to use hosted data lake (default)
+1. Click create!
+
+<img src={step1_create} alt="step1_create" />
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <p>
+    _With every collection created, there is a unique assigned collection token.
+    This will be passed to Plumber in order for it to send data to the correct
+    Collection._
+  </p>
+</Notification>
+
+## Step 2: Install and Configure Plumber
+
+Click [here](/en/resources/open-source/plumber-oss/) for detailed instructions
+for installing Plumber. Once installed, you will need to connect Plumber to
+your broker/messaging system, and create a relay between Plumber and Streamdal
+with your collection token.
+
+For this step in the guide, we will be demonstrating on a local RabbitMQ. Check
+out the different environment variables
+[here](https://github.com/streamdal/plumber/blob/master/docs/env.md) for what
+flags to pass for different systems like Kafka, Kineses, SQS, etc.
+
+<div class="w-full max-w-2xl m-0">
+  <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
+  <label
+    for="tab1"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab1:border-b-4 peer-checked/tab1:border-purple-bright peer-checked/tab1:font-bold"
+  >
+    CLI setup
+  </label>
+  <input id="tab2" type="radio" name="pct" class="hidden peer/tab2" />
+  <label
+    for="tab2"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab2:border-b-4 peer-checked/tab2:border-purple-bright peer-checked/tab2:font-bold"
+  >
+    Docker-Compose
+  </label>
+  <div class="hidden peer-checked/tab1:block clear-both p-5 w-full">
+    Use the following CLI commands to get plumber relaying data to Streamdal.
+    <br/>
+
+      1. Start Plumber in server mode
+      <br/>
+
+      ```
+      plumber server
+      ```
+
+      <br/>
+
+      2. In a new terminal window, create the connection between Plumber and
+      the broker
+      <br/>
+
+      ```
+      plumber manage create connection rabbit --name rabbitQuickstart
+      ```
+
+      <br/>
+
+      3. Create a relay between Plumber and Streamdal. _This is how we ingest
+      data_
+      <br/>
+
+      ```
+      plumber manage create relay rabbit \
+      --connection-id=$id_for_rabbitQuickstart \
+      --collection-token=$secret_collection_token --exchange-name=billing \
+      --binding-key=billing --queue-name=plumber-billing --queue-durable
+      ```
+
+  </div>
+  <div class="hidden peer-checked/tab2:block clear-both p-5 w-full">
+      Instead of manually entering CLI commands or creating scripts, you can
+      containerize plumber in your infrastructure. Below is what the
+      docker-compose.yaml looks like for this guide.
+      <br/>
+
+      _Note: if you are copying this docker-compose.yaml, just be sure to
+      create the exchange and binding key within Rabbit once launched, and link
+      it to the plumber-billing queue._
+      <br/>
+
+      ```
+      version: "3.2"
+      services:
+        rabbitmq:
+          image: rabbitmq:3-management-alpine
+          container_name: 'rabbitmq'
+          environment:
+            - RABBITMQ_DEFAULT_USER=streamdal
+            - RABBITMQ_DEFAULT_PASS=streamdal
+          ports:
+              - 5672:5672
+              - 15672:15672
+        plumber:
+          image: streamdal/plumber:latest
+          platform: linux/amd64
+          depends_on:
+            - rabbitmq
+          command:
+            - ./plumber-linux
+            - relay
+            - rabbit
+          environment:
+            - PLUMBER_RELAY_TYPE=rabbit
+            - PLUMBER_RELAY_TOKEN=$(MyToken)
+            - PLUMBER_RELAY_RABBIT_EXCHANGE=billing
+            - PLUMBER_RELAY_RABBIT_QUEUE=plumber-billing
+            - PLUMBER_RELAY_RABBIT_ROUTING_KEY=billing
+            - PLUMBER_RELAY_RABBIT_QUEUE_EXCLUSIVE=false
+            - PLUMBER_RELAY_RABBIT_QUEUE_DURABLE=true
+            - PLUMBER_RELAY_RABBIT_ADDRESS=amqp://streamdal:streamdal@localhost:5672
+            - PLUMBER_RELAY_GRPC_ADDRESS=grpc-collector.batch.sh:9000
+          restart: on-failure
+    ```
+
+    <br/>
+
+  </div>
+</div>
+
+<Notification type="tip">
+  <img src={tip} alt="tip" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-code:text-white">
+    If you ever need to find Plumber connection IDs, you can use: `plumber get
+    connection`
+  </div>
+</Notification>
+
+<img src={plumber} alt="plumber" />
+
+You can find the collection token in the console UI of the collection you
+created:
+
+<img src={token} alt="token" />
+
+Ensure that the environment variable `PLUMBER_RELAY_TOKEN` is set to the unique
+collection token. This is similar to the `--collection-token` flag you can pass
+manually, and is needed to point Plumber to the unique collection.
+
+## Start Observing Data
+
+And that's it! You can start watching events appear in the
+[console](https://console.streamdal.com/collections).
+
+If you've installed Plumber, then you also have a powerful tool for interacting
+with your messaging system. Click
+[here](/en/resources/open-source/plumber-oss/) to learn how to write data to
+your broker with Plumber.
+
+Now you are ready to take advantage of more advanced functionality:
+
+- [Search](/en/components/collections/overview/#search)
+- [Replays](/en/components/replays/)
+- [Monitors & Alerts](/en/components/monitor/overview/)
+- [Smart Deadletter Queue (DLQ)](/en/components/dead-letter/)
+- [Schema Management](/en/components/schemas/overview/)
+- [Functions & Transformations](/en/components/functions/overview/)
+
+Not sure what to feature to try next? Be sure to review the various
+[use cases](/en/getting-started/use-cases/) for a better idea of the kinds of
+performance, observability, and reliability you can enjoy with Streamdal.

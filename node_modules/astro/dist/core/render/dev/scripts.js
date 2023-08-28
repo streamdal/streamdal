@@ -1,0 +1,34 @@
+import { rootRelativePath, viteID } from "../../util.js";
+import { createModuleScriptElementWithSrc } from "../ssr-element.js";
+import { crawlGraph } from "./vite.js";
+async function getScriptsForURL(filePath, root, loader) {
+  const elements = /* @__PURE__ */ new Set();
+  const rootID = viteID(filePath);
+  const modInfo = loader.getModuleInfo(rootID);
+  addHoistedScripts(elements, modInfo, root);
+  for await (const moduleNode of crawlGraph(loader, rootID, true)) {
+    const id = moduleNode.id;
+    if (id) {
+      const info = loader.getModuleInfo(id);
+      addHoistedScripts(elements, info, root);
+    }
+  }
+  return elements;
+}
+function addHoistedScripts(set, info, root) {
+  var _a, _b;
+  if (!((_a = info == null ? void 0 : info.meta) == null ? void 0 : _a.astro)) {
+    return;
+  }
+  let id = info.id;
+  const astro = (_b = info == null ? void 0 : info.meta) == null ? void 0 : _b.astro;
+  for (let i = 0; i < astro.scripts.length; i++) {
+    let scriptId = `${id}?astro&type=script&index=${i}&lang.ts`;
+    scriptId = rootRelativePath(root, scriptId);
+    const element = createModuleScriptElementWithSrc(scriptId);
+    set.add(element);
+  }
+}
+export {
+  getScriptsForURL
+};

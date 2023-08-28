@@ -1,0 +1,1 @@
+{"version":3,"file":"base.js","sourceRoot":"","sources":["../../src/configs/base.ts"],"names":[],"mappings":";;;AAEa,QAAA,IAAI,GAAkB;IACjC,MAAM,EAAE,YAAY;IACpB,aAAa,EAAE;QACb,UAAU,EAAE,QAAQ;QACpB,WAAW,EAAE,QAAQ;KACtB;IACD,OAAO,EAAE,CAAC,KAAK,CAAC;IAChB,SAAS,EAAE,YAAY;IACvB,KAAK,EAAE;QACL,YAAY,EAAE,MAAM;QACpB,uBAAuB,EAAE,OAAO;KACjC;CACF,CAAA"}

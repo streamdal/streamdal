@@ -1,0 +1,129 @@
+---
+title: Technical FAQs
+metaTitle: "Streamdal Technical FAQs"
+description: Streamdal Technical FAQs
+layout: ../../../../layouts/MainLayout.astro
+---
+
+## Why do you need Streamdal?
+
+### You should give us a try if:
+
+- You want to gain visibility into your message queues
+- You are using an encoded message/event format (such as Protobuf, Avro, Flatbuffer)
+- You are working on something that requires data replay
+- You are exploring event driven architectures
+- Want to turn your message queue data into a useable data lake
+
+Really... there are a lot of reasons. Chances are that if it has something to do with message queues - we are probably a good fit for you.
+
+Take a look at the [Use Cases section](https://docs.streamdal.com/en/getting-started/use-cases/) to get a better idea as to what's possible with the Streamdal platform
+
+## How do I get data into Streamdal?
+
+There are a lot of ways to get data into Streamdal, you have the following options:
+
+- Plumber running in `relay` mode
+- HTTP API
+- gRPC API
+
+## How do I get data out of Streamdal?
+
+Getting data out is simple. Either:
+
+- Replay the data using our replay feature
+- Download the contents of the S3 bucket we provide for you
+  - Or if you bring your own bucket, you already have the data
+- Export the data as a JSON dump
+
+## What is event replay?
+
+Event replay is just what it sounds like - the ability to replay an arbitrary number of events that occurred in the past to an arbitrary destination.
+
+The events are messages that were collected from your messaging system(s) and usually represent a "state" that your system or component was in at that particular time.
+
+There are many reasons why you'd want to replay events:
+
+- To gain insight into what happened during an outage
+- To debug issues as you're developing your software
+- To test your software with real event data
+- To feed data for machine learning
+- and [many, many more](https://docs.streamdal.com/en/getting-started/use-cases/)
+
+Event replay is a core component of event driven system architectures such as event sourcing in which the event is the source of truth. Meaning, rather than relying on a "status" in a database column, the event (and the surrounding events) specifies what the "status" is at that specific time.
+
+If you are doing event sourcing, you will 100% need a replay mechanism
+
+## What is event driven architecture?
+
+Event driven architecture is the umbrella term for system and software architectures that operate by emitting and reacting to events. Event driven architectures utilize producers to emit events that indicate state changes and consumers who consume the events and react to the state change.
+
+Core concepts of event driven architectures:
+
+- Loose coupling
+- Asynchronous communication
+- Idempotency
+
+Some examples of event driven architectures:
+
+- Billing service emits "payment processed" messages which are then consumed by the account service to "unlock" the associated account
+- State management in Redux
+- Using Python Celery to execute tasks
+
+You can read more about event driven architectures [here](https://en.wikipedia.org/wiki/Event-driven_architecture).
+
+## Why not build your own event replay mechanism?
+
+Event replay sounds deceptively simple - read events from somewhere, send them to a destination. What's the big deal?
+
+Building a super basic replayer is pretty straightforward - write your events to a message system, write a service that archives the events somewhere and write another service to "read" and "replay" the events.
+
+The difficulties start arising once you want something beyond just a "replay events from/to date".
+
+### Namely:
+
+- How do you replay events that contain specific data?
+- You now need to index your events
+- You now have to store your events in a queryable format
+- How do you scale past 1B events?
+- How do you make replay self-serve?
+- Who maintains all of these components?
+
+## Why not build your own event replay mechanism?
+
+Event replay sounds deceptively simple - read events from somewhere, send them to a destination. What's the big deal?
+
+Building a super basic replayer is pretty straightforward - write your events to a message system, write a service that archives the events somewhere and write another service to "read" and "replay" the events.
+
+The difficulties start arising once you want something beyond just a "replay events from/to date".
+
+### Namely:
+
+- How do you replay events that contain specific data?
+- You now need to index your events
+- You now have to store your events in a queryable format
+- How do you scale past 1B events?
+- How do you make replay self-serve?
+- Who maintains all of these components?
+
+## A note on Kafka
+
+While Kafka has replays, if you want to do anything outside of "replay from this offset until this offset" - you will want something more sophisticated. In our experience, Kafka replays work best when used as a recovery mechanism rather than an "on-demand replay mechanism" to facilitate event-driven architectures.
+
+## What happens to my data if I exceed storage limits?
+
+In short - nothing but we will ask you very nicely to increase your storage limits by either purchasing a storage add-on or upgrading your plan.
+
+## What kind of messaging technologies do you support?
+
+We support nearly all popular messaging technologies and several non-messaging technologies such as MongoDB, PostgreSQL, and MySQL. For a full list, see the list here. If you need to replay data to a destination that we do not support - let us know and we'll make it happen.
+
+## Where are Streamdal's collectors hosted?
+
+As of 02.2022, Streamdal's collectors are hosted in AWS, us-west-2 (Oregon, US). If you are pushing a large volume of events (1,000+ per sec), you may need for our collectors to be located closer to you geographically. If so, contact us and we can spin up collectors closer to you.
+
+## What are the outbound IP's that Streamdal uses for replays?
+
+- 35.165.253.176
+- 52.25.81.114
+- 54.190.100.78

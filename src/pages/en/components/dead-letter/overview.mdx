@@ -1,0 +1,28 @@
+---
+title: Dead Letter
+metaTitle: "Dead Letter Queue"
+description: Managing and correcting events with bad schemas
+layout: ../../../../layouts/MainLayout.astro
+---
+
+Every collection in Streamdal has an associated **Dead Letter**. This is where events with bad schemas are sent. Dead Letter serves as a quarantine zone for events that couldn't be processed due to schema-related issues, providing a safeguard to prevent faulty events from contaminating your system.
+
+## Staging Area
+
+The **Staging Area** is a temporary holding place within the Dead Letter where selected messages can be corrected.
+
+Messages can be moved into the Staging Area either manually or many at a time based on a query. Once in the Staging Area, these messages can be corrected manually or by using a function designed to fix the specific schema issue.
+
+The Staging Area allows you to correct and verify the events before they are reintroduced into your system, ensuring the integrity of your data.
+
+## Replaying Events
+
+After all messages in the Staging Area have been corrected and marked as replayable, they can be **replayed** back into the original collection or sent to a specific destination like Kafka or Google Cloud Platform for reprocessing.
+
+The replay feature allows you to recover from data issues without losing valuable information. By replaying corrected events back into your system, you ensure that all events are processed and stored as intended.
+
+Remember, it's crucial to ensure that all schema issues are fully resolved before replaying the events. This is to prevent any further problems and ensure the smooth operation of your system.
+
+## Importance of Dead Letter
+
+The Dead Letter functionality is a crucial part of data processing and error handling in event-driven systems. By capturing and isolating events with bad schemas, it protects the integrity of your data and your system. The staging and replaying features allow for efficient correction and reprocessing of these events, minimizing the impact of schema issues and maximizing data utilization.

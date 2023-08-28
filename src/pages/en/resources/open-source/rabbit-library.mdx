@@ -1,0 +1,16 @@
+---
+title: Rabbit Library
+metaTitle: "Rabbit: Golang Streadway/AMQP Wrapper Library"
+description: Wrapper library that we use for communicating with our internal RabbitMQ instances.
+layout: ../../../../layouts/MainLayout.astro
+---
+
+[Rabbit](https://github.com/streamdal/rabbit) is our Golang [streadway/amqp](https://github.com/streadway/amqp) wrapper library that we use for communicating with our internal RabbitMQ instances.
+
+We make _significant_ use of RabbitMQ internally because of its sophisticated routing capabilities.
+
+While the `streadway/amqp` library is performant and reliable, it does not support automatic reconnects or `context` usage (for cancellation).
+
+Our `rabbit` library aims to address that.
+
+NOTE: We also use Kafka internally for which we use the [segmentio/kafka-go](https://github.com/segmentio/kafka-go) lib.

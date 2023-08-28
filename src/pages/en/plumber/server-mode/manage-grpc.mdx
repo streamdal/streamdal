@@ -1,0 +1,105 @@
+---
+title: Manage with gRPC
+metaTitle: "Plumber: Manage with gRPC"
+description: Manage plumber through gRPC
+layout: ../../../../layouts/MainLayout.astro
+---
+
+`Plumber` server can be controlled via its gRPC protobuf API.
+
+The API enables you to tweak plumber settings at runtime, along with managing connections, relays, tunnels and more.
+
+**gRPC method documentation: [https://buf.build/streamdal/plumber-schemas/docs/main/protos]**(https://buf.build/streamdal/plumber-schemas/docs/main/protos)
+
+**Protobuf schemas: [https://github.com/streamdal/plumber-schemas]**(https://github.com/streamdal/plumber-schemas)
+
+## Auth
+
+Nearly every gRPC method will require authentication.
+
+You can expect to have to add this to the request body:
+
+```json
+{
+  "auth": {
+    "token": "plumber's auth token"
+  }
+}
+```
+
+## Create a Connection
+
+In order to create a relay or a tunnel, you will first need to create a connection.
+
+The connection is representative of the backend you are planning on using to relay data from or tunnel data to. It will contain details such as:
+
+- Address and port of the backend/message bus/database server
+- Credentials for accessing the resource
+- TLS/SSL settings
+
+A create request will look something like this:
+
+```json
+{
+  "auth": {
+    "token": "plumber-auth-token"
+  },
+  "options": {
+    "name": "Kafka Connection",
+    "notes": "Demo for docs",
+    "kafka": {
+      "address": ["localhost:9092"]
+    }
+  }
+}
+```
+
+The response will include a `connection_id` that you will have to use when creating a relay or tunnel.
+
+## Create a Relay
+
+To create a relay, use the `CreateRelay` method and pass something like this:
+
+```json
+{
+  "auth": {
+    "token": "plumber-auth-token"
+  },
+  "opts": {
+    "collection_token": "collection-token-from-batch-console",
+    "connection_id": "connection-id-from-create-connection-response",
+    "args": {
+      "topics": ["foo"]
+    }
+  }
+}
+```
+
+The API will return a `relay_id` that can then be used for further controlling the relay.
+
+## Create a Tunnel
+
+To create a tunnel, use the `CreateTunnel` method and pass something like this:
+
+```json
+{
+  "auth": {
+    "token": "plumber-auth-token"
+  },
+  "opts": {
+    "api_token": "api-token-created-in-batch-console",
+    "connection_id": "connection-id-from-create-connection-response",
+    "_active": true, // Set this to also start the tunnel
+    "name": "Tunnel test",
+    "kafka": {
+      "args": {
+        "topics": ["replay"]
+      }
+    }
+  }
+}
+```
+
+The API will return a `tunnel_id` that can be used for further controlling the tunnel.
+
+For a complete list of all available methods, request and response types, please refer to the [API docs](https://buf.build/streamdal/plumber-schemas/docs/main/protos).

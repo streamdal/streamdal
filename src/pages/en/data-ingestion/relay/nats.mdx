@@ -1,0 +1,47 @@
+---
+title: Relay NATS
+metaTitle: "Plumber: Relay NATS Data To Streamdal"
+description: Relay NATS data to Streamdal
+layout: ../../../../layouts/MainLayout.astro
+---
+
+In this guide, we will cover how to relay NATS JetStream data to Streamdal using Plumber. This can be particularly useful when you need to migrate data, forward messages, or transform data in transit from NATS to Streamdal.
+
+## Prerequisites
+
+Before you start, you will need the following:
+
+- Docker installed on your machine.
+- A running NATS JetStream instance.
+- Your Streamdal token. You can find this in your Streamdal dashboard.
+- The NATS JetStream stream you want to relay.
+
+## NATS Relay
+
+To relay a NATS JetStream stream to Streamdal, we will use the `plumber relay` command in a Docker container. Here's the Docker command to set up the relay:
+
+```
+docker run -d --name  nats-jetstream -p 8080:8080 \
+    -e PLUMBER_RELAY_NATS_JETSTREAM_DSN=nats://localhost:4222 \
+    -e PLUMBER_RELAY_NATS_JETSTREAM_CLIENT_ID=plumber \
+    -e PLUMBER_RELAY_NATS_JETSTREAM_STREAM=orders \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    streamdal/plumber:local plumber relay nats-jetstream
+```
+
+Make sure to replace `nats://localhost:4222`, `plumber`, `orders`, and `$YOUR-STREAMDAL-TOKEN-HERE` with your actual NATS JetStream DSN, client ID, stream name, and Streamdal token respectively.
+
+## Understanding the Docker Command
+
+Here's a breakdown of the Docker command:
+
+- `PLUMBER_RELAY_NATS_JETSTREAM_DSN`: This is your NATS JetStream DSN (Data Source Name). It specifies the host and port of your NATS JetStream server.
+- `PLUMBER_RELAY_NATS_JETSTREAM_CLIENT_ID`: The client ID for your NATS JetStream connection.
+- `PLUMBER_RELAY_NATS_JETSTREAM_STREAM`: The NATS JetStream stream you want to relay.
+- `PLUMBER_RELAY_TOKEN`: This is your Streamdal token. Plumber uses this to authenticate with Streamdal.
+
+The `plumber relay nats-jetstream` command tells Plumber to start in relay mode and read from nats Jetstream.
+
+After running this command, Plumber will start relaying data from the specified NATS JetStream stream to Streamdal.
+
+Please note that you need to adjust the details according to your actual setup and security requirements.

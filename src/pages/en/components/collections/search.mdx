@@ -1,0 +1,175 @@
+---
+title: Collection Search
+metaTitle: "Collection Search: Search Syntax & Examples For Collections"
+description: Search your Collection messages in Streamdal
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import { Notification } from "accessible-astro-components";
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+
+Our collectors enrich your events metadata which you can use in your queries.
+
+## Streamdal metadata:
+
+- `batch.info.date_human`
+  - An ISO 8601 format timestamp
+- `batch.info.date_string`
+  - A nanosecond UNIX timestamp
+- `batch.info.request_id`
+  - A unique UUID assigned to this event
+- `batch.info.source`
+  - Identifier for the (Batch) system that received the event
+
+## Search Syntax
+
+The detailed collection view enables you to search through your event data
+using a [Lucene-like](https://lucene.apache.org/core/2_9_4/queryparsersyntax.html)
+syntax (such as used by ElasticSearch) and uses full-text search.
+
+Our search supports the following operations:
+
+- Value contains or does NOT contain
+- Value is greater than, less than
+- Value is between X and Y
+- Date operations
+- Expression chaining
+- Search modifiers
+
+## Timestamps
+
+Timestamps are "special". To fetch events that fit a specific time range, use the `batch.info.date_human`
+field which uses [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <p>Timestamps in Streamdal metadata use the UTC timezone.</p>
+</Notification>
+
+## Client Metadata
+
+Client metadata is stored in parquet as a `map[string]string` and if queried via
+Athena (instead of the dashboard), you must use the following syntax:
+
+```
+SELECT * FROM $db.$table WHERE client.metadata['request_id'] = 'foo'
+```
+
+<Notification type="warning">
+  <img src={warning} alt="warning" width="30px" height="30px" />
+  The above applies *only* to when querying parquet files via Athena or another parquet-capable
+  platform.
+</Notification>
+
+## Search Modifiers
+
+It is possible to alter the results of a search by adding modifiers to the search query.
+
+The modifier syntax is as follows: `${MODIFIER input}`
+Or to use multiple modifiers: `${MODIFIER input AND MODIFIER input AND ...}`
+
+Available modifiers:
+
+1. `ORDER_BY <field_name>`
+   1. Sort the results by a given field
+   2. Equivalent to ORDER BY in SQL
+2. `SORT ASC|DESC`
+   1. Sorts the returned data in ascending or descending order
+   2. Equivalent to SQL ORDER BY ... ASC|DESC
+3. `LIMIT <number>`
+   1. Limits the number of results returned by the search
+   2. Equivalent to `SQL LIMIT <number>`
+4. `UNIQUE <field_name>`
+   1. Limit results to unique values from a column
+   2. Equivalent to SQL `GROUP BY ...`
+
+You can chain multiple modifiers together by adding an `AND` between the modifiers.
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  Case matters for both modifier actions and the chaining keyword (AND).
+</Notification>
+
+## Search Examples
+
+### All results
+
+Fetch all results (for the picked time interval).
+
+```
+*
+```
+
+### Any part of a string
+
+Find any events that contain the string "foo" in any key or field.
+
+```
+foo
+```
+
+### Logical NOT
+
+Find all events that do not contain the string foo in batch.info.source.
+
+```
+batch.info.source: (NOT foo)
+```
+
+### Events ingested between timestamps
+
+```
+batch.info.date_human: [2021-03-08T22:29:05Z TO 2021-03-08T22:30:26Z]
+```
+
+### Chaining multiple conditions
+
+Find all events where `client.payload.age` is greater than `32` AND `client.payload.title` is set to "engineer".
+
+```
+client.payload.age: >32 AND client.payload.title: engineer.
+```
+
+### Query by array length
+
+You can query the length of an array using the length() function. The following query will match all records where my_array has 2 items
+
+```
+client.payload.my_array[].length(): 2
+```
+
+Greater than and less than operators are also supported: &gt;, &lt;, &gt;&#61;, and &lt;&#61;
+
+The following query will match aall records where my_array has 3 or more items
+
+```
+client.payload.my_array[].length(): >=3
+```
+
+### Specifying search modifiers
+
+Find the event that has the oldest age:
+
+```
+client.payload.age: >32 ${ORDER client.payload.age AND SORT DESC AND LIMIT 1}
+```
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <div>Exact matches</div>
+    <div>
+      Due to how indexing works, searching for an exact values might provide
+      false positives. See below for examples:
+    </div>
+  </div>
+</Notification>
+
+Searching for **foo** when there are events with **foobar** will return both **foo** and **foobar**.
+
+You have several options to get around this:
+
+- Search for values that are unique and not part of any existing values
+- Add additional constraints to the searc
+- Surround your field in double quotes so the value is treated as a single element

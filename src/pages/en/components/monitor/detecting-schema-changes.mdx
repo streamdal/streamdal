@@ -1,0 +1,37 @@
+---
+title: Schema Change Monitors
+metaTitle: "Schema Monitors: Detecting Schema Changes"
+description: Monitors for detecting schema changes
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import schema_monitor from "@images/monitor/schema-monitor.gif";
+
+Schema Change Monitors detect changes to a collection from an inbound event source. These changes can occur when a third-party service is used as an event source or an internal change impacts event production.
+
+## Schema Change Types
+
+1. **Schema Evolution**: A change in the event schema without altering its semantic meaning, e.g., adding a new field to the event.
+2. **Schema Conflict**: A change in the event schema that modifies its semantic meaning, e.g., changing a field's value type from string to integer.
+
+## Schema Change Monitor Types
+
+### Schema Evolution
+
+Detecting schema evolution is crucial in event-driven systems as it helps update the collection schema to align with the new event schema. Streamdal automatically handles this for JSON and Plain. For Protobuf and Avro events, the new schema must be manually uploaded. If your applications are sensitive to new fields, consider utilizing this monitor.
+
+### Schema Conflict
+
+Schema conflicts are more serious as they can cause application failures or data storage issues. For instance, if a field changes from a string to an integer, the data cannot be written to a database expecting a string field. If a field is removed, it can also cause issues.
+
+## Schema Change Monitor Configuration
+
+1. Navigate to [Monitor](https://console.streamdal.com/monitor) in the console, and click the `+` button to create a new monitor.
+2. Name the monitor.
+3. Select the monitor type 'collection'.
+4. Associate the collections you wish to monitor.
+5. Attach an alert to the monitor.
+6. Choose rule `Schema Evolution`.
+7. Select condition `Schema Conflict Encountered` or `Schema Evolved`.
+
+<img src={schema_monitor} alt="schema_monitor" />

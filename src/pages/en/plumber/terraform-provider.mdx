@@ -1,0 +1,111 @@
+---
+title: Plumber Terraform Provider
+metaTitle: "Plumber: Terraform Provider"
+description: Use terraform to manage your plumber instance
+layout: ../../../layouts/MainLayout.astro
+---
+
+## Usage
+
+You will first need to be running Plumber in server mode. See [Plumber Server Mode](/en/plumber/server-mode/overview/) for more information on getting it set up
+
+First define the provider config. For our example, we're putting plumber's authentication token in the config, but it is recommended that you use the `PLUMBER_TOKEN` environment variable to set this value, or pull in via a secrets manager such as Vault.
+
+You will also need to fill in the `address` variable so terraform knows where to talk to your plumber server instance
+
+```hcl
+terraform {
+  required_providers {
+    plumber = {
+      version = "~> 0.1.0"
+      source  = "streamdal/plumber"
+    }
+  }
+}
+
+provider "plumber" {
+  plumber_token      = "your-plumber-servers-token"
+  address            = "address-of-your-plumber-server:9090"
+}
+```
+
+## Creating Connections
+
+You can use the `plumber_connection` resource to manage connections
+
+See [https://registry.terraform.io/providers/streamdal/plumber/latest/docs/resources/connection](https://registry.terraform.io/providers/streamdal/plumber/latest/docs/resources/connection) for all available connection types and their parameters
+
+```hcl
+resource "plumber_connection" "my_kafka_server" {
+  name = "test kafka"
+  kafka {
+    address = ["kafka.default.svc.cluster.local:9092"]
+    connection_timeout = 5
+    tls_skip_verify = true
+    sasl_type = "plain"
+    sasl_username = "plumberconn"
+    sasl_password = "uLZ29]q%cHhW$bWe"
+  }
+}
+```
+
+## Create Relays
+
+Need to ship messages to your streamdal.com collections?
+Create a relay with the above connection easily:
+
+```hcl
+resource "plumber_relay" "my_kafka_relay" {
+  # Use our connection ID from earlier
+  connection_id = plumber_connection.my_kafka_server.id
+
+  # Fill in with the token from your collection in https://console.streamdal.com
+  collection_token = "48b30466-e3cb-4a58-9905-45b74284709f"
+
+  # Relay details for your kafka connection
+  kafka {
+    # You can specify multiple topics
+    # Streamdal commends a collection per topic if message structure differsh
+    topics = ["new_orders"]
+    consumer_group_name = "plumber"
+  }
+}
+```
+
+## Create Replay Tunnel
+
+Plumber can act as a replay destination, allowing you to replay messages to your bus without the need to punch holes in firewalls or hand out credentials.
+
+For this functionality, you will need to obtain an API token from [https://console.streamdal.com/account/security](https://console.streamdal.com/account/security)
+
+As with the plumber token, we don't recommend storing the API token in your terraform files. You can use the environment variable `BATCHSH_TOKEN` to provide it to terraform. However for demo purposes, we'll just put it in the terraform config:
+
+```hcl
+resource "plumber_tunnel" "my_replay_tunnel" {
+  name = "Tunnel to infra kafka"
+
+  # Obtained from your https://console.streamdal.com account
+  batchsh_api_token = "batchsh_3b17c235a49a871d2c9715c80acdef33c9bfe6e1bc881a61f5659021eac9"
+
+  # Use our connection ID from earlier
+  connection_id = plumber_connection.my_kafka_server.id
+
+  # Start the relay immediately after creating
+  active = true
+
+  # Specify the kafka topic that messages will be written to when replaying to this tunnel
+  kafka {
+    topics = ["new_orders"]
+
+    # Write the message with a key if needed
+    key = "my_msg_key"
+
+    # Let's also specify kafka headers!
+    headers = {
+      replayed = "true"
+    }
+  }
+}
+```
+
+After applying, you can go to [https://console.dev.streamdal.com/destinations](https://console.dev.streamdal.com/destinations), you will see your newly created "_Tunnel to infra kafka_" destination. You can replay messages from your collections to this destination, and plumber will write them to the `new_orders` topic in your kafka. No fussing with credentials or firewalls!

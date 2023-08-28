@@ -1,0 +1,30 @@
+---
+title: Ingestion HTTP
+metaTitle: "HTTP Data Ingestion"
+description: Ingest data via HTTP
+layout: ../../../layouts/MainLayout.astro
+---
+
+## Traditional HTTP API
+
+Streamdal has a **super** simple HTTP API for accepting event data. There is only one `POST` method which requires you to pass in a `Streamdal-Token` header.
+
+Returns `200` on **success**.
+
+Returns `401` if `Streamdal-Token` is **invalid**.
+
+Collection token
+
+```javascript
+{"message":"event has been successfully collected"}
+```
+
+## When should you use this API?
+
+The HTTP API does not support batching and is not intended for high throughput collection. The goal of the HTTP API is to provide you with a way to send us data in the easiest way possible - via a `curl` or a quick script.
+
+If you need high throughput - use either [plumber](undefined), the [gRPC API](undefined) or the [kafka sink connector](undefined) (beta).
+
+## Throughput
+
+Under optimal conditions, you can reach up to ~5,000 events/sec ingestion speeds but this will vary based on your location/latency and client server.

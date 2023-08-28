@@ -1,0 +1,73 @@
+---
+title: Events
+metaTitle: "Events: What Are They & Best Practices"
+description: Defining your events
+layout: ../../../../layouts/MainLayout.astro
+---
+
+**Events** are messages that you send and receive to communicate _state change_ of a component or a system.
+
+Anything can be an event - passing a message in a JavaScript application is an event and so is passing a message via Kafka or via a UDP socket.
+
+The most _common_ use case for events is to pass them through a message system such as RabbitMQ, Kafka or SQS to facilitate _asynchronous_ work.
+
+While any piece of data can be an event, you should strive to have well-composed events. A well-composed event _should:_
+
+- Use a common [event envelope](undefined)
+- Indicate the event type
+- **Not** use ambiguous field names
+- **Not** share field names
+- Be easy to parse by a computer
+- Be type safe
+
+> NOTE: Streamdal uses "_events_" and "_messages_" terminology interchangeably throughout the platform - they are one and the same.
+
+## Message Passing Patterns
+
+There are many ways to facilitate message passing.
+
+The most common way to pass messages would be to utilize a messaging system such as:
+
+- [RabbitMQ](https://www.rabbitmq.com/)
+- [Kafka](https://kafka.apache.org/)
+- [AWS SQS](https://aws.amazon.com/sqs/)
+- [NATS](https://nats.io/)
+- [Redis](https://redis.io/)
+- [.. and many more](https://en.wikipedia.org/wiki/Message_queue)
+
+More advanced use-cases may utilize technologies such as [ZeroMQ](https://zeromq.org/), [Nanomsg](https://nanomsg.org/), [Elixir's built-in RPC](https://erlang.org/doc/man/rpc.html) or pure [gRPC](https://grpc.io/).
+
+## Why utilize message passing?
+
+There are many benefits to using a message passing mechanism but the _primary_ reason is to gain additional **reliability** in your distributed system.
+
+The quickest way to demonstrate this is through an example.
+
+### Example
+
+Traditionally, if you (application A) want another application (B) to do some work, you would have A call B via a REST API. This is easy and it works but soon you may find out that:
+
+- Networks are unreliable and 1% of your requests don't complete
+- Application B gets deployed way more often than you thought
+- Application B gets restarted every night due to a memory leak
+- Application B is rate-limited to 5 requests per second (while application A often hits 100+ requests per second)
+
+**This all translates to poor service reliability.**
+
+## A better approach
+
+A way to improve service reliability would be to utilize an asynchronous approach that involves message passing.
+
+- Application A produces a message to a message queue
+- The message contains ALL of the necessary information for another application to be able to process the request and produce a result _somewhere_
+- Application B _eventually_ picks up the message, processes it and produces a result by emitting _another_ event that application A picks up
+
+## Takeaway
+
+By utilizing an asynchronous approach, you are:
+
+- Alleviating service back pressure on application B
+- Increasing successful request completion for application A
+- Changing the relationship between A and B:
+  - B is no longer a _hard_ dependency for A - it is now a _soft_ dependency, meaning, application A can survive if B goes away
+- And.. _drumroll_ .. you are beginning to use [event-driven architecture](https://en.wikipedia.org/wiki/Event-driven_architecture)

@@ -1,0 +1,38 @@
+---
+title: Collection Functions
+metaTitle: "Creating A Collection Function"
+description: Streamdal's high-performance functions for collections
+layout: ../../../../layouts/MainLayout.astro
+---
+
+Collection functions in Streamdal operate directly on collections, acting on events as they are ingested into the system. Written in JavaScript, TypeScript, Rust, or Golang, and executed using WebAssembly (Wasm), these functions offer high performance and versatility.
+
+## Overview
+
+As data is ingested into a collection, a collection function can perform actions on the incoming events. This can include cleaning or modifying data in real-time before it is stored, ensuring that your collections remain consistent and high-quality.
+
+## Use Cases
+
+Collection functions can be employed in various scenarios, such as:
+
+- **Data Normalization**: Collection functions can standardize the format of incoming events, like transforming date formats, standardizing text casing, or converting units of measurement.
+
+- **Data Enrichment**: Collection functions can add or modify fields in the incoming events based on certain conditions or lookups, thereby enriching the data with additional context or insights.
+
+- **Data Masking or Redaction**: In cases where the incoming events contain sensitive data, collection functions can be used to mask or redact this data to ensure privacy and compliance with regulations.
+
+## Creating a Collection Function
+
+1. Navigate to the Streamdal console and select 'Functions' from the side navigation.
+2. Click on the `+` button to create a new function.
+3. Choose 'Collection Function' as the type.
+4. Write your function code in the provided editor.
+5. In the test section, paste in a sample payload. If you already have messages in the collection, click on an event and select 'Copy Payload'. Paste in everything from the payload section.
+6. Build
+7. Run test and confirm no errors
+8. Deploy
+9. Navigate back to the collection and asscoaite the function
+
+Remember to thoroughly test your function to ensure it behaves as expected and doesn't introduce issues into your data ingestion process. A faulty collection function can disrupt your data pipeline, so consider setting up monitor functions to alert on potential issues.
+
+Collection functions are an essential part of Streamdal's capability to ensure that your data is clean, consistent, and enriched right at the point of ingestion.

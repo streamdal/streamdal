@@ -1,0 +1,105 @@
+---
+title: Manage with CLI
+metaTitle: "Plumber: Manage with CLI"
+description: Manage plumber through your terminal
+layout: ../../../../layouts/MainLayout.astro
+---
+
+It is possible to control plumber server without having to use `grpcurl` or another gRPC tool to talk to its gRPC API.
+
+You can also "talk" to plumber by using the built-in `manage` command in the `plumber` CLI tool itself.
+
+The `manage` sub-command allows you manage connections, relays and tunnels.
+
+## Examples
+
+### Listing all connections | relays | tunnels
+
+```bash
+$ plumber manage get connection
+█▀█ █   █ █ █▀▄▀█ █▄▄ █▀▀ █▀█
+█▀▀ █▄▄ █▄█ █ ▀ █ █▄█ ██▄ █▀▄
+{
+  "options": [
+    {
+      "Id": "1a1c34d9-783d-4554-8fc9-ad0583fe9191",
+      "kafka": {
+        "address": [
+          "localhost:9092"
+        ]
+      },
+      "name": "Our kafka",
+      "notes": "demo"
+    }
+  ]
+}
+$ plumber manage get relay
+...
+$ plumber manage get tunnel
+...
+```
+
+### Listing a specific connection|relay|tunnel
+
+```bash
+$ plumber manage get connection --id=<connection_id>
+█▀█ █   █ █ █▀▄▀█ █▄▄ █▀▀ █▀█
+█▀▀ █▄▄ █▄█ █ ▀ █ █▄█ ██▄ █▀▄
+{
+  "options": {
+    "Id": "1a1c34d9-783d-4554-8fc9-ad0583fe9191",
+    "kafka": {
+      "address": [
+        "localhost:9092"
+      ]
+    },
+    "name": "Our kafka",
+    "notes": "demo"
+  }
+}
+$ plumber managet get relay --id=<relay_id>
+...
+$ plumber managet get tunnel --id=<tunnel_id>
+...
+```
+
+### Create a connection
+
+```bash
+$ plumber manage create connection kafka --name="My Kafka" --address "localhost:9092"
+█▀█ █   █ █ █▀▄▀█ █▄▄ █▀▀ █▀█
+█▀▀ █▄▄ █▄█ █ ▀ █ █▄█ ██▄ █▀▄
+{
+  "connectionId": "e516e1fe-018c-49b6-a3ca-45968a7524af"
+}
+```
+
+### Create a relay
+
+```bash
+$ manage create relay kafka --connection-id e516e1fe-018c-49b6-a3ca-45968a7524af --collection-token b31a7374-6c65-4123-75d1-b004870c0785 --topics foo
+█▀█ █   █ █ █▀▄▀█ █▄▄ █▀▀ █▀█
+█▀▀ █▄▄ █▄█ █ ▀ █ █▄█ ██▄ █▀▄
+{
+  "relayId": "c8797866-1241-4f51-8aca-9b6a5f7d2830",
+  "status": {
+    "message": "Relay started",
+    "requestId": "4a9032b7-02c2-481d-b7f4-9b5a7d20ef22"
+  }
+}
+```
+
+### Create a tunnel
+
+```bash
+$ plumber manage create tunnel kafka --connection-id e516e1fe-018c-49b6-a3ca-45968a7524af --api-token batchsh_1545be39771f3a8ae2379d7eaaa0e20f601c8331bb3850dce6968bad6a91 --topics foo
+█▀█ █   █ █ █▀▄▀█ █▄▄ █▀▀ █▀█
+█▀▀ █▄▄ █▄█ █ ▀ █ █▄█ ██▄ █▀▄
+{
+  "tunnelId": "c8797866-1241-4f51-8aca-8a7a4f7b1712",
+  "status": {
+    "message": "Tunnel started",
+    "requestId": "4a9032b7-02c2-481d-b7f4-8a4d6de1ef23"
+  }
+}
+```

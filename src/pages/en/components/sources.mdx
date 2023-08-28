@@ -1,0 +1,38 @@
+---
+title: Sources for your data
+metaTitle: "Sources for your data"
+description: Grather data using plumber from our multiple integrations
+layout: ../../../layouts/MainLayout.astro
+---
+
+**Sources** are managed plumber relays
+
+Sources hydrate collections with events from a datasource such as Kafka, RabbitMQ, SQS, and many more.
+
+Sources are managed [plumber](https://docs.streamdal.com/resources/open-source/oss-plumber) instance that live in the Streamdal platform.
+
+Sources are ideal for those that have long running relays and don't not want to deal with the complexity of running plumber.
+
+## Creating a Source
+
+1. Login to [console.streamdal.com](https://console.streamdal.com)
+2. Create a collection if you have not already
+3. Ensure your datasource is accessible to streamdal.com from [IP's](https://app.gitbook.com/@batch-1/s/docs/~/drafts/-Mjes-eK8lsaN9vQsP8r/resources/faq#what-are-the-outbound-ips-that-batch-uses-for-replays)
+4. Navigate to 'Sources'
+5. Select 'New Source'
+
+![](files/undefined)
+
+5. Select the 'Collection' you will use to store data
+
+6. Select the 'Relay Type' which should be the same as the source you wish to collect data from
+
+![](files/undefined)
+
+7. Fill in relevant details about your data source
+
+![](files/undefined)
+
+8. Confirm the 'Source' is heathy
+
+![](files/undefined)

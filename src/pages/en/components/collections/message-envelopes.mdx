@@ -1,0 +1,109 @@
+---
+title: Message Envelopes
+metaTitle: "Message Envelops: Usages & Best Practices"
+description: Define your messages
+layout: ../../../../layouts/MainLayout.astro
+---
+
+A message envelope is a common "schema" that you use for ALL events in your system. Think "namespace".
+
+By having a common envelope, you are less likely to run into bugs and make mistakes as you construct events that are to be processed by other systems.
+
+Just like with messaging systems, it is up to you to choose what message envelope you wish to use - all of them have their own PROS and CONS.
+
+## JSON
+
+By far, the most common message envelope utilizes `JSON`.
+
+And for good reason:
+
+- It is simple
+- It is well supported in virtually all programming languages
+- And is _mostly_ human readable
+
+Choosing `JSON` for your message envelope is (probably) a good idea if:
+
+- You are adding asynchronous elements to an existing system
+- You are interfacing with many different programming languages
+- Establishing new standards in your org is difficult
+
+`JSON`comes with its fair share of CONS though:
+
+- No type safety
+- Schema-enforcement is **not** easy
+
+  - This can be alleviated by using something like [JSON Schema](https://json-schema.org/) but that will require org-wide adoption for it to be effective
+
+- Without schema-enforcement, you are more likely to end up with events that are missing critical event data (ie. team B forgot to fill out the "payment_source" field)
+- No built-in compression; this will influence:
+
+  - message transfer speed
+  - bandwidth usage
+  - storage cost
+
+- No automatic client or server code generation
+
+Streamdal supports `JSON` and does [automatic schema inference](undefined).
+
+## Protobuf
+
+[Protobuf](https://developers.google.com/protocol-buffers) is fairly complex but offers a high-degree of confidence in your event quality due to built-in schema enforcement, type safety and excellent cross-language support.
+
+### Pros
+
+- You are tasked with establishing a long-lasting, sophisticated and reliable event-driven architecture at your org
+- You MUST have schema-enforcement and type safety
+- You need _rich_ type support
+- You are (or are planning on) using gRPC
+- You want to generate client/server code from schemas
+- You want to be able to point folks at good documentation
+
+### Cons
+
+- You will have to create your own schema repository and setup a build process to generate your compiled protobufs
+- The CLI tools are complex
+- Deprecation is less-than-ideal
+- Protobuf messages are semi-human-readable - as in, you will not be able to view all values in a message via `cat` - you will need to properly decode the message
+
+Streamdal has full support for `protobuf` - all fields in a protobuf message are indexed and available for search and replay.
+
+**WARNING: If you use `google.protobuf/any.proto`, please view the following article: [Risks with`google.protobuf/any.proto`](undefined).**
+
+## Avro
+
+Avro is the _default_ message serialization format used by Kafka. While it is language-neutral, it is best paired with Java and Kafka.
+
+While it is very similar to `protobuf` and offers many of the same advantages, it also has some unique properties:
+
+- Schema evolution
+
+  - Reads and writes are tightly coupled with schemas which enables you to have granular control over how message envelopes evolve
+
+- Dynamic typing
+  - Along with static types, it is also possible to include untyped data
+
+### Good idea `IF`
+
+- You are a Java and/or Kafka shop
+- You are using Confluent's platform
+- You need both static and dynamic types
+
+### Cons
+
+- **Avro is not as well supported as Protobuf**
+- Need schema to read/write data (might be a PRO in some cases)
+
+Streamdal has full support for Avro - all fields in an Avro message are indexed and available for search and replay.
+
+## Other Formats
+
+There are [many other message serialization formats](https://en.wikipedia.org/wiki/Comparison_of_data-serialization_formats).
+
+Streamdal also supports:
+
+- Thrift
+- Flatbuffer
+
+In most cases, we advise to use `JSON` if you are new to messaging patterns and are not sure about all of your requirements.
+
+If you are familiar with asynchronous patterns and are comfortable with distributed systems, choosing `protobuf` is a good call.

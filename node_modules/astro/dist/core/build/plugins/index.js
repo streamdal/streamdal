@@ -1,0 +1,27 @@
+import { astroConfigBuildPlugin } from "../../../content/vite-plugin-content-assets.js";
+import { astroHeadBuildPlugin } from "../../../vite-plugin-head/index.js";
+import { pluginAliasResolve } from "./plugin-alias-resolve.js";
+import { pluginAnalyzer } from "./plugin-analyzer.js";
+import { pluginComponentEntry } from "./plugin-component-entry.js";
+import { pluginCSS } from "./plugin-css.js";
+import { pluginHoistedScripts } from "./plugin-hoisted-scripts.js";
+import { pluginInternals } from "./plugin-internals.js";
+import { pluginPages } from "./plugin-pages.js";
+import { pluginPrerender } from "./plugin-prerender.js";
+import { pluginSSR } from "./plugin-ssr.js";
+function registerAllPlugins({ internals, options, register }) {
+  register(pluginComponentEntry(internals));
+  register(pluginAliasResolve(internals));
+  register(pluginAnalyzer(internals));
+  register(pluginInternals(internals));
+  register(pluginPages(options, internals));
+  register(pluginCSS(options, internals));
+  register(astroHeadBuildPlugin(options, internals));
+  register(pluginPrerender(options, internals));
+  register(astroConfigBuildPlugin(options, internals));
+  register(pluginHoistedScripts(options, internals));
+  register(pluginSSR(options, internals));
+}
+export {
+  registerAllPlugins
+};

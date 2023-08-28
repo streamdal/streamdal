@@ -1,0 +1,45 @@
+---
+title: Relay GCP Pub/Sub
+metaTitle: "Plumber: Relay GCP Pub/Sub Data To Streamdal"
+description: Relaying GCP Pub/Sub messages to Streamdal
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import { Notification } from "accessible-astro-components";
+
+In this guide, we will cover how to relay Google Cloud Pub/Sub messages to Streamdal using Plumber. This can be particularly useful when you need to migrate data, forward messages, or transform data in transit from GCP Pub/Sub to Streamdal.
+
+## Prerequisites
+
+Before you start, you will need the following:
+
+- Plumber installed on your machine.
+- A GCP Pub/Sub subscription.
+- Your GCP project ID.
+- Your GCP Pub/Sub subscription ID.
+
+## GCP Pub/Sub Relay
+
+To relay a GCP Pub/Sub subscription to Streamdal, we will use the `plumber relay` command. Here's the command to set up the relay:
+
+```shell
+plumber relay gcp-pubsub --project-id=PROJECT-ID --sub-id=SUB-ID
+Make sure to replace PROJECT-ID and SUB-ID with your actual GCP project ID and subscription ID respectively.
+```
+
+## Understanding the Plumber Command
+
+Here's a breakdown of the Plumber command:
+
+`relay:` This is the main command that tells Plumber to start in relay mode.
+`gcp-pubsub:` This tells Plumber that the data source is GCP Pub/Sub.
+`--project-id:` This is your GCP project ID.
+`--sub-id:` This is your GCP Pub/Sub subscription ID.
+After running this command, Plumber will start relaying data from the specified GCP Pub/Sub subscription to Streamdal.
+
+Please note that you need to adjust the details according to your actual setup and security requirements.
+
+<Notification type="info">
+  Be sure to replace `PROJECT-ID` and `SUB-ID` with your actual GCP project ID
+  and subscription ID respectively.
+</Notification>

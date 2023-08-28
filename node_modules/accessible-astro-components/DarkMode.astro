@@ -1,0 +1,37 @@
+<button class="darkmode-toggle" aria-pressed="false" aria-label="Enable dark mode">
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M9.353 3C5.849 4.408 3 7.463 3 11.47A9.53 9.53 0 0 0 12.53 21c4.007 0 7.062-2.849 8.47-6.353C8.17 17.065 8.14 8.14 9.353 3z"/></svg>
+</button>
+
+<script is:inline>
+  // variables
+  let darkMode = localStorage.getItem('darkMode')
+  const darkModeToggle = document.querySelector('.darkmode-toggle')
+
+  // functions
+  const enableDarkMode = () => {
+    document.body.classList.add('darkmode')
+    darkModeToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="32" height="32" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M13 3a1 1 0 1 0-2 0v1a1 1 0 1 0 2 0V3zM5.707 4.293a1 1 0 0 0-1.414 1.414l1 1a1 1 0 0 0 1.414-1.414l-1-1zm14 0a1 1 0 0 0-1.414 0l-1 1a1 1 0 0 0 1.414 1.414l1-1a1 1 0 0 0 0-1.414zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm-9 4a1 1 0 1 0 0 2h1a1 1 0 1 0 0-2H3zm17 0a1 1 0 1 0 0 2h1a1 1 0 1 0 0-2h-1zM6.707 18.707a1 1 0 1 0-1.414-1.414l-1 1a1 1 0 1 0 1.414 1.414l1-1zm12-1.414a1 1 0 0 0-1.414 1.414l1 1a1 1 0 0 0 1.414-1.414l-1-1zM13 20a1 1 0 1 0-2 0v1a1 1 0 1 0 2 0v-1z" fill="currentColor"/></svg>`
+    darkModeToggle.setAttribute('aria-pressed', 'true')
+    darkModeToggle.setAttribute('aria-label', 'Disable dark mode')
+    localStorage.setItem('darkMode', 'enabled')
+  }
+
+  const disableDarkMode = () => {
+    document.body.classList.remove('darkmode')
+    darkModeToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M9.353 3C5.849 4.408 3 7.463 3 11.47A9.53 9.53 0 0 0 12.53 21c4.007 0 7.062-2.849 8.47-6.353C8.17 17.065 8.14 8.14 9.353 3z"/></svg>`
+    darkModeToggle.setAttribute('aria-pressed', 'false')
+    darkModeToggle.setAttribute('aria-label', 'Enable dark mode')
+    localStorage.setItem('darkMode', null)
+  }
+
+  // execution
+  if (darkMode === 'enabled') enableDarkMode()
+
+  darkModeToggle.addEventListener('click', () => {
+    darkMode = localStorage.getItem('darkMode')
+
+    darkMode !== 'enabled'
+      ? enableDarkMode()
+      : disableDarkMode()
+  })
+</script>

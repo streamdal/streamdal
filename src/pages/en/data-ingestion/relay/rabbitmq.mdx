@@ -1,0 +1,50 @@
+---
+title: Relay RabbitMQ
+metaTitle: "Plumber: Relay RabbitMQ Data To Streamdal"
+description: Relaying RabbitMQ messages to Streamdal
+layout: ../../../../layouts/MainLayout.astro
+---
+
+In this guide, we will cover how to relay RabbitMQ messages to Streamdal using Plumber. This can be particularly useful when you need to migrate data, forward messages, or transform data in transit from RabbitMQ to Streamdal.
+
+## Prerequisites
+
+Before you start, you will need the following:
+
+- Plumber installed on your machine.
+- A RabbitMQ server.
+- A RabbitMQ exchange and queue set up on your RabbitMQ server.
+- Your Streamdal token.
+
+## RabbitMQ Relay
+
+To relay a RabbitMQ queue to Streamdal, we will use the `plumber relay` command. Here's the command to set up the relay:
+
+```shell
+$ docker run --name plumber-rabbit -p 8080:8080 \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-STREAMDAL-TOKEN-HERE \
+    -e PLUMBER_RELAY_RABBIT_EXCHANGE=my_exchange \
+    -e PLUMBER_RELAY_RABBIT_QUEUE=my_queue \
+    -e PLUMBER_RELAY_RABBIT_ROUTING_KEY=some.routing.key \
+    -e PLUMBER_RELAY_RABBIT_QUEUE_EXCLUSIVE=false \
+    -e PLUMBER_RELAY_RABBIT_QUEUE_DURABLE=true \
+    streamdal/plumber plumber relay rabbit
+```
+
+Make sure to replace $YOUR-STREAMDAL-TOKEN-HERE, my_exchange, my_queue, and some.routing.key with your actual Streamdal token, RabbitMQ exchange name, RabbitMQ queue name, and RabbitMQ routing key respectively.
+
+## Understanding the Plumber Command
+
+Here's a breakdown of the Plumber command:
+
+`relay:` This is the main command that tells Plumber to start in relay mode.
+`rabbit:` This tells Plumber that the data source is RabbitMQ.
+`PLUMBER_RELAY_TOKEN:` This is your Streamdal token.
+`PLUMBER_RELAY_RABBIT_EXCHANGE:` This is your RabbitMQ exchange name.
+`PLUMBER_RELAY_RABBIT_QUEUE:` This is your RabbitMQ queue name.
+`PLUMBER_RELAY_RABBIT_ROUTING_KEY:` This is your RabbitMQ routing key.
+`PLUMBER_RELAY_RABBIT_QUEUE_EXCLUSIVE:` This specifies whether the queue is exclusive.
+`PLUMBER_RELAY_RABBIT_QUEUE_DURABLE:` This specifies whether the queue is durable.
+After running this command, Plumber will start relaying data from the specified RabbitMQ queue to Streamdal.
+
+Please note that you need to adjust the details according to your actual setup and security requirements.

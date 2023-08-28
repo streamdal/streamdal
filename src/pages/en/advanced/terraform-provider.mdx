@@ -1,0 +1,100 @@
+---
+title: Streamdal with Terraform
+description: Manage your data with terraform on Streamdal
+layout: ../../../layouts/MainLayout.astro
+---
+
+Streamdal supports managing collections and team members via terraform.
+
+## Usage
+
+First, obtain an API token from [https://console.streamdal.com/account/security](https://console.streamdal.com/account/security)
+
+Then import the provider into your terraform config. For example purposes, we include the token in the actual `.tf` file, but it is recommended that you store in Vault or provide via environment variable (`BATCHSH_TOKEN`) instead.
+
+```hcl
+terraform {
+  required_providers {
+    batchsh = {
+      source = "streamdal/batchsh"
+      version = "0.1.0"
+    }
+  }
+}
+
+provider "batchsh" {
+  token = "batchsh_......."
+}
+```
+
+## Creating Collections
+
+You can either specify the schema and data lake IDs manually, or use the terraform data sources to dynamically pull them like the example below
+
+```hcl
+variable "datalake" {
+  type = string
+
+  // Change to your schema name or use default JSON
+  // Wildcards "*" are accepted
+  default = "Default DataLake"
+}
+
+variable "schema" {
+  type = string
+
+  // Change to your schema name or use default JSON
+  // Wildcards "*" are accepted
+  default = "Generic JSON"
+}
+
+data "batchsh_datalake" "collection_lake" {
+  filter {
+    name   = "name"
+    values = [var.datalake]
+  }
+}
+
+data "batchsh_schema" "collection_schema" {
+  filter {
+    name   = "name"
+    values = [var.schema]
+  }
+}
+
+resource "batchsh_collection" "test" {
+  name          = "My TF Managed Collection"
+  notes         = "Any notes you wish to keep about this collection"
+  schema_id     = data.batchsh_schema.collection_schema.id
+  datalake_id   = data.batchsh_datalake.collection_lake.id
+}
+```
+
+## Importing existing collections
+
+If you already have collections created in your streamdal.com account, and wish to import them, you can use the terraform import command to do so. In this example, we import our collection `15ff9104-de23-4e82-9906-dcc41ccf6aea` and give the name "orders"
+
+```bash
+terraform import batchsh_collection.orders 15ff9104-de23-4e82-9906-dcc41ccf6aea
+```
+
+## Creating Team Members
+
+Team members can also be managed:
+
+```hcl
+resource "batchsh_team_member" "johnny" {
+  name     = "Johnny User"
+  email    = "johnny@streamdal.com"
+  password = "./password123"
+  roles    = ["member"]
+}
+```
+
+## Importing existing team members
+
+Just like collections, you can also import existing team members, that were created via the streamdal.com console, into terraform. In this example, we already created an account for our friend Steve in console, and now we want to manage it via terraform:
+
+```bash
+terraform import batchsh_team_member.steve 6d7ab8ad-b9a7-42c4-8fb6-262c68e97df5
+```

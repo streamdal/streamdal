@@ -1,0 +1,65 @@
+---
+import "../styles/theme.scss";
+import "../styles/index.scss";
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<meta name="generator" content={Astro.generator} />
+
+<link rel="icon" type="image/svg+xml" href="/favicon-16x16.svg" sizes="16x16" />
+<link rel="icon" type="image/svg+xml" href="/favicon-32x32.svg" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon-48x48.svg" sizes="48x48" />
+
+<link rel="sitemap" href="/sitemap.xml" />
+
+<!-- Preload Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&display=swap"
+  rel="stylesheet"
+/>
+
+<!-- Scrollable a11y code helper -->
+<script src="/make-scrollable-code-focusable.js" is:inline></script>
+
+<!-- This is intentionally inlined to avoid FOUC -->
+<script is:inline>
+  const root = document.documentElement;
+  const theme = localStorage.getItem("theme");
+  if (
+    theme === "dark" ||
+    (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    root.classList.add("theme-dark");
+  } else {
+    root.classList.remove("theme-dark");
+  }
+</script>
+
+<!-- Google Tag Manager -->
+<script>
+  {
+    import.meta.env.PUBLIC_GOOGLE_TAG_MANGER_ID
+      ? (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != "dataLayer" ? "&l=" + l : "";
+          j.async = true;
+          j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(
+          window,
+          document,
+          "script",
+          "dataLayer",
+          `${import.meta.env.PUBLIC_GOOGLE_TAG_MANGER_ID}`
+        )
+      : "";
+  }
+</script>
+<!-- End Google Tag Manager -->

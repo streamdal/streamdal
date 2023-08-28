@@ -1,0 +1,101 @@
+---
+title: Monitoring NATS
+metaTitle: "Plumber: How To Use With NATS"
+description: Monitor and alert on data passing through NATS
+layout: ../../../layouts/MainLayout.astro
+---
+
+Plumber supports reading/writing/relay NATS, NATS Streaming, and NATS JetStream
+
+## NATS
+
+### Reading
+
+```bash
+plumber read nats --dsn "nats://localhost:4222" --subject new_customers
+```
+
+### Writing
+
+```bash
+plumber write nats \
+  --dsn "nats://user:pass@nats.test.io:4222" \
+  --subject new_customers \
+  --input '{"id": "1224", "name": "John Q Customer"}'
+```
+
+### Relaying
+
+```bash
+docker run --name plumber-nats -p 8080:8080 \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    -e PLUMBER_RELAY_NATS_DSN="nats://user:pass@nats.test.io:4222" \
+    -e PLUMBER_RELAY_NATS_SUBJECT="new_customers" \
+    streamdal/plumber relay nats
+```
+
+## NATS Streaming
+
+NATS Streaming ("stan") is [**deprecated**](https://docs.nats.io/legacy/stan) in favor of JetStream. `plumber` will continue to support NATS Streaming.
+
+### Reading
+
+```bash
+plumber read nats-streaming \
+  --channel "new_customers" \
+  --cluster-id "[FROM YOUR SERVER CONFIG]" \
+  --client-id "plumber"
+```
+
+### Writing
+
+```bash
+plumber write nats-streaming \
+  --channel "new_customers" \
+  --cluster-id "[FROM YOUR SERVER CONFIG]" \
+  --client-id "plumber-producer" \
+  --input '{"id": "1224", "name": "John Q Customer"}'
+```
+
+### Relaying
+
+```bash
+docker run -bash-name plumber-nats -p 8080:8080 \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    -e PLUMBER_RELAY_NATS_STREAMING_DSN="nats://user:pass@nats.test.io:4222" \
+    -e PLUMBER_RELAY_NATS_CHANNEL="new_customers" \
+    -e PLUMBER_RELAY_NATS_STREAMING_CLUSTER_ID="[FROM YOUR SERVER CONFIG]" \
+    -e PLUMBER_RELAY_NATS_STREAMING_CLIENT_ID="plumber-relayer" \
+    -e PLUMBER_RELAY_NATS_STREAMING_READ_LAST=true \
+    streamdal/plumber relay nats-streaming
+```
+
+## NATS JetStream
+
+### Reading
+
+```bash
+plumber read nats-jetstream \
+  --dsn "nats://localhost:4222" \
+  --stream new_customer_streams
+```
+
+### Writing
+
+```bash
+plumber write nats \
+  --dsn "nats://user:pass@nats.test.io:4222" \
+  --stream new_customers \
+  --input '{"id": "1224", "name": "John Q Customer"}'
+```
+
+### Relaying
+
+```bash
+docker run --name plumber-nats -p 8080:8080 \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    -e PLUMBER_RELAY_NATS_DSN="nats://user:pass@nats.test.io:4222" \
+    -e PLUMBER_RELAY_NATS_SUBJECT="new_customers" \
+    -e PLUMBER_RELAY_NATS_JETSTREAM_STREAM="new_orders" \
+    streamdal/plumber relay nats-jetstream
+```

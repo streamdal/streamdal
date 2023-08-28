@@ -1,0 +1,6 @@
+import type { Plugin as VitePlugin } from 'vite';
+import type { BuildInternals } from '../internal.js';
+import type { AstroBuildPlugin } from '../plugin.js';
+import type { StaticBuildOptions } from '../types';
+export declare function vitePluginPrerender(opts: StaticBuildOptions, internals: BuildInternals): VitePlugin;
+export declare function pluginPrerender(opts: StaticBuildOptions, internals: BuildInternals): AstroBuildPlugin;

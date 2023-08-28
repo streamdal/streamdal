@@ -1,0 +1,112 @@
+---
+title: Plumber Relay
+metaTitle: "Plumber: Relay Set Up & Configuration"
+description: Relay data through our plumber open source tool
+layout: ../../../../layouts/MainLayout.astro
+---
+
+Relaying data using [plumber](https://github.com/streamdal/plumber) is the most
+reliable and performant way to get data into Streamdal.
+
+You can launch `plumber` relays in multiple ways:
+
+- Running `plumber` in single-relay mode via CLI
+
+  - Best for quick, one-offs
+
+- Running `plumber` as [a docker container](https://hub.docker.com/r/streamdal/plumber)
+
+  - Best for ephemeral workloads
+
+- Running `plumber` in [server mode](undefined)
+  - Best for production
+
+The following examples show how to run `plumber` in **single relay mode**.
+
+For production deployments, we suggest to deploy `plumber` running in [server mode](undefined).
+
+```bash
+plumber relay kafka \
+  --address "your-kafka-address.com:9092" \
+  --token YOUR-COLLECTION-TOKEN-HERE \
+  --topics orders \
+  --tls-skip-verify
+```
+
+In this example, all messages from kafka topic new_orders will be automatically sent to the collection with the specified relay token.
+
+```bash
+docker run --name plumber-rabbit -p 8080:8080 \
+    -e PLUMBER_RELAY_TYPE=rabbit \
+    -e PLUMBER_RELAY_TOKEN=$YOUR-BATCHSH-TOKEN-HERE \
+    -e PLUMBER_RELAY_RABBIT_EXCHANGE=my_exchange \
+    -e PLUMBER_RELAY_RABBIT_QUEUE=my_queue \
+    -e PLUMBER_RELAY_RABBIT_ROUTING_KEY=some.routing.key \
+    -e PLUMBER_RELAY_RABBIT_QUEUE_EXCLUSIVE=false \
+    -e PLUMBER_RELAY_RABBIT_QUEUE_DURABLE=true \
+    streamdal/plumber \
+    rabbit
+```
+
+In this example, all messages sent to `my_exchange` that match the routing key `some.routing.key` will be sent to `my_queue` .
+
+At that point, plumber will pick up the messages and send them to Streamdal using the specified token.
+
+A full suite of environment variables are provided in [ENV.md](https://github.com/streamdal/plumber/blob/master/ENV.md) for configuring plumber's relay mode.
+
+Example of running plumber via kubernetes
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plumber-deployment
+spec:
+  selector:
+    matchLabels:
+      app: plumber
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: plumber
+    spec:
+      containers:
+        - name: plumber
+          image: streamdal/plumber:latest
+          command: ["/plumber-linux", "relay", "kafka"]
+          args: ["--stats-enable"]
+          ports:
+            - containerPort: 9191
+          env:
+            - name: PLUMBER_RELAY_TOKEN
+              value: "--- COLLECTION TOKEN HERE ---"
+            - name: PLUMBER_RELAY_KAFKA_ADDRESS
+              value: "kafka.server.com:9092"
+            - name: PLUMBER_RELAY_KAFKA_TOPIC
+              value: "new-orders"
+            - name: PLUMBER_RELAY_KAFKA_GROUP_ID
+              value: "plumber"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+```
+
+More examples of relaying from various systems can be found in [EXAMPLES.md](https://github.com/streamdal/plumber/blob/master/EXAMPLES.md#relay-mode).
+
+## When should you use this API?
+
+Plumber is the easiest way to relay throughput heavy workloads and should be used by anyone wanting to get up and running quickly.
+
+## Throughput
+
+`plumber` uses gRPC under the hood to communicate with Streamdal's collectors.
+
+You should be able to comfortably reach 25K-50K messages/sec on a single `plumber` instance. To reach higher levels, you should run `plumber` in cluster server mode and launch 2+ replicas of `plumber`.
+
+Make sure to use the same **consumer group** if relaying for backends such as Kafka or NATS.

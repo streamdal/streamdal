@@ -1,0 +1,197 @@
+---
+title: Schemas
+metaTitle: "Schemas: Usage & Best Practices"
+description: Manage your schemas with version control
+layout: ../../../../layouts/MainLayout.astro
+---
+
+**Schemas** define what kind of data a collection represents and how it is stored in your [collection](/en/components/collections/overview/).
+
+Streamdal currently supports three types of schemas:
+
+- [JSON](/en/components/schemas/overview/#json) (auto-created)
+- [Protocol Buffers](/en/components/schemas/overview/#protocol-buffers)
+- Flatbuffer
+- Avro
+- [Plain](/en/components/schemas/overview/#plain) (auto-created)
+
+## JSON
+
+JSON schemas require that the data payloads sent to your collection be valid JSON. We perform automatic schema inference on your payload, allowing you to add/exclude fields from your payloads as needed. No need to manually define or update your schema!
+
+### Advantages:
+
+- **Fields can be added simply by including them in your payload. The schema will be inferred and updated automatically with no need for manual work on your part**
+- Ideal for structured or semi-structured data
+- Allows querying of individual fields
+- Fields can be removed from your payloads, unlike protocol buffers
+
+### Disadvantages:
+
+- Type cannot be changed on a field once it has been observed
+- **The type of a field (_string, number, object, array, bool_) must remain the same once the field is present in your collection**
+
+```javascript
+// EXAMPLE
+
+// Event 1 - GOOD
+{
+    "foo": "string1",
+    "baz": [1, 2, 3]
+}
+
+// A subsequent event CAN omit "baz"
+
+// Event 2 - GOOD
+{
+    "foo": "boop"
+}
+
+// A subsequent event CANNOT modify the type for "baz"
+
+// Event 3 - BAD
+{
+    "foo": "beep",
+    "baz": "now it's a string"
+}
+```
+
+## Protocol Buffers
+
+Protocol buffer schemas allow you to send binary protobuf messages directly to your collection. Streamdal will decode the messages using the protobuf definitions you uploaded when creating the schema. There is no need to decode/transform the messages on your end before sending it to us!
+
+There are two methods for uploading your protobuf definitions to Streamdal:
+
+1. **Upload a zip archive of your .proto files (Not recommended)**
+   This method is not as reliable as uploading a file descriptor set because it assumes your directory structure matches your include paths perfectly.
+2. **Upload file descriptor set (Preferred)**
+   This is the preferred method as it avoids any issues with include paths and ensures we can always process your protobuf definitions 100% of the time.
+
+To generate a `.fds` descriptor set file, you will need to add the following flags to your `protoc` call:
+
+```bash
+--include_imports
+--include_source_info
+-o ./protos.fds
+```
+
+You then upload the resulting `protos.fds` file when creating your schema in the Streamdal Console and you're all set!
+
+You can find an example here in our [Makefile](https://github.com/streamdal/plumber-schemas/blob/b078079a016f40b305de8dd7a14f742534e4ff50/Makefile#L99-L101).
+
+### Advantages:
+
+- Ideal for structured data
+- Allows querying of individual fields
+
+### Disadvantages:
+
+- Any updates to your protobuf definitions require you to re-upload them to Streamdal before we can accept messages containing new fields
+
+## Plain
+
+Plain schemas are a catch-all for unstructured data. We do not perform schema inference on the contents your data. The contents of your data is not indexed, so fields within the data are not queryable, only the entire payload as a whole. For more structured data, we recommend using a JSON schema
+
+### Advantages:
+
+- Your data can be in any format
+
+### Disadvantages:
+
+- Data within the payloads cannot be queried
+
+## Schema Inspection
+
+You can inspect the schema Streamdal has inferred in console.streamdal.com.
+
+1. Navigate to 'collections' section of the dashboard
+2. Click the collection you wish to inspect
+3. Select the sprocket at the top right
+   ![](files/undefined)
+4. Scroll down until you reach the 'Schema' section
+
+![](files/undefined)
+
+## Update Schemas from CircleCI
+
+The schema publisher orb can be used to upload new protobuf schema artifacts to one of your existing schemas
+
+## Example usage
+
+In order to use the orb, you must first generate an API token from [https://console.streamdal.com/account/security](https://console.streamdal.com/account/security) . Then addd the key as an environment variable named **`BATCH_API_KEY`** under your CircleCI project. You can then use the orb to upload a zip of .proto files or a file descriptor set
+
+\_\_
+
+### _File Descriptor Set Upload_
+
+_.circleci/config.yml:_
+
+```yaml
+version: 2.1
+orbs:
+  publisher: streamdal/schema-publisher-orb@0.1.0
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - build/go/descriptor-sets
+workflows:
+  publish-protos:
+    jobs:
+      - build
+      - publisher/publish:
+          requires:
+            - build
+          pre-steps:
+            - attach_workspace:
+                at: /tmp/output
+          schemaId: "7e8c3d9c-ed21-475e-832f-794abae3deac"
+          schemaName: "CircleCI test"
+          schemaType: "protobuf"
+          artifactType: "descriptor_set"
+          descriptorSetPath: "/tmp/output/build/go/descriptor-sets/protos.fds"
+```
+
+### .protos directory upload
+
+_.circleci/config.yml:_
+
+```yaml
+version: 2.1
+orbs:
+  publisher: streamdal/schema-publisher-orb@0.1.0
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - protos/*.protos
+workflows:
+  publish-protos:
+    jobs:
+      - build
+      - publisher/publish:
+          requires:
+            - build
+          pre-steps:
+            - attach_workspace:
+                at: /tmp/output
+          schemaId: "7e8c3d9c-ed21-475e-832f-794abae3deac"
+          schemaName: "CircleCI test"
+          schemaType: "protobuf"
+          artifactType: "protos_archive"
+          rootDir: "/tmp/output/protos"
+```
+
+## Update schemas using github build - hooks
