@@ -1,3 +1,5 @@
+import pprint
+
 import snitch_protos.protos as protos
 import uuid
 from snitchpy import SnitchClient
@@ -65,3 +67,33 @@ class TestSnitchWasm:
 
         assert res2 is not None
         assert res2.exit_code == 2
+
+    def test_http_request(self):
+        """Test we can execute a wasm file"""
+
+        client = object.__new__(SnitchClient)
+        client.functions = {}
+
+        with open("./assets/test/httprequest.wasm", "rb") as file:
+            wasm_bytes = file.read()
+
+        step = protos.PipelineStep(
+            name="httprequest test",
+            on_success=[],
+            on_failure=[],
+            wasm_bytes=wasm_bytes,
+            wasm_id=uuid.uuid4().__str__(),
+            wasm_function="f",
+            http_request=protos.steps.HttpRequestStep(
+                request=protos.steps.HttpRequest(
+                    url="https://www.streamdal.com/404_me",
+                    method=protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET,
+                ),
+            ),
+        )
+
+        res = client._call_wasm(step=step, data=b"")
+
+        assert res is not None
+        assert res.exit_code == 2
+        assert res.exit_msg == "Request returned non-200 response code: 404"

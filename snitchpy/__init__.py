@@ -3,10 +3,12 @@ import datetime
 import logging
 import os
 import platform
+import pprint
 import signal
 import snitch_protos.protos as protos
 import socket
 import uuid
+import requests
 from betterproto import which_one_of
 from copy import copy
 from dataclasses import dataclass, field
@@ -14,7 +16,20 @@ from grpclib.client import Channel
 from .metrics import Metrics
 from threading import Thread, Event
 from urllib.parse import urlparse
-from wasmtime import Config, Engine, Linker, Module, Store, Memory, WasiConfig, Instance
+from wasmtime import (
+    Config,
+    Engine,
+    Linker,
+    Module,
+    Store,
+    Memory,
+    WasiConfig,
+    Instance,
+    Func,
+    FuncType,
+    ValType,
+    Caller,
+)
 
 DEFAULT_SNITCH_URL = "localhost:9090"
 DEFAULT_SNITCH_TOKEN = "1234"
@@ -741,6 +756,14 @@ class SnitchClient:
         store = Store(linker.engine)
         store.set_wasi(wasi)
 
+        linker.define_func(
+            "env",
+            "httpRequest",
+            FuncType([ValType.i32(), ValType.i32()], [ValType.i32()]),
+            self.http_request,
+            True,
+        )
+
         instance = linker.instantiate(store, module)
 
         self.functions[step.wasm_id] = (instance, store)
@@ -777,9 +800,7 @@ class SnitchClient:
         return self._read_memory(memory, store, result_ptr)
 
     @staticmethod
-    def _read_memory(
-        memory: Memory, store: Store, result_ptr: int, length: int = -1
-    ) -> bytes:
+    def _read_memory(memory: Memory, store, result_ptr: int, length: int = -1) -> bytes:
         mem_len = memory.data_len(store)
 
         # Ensure we aren't reading out of bounds
@@ -826,3 +847,45 @@ class SnitchClient:
             return "producer"
 
         return "consumer"
+
+    def http_request(self, caller: Caller, ptr: int, length: int) -> int:
+        memory: Memory = caller.get("memory")
+
+        data = self._read_memory(memory, caller, ptr, length)
+
+        req = protos.steps.HttpRequest().parse(data)
+
+        if req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET:
+            response = requests.get(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST:
+            response = requests.post(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT:
+            response = requests.put(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
+            response = requests.delete(req.url)
+        else:
+            raise ValueError("Invalid HTTP method provided")
+
+        headers = {}
+        for k, v in response.headers.items():
+            headers[k] = v
+
+        res = protos.steps.HttpResponse(
+            code=response.status_code,
+            body=response.text.encode("utf-8"),
+            headers=headers,
+        )
+
+        resp = res.SerializeToString()
+
+        # Append terminator sequence
+        resp += b"\xa6\xa6\xa6"
+
+        # Allocate memory for response
+        alloc = caller.get("alloc")
+        resp_ptr = alloc(caller, len(resp) + 64)
+
+        # Write response to memory
+        memory.write(caller, resp, resp_ptr)
+
+        return resp_ptr
