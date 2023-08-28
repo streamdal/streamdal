@@ -453,7 +453,7 @@ const PipelineDetail = (
                         />
                         <div>
                           {argTypes.includes(
-                            DetectiveType[data.steps[i].step.detective.type],
+                            DetectiveType[data.steps[i].step.detective?.type],
                           ) &&
                             (
                               <StepArgs
