@@ -38,7 +38,7 @@ export const parsePath = (path: string) =>
 
 export const resolveValue = (object: any, path: string) =>
   parsePath(path)
-    .reduce((o, p) => o[p], object);
+    .reduce((o, p) => o ? o[p] : null, object);
 
 export const setValue = (
   object: any,
