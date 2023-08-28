@@ -33,17 +33,25 @@ import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 
+const detective = {
+  type: DetectiveType.BOOLEAN_TRUE,
+  path: "",
+  args: [""],
+};
+
+const transform = {
+  type: TransformType.MASK_VALUE,
+  path: "",
+  value: "",
+};
+
 export const newStep = {
   name: "",
   onSuccess: [],
   onFailure: [],
   step: {
     oneofKind: "detective",
-    detective: {
-      type: DetectiveType.BOOLEAN_TRUE,
-      path: "",
-      args: [""],
-    },
+    detective,
   },
 };
 
@@ -57,7 +65,7 @@ const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
 const TransformTypeEnum = z.nativeEnum(TransformType);
 
-const kinds = ["detective", "transform", "encode", "decode"];
+const kinds = ["detective", "transform"];
 
 const stepKindSchema = z.discriminatedUnion("oneofKind", [
   z.object({
@@ -114,8 +122,23 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
     oneofKind: z.literal("transform"),
     transform: z.object({
       path: z.string().min(1, { message: "Required" }),
-      value: z.string().min(1, { message: "Required" }),
+      value: z.string(),
       type: zfd.numeric(TransformTypeEnum),
+    }).superRefine((transform, ctx) => {
+      if (
+        TransformType[transform.type] ===
+          TransformType[TransformType.REPLACE_VALUE] &&
+        !transform.value
+      ) {
+        ctx.addIssue({
+          path: ["value"],
+          code: z.ZodIssueCode.custom,
+          message: "Value is required for this transform type",
+          fatal: true,
+        });
+
+        return z.never;
+      }
     }),
   }),
   z.object({
@@ -207,6 +230,14 @@ const PipelineDetail = (
     setOpen([...open, data.steps.length]);
     setTimeout(() => initFlowbite(), 1000);
   };
+
+  const getStepKinds = (data: any) =>
+    data?.steps.map((s: PipelineStep) => s.step.oneofKind);
+  const [stepKinds, setStepKinds] = useState(getStepKinds(data));
+
+  useEffect(() => {
+    setStepKinds(getStepKinds(data));
+  }, [data]);
 
   const deleteStep = (stepIndex: number) => {
     setData({ ...data, steps: data.steps.filter((_, i) => i !== stepIndex) });
@@ -400,22 +431,17 @@ const PipelineDetail = (
                       />
                     ))}
                   />
-                  {["detective", "transform"].includes(
-                    data?.steps[i]?.step?.oneofKind,
-                  ) && (
-                    <FormInput
-                      name={`steps.${i}.step.detective.path`}
-                      data={data}
-                      setData={setData}
-                      label="Path"
-                      placeHolder="ex: object.field"
-                      errors={errors}
-                    />
-                  )}
-                  {"detective" ===
-                      data?.steps[i]?.step?.oneofKind &&
-                    (
-                      <div class="flex flex-col">
+                  {"detective" === stepKinds[i] && (
+                    <>
+                      <FormInput
+                        name={`steps.${i}.step.detective.path`}
+                        data={data}
+                        setData={setData}
+                        label="Path"
+                        placeHolder="ex: object.field"
+                        errors={errors}
+                      />
+                      <div className="flex flex-col">
                         <FormSelect
                           name={`steps.${i}.step.detective.type`}
                           label="Detective Type"
@@ -442,7 +468,37 @@ const PipelineDetail = (
                             )}
                         </div>
                       </div>
-                    )}
+                    </>
+                  )}
+                  {"transform" === stepKinds[i] && (
+                    <>
+                      <FormInput
+                        name={`steps.${i}.step.transform.path`}
+                        data={data}
+                        setData={setData}
+                        label="Path"
+                        placeHolder="ex: object.field"
+                        errors={errors}
+                      />
+                      <FormSelect
+                        name={`steps.${i}.step.transform.type`}
+                        label="Transform Type"
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        inputClass="w-64"
+                        children={optionsFromEnum(TransformType)}
+                      />
+                      <FormInput
+                        name={`steps.${i}.step.transform.value`}
+                        data={data}
+                        setData={setData}
+                        label="Value"
+                        placeHolder="Only required if replacing value"
+                        errors={errors}
+                      />
+                    </>
+                  )}
                   <StepConditions
                     stepIndex={i}
                     data={data}
