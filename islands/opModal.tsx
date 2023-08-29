@@ -41,10 +41,10 @@ export default function OpModal(
           pipeline={attachedPipeline}
         />
       )}
-      <div class="absolute z-50 top-0 right-0 pt-[100px] pr-[14px] max-h-[600px] overflow-hidden flex flex-row justify-end items-start ">
+      <div class="fixed z-50 h-screen top-0 right-0 flex flex-row justify-end items-start ">
         {opModal.value?.attach && <OddAttachModal serviceMap={serviceMap} />}
-        <div class="w-[308px] ml-2 overflow-hidden">
-          <div class="bg-[#28203F] rounded-lg shadow dark:bg-gray-700">
+        <div class="w-[308px] h-full ml-2 overflow-hidden">
+          <div class="bg-[#28203F] h-full shadow dark:bg-gray-700">
             <div class="rounded-t flex justify-between">
               <div class="flex items-start justify-between p-4">
                 {opType === "consumer"
