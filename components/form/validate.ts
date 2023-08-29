@@ -8,9 +8,7 @@ export const validate = <T>(
   schema: ZodSchema<T>,
   data: FormData,
 ): { data: z.infer<typeof schema> | null; errors: ErrorType | null } => {
-  try {
-    console.log("shit get", data.get("id"));
-    console.log("shit get", data.get("name"));
+  try {);
     const validated = schema.parse(data);
     return { data: validated, errors: null };
   } catch (error: any) {
