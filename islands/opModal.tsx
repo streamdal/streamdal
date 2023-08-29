@@ -54,7 +54,9 @@ export default function OpModal(
           !isOpen && "translate-x-full right-[80px]"
         } flex flex-row justify-end items-start`}
       >
-        {opModal.value?.attach && <OddAttachModal serviceMap={serviceMap} />}
+        {(opModal.value?.attach && isOpen) && (
+          <OddAttachModal serviceMap={serviceMap} />
+        )}
         <div class="w-[308px] shadow-xl h-full ml-2">
           <div id="jesus" class="bg-white h-full dark:bg-gray-700">
             <div class=" flex p-4 justify-between items-center border-b border-purple-100">

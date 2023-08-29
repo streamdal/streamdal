@@ -4,7 +4,7 @@ import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { ServiceMapType } from "../../lib/fetch.ts";
-import { opUpdateSignal, serviceSignal } from "../../islands/serviceMap.tsx";
+import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 
 export const OddAttachModal = (
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -56,7 +56,7 @@ export const OddAttachModal = (
     }
   };
   return (
-    <div class="mt-[100px]">
+    <div class="mt-[235px]">
       <div class="w-[200px] bg-white divide-gray-100 rounded-md shadow-lg border max-h-[400px] overflow-auto">
         <form onSumbit={attachPipeline}>
           <ul
