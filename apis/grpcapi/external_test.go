@@ -746,6 +746,13 @@ var _ = Describe("External gRPC API", func() {
 			// Verify key still exists in nats
 			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, audKey)
 			Expect(err).ToNot(HaveOccurred())
+
+			// Cleanup key
+			err = natsClient.Delete(context.Background(), store.NATSConfigBucket, configKey)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = natsClient.Delete(context.Background(), store.NATSAudienceBucket, audKey)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should delete the audience", func() {
