@@ -13,6 +13,9 @@ service External {
   // Should return everything that is needed to build the initial view in the console
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
 
+  // Temporary method to test gRPC-Web streaming
+  rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
+
   // Returns pipelines (_wasm_bytes field is stripped)
   rpc GetPipelines(GetPipelinesRequest) returns (GetPipelinesResponse);
 

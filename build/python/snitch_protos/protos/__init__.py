@@ -782,6 +782,24 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def get_all_stream(
+        self,
+        get_all_request: "GetAllRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> AsyncIterator["GetAllResponse"]:
+        async for response in self._unary_stream(
+            "/protos.External/GetAllStream",
+            get_all_request,
+            GetAllResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        ):
+            yield response
+
     async def get_pipelines(
         self,
         get_pipelines_request: "GetPipelinesRequest",
@@ -1198,6 +1216,12 @@ class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_all_stream(
+        self, get_all_request: "GetAllRequest"
+    ) -> AsyncIterator["GetAllResponse"]:
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield GetAllResponse()
+
     async def get_pipelines(
         self, get_pipelines_request: "GetPipelinesRequest"
     ) -> "GetPipelinesResponse":
@@ -1292,6 +1316,16 @@ class ExternalBase(ServiceBase):
         request = await stream.recv_message()
         response = await self.get_all(request)
         await stream.send_message(response)
+
+    async def __rpc_get_all_stream(
+        self, stream: "grpclib.server.Stream[GetAllRequest, GetAllResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.get_all_stream,
+            stream,
+            request,
+        )
 
     async def __rpc_get_pipelines(
         self, stream: "grpclib.server.Stream[GetPipelinesRequest, GetPipelinesResponse]"
@@ -1432,6 +1466,12 @@ class ExternalBase(ServiceBase):
             "/protos.External/GetAll": grpclib.const.Handler(
                 self.__rpc_get_all,
                 grpclib.const.Cardinality.UNARY_UNARY,
+                GetAllRequest,
+                GetAllResponse,
+            ),
+            "/protos.External/GetAllStream": grpclib.const.Handler(
+                self.__rpc_get_all_stream,
+                grpclib.const.Cardinality.UNARY_STREAM,
                 GetAllRequest,
                 GetAllResponse,
             ),

@@ -330,6 +330,7 @@ export const TestResponse = new TestResponse$Type();
  */
 export const External = new ServiceType("protos.External", [
     { name: "GetAll", options: {}, I: GetAllRequest, O: GetAllResponse },
+    { name: "GetAllStream", serverStreaming: true, options: {}, I: GetAllRequest, O: GetAllResponse },
     { name: "GetPipelines", options: {}, I: GetPipelinesRequest, O: GetPipelinesResponse },
     { name: "GetPipeline", options: {}, I: GetPipelineRequest, O: GetPipelineResponse },
     { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: CreatePipelineResponse },
