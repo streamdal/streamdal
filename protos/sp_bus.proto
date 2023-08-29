@@ -30,6 +30,7 @@ message BusEvent {
     protos.ResumePipelineRequest resume_pipeline_request = 108;
     protos.MetricsRequest metrics_request = 109;
     protos.KVRequest kv_request = 110;
+    protos.DeleteAudienceRequest delete_audience_request = 111;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC
