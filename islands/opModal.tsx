@@ -96,7 +96,7 @@ export default function OpModal(
             </button>
             {isOpen && (opModal.value == null
               ? (
-                <div class="h-full w-full flex flex-col justify-center items-center">
+                <div class="w-full h-4/5 flex flex-col justify-center items-center">
                   <EmptyStateBird class="mb-2" />
                   <h2 class="text-[#8E84AD]">No Items Selected</h2>
                 </div>
@@ -119,7 +119,7 @@ export default function OpModal(
                     </div>
                     {
                       /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                           the content of the modal but keep the modal open*/
+                                                                                                                                                                                                                                                 the content of the modal but keep the modal open*/
                     }
                     {/*<button*/}
                     {/*  type="button"*/}
