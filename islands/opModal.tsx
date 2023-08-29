@@ -1,7 +1,6 @@
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import IconX from "tabler-icons/tsx/x.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import IconUserCircle from "tabler-icons/tsx/user-circle.tsx";
 import IconCircleChevronRight from "tabler-icons/tsx/circle-chevron-right.tsx";
@@ -118,13 +117,17 @@ export default function OpModal(
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className="mt-1 mr-1 text-purple-700 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-6 h-6 ml-auto inline-flex justify-center items-center"
-                      onClick={() => opModal.value = null}
-                    >
-                      <IconX class="w-4 h-4" />
-                    </button>
+                    {
+                      /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
+                                           the content of the modal but keep the modal open*/
+                    }
+                    {/*<button*/}
+                    {/*  type="button"*/}
+                    {/*  className="mt-1 mr-1 text-purple-700 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-6 h-6 ml-auto inline-flex justify-center items-center"*/}
+                    {/*  onClick={() => opModal.value = null}*/}
+                    {/*>*/}
+                    {/*  <IconX class="w-4 h-4" />*/}
+                    {/*</button>*/}
                   </div>
                   <div class="px-4 py-1">
                     <div class="mb-2 flex justify-between items-center pr-2">
@@ -229,7 +232,7 @@ export default function OpModal(
                           />
                         </svg>
                         <h3 class="text-web text-sm font-semibold ml-3">
-                          Trends
+                          Metrics
                         </h3>
                       </button>
                     </h3>
@@ -239,7 +242,7 @@ export default function OpModal(
                       aria-labelledby="collapse-heading-2"
                     >
                       <p class="p-5 text-gray-300 text-xs dark:text-gray-400">
-                        Trends coming soon...
+                        Metrics coming soon...
                       </p>
                     </div>
                     <h3 id="collapse-heading-3">
