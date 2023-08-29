@@ -168,7 +168,7 @@ func StringPtr(in string) *string {
 	return &in
 }
 
-func ConvertConfigStrAudience(config map[*protos.Audience]string) map[string]string {
+func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]string {
 	if config == nil {
 		return nil
 	}
@@ -176,7 +176,9 @@ func ConvertConfigStrAudience(config map[*protos.Audience]string) map[string]str
 	m := map[string]string{}
 
 	for k, v := range config {
-		m[AudienceToStr(k)] = v
+		// TODO: update to support multiple pipelines per audience
+		// TODO: this will require changes to frontend since the response will change
+		m[AudienceToStr(k)] = v[0]
 	}
 
 	return m
