@@ -744,6 +744,9 @@ class BusEvent(betterproto.Message):
     )
     metrics_request: "MetricsRequest" = betterproto.message_field(109, group="event")
     kv_request: "KvRequest" = betterproto.message_field(110, group="event")
+    delete_audience_request: "DeleteAudienceRequest" = betterproto.message_field(
+        111, group="event"
+    )
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
