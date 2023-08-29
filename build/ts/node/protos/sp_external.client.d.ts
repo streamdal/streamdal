@@ -25,6 +25,7 @@ import type { GetPipelineResponse } from "./sp_external.js";
 import type { GetPipelineRequest } from "./sp_external.js";
 import type { GetPipelinesResponse } from "./sp_external.js";
 import type { GetPipelinesRequest } from "./sp_external.js";
+import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAllResponse } from "./sp_external.js";
 import type { GetAllRequest } from "./sp_external.js";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
@@ -39,6 +40,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Temporary method to test gRPC-Web streaming
+     *
+     * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
+     */
+    getAllStream(input: GetAllRequest, options?: RpcOptions): ServerStreamingCall<GetAllRequest, GetAllResponse>;
     /**
      * Returns pipelines (_wasm_bytes field is stripped)
      *
@@ -149,6 +156,12 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Temporary method to test gRPC-Web streaming
+     *
+     * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
+     */
+    getAllStream(input: GetAllRequest, options?: RpcOptions): ServerStreamingCall<GetAllRequest, GetAllResponse>;
     /**
      * Returns pipelines (_wasm_bytes field is stripped)
      *

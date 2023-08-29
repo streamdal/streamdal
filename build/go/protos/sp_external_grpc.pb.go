@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ExternalClient interface {
 	// Should return everything that is needed to build the initial view in the console
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	// Temporary method to test gRPC-Web streaming
+	GetAllStream(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (External_GetAllStreamClient, error)
 	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(ctx context.Context, in *GetPipelinesRequest, opts ...grpc.CallOption) (*GetPipelinesResponse, error)
 	// Returns a single pipeline (_wasm_bytes field is stripped)
@@ -69,6 +71,38 @@ func (c *externalClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *externalClient) GetAllStream(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (External_GetAllStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[0], "/protos.External/GetAllStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &externalGetAllStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type External_GetAllStreamClient interface {
+	Recv() (*GetAllResponse, error)
+	grpc.ClientStream
+}
+
+type externalGetAllStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *externalGetAllStreamClient) Recv() (*GetAllResponse, error) {
+	m := new(GetAllResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *externalClient) GetPipelines(ctx context.Context, in *GetPipelinesRequest, opts ...grpc.CallOption) (*GetPipelinesResponse, error) {
@@ -239,6 +273,8 @@ func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc
 type ExternalServer interface {
 	// Should return everything that is needed to build the initial view in the console
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	// Temporary method to test gRPC-Web streaming
+	GetAllStream(*GetAllRequest, External_GetAllStreamServer) error
 	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(context.Context, *GetPipelinesRequest) (*GetPipelinesResponse, error)
 	// Returns a single pipeline (_wasm_bytes field is stripped)
@@ -276,6 +312,9 @@ type UnimplementedExternalServer struct {
 
 func (UnimplementedExternalServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedExternalServer) GetAllStream(*GetAllRequest, External_GetAllStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllStream not implemented")
 }
 func (UnimplementedExternalServer) GetPipelines(context.Context, *GetPipelinesRequest) (*GetPipelinesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPipelines not implemented")
@@ -360,6 +399,27 @@ func _External_GetAll_Handler(srv interface{}, ctx context.Context, dec func(int
 		return srv.(ExternalServer).GetAll(ctx, req.(*GetAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _External_GetAllStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetAllRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExternalServer).GetAllStream(m, &externalGetAllStreamServer{stream})
+}
+
+type External_GetAllStreamServer interface {
+	Send(*GetAllResponse) error
+	grpc.ServerStream
+}
+
+type externalGetAllStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *externalGetAllStreamServer) Send(m *GetAllResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _External_GetPipelines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -770,6 +830,12 @@ var External_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _External_Test_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllStream",
+			Handler:       _External_GetAllStream_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "sp_external.proto",
 }
