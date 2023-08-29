@@ -524,6 +524,22 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 	}, nil
 }
 
+func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteAudienceRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Options.StoreService.DeleteAudience(ctx, req.Audience); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Audience deleted",
+	}, nil
+}
+
 func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,

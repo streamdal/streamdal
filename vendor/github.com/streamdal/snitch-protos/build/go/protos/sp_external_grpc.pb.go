@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.18.1
-// source: external.proto
+// source: sp_external.proto
 
 package protos
 
@@ -49,6 +49,7 @@ type ExternalClient interface {
 	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
 	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -214,6 +215,15 @@ func (c *externalClient) DetachNotification(ctx context.Context, in *DetachNotif
 	return out, nil
 }
 
+func (c *externalClient) DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/DeleteAudience", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -254,6 +264,7 @@ type ExternalServer interface {
 	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
 	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
+	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -313,6 +324,9 @@ func (UnimplementedExternalServer) AttachNotification(context.Context, *AttachNo
 }
 func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetachNotification not implemented")
+}
+func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAudience not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -636,6 +650,24 @@ func _External_DetachNotification_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_DeleteAudience_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAudienceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DeleteAudience(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/DeleteAudience",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DeleteAudience(ctx, req.(*DeleteAudienceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -730,10 +762,14 @@ var External_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _External_DetachNotification_Handler,
 		},
 		{
+			MethodName: "DeleteAudience",
+			Handler:    _External_DeleteAudience_Handler,
+		},
+		{
 			MethodName: "Test",
 			Handler:    _External_Test_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "external.proto",
+	Metadata: "sp_external.proto",
 }

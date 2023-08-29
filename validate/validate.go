@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
@@ -513,6 +514,34 @@ func MetricsRequest(req *protos.MetricsRequest) error {
 
 	if req.Metrics == nil {
 		return ErrNilField("Metrics")
+	}
+
+	return nil
+}
+
+func DeleteAudienceRequest(req *protos.DeleteAudienceRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	if req.Audience.ServiceName == "" {
+		return ErrEmptyField("Audience.ServiceName")
+	}
+
+	if req.Audience.ComponentName == "" {
+		return ErrEmptyField("Audience.ComponentName")
+	}
+
+	if req.Audience.OperationName == "" {
+		return ErrEmptyField("Audience.OperationName")
+	}
+
+	if req.Audience.OperationType == protos.OperationType_OPERATION_TYPE_UNSET {
+		return ErrUnsetEnum("Audience.OperationType")
 	}
 
 	return nil
