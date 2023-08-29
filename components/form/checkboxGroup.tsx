@@ -1,25 +1,26 @@
-import { ErrorType, parsePath, updateData } from "./validate.ts";
+import { ErrorType, resolveValue } from "./validate.ts";
 import { isNumeric, titleCase } from "../../lib/utils.ts";
+import { FormCheckbox } from "./formCheckbox.tsx";
 
 export type CheckboxGroupProps = {
   name: string;
   data: any;
-  setData: (data: any) => void;
   options: any;
   label?: string;
   errors: ErrorType;
-  inputClass?: string;
   wrapperClass?: string;
 };
 
+//
+// This may not be generally re-usable as it's currently built around our standard
+// proto option enum structure. See PipelineStepCondition, DetectiveType,
+// TransformType, etc.
 export const CheckboxGroup = ({
   name,
   data,
-  setData,
   options,
   errors,
   label,
-  inputClass,
   wrapperClass,
 }: CheckboxGroupProps) => {
   return (
@@ -40,27 +41,15 @@ export const CheckboxGroup = ({
           [k, _],
         ) => k !== "0" && isNumeric(k)).map(([k, v], i) => {
           const path = `${name}[${i}]`;
+          const selected = resolveValue(data, name);
           return (
-            <div class="flex flex-row items-center">
-              <input
-                type="checkbox"
-                id={path}
-                name={path}
-                className={`w-4 h-4 rounded border mx-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 ${inputClass}`}
-                value={k}
-                onChange={(e) => {
-                  updateData(
-                    data,
-                    setData,
-                    parsePath(path),
-                    e.target.checked ? e.target.value : null,
-                  );
-                }}
-              />
-              <label class="text-web font-medium text-[14px]">
-                {titleCase(v)}
-              </label>
-            </div>
+            <FormCheckbox
+              path={path}
+              value={k}
+              display={titleCase(v)}
+              defaultChecked={Array.isArray(selected) &&
+                selected.includes(Number(k))}
+            />
           );
         })}
       </div>

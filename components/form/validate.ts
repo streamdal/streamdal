@@ -3,7 +3,6 @@ import { ZodSchema } from "zod/types.ts";
 import * as z from "zod/index.ts";
 
 export type ErrorType = { [key: string]: string };
-export type ObjectType = Record<number | string, any>;
 
 export const validate = <T>(
   schema: ZodSchema<T>,
@@ -25,13 +24,8 @@ export const updateData = (
   data: any,
   setData: (arg: any) => void,
   keys: (string | number)[],
-  value: string,
-) => {
-  setData({
-    ...data,
-    ...setValue(data, keys, value),
-  });
-};
+  value: string | number,
+) => setData(setValue(data, keys, value));
 
 export const parsePath = (path: string) =>
   path.split(/[\.\[\]'\"]/).filter((p) => p);
@@ -40,21 +34,27 @@ export const resolveValue = (object: any, path: string) =>
   parsePath(path)
     .reduce((o, p) => o ? o[p] : null, object);
 
+//
+// Returns a copy of the provided object with the provided value set
+// at path specified in keys
 export const setValue = (
-  object: any,
-  path: any[],
-  value: string,
+  data: any,
+  keys: any[],
+  value: string | number,
 ) => {
-  const updated = object;
-  path.reduce((obj: ObjectType, key, index) => {
-    if (index === path.length - 1) {
-      obj[key] = value;
-    } else {
-      if (!obj[key]) {
-        obj[key] = {};
-      }
-      return obj[key];
-    }
-  }, updated);
-  return updated;
+  const [key, ...restKeys] = keys;
+
+  let children;
+  if (restKeys.length > 0) {
+    children = data[key] && typeof data[key] === "object"
+      ? data[key]
+      : (Number.isInteger(key) ? [] : {});
+
+    children = setValue(children, restKeys, value);
+  }
+
+  const result = Array.isArray(data) ? [...data] : { ...data };
+  result[key] = restKeys.length > 0 ? children : value;
+
+  return result;
 };

@@ -21,7 +21,7 @@ import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { isNumeric, titleCase } from "../lib/utils.ts";
+import { isNumeric, logFormData, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -165,15 +165,15 @@ const stepSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
   onSuccess: zfd.repeatable(
-    z.array(zfd.numeric(StepConditionEnum)).default(
+    z.array(zfd.numeric(StepConditionEnum).optional()).default(
       [],
-    ),
+    ).transform((val) => val.filter((v) => v)),
   ),
   onFailure: zfd.repeatable(
-    z.array(zfd.numeric(StepConditionEnum)).default(
+    z.array(zfd.numeric(StepConditionEnum).optional()).default(
       [],
     ),
-  ),
+  ).transform((val) => val.filter((v) => v)),
   step: stepKindSchema,
 });
 
@@ -209,12 +209,13 @@ const PipelineDetail = (
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState({
     ...pipeline,
-    steps: pipeline.steps.map((s, i) => ({
+    steps: pipeline.steps.map((s: PipelineStep, i) => ({
       ...s,
       dragId: crypto.randomUUID(),
       dragOrder: i,
     })),
   });
+
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);
 
@@ -230,14 +231,6 @@ const PipelineDetail = (
     setOpen([...open, data.steps.length]);
     setTimeout(() => initFlowbite(), 1000);
   };
-
-  const getStepKinds = (data: any) =>
-    data?.steps.map((s: PipelineStep) => s.step.oneofKind);
-  const [stepKinds, setStepKinds] = useState(getStepKinds(data));
-
-  useEffect(() => {
-    setStepKinds(getStepKinds(data));
-  }, [data]);
 
   const deleteStep = (stepIndex: number) => {
     setData({ ...data, steps: data.steps.filter((_, i) => i !== stepIndex) });
@@ -431,7 +424,7 @@ const PipelineDetail = (
                       />
                     ))}
                   />
-                  {"detective" === stepKinds[i] && (
+                  {"detective" === step.step.oneofKind && (
                     <>
                       <FormInput
                         name={`steps.${i}.step.detective.path`}
@@ -470,7 +463,7 @@ const PipelineDetail = (
                       </div>
                     </>
                   )}
-                  {"transform" === stepKinds[i] && (
+                  {"transform" === step.step.oneofKind && (
                     <>
                       <FormInput
                         name={`steps.${i}.step.transform.path`}
