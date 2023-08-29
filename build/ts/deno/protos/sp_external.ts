@@ -4,6 +4,7 @@
 import { StandardResponse } from "./sp_common.ts";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Metric } from "./sp_common.ts";
 import { NotificationConfig } from "./sp_notify.ts";
 import { Pipeline } from "./sp_pipeline.ts";
 import { PipelineInfo } from "./sp_info.ts";
@@ -279,6 +280,24 @@ export interface DeleteAudienceRequest {
      * @generated from protobuf field: protos.Audience audience = 1;
      */
     audience?: Audience;
+}
+/**
+ * Nothing needed here, we return all metrics currently
+ *
+ * @generated from protobuf message protos.GetMetricsRequest
+ */
+export interface GetMetricsRequest {
+}
+/**
+ * @generated from protobuf message protos.GetMetricsResponse
+ */
+export interface GetMetricsResponse {
+    /**
+     * @generated from protobuf field: map<string, protos.Metric> metrics = 1;
+     */
+    metrics: {
+        [key: string]: Metric;
+    };
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -591,6 +610,28 @@ class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
  */
 export const DeleteAudienceRequest = new DeleteAudienceRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetMetricsRequest$Type extends MessageType<GetMetricsRequest> {
+    constructor() {
+        super("protos.GetMetricsRequest", []);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetMetricsRequest
+ */
+export const GetMetricsRequest = new GetMetricsRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
+    constructor() {
+        super("protos.GetMetricsResponse", [
+            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Metric } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetMetricsResponse
+ */
+export const GetMetricsResponse = new GetMetricsResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -637,5 +678,6 @@ export const External = new ServiceType("protos.External", [
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
+    { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

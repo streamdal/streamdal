@@ -59,14 +59,8 @@ message NotifyRequest {
   int64 occurred_at_unix_ts_utc = 4;
 }
 
-message Metrics {
-  string name = 1;
-  map<string, string> labels = 2;
-  double value = 3;
-}
-
 message MetricsRequest {
-  repeated Metrics metrics = 1;
+  repeated protos.Metric metrics = 1;
 }
 
 message RegisterRequest {

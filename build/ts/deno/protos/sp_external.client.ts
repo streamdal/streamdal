@@ -6,6 +6,8 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.ts";
 import type { TestResponse } from "./sp_external.ts";
 import type { TestRequest } from "./sp_external.ts";
+import type { GetMetricsResponse } from "./sp_external.ts";
+import type { GetMetricsRequest } from "./sp_external.ts";
 import type { DeleteAudienceRequest } from "./sp_external.ts";
 import type { DetachNotificationRequest } from "./sp_external.ts";
 import type { AttachNotificationRequest } from "./sp_external.ts";
@@ -106,37 +108,59 @@ export interface IExternalClient {
      */
     resumePipeline(input: ResumePipelineRequest, options?: RpcOptions): UnaryCall<ResumePipelineRequest, StandardResponse>;
     /**
+     * Create a new notification config
+     *
      * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
      */
     createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse>;
     /**
+     * Update an existing notification config
+     *
      * @generated from protobuf rpc: UpdateNotification(protos.UpdateNotificationRequest) returns (protos.StandardResponse);
      */
     updateNotification(input: UpdateNotificationRequest, options?: RpcOptions): UnaryCall<UpdateNotificationRequest, StandardResponse>;
     /**
+     * Delete a notification config
+     *
      * @generated from protobuf rpc: DeleteNotification(protos.DeleteNotificationRequest) returns (protos.StandardResponse);
      */
     deleteNotification(input: DeleteNotificationRequest, options?: RpcOptions): UnaryCall<DeleteNotificationRequest, StandardResponse>;
     /**
+     * Returns all notification configs
+     *
      * @generated from protobuf rpc: GetNotifications(protos.GetNotificationsRequest) returns (protos.GetNotificationsResponse);
      */
     getNotifications(input: GetNotificationsRequest, options?: RpcOptions): UnaryCall<GetNotificationsRequest, GetNotificationsResponse>;
     /**
+     * Returns a single notification config
+     *
      * @generated from protobuf rpc: GetNotification(protos.GetNotificationRequest) returns (protos.GetNotificationResponse);
      */
     getNotification(input: GetNotificationRequest, options?: RpcOptions): UnaryCall<GetNotificationRequest, GetNotificationResponse>;
     /**
+     * Attach a notification config to a pipeline
+     *
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input: AttachNotificationRequest, options?: RpcOptions): UnaryCall<AttachNotificationRequest, StandardResponse>;
     /**
+     * Detach a notification config from a pipeline
+     *
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
+     * Delete an un-attached audience
+     *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse>;
+    /**
+     * Returns all metric counters
+     *
+     * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
+     */
+    getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse>;
     /**
      * Test method
      *
@@ -253,6 +277,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<ResumePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Create a new notification config
+     *
      * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
      */
     createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse> {
@@ -260,6 +286,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<CreateNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Update an existing notification config
+     *
      * @generated from protobuf rpc: UpdateNotification(protos.UpdateNotificationRequest) returns (protos.StandardResponse);
      */
     updateNotification(input: UpdateNotificationRequest, options?: RpcOptions): UnaryCall<UpdateNotificationRequest, StandardResponse> {
@@ -267,6 +295,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<UpdateNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a notification config
+     *
      * @generated from protobuf rpc: DeleteNotification(protos.DeleteNotificationRequest) returns (protos.StandardResponse);
      */
     deleteNotification(input: DeleteNotificationRequest, options?: RpcOptions): UnaryCall<DeleteNotificationRequest, StandardResponse> {
@@ -274,6 +304,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DeleteNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns all notification configs
+     *
      * @generated from protobuf rpc: GetNotifications(protos.GetNotificationsRequest) returns (protos.GetNotificationsResponse);
      */
     getNotifications(input: GetNotificationsRequest, options?: RpcOptions): UnaryCall<GetNotificationsRequest, GetNotificationsResponse> {
@@ -281,6 +313,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetNotificationsRequest, GetNotificationsResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns a single notification config
+     *
      * @generated from protobuf rpc: GetNotification(protos.GetNotificationRequest) returns (protos.GetNotificationResponse);
      */
     getNotification(input: GetNotificationRequest, options?: RpcOptions): UnaryCall<GetNotificationRequest, GetNotificationResponse> {
@@ -288,6 +322,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetNotificationRequest, GetNotificationResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Attach a notification config to a pipeline
+     *
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input: AttachNotificationRequest, options?: RpcOptions): UnaryCall<AttachNotificationRequest, StandardResponse> {
@@ -295,6 +331,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<AttachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Detach a notification config from a pipeline
+     *
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse> {
@@ -302,6 +340,8 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DetachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete an un-attached audience
+     *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse> {
@@ -309,12 +349,21 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DeleteAudienceRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns all metric counters
+     *
+     * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
+     */
+    getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse> {
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetMetricsRequest, GetMetricsResponse>("serverStreaming", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

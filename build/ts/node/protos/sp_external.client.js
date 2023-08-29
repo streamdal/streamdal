@@ -111,6 +111,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Create a new notification config
+     *
      * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
      */
     createNotification(input, options) {
@@ -118,6 +120,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Update an existing notification config
+     *
      * @generated from protobuf rpc: UpdateNotification(protos.UpdateNotificationRequest) returns (protos.StandardResponse);
      */
     updateNotification(input, options) {
@@ -125,6 +129,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a notification config
+     *
      * @generated from protobuf rpc: DeleteNotification(protos.DeleteNotificationRequest) returns (protos.StandardResponse);
      */
     deleteNotification(input, options) {
@@ -132,6 +138,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns all notification configs
+     *
      * @generated from protobuf rpc: GetNotifications(protos.GetNotificationsRequest) returns (protos.GetNotificationsResponse);
      */
     getNotifications(input, options) {
@@ -139,6 +147,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns a single notification config
+     *
      * @generated from protobuf rpc: GetNotification(protos.GetNotificationRequest) returns (protos.GetNotificationResponse);
      */
     getNotification(input, options) {
@@ -146,6 +156,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Attach a notification config to a pipeline
+     *
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input, options) {
@@ -153,6 +165,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Detach a notification config from a pipeline
+     *
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input, options) {
@@ -160,6 +174,8 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete an un-attached audience
+     *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input, options) {
@@ -167,12 +183,21 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns all metric counters
+     *
+     * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
+     */
+    getMetrics(input, options) {
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        return stackIntercept("serverStreaming", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
 }

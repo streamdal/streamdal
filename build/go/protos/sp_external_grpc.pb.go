@@ -44,14 +44,24 @@ type ExternalClient interface {
 	PausePipeline(ctx context.Context, in *PausePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(ctx context.Context, in *ResumePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Create a new notification config
 	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Update an existing notification config
 	UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Delete a notification config
 	DeleteNotification(ctx context.Context, in *DeleteNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Returns all notification configs
 	GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
+	// Returns a single notification config
 	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
+	// Attach a notification config to a pipeline
 	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Detach a notification config from a pipeline
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Delete an un-attached audience
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Returns all metric counters
+	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -258,6 +268,38 @@ func (c *externalClient) DeleteAudience(ctx context.Context, in *DeleteAudienceR
 	return out, nil
 }
 
+func (c *externalClient) GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[1], "/protos.External/GetMetrics", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &externalGetMetricsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type External_GetMetricsClient interface {
+	Recv() (*GetMetricsResponse, error)
+	grpc.ClientStream
+}
+
+type externalGetMetricsClient struct {
+	grpc.ClientStream
+}
+
+func (x *externalGetMetricsClient) Recv() (*GetMetricsResponse, error) {
+	m := new(GetMetricsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -293,14 +335,24 @@ type ExternalServer interface {
 	PausePipeline(context.Context, *PausePipelineRequest) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error)
+	// Create a new notification config
 	CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error)
+	// Update an existing notification config
 	UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error)
+	// Delete a notification config
 	DeleteNotification(context.Context, *DeleteNotificationRequest) (*StandardResponse, error)
+	// Returns all notification configs
 	GetNotifications(context.Context, *GetNotificationsRequest) (*GetNotificationsResponse, error)
+	// Returns a single notification config
 	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
+	// Attach a notification config to a pipeline
 	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
+	// Detach a notification config from a pipeline
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
+	// Delete an un-attached audience
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
+	// Returns all metric counters
+	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -366,6 +418,9 @@ func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNo
 }
 func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAudience not implemented")
+}
+func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetMetrics not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -728,6 +783,27 @@ func _External_DeleteAudience_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_GetMetrics_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetMetricsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExternalServer).GetMetrics(m, &externalGetMetricsServer{stream})
+}
+
+type External_GetMetricsServer interface {
+	Send(*GetMetricsResponse) error
+	grpc.ServerStream
+}
+
+type externalGetMetricsServer struct {
+	grpc.ServerStream
+}
+
+func (x *externalGetMetricsServer) Send(m *GetMetricsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -834,6 +910,11 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "GetAllStream",
 			Handler:       _External_GetAllStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GetMetrics",
+			Handler:       _External_GetMetrics_Handler,
 			ServerStreams: true,
 		},
 	},

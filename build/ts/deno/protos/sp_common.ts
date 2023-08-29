@@ -56,6 +56,25 @@ export interface Audience {
     operationName: string;
 }
 /**
+ * @generated from protobuf message protos.Metric
+ */
+export interface Metric {
+    /**
+     * @generated from protobuf field: string name = 1;
+     */
+    name: string;
+    /**
+     * @generated from protobuf field: map<string, string> labels = 2;
+     */
+    labels: {
+        [key: string]: string;
+    };
+    /**
+     * @generated from protobuf field: double value = 3;
+     */
+    value: number;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -134,3 +153,17 @@ class Audience$Type extends MessageType<Audience> {
  * @generated MessageType for protobuf message protos.Audience
  */
 export const Audience = new Audience$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Metric$Type extends MessageType<Metric> {
+    constructor() {
+        super("protos.Metric", [
+            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Metric
+ */
+export const Metric = new Metric$Type();

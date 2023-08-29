@@ -36,28 +36,11 @@ class HeartbeatRequest(_message.Message):
     session_id: str
     def __init__(self, session_id: _Optional[str] = ...) -> None: ...
 
-class Metrics(_message.Message):
-    __slots__ = ["labels", "name", "value"]
-    class LabelsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    LABELS_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    VALUE_FIELD_NUMBER: _ClassVar[int]
-    labels: _containers.ScalarMap[str, str]
-    name: str
-    value: float
-    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ...) -> None: ...
-
 class MetricsRequest(_message.Message):
     __slots__ = ["metrics"]
     METRICS_FIELD_NUMBER: _ClassVar[int]
-    metrics: _containers.RepeatedCompositeFieldContainer[Metrics]
-    def __init__(self, metrics: _Optional[_Iterable[_Union[Metrics, _Mapping]]] = ...) -> None: ...
+    metrics: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Metric]
+    def __init__(self, metrics: _Optional[_Iterable[_Union[_sp_common_pb2.Metric, _Mapping]]] = ...) -> None: ...
 
 class NewAudienceRequest(_message.Message):
     __slots__ = ["audience", "session_id"]

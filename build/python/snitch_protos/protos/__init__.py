@@ -143,6 +143,15 @@ class Audience(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class Metric(betterproto.Message):
+    name: str = betterproto.string_field(1)
+    labels: Dict[str, str] = betterproto.map_field(
+        2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+    value: float = betterproto.double_field(3)
+
+
+@dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):
     """
     Pipeline is a structure that holds one or more pipeline steps. This
@@ -455,6 +464,18 @@ class DeleteAudienceRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetMetricsRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class GetMetricsResponse(betterproto.Message):
+    metrics: Dict[str, "Metric"] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass(eq=False, repr=False)
 class TestRequest(betterproto.Message):
     input: str = betterproto.string_field(1)
 
@@ -635,17 +656,8 @@ class NotifyRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class Metrics(betterproto.Message):
-    name: str = betterproto.string_field(1)
-    labels: Dict[str, str] = betterproto.map_field(
-        2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
-    )
-    value: float = betterproto.double_field(3)
-
-
-@dataclass(eq=False, repr=False)
 class MetricsRequest(betterproto.Message):
-    metrics: List["Metrics"] = betterproto.message_field(1)
+    metrics: List["Metric"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1089,6 +1101,24 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def get_metrics(
+        self,
+        get_metrics_request: "GetMetricsRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> AsyncIterator["GetMetricsResponse"]:
+        async for response in self._unary_stream(
+            "/protos.External/GetMetrics",
+            get_metrics_request,
+            GetMetricsResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        ):
+            yield response
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1307,6 +1337,12 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_metrics(
+        self, get_metrics_request: "GetMetricsRequest"
+    ) -> AsyncIterator["GetMetricsResponse"]:
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield GetMetricsResponse()
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -1454,6 +1490,16 @@ class ExternalBase(ServiceBase):
         response = await self.delete_audience(request)
         await stream.send_message(response)
 
+    async def __rpc_get_metrics(
+        self, stream: "grpclib.server.Stream[GetMetricsRequest, GetMetricsResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.get_metrics,
+            stream,
+            request,
+        )
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1576,6 +1622,12 @@ class ExternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 DeleteAudienceRequest,
                 StandardResponse,
+            ),
+            "/protos.External/GetMetrics": grpclib.const.Handler(
+                self.__rpc_get_metrics,
+                grpclib.const.Cardinality.UNARY_STREAM,
+                GetMetricsRequest,
+                GetMetricsResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
