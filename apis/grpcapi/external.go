@@ -504,8 +504,14 @@ func (s *ExternalServer) GetNotification(ctx context.Context, req *protos.GetNot
 func stripSensitiveFields(cfg *protos.NotificationConfig) {
 	switch cfg.Type {
 	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
-		smtp := cfg.GetEmail().GetSmtp()
-		smtp.Password = ""
+		switch cfg.GetEmail().Type {
+		case protos.NotificationEmail_TYPE_SMTP:
+			smtp := cfg.GetEmail().GetSmtp()
+			smtp.Password = ""
+		case protos.NotificationEmail_TYPE_SES:
+			ses := cfg.GetEmail().GetSes()
+			ses.SesSecretAccessKey = ""
+		}
 	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
 		pd := cfg.GetPagerduty()
 		pd.Token = ""
