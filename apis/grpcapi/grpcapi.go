@@ -6,16 +6,18 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/natty"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	_ "google.golang.org/grpc/reflection"
 
+	"github.com/streamdal/natty"
+	"github.com/streamdal/snitch-protos/build/go/protos"
+
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
@@ -40,6 +42,7 @@ type GRPCAPI struct {
 
 type Options struct {
 	Config          *config.Config
+	MetricsService  metrics.IMetrics
 	StoreService    store.IStore
 	BusService      bus.IBus
 	ShutdownContext context.Context

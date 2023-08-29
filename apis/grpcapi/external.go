@@ -3,6 +3,7 @@ package grpcapi
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -540,6 +541,43 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: "Audience deleted",
 	}, nil
+}
+
+func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.External_GetMetricsServer) error {
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-server.Context().Done():
+			return nil
+		case <-ticker.C:
+			sliceCounters, err := s.Options.MetricsService.FetchCounters(server.Context())
+			if err != nil {
+				s.log.Errorf("error getting counters: %s", err)
+				continue
+			}
+
+			counters := make(map[string]*protos.Metric)
+
+			for _, c := range sliceCounters {
+				counters[counterName(c.Name, c.Labels)] = c
+			}
+
+			if err := server.SendMsg(&protos.GetMetricsResponse{Metrics: counters}); err != nil {
+				s.log.Errorf("error sending metrics: %s", err)
+			}
+		}
+	}
+}
+
+func counterName(name string, labels map[string]string) string {
+	vals := make([]string, 0)
+	for k, v := range labels {
+		vals = append(vals, fmt.Sprintf("%s-%s", k, v))
+	}
+
+	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
 }
 
 func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
