@@ -14,6 +14,7 @@ import (
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-server/services/encryption"
 	"github.com/streamdal/snitch-server/services/store/types"
 	"github.com/streamdal/snitch-server/util"
 )
@@ -77,6 +78,7 @@ type IStore interface {
 }
 
 type Options struct {
+	Encryption  encryption.IEncryption
 	NATSBackend natty.INatty
 	ShutdownCtx context.Context
 	NodeName    string
@@ -658,6 +660,12 @@ func (s *Store) GetNotificationConfig(ctx context.Context, req *protos.GetNotifi
 		return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", req.NotificationId)
 	}
 
+	// Decrypt data
+	data, err = s.options.Encryption.Decrypt(data)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error decrypting notification config '%s'", req.NotificationId)
+	}
+
 	cfg := &protos.NotificationConfig{}
 	if err := proto.Unmarshal(data, cfg); err != nil {
 		return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", req.NotificationId)
@@ -684,6 +692,12 @@ func (s *Store) GetNotificationConfigs(ctx context.Context) (map[string]*protos.
 			return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", key)
 		}
 
+		// Decrypt data
+		data, err = s.options.Encryption.Decrypt(data)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error decrypting notification config '%s'", key)
+		}
+
 		notificationConfig := &protos.NotificationConfig{}
 		if err := proto.Unmarshal(data, notificationConfig); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", key)
@@ -701,6 +715,35 @@ func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.Create
 		return errors.Wrap(err, "error marshaling notification config")
 	}
 
+	// Encrypt data
+	data, err = s.options.Encryption.Encrypt(data)
+	if err != nil {
+		return errors.Wrap(err, "error encrypting notification config")
+	}
+
+	key := NATSNotificationConfigKey(*req.Notification.Id)
+	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
+		return errors.Wrap(err, "error saving notification config to NATS")
+	}
+
+	return nil
+}
+func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error {
+	if err := s.fillSensitiveFields(ctx, req); err != nil {
+		return errors.Wrap(err, "error filling sensitive fields")
+	}
+
+	data, err := proto.Marshal(req.Notification)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling notification config")
+	}
+
+	// Encrypt data
+	data, err = s.options.Encryption.Encrypt(data)
+	if err != nil {
+		return errors.Wrap(err, "error encrypting notification config")
+	}
+
 	key := NATSNotificationConfigKey(*req.Notification.Id)
 	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
 		return errors.Wrap(err, "error saving notification config to NATS")
@@ -709,15 +752,44 @@ func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.Create
 	return nil
 }
 
-func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error {
-	data, err := proto.Marshal(req.Notification)
+// fillSensitiveFields fills in any sensitive fields that were not provided in the request, assuming
+// that the notification type has not changed.
+func (s *Store) fillSensitiveFields(ctx context.Context, req *protos.UpdateNotificationRequest) error {
+	existing, err := s.GetNotificationConfig(ctx, &protos.GetNotificationRequest{NotificationId: *req.Notification.Id})
 	if err != nil {
-		return errors.Wrap(err, "error marshaling notification config")
+		return errors.Wrap(err, "error fetching existing notification config")
 	}
 
-	key := NATSNotificationConfigKey(*req.Notification.Id)
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
-		return errors.Wrap(err, "error saving notification config to NATS")
+	// If the notification type changed, we don't need to fill in any sensitive fields, the user will have done that
+	if req.Notification.Type != existing.Type {
+		return nil
+	}
+
+	switch req.Notification.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		email := req.Notification.GetEmail()
+		switch email.Type {
+		case protos.NotificationEmail_TYPE_SMTP:
+			smtp := email.GetSmtp()
+			if smtp.Password == "" {
+				smtp.Password = existing.GetEmail().GetSmtp().GetPassword()
+			}
+		case protos.NotificationEmail_TYPE_SES:
+			ses := email.GetSes()
+			if ses.SesSecretAccessKey == "" {
+				ses.SesSecretAccessKey = existing.GetEmail().GetSes().SesSecretAccessKey
+			}
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		pd := req.Notification.GetPagerduty()
+		if pd.Token == "" {
+			pd.Token = existing.GetPagerduty().Token
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		slack := req.Notification.GetSlack()
+		if slack.BotToken == "" {
+			slack.BotToken = existing.GetSlack().BotToken
+		}
 	}
 
 	return nil

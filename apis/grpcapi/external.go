@@ -478,6 +478,10 @@ func (s *ExternalServer) GetNotifications(ctx context.Context, req *protos.GetNo
 		return nil, errors.Wrap(err, "unable to get notification configs")
 	}
 
+	for _, cfg := range cfgs {
+		stripSensitiveFields(cfg)
+	}
+
 	return &protos.GetNotificationsResponse{Notifications: cfgs}, nil
 }
 
@@ -491,7 +495,24 @@ func (s *ExternalServer) GetNotification(ctx context.Context, req *protos.GetNot
 		return nil, errors.Wrap(err, "unable to get notification config")
 	}
 
+	stripSensitiveFields(cfg)
+
 	return &protos.GetNotificationResponse{Notification: cfg}, nil
+}
+
+// stripSensitiveFields blacks out sensitive fields in notification configs, before returning data to the frontend
+func stripSensitiveFields(cfg *protos.NotificationConfig) {
+	switch cfg.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		smtp := cfg.GetEmail().GetSmtp()
+		smtp.Password = ""
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		pd := cfg.GetPagerduty()
+		pd.Token = ""
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		slack := cfg.GetSlack()
+		slack.BotToken = ""
+	}
 }
 
 func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.AttachNotificationRequest) (*protos.StandardResponse, error) {

@@ -32,6 +32,9 @@ type Config struct {
 	WASMDir              string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
 	SeedDummyData        bool             `help:"Seed NATS with dummy data for testing" default:"false"`
 
+	// TODO: remove default for release
+	AesKey string `help:"AES256 encryption key to encrypt notification configs at rest" default:"D4BEC3EA5794EE0F38B21B9D4EC69F17F295C62618AB7F2C74814190F1F41ACC"`
+
 	KongContext *kong.Context `kong:"-"`
 }
 
