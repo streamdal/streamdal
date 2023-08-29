@@ -169,7 +169,7 @@ message DetachNotificationRequest {
 }
 
 message DeleteAudienceRequest {
-  protos.Audience audiences = 1;
+  protos.Audience audience = 1;
 }
 
 message TestRequest {

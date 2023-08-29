@@ -276,9 +276,9 @@ export interface DetachNotificationRequest {
  */
 export interface DeleteAudienceRequest {
     /**
-     * @generated from protobuf field: protos.Audience audiences = 1;
+     * @generated from protobuf field: protos.Audience audience = 1;
      */
-    audiences?: Audience;
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -582,7 +582,7 @@ export const DetachNotificationRequest = new DetachNotificationRequest$Type();
 class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
     constructor() {
         super("protos.DeleteAudienceRequest", [
-            { no: 1, name: "audiences", kind: "message", T: () => Audience }
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }

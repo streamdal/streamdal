@@ -272,9 +272,9 @@ export interface DetachNotificationRequest {
  */
 export interface DeleteAudienceRequest {
     /**
-     * @generated from protobuf field: protos.Audience audiences = 1;
+     * @generated from protobuf field: protos.Audience audience = 1;
      */
-    audiences?: Audience;
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TestRequest

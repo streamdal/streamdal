@@ -451,7 +451,7 @@ class DetachNotificationRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class DeleteAudienceRequest(betterproto.Message):
-    audiences: "Audience" = betterproto.message_field(1)
+    audience: "Audience" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
