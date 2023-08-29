@@ -83,4 +83,18 @@ class Audience$Type extends MessageType {
  * @generated MessageType for protobuf message protos.Audience
  */
 export const Audience = new Audience$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Metric$Type extends MessageType {
+    constructor() {
+        super("protos.Metric", [
+            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Metric
+ */
+export const Metric = new Metric$Type();
 //# sourceMappingURL=sp_common.js.map

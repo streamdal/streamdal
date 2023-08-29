@@ -43,15 +43,32 @@ service External {
   // Resume a pipeline; noop if pipeline is not paused
   rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
 
+  // Create a new notification config
   rpc CreateNotification(CreateNotificationRequest) returns (protos.StandardResponse);
+
+  // Update an existing notification config
   rpc UpdateNotification(UpdateNotificationRequest) returns (protos.StandardResponse);
+
+  // Delete a notification config
   rpc DeleteNotification(DeleteNotificationRequest) returns (protos.StandardResponse);
+
+  // Returns all notification configs
   rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
+
+  // Returns a single notification config
   rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+
+  // Attach a notification config to a pipeline
   rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
+
+  // Detach a notification config from a pipeline
   rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
 
+  // Delete an un-attached audience
   rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
+
+  // Returns all metric counters
+  rpc GetMetrics(GetMetricsRequest) returns (stream GetMetricsResponse);
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -173,6 +190,14 @@ message DetachNotificationRequest {
 
 message DeleteAudienceRequest {
   protos.Audience audience = 1;
+}
+
+message GetMetricsRequest {
+  // Nothing needed here, we return all metrics currently
+}
+
+message GetMetricsResponse {
+  map<string,protos.Metric> metrics = 1;
 }
 
 message TestRequest {

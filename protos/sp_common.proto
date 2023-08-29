@@ -44,3 +44,9 @@ message Audience {
   // Name for the consumer or producer
   string operation_name = 4;
 }
+
+message Metric {
+  string name = 1;
+  map<string, string> labels = 2;
+  double value = 3;
+}

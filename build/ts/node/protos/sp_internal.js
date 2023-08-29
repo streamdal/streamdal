@@ -6,6 +6,7 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Command } from "./sp_command.js";
 import { ClientInfo } from "./sp_info.js";
+import { Metric } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends MessageType {
@@ -48,24 +49,10 @@ class NotifyRequest$Type extends MessageType {
  */
 export const NotifyRequest = new NotifyRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Metrics$Type extends MessageType {
-    constructor() {
-        super("protos.Metrics", [
-            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
-            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.Metrics
- */
-export const Metrics = new Metrics$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class MetricsRequest$Type extends MessageType {
     constructor() {
         super("protos.MetricsRequest", [
-            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Metrics }
+            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Metric }
         ]);
     }
 }

@@ -2,6 +2,7 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Command } from "./sp_command.js";
 import { ClientInfo } from "./sp_info.js";
+import { Metric } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 /**
  * @generated from protobuf message protos.NewAudienceRequest
@@ -56,32 +57,13 @@ export interface NotifyRequest {
     occurredAtUnixTsUtc: bigint;
 }
 /**
- * @generated from protobuf message protos.Metrics
- */
-export interface Metrics {
-    /**
-     * @generated from protobuf field: string name = 1;
-     */
-    name: string;
-    /**
-     * @generated from protobuf field: map<string, string> labels = 2;
-     */
-    labels: {
-        [key: string]: string;
-    };
-    /**
-     * @generated from protobuf field: double value = 3;
-     */
-    value: number;
-}
-/**
  * @generated from protobuf message protos.MetricsRequest
  */
 export interface MetricsRequest {
     /**
-     * @generated from protobuf field: repeated protos.Metrics metrics = 1;
+     * @generated from protobuf field: repeated protos.Metric metrics = 1;
      */
-    metrics: Metrics[];
+    metrics: Metric[];
 }
 /**
  * @generated from protobuf message protos.RegisterRequest
@@ -182,13 +164,6 @@ declare class NotifyRequest$Type extends MessageType<NotifyRequest> {
  * @generated MessageType for protobuf message protos.NotifyRequest
  */
 export declare const NotifyRequest: NotifyRequest$Type;
-declare class Metrics$Type extends MessageType<Metrics> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.Metrics
- */
-export declare const Metrics: Metrics$Type;
 declare class MetricsRequest$Type extends MessageType<MetricsRequest> {
     constructor();
 }

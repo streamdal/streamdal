@@ -6,6 +6,7 @@ import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Command } from "./sp_command.js";
 import { ClientInfo } from "./sp_info.js";
+import { Metric } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 /**
  * @generated from protobuf message protos.NewAudienceRequest
@@ -60,32 +61,13 @@ export interface NotifyRequest {
     occurredAtUnixTsUtc: bigint;
 }
 /**
- * @generated from protobuf message protos.Metrics
- */
-export interface Metrics {
-    /**
-     * @generated from protobuf field: string name = 1;
-     */
-    name: string;
-    /**
-     * @generated from protobuf field: map<string, string> labels = 2;
-     */
-    labels: {
-        [key: string]: string;
-    };
-    /**
-     * @generated from protobuf field: double value = 3;
-     */
-    value: number;
-}
-/**
  * @generated from protobuf message protos.MetricsRequest
  */
 export interface MetricsRequest {
     /**
-     * @generated from protobuf field: repeated protos.Metrics metrics = 1;
+     * @generated from protobuf field: repeated protos.Metric metrics = 1;
      */
-    metrics: Metrics[];
+    metrics: Metric[];
 }
 /**
  * @generated from protobuf message protos.RegisterRequest
@@ -206,24 +188,10 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
  */
 export const NotifyRequest = new NotifyRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Metrics$Type extends MessageType<Metrics> {
-    constructor() {
-        super("protos.Metrics", [
-            { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
-            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.Metrics
- */
-export const Metrics = new Metrics$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class MetricsRequest$Type extends MessageType<MetricsRequest> {
     constructor() {
         super("protos.MetricsRequest", [
-            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Metrics }
+            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Metric }
         ]);
     }
 }

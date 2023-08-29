@@ -109,6 +109,23 @@ class GetAllResponse(_message.Message):
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
     def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
+class GetMetricsRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetMetricsResponse(_message.Message):
+    __slots__ = ["metrics"]
+    class MetricsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _sp_common_pb2.Metric
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_common_pb2.Metric, _Mapping]] = ...) -> None: ...
+    METRICS_FIELD_NUMBER: _ClassVar[int]
+    metrics: _containers.MessageMap[str, _sp_common_pb2.Metric]
+    def __init__(self, metrics: _Optional[_Mapping[str, _sp_common_pb2.Metric]] = ...) -> None: ...
+
 class GetNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]
     NOTIFICATION_ID_FIELD_NUMBER: _ClassVar[int]

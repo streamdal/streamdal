@@ -4,6 +4,7 @@
 import { StandardResponse } from "./sp_common.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
 import { PipelineInfo } from "./sp_info.js";
@@ -302,6 +303,28 @@ class DeleteAudienceRequest$Type extends MessageType {
  */
 export const DeleteAudienceRequest = new DeleteAudienceRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetMetricsRequest$Type extends MessageType {
+    constructor() {
+        super("protos.GetMetricsRequest", []);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetMetricsRequest
+ */
+export const GetMetricsRequest = new GetMetricsRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetMetricsResponse$Type extends MessageType {
+    constructor() {
+        super("protos.GetMetricsResponse", [
+            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Metric } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetMetricsResponse
+ */
+export const GetMetricsResponse = new GetMetricsResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType {
     constructor() {
         super("protos.TestRequest", [
@@ -348,6 +371,7 @@ export const External = new ServiceType("protos.External", [
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
+    { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);
 //# sourceMappingURL=sp_external.js.map
