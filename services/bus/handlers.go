@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
@@ -41,22 +42,24 @@ func (b *Bus) getPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
 	}
 
 	// Build list of all used pipelines
-	for aud, pid := range cfgs {
-		pu := &PipelineUsage{
-			PipelineId: pid,
-			Audience:   aud,
-		}
-
-		// Check if this pipeline is "active"
-		for _, l := range live {
-			if util.AudienceEquals(l.Audience, aud) {
-				pu.Active = true
-				pu.NodeName = l.NodeName
-				pu.SessionId = l.SessionID
+	for aud, pipelineIDs := range cfgs {
+		for _, pid := range pipelineIDs {
+			pu := &PipelineUsage{
+				PipelineId: pid,
+				Audience:   aud,
 			}
-		}
 
-		pipelines = append(pipelines, pu)
+			// Check if this pipeline is "active"
+			for _, l := range live {
+				if util.AudienceEquals(l.Audience, aud) {
+					pu.Active = true
+					pu.NodeName = l.NodeName
+					pu.SessionId = l.SessionID
+				}
+			}
+
+			pipelines = append(pipelines, pu)
+		}
 	}
 
 	return pipelines, nil
