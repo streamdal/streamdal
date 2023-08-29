@@ -96,7 +96,7 @@ export const detachPipeline = async (
   }
 };
 
-export const papusePipeline = async (
+export const pausePipeline = async (
   pipelineId: string,
   audience: Audience,
 ) => {
