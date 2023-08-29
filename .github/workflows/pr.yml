@@ -1,7 +1,7 @@
 name: Snitch Console - Pull Request
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,6 +13,6 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-        
+
       - name: Test
         run: deno task test
