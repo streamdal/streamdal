@@ -272,6 +272,15 @@ export interface DetachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.DeleteAudienceRequest
+ */
+export interface DeleteAudienceRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audiences = 1;
+     */
+    audiences?: Audience;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -570,6 +579,18 @@ class DetachNotificationRequest$Type extends MessageType<DetachNotificationReque
  */
 export const DetachNotificationRequest = new DetachNotificationRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
+    constructor() {
+        super("protos.DeleteAudienceRequest", [
+            { no: 1, name: "audiences", kind: "message", T: () => Audience }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteAudienceRequest
+ */
+export const DeleteAudienceRequest = new DeleteAudienceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -614,5 +635,6 @@ export const External = new ServiceType("protos.External", [
     { name: "GetNotification", options: {}, I: GetNotificationRequest, O: GetNotificationResponse },
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
+    { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

@@ -48,6 +48,8 @@ service External {
   rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
   rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
 
+  rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -164,6 +166,10 @@ message AttachNotificationRequest {
 message DetachNotificationRequest {
   string notification_id = 1;
   string pipeline_id = 2;
+}
+
+message DeleteAudienceRequest {
+  protos.Audience audiences = 1;
 }
 
 message TestRequest {

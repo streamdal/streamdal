@@ -268,6 +268,15 @@ export interface DetachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.DeleteAudienceRequest
+ */
+export interface DeleteAudienceRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audiences = 1;
+     */
+    audiences?: Audience;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -446,6 +455,13 @@ declare class DetachNotificationRequest$Type extends MessageType<DetachNotificat
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 export declare const DetachNotificationRequest: DetachNotificationRequest$Type;
+declare class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteAudienceRequest
+ */
+export declare const DeleteAudienceRequest: DeleteAudienceRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
 }
