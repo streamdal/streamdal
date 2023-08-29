@@ -717,7 +717,7 @@ var _ = Describe("External gRPC API", func() {
 	})
 
 	Describe("DeleteAudience", func() {
-		FIt("should fail if the audience is attached to a pipeline", func() {
+		It("should fail if the audience is attached to a pipeline", func() {
 			audience := &protos.Audience{
 				ComponentName: "kafka",
 				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
