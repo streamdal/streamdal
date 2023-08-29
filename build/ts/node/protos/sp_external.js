@@ -293,7 +293,7 @@ export const DetachNotificationRequest = new DetachNotificationRequest$Type();
 class DeleteAudienceRequest$Type extends MessageType {
     constructor() {
         super("protos.DeleteAudienceRequest", [
-            { no: 1, name: "audiences", kind: "message", T: () => Audience }
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }

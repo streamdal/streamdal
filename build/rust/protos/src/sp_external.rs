@@ -3038,8 +3038,8 @@ impl ::protobuf::reflect::ProtobufValue for DetachNotificationRequest {
 // @@protoc_insertion_point(message:protos.DeleteAudienceRequest)
 pub struct DeleteAudienceRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.DeleteAudienceRequest.audiences)
-    pub audiences: ::protobuf::MessageField<super::sp_common::Audience>,
+    // @@protoc_insertion_point(field:protos.DeleteAudienceRequest.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.DeleteAudienceRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -3060,9 +3060,9 @@ impl DeleteAudienceRequest {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
-            "audiences",
-            |m: &DeleteAudienceRequest| { &m.audiences },
-            |m: &mut DeleteAudienceRequest| { &mut m.audiences },
+            "audience",
+            |m: &DeleteAudienceRequest| { &m.audience },
+            |m: &mut DeleteAudienceRequest| { &mut m.audience },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<DeleteAudienceRequest>(
             "DeleteAudienceRequest",
@@ -3083,7 +3083,7 @@ impl ::protobuf::Message for DeleteAudienceRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audiences)?;
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -3097,7 +3097,7 @@ impl ::protobuf::Message for DeleteAudienceRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.audiences.as_ref() {
+        if let Some(v) = self.audience.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
@@ -3107,7 +3107,7 @@ impl ::protobuf::Message for DeleteAudienceRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.audiences.as_ref() {
+        if let Some(v) = self.audience.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -3127,13 +3127,13 @@ impl ::protobuf::Message for DeleteAudienceRequest {
     }
 
     fn clear(&mut self) {
-        self.audiences.clear();
+        self.audience.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static DeleteAudienceRequest {
         static instance: DeleteAudienceRequest = DeleteAudienceRequest {
-            audiences: ::protobuf::MessageField::none(),
+            audience: ::protobuf::MessageField::none(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -3449,10 +3449,10 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     n_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeline_id\x18\
     \x02\x20\x01(\tR\npipelineId\"e\n\x19DetachNotificationRequest\x12'\n\
     \x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bp\
-    ipeline_id\x18\x02\x20\x01(\tR\npipelineId\"G\n\x15DeleteAudienceRequest\
-    \x12.\n\taudiences\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\taudiences\
-    \"#\n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\
-    \n\x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\
+    ipeline_id\x18\x02\x20\x01(\tR\npipelineId\"E\n\x15DeleteAudienceRequest\
+    \x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audien\
+    ce\"#\n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"\
+    &\n\x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\
     \xaf\x0b\n\x08External\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\
     \x16.protos.GetAllResponse\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipe\
     linesRequest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\
@@ -3665,9 +3665,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x04\xa7\x01\t\x14\n\r\n\x05\x04\x16\x02\x01\x03\x12\x04\xa7\x01\x17\
     \x18\n\x0c\n\x02\x04\x17\x12\x06\xaa\x01\0\xac\x01\x01\n\x0b\n\x03\x04\
     \x17\x01\x12\x04\xaa\x01\x08\x1d\n\x0c\n\x04\x04\x17\x02\0\x12\x04\xab\
-    \x01\x02\x20\n\r\n\x05\x04\x17\x02\0\x06\x12\x04\xab\x01\x02\x11\n\r\n\
-    \x05\x04\x17\x02\0\x01\x12\x04\xab\x01\x12\x1b\n\r\n\x05\x04\x17\x02\0\
-    \x03\x12\x04\xab\x01\x1e\x1f\n\x0c\n\x02\x04\x18\x12\x06\xae\x01\0\xb0\
+    \x01\x02\x1f\n\r\n\x05\x04\x17\x02\0\x06\x12\x04\xab\x01\x02\x11\n\r\n\
+    \x05\x04\x17\x02\0\x01\x12\x04\xab\x01\x12\x1a\n\r\n\x05\x04\x17\x02\0\
+    \x03\x12\x04\xab\x01\x1d\x1e\n\x0c\n\x02\x04\x18\x12\x06\xae\x01\0\xb0\
     \x01\x01\n\x0b\n\x03\x04\x18\x01\x12\x04\xae\x01\x08\x13\n\x0c\n\x04\x04\
     \x18\x02\0\x12\x04\xaf\x01\x02\x13\n\r\n\x05\x04\x18\x02\0\x05\x12\x04\
     \xaf\x01\x02\x08\n\r\n\x05\x04\x18\x02\0\x01\x12\x04\xaf\x01\t\x0e\n\r\n\
