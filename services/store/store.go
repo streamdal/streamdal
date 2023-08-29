@@ -48,11 +48,12 @@ type IStore interface {
 	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
-	GetConfig(ctx context.Context) (map[*protos.Audience]string, error) // v: pipeline_id
+	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
+	DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
@@ -462,8 +463,51 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	return nil
 }
 
-func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience]string, error) {
-	cfgs := make(map[*protos.Audience]string)
+func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
+	var force bool
+	llog := s.log.WithField("method", "DeleteAudience")
+	llog.Debug("received request to delete audience")
+
+	// Check if there are configs
+	configs, err := s.GetConfig(ctx)
+	if err != nil {
+		s.log.Error(err)
+		return s.deleteAudienceKey(ctx, req.Audience)
+	}
+
+	// If we have configs and we're not forcing, we can't delete
+	pipelines, ok := configs[req.Audience]
+	if ok && !force {
+		return fmt.Errorf("audience is in use by pipeline '%s', cannot delete", pipelines)
+	}
+
+	return s.deleteAudienceKey(ctx, req.Audience)
+}
+
+func (s *Store) deleteAudienceKey(ctx context.Context, aud *protos.Audience) error {
+	// Delete audience from bucket
+	audStr := util.AudienceToStr(aud)
+	if err := s.options.NATSBackend.Delete(
+		ctx,
+		NATSAudienceBucket,
+		NATSAudienceKey(audStr),
+	); err != nil {
+		if err == nats.ErrBucketNotFound {
+			return nil
+		}
+
+		if err == nats.ErrKeyNotFound {
+			s.log.Debugf("audience '%s' not found; nothing to do", audStr)
+			return nil
+		}
+		return errors.Wrap(err, "error deleting audience from NATS")
+	}
+
+	return nil
+}
+
+func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) {
+	cfgs := make(map[*protos.Audience][]string)
 
 	audienceKeys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
 	if err != nil {
@@ -481,7 +525,11 @@ func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience]string, err
 			return nil, fmt.Errorf("invalid config key '%s'", aud)
 		}
 
-		cfgs[audience] = pipelineID
+		if cfgs[audience] == nil {
+			cfgs[audience] = make([]string, 0)
+		}
+
+		cfgs[audience] = append(cfgs[audience], pipelineID)
 	}
 
 	return cfgs, nil

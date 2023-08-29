@@ -47,12 +47,12 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	config, err := s.Options.StoreService.GetConfig(ctx)
+	configs, err := s.Options.StoreService.GetConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
 
-	configStrAudience := util.ConvertConfigStrAudience(config)
+	configStrAudience := util.ConvertConfigStrAudience(configs)
 
 	return &protos.GetAllResponse{
 		Live:      liveInfo,
@@ -136,9 +136,11 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	}
 
 	// Update pipeline info with info about attached pipelines
-	for aud, pipelineID := range pipelineConfig {
-		if _, ok := gen[pipelineID]; ok {
-			gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
+	for aud, pipelineIDs := range pipelineConfig {
+		for _, pipelineID := range pipelineIDs {
+			if _, ok := gen[pipelineID]; ok {
+				gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
+			}
 		}
 	}
 
@@ -521,6 +523,22 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: "Notification config detached",
+	}, nil
+}
+
+func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteAudienceRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if err := s.Options.StoreService.DeleteAudience(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Audience deleted",
 	}, nil
 }
 

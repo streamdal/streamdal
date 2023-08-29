@@ -715,6 +715,66 @@ var _ = Describe("External gRPC API", func() {
 			Expect(err).To(Equal(nats.ErrKeyNotFound))
 		})
 	})
+
+	Describe("DeleteAudience", func() {
+		It("should fail if the audience is attached to a pipeline", func() {
+			audience := &protos.Audience{
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
+				ServiceName:   "test-service",
+			}
+
+			// Put audience key in snitch_config
+			key := store.NATSConfigKey(audience, "test-pipeline-id")
+			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, key, []byte(``))
+			Expect(err).ToNot(HaveOccurred())
+
+			// Put audience-pipeline mapping in snitch_config
+			key = store.NATSConfigKey(audience, "test-pipeline-id")
+			err = natsClient.Put(context.Background(), store.NATSConfigBucket, key, []byte(``))
+			Expect(err).ToNot(HaveOccurred())
+
+			// Try to delete audience
+			resp, err := externalClient.DeleteAudience(ctxWithGoodAuth, &protos.DeleteAudienceRequest{
+				Audience: audience,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			// Verify key has been deleted from nats
+			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, key)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should delete the audience", func() {
+			audience := &protos.Audience{
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "consumer-name",
+				ServiceName:   "test-service",
+			}
+
+			// Put audience key in snitch_config
+			key := store.NATSAudienceKey(util.AudienceToStr(audience))
+			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, key, []byte(``))
+			Expect(err).ToNot(HaveOccurred())
+
+			// Delete audience
+			resp, err := externalClient.DeleteAudience(ctxWithGoodAuth, &protos.DeleteAudienceRequest{
+				Audience: audience,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			// Verify key has been deleted from nats
+			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, key)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(nats.ErrKeyNotFound))
+		})
+	})
 })
 
 func runServer() {
