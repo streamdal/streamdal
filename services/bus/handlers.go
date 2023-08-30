@@ -8,6 +8,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/types"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -538,5 +539,29 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 
 	b.log.Debug("handled kv request bus event")
 
+	return nil
+}
+
+func (b *Bus) handleRegisterRequest(shutdownCtx context.Context, req *protos.RegisterRequest) error {
+	b.log.Debugf("handling delete audience request bus event: %v", req)
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register handler")
+	return nil
+}
+
+func (b *Bus) handleDeleteAudienceRequest(shutdownCtx context.Context, req *protos.DeleteAudienceRequest) error {
+	b.log.Debugf("handling delete audience request bus event: %v", req)
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience handler")
+	return nil
+}
+
+func (b *Bus) handleDeregisterRequest(ctx context.Context, req *protos.DeregisterRequest) error {
+	b.log.Debugf("handling delete register request bus event: %v", req)
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via deregister handler")
+	return nil
+}
+
+func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudienceRequest) error {
+	b.log.Debugf("handling new audience request bus event: %v", req)
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience handler")
 	return nil
 }

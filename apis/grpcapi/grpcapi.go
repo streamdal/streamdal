@@ -17,6 +17,7 @@ import (
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/notify"
+	"github.com/streamdal/snitch-server/services/pubsub"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 )
@@ -46,6 +47,7 @@ type Options struct {
 	CmdService      cmd.ICmd
 	NotifyService   notify.INotifier
 	NATSBackend     natty.INatty
+	PubSubService   pubsub.IPubSub
 }
 
 func New(o *Options) (*GRPCAPI, error) {
@@ -213,6 +215,10 @@ func validateOptions(o *Options) error {
 
 	if o.NATSBackend == nil {
 		return errors.New("options.NATSBackend cannot be nil")
+	}
+
+	if o.PubSubService == nil {
+		return errors.New("options.PubSubService cannot be nil")
 	}
 
 	return nil
