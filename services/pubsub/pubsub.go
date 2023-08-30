@@ -84,7 +84,10 @@ func (ps *PubSub) Close(topic, channelID string) {
 	}
 
 	delete(ps.topics[topic], channelID)
-	close(ch)
+
+	if ch != nil {
+		close(ch)
+	}
 }
 
 func (ps *PubSub) Publish(topic string, data string) {

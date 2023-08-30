@@ -86,6 +86,10 @@ func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.E
 		return fmt.Errorf("unable to send initial GetAll response: %s", err)
 	}
 
+	// Cleanup after Listen()
+	requestID := util.CtxRequestId(server.Context())
+	defer s.Options.PubSubService.Close(types.PubSubChangesTopic, requestID)
+
 MAIN:
 	for {
 		select {
@@ -95,7 +99,7 @@ MAIN:
 		case <-s.Options.ShutdownContext.Done():
 			llog.Debug("server shutting down")
 			break MAIN
-		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic):
+		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
 			llog.Debug("received changes message via pubsub")
 
 			// Generate a GetAllResponse
