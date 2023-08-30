@@ -176,10 +176,11 @@ class TailResponse(betterproto.Message):
     type: "TailResponseType" = betterproto.enum_field(1)
     audience: "Audience" = betterproto.message_field(2)
     pipeline_id: str = betterproto.string_field(3)
-    timestamp_ns: int = betterproto.int64_field(4)
+    session_id: str = betterproto.string_field(4)
+    timestamp_ns: int = betterproto.int64_field(5)
     """Timestamp in nanoseconds"""
 
-    data: bytes = betterproto.bytes_field(5)
+    data: bytes = betterproto.bytes_field(6)
     """
     Payload data. For errors, this will be the error message For payloads, this
     will be JSON of the payload data, post processing

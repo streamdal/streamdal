@@ -135,8 +135,9 @@ class TailResponse$Type extends MessageType {
             { no: 1, name: "type", kind: "enum", T: () => ["protos.TailResponseType", TailResponseType, "TAIL_RESPONSE_TYPE_"] },
             { no: 2, name: "audience", kind: "message", T: () => Audience },
             { no: 3, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 5, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 4, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 6, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }
