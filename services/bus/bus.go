@@ -12,9 +12,9 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-server/apis/grpcapi"
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/metrics"
+	"github.com/streamdal/snitch-server/services/pubsub"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -60,15 +60,14 @@ type Bus struct {
 }
 
 type Options struct {
-	Store              store.IStore
-	NATS               natty.INatty
-	Metrics            metrics.IMetrics
-	Cmd                cmd.ICmd
-	NodeName           string
-	WASMDir            string
-	ChangeOccurredFunc func()
-	ShutdownCtx        context.Context
-	ExternalGRPCServer grpcapi.IExternalGRPCServer
+	Store       store.IStore
+	NATS        natty.INatty
+	Metrics     metrics.IMetrics
+	Cmd         cmd.ICmd
+	NodeName    string
+	WASMDir     string
+	ShutdownCtx context.Context
+	PubSub      pubsub.IPubSub
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -129,8 +128,8 @@ func (o *Options) validate() error {
 		return errors.New("metrics service must be provided")
 	}
 
-	if o.ChangeOccurredFunc == nil {
-		return errors.New("change occurred func must be provided")
+	if o.PubSub == nil {
+		return errors.New("pubsub must be provided")
 	}
 
 	return nil

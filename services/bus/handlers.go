@@ -8,6 +8,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/types"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -541,20 +542,14 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 	return nil
 }
 
-// TODO: Implement
 func (b *Bus) handleRegisterRequest(shutdownCtx context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("handling delete audience request bus event: %v", req)
-
-	b.options.ExternalGRPCServer.ChangeOccurred()
-
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register handler")
 	return nil
 }
 
-// TODO: Implement
 func (b *Bus) handleDeleteAudienceRequest(shutdownCtx context.Context, req *protos.DeleteAudienceRequest) error {
 	b.log.Debugf("handling delete audience request bus event: %v", req)
-
-	b.options.ExternalGRPCServer.ChangeOccurred()
-
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience handler")
 	return nil
 }

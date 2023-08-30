@@ -11,6 +11,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/types"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -76,14 +77,30 @@ MAIN:
 	for {
 		select {
 		case <-server.Context().Done():
-			llog.Debug("GetAllStream: client closed connection")
+			llog.Debug("client closed connection")
 			break MAIN
 		case <-s.Options.ShutdownContext.Done():
-			llog.Debug("GetAllStream: server shutting down")
+			llog.Debug("server shutting down")
 			break MAIN
-		default: // TODO: Remove default, add case for something new becoming live
+		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic):
+			llog.Debug("received changes message via pubsub")
+
+			// Generate a GetAllResponse
+			resp, err := s.GetAll(server.Context(), req)
+			if err != nil {
+				llog.Errorf("unable to complete GetAll: %s", err)
+				continue
+			}
+
+			// Send response
+			if err := server.Send(resp); err != nil {
+				llog.Errorf("unable to send GetAll response: %s", err)
+				continue
+			}
 		}
 	}
+
+	llog.Debug("closing stream")
 
 	return nil
 }

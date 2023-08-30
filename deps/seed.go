@@ -8,6 +8,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+
 	"github.com/streamdal/snitch-server/util"
 )
 
@@ -162,7 +163,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	}
 
 	metrics := &protos.MetricsRequest{
-		Metrics: []*protos.Metrics{
+		Metrics: []*protos.Metric{
 			{Name: "counter_produce_bytes", Labels: labels1, Value: float64(rand.Int63())},
 			{Name: "counter_produce_errors", Labels: labels1, Value: float64(rand.Int63())},
 			{Name: "counter_produce_processed", Labels: labels1, Value: float64(rand.Int63())},

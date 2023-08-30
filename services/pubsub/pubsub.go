@@ -8,6 +8,13 @@ import (
 	"github.com/streamdal/snitch-server/util"
 )
 
+type IPubSub interface {
+	Listen(topic string, channelID ...string) chan string
+	Publish(topic string, data string)
+	Close(topic, channelID string)
+	Reset()
+}
+
 type PubSub struct {
 	topics map[string]map[string]chan string // k1: topic k2: subscriber id v: channel
 	mtx    *sync.RWMutex

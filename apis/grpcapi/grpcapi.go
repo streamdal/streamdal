@@ -17,6 +17,7 @@ import (
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/notify"
+	"github.com/streamdal/snitch-server/services/pubsub"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 )
@@ -50,6 +51,7 @@ type Options struct {
 	CmdService      cmd.ICmd
 	NotifyService   notify.INotifier
 	NATSBackend     natty.INatty
+	PubSubService   pubsub.IPubSub
 }
 
 func New(o *Options) (*GRPCAPI, error) {
@@ -61,17 +63,6 @@ func New(o *Options) (*GRPCAPI, error) {
 		Options: o,
 		log:     logrus.WithField("pkg", "grpcapi"),
 	}, nil
-}
-
-// TODO: This would be called by bus handler(s) to announce a change
-func (g *GRPCAPI) InternalUpdate() {
-	// TODO: If change occurred channel is open, write to it; if closed, do nothing
-
-}
-
-// TODO: This would be called by external server to begin listening for changes
-func (g *GRPCAPI) GetInternalUpdateChan() chan struct{} {
-	return nil
 }
 
 func (g *GRPCAPI) Run() error {
@@ -228,6 +219,10 @@ func validateOptions(o *Options) error {
 
 	if o.NATSBackend == nil {
 		return errors.New("options.NATSBackend cannot be nil")
+	}
+
+	if o.PubSubService == nil {
+		return errors.New("options.PubSubService cannot be nil")
 	}
 
 	return nil
