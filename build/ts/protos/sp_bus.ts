@@ -2,6 +2,7 @@
 // @generated from protobuf file "sp_bus.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { NewAudienceRequest } from "./sp_internal.js";
 import { DeleteAudienceRequest } from "./sp_external.js";
 import { KVRequest } from "./sp_kv.js";
 import { MetricsRequest } from "./sp_internal.js";
@@ -100,6 +101,12 @@ export interface BusEvent {
          */
         deleteAudienceRequest: DeleteAudienceRequest;
     } | {
+        oneofKind: "newAudienceRequest";
+        /**
+         * @generated from protobuf field: protos.NewAudienceRequest new_audience_request = 112;
+         */
+        newAudienceRequest: NewAudienceRequest;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -137,6 +144,7 @@ class BusEvent$Type extends MessageType<BusEvent> {
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => MetricsRequest },
             { no: 110, name: "kv_request", kind: "message", oneof: "event", T: () => KVRequest },
             { no: 111, name: "delete_audience_request", kind: "message", oneof: "event", T: () => DeleteAudienceRequest },
+            { no: 112, name: "new_audience_request", kind: "message", oneof: "event", T: () => NewAudienceRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
