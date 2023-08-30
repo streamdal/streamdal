@@ -27,8 +27,6 @@ export default function OpModal(
   const attachedPipeline = opModal.value?.attachedPipeline;
   const opType = OperationType[audience?.operationType];
 
-  console.log(opType);
-
   const [isOpen, setIsOpen] = useState(false);
 
   useSignalEffect(() => {
