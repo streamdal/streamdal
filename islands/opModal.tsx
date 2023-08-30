@@ -17,7 +17,8 @@ import { PausePipelineModal } from "../components/modals/pausePipelineModal.tsx"
 import { DetachPipelineModal } from "../components/modals/detachPipelineModal.tsx";
 import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
+import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
 
 export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -28,11 +29,11 @@ export default function OpModal(
 
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    if (opModal.value !== null) {
+  useSignalEffect(() => {
+    if (opModal.value) {
       setIsOpen(true);
     }
-  }, [audience]);
+  });
 
   return (
     <>
@@ -119,7 +120,7 @@ export default function OpModal(
                     </div>
                     {
                       /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                                                                                                                                                                                                                                 the content of the modal but keep the modal open*/
+                                                                                                                                                                                                                                                                                             the content of the modal but keep the modal open*/
                     }
                     {/*<button*/}
                     {/*  type="button"*/}
