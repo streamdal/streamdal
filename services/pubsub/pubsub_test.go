@@ -80,7 +80,12 @@ var _ = Describe("PubSub", func() {
 	})
 
 	Describe("Close", func() {
-		It("map of channels should not contain entry", func() {
+		It("should not panic when closing non-existing topic", func() {
+			ps := New()
+			ps.Close("test", "foobar")
+		})
+
+		It("map of channels should not contain entry after Close", func() {
 			ps := New()
 			channelID := util.GenerateUUID()
 			wg := &sync.WaitGroup{}

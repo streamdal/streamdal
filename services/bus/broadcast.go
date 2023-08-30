@@ -51,6 +51,10 @@ func (b *Bus) BroadcastDeregister(ctx context.Context, req *protos.DeregisterReq
 	return b.broadcast(ctx, "deregister", &protos.BusEvent{Event: &protos.BusEvent_DeregisterRequest{DeregisterRequest: req}})
 }
 
+func (b *Bus) BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
+	return b.broadcast(ctx, "new_audience", &protos.BusEvent{Event: &protos.BusEvent_NewAudienceRequest{NewAudienceRequest: req}})
+}
+
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
 // it to other snitch-server nodes.
 func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {

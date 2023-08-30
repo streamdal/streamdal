@@ -53,6 +53,7 @@ type IBus interface {
 	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
 	BroadcastKVDelete(ctx context.Context, key string) error
 	BroadcastKVDeleteAll(ctx context.Context) error
+	BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 }
 
 type Bus struct {
@@ -208,6 +209,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handleRegisterRequest(shutdownCtx, busEvent.GetRegisterRequest())
 	case *protos.BusEvent_DeregisterRequest:
 		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
+	case *protos.BusEvent_NewAudienceRequest:
+		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
 		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:

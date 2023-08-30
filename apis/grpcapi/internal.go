@@ -311,6 +311,11 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		}, nil
 	}
 
+	// Broadcast audience creation so that we can notify UI GetAllStream clients
+	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
+		s.log.Errorf("unable to broadcast new audience: %s", err.Error())
+	}
+
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
