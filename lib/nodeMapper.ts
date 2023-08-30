@@ -1,8 +1,9 @@
 import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { ClientInfo, LiveInfo } from "snitch-protos/protos/sp_info.ts";
+import { ClientInfo } from "snitch-protos/protos/sp_info.ts";
 import { ServiceMapType } from "./fetch.ts";
 import {
+  audienceKey,
   componentKey,
   getAttachedPipeline,
   groupKey,
@@ -99,13 +100,7 @@ export const mapOperation = (
     extent: "parent",
     data: {
       audience: a,
-      clients: serviceMap.live?.filter((l: LiveInfo) =>
-        l.audiences?.includes(a)
-      )?.map(
-        (
-          l: LiveInfo,
-        ) => l.client,
-      ) as ClientInfo[],
+      clients: serviceMap.liveAudiences.get(audienceKey(a)),
       attachedPipeline: getAttachedPipeline(
         a,
         serviceMap.pipelines,
