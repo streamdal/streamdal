@@ -103,16 +103,20 @@ export interface TailResponse {
      */
     audience?: Audience;
     /**
+     * @generated from protobuf field: string pipeline_id = 3;
+     */
+    pipelineId: string;
+    /**
      * Timestamp in nanoseconds
      *
-     * @generated from protobuf field: int64 timestamp_ns = 3;
+     * @generated from protobuf field: int64 timestamp_ns = 4;
      */
     timestampNs: bigint;
     /**
      * Payload data. For errors, this will be the error message
      * For payloads, this will be JSON of the payload data, post processing
      *
-     * @generated from protobuf field: bytes data = 4;
+     * @generated from protobuf field: bytes data = 5;
      */
     data: Uint8Array;
 }
@@ -254,8 +258,9 @@ class TailResponse$Type extends MessageType<TailResponse> {
         super("protos.TailResponse", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.TailResponseType", TailResponseType, "TAIL_RESPONSE_TYPE_"] },
             { no: 2, name: "audience", kind: "message", T: () => Audience },
-            { no: 3, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 3, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 5, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }

@@ -100,16 +100,20 @@ export interface TailResponse {
      */
     audience?: Audience;
     /**
+     * @generated from protobuf field: string pipeline_id = 3;
+     */
+    pipelineId: string;
+    /**
      * Timestamp in nanoseconds
      *
-     * @generated from protobuf field: int64 timestamp_ns = 3;
+     * @generated from protobuf field: int64 timestamp_ns = 4;
      */
     timestampNs: bigint;
     /**
      * Payload data. For errors, this will be the error message
      * For payloads, this will be JSON of the payload data, post processing
      *
-     * @generated from protobuf field: bytes data = 4;
+     * @generated from protobuf field: bytes data = 5;
      */
     data: Uint8Array;
 }

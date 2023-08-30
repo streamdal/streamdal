@@ -72,16 +72,18 @@ class TailRequest(_message.Message):
     def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
 class TailResponse(_message.Message):
-    __slots__ = ["audience", "data", "timestamp_ns", "type"]
+    __slots__ = ["audience", "data", "pipeline_id", "timestamp_ns", "type"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_NS_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     audience: Audience
     data: bytes
+    pipeline_id: str
     timestamp_ns: int
     type: TailResponseType
-    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., timestamp_ns: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
 
 class ResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

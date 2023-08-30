@@ -69,12 +69,14 @@ message TailResponse {
 
   Audience audience = 2;
 
+  string pipeline_id = 3;
+
   // Timestamp in nanoseconds
-  int64 timestamp_ns = 3;
+  int64 timestamp_ns = 4;
 
   // Payload data. For errors, this will be the error message
   // For payloads, this will be JSON of the payload data, post processing
-  bytes data = 4;
+  bytes data = 5;
 }
 
 message TailCommand {
