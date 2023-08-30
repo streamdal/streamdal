@@ -24,8 +24,11 @@ export const mapLiveAudiences = (live: LiveInfo[]) => {
     for (const a of l.audiences) {
       const key = audienceKey(a);
       liveAudiences.has(key)
-        ? liveAudiences.set(key, [...liveAudiences.get(key), l.client])
-        : liveAudiences.set(key, [l.client]);
+        ? liveAudiences.set(key, [
+          ...liveAudiences.get(key) as ClientInfo[],
+          l.client as ClientInfo,
+        ])
+        : liveAudiences.set(key, [l.client] as ClientInfo[]);
     }
   }
   return liveAudiences;
