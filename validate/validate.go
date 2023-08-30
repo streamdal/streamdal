@@ -281,6 +281,10 @@ func PausePipelineRequest(req *protos.PausePipelineRequest) error {
 		return ErrEmptyField("PipelineId")
 	}
 
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
+	}
+
 	return nil
 }
 
@@ -291,6 +295,10 @@ func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
 
 	if req.PipelineId == "" {
 		return ErrEmptyField("PipelineId")
+	}
+
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
 	}
 
 	return nil
