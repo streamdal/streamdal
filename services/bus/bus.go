@@ -12,6 +12,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/streamdal/snitch-server/apis/grpcapi"
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/store"
@@ -38,6 +39,8 @@ const (
 
 type IBus interface {
 	RunConsumer() error
+	BroadcastRegister(ctx context.Context, req *protos.RegisterRequest) error
+	BroadcastDeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
 	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
@@ -57,13 +60,15 @@ type Bus struct {
 }
 
 type Options struct {
-	Store       store.IStore
-	NATS        natty.INatty
-	Metrics     metrics.IMetrics
-	Cmd         cmd.ICmd
-	NodeName    string
-	WASMDir     string
-	ShutdownCtx context.Context
+	Store              store.IStore
+	NATS               natty.INatty
+	Metrics            metrics.IMetrics
+	Cmd                cmd.ICmd
+	NodeName           string
+	WASMDir            string
+	ChangeOccurredFunc func()
+	ShutdownCtx        context.Context
+	ExternalGRPCServer grpcapi.IExternalGRPCServer
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -122,6 +127,10 @@ func (o *Options) validate() error {
 
 	if o.Metrics == nil {
 		return errors.New("metrics service must be provided")
+	}
+
+	if o.ChangeOccurredFunc == nil {
+		return errors.New("change occurred func must be provided")
 	}
 
 	return nil
@@ -195,6 +204,10 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	var err error
 
 	switch t := busEvent.Event.(type) {
+	case *protos.BusEvent_RegisterRequest:
+		err = b.handleRegisterRequest(shutdownCtx, busEvent.GetRegisterRequest())
+	case *protos.BusEvent_DeleteAudienceRequest:
+		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:
 		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
 	case *protos.BusEvent_DeletePipelineRequest:

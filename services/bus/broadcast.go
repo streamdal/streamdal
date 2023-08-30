@@ -39,6 +39,14 @@ func (b *Bus) BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) 
 	return b.broadcast(ctx, "metrics", &protos.BusEvent{Event: &protos.BusEvent_MetricsRequest{MetricsRequest: req}})
 }
 
+func (b *Bus) BroadcastRegister(ctx context.Context, req *protos.RegisterRequest) error {
+	return b.broadcast(ctx, "register", &protos.BusEvent{Event: &protos.BusEvent_RegisterRequest{RegisterRequest: req}})
+}
+
+func (b *Bus) BroadcastDeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
+	return b.broadcast(ctx, "delete_audience", &protos.BusEvent{Event: &protos.BusEvent_DeleteAudienceRequest{DeleteAudienceRequest: req}})
+}
+
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
 // it to other snitch-server nodes.
 func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {

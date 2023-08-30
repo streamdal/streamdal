@@ -33,6 +33,10 @@ var (
 	GRPCMissingMetadataError = errors.New("missing metadata; misconfigured grpc client?")
 )
 
+type IGRPCAPI interface {
+	ChangeOccurred()
+}
+
 type GRPCAPI struct {
 	Options *Options
 	log     *logrus.Entry
@@ -57,6 +61,17 @@ func New(o *Options) (*GRPCAPI, error) {
 		Options: o,
 		log:     logrus.WithField("pkg", "grpcapi"),
 	}, nil
+}
+
+// TODO: This would be called by bus handler(s) to announce a change
+func (g *GRPCAPI) InternalUpdate() {
+	// TODO: If change occurred channel is open, write to it; if closed, do nothing
+
+}
+
+// TODO: This would be called by external server to begin listening for changes
+func (g *GRPCAPI) GetInternalUpdateChan() chan struct{} {
+	return nil
 }
 
 func (g *GRPCAPI) Run() error {

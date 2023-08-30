@@ -540,3 +540,21 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 
 	return nil
 }
+
+// TODO: Implement
+func (b *Bus) handleRegisterRequest(shutdownCtx context.Context, req *protos.RegisterRequest) error {
+	b.log.Debugf("handling delete audience request bus event: %v", req)
+
+	b.options.ExternalGRPCServer.ChangeOccurred()
+
+	return nil
+}
+
+// TODO: Implement
+func (b *Bus) handleDeleteAudienceRequest(shutdownCtx context.Context, req *protos.DeleteAudienceRequest) error {
+	b.log.Debugf("handling delete audience request bus event: %v", req)
+
+	b.options.ExternalGRPCServer.ChangeOccurred()
+
+	return nil
+}
