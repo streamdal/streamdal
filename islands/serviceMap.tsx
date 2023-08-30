@@ -1,9 +1,4 @@
-import ReactFlow, {
-  Background,
-  Controls,
-  useEdgesState,
-  useNodesState,
-} from "reactflow";
+import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
 import "flowbite";
 import {
   ComponentNode,
@@ -83,10 +78,6 @@ export default function ServiceMap(
         defaultViewport={defaultViewport}
       >
         <Background style={{ height: "100vh" }} />
-        <Controls
-          position="top-right"
-          className="absolute top-[100px]"
-        />
       </ReactFlow>
     </div>
   );

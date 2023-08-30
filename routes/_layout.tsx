@@ -3,6 +3,7 @@ import { getDisplayNodes, getServiceMap } from "../lib/fetch.ts";
 import ServiceMap, { serviceSignal } from "../islands/serviceMap.tsx";
 import { NavBar } from "../components/nav/nav.tsx";
 import { ReactFlowProvider } from "reactflow";
+import OpModal from "../islands/opModal.tsx";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
   const serviceMap = await getServiceMap();
@@ -12,6 +13,9 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
   return (
     <>
       <NavBar />
+      <OpModal
+        serviceMap={serviceSignal.value}
+      />
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />
