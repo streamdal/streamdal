@@ -40,6 +40,7 @@ const (
 type IBus interface {
 	RunConsumer() error
 	BroadcastRegister(ctx context.Context, req *protos.RegisterRequest) error
+	BroadcastDeregister(ctx context.Context, req *protos.DeregisterRequest) error
 	BroadcastDeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
@@ -205,6 +206,8 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	switch t := busEvent.Event.(type) {
 	case *protos.BusEvent_RegisterRequest:
 		err = b.handleRegisterRequest(shutdownCtx, busEvent.GetRegisterRequest())
+	case *protos.BusEvent_DeregisterRequest:
+		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
 		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:

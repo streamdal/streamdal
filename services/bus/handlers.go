@@ -553,3 +553,9 @@ func (b *Bus) handleDeleteAudienceRequest(shutdownCtx context.Context, req *prot
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience handler")
 	return nil
 }
+
+func (b *Bus) handleDeregisterRequest(ctx context.Context, req *protos.DeregisterRequest) error {
+	b.log.Debugf("handling delete register request bus event: %v", req)
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via deregister handler")
+	return nil
+}

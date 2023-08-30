@@ -138,7 +138,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrapf(err, "unable to start heartbeat watcher for session id '%s'", request.SessionId)
 	}
 
-	// TODO: Broadcast registration to all nodes which will trigger handlers to push
+	// Broadcast registration to all nodes which will trigger handlers to push
 	// an update to GetAllStream() chan
 	if err := s.Options.BusService.BroadcastRegister(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to broadcast register")
@@ -204,14 +204,19 @@ MAIN:
 		llog.Debugf("no channel found for session id '%s'", request.SessionId)
 	}
 
-	// NOTE: No need to announce de-registration to other nodes because we want
-	// the UI to keep displaying nodes even if they're not attached.
-
-	if err := s.Options.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
+	deregisterRequest := &protos.DeregisterRequest{
 		ServiceName: request.ServiceName,
 		SessionId:   request.SessionId,
-	}); err != nil {
+	}
+
+	if err := s.Options.StoreService.DeleteRegistration(server.Context(), deregisterRequest); err != nil {
 		return errors.Wrap(err, "unable to delete registration")
+	}
+
+	// TODO: Announce de-registration - the UI will still display the audience(s) but
+	// they no longer will be live (ie. attached clients will decrease)
+	if err := s.Options.BusService.BroadcastDeregister(server.Context(), deregisterRequest); err != nil {
+		llog.Errorf("unable to broadcast deregister event for session id '%s': %v", deregisterRequest.SessionId, err)
 	}
 
 	return nil

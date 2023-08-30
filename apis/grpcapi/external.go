@@ -73,6 +73,19 @@ func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.E
 		"method": "GetAllStream",
 	})
 
+	// Generate initial GetAllResponse
+	resp, err := s.GetAll(server.Context(), req)
+	if err != nil {
+		llog.Errorf("unable to complete initial GetAll: %s", err)
+		return fmt.Errorf("unable to complete initial GetAll: %s", err)
+	}
+
+	// Send initial response
+	if err := server.Send(resp); err != nil {
+		llog.Errorf("unable to send initial GetAll response: %s", err)
+		return fmt.Errorf("unable to send initial GetAll response: %s", err)
+	}
+
 MAIN:
 	for {
 		select {
@@ -578,7 +591,7 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// TODO: Broadcast delete to other nodes so that they can emit an event for GetAllStream()
+	// Broadcast delete to other nodes so that they can emit an event for GetAllStream()
 	if err := s.Options.BusService.BroadcastDeleteAudience(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
