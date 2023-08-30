@@ -87,3 +87,9 @@ export const getAttachedPipeline = async (name: string) => {
   );
   return attachedPipelineName;
 };
+
+export const getNotifications = async () => {
+  const { response } = await client.getNotifications({}, meta);
+
+  return response.notifications;
+};
