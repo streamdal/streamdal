@@ -1,3 +1,4 @@
+import sp_common_pb2 as _sp_common_pb2
 import sp_external_pb2 as _sp_external_pb2
 import sp_internal_pb2 as _sp_internal_pb2
 import sp_kv_pb2 as _sp_kv_pb2
@@ -9,7 +10,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class BusEvent(_message.Message):
-    __slots__ = ["_metadata", "attach_pipeline_request", "create_pipeline_request", "delete_audience_request", "delete_pipeline_request", "deregister_request", "detach_pipeline_request", "kv_request", "metrics_request", "pause_pipeline_request", "register_request", "resume_pipeline_request", "source", "update_pipeline_request"]
+    __slots__ = ["_metadata", "attach_pipeline_request", "create_pipeline_request", "delete_audience_request", "delete_pipeline_request", "deregister_request", "detach_pipeline_request", "kv_request", "metrics_request", "pause_pipeline_request", "register_request", "resume_pipeline_request", "source", "tail_request", "update_pipeline_request"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -29,6 +30,7 @@ class BusEvent(_message.Message):
     REGISTER_REQUEST_FIELD_NUMBER: _ClassVar[int]
     RESUME_PIPELINE_REQUEST_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
+    TAIL_REQUEST_FIELD_NUMBER: _ClassVar[int]
     UPDATE_PIPELINE_REQUEST_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
     _metadata: _containers.ScalarMap[str, str]
@@ -44,5 +46,6 @@ class BusEvent(_message.Message):
     register_request: _sp_internal_pb2.RegisterRequest
     resume_pipeline_request: _sp_external_pb2.ResumePipelineRequest
     source: str
+    tail_request: _sp_common_pb2.TailRequest
     update_pipeline_request: _sp_external_pb2.UpdatePipelineRequest
-    def __init__(self, source: _Optional[str] = ..., register_request: _Optional[_Union[_sp_internal_pb2.RegisterRequest, _Mapping]] = ..., deregister_request: _Optional[_Union[_sp_internal_pb2.DeregisterRequest, _Mapping]] = ..., create_pipeline_request: _Optional[_Union[_sp_external_pb2.CreatePipelineRequest, _Mapping]] = ..., delete_pipeline_request: _Optional[_Union[_sp_external_pb2.DeletePipelineRequest, _Mapping]] = ..., update_pipeline_request: _Optional[_Union[_sp_external_pb2.UpdatePipelineRequest, _Mapping]] = ..., attach_pipeline_request: _Optional[_Union[_sp_external_pb2.AttachPipelineRequest, _Mapping]] = ..., detach_pipeline_request: _Optional[_Union[_sp_external_pb2.DetachPipelineRequest, _Mapping]] = ..., pause_pipeline_request: _Optional[_Union[_sp_external_pb2.PausePipelineRequest, _Mapping]] = ..., resume_pipeline_request: _Optional[_Union[_sp_external_pb2.ResumePipelineRequest, _Mapping]] = ..., metrics_request: _Optional[_Union[_sp_internal_pb2.MetricsRequest, _Mapping]] = ..., kv_request: _Optional[_Union[_sp_kv_pb2.KVRequest, _Mapping]] = ..., delete_audience_request: _Optional[_Union[_sp_external_pb2.DeleteAudienceRequest, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, source: _Optional[str] = ..., register_request: _Optional[_Union[_sp_internal_pb2.RegisterRequest, _Mapping]] = ..., deregister_request: _Optional[_Union[_sp_internal_pb2.DeregisterRequest, _Mapping]] = ..., create_pipeline_request: _Optional[_Union[_sp_external_pb2.CreatePipelineRequest, _Mapping]] = ..., delete_pipeline_request: _Optional[_Union[_sp_external_pb2.DeletePipelineRequest, _Mapping]] = ..., update_pipeline_request: _Optional[_Union[_sp_external_pb2.UpdatePipelineRequest, _Mapping]] = ..., attach_pipeline_request: _Optional[_Union[_sp_external_pb2.AttachPipelineRequest, _Mapping]] = ..., detach_pipeline_request: _Optional[_Union[_sp_external_pb2.DetachPipelineRequest, _Mapping]] = ..., pause_pipeline_request: _Optional[_Union[_sp_external_pb2.PausePipelineRequest, _Mapping]] = ..., resume_pipeline_request: _Optional[_Union[_sp_external_pb2.ResumePipelineRequest, _Mapping]] = ..., metrics_request: _Optional[_Union[_sp_internal_pb2.MetricsRequest, _Mapping]] = ..., kv_request: _Optional[_Union[_sp_kv_pb2.KVRequest, _Mapping]] = ..., delete_audience_request: _Optional[_Union[_sp_external_pb2.DeleteAudienceRequest, _Mapping]] = ..., tail_request: _Optional[_Union[_sp_common_pb2.TailRequest, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...

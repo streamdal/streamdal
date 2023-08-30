@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "sp_common.proto";
 import "sp_external.proto";
 import "sp_internal.proto";
 import "sp_kv.proto";
@@ -31,6 +32,7 @@ message BusEvent {
     protos.MetricsRequest metrics_request = 109;
     protos.KVRequest kv_request = 110;
     protos.DeleteAudienceRequest delete_audience_request = 111;
+    protos.TailRequest tail_request = 112;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC

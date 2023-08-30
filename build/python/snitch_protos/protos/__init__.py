@@ -792,6 +792,7 @@ class BusEvent(betterproto.Message):
     delete_audience_request: "DeleteAudienceRequest" = betterproto.message_field(
         111, group="event"
     )
+    tail_request: "TailRequest" = betterproto.message_field(112, group="event")
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )

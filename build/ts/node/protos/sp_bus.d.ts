@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { TailRequest } from "./sp_common.js";
 import { DeleteAudienceRequest } from "./sp_external.js";
 import { KVRequest } from "./sp_kv.js";
 import { MetricsRequest } from "./sp_internal.js";
@@ -96,6 +97,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.DeleteAudienceRequest delete_audience_request = 111;
          */
         deleteAudienceRequest: DeleteAudienceRequest;
+    } | {
+        oneofKind: "tailRequest";
+        /**
+         * @generated from protobuf field: protos.TailRequest tail_request = 112;
+         */
+        tailRequest: TailRequest;
     } | {
         oneofKind: undefined;
     };
