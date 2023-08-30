@@ -62,7 +62,7 @@ type ExternalClient interface {
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
-	Tail(ctx context.Context, opts ...grpc.CallOption) (External_TailClient, error)
+	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -301,18 +301,23 @@ func (x *externalGetMetricsClient) Recv() (*GetMetricsResponse, error) {
 	return m, nil
 }
 
-func (c *externalClient) Tail(ctx context.Context, opts ...grpc.CallOption) (External_TailClient, error) {
+func (c *externalClient) Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error) {
 	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[2], "/protos.External/Tail", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &externalTailClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	return x, nil
 }
 
 type External_TailClient interface {
-	Send(*TailResponse) error
-	CloseAndRecv() (*StandardResponse, error)
+	Recv() (*TailResponse, error)
 	grpc.ClientStream
 }
 
@@ -320,15 +325,8 @@ type externalTailClient struct {
 	grpc.ClientStream
 }
 
-func (x *externalTailClient) Send(m *TailResponse) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *externalTailClient) CloseAndRecv() (*StandardResponse, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(StandardResponse)
+func (x *externalTailClient) Recv() (*TailResponse, error) {
+	m := new(TailResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -388,7 +386,7 @@ type ExternalServer interface {
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
-	Tail(External_TailServer) error
+	Tail(*TailRequest, External_TailServer) error
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -458,7 +456,7 @@ func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudien
 func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetMetrics not implemented")
 }
-func (UnimplementedExternalServer) Tail(External_TailServer) error {
+func (UnimplementedExternalServer) Tail(*TailRequest, External_TailServer) error {
 	return status.Errorf(codes.Unimplemented, "method Tail not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
@@ -844,12 +842,15 @@ func (x *externalGetMetricsServer) Send(m *GetMetricsResponse) error {
 }
 
 func _External_Tail_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ExternalServer).Tail(&externalTailServer{stream})
+	m := new(TailRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExternalServer).Tail(m, &externalTailServer{stream})
 }
 
 type External_TailServer interface {
-	SendAndClose(*StandardResponse) error
-	Recv() (*TailResponse, error)
+	Send(*TailResponse) error
 	grpc.ServerStream
 }
 
@@ -857,16 +858,8 @@ type externalTailServer struct {
 	grpc.ServerStream
 }
 
-func (x *externalTailServer) SendAndClose(m *StandardResponse) error {
+func (x *externalTailServer) Send(m *TailResponse) error {
 	return x.ServerStream.SendMsg(m)
-}
-
-func (x *externalTailServer) Recv() (*TailResponse, error) {
-	m := new(TailResponse)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -985,7 +978,7 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Tail",
 			Handler:       _External_Tail_Handler,
-			ClientStreams: true,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "sp_external.proto",

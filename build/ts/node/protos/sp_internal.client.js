@@ -75,11 +75,11 @@ export class InternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: SendTail(protos.TailRequest) returns (stream protos.TailResponse);
+     * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
-    sendTail(input, options) {
+    sendTail(options) {
         const method = this.methods[6], opt = this._transport.mergeOptions(options);
-        return stackIntercept("serverStreaming", this._transport, method, opt, input);
+        return stackIntercept("clientStreaming", this._transport, method, opt);
     }
 }
 //# sourceMappingURL=sp_internal.client.js.map

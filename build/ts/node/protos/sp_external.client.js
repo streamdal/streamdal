@@ -192,11 +192,11 @@ export class ExternalClient {
         return stackIntercept("serverStreaming", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options) {
+    tail(input, options) {
         const method = this.methods[20], opt = this._transport.mergeOptions(options);
-        return stackIntercept("clientStreaming", this._transport, method, opt);
+        return stackIntercept("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * Test method

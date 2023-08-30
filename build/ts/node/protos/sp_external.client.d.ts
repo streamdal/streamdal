@@ -3,7 +3,7 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
 import type { TailResponse } from "./sp_common.js";
-import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { TailRequest } from "./sp_common.js";
 import type { GetMetricsResponse } from "./sp_external.js";
 import type { GetMetricsRequest } from "./sp_external.js";
 import type { DeleteAudienceRequest } from "./sp_external.js";
@@ -159,9 +159,9 @@ export interface IExternalClient {
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse>;
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
     /**
      * Test method
      *
@@ -301,9 +301,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse>;
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
     /**
      * Test method
      *

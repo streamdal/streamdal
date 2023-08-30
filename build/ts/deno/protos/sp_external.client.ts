@@ -7,7 +7,7 @@ import { External } from "./sp_external.ts";
 import type { TestResponse } from "./sp_external.ts";
 import type { TestRequest } from "./sp_external.ts";
 import type { TailResponse } from "./sp_common.ts";
-import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { TailRequest } from "./sp_common.ts";
 import type { GetMetricsResponse } from "./sp_external.ts";
 import type { GetMetricsRequest } from "./sp_external.ts";
 import type { DeleteAudienceRequest } from "./sp_external.ts";
@@ -164,9 +164,9 @@ export interface IExternalClient {
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse>;
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
     /**
      * Test method
      *
@@ -364,11 +364,11 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetMetricsRequest, GetMetricsResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
+    tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse> {
         const method = this.methods[20], opt = this._transport.mergeOptions(options);
-        return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
+        return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * Test method

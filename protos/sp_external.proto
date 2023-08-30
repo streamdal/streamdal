@@ -70,7 +70,7 @@ service External {
   // Returns all metric counters
   rpc GetMetrics(GetMetricsRequest) returns (stream GetMetricsResponse);
 
-  rpc Tail(stream TailResponse) returns (StandardResponse);
+  rpc Tail(TailRequest) returns (stream TailResponse);
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);

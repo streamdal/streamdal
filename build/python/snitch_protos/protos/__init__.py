@@ -1170,23 +1170,21 @@ class ExternalStub(betterproto.ServiceStub):
 
     async def tail(
         self,
-        tail_response_iterator: Union[
-            AsyncIterable["TailResponse"], Iterable["TailResponse"]
-        ],
+        tail_request: "TailRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "StandardResponse":
-        return await self._stream_unary(
+    ) -> AsyncIterator["TailResponse"]:
+        async for response in self._unary_stream(
             "/protos.External/Tail",
-            tail_response_iterator,
+            tail_request,
             TailResponse,
-            StandardResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
-        )
+        ):
+            yield response
 
     async def test(
         self,
@@ -1312,21 +1310,23 @@ class InternalStub(betterproto.ServiceStub):
 
     async def send_tail(
         self,
-        tail_request: "TailRequest",
+        tail_response_iterator: Union[
+            AsyncIterable["TailResponse"], Iterable["TailResponse"]
+        ],
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> AsyncIterator["TailResponse"]:
-        async for response in self._unary_stream(
+    ) -> "StandardResponse":
+        return await self._stream_unary(
             "/protos.Internal/SendTail",
-            tail_request,
+            tail_response_iterator,
             TailResponse,
+            StandardResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
-        ):
-            yield response
+        )
 
 
 class ExternalBase(ServiceBase):
@@ -1430,10 +1430,9 @@ class ExternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield GetMetricsResponse()
 
-    async def tail(
-        self, tail_response_iterator: AsyncIterator["TailResponse"]
-    ) -> "StandardResponse":
+    async def tail(self, tail_request: "TailRequest") -> AsyncIterator["TailResponse"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield TailResponse()
 
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
@@ -1593,11 +1592,14 @@ class ExternalBase(ServiceBase):
         )
 
     async def __rpc_tail(
-        self, stream: "grpclib.server.Stream[TailResponse, StandardResponse]"
+        self, stream: "grpclib.server.Stream[TailRequest, TailResponse]"
     ) -> None:
-        request = stream.__aiter__()
-        response = await self.tail(request)
-        await stream.send_message(response)
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.tail,
+            stream,
+            request,
+        )
 
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
@@ -1730,9 +1732,9 @@ class ExternalBase(ServiceBase):
             ),
             "/protos.External/Tail": grpclib.const.Handler(
                 self.__rpc_tail,
-                grpclib.const.Cardinality.STREAM_UNARY,
+                grpclib.const.Cardinality.UNARY_STREAM,
+                TailRequest,
                 TailResponse,
-                StandardResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
@@ -1773,10 +1775,9 @@ class InternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def send_tail(
-        self, tail_request: "TailRequest"
-    ) -> AsyncIterator["TailResponse"]:
+        self, tail_response_iterator: AsyncIterator["TailResponse"]
+    ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
-        yield TailResponse()
 
     async def __rpc_register(
         self, stream: "grpclib.server.Stream[RegisterRequest, Command]"
@@ -1825,14 +1826,11 @@ class InternalBase(ServiceBase):
         await stream.send_message(response)
 
     async def __rpc_send_tail(
-        self, stream: "grpclib.server.Stream[TailRequest, TailResponse]"
+        self, stream: "grpclib.server.Stream[TailResponse, StandardResponse]"
     ) -> None:
-        request = await stream.recv_message()
-        await self._call_rpc_handler_server_stream(
-            self.send_tail,
-            stream,
-            request,
-        )
+        request = stream.__aiter__()
+        response = await self.send_tail(request)
+        await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
@@ -1874,8 +1872,8 @@ class InternalBase(ServiceBase):
             ),
             "/protos.Internal/SendTail": grpclib.const.Handler(
                 self.__rpc_send_tail,
-                grpclib.const.Cardinality.UNARY_STREAM,
-                TailRequest,
+                grpclib.const.Cardinality.STREAM_UNARY,
                 TailResponse,
+                StandardResponse,
             ),
         }
