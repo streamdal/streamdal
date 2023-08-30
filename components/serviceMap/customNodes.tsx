@@ -119,22 +119,6 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
           attachedPipeline={data.attachedPipeline}
         />
       </div>
-      {data.clients?.length > 0
-        ? (
-          <>
-            <div
-              data-tooltip-target={`${toolTipId}-notifications`}
-              class="absolute inline-flex items-center justify-evenly w-6 h-6 text-xs text-white bg-purple-500 rounded-full -top-2 -right-1 cursor-default"
-            >
-              {data.clients?.length || 0}
-            </div>
-            <Tooltip
-              targetId={`${toolTipId}-notifications`}
-              message={`${data.clients?.length || 0} notifications`}
-            />
-          </>
-        )
-        : null}
 
       <Handle
         type="source"
