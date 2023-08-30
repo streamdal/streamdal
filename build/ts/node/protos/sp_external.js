@@ -2,7 +2,6 @@
 // @generated from protobuf file "sp_external.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { TailResponse } from "./sp_common.js";
-import { TailRequest } from "./sp_common.js";
 import { StandardResponse } from "./sp_common.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
@@ -374,7 +373,7 @@ export const External = new ServiceType("protos.External", [
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
-    { name: "SendTail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
+    { name: "Tail", clientStreaming: true, options: {}, I: TailResponse, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);
 //# sourceMappingURL=sp_external.js.map

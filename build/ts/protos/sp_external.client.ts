@@ -7,7 +7,7 @@ import { External } from "./sp_external.js";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
 import type { TailResponse } from "./sp_common.js";
-import type { TailRequest } from "./sp_common.js";
+import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetMetricsResponse } from "./sp_external.js";
 import type { GetMetricsRequest } from "./sp_external.js";
 import type { DeleteAudienceRequest } from "./sp_external.js";
@@ -164,9 +164,9 @@ export interface IExternalClient {
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse>;
     /**
-     * @generated from protobuf rpc: SendTail(protos.TailRequest) returns (stream protos.TailResponse);
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
-    sendTail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
     /**
      * Test method
      *
@@ -364,11 +364,11 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetMetricsRequest, GetMetricsResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: SendTail(protos.TailRequest) returns (stream protos.TailResponse);
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
-    sendTail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse> {
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
         const method = this.methods[20], opt = this._transport.mergeOptions(options);
-        return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
+        return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
     }
     /**
      * Test method

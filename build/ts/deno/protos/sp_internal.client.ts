@@ -5,7 +5,7 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Internal } from "./sp_internal.ts";
 import type { TailResponse } from "./sp_common.ts";
-import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { TailRequest } from "./sp_common.ts";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal.ts";
 import type { GetAttachCommandsByServiceRequest } from "./sp_internal.ts";
 import type { MetricsRequest } from "./sp_internal.ts";
@@ -69,9 +69,9 @@ export interface IInternalClient {
      */
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SendTail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    sendTail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -146,10 +146,10 @@ export class InternalClient implements IInternalClient, ServiceInfo {
         return stackIntercept<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SendTail(protos.TailRequest) returns (stream protos.TailResponse);
      */
-    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
+    sendTail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse> {
         const method = this.methods[6], opt = this._transport.mergeOptions(options);
-        return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
+        return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
     }
 }

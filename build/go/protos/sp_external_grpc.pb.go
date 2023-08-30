@@ -62,7 +62,7 @@ type ExternalClient interface {
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
-	SendTail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_SendTailClient, error)
+	Tail(ctx context.Context, opts ...grpc.CallOption) (External_TailClient, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -301,32 +301,34 @@ func (x *externalGetMetricsClient) Recv() (*GetMetricsResponse, error) {
 	return m, nil
 }
 
-func (c *externalClient) SendTail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_SendTailClient, error) {
-	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[2], "/protos.External/SendTail", opts...)
+func (c *externalClient) Tail(ctx context.Context, opts ...grpc.CallOption) (External_TailClient, error) {
+	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[2], "/protos.External/Tail", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &externalSendTailClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
+	x := &externalTailClient{stream}
 	return x, nil
 }
 
-type External_SendTailClient interface {
-	Recv() (*TailResponse, error)
+type External_TailClient interface {
+	Send(*TailResponse) error
+	CloseAndRecv() (*StandardResponse, error)
 	grpc.ClientStream
 }
 
-type externalSendTailClient struct {
+type externalTailClient struct {
 	grpc.ClientStream
 }
 
-func (x *externalSendTailClient) Recv() (*TailResponse, error) {
-	m := new(TailResponse)
+func (x *externalTailClient) Send(m *TailResponse) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *externalTailClient) CloseAndRecv() (*StandardResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(StandardResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -386,7 +388,7 @@ type ExternalServer interface {
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
-	SendTail(*TailRequest, External_SendTailServer) error
+	Tail(External_TailServer) error
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -456,8 +458,8 @@ func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudien
 func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetMetrics not implemented")
 }
-func (UnimplementedExternalServer) SendTail(*TailRequest, External_SendTailServer) error {
-	return status.Errorf(codes.Unimplemented, "method SendTail not implemented")
+func (UnimplementedExternalServer) Tail(External_TailServer) error {
+	return status.Errorf(codes.Unimplemented, "method Tail not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -841,25 +843,30 @@ func (x *externalGetMetricsServer) Send(m *GetMetricsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _External_SendTail_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(TailRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ExternalServer).SendTail(m, &externalSendTailServer{stream})
+func _External_Tail_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ExternalServer).Tail(&externalTailServer{stream})
 }
 
-type External_SendTailServer interface {
-	Send(*TailResponse) error
+type External_TailServer interface {
+	SendAndClose(*StandardResponse) error
+	Recv() (*TailResponse, error)
 	grpc.ServerStream
 }
 
-type externalSendTailServer struct {
+type externalTailServer struct {
 	grpc.ServerStream
 }
 
-func (x *externalSendTailServer) Send(m *TailResponse) error {
+func (x *externalTailServer) SendAndClose(m *StandardResponse) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *externalTailServer) Recv() (*TailResponse, error) {
+	m := new(TailResponse)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -976,9 +983,9 @@ var External_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "SendTail",
-			Handler:       _External_SendTail_Handler,
-			ServerStreams: true,
+			StreamName:    "Tail",
+			Handler:       _External_Tail_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "sp_external.proto",

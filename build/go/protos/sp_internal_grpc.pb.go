@@ -43,7 +43,7 @@ type InternalClient interface {
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
 	// This is needed because Register() is async
 	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
-	Tail(ctx context.Context, opts ...grpc.CallOption) (Internal_TailClient, error)
+	SendTail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (Internal_SendTailClient, error)
 }
 
 type internalClient struct {
@@ -131,34 +131,32 @@ func (c *internalClient) GetAttachCommandsByService(ctx context.Context, in *Get
 	return out, nil
 }
 
-func (c *internalClient) Tail(ctx context.Context, opts ...grpc.CallOption) (Internal_TailClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Internal_ServiceDesc.Streams[1], "/protos.Internal/Tail", opts...)
+func (c *internalClient) SendTail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (Internal_SendTailClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Internal_ServiceDesc.Streams[1], "/protos.Internal/SendTail", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &internalTailClient{stream}
-	return x, nil
-}
-
-type Internal_TailClient interface {
-	Send(*TailResponse) error
-	CloseAndRecv() (*StandardResponse, error)
-	grpc.ClientStream
-}
-
-type internalTailClient struct {
-	grpc.ClientStream
-}
-
-func (x *internalTailClient) Send(m *TailResponse) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *internalTailClient) CloseAndRecv() (*StandardResponse, error) {
+	x := &internalSendTailClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(StandardResponse)
+	return x, nil
+}
+
+type Internal_SendTailClient interface {
+	Recv() (*TailResponse, error)
+	grpc.ClientStream
+}
+
+type internalSendTailClient struct {
+	grpc.ClientStream
+}
+
+func (x *internalSendTailClient) Recv() (*TailResponse, error) {
+	m := new(TailResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -190,7 +188,7 @@ type InternalServer interface {
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
 	// This is needed because Register() is async
 	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
-	Tail(Internal_TailServer) error
+	SendTail(*TailRequest, Internal_SendTailServer) error
 	mustEmbedUnimplementedInternalServer()
 }
 
@@ -216,8 +214,8 @@ func (UnimplementedInternalServer) Metrics(context.Context, *MetricsRequest) (*S
 func (UnimplementedInternalServer) GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAttachCommandsByService not implemented")
 }
-func (UnimplementedInternalServer) Tail(Internal_TailServer) error {
-	return status.Errorf(codes.Unimplemented, "method Tail not implemented")
+func (UnimplementedInternalServer) SendTail(*TailRequest, Internal_SendTailServer) error {
+	return status.Errorf(codes.Unimplemented, "method SendTail not implemented")
 }
 func (UnimplementedInternalServer) mustEmbedUnimplementedInternalServer() {}
 
@@ -343,30 +341,25 @@ func _Internal_GetAttachCommandsByService_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Internal_Tail_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(InternalServer).Tail(&internalTailServer{stream})
-}
-
-type Internal_TailServer interface {
-	SendAndClose(*StandardResponse) error
-	Recv() (*TailResponse, error)
-	grpc.ServerStream
-}
-
-type internalTailServer struct {
-	grpc.ServerStream
-}
-
-func (x *internalTailServer) SendAndClose(m *StandardResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *internalTailServer) Recv() (*TailResponse, error) {
-	m := new(TailResponse)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
+func _Internal_SendTail_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TailRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	return m, nil
+	return srv.(InternalServer).SendTail(m, &internalSendTailServer{stream})
+}
+
+type Internal_SendTailServer interface {
+	Send(*TailResponse) error
+	grpc.ServerStream
+}
+
+type internalSendTailServer struct {
+	grpc.ServerStream
+}
+
+func (x *internalSendTailServer) Send(m *TailResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // Internal_ServiceDesc is the grpc.ServiceDesc for Internal service.
@@ -404,9 +397,9 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "Tail",
-			Handler:       _Internal_Tail_Handler,
-			ClientStreams: true,
+			StreamName:    "SendTail",
+			Handler:       _Internal_SendTail_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "sp_internal.proto",

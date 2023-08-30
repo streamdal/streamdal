@@ -36,7 +36,7 @@ service Internal {
   // This is needed because Register() is async
   rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
 
-  rpc Tail(stream TailResponse) returns (StandardResponse);
+  rpc SendTail(TailRequest) returns (stream TailResponse);
 }
 
 message NewAudienceRequest {

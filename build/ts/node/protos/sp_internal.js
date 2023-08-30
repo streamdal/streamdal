@@ -2,6 +2,7 @@
 // @generated from protobuf file "sp_internal.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { TailResponse } from "./sp_common.js";
+import { TailRequest } from "./sp_common.js";
 import { StandardResponse } from "./sp_common.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
@@ -125,6 +126,6 @@ export const Internal = new ServiceType("protos.Internal", [
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
     { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse },
     { name: "GetAttachCommandsByService", options: {}, I: GetAttachCommandsByServiceRequest, O: GetAttachCommandsByServiceResponse },
-    { name: "Tail", clientStreaming: true, options: {}, I: TailResponse, O: StandardResponse }
+    { name: "SendTail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse }
 ]);
 //# sourceMappingURL=sp_internal.js.map
