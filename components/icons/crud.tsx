@@ -1,4 +1,5 @@
 export const Edit = (props: any) => {
+  console.log("fuck", props);
   return (
     <svg
       width="14"

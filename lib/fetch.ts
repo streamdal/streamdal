@@ -36,6 +36,7 @@ export const mapLiveAudiences = (live: LiveInfo[]) => {
 
 export const getServiceMap = async (): Promise<ServiceMapType> => {
   const { response } = await client.getAll({}, meta);
+  console.dir(response, { depth: 20 });
   return {
     ...response,
     pipes: Object.values(response?.pipelines),
@@ -72,6 +73,13 @@ export const pausePipeline = async (pipeline: any) => {
   const { response } = await client.pausePipeline(
     { pipelineId: pipeline },
     meta,
+  );
+  console.log(
+    "in pause pipeline",
+    "response: ",
+    response,
+    "pipeline: ",
+    pipeline,
   );
   return response;
 };

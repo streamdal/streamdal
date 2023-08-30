@@ -5,6 +5,7 @@ import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import IconUserCircle from "tabler-icons/tsx/user-circle.tsx";
 import IconCircleChevronRight from "tabler-icons/tsx/circle-chevron-right.tsx";
 import IconCircleChevronLeft from "tabler-icons/tsx/circle-chevron-left.tsx";
+import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { titleCase } from "../lib/utils.ts";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
@@ -26,6 +27,9 @@ export default function OpModal(
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
   const opType = OperationType[audience?.operationType];
+
+  console.log(attachedPipeline);
+  console.log(audience);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -120,7 +124,7 @@ export default function OpModal(
                     </div>
                     {
                       /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                                                                                                                                                                                                                                                                                                                                                                                                                 the content of the modal but keep the modal open*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               the content of the modal but keep the modal open*/
                     }
                     {/*<button*/}
                     {/*  type="button"*/}
@@ -173,6 +177,7 @@ export default function OpModal(
                             <button
                               data-tooltip-target="pipeline-unlink"
                               type="button"
+                              class="mr-2"
                               onClick={() =>
                                 opModal.value = {
                                   ...opModal.value,
@@ -185,6 +190,21 @@ export default function OpModal(
                               targetId="pipeline-unlink"
                               message={"Click to detach pipeline"}
                             />
+                            <a
+                              href={"/pipelines"}
+                              className="flex items-center"
+                            >
+                              <button
+                                type="button"
+                                data-tooltip-target="pipeline-edit"
+                              >
+                                <IconAdjustmentsHorizontal class="w-4 h-4 text-gray-400" />
+                              </button>
+                              <Tooltip
+                                targetId="pipeline-edit"
+                                message={"Edit Pipelines"}
+                              />
+                            </a>
                           </div>
                         </div>
                       )
