@@ -4,6 +4,8 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Internal } from "./sp_internal.ts";
+import type { TailResponse } from "./sp_common.ts";
+import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal.ts";
 import type { GetAttachCommandsByServiceRequest } from "./sp_internal.ts";
 import type { MetricsRequest } from "./sp_internal.ts";
@@ -66,6 +68,10 @@ export interface IInternalClient {
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
+    /**
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     */
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -138,5 +144,12 @@ export class InternalClient implements IInternalClient, ServiceInfo {
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse> {
         const method = this.methods[5], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     */
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
     }
 }

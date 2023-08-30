@@ -72,6 +72,57 @@ export interface Metric {
     value: number;
 }
 /**
+ * @generated from protobuf message protos.TailRequest
+ */
+export interface TailRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
+ * TailResponse originates in the SDK and then is sent to snitch servers where
+ * it is forwarded to the correct frontend streaming gRPC connection
+ *
+ * @generated from protobuf message protos.TailResponse
+ */
+export interface TailResponse {
+    /**
+     * @generated from protobuf field: protos.TailResponseType type = 1;
+     */
+    type: TailResponseType;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+    /**
+     * Timestamp in nanoseconds
+     *
+     * @generated from protobuf field: int64 timestamp_ns = 3;
+     */
+    timestampNs: bigint;
+    /**
+     * Payload data. For errors, this will be the error message
+     * For payloads, this will be JSON of the payload data, post processing
+     *
+     * @generated from protobuf field: bytes data = 4;
+     */
+    data: Uint8Array;
+}
+/**
+ * @generated from protobuf message protos.TailCommand
+ */
+export interface TailCommand {
+    /**
+     * @generated from protobuf field: protos.TailRequest request = 1;
+     */
+    request?: TailRequest;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -121,6 +172,23 @@ export declare enum OperationType {
      */
     PRODUCER = 2
 }
+/**
+ * @generated from protobuf enum protos.TailResponseType
+ */
+export declare enum TailResponseType {
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+     */
+    PAYLOAD = 1,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_ERROR = 2;
+     */
+    ERROR = 2
+}
 declare class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor();
 }
@@ -142,4 +210,25 @@ declare class Metric$Type extends MessageType<Metric> {
  * @generated MessageType for protobuf message protos.Metric
  */
 export declare const Metric: Metric$Type;
+declare class TailRequest$Type extends MessageType<TailRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.TailRequest
+ */
+export declare const TailRequest: TailRequest$Type;
+declare class TailResponse$Type extends MessageType<TailResponse> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.TailResponse
+ */
+export declare const TailResponse: TailResponse$Type;
+declare class TailCommand$Type extends MessageType<TailCommand> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.TailCommand
+ */
+export declare const TailCommand: TailCommand$Type;
 export {};

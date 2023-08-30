@@ -35,6 +35,8 @@ service Internal {
   // Used to pull all pipeline configs for the service name in the SDK's constructor
   // This is needed because Register() is async
   rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
+
+  rpc Tail(stream TailResponse) returns (StandardResponse);
 }
 
 message NewAudienceRequest {

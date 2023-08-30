@@ -1,6 +1,7 @@
 import { MessageType } from "@protobuf-ts/runtime";
 import { KVInstruction } from "./sp_kv.js";
 import { Pipeline } from "./sp_pipeline.js";
+import { TailCommand } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 /**
  * Command is used by snitch-server for sending commands to SDKs
@@ -57,6 +58,15 @@ export interface Command {
          * @generated from protobuf field: protos.KVCommand kv = 105;
          */
         kv: KVCommand;
+    } | {
+        oneofKind: "tail";
+        /**
+         * Emitted by snitch-server when a user makes a Tail() call
+         * Consumed by all snitch-server instances and by SDKs
+         *
+         * @generated from protobuf field: protos.TailCommand tail = 106;
+         */
+        tail: TailCommand;
     } | {
         oneofKind: undefined;
     };

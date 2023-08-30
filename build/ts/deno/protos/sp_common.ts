@@ -75,6 +75,57 @@ export interface Metric {
     value: number;
 }
 /**
+ * @generated from protobuf message protos.TailRequest
+ */
+export interface TailRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: string pipeline_id = 2;
+     */
+    pipelineId: string;
+}
+/**
+ * TailResponse originates in the SDK and then is sent to snitch servers where
+ * it is forwarded to the correct frontend streaming gRPC connection
+ *
+ * @generated from protobuf message protos.TailResponse
+ */
+export interface TailResponse {
+    /**
+     * @generated from protobuf field: protos.TailResponseType type = 1;
+     */
+    type: TailResponseType;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+    /**
+     * Timestamp in nanoseconds
+     *
+     * @generated from protobuf field: int64 timestamp_ns = 3;
+     */
+    timestampNs: bigint;
+    /**
+     * Payload data. For errors, this will be the error message
+     * For payloads, this will be JSON of the payload data, post processing
+     *
+     * @generated from protobuf field: bytes data = 4;
+     */
+    data: Uint8Array;
+}
+/**
+ * @generated from protobuf message protos.TailCommand
+ */
+export interface TailCommand {
+    /**
+     * @generated from protobuf field: protos.TailRequest request = 1;
+     */
+    request?: TailRequest;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -124,6 +175,23 @@ export enum OperationType {
      */
     PRODUCER = 2
 }
+/**
+ * @generated from protobuf enum protos.TailResponseType
+ */
+export enum TailResponseType {
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+     */
+    PAYLOAD = 1,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_ERROR = 2;
+     */
+    ERROR = 2
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor() {
@@ -167,3 +235,43 @@ class Metric$Type extends MessageType<Metric> {
  * @generated MessageType for protobuf message protos.Metric
  */
 export const Metric = new Metric$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailRequest$Type extends MessageType<TailRequest> {
+    constructor() {
+        super("protos.TailRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailRequest
+ */
+export const TailRequest = new TailRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailResponse$Type extends MessageType<TailResponse> {
+    constructor() {
+        super("protos.TailResponse", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailResponseType", TailResponseType, "TAIL_RESPONSE_TYPE_"] },
+            { no: 2, name: "audience", kind: "message", T: () => Audience },
+            { no: 3, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailResponse
+ */
+export const TailResponse = new TailResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailCommand$Type extends MessageType<TailCommand> {
+    constructor() {
+        super("protos.TailCommand", [
+            { no: 1, name: "request", kind: "message", T: () => TailRequest }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailCommand
+ */
+export const TailCommand = new TailCommand$Type();

@@ -4,6 +4,7 @@
 import { MessageType } from "@protobuf-ts/runtime";
 import { KVInstruction } from "./sp_kv.js";
 import { Pipeline } from "./sp_pipeline.js";
+import { TailCommand } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType {
@@ -15,7 +16,8 @@ class Command$Type extends MessageType {
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
-            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand }
+            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
+            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand }
         ]);
     }
 }

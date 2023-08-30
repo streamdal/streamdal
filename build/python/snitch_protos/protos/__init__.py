@@ -6,10 +6,13 @@
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
+    AsyncIterable,
     AsyncIterator,
     Dict,
+    Iterable,
     List,
     Optional,
+    Union,
 )
 
 import betterproto
@@ -42,6 +45,12 @@ class OperationType(betterproto.Enum):
     OPERATION_TYPE_UNSET = 0
     OPERATION_TYPE_CONSUMER = 1
     OPERATION_TYPE_PRODUCER = 2
+
+
+class TailResponseType(betterproto.Enum):
+    TAIL_RESPONSE_TYPE_UNSET = 0
+    TAIL_RESPONSE_TYPE_PAYLOAD = 1
+    TAIL_RESPONSE_TYPE_ERROR = 2
 
 
 class PipelineStepCondition(betterproto.Enum):
@@ -149,6 +158,36 @@ class Metric(betterproto.Message):
         2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     value: float = betterproto.double_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class TailRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
+    pipeline_id: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class TailResponse(betterproto.Message):
+    """
+    TailResponse originates in the SDK and then is sent to snitch servers where
+    it is forwarded to the correct frontend streaming gRPC connection
+    """
+
+    type: "TailResponseType" = betterproto.enum_field(1)
+    audience: "Audience" = betterproto.message_field(2)
+    timestamp_ns: int = betterproto.int64_field(3)
+    """Timestamp in nanoseconds"""
+
+    data: bytes = betterproto.bytes_field(4)
+    """
+    Payload data. For errors, this will be the error message For payloads, this
+    will be JSON of the payload data, post processing
+    """
+
+
+@dataclass(eq=False, repr=False)
+class TailCommand(betterproto.Message):
+    request: "TailRequest" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -587,6 +626,12 @@ class Command(betterproto.Message):
     """
     snitch-server will emit this when a user makes changes to the KV store via
     the KV HTTP API.
+    """
+
+    tail: "TailCommand" = betterproto.message_field(106, group="command")
+    """
+    Emitted by snitch-server when a user makes a Tail() call Consumed by all
+    snitch-server instances and by SDKs
     """
 
 
@@ -1122,6 +1167,24 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def send_tail(
+        self,
+        tail_request: "TailRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> AsyncIterator["TailResponse"]:
+        async for response in self._unary_stream(
+            "/protos.External/SendTail",
+            tail_request,
+            TailResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        ):
+            yield response
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1244,6 +1307,26 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def tail(
+        self,
+        tail_response_iterator: Union[
+            AsyncIterable["TailResponse"], Iterable["TailResponse"]
+        ],
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._stream_unary(
+            "/protos.Internal/Tail",
+            tail_response_iterator,
+            TailResponse,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
 
 class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
@@ -1345,6 +1428,12 @@ class ExternalBase(ServiceBase):
     ) -> AsyncIterator["GetMetricsResponse"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield GetMetricsResponse()
+
+    async def send_tail(
+        self, tail_request: "TailRequest"
+    ) -> AsyncIterator["TailResponse"]:
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield TailResponse()
 
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
@@ -1503,6 +1592,16 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_send_tail(
+        self, stream: "grpclib.server.Stream[TailRequest, TailResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.send_tail,
+            stream,
+            request,
+        )
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1632,6 +1731,12 @@ class ExternalBase(ServiceBase):
                 GetMetricsRequest,
                 GetMetricsResponse,
             ),
+            "/protos.External/SendTail": grpclib.const.Handler(
+                self.__rpc_send_tail,
+                grpclib.const.Cardinality.UNARY_STREAM,
+                TailRequest,
+                TailResponse,
+            ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
                 grpclib.const.Cardinality.UNARY_UNARY,
@@ -1668,6 +1773,11 @@ class InternalBase(ServiceBase):
         self,
         get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
     ) -> "GetAttachCommandsByServiceResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def tail(
+        self, tail_response_iterator: AsyncIterator["TailResponse"]
+    ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def __rpc_register(
@@ -1716,6 +1826,13 @@ class InternalBase(ServiceBase):
         response = await self.get_attach_commands_by_service(request)
         await stream.send_message(response)
 
+    async def __rpc_tail(
+        self, stream: "grpclib.server.Stream[TailResponse, StandardResponse]"
+    ) -> None:
+        request = stream.__aiter__()
+        response = await self.tail(request)
+        await stream.send_message(response)
+
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
             "/protos.Internal/Register": grpclib.const.Handler(
@@ -1753,5 +1870,11 @@ class InternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 GetAttachCommandsByServiceRequest,
                 GetAttachCommandsByServiceResponse,
+            ),
+            "/protos.Internal/Tail": grpclib.const.Handler(
+                self.__rpc_tail,
+                grpclib.const.Cardinality.STREAM_UNARY,
+                TailResponse,
+                StandardResponse,
             ),
         }

@@ -50,3 +50,33 @@ message Metric {
   map<string, string> labels = 2;
   double value = 3;
 }
+
+message TailRequest {
+  Audience audience = 1;
+  string pipeline_id = 2;
+}
+
+enum TailResponseType {
+  TAIL_RESPONSE_TYPE_UNSET = 0;
+  TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+  TAIL_RESPONSE_TYPE_ERROR = 2;
+}
+
+// TailResponse originates in the SDK and then is sent to snitch servers where
+// it is forwarded to the correct frontend streaming gRPC connection
+message TailResponse {
+  TailResponseType type = 1;
+
+  Audience audience = 2;
+
+  // Timestamp in nanoseconds
+  int64 timestamp_ns = 3;
+
+  // Payload data. For errors, this will be the error message
+  // For payloads, this will be JSON of the payload data, post processing
+  bytes data = 4;
+}
+
+message TailCommand {
+  TailRequest request = 1;
+}

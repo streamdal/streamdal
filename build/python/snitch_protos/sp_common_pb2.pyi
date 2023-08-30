@@ -14,6 +14,9 @@ RESPONSE_CODE_INTERNAL_SERVER_ERROR: ResponseCode
 RESPONSE_CODE_NOT_FOUND: ResponseCode
 RESPONSE_CODE_OK: ResponseCode
 RESPONSE_CODE_UNSET: ResponseCode
+TAIL_RESPONSE_TYPE_ERROR: TailResponseType
+TAIL_RESPONSE_TYPE_PAYLOAD: TailResponseType
+TAIL_RESPONSE_TYPE_UNSET: TailResponseType
 
 class Audience(_message.Message):
     __slots__ = ["component_name", "operation_name", "operation_type", "service_name"]
@@ -54,8 +57,37 @@ class StandardResponse(_message.Message):
     message: str
     def __init__(self, id: _Optional[str] = ..., code: _Optional[_Union[ResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
+class TailCommand(_message.Message):
+    __slots__ = ["request"]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    request: TailRequest
+    def __init__(self, request: _Optional[_Union[TailRequest, _Mapping]] = ...) -> None: ...
+
+class TailRequest(_message.Message):
+    __slots__ = ["audience", "pipeline_id"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    audience: Audience
+    pipeline_id: str
+    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
+
+class TailResponse(_message.Message):
+    __slots__ = ["audience", "data", "timestamp_ns", "type"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    TIMESTAMP_NS_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    audience: Audience
+    data: bytes
+    timestamp_ns: int
+    type: TailResponseType
+    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., timestamp_ns: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
+
 class ResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
 
 class OperationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class TailResponseType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

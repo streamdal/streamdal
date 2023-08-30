@@ -4,6 +4,7 @@
 import { MessageType } from "@protobuf-ts/runtime";
 import { KVInstruction } from "./sp_kv.ts";
 import { Pipeline } from "./sp_pipeline.ts";
+import { TailCommand } from "./sp_common.ts";
 import { Audience } from "./sp_common.ts";
 /**
  * Command is used by snitch-server for sending commands to SDKs
@@ -60,6 +61,15 @@ export interface Command {
          * @generated from protobuf field: protos.KVCommand kv = 105;
          */
         kv: KVCommand;
+    } | {
+        oneofKind: "tail";
+        /**
+         * Emitted by snitch-server when a user makes a Tail() call
+         * Consumed by all snitch-server instances and by SDKs
+         *
+         * @generated from protobuf field: protos.TailCommand tail = 106;
+         */
+        tail: TailCommand;
     } | {
         oneofKind: undefined;
     };
@@ -135,7 +145,8 @@ class Command$Type extends MessageType<Command> {
             { no: 102, name: "pause_pipeline", kind: "message", oneof: "command", T: () => PausePipelineCommand },
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
-            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand }
+            { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
+            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand }
         ]);
     }
 }

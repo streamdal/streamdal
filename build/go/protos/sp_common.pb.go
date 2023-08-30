@@ -129,6 +129,55 @@ func (OperationType) EnumDescriptor() ([]byte, []int) {
 	return file_sp_common_proto_rawDescGZIP(), []int{1}
 }
 
+type TailResponseType int32
+
+const (
+	TailResponseType_TAIL_RESPONSE_TYPE_UNSET   TailResponseType = 0
+	TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD TailResponseType = 1
+	TailResponseType_TAIL_RESPONSE_TYPE_ERROR   TailResponseType = 2
+)
+
+// Enum value maps for TailResponseType.
+var (
+	TailResponseType_name = map[int32]string{
+		0: "TAIL_RESPONSE_TYPE_UNSET",
+		1: "TAIL_RESPONSE_TYPE_PAYLOAD",
+		2: "TAIL_RESPONSE_TYPE_ERROR",
+	}
+	TailResponseType_value = map[string]int32{
+		"TAIL_RESPONSE_TYPE_UNSET":   0,
+		"TAIL_RESPONSE_TYPE_PAYLOAD": 1,
+		"TAIL_RESPONSE_TYPE_ERROR":   2,
+	}
+)
+
+func (x TailResponseType) Enum() *TailResponseType {
+	p := new(TailResponseType)
+	*p = x
+	return p
+}
+
+func (x TailResponseType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TailResponseType) Descriptor() protoreflect.EnumDescriptor {
+	return file_sp_common_proto_enumTypes[2].Descriptor()
+}
+
+func (TailResponseType) Type() protoreflect.EnumType {
+	return &file_sp_common_proto_enumTypes[2]
+}
+
+func (x TailResponseType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TailResponseType.Descriptor instead.
+func (TailResponseType) EnumDescriptor() ([]byte, []int) {
+	return file_sp_common_proto_rawDescGZIP(), []int{2}
+}
+
 // Common response message for many gRPC methods
 type StandardResponse struct {
 	state         protoimpl.MessageState
@@ -334,6 +383,184 @@ func (x *Metric) GetValue() float64 {
 	return 0
 }
 
+type TailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Audience   *Audience `protobuf:"bytes,1,opt,name=audience,proto3" json:"audience,omitempty"`
+	PipelineId string    `protobuf:"bytes,2,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
+}
+
+func (x *TailRequest) Reset() {
+	*x = TailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_common_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TailRequest) ProtoMessage() {}
+
+func (x *TailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_common_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TailRequest.ProtoReflect.Descriptor instead.
+func (*TailRequest) Descriptor() ([]byte, []int) {
+	return file_sp_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TailRequest) GetAudience() *Audience {
+	if x != nil {
+		return x.Audience
+	}
+	return nil
+}
+
+func (x *TailRequest) GetPipelineId() string {
+	if x != nil {
+		return x.PipelineId
+	}
+	return ""
+}
+
+// TailResponse originates in the SDK and then is sent to snitch servers where
+// it is forwarded to the correct frontend streaming gRPC connection
+type TailResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type     TailResponseType `protobuf:"varint,1,opt,name=type,proto3,enum=protos.TailResponseType" json:"type,omitempty"`
+	Audience *Audience        `protobuf:"bytes,2,opt,name=audience,proto3" json:"audience,omitempty"`
+	// Timestamp in nanoseconds
+	TimestampNs int64 `protobuf:"varint,3,opt,name=timestamp_ns,json=timestampNs,proto3" json:"timestamp_ns,omitempty"`
+	// Payload data. For errors, this will be the error message
+	// For payloads, this will be JSON of the payload data, post processing
+	Data []byte `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+}
+
+func (x *TailResponse) Reset() {
+	*x = TailResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_common_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TailResponse) ProtoMessage() {}
+
+func (x *TailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_common_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TailResponse.ProtoReflect.Descriptor instead.
+func (*TailResponse) Descriptor() ([]byte, []int) {
+	return file_sp_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TailResponse) GetType() TailResponseType {
+	if x != nil {
+		return x.Type
+	}
+	return TailResponseType_TAIL_RESPONSE_TYPE_UNSET
+}
+
+func (x *TailResponse) GetAudience() *Audience {
+	if x != nil {
+		return x.Audience
+	}
+	return nil
+}
+
+func (x *TailResponse) GetTimestampNs() int64 {
+	if x != nil {
+		return x.TimestampNs
+	}
+	return 0
+}
+
+func (x *TailResponse) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type TailCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Request *TailRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
+}
+
+func (x *TailCommand) Reset() {
+	*x = TailCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_common_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TailCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TailCommand) ProtoMessage() {}
+
+func (x *TailCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_common_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TailCommand.ProtoReflect.Descriptor instead.
+func (*TailCommand) Descriptor() ([]byte, []int) {
+	return file_sp_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TailCommand) GetRequest() *TailRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
 var File_sp_common_proto protoreflect.FileDescriptor
 
 var file_sp_common_proto_rawDesc = []byte{
@@ -367,7 +594,27 @@ var file_sp_common_proto_rawDesc = []byte{
 	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
-	0x01, 0x2a, 0xc3, 0x01, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f,
+	0x01, 0x22, 0x5c, 0x0a, 0x0b, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69,
+	0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x1f,
+	0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x22,
+	0xa1, 0x01, 0x0a, 0x0c, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x2c, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x18,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x2c,
+	0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e,
+	0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x21, 0x0a, 0x0c,
+	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x5f, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x0b, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x4e, 0x73, 0x12,
+	0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64,
+	0x61, 0x74, 0x61, 0x22, 0x3c, 0x0a, 0x0b, 0x54, 0x61, 0x69, 0x6c, 0x43, 0x6f, 0x6d, 0x6d, 0x61,
+	0x6e, 0x64, 0x12, 0x2d, 0x0a, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x61, 0x69,
+	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x2a, 0xc3, 0x01, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f,
 	0x64, 0x65, 0x12, 0x17, 0x0a, 0x13, 0x52, 0x45, 0x53, 0x50, 0x4f, 0x4e, 0x53, 0x45, 0x5f, 0x43,
 	0x4f, 0x44, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x14, 0x0a, 0x10, 0x52,
 	0x45, 0x53, 0x50, 0x4f, 0x4e, 0x53, 0x45, 0x5f, 0x43, 0x4f, 0x44, 0x45, 0x5f, 0x4f, 0x4b, 0x10,
@@ -385,7 +632,14 @@ var file_sp_common_proto_rawDesc = []byte{
 	0x10, 0x00, 0x12, 0x1b, 0x0a, 0x17, 0x4f, 0x50, 0x45, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x5f,
 	0x54, 0x59, 0x50, 0x45, 0x5f, 0x43, 0x4f, 0x4e, 0x53, 0x55, 0x4d, 0x45, 0x52, 0x10, 0x01, 0x12,
 	0x1b, 0x0a, 0x17, 0x4f, 0x50, 0x45, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x54, 0x59, 0x50,
-	0x45, 0x5f, 0x50, 0x52, 0x4f, 0x44, 0x55, 0x43, 0x45, 0x52, 0x10, 0x02, 0x42, 0x34, 0x5a, 0x32,
+	0x45, 0x5f, 0x50, 0x52, 0x4f, 0x44, 0x55, 0x43, 0x45, 0x52, 0x10, 0x02, 0x2a, 0x6e, 0x0a, 0x10,
+	0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x1c, 0x0a, 0x18, 0x54, 0x41, 0x49, 0x4c, 0x5f, 0x52, 0x45, 0x53, 0x50, 0x4f, 0x4e, 0x53,
+	0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x1e,
+	0x0a, 0x1a, 0x54, 0x41, 0x49, 0x4c, 0x5f, 0x52, 0x45, 0x53, 0x50, 0x4f, 0x4e, 0x53, 0x45, 0x5f,
+	0x54, 0x59, 0x50, 0x45, 0x5f, 0x50, 0x41, 0x59, 0x4c, 0x4f, 0x41, 0x44, 0x10, 0x01, 0x12, 0x1c,
+	0x0a, 0x18, 0x54, 0x41, 0x49, 0x4c, 0x5f, 0x52, 0x45, 0x53, 0x50, 0x4f, 0x4e, 0x53, 0x45, 0x5f,
+	0x54, 0x59, 0x50, 0x45, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0x02, 0x42, 0x34, 0x5a, 0x32,
 	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61,
 	0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e, 0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74,
@@ -404,25 +658,33 @@ func file_sp_common_proto_rawDescGZIP() []byte {
 	return file_sp_common_proto_rawDescData
 }
 
-var file_sp_common_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_sp_common_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_sp_common_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_sp_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_sp_common_proto_goTypes = []interface{}{
 	(ResponseCode)(0),        // 0: protos.ResponseCode
 	(OperationType)(0),       // 1: protos.OperationType
-	(*StandardResponse)(nil), // 2: protos.StandardResponse
-	(*Audience)(nil),         // 3: protos.Audience
-	(*Metric)(nil),           // 4: protos.Metric
-	nil,                      // 5: protos.Metric.LabelsEntry
+	(TailResponseType)(0),    // 2: protos.TailResponseType
+	(*StandardResponse)(nil), // 3: protos.StandardResponse
+	(*Audience)(nil),         // 4: protos.Audience
+	(*Metric)(nil),           // 5: protos.Metric
+	(*TailRequest)(nil),      // 6: protos.TailRequest
+	(*TailResponse)(nil),     // 7: protos.TailResponse
+	(*TailCommand)(nil),      // 8: protos.TailCommand
+	nil,                      // 9: protos.Metric.LabelsEntry
 }
 var file_sp_common_proto_depIdxs = []int32{
 	0, // 0: protos.StandardResponse.code:type_name -> protos.ResponseCode
 	1, // 1: protos.Audience.operation_type:type_name -> protos.OperationType
-	5, // 2: protos.Metric.labels:type_name -> protos.Metric.LabelsEntry
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	9, // 2: protos.Metric.labels:type_name -> protos.Metric.LabelsEntry
+	4, // 3: protos.TailRequest.audience:type_name -> protos.Audience
+	2, // 4: protos.TailResponse.type:type_name -> protos.TailResponseType
+	4, // 5: protos.TailResponse.audience:type_name -> protos.Audience
+	6, // 6: protos.TailCommand.request:type_name -> protos.TailRequest
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_sp_common_proto_init() }
@@ -467,14 +729,50 @@ func file_sp_common_proto_init() {
 				return nil
 			}
 		}
+		file_sp_common_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TailRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sp_common_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TailResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sp_common_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TailCommand); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sp_common_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   4,
+			NumEnums:      3,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

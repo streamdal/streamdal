@@ -54,6 +54,24 @@ export var OperationType;
      */
     OperationType[OperationType["PRODUCER"] = 2] = "PRODUCER";
 })(OperationType || (OperationType = {}));
+/**
+ * @generated from protobuf enum protos.TailResponseType
+ */
+export var TailResponseType;
+(function (TailResponseType) {
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_UNSET = 0;
+     */
+    TailResponseType[TailResponseType["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+     */
+    TailResponseType[TailResponseType["PAYLOAD"] = 1] = "PAYLOAD";
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_ERROR = 2;
+     */
+    TailResponseType[TailResponseType["ERROR"] = 2] = "ERROR";
+})(TailResponseType || (TailResponseType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType {
     constructor() {
@@ -97,4 +115,44 @@ class Metric$Type extends MessageType {
  * @generated MessageType for protobuf message protos.Metric
  */
 export const Metric = new Metric$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailRequest$Type extends MessageType {
+    constructor() {
+        super("protos.TailRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailRequest
+ */
+export const TailRequest = new TailRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailResponse$Type extends MessageType {
+    constructor() {
+        super("protos.TailResponse", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailResponseType", TailResponseType, "TAIL_RESPONSE_TYPE_"] },
+            { no: 2, name: "audience", kind: "message", T: () => Audience },
+            { no: 3, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 4, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailResponse
+ */
+export const TailResponse = new TailResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailCommand$Type extends MessageType {
+    constructor() {
+        super("protos.TailCommand", [
+            { no: 1, name: "request", kind: "message", T: () => TailRequest }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailCommand
+ */
+export const TailCommand = new TailCommand$Type();
 //# sourceMappingURL=sp_common.js.map

@@ -1,5 +1,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
+import type { TailResponse } from "./sp_common.js";
+import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal.js";
 import type { GetAttachCommandsByServiceRequest } from "./sp_internal.js";
 import type { MetricsRequest } from "./sp_internal.js";
@@ -61,6 +63,10 @@ export interface IInternalClient {
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
+    /**
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     */
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -118,4 +124,8 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
+    /**
+     * @generated from protobuf rpc: Tail(stream protos.TailResponse) returns (protos.StandardResponse);
+     */
+    tail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
 }

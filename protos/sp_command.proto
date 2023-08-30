@@ -24,6 +24,10 @@ message Command {
     // snitch-server will emit this when a user makes changes to the KV store
     // via the KV HTTP API.
     KVCommand kv = 105;
+
+    // Emitted by snitch-server when a user makes a Tail() call
+    // Consumed by all snitch-server instances and by SDKs
+    TailCommand tail = 106;
   }
 }
 
