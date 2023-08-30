@@ -34,10 +34,6 @@ var (
 	GRPCMissingMetadataError = errors.New("missing metadata; misconfigured grpc client?")
 )
 
-type IGRPCAPI interface {
-	ChangeOccurred()
-}
-
 type GRPCAPI struct {
 	Options *Options
 	log     *logrus.Entry

@@ -14,8 +14,6 @@ import (
 var _ = Describe("PubSub", func() {
 	Describe("Listen", func() {
 		It("should receive published message", func() {
-			//TestItOut()
-
 			ps := New()
 			wg := &sync.WaitGroup{}
 			readyWg := &sync.WaitGroup{}
