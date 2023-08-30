@@ -18,7 +18,7 @@ import { DetachPipelineModal } from "../components/modals/detachPipelineModal.ts
 import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useState } from "preact/hooks";
-import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
+import { useSignalEffect } from "@preact/signals";
 
 export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
@@ -26,6 +26,8 @@ export default function OpModal(
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
   const opType = OperationType[audience?.operationType];
+
+  console.log(opType);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -106,7 +108,7 @@ export default function OpModal(
                 <div>
                   <div class="rounded-t flex justify-between">
                     <div class="flex items-start justify-between p-4">
-                      {opType === "consumer"
+                      {opType === "CONSUMER"
                         ? <ConsumerIcon className={"mx-2"} />
                         : <ProducerIcon className={"mx-2"} />}
                       <div class="flex flex-col">
@@ -120,7 +122,7 @@ export default function OpModal(
                     </div>
                     {
                       /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                                                                                                                                                                                                                                                                             the content of the modal but keep the modal open*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                 the content of the modal but keep the modal open*/
                     }
                     {/*<button*/}
                     {/*  type="button"*/}
