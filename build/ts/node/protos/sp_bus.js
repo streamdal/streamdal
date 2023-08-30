@@ -3,6 +3,7 @@
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
 import { TailRequest } from "./sp_common.js";
+import { NewAudienceRequest } from "./sp_internal.js";
 import { DeleteAudienceRequest } from "./sp_external.js";
 import { KVRequest } from "./sp_kv.js";
 import { MetricsRequest } from "./sp_internal.js";
@@ -32,7 +33,8 @@ class BusEvent$Type extends MessageType {
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => MetricsRequest },
             { no: 110, name: "kv_request", kind: "message", oneof: "event", T: () => KVRequest },
             { no: 111, name: "delete_audience_request", kind: "message", oneof: "event", T: () => DeleteAudienceRequest },
-            { no: 112, name: "tail_request", kind: "message", oneof: "event", T: () => TailRequest },
+            { no: 112, name: "new_audience_request", kind: "message", oneof: "event", T: () => NewAudienceRequest },
+            { no: 113, name: "tail_request", kind: "message", oneof: "event", T: () => TailRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
