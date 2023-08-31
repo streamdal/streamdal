@@ -93,6 +93,10 @@ message GetAllResponse {
   // Audience to pipeline ID config/mapping.
   // key == $audience_as_string, value = $pipeline_id
   map <string, string> config = 4;
+
+  // When was this response generated. This is useful for determining what is
+  // the latest update when using GetAllStream().
+  int64 generated_at_unix_ts_ns_utc = 100;
 }
 
 message GetPipelinesRequest {

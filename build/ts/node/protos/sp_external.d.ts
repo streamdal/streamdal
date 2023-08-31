@@ -48,6 +48,13 @@ export interface GetAllResponse {
     config: {
         [key: string]: string;
     };
+    /**
+     * When was this response generated. This is useful for determining what is
+     * the latest update when using GetAllStream().
+     *
+     * @generated from protobuf field: int64 generated_at_unix_ts_ns_utc = 100;
+     */
+    generatedAtUnixTsNsUtc: bigint;
 }
 /**
  * Don't think we need anything here
