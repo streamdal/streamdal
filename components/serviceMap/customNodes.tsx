@@ -81,6 +81,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 
 export const OperationNode = ({ data }: { data: NodeData }) => {
   const toolTipId = removeWhitespace(data.audience.operationName);
+  console.log(data.clients);
 
   return (
     <div class="h-[96px]">
@@ -95,6 +96,7 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
               opModal.value = {
                 audience: data.audience,
                 attachedPipeline: data.attachedPipeline,
+                clients: data.clients?.length,
               }}
           >
             <h2
@@ -109,7 +111,7 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
             />
             <h3 class="text-xs text-streamdalPurple font-semibold">
               {`${data.clients?.length || 0} attached client${
-                data.clients?.length === 0 ? "s" : ""
+                data.clients?.length !== 1 ? "s" : ""
               }`}
             </h3>
           </div>

@@ -36,7 +36,6 @@ export const mapLiveAudiences = (live: LiveInfo[]) => {
 
 export const getServiceMap = async (): Promise<ServiceMapType> => {
   const { response } = await client.getAll({}, meta);
-  console.dir(response, { depth: 20 });
   return {
     ...response,
     pipes: Object.values(response?.pipelines),
