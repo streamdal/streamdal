@@ -33,6 +33,8 @@ type IServerClient interface {
 
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
 
+	GetConn() protos.InternalClient
+
 	SendTail(ctx context.Context, rtr *protos.TailResponse) error
 }
 
@@ -61,6 +63,10 @@ func New(plumberAddress, plumberToken string) (*Client, error) {
 		Server: protos.NewInternalClient(conn),
 		Token:  plumberToken,
 	}, nil
+}
+
+func (c *Client) GetConn() protos.InternalClient {
+	return c.Server
 }
 
 func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error {

@@ -6,9 +6,53 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/snitch-go-client/validation"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/server"
+	"github.com/streamdal/snitch-go-client/validation"
 )
+
+const NumTailWorkers = 2
+
+type Tail struct {
+	request      *protos.Command
+	Ch           chan *protos.TailResponse
+	snitchServer server.IServerClient
+	cancelCtx    context.Context
+	CancelFunc   context.CancelFunc
+	log          logger.Logger
+}
+
+func (t *Tail) startWorkers() error {
+	for i := 0; i < NumTailWorkers; i++ {
+		// Start SDK -> Server streaming gRPC connection
+		stream, err := t.snitchServer.GetConn().SendTail(t.cancelCtx)
+		if err != nil {
+			return errors.Wrap(err, "error starting tail worker")
+		}
+
+		go t.startWorker(stream)
+	}
+
+	return nil
+}
+
+func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
+	defer stream.CloseSend()
+
+	for {
+		select {
+		case <-t.cancelCtx.Done():
+			t.log.Debug("tail worker cancelled")
+			return
+		case resp := <-t.Ch:
+			if err := stream.Send(resp); err != nil {
+				t.log.Errorf("error sending tail: %s", err)
+			}
+		}
+	}
+}
 
 func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 	if err := validation.ValidateTailCommand(cmd); err != nil {
@@ -30,28 +74,44 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 
 	s.config.Logger.Debugf("Tailing audience %s", cmd.GetTail().Request.PipelineId)
 
-	s.setTailing(cmd.Audience, cmd.GetTail().Request.PipelineId, cmd.GetTail().Request)
+	ctx, cancel := context.WithCancel(s.config.ShutdownCtx)
+
+	// Start workers
+	t := &Tail{
+		request:      cmd,
+		Ch:           make(chan *protos.TailResponse, 100),
+		cancelCtx:    ctx,
+		CancelFunc:   cancel,
+		snitchServer: s.serverClient,
+		log:          s.config.Logger,
+	}
+
+	if err := t.startWorkers(); err != nil {
+		return errors.Wrap(err, "unable to tail pipeline")
+	}
+
+	s.setTailing(cmd.Audience, cmd.GetTail().Request.PipelineId, t)
 
 	return nil
 }
 
-func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) *protos.TailRequest {
+func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) *Tail {
 	s.tailsMtx.RLock()
 	defer s.tailsMtx.RUnlock()
 
-	req, ok := s.tails[tailKey(aud, pipelineID)]
+	tail, ok := s.tails[tailKey(aud, pipelineID)]
 	if ok {
-		return req
+		return tail
 	}
 
 	return nil
 }
 
-func (s *Snitch) setTailing(aud *protos.Audience, pipelineID string, req *protos.TailRequest) {
+func (s *Snitch) setTailing(aud *protos.Audience, pipelineID string, tail *Tail) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
-	s.tails[tailKey(aud, pipelineID)] = req
+	s.tails[tailKey(aud, pipelineID)] = tail
 }
 
 func tailKey(aud *protos.Audience, pipelineID string) string {

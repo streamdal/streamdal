@@ -89,7 +89,7 @@ type Snitch struct {
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
 	tailsMtx           *sync.RWMutex
-	tails              map[string]*protos.TailRequest
+	tails              map[string]*Tail
 }
 
 type Config struct {
@@ -165,7 +165,7 @@ func New(cfg *Config) (*Snitch, error) {
 		metrics:            m,
 		sessionID:          uuid.New().String(),
 		tailsMtx:           &sync.RWMutex{},
-		tails:              make(map[string]*protos.TailRequest),
+		tails:              make(map[string]*Tail),
 	}
 
 	if cfg.DryRun {
@@ -175,7 +175,6 @@ func New(cfg *Config) (*Snitch, error) {
 	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
 		return nil, err
 	}
-
 	errCh := make(chan error, 0)
 
 	// Start register
@@ -188,6 +187,8 @@ func New(cfg *Config) (*Snitch, error) {
 	// Start heartbeat
 	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
 
+	go s.watchForShutdown()
+
 	// Make sure we were able to start without issues
 	select {
 	case err := <-errCh:
@@ -195,6 +196,7 @@ func New(cfg *Config) (*Snitch, error) {
 	case <-time.After(time.Second * 5):
 		return s, nil
 	}
+
 }
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
@@ -261,6 +263,18 @@ func validateConfig(cfg *Config) error {
 	}
 
 	return nil
+}
+
+func (s *Snitch) watchForShutdown() {
+	<-s.config.ShutdownCtx.Done()
+
+	// Shut down all tails
+	s.tailsMtx.RLock()
+	defer s.tailsMtx.RUnlock()
+	for _, t := range s.tails {
+		s.config.Logger.Debugf("Shutting down tail for pipeline %s", t.request.GetTail().Request.PipelineId)
+		t.CancelFunc()
+	}
 }
 
 func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
@@ -510,8 +524,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		timeoutCxl()
 
 		// Perform tail if necessary
-		if tailReq := s.getTail(aud, pipeline.Id); tailReq != nil {
-			// TODO: This needs to go to a worker pool, but just straight call gRPC for the time being
+		if tail := s.getTail(aud, pipeline.Id); tail != nil {
 			tr := &protos.TailResponse{
 				Type:         protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
 				Audience:     aud,
@@ -521,9 +534,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				OriginalData: originalData,
 				NewData:      data,
 			}
-			if err := s.serverClient.SendTail(ctx, tr); err != nil {
-				s.config.Logger.Errorf("failed to send tail: %s", err)
-			}
+			tail.Ch <- tr
 		}
 	}
 
