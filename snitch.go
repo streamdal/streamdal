@@ -415,6 +415,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	for _, p := range pipelines {
+		originalData := data // Used for tail request
 		pipeline := p.GetAttachPipeline().GetPipeline()
 		labels["pipeline_name"] = pipeline.Name
 		labels["pipeline_id"] = pipeline.Id
@@ -511,7 +512,16 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		// Perform tail if necessary
 		if tailReq := s.getTail(aud, pipeline.Id); tailReq != nil {
 			// TODO: This needs to go to a worker pool, but just straight call gRPC for the time being
-			if err := s.serverClient.SendTail(ctx, tailReq, s.sessionID, data); err != nil {
+			tr := &protos.TailResponse{
+				Type:         protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
+				Audience:     aud,
+				PipelineId:   pipeline.Id,
+				SessionId:    s.sessionID,
+				TimestampNs:  time.Now().UTC().UnixNano(),
+				OriginalData: originalData,
+				NewData:      data,
+			}
+			if err := s.serverClient.SendTail(ctx, tr); err != nil {
 				s.config.Logger.Errorf("failed to send tail: %s", err)
 			}
 		}

@@ -33,7 +33,7 @@ type IServerClient interface {
 
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
 
-	SendTail(ctx context.Context, req *protos.TailRequest, sessionID string, data []byte) error
+	SendTail(ctx context.Context, rtr *protos.TailResponse) error
 }
 
 const (
@@ -139,17 +139,8 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 	return resp, nil
 }
 
-func (c *Client) SendTail(ctx context.Context, req *protos.TailRequest, sessionID string, data []byte) error {
+func (c *Client) SendTail(ctx context.Context, tr *protos.TailResponse) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
-
-	tr := &protos.TailResponse{
-		Type:        protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-		Audience:    req.Audience,
-		PipelineId:  req.PipelineId,
-		SessionId:   sessionID,
-		TimestampNs: time.Now().UTC().UnixNano(),
-		Data:        data,
-	}
 
 	// TODO: endpoint accepts a stream so we will need to store this connection somewhere
 	srv, err := c.Server.SendTail(ctx)
