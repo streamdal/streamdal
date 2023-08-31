@@ -57,10 +57,11 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	configStrAudience := util.ConvertConfigStrAudience(configs)
 
 	return &protos.GetAllResponse{
-		Live:      liveInfo,
-		Audiences: audiences,
-		Pipelines: pipelines,
-		Config:    configStrAudience,
+		Live:                   liveInfo,
+		Audiences:              audiences,
+		Pipelines:              pipelines,
+		Config:                 configStrAudience,
+		GeneratedAtUnixTsNsUtc: time.Now().UTC().UnixNano(),
 	}, nil
 }
 
