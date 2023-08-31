@@ -511,7 +511,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		// Perform tail if necessary
 		if tailReq := s.getTail(aud, pipeline.Id); tailReq != nil {
 			// TODO: This needs to go to a worker pool, but just straight call gRPC for the time being
-			if err := s.serverClient.SendTail(ctx, tailReq, data); err != nil {
+			if err := s.serverClient.SendTail(ctx, tailReq, s.sessionID, data); err != nil {
 				s.config.Logger.Errorf("failed to send tail: %s", err)
 			}
 		}
