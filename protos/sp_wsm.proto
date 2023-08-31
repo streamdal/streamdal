@@ -6,13 +6,21 @@ import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
-// Included in WASM response; SDK is responsible for interpreting the response
-// status and how it relates to the step condition.
-// ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
+// Included in WASM response; the SDK should use the WASMExitCode to determine
+// what to do next - should it execute next step, should it notify or should it
+// stop executing/abort the rest of the steps in the pipeline.
+//
+// Example:
+//
+// a. WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
 // conditions to determine what to do next.
-// ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
-// to determine what to do next;
-enum WASMExitCode { // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+//
+// b. WASM func returns WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success
+// conditions to determine what to do next.
+//
+// .. and so on.
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+enum WASMExitCode {
   WASM_EXIT_CODE_UNSET = 0;
   WASM_EXIT_CODE_SUCCESS = 1;
   WASM_EXIT_CODE_FAILURE = 2; // Probably need better names for these as FAILURE is too harsh

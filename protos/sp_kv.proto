@@ -4,19 +4,23 @@ package protos;
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
 
+// NOTE: Most of these message types are used by snitch-server to facilitate KV
+// functionality.
+
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
 enum KVAction {
-  KV_ACTION_UNSET = 0; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-  KV_ACTION_CREATE = 1; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-  KV_ACTION_UPDATE = 2; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_UNSET = 0;
+  KV_ACTION_CREATE = 1;
+  KV_ACTION_UPDATE = 2;
 
   // Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
-  KV_ACTION_DELETE = 3; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_DELETE = 3;
 
   // Only "requested_at_*" needs to be set in *protos.KVInstruction
-  KV_ACTION_DELETE_ALL = 4; // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+  KV_ACTION_DELETE_ALL = 4;
 }
 
-// Represents a single KV object
+// KVObject represents a single KV object
 message KVObject {
   // Key regex: /^[a-zA-Z0-9_-:]+$/)
   string key = 1;

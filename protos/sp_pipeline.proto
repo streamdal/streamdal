@@ -7,6 +7,7 @@ import "steps/sp_steps_decode.proto";
 import "steps/sp_steps_detective.proto";
 import "steps/sp_steps_encode.proto";
 import "steps/sp_steps_httprequest.proto";
+import "steps/sp_steps_kv.proto";
 import "steps/sp_steps_transform.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
@@ -40,11 +41,10 @@ message PipelineStep {
   // Friendly name for the step
   string name = 1;
 
-  // What should SDK do if step succeeds?
-  //
+  // SDKs should read this when WASM returns success to determine what to do next
   repeated PipelineStepCondition on_success = 2;
 
-  // What should SDK do if step fails?
+  // SDKs should read this when WASM returns failure to determine what to do next
   repeated  PipelineStepCondition on_failure = 3;
 
   oneof step {
@@ -54,6 +54,7 @@ message PipelineStep {
     steps.DecodeStep decode = 1003;
     steps.CustomStep custom = 1004;
     steps.HttpRequestStep http_request = 1005;
+    steps.KVStep kv = 1006;
   }
 
   // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server

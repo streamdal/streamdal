@@ -2,6 +2,7 @@
 // @generated from protobuf file "sp_pipeline.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVStep } from "./steps/sp_steps_kv.js";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
 import { CustomStep } from "./steps/sp_steps_custom.js";
 import { DecodeStep } from "./steps/sp_steps_decode.js";
@@ -57,6 +58,7 @@ class PipelineStep$Type extends MessageType {
             { no: 1003, name: "decode", kind: "message", oneof: "step", T: () => DecodeStep },
             { no: 1004, name: "custom", kind: "message", oneof: "step", T: () => CustomStep },
             { no: 1005, name: "http_request", kind: "message", oneof: "step", T: () => HttpRequestStep },
+            { no: 1006, name: "kv", kind: "message", oneof: "step", T: () => KVStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }

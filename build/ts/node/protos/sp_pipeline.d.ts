@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVStep } from "./steps/sp_steps_kv.js";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
 import { CustomStep } from "./steps/sp_steps_custom.js";
 import { DecodeStep } from "./steps/sp_steps_decode.js";
@@ -46,14 +47,13 @@ export interface PipelineStep {
      */
     name: string;
     /**
-     * What should SDK do if step succeeds?
-     *
+     * SDKs should read this when WASM returns success to determine what to do next
      *
      * @generated from protobuf field: repeated protos.PipelineStepCondition on_success = 2;
      */
     onSuccess: PipelineStepCondition[];
     /**
-     * What should SDK do if step fails?
+     * SDKs should read this when WASM returns failure to determine what to do next
      *
      * @generated from protobuf field: repeated protos.PipelineStepCondition on_failure = 3;
      */
@@ -97,6 +97,12 @@ export interface PipelineStep {
          * @generated from protobuf field: protos.steps.HttpRequestStep http_request = 1005;
          */
         httpRequest: HttpRequestStep;
+    } | {
+        oneofKind: "kv";
+        /**
+         * @generated from protobuf field: protos.steps.KVStep kv = 1006;
+         */
+        kv: KVStep;
     } | {
         oneofKind: undefined;
     };

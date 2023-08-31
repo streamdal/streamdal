@@ -3,7 +3,7 @@
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * Represents a single KV object
+ * KVObject represents a single KV object
  *
  * @generated from protobuf message protos.KVObject
  */
@@ -115,40 +115,35 @@ export interface KVUpdateHTTPRequest {
      */
     kvs: KVObject[];
 }
+// NOTE: Most of these message types are used by snitch-server to facilitate KV
+// functionality.
+
 /**
+ * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+ *
  * @generated from protobuf enum protos.KVAction
  */
 export enum KVAction {
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
      */
     KV_ACTION_UNSET = 0,
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
      */
     KV_ACTION_CREATE = 1,
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
      */
     KV_ACTION_UPDATE = 2,
     /**
      * Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
      *
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
      */
     KV_ACTION_DELETE = 3,
     /**
      * Only "requested_at_*" needs to be set in *protos.KVInstruction
-     *
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
      *
      * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 4;
      */

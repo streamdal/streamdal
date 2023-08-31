@@ -2,41 +2,35 @@
 // @generated from protobuf file "sp_kv.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+// NOTE: Most of these message types are used by snitch-server to facilitate KV
+// functionality.
 /**
+ * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+ *
  * @generated from protobuf enum protos.KVAction
  */
 export var KVAction;
 (function (KVAction) {
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
      */
     KVAction[KVAction["KV_ACTION_UNSET"] = 0] = "KV_ACTION_UNSET";
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
      */
     KVAction[KVAction["KV_ACTION_CREATE"] = 1] = "KV_ACTION_CREATE";
     /**
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
      */
     KVAction[KVAction["KV_ACTION_UPDATE"] = 2] = "KV_ACTION_UPDATE";
     /**
      * Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
      *
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-     *
      * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
      */
     KVAction[KVAction["KV_ACTION_DELETE"] = 3] = "KV_ACTION_DELETE";
     /**
      * Only "requested_at_*" needs to be set in *protos.KVInstruction
-     *
-     * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
      *
      * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 4;
      */
