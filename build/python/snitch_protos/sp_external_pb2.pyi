@@ -84,7 +84,7 @@ class GetAllRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAllResponse(_message.Message):
-    __slots__ = ["audiences", "config", "live", "pipelines"]
+    __slots__ = ["audiences", "config", "generated_at_unix_ts_ns_utc", "live", "pipelines"]
     class ConfigEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -101,13 +101,15 @@ class GetAllResponse(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_info_pb2.PipelineInfo, _Mapping]] = ...) -> None: ...
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     CONFIG_FIELD_NUMBER: _ClassVar[int]
+    GENERATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
     LIVE_FIELD_NUMBER: _ClassVar[int]
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
     audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
     config: _containers.ScalarMap[str, str]
+    generated_at_unix_ts_ns_utc: int
     live: _containers.RepeatedCompositeFieldContainer[_sp_info_pb2.LiveInfo]
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
-    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []

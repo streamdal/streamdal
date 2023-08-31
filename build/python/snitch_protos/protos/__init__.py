@@ -340,6 +340,12 @@ class GetAllResponse(betterproto.Message):
     $pipeline_id
     """
 
+    generated_at_unix_ts_ns_utc: int = betterproto.int64_field(100)
+    """
+    When was this response generated. This is useful for determining what is
+    the latest update when using GetAllStream().
+    """
+
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesRequest(betterproto.Message):

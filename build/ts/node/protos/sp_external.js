@@ -27,7 +27,8 @@ class GetAllResponse$Type extends MessageType {
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
-            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
 }
