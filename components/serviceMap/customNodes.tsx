@@ -3,10 +3,10 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "twind";
 import { OperationType } from "snitch-protos/protos/sp_common.ts";
-import { NodeMenu, ServiceNodeMenu } from "./nodeMenu.tsx";
+import { ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { removeWhitespace, serviceKey, titleCase } from "../../lib/utils.ts";
+import { removeWhitespace, titleCase } from "../../lib/utils.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { NodeData } from "../../lib/nodeMapper.ts";
 import { opModal } from "./opModalSignal.ts";
@@ -81,6 +81,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 
 export const OperationNode = ({ data }: { data: NodeData }) => {
   const toolTipId = removeWhitespace(data.audience.operationName);
+  console.log(data.clients);
 
   return (
     <div class="h-[96px]">
@@ -95,6 +96,7 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
               opModal.value = {
                 audience: data.audience,
                 attachedPipeline: data.attachedPipeline,
+                clients: data.clients?.length,
               }}
           >
             <h2
@@ -109,15 +111,11 @@ export const OperationNode = ({ data }: { data: NodeData }) => {
             />
             <h3 class="text-xs text-streamdalPurple font-semibold">
               {`${data.clients?.length || 0} attached client${
-                data.clients?.length === 0 ? "s" : ""
+                data.clients?.length !== 1 ? "s" : ""
               }`}
             </h3>
           </div>
         </div>
-        <NodeMenu
-          audience={data.audience}
-          attachedPipeline={data.attachedPipeline}
-        />
       </div>
 
       <Handle

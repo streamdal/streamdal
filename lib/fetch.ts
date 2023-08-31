@@ -68,9 +68,9 @@ export const getPipeline = async (pipelineId: string) => {
   return response?.pipeline;
 };
 
-export const pausePipeline = async (pipeline: any) => {
+export const pausePipeline = async (pipeline: any, audience: Audience) => {
   const { response } = await client.pausePipeline(
-    { pipelineId: pipeline },
+    { pipelineId: pipeline, audience: audience },
     meta,
   );
   return response;

@@ -5,7 +5,7 @@ import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import IconUserCircle from "tabler-icons/tsx/user-circle.tsx";
 import IconCircleChevronRight from "tabler-icons/tsx/circle-chevron-right.tsx";
 import IconCircleChevronLeft from "tabler-icons/tsx/circle-chevron-left.tsx";
-import { titleCase } from "../lib/utils.ts";
+import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "snitch-protos/protos/sp_common.ts";
@@ -26,6 +26,7 @@ export default function OpModal(
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
   const opType = OperationType[audience?.operationType];
+  const clients = opModal.value?.clients;
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -88,7 +89,7 @@ export default function OpModal(
               </button>
             </div>
             <button
-              class=" bg-white ml-[-20px] rounded-full shadow-md"
+              class="bg-white mt-[-20px] ml-[-20px] rounded-full shadow-md"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen
@@ -114,13 +115,15 @@ export default function OpModal(
                           {audience?.operationName}
                         </h3>
                         <p class="text-xs text-gray-500">
-                          {`${titleCase(opType)}`}
+                          {`${clients || 0} attached client${
+                            (clients !== 1) ? "s" : ""
+                          }`}
                         </p>
                       </div>
                     </div>
                     {
                       /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                                                                                                                                                                                                                                                                                                                                                                                                                 the content of the modal but keep the modal open*/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           the content of the modal but keep the modal open*/
                     }
                     {/*<button*/}
                     {/*  type="button"*/}
@@ -130,14 +133,16 @@ export default function OpModal(
                     {/*  <IconX class="w-4 h-4" />*/}
                     {/*</button>*/}
                   </div>
-                  <div class="px-4 py-1">
+                  <div class="px-4 py-4 rounded bg-purple-500 mx-2">
                     <div class="mb-2 flex justify-between items-center pr-2">
-                      <h3 class="text-purple-700 text-sm">Attached Pipeline</h3>
+                      <h3 class="text-white font-bold text-sm">
+                        Attached Pipeline
+                      </h3>
                     </div>
                     {!serviceMap?.pipes.length
                       ? (
                         <a href={"/pipelines"}>
-                          <button class="text-gray-400 border-dashed border-gray-600 font-medium rounded-sm w-full flex justify-center text-sm px-2 text-xs py-1 text-center inline-flex items-center">
+                          <button class="text-white border bg-white font-medium rounded-sm w-full flex justify-center text-sm px-2 text-xs py-1 text-center inline-flex items-center">
                             <IconPlus class="w-4 h-4 mr-1" />
                             Create a new pipeline
                           </button>
@@ -146,14 +151,14 @@ export default function OpModal(
                       : attachedPipeline
                       ? (
                         <div
-                          className={`flex justify-between items-center text-purple-700 border border-gray-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
+                          className={`flex justify-between items-center text-white bg-web border border-gray-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
                             opModal.value?.attach &&
                             "ring-1 outline-none active:ring-purple-600"
                           }`}
                         >
                           {attachedPipeline?.name}
 
-                          <div class="flex flex-row items-center">
+                          <div class="py-1 flex flex-row items-center">
                             <button
                               data-tooltip-target="pipeline-pause"
                               type="button"
@@ -173,6 +178,7 @@ export default function OpModal(
                             <button
                               data-tooltip-target="pipeline-unlink"
                               type="button"
+                              class="mr-2"
                               onClick={() =>
                                 opModal.value = {
                                   ...opModal.value,
@@ -185,13 +191,28 @@ export default function OpModal(
                               targetId="pipeline-unlink"
                               message={"Click to detach pipeline"}
                             />
+                            <a
+                              href={"/pipelines"}
+                              className="flex items-center"
+                            >
+                              <button
+                                type="button"
+                                data-tooltip-target="pipeline-edit"
+                              >
+                                <IconAdjustmentsHorizontal class="w-4 h-4 text-gray-400" />
+                              </button>
+                              <Tooltip
+                                targetId="pipeline-edit"
+                                message={"Edit Pipelines"}
+                              />
+                            </a>
                           </div>
                         </div>
                       )
                       : (
                         <button
                           id="attach-pipeline"
-                          className="text-web border border-gray-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
+                          className="text-purple-200 bg-web border border-gray-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
                           type="button"
                           onClick={() =>
                             opModal.value = { ...opModal.value, attach: true }}
