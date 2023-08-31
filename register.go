@@ -129,6 +129,12 @@ func (s *Snitch) register(looper director.Looper) error {
 				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
 				return nil
 			}
+		} else if tail := cmd.GetTail(); tail != nil {
+			s.config.Logger.Debugf("Received tail command for pipeline '%s'", tail.GetRequest().PipelineId)
+			if err := s.tailPipeline(context.Background(), cmd); err != nil {
+				s.config.Logger.Errorf("Failed to tail pipeline: %s", err)
+				return nil
+			}
 		}
 
 		return nil

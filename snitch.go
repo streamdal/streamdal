@@ -88,6 +88,8 @@ type Snitch struct {
 	audiences          map[string]struct{}
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
+	tailsMtx           *sync.RWMutex
+	tails              map[string]*protos.TailRequest
 }
 
 type Config struct {
@@ -162,6 +164,8 @@ func New(cfg *Config) (*Snitch, error) {
 		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
+		tailsMtx:           &sync.RWMutex{},
+		tails:              make(map[string]*protos.TailRequest),
 	}
 
 	if cfg.DryRun {
@@ -503,6 +507,14 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		}
 
 		timeoutCxl()
+
+		// Perform tail if necessary
+		if tailReq := s.getTail(aud, pipeline.Id); tailReq != nil {
+			// TODO: This needs to go to a worker pool, but just straight call gRPC for the time being
+			if err := s.serverClient.SendTail(ctx, tailReq, data); err != nil {
+				s.config.Logger.Errorf("failed to send tail: %s", err)
+			}
+		}
 	}
 
 	// Dry run should not modify anything, but we must allow pipeline to

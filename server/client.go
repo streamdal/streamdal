@@ -32,6 +32,8 @@ type IServerClient interface {
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
+
+	SendTail(ctx context.Context, req *protos.TailRequest, data []byte) error
 }
 
 const (
@@ -87,7 +89,7 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 	}
 
 	req := &protos.MetricsRequest{
-		Metrics: []*protos.Metrics{
+		Metrics: []*protos.Metric{
 			{
 				Name:   string(counter.Name),
 				Value:  float64(counter.Value),
@@ -135,4 +137,29 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 	}
 
 	return resp, nil
+}
+
+func (c *Client) SendTail(ctx context.Context, req *protos.TailRequest, data []byte) error {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
+
+	tr := &protos.TailResponse{
+		Type:        protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
+		Audience:    req.Audience,
+		PipelineId:  req.PipelineId,
+		TimestampNs: time.Now().UTC().UnixNano(),
+		Data:        data,
+	}
+
+	// TODO: endpoint accepts a stream so we will need to store this connection somewhere
+	srv, err := c.Server.SendTail(ctx)
+	if err != nil {
+		return errors.Wrap(err, "unable to talk to snitch server")
+	}
+	defer srv.CloseSend()
+
+	if err := srv.Send(tr); err != nil {
+		return errors.Wrap(err, "unable to send tail")
+	}
+
+	return nil
 }
