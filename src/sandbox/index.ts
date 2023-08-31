@@ -95,17 +95,39 @@ const logTest = async (snitch: any, audience: Audience, input: any) => {
   console.log("\n");
 };
 
-export const example = async () => {
+// eslint-disable-next-line @typescript-eslint/require-await
+export const exampleStaggered = async () => {
   const snitchA = new Snitch(serviceAConfig);
   const snitchB = new Snitch(serviceBConfig);
 
   setInterval(() => {
     void logTest(snitchA, audienceAConsumer, exampleData);
+  }, 2000);
+
+  setTimeout(() => {
+    void logTest(snitchA, audienceAProducer, exampleData);
   }, 4000);
 
-  await logTest(snitchA, audienceAProducer, exampleData);
-  await logTest(snitchB, audienceBConsumer, exampleData);
-  await logTest(snitchB, audienceBProducer, exampleData);
+  setTimeout(() => {
+    void logTest(snitchB, audienceBConsumer, exampleData);
+  }, 8000);
+
+  setTimeout(() => {
+    void logTest(snitchB, audienceBProducer, exampleData);
+  }, 12000);
 };
 
-void example();
+// eslint-disable-next-line @typescript-eslint/require-await
+export const exampleConcurrent = async () => {
+  const snitchA = new Snitch(serviceAConfig);
+  const snitchB = new Snitch(serviceBConfig);
+  setInterval(() => {
+    void logTest(snitchA, audienceAConsumer, exampleData);
+  }, 4000);
+
+  void logTest(snitchA, audienceAProducer, exampleData);
+  void logTest(snitchB, audienceBConsumer, exampleData);
+  void logTest(snitchB, audienceBProducer, exampleData);
+};
+
+void exampleConcurrent();
