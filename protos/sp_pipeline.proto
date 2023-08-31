@@ -41,11 +41,10 @@ message PipelineStep {
   // Friendly name for the step
   string name = 1;
 
-  // What should SDK do if step succeeds?
-  //
+  // SDKs should read this when WASM returns success to determine what to do next
   repeated PipelineStepCondition on_success = 2;
 
-  // What should SDK do if step fails?
+  // SDKs should read this when WASM returns failure to determine what to do next
   repeated  PipelineStepCondition on_failure = 3;
 
   oneof step {

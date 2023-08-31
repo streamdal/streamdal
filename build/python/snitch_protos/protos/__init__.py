@@ -185,10 +185,16 @@ class PipelineStep(betterproto.Message):
     """Friendly name for the step"""
 
     on_success: List["PipelineStepCondition"] = betterproto.enum_field(2)
-    """What should SDK do if step succeeds?"""
+    """
+    SDKs should read this when WASM returns success to determine what to do
+    next
+    """
 
     on_failure: List["PipelineStepCondition"] = betterproto.enum_field(3)
-    """What should SDK do if step fails?"""
+    """
+    SDKs should read this when WASM returns failure to determine what to do
+    next
+    """
 
     detective: "steps.DetectiveStep" = betterproto.message_field(1000, group="step")
     transform: "steps.TransformStep" = betterproto.message_field(1001, group="step")

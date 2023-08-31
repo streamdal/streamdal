@@ -1,6 +1,6 @@
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * Used for constructing a pipeline step
+ * Encoded in KVStep; also used as param to HostFuncKVExists() in SDK
  *
  * @generated from protobuf message protos.steps.KVExistsRequest
  */
@@ -15,7 +15,7 @@ export interface KVExistsRequest {
     mode: KVExistsMode;
 }
 /**
- * Used as part of KVResponse (ie. the only accessor for this should be KV WASM)
+ * Returned by HostFuncKVExists() in SDK
  *
  * @generated from protobuf message protos.steps.KVExistsResponse
  */
@@ -40,25 +40,6 @@ export interface KVStep {
          * @generated from protobuf field: protos.steps.KVExistsRequest kv_exists_request = 1;
          */
         kvExistsRequest: KVExistsRequest;
-    } | {
-        oneofKind: undefined;
-    };
-}
-/**
- * Returned by HostFuncKVExists()
- *
- * @generated from protobuf message protos.steps.KVResponse
- */
-export interface KVResponse {
-    /**
-     * @generated from protobuf oneof: response
-     */
-    response: {
-        oneofKind: "kvExistsResponse";
-        /**
-         * @generated from protobuf field: protos.steps.KVExistsResponse kv_exists_response = 1;
-         */
-        kvExistsResponse: KVExistsResponse;
     } | {
         oneofKind: undefined;
     };
@@ -116,11 +97,4 @@ declare class KVStep$Type extends MessageType<KVStep> {
  * @generated MessageType for protobuf message protos.steps.KVStep
  */
 export declare const KVStep: KVStep$Type;
-declare class KVResponse$Type extends MessageType<KVResponse> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.steps.KVResponse
- */
-export declare const KVResponse: KVResponse$Type;
 export {};

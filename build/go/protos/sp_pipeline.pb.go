@@ -151,9 +151,9 @@ type PipelineStep struct {
 
 	// Friendly name for the step
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// What should SDK do if step succeeds?
+	// SDKs should read this when WASM returns success to determine what to do next
 	OnSuccess []PipelineStepCondition `protobuf:"varint,2,rep,packed,name=on_success,json=onSuccess,proto3,enum=protos.PipelineStepCondition" json:"on_success,omitempty"`
-	// What should SDK do if step fails?
+	// SDKs should read this when WASM returns failure to determine what to do next
 	OnFailure []PipelineStepCondition `protobuf:"varint,3,rep,packed,name=on_failure,json=onFailure,proto3,enum=protos.PipelineStepCondition" json:"on_failure,omitempty"`
 	// Types that are assignable to Step:
 	//

@@ -25,7 +25,7 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
-///  Used for constructing a pipeline step
+///  Encoded in KVStep; also used as param to HostFuncKVExists() in SDK
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.steps.KVExistsRequest)
 pub struct KVExistsRequest {
@@ -166,7 +166,7 @@ impl ::protobuf::reflect::ProtobufValue for KVExistsRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  Used as part of KVResponse (ie. the only accessor for this should be KV WASM)
+///  Returned by HostFuncKVExists() in SDK
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.steps.KVExistsResponse)
 pub struct KVExistsResponse {
@@ -500,217 +500,6 @@ pub mod kvstep {
     }
 }
 
-///  Returned by HostFuncKVExists()
-#[derive(PartialEq,Clone,Default,Debug)]
-// @@protoc_insertion_point(message:protos.steps.KVResponse)
-pub struct KVResponse {
-    // message oneof groups
-    pub response: ::std::option::Option<kvresponse::Response>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.steps.KVResponse.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a KVResponse {
-    fn default() -> &'a KVResponse {
-        <KVResponse as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl KVResponse {
-    pub fn new() -> KVResponse {
-        ::std::default::Default::default()
-    }
-
-    // .protos.steps.KVExistsResponse kv_exists_response = 1;
-
-    pub fn kv_exists_response(&self) -> &KVExistsResponse {
-        match self.response {
-            ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(ref v)) => v,
-            _ => <KVExistsResponse as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_kv_exists_response(&mut self) {
-        self.response = ::std::option::Option::None;
-    }
-
-    pub fn has_kv_exists_response(&self) -> bool {
-        match self.response {
-            ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_kv_exists_response(&mut self, v: KVExistsResponse) {
-        self.response = ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_kv_exists_response(&mut self) -> &mut KVExistsResponse {
-        if let ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(_)) = self.response {
-        } else {
-            self.response = ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(KVExistsResponse::new()));
-        }
-        match self.response {
-            ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_kv_exists_response(&mut self) -> KVExistsResponse {
-        if self.has_kv_exists_response() {
-            match self.response.take() {
-                ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            KVExistsResponse::new()
-        }
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(1);
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, KVExistsResponse>(
-            "kv_exists_response",
-            KVResponse::has_kv_exists_response,
-            KVResponse::kv_exists_response,
-            KVResponse::mut_kv_exists_response,
-            KVResponse::set_kv_exists_response,
-        ));
-        oneofs.push(kvresponse::Response::generated_oneof_descriptor_data());
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVResponse>(
-            "KVResponse",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for KVResponse {
-    const NAME: &'static str = "KVResponse";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.response = ::std::option::Option::Some(kvresponse::Response::KvExistsResponse(is.read_message()?));
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let ::std::option::Option::Some(ref v) = self.response {
-            match v {
-                &kvresponse::Response::KvExistsResponse(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-            };
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let ::std::option::Option::Some(ref v) = self.response {
-            match v {
-                &kvresponse::Response::KvExistsResponse(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-                },
-            };
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> KVResponse {
-        KVResponse::new()
-    }
-
-    fn clear(&mut self) {
-        self.response = ::std::option::Option::None;
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static KVResponse {
-        static instance: KVResponse = KVResponse {
-            response: ::std::option::Option::None,
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for KVResponse {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("KVResponse").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for KVResponse {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for KVResponse {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-/// Nested message and enums of message `KVResponse`
-pub mod kvresponse {
-
-    #[derive(Clone,PartialEq,Debug)]
-    #[non_exhaustive]
-    // @@protoc_insertion_point(oneof:protos.steps.KVResponse.response)
-    pub enum Response {
-        // @@protoc_insertion_point(oneof_field:protos.steps.KVResponse.kv_exists_response)
-        KvExistsResponse(super::KVExistsResponse),
-    }
-
-    impl ::protobuf::Oneof for Response {
-    }
-
-    impl ::protobuf::OneofFull for Response {
-        fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
-            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| <super::KVResponse as ::protobuf::MessageFull>::descriptor().oneof_by_name("response").unwrap()).clone()
-        }
-    }
-
-    impl Response {
-        pub(in super) fn generated_oneof_descriptor_data() -> ::protobuf::reflect::GeneratedOneofDescriptorData {
-            ::protobuf::reflect::GeneratedOneofDescriptorData::new::<Response>("response")
-        }
-    }
-}
-
 ///  Used by frontend when constructing a pipeline that contains a KV step that
 ///  performs a KVExists request.
 ///  protolint:disable:next ENUM_FIELD_NAMES_PREFIX
@@ -778,12 +567,10 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01(\x0e2\x1a.protos.steps.KVExistsModeR\x04mode\"*\n\x10KVExistsRespon\
     se\x12\x16\n\x06exists\x18\x01\x20\x01(\x08R\x06exists\"`\n\x06KVStep\
     \x12K\n\x11kv_exists_request\x18\x01\x20\x01(\x0b2\x1d.protos.steps.KVEx\
-    istsRequestH\0R\x0fkvExistsRequestB\t\n\x07request\"h\n\nKVResponse\x12N\
-    \n\x12kv_exists_response\x18\x01\x20\x01(\x0b2\x1e.protos.steps.KVExists\
-    ResponseH\0R\x10kvExistsResponseB\n\n\x08response*_\n\x0cKVExistsMode\
+    istsRequestH\0R\x0fkvExistsRequestB\t\n\x07request*_\n\x0cKVExistsMode\
     \x12\x18\n\x14KV_EXISTS_MODE_UNSET\x10\0\x12\x19\n\x15KV_EXISTS_MODE_STA\
     TIC\x10\x01\x12\x1a\n\x16KV_EXISTS_MODE_DYNAMIC\x10\x02B:Z8github.com/st\
-    reamdal/snitch-protos/build/go/protos/stepsJ\xe8\x0e\n\x06\x12\x04\0\0A\
+    reamdal/snitch-protos/build/go/protos/stepsJ\xd0\r\n\x06\x12\x04\0\0:\
     \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\
     \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\xaf\x05\
     \n\x02\x05\0\x12\x04\x19\0(\x01\x1a\x9a\x01\x20Used\x20by\x20frontend\
@@ -816,30 +603,24 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20value\x20of\x20\"foo\"\x20in\x20the\x20payload\x20(which\x20is\x20\"\
     bar\")\n\x202.\x20Use\x20\"bar\"\x20as\x20the\x20\"key\"\x20for\x20the\
     \x20KV\x20lookup\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03'\x02\x18\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03'\x1b\x1c\n3\n\x02\x04\0\x12\x04+\0.\x01\
-    \x1a'\x20Used\x20for\x20constructing\x20a\x20pipeline\x20step\n\n\n\n\
-    \x03\x04\0\x01\x12\x03+\x08\x17\n\x0b\n\x04\x04\0\x02\0\x12\x03,\x02\x11\
-    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03,\t\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03,\x0f\x10\n\x0b\n\
-    \x04\x04\0\x02\x01\x12\x03-\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
-    \x03-\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03-\x0f\x13\n\x0c\n\x05\
-    \x04\0\x02\x01\x03\x12\x03-\x16\x17\n[\n\x02\x04\x01\x12\x041\03\x01\x1a\
-    O\x20Used\x20as\x20part\x20of\x20KVResponse\x20(ie.\x20the\x20only\x20ac\
-    cessor\x20for\x20this\x20should\x20be\x20KV\x20WASM)\n\n\n\n\x03\x04\x01\
-    \x01\x12\x031\x08\x18\n\x0b\n\x04\x04\x01\x02\0\x12\x032\x02\x12\n\x0c\n\
-    \x05\x04\x01\x02\0\x05\x12\x032\x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\
-    \x12\x032\x07\r\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x032\x10\x11\n#\n\x02\
-    \x04\x02\x12\x046\0:\x01\x1a\x17\x20Used\x20in\x20PipelineSteps\n\n\n\n\
-    \x03\x04\x02\x01\x12\x036\x08\x0e\n\x0c\n\x04\x04\x02\x08\0\x12\x047\x02\
-    9\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\x037\x08\x0f\n\x0b\n\x04\x04\x02\
-    \x02\0\x12\x038\x04*\n\x0c\n\x05\x04\x02\x02\0\x06\x12\x038\x04\x13\n\
-    \x0c\n\x05\x04\x02\x02\0\x01\x12\x038\x14%\n\x0c\n\x05\x04\x02\x02\0\x03\
-    \x12\x038()\n,\n\x02\x04\x03\x12\x04=\0A\x01\x1a\x20\x20Returned\x20by\
-    \x20HostFuncKVExists()\n\n\n\n\x03\x04\x03\x01\x12\x03=\x08\x12\n\x0c\n\
-    \x04\x04\x03\x08\0\x12\x04>\x02@\x03\n\x0c\n\x05\x04\x03\x08\0\x01\x12\
-    \x03>\x08\x10\n\x0b\n\x04\x04\x03\x02\0\x12\x03?\x04,\n\x0c\n\x05\x04\
-    \x03\x02\0\x06\x12\x03?\x04\x14\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03?\
-    \x15'\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03?*+b\x06proto3\
+    \n\x05\x05\0\x02\x02\x02\x12\x03'\x1b\x1c\nP\n\x02\x04\0\x12\x04+\0.\x01\
+    \x1aD\x20Encoded\x20in\x20KVStep;\x20also\x20used\x20as\x20param\x20to\
+    \x20HostFuncKVExists()\x20in\x20SDK\n\n\n\n\x03\x04\0\x01\x12\x03+\x08\
+    \x17\n\x0b\n\x04\x04\0\x02\0\x12\x03,\x02\x11\n\x0c\n\x05\x04\0\x02\0\
+    \x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03,\t\x0c\n\x0c\n\
+    \x05\x04\0\x02\0\x03\x12\x03,\x0f\x10\n\x0b\n\x04\x04\0\x02\x01\x12\x03-\
+    \x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03-\x02\x0e\n\x0c\n\x05\x04\
+    \0\x02\x01\x01\x12\x03-\x0f\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03-\
+    \x16\x17\n3\n\x02\x04\x01\x12\x041\03\x01\x1a'\x20Returned\x20by\x20Host\
+    FuncKVExists()\x20in\x20SDK\n\n\n\n\x03\x04\x01\x01\x12\x031\x08\x18\n\
+    \x0b\n\x04\x04\x01\x02\0\x12\x032\x02\x12\n\x0c\n\x05\x04\x01\x02\0\x05\
+    \x12\x032\x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x032\x07\r\n\x0c\n\
+    \x05\x04\x01\x02\0\x03\x12\x032\x10\x11\n#\n\x02\x04\x02\x12\x046\0:\x01\
+    \x1a\x17\x20Used\x20in\x20PipelineSteps\n\n\n\n\x03\x04\x02\x01\x12\x036\
+    \x08\x0e\n\x0c\n\x04\x04\x02\x08\0\x12\x047\x029\x03\n\x0c\n\x05\x04\x02\
+    \x08\0\x01\x12\x037\x08\x0f\n\x0b\n\x04\x04\x02\x02\0\x12\x038\x04*\n\
+    \x0c\n\x05\x04\x02\x02\0\x06\x12\x038\x04\x13\n\x0c\n\x05\x04\x02\x02\0\
+    \x01\x12\x038\x14%\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x038()b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -857,11 +638,10 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(4);
+            let mut messages = ::std::vec::Vec::with_capacity(3);
             messages.push(KVExistsRequest::generated_message_descriptor_data());
             messages.push(KVExistsResponse::generated_message_descriptor_data());
             messages.push(KVStep::generated_message_descriptor_data());
-            messages.push(KVResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(KVExistsMode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

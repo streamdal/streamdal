@@ -50,14 +50,13 @@ export interface PipelineStep {
      */
     name: string;
     /**
-     * What should SDK do if step succeeds?
-     *
+     * SDKs should read this when WASM returns success to determine what to do next
      *
      * @generated from protobuf field: repeated protos.PipelineStepCondition on_success = 2;
      */
     onSuccess: PipelineStepCondition[];
     /**
-     * What should SDK do if step fails?
+     * SDKs should read this when WASM returns failure to determine what to do next
      *
      * @generated from protobuf field: repeated protos.PipelineStepCondition on_failure = 3;
      */

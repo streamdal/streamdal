@@ -87,16 +87,4 @@ class KVStep$Type extends MessageType {
  * @generated MessageType for protobuf message protos.steps.KVStep
  */
 export const KVStep = new KVStep$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class KVResponse$Type extends MessageType {
-    constructor() {
-        super("protos.steps.KVResponse", [
-            { no: 1, name: "kv_exists_response", kind: "message", oneof: "response", T: () => KVExistsResponse }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.steps.KVResponse
- */
-export const KVResponse = new KVResponse$Type();
 //# sourceMappingURL=sp_steps_kv.js.map

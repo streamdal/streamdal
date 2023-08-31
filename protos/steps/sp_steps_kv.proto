@@ -40,13 +40,13 @@ enum KVExistsMode {
   KV_EXISTS_MODE_DYNAMIC = 2;
 }
 
-// Used for constructing a pipeline step
+// Encoded in KVStep; also used as param to HostFuncKVExists() in SDK
 message KVExistsRequest {
   string key = 1;
   KVExistsMode mode = 2;
 }
 
-// Used as part of KVResponse (ie. the only accessor for this should be KV WASM)
+// Returned by HostFuncKVExists() in SDK
 message KVExistsResponse {
   bool exists = 1;
 }
@@ -55,12 +55,5 @@ message KVExistsResponse {
 message KVStep {
   oneof request {
     KVExistsRequest kv_exists_request = 1;
-  }
-}
-
-// Returned by HostFuncKVExists()
-message KVResponse {
-  oneof response {
-    KVExistsResponse kv_exists_response = 1;
   }
 }

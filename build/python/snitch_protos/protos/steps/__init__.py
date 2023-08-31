@@ -213,7 +213,7 @@ class HttpRequestStep(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvExistsRequest(betterproto.Message):
-    """Used for constructing a pipeline step"""
+    """Encoded in KVStep; also used as param to HostFuncKVExists() in SDK"""
 
     key: str = betterproto.string_field(1)
     mode: "KvExistsMode" = betterproto.enum_field(2)
@@ -221,10 +221,7 @@ class KvExistsRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvExistsResponse(betterproto.Message):
-    """
-    Used as part of KVResponse (ie. the only accessor for this should be KV
-    WASM)
-    """
+    """Returned by HostFuncKVExists() in SDK"""
 
     exists: bool = betterproto.bool_field(1)
 
@@ -234,15 +231,6 @@ class KvStep(betterproto.Message):
     """Used in PipelineSteps"""
 
     kv_exists_request: "KvExistsRequest" = betterproto.message_field(1, group="request")
-
-
-@dataclass(eq=False, repr=False)
-class KvResponse(betterproto.Message):
-    """Returned by HostFuncKVExists()"""
-
-    kv_exists_response: "KvExistsResponse" = betterproto.message_field(
-        1, group="response"
-    )
 
 
 @dataclass(eq=False, repr=False)
