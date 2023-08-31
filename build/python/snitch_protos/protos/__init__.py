@@ -82,6 +82,8 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
 
 
 class KvAction(betterproto.Enum):
+    """protolint:disable:next ENUM_FIELD_NAMES_PREFIX"""
+
     KV_ACTION_UNSET = 0
     KV_ACTION_CREATE = 1
     KV_ACTION_UPDATE = 2
@@ -96,11 +98,14 @@ class KvAction(betterproto.Enum):
 
 class WasmExitCode(betterproto.Enum):
     """
-    Included in WASM response; SDK is responsible for interpreting the response
-    status and how it relates to the step condition. ie. WASM func returns
-    WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR conditions to determine what
-    to do next. ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH
-    conditions to determine what to do next;
+    Included in WASM response; the SDK should use the WASMExitCode to determine
+    what to do next - should it execute next step, should it notify or should
+    it stop executing/abort the rest of the steps in the pipeline. Example: a.
+    WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
+    conditions to determine what to do next. b. WASM func returns
+    WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success conditions to
+    determine what to do next. .. and so on. protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
     """
 
     WASM_EXIT_CODE_UNSET = 0
@@ -193,6 +198,7 @@ class PipelineStep(betterproto.Message):
     http_request: "steps.HttpRequestStep" = betterproto.message_field(
         1005, group="step"
     )
+    kv: "steps.KvStep" = betterproto.message_field(1006, group="step")
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
@@ -493,7 +499,7 @@ class TestResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvObject(betterproto.Message):
-    """Represents a single KV object"""
+    """KVObject represents a single KV object"""
 
     key: str = betterproto.string_field(1)
     """Key regex: /^[a-zA-Z0-9_-:]+$/)"""

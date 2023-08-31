@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package protos.steps;
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+// KV consists of two parts:
+//
+// - KVStep
+// - HostFuncKVExists
+//
+// KVStep is used in PipelineSteps that will execute a specific KV request;
+// the actual KV lookup is performed by the KV WASM func that calls out to
+// HostFuncKVExists() that is a function exported by the SDK.
+//
+// The HostFuncKVExists() function is needed because as of 08.30.2023, WASM does
+// not have socket support, so we need to call out to the SDK to perform the
+// actual KV API call.
+//
+
+// Used by frontend when constructing a pipeline that contains a KV step that
+// performs a KVExists request.
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+enum KVExistsMode {
+  KV_EXISTS_MODE_UNSET = 0;
+
+  // Will cause the KV lookup to use the key string as-is for the lookup
+  KV_EXISTS_MODE_STATIC = 1;
+
+  // DYNAMIC mode will cause the KV lookup WASM to use the key to lookup the
+  // associated value and use the result for the key existence check.
+  //
+  // For example, if "key" in KVExistsRequest is set to "foo", KV WASM will do
+  // the following:
+  //
+  // 1. Lookup the value of "foo" in the payload (which is "bar")
+  // 2. Use "bar" as the "key" for the KV lookup
+  KV_EXISTS_MODE_DYNAMIC = 2;
+}
+
+// Used for constructing a pipeline step
+message KVExistsRequest {
+  string key = 1;
+  KVExistsMode mode = 2;
+}
+
+// Used as part of KVResponse (ie. the only accessor for this should be KV WASM)
+message KVExistsResponse {
+  bool exists = 1;
+}
+
+// Used in PipelineSteps
+message KVStep {
+  oneof request {
+    KVExistsRequest kv_exists_request = 1;
+  }
+}
+
+// Returned by HostFuncKVExists()
+message KVResponse {
+  oneof response {
+    KVExistsResponse kv_exists_response = 1;
+  }
+}

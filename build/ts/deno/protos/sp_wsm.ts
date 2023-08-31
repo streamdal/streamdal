@@ -38,14 +38,20 @@ export interface WASMResponse {
     exitMsg: string;
 }
 /**
- * Included in WASM response; SDK is responsible for interpreting the response
- * status and how it relates to the step condition.
- * ie. WASM func returns WASM_EXIT_CODE_INTERNAL_ERROR lookup ON_ERROR
- * conditions to determine what to do next.
- * ie. WASM func returns WASM_EXIT_CODE_SUCCESS lookup ON_MATCH conditions
- * to determine what to do next;
+ * Included in WASM response; the SDK should use the WASMExitCode to determine
+ * what to do next - should it execute next step, should it notify or should it
+ * stop executing/abort the rest of the steps in the pipeline.
  *
- * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+ * Example:
+ *
+ * a. WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
+ * conditions to determine what to do next.
+ *
+ * b. WASM func returns WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success
+ * conditions to determine what to do next.
+ *
+ * .. and so on.
+ * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
  *
  * @generated from protobuf enum protos.WASMExitCode
  */

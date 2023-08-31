@@ -7,6 +7,7 @@ import "steps/sp_steps_decode.proto";
 import "steps/sp_steps_detective.proto";
 import "steps/sp_steps_encode.proto";
 import "steps/sp_steps_httprequest.proto";
+import "steps/sp_steps_kv.proto";
 import "steps/sp_steps_transform.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
@@ -54,6 +55,7 @@ message PipelineStep {
     steps.DecodeStep decode = 1003;
     steps.CustomStep custom = 1004;
     steps.HttpRequestStep http_request = 1005;
+    steps.KVStep kv = 1006;
   }
 
   // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server

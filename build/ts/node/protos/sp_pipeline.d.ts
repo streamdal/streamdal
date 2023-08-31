@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVStep } from "./steps/sp_steps_kv.js";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
 import { CustomStep } from "./steps/sp_steps_custom.js";
 import { DecodeStep } from "./steps/sp_steps_decode.js";
@@ -97,6 +98,12 @@ export interface PipelineStep {
          * @generated from protobuf field: protos.steps.HttpRequestStep http_request = 1005;
          */
         httpRequest: HttpRequestStep;
+    } | {
+        oneofKind: "kv";
+        /**
+         * @generated from protobuf field: protos.steps.KVStep kv = 1006;
+         */
+        kv: KVStep;
     } | {
         oneofKind: undefined;
     };
