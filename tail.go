@@ -44,10 +44,17 @@ func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
 		return
 	}
 
+	// Always cancel the context regardless of how we exit so
+	// that getTail() can remove the tail from the map
+	defer t.CancelFunc()
+
 	for {
 		select {
 		case <-t.cancelCtx.Done():
 			t.log.Debug("tail worker cancelled")
+			return
+		case <-stream.Context().Done():
+			t.log.Debug("tail worker context terminated")
 			return
 		case resp := <-t.Ch:
 			if err := stream.Send(resp); err != nil {
@@ -100,14 +107,26 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 
 func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) *Tail {
 	s.tailsMtx.RLock()
-	defer s.tailsMtx.RUnlock()
-
 	tail, ok := s.tails[tailKey(aud, pipelineID)]
+	s.tailsMtx.RUnlock()
+
 	if ok {
+		// We don't know when a tail is cancelled so we need to check the context
+		if tail.cancelCtx.Err() == context.Canceled {
+			s.removeTail(aud, pipelineID)
+			return nil
+		}
+
 		return tail
 	}
 
 	return nil
+}
+func (s *Snitch) removeTail(aud *protos.Audience, pipelineID string) {
+	s.tailsMtx.Lock()
+	defer s.tailsMtx.Unlock()
+
+	delete(s.tails, tailKey(aud, pipelineID))
 }
 
 func (s *Snitch) setTailing(aud *protos.Audience, pipelineID string, tail *Tail) {
