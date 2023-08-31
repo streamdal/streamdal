@@ -54,6 +54,8 @@ message Metric {
 message TailRequest {
   Audience audience = 1;
   string pipeline_id = 2;
+
+  map<string, string> _metadata = 3; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 enum TailResponseType {
@@ -78,7 +80,12 @@ message TailResponse {
 
   // Payload data. For errors, this will be the error message
   // For payloads, this will be JSON of the payload data, post processing
-  bytes data = 6;
+  bytes original_data = 6;
+
+  // For payloads, this will be the new data, post processing
+  bytes new_data = 7;
+
+  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message TailCommand {

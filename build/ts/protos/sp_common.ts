@@ -86,6 +86,12 @@ export interface TailRequest {
      * @generated from protobuf field: string pipeline_id = 2;
      */
     pipelineId: string;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 3;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * TailResponse originates in the SDK and then is sent to snitch servers where
@@ -120,9 +126,21 @@ export interface TailResponse {
      * Payload data. For errors, this will be the error message
      * For payloads, this will be JSON of the payload data, post processing
      *
-     * @generated from protobuf field: bytes data = 6;
+     * @generated from protobuf field: bytes original_data = 6;
      */
-    data: Uint8Array;
+    originalData: Uint8Array;
+    /**
+     * For payloads, this will be the new data, post processing
+     *
+     * @generated from protobuf field: bytes new_data = 7;
+     */
+    newData: Uint8Array;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.TailCommand
@@ -248,7 +266,8 @@ class TailRequest$Type extends MessageType<TailRequest> {
     constructor() {
         super("protos.TailRequest", [
             { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
 }
@@ -265,7 +284,9 @@ class TailResponse$Type extends MessageType<TailResponse> {
             { no: 3, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 6, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 6, name: "original_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 7, name: "new_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
 }

@@ -64,28 +64,48 @@ class TailCommand(_message.Message):
     def __init__(self, request: _Optional[_Union[TailRequest, _Mapping]] = ...) -> None: ...
 
 class TailRequest(_message.Message):
-    __slots__ = ["audience", "pipeline_id"]
+    __slots__ = ["_metadata", "audience", "pipeline_id"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     pipeline_id: str
-    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TailResponse(_message.Message):
-    __slots__ = ["audience", "data", "pipeline_id", "session_id", "timestamp_ns", "type"]
+    __slots__ = ["_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "timestamp_ns", "type"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    DATA_FIELD_NUMBER: _ClassVar[int]
+    NEW_DATA_FIELD_NUMBER: _ClassVar[int]
+    ORIGINAL_DATA_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_NS_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     audience: Audience
-    data: bytes
+    new_data: bytes
+    original_data: bytes
     pipeline_id: str
     session_id: str
     timestamp_ns: int
     type: TailResponseType
-    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., session_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., session_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., original_data: _Optional[bytes] = ..., new_data: _Optional[bytes] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

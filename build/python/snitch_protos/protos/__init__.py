@@ -164,6 +164,9 @@ class Metric(betterproto.Message):
 class TailRequest(betterproto.Message):
     audience: "Audience" = betterproto.message_field(1)
     pipeline_id: str = betterproto.string_field(2)
+    metadata: Dict[str, str] = betterproto.map_field(
+        3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
 
 
 @dataclass(eq=False, repr=False)
@@ -180,11 +183,18 @@ class TailResponse(betterproto.Message):
     timestamp_ns: int = betterproto.int64_field(5)
     """Timestamp in nanoseconds"""
 
-    data: bytes = betterproto.bytes_field(6)
+    original_data: bytes = betterproto.bytes_field(6)
     """
     Payload data. For errors, this will be the error message For payloads, this
     will be JSON of the payload data, post processing
     """
+
+    new_data: bytes = betterproto.bytes_field(7)
+    """For payloads, this will be the new data, post processing"""
+
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
 
 
 @dataclass(eq=False, repr=False)
