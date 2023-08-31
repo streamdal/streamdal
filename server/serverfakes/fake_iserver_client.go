@@ -25,6 +25,19 @@ type FakeIServerClient struct {
 		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}
+	GetTailStreamStub        func(context.Context) (protos.Internal_SendTailClient, error)
+	getTailStreamMutex       sync.RWMutex
+	getTailStreamArgsForCall []struct {
+		arg1 context.Context
+	}
+	getTailStreamReturns struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}
+	getTailStreamReturnsOnCall map[int]struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}
 	HeartBeatStub        func(context.Context, string) error
 	heartBeatMutex       sync.RWMutex
 	heartBeatArgsForCall []struct {
@@ -88,18 +101,6 @@ type FakeIServerClient struct {
 		result1 error
 	}
 	sendMetricsReturnsOnCall map[int]struct {
-		result1 error
-	}
-	SendTailStub        func(context.Context, *protos.TailResponse) error
-	sendTailMutex       sync.RWMutex
-	sendTailArgsForCall []struct {
-		arg1 context.Context
-		arg2 *protos.TailResponse
-	}
-	sendTailReturns struct {
-		result1 error
-	}
-	sendTailReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -167,6 +168,70 @@ func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, re
 	}
 	fake.getAttachCommandsByServiceReturnsOnCall[i] = struct {
 		result1 *protos.GetAttachCommandsByServiceResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIServerClient) GetTailStream(arg1 context.Context) (protos.Internal_SendTailClient, error) {
+	fake.getTailStreamMutex.Lock()
+	ret, specificReturn := fake.getTailStreamReturnsOnCall[len(fake.getTailStreamArgsForCall)]
+	fake.getTailStreamArgsForCall = append(fake.getTailStreamArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.GetTailStreamStub
+	fakeReturns := fake.getTailStreamReturns
+	fake.recordInvocation("GetTailStream", []interface{}{arg1})
+	fake.getTailStreamMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIServerClient) GetTailStreamCallCount() int {
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
+	return len(fake.getTailStreamArgsForCall)
+}
+
+func (fake *FakeIServerClient) GetTailStreamCalls(stub func(context.Context) (protos.Internal_SendTailClient, error)) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = stub
+}
+
+func (fake *FakeIServerClient) GetTailStreamArgsForCall(i int) context.Context {
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
+	argsForCall := fake.getTailStreamArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeIServerClient) GetTailStreamReturns(result1 protos.Internal_SendTailClient, result2 error) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = nil
+	fake.getTailStreamReturns = struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIServerClient) GetTailStreamReturnsOnCall(i int, result1 protos.Internal_SendTailClient, result2 error) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = nil
+	if fake.getTailStreamReturnsOnCall == nil {
+		fake.getTailStreamReturnsOnCall = make(map[int]struct {
+			result1 protos.Internal_SendTailClient
+			result2 error
+		})
+	}
+	fake.getTailStreamReturnsOnCall[i] = struct {
+		result1 protos.Internal_SendTailClient
 		result2 error
 	}{result1, result2}
 }
@@ -487,73 +552,13 @@ func (fake *FakeIServerClient) SendMetricsReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIServerClient) SendTail(arg1 context.Context, arg2 *protos.TailResponse) error {
-	fake.sendTailMutex.Lock()
-	ret, specificReturn := fake.sendTailReturnsOnCall[len(fake.sendTailArgsForCall)]
-	fake.sendTailArgsForCall = append(fake.sendTailArgsForCall, struct {
-		arg1 context.Context
-		arg2 *protos.TailResponse
-	}{arg1, arg2})
-	stub := fake.SendTailStub
-	fakeReturns := fake.sendTailReturns
-	fake.recordInvocation("SendTail", []interface{}{arg1, arg2})
-	fake.sendTailMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeIServerClient) SendTailCallCount() int {
-	fake.sendTailMutex.RLock()
-	defer fake.sendTailMutex.RUnlock()
-	return len(fake.sendTailArgsForCall)
-}
-
-func (fake *FakeIServerClient) SendTailCalls(stub func(context.Context, *protos.TailResponse) error) {
-	fake.sendTailMutex.Lock()
-	defer fake.sendTailMutex.Unlock()
-	fake.SendTailStub = stub
-}
-
-func (fake *FakeIServerClient) SendTailArgsForCall(i int) (context.Context, *protos.TailResponse) {
-	fake.sendTailMutex.RLock()
-	defer fake.sendTailMutex.RUnlock()
-	argsForCall := fake.sendTailArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeIServerClient) SendTailReturns(result1 error) {
-	fake.sendTailMutex.Lock()
-	defer fake.sendTailMutex.Unlock()
-	fake.SendTailStub = nil
-	fake.sendTailReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIServerClient) SendTailReturnsOnCall(i int, result1 error) {
-	fake.sendTailMutex.Lock()
-	defer fake.sendTailMutex.Unlock()
-	fake.SendTailStub = nil
-	if fake.sendTailReturnsOnCall == nil {
-		fake.sendTailReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.sendTailReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getAttachCommandsByServiceMutex.RLock()
 	defer fake.getAttachCommandsByServiceMutex.RUnlock()
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
 	fake.heartBeatMutex.RLock()
 	defer fake.heartBeatMutex.RUnlock()
 	fake.newAudienceMutex.RLock()
@@ -564,8 +569,6 @@ func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	defer fake.registerMutex.RUnlock()
 	fake.sendMetricsMutex.RLock()
 	defer fake.sendMetricsMutex.RUnlock()
-	fake.sendTailMutex.RLock()
-	defer fake.sendTailMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

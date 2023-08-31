@@ -27,7 +27,7 @@ type Tail struct {
 func (t *Tail) startWorkers() error {
 	for i := 0; i < NumTailWorkers; i++ {
 		// Start SDK -> Server streaming gRPC connection
-		stream, err := t.snitchServer.GetConn().SendTail(t.cancelCtx)
+		stream, err := t.snitchServer.GetTailStream(t.cancelCtx)
 		if err != nil {
 			return errors.Wrap(err, "error starting tail worker")
 		}
@@ -39,7 +39,10 @@ func (t *Tail) startWorkers() error {
 }
 
 func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
-	defer stream.CloseSend()
+	if stream == nil {
+		t.log.Error("stream is nil, unable to start tail worker")
+		return
+	}
 
 	for {
 		select {

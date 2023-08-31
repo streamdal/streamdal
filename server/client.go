@@ -33,9 +33,7 @@ type IServerClient interface {
 
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
 
-	GetConn() protos.InternalClient
-
-	SendTail(ctx context.Context, rtr *protos.TailResponse) error
+	GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error)
 }
 
 const (
@@ -63,10 +61,6 @@ func New(plumberAddress, plumberToken string) (*Client, error) {
 		Server: protos.NewInternalClient(conn),
 		Token:  plumberToken,
 	}, nil
-}
-
-func (c *Client) GetConn() protos.InternalClient {
-	return c.Server
 }
 
 func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error {
@@ -145,19 +139,14 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 	return resp, nil
 }
 
-func (c *Client) SendTail(ctx context.Context, tr *protos.TailResponse) error {
+func (c *Client) GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
 	// TODO: endpoint accepts a stream so we will need to store this connection somewhere
 	srv, err := c.Server.SendTail(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to talk to snitch server")
-	}
-	defer srv.CloseSend()
-
-	if err := srv.Send(tr); err != nil {
-		return errors.Wrap(err, "unable to send tail")
+		return nil, errors.Wrap(err, "unable to talk to snitch server")
 	}
 
-	return nil
+	return srv, nil
 }

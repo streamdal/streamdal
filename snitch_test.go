@@ -258,6 +258,8 @@ func TestProcess_success(t *testing.T) {
 		functions:    map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
+		tails:        map[string]*Tail{},
+		tailsMtx:     &sync.RWMutex{},
 		config: &Config{
 			ServiceName:     "mysvc1",
 			Logger:          &logger.NoOpLogger{},
