@@ -7,16 +7,13 @@ import {
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
 import { signal, useSignalEffect } from "@preact/signals";
-import { ServiceNodes } from "../lib/fetch.ts";
 import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
+import { updateNode } from "../lib/nodeMapper.ts";
+import { GrpcConfigs, streamServiceMap } from "../lib/client/stream.ts";
+import { serviceDisplaySignal } from "../components/serviceMap/serviceSignal.ts";
 
 const LAYOUT_KEY = "service-map-layout";
-
-export const serviceSignal = signal<ServiceNodes | null>(
-  null,
-);
 
 export type OpUpdate = {
   audience: Audience;
@@ -39,18 +36,15 @@ const serialize = async (instance: any) => {
 };
 
 export default function ServiceMap(
-  { nodesData, edgesData, blur = false }: {
-    nodesData: FlowNode[];
-    edgesData: FlowEdge[];
+  { grpcConfigs, blur = false }: {
+    grpcConfigs: GrpcConfigs;
     blur?: boolean;
   },
 ) {
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    nodesData,
-  );
-  const [edges, onEdgesChange] = useEdgesState(
-    edgesData,
-  );
+  void streamServiceMap(grpcConfigs);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState();
+  const [edges, setEdges, onEdgesChange] = useEdgesState();
 
   const defaultViewport = {
     x: 0,
@@ -62,6 +56,17 @@ export default function ServiceMap(
     if (opUpdateSignal.value) {
       const updated = updateNode(nodes, opUpdateSignal.value);
       setNodes(updated);
+    }
+  });
+
+  useSignalEffect(() => {
+    if (serviceDisplaySignal?.value) {
+      console.log(
+        "shit client service display signal",
+        serviceDisplaySignal?.value,
+      );
+      setNodes(serviceDisplaySignal.value.displayNodes);
+      setEdges(serviceDisplaySignal.value.displayEdges);
     }
   });
 

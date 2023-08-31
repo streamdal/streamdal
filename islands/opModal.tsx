@@ -6,7 +6,7 @@ import IconUserCircle from "tabler-icons/tsx/user-circle.tsx";
 import IconCircleChevronRight from "tabler-icons/tsx/circle-chevron-right.tsx";
 import IconCircleChevronLeft from "tabler-icons/tsx/circle-chevron-left.tsx";
 import { titleCase } from "../lib/utils.ts";
-import { ServiceMapType } from "../lib/fetch.ts";
+import { ServiceMap } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "snitch-protos/protos/sp_common.ts";
 import IconLink from "tabler-icons/tsx/link.tsx";
@@ -21,7 +21,7 @@ import { useState } from "preact/hooks";
 import { useSignalEffect } from "@preact/signals";
 
 export default function OpModal(
-  { serviceMap }: { serviceMap: ServiceMapType },
+  { serviceMap }: { serviceMap: ServiceMap },
 ) {
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;

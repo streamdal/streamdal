@@ -1,61 +1,23 @@
 import { client, meta } from "./grpc.ts";
 import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
-import {
-  ClientInfo,
-  LiveInfo,
-  PipelineInfo,
-} from "snitch-protos/protos/sp_info.ts";
+import { PipelineInfo } from "snitch-protos/protos/sp_info.ts";
 import { Audience } from "snitch-protos/protos/sp_common.ts";
-import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
-import { audienceKey } from "./utils.ts";
-
-export type ServiceMapType = GetAllResponse & {
-  pipes: PipelineInfo[];
-  liveAudiences: Map<string, ClientInfo[]>;
-};
+import { mapServiceDisplay, mapServiceResponse } from "./serviceMap.ts";
 
 export type ConfigType = { [key: string]: string };
 export type PipelinesType = { [key: string]: PipelineInfo };
 
-export const mapLiveAudiences = (live: LiveInfo[]) => {
-  const liveAudiences = new Map<string, ClientInfo[]>();
-
-  for (const l of live) {
-    for (const a of l.audiences) {
-      const key = audienceKey(a);
-      liveAudiences.has(key)
-        ? liveAudiences.set(key, [
-          ...liveAudiences.get(key) as ClientInfo[],
-          l.client as ClientInfo,
-        ])
-        : liveAudiences.set(key, [l.client] as ClientInfo[]);
-    }
-  }
-  return liveAudiences;
-};
-
-export const getServiceMap = async (): Promise<ServiceMapType> => {
+export const getAll = async (): Promise<GetAllResponse> => {
   const { response } = await client.getAll({}, meta);
+  return response;
+};
+
+export const getServiceMap = async () => {
+  const serviceMap = mapServiceResponse(await getAll());
   return {
-    ...response,
-    pipes: Object.values(response?.pipelines),
-    liveAudiences: mapLiveAudiences(response.live),
+    serviceMap,
+    serviceDisplayMap: mapServiceDisplay(serviceMap),
   };
-};
-
-export type ServiceNodes = {
-  nodes: FlowNode[];
-  edges: FlowEdge[];
-};
-
-export const getDisplayNodes = async (
-  serviceMap: ServiceMapType,
-): Promise<ServiceNodes> => {
-  const edges = Array.from(mapEdges(serviceMap.audiences).values());
-  const nodes = Array.from(
-    mapNodes(serviceMap).nodes.values(),
-  );
-  return { nodes, edges };
 };
 
 export const getPipelines = async () => {

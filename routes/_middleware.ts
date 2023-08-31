@@ -4,7 +4,7 @@ import {
   WithSession,
 } from "https://deno.land/x/fresh_session@0.2.2/mod.ts";
 import { ErrorType } from "../components/form/validate.ts";
-import { ServiceMapType } from "../lib/fetch.ts";
+import { ServiceMap } from "../lib/fetch.ts";
 
 export type SuccessType = {
   status: boolean;
@@ -21,7 +21,7 @@ export type SuccessRoute = {
 Deno.env.set("APP_KEY", "dayroom-tingling-movable-flatly");
 
 export type State =
-  & { success: SuccessType; serviceMap: ServiceMapType }
+  & { success: SuccessType; serviceMap: ServiceMap }
   & WithSession;
 
 const session = cookieSession();
