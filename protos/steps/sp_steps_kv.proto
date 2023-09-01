@@ -48,7 +48,14 @@ message KVExistsRequest {
 
 // Returned by HostFuncKVExists() in SDK
 message KVExistsResponse {
+  // Whether the key exists
   bool exists = 1;
+
+  // Whether the request resulted in an error
+  bool is_error = 2;
+
+  // Potential message containing debug or error info
+  string message = 3;
 }
 
 // Used in PipelineSteps

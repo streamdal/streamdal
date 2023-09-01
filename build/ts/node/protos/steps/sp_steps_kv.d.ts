@@ -21,9 +21,23 @@ export interface KVExistsRequest {
  */
 export interface KVExistsResponse {
     /**
+     * Whether the key exists
+     *
      * @generated from protobuf field: bool exists = 1;
      */
     exists: boolean;
+    /**
+     * Whether the request resulted in an error
+     *
+     * @generated from protobuf field: bool is_error = 2;
+     */
+    isError: boolean;
+    /**
+     * Potential message containing debug or error info
+     *
+     * @generated from protobuf field: string message = 3;
+     */
+    message: string;
 }
 /**
  * Used in PipelineSteps

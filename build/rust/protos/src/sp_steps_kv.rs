@@ -171,8 +171,15 @@ impl ::protobuf::reflect::ProtobufValue for KVExistsRequest {
 // @@protoc_insertion_point(message:protos.steps.KVExistsResponse)
 pub struct KVExistsResponse {
     // message fields
+    ///  Whether the key exists
     // @@protoc_insertion_point(field:protos.steps.KVExistsResponse.exists)
     pub exists: bool,
+    ///  Whether the request resulted in an error
+    // @@protoc_insertion_point(field:protos.steps.KVExistsResponse.is_error)
+    pub is_error: bool,
+    ///  Potential message containing debug or error info
+    // @@protoc_insertion_point(field:protos.steps.KVExistsResponse.message)
+    pub message: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.KVExistsResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -190,12 +197,22 @@ impl KVExistsResponse {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "exists",
             |m: &KVExistsResponse| { &m.exists },
             |m: &mut KVExistsResponse| { &mut m.exists },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "is_error",
+            |m: &KVExistsResponse| { &m.is_error },
+            |m: &mut KVExistsResponse| { &mut m.is_error },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "message",
+            |m: &KVExistsResponse| { &m.message },
+            |m: &mut KVExistsResponse| { &mut m.message },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<KVExistsResponse>(
             "KVExistsResponse",
@@ -218,6 +235,12 @@ impl ::protobuf::Message for KVExistsResponse {
                 8 => {
                     self.exists = is.read_bool()?;
                 },
+                16 => {
+                    self.is_error = is.read_bool()?;
+                },
+                26 => {
+                    self.message = is.read_string()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -233,6 +256,12 @@ impl ::protobuf::Message for KVExistsResponse {
         if self.exists != false {
             my_size += 1 + 1;
         }
+        if self.is_error != false {
+            my_size += 1 + 1;
+        }
+        if !self.message.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.message);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -241,6 +270,12 @@ impl ::protobuf::Message for KVExistsResponse {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if self.exists != false {
             os.write_bool(1, self.exists)?;
+        }
+        if self.is_error != false {
+            os.write_bool(2, self.is_error)?;
+        }
+        if !self.message.is_empty() {
+            os.write_string(3, &self.message)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -260,12 +295,16 @@ impl ::protobuf::Message for KVExistsResponse {
 
     fn clear(&mut self) {
         self.exists = false;
+        self.is_error = false;
+        self.message.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static KVExistsResponse {
         static instance: KVExistsResponse = KVExistsResponse {
             exists: false,
+            is_error: false,
+            message: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -564,63 +603,73 @@ impl KVExistsMode {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x17steps/sp_steps_kv.proto\x12\x0cprotos.steps\"S\n\x0fKVExistsReques\
     t\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12.\n\x04mode\x18\x02\x20\
-    \x01(\x0e2\x1a.protos.steps.KVExistsModeR\x04mode\"*\n\x10KVExistsRespon\
-    se\x12\x16\n\x06exists\x18\x01\x20\x01(\x08R\x06exists\"`\n\x06KVStep\
-    \x12K\n\x11kv_exists_request\x18\x01\x20\x01(\x0b2\x1d.protos.steps.KVEx\
-    istsRequestH\0R\x0fkvExistsRequestB\t\n\x07request*_\n\x0cKVExistsMode\
-    \x12\x18\n\x14KV_EXISTS_MODE_UNSET\x10\0\x12\x19\n\x15KV_EXISTS_MODE_STA\
-    TIC\x10\x01\x12\x1a\n\x16KV_EXISTS_MODE_DYNAMIC\x10\x02B:Z8github.com/st\
-    reamdal/snitch-protos/build/go/protos/stepsJ\xd0\r\n\x06\x12\x04\0\0:\
-    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\
-    \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\xaf\x05\
-    \n\x02\x05\0\x12\x04\x19\0(\x01\x1a\x9a\x01\x20Used\x20by\x20frontend\
-    \x20when\x20constructing\x20a\x20pipeline\x20that\x20contains\x20a\x20KV\
-    \x20step\x20that\n\x20performs\x20a\x20KVExists\x20request.\n\x20protoli\
-    nt:disable:next\x20ENUM_FIELD_NAMES_PREFIX\n2\x85\x04\x20!!!!!!!!!!!!!!!\
-    !!!!!!!!!!!!\x20IMPORTANT\x20!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\x20KV\
-    \x20consists\x20of\x20two\x20parts:\n\n\x20-\x20KVStep\n\x20-\x20HostFun\
-    cKVExists\n\n\x20KVStep\x20is\x20used\x20in\x20PipelineSteps\x20that\x20\
-    will\x20execute\x20a\x20specific\x20KV\x20request;\n\x20the\x20actual\
-    \x20KV\x20lookup\x20is\x20performed\x20by\x20the\x20KV\x20WASM\x20func\
-    \x20that\x20calls\x20out\x20to\n\x20HostFuncKVExists()\x20that\x20is\x20\
-    a\x20function\x20exported\x20by\x20the\x20SDK.\n\n\x20The\x20HostFuncKVE\
-    xists()\x20function\x20is\x20needed\x20because\x20as\x20of\x2008.30.2023\
-    ,\x20WASM\x20does\n\x20not\x20have\x20socket\x20support,\x20so\x20we\x20\
-    need\x20to\x20call\x20out\x20to\x20the\x20SDK\x20to\x20perform\x20the\n\
-    \x20actual\x20KV\x20API\x20call.\n\n\n\n\n\x03\x05\0\x01\x12\x03\x19\x05\
-    \x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x1a\x02\x1b\n\x0c\n\x05\x05\0\x02\0\
-    \x01\x12\x03\x1a\x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x1a\x19\x1a\
-    \nR\n\x04\x05\0\x02\x01\x12\x03\x1d\x02\x1c\x1aE\x20Will\x20cause\x20the\
-    \x20KV\x20lookup\x20to\x20use\x20the\x20key\x20string\x20as-is\x20for\
-    \x20the\x20lookup\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x1d\x02\x17\n\
-    \x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x1d\x1a\x1b\n\xe1\x02\n\x04\x05\0\
-    \x02\x02\x12\x03'\x02\x1d\x1a\xd3\x02\x20DYNAMIC\x20mode\x20will\x20caus\
-    e\x20the\x20KV\x20lookup\x20WASM\x20to\x20use\x20the\x20key\x20to\x20loo\
-    kup\x20the\n\x20associated\x20value\x20and\x20use\x20the\x20result\x20fo\
-    r\x20the\x20key\x20existence\x20check.\n\n\x20For\x20example,\x20if\x20\
-    \"key\"\x20in\x20KVExistsRequest\x20is\x20set\x20to\x20\"foo\",\x20KV\
-    \x20WASM\x20will\x20do\n\x20the\x20following:\n\n\x201.\x20Lookup\x20the\
-    \x20value\x20of\x20\"foo\"\x20in\x20the\x20payload\x20(which\x20is\x20\"\
-    bar\")\n\x202.\x20Use\x20\"bar\"\x20as\x20the\x20\"key\"\x20for\x20the\
-    \x20KV\x20lookup\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03'\x02\x18\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03'\x1b\x1c\nP\n\x02\x04\0\x12\x04+\0.\x01\
-    \x1aD\x20Encoded\x20in\x20KVStep;\x20also\x20used\x20as\x20param\x20to\
-    \x20HostFuncKVExists()\x20in\x20SDK\n\n\n\n\x03\x04\0\x01\x12\x03+\x08\
-    \x17\n\x0b\n\x04\x04\0\x02\0\x12\x03,\x02\x11\n\x0c\n\x05\x04\0\x02\0\
-    \x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03,\t\x0c\n\x0c\n\
-    \x05\x04\0\x02\0\x03\x12\x03,\x0f\x10\n\x0b\n\x04\x04\0\x02\x01\x12\x03-\
-    \x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03-\x02\x0e\n\x0c\n\x05\x04\
-    \0\x02\x01\x01\x12\x03-\x0f\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03-\
-    \x16\x17\n3\n\x02\x04\x01\x12\x041\03\x01\x1a'\x20Returned\x20by\x20Host\
-    FuncKVExists()\x20in\x20SDK\n\n\n\n\x03\x04\x01\x01\x12\x031\x08\x18\n\
-    \x0b\n\x04\x04\x01\x02\0\x12\x032\x02\x12\n\x0c\n\x05\x04\x01\x02\0\x05\
-    \x12\x032\x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x032\x07\r\n\x0c\n\
-    \x05\x04\x01\x02\0\x03\x12\x032\x10\x11\n#\n\x02\x04\x02\x12\x046\0:\x01\
-    \x1a\x17\x20Used\x20in\x20PipelineSteps\n\n\n\n\x03\x04\x02\x01\x12\x036\
-    \x08\x0e\n\x0c\n\x04\x04\x02\x08\0\x12\x047\x029\x03\n\x0c\n\x05\x04\x02\
-    \x08\0\x01\x12\x037\x08\x0f\n\x0b\n\x04\x04\x02\x02\0\x12\x038\x04*\n\
-    \x0c\n\x05\x04\x02\x02\0\x06\x12\x038\x04\x13\n\x0c\n\x05\x04\x02\x02\0\
-    \x01\x12\x038\x14%\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x038()b\x06proto3\
+    \x01(\x0e2\x1a.protos.steps.KVExistsModeR\x04mode\"_\n\x10KVExistsRespon\
+    se\x12\x16\n\x06exists\x18\x01\x20\x01(\x08R\x06exists\x12\x19\n\x08is_e\
+    rror\x18\x02\x20\x01(\x08R\x07isError\x12\x18\n\x07message\x18\x03\x20\
+    \x01(\tR\x07message\"`\n\x06KVStep\x12K\n\x11kv_exists_request\x18\x01\
+    \x20\x01(\x0b2\x1d.protos.steps.KVExistsRequestH\0R\x0fkvExistsRequestB\
+    \t\n\x07request*_\n\x0cKVExistsMode\x12\x18\n\x14KV_EXISTS_MODE_UNSET\
+    \x10\0\x12\x19\n\x15KV_EXISTS_MODE_STATIC\x10\x01\x12\x1a\n\x16KV_EXISTS\
+    _MODE_DYNAMIC\x10\x02B:Z8github.com/streamdal/snitch-protos/build/go/pro\
+    tos/stepsJ\xb8\x0f\n\x06\x12\x04\0\0A\x01\n\x08\n\x01\x0c\x12\x03\0\0\
+    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\
+    \t\n\x02\x08\x0b\x12\x03\x04\0O\n\xaf\x05\n\x02\x05\0\x12\x04\x19\0(\x01\
+    \x1a\x9a\x01\x20Used\x20by\x20frontend\x20when\x20constructing\x20a\x20p\
+    ipeline\x20that\x20contains\x20a\x20KV\x20step\x20that\n\x20performs\x20\
+    a\x20KVExists\x20request.\n\x20protolint:disable:next\x20ENUM_FIELD_NAME\
+    S_PREFIX\n2\x85\x04\x20!!!!!!!!!!!!!!!!!!!!!!!!!!!\x20IMPORTANT\x20!!!!!\
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\x20KV\x20consists\x20of\x20two\x20parts\
+    :\n\n\x20-\x20KVStep\n\x20-\x20HostFuncKVExists\n\n\x20KVStep\x20is\x20u\
+    sed\x20in\x20PipelineSteps\x20that\x20will\x20execute\x20a\x20specific\
+    \x20KV\x20request;\n\x20the\x20actual\x20KV\x20lookup\x20is\x20performed\
+    \x20by\x20the\x20KV\x20WASM\x20func\x20that\x20calls\x20out\x20to\n\x20H\
+    ostFuncKVExists()\x20that\x20is\x20a\x20function\x20exported\x20by\x20th\
+    e\x20SDK.\n\n\x20The\x20HostFuncKVExists()\x20function\x20is\x20needed\
+    \x20because\x20as\x20of\x2008.30.2023,\x20WASM\x20does\n\x20not\x20have\
+    \x20socket\x20support,\x20so\x20we\x20need\x20to\x20call\x20out\x20to\
+    \x20the\x20SDK\x20to\x20perform\x20the\n\x20actual\x20KV\x20API\x20call.\
+    \n\n\n\n\n\x03\x05\0\x01\x12\x03\x19\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\
+    \x03\x1a\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x1a\x02\x16\n\x0c\n\
+    \x05\x05\0\x02\0\x02\x12\x03\x1a\x19\x1a\nR\n\x04\x05\0\x02\x01\x12\x03\
+    \x1d\x02\x1c\x1aE\x20Will\x20cause\x20the\x20KV\x20lookup\x20to\x20use\
+    \x20the\x20key\x20string\x20as-is\x20for\x20the\x20lookup\n\n\x0c\n\x05\
+    \x05\0\x02\x01\x01\x12\x03\x1d\x02\x17\n\x0c\n\x05\x05\0\x02\x01\x02\x12\
+    \x03\x1d\x1a\x1b\n\xe1\x02\n\x04\x05\0\x02\x02\x12\x03'\x02\x1d\x1a\xd3\
+    \x02\x20DYNAMIC\x20mode\x20will\x20cause\x20the\x20KV\x20lookup\x20WASM\
+    \x20to\x20use\x20the\x20key\x20to\x20lookup\x20the\n\x20associated\x20va\
+    lue\x20and\x20use\x20the\x20result\x20for\x20the\x20key\x20existence\x20\
+    check.\n\n\x20For\x20example,\x20if\x20\"key\"\x20in\x20KVExistsRequest\
+    \x20is\x20set\x20to\x20\"foo\",\x20KV\x20WASM\x20will\x20do\n\x20the\x20\
+    following:\n\n\x201.\x20Lookup\x20the\x20value\x20of\x20\"foo\"\x20in\
+    \x20the\x20payload\x20(which\x20is\x20\"bar\")\n\x202.\x20Use\x20\"bar\"\
+    \x20as\x20the\x20\"key\"\x20for\x20the\x20KV\x20lookup\n\n\x0c\n\x05\x05\
+    \0\x02\x02\x01\x12\x03'\x02\x18\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03'\
+    \x1b\x1c\nP\n\x02\x04\0\x12\x04+\0.\x01\x1aD\x20Encoded\x20in\x20KVStep;\
+    \x20also\x20used\x20as\x20param\x20to\x20HostFuncKVExists()\x20in\x20SDK\
+    \n\n\n\n\x03\x04\0\x01\x12\x03+\x08\x17\n\x0b\n\x04\x04\0\x02\0\x12\x03,\
+    \x02\x11\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\0\
+    \x02\0\x01\x12\x03,\t\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03,\x0f\x10\n\
+    \x0b\n\x04\x04\0\x02\x01\x12\x03-\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\
+    \x12\x03-\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03-\x0f\x13\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03-\x16\x17\n3\n\x02\x04\x01\x12\x041\0:\x01\
+    \x1a'\x20Returned\x20by\x20HostFuncKVExists()\x20in\x20SDK\n\n\n\n\x03\
+    \x04\x01\x01\x12\x031\x08\x18\n%\n\x04\x04\x01\x02\0\x12\x033\x02\x12\
+    \x1a\x18\x20Whether\x20the\x20key\x20exists\n\n\x0c\n\x05\x04\x01\x02\0\
+    \x05\x12\x033\x02\x06\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x033\x07\r\n\x0c\
+    \n\x05\x04\x01\x02\0\x03\x12\x033\x10\x11\n7\n\x04\x04\x01\x02\x01\x12\
+    \x036\x02\x14\x1a*\x20Whether\x20the\x20request\x20resulted\x20in\x20an\
+    \x20error\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x036\x02\x06\n\x0c\n\x05\
+    \x04\x01\x02\x01\x01\x12\x036\x07\x0f\n\x0c\n\x05\x04\x01\x02\x01\x03\
+    \x12\x036\x12\x13\n?\n\x04\x04\x01\x02\x02\x12\x039\x02\x15\x1a2\x20Pote\
+    ntial\x20message\x20containing\x20debug\x20or\x20error\x20info\n\n\x0c\n\
+    \x05\x04\x01\x02\x02\x05\x12\x039\x02\x08\n\x0c\n\x05\x04\x01\x02\x02\
+    \x01\x12\x039\t\x10\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x039\x13\x14\n#\
+    \n\x02\x04\x02\x12\x04=\0A\x01\x1a\x17\x20Used\x20in\x20PipelineSteps\n\
+    \n\n\n\x03\x04\x02\x01\x12\x03=\x08\x0e\n\x0c\n\x04\x04\x02\x08\0\x12\
+    \x04>\x02@\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\x03>\x08\x0f\n\x0b\n\
+    \x04\x04\x02\x02\0\x12\x03?\x04*\n\x0c\n\x05\x04\x02\x02\0\x06\x12\x03?\
+    \x04\x13\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03?\x14%\n\x0c\n\x05\x04\x02\
+    \x02\0\x03\x12\x03?()b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
