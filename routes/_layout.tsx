@@ -22,7 +22,8 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
           <ServiceMap
             nodesData={nodes}
             edgesData={edges}
-            blur={req.url.includes("pipelines")}
+            blur={req.url.includes("pipelines") ||
+              req.url.includes("notifications")}
           />
         </ReactFlowProvider>
       </div>
