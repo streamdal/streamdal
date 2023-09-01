@@ -3,6 +3,7 @@ package snitch
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/pkg/errors"
 
@@ -58,6 +59,10 @@ func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
 			return
 		case resp := <-t.Ch:
 			if err := stream.Send(resp); err != nil {
+				if err == io.EOF {
+					t.log.Debug("tail worker received EOF, exiting")
+					return
+				}
 				t.log.Errorf("error sending tail: %s", err)
 			}
 		}
