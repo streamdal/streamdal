@@ -416,7 +416,14 @@ func TestHttpRequest(t *testing.T) {
 		Input: []byte(``),
 	}
 
-	f, err := createFunction(req.Step)
+	s := &Snitch{
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines:    map[string]map[string]*protos.Command{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+	}
+
+	f, err := s.createFunction(req.Step)
 	if err != nil {
 		t.Fatal(err)
 	}

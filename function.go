@@ -99,7 +99,7 @@ func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
 func (s *Snitch) createFunction(step *protos.PipelineStep) (*function, error) {
 	inst, err := s.createWASMInstance(step.GetXWasmBytes())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to create WASM instance")
 	}
 
 	// This is the actual function we'll be executing
@@ -152,17 +152,18 @@ func (s *Snitch) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		WithSysWalltime().
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
 
-	// TODO: module name probably needs to be unique
-	for name, fn := range hostFuncs {
-		_, err := r.NewHostModuleBuilder("env").
-			NewFunctionBuilder().
-			WithFunc(fn).
-			Export(name).
-			Instantiate(ctx)
+	builder := r.NewHostModuleBuilder("env")
 
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to instantiate module for fn '%s'", name)
-		}
+	// This is how multiple host funcs are exported:
+	// https://github.com/tetratelabs/wazero/blob/b7e8191cceb83c7335d6b8922b40b957475beecf/examples/import-go/age-calculator.go#L41
+	for name, fn := range hostFuncs {
+		builder = builder.NewFunctionBuilder().
+			WithFunc(fn).
+			Export(name)
+	}
+
+	if _, err := builder.Instantiate(ctx); err != nil {
+		return nil, errors.Wrap(err, "failed to instantiate module")
 	}
 
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
