@@ -4,8 +4,30 @@ import { useState } from "preact/hooks";
 import { ErrorType, validate } from "../form/validate.ts";
 import { FormSelect } from "../form/formSelect.tsx";
 import { NotificationType } from "snitch-protos/protos/sp_notify.ts";
-import { titleCase } from "../../lib/utils.ts";
 import { FormInput } from "../form/formInput.tsx";
+import { zfd } from "https://esm.sh/v130/zod-form-data@2.0.1/denonext/zod-form-data.mjs";
+import { z } from "zod/index.ts";
+import { titleCase } from "../../lib/utils.ts";
+
+const NotificationTypeEnum = z.nativeEnum(NotificationType);
+
+const NotificationKindSchema = z.object({
+  oneofKind: z.literal("slack"),
+  slack: z.object({
+    botToken: z.string().min(1, { message: "Required" }),
+    channel: z.string().min(1, { message: "Required" }),
+  }),
+});
+
+export const NotificationSchema = zfd.formData({
+  id: z.string().optional(),
+  name: z.string().min(1, { message: "Required" }),
+  type: z.string(),
+  notificationType: zfd.numeric(NotificationTypeEnum),
+  config: NotificationKindSchema,
+});
+
+export type NotificationType = z.infer<typeof NotificationSchema>;
 
 export const NotificationConfigModal = (props: any) => {
   const close = () => opModal.value = { ...opModal.value, pause: false };
@@ -14,14 +36,13 @@ export const NotificationConfigModal = (props: any) => {
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState();
 
-  console.log(NotificationType);
-
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
-    const { errors } = validate("schema", "data");
-    setErrors(erros || {});
+    const { errors } = validate(NotificationSchema, notificationFormData);
+    setErrors(errors || {});
 
     if (errors) {
+      console.log("there was an error");
       e.preventDefault();
       return;
     }
@@ -41,14 +62,22 @@ export const NotificationConfigModal = (props: any) => {
               <div class="text-[16px] font-bold">Notifications</div>
               <form
                 onSubmit={onSubmit}
-                action="/notifications/config"
+                action="/notifications/configure"
                 method="post"
               >
                 <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
                   <div class="flex flex-row items-center">
                     <div class="text-[16px] font-medium mr-2 h-[54px]">
+                      <FormInput
+                        name="name"
+                        data={data}
+                        setData={setData}
+                        label="Notification Label"
+                        placeHolder=""
+                        errors={errors}
+                      />
                       <FormSelect
-                        name={`notificationType.config`}
+                        name={"notificationType"}
                         data={data}
                         setData={setData}
                         label="Notification Type"
@@ -76,7 +105,7 @@ export const NotificationConfigModal = (props: any) => {
                         .
                       </h2>
                       <FormInput
-                        name={`notificationType.config.oneOfKind`}
+                        name={`notificationType.oneOfKind`}
                         data={data}
                         setData={setData}
                         label="Slack token"
