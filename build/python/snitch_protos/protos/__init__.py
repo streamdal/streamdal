@@ -833,6 +833,7 @@ class BusEvent(betterproto.Message):
         112, group="event"
     )
     tail_request: "TailRequest" = betterproto.message_field(113, group="event")
+    tail_response: "TailResponse" = betterproto.message_field(114, group="event")
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )

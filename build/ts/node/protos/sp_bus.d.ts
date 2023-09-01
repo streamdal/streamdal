@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { TailResponse } from "./sp_common.js";
 import { TailRequest } from "./sp_common.js";
 import { NewAudienceRequest } from "./sp_internal.js";
 import { DeleteAudienceRequest } from "./sp_external.js";
@@ -110,6 +111,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.TailRequest tail_request = 113;
          */
         tailRequest: TailRequest;
+    } | {
+        oneofKind: "tailResponse";
+        /**
+         * @generated from protobuf field: protos.TailResponse tail_response = 114;
+         */
+        tailResponse: TailResponse;
     } | {
         oneofKind: undefined;
     };

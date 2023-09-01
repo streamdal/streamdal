@@ -34,6 +34,7 @@ message BusEvent {
     protos.DeleteAudienceRequest delete_audience_request = 111;
     protos.NewAudienceRequest new_audience_request = 112;
     protos.TailRequest tail_request = 113;
+    protos.TailResponse tail_response = 114;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC
