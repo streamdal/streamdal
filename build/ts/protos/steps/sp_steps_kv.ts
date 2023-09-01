@@ -24,9 +24,23 @@ export interface KVExistsRequest {
  */
 export interface KVExistsResponse {
     /**
+     * Whether the key exists
+     *
      * @generated from protobuf field: bool exists = 1;
      */
     exists: boolean;
+    /**
+     * Whether the request resulted in an error
+     *
+     * @generated from protobuf field: bool is_error = 2;
+     */
+    isError: boolean;
+    /**
+     * Potential message containing debug or error info
+     *
+     * @generated from protobuf field: string message = 3;
+     */
+    message: string;
 }
 /**
  * Used in PipelineSteps
@@ -112,7 +126,9 @@ export const KVExistsRequest = new KVExistsRequest$Type();
 class KVExistsResponse$Type extends MessageType<KVExistsResponse> {
     constructor() {
         super("protos.steps.KVExistsResponse", [
-            { no: 1, name: "exists", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "exists", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "is_error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }

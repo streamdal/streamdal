@@ -224,6 +224,13 @@ class KvExistsResponse(betterproto.Message):
     """Returned by HostFuncKVExists() in SDK"""
 
     exists: bool = betterproto.bool_field(1)
+    """Whether the key exists"""
+
+    is_error: bool = betterproto.bool_field(2)
+    """Whether the request resulted in an error"""
+
+    message: str = betterproto.string_field(3)
+    """Potential message containing debug or error info"""
 
 
 @dataclass(eq=False, repr=False)
