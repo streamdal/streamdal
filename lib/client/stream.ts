@@ -21,12 +21,11 @@ export const streamServiceMap = async (configs: GrpcConfigs) => {
 
   const client: IExternalClient = new ExternalClient(transport);
 
-  console.log(`calling getAllStream: ${new Date()}`);
   const call: any = client.getAllStream({}, {
     meta: { "auth-token": configs.grpcToken },
   });
   for await (const response of call.responses) {
-    console.log(`getAllStream response at ${new Date()}: `);
+    console.log(`getAllStream response at: `);
     console.dir(response, { depth: 20 });
     const serviceMap = mapServiceResponse(response);
     serviceSignal.value = serviceMap;

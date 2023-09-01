@@ -12,6 +12,7 @@ import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { updateNode } from "../lib/nodeMapper.ts";
 import { GrpcConfigs, streamServiceMap } from "../lib/client/stream.ts";
 import { serviceDisplaySignal } from "../components/serviceMap/serviceSignal.ts";
+import { useEffect } from "preact/hooks";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -41,7 +42,9 @@ export default function ServiceMap(
     blur?: boolean;
   },
 ) {
-  void streamServiceMap(grpcConfigs);
+  useEffect(() => {
+    void streamServiceMap(grpcConfigs);
+  }, []);
 
   const [nodes, setNodes, onNodesChange] = useNodesState();
   const [edges, setEdges, onEdgesChange] = useEdgesState();
@@ -61,10 +64,6 @@ export default function ServiceMap(
 
   useSignalEffect(() => {
     if (serviceDisplaySignal?.value) {
-      console.log(
-        "shit client service display signal",
-        serviceDisplaySignal?.value,
-      );
       setNodes(serviceDisplaySignal.value.displayNodes);
       setEdges(serviceDisplaySignal.value.displayEdges);
     }
