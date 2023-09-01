@@ -88,6 +88,14 @@ message TailResponse {
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
+enum TailCommandType {
+  TAIL_COMMAND_TYPE_UNSET = 0;
+  TAIL_COMMAND_TYPE_START = 1;
+  TAIL_COMMAND_TYPE_STOP = 2;
+}
+
 message TailCommand {
-  TailRequest request = 1;
+  TailCommandType type = 1;
+
+  TailRequest request = 2;
 }
