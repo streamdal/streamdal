@@ -61,7 +61,7 @@ export const removeWhitespace = (s: string) => s.replace(/ /g, "");
 
 export const logFormData = (data: FormData) => {
   for (const pair of data) {
-    console.log(pair[0] + ", " + pair[1]);
+    // console.log(pair[0] + ", " + pair[1]);
   }
 };
 
