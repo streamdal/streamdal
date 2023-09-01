@@ -1,6 +1,6 @@
 export const SITE = {
-  title: "Streamdal Documentation",
-  description: "Streamdal.com platform documentation",
+  title: "Snitch Documentation",
+  description: "Snitch.build documentation",
   defaultLanguage: "en_US",
 };
 
@@ -71,19 +71,19 @@ export const SIDEBAR: Sidebar = {
         text: "Getting Started",
         children: [
           {
-            text: "Overview",
-            slug: "overview",
-            link: "en/overview",
+            text: "What is Snitch?",
+            slug: "what-is-snitch",
+            link: "en/what-is-snitch",
+          },
+          {
+            text: "How Snitch Works",
+            slug: "how-snitch-works",
+            link: "en/getting-started/how-snitch-works",
           },
           {
             text: "Quickstart",
-            slug: "quick-start",
-            link: "en/getting-started/quick-start",
-          },
-          {
-            text: "Use Cases",
-            slug: "use-cases",
-            link: "en/getting-started/use-cases",
+            slug: "quickstart",
+            link: "en/getting-started/quickstart",
           },
         ],
       },
@@ -91,436 +91,273 @@ export const SIDEBAR: Sidebar = {
         text: "Guides",
         children: [
           {
-            text: "Overview",
-            slug: "guides-overview",
-            link: "en/guides/overview",
+            text: "Deployment",
+            slug: "deployment",
+            link: "en/guides/deployment",
           },
           {
-            text: "How to use Plumber with NATS",
-            slug: "guides-how-to-use-plumber-with-nats",
-            link: "en/guides/how-to-use-plumber-with-nats",
+            text: "Instrumentation",
+            slug: "instrumentation",
+            link: "en/guides/instrumentation",
           },
           {
-            text: "How to use Plumber with RabbitMQ",
-            slug: "guides-how-to-use-plumber-with-rabbit",
-            link: "en/guides/how-to-use-plumber-with-rabbit",
-          },
-          {
-            text: "How to use Plumber with Kafka",
-            slug: "guides-how-to-use-plumber-with-kafka",
-            link: "en/guides/how-to-use-plumber-with-kafka",
+            text: "Quarantine",
+            slug: "quarantine",
+            link: "en/guides/quarantine",
           },
         ],
       },
       {
-        text: "Data Ingestion",
+        text: "Core Components",
         children: [
           {
             text: "Overview",
-            slug: "data-ingestion-overview",
-            link: "en/data-ingestion/overview",
+            slug: "core-components-overview",
+            link: "en/core-components/overview",
           },
           {
-            text: "Relay",
-            children: [
-              {
-                text: "Overview",
-                slug: "data-ingestion-relay-overview ",
-                link: "en/data-ingestion/relay/overview",
-              },
-              {
-                text: "Kafka",
-                slug: "data-ingestion-relay-kafka",
-                link: "en/data-ingestion/relay/kafka",
-              },
-              {
-                text: "RabbitMQ",
-                slug: "data-ingestion-relay-rabbitmq",
-                link: "en/data-ingestion/relay/rabbitmq",
-              },
-              {
-                text: "GCP Pub/Sub",
-                slug: "data-ingestion-relay-gcp-pub-sub",
-                link: "en/data-ingestion/relay/gcp-pub-sub",
-              },
-              {
-                text: "AWS Kinesis",
-                slug: "data-ingestion-relay-aws-kinesis",
-                link: "en/data-ingestion/relay/aws-kinesis",
-              },
-              {
-                text: "NATS",
-                slug: "data-ingestion-relay-nats",
-                link: "en/data-ingestion/relay/nats",
-              },
-              {
-                text: "PostgreSQL CDC",
-                slug: "relay-postgresql-cdc",
-                link: "en/data-ingestion/relay/postgresql-cdc",
-              },
-              {
-                text: "Mongo CDC",
-                slug: "relay-mongo-cdc",
-                link: "en/data-ingestion/relay/mongo-cdc",
-              },
-              {
-                text: "Other Systems",
-                slug: "relay-other-systems",
-                link: "en/data-ingestion/relay/other-systems",
-              },
-            ],
+            text: "SDK",
+            slug: "sdk",
+            link: "en/core-components/sdk",
           },
           {
-            text: "HTTP API",
-            slug: "data-ingestion-http",
-            link: "en/data-ingestion/http",
+            text: "Server",
+            slug: "server",
+            link: "en/core-components/server",
           },
           {
-            text: "gRPC API",
-            slug: "data-ingestion-grpc",
-            link: "en/data-ingestion/grpc",
+            text: "Console UI",
+            slug: "console-ui",
+            link: "en/core-components/console-ui",
+          },
+          {
+            text: "Libraries [Shims] (Coming Soon!)",
+            slug: "libraries-shiums",
+            link: "en/core-components/libraries-shims",
           },
         ],
       },
       {
-        text: "Components",
+        text: "Language Support",
         children: [
           {
-            text: "Collections",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-collections-overview",
-                link: "en/components/collections/overview",
-              },
-              {
-                text: "Search",
-                slug: "components-collections-search",
-                link: "en/components/collections/search",
-              },
-              {
-                text: "Events",
-                slug: "components-collections-events",
-                link: "en/components/collections/events",
-              },
-              {
-                text: "Message Envelopes",
-                slug: "components-events-message-envelopes",
-                link: "en/components/collections/message-envelopes",
-              },
-            ],
+            text: "Go",
+            slug: "go",
+            link: "en/language-support/go"
           },
           {
-            text: "Replays",
-            slug: "components-replays",
-            link: "en/components/replays",
+            text: "Node",
+            slug: "node",
+            link: "en/language-support/node"
           },
           {
-            text: "Destinations",
-            children: [
-              {
-                text: "Overview",
-                slug: "destinations-overview",
-                link: "en/components/destinations/overview",
-              },
-              {
-                text: "GCP Pub/Sub",
-                slug: "destinations-gcp-pub-sub",
-                link: "en/components/destinations/gcp-pub-sub",
-              },
-              {
-                text: "Snowflake",
-                slug: "destinations-snowflake",
-                link: "en/components/destinations/snowflake",
-              },
-            ],
+            text: "Python",
+            slug: "python",
+            link: "en/language-support/python",
           },
           {
-            text: "Schemas",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-schemas-overview",
-                link: "en/components/schemas/overview",
-              },
-              {
-                text: "Automatic Schema Publishing",
-                slug: "components-schemas-automatic-publishing",
-                link: "en/components/schemas/automatic-publishing",
-              },
-            ],
+            text: "Java (Coming Soon!)",
+            slug: "java",
+            link: "en/language-support/"
           },
           {
-            text: "Monitor",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-monitor-overview",
-                link: "en/components/monitor/overview",
-              },
-              {
-                text: "Monitoring Data Flow",
-                slug: "components-monitor-monitoring-data-flow",
-                link: "en/components/monitor/monitoring-data-flow",
-              },
-              {
-                text: "Dead Letter",
-                slug: "components-monitor-dead-letter",
-                link: "en/components/monitor/dead-letter",
-              },
-              {
-                text: "Anomaly Detection",
-                slug: "components-monitor-anomaly-detection",
-                link: "en/components/monitor/anomaly-detection",
-              },
-              {
-                text: "Detecting Schema Changes",
-                slug: "components-monitor-detecting-schema-changes",
-                link: "en/components/monitor/detecting-schema-changes",
-              },
-              {
-                text: "Semantic Data Monitoring",
-                slug: "components-monitor-semantic",
-                link: "en/components/monitor/semantic-data-monitoring",
-              },
-            ],
+            text: "Scala (Coming Soon!)",
+            slug: "scala",
+            link: "en/language-support/"
           },
           {
-            text: "Alert",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-alert-overview",
-                link: "en/components/alert/overview",
-              },
-            ],
+            text: "Rust (Coming Soon!)",
+            slug: "rust",
+            link: "en/language-support/"
           },
           {
-            text: "Functions",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-functions-overview",
-                link: "en/components/functions/overview",
-              },
-              {
-                text: "Collections",
-                slug: "components-functions-collections",
-                link: "en/components/functions/collections",
-              },
-              {
-                text: "Replay",
-                slug: "components-functions-replay",
-                link: "en/components/functions/replay",
-              },
-              {
-                text: "Monitor",
-                slug: "components-functions-monitor",
-                link: "en/components/functions/monitor",
-              },
-              {
-                text: "Dead Letter",
-                slug: "components-functions-dead-letter",
-                link: "en/components/functions/dead-letter",
-              },
-            ],
+            text: "Ruby (Coming Soon!)",
+            slug: "ruby",
+            link: "en/language-support/ruby"
           },
           {
-            text: "Dead Letter",
-            children: [
-              {
-                text: "Overview",
-                slug: "components-dead-letter-overview",
-                link: "en/components/dead-letter/overview",
-              },
-              {
-                text: "Staging",
-                slug: "components-dead-letter-staging",
-                link: "en/components/dead-letter/staging",
-              },
-            ],
-          },
-          {
-            text: "Tunnels",
-            slug: "components-tunnels",
-            link: "en/components/tunnels",
-          },
-          {
-            text: "Hosted Plumber",
-            slug: "components-hosted-plumber",
-            link: "en/components/hosted-plumber",
-          },
-        ],
-      },
-      {
-        text: "Advanced",
-        children: [
-          {
-            text: "Data Science",
-            slug: "advanced-data-science",
-            link: "en/advanced/data-science",
-          },
-          {
-            text: "Data Lake",
-            slug: "advanced-data-lake",
-            link: "en/advanced/data-lake",
-          },
-          {
-            text: "Schema Inference",
-            slug: "advanced-schema-inference",
-            link: "en/advanced/schema-inference",
-          },
-          {
-            text: "Architecture",
-            slug: "advanced-architecture",
-            link: "en/advanced/architecture",
-          },
-        ],
-      },
-      {
-        text: "Plumber",
-        children: [
-          {
-            text: "Overview",
-            slug: "plumber-overview",
-            link: "en/plumber/overview",
-          },
-          {
-            text: "Server Mode",
-            children: [
-              {
-                text: "Overview",
-                slug: "plumber-server-mode-overview",
-                link: "en/plumber/server-mode/overview",
-              },
-              {
-                text: "Deploy",
-                slug: "plumber-server-mode-deploy",
-                link: "en/plumber/server-mode/deploy",
-              },
-              {
-                text: "Manage via CLI",
-                slug: "plumber-manage-cli",
-                link: "en/plumber/server-mode/manage-cli",
-              },
-              {
-                text: "Manage via gRPC",
-                slug: "plumber-manage-grpc",
-                link: "en/plumber/server-mode/manage-grpc",
-              },
-              {
-                text: "Manage via gRPC Example",
-                slug: "plumber-manage-grpc-example",
-                link: "en/plumber/server-mode/manage-grpc-example",
-              },
-            ],
-          },
-          {
-            text: "Terraform",
-            slug: "plumber-terraform",
-            link: "en/plumber/terraform-provider",
-          },
-          {
-            text: "Telemetry",
-            slug: "plumber-telemetry",
-            link: "en/plumber/telemetry",
+            text: "C++ (Coming Soon!)",
+            slug: "c++",
+            link: "en/language-support/c++"
           },
         ],
       },
     ],
     api: [
       {
-        text: "Resources",
+        text: "Data Governance",
         children: [
           {
-            text: "Support",
-            slug: "support",
-            link: "en/resources/support",
+            text: "Overview",
+            slug: "overview",
+            link: "en/data-governance/overview"
+          },
+          {
+            text: "Data Quality",
+            slug: "data-quality",
+            link: "en/data-governance/data-quality"
+          },
+          {
+            text: "Internal Governance",
+            slug: "internal-governance",
+            link: "en/data-governance/internal-governance"
+          },
+          {
+            text: "Governance for Compliance",
+            slug: "overview",
+            link: "en/data-governance/compliance/overview",
+            children: [
+              {
+                text: "CCPA/CPRA",
+                slug: "ccpa-cpra",
+                link: "en/data-governance/compliance/ccpa-cpra",
+              },
+              {
+                text: "CDPA",
+                slug: "cdpa",
+                link: "en/data-governance/compliance/cdpa",
+              },
+              {
+                text: "FED RAMP",
+                slug: "fed-ramp",
+                link: "en/data-governance/compliance/fed-ramp",
+              },
+              {
+                text: "GBLA",
+                slug: "gbla",
+                link: "en/data-governance/compliance/gbla",
+              },
+              {
+                text: "GDPR",
+                slug: "gdpr",
+                link: "en/data-governance/compliance/gdpr",
+              },
+              {
+                text: "HIPAA",
+                slug: "hipaa",
+                link: "en/data-governance/compliance/",
+              },
+              {
+                text: "ISC/IEC",
+                slug: "isc-iec",
+                link: "en/data-governance/compliance/",
+              },
+              {
+                text: "NY State S.H.I.E.L.D",
+                slug: "ny-state-shield",
+                link: "en/data-governance/compliance/ny-state-shield",
+              },
+              {
+                text: "NYCRR 500",
+                slug: "nycrr-500",
+                link: "en/data-governance/compliance/nycrr-500",
+              },
+              {
+                text: "PCI DSS",
+                slug: "pci-dss",
+                link: "en/data-governance/compliance/pci-dss",
+              },
+              {
+                text: "SOCII",
+                slug: "socii",
+                link: "en/data-governance/compliance/",
+              },
+              {
+                text: "PIPEDA",
+                slug: "pipeda",
+                link: "en/data-governance/compliance/pipeda",
+              },
+              {
+                text: "TDPSA",
+                slug: "tdpsa",
+                link: "en/data-governance/compliance/tdpsa",
+              },
+            ]
+          },  
+        ],
+      },
+      {
+        text: "Resources & Support",
+        children: [
+          {
+            text: "Get Support",
+            slug: "get-support",
+            link: "en/resources-support/get-support",
           },
           {
             text: "Changelog",
             slug: "changelog",
-            link: "en/resources/changelog",
+            link: "en/resources-support/changelog",
+          },
+          {
+            text: "Community",
+            slug: "community",
+            link: "en/resources-support/community",
+          },
+          {
+            text: "Contributing",
+            slug: "contributing",
+            link: "en/resources-support/contributing",
+          },
+          {
+            text: "FAQ",
+            slug: "faq",
+            link: "en/resources-support/faq",
+          },
+          {
+            text: "Glossary",
+            slug: "glossary",
+            link: "en/resources-support/glossary",
+          },
+          {
+            text: "Known Issues",
+            slug: "known-issues",
+            link: "en/resources-support/known-issues",
+          },
+          {
+            text: "License & Use",
+            slug: "license",
+            link: "en/resources-support/license",
+          },
+          {
+            text: "Release Notes",
+            slug: "release-notes",
+            link: "en/resources-support/release-notes",
+          },
+          {
+            text: "Roadmap",
+            slug: "roadmap",
+            link: "en/resources-support/roadmap",
           },
         ],
       },
       {
-        text: "Open Source",
+        text: "Engineering",
         children: [
           {
-            text: "Plumber",
-            slug: "plumber-oss",
-            link: "en/resources/open-source/plumber-oss",
+            text: "Overview",
+            slug: "overview",
+            link: "en/engineering/overview",
           },
           {
-            text: "Rabbit library",
-            slug: "rabbit-library",
-            link: "en/resources/open-source/rabbit-library",
+            text: "gRPC",
+            slug: "grpc",
+            link: "en/engineering/grpc",
           },
           {
-            text: "Schema Publisher",
-            slug: "schema-publisher",
-            link: "en/resources/open-source/schema-publisher",
+            text: "Metrics (Coming Soon!)",
+            slug: "metrics",
+            link: "en/engineering/metrics",
           },
           {
-            text: "Go Template",
-            slug: "go-template",
-            link: "en/resources/open-source/go-template",
+            text: "Observability",
+            slug: "observability",
+            link: "en/engineering/observability",
           },
           {
-            text: "Kng",
-            slug: "kng",
-            link: "en/resources/open-source/kng",
-          },
-          {
-            text: "Kafka Sink Connector",
-            slug: "kafka-sink-connector",
-            link: "en/resources/open-source/kafka-sink-connector",
-          },
-        ],
-      },
-      {
-        text: "Legal",
-        children: [
-          {
-            text: "Terms and Conditions",
-            slug: "terms-and-conditions",
-            link: "en/resources/legal/terms-and-conditions",
-          },
-          {
-            text: "Service Legal Agreement",
-            slug: "service-legal-agreement",
-            link: "en/resources/legal/service-legal-agreement",
-          },
-          {
-            text: "Privacy Policy",
-            slug: "privacy-policy",
-            link: "en/resources/legal/privacy-policy",
-          },
-          {
-            text: "Acceptable Use Policy",
-            slug: "acceptable-use-policy",
-            link: "en/resources/legal/acceptable-use-policy",
-          },
-          {
-            text: "Billing",
-            slug: "billing",
-            link: "en/resources/legal/billing",
-          },
-        ],
-      },
-      {
-        text: "FAQ",
-        children: [
-          {
-            text: "Technical",
-            slug: "technical",
-            link: "en/resources/faq/technical",
-          },
-          {
-            text: "Pricing",
-            slug: "pricing",
-            link: "en/resources/faq/pricing",
+            text: "Tail",
+            slug: "tail",
+            link: "en/engineering/tail",
           },
         ],
       },

@@ -1,4 +1,4 @@
-import error from "@images/heimdall/Heimdall_Error.png";
+import error from "@images/raven/raven_error.png";
 
 const PageNotFound = () => (
   <div class="flex-col justify-center items-center w-full prose-h1:no-underline">
