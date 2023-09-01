@@ -53,6 +53,12 @@ class TailResponseType(betterproto.Enum):
     TAIL_RESPONSE_TYPE_ERROR = 2
 
 
+class TailCommandType(betterproto.Enum):
+    TAIL_COMMAND_TYPE_UNSET = 0
+    TAIL_COMMAND_TYPE_START = 1
+    TAIL_COMMAND_TYPE_STOP = 2
+
+
 class PipelineStepCondition(betterproto.Enum):
     """
     A condition defines how the SDK should handle a step response -- should it
@@ -204,7 +210,8 @@ class TailResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class TailCommand(betterproto.Message):
-    request: "TailRequest" = betterproto.message_field(1)
+    type: "TailCommandType" = betterproto.enum_field(1)
+    request: "TailRequest" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)

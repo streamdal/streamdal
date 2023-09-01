@@ -986,6 +986,8 @@ impl ::protobuf::reflect::ProtobufValue for TailResponse {
 // @@protoc_insertion_point(message:protos.TailCommand)
 pub struct TailCommand {
     // message fields
+    // @@protoc_insertion_point(field:protos.TailCommand.type)
+    pub type_: ::protobuf::EnumOrUnknown<TailCommandType>,
     // @@protoc_insertion_point(field:protos.TailCommand.request)
     pub request: ::protobuf::MessageField<TailRequest>,
     // special fields
@@ -1005,8 +1007,13 @@ impl TailCommand {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "type",
+            |m: &TailCommand| { &m.type_ },
+            |m: &mut TailCommand| { &mut m.type_ },
+        ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, TailRequest>(
             "request",
             |m: &TailCommand| { &m.request },
@@ -1030,7 +1037,10 @@ impl ::protobuf::Message for TailCommand {
     fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
-                10 => {
+                8 => {
+                    self.type_ = is.read_enum_or_unknown()?;
+                },
+                18 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.request)?;
                 },
                 tag => {
@@ -1045,6 +1055,9 @@ impl ::protobuf::Message for TailCommand {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailCommandType::TAIL_COMMAND_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.type_.value());
+        }
         if let Some(v) = self.request.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
@@ -1055,8 +1068,11 @@ impl ::protobuf::Message for TailCommand {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailCommandType::TAIL_COMMAND_TYPE_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+        }
         if let Some(v) = self.request.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1075,12 +1091,14 @@ impl ::protobuf::Message for TailCommand {
     }
 
     fn clear(&mut self) {
+        self.type_ = ::protobuf::EnumOrUnknown::new(TailCommandType::TAIL_COMMAND_TYPE_UNSET);
         self.request.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static TailCommand {
         static instance: TailCommand = TailCommand {
+            type_: ::protobuf::EnumOrUnknown::from_i32(0),
             request: ::protobuf::MessageField::none(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -1293,6 +1311,64 @@ impl TailResponseType {
     }
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.TailCommandType)
+pub enum TailCommandType {
+    // @@protoc_insertion_point(enum_value:protos.TailCommandType.TAIL_COMMAND_TYPE_UNSET)
+    TAIL_COMMAND_TYPE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.TailCommandType.TAIL_COMMAND_TYPE_START)
+    TAIL_COMMAND_TYPE_START = 1,
+    // @@protoc_insertion_point(enum_value:protos.TailCommandType.TAIL_COMMAND_TYPE_STOP)
+    TAIL_COMMAND_TYPE_STOP = 2,
+}
+
+impl ::protobuf::Enum for TailCommandType {
+    const NAME: &'static str = "TailCommandType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TailCommandType> {
+        match value {
+            0 => ::std::option::Option::Some(TailCommandType::TAIL_COMMAND_TYPE_UNSET),
+            1 => ::std::option::Option::Some(TailCommandType::TAIL_COMMAND_TYPE_START),
+            2 => ::std::option::Option::Some(TailCommandType::TAIL_COMMAND_TYPE_STOP),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [TailCommandType] = &[
+        TailCommandType::TAIL_COMMAND_TYPE_UNSET,
+        TailCommandType::TAIL_COMMAND_TYPE_START,
+        TailCommandType::TAIL_COMMAND_TYPE_STOP,
+    ];
+}
+
+impl ::protobuf::EnumFull for TailCommandType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("TailCommandType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for TailCommandType {
+    fn default() -> Self {
+        TailCommandType::TAIL_COMMAND_TYPE_UNSET
+    }
+}
+
+impl TailCommandType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<TailCommandType>("TailCommandType")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0fsp_common.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\
     \x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\
@@ -1320,8 +1396,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x18\x07\x20\x01(\x0cR\x07newData\x12@\n\t_metadata\x18\xe8\x07\x20\x03(\
     \x0b2\".protos.TailResponse.MetadataEntryR\x08Metadata\x1a;\n\rMetadataE\
     ntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\
-    \x02\x20\x01(\tR\x05value:\x028\x01\"<\n\x0bTailCommand\x12-\n\x07reques\
-    t\x18\x01\x20\x01(\x0b2\x13.protos.TailRequestR\x07request*\xc3\x01\n\
+    \x02\x20\x01(\tR\x05value:\x028\x01\"i\n\x0bTailCommand\x12+\n\x04type\
+    \x18\x01\x20\x01(\x0e2\x17.protos.TailCommandTypeR\x04type\x12-\n\x07req\
+    uest\x18\x02\x20\x01(\x0b2\x13.protos.TailRequestR\x07request*\xc3\x01\n\
     \x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\x14\n\x10RES\
     PONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUEST\x10\x02\x12\
     \x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_CODE_INTERNAL_\
@@ -1330,14 +1407,16 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     PERATION_TYPE_CONSUMER\x10\x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\
     \x02*n\n\x10TailResponseType\x12\x1c\n\x18TAIL_RESPONSE_TYPE_UNSET\x10\0\
     \x12\x1e\n\x1aTAIL_RESPONSE_TYPE_PAYLOAD\x10\x01\x12\x1c\n\x18TAIL_RESPO\
-    NSE_TYPE_ERROR\x10\x02B4Z2github.com/streamdal/snitch-protos/build/go/pr\
-    otosJ\xfe\x16\n\x06\x12\x04\0\0\\\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
-    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\
-    \x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\
-    \x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\
-    \n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\
-    \x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20resp\
-    onse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
+    NSE_TYPE_ERROR\x10\x02*g\n\x0fTailCommandType\x12\x1b\n\x17TAIL_COMMAND_\
+    TYPE_UNSET\x10\0\x12\x1b\n\x17TAIL_COMMAND_TYPE_START\x10\x01\x12\x1a\n\
+    \x16TAIL_COMMAND_TYPE_STOP\x10\x02B4Z2github.com/streamdal/snitch-protos\
+    /build/go/protosJ\xc8\x18\n\x06\x12\x04\0\0d\x01\n\x08\n\x01\x0c\x12\x03\
+    \0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0\
+    I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\
+    \x1a/\x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\
+    \n\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\
+    \t\x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20re\
+    sponse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
     \x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\
     \n\x0b\n\x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\
     \x06\x12\x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\
@@ -1442,11 +1521,21 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     B\n\x04\x04\x04\x02\x07\x12\x03W\x02&\"5\x20protolint:disable:this\x20FI\
     ELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x04\x02\x07\x06\x12\x03W\
     \x02\x14\n\x0c\n\x05\x04\x04\x02\x07\x01\x12\x03W\x15\x1e\n\x0c\n\x05\
-    \x04\x04\x02\x07\x03\x12\x03W!%\n\n\n\x02\x04\x05\x12\x04Z\0\\\x01\n\n\n\
-    \x03\x04\x05\x01\x12\x03Z\x08\x13\n\x0b\n\x04\x04\x05\x02\0\x12\x03[\x02\
-    \x1a\n\x0c\n\x05\x04\x05\x02\0\x06\x12\x03[\x02\r\n\x0c\n\x05\x04\x05\
-    \x02\0\x01\x12\x03[\x0e\x15\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03[\x18\
-    \x19b\x06proto3\
+    \x04\x04\x02\x07\x03\x12\x03W!%\n\n\n\x02\x05\x03\x12\x04Z\0^\x01\n\n\n\
+    \x03\x05\x03\x01\x12\x03Z\x05\x14\n\x0b\n\x04\x05\x03\x02\0\x12\x03[\x02\
+    \x1e\n\x0c\n\x05\x05\x03\x02\0\x01\x12\x03[\x02\x19\n\x0c\n\x05\x05\x03\
+    \x02\0\x02\x12\x03[\x1c\x1d\n\x0b\n\x04\x05\x03\x02\x01\x12\x03\\\x02\
+    \x1e\n\x0c\n\x05\x05\x03\x02\x01\x01\x12\x03\\\x02\x19\n\x0c\n\x05\x05\
+    \x03\x02\x01\x02\x12\x03\\\x1c\x1d\n\x0b\n\x04\x05\x03\x02\x02\x12\x03]\
+    \x02\x1d\n\x0c\n\x05\x05\x03\x02\x02\x01\x12\x03]\x02\x18\n\x0c\n\x05\
+    \x05\x03\x02\x02\x02\x12\x03]\x1b\x1c\n\n\n\x02\x04\x05\x12\x04`\0d\x01\
+    \n\n\n\x03\x04\x05\x01\x12\x03`\x08\x13\n\x0b\n\x04\x04\x05\x02\0\x12\
+    \x03a\x02\x1b\n\x0c\n\x05\x04\x05\x02\0\x06\x12\x03a\x02\x11\n\x0c\n\x05\
+    \x04\x05\x02\0\x01\x12\x03a\x12\x16\n\x0c\n\x05\x04\x05\x02\0\x03\x12\
+    \x03a\x19\x1a\n\x0b\n\x04\x04\x05\x02\x01\x12\x03c\x02\x1a\n\x0c\n\x05\
+    \x04\x05\x02\x01\x06\x12\x03c\x02\r\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\
+    \x03c\x0e\x15\n\x0c\n\x05\x04\x05\x02\x01\x03\x12\x03c\x18\x19b\x06proto\
+    3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1471,10 +1560,11 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(TailRequest::generated_message_descriptor_data());
             messages.push(TailResponse::generated_message_descriptor_data());
             messages.push(TailCommand::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(3);
+            let mut enums = ::std::vec::Vec::with_capacity(4);
             enums.push(ResponseCode::generated_enum_descriptor_data());
             enums.push(OperationType::generated_enum_descriptor_data());
             enums.push(TailResponseType::generated_enum_descriptor_data());
+            enums.push(TailCommandType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

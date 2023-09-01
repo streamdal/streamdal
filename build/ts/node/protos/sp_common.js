@@ -72,6 +72,24 @@ export var TailResponseType;
      */
     TailResponseType[TailResponseType["ERROR"] = 2] = "ERROR";
 })(TailResponseType || (TailResponseType = {}));
+/**
+ * @generated from protobuf enum protos.TailCommandType
+ */
+export var TailCommandType;
+(function (TailCommandType) {
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_UNSET = 0;
+     */
+    TailCommandType[TailCommandType["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_START = 1;
+     */
+    TailCommandType[TailCommandType["START"] = 1] = "START";
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_STOP = 2;
+     */
+    TailCommandType[TailCommandType["STOP"] = 2] = "STOP";
+})(TailCommandType || (TailCommandType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType {
     constructor() {
@@ -152,7 +170,8 @@ export const TailResponse = new TailResponse$Type();
 class TailCommand$Type extends MessageType {
     constructor() {
         super("protos.TailCommand", [
-            { no: 1, name: "request", kind: "message", T: () => TailRequest }
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailCommandType", TailCommandType, "TAIL_COMMAND_TYPE_"] },
+            { no: 2, name: "request", kind: "message", T: () => TailRequest }
         ]);
     }
 }

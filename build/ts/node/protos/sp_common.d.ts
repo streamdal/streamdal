@@ -144,7 +144,11 @@ export interface TailResponse {
  */
 export interface TailCommand {
     /**
-     * @generated from protobuf field: protos.TailRequest request = 1;
+     * @generated from protobuf field: protos.TailCommandType type = 1;
+     */
+    type: TailCommandType;
+    /**
+     * @generated from protobuf field: protos.TailRequest request = 2;
      */
     request?: TailRequest;
 }
@@ -214,6 +218,23 @@ export declare enum TailResponseType {
      * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_ERROR = 2;
      */
     ERROR = 2
+}
+/**
+ * @generated from protobuf enum protos.TailCommandType
+ */
+export declare enum TailCommandType {
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_START = 1;
+     */
+    START = 1,
+    /**
+     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_STOP = 2;
+     */
+    STOP = 2
 }
 declare class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor();
