@@ -1,14 +1,18 @@
 import { LayoutContext } from "$fresh/server.ts";
-import ServiceMap from "../islands/serviceMap.tsx";
+import ServiceMapComponent from "../islands/serviceMap.tsx";
 import { NavBar } from "../components/nav/nav.tsx";
 import { ReactFlowProvider } from "reactflow";
 import OpModal from "../islands/opModal.tsx";
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { grpcToken, grpcUrl } from "../lib/configs.ts";
+import {
+  serviceSignal,
+  setServiceSignal,
+} from "../components/serviceMap/serviceSignal.ts";
+import { getAll } from "../lib/fetch.ts";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
-  const url = await grpcUrl();
-  const token = await grpcToken();
+  const allServices = await getAll();
+  setServiceSignal(allServices);
+
   return (
     <>
       <NavBar />
@@ -18,11 +22,9 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />
-          <ServiceMap
-            grpcConfigs={{
-              grpcUrl: url,
-              grpcToken: token,
-            }}
+          <ServiceMapComponent
+            initNodes={Array.from(serviceSignal.value.nodesMap.values())}
+            initEdges={Array.from(serviceSignal.value.edgesMap.values())}
             blur={req.url.includes("pipelines")}
           />
         </ReactFlowProvider>

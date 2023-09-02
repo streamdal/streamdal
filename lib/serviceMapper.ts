@@ -7,7 +7,7 @@ import {
 } from "snitch-protos/protos/sp_info.ts";
 import { audienceKey } from "./utils.ts";
 
-export type ServiceMap = GetAllResponse & {
+export type ServiceMapper = GetAllResponse & {
   pipes: PipelineInfo[];
   liveAudiences: Map<string, ClientInfo[]>;
 };
@@ -15,8 +15,6 @@ export type ServiceMap = GetAllResponse & {
 export type DisplayServiceMap = {
   nodesMap: Map<string, FlowNode>;
   edgesMap: Map<string, FlowEdge>;
-  displayNodes: FlowNode[];
-  displayEdges: FlowEdge[];
 };
 
 export const mapLiveAudiences = (live: LiveInfo[]) => {
@@ -38,14 +36,14 @@ export const mapLiveAudiences = (live: LiveInfo[]) => {
 
 export const mapServiceResponse = (
   response: GetAllResponse,
-): ServiceMap => ({
+): ServiceMapper => ({
   ...response,
   pipes: Object.values(response?.pipelines),
   liveAudiences: mapLiveAudiences(response.live),
 });
 
 export const mapServiceDisplay = (
-  serviceMap: ServiceMap,
+  serviceMap: ServiceMapper,
 ): DisplayServiceMap => {
   const nodesMap = mapNodes(serviceMap);
   const edgesMap = mapEdges(serviceMap.audiences);
@@ -53,7 +51,5 @@ export const mapServiceDisplay = (
   return {
     nodesMap,
     edgesMap,
-    displayNodes: Array.from(nodesMap.values()),
-    displayEdges: Array.from(edgesMap.values()),
   };
 };

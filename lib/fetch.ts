@@ -2,7 +2,6 @@ import { client, meta } from "./grpc.ts";
 import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
 import { PipelineInfo } from "snitch-protos/protos/sp_info.ts";
 import { Audience } from "snitch-protos/protos/sp_common.ts";
-import { mapServiceDisplay, mapServiceResponse } from "./serviceMap.ts";
 
 export type ConfigType = { [key: string]: string };
 export type PipelinesType = { [key: string]: PipelineInfo };
@@ -10,14 +9,6 @@ export type PipelinesType = { [key: string]: PipelineInfo };
 export const getAll = async (): Promise<GetAllResponse> => {
   const { response } = await client.getAll({}, meta);
   return response;
-};
-
-export const getServiceMap = async () => {
-  const serviceMap = mapServiceResponse(await getAll());
-  return {
-    serviceMap,
-    serviceDisplayMap: mapServiceDisplay(serviceMap),
-  };
 };
 
 export const getPipelines = async () => {

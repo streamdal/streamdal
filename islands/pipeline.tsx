@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -21,7 +21,7 @@ import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { isNumeric, logFormData, titleCase } from "../lib/utils.ts";
+import { isNumeric, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
