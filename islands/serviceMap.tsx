@@ -38,11 +38,43 @@ const serialize = async (instance: any) => {
 export const updateNodes = (
   nodes: FlowNode[],
   nodesMap: Map<string, FlowNode>,
-) =>
-  nodes.filter((n: FlowNode) => nodesMap.has(n.id)).map((n: FlowNode) => ({
-    ...nodesMap.get(n.id),
-    position: n.position,
-  }));
+) => {
+  if (nodes?.length === 0) {
+    return Array.from(serviceSignal.value.nodesMap.values());
+  }
+
+  const newNodes = nodes.filter((n: FlowNode) => nodesMap.has(n.id)).map((
+    n: FlowNode,
+  ) => {
+    const node = {
+      ...nodesMap.get(n.id),
+      position: n.position,
+    };
+    //
+    // remove updated node so only new nodes remain for adding afterwards
+    nodesMap.delete(n.id);
+    return node;
+  });
+  return [...newNodes, ...Array.from(nodesMap.values())];
+};
+
+export const updateEdges = (
+  edges: FlowEdge[],
+  edgesMap: Map<string, FlowEdge>,
+) => {
+  if (edges?.length === 0) {
+    return Array.from(serviceSignal.value.edgesMap.values());
+  }
+
+  const newEdges = edges.filter((e: FlowEdge) => edgesMap.has(e.id)).map((
+    e: FlowEdge,
+  ) => {
+    const edge = edgesMap.get(e.id);
+    edgesMap.delete(e.id);
+    return edge;
+  });
+  return [...newEdges, ...Array.from(edgesMap.values())];
+};
 
 export default function ServiceMapComponent(
   { initNodes, initEdges, blur = false }: {
@@ -98,7 +130,7 @@ export default function ServiceMapComponent(
   useSignalEffect(() => {
     if (serviceSignal.value) {
       setNodes(updateNodes(nodes, serviceSignal.value.nodesMap));
-      setEdges(serviceSignal.value.displayEdges);
+      setEdges(updateEdges(edges, serviceSignal.value.edgesMap));
     }
   });
 
