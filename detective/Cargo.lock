@@ -94,7 +94,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.87",
 ]
 
 [[package]]
@@ -110,7 +110,7 @@ dependencies = [
  "common",
  "protobuf",
  "snitch-detective",
- "snitch-protos",
+ "snitch-protos 0.0.78",
 ]
 
 [[package]]
@@ -398,7 +398,7 @@ dependencies = [
  "protobuf-json-mapping",
  "regex",
  "semver",
- "snitch-protos",
+ "snitch-protos 0.0.78",
  "thiserror",
  "url",
 ]
@@ -408,6 +408,15 @@ name = "snitch-protos"
 version = "0.0.78"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73ae8bd10f1714436eb38b76f7bab189c67375a9a8355a87915f65daf357ea98"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
+name = "snitch-protos"
+version = "0.0.87"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4aece3b7bfd1d8bb329c8c288b0c234ebd829c4fc91c2eb6ba53b91b2a77d9e2"
 dependencies = [
  "protobuf",
 ]

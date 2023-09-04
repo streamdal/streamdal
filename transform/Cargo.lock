@@ -22,7 +22,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.87",
 ]
 
 [[package]]
@@ -157,6 +157,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "snitch-protos"
+version = "0.0.87"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4aece3b7bfd1d8bb329c8c288b0c234ebd829c4fc91c2eb6ba53b91b2a77d9e2"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
 name = "snitch-transform"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -203,7 +212,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.78",
  "snitch-transform",
 ]
 

@@ -2,9 +2,13 @@ use protobuf;
 use protos::sp_wsm::{WASMExitCode, WASMRequest, WASMResponse};
 use std::mem;
 
+// Maximum number of bytes to read from memory if we don't hit terminator characters
+// If this value is exceeded, WASM will panic
+const MAX_READ_SIZE: usize = 1024 * 1024; // 1 MB
+
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
 pub fn read_request(ptr: *mut u8, length: usize, deallocate: bool) -> Result<WASMRequest, String> {
-    let request_bytes = read_memory(ptr, length);
+    let request_bytes = read_memory_with_length(ptr, length);
 
     // Decode read request
     let request: WASMRequest =
@@ -71,8 +75,41 @@ pub unsafe extern "C" fn dealloc(pointer: *mut u8, size: i32) {
     drop(Vec::from_raw_parts(pointer, size as usize, size as usize))
 }
 
-/// Helper for reading data from memory
-pub fn read_memory(ptr: *mut u8, length: usize) -> Vec<u8> {
+/// Helper for reading data from memory when length is known ahead of time
+pub fn read_memory_with_length(ptr: *mut u8, length: usize) -> Vec<u8> {
     let array = unsafe { std::slice::from_raw_parts(ptr, length) };
     return array.to_vec();
+}
+
+/// Helper for reading data from memory without knowing length ahead of time
+pub fn read_memory_until_terminator(ptr: *mut u8) -> Vec<u8> {
+    let mut buf: Vec<u8> = Vec::new();
+    let mut null_hits = 0;
+
+    let mut offset = 0;
+    loop {
+        unsafe {
+            let current_ptr = ptr.offset(offset as isize);
+            let value = *current_ptr;
+
+            if offset >= MAX_READ_SIZE {
+                panic!("read_memory: exceeded max length of {}", MAX_READ_SIZE);
+            }
+
+            if null_hits == 3 {
+                // We're at the end
+                return buf;
+            }
+
+            if value == 166 {
+                null_hits += 1;
+                continue;
+            }
+
+            offset += 1;
+
+            buf.push(value);
+            null_hits = 0;
+        }
+    }
 }
