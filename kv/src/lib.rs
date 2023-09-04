@@ -3,10 +3,6 @@ use protos::sp_steps_httprequest::HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET;
 use protos::sp_steps_httprequest::HttpResponse;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 
-// Maximum number of bytes to read from memory if we don't hit terminator characters
-// If this value is exceeded, WASM will panic
-const MAX_READ_SIZE: usize = 1024 * 1024; // 1 MB
-
 extern "C" {
     fn kvExists(ptr: *mut u8, length: usize) -> *mut u8;
 }
@@ -47,7 +43,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     }
 
     // Need to read memory at res_ptr and return a response
-    let data = read_memory(res_ptr, 0);
+    let data = common::read_memory_until_terminator(res_ptr);
 
     // Deallocate request memory
     unsafe {
@@ -55,6 +51,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     }
 
     let result = http_response(data);
+
+    // TODO: Updated for KVExists response (note: should handle multiple different KV response types (ie. kvexists, kvcreate, etc)
     return match result {
         Ok(res) => {
             if res.code < 200 || res.code > 299 {
@@ -82,13 +80,13 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     };
 }
 
-pub fn http_response(data: Vec<u8>) -> Result<HttpResponse, String> {
-    // Decode read request
-    let request: HttpResponse =
-        protobuf::Message::parse_from_bytes(data.as_slice()).map_err(|e| e.to_string())?;
-
-    Ok(request)
-}
+// pub fn http_response(data: Vec<u8>) -> Result<HttpResponse, String> {
+//     // Decode read request
+//     let request: HttpResponse =
+//         protobuf::Message::parse_from_bytes(data.as_slice()).map_err(|e| e.to_string())?;
+//
+//     Ok(request)
+// }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
     if !req.step.has_kv() {
