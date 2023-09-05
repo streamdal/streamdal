@@ -147,10 +147,14 @@ func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error 
 		return nil
 	}
 
-	if _, ok := tails[tailID]; !ok {
+	tail, ok := tails[tailID]
+	if !ok {
 		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
 		return nil
 	}
+
+	// Cancel workers
+	tail.CancelFunc()
 
 	s.removeTail(aud, pipelineID, tailID)
 
