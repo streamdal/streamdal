@@ -64,6 +64,8 @@ type IStore interface {
 	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 
+	IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
+
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
 	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
@@ -171,8 +173,8 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 
 // AddHeartbeat updates the TTL for registration and all audiences in snitch_live bucket
 func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
-	llog := s.log.WithField("method", "AddHeartbeat")
-	llog.Debug("received request to add heartbeat")
+	//llog := s.log.WithField("method", "AddHeartbeat")
+	//llog.Debug("received request to add heartbeat")
 
 	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
 	if err != nil {
@@ -185,7 +187,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		}
 
 		// Key has session_id prefix, refresh it
-		llog.Debugf("attempting to refresh key '%s'", k)
+		//llog.Debugf("attempting to refresh key '%s'", k)
 
 		if err := s.options.NATSBackend.Refresh(ctx, NATSLiveBucket, k); err != nil {
 			return errors.Wrap(err, "error refreshing key")
@@ -897,4 +899,18 @@ func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, e
 	}
 
 	return paused, nil
+}
+
+func (s *Store) IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
+	key := NATSConfigKey(audience, pipelineID)
+
+	if _, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, key); err != nil {
+		if err == nats.ErrKeyNotFound {
+			return false, nil
+		}
+
+		return false, errors.Wrap(err, "error fetching pipeline attachment from NATS")
+	}
+
+	return true, nil
 }

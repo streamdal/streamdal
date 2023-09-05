@@ -9,21 +9,22 @@ import (
 )
 
 type IPubSub interface {
-	Listen(topic string, channelID ...string) chan string
-	Publish(topic string, data string)
+	HaveTopic(topic string) bool
+	Listen(topic string, channelID ...string) chan interface{}
+	Publish(topic string, m interface{})
 	Close(topic, channelID string)
 	Reset()
 }
 
 type PubSub struct {
-	topics map[string]map[string]chan string // k1: topic k2: subscriber id v: channel
+	topics map[string]map[string]chan interface{} // k1: topic k2: subscriber id v: channel
 	mtx    *sync.RWMutex
 	log    *logrus.Entry
 }
 
 func New() *PubSub {
 	return &PubSub{
-		topics: make(map[string]map[string]chan string),
+		topics: make(map[string]map[string]chan interface{}),
 		log:    logrus.WithField("pkg", "pubsub"),
 		mtx:    &sync.RWMutex{},
 	}
@@ -33,7 +34,7 @@ func New() *PubSub {
 // any messages that are published to that topic. Listen accepts an optional
 // identifier that will be used to identify a specific listener. The identifier
 // is useful for being able to close a _specific_ channel.
-func (ps *PubSub) Listen(topic string, channelID ...string) chan string {
+func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 	var id string
 
 	if len(channelID) > 0 {
@@ -42,11 +43,11 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan string {
 		id = util.GenerateUUID()
 	}
 
-	ch := make(chan string, 1)
+	ch := make(chan interface{}, 1)
 
 	ps.mtx.Lock()
 	if _, ok := ps.topics[topic]; !ok {
-		ps.topics[topic] = make(map[string]chan string)
+		ps.topics[topic] = make(map[string]chan interface{})
 	}
 
 	ps.topics[topic][id] = ch
@@ -68,7 +69,7 @@ func (ps *PubSub) Reset() {
 		}
 	}
 
-	ps.topics = make(map[string]map[string]chan string)
+	ps.topics = make(map[string]map[string]chan interface{})
 }
 
 // Close will delete the channel from the topic map and close the channel.
@@ -90,7 +91,7 @@ func (ps *PubSub) Close(topic, channelID string) {
 	}
 }
 
-func (ps *PubSub) Publish(topic string, data string) {
+func (ps *PubSub) Publish(topic string, m interface{}) {
 	ps.mtx.RLock()
 	defer ps.mtx.RUnlock()
 
@@ -99,6 +100,14 @@ func (ps *PubSub) Publish(topic string, data string) {
 	}
 
 	for _, ch := range ps.topics[topic] {
-		ch <- data
+		ch <- m
 	}
+}
+
+func (ps *PubSub) HaveTopic(topic string) bool {
+	ps.mtx.RLock()
+	defer ps.mtx.RUnlock()
+
+	_, ok := ps.topics[topic]
+	return ok
 }

@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/util"
 )
@@ -108,6 +109,24 @@ func (b *Bus) BroadcastKVDeleteAll(ctx context.Context) error {
 					},
 				},
 			},
+		},
+	})
+}
+
+func (b *Bus) BroadcastTailRequest(ctx context.Context, req *protos.TailRequest) error {
+	return b.broadcast(ctx, "tail", &protos.BusEvent{
+		Event: &protos.BusEvent_TailRequest{
+			TailRequest: req,
+		},
+	})
+}
+
+func (b *Bus) BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error {
+	// TODO: this should probably go over a unique stream based on the TailRequestID
+	// TODO: but that will involve creating the stream and then cleaning up the stream after the TailRequest is complete
+	return b.broadcast(ctx, "tail", &protos.BusEvent{
+		Event: &protos.BusEvent_TailResponse{
+			TailResponse: resp,
 		},
 	})
 }

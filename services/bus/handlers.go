@@ -542,26 +542,47 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 	return nil
 }
 
-func (b *Bus) handleRegisterRequest(shutdownCtx context.Context, req *protos.RegisterRequest) error {
+func (b *Bus) handleRegisterRequest(_ context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("handling delete audience request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register handler")
 	return nil
 }
 
-func (b *Bus) handleDeleteAudienceRequest(shutdownCtx context.Context, req *protos.DeleteAudienceRequest) error {
+func (b *Bus) handleDeleteAudienceRequest(_ context.Context, req *protos.DeleteAudienceRequest) error {
 	b.log.Debugf("handling delete audience request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience handler")
 	return nil
 }
 
-func (b *Bus) handleDeregisterRequest(ctx context.Context, req *protos.DeregisterRequest) error {
+func (b *Bus) handleDeregisterRequest(_ context.Context, req *protos.DeregisterRequest) error {
 	b.log.Debugf("handling delete register request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via deregister handler")
 	return nil
 }
 
-func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudienceRequest) error {
+func (b *Bus) handleNewAudienceRequest(_ context.Context, req *protos.NewAudienceRequest) error {
 	b.log.Debugf("handling new audience request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience handler")
+	return nil
+}
+
+func (b *Bus) handleTailRequest(_ context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail request bus event: %v", req)
+	// TODO: this
+	return nil
+}
+
+func (b *Bus) handleTailResponse(_ context.Context, req *protos.TailResponse) error {
+	b.log.Debugf("handling tail response bus event: %v", req)
+
+	// Check if there is a pubsub topic.
+	// If not, we're not the instance that the frontend is connected to and can ignore the event.
+	if !b.options.PubSub.HaveTopic(req.TailRequestId) {
+		b.log.Debugf("no pubsub topic for session id '%s' - skipping", req.SessionId)
+		return nil
+	}
+
+	b.options.PubSub.Publish(req.TailRequestId, req)
+
 	return nil
 }
