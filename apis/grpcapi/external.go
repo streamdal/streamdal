@@ -57,10 +57,11 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	configStrAudience := util.ConvertConfigStrAudience(configs)
 
 	return &protos.GetAllResponse{
-		Live:      liveInfo,
-		Audiences: audiences,
-		Pipelines: pipelines,
-		Config:    configStrAudience,
+		Live:                   liveInfo,
+		Audiences:              audiences,
+		Pipelines:              pipelines,
+		Config:                 configStrAudience,
+		GeneratedAtUnixTsNsUtc: time.Now().UTC().UnixNano(),
 	}, nil
 }
 
@@ -90,6 +91,8 @@ func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.E
 	requestID := util.CtxRequestId(server.Context())
 	defer s.Options.PubSubService.Close(types.PubSubChangesTopic, requestID)
 
+	sendInProgress := false
+
 MAIN:
 	for {
 		select {
@@ -100,20 +103,39 @@ MAIN:
 			llog.Debug("server shutting down")
 			break MAIN
 		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
-			llog.Debug("received changes message via pubsub")
-
-			// Generate a GetAllResponse
-			resp, err := s.GetAll(server.Context(), req)
-			if err != nil {
-				llog.Errorf("unable to complete GetAll: %s", err)
+			if sendInProgress {
+				llog.Debug("send in progress, skipping changes message")
 				continue
 			}
 
-			// Send response
-			if err := server.Send(resp); err != nil {
-				llog.Errorf("unable to send GetAll response: %s", err)
-				continue
-			}
+			sendInProgress = true
+
+			llog.Debug("launching goroutine to send delayed GetAllResponse")
+
+			// Artificial update slowdown -- we do this to avoid spamming the
+			// client with updates when there are many concurrent Listen() hits
+			go func() {
+				defer func() {
+					sendInProgress = false
+				}()
+
+				time.Sleep(100 * time.Millisecond)
+
+				llog.Debug("received changes message via pubsub")
+
+				// Generate a GetAllResponse
+				resp, err := s.GetAll(server.Context(), req)
+				if err != nil {
+					llog.Errorf("unable to complete GetAll: %s", err)
+					return
+				}
+
+				// Send response
+				if err := server.Send(resp); err != nil {
+					llog.Errorf("unable to send GetAll response: %s", err)
+					return
+				}
+			}()
 		}
 	}
 
