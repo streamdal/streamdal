@@ -89,7 +89,7 @@ type Snitch struct {
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
 	tailsMtx           *sync.RWMutex
-	tails              map[string]*Tail
+	tails              map[string]map[string]*Tail
 }
 
 type Config struct {
@@ -165,7 +165,7 @@ func New(cfg *Config) (*Snitch, error) {
 		metrics:            m,
 		sessionID:          uuid.New().String(),
 		tailsMtx:           &sync.RWMutex{},
-		tails:              make(map[string]*Tail),
+		tails:              make(map[string]map[string]*Tail),
 	}
 
 	if cfg.DryRun {
@@ -271,9 +271,11 @@ func (s *Snitch) watchForShutdown() {
 	// Shut down all tails
 	s.tailsMtx.RLock()
 	defer s.tailsMtx.RUnlock()
-	for _, t := range s.tails {
-		s.config.Logger.Debugf("Shutting down tail for pipeline %s", t.Request.GetTail().Request.PipelineId)
-		t.CancelFunc()
+	for _, tails := range s.tails {
+		for reqID, tail := range tails {
+			s.config.Logger.Debugf("Shutting down tail '%s' for pipeline %s", reqID, tail.Request.GetTail().Request.PipelineId)
+			tail.CancelFunc()
+		}
 	}
 }
 
@@ -524,19 +526,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		timeoutCxl()
 
 		// Perform tail if necessary
-		if tail := s.getTail(aud, pipeline.Id); tail != nil {
-			tr := &protos.TailResponse{
-				Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-				TailRequestId: tail.Request.GetTail().Request.Id,
-				Audience:      aud,
-				PipelineId:    pipeline.Id,
-				SessionId:     s.sessionID,
-				TimestampNs:   time.Now().UTC().UnixNano(),
-				OriginalData:  originalData,
-				NewData:       data,
-			}
-			tail.Ch <- tr
-		}
+		s.sendTail(aud, pipeline.Id, originalData, data)
 	}
 
 	// Dry run should not modify anything, but we must allow pipeline to

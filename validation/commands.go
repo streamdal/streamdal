@@ -46,7 +46,7 @@ func ValidateAudience(aud *protos.Audience) error {
 	return nil
 }
 
-func ValidateTailCommand(cmd *protos.Command) error {
+func ValidateTailRequestStartCommand(cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrNilInput
 	}
@@ -67,6 +67,28 @@ func ValidateTailCommand(cmd *protos.Command) error {
 
 	if err := ValidateAudience(cmd.Audience); err != nil {
 		return errors.Wrap(err, "invalid audience")
+	}
+
+	return nil
+}
+
+func ValidateTailRequestStopCommand(cmd *protos.Command) error {
+	if cmd == nil {
+		return ErrNilInput
+	}
+
+	tail := cmd.GetTail()
+	if tail == nil {
+		return ErrNilField("tail")
+	}
+
+	req := tail.GetRequest()
+	if req == nil {
+		return ErrNilField("request")
+	}
+
+	if req.Id == "" {
+		return ErrEmptyField("id")
 	}
 
 	return nil

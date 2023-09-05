@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -23,6 +24,27 @@ type Tail struct {
 	cancelCtx    context.Context
 	CancelFunc   context.CancelFunc
 	log          logger.Logger
+}
+
+func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
+	tails := s.getTail(aud, pipelineID)
+	if len(tails) == 0 {
+		return
+	}
+
+	for _, tail := range tails {
+		tr := &protos.TailResponse{
+			Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
+			TailRequestId: tail.Request.GetTail().Request.Id,
+			Audience:      aud,
+			PipelineId:    pipelineID,
+			SessionId:     s.sessionID,
+			TimestampNs:   time.Now().UTC().UnixNano(),
+			OriginalData:  originalData,
+			NewData:       postPipelineData,
+		}
+		tail.Ch <- tr
+	}
 }
 
 func (t *Tail) startWorkers() error {
@@ -70,7 +92,7 @@ func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
 }
 
 func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
-	if err := validation.ValidateTailCommand(cmd); err != nil {
+	if err := validation.ValidateTailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
 
@@ -105,40 +127,71 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 		return errors.Wrap(err, "unable to tail pipeline")
 	}
 
-	s.setTailing(cmd.Audience, cmd.GetTail().Request.PipelineId, t)
+	s.setTailing(t)
 
 	return nil
 }
 
-func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) *Tail {
+func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error {
+	if err := validation.ValidateTailRequestStopCommand(cmd); err != nil {
+		return errors.Wrap(err, "invalid tail request stop command")
+	}
+
+	aud := cmd.GetTail().Request.Audience
+	pipelineID := cmd.GetTail().Request.PipelineId
+	tailID := cmd.GetTail().Request.Id
+
+	tails := s.getTail(aud, pipelineID)
+	if len(tails) == 0 {
+		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
+		return nil
+	}
+
+	if _, ok := tails[tailID]; !ok {
+		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
+		return nil
+	}
+
+	s.removeTail(aud, pipelineID, tailID)
+
+	return nil
+}
+
+func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) map[string]*Tail {
 	s.tailsMtx.RLock()
-	tail, ok := s.tails[tailKey(aud, pipelineID)]
+	tails, ok := s.tails[tailKey(aud, pipelineID)]
 	s.tailsMtx.RUnlock()
 
 	if ok {
 		// We don't know when a tail is cancelled so we need to check the context
-		if tail.cancelCtx.Err() == context.Canceled {
-			s.removeTail(aud, pipelineID)
-			return nil
-		}
+		//if tail.cancelCtx.Err() == context.Canceled {
+		//	s.removeTail(id)
+		//	return nil
+		//}
 
-		return tail
+		return tails
 	}
 
 	return nil
 }
-func (s *Snitch) removeTail(aud *protos.Audience, pipelineID string) {
+func (s *Snitch) removeTail(aud *protos.Audience, pipelineID, tailID string) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
-	delete(s.tails, tailKey(aud, pipelineID))
+	delete(s.tails[tailKey(aud, pipelineID)], tailID)
 }
 
-func (s *Snitch) setTailing(aud *protos.Audience, pipelineID string, tail *Tail) {
+func (s *Snitch) setTailing(tail *Tail) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
-	s.tails[tailKey(aud, pipelineID)] = tail
+	tr := tail.Request.GetTail().Request
+
+	if _, ok := s.tails[tailKey(tr.Audience, tr.PipelineId)]; !ok {
+		s.tails[tailKey(tr.Audience, tr.PipelineId)] = make(map[string]*Tail)
+	}
+
+	s.tails[tailKey(tr.Audience, tr.PipelineId)][tr.Id] = tail
 }
 
 func tailKey(aud *protos.Audience, pipelineID string) string {
