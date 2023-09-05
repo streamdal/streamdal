@@ -17,7 +17,7 @@ import (
 const NumTailWorkers = 2
 
 type Tail struct {
-	request      *protos.Command
+	Request      *protos.Command
 	Ch           chan *protos.TailResponse
 	snitchServer server.IServerClient
 	cancelCtx    context.Context
@@ -93,7 +93,7 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 
 	// Start workers
 	t := &Tail{
-		request:      cmd,
+		Request:      cmd,
 		Ch:           make(chan *protos.TailResponse, 100),
 		cancelCtx:    ctx,
 		CancelFunc:   cancel,

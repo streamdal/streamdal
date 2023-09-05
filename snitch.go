@@ -272,7 +272,7 @@ func (s *Snitch) watchForShutdown() {
 	s.tailsMtx.RLock()
 	defer s.tailsMtx.RUnlock()
 	for _, t := range s.tails {
-		s.config.Logger.Debugf("Shutting down tail for pipeline %s", t.request.GetTail().Request.PipelineId)
+		s.config.Logger.Debugf("Shutting down tail for pipeline %s", t.Request.GetTail().Request.PipelineId)
 		t.CancelFunc()
 	}
 }
@@ -526,13 +526,14 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		// Perform tail if necessary
 		if tail := s.getTail(aud, pipeline.Id); tail != nil {
 			tr := &protos.TailResponse{
-				Type:         protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-				Audience:     aud,
-				PipelineId:   pipeline.Id,
-				SessionId:    s.sessionID,
-				TimestampNs:  time.Now().UTC().UnixNano(),
-				OriginalData: originalData,
-				NewData:      data,
+				Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
+				TailRequestId: tail.Request.GetTail().Request.Id,
+				Audience:      aud,
+				PipelineId:    pipeline.Id,
+				SessionId:     s.sessionID,
+				TimestampNs:   time.Now().UTC().UnixNano(),
+				OriginalData:  originalData,
+				NewData:       data,
 			}
 			tail.Ch <- tr
 		}
