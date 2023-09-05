@@ -130,4 +130,4 @@ export const exampleConcurrent = async () => {
   void logTest(snitchB, audienceBProducer, exampleData);
 };
 
-void exampleConcurrent();
+void exampleStaggered();
