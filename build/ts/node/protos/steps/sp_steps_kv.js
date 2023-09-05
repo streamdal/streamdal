@@ -67,7 +67,9 @@ export const KVExistsRequest = new KVExistsRequest$Type();
 class KVExistsResponse$Type extends MessageType {
     constructor() {
         super("protos.steps.KVExistsResponse", [
-            { no: 1, name: "exists", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "exists", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "is_error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
