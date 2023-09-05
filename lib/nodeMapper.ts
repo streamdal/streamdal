@@ -1,7 +1,6 @@
 import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { ClientInfo } from "snitch-protos/protos/sp_info.ts";
-import { ServiceMapType } from "./fetch.ts";
 import {
   audienceKey,
   componentKey,
@@ -12,6 +11,7 @@ import {
 } from "./utils.ts";
 import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
+import { ServiceMapper } from "./serviceMapper.ts";
 
 export type NodeData = {
   audience: Audience;
@@ -64,7 +64,7 @@ export const xOffset = (
 export const mapOperation = (
   nodesMap: NodesMap,
   a: Audience,
-  serviceMap: ServiceMapType,
+  serviceMap: ServiceMapper,
 ) => {
   const op = OperationType[a.operationType].toLowerCase() as GroupCountKey;
   const groupCount = nodesMap.services.get(serviceKey(a))!;
@@ -111,8 +111,8 @@ export const mapOperation = (
 };
 
 export const mapNodes = (
-  serviceMap: ServiceMapType,
-): NodesMap => {
+  serviceMap: ServiceMapper,
+): Map<string, FlowNode> => {
   const nodesMap = {
     nodes: new Map<string, FlowNode>(),
     services: new Map<string, GroupCount>(),
@@ -141,7 +141,7 @@ export const mapNodes = (
       groupCount["consumer"] || 1,
     );
 
-    nodesMap.nodes.set(a.componentName, {
+    nodesMap.nodes.set(componentKey(a), {
       id: componentKey(a),
       type: "component",
       sourcePosition: "right",
@@ -155,7 +155,7 @@ export const mapNodes = (
     });
   });
 
-  return nodesMap;
+  return nodesMap.nodes;
 };
 
 //

@@ -1,7 +1,7 @@
 import OpModal from "../../../../../../../../islands/opModal.tsx";
 import { PageProps } from "$fresh/src/server/types.ts";
 import { SuccessRoute } from "../../../../../../../_middleware.ts";
-import { serviceSignal } from "../../../../../../../../islands/serviceMap.tsx";
+import { serviceSignal } from "../../../../../../../../components/serviceMap/serviceSignal.ts";
 
 export default function FlowRoute(
   props: PageProps<

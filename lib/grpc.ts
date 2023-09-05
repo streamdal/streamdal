@@ -3,15 +3,14 @@ import {
   IExternalClient,
 } from "snitch-protos/protos/sp_external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+import { grpcToken, grpcUrl } from "./configs.ts";
 
 export const meta = {
-  meta: { "auth-token": "1234" },
+  meta: { "auth-token": await grpcToken() },
 };
 
 const transport = new GrpcWebFetchTransport({
-  baseUrl: `${
-    (await Deno.env.get("SNITCH_GRPC_WEB_URL")) || "http://localhost:9091"
-  }`,
+  baseUrl: await grpcUrl(),
   format: "binary",
 });
 
