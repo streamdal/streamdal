@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -55,13 +57,15 @@ func (t *Tail) startWorkers() error {
 			return errors.Wrap(err, "error starting tail worker")
 		}
 
-		go t.startWorker(stream)
+		looper := director.NewFreeLooper(director.FOREVER, make(chan error, 1))
+
+		go t.startWorker(looper, stream)
 	}
 
 	return nil
 }
 
-func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
+func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTailClient) {
 	if stream == nil {
 		t.log.Error("stream is nil, unable to start tail worker")
 		return
@@ -71,24 +75,31 @@ func (t *Tail) startWorker(stream protos.Internal_SendTailClient) {
 	// that getTail() can remove the tail from the map
 	defer t.CancelFunc()
 
-	for {
+	looper.Loop(func() error {
 		select {
 		case <-t.cancelCtx.Done():
 			t.log.Debug("tail worker cancelled")
-			return
+			return nil
 		case <-stream.Context().Done():
 			t.log.Debug("tail worker context terminated")
-			return
+			return nil
 		case resp := <-t.Ch:
 			if err := stream.Send(resp); err != nil {
-				if err == io.EOF {
+				if strings.Contains(err.Error(), io.EOF.Error()) {
 					t.log.Debug("tail worker received EOF, exiting")
-					return
+					return nil
+				}
+				if strings.Contains(err.Error(), "connection refused") {
+					// Snitch server went away, log, sleep, and wait for reconnect
+					t.log.Warn("failed to send tail response, snitch server went away, waiting for reconnect")
+					time.Sleep(ReconnectSleep)
+					return nil
 				}
 				t.log.Errorf("error sending tail: %s", err)
 			}
 		}
-	}
+		return nil
+	})
 }
 
 func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {

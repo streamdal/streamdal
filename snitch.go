@@ -17,6 +17,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -322,6 +323,12 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 		}
 
 		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+			if strings.Contains(err.Error(), "connection refused") {
+				// Snitch server went away, log, sleep, and wait for reconnect
+				s.config.Logger.Warn("failed to send heartbeat, snitch server went away, waiting for reconnect")
+				time.Sleep(ReconnectSleep)
+				return nil
+			}
 			s.config.Logger.Errorf("failed to send heartbeat: %s", err)
 		}
 

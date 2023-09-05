@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -223,6 +224,12 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
 			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Name, entry.Value)
 			err = m.ServerClient.SendMetrics(context.Background(), entry)
+			if strings.Contains(err.Error(), "connection refused") {
+				// Snitch server went away, log, sleep, and wait for reconnect
+				m.Log.Warn("failed to send metrics, snitch server went away, waiting for reconnect")
+				time.Sleep(time.Second * 5)
+				return nil
+			}
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()

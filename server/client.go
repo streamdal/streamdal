@@ -142,7 +142,6 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 func (c *Client) GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
-	// TODO: endpoint accepts a stream so we will need to store this connection somewhere
 	srv, err := c.Server.SendTail(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to talk to snitch server")

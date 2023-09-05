@@ -2,7 +2,6 @@ package snitch
 
 import (
 	"context"
-	"io"
 	"runtime"
 	"strings"
 	"time"
@@ -81,7 +80,7 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
-			if errors.Is(err, io.EOF) || strings.Contains(err.Error(), "reading from server: EOF") {
+			if strings.Contains(err.Error(), "reading from server: EOF") {
 				// Nicer reconnect messages
 				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
