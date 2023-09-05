@@ -52,10 +52,10 @@ message Metric {
 }
 
 message TailRequest {
-  Audience audience = 1;
-  string pipeline_id = 2;
-
-  map<string, string> _metadata = 3; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  string id = 1;
+  Audience audience = 2;
+  string pipeline_id = 3;
+  map<string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 enum TailResponseType {
@@ -69,21 +69,23 @@ enum TailResponseType {
 message TailResponse {
   TailResponseType type = 1;
 
-  Audience audience = 2;
+  string tail_request_id = 2;
 
-  string pipeline_id = 3;
+  Audience audience = 3;
 
-  string session_id = 4;
+  string pipeline_id = 4;
+
+  string session_id = 5;
 
   // Timestamp in nanoseconds
-  int64 timestamp_ns = 5;
+  int64 timestamp_ns = 6;
 
   // Payload data. For errors, this will be the error message
   // For payloads, this will be JSON of the payload data, post processing
-  bytes original_data = 6;
+  bytes original_data = 7;
 
   // For payloads, this will be the new data, post processing
-  bytes new_data = 7;
+  bytes new_data = 8;
 
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

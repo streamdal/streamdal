@@ -76,15 +76,19 @@ export interface Metric {
  */
 export interface TailRequest {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 2;
+     * @generated from protobuf field: string pipeline_id = 3;
      */
     pipelineId: string;
     /**
-     * @generated from protobuf field: map<string, string> _metadata = 3;
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
      */
     Metadata: {
         [key: string]: string;
@@ -102,34 +106,38 @@ export interface TailResponse {
      */
     type: TailResponseType;
     /**
-     * @generated from protobuf field: protos.Audience audience = 2;
+     * @generated from protobuf field: string tail_request_id = 2;
+     */
+    tailRequestId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 3;
+     * @generated from protobuf field: string pipeline_id = 4;
      */
     pipelineId: string;
     /**
-     * @generated from protobuf field: string session_id = 4;
+     * @generated from protobuf field: string session_id = 5;
      */
     sessionId: string;
     /**
      * Timestamp in nanoseconds
      *
-     * @generated from protobuf field: int64 timestamp_ns = 5;
+     * @generated from protobuf field: int64 timestamp_ns = 6;
      */
     timestampNs: bigint;
     /**
      * Payload data. For errors, this will be the error message
      * For payloads, this will be JSON of the payload data, post processing
      *
-     * @generated from protobuf field: bytes original_data = 6;
+     * @generated from protobuf field: bytes original_data = 7;
      */
     originalData: Uint8Array;
     /**
      * For payloads, this will be the new data, post processing
      *
-     * @generated from protobuf field: bytes new_data = 7;
+     * @generated from protobuf field: bytes new_data = 8;
      */
     newData: Uint8Array;
     /**

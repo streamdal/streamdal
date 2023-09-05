@@ -173,10 +173,11 @@ class Metric(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class TailRequest(betterproto.Message):
-    audience: "Audience" = betterproto.message_field(1)
-    pipeline_id: str = betterproto.string_field(2)
+    id: str = betterproto.string_field(1)
+    audience: "Audience" = betterproto.message_field(2)
+    pipeline_id: str = betterproto.string_field(3)
     metadata: Dict[str, str] = betterproto.map_field(
-        3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
 
 
@@ -188,19 +189,20 @@ class TailResponse(betterproto.Message):
     """
 
     type: "TailResponseType" = betterproto.enum_field(1)
-    audience: "Audience" = betterproto.message_field(2)
-    pipeline_id: str = betterproto.string_field(3)
-    session_id: str = betterproto.string_field(4)
-    timestamp_ns: int = betterproto.int64_field(5)
+    tail_request_id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: str = betterproto.string_field(4)
+    session_id: str = betterproto.string_field(5)
+    timestamp_ns: int = betterproto.int64_field(6)
     """Timestamp in nanoseconds"""
 
-    original_data: bytes = betterproto.bytes_field(6)
+    original_data: bytes = betterproto.bytes_field(7)
     """
     Payload data. For errors, this will be the error message For payloads, this
     will be JSON of the payload data, post processing
     """
 
-    new_data: bytes = betterproto.bytes_field(7)
+    new_data: bytes = betterproto.bytes_field(8)
     """For payloads, this will be the new data, post processing"""
 
     metadata: Dict[str, str] = betterproto.map_field(
