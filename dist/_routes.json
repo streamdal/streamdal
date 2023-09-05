@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/_astro/404.2d2e42e0.css",
+    "/_astro/404.df6034ee.css",
+    "/_astro/DocSearch.22d1be39.js",
+    "/_astro/LanguageSelect.379ef6ba.js",
+    "/_astro/SidebarToggle.19e042da.js",
+    "/_astro/SidebarToggleTabGroup.af91e10a.js",
+    "/_astro/TableOfContents.2495ec14.js",
+    "/_astro/client.7a4f1478.js",
+    "/_astro/compat.module.8d32febc.js",
+    "/_astro/components.f6213d81.css",
+    "/_astro/hooks.module.b9808d06.js",
+    "/_astro/jsxRuntime.module.6316ea77.js",
+    "/_astro/preact.module.9adf8a76.js",
+    "/_astro/raven_error.80de868e.png",
+    "/_astro/signals.module.967fe86b.js",
+    "/_worker.js",
+    "/default-og-image.png",
+    "/favicon-16x16.svg",
+    "/favicon-32x32.svg",
+    "/favicon-48x48.svg",
+    "/favicon.svg",
+    "/make-scrollable-code-focusable.js",
+    "/sitemap-0.xml",
+    "/sitemap-index.xml",
+    "/streamdal-logo-large.svg",
+    "/streamdal-logo-lg.svg"
+  ]
+}

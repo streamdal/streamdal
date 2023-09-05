@@ -158,17 +158,17 @@ export const SIDEBAR: Sidebar = {
           {
             text: "Java (Coming Soon!)",
             slug: "java",
-            link: "en/language-support/"
+            link: "en/language-support/java"
           },
           {
             text: "Scala (Coming Soon!)",
             slug: "scala",
-            link: "en/language-support/"
+            link: "en/language-support/scala"
           },
           {
             text: "Rust (Coming Soon!)",
             slug: "rust",
-            link: "en/language-support/"
+            link: "en/language-support/rust"
           },
           {
             text: "Ruby (Coming Soon!)",
@@ -320,11 +320,6 @@ export const SIDEBAR: Sidebar = {
             link: "en/resources-support/license",
           },
           {
-            text: "Release Notes",
-            slug: "release-notes",
-            link: "en/resources-support/release-notes",
-          },
-          {
             text: "Roadmap",
             slug: "roadmap",
             link: "en/resources-support/roadmap",
@@ -355,9 +350,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/engineering/observability",
           },
           {
-            text: "Tail",
-            slug: "tail",
-            link: "en/engineering/tail",
+            text: "Peek",
+            slug: "peek",
+            link: "en/engineering/peek",
           },
         ],
       },
