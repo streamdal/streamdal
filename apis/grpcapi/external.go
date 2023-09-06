@@ -673,8 +673,6 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			}
 		}
 	}
-
-	// TODO: broadcast the stop
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
