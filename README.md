@@ -43,7 +43,7 @@ func main() {
 		StepTimeout:     time.Millisecond * 10,
 		PipelineTimeout: time.Millisecond * 100,
 		DryRun:          false,
-		ServiceName:     "kafka",
+		ServiceName:     "billing-svc",
 		ShutdownCtx:     ctx,
 	})
 	if err != nil {
