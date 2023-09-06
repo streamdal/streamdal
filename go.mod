@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
-	github.com/streamdal/snitch-protos v0.0.88-0.20230905140716-89e6496e37e6
+	github.com/streamdal/snitch-protos v0.0.88-0.20230906130753-91fb480b1e63
 	github.com/tetratelabs/wazero v1.2.0
 	google.golang.org/grpc v1.40.0
 )

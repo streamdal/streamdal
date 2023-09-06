@@ -129,21 +129,21 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 		} else if tail := cmd.GetTail(); tail != nil {
-			switch tail.Type {
-			case protos.TailCommandType_TAIL_COMMAND_TYPE_START:
+			switch tail.GetRequest().Type {
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
 				s.config.Logger.Debugf("Received start tail command for pipeline '%s'", tail.GetRequest().PipelineId)
 				if err := s.tailPipeline(context.Background(), cmd); err != nil {
 					s.config.Logger.Errorf("Failed to tail pipeline: %s", err)
 					return nil
 				}
-			case protos.TailCommandType_TAIL_COMMAND_TYPE_STOP:
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 				s.config.Logger.Debugf("Received stop tail command for pipeline '%s'", tail.GetRequest().PipelineId)
 				if err := s.stopTailPipeline(context.Background(), cmd); err != nil {
 					s.config.Logger.Errorf("Failed to stop tail pipeline: %s", err)
 					return nil
 				}
 			default:
-				s.config.Logger.Errorf("Unknown tail command type: %s", tail.Type)
+				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
 				return nil
 			}
 

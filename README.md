@@ -38,30 +38,31 @@ func main() {
 	defer cancel()
 
 	sc, err := snitch.New(&snitch.Config{
-		SnitchURL:   "localhost:9090",
-		SnitchToken: "streadmal",
-		StepTimeout:  time.Millisecond * 10,
+		SnitchURL:       "localhost:9090",
+		SnitchToken:     "streadmal",
+		StepTimeout:     time.Millisecond * 10,
 		PipelineTimeout: time.Millisecond * 100,
-		DryRun:       false,
-		DataSource:   "kafka",
-		ShutdownCtx:  ctx,
+		DryRun:          false,
+		ServiceName:     "kafka",
+		ShutdownCtx:     ctx,
 	})
 	if err != nil {
 		panic(err)
 	}
 
 	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
-		OperationType:   snitch.OperationTypeConsumer,
-        OperationName:   "new-order-topic",
-        ComponentName:   "kafka",
-        Data:            []byte(`{"object": {"field": true}}`),
-    })
+		OperationType: snitch.OperationTypeConsumer,
+		OperationName: "new-order-topic",
+		ComponentName: "kafka",
+		Data:          []byte(`{"object": {"field": true}}`),
+	})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("%#v\n", resp)
 }
+
 ```
 
 ### Metrics
