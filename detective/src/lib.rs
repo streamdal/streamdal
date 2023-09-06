@@ -8,12 +8,22 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
     let wasm_request = match common::read_request(ptr, length, true) {
         Ok(req) => req,
-        Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
+        Err(e) => {
+            return common::write_response(
+                &vec![],
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to read request: {}", e),
+            );
+        }
     };
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        panic!("invalid step: {}", err) // TODO: Should write response here
+        common::write_response(
+            &wasm_request.input,
+            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            format!("step validation failed: {}", err),
+        );
     }
 
     // Generate detective request
