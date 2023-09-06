@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 protobuf = "3.2.0"
-snitch-detective = "0.0.21"
-snitch-protos = "0.0.78"
+snitch-detective = "0.0.22"
+snitch-protos = "0.0.87"
 common = { path = "../common" }
 
 [profile.release]
