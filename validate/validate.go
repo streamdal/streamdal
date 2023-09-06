@@ -651,9 +651,25 @@ func KVRequest(r *protos.KVRequest) error {
 	return nil
 }
 
-func TailRequest(r *protos.TailRequest) error {
+func StartTailRequest(r *protos.TailRequest) error {
+	return validateTailRequest(r)
+}
+
+func StopTailRequest(r *protos.TailRequest) error {
+	return validateTailRequest(r)
+}
+
+func validateTailRequest(r *protos.TailRequest) error {
 	if r == nil {
 		return ErrNilInput
+	}
+
+	if r.Type == protos.TailRequestType_TAIL_REQUEST_TYPE_UNSET {
+		return ErrUnsetEnum("Type")
+	}
+
+	if r.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if r.PipelineId == "" {

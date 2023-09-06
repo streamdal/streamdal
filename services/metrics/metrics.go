@@ -185,7 +185,6 @@ func validateConfig(cfg *Config) error {
 }
 
 func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error {
-	m.log.Debugf("received metrics request: %v", req.Metrics)
 	for _, metric := range req.Metrics {
 		counter := m.getVecCounter(ctx, metric.Name)
 		if counter == nil {

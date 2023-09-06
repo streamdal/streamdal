@@ -98,7 +98,7 @@ func (b *Bus) getActivePipelineUsage(ctx context.Context, pipelineID string) ([]
 // uses this pipeline id. If it does, we need to have the client "reload" the
 // pipeline. We can do this by sending a "SetPipeline" cmd to the client.
 func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.UpdatePipelineRequest) error {
-	b.log.Debugf("handling update pipeline request bus event: %v", req)
+	b.log.Debugf("handling update pipeline request bus event: %v", req.Pipeline.Name)
 
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
@@ -485,7 +485,7 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 }
 
 func (b *Bus) handleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error {
-	b.log.Debugf("handling metrics request bus event: %v", req)
+	//b.log.Debugf("handling metrics request bus event: %v", req)
 
 	if err := validate.MetricsRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
@@ -566,9 +566,83 @@ func (b *Bus) handleNewAudienceRequest(_ context.Context, req *protos.NewAudienc
 	return nil
 }
 
-func (b *Bus) handleTailRequest(_ context.Context, req *protos.TailRequest) error {
+func (b *Bus) handleTailCommand(ctx context.Context, req *protos.TailRequest) error {
 	b.log.Debugf("handling tail request bus event: %v", req)
-	// TODO: this
+
+	switch req.Type {
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
+		b.log.Debugf("handling tail start command")
+		if err := validate.StartTailRequest(req); err != nil {
+			return errors.Wrap(err, "invalid tail request")
+		}
+
+		return b.sendTailCommand(ctx, req)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
+		b.log.Debugf("handling tail stop command")
+		if err := validate.StopTailRequest(req); err != nil {
+			return errors.Wrap(err, "invalid tail request")
+		}
+
+		return b.sendTailCommand(ctx, req)
+	default:
+		b.log.Debugf("unknown tail command type: %v", req.Type)
+	}
+
+	return nil
+}
+
+func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) error {
+	// Find registered clients
+	// There may be multiple instances connected to the same snitch server instance with
+	// the same pipeline ID and audience
+	live, err := b.options.Store.GetLive(ctx)
+	if err != nil {
+		return errors.Wrap(err, "unable to get live SDK connections")
+	}
+
+	for _, l := range live {
+		// Check if the audience matches
+		if !util.AudienceEquals(l.Audience, req.Audience) {
+			continue
+		}
+
+		// Session isn't talking to this node
+		if l.NodeName != b.options.NodeName {
+			continue
+		}
+
+		isAttached, err := b.options.Store.IsPipelineAttached(ctx, req.Audience, req.PipelineId)
+		if err != nil {
+			b.log.Error(errors.Wrap(err, "unable to verify pipeline is attached"))
+			continue
+		}
+		if !isAttached {
+			continue
+		}
+
+		// Get channel for the connected client. This allows us to send commands
+		// to a client that is connected via the Register() method
+		sdkCommandChan, isNewChan := b.options.Cmd.AddChannel(l.SessionID)
+		if isNewChan {
+			b.log.Debugf("new channel created for session id '%s'", l.SessionID)
+		} else {
+			b.log.Debugf("channel already exists for session id '%s'", l.SessionID)
+		}
+
+		// Send TailCommand to connected client
+		// This causes the client to call SendTail() on it's end, which initiates a stream of TailResponse messages
+		// that will come in via internal gRPC API and then get shipped over NATS for each snitch server instance
+		// to possibly receive and then further send to the front end
+		sdkCommandChan <- &protos.Command{
+			Audience: req.Audience,
+			Command: &protos.Command_Tail{
+				Tail: &protos.TailCommand{
+					Request: req,
+				},
+			},
+		}
+	}
+
 	return nil
 }
 

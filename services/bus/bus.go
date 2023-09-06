@@ -235,7 +235,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 	case *protos.BusEvent_KvRequest:
 		err = b.handleKVRequest(shutdownCtx, busEvent.GetKvRequest())
 	case *protos.BusEvent_TailRequest:
-		err = b.handleTailRequest(shutdownCtx, busEvent.GetTailRequest())
+		err = b.handleTailCommand(shutdownCtx, busEvent.GetTailRequest())
 	case *protos.BusEvent_TailResponse:
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
 	default:

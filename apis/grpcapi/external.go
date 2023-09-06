@@ -630,20 +630,12 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 }
 
 func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
-	if err := validate.TailRequest(req); err != nil {
-		return errors.Wrap(err, "invalid tail request")
-	}
-
 	// Each tail request gets its own unique ID so that we can receive messages over
 	// a unique channel from NATS
 	req.Id = util.GenerateUUID()
 
-	// Find registered clients
-	// There may be multiple instances connected to the same snitch server instance with
-	// the same pipeline ID and audience
-	live, err := s.Options.StoreService.GetLive(server.Context())
-	if err != nil {
-		return errors.Wrap(err, "unable to get live SDK connections")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
 	}
 
 	// Get channel for receiving TailResponse messages that get shipped over NATS.
@@ -651,57 +643,16 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// messages from NATS
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.Id, util.CtxRequestId(server.Context()))
 
-	for _, l := range live {
-		// Check if the audience matches
-		if !util.AudienceEquals(l.Audience, req.Audience) {
-			continue
-		}
-
-		isAttached, err := s.Options.StoreService.IsPipelineAttached(server.Context(), req.Audience, req.PipelineId)
-		if err != nil {
-			s.log.Error(errors.Wrap(err, "unable to verify pipeline is attached"))
-			continue
-		}
-		if !isAttached {
-			continue
-		}
-
-		// Get channel for the connected client. This allows us to send commands
-		// to a client that is connected via the Register() method
-		sdkCommandChan, isNewChan := s.Options.CmdService.AddChannel(l.SessionID)
-		if isNewChan {
-			s.log.Debugf("new channel created for session id '%s'", l.SessionID)
-		} else {
-			s.log.Debugf("channel already exists for session id '%s'", l.SessionID)
-		}
-
-		// Send TailCommand to connected client
-		// This causes the client to call SendTail() on it's end, which initiates a stream of TailResponse messages
-		// that will come in via internal gRPC API and then get shipped over NATS for each snitch server instance
-		// to possibly receive and then further send to the front end
-		sdkCommandChan <- &protos.Command{
-			Audience: req.Audience,
-			Command: &protos.Command_Tail{
-				Tail: &protos.TailCommand{
-					Type:    protos.TailCommandType_TAIL_COMMAND_TYPE_START,
-					Request: req,
-				},
-			},
-		}
-
-		// When this method exits, auto-send the stop command to all connected SDKs
-		defer func(ch chan *protos.Command) {
-			ch <- &protos.Command{
-				Audience: req.Audience,
-				Command: &protos.Command_Tail{
-					Tail: &protos.TailCommand{
-						Type:    protos.TailCommandType_TAIL_COMMAND_TYPE_STOP,
-						Request: req,
-					},
-				},
-			}
-		}(sdkCommandChan)
+	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
+		return errors.Wrap(err, "unable to broadcast tail request")
 	}
+
+	defer func() {
+		req.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
+		if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
+			s.log.Error(errors.Wrap(err, "unable to broadcast stop tail request"))
+		}
+	}()
 
 	for {
 		select {
@@ -714,7 +665,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		case msg := <-sdkReceiveChan:
 			tr, ok := msg.(*protos.TailResponse)
 			if !ok {
-				s.log.Errorf("unknown message received from pubsub: %v", msg)
+				s.log.Errorf("unknown message received from connected SDK session: %v", msg)
 				continue
 			}
 			if err := server.Send(tr); err != nil {
@@ -722,9 +673,11 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			}
 		}
 	}
+
+	// TODO: broadcast the stop
 }
 
-func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
+func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

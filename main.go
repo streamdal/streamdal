@@ -135,7 +135,8 @@ func run(d *deps.Dependencies) error {
 	case <-d.ShutdownContext.Done():
 		// Give components a moment to shutdown
 		time.Sleep(5 * time.Second)
-		return errors.New("shutting down")
+		logrus.Info("Shutting down...")
+		return nil
 	}
 }
 
