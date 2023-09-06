@@ -2,9 +2,11 @@
 // @generated from protobuf file "sp_kv.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
-// NOTE: Most of these message types are used by snitch-server to facilitate KV
-// functionality.
 /**
+ * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
+ * Note that only a subset of actions are used for protos.KVCommand (CREATE,
+ * UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
+ *
  * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
  *
  * @generated from protobuf enum protos.KVAction
@@ -16,25 +18,29 @@ export var KVAction;
      */
     KVAction[KVAction["KV_ACTION_UNSET"] = 0] = "KV_ACTION_UNSET";
     /**
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 1;
+     * @generated from protobuf enum value: KV_ACTION_GET = 1;
      */
-    KVAction[KVAction["KV_ACTION_CREATE"] = 1] = "KV_ACTION_CREATE";
+    KVAction[KVAction["KV_ACTION_GET"] = 1] = "KV_ACTION_GET";
     /**
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 2;
+     * @generated from protobuf enum value: KV_ACTION_CREATE = 2;
      */
-    KVAction[KVAction["KV_ACTION_UPDATE"] = 2] = "KV_ACTION_UPDATE";
+    KVAction[KVAction["KV_ACTION_CREATE"] = 2] = "KV_ACTION_CREATE";
     /**
-     * Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
-     *
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 3;
+     * @generated from protobuf enum value: KV_ACTION_UPDATE = 3;
      */
-    KVAction[KVAction["KV_ACTION_DELETE"] = 3] = "KV_ACTION_DELETE";
+    KVAction[KVAction["KV_ACTION_UPDATE"] = 3] = "KV_ACTION_UPDATE";
     /**
-     * Only "requested_at_*" needs to be set in *protos.KVInstruction
-     *
-     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 4;
+     * @generated from protobuf enum value: KV_ACTION_EXISTS = 4;
      */
-    KVAction[KVAction["KV_ACTION_DELETE_ALL"] = 4] = "KV_ACTION_DELETE_ALL";
+    KVAction[KVAction["KV_ACTION_EXISTS"] = 4] = "KV_ACTION_EXISTS";
+    /**
+     * @generated from protobuf enum value: KV_ACTION_DELETE = 5;
+     */
+    KVAction[KVAction["KV_ACTION_DELETE"] = 5] = "KV_ACTION_DELETE";
+    /**
+     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 6;
+     */
+    KVAction[KVAction["KV_ACTION_DELETE_ALL"] = 6] = "KV_ACTION_DELETE_ALL";
 })(KVAction || (KVAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class KVObject$Type extends MessageType {

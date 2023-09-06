@@ -52,6 +52,7 @@ enum KVMode {
 }
 
 // Returned by KV host func and interpreted by KV WASM.
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
 enum KVStatus {
   KV_STATUS_UNSET = 0;
   KV_STATUS_SUCCESS = 1;
