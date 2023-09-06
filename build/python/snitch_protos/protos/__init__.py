@@ -53,10 +53,10 @@ class TailResponseType(betterproto.Enum):
     TAIL_RESPONSE_TYPE_ERROR = 2
 
 
-class TailCommandType(betterproto.Enum):
-    TAIL_COMMAND_TYPE_UNSET = 0
-    TAIL_COMMAND_TYPE_START = 1
-    TAIL_COMMAND_TYPE_STOP = 2
+class TailRequestType(betterproto.Enum):
+    TAIL_REQUEST_TYPE_UNSET = 0
+    TAIL_REQUEST_TYPE_START = 1
+    TAIL_REQUEST_TYPE_STOP = 2
 
 
 class PipelineStepCondition(betterproto.Enum):
@@ -173,9 +173,10 @@ class Metric(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class TailRequest(betterproto.Message):
-    id: str = betterproto.string_field(1)
-    audience: "Audience" = betterproto.message_field(2)
-    pipeline_id: str = betterproto.string_field(3)
+    type: "TailRequestType" = betterproto.enum_field(1)
+    id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: str = betterproto.string_field(4)
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
@@ -208,12 +209,6 @@ class TailResponse(betterproto.Message):
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
-
-
-@dataclass(eq=False, repr=False)
-class TailCommand(betterproto.Message):
-    type: "TailCommandType" = betterproto.enum_field(1)
-    request: "TailRequest" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -709,6 +704,11 @@ class KvCommand(betterproto.Message):
     Create & Update specific setting that will cause the Create or Update to
     work as an upsert.
     """
+
+
+@dataclass(eq=False, repr=False)
+class TailCommand(betterproto.Message):
+    request: "TailRequest" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)

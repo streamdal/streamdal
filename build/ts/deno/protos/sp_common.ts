@@ -79,15 +79,19 @@ export interface Metric {
  */
 export interface TailRequest {
     /**
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: protos.TailRequestType type = 1;
+     */
+    type: TailRequestType;
+    /**
+     * @generated from protobuf field: string id = 2;
      */
     id: string;
     /**
-     * @generated from protobuf field: protos.Audience audience = 2;
+     * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 3;
+     * @generated from protobuf field: string pipeline_id = 4;
      */
     pipelineId: string;
     /**
@@ -149,19 +153,6 @@ export interface TailResponse {
     Metadata: {
         [key: string]: string;
     }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-}
-/**
- * @generated from protobuf message protos.TailCommand
- */
-export interface TailCommand {
-    /**
-     * @generated from protobuf field: protos.TailCommandType type = 1;
-     */
-    type: TailCommandType;
-    /**
-     * @generated from protobuf field: protos.TailRequest request = 2;
-     */
-    request?: TailRequest;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -231,19 +222,19 @@ export enum TailResponseType {
     ERROR = 2
 }
 /**
- * @generated from protobuf enum protos.TailCommandType
+ * @generated from protobuf enum protos.TailRequestType
  */
-export enum TailCommandType {
+export enum TailRequestType {
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_UNSET = 0;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_START = 1;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_START = 1;
      */
     START = 1,
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_STOP = 2;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
      */
     STOP = 2
 }
@@ -294,9 +285,10 @@ export const Metric = new Metric$Type();
 class TailRequest$Type extends MessageType<TailRequest> {
     constructor() {
         super("protos.TailRequest", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => Audience },
-            { no: 3, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailRequestType", TailRequestType, "TAIL_REQUEST_TYPE_"] },
+            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audience", kind: "message", T: () => Audience },
+            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -325,16 +317,3 @@ class TailResponse$Type extends MessageType<TailResponse> {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export const TailResponse = new TailResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class TailCommand$Type extends MessageType<TailCommand> {
-    constructor() {
-        super("protos.TailCommand", [
-            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailCommandType", TailCommandType, "TAIL_COMMAND_TYPE_"] },
-            { no: 2, name: "request", kind: "message", T: () => TailRequest }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.TailCommand
- */
-export const TailCommand = new TailCommand$Type();

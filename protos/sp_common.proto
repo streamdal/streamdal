@@ -52,9 +52,10 @@ message Metric {
 }
 
 message TailRequest {
-  string id = 1;
-  Audience audience = 2;
-  string pipeline_id = 3;
+  TailRequestType type = 1;
+  string id = 2;
+  Audience audience = 3;
+  string pipeline_id = 4;
   map<string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
@@ -62,6 +63,12 @@ enum TailResponseType {
   TAIL_RESPONSE_TYPE_UNSET = 0;
   TAIL_RESPONSE_TYPE_PAYLOAD = 1;
   TAIL_RESPONSE_TYPE_ERROR = 2;
+}
+
+enum TailRequestType {
+  TAIL_REQUEST_TYPE_UNSET = 0;
+  TAIL_REQUEST_TYPE_START = 1;
+  TAIL_REQUEST_TYPE_STOP = 2;
 }
 
 // TailResponse originates in the SDK and then is sent to snitch servers where
@@ -88,16 +95,4 @@ message TailResponse {
   bytes new_data = 8;
 
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-}
-
-enum TailCommandType {
-  TAIL_COMMAND_TYPE_UNSET = 0;
-  TAIL_COMMAND_TYPE_START = 1;
-  TAIL_COMMAND_TYPE_STOP = 2;
-}
-
-message TailCommand {
-  TailCommandType type = 1;
-
-  TailRequest request = 2;
 }

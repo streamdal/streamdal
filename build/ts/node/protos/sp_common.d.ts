@@ -76,15 +76,19 @@ export interface Metric {
  */
 export interface TailRequest {
     /**
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: protos.TailRequestType type = 1;
+     */
+    type: TailRequestType;
+    /**
+     * @generated from protobuf field: string id = 2;
      */
     id: string;
     /**
-     * @generated from protobuf field: protos.Audience audience = 2;
+     * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 3;
+     * @generated from protobuf field: string pipeline_id = 4;
      */
     pipelineId: string;
     /**
@@ -146,19 +150,6 @@ export interface TailResponse {
     Metadata: {
         [key: string]: string;
     };
-}
-/**
- * @generated from protobuf message protos.TailCommand
- */
-export interface TailCommand {
-    /**
-     * @generated from protobuf field: protos.TailCommandType type = 1;
-     */
-    type: TailCommandType;
-    /**
-     * @generated from protobuf field: protos.TailRequest request = 2;
-     */
-    request?: TailRequest;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -228,19 +219,19 @@ export declare enum TailResponseType {
     ERROR = 2
 }
 /**
- * @generated from protobuf enum protos.TailCommandType
+ * @generated from protobuf enum protos.TailRequestType
  */
-export declare enum TailCommandType {
+export declare enum TailRequestType {
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_UNSET = 0;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_START = 1;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_START = 1;
      */
     START = 1,
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_STOP = 2;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
      */
     STOP = 2
 }
@@ -279,11 +270,4 @@ declare class TailResponse$Type extends MessageType<TailResponse> {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export declare const TailResponse: TailResponse$Type;
-declare class TailCommand$Type extends MessageType<TailCommand> {
-    constructor();
-}
-/**
- * @generated MessageType for protobuf message protos.TailCommand
- */
-export declare const TailCommand: TailCommand$Type;
 export {};

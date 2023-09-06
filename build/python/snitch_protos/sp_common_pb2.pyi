@@ -14,9 +14,9 @@ RESPONSE_CODE_INTERNAL_SERVER_ERROR: ResponseCode
 RESPONSE_CODE_NOT_FOUND: ResponseCode
 RESPONSE_CODE_OK: ResponseCode
 RESPONSE_CODE_UNSET: ResponseCode
-TAIL_COMMAND_TYPE_START: TailCommandType
-TAIL_COMMAND_TYPE_STOP: TailCommandType
-TAIL_COMMAND_TYPE_UNSET: TailCommandType
+TAIL_REQUEST_TYPE_START: TailRequestType
+TAIL_REQUEST_TYPE_STOP: TailRequestType
+TAIL_REQUEST_TYPE_UNSET: TailRequestType
 TAIL_RESPONSE_TYPE_ERROR: TailResponseType
 TAIL_RESPONSE_TYPE_PAYLOAD: TailResponseType
 TAIL_RESPONSE_TYPE_UNSET: TailResponseType
@@ -60,16 +60,8 @@ class StandardResponse(_message.Message):
     message: str
     def __init__(self, id: _Optional[str] = ..., code: _Optional[_Union[ResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
-class TailCommand(_message.Message):
-    __slots__ = ["request", "type"]
-    REQUEST_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
-    request: TailRequest
-    type: TailCommandType
-    def __init__(self, type: _Optional[_Union[TailCommandType, str]] = ..., request: _Optional[_Union[TailRequest, _Mapping]] = ...) -> None: ...
-
 class TailRequest(_message.Message):
-    __slots__ = ["_metadata", "audience", "id", "pipeline_id"]
+    __slots__ = ["_metadata", "audience", "id", "pipeline_id", "type"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -80,12 +72,14 @@ class TailRequest(_message.Message):
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
     _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     id: str
     pipeline_id: str
-    def __init__(self, id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    type: TailRequestType
+    def __init__(self, type: _Optional[_Union[TailRequestType, str]] = ..., id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TailResponse(_message.Message):
     __slots__ = ["_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "tail_request_id", "timestamp_ns", "type"]
@@ -125,5 +119,5 @@ class OperationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 class TailResponseType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
 
-class TailCommandType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class TailRequestType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

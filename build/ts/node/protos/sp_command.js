@@ -2,9 +2,9 @@
 // @generated from protobuf file "sp_command.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { TailRequest } from "./sp_common.js";
 import { KVInstruction } from "./sp_kv.js";
 import { Pipeline } from "./sp_pipeline.js";
-import { TailCommand } from "./sp_common.js";
 import { Audience } from "./sp_common.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType {
@@ -96,4 +96,16 @@ class KVCommand$Type extends MessageType {
  * @generated MessageType for protobuf message protos.KVCommand
  */
 export const KVCommand = new KVCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailCommand$Type extends MessageType {
+    constructor() {
+        super("protos.TailCommand", [
+            { no: 2, name: "request", kind: "message", T: () => TailRequest }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailCommand
+ */
+export const TailCommand = new TailCommand$Type();
 //# sourceMappingURL=sp_command.js.map

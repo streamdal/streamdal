@@ -73,23 +73,23 @@ export var TailResponseType;
     TailResponseType[TailResponseType["ERROR"] = 2] = "ERROR";
 })(TailResponseType || (TailResponseType = {}));
 /**
- * @generated from protobuf enum protos.TailCommandType
+ * @generated from protobuf enum protos.TailRequestType
  */
-export var TailCommandType;
-(function (TailCommandType) {
+export var TailRequestType;
+(function (TailRequestType) {
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_UNSET = 0;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_UNSET = 0;
      */
-    TailCommandType[TailCommandType["UNSET"] = 0] = "UNSET";
+    TailRequestType[TailRequestType["UNSET"] = 0] = "UNSET";
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_START = 1;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_START = 1;
      */
-    TailCommandType[TailCommandType["START"] = 1] = "START";
+    TailRequestType[TailRequestType["START"] = 1] = "START";
     /**
-     * @generated from protobuf enum value: TAIL_COMMAND_TYPE_STOP = 2;
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
      */
-    TailCommandType[TailCommandType["STOP"] = 2] = "STOP";
-})(TailCommandType || (TailCommandType = {}));
+    TailRequestType[TailRequestType["STOP"] = 2] = "STOP";
+})(TailRequestType || (TailRequestType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType {
     constructor() {
@@ -137,9 +137,10 @@ export const Metric = new Metric$Type();
 class TailRequest$Type extends MessageType {
     constructor() {
         super("protos.TailRequest", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => Audience },
-            { no: 3, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailRequestType", TailRequestType, "TAIL_REQUEST_TYPE_"] },
+            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audience", kind: "message", T: () => Audience },
+            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -168,17 +169,4 @@ class TailResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export const TailResponse = new TailResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class TailCommand$Type extends MessageType {
-    constructor() {
-        super("protos.TailCommand", [
-            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailCommandType", TailCommandType, "TAIL_COMMAND_TYPE_"] },
-            { no: 2, name: "request", kind: "message", T: () => TailRequest }
-        ]);
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.TailCommand
- */
-export const TailCommand = new TailCommand$Type();
 //# sourceMappingURL=sp_common.js.map

@@ -59,3 +59,7 @@ message KVCommand {
   // work as an upsert.
   bool overwrite = 2;
 }
+
+message TailCommand {
+  TailRequest request = 2;
+}
