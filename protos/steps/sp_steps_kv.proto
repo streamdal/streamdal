@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package protos.steps;
 
+// We are importing this to get access to the KVAction type
+import "sp_kv.proto";
+
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -9,7 +12,7 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 // KV consists of two parts:
 //
 // - KVStep
-// - HostFuncKVExists
+// - KVStepResponse
 //
 // KVStep is used in PipelineSteps that will execute a specific KV request;
 // the actual KV lookup is performed by the KV WASM func that calls out to
@@ -19,48 +22,69 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 // not have socket support, so we need to call out to the SDK to perform the
 // actual KV API call.
 //
+// NOTE: The KV host funcs accept a special request type but return a generic
+// response. This is done so that we can include custom request params that
+// might only be relevant to that specific KV func while the response will
+// contain fields that are common to all KV funcs. Ie. KVExistsRequest requires
+// you to specify the lookup mode (which would not be needed for something like
+// a KVGet request), while the response is generally the same - did it succeed?
+// did it fail? was there an internal error? what is the return data (if any)?
 
 // Used by frontend when constructing a pipeline that contains a KV step that
-// performs a KVExists request.
+// performs any KV request. The mode determines _what_ the contents of the
+// key will be. Read comments about "static" vs "dynamic".
 // protolint:disable:next ENUM_FIELD_NAMES_PREFIX
-enum KVExistsMode {
-  KV_EXISTS_MODE_UNSET = 0;
+enum KVMode {
+  KV_MODE_UNSET = 0;
 
   // Will cause the KV lookup to use the key string as-is for the lookup
-  KV_EXISTS_MODE_STATIC = 1;
+  KV_MODE_STATIC = 1;
 
   // DYNAMIC mode will cause the KV lookup WASM to use the key to lookup the
   // associated value and use the result for the key existence check.
   //
-  // For example, if "key" in KVExistsRequest is set to "foo", KV WASM will do
+  // For example, if "key" in KVHostFuncRequest is set to "foo", KV WASM will do
   // the following:
   //
   // 1. Lookup the value of "foo" in the payload (which is "bar")
   // 2. Use "bar" as the "key" for the KV lookup
-  KV_EXISTS_MODE_DYNAMIC = 2;
+  KV_MODE_DYNAMIC = 2;
 }
 
-// Encoded in KVStep; also used as param to HostFuncKVExists() in SDK
-message KVExistsRequest {
-  string key = 1;
-  KVExistsMode mode = 2;
+// Returned by KV host func and interpreted by KV WASM.
+enum KVStatus {
+  KV_STATUS_UNSET = 0;
+  KV_STATUS_SUCCESS = 1;
+  KV_STATUS_FAILURE = 2;
+  KV_STATUS_ERROR = 3;
 }
 
-// Returned by HostFuncKVExists() in SDK
-message KVExistsResponse {
-  // Whether the key exists
-  bool exists = 1;
+// Returned by SDK host func and interpreted by KV WASM.
+message KVStepResponse {
+  // Status of the action; interpreted by KV WASM to so it can generate a protos.WASMResponse
+  KVStatus status = 1;
 
-  // Whether the request resulted in an error
-  bool is_error = 2;
+  // Message containing info, debug or error details; included in protos.WASMResponse
+  string message = 2;
 
-  // Potential message containing debug or error info
-  string message = 3;
+  // Optional because the only action that uses field is KV_ACTION_GET
+  //
+  // DS: Not sure how we'll use KV_ACTION_GET in steps yet but this is probably
+  // a good place to start. 09.06.2023.
+  optional bytes value = 3;
 }
 
-// Used in PipelineSteps
+// Used in PipelineSteps and passed to KV host func; constructed by frontend
 message KVStep {
-  oneof request {
-    KVExistsRequest kv_exists_request = 1;
-  }
+  // What type of action this step should perform
+  protos.KVAction action = 1;
+
+  // How the key field will be used to perform lookup
+  KVMode mode = 2;
+
+  // The key the action is taking place on
+  string key = 3;
+
+  // Optional because the only action that needs value is KV_ACTION_CREATE
+  optional bytes value = 4;
 }
