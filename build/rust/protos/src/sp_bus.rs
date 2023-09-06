@@ -689,8 +689,106 @@ impl BusEvent {
         }
     }
 
+    // .protos.TailRequest tail_request = 113;
+
+    pub fn tail_request(&self) -> &super::sp_common::TailRequest {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailRequest(ref v)) => v,
+            _ => <super::sp_common::TailRequest as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_tail_request(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_tail_request(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailRequest(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tail_request(&mut self, v: super::sp_common::TailRequest) {
+        self.event = ::std::option::Option::Some(bus_event::Event::TailRequest(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_tail_request(&mut self) -> &mut super::sp_common::TailRequest {
+        if let ::std::option::Option::Some(bus_event::Event::TailRequest(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::TailRequest(super::sp_common::TailRequest::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailRequest(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_tail_request(&mut self) -> super::sp_common::TailRequest {
+        if self.has_tail_request() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::TailRequest(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::sp_common::TailRequest::new()
+        }
+    }
+
+    // .protos.TailResponse tail_response = 114;
+
+    pub fn tail_response(&self) -> &super::sp_common::TailResponse {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailResponse(ref v)) => v,
+            _ => <super::sp_common::TailResponse as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_tail_response(&mut self) {
+        self.event = ::std::option::Option::None;
+    }
+
+    pub fn has_tail_response(&self) -> bool {
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailResponse(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tail_response(&mut self, v: super::sp_common::TailResponse) {
+        self.event = ::std::option::Option::Some(bus_event::Event::TailResponse(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_tail_response(&mut self) -> &mut super::sp_common::TailResponse {
+        if let ::std::option::Option::Some(bus_event::Event::TailResponse(_)) = self.event {
+        } else {
+            self.event = ::std::option::Option::Some(bus_event::Event::TailResponse(super::sp_common::TailResponse::new()));
+        }
+        match self.event {
+            ::std::option::Option::Some(bus_event::Event::TailResponse(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_tail_response(&mut self) -> super::sp_common::TailResponse {
+        if self.has_tail_response() {
+            match self.event.take() {
+                ::std::option::Option::Some(bus_event::Event::TailResponse(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::sp_common::TailResponse::new()
+        }
+    }
+
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(15);
+        let mut fields = ::std::vec::Vec::with_capacity(17);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "source",
@@ -788,6 +886,20 @@ impl BusEvent {
             BusEvent::mut_new_audience_request,
             BusEvent::set_new_audience_request,
         ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_common::TailRequest>(
+            "tail_request",
+            BusEvent::has_tail_request,
+            BusEvent::tail_request,
+            BusEvent::mut_tail_request,
+            BusEvent::set_tail_request,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_common::TailResponse>(
+            "tail_response",
+            BusEvent::has_tail_response,
+            BusEvent::tail_response,
+            BusEvent::mut_tail_response,
+            BusEvent::set_tail_response,
+        ));
         fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
             "_metadata",
             |m: &BusEvent| { &m._metadata },
@@ -853,6 +965,12 @@ impl ::protobuf::Message for BusEvent {
                 },
                 898 => {
                     self.event = ::std::option::Option::Some(bus_event::Event::NewAudienceRequest(is.read_message()?));
+                },
+                906 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::TailRequest(is.read_message()?));
+                },
+                914 => {
+                    self.event = ::std::option::Option::Some(bus_event::Event::TailResponse(is.read_message()?));
                 },
                 8002 => {
                     let len = is.read_raw_varint32()?;
@@ -944,6 +1062,14 @@ impl ::protobuf::Message for BusEvent {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
+                &bus_event::Event::TailRequest(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &bus_event::Event::TailResponse(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
             };
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -1005,6 +1131,12 @@ impl ::protobuf::Message for BusEvent {
                 &bus_event::Event::NewAudienceRequest(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(112, v, os)?;
                 },
+                &bus_event::Event::TailRequest(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(113, v, os)?;
+                },
+                &bus_event::Event::TailResponse(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(114, v, os)?;
+                },
             };
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -1025,6 +1157,8 @@ impl ::protobuf::Message for BusEvent {
 
     fn clear(&mut self) {
         self.source.clear();
+        self.event = ::std::option::Option::None;
+        self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
         self.event = ::std::option::Option::None;
@@ -1098,6 +1232,10 @@ pub mod bus_event {
         DeleteAudienceRequest(super::super::sp_external::DeleteAudienceRequest),
         // @@protoc_insertion_point(oneof_field:protos.BusEvent.new_audience_request)
         NewAudienceRequest(super::super::sp_internal::NewAudienceRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.tail_request)
+        TailRequest(super::super::sp_common::TailRequest),
+        // @@protoc_insertion_point(oneof_field:protos.BusEvent.tail_response)
+        TailResponse(super::super::sp_common::TailResponse),
     }
 
     impl ::protobuf::Oneof for Event {
@@ -1118,98 +1256,105 @@ pub mod bus_event {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0csp_bus.proto\x12\x06protos\x1a\x11sp_external.proto\x1a\x11sp_inte\
-    rnal.proto\x1a\x0bsp_kv.proto\"\xc4\t\n\x08BusEvent\x12\x16\n\x06source\
-    \x18\x01\x20\x01(\tR\x06source\x12D\n\x10register_request\x18d\x20\x01(\
-    \x0b2\x17.protos.RegisterRequestH\0R\x0fregisterRequest\x12J\n\x12deregi\
-    ster_request\x18e\x20\x01(\x0b2\x19.protos.DeregisterRequestH\0R\x11dere\
-    gisterRequest\x12W\n\x17create_pipeline_request\x18f\x20\x01(\x0b2\x1d.p\
-    rotos.CreatePipelineRequestH\0R\x15createPipelineRequest\x12W\n\x17delet\
-    e_pipeline_request\x18g\x20\x01(\x0b2\x1d.protos.DeletePipelineRequestH\
-    \0R\x15deletePipelineRequest\x12W\n\x17update_pipeline_request\x18h\x20\
-    \x01(\x0b2\x1d.protos.UpdatePipelineRequestH\0R\x15updatePipelineRequest\
-    \x12W\n\x17attach_pipeline_request\x18i\x20\x01(\x0b2\x1d.protos.AttachP\
-    ipelineRequestH\0R\x15attachPipelineRequest\x12W\n\x17detach_pipeline_re\
-    quest\x18j\x20\x01(\x0b2\x1d.protos.DetachPipelineRequestH\0R\x15detachP\
-    ipelineRequest\x12T\n\x16pause_pipeline_request\x18k\x20\x01(\x0b2\x1c.p\
-    rotos.PausePipelineRequestH\0R\x14pausePipelineRequest\x12W\n\x17resume_\
-    pipeline_request\x18l\x20\x01(\x0b2\x1d.protos.ResumePipelineRequestH\0R\
-    \x15resumePipelineRequest\x12A\n\x0fmetrics_request\x18m\x20\x01(\x0b2\
-    \x16.protos.MetricsRequestH\0R\x0emetricsRequest\x122\n\nkv_request\x18n\
-    \x20\x01(\x0b2\x11.protos.KVRequestH\0R\tkvRequest\x12W\n\x17delete_audi\
-    ence_request\x18o\x20\x01(\x0b2\x1d.protos.DeleteAudienceRequestH\0R\x15\
-    deleteAudienceRequest\x12N\n\x14new_audience_request\x18p\x20\x01(\x0b2\
-    \x1a.protos.NewAudienceRequestH\0R\x12newAudienceRequest\x12<\n\t_metada\
-    ta\x18\xe8\x07\x20\x03(\x0b2\x1e.protos.BusEvent.MetadataEntryR\x08Metad\
-    ata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\
-    \x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01B\x07\n\x05eve\
-    ntB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\x93\x0f\n\x06\
-    \x12\x04\0\0/\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
-    \x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\
-    \x03\x05\0\x1b\n\t\n\x02\x03\x02\x12\x03\x06\0\x15\n\x08\n\x01\x08\x12\
-    \x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\nX\n\x02\x04\0\x12\x04\x0b\
-    \0/\x01\x1aL\x20Type\x20used\x20by\x20`snitch-server`\x20for\x20broadcas\
-    ting\x20events\x20to\x20other\x20snitch\x20nodes\n\n\n\n\x03\x04\0\x01\
-    \x12\x03\x0b\x08\x10\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0c\x02\x14\n\x0c\n\
-    \x05\x04\0\x02\0\x05\x12\x03\x0c\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
-    \x03\x0c\t\x0f\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0c\x12\x13\n\xc7\x02\
-    \n\x04\x04\0\x08\0\x12\x04\x14\x02\"\x03\x1a\xb8\x02\x20This\x20_should_\
+    \n\x0csp_bus.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\x11sp_extern\
+    al.proto\x1a\x11sp_internal.proto\x1a\x0bsp_kv.proto\"\xbb\n\n\x08BusEve\
+    nt\x12\x16\n\x06source\x18\x01\x20\x01(\tR\x06source\x12D\n\x10register_\
+    request\x18d\x20\x01(\x0b2\x17.protos.RegisterRequestH\0R\x0fregisterReq\
+    uest\x12J\n\x12deregister_request\x18e\x20\x01(\x0b2\x19.protos.Deregist\
+    erRequestH\0R\x11deregisterRequest\x12W\n\x17create_pipeline_request\x18\
+    f\x20\x01(\x0b2\x1d.protos.CreatePipelineRequestH\0R\x15createPipelineRe\
+    quest\x12W\n\x17delete_pipeline_request\x18g\x20\x01(\x0b2\x1d.protos.De\
+    letePipelineRequestH\0R\x15deletePipelineRequest\x12W\n\x17update_pipeli\
+    ne_request\x18h\x20\x01(\x0b2\x1d.protos.UpdatePipelineRequestH\0R\x15up\
+    datePipelineRequest\x12W\n\x17attach_pipeline_request\x18i\x20\x01(\x0b2\
+    \x1d.protos.AttachPipelineRequestH\0R\x15attachPipelineRequest\x12W\n\
+    \x17detach_pipeline_request\x18j\x20\x01(\x0b2\x1d.protos.DetachPipeline\
+    RequestH\0R\x15detachPipelineRequest\x12T\n\x16pause_pipeline_request\
+    \x18k\x20\x01(\x0b2\x1c.protos.PausePipelineRequestH\0R\x14pausePipeline\
+    Request\x12W\n\x17resume_pipeline_request\x18l\x20\x01(\x0b2\x1d.protos.\
+    ResumePipelineRequestH\0R\x15resumePipelineRequest\x12A\n\x0fmetrics_req\
+    uest\x18m\x20\x01(\x0b2\x16.protos.MetricsRequestH\0R\x0emetricsRequest\
+    \x122\n\nkv_request\x18n\x20\x01(\x0b2\x11.protos.KVRequestH\0R\tkvReque\
+    st\x12W\n\x17delete_audience_request\x18o\x20\x01(\x0b2\x1d.protos.Delet\
+    eAudienceRequestH\0R\x15deleteAudienceRequest\x12N\n\x14new_audience_req\
+    uest\x18p\x20\x01(\x0b2\x1a.protos.NewAudienceRequestH\0R\x12newAudience\
+    Request\x128\n\x0ctail_request\x18q\x20\x01(\x0b2\x13.protos.TailRequest\
+    H\0R\x0btailRequest\x12;\n\rtail_response\x18r\x20\x01(\x0b2\x14.protos.\
+    TailResponseH\0R\x0ctailResponse\x12<\n\t_metadata\x18\xe8\x07\x20\x03(\
+    \x0b2\x1e.protos.BusEvent.MetadataEntryR\x08Metadata\x1a;\n\rMetadataEnt\
+    ry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\
+    \x02\x20\x01(\tR\x05value:\x028\x01B\x07\n\x05eventB4Z2github.com/stream\
+    dal/snitch-protos/build/go/protosJ\x8c\x10\n\x06\x12\x04\0\02\x01\n\x08\
+    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\
+    \x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x1b\n\t\n\x02\
+    \x03\x02\x12\x03\x06\0\x1b\n\t\n\x02\x03\x03\x12\x03\x07\0\x15\n\x08\n\
+    \x01\x08\x12\x03\t\0I\n\t\n\x02\x08\x0b\x12\x03\t\0I\nX\n\x02\x04\0\x12\
+    \x04\x0c\02\x01\x1aL\x20Type\x20used\x20by\x20`snitch-server`\x20for\x20\
+    broadcasting\x20events\x20to\x20other\x20snitch\x20nodes\n\n\n\n\x03\x04\
+    \0\x01\x12\x03\x0c\x08\x10\n\x0b\n\x04\x04\0\x02\0\x12\x03\r\x02\x14\n\
+    \x0c\n\x05\x04\0\x02\0\x05\x12\x03\r\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\
+    \x12\x03\r\t\x0f\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\r\x12\x13\n\xc7\x02\
+    \n\x04\x04\0\x08\0\x12\x04\x15\x02%\x03\x1a\xb8\x02\x20This\x20_should_\
     \x20contain\x20request\x20messages\x20-\x20each\x20snitch-server\x20can\
     \x20determine\n\x20how\x20to\x20interpret\x20and\x20handle\x20the\x20mes\
     sage.\n\n\x20NOTE:\x20The\x20bus\x20_should\x20not_\x20be\x20used\x20for\
     \x20transmitting\x20commands\x20to\x20SDKs.\x20The\n\x20consumer\x20in\
     \x20each\x20SDK\x20should\x20receive\x20a\x20request\x20and\x20potential\
     ly\x20craft\x20a\x20new\n\x20command\x20to\x20send\x20to\x20the\x20appro\
-    priate\x20SDK(s).\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x14\x08\r\n\x0b\
-    \n\x04\x04\0\x02\x01\x12\x03\x15\x042\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
-    \x03\x15\x04\x1a\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x15\x1b+\n\x0c\n\
-    \x05\x04\0\x02\x01\x03\x12\x03\x15.1\n\x0b\n\x04\x04\0\x02\x02\x12\x03\
-    \x16\x046\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x16\x04\x1c\n\x0c\n\x05\
-    \x04\0\x02\x02\x01\x12\x03\x16\x1d/\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
-    \x03\x1625\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x17\x04?\n\x0c\n\x05\x04\0\
-    \x02\x03\x06\x12\x03\x17\x04\x20\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
-    \x17!8\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x17;>\n\x0b\n\x04\x04\0\x02\
-    \x04\x12\x03\x18\x04?\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x18\x04\x20\
-    \n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x18!8\n\x0c\n\x05\x04\0\x02\x04\
-    \x03\x12\x03\x18;>\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x19\x04?\n\x0c\n\
-    \x05\x04\0\x02\x05\x06\x12\x03\x19\x04\x20\n\x0c\n\x05\x04\0\x02\x05\x01\
-    \x12\x03\x19!8\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x19;>\n\x0b\n\x04\
-    \x04\0\x02\x06\x12\x03\x1a\x04?\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\
-    \x1a\x04\x20\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x1a!8\n\x0c\n\x05\x04\
-    \0\x02\x06\x03\x12\x03\x1a;>\n\x0b\n\x04\x04\0\x02\x07\x12\x03\x1b\x04?\
-    \n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1b\x04\x20\n\x0c\n\x05\x04\0\x02\
-    \x07\x01\x12\x03\x1b!8\n\x0c\n\x05\x04\0\x02\x07\x03\x12\x03\x1b;>\n\x0b\
-    \n\x04\x04\0\x02\x08\x12\x03\x1c\x04=\n\x0c\n\x05\x04\0\x02\x08\x06\x12\
-    \x03\x1c\x04\x1f\n\x0c\n\x05\x04\0\x02\x08\x01\x12\x03\x1c\x206\n\x0c\n\
-    \x05\x04\0\x02\x08\x03\x12\x03\x1c9<\n\x0b\n\x04\x04\0\x02\t\x12\x03\x1d\
-    \x04?\n\x0c\n\x05\x04\0\x02\t\x06\x12\x03\x1d\x04\x20\n\x0c\n\x05\x04\0\
-    \x02\t\x01\x12\x03\x1d!8\n\x0c\n\x05\x04\0\x02\t\x03\x12\x03\x1d;>\n\x0b\
-    \n\x04\x04\0\x02\n\x12\x03\x1e\x040\n\x0c\n\x05\x04\0\x02\n\x06\x12\x03\
-    \x1e\x04\x19\n\x0c\n\x05\x04\0\x02\n\x01\x12\x03\x1e\x1a)\n\x0c\n\x05\
-    \x04\0\x02\n\x03\x12\x03\x1e,/\n\x0b\n\x04\x04\0\x02\x0b\x12\x03\x1f\x04\
-    &\n\x0c\n\x05\x04\0\x02\x0b\x06\x12\x03\x1f\x04\x14\n\x0c\n\x05\x04\0\
-    \x02\x0b\x01\x12\x03\x1f\x15\x1f\n\x0c\n\x05\x04\0\x02\x0b\x03\x12\x03\
-    \x1f\"%\n\x0b\n\x04\x04\0\x02\x0c\x12\x03\x20\x04?\n\x0c\n\x05\x04\0\x02\
-    \x0c\x06\x12\x03\x20\x04\x20\n\x0c\n\x05\x04\0\x02\x0c\x01\x12\x03\x20!8\
-    \n\x0c\n\x05\x04\0\x02\x0c\x03\x12\x03\x20;>\n\x0b\n\x04\x04\0\x02\r\x12\
-    \x03!\x049\n\x0c\n\x05\x04\0\x02\r\x06\x12\x03!\x04\x1d\n\x0c\n\x05\x04\
-    \0\x02\r\x01\x12\x03!\x1e2\n\x0c\n\x05\x04\0\x02\r\x03\x12\x03!58\n\xd4\
-    \x04\n\x04\x04\0\x02\x0e\x12\x03.\x02(\x1a\x8f\x04\x20All\x20gRPC\x20met\
-    adata\x20is\x20stored\x20in\x20ctx;\x20when\x20request\x20goes\x20outsid\
-    e\x20of\x20gRPC\n\x20bounds,\x20we\x20will\x20translate\x20ctx\x20metada\
-    ta\x20into\x20this\x20field.\n\n\x20Example:\n\x201.\x20Request\x20comes\
-    \x20into\x20snitch-server\x20via\x20external\x20gRPC\x20to\x20set\x20new\
-    \x20pipeline\n\x202.\x20snitch-server\x20has\x20to\x20send\x20SetPipelin\
-    e\x20cmd\x20to\x20SDK\x20via\x20gRPC\x20-\x20it\x20passes\n\x20\x20\x20\
-    \x20on\x20original\x20metadata\x20in\x20request.\n\x203.\x20snitch-serve\
-    r\x20has\x20to\x20broadcast\x20SetPipeline\x20cmd\x20to\x20other\x20serv\
-    ices\x20via\x20bus\n\x204.\x20Since\x20this\x20is\x20not\x20a\x20gRPC\
-    \x20call,\x20snitch-server\x20translates\x20ctx\x20metadata\x20to\n\x20\
-    \x20\x20\x20this\x20field\x20and\x20includes\x20it\x20in\x20the\x20bus\
-    \x20event.\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CAS\
-    E\n\n\x0c\n\x05\x04\0\x02\x0e\x06\x12\x03.\x02\x16\n\x0c\n\x05\x04\0\x02\
-    \x0e\x01\x12\x03.\x17\x20\n\x0c\n\x05\x04\0\x02\x0e\x03\x12\x03.#'b\x06p\
-    roto3\
+    priate\x20SDK(s).\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x15\x08\r\n\x0b\
+    \n\x04\x04\0\x02\x01\x12\x03\x16\x042\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
+    \x03\x16\x04\x1a\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x16\x1b+\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03\x16.1\n\x0b\n\x04\x04\0\x02\x02\x12\x03\
+    \x17\x046\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x17\x04\x1c\n\x0c\n\x05\
+    \x04\0\x02\x02\x01\x12\x03\x17\x1d/\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
+    \x03\x1725\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x18\x04?\n\x0c\n\x05\x04\0\
+    \x02\x03\x06\x12\x03\x18\x04\x20\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
+    \x18!8\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x18;>\n\x0b\n\x04\x04\0\x02\
+    \x04\x12\x03\x19\x04?\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x19\x04\x20\
+    \n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x19!8\n\x0c\n\x05\x04\0\x02\x04\
+    \x03\x12\x03\x19;>\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x1a\x04?\n\x0c\n\
+    \x05\x04\0\x02\x05\x06\x12\x03\x1a\x04\x20\n\x0c\n\x05\x04\0\x02\x05\x01\
+    \x12\x03\x1a!8\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x1a;>\n\x0b\n\x04\
+    \x04\0\x02\x06\x12\x03\x1b\x04?\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\
+    \x1b\x04\x20\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x1b!8\n\x0c\n\x05\x04\
+    \0\x02\x06\x03\x12\x03\x1b;>\n\x0b\n\x04\x04\0\x02\x07\x12\x03\x1c\x04?\
+    \n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1c\x04\x20\n\x0c\n\x05\x04\0\x02\
+    \x07\x01\x12\x03\x1c!8\n\x0c\n\x05\x04\0\x02\x07\x03\x12\x03\x1c;>\n\x0b\
+    \n\x04\x04\0\x02\x08\x12\x03\x1d\x04=\n\x0c\n\x05\x04\0\x02\x08\x06\x12\
+    \x03\x1d\x04\x1f\n\x0c\n\x05\x04\0\x02\x08\x01\x12\x03\x1d\x206\n\x0c\n\
+    \x05\x04\0\x02\x08\x03\x12\x03\x1d9<\n\x0b\n\x04\x04\0\x02\t\x12\x03\x1e\
+    \x04?\n\x0c\n\x05\x04\0\x02\t\x06\x12\x03\x1e\x04\x20\n\x0c\n\x05\x04\0\
+    \x02\t\x01\x12\x03\x1e!8\n\x0c\n\x05\x04\0\x02\t\x03\x12\x03\x1e;>\n\x0b\
+    \n\x04\x04\0\x02\n\x12\x03\x1f\x040\n\x0c\n\x05\x04\0\x02\n\x06\x12\x03\
+    \x1f\x04\x19\n\x0c\n\x05\x04\0\x02\n\x01\x12\x03\x1f\x1a)\n\x0c\n\x05\
+    \x04\0\x02\n\x03\x12\x03\x1f,/\n\x0b\n\x04\x04\0\x02\x0b\x12\x03\x20\x04\
+    &\n\x0c\n\x05\x04\0\x02\x0b\x06\x12\x03\x20\x04\x14\n\x0c\n\x05\x04\0\
+    \x02\x0b\x01\x12\x03\x20\x15\x1f\n\x0c\n\x05\x04\0\x02\x0b\x03\x12\x03\
+    \x20\"%\n\x0b\n\x04\x04\0\x02\x0c\x12\x03!\x04?\n\x0c\n\x05\x04\0\x02\
+    \x0c\x06\x12\x03!\x04\x20\n\x0c\n\x05\x04\0\x02\x0c\x01\x12\x03!!8\n\x0c\
+    \n\x05\x04\0\x02\x0c\x03\x12\x03!;>\n\x0b\n\x04\x04\0\x02\r\x12\x03\"\
+    \x049\n\x0c\n\x05\x04\0\x02\r\x06\x12\x03\"\x04\x1d\n\x0c\n\x05\x04\0\
+    \x02\r\x01\x12\x03\"\x1e2\n\x0c\n\x05\x04\0\x02\r\x03\x12\x03\"58\n\x0b\
+    \n\x04\x04\0\x02\x0e\x12\x03#\x04*\n\x0c\n\x05\x04\0\x02\x0e\x06\x12\x03\
+    #\x04\x16\n\x0c\n\x05\x04\0\x02\x0e\x01\x12\x03#\x17#\n\x0c\n\x05\x04\0\
+    \x02\x0e\x03\x12\x03#&)\n\x0b\n\x04\x04\0\x02\x0f\x12\x03$\x04,\n\x0c\n\
+    \x05\x04\0\x02\x0f\x06\x12\x03$\x04\x17\n\x0c\n\x05\x04\0\x02\x0f\x01\
+    \x12\x03$\x18%\n\x0c\n\x05\x04\0\x02\x0f\x03\x12\x03$(+\n\xd4\x04\n\x04\
+    \x04\0\x02\x10\x12\x031\x02(\x1a\x8f\x04\x20All\x20gRPC\x20metadata\x20i\
+    s\x20stored\x20in\x20ctx;\x20when\x20request\x20goes\x20outside\x20of\
+    \x20gRPC\n\x20bounds,\x20we\x20will\x20translate\x20ctx\x20metadata\x20i\
+    nto\x20this\x20field.\n\n\x20Example:\n\x201.\x20Request\x20comes\x20int\
+    o\x20snitch-server\x20via\x20external\x20gRPC\x20to\x20set\x20new\x20pip\
+    eline\n\x202.\x20snitch-server\x20has\x20to\x20send\x20SetPipeline\x20cm\
+    d\x20to\x20SDK\x20via\x20gRPC\x20-\x20it\x20passes\n\x20\x20\x20\x20on\
+    \x20original\x20metadata\x20in\x20request.\n\x203.\x20snitch-server\x20h\
+    as\x20to\x20broadcast\x20SetPipeline\x20cmd\x20to\x20other\x20services\
+    \x20via\x20bus\n\x204.\x20Since\x20this\x20is\x20not\x20a\x20gRPC\x20cal\
+    l,\x20snitch-server\x20translates\x20ctx\x20metadata\x20to\n\x20\x20\x20\
+    \x20this\x20field\x20and\x20includes\x20it\x20in\x20the\x20bus\x20event.\
+    \n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\
+    \n\x05\x04\0\x02\x10\x06\x12\x031\x02\x16\n\x0c\n\x05\x04\0\x02\x10\x01\
+    \x12\x031\x17\x20\n\x0c\n\x05\x04\0\x02\x10\x03\x12\x031#'b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1226,7 +1371,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     static file_descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::FileDescriptor> = ::protobuf::rt::Lazy::new();
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
-            let mut deps = ::std::vec::Vec::with_capacity(3);
+            let mut deps = ::std::vec::Vec::with_capacity(4);
+            deps.push(super::sp_common::file_descriptor().clone());
             deps.push(super::sp_external::file_descriptor().clone());
             deps.push(super::sp_internal::file_descriptor().clone());
             deps.push(super::sp_kv::file_descriptor().clone());

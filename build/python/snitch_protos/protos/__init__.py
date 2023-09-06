@@ -6,10 +6,13 @@
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
+    AsyncIterable,
     AsyncIterator,
     Dict,
+    Iterable,
     List,
     Optional,
+    Union,
 )
 
 import betterproto
@@ -42,6 +45,18 @@ class OperationType(betterproto.Enum):
     OPERATION_TYPE_UNSET = 0
     OPERATION_TYPE_CONSUMER = 1
     OPERATION_TYPE_PRODUCER = 2
+
+
+class TailResponseType(betterproto.Enum):
+    TAIL_RESPONSE_TYPE_UNSET = 0
+    TAIL_RESPONSE_TYPE_PAYLOAD = 1
+    TAIL_RESPONSE_TYPE_ERROR = 2
+
+
+class TailRequestType(betterproto.Enum):
+    TAIL_REQUEST_TYPE_UNSET = 0
+    TAIL_REQUEST_TYPE_START = 1
+    TAIL_REQUEST_TYPE_STOP = 2
 
 
 class PipelineStepCondition(betterproto.Enum):
@@ -154,6 +169,46 @@ class Metric(betterproto.Message):
         2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     value: float = betterproto.double_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class TailRequest(betterproto.Message):
+    type: "TailRequestType" = betterproto.enum_field(1)
+    id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: str = betterproto.string_field(4)
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+
+
+@dataclass(eq=False, repr=False)
+class TailResponse(betterproto.Message):
+    """
+    TailResponse originates in the SDK and then is sent to snitch servers where
+    it is forwarded to the correct frontend streaming gRPC connection
+    """
+
+    type: "TailResponseType" = betterproto.enum_field(1)
+    tail_request_id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: str = betterproto.string_field(4)
+    session_id: str = betterproto.string_field(5)
+    timestamp_ns: int = betterproto.int64_field(6)
+    """Timestamp in nanoseconds"""
+
+    original_data: bytes = betterproto.bytes_field(7)
+    """
+    Payload data. For errors, this will be the error message For payloads, this
+    will be JSON of the payload data, post processing
+    """
+
+    new_data: bytes = betterproto.bytes_field(8)
+    """For payloads, this will be the new data, post processing"""
+
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
 
 
 @dataclass(eq=False, repr=False)
@@ -607,6 +662,12 @@ class Command(betterproto.Message):
     the KV HTTP API.
     """
 
+    tail: "TailCommand" = betterproto.message_field(106, group="command")
+    """
+    Emitted by snitch-server when a user makes a Tail() call Consumed by all
+    snitch-server instances and by SDKs
+    """
+
 
 @dataclass(eq=False, repr=False)
 class AttachPipelineCommand(betterproto.Message):
@@ -643,6 +704,11 @@ class KvCommand(betterproto.Message):
     Create & Update specific setting that will cause the Create or Update to
     work as an upsert.
     """
+
+
+@dataclass(eq=False, repr=False)
+class TailCommand(betterproto.Message):
+    request: "TailRequest" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -768,6 +834,8 @@ class BusEvent(betterproto.Message):
     new_audience_request: "NewAudienceRequest" = betterproto.message_field(
         112, group="event"
     )
+    tail_request: "TailRequest" = betterproto.message_field(113, group="event")
+    tail_response: "TailResponse" = betterproto.message_field(114, group="event")
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
@@ -1143,6 +1211,24 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def tail(
+        self,
+        tail_request: "TailRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> AsyncIterator["TailResponse"]:
+        async for response in self._unary_stream(
+            "/protos.External/Tail",
+            tail_request,
+            TailResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        ):
+            yield response
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1265,6 +1351,26 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def send_tail(
+        self,
+        tail_response_iterator: Union[
+            AsyncIterable["TailResponse"], Iterable["TailResponse"]
+        ],
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._stream_unary(
+            "/protos.Internal/SendTail",
+            tail_response_iterator,
+            TailResponse,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
 
 class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
@@ -1366,6 +1472,10 @@ class ExternalBase(ServiceBase):
     ) -> AsyncIterator["GetMetricsResponse"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield GetMetricsResponse()
+
+    async def tail(self, tail_request: "TailRequest") -> AsyncIterator["TailResponse"]:
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield TailResponse()
 
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
@@ -1524,6 +1634,16 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_tail(
+        self, stream: "grpclib.server.Stream[TailRequest, TailResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.tail,
+            stream,
+            request,
+        )
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1653,6 +1773,12 @@ class ExternalBase(ServiceBase):
                 GetMetricsRequest,
                 GetMetricsResponse,
             ),
+            "/protos.External/Tail": grpclib.const.Handler(
+                self.__rpc_tail,
+                grpclib.const.Cardinality.UNARY_STREAM,
+                TailRequest,
+                TailResponse,
+            ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
                 grpclib.const.Cardinality.UNARY_UNARY,
@@ -1689,6 +1815,11 @@ class InternalBase(ServiceBase):
         self,
         get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
     ) -> "GetAttachCommandsByServiceResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def send_tail(
+        self, tail_response_iterator: AsyncIterator["TailResponse"]
+    ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def __rpc_register(
@@ -1737,6 +1868,13 @@ class InternalBase(ServiceBase):
         response = await self.get_attach_commands_by_service(request)
         await stream.send_message(response)
 
+    async def __rpc_send_tail(
+        self, stream: "grpclib.server.Stream[TailResponse, StandardResponse]"
+    ) -> None:
+        request = stream.__aiter__()
+        response = await self.send_tail(request)
+        await stream.send_message(response)
+
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
             "/protos.Internal/Register": grpclib.const.Handler(
@@ -1774,5 +1912,11 @@ class InternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 GetAttachCommandsByServiceRequest,
                 GetAttachCommandsByServiceResponse,
+            ),
+            "/protos.Internal/SendTail": grpclib.const.Handler(
+                self.__rpc_send_tail,
+                grpclib.const.Cardinality.STREAM_UNARY,
+                TailResponse,
+                StandardResponse,
             ),
         }

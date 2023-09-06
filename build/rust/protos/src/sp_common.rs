@@ -541,6 +541,498 @@ impl ::protobuf::reflect::ProtobufValue for Metric {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.TailRequest)
+pub struct TailRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.TailRequest.type)
+    pub type_: ::protobuf::EnumOrUnknown<TailRequestType>,
+    // @@protoc_insertion_point(field:protos.TailRequest.id)
+    pub id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.TailRequest.audience)
+    pub audience: ::protobuf::MessageField<Audience>,
+    // @@protoc_insertion_point(field:protos.TailRequest.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.TailRequest._metadata)
+    pub _metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.TailRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TailRequest {
+    fn default() -> &'a TailRequest {
+        <TailRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TailRequest {
+    pub fn new() -> TailRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(5);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "type",
+            |m: &TailRequest| { &m.type_ },
+            |m: &mut TailRequest| { &mut m.type_ },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &TailRequest| { &m.id },
+            |m: &mut TailRequest| { &mut m.id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, Audience>(
+            "audience",
+            |m: &TailRequest| { &m.audience },
+            |m: &mut TailRequest| { &mut m.audience },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &TailRequest| { &m.pipeline_id },
+            |m: &mut TailRequest| { &mut m.pipeline_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "_metadata",
+            |m: &TailRequest| { &m._metadata },
+            |m: &mut TailRequest| { &mut m._metadata },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TailRequest>(
+            "TailRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TailRequest {
+    const NAME: &'static str = "TailRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                8 => {
+                    self.type_ = is.read_enum_or_unknown()?;
+                },
+                18 => {
+                    self.id = is.read_string()?;
+                },
+                26 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                34 => {
+                    self.pipeline_id = is.read_string()?;
+                },
+                8002 => {
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self._metadata.insert(key, value);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailRequestType::TAIL_REQUEST_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.type_.value());
+        }
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.id);
+        }
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.pipeline_id);
+        }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailRequestType::TAIL_REQUEST_TYPE_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+        }
+        if !self.id.is_empty() {
+            os.write_string(2, &self.id)?;
+        }
+        if let Some(v) = self.audience.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
+        }
+        if !self.pipeline_id.is_empty() {
+            os.write_string(4, &self.pipeline_id)?;
+        }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(8002)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TailRequest {
+        TailRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.type_ = ::protobuf::EnumOrUnknown::new(TailRequestType::TAIL_REQUEST_TYPE_UNSET);
+        self.id.clear();
+        self.audience.clear();
+        self.pipeline_id.clear();
+        self._metadata.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TailRequest {
+        static instance: ::protobuf::rt::Lazy<TailRequest> = ::protobuf::rt::Lazy::new();
+        instance.get(TailRequest::new)
+    }
+}
+
+impl ::protobuf::MessageFull for TailRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TailRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TailRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TailRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  TailResponse originates in the SDK and then is sent to snitch servers where
+///  it is forwarded to the correct frontend streaming gRPC connection
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.TailResponse)
+pub struct TailResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.TailResponse.type)
+    pub type_: ::protobuf::EnumOrUnknown<TailResponseType>,
+    // @@protoc_insertion_point(field:protos.TailResponse.tail_request_id)
+    pub tail_request_id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.TailResponse.audience)
+    pub audience: ::protobuf::MessageField<Audience>,
+    // @@protoc_insertion_point(field:protos.TailResponse.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.TailResponse.session_id)
+    pub session_id: ::std::string::String,
+    ///  Timestamp in nanoseconds
+    // @@protoc_insertion_point(field:protos.TailResponse.timestamp_ns)
+    pub timestamp_ns: i64,
+    ///  Payload data. For errors, this will be the error message
+    ///  For payloads, this will be JSON of the payload data, post processing
+    // @@protoc_insertion_point(field:protos.TailResponse.original_data)
+    pub original_data: ::std::vec::Vec<u8>,
+    ///  For payloads, this will be the new data, post processing
+    // @@protoc_insertion_point(field:protos.TailResponse.new_data)
+    pub new_data: ::std::vec::Vec<u8>,
+    // @@protoc_insertion_point(field:protos.TailResponse._metadata)
+    pub _metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.TailResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TailResponse {
+    fn default() -> &'a TailResponse {
+        <TailResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TailResponse {
+    pub fn new() -> TailResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(9);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "type",
+            |m: &TailResponse| { &m.type_ },
+            |m: &mut TailResponse| { &mut m.type_ },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "tail_request_id",
+            |m: &TailResponse| { &m.tail_request_id },
+            |m: &mut TailResponse| { &mut m.tail_request_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, Audience>(
+            "audience",
+            |m: &TailResponse| { &m.audience },
+            |m: &mut TailResponse| { &mut m.audience },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &TailResponse| { &m.pipeline_id },
+            |m: &mut TailResponse| { &mut m.pipeline_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "session_id",
+            |m: &TailResponse| { &m.session_id },
+            |m: &mut TailResponse| { &mut m.session_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "timestamp_ns",
+            |m: &TailResponse| { &m.timestamp_ns },
+            |m: &mut TailResponse| { &mut m.timestamp_ns },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "original_data",
+            |m: &TailResponse| { &m.original_data },
+            |m: &mut TailResponse| { &mut m.original_data },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "new_data",
+            |m: &TailResponse| { &m.new_data },
+            |m: &mut TailResponse| { &mut m.new_data },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "_metadata",
+            |m: &TailResponse| { &m._metadata },
+            |m: &mut TailResponse| { &mut m._metadata },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TailResponse>(
+            "TailResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TailResponse {
+    const NAME: &'static str = "TailResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                8 => {
+                    self.type_ = is.read_enum_or_unknown()?;
+                },
+                18 => {
+                    self.tail_request_id = is.read_string()?;
+                },
+                26 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                34 => {
+                    self.pipeline_id = is.read_string()?;
+                },
+                42 => {
+                    self.session_id = is.read_string()?;
+                },
+                48 => {
+                    self.timestamp_ns = is.read_int64()?;
+                },
+                58 => {
+                    self.original_data = is.read_bytes()?;
+                },
+                66 => {
+                    self.new_data = is.read_bytes()?;
+                },
+                8002 => {
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self._metadata.insert(key, value);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailResponseType::TAIL_RESPONSE_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.type_.value());
+        }
+        if !self.tail_request_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.tail_request_id);
+        }
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.pipeline_id);
+        }
+        if !self.session_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(5, &self.session_id);
+        }
+        if self.timestamp_ns != 0 {
+            my_size += ::protobuf::rt::int64_size(6, self.timestamp_ns);
+        }
+        if !self.original_data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(7, &self.original_data);
+        }
+        if !self.new_data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(8, &self.new_data);
+        }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TailResponseType::TAIL_RESPONSE_TYPE_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+        }
+        if !self.tail_request_id.is_empty() {
+            os.write_string(2, &self.tail_request_id)?;
+        }
+        if let Some(v) = self.audience.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
+        }
+        if !self.pipeline_id.is_empty() {
+            os.write_string(4, &self.pipeline_id)?;
+        }
+        if !self.session_id.is_empty() {
+            os.write_string(5, &self.session_id)?;
+        }
+        if self.timestamp_ns != 0 {
+            os.write_int64(6, self.timestamp_ns)?;
+        }
+        if !self.original_data.is_empty() {
+            os.write_bytes(7, &self.original_data)?;
+        }
+        if !self.new_data.is_empty() {
+            os.write_bytes(8, &self.new_data)?;
+        }
+        for (k, v) in &self._metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(8002)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TailResponse {
+        TailResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.type_ = ::protobuf::EnumOrUnknown::new(TailResponseType::TAIL_RESPONSE_TYPE_UNSET);
+        self.tail_request_id.clear();
+        self.audience.clear();
+        self.pipeline_id.clear();
+        self.session_id.clear();
+        self.timestamp_ns = 0;
+        self.original_data.clear();
+        self.new_data.clear();
+        self._metadata.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TailResponse {
+        static instance: ::protobuf::rt::Lazy<TailResponse> = ::protobuf::rt::Lazy::new();
+        instance.get(TailResponse::new)
+    }
+}
+
+impl ::protobuf::MessageFull for TailResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TailResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TailResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TailResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Common status codes used in gRPC method responses
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.ResponseCode)
@@ -671,6 +1163,122 @@ impl OperationType {
     }
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.TailResponseType)
+pub enum TailResponseType {
+    // @@protoc_insertion_point(enum_value:protos.TailResponseType.TAIL_RESPONSE_TYPE_UNSET)
+    TAIL_RESPONSE_TYPE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.TailResponseType.TAIL_RESPONSE_TYPE_PAYLOAD)
+    TAIL_RESPONSE_TYPE_PAYLOAD = 1,
+    // @@protoc_insertion_point(enum_value:protos.TailResponseType.TAIL_RESPONSE_TYPE_ERROR)
+    TAIL_RESPONSE_TYPE_ERROR = 2,
+}
+
+impl ::protobuf::Enum for TailResponseType {
+    const NAME: &'static str = "TailResponseType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TailResponseType> {
+        match value {
+            0 => ::std::option::Option::Some(TailResponseType::TAIL_RESPONSE_TYPE_UNSET),
+            1 => ::std::option::Option::Some(TailResponseType::TAIL_RESPONSE_TYPE_PAYLOAD),
+            2 => ::std::option::Option::Some(TailResponseType::TAIL_RESPONSE_TYPE_ERROR),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [TailResponseType] = &[
+        TailResponseType::TAIL_RESPONSE_TYPE_UNSET,
+        TailResponseType::TAIL_RESPONSE_TYPE_PAYLOAD,
+        TailResponseType::TAIL_RESPONSE_TYPE_ERROR,
+    ];
+}
+
+impl ::protobuf::EnumFull for TailResponseType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("TailResponseType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for TailResponseType {
+    fn default() -> Self {
+        TailResponseType::TAIL_RESPONSE_TYPE_UNSET
+    }
+}
+
+impl TailResponseType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<TailResponseType>("TailResponseType")
+    }
+}
+
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.TailRequestType)
+pub enum TailRequestType {
+    // @@protoc_insertion_point(enum_value:protos.TailRequestType.TAIL_REQUEST_TYPE_UNSET)
+    TAIL_REQUEST_TYPE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.TailRequestType.TAIL_REQUEST_TYPE_START)
+    TAIL_REQUEST_TYPE_START = 1,
+    // @@protoc_insertion_point(enum_value:protos.TailRequestType.TAIL_REQUEST_TYPE_STOP)
+    TAIL_REQUEST_TYPE_STOP = 2,
+}
+
+impl ::protobuf::Enum for TailRequestType {
+    const NAME: &'static str = "TailRequestType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TailRequestType> {
+        match value {
+            0 => ::std::option::Option::Some(TailRequestType::TAIL_REQUEST_TYPE_UNSET),
+            1 => ::std::option::Option::Some(TailRequestType::TAIL_REQUEST_TYPE_START),
+            2 => ::std::option::Option::Some(TailRequestType::TAIL_REQUEST_TYPE_STOP),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [TailRequestType] = &[
+        TailRequestType::TAIL_REQUEST_TYPE_UNSET,
+        TailRequestType::TAIL_REQUEST_TYPE_START,
+        TailRequestType::TAIL_REQUEST_TYPE_STOP,
+    ];
+}
+
+impl ::protobuf::EnumFull for TailRequestType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("TailRequestType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for TailRequestType {
+    fn default() -> Self {
+        TailRequestType::TAIL_REQUEST_TYPE_UNSET
+    }
+}
+
+impl TailRequestType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<TailRequestType>("TailRequestType")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0fsp_common.proto\x12\x06protos\"f\n\x10StandardResponse\x12\x0e\n\
     \x02id\x18\x01\x20\x01(\tR\x02id\x12(\n\x04code\x18\x02\x20\x01(\x0e2\
@@ -683,77 +1291,163 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01(\tR\x04name\x122\n\x06labels\x18\x02\x20\x03(\x0b2\x1a.protos.Metri\
     c.LabelsEntryR\x06labels\x12\x14\n\x05value\x18\x03\x20\x01(\x01R\x05val\
     ue\x1a9\n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\
-    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01*\xc3\x01\n\x0cRes\
-    ponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\x14\n\x10RESPONSE_C\
-    ODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\
-    \x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_CODE_INTERNAL_SERVER\
-    _ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC_ERROR\x10\x05*c\n\rOpe\
-    rationType\x12\x18\n\x14OPERATION_TYPE_UNSET\x10\0\x12\x1b\n\x17OPERATIO\
-    N_TYPE_CONSUMER\x10\x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\x02B4Z2\
-    github.com/streamdal/snitch-protos/build/go/protosJ\xb1\x0c\n\x06\x12\
-    \x04\0\03\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\
-    \0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Common\x20response\x20m\
-    essage\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\x04\0\x01\x12\x03\
-    \x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\x02\x10\x1a+\x20Co-relation\
-    \x20ID\x20for\x20the\x20request\x20/\x20response\n\n\x0c\n\x05\x04\0\x02\
-    \0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\t\t\x0b\n\
-    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\n\x0b\n\x04\x04\0\x02\x01\
-    \x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\n\x02\x0e\n\x0c\
-    \n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\x0c\n\x05\x04\0\x02\x01\x03\
-    \x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x0b\x02\x15\n\x0c\n\
-    \x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\
-    \x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x0b\x13\x14\n?\
-    \n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Common\x20status\x20codes\x20\
-    used\x20in\x20gRPC\x20method\x20responses\n\n\n\n\x03\x05\0\x01\x12\x03\
-    \x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x10\x02\x19\n\x0c\n\x05\x05\
-    \0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x10\
-    \x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x11\x02\x17\n\x0c\n\x05\x05\0\
-    \x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\
-    \x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\x12\x02\x20\n\x0c\n\x05\
-    \x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\n\x05\x05\0\x02\x02\x02\x12\
-    \x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x13\x02\x1e\n\x0c\n\
-    \x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\x0c\n\x05\x05\0\x02\x03\x02\
-    \x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x14\x02*\n\x0c\n\
-    \x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\x0c\n\x05\x05\0\x02\x04\x02\
-    \x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\x15\x02\"\n\x0c\n\x05\
-    \x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\x05\x05\0\x02\x05\x02\x12\
-    \x03\x15\x20!\nJ\n\x02\x05\x01\x12\x04\x19\0\x1d\x01\x1a>\x20Each\x20SDK\
-    \x20client\x20is\x20a\x20$service\x20+\x20$component\x20+\x20$operation_\
-    type\n\n\n\n\x03\x05\x01\x01\x12\x03\x19\x05\x12\n\x0b\n\x04\x05\x01\x02\
-    \0\x12\x03\x1a\x02\x1b\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1a\x02\x16\
-    \n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x1a\x19\x1a\n\x0b\n\x04\x05\x01\
-    \x02\x01\x12\x03\x1b\x02\x1e\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x1b\
-    \x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x1b\x1c\x1d\n\x0b\n\x04\
-    \x05\x01\x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\
-    \x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x1c\x1c\x1d\n<\
-    \n\x02\x04\x01\x12\x04\x20\0-\x01\x1a0\x20Used\x20to\x20indicate\x20who\
-    \x20a\x20command\x20is\x20intended\x20for\n\n\n\n\x03\x04\x01\x01\x12\
-    \x03\x20\x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\x02\x1a\x1a`\x20Name\
-    \x20of\x20the\x20service\x20--\x20let's\x20include\x20the\x20service\x20\
-    name\x20on\x20all\x20calls,\x20we\x20can\n\x20optimize\x20later\x20~DS\n\
-    \n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03#\x02\x08\n\x0c\n\x05\x04\x01\x02\
-    \0\x01\x12\x03#\t\x15\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03#\x18\x19\nX\
-    \n\x04\x04\x01\x02\x01\x12\x03&\x02\x1c\x1aK\x20Name\x20of\x20the\x20com\
-    ponent\x20the\x20SDK\x20is\x20interacting\x20with\x20(ie.\x20kafka-$topi\
-    c-name)\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03&\x02\x08\n\x0c\n\x05\
-    \x04\x01\x02\x01\x01\x12\x03&\t\x17\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\
-    \x03&\x1a\x1b\n#\n\x04\x04\x01\x02\x02\x12\x03)\x02#\x1a\x16\x20Consumer\
-    \x20or\x20Producer\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03)\x02\x0f\n\
-    \x0c\n\x05\x04\x01\x02\x02\x01\x12\x03)\x10\x1e\n\x0c\n\x05\x04\x01\x02\
-    \x02\x03\x12\x03)!\"\n0\n\x04\x04\x01\x02\x03\x12\x03,\x02\x1c\x1a#\x20N\
-    ame\x20for\x20the\x20consumer\x20or\x20producer\n\n\x0c\n\x05\x04\x01\
-    \x02\x03\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03,\t\
-    \x17\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\x03,\x1a\x1b\n\n\n\x02\x04\x02\
-    \x12\x04/\03\x01\n\n\n\x03\x04\x02\x01\x12\x03/\x08\x0e\n\x0b\n\x04\x04\
-    \x02\x02\0\x12\x030\x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x030\x02\
-    \x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x030\t\r\n\x0c\n\x05\x04\x02\x02\
-    \0\x03\x12\x030\x10\x11\n\x0b\n\x04\x04\x02\x02\x01\x12\x031\x02!\n\x0c\
-    \n\x05\x04\x02\x02\x01\x06\x12\x031\x02\x15\n\x0c\n\x05\x04\x02\x02\x01\
-    \x01\x12\x031\x16\x1c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x031\x1f\x20\n\
-    \x0b\n\x04\x04\x02\x02\x02\x12\x032\x02\x13\n\x0c\n\x05\x04\x02\x02\x02\
-    \x05\x12\x032\x02\x08\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x032\t\x0e\n\
-    \x0c\n\x05\x04\x02\x02\x02\x03\x12\x032\x11\x12b\x06proto3\
+    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\x97\x02\n\x0bTa\
+    ilRequest\x12+\n\x04type\x18\x01\x20\x01(\x0e2\x17.protos.TailRequestTyp\
+    eR\x04type\x12\x0e\n\x02id\x18\x02\x20\x01(\tR\x02id\x12,\n\x08audience\
+    \x18\x03\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12\x1f\n\x0bpip\
+    eline_id\x18\x04\x20\x01(\tR\npipelineId\x12?\n\t_metadata\x18\xe8\x07\
+    \x20\x03(\x0b2!.protos.TailRequest.MetadataEntryR\x08Metadata\x1a;\n\rMe\
+    tadataEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05val\
+    ue\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\xb4\x03\n\x0cTailResponse\
+    \x12,\n\x04type\x18\x01\x20\x01(\x0e2\x18.protos.TailResponseTypeR\x04ty\
+    pe\x12&\n\x0ftail_request_id\x18\x02\x20\x01(\tR\rtailRequestId\x12,\n\
+    \x08audience\x18\x03\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12\
+    \x1f\n\x0bpipeline_id\x18\x04\x20\x01(\tR\npipelineId\x12\x1d\n\nsession\
+    _id\x18\x05\x20\x01(\tR\tsessionId\x12!\n\x0ctimestamp_ns\x18\x06\x20\
+    \x01(\x03R\x0btimestampNs\x12#\n\roriginal_data\x18\x07\x20\x01(\x0cR\
+    \x0coriginalData\x12\x19\n\x08new_data\x18\x08\x20\x01(\x0cR\x07newData\
+    \x12@\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\".protos.TailResponse.Metad\
+    ataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\
+    \x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\
+    \x01*\xc3\x01\n\x0cResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\
+    \x12\x14\n\x10RESPONSE_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_RE\
+    QUEST\x10\x02\x12\x1b\n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPON\
+    SE_CODE_INTERNAL_SERVER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC\
+    _ERROR\x10\x05*c\n\rOperationType\x12\x18\n\x14OPERATION_TYPE_UNSET\x10\
+    \0\x12\x1b\n\x17OPERATION_TYPE_CONSUMER\x10\x01\x12\x1b\n\x17OPERATION_T\
+    YPE_PRODUCER\x10\x02*n\n\x10TailResponseType\x12\x1c\n\x18TAIL_RESPONSE_\
+    TYPE_UNSET\x10\0\x12\x1e\n\x1aTAIL_RESPONSE_TYPE_PAYLOAD\x10\x01\x12\x1c\
+    \n\x18TAIL_RESPONSE_TYPE_ERROR\x10\x02*g\n\x0fTailRequestType\x12\x1b\n\
+    \x17TAIL_REQUEST_TYPE_UNSET\x10\0\x12\x1b\n\x17TAIL_REQUEST_TYPE_START\
+    \x10\x01\x12\x1a\n\x16TAIL_REQUEST_TYPE_STOP\x10\x02B4Z2github.com/strea\
+    mdal/snitch-protos/build/go/protosJ\xe7\x18\n\x06\x12\x04\0\0a\x01\n\x08\
+    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
+    \x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\
+    \x04\x07\0\x0c\x01\x1a/\x20Common\x20response\x20message\x20for\x20many\
+    \x20gRPC\x20methods\n\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\
+    \x04\0\x02\0\x12\x03\t\x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\
+    \x20request\x20/\x20response\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\
+    \x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\
+    \x03\x12\x03\t\x0e\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\
+    \n\x05\x04\0\x02\x01\x06\x12\x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\
+    \x12\x03\n\x0f\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\
+    \n\x04\x04\0\x02\x02\x12\x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\
+    \x12\x03\x0b\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\
+    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\
+    \x0f\0\x16\x01\x1a3\x20Common\x20status\x20codes\x20used\x20in\x20gRPC\
+    \x20method\x20responses\n\n\n\n\x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\
+    \n\x04\x05\0\x02\0\x12\x03\x10\x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\
+    \x03\x10\x02\x15\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\
+    \x04\x05\0\x02\x01\x12\x03\x11\x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\
+    \x03\x11\x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\
+    \n\x04\x05\0\x02\x02\x12\x03\x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\
+    \x12\x03\x12\x02\x1b\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\
+    \x0b\n\x04\x05\0\x02\x03\x12\x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\
+    \x01\x12\x03\x13\x02\x19\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\
+    \x1d\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\
+    \x04\x01\x12\x03\x14\x02%\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x14()\n\
+    \x0b\n\x04\x05\0\x02\x05\x12\x03\x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\
+    \x12\x03\x15\x02\x1d\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\x15\x20!\nJ\n\
+    \x02\x05\x01\x12\x04\x19\0\x1d\x01\x1a>\x20Each\x20SDK\x20client\x20is\
+    \x20a\x20$service\x20+\x20$component\x20+\x20$operation_type\n\n\n\n\x03\
+    \x05\x01\x01\x12\x03\x19\x05\x12\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1a\
+    \x02\x1b\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1a\x02\x16\n\x0c\n\x05\
+    \x05\x01\x02\0\x02\x12\x03\x1a\x19\x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\
+    \x03\x1b\x02\x1e\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x1b\x02\x19\n\
+    \x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x1b\x1c\x1d\n\x0b\n\x04\x05\x01\
+    \x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x1c\
+    \x02\x19\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x1c\x1c\x1d\n<\n\x02\
+    \x04\x01\x12\x04\x20\0-\x01\x1a0\x20Used\x20to\x20indicate\x20who\x20a\
+    \x20command\x20is\x20intended\x20for\n\n\n\n\x03\x04\x01\x01\x12\x03\x20\
+    \x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\x02\x1a\x1a`\x20Name\x20of\x20t\
+    he\x20service\x20--\x20let's\x20include\x20the\x20service\x20name\x20on\
+    \x20all\x20calls,\x20we\x20can\n\x20optimize\x20later\x20~DS\n\n\x0c\n\
+    \x05\x04\x01\x02\0\x05\x12\x03#\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\
+    \x12\x03#\t\x15\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03#\x18\x19\nX\n\x04\
+    \x04\x01\x02\x01\x12\x03&\x02\x1c\x1aK\x20Name\x20of\x20the\x20component\
+    \x20the\x20SDK\x20is\x20interacting\x20with\x20(ie.\x20kafka-$topic-name\
+    )\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03&\x02\x08\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x03&\t\x17\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03&\x1a\
+    \x1b\n#\n\x04\x04\x01\x02\x02\x12\x03)\x02#\x1a\x16\x20Consumer\x20or\
+    \x20Producer\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03)\x02\x0f\n\x0c\n\
+    \x05\x04\x01\x02\x02\x01\x12\x03)\x10\x1e\n\x0c\n\x05\x04\x01\x02\x02\
+    \x03\x12\x03)!\"\n0\n\x04\x04\x01\x02\x03\x12\x03,\x02\x1c\x1a#\x20Name\
+    \x20for\x20the\x20consumer\x20or\x20producer\n\n\x0c\n\x05\x04\x01\x02\
+    \x03\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03,\t\x17\
+    \n\x0c\n\x05\x04\x01\x02\x03\x03\x12\x03,\x1a\x1b\n\n\n\x02\x04\x02\x12\
+    \x04/\03\x01\n\n\n\x03\x04\x02\x01\x12\x03/\x08\x0e\n\x0b\n\x04\x04\x02\
+    \x02\0\x12\x030\x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x030\x02\x08\n\
+    \x0c\n\x05\x04\x02\x02\0\x01\x12\x030\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\
+    \x12\x030\x10\x11\n\x0b\n\x04\x04\x02\x02\x01\x12\x031\x02!\n\x0c\n\x05\
+    \x04\x02\x02\x01\x06\x12\x031\x02\x15\n\x0c\n\x05\x04\x02\x02\x01\x01\
+    \x12\x031\x16\x1c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x031\x1f\x20\n\x0b\
+    \n\x04\x04\x02\x02\x02\x12\x032\x02\x13\n\x0c\n\x05\x04\x02\x02\x02\x05\
+    \x12\x032\x02\x08\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x032\t\x0e\n\x0c\n\
+    \x05\x04\x02\x02\x02\x03\x12\x032\x11\x12\n\n\n\x02\x04\x03\x12\x045\0;\
+    \x01\n\n\n\x03\x04\x03\x01\x12\x035\x08\x13\n\x0b\n\x04\x04\x03\x02\0\
+    \x12\x036\x02\x1b\n\x0c\n\x05\x04\x03\x02\0\x06\x12\x036\x02\x11\n\x0c\n\
+    \x05\x04\x03\x02\0\x01\x12\x036\x12\x16\n\x0c\n\x05\x04\x03\x02\0\x03\
+    \x12\x036\x19\x1a\n\x0b\n\x04\x04\x03\x02\x01\x12\x037\x02\x10\n\x0c\n\
+    \x05\x04\x03\x02\x01\x05\x12\x037\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\
+    \x01\x12\x037\t\x0b\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x037\x0e\x0f\n\
+    \x0b\n\x04\x04\x03\x02\x02\x12\x038\x02\x18\n\x0c\n\x05\x04\x03\x02\x02\
+    \x06\x12\x038\x02\n\n\x0c\n\x05\x04\x03\x02\x02\x01\x12\x038\x0b\x13\n\
+    \x0c\n\x05\x04\x03\x02\x02\x03\x12\x038\x16\x17\n\x0b\n\x04\x04\x03\x02\
+    \x03\x12\x039\x02\x19\n\x0c\n\x05\x04\x03\x02\x03\x05\x12\x039\x02\x08\n\
+    \x0c\n\x05\x04\x03\x02\x03\x01\x12\x039\t\x14\n\x0c\n\x05\x04\x03\x02\
+    \x03\x03\x12\x039\x17\x18\nB\n\x04\x04\x03\x02\x04\x12\x03:\x02'\"5\x20p\
+    rotolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\
+    \x03\x02\x04\x06\x12\x03:\x02\x15\n\x0c\n\x05\x04\x03\x02\x04\x01\x12\
+    \x03:\x16\x1f\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\x03:\"&\n\n\n\x02\x05\
+    \x02\x12\x04=\0A\x01\n\n\n\x03\x05\x02\x01\x12\x03=\x05\x15\n\x0b\n\x04\
+    \x05\x02\x02\0\x12\x03>\x02\x1f\n\x0c\n\x05\x05\x02\x02\0\x01\x12\x03>\
+    \x02\x1a\n\x0c\n\x05\x05\x02\x02\0\x02\x12\x03>\x1d\x1e\n\x0b\n\x04\x05\
+    \x02\x02\x01\x12\x03?\x02!\n\x0c\n\x05\x05\x02\x02\x01\x01\x12\x03?\x02\
+    \x1c\n\x0c\n\x05\x05\x02\x02\x01\x02\x12\x03?\x1f\x20\n\x0b\n\x04\x05\
+    \x02\x02\x02\x12\x03@\x02\x1f\n\x0c\n\x05\x05\x02\x02\x02\x01\x12\x03@\
+    \x02\x1a\n\x0c\n\x05\x05\x02\x02\x02\x02\x12\x03@\x1d\x1e\n\n\n\x02\x05\
+    \x03\x12\x04C\0G\x01\n\n\n\x03\x05\x03\x01\x12\x03C\x05\x14\n\x0b\n\x04\
+    \x05\x03\x02\0\x12\x03D\x02\x1e\n\x0c\n\x05\x05\x03\x02\0\x01\x12\x03D\
+    \x02\x19\n\x0c\n\x05\x05\x03\x02\0\x02\x12\x03D\x1c\x1d\n\x0b\n\x04\x05\
+    \x03\x02\x01\x12\x03E\x02\x1e\n\x0c\n\x05\x05\x03\x02\x01\x01\x12\x03E\
+    \x02\x19\n\x0c\n\x05\x05\x03\x02\x01\x02\x12\x03E\x1c\x1d\n\x0b\n\x04\
+    \x05\x03\x02\x02\x12\x03F\x02\x1d\n\x0c\n\x05\x05\x03\x02\x02\x01\x12\
+    \x03F\x02\x18\n\x0c\n\x05\x05\x03\x02\x02\x02\x12\x03F\x1b\x1c\n\x9d\x01\
+    \n\x02\x04\x04\x12\x04K\0a\x01\x1a\x90\x01\x20TailResponse\x20originates\
+    \x20in\x20the\x20SDK\x20and\x20then\x20is\x20sent\x20to\x20snitch\x20ser\
+    vers\x20where\n\x20it\x20is\x20forwarded\x20to\x20the\x20correct\x20fron\
+    tend\x20streaming\x20gRPC\x20connection\n\n\n\n\x03\x04\x04\x01\x12\x03K\
+    \x08\x14\n\x0b\n\x04\x04\x04\x02\0\x12\x03L\x02\x1c\n\x0c\n\x05\x04\x04\
+    \x02\0\x06\x12\x03L\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03L\x13\
+    \x17\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03L\x1a\x1b\n\x0b\n\x04\x04\x04\
+    \x02\x01\x12\x03N\x02\x1d\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03N\x02\
+    \x08\n\x0c\n\x05\x04\x04\x02\x01\x01\x12\x03N\t\x18\n\x0c\n\x05\x04\x04\
+    \x02\x01\x03\x12\x03N\x1b\x1c\n\x0b\n\x04\x04\x04\x02\x02\x12\x03P\x02\
+    \x18\n\x0c\n\x05\x04\x04\x02\x02\x06\x12\x03P\x02\n\n\x0c\n\x05\x04\x04\
+    \x02\x02\x01\x12\x03P\x0b\x13\n\x0c\n\x05\x04\x04\x02\x02\x03\x12\x03P\
+    \x16\x17\n\x0b\n\x04\x04\x04\x02\x03\x12\x03R\x02\x19\n\x0c\n\x05\x04\
+    \x04\x02\x03\x05\x12\x03R\x02\x08\n\x0c\n\x05\x04\x04\x02\x03\x01\x12\
+    \x03R\t\x14\n\x0c\n\x05\x04\x04\x02\x03\x03\x12\x03R\x17\x18\n\x0b\n\x04\
+    \x04\x04\x02\x04\x12\x03T\x02\x18\n\x0c\n\x05\x04\x04\x02\x04\x05\x12\
+    \x03T\x02\x08\n\x0c\n\x05\x04\x04\x02\x04\x01\x12\x03T\t\x13\n\x0c\n\x05\
+    \x04\x04\x02\x04\x03\x12\x03T\x16\x17\n'\n\x04\x04\x04\x02\x05\x12\x03W\
+    \x02\x19\x1a\x1a\x20Timestamp\x20in\x20nanoseconds\n\n\x0c\n\x05\x04\x04\
+    \x02\x05\x05\x12\x03W\x02\x07\n\x0c\n\x05\x04\x04\x02\x05\x01\x12\x03W\
+    \x08\x14\n\x0c\n\x05\x04\x04\x02\x05\x03\x12\x03W\x17\x18\n\x8e\x01\n\
+    \x04\x04\x04\x02\x06\x12\x03[\x02\x1a\x1a\x80\x01\x20Payload\x20data.\
+    \x20For\x20errors,\x20this\x20will\x20be\x20the\x20error\x20message\n\
+    \x20For\x20payloads,\x20this\x20will\x20be\x20JSON\x20of\x20the\x20paylo\
+    ad\x20data,\x20post\x20processing\n\n\x0c\n\x05\x04\x04\x02\x06\x05\x12\
+    \x03[\x02\x07\n\x0c\n\x05\x04\x04\x02\x06\x01\x12\x03[\x08\x15\n\x0c\n\
+    \x05\x04\x04\x02\x06\x03\x12\x03[\x18\x19\nG\n\x04\x04\x04\x02\x07\x12\
+    \x03^\x02\x15\x1a:\x20For\x20payloads,\x20this\x20will\x20be\x20the\x20n\
+    ew\x20data,\x20post\x20processing\n\n\x0c\n\x05\x04\x04\x02\x07\x05\x12\
+    \x03^\x02\x07\n\x0c\n\x05\x04\x04\x02\x07\x01\x12\x03^\x08\x10\n\x0c\n\
+    \x05\x04\x04\x02\x07\x03\x12\x03^\x13\x14\nB\n\x04\x04\x04\x02\x08\x12\
+    \x03`\x02&\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\
+    \n\n\x0c\n\x05\x04\x04\x02\x08\x06\x12\x03`\x02\x14\n\x0c\n\x05\x04\x04\
+    \x02\x08\x01\x12\x03`\x15\x1e\n\x0c\n\x05\x04\x04\x02\x08\x03\x12\x03`!%\
+    b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -771,13 +1465,17 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(3);
+            let mut messages = ::std::vec::Vec::with_capacity(5);
             messages.push(StandardResponse::generated_message_descriptor_data());
             messages.push(Audience::generated_message_descriptor_data());
             messages.push(Metric::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(2);
+            messages.push(TailRequest::generated_message_descriptor_data());
+            messages.push(TailResponse::generated_message_descriptor_data());
+            let mut enums = ::std::vec::Vec::with_capacity(4);
             enums.push(ResponseCode::generated_enum_descriptor_data());
             enums.push(OperationType::generated_enum_descriptor_data());
+            enums.push(TailResponseType::generated_enum_descriptor_data());
+            enums.push(TailRequestType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

@@ -24,6 +24,10 @@ message Command {
     // snitch-server will emit this when a user makes changes to the KV store
     // via the KV HTTP API.
     KVCommand kv = 105;
+
+    // Emitted by snitch-server when a user makes a Tail() call
+    // Consumed by all snitch-server instances and by SDKs
+    TailCommand tail = 106;
   }
 }
 
@@ -54,4 +58,8 @@ message KVCommand {
   // Create & Update specific setting that will cause the Create or Update to
   // work as an upsert.
   bool overwrite = 2;
+}
+
+message TailCommand {
+  TailRequest request = 2;
 }

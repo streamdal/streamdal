@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { TailRequest } from "./sp_common.js";
 import { KVInstruction } from "./sp_kv.js";
 import { Pipeline } from "./sp_pipeline.js";
 import { Audience } from "./sp_common.js";
@@ -57,6 +58,15 @@ export interface Command {
          * @generated from protobuf field: protos.KVCommand kv = 105;
          */
         kv: KVCommand;
+    } | {
+        oneofKind: "tail";
+        /**
+         * Emitted by snitch-server when a user makes a Tail() call
+         * Consumed by all snitch-server instances and by SDKs
+         *
+         * @generated from protobuf field: protos.TailCommand tail = 106;
+         */
+        tail: TailCommand;
     } | {
         oneofKind: undefined;
     };
@@ -122,6 +132,15 @@ export interface KVCommand {
      */
     overwrite: boolean;
 }
+/**
+ * @generated from protobuf message protos.TailCommand
+ */
+export interface TailCommand {
+    /**
+     * @generated from protobuf field: protos.TailRequest request = 2;
+     */
+    request?: TailRequest;
+}
 declare class Command$Type extends MessageType<Command> {
     constructor();
 }
@@ -171,4 +190,11 @@ declare class KVCommand$Type extends MessageType<KVCommand> {
  * @generated MessageType for protobuf message protos.KVCommand
  */
 export declare const KVCommand: KVCommand$Type;
+declare class TailCommand$Type extends MessageType<TailCommand> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.TailCommand
+ */
+export declare const TailCommand: TailCommand$Type;
 export {};

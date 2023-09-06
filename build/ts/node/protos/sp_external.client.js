@@ -192,12 +192,19 @@ export class ExternalClient {
         return stackIntercept("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
+     */
+    tail(input, options) {
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        return stackIntercept("serverStreaming", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        const method = this.methods[21], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
 }

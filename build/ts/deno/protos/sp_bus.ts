@@ -2,6 +2,8 @@
 // @generated from protobuf file "sp_bus.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { TailResponse } from "./sp_common.ts";
+import { TailRequest } from "./sp_common.ts";
 import { NewAudienceRequest } from "./sp_internal.ts";
 import { DeleteAudienceRequest } from "./sp_external.ts";
 import { KVRequest } from "./sp_kv.ts";
@@ -107,6 +109,18 @@ export interface BusEvent {
          */
         newAudienceRequest: NewAudienceRequest;
     } | {
+        oneofKind: "tailRequest";
+        /**
+         * @generated from protobuf field: protos.TailRequest tail_request = 113;
+         */
+        tailRequest: TailRequest;
+    } | {
+        oneofKind: "tailResponse";
+        /**
+         * @generated from protobuf field: protos.TailResponse tail_response = 114;
+         */
+        tailResponse: TailResponse;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -145,6 +159,8 @@ class BusEvent$Type extends MessageType<BusEvent> {
             { no: 110, name: "kv_request", kind: "message", oneof: "event", T: () => KVRequest },
             { no: 111, name: "delete_audience_request", kind: "message", oneof: "event", T: () => DeleteAudienceRequest },
             { no: 112, name: "new_audience_request", kind: "message", oneof: "event", T: () => NewAudienceRequest },
+            { no: 113, name: "tail_request", kind: "message", oneof: "event", T: () => TailRequest },
+            { no: 114, name: "tail_response", kind: "message", oneof: "event", T: () => TailResponse },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }

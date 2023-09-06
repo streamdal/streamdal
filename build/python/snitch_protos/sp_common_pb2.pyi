@@ -14,6 +14,12 @@ RESPONSE_CODE_INTERNAL_SERVER_ERROR: ResponseCode
 RESPONSE_CODE_NOT_FOUND: ResponseCode
 RESPONSE_CODE_OK: ResponseCode
 RESPONSE_CODE_UNSET: ResponseCode
+TAIL_REQUEST_TYPE_START: TailRequestType
+TAIL_REQUEST_TYPE_STOP: TailRequestType
+TAIL_REQUEST_TYPE_UNSET: TailRequestType
+TAIL_RESPONSE_TYPE_ERROR: TailResponseType
+TAIL_RESPONSE_TYPE_PAYLOAD: TailResponseType
+TAIL_RESPONSE_TYPE_UNSET: TailResponseType
 
 class Audience(_message.Message):
     __slots__ = ["component_name", "operation_name", "operation_type", "service_name"]
@@ -54,8 +60,64 @@ class StandardResponse(_message.Message):
     message: str
     def __init__(self, id: _Optional[str] = ..., code: _Optional[_Union[ResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
+class TailRequest(_message.Message):
+    __slots__ = ["_metadata", "audience", "id", "pipeline_id", "type"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
+    audience: Audience
+    id: str
+    pipeline_id: str
+    type: TailRequestType
+    def __init__(self, type: _Optional[_Union[TailRequestType, str]] = ..., id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class TailResponse(_message.Message):
+    __slots__ = ["_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "tail_request_id", "timestamp_ns", "type"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    NEW_DATA_FIELD_NUMBER: _ClassVar[int]
+    ORIGINAL_DATA_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    TAIL_REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    TIMESTAMP_NS_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
+    audience: Audience
+    new_data: bytes
+    original_data: bytes
+    pipeline_id: str
+    session_id: str
+    tail_request_id: str
+    timestamp_ns: int
+    type: TailResponseType
+    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., tail_request_id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., session_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., original_data: _Optional[bytes] = ..., new_data: _Optional[bytes] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class ResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
 
 class OperationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class TailResponseType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class TailRequestType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

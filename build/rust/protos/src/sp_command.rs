@@ -346,8 +346,57 @@ impl Command {
         }
     }
 
+    // .protos.TailCommand tail = 106;
+
+    pub fn tail(&self) -> &TailCommand {
+        match self.command {
+            ::std::option::Option::Some(command::Command::Tail(ref v)) => v,
+            _ => <TailCommand as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_tail(&mut self) {
+        self.command = ::std::option::Option::None;
+    }
+
+    pub fn has_tail(&self) -> bool {
+        match self.command {
+            ::std::option::Option::Some(command::Command::Tail(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tail(&mut self, v: TailCommand) {
+        self.command = ::std::option::Option::Some(command::Command::Tail(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_tail(&mut self) -> &mut TailCommand {
+        if let ::std::option::Option::Some(command::Command::Tail(_)) = self.command {
+        } else {
+            self.command = ::std::option::Option::Some(command::Command::Tail(TailCommand::new()));
+        }
+        match self.command {
+            ::std::option::Option::Some(command::Command::Tail(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_tail(&mut self) -> TailCommand {
+        if self.has_tail() {
+            match self.command.take() {
+                ::std::option::Option::Some(command::Command::Tail(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TailCommand::new()
+        }
+    }
+
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(7);
+        let mut fields = ::std::vec::Vec::with_capacity(8);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
             "audience",
@@ -396,6 +445,13 @@ impl Command {
             Command::mut_kv,
             Command::set_kv,
         ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TailCommand>(
+            "tail",
+            Command::has_tail,
+            Command::tail,
+            Command::mut_tail,
+            Command::set_tail,
+        ));
         oneofs.push(command::Command::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Command>(
             "Command",
@@ -435,6 +491,9 @@ impl ::protobuf::Message for Command {
                 },
                 842 => {
                     self.command = ::std::option::Option::Some(command::Command::Kv(is.read_message()?));
+                },
+                850 => {
+                    self.command = ::std::option::Option::Some(command::Command::Tail(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -478,6 +537,10 @@ impl ::protobuf::Message for Command {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
+                &command::Command::Tail(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
             };
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -509,6 +572,9 @@ impl ::protobuf::Message for Command {
                 &command::Command::Kv(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
                 },
+                &command::Command::Tail(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(106, v, os)?;
+                },
             };
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -529,6 +595,7 @@ impl ::protobuf::Message for Command {
 
     fn clear(&mut self) {
         self.audience.clear();
+        self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
@@ -584,6 +651,8 @@ pub mod command {
         KeepAlive(super::KeepAliveCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.kv)
         Kv(super::KVCommand),
+        // @@protoc_insertion_point(oneof_field:protos.Command.tail)
+        Tail(super::TailCommand),
     }
 
     impl ::protobuf::Oneof for Command {
@@ -1339,9 +1408,132 @@ impl ::protobuf::reflect::ProtobufValue for KVCommand {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.TailCommand)
+pub struct TailCommand {
+    // message fields
+    // @@protoc_insertion_point(field:protos.TailCommand.request)
+    pub request: ::protobuf::MessageField<super::sp_common::TailRequest>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.TailCommand.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TailCommand {
+    fn default() -> &'a TailCommand {
+        <TailCommand as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TailCommand {
+    pub fn new() -> TailCommand {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::TailRequest>(
+            "request",
+            |m: &TailCommand| { &m.request },
+            |m: &mut TailCommand| { &mut m.request },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TailCommand>(
+            "TailCommand",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TailCommand {
+    const NAME: &'static str = "TailCommand";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                18 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.request)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.request.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.request.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TailCommand {
+        TailCommand::new()
+    }
+
+    fn clear(&mut self) {
+        self.request.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TailCommand {
+        static instance: TailCommand = TailCommand {
+            request: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TailCommand {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TailCommand").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TailCommand {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TailCommand {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x10sp_command.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\x0bsp_kv\
-    .proto\x1a\x11sp_pipeline.proto\"\xc7\x03\n\x07Command\x12,\n\x08audienc\
+    .proto\x1a\x11sp_pipeline.proto\"\xf2\x03\n\x07Command\x12,\n\x08audienc\
     e\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12H\n\x0fattac\
     h_pipeline\x18d\x20\x01(\x0b2\x1d.protos.AttachPipelineCommandH\0R\x0eat\
     tachPipeline\x12H\n\x0fdetach_pipeline\x18e\x20\x01(\x0b2\x1d.protos.Det\
@@ -1350,74 +1542,85 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x0fresume_pipeline\x18g\x20\x01(\x0b2\x1d.protos.ResumePipelineCommandH\
     \0R\x0eresumePipeline\x129\n\nkeep_alive\x18h\x20\x01(\x0b2\x18.protos.K\
     eepAliveCommandH\0R\tkeepAlive\x12#\n\x02kv\x18i\x20\x01(\x0b2\x11.proto\
-    s.KVCommandH\0R\x02kvB\t\n\x07command\"E\n\x15AttachPipelineCommand\x12,\
-    \n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\
-    \n\x15DetachPipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\
-    \npipelineId\"7\n\x14PausePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\
-    \x01\x20\x01(\tR\npipelineId\"8\n\x15ResumePipelineCommand\x12\x1f\n\x0b\
-    pipeline_id\x18\x01\x20\x01(\tR\npipelineId\"\x12\n\x10KeepAliveCommand\
-    \"d\n\tKVCommand\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos\
-    .KVInstructionR\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\
-    \x08R\toverwriteB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\
-    \xf0\x0b\n\x06\x12\x04\0\08\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
-    \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\
-    \x03\x01\x12\x03\x05\0\x15\n\t\n\x02\x03\x02\x12\x03\x06\0\x1b\n\x08\n\
-    \x01\x08\x12\x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\nK\n\x02\x04\0\
-    \x12\x04\x0b\0\x1b\x01\x1a?\x20Command\x20is\x20used\x20by\x20snitch-ser\
-    ver\x20for\x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\x04\0\x01\
-    \x12\x03\x0b\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\x03\x0e\x02\x1f\x1a\
-    \x85\x01\x20Who\x20is\x20this\x20command\x20intended\x20for?\n\x20NOTE:\
-    \x20Some\x20commands\x20(such\x20as\x20KeepAliveCommand,\x20KVCommand)\
-    \x20do\x20NOT\x20use\x20audience\x20and\x20will\x20ignore\x20it\n\n\x0c\
-    \n\x05\x04\0\x02\0\x06\x12\x03\x0e\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\
-    \x12\x03\x0e\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x1d\x1e\n\
-    \x0c\n\x04\x04\0\x08\0\x12\x04\x10\x02\x1a\x03\n\x0c\n\x05\x04\0\x08\0\
-    \x01\x12\x03\x10\x08\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x11\x040\n\
-    \x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x11\x04\x19\n\x0c\n\x05\x04\0\x02\
-    \x01\x01\x12\x03\x11\x1a)\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x11,/\n\
-    \x0b\n\x04\x04\0\x02\x02\x12\x03\x12\x040\n\x0c\n\x05\x04\0\x02\x02\x06\
-    \x12\x03\x12\x04\x19\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x12\x1a)\n\
-    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x12,/\n\x0b\n\x04\x04\0\x02\x03\x12\
-    \x03\x13\x04.\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x13\x04\x18\n\x0c\n\
-    \x05\x04\0\x02\x03\x01\x12\x03\x13\x19'\n\x0c\n\x05\x04\0\x02\x03\x03\
-    \x12\x03\x13*-\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x14\x040\n\x0c\n\x05\
-    \x04\0\x02\x04\x06\x12\x03\x14\x04\x19\n\x0c\n\x05\x04\0\x02\x04\x01\x12\
-    \x03\x14\x1a)\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x14,/\n\x0b\n\x04\
-    \x04\0\x02\x05\x12\x03\x15\x04&\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\
-    \x15\x04\x14\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x15\x15\x1f\n\x0c\n\
-    \x05\x04\0\x02\x05\x03\x12\x03\x15\"%\nk\n\x04\x04\0\x02\x06\x12\x03\x19\
-    \x04\x17\x1a^\x20snitch-server\x20will\x20emit\x20this\x20when\x20a\x20u\
-    ser\x20makes\x20changes\x20to\x20the\x20KV\x20store\n\x20via\x20the\x20K\
-    V\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\x19\x04\r\n\
-    \x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\x0e\x10\n\x0c\n\x05\x04\0\x02\
-    \x06\x03\x12\x03\x19\x13\x16\n\n\n\x02\x04\x01\x12\x04\x1d\0\x1f\x01\n\n\
-    \n\x03\x04\x01\x01\x12\x03\x1d\x08\x1d\n\x0b\n\x04\x04\x01\x02\0\x12\x03\
-    \x1e\x02\x1f\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03\x1e\x02\x11\n\x0c\n\
-    \x05\x04\x01\x02\0\x01\x12\x03\x1e\x12\x1a\n\x0c\n\x05\x04\x01\x02\0\x03\
-    \x12\x03\x1e\x1d\x1e\n\n\n\x02\x04\x02\x12\x04!\0#\x01\n\n\n\x03\x04\x02\
-    \x01\x12\x03!\x08\x1d\n\x0b\n\x04\x04\x02\x02\0\x12\x03\"\x02\x19\n\x0c\
-    \n\x05\x04\x02\x02\0\x05\x12\x03\"\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\
-    \x12\x03\"\t\x14\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03\"\x17\x18\n\n\n\
-    \x02\x04\x03\x12\x04%\0'\x01\n\n\n\x03\x04\x03\x01\x12\x03%\x08\x1c\n\
-    \x0b\n\x04\x04\x03\x02\0\x12\x03&\x02\x19\n\x0c\n\x05\x04\x03\x02\0\x05\
-    \x12\x03&\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03&\t\x14\n\x0c\n\
-    \x05\x04\x03\x02\0\x03\x12\x03&\x17\x18\n\n\n\x02\x04\x04\x12\x04)\0+\
-    \x01\n\n\n\x03\x04\x04\x01\x12\x03)\x08\x1d\n\x0b\n\x04\x04\x04\x02\0\
-    \x12\x03*\x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03*\x02\x08\n\x0c\n\
-    \x05\x04\x04\x02\0\x01\x12\x03*\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\
-    \x03*\x17\x18\nD\n\x02\x04\x05\x12\x04-\0/\x01\"8\x20Nothing\x20needed\
-    \x20in\x20here,\x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\
-    \n\n\x03\x04\x05\x01\x12\x03-\x08\x18\nG\n\x02\x04\x06\x12\x042\08\x01\
-    \x1a;\x20Sent\x20by\x20snitch-server\x20on\x20Register\x20channel(s)\x20\
-    to\x20live\x20SDKs\n\n\n\n\x03\x04\x06\x01\x12\x032\x08\x11\n\x0b\n\x04\
-    \x04\x06\x02\0\x12\x033\x021\n\x0c\n\x05\x04\x06\x02\0\x04\x12\x033\x02\
-    \n\n\x0c\n\x05\x04\x06\x02\0\x06\x12\x033\x0b\x1f\n\x0c\n\x05\x04\x06\
-    \x02\0\x01\x12\x033\x20,\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x033/0\nk\n\
-    \x04\x04\x06\x02\x01\x12\x037\x02\x15\x1a^\x20Create\x20&\x20Update\x20s\
-    pecific\x20setting\x20that\x20will\x20cause\x20the\x20Create\x20or\x20Up\
-    date\x20to\n\x20work\x20as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x06\x02\
-    \x01\x05\x12\x037\x02\x06\n\x0c\n\x05\x04\x06\x02\x01\x01\x12\x037\x07\
-    \x10\n\x0c\n\x05\x04\x06\x02\x01\x03\x12\x037\x13\x14b\x06proto3\
+    s.KVCommandH\0R\x02kv\x12)\n\x04tail\x18j\x20\x01(\x0b2\x13.protos.TailC\
+    ommandH\0R\x04tailB\t\n\x07command\"E\n\x15AttachPipelineCommand\x12,\n\
+    \x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\
+    \x15DetachPipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
+    pipelineId\"7\n\x14PausePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\
+    \x20\x01(\tR\npipelineId\"8\n\x15ResumePipelineCommand\x12\x1f\n\x0bpipe\
+    line_id\x18\x01\x20\x01(\tR\npipelineId\"\x12\n\x10KeepAliveCommand\"d\n\
+    \tKVCommand\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVIn\
+    structionR\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\to\
+    verwrite\"<\n\x0bTailCommand\x12-\n\x07request\x18\x02\x20\x01(\x0b2\x13\
+    .protos.TailRequestR\x07requestB4Z2github.com/streamdal/snitch-protos/bu\
+    ild/go/protosJ\xe7\r\n\x06\x12\x04\0\0@\x01\n\x08\n\x01\x0c\x12\x03\0\0\
+    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\
+    \n\t\n\x02\x03\x01\x12\x03\x05\0\x15\n\t\n\x02\x03\x02\x12\x03\x06\0\x1b\
+    \n\x08\n\x01\x08\x12\x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\nK\n\
+    \x02\x04\0\x12\x04\x0b\0\x1f\x01\x1a?\x20Command\x20is\x20used\x20by\x20\
+    snitch-server\x20for\x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\
+    \x04\0\x01\x12\x03\x0b\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\x03\x0e\
+    \x02\x1f\x1a\x85\x01\x20Who\x20is\x20this\x20command\x20intended\x20for?\
+    \n\x20NOTE:\x20Some\x20commands\x20(such\x20as\x20KeepAliveCommand,\x20K\
+    VCommand)\x20do\x20NOT\x20use\x20audience\x20and\x20will\x20ignore\x20it\
+    \n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x0e\x02\x11\n\x0c\n\x05\x04\0\x02\
+    \0\x01\x12\x03\x0e\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x1d\
+    \x1e\n\x0c\n\x04\x04\0\x08\0\x12\x04\x10\x02\x1e\x03\n\x0c\n\x05\x04\0\
+    \x08\0\x01\x12\x03\x10\x08\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x11\x04\
+    0\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x11\x04\x19\n\x0c\n\x05\x04\0\
+    \x02\x01\x01\x12\x03\x11\x1a)\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x11,\
+    /\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x12\x040\n\x0c\n\x05\x04\0\x02\x02\
+    \x06\x12\x03\x12\x04\x19\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x12\x1a)\
+    \n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x12,/\n\x0b\n\x04\x04\0\x02\x03\
+    \x12\x03\x13\x04.\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x13\x04\x18\n\
+    \x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x13\x19'\n\x0c\n\x05\x04\0\x02\x03\
+    \x03\x12\x03\x13*-\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x14\x040\n\x0c\n\
+    \x05\x04\0\x02\x04\x06\x12\x03\x14\x04\x19\n\x0c\n\x05\x04\0\x02\x04\x01\
+    \x12\x03\x14\x1a)\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x14,/\n\x0b\n\
+    \x04\x04\0\x02\x05\x12\x03\x15\x04&\n\x0c\n\x05\x04\0\x02\x05\x06\x12\
+    \x03\x15\x04\x14\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x15\x15\x1f\n\x0c\
+    \n\x05\x04\0\x02\x05\x03\x12\x03\x15\"%\nk\n\x04\x04\0\x02\x06\x12\x03\
+    \x19\x04\x17\x1a^\x20snitch-server\x20will\x20emit\x20this\x20when\x20a\
+    \x20user\x20makes\x20changes\x20to\x20the\x20KV\x20store\n\x20via\x20the\
+    \x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\x19\x04\r\
+    \n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\x0e\x10\n\x0c\n\x05\x04\0\x02\
+    \x06\x03\x12\x03\x19\x13\x16\n|\n\x04\x04\0\x02\x07\x12\x03\x1d\x04\x1b\
+    \x1ao\x20Emitted\x20by\x20snitch-server\x20when\x20a\x20user\x20makes\
+    \x20a\x20Tail()\x20call\n\x20Consumed\x20by\x20all\x20snitch-server\x20i\
+    nstances\x20and\x20by\x20SDKs\n\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\
+    \x1d\x04\x0f\n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1d\x10\x14\n\x0c\n\
+    \x05\x04\0\x02\x07\x03\x12\x03\x1d\x17\x1a\n\n\n\x02\x04\x01\x12\x04!\0#\
+    \x01\n\n\n\x03\x04\x01\x01\x12\x03!\x08\x1d\n\x0b\n\x04\x04\x01\x02\0\
+    \x12\x03\"\x02\x1f\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03\"\x02\x11\n\x0c\
+    \n\x05\x04\x01\x02\0\x01\x12\x03\"\x12\x1a\n\x0c\n\x05\x04\x01\x02\0\x03\
+    \x12\x03\"\x1d\x1e\n\n\n\x02\x04\x02\x12\x04%\0'\x01\n\n\n\x03\x04\x02\
+    \x01\x12\x03%\x08\x1d\n\x0b\n\x04\x04\x02\x02\0\x12\x03&\x02\x19\n\x0c\n\
+    \x05\x04\x02\x02\0\x05\x12\x03&\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\
+    \x12\x03&\t\x14\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03&\x17\x18\n\n\n\x02\
+    \x04\x03\x12\x04)\0+\x01\n\n\n\x03\x04\x03\x01\x12\x03)\x08\x1c\n\x0b\n\
+    \x04\x04\x03\x02\0\x12\x03*\x02\x19\n\x0c\n\x05\x04\x03\x02\0\x05\x12\
+    \x03*\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03*\t\x14\n\x0c\n\x05\
+    \x04\x03\x02\0\x03\x12\x03*\x17\x18\n\n\n\x02\x04\x04\x12\x04-\0/\x01\n\
+    \n\n\x03\x04\x04\x01\x12\x03-\x08\x1d\n\x0b\n\x04\x04\x04\x02\0\x12\x03.\
+    \x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03.\x02\x08\n\x0c\n\x05\x04\
+    \x04\x02\0\x01\x12\x03.\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03.\x17\
+    \x18\nD\n\x02\x04\x05\x12\x041\03\x01\"8\x20Nothing\x20needed\x20in\x20h\
+    ere,\x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\
+    \x05\x01\x12\x031\x08\x18\nG\n\x02\x04\x06\x12\x046\0<\x01\x1a;\x20Sent\
+    \x20by\x20snitch-server\x20on\x20Register\x20channel(s)\x20to\x20live\
+    \x20SDKs\n\n\n\n\x03\x04\x06\x01\x12\x036\x08\x11\n\x0b\n\x04\x04\x06\
+    \x02\0\x12\x037\x021\n\x0c\n\x05\x04\x06\x02\0\x04\x12\x037\x02\n\n\x0c\
+    \n\x05\x04\x06\x02\0\x06\x12\x037\x0b\x1f\n\x0c\n\x05\x04\x06\x02\0\x01\
+    \x12\x037\x20,\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x037/0\nk\n\x04\x04\x06\
+    \x02\x01\x12\x03;\x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20s\
+    etting\x20that\x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\
+    \x20work\x20as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x06\x02\x01\x05\x12\
+    \x03;\x02\x06\n\x0c\n\x05\x04\x06\x02\x01\x01\x12\x03;\x07\x10\n\x0c\n\
+    \x05\x04\x06\x02\x01\x03\x12\x03;\x13\x14\n\n\n\x02\x04\x07\x12\x04>\0@\
+    \x01\n\n\n\x03\x04\x07\x01\x12\x03>\x08\x13\n\x0b\n\x04\x04\x07\x02\0\
+    \x12\x03?\x02\x1a\n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03?\x02\r\n\x0c\n\
+    \x05\x04\x07\x02\0\x01\x12\x03?\x0e\x15\n\x0c\n\x05\x04\x07\x02\0\x03\
+    \x12\x03?\x18\x19b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1438,7 +1641,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::sp_common::file_descriptor().clone());
             deps.push(super::sp_kv::file_descriptor().clone());
             deps.push(super::sp_pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(7);
+            let mut messages = ::std::vec::Vec::with_capacity(8);
             messages.push(Command::generated_message_descriptor_data());
             messages.push(AttachPipelineCommand::generated_message_descriptor_data());
             messages.push(DetachPipelineCommand::generated_message_descriptor_data());
@@ -1446,6 +1649,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(ResumePipelineCommand::generated_message_descriptor_data());
             messages.push(KeepAliveCommand::generated_message_descriptor_data());
             messages.push(KVCommand::generated_message_descriptor_data());
+            messages.push(TailCommand::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(0);
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),

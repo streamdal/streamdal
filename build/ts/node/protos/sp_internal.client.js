@@ -74,5 +74,12 @@ export class InternalClient {
         const method = this.methods[5], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
+    /**
+     * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
+     */
+    sendTail(options) {
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        return stackIntercept("clientStreaming", this._transport, method, opt);
+    }
 }
 //# sourceMappingURL=sp_internal.client.js.map

@@ -75,6 +75,86 @@ export interface Metric {
     value: number;
 }
 /**
+ * @generated from protobuf message protos.TailRequest
+ */
+export interface TailRequest {
+    /**
+     * @generated from protobuf field: protos.TailRequestType type = 1;
+     */
+    type: TailRequestType;
+    /**
+     * @generated from protobuf field: string id = 2;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 3;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: string pipeline_id = 4;
+     */
+    pipelineId: string;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+/**
+ * TailResponse originates in the SDK and then is sent to snitch servers where
+ * it is forwarded to the correct frontend streaming gRPC connection
+ *
+ * @generated from protobuf message protos.TailResponse
+ */
+export interface TailResponse {
+    /**
+     * @generated from protobuf field: protos.TailResponseType type = 1;
+     */
+    type: TailResponseType;
+    /**
+     * @generated from protobuf field: string tail_request_id = 2;
+     */
+    tailRequestId: string;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 3;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: string pipeline_id = 4;
+     */
+    pipelineId: string;
+    /**
+     * @generated from protobuf field: string session_id = 5;
+     */
+    sessionId: string;
+    /**
+     * Timestamp in nanoseconds
+     *
+     * @generated from protobuf field: int64 timestamp_ns = 6;
+     */
+    timestampNs: bigint;
+    /**
+     * Payload data. For errors, this will be the error message
+     * For payloads, this will be JSON of the payload data, post processing
+     *
+     * @generated from protobuf field: bytes original_data = 7;
+     */
+    originalData: Uint8Array;
+    /**
+     * For payloads, this will be the new data, post processing
+     *
+     * @generated from protobuf field: bytes new_data = 8;
+     */
+    newData: Uint8Array;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -124,6 +204,40 @@ export enum OperationType {
      */
     PRODUCER = 2
 }
+/**
+ * @generated from protobuf enum protos.TailResponseType
+ */
+export enum TailResponseType {
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+     */
+    PAYLOAD = 1,
+    /**
+     * @generated from protobuf enum value: TAIL_RESPONSE_TYPE_ERROR = 2;
+     */
+    ERROR = 2
+}
+/**
+ * @generated from protobuf enum protos.TailRequestType
+ */
+export enum TailRequestType {
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_START = 1;
+     */
+    START = 1,
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
+     */
+    STOP = 2
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor() {
@@ -167,3 +281,39 @@ class Metric$Type extends MessageType<Metric> {
  * @generated MessageType for protobuf message protos.Metric
  */
 export const Metric = new Metric$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailRequest$Type extends MessageType<TailRequest> {
+    constructor() {
+        super("protos.TailRequest", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailRequestType", TailRequestType, "TAIL_REQUEST_TYPE_"] },
+            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audience", kind: "message", T: () => Audience },
+            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailRequest
+ */
+export const TailRequest = new TailRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TailResponse$Type extends MessageType<TailResponse> {
+    constructor() {
+        super("protos.TailResponse", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.TailResponseType", TailResponseType, "TAIL_RESPONSE_TYPE_"] },
+            { no: 2, name: "tail_request_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audience", kind: "message", T: () => Audience },
+            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 7, name: "original_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 8, name: "new_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.TailResponse
+ */
+export const TailResponse = new TailResponse$Type();
