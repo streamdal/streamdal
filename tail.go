@@ -75,13 +75,24 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 	// that getTail() can remove the tail from the map
 	defer t.CancelFunc()
 
+	var quit bool
+
 	looper.Loop(func() error {
+		if quit {
+			time.Sleep(time.Millisecond * 50)
+			return nil
+		}
+
 		select {
 		case <-t.cancelCtx.Done():
 			t.log.Debug("tail worker cancelled")
+			quit = true
+			looper.Quit()
 			return nil
 		case <-stream.Context().Done():
 			t.log.Debug("tail worker context terminated")
+			quit = true
+			looper.Quit()
 			return nil
 		case resp := <-t.Ch:
 			if err := stream.Send(resp); err != nil {
