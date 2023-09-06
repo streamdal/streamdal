@@ -204,8 +204,6 @@ export const SIDEBAR: Sidebar = {
           },
           {
             text: "Governance for Compliance",
-            slug: "overview",
-            link: "en/data-governance/compliance/overview",
             children: [
               {
                 text: "CCPA/CPRA",
@@ -235,12 +233,12 @@ export const SIDEBAR: Sidebar = {
               {
                 text: "HIPAA",
                 slug: "hipaa",
-                link: "en/data-governance/compliance/",
+                link: "en/data-governance/compliance/hipaa",
               },
               {
                 text: "ISC/IEC",
                 slug: "isc-iec",
-                link: "en/data-governance/compliance/",
+                link: "en/data-governance/compliance/isc-iec",
               },
               {
                 text: "NY State S.H.I.E.L.D",
@@ -260,7 +258,7 @@ export const SIDEBAR: Sidebar = {
               {
                 text: "SOCII",
                 slug: "socii",
-                link: "en/data-governance/compliance/",
+                link: "en/data-governance/compliance/socii",
               },
               {
                 text: "PIPEDA",
