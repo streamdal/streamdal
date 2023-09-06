@@ -7,6 +7,7 @@
 package steps
 
 import (
+	protos "github.com/streamdal/snitch-protos/build/go/protos"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -21,78 +22,140 @@ const (
 )
 
 // Used by frontend when constructing a pipeline that contains a KV step that
-// performs a KVExists request.
+// performs any KV request. The mode determines _what_ the contents of the
+// key will be. Read comments about "static" vs "dynamic".
 // protolint:disable:next ENUM_FIELD_NAMES_PREFIX
-type KVExistsMode int32
+type KVMode int32
 
 const (
-	KVExistsMode_KV_EXISTS_MODE_UNSET KVExistsMode = 0
+	KVMode_KV_MODE_UNSET KVMode = 0
 	// Will cause the KV lookup to use the key string as-is for the lookup
-	KVExistsMode_KV_EXISTS_MODE_STATIC KVExistsMode = 1
+	KVMode_KV_MODE_STATIC KVMode = 1
 	// DYNAMIC mode will cause the KV lookup WASM to use the key to lookup the
 	// associated value and use the result for the key existence check.
 	//
-	// For example, if "key" in KVExistsRequest is set to "foo", KV WASM will do
+	// For example, if "key" in KVHostFuncRequest is set to "foo", KV WASM will do
 	// the following:
 	//
 	// 1. Lookup the value of "foo" in the payload (which is "bar")
 	// 2. Use "bar" as the "key" for the KV lookup
-	KVExistsMode_KV_EXISTS_MODE_DYNAMIC KVExistsMode = 2
+	KVMode_KV_MODE_DYNAMIC KVMode = 2
 )
 
-// Enum value maps for KVExistsMode.
+// Enum value maps for KVMode.
 var (
-	KVExistsMode_name = map[int32]string{
-		0: "KV_EXISTS_MODE_UNSET",
-		1: "KV_EXISTS_MODE_STATIC",
-		2: "KV_EXISTS_MODE_DYNAMIC",
+	KVMode_name = map[int32]string{
+		0: "KV_MODE_UNSET",
+		1: "KV_MODE_STATIC",
+		2: "KV_MODE_DYNAMIC",
 	}
-	KVExistsMode_value = map[string]int32{
-		"KV_EXISTS_MODE_UNSET":   0,
-		"KV_EXISTS_MODE_STATIC":  1,
-		"KV_EXISTS_MODE_DYNAMIC": 2,
+	KVMode_value = map[string]int32{
+		"KV_MODE_UNSET":   0,
+		"KV_MODE_STATIC":  1,
+		"KV_MODE_DYNAMIC": 2,
 	}
 )
 
-func (x KVExistsMode) Enum() *KVExistsMode {
-	p := new(KVExistsMode)
+func (x KVMode) Enum() *KVMode {
+	p := new(KVMode)
 	*p = x
 	return p
 }
 
-func (x KVExistsMode) String() string {
+func (x KVMode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (KVExistsMode) Descriptor() protoreflect.EnumDescriptor {
+func (KVMode) Descriptor() protoreflect.EnumDescriptor {
 	return file_steps_sp_steps_kv_proto_enumTypes[0].Descriptor()
 }
 
-func (KVExistsMode) Type() protoreflect.EnumType {
+func (KVMode) Type() protoreflect.EnumType {
 	return &file_steps_sp_steps_kv_proto_enumTypes[0]
 }
 
-func (x KVExistsMode) Number() protoreflect.EnumNumber {
+func (x KVMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use KVExistsMode.Descriptor instead.
-func (KVExistsMode) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use KVMode.Descriptor instead.
+func (KVMode) EnumDescriptor() ([]byte, []int) {
 	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{0}
 }
 
-// Encoded in KVStep; also used as param to HostFuncKVExists() in SDK
-type KVExistsRequest struct {
+// Returned by KV host func and interpreted by KV WASM.
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+type KVStatus int32
+
+const (
+	KVStatus_KV_STATUS_UNSET   KVStatus = 0
+	KVStatus_KV_STATUS_SUCCESS KVStatus = 1
+	KVStatus_KV_STATUS_FAILURE KVStatus = 2
+	KVStatus_KV_STATUS_ERROR   KVStatus = 3
+)
+
+// Enum value maps for KVStatus.
+var (
+	KVStatus_name = map[int32]string{
+		0: "KV_STATUS_UNSET",
+		1: "KV_STATUS_SUCCESS",
+		2: "KV_STATUS_FAILURE",
+		3: "KV_STATUS_ERROR",
+	}
+	KVStatus_value = map[string]int32{
+		"KV_STATUS_UNSET":   0,
+		"KV_STATUS_SUCCESS": 1,
+		"KV_STATUS_FAILURE": 2,
+		"KV_STATUS_ERROR":   3,
+	}
+)
+
+func (x KVStatus) Enum() *KVStatus {
+	p := new(KVStatus)
+	*p = x
+	return p
+}
+
+func (x KVStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (KVStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_steps_sp_steps_kv_proto_enumTypes[1].Descriptor()
+}
+
+func (KVStatus) Type() protoreflect.EnumType {
+	return &file_steps_sp_steps_kv_proto_enumTypes[1]
+}
+
+func (x KVStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use KVStatus.Descriptor instead.
+func (KVStatus) EnumDescriptor() ([]byte, []int) {
+	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{1}
+}
+
+// Returned by SDK host func and interpreted by KV WASM.
+type KVStepResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Key  string       `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Mode KVExistsMode `protobuf:"varint,2,opt,name=mode,proto3,enum=protos.steps.KVExistsMode" json:"mode,omitempty"`
+	// Status of the action; interpreted by KV WASM to so it can generate a protos.WASMResponse
+	Status KVStatus `protobuf:"varint,1,opt,name=status,proto3,enum=protos.steps.KVStatus" json:"status,omitempty"`
+	// Message containing info, debug or error details; included in protos.WASMResponse
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Optional because the only action that uses field is KV_ACTION_GET
+	//
+	// DS: Not sure how we'll use KV_ACTION_GET in steps yet but this is probably
+	// a good place to start. 09.06.2023.
+	Value []byte `protobuf:"bytes,3,opt,name=value,proto3,oneof" json:"value,omitempty"`
 }
 
-func (x *KVExistsRequest) Reset() {
-	*x = KVExistsRequest{}
+func (x *KVStepResponse) Reset() {
+	*x = KVStepResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_steps_sp_steps_kv_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,13 +163,13 @@ func (x *KVExistsRequest) Reset() {
 	}
 }
 
-func (x *KVExistsRequest) String() string {
+func (x *KVStepResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*KVExistsRequest) ProtoMessage() {}
+func (*KVStepResponse) ProtoMessage() {}
 
-func (x *KVExistsRequest) ProtoReflect() protoreflect.Message {
+func (x *KVStepResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_steps_sp_steps_kv_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -118,108 +181,52 @@ func (x *KVExistsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use KVExistsRequest.ProtoReflect.Descriptor instead.
-func (*KVExistsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use KVStepResponse.ProtoReflect.Descriptor instead.
+func (*KVStepResponse) Descriptor() ([]byte, []int) {
 	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *KVExistsRequest) GetKey() string {
+func (x *KVStepResponse) GetStatus() KVStatus {
 	if x != nil {
-		return x.Key
+		return x.Status
 	}
-	return ""
+	return KVStatus_KV_STATUS_UNSET
 }
 
-func (x *KVExistsRequest) GetMode() KVExistsMode {
-	if x != nil {
-		return x.Mode
-	}
-	return KVExistsMode_KV_EXISTS_MODE_UNSET
-}
-
-// Returned by HostFuncKVExists() in SDK
-type KVExistsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Whether the key exists
-	Exists bool `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
-	// Whether the request resulted in an error
-	IsError bool `protobuf:"varint,2,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
-	// Potential message containing debug or error info
-	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *KVExistsResponse) Reset() {
-	*x = KVExistsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_steps_sp_steps_kv_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *KVExistsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*KVExistsResponse) ProtoMessage() {}
-
-func (x *KVExistsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steps_sp_steps_kv_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use KVExistsResponse.ProtoReflect.Descriptor instead.
-func (*KVExistsResponse) Descriptor() ([]byte, []int) {
-	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *KVExistsResponse) GetExists() bool {
-	if x != nil {
-		return x.Exists
-	}
-	return false
-}
-
-func (x *KVExistsResponse) GetIsError() bool {
-	if x != nil {
-		return x.IsError
-	}
-	return false
-}
-
-func (x *KVExistsResponse) GetMessage() string {
+func (x *KVStepResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-// Used in PipelineSteps
+func (x *KVStepResponse) GetValue() []byte {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+// Used in PipelineSteps and passed to KV host func; constructed by frontend
 type KVStep struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Types that are assignable to Request:
-	//
-	//	*KVStep_KvExistsRequest
-	Request isKVStep_Request `protobuf_oneof:"request"`
+	// What type of action this step should perform
+	Action protos.KVAction `protobuf:"varint,1,opt,name=action,proto3,enum=protos.KVAction" json:"action,omitempty"`
+	// How the key field will be used to perform lookup
+	Mode KVMode `protobuf:"varint,2,opt,name=mode,proto3,enum=protos.steps.KVMode" json:"mode,omitempty"`
+	// The key the action is taking place on
+	Key string `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	// Optional because the only action that needs value is KV_ACTION_CREATE
+	Value []byte `protobuf:"bytes,4,opt,name=value,proto3,oneof" json:"value,omitempty"`
 }
 
 func (x *KVStep) Reset() {
 	*x = KVStep{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_steps_sp_steps_kv_proto_msgTypes[2]
+		mi := &file_steps_sp_steps_kv_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -232,7 +239,7 @@ func (x *KVStep) String() string {
 func (*KVStep) ProtoMessage() {}
 
 func (x *KVStep) ProtoReflect() protoreflect.Message {
-	mi := &file_steps_sp_steps_kv_proto_msgTypes[2]
+	mi := &file_steps_sp_steps_kv_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -245,67 +252,76 @@ func (x *KVStep) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KVStep.ProtoReflect.Descriptor instead.
 func (*KVStep) Descriptor() ([]byte, []int) {
-	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{2}
+	return file_steps_sp_steps_kv_proto_rawDescGZIP(), []int{1}
 }
 
-func (m *KVStep) GetRequest() isKVStep_Request {
-	if m != nil {
-		return m.Request
+func (x *KVStep) GetAction() protos.KVAction {
+	if x != nil {
+		return x.Action
+	}
+	return protos.KVAction(0)
+}
+
+func (x *KVStep) GetMode() KVMode {
+	if x != nil {
+		return x.Mode
+	}
+	return KVMode_KV_MODE_UNSET
+}
+
+func (x *KVStep) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *KVStep) GetValue() []byte {
+	if x != nil {
+		return x.Value
 	}
 	return nil
 }
-
-func (x *KVStep) GetKvExistsRequest() *KVExistsRequest {
-	if x, ok := x.GetRequest().(*KVStep_KvExistsRequest); ok {
-		return x.KvExistsRequest
-	}
-	return nil
-}
-
-type isKVStep_Request interface {
-	isKVStep_Request()
-}
-
-type KVStep_KvExistsRequest struct {
-	KvExistsRequest *KVExistsRequest `protobuf:"bytes,1,opt,name=kv_exists_request,json=kvExistsRequest,proto3,oneof"`
-}
-
-func (*KVStep_KvExistsRequest) isKVStep_Request() {}
 
 var File_steps_sp_steps_kv_proto protoreflect.FileDescriptor
 
 var file_steps_sp_steps_kv_proto_rawDesc = []byte{
 	0x0a, 0x17, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2f, 0x73, 0x70, 0x5f, 0x73, 0x74, 0x65, 0x70, 0x73,
 	0x5f, 0x6b, 0x76, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0c, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x73, 0x2e, 0x73, 0x74, 0x65, 0x70, 0x73, 0x22, 0x53, 0x0a, 0x0f, 0x4b, 0x56, 0x45, 0x78, 0x69,
-	0x73, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65,
-	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x2e, 0x0a, 0x04,
-	0x6d, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2e, 0x4b, 0x56, 0x45, 0x78, 0x69, 0x73,
-	0x74, 0x73, 0x4d, 0x6f, 0x64, 0x65, 0x52, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x22, 0x5f, 0x0a, 0x10,
-	0x4b, 0x56, 0x45, 0x78, 0x69, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x16, 0x0a, 0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
-	0x52, 0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x69, 0x73, 0x5f, 0x65,
-	0x72, 0x72, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x69, 0x73, 0x45, 0x72,
-	0x72, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x60, 0x0a,
-	0x06, 0x4b, 0x56, 0x53, 0x74, 0x65, 0x70, 0x12, 0x4b, 0x0a, 0x11, 0x6b, 0x76, 0x5f, 0x65, 0x78,
-	0x69, 0x73, 0x74, 0x73, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x73, 0x74, 0x65, 0x70,
-	0x73, 0x2e, 0x4b, 0x56, 0x45, 0x78, 0x69, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x48, 0x00, 0x52, 0x0f, 0x6b, 0x76, 0x45, 0x78, 0x69, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x42, 0x09, 0x0a, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2a,
-	0x5f, 0x0a, 0x0c, 0x4b, 0x56, 0x45, 0x78, 0x69, 0x73, 0x74, 0x73, 0x4d, 0x6f, 0x64, 0x65, 0x12,
-	0x18, 0x0a, 0x14, 0x4b, 0x56, 0x5f, 0x45, 0x58, 0x49, 0x53, 0x54, 0x53, 0x5f, 0x4d, 0x4f, 0x44,
-	0x45, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x19, 0x0a, 0x15, 0x4b, 0x56, 0x5f,
-	0x45, 0x58, 0x49, 0x53, 0x54, 0x53, 0x5f, 0x4d, 0x4f, 0x44, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54,
-	0x49, 0x43, 0x10, 0x01, 0x12, 0x1a, 0x0a, 0x16, 0x4b, 0x56, 0x5f, 0x45, 0x58, 0x49, 0x53, 0x54,
-	0x53, 0x5f, 0x4d, 0x4f, 0x44, 0x45, 0x5f, 0x44, 0x59, 0x4e, 0x41, 0x4d, 0x49, 0x43, 0x10, 0x02,
-	0x42, 0x3a, 0x5a, 0x38, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73,
-	0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e, 0x69, 0x74, 0x63, 0x68, 0x2d,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x73, 0x74, 0x65, 0x70, 0x73, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x2e, 0x73, 0x74, 0x65, 0x70, 0x73, 0x1a, 0x0b, 0x73, 0x70, 0x5f, 0x6b, 0x76, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x22, 0x7f, 0x0a, 0x0e, 0x4b, 0x56, 0x53, 0x74, 0x65, 0x70, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e,
+	0x73, 0x74, 0x65, 0x70, 0x73, 0x2e, 0x4b, 0x56, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06,
+	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x19, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x48,
+	0x00, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x88, 0x01, 0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x93, 0x01, 0x0a, 0x06, 0x4b, 0x56, 0x53, 0x74, 0x65, 0x70,
+	0x12, 0x28, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4b, 0x56, 0x41, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x52, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x28, 0x0a, 0x04, 0x6d, 0x6f,
+	0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x73, 0x74, 0x65, 0x70, 0x73, 0x2e, 0x4b, 0x56, 0x4d, 0x6f, 0x64, 0x65, 0x52, 0x04,
+	0x6d, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x19, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x88, 0x01,
+	0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x2a, 0x44, 0x0a, 0x06, 0x4b,
+	0x56, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x4b, 0x56, 0x5f, 0x4d, 0x4f, 0x44, 0x45,
+	0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x12, 0x0a, 0x0e, 0x4b, 0x56, 0x5f, 0x4d,
+	0x4f, 0x44, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x49, 0x43, 0x10, 0x01, 0x12, 0x13, 0x0a, 0x0f,
+	0x4b, 0x56, 0x5f, 0x4d, 0x4f, 0x44, 0x45, 0x5f, 0x44, 0x59, 0x4e, 0x41, 0x4d, 0x49, 0x43, 0x10,
+	0x02, 0x2a, 0x62, 0x0a, 0x08, 0x4b, 0x56, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x13, 0x0a,
+	0x0f, 0x4b, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54,
+	0x10, 0x00, 0x12, 0x15, 0x0a, 0x11, 0x4b, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f,
+	0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x01, 0x12, 0x15, 0x0a, 0x11, 0x4b, 0x56, 0x5f,
+	0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x02,
+	0x12, 0x13, 0x0a, 0x0f, 0x4b, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x45, 0x52,
+	0x52, 0x4f, 0x52, 0x10, 0x03, 0x42, 0x3a, 0x5a, 0x38, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e,
+	0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c,
+	0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x73, 0x74, 0x65, 0x70,
+	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -320,22 +336,24 @@ func file_steps_sp_steps_kv_proto_rawDescGZIP() []byte {
 	return file_steps_sp_steps_kv_proto_rawDescData
 }
 
-var file_steps_sp_steps_kv_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_steps_sp_steps_kv_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_steps_sp_steps_kv_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_steps_sp_steps_kv_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_steps_sp_steps_kv_proto_goTypes = []interface{}{
-	(KVExistsMode)(0),        // 0: protos.steps.KVExistsMode
-	(*KVExistsRequest)(nil),  // 1: protos.steps.KVExistsRequest
-	(*KVExistsResponse)(nil), // 2: protos.steps.KVExistsResponse
-	(*KVStep)(nil),           // 3: protos.steps.KVStep
+	(KVMode)(0),            // 0: protos.steps.KVMode
+	(KVStatus)(0),          // 1: protos.steps.KVStatus
+	(*KVStepResponse)(nil), // 2: protos.steps.KVStepResponse
+	(*KVStep)(nil),         // 3: protos.steps.KVStep
+	(protos.KVAction)(0),   // 4: protos.KVAction
 }
 var file_steps_sp_steps_kv_proto_depIdxs = []int32{
-	0, // 0: protos.steps.KVExistsRequest.mode:type_name -> protos.steps.KVExistsMode
-	1, // 1: protos.steps.KVStep.kv_exists_request:type_name -> protos.steps.KVExistsRequest
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 0: protos.steps.KVStepResponse.status:type_name -> protos.steps.KVStatus
+	4, // 1: protos.steps.KVStep.action:type_name -> protos.KVAction
+	0, // 2: protos.steps.KVStep.mode:type_name -> protos.steps.KVMode
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_steps_sp_steps_kv_proto_init() }
@@ -345,7 +363,7 @@ func file_steps_sp_steps_kv_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_steps_sp_steps_kv_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*KVExistsRequest); i {
+			switch v := v.(*KVStepResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -357,18 +375,6 @@ func file_steps_sp_steps_kv_proto_init() {
 			}
 		}
 		file_steps_sp_steps_kv_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*KVExistsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_steps_sp_steps_kv_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*KVStep); i {
 			case 0:
 				return &v.state
@@ -381,16 +387,15 @@ func file_steps_sp_steps_kv_proto_init() {
 			}
 		}
 	}
-	file_steps_sp_steps_kv_proto_msgTypes[2].OneofWrappers = []interface{}{
-		(*KVStep_KvExistsRequest)(nil),
-	}
+	file_steps_sp_steps_kv_proto_msgTypes[0].OneofWrappers = []interface{}{}
+	file_steps_sp_steps_kv_proto_msgTypes[1].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_steps_sp_steps_kv_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   3,
+			NumEnums:      2,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

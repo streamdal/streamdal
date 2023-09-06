@@ -12,6 +12,8 @@ from typing import (
 
 import betterproto
 
+from ... import protos as __protos__
+
 
 class DetectiveType(betterproto.Enum):
     DETECTIVE_TYPE_UNKNOWN = 0
@@ -130,24 +132,38 @@ class HttpRequestMethod(betterproto.Enum):
     HTTP_REQUEST_METHOD_DELETE = 4
 
 
-class KvExistsMode(betterproto.Enum):
+class KvMode(betterproto.Enum):
     """
     Used by frontend when constructing a pipeline that contains a KV step that
-    performs a KVExists request. protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+    performs any KV request. The mode determines _what_ the contents of the key
+    will be. Read comments about "static" vs "dynamic". protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
     """
 
-    KV_EXISTS_MODE_UNSET = 0
-    KV_EXISTS_MODE_STATIC = 1
+    KV_MODE_UNSET = 0
+    KV_MODE_STATIC = 1
     """Will cause the KV lookup to use the key string as-is for the lookup"""
 
-    KV_EXISTS_MODE_DYNAMIC = 2
+    KV_MODE_DYNAMIC = 2
     """
     DYNAMIC mode will cause the KV lookup WASM to use the key to lookup the
     associated value and use the result for the key existence check. For
-    example, if "key" in KVExistsRequest is set to "foo", KV WASM will do the
+    example, if "key" in KVHostFuncRequest is set to "foo", KV WASM will do the
     following: 1. Lookup the value of "foo" in the payload (which is "bar") 2.
     Use "bar" as the "key" for the KV lookup
     """
+
+
+class KvStatus(betterproto.Enum):
+    """
+    Returned by KV host func and interpreted by KV WASM. protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
+    """
+
+    KV_STATUS_UNSET = 0
+    KV_STATUS_SUCCESS = 1
+    KV_STATUS_FAILURE = 2
+    KV_STATUS_ERROR = 3
 
 
 class TransformType(betterproto.Enum):
@@ -212,32 +228,48 @@ class HttpRequestStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class KvExistsRequest(betterproto.Message):
-    """Encoded in KVStep; also used as param to HostFuncKVExists() in SDK"""
+class KvStepResponse(betterproto.Message):
+    """Returned by SDK host func and interpreted by KV WASM."""
 
-    key: str = betterproto.string_field(1)
-    mode: "KvExistsMode" = betterproto.enum_field(2)
+    status: "KvStatus" = betterproto.enum_field(1)
+    """
+    Status of the action; interpreted by KV WASM to so it can generate a
+    protos.WASMResponse
+    """
 
+    message: str = betterproto.string_field(2)
+    """
+    Message containing info, debug or error details; included in
+    protos.WASMResponse
+    """
 
-@dataclass(eq=False, repr=False)
-class KvExistsResponse(betterproto.Message):
-    """Returned by HostFuncKVExists() in SDK"""
-
-    exists: bool = betterproto.bool_field(1)
-    """Whether the key exists"""
-
-    is_error: bool = betterproto.bool_field(2)
-    """Whether the request resulted in an error"""
-
-    message: str = betterproto.string_field(3)
-    """Potential message containing debug or error info"""
+    value: Optional[bytes] = betterproto.bytes_field(3, optional=True, group="_value")
+    """
+    Optional because the only action that uses field is KV_ACTION_GET DS: Not
+    sure how we'll use KV_ACTION_GET in steps yet but this is probably a good
+    place to start. 09.06.2023.
+    """
 
 
 @dataclass(eq=False, repr=False)
 class KvStep(betterproto.Message):
-    """Used in PipelineSteps"""
+    """
+    Used in PipelineSteps and passed to KV host func; constructed by frontend
+    """
 
-    kv_exists_request: "KvExistsRequest" = betterproto.message_field(1, group="request")
+    action: "__protos__.KvAction" = betterproto.enum_field(1)
+    """What type of action this step should perform"""
+
+    mode: "KvMode" = betterproto.enum_field(2)
+    """How the key field will be used to perform lookup"""
+
+    key: str = betterproto.string_field(3)
+    """The key the action is taking place on"""
+
+    value: Optional[bytes] = betterproto.bytes_field(4, optional=True, group="_value")
+    """
+    Optional because the only action that needs value is KV_ACTION_CREATE
+    """
 
 
 @dataclass(eq=False, repr=False)

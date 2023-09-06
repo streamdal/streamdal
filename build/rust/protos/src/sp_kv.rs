@@ -25,12 +25,13 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
-///  KVObject represents a single KV object
+///  KVObject represents a single KV object used in protos.KVInstruction; this is
+///  constructed by snitch-server and broadcasted out to other snitch-server nodes.
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.KVObject)
 pub struct KVObject {
     // message fields
-    ///  Key regex: /^[a-zA-Z0-9_-:]+$/)
+    ///  Valid key regex: /^[a-zA-Z0-9_-:]+$/)
     // @@protoc_insertion_point(field:protos.KVObject.key)
     pub key: ::std::string::String,
     ///  KV value
@@ -804,20 +805,28 @@ impl ::protobuf::reflect::ProtobufValue for KVUpdateHTTPRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+///  KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
+///  Note that only a subset of actions are used for protos.KVCommand (CREATE,
+///  UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
+///
 ///  protolint:disable:next ENUM_FIELD_NAMES_PREFIX
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.KVAction)
 pub enum KVAction {
     // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_UNSET)
     KV_ACTION_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_GET)
+    KV_ACTION_GET = 1,
     // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_CREATE)
-    KV_ACTION_CREATE = 1,
+    KV_ACTION_CREATE = 2,
     // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_UPDATE)
-    KV_ACTION_UPDATE = 2,
+    KV_ACTION_UPDATE = 3,
+    // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_EXISTS)
+    KV_ACTION_EXISTS = 4,
     // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_DELETE)
-    KV_ACTION_DELETE = 3,
+    KV_ACTION_DELETE = 5,
     // @@protoc_insertion_point(enum_value:protos.KVAction.KV_ACTION_DELETE_ALL)
-    KV_ACTION_DELETE_ALL = 4,
+    KV_ACTION_DELETE_ALL = 6,
 }
 
 impl ::protobuf::Enum for KVAction {
@@ -830,18 +839,22 @@ impl ::protobuf::Enum for KVAction {
     fn from_i32(value: i32) -> ::std::option::Option<KVAction> {
         match value {
             0 => ::std::option::Option::Some(KVAction::KV_ACTION_UNSET),
-            1 => ::std::option::Option::Some(KVAction::KV_ACTION_CREATE),
-            2 => ::std::option::Option::Some(KVAction::KV_ACTION_UPDATE),
-            3 => ::std::option::Option::Some(KVAction::KV_ACTION_DELETE),
-            4 => ::std::option::Option::Some(KVAction::KV_ACTION_DELETE_ALL),
+            1 => ::std::option::Option::Some(KVAction::KV_ACTION_GET),
+            2 => ::std::option::Option::Some(KVAction::KV_ACTION_CREATE),
+            3 => ::std::option::Option::Some(KVAction::KV_ACTION_UPDATE),
+            4 => ::std::option::Option::Some(KVAction::KV_ACTION_EXISTS),
+            5 => ::std::option::Option::Some(KVAction::KV_ACTION_DELETE),
+            6 => ::std::option::Option::Some(KVAction::KV_ACTION_DELETE_ALL),
             _ => ::std::option::Option::None
         }
     }
 
     const VALUES: &'static [KVAction] = &[
         KVAction::KV_ACTION_UNSET,
+        KVAction::KV_ACTION_GET,
         KVAction::KV_ACTION_CREATE,
         KVAction::KV_ACTION_UPDATE,
+        KVAction::KV_ACTION_EXISTS,
         KVAction::KV_ACTION_DELETE,
         KVAction::KV_ACTION_DELETE_ALL,
     ];
@@ -886,41 +899,49 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x13KVCreateHTTPRequest\x12\"\n\x03kvs\x18\x01\x20\x03(\x0b2\x10.protos.\
     KVObjectR\x03kvs\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"\
     9\n\x13KVUpdateHTTPRequest\x12\"\n\x03kvs\x18\x01\x20\x03(\x0b2\x10.prot\
-    os.KVObjectR\x03kvs*{\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\
-    \x12\x14\n\x10KV_ACTION_CREATE\x10\x01\x12\x14\n\x10KV_ACTION_UPDATE\x10\
-    \x02\x12\x14\n\x10KV_ACTION_DELETE\x10\x03\x12\x18\n\x14KV_ACTION_DELETE\
-    _ALL\x10\x04B4Z2github.com/streamdal/snitch-protos/build/go/protosJ\xa9\
-    \x14\n\x06\x12\x04\0\0N\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\
-    \x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\x08\x0b\
-    \x12\x03\x04\0I\n\x9c\x01\n\x02\x05\0\x12\x04\n\0\x14\x01\x1a0\x20protol\
-    int:disable:next\x20ENUM_FIELD_NAMES_PREFIX\n2^\x20NOTE:\x20Most\x20of\
-    \x20these\x20message\x20types\x20are\x20used\x20by\x20snitch-server\x20t\
-    o\x20facilitate\x20KV\n\x20functionality.\n\n\n\n\x03\x05\0\x01\x12\x03\
-    \n\x05\r\n\x0b\n\x04\x05\0\x02\0\x12\x03\x0b\x02\x16\n\x0c\n\x05\x05\0\
-    \x02\0\x01\x12\x03\x0b\x02\x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0b\
-    \x14\x15\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x0c\x02\x17\n\x0c\n\x05\x05\0\
-    \x02\x01\x01\x12\x03\x0c\x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\
-    \x0c\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\r\x02\x17\n\x0c\n\x05\x05\
-    \0\x02\x02\x01\x12\x03\r\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\r\
-    \x15\x16\nW\n\x04\x05\0\x02\x03\x12\x03\x10\x02\x17\x1aJ\x20Only\x20\"ke\
-    y\"\x20and\x20\"requested_at_*\"\x20needs\x20to\x20be\x20set\x20in\x20*p\
-    rotos.KVInstruction\n\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x10\x02\x12\
-    \n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x10\x15\x16\nM\n\x04\x05\0\x02\
-    \x04\x12\x03\x13\x02\x1b\x1a@\x20Only\x20\"requested_at_*\"\x20needs\x20\
-    to\x20be\x20set\x20in\x20*protos.KVInstruction\n\n\x0c\n\x05\x05\0\x02\
-    \x04\x01\x12\x03\x13\x02\x16\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x13\
-    \x19\x1a\n4\n\x02\x04\0\x12\x04\x17\0#\x01\x1a(\x20KVObject\x20represent\
-    s\x20a\x20single\x20KV\x20object\n\n\n\n\x03\x04\0\x01\x12\x03\x17\x08\
-    \x10\n.\n\x04\x04\0\x02\0\x12\x03\x19\x02\x11\x1a!\x20Key\x20regex:\x20/\
-    ^[a-zA-Z0-9_-:]+$/)\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x19\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\0\x01\x12\x03\x19\t\x0c\n\x0c\n\x05\x04\0\x02\0\x03\
-    \x12\x03\x19\x0f\x10\n\x17\n\x04\x04\0\x02\x01\x12\x03\x1c\x02\x12\x1a\n\
-    \x20KV\x20value\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x1c\x02\x07\n\
-    \x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1c\x08\r\n\x0c\n\x05\x04\0\x02\x01\
-    \x03\x12\x03\x1c\x10\x11\n+\n\x04\x04\0\x02\x02\x12\x03\x1f\x02(\x1a\x1e\
-    \x20When\x20was\x20this\x20object\x20created\n\n\x0c\n\x05\x04\0\x02\x02\
-    \x05\x12\x03\x1f\x02\x07\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x1f\x08#\
-    \n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1f&'\n/\n\x04\x04\0\x02\x03\x12\
+    os.KVObjectR\x03kvs*\xa4\x01\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\
+    \x10\0\x12\x11\n\rKV_ACTION_GET\x10\x01\x12\x14\n\x10KV_ACTION_CREATE\
+    \x10\x02\x12\x14\n\x10KV_ACTION_UPDATE\x10\x03\x12\x14\n\x10KV_ACTION_EX\
+    ISTS\x10\x04\x12\x14\n\x10KV_ACTION_DELETE\x10\x05\x12\x18\n\x14KV_ACTIO\
+    N_DELETE_ALL\x10\x06B4Z2github.com/streamdal/snitch-protos/build/go/prot\
+    osJ\xec\x15\n\x06\x12\x04\0\0N\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
+    \n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\
+    \x08\x0b\x12\x03\x04\0I\n\x9d\x02\n\x02\x05\0\x12\x04\x0b\0\x13\x01\x1a\
+    \x90\x02\x20KVAction\x20is\x20a\x20shared\x20type\x20that\x20is\x20used\
+    \x20for\x20protos.KVCommand\x20and\x20protos.KVStep.\n\x20Note\x20that\
+    \x20only\x20a\x20subset\x20of\x20actions\x20are\x20used\x20for\x20protos\
+    .KVCommand\x20(CREATE,\n\x20UPDATE,\x20DELETE,\x20DELETE_ALL)\x20while\
+    \x20protos.KVStep\x20uses\x20most\x20of\x20them.\n\n\x20protolint:disabl\
+    e:next\x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\x03\x0b\x05\
+    \r\n\x0b\n\x04\x05\0\x02\0\x12\x03\x0c\x02\x16\n\x0c\n\x05\x05\0\x02\0\
+    \x01\x12\x03\x0c\x02\x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0c\x14\x15\
+    \n\x0b\n\x04\x05\0\x02\x01\x12\x03\r\x02\x14\n\x0c\n\x05\x05\0\x02\x01\
+    \x01\x12\x03\r\x02\x0f\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\r\x12\x13\n\
+    \x0b\n\x04\x05\0\x02\x02\x12\x03\x0e\x02\x17\n\x0c\n\x05\x05\0\x02\x02\
+    \x01\x12\x03\x0e\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x0e\x15\
+    \x16\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0f\x02\x17\n\x0c\n\x05\x05\0\x02\
+    \x03\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x0f\
+    \x15\x16\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x10\x02\x17\n\x0c\n\x05\x05\0\
+    \x02\x04\x01\x12\x03\x10\x02\x12\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\
+    \x10\x15\x16\n\x0b\n\x04\x05\0\x02\x05\x12\x03\x11\x02\x17\n\x0c\n\x05\
+    \x05\0\x02\x05\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\x05\0\x02\x05\x02\x12\
+    \x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x06\x12\x03\x12\x02\x1b\n\x0c\n\
+    \x05\x05\0\x02\x06\x01\x12\x03\x12\x02\x16\n\x0c\n\x05\x05\0\x02\x06\x02\
+    \x12\x03\x12\x19\x1a\n\xab\x01\n\x02\x04\0\x12\x04\x17\0#\x01\x1a\x9e\
+    \x01\x20KVObject\x20represents\x20a\x20single\x20KV\x20object\x20used\
+    \x20in\x20protos.KVInstruction;\x20this\x20is\n\x20constructed\x20by\x20\
+    snitch-server\x20and\x20broadcasted\x20out\x20to\x20other\x20snitch-serv\
+    er\x20nodes.\n\n\n\n\x03\x04\0\x01\x12\x03\x17\x08\x10\n4\n\x04\x04\0\
+    \x02\0\x12\x03\x19\x02\x11\x1a'\x20Valid\x20key\x20regex:\x20/^[a-zA-Z0-\
+    9_-:]+$/)\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x19\x02\x08\n\x0c\n\x05\
+    \x04\0\x02\0\x01\x12\x03\x19\t\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\
+    \x19\x0f\x10\n\x17\n\x04\x04\0\x02\x01\x12\x03\x1c\x02\x12\x1a\n\x20KV\
+    \x20value\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x1c\x02\x07\n\x0c\n\
+    \x05\x04\0\x02\x01\x01\x12\x03\x1c\x08\r\n\x0c\n\x05\x04\0\x02\x01\x03\
+    \x12\x03\x1c\x10\x11\n+\n\x04\x04\0\x02\x02\x12\x03\x1f\x02(\x1a\x1e\x20\
+    When\x20was\x20this\x20object\x20created\n\n\x0c\n\x05\x04\0\x02\x02\x05\
+    \x12\x03\x1f\x02\x07\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x1f\x08#\n\
+    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1f&'\n/\n\x04\x04\0\x02\x03\x12\
     \x03\"\x02(\x1a\"\x20Last\x20time\x20the\x20object\x20was\x20updated\n\n\
     \x0c\n\x05\x04\0\x02\x03\x05\x12\x03\"\x02\x07\n\x0c\n\x05\x04\0\x02\x03\
     \x01\x12\x03\"\x08#\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\"&'\n\xb3\x01\
