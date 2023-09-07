@@ -3,10 +3,10 @@ import datetime
 import logging
 import os
 import platform
-import pprint
 import signal
 import snitch_protos.protos as protos
 import socket
+import time
 import uuid
 import requests
 from betterproto import which_one_of
@@ -14,8 +14,9 @@ from copy import copy
 from dataclasses import dataclass, field
 from grpclib.client import Channel
 from .metrics import Metrics
-from threading import Thread, Event
-from urllib.parse import urlparse
+from .tail import Tail
+
+from threading import Thread, Event, Lock
 from wasmtime import (
     Config,
     Engine,
@@ -25,7 +26,6 @@ from wasmtime import (
     Memory,
     WasiConfig,
     Instance,
-    Func,
     FuncType,
     ValType,
     Caller,
@@ -118,6 +118,7 @@ class SnitchClient:
     auth_token: str
     workers: list
     audiences: dict
+    tails: dict
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -143,6 +144,7 @@ class SnitchClient:
         self.pipelines = {}
         self.paused_pipelines = {}
         self.audiences = {}
+        self.tails = {}
         self.log = log
         self.exit = cfg.exit
         self.metrics = Metrics(
@@ -309,6 +311,7 @@ class SnitchClient:
         pipelines = self._get_pipelines(aud)
 
         for _, cmd in pipelines.items():
+            original_data = data  # Needed for send_tail()
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
@@ -411,6 +414,8 @@ class SnitchClient:
                     return ProcessResponse(
                         data=data, error=True, message=wasm_resp.exit_msg
                     )
+
+            self._send_tail(cmd.audience, pipeline.id, original_data, data)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
@@ -553,7 +558,9 @@ class SnitchClient:
                 elif command == "resume_pipeline":
                     self._resume_pipeline(cmd)
                 elif command == "keep_alive":
-                    print("keep alive")
+                    pass
+                elif command == "tail_request":
+                    self._tail_request(cmd)
                 else:
                     self.log.error("Unknown response type: {}".format(cmd))
 
@@ -889,3 +896,111 @@ class SnitchClient:
         memory.write(caller, resp, resp_ptr)
 
         return resp_ptr
+
+    # ------------------------------------------------------------------------------------
+
+    def _tail_request(self, cmd: protos.Command):
+        # TODO: validate cmd
+
+        if cmd.tail.request.type == protos.TailRequestType.TAIL_REQUEST_TYPE_START:
+            self._start_tail(cmd)
+        elif cmd.tail.request.type == protos.TailRequestType.TAIL_REQUEST_TYPE_STOP:
+            self._stop_tail(cmd)
+
+    def _send_tail(
+        self,
+        aud: protos.Audience,
+        pipeline_id: str,
+        original_data: bytes,
+        new_data: bytes,
+    ):
+        tails = self._get_tails(aud, pipeline_id)
+        if len(tails) == 0:
+            return
+
+        for tail_id, running_tail in tails.items():
+            tr = protos.TailResponse(
+                type=protos.TailResponseType.TAIL_RESPONSE_TYPE_PAYLOAD,
+                tail_request_id=running_tail.request.id,
+                audience=aud,
+                pipeline_id=pipeline_id,
+                session_id=self.session_id,
+                timestamp_ns=time.time_ns(),
+                original_data=original_data,
+                new_data=new_data,
+            )
+            running_tail.queue.put_nowait(tr)
+
+    def _start_tail(self, cmd: protos.Command):
+        # TODO: Validate cmd
+        req = cmd.tail.request
+
+        pipelines = self._get_pipelines(req.audience)
+        if len(pipelines) == 0:
+            self.log.debug(
+                f"received tail command for non-existent pipeline: {req.pipeline_id}"
+            )
+            return
+
+        if req.pipeline_id not in pipelines.keys():
+            self.log.debug(
+                f"received tail command for non-existent pipeline: {req.pipeline_id}"
+            )
+            return
+
+        self.log.debug(f"Tailing pipeline: {req.pipeline_id}")
+
+        t = Tail(
+            request=req,
+            log=self.log,
+            exit=self.exit,
+            grpc_stub=self.grpc_stub,
+            grpc_loop=self.grpc_loop,
+            auth_token=self.auth_token,
+        )
+
+        self._set_tail(t)
+
+    def _set_tail(self, t: Tail):
+        key = self._tail_key(t.request.audience, t.request.pipeline_id)
+
+        if key not in self.tails:
+            self.tails[key] = {}
+
+        self.tails[key][t.request.id] = t
+
+    def _stop_tail(self, cmd: protos.Command):
+        # TODO: validate proto command
+
+        aud = cmd.tail.request.audience
+        pipeline_id = cmd.tail.request.pipeline_id
+        tail_id = cmd.tail.request.id
+
+        tails = self._get_tails(aud, pipeline_id)
+        if len(tails) == 0:
+            self.log.debug(
+                "received stop tail command for non-existent tail: {}".format(tail_id)
+            )
+            return
+
+        pass
+
+    def _get_tails(self, aud: protos.Audience, pipeline_id: str) -> dict[str, Tail]:
+        key = self._tail_key(aud, pipeline_id)
+        if key in self.tails:
+            return self.tails[key]
+
+        return {}
+
+    def _remove_tail(self, aud: protos.Audience, pipeline_id: str, tail_id: str):
+        key = self._tail_key(aud, pipeline_id)
+        if key not in self.tails:
+            return
+
+        if tail_id not in self.tails[key]:
+            return
+
+        del self.tails[key][tail_id]
+
+    def _tail_key(self, aud: protos.Audience, pipeline_id: str) -> str:
+        return f"{self._aud_to_str(aud)}.{pipeline_id}"

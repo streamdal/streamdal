@@ -42,7 +42,8 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.4.2
 six==1.16.0
-snitch-protos==0.0.78
+snitch-protos==0.0.89
+snitchpy==0.0.1
 stringcase==1.2.0
 tf==1.0.0
 twine==4.0.2
