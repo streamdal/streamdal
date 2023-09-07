@@ -168,7 +168,7 @@ export const mapNodes = (
         type: "service",
         dragHandle: "#dragHandle",
         position: {
-          x: offset(sKey, nodesMap.services, GROUP_COUNT + 25),
+          x: 25 + offset(sKey, nodesMap.services, GROUP_COUNT + 25),
           y: 0,
         },
         data: { audience: a },
