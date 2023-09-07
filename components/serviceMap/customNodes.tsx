@@ -55,7 +55,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 
   return (
     <div
-      class={`rounded-lg shadow-lg border-1 border-purple-200 w-[${GROUP_COUNT}px] pb-4`}
+      class={`rounded-lg shadow-lg border-1 bg-sunset border-purple-200 w-[${GROUP_COUNT}px] pb-4`}
     >
       <div id="dragHandle" class="flex flex-row items-center py-2">
         <IconGripVertical class="w-6 h-6 mx-2 text-purple-100 bg-white border border-purple-200" />
