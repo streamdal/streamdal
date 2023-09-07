@@ -9,6 +9,20 @@ import { zfd } from "https://esm.sh/v130/zod-form-data@2.0.1/denonext/zod-form-d
 import { z } from "zod/index.ts";
 import { NotificationType } from "snitch-protos/protos/sp_notify.ts";
 
+const slack = {
+  botToken: "",
+  channel: "",
+};
+
+const newNotificationConfig = {
+  name: "",
+  type: "1",
+  config: {
+    oneofKind: "slack",
+    slack: slack,
+  },
+};
+
 const NotificationTypeEnum = z.nativeEnum(NotificationType);
 
 const NotificationKindSchema = z.discriminatedUnion("oneofKind", [
@@ -39,7 +53,7 @@ export const NotificationDetail = (success: SuccessType) => {
   const e: ErrorType = {};
 
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState({});
+  const [data, setData] = useState(newNotificationConfig);
   console.log("shit", data);
 
   const onSubmit = async (e: any) => {
@@ -82,7 +96,7 @@ export const NotificationDetail = (success: SuccessType) => {
             />
             <FormHidden
               name={"config.oneofKind"}
-              value={data?.type}
+              value={data.config.oneofKind}
             />
             <h2 className="mb-6">
               In order to get Slack Alerts, you'll need to provide a Slack API
@@ -96,11 +110,11 @@ export const NotificationDetail = (success: SuccessType) => {
               </a>
               .
             </h2>
-            {data?.type === "slack" &&
+            {data?.type === "1" &&
               (
                 <>
                   <FormInput
-                    name={`config.slack.oneofKind.botToken`}
+                    name={`config.slack.botToken`}
                     data={data}
                     setData={setData}
                     label="Slack token"
@@ -108,7 +122,7 @@ export const NotificationDetail = (success: SuccessType) => {
                     errors={errors}
                   />
                   <FormInput
-                    name={`config.slack.oneofKind.channel`}
+                    name={`config.slack.channel`}
                     data={data}
                     setData={setData}
                     label="Slack Channel"
@@ -119,7 +133,7 @@ export const NotificationDetail = (success: SuccessType) => {
               )}
             <div class="flex flex-row justify-end mr-6 mb-6">
               <button className="btn-heimdal" type="submit">
-                Configure Slack
+                Configure Notifications
               </button>
             </div>
           </div>

@@ -14,7 +14,7 @@ export const NotificationConfigModal = (props: any) => {
         role="dialog"
       >
         <div class="relative w-1/2 h-full max-w-5xl">
-          <div class="relative bg-white h-1/2 rounded-lg shadow-2xl shadow-stormCloud">
+          <div class="relative bg-white h-3/4 rounded-lg shadow-2xl shadow-stormCloud">
             <div class="flex flex-col justify-between items-center px-10 py-10">
               <div class="text-[16px] font-bold">Notifications</div>
               <NotificationDetail success={props.success} />
