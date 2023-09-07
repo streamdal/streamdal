@@ -1,14 +1,74 @@
 ---
-title: Deployment
-description: Snitch deployment
+title: Snitch Deployment Guide
+metaTitle: "Step-by-step Guide for Snitch"
+description: A detailed guide to deploying Snitch Server on Kubernetes, Docker, and AWS.
 layout: ../../../layouts/MainLayout.astro
 ---
+<br />
+<br />
 
-import info from "@images/icons/info.png";
+## Helm Deployment for Snitch Server
 
-import { Notification } from "accessible-astro-components";
+Deploying Snitch Server on Kubernetes using Helm has never been easier. Follow the steps below to get your Snitch Server up and running.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+### **Pre-requisites**
+
+- Helm (version 3 or above)
+- An active Kubernetes cluster (version 1.16 or above)
+
+### **1. Add the Snitch Helm Repository**
+
+Start by adding the Snitch Helm repository:
+
+```bash
+helm repo add snitch https://streamdal.github.io/snitch/helm-charts/snitch-server
+```
+
+### **2. Update the Repositories**
+After adding, ensure you update the Helm repositories:
+
+```bash
+helm repo update
+```
+### **3. Install Snitch Server**
+With the repo added and updated, you can now install the Snitch Server:
+
+```bash
+helm install snitch snitch/snitch-server
+```
+
+### **4. Access the Snitch Console**
+
+Once installed, you might want to access the Snitch console. Forward the console port to do so:
+
+```bash
+kubectl port-forward svc/snitch-snitch-server-console 3000:3000 
+```
+
+Then open your browser and navigate to http://127.0.0.1:3000.
+
+### **5. Customizing Your Deployment with values.yaml**
+
+Snitch Helm chart comes with a set of default configurations. However, you might want to tailor the installation to your needs. This is where values.yaml comes into play.
+
+For instance, you might want to change the default authentication token or configure NATS storage.
+
+Here's a brief overview of what you can configure:
+
+* Image Settings: Like the repository, pull policy, and tag.
+* Service Ports: Define ports for the Server, gRPC, and Envoy.
+* Ingress Settings: Customize ingress for the main server and the console.
+* Environment Variables: Set specific environment variables such as authentication tokens.
+* NATS Configuration: Configure JetStream and Memory/File storage settings for NATS.
+
+
+To customize, create a values.yaml file, define your settings, and then deploy using:
+
+```bash
+helm install [RELEASE_NAME] snitch/snitch-server -f values.yaml
+```
+
+For a detailed list of all configuration options, refer to the default values.yaml file provided in the Helm chart.
+
+## Final Thoughts
+Deploying Snitch Server with Helm allows for a streamlined Kubernetes deployment, and with the flexibility of the values.yaml file, you can adjust the installation to perfectly fit your environment and requirements.

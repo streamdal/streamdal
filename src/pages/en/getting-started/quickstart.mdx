@@ -1,14 +1,34 @@
 ---
-title: Quickstart
-description: Snitch Quickstart
+title: What is Snitch?
+metaTitle: "Understanding the Core of Snitch"
+description: Dive deeper into what makes Snitch unique.
 layout: ../../../layouts/MainLayout.astro
 ---
+<br />
+<br />
+Snitch handles real-time data management and security. Its core functionality revolves around not only ensuring the integrity of data but also implementing transformations seamlessly within the data stream, optimizing costs and efficiency. Let's dive deeper into its core features.
 
-import info from "@images/icons/info.png";
+## PII Detection
 
-import { Notification } from "accessible-astro-components";
+Protecting personal and sensitive data is paramount. Snitch's **PII Detection** capabilities scan real-time data streams to identify and manage Personally Identifiable Information (PII). Be it a stray email address, a credit card number, or any sensitive piece of information; Snitch is ever-vigilant.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+## Transformations: In-Broker Data Adjustments
+
+Instead of redirecting data to third-party systems for adjustment, Snitch innovatively allows developers to deploy their transformation logic directly to the data's source. This revolutionary approach is akin to fitting a water purifier directly within the water tank.
+
+Benefits:
+- **Cost Savings**: By eliminating the constant transfer of data between storage and computation, costs are significantly reduced.
+- **Reduced Latency**: Direct transformations mean less waiting time, resulting in real-time or near-real-time data adjustments.
+- **Minimized Overhead**: With fewer systems in the chain, there's less overhead to manage and maintain.
+
+While the concept appears streamlined on paper, its true brilliance lies in its execution. Implementing this approach reliably, securely, and efficiently is what sets Snitch apart.
+
+## Quarantine Actions
+
+Data anomalies or inadvertent transmission of sensitive information is a real concern in real-time data streams. Snitch's **Quarantine** capability ensures this data doesn't make its way to unintended recipients. By quarantining suspicious or non-compliant data in real-time, Snitch provides a vital protective layer.
+
+---
+
+Embarking on your journey with Snitch means setting a gold standard for data integrity, privacy, and compliance in real-time streams. With a foundation built on innovation and efficiency, you're always a step ahead.
+
+Continue exploring to see how Snitch can redefine your real-time data processes.

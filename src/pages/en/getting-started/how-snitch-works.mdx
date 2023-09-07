@@ -1,14 +1,31 @@
 ---
-title: How Snitch Works
-description: How Snitch Works
+title: How Snitch Works?
+metaTitle: "Peeling Back the Layers of Snitch's Operations"
+description: A deep dive into the intricacies of Snitch's operational mechanics.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+<br />
+<br />
+Understanding Snitch is to understand the synergy between sophisticated rule generation and real-time SDK integration. Snitch operates on a premise of dynamic rule creation, timely synchronization, and instantaneous data management.
 
-import { Notification } from "accessible-astro-components";
+## Snitch Server: The Heart of Rule Creation
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+At the core of the ecosystem is the Snitch server, which you deploy directly on your network. This isn't just any server; it's a powerhouse designed to allow end-users to sculpt rules tailored to specific needs.
+
+The genius of Snitch server lies in its ability to convert these crafted rules into **WebAssembly (WASM)**. This transformation into WASM ensures that rules are not only lightweight and portable but also executed at near-native speed, making real-time data transformations and operations a reality.
+
+## SDK: The Conduit of Compliance
+
+The Snitch SDK, adaptable and vigilant, is an active participant in the dance of data management. Rather than being a passive element, the SDK pulls the WASM-compiled rules from the Snitch server at frequent intervals, ensuring it's always equipped with the most updated directives.
+
+With the rules in tow, the SDK provides capabilities like:
+
+- **On-the-fly Transformations**: Modify and adjust data in real-time based on the latest rules without external dependencies.
+- **PII Detection**: Swiftly identify and manage sensitive information, ensuring data privacy is never compromised.
+- **Data Reliability**: By enforcing the latest rules, ensure the integrity and consistency of data throughout its lifecycle.
+- **Access Control**: Based on the rules, the SDK can determine and restrict who can consume and access the data, fortifying data security.
+
+---
+
+The fusion of the Snitch server's rule generation prowess with the SDK's execution capabilities births a system where data security, transformation, and compliance are not just buzzwords—they are tangible results. Dive deeper to understand each component in detail and unlock the full potential of Snitch in your operations.
