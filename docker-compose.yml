@@ -7,5 +7,6 @@ services:
     image: snitch-console-image
     environment:
       - SNITCH_GRPC_WEB_URL="http://127.0.0.1:9091"
+      - SNITCH_GRPC_AUTH_TOKEN="1234"
     ports:
       - "3000:3000"

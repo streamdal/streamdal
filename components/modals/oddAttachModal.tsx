@@ -3,11 +3,11 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { ServiceMapType } from "../../lib/fetch.ts";
+import { ServiceMapper } from "../../lib/fetch.ts";
 import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 
 export const OddAttachModal = (
-  { serviceMap }: { serviceMap: ServiceMapType },
+  { serviceMap }: { serviceMap: ServiceMap },
 ) => {
   const audience = opModal.value.audience;
   const attachedPipeline = opModal.value.attachedPipeline;

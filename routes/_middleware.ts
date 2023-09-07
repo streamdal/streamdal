@@ -4,7 +4,7 @@ import {
   WithSession,
 } from "https://deno.land/x/fresh_session@0.2.2/mod.ts";
 import { ErrorType } from "../components/form/validate.ts";
-import { ServiceMapType } from "../lib/fetch.ts";
+import { ServiceMapper } from "../lib/serviceMapper.ts";
 
 export type SuccessType = {
   status: boolean;
@@ -17,16 +17,23 @@ export type SuccessRoute = {
 };
 
 //
-// TODO; move to env
-Deno.env.set("APP_KEY", "dayroom-tingling-movable-flatly");
+// ensure session key is present
+!Deno.env.get("APP_KEY") && Deno.env.set("APP_KEY", crypto.randomUUID());
 
 export type State =
-  & { success: SuccessType; serviceMap: ServiceMapType }
+  & { success: SuccessType; serviceMap: ServiceMapper }
   & WithSession;
 
 const session = cookieSession();
 
 const sessionHandler = (req: Request, ctx: MiddlewareHandlerContext<State>) => {
-  return session(req, ctx as any);
+  const { pathname } = new URL(req.url);
+  if (
+    pathname.includes("/ws/")
+  ) {
+    return ctx.next();
+  } else {
+    return session(req, ctx as any);
+  }
 };
 export const handler = [sessionHandler];
