@@ -1,13 +1,12 @@
 import { SuccessType } from "../_middleware.ts";
 import { Handlers } from "$fresh/src/server/types.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { ErrorType, validate } from "../../components/form/validate.ts";
-import { NotificationSchema } from "../../components/modals/notificationConfigModal.tsx";
+import { logFormData } from "../../lib/utils.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const notificationData = await req.formData();
-
+    logFormData(notificationData);
     const { data: notification, errors }: {
       pipeline: Pipeline;
       errors: ErrorType;
@@ -15,6 +14,23 @@ export const handler: Handlers<SuccessType> = {
       NotificationSchema,
       notificationData,
     );
+
+    const { session } = ctx.state;
+
+    if (errors) {
+      session.set("success", {
+        status: false,
+        message: "Validation failed",
+        errors,
+      });
+      return new Response(
+        "",
+        {
+          status: 307,
+          headers: { Location: `/notifications` },
+        },
+      );
+    }
   },
 };
 

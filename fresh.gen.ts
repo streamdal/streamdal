@@ -18,10 +18,11 @@ import * as $12 from "./routes/service/[service]/component/[component]/[operatio
 import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
 import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
 import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $$0 from "./islands/opModal.tsx";
-import * as $$1 from "./islands/pipeline.tsx";
-import * as $$2 from "./islands/pipelines.tsx";
-import * as $$3 from "./islands/serviceMap.tsx";
+import * as $$0 from "./islands/notifications.tsx";
+import * as $$1 from "./islands/opModal.tsx";
+import * as $$2 from "./islands/pipeline.tsx";
+import * as $$3 from "./islands/pipelines.tsx";
+import * as $$4 from "./islands/serviceMap.tsx";
 
 const manifest = {
   routes: {
@@ -47,10 +48,11 @@ const manifest = {
       $15,
   },
   islands: {
-    "./islands/opModal.tsx": $$0,
-    "./islands/pipeline.tsx": $$1,
-    "./islands/pipelines.tsx": $$2,
-    "./islands/serviceMap.tsx": $$3,
+    "./islands/notifications.tsx": $$0,
+    "./islands/opModal.tsx": $$1,
+    "./islands/pipeline.tsx": $$2,
+    "./islands/pipelines.tsx": $$3,
+    "./islands/serviceMap.tsx": $$4,
   },
   baseUrl: import.meta.url,
 };

@@ -81,7 +81,6 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 
 export const OperationNode = ({ data }: { data: NodeData }) => {
   const toolTipId = removeWhitespace(data.audience.operationName);
-  console.log(data.clients);
 
   return (
     <div class="h-[96px]">
