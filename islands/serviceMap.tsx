@@ -35,6 +35,8 @@ const serialize = async (instance: any) => {
   localStorage.setItem(LAYOUT_KEY, JSON.stringify(instance.toObject()));
 };
 
+//
+// Todo updates in the ui need some work
 export const updateNodes = (
   nodes: FlowNode[],
   nodesMap: Map<string, FlowNode>,
@@ -129,8 +131,10 @@ export default function ServiceMapComponent(
 
   useSignalEffect(() => {
     if (serviceSignal.value) {
-      setNodes(updateNodes(nodes, serviceSignal.value.nodesMap));
-      setEdges(updateEdges(edges, serviceSignal.value.edgesMap));
+      serviceSignal.value.nodesMap &&
+        setNodes(Array.from(serviceSignal.value.nodesMap.values()));
+      serviceSignal.value.edgesMap &&
+        setEdges(Array.from(serviceSignal.value.edgesMap.values()));
     }
   });
 
