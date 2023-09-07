@@ -102,11 +102,14 @@ export const createNotification = async (
   notificationConfig: NotificationConfig,
 ) => {
   try {
-    const request: CreateNotificationRequest = { notificationConfig };
+    const request: CreateNotificationRequest = {
+      notification: notificationConfig,
+    };
     const { response } = await client.createNotification(
       request,
       meta,
     );
+    console.log(response);
     return response;
   } catch (error) {
     console.error("error configuring notifications", error);

@@ -35,6 +35,8 @@ export const handler: Handlers<SuccessType> = {
                 },
             );
         }
+        console.log("notification", notification);
+
         const response = await createNotification(notification);
 
         session.set("success", {
@@ -43,7 +45,7 @@ export const handler: Handlers<SuccessType> = {
                 ? "Success!"
                 : "Configure notification failed. Please try again later",
             ...response.code !== ResponseCode.OK
-                ? {errors: {apiError: response.message}}
+                ? {errors: {apiError: response.message, status: response.code}}
                 : {},
         });
 

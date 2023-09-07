@@ -53,6 +53,8 @@ export const NotificationDetail = (success: SuccessType) => {
 
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState(newNotificationConfig);
+  console.log(data);
+  console.log(NotificationType[data?.type]);
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
@@ -77,7 +79,7 @@ export const NotificationDetail = (success: SuccessType) => {
               name="name"
               data={data}
               setData={setData}
-              label="Notification Label"
+              label="Notification Name"
               placeHolder=""
               errors={errors}
             />
@@ -92,23 +94,23 @@ export const NotificationDetail = (success: SuccessType) => {
             />
             <FormHidden
               name={"config.oneofKind"}
-              value={data.config.oneofKind}
+              value={NotificationType[data?.type].toLowerCase()}
             />
-            <h2 className="mb-6">
-              In order to get Slack Alerts, you'll need to provide a Slack API
-              token. To generate a token, follow the instructions{" "}
-              <a
-                href="https://api.slack.com/tutorials/tracks/getting-a-token"
-                target="_new"
-                className="underline underline-offset-2"
-              >
-                here
-              </a>
-              .
-            </h2>
             {data?.type === "1" &&
               (
                 <>
+                  <h2 className="mb-6">
+                    In order to get Slack Alerts, you'll need to provide a Slack
+                    API token. To generate a token, follow the instructions{" "}
+                    <a
+                      href="https://api.slack.com/tutorials/tracks/getting-a-token"
+                      target="_new"
+                      className="underline underline-offset-2"
+                    >
+                      here
+                    </a>
+                    .
+                  </h2>
                   <FormInput
                     name={`config.slack.botToken`}
                     data={data}
@@ -128,7 +130,13 @@ export const NotificationDetail = (success: SuccessType) => {
                 </>
               )}
             <div class="flex flex-row justify-end mr-6 mb-6">
-              <button className="btn-heimdal" type="submit">
+              <button
+                className={`btn-heimdal ${
+                  data.type !== "1" && "bg-gray-200 hover:bg-gray-200"
+                }`}
+                type="submit"
+                disabled={data.config.oneofKind !== "slack"}
+              >
                 Configure Notifications
               </button>
             </div>

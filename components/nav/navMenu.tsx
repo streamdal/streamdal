@@ -1,5 +1,6 @@
 import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
+import IconBell from "tabler-icons/tsx/bell.tsx";
 
 export const NavMenu = () => {
   return (
@@ -44,6 +45,15 @@ export const NavMenu = () => {
             >
               <IconListCheck class="w-6 h-6 text-gray-500" />
               <span class="ml-3">Pipelines</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/notifications"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group"
+            >
+              <IconBell class="w-6 h-6 text-gray-500" />
+              <span class="ml-3">Notifications</span>
             </a>
           </li>
           <li class="cursor-not-allowed">
