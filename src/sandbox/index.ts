@@ -130,4 +130,101 @@ export const exampleConcurrent = async () => {
   void logTest(snitchB, audienceBProducer, exampleData);
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
+export const exampleMultipleGroup = async () => {
+  const snitchA = new Snitch(serviceAConfig);
+  const snitchB = new Snitch(serviceBConfig);
+
+  void logTest(snitchA, audienceAConsumer, exampleData);
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+    exampleData
+  );
+  void logTest(snitchA, audienceAProducer, exampleData);
+  void logTest(snitchB, audienceBConsumer, exampleData);
+  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(
+    snitchB,
+    { ...audienceBProducer, operationName: "kafka-producer-two" },
+    exampleData
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export const exampleMultipleComponentsPerService = async () => {
+  const snitchA = new Snitch(serviceAConfig);
+  const snitchB = new Snitch(serviceBConfig);
+
+  void logTest(snitchA, audienceAConsumer, exampleData);
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData
+  );
+  void logTest(snitchA, audienceAProducer, exampleData);
+  void logTest(snitchB, audienceBConsumer, exampleData);
+  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(
+    snitchB,
+    { ...audienceBProducer, componentName: "kafka" },
+    exampleData
+  );
+};
+
+export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async () => {
+    const snitchA = new Snitch(serviceAConfig);
+    const snitchB = new Snitch(serviceBConfig);
+
+    setInterval(() => {
+      void logTest(snitchA, audienceAConsumer, exampleData);
+    }, 2000);
+
+    setInterval(() => {
+      void logTest(
+        snitchA,
+        { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+        exampleData
+      );
+    }, 4000);
+
+    setInterval(() => {
+      void logTest(
+        snitchA,
+        { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+        exampleData
+      );
+    }, 6000);
+
+    setInterval(() => {
+      void logTest(
+        snitchA,
+        { ...audienceAConsumer, componentName: "another-kafka" },
+        exampleData
+      );
+    }, 8000);
+
+    setInterval(() => {
+      void logTest(snitchA, audienceAProducer, exampleData);
+    }, 10000);
+
+    setInterval(() => {
+      void logTest(snitchB, audienceBConsumer, exampleData);
+    }, 12000);
+
+    setInterval(() => {
+      void logTest(snitchB, audienceBProducer, exampleData);
+    }, 14000);
+
+    setInterval(() => {
+      void logTest(
+        snitchB,
+        { ...audienceBProducer, componentName: "kafka" },
+        exampleData
+      );
+    }, 16000);
+  };
+
 void exampleStaggered();
