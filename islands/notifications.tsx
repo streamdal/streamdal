@@ -32,6 +32,7 @@ const NotificationKindSchema = z.discriminatedUnion("oneofKind", [
       channel: z.string().min(1, { message: "Required" }),
     }),
   }),
+  //TO DO: set up email and pager configs
   z.object({
     oneofKind: z.literal("email"),
     email: z.object({
@@ -54,7 +55,8 @@ export const NotificationDetail = (success: SuccessType) => {
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState(newNotificationConfig);
   console.log(data);
-  console.log(NotificationType[data?.type]);
+  console.log(NotificationType[data?.type].toLowerCase());
+  console.log(data);
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
@@ -72,7 +74,7 @@ export const NotificationDetail = (success: SuccessType) => {
       action="/notifications/configure"
       method="post"
     >
-      <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
+      <div class="flex justify-between rounded-t items-center min-w-full px-[18px] pt-[18px] pb-[8px]">
         <div class="flex flex-row items-center">
           <div class="text-[16px] font-medium mr-2 h-[54px]">
             <FormInput
@@ -93,13 +95,13 @@ export const NotificationDetail = (success: SuccessType) => {
               children={optionsFromEnum(NotificationType)}
             />
             <FormHidden
-              name={"config.oneofKind"}
+              name={`config.oneofKind`}
               value={NotificationType[data?.type].toLowerCase()}
             />
             {data?.type === "1" &&
               (
                 <>
-                  <h2 className="mb-6">
+                  <h2 className="mb-6 w-full">
                     In order to get Slack Alerts, you'll need to provide a Slack
                     API token. To generate a token, follow the instructions{" "}
                     <a
@@ -131,15 +133,23 @@ export const NotificationDetail = (success: SuccessType) => {
               )}
             <div class="flex flex-row justify-end mr-6 mb-6">
               <button
-                className={`btn-heimdal ${
-                  data.type !== "1" && "bg-gray-200 hover:bg-gray-200"
+                className={`${
+                  data.type === "1" ? "btn-heimdal" : "btn-disabled"
                 }`}
                 type="submit"
-                disabled={data.config.oneofKind !== "slack"}
+                disabled={data.type !== "1"}
               >
                 Configure Notifications
               </button>
             </div>
+            {data.type !== "1" && (
+              <p class="text-center">
+                {`Notifications for ${
+                  NotificationType[data?.type].toLowerCase()
+                } coming soon!`} <br />{" "}
+                Please choose a different notification method.
+              </p>
+            )}
           </div>
         </div>
       </div>

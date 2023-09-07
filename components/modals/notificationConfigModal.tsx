@@ -21,8 +21,8 @@ export const NotificationConfigModal = ({ success }: SuccessType) => {
         class="absolute mt-12 z-40 w-full h-full px-4 py-2 overflow-x-hidden overflow-y-hidden max-h-full justify-center items-center flex"
         role="dialog"
       >
-        <div class="relative w-1/2 h-full min-w-[400px] max-w-5xl">
-          <div class="flex relative bg-white h-3/4 rounded-lg shadow-2xl shadow-stormCloud">
+        <div class="relative h-full w-[600px] min-w-[400px] max-w-5xl">
+          <div class="flex justify-center relative bg-white h-3/4 rounded-lg shadow-2xl shadow-stormCloud">
             <a
               href="/"
               className="flex justify-center items-center absolute right-0 w-10 h-10"
@@ -49,7 +49,7 @@ export const NotificationConfigModal = ({ success }: SuccessType) => {
                 <span class="sr-only">Close modal</span>
               </button>
             </a>
-            <div class="flex flex-col items-center px-10 py-10">
+            <div class="flex flex-col min-w-full items-center px-10 py-10">
               <div class="text-[16px] font-bold mb-3">Notifications</div>
               <NotificationDetail success={success} />
             </div>
