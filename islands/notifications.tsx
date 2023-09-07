@@ -4,7 +4,6 @@ import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { ErrorType, validate } from "../components/form/validate.ts";
 import { useState } from "preact/hooks";
-import { logFormData } from "../lib/utils.ts";
 import { zfd } from "https://esm.sh/v130/zod-form-data@2.0.1/denonext/zod-form-data.mjs";
 import { z } from "zod/index.ts";
 import { NotificationType } from "snitch-protos/protos/sp_notify.ts";
@@ -54,16 +53,13 @@ export const NotificationDetail = (success: SuccessType) => {
 
   const [errors, setErrors] = useState(e);
   const [data, setData] = useState(newNotificationConfig);
-  console.log("shit", data);
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
-    logFormData(notificationFormData);
     const { errors } = validate(NotificationSchema, notificationFormData);
     setErrors(errors || {});
 
     if (errors) {
-      console.log("there was an error");
       e.preventDefault();
       return;
     }

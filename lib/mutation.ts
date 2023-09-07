@@ -7,9 +7,11 @@ import { client, meta } from "./grpc.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import {
   AttachPipelineRequest,
+  CreateNotificationRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
 } from "snitch-protos/protos/sp_external.ts";
+import { NotificationConfig } from "snitch-protos/protos/sp_notify.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;
@@ -90,6 +92,26 @@ export const detachPipeline = async (
     console.error("error detaching pipeline", error);
     return {
       id: "detachPipelineRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const createNotification = async (
+  notificationConfig: NotificationConfig,
+) => {
+  try {
+    const request: CreateNotificationRequest = { notificationConfig };
+    const { response } = await client.createNotification(
+      request,
+      meta,
+    );
+    return response;
+  } catch (error) {
+    console.error("error configuring notifications", error);
+    return {
+      id: "configNotificationRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };

@@ -8,13 +8,10 @@ export const validate = <T>(
   schema: ZodSchema<T>,
   data: FormData,
 ): { data: z.infer<typeof schema> | null; errors: ErrorType | null } => {
-  // console.log("schema: ", schema, "data: ", data);
-
   try {
     const validated = schema.parse(data);
     return { data: validated, errors: null };
   } catch (error: any) {
-    console.log("a fucking error: ", error);
     const errors = error?.issues?.reduce(
       (o: any, e: ZodIssue) => ({ ...o, [e.path.join(".")]: e.message }),
       {},

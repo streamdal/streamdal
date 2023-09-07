@@ -201,7 +201,6 @@ const PipelineDetail = (
 ) => {
   const [open, setOpen] = useState([0]);
   const [deleteOpen, setDeleteOpen] = useState(null);
-  console.log("fuck", pipeline);
 
   //
   // typing the initializer to force preact useState hooks to
@@ -216,7 +215,6 @@ const PipelineDetail = (
       dragOrder: i,
     })),
   });
-  console.log("hellish", data);
 
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);
