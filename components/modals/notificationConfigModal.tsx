@@ -3,8 +3,6 @@ import { NotificationDetail } from "../../islands/notifications.tsx";
 import { SuccessType } from "../../routes/_middleware.ts";
 
 export const NotificationConfigModal = ({ success }: SuccessType) => {
-  console.log(success);
-
   if (success?.message) {
     toastSignal.value = {
       id: "notifications",
