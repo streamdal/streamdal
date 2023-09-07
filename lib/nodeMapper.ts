@@ -1,7 +1,6 @@
 import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { ClientInfo } from "snitch-protos/protos/sp_info.ts";
-import { ServiceMapType } from "./fetch.ts";
 import {
   audienceKey,
   componentKey,
@@ -12,12 +11,18 @@ import {
 } from "./utils.ts";
 import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
+import { ServiceMapper } from "./serviceMapper.ts";
+import { GROUP_COUNT } from "../components/serviceMap/customNodes.tsx";
 
-export type NodeData = {
+export type Operation = {
   audience: Audience;
   attachedPipeline?: Pipeline;
   clients?: ClientInfo[];
-  groupCount?: number;
+};
+
+export type NodeData = {
+  audience: Audience;
+  ops?: Operation[];
 };
 
 export type FlowNode = {
@@ -37,17 +42,6 @@ export type FlowNode = {
   style?: any;
 };
 
-type GroupCountKey = "producer" | "consumer";
-export type GroupCount = { [key in GroupCountKey]: number };
-
-//
-// the service map is used for x-axis offset layout positions and
-// group counts per service are used for y-axix offset layout positions
-export type NodesMap = {
-  nodes: Map<string, FlowNode>;
-  services: Map<string, GroupCount>;
-};
-
 export type FlowEdge = {
   id: string;
   source: string;
@@ -56,106 +50,148 @@ export type FlowEdge = {
   style: any;
 };
 
-export const xOffset = (
-  audience: Audience,
-  services: Map<string, GroupCount>,
-) => Array.from(services.keys()).indexOf(serviceKey(audience)) * 800;
+//
+// This is heart of our homegrown layouts:
+// * operationGroups max determines component node y axis offsets
+// * group counts per service determine service node x axis offsets
+// * group counts per component determine component node x axis offsets
+export type NodesMap = {
+  nodes: Map<string, FlowNode>;
+  //
+  // number is operation groups per component
+  components: Map<string, number>;
+  //
+  // number is operation groups per service
+  services: Map<string, number>;
+  operationGroups: Map<string, number>;
+};
+
+//
+// Start from the hard offset of all the previous group widths,
+// then roughly center it in it's own group cluster
+export const offset = (
+  key: string,
+  item: Map<string, number>,
+  multiplier: number,
+) => {
+  let offset = 0;
+  for (const [k, v] of item) {
+    if (k === key) {
+      break;
+    }
+    offset += v * multiplier;
+  }
+
+  return offset + ((item.get(key) || 0) * GROUP_COUNT) / 2;
+};
 
 export const mapOperation = (
   nodesMap: NodesMap,
   a: Audience,
-  serviceMap: ServiceMapType,
+  serviceMap: ServiceMapper,
 ) => {
-  const op = OperationType[a.operationType].toLowerCase() as GroupCountKey;
-  const groupCount = nodesMap.services.get(serviceKey(a))!;
-  groupCount.producer = groupCount.producer + (op === "producer" ? 1 : 0);
-  groupCount.consumer = groupCount.consumer + (op === "consumer" ? 1 : 0);
-  nodesMap.services.set(serviceKey(a), groupCount);
+  const gKey = groupKey(a);
+  nodesMap.operationGroups.set(
+    gKey,
+    (nodesMap.operationGroups.get(gKey) || 0) + 1,
+  );
+  const op = OperationType[a.operationType].toLowerCase();
+  const node = nodesMap.nodes.get(gKey);
 
-  nodesMap.nodes.set(groupKey(a), {
-    id: groupKey(a),
-    type: `${op}Group`,
-    sourcePosition: "right",
-    targetPosition: "left",
-    dragHandle: "#dragHandle",
-    position: {
-      x: (op === "consumer" ? 25 : 350) + xOffset(a, nodesMap.services),
-      y: 200,
-    },
-    data: {
-      audience: a,
-      groupCount: groupCount[op],
-    },
-  });
-
-  nodesMap.nodes.set(operationKey(a), {
-    id: operationKey(a),
-    draggable: false,
-    type: op,
-    position: {
-      x: 10,
-      y: 38 + ((groupCount[op] - 1) * 80),
-    },
-    parentNode: groupKey(a),
-    extent: "parent",
-    data: {
-      audience: a,
-      clients: serviceMap.liveAudiences.get(audienceKey(a)),
-      attachedPipeline: getAttachedPipeline(
-        a,
-        serviceMap.pipelines,
-        serviceMap.config,
-      ),
-    },
-  });
+  if (node) {
+    nodesMap.nodes.set(gKey, {
+      ...node,
+      data: {
+        ...node.data,
+        ops: [...node.data.ops!, {
+          audience: a,
+          clients: serviceMap.liveAudiences.get(audienceKey(a)),
+          attachedPipeline: getAttachedPipeline(
+            a,
+            serviceMap.pipelines,
+            serviceMap.config,
+          ),
+        }] as Operation[],
+      },
+    });
+  } else {
+    const sKey = serviceKey(a);
+    const cKey = componentKey(a);
+    nodesMap.services.set(sKey, (nodesMap.services.get(sKey) || 0) + 1);
+    nodesMap.components.set(cKey, (nodesMap.components.get(cKey) || 0) + 1);
+    nodesMap.nodes.set(gKey, {
+      id: gKey,
+      type: `${op}Group`,
+      dragHandle: "#dragHandle",
+      position: {
+        x: nodesMap.operationGroups.size === 1
+          ? 25
+          : (nodesMap.operationGroups.size - 1) * 325,
+        y: 200,
+      },
+      data: {
+        audience: a,
+        ops: [{
+          audience: a,
+          clients: serviceMap.liveAudiences.get(audienceKey(a)),
+          attachedPipeline: getAttachedPipeline(
+            a,
+            serviceMap.pipelines,
+            serviceMap.config,
+          ),
+        }],
+      },
+    });
+  }
 };
 
 export const mapNodes = (
-  serviceMap: ServiceMapType,
-): NodesMap => {
-  const nodesMap = {
+  serviceMap: ServiceMapper,
+): Map<string, FlowNode> => {
+  const nodesMap: NodesMap = {
     nodes: new Map<string, FlowNode>(),
-    services: new Map<string, GroupCount>(),
+    components: new Map(),
+    services: new Map(),
+    operationGroups: new Map(),
   };
 
-  serviceMap.audiences.forEach((a: Audience) => {
-    if (!nodesMap.services.has(serviceKey(a))) {
-      nodesMap.services.set(serviceKey(a), { producer: 0, consumer: 0 });
-    }
+  serviceMap.audiences.sort((a, b) =>
+    a.serviceName.localeCompare(b.serviceName) ||
+    a.operationType - b.operationType
+  ).forEach(
+    (a: Audience) => {
+      const sKey = serviceKey(a);
+      const cKey = componentKey(a);
 
-    nodesMap.nodes.set(serviceKey(a), {
-      id: serviceKey(a),
-      type: "service",
-      dragHandle: "#dragHandle",
-      position: { x: 150 + xOffset(a, nodesMap.services), y: 0 },
-      data: { audience: a },
-    });
+      nodesMap.nodes.set(sKey, {
+        id: sKey,
+        type: "service",
+        dragHandle: "#dragHandle",
+        position: {
+          x: 25 + offset(sKey, nodesMap.services, GROUP_COUNT + 25),
+          y: 0,
+        },
+        data: { audience: a },
+      });
 
-    mapOperation(nodesMap, a, serviceMap);
+      mapOperation(nodesMap, a, serviceMap);
 
-    //
-    // guaranteed to be initialized above
-    const groupCount = nodesMap.services.get(serviceKey(a))!;
-    const count = Math.max(
-      groupCount["producer"] || 1,
-      groupCount["consumer"] || 1,
-    );
+      const max = Math.max(...Array.from(nodesMap.operationGroups.values()));
 
-    nodesMap.nodes.set(a.componentName, {
-      id: componentKey(a),
-      type: "component",
-      sourcePosition: "right",
-      targetPosition: "left",
-      dragHandle: "#dragHandle",
-      position: {
-        x: 240 + xOffset(a, nodesMap.services),
-        y: 350 + (count - 1) * 76,
-      },
-      data: { audience: a },
-    });
-  });
+      nodesMap.nodes.set(cKey, {
+        id: cKey,
+        type: "component",
+        dragHandle: "#dragHandle",
+        position: {
+          x: offset(cKey, nodesMap.components, GROUP_COUNT),
+          y: 450 + (max - 1) * 76,
+        },
+        data: { audience: a },
+      });
+    },
+  );
 
-  return nodesMap;
+  return nodesMap.nodes;
 };
 
 //
@@ -167,8 +203,8 @@ export const mapEdgePair = (
   a: Audience,
 ): Map<string, FlowEdge> => {
   const op = OperationType[a.operationType].toLowerCase();
-  edgesMap.set(`${componentKey(a)}-${op}-edge`, {
-    id: `${componentKey(a)}-${op}-edge`,
+  edgesMap.set(`${componentKey(a)}-${groupKey(a)}-edge`, {
+    id: `${componentKey(a)}-${groupKey(a)}-edge`,
     ...op === "consumer"
       ? {
         source: componentKey(a),
@@ -190,8 +226,8 @@ export const mapEdgePair = (
     },
   });
 
-  edgesMap.set(`${serviceKey(a)}-${op}-edge`, {
-    id: `${serviceKey(a)}-${op}-edge`,
+  edgesMap.set(`${serviceKey(a)}-${groupKey(a)}-edge`, {
+    id: `${serviceKey(a)}-${groupKey(a)}-edge`,
     ...op === "consumer"
       ? {
         source: groupKey(a),
