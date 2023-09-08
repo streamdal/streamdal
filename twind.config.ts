@@ -80,6 +80,18 @@ export default {
         },
       };
     },
+    "btn-disabled": () => {
+      return {
+        width: "137px",
+        height: "47px",
+        borderRadius: "4px",
+        fontWeight: "bold",
+        fontSize: "14px",
+        color: "#424242",
+        background: "#EEEEEE",
+        cursor: "not-allowed",
+      };
+    },
     "btn-dark": () => {
       return {
         width: "137px",
