@@ -1,4 +1,9 @@
-import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
+import ReactFlow, {
+  Background,
+  ReactFlowInstance,
+  useEdgesState,
+  useNodesState,
+} from "reactflow";
 import "flowbite";
 import {
   ComponentNode,
@@ -11,7 +16,8 @@ import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { OP_MODAL_WIDTH } from "./opModal.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -85,6 +91,10 @@ export default function ServiceMapComponent(
     blur?: boolean;
   },
 ) {
+  const wrapper = useRef(null);
+
+  const [rfInstance, setRfInstance] = useState(null);
+
   useEffect(() => {
     const url = new URL("./ws/service-map", location.href);
     url.protocol = url.protocol.replace("http", "ws");
@@ -129,20 +139,42 @@ export default function ServiceMapComponent(
     }
   });
 
+  const fit = (nodes: FlowNode[], rfInstance) => {
+    const { right } = wrapper?.current?.getBoundingClientRect();
+    if (
+      right && rfInstance && nodes.find((n: FlowNode) => n.position.x > right)
+    ) {
+      //
+      // TODO, use useNodesInitialized instead of a timeout hack,
+      // which doesn't currently work in our deno fresh setup
+      setTimeout(() => rfInstance.fitView(), 100);
+    }
+  };
+
   useSignalEffect(() => {
     if (serviceSignal.value) {
-      serviceSignal.value.nodesMap &&
-        setNodes(Array.from(serviceSignal.value.nodesMap.values()));
+      const nodes: FlowNode[] = Array.from(
+        serviceSignal.value.nodesMap.values(),
+      );
+      setNodes(Array.from(serviceSignal.value.nodesMap.values()));
       serviceSignal.value.edgesMap &&
         setEdges(Array.from(serviceSignal.value.edgesMap.values()));
+
+      fit(nodes, rfInstance);
     }
   });
 
   return (
     <div
-      class={`w-full h-screen m-0 ${blur ? "filter blur-sm" : ""}`}
+      class={`w-full h-screen m-0 ${
+        blur ? "filter blur-sm" : ""
+      } w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+      ref={wrapper}
     >
       <ReactFlow
+        onInit={(reactFlowInstance: ReactFlowInstance) => {
+          setRfInstance(reactFlowInstance, fit(nodes, reactFlowInstance));
+        }}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}

@@ -20,6 +20,8 @@ import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useState } from "preact/hooks";
 import { useSignalEffect } from "@preact/signals";
 
+export const OP_MODAL_WIDTH = "80px";
+
 export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
 ) {
@@ -52,7 +54,7 @@ export default function OpModal(
       )}
       <div
         class={`fixed z-50 h-screen top-0 right-0 transition-transform ${
-          !isOpen && "translate-x-full right-[80px]"
+          !isOpen && `translate-x-full right-[${OP_MODAL_WIDTH}]`
         } flex flex-row justify-end items-start`}
       >
         {(opModal.value?.attach && isOpen) && (
