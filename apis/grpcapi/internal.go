@@ -371,6 +371,14 @@ func (s *InternalServer) GetAttachCommandsByService(
 }
 
 func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
+	// This isn't necessary for go, but other langauge libraries, such as python
+	// require a response to eventually be sent and will throw an exception if
+	// one is not received
+	defer srv.SendAndClose(&protos.StandardResponse{
+		Id:   util.CtxRequestId(srv.Context()),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+	})
+
 	for {
 		select {
 		case <-srv.Context().Done():
