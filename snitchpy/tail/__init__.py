@@ -35,12 +35,11 @@ class Tail:
         self.snitch_url = snitch_url
 
     def tail_iterator(self):
-        while True:
+        while not self.exit.is_set():
             try:
                 yield self.queue.get(timeout=1)
             except Empty:
-                if self.exit.is_set():
-                    return
+                pass
 
     def start_tail_workers(self):
         for i in range(NUM_TAIL_WORKERS):
