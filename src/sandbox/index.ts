@@ -46,6 +46,15 @@ const serviceBConfig: SnitchConfigs = {
   dryRun: false,
 };
 
+const serviceCConfig: SnitchConfigs = {
+  snitchUrl: "localhost:9091",
+  snitchToken: "1234",
+  serviceName: "third-service",
+  pipelineTimeout: "100",
+  stepTimeout: "10",
+  dryRun: false,
+};
+
 const audienceAConsumer: Audience = {
   serviceName: "test-service",
   componentName: "kafka",
@@ -72,6 +81,20 @@ const audienceBProducer: Audience = {
   componentName: "another-kafka",
   operationType: OperationType.PRODUCER,
   operationName: "test-kafka-producer",
+};
+
+const audienceCConsumer: Audience = {
+  serviceName: "third-service",
+  componentName: "third-kafka",
+  operationType: OperationType.CONSUMER,
+  operationName: "kafka-consumer",
+};
+
+const audienceCProducer: Audience = {
+  serviceName: "third-service",
+  componentName: "third-kafka",
+  operationType: OperationType.PRODUCER,
+  operationName: "kafka-consumer",
 };
 
 const logTest = async (snitch: any, audience: Audience, input: any) => {
@@ -177,6 +200,7 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
   async () => {
     const snitchA = new Snitch(serviceAConfig);
     const snitchB = new Snitch(serviceBConfig);
+    const snitchC = new Snitch(serviceCConfig);
 
     setInterval(() => {
       void logTest(snitchA, audienceAConsumer, exampleData);
@@ -225,6 +249,14 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
         exampleData
       );
     }, 16000);
+
+    setInterval(() => {
+      void logTest(snitchC, audienceCConsumer, exampleData);
+    }, 2000);
+
+    setInterval(() => {
+      void logTest(snitchC, audienceCProducer, exampleData);
+    }, 2000);
   };
 
 void exampleStaggered();
