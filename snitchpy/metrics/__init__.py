@@ -179,9 +179,7 @@ class Metrics:
             protos.Metric(name=entry.name, value=entry.value, labels=entry.labels)
         ]
 
-        self.log.debug("Publishing metrics: {}".format(req))
         self.loop.create_task(call(req))
-        self.log.debug("Published metrics: {}".format(req))
 
     def run_publisher_worker(self, id: int) -> None:
         """Counter worker pool is responsible for listening to incr() requests and publish queue"""

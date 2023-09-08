@@ -560,9 +560,10 @@ class SnitchClient:
                 if self.exit.is_set():
                     return
 
-                self.log.debug("received command: {}".format(cmd))
-
                 (command, _) = which_one_of(cmd, "command")
+
+                if command != "keep_alive":
+                    self.log.debug("received command: {}".format(cmd))
 
                 if command == "attach_pipeline":
                     self._attach_pipeline(cmd)
