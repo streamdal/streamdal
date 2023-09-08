@@ -104,9 +104,6 @@ class SnitchConfig:
 
 class SnitchClient:
     cfg: SnitchConfig
-    channel: Channel
-    stub: protos.InternalStub
-    loop: asyncio.AbstractEventLoop
     pipelines: dict
     paused_pipelines: dict
     log: logging.Logger
@@ -119,6 +116,16 @@ class SnitchClient:
     workers: list
     audiences: dict
     tails: dict
+
+    # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
+    # channels for register and tail requests. All other unary operations can use the same
+    # grpc_channel and grpc_loop
+    grpc_channel: Channel
+    grpc_stub: protos.InternalStub
+    grpc_loop: asyncio.AbstractEventLoop
+    register_channel: Channel
+    register_stub: protos.InternalStub
+    register_loop: asyncio.AbstractEventLoop
 
     def __init__(self, cfg: SnitchConfig):
         self._validate_config(cfg)
@@ -484,17 +491,25 @@ class SnitchClient:
         self.exit.set()
         self.metrics.shutdown(args)
 
+        # Shut down tail request workers
+        for tails in self.tails.values():
+            for tr in tails.values():
+                tr.exit.set()
+
+        # Shut down heartbeat and register workers
         for worker in self.workers:
             self.log.debug("Waiting for worker {} to exit".format(worker.name))
             try:
                 if worker.is_alive():
                     worker.join()
-            except RuntimeError as e:
+            except RuntimeError:
                 self.log.error("Could not exit worker {}".format(worker.name))
                 continue
 
+        # Cleanup gRPC connections
         self.grpc_channel.close()
         self.register_channel.close()
+
         self.log.debug("exited shutdown()")
 
     def _heartbeat(self):
@@ -559,15 +574,14 @@ class SnitchClient:
                     self._resume_pipeline(cmd)
                 elif command == "keep_alive":
                     pass
-                elif command == "tail_request":
+                elif command == "tail":
                     self._tail_request(cmd)
                 else:
                     self.log.error("Unknown response type: {}".format(cmd))
 
         self.log.debug("Starting register looper")
         asyncio.set_event_loop(self.register_loop)
-        self.cancel_task = self.register_loop.create_task(call())
-        self.register_loop.run_until_complete(self.cancel_task)
+        self.register_loop.run_until_complete(call())
 
         # Wait for all pending tasks to complete before exiting thread, to avoid exception
         self.register_loop.run_until_complete(
@@ -953,11 +967,12 @@ class SnitchClient:
         t = Tail(
             request=req,
             log=self.log,
-            exit=self.exit,
-            grpc_stub=self.grpc_stub,
-            grpc_loop=self.grpc_loop,
+            exit=Event(),
+            snitch_url=self.cfg.snitch_url,
             auth_token=self.auth_token,
         )
+
+        t.start_tail_workers()
 
         self._set_tail(t)
 
@@ -983,7 +998,17 @@ class SnitchClient:
             )
             return
 
-        pass
+        if tail_id not in tails.keys():
+            self.log.debug(
+                "received stop tail command for non-existent tail: {}".format(tail_id)
+            )
+            return
+
+        self.log.debug("Stopping tail: {}".format(tail_id))
+
+        tails[tail_id].exit.set()
+
+        self._remove_tail(aud, pipeline_id, tail_id)
 
     def _get_tails(self, aud: protos.Audience, pipeline_id: str) -> dict[str, Tail]:
         key = self._tail_key(aud, pipeline_id)

@@ -15,7 +15,7 @@ class TestSnitchClient:
     def before_each(self):
         client = object.__new__(SnitchClient)
         client.cfg = SnitchConfig(service_name="testing")
-        client.loop = asyncio.get_event_loop()
+        client.grpc_loop = asyncio.get_event_loop()
         client.log = mock.Mock()
         client.metrics = mock.Mock()
         client.grpc_stub = mock.AsyncMock()

@@ -1,8 +1,10 @@
 import logging
 import asyncio
 import snitch_protos.protos as protos
+from grpclib.client import Channel
+from grpclib.exceptions import ProtocolError
 from queue import SimpleQueue, Empty
-from threading import Lock, Event
+from threading import Lock, Event, Thread
 
 # The number of tail worker threads to start
 NUM_TAIL_WORKERS = 2
@@ -10,9 +12,8 @@ NUM_TAIL_WORKERS = 2
 
 class Tail:
     request: protos.TailRequest
-    grpc_stub: protos.InternalStub
-    grpc_loop: asyncio.AbstractEventLoop
     auth_token: str
+    snitch_url: str
     lock: Lock = Lock()
     exit: Event = Event()
     queue: SimpleQueue = SimpleQueue()
@@ -21,19 +22,17 @@ class Tail:
     def __init__(
         self,
         request: protos.TailRequest,
-        grpc_stub: protos.InternalStub,
-        grpc_loop: asyncio.AbstractEventLoop,
+        snitch_url: str,
         exit: Event,
         auth_token: str,
         log: logging.Logger,
     ):
         self.request = request
-        self.grpc_stub = grpc_stub
-        self.grpc_loop = grpc_loop
         self.queue = SimpleQueue()
         self.exit = exit
         self.log = log
         self.auth_token = auth_token
+        self.snitch_url = snitch_url
 
     def tail_iterator(self):
         while True:
@@ -45,19 +44,36 @@ class Tail:
 
     def start_tail_workers(self):
         for i in range(NUM_TAIL_WORKERS):
-            self.start_tail_worker()
-
-    def start_tail_worker(self):
-        self.log.debug("Starting tail worker")
-
-        # Get gRPC tail stream
-        async def call():
-            await self.grpc_stub.send_tail(
-                tail_response_iterator=self.tail_iterator(),
-                metadata={"auth-token": self.auth_token},
+            incr_worker = Thread(
+                target=self.start_tail_worker, args=(i + 1,), daemon=False
             )
+            incr_worker.start()
+
+    def start_tail_worker(self, worker_id: int):
+        self.log.debug(f"Starting tail worker {worker_id}")
+
+        # Create gRPC channel and stub
+        (host, port) = self.snitch_url.split(":")
+        loop = asyncio.new_event_loop()
+        channel = Channel(host=host, port=port, loop=loop)
+        stub = protos.InternalStub(channel=channel)
+
+        async def call():
+            try:
+                await stub.send_tail(
+                    tail_response_iterator=self.tail_iterator(),
+                    metadata={"auth-token": self.auth_token},
+                )
+            except AssertionError:
+                # Ignore. I think this occurs because we're not returning
+                # any response from the server since this is client side streaming to server
+                pass
+            except ProtocolError:
+                pass
 
         while not self.exit.is_set():
-            self.grpc_loop.run_until_complete(call())
+            loop.run_until_complete(call())
 
-        self.log.debug("Tail worker exiting")
+        channel.close()
+
+        self.log.debug(f"Tail worker {worker_id} exiting")
