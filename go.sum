@@ -725,6 +725,14 @@ github.com/streamdal/natty v0.0.39 h1:kw7fjvM6FgdBomnWhc/zQ9FS+AVEFifGKGEdcex3oN
 github.com/streamdal/natty v0.0.39/go.mod h1:KjJtg14I/lHdCH9yrvDZM6nBsZh8xyolKTEqDH730jw=
 github.com/streamdal/snitch-protos v0.0.80 h1:og5yju0N/cIXq0S9hX960X+TOAXR73s62WA5v3k63Tw=
 github.com/streamdal/snitch-protos v0.0.80/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.81 h1:sDVfbXa+QXRgvWcpNDdMNCrQoVfM8CM9q1m4G87cDwI=
+github.com/streamdal/snitch-protos v0.0.81/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.83 h1:IniLTRYLWGEUPApv7JeCyCUfJfcBzkLSU03GiVcfli4=
+github.com/streamdal/snitch-protos v0.0.83/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.84 h1:r+mNsNhyOsma48uvthiivfoxtDeViMPBuBUmA4W/mPw=
+github.com/streamdal/snitch-protos v0.0.84/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
+github.com/streamdal/snitch-protos v0.0.85 h1:fiL3ZfK1qvEHCz0NJIVPZkOiP3ylfF+L3s6I+m7ddGA=
+github.com/streamdal/snitch-protos v0.0.85/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

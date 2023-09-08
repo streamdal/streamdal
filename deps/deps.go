@@ -22,6 +22,7 @@ import (
 	"github.com/streamdal/snitch-server/services/kv"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
+	"github.com/streamdal/snitch-server/services/pubsub"
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -46,6 +47,7 @@ type Dependencies struct {
 	StoreService      store.IStore
 	CmdService        cmd.ICmd
 	KVService         kv.IKV
+	PubSubService     pubsub.IPubSub
 	EncryptionService encryption.IEncryption
 	Health            health.IHealth
 	ShutdownContext   context.Context
@@ -252,6 +254,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.StoreService = storeService
 
+	d.PubSubService = pubsub.New()
+
 	busService, err := bus.New(&bus.Options{
 		Store:       storeService,
 		NATS:        d.NATSBackend,
@@ -260,6 +264,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		ShutdownCtx: d.ShutdownContext,
 		WASMDir:     d.Config.WASMDir,
 		Metrics:     d.MetricsService,
+		PubSub:      d.PubSubService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")

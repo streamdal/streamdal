@@ -815,6 +815,7 @@ func runServer() {
 		CmdService:      d.CmdService,
 		NotifyService:   d.NotifyService,
 		NATSBackend:     d.NATSBackend,
+		PubSubService:   d.PubSubService,
 	})
 
 	if err != nil {
