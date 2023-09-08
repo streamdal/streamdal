@@ -1010,7 +1010,7 @@ class SnitchClient:
 
         self._remove_tail(aud, pipeline_id, tail_id)
 
-    def _get_tails(self, aud: protos.Audience, pipeline_id: str) -> dict[str, Tail]:
+    def _get_tails(self, aud: protos.Audience, pipeline_id: str) -> dict:
         key = self._tail_key(aud, pipeline_id)
         if key in self.tails:
             return self.tails[key]
