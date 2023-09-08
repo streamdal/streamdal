@@ -64,8 +64,8 @@ class Tail:
                     metadata={"auth-token": self.auth_token},
                 )
             except AssertionError:
-                # Ignore. I think this occurs because we're not returning
-                # any response from the server since this is client side streaming to server
+                # Ignore. This will occur on server disconnect since the gRPC
+                # library is expecting a response
                 pass
             except ProtocolError:
                 pass
