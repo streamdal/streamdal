@@ -12,7 +12,10 @@ import {
 import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
 import { ServiceMapper } from "./serviceMapper.ts";
-import { GROUP_COUNT } from "../components/serviceMap/customNodes.tsx";
+import {
+  GROUP_MARGIN,
+  GROUP_WIDTH,
+} from "../components/serviceMap/customNodes.tsx";
 
 export type Operation = {
   audience: Audience;
@@ -72,17 +75,16 @@ export type NodesMap = {
 export const offset = (
   key: string,
   item: Map<string, number>,
-  multiplier: number,
 ) => {
   let offset = 0;
   for (const [k, v] of item) {
     if (k === key) {
-      break;
+      return offset +
+        ((item.get(key) || 1) * (GROUP_WIDTH + GROUP_MARGIN) / 2);
     }
-    offset += v * multiplier;
+    offset += v * GROUP_WIDTH + GROUP_MARGIN;
   }
-
-  return offset + ((item.get(key) || 0) * GROUP_COUNT) / 2;
+  return offset ? offset : 25;
 };
 
 export const mapOperation = (
@@ -126,7 +128,7 @@ export const mapOperation = (
       position: {
         x: nodesMap.operationGroups.size === 1
           ? 25
-          : (nodesMap.operationGroups.size - 1) * 325,
+          : (nodesMap.operationGroups.size - 1) * (GROUP_WIDTH + GROUP_MARGIN),
         y: 200,
       },
       data: {
@@ -168,7 +170,10 @@ export const mapNodes = (
         type: "service",
         dragHandle: "#dragHandle",
         position: {
-          x: 25 + offset(sKey, nodesMap.services, GROUP_COUNT + 25),
+          x: 25 + offset(
+            sKey,
+            nodesMap.services,
+          ),
           y: 0,
         },
         data: { audience: a },
@@ -183,7 +188,7 @@ export const mapNodes = (
         type: "component",
         dragHandle: "#dragHandle",
         position: {
-          x: offset(cKey, nodesMap.components, GROUP_COUNT),
+          x: offset(cKey, nodesMap.components),
           y: 450 + (max - 1) * 76,
         },
         data: { audience: a },

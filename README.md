@@ -28,3 +28,8 @@ gets confused, you can force update the Deno lib cache with
 This console needs a snitch-server to run against. See
 [snitch-server](https://github.com/streamdal/snitch-server) for instructions on
 running it locally.
+
+### Versions
+
+Update `verstion.ts` to display a new version in the app. See:
+`https://deno.land/x/version_ts@0.2.2` to make this a little easier.

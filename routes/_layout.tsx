@@ -8,6 +8,7 @@ import {
   setServiceSignal,
 } from "../components/serviceMap/serviceSignal.ts";
 import { getAll } from "../lib/fetch.ts";
+import { version } from "../version.ts";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
   const allServices = await getAll();
@@ -28,6 +29,9 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
             blur={req.url.includes("pipelines")}
           />
         </ReactFlowProvider>
+        <div class="absolute bottom-0 left-0 text-streamdalPurple ml-2 mb-1">
+          {version}
+        </div>
       </div>
     </>
   );
