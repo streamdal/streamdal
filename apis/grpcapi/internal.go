@@ -138,6 +138,12 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrapf(err, "unable to start heartbeat watcher for session id '%s'", request.SessionId)
 	}
 
+	// Broadcast registration to all nodes which will trigger handlers to push
+	// an update to GetAllStream() chan
+	if err := s.Options.BusService.BroadcastRegister(server.Context(), request); err != nil {
+		return errors.Wrap(err, "unable to broadcast register")
+	}
+
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
@@ -198,11 +204,19 @@ MAIN:
 		llog.Debugf("no channel found for session id '%s'", request.SessionId)
 	}
 
-	if err := s.Options.StoreService.DeleteRegistration(server.Context(), &protos.DeregisterRequest{
+	deregisterRequest := &protos.DeregisterRequest{
 		ServiceName: request.ServiceName,
 		SessionId:   request.SessionId,
-	}); err != nil {
+	}
+
+	if err := s.Options.StoreService.DeleteRegistration(server.Context(), deregisterRequest); err != nil {
 		return errors.Wrap(err, "unable to delete registration")
+	}
+
+	// TODO: Announce de-registration - the UI will still display the audience(s) but
+	// they no longer will be live (ie. attached clients will decrease)
+	if err := s.Options.BusService.BroadcastDeregister(server.Context(), deregisterRequest); err != nil {
+		llog.Errorf("unable to broadcast deregister event for session id '%s': %v", deregisterRequest.SessionId, err)
 	}
 
 	return nil
@@ -295,6 +309,11 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 			Message: fmt.Sprintf("unable to save audience: %s", err.Error()),
 		}, nil
+	}
+
+	// Broadcast audience creation so that we can notify UI GetAllStream clients
+	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
+		s.log.Errorf("unable to broadcast new audience: %s", err.Error())
 	}
 
 	return &protos.StandardResponse{

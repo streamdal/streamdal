@@ -8,6 +8,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+
 	"github.com/streamdal/snitch-server/util"
 )
 

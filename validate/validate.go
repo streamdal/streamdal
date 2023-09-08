@@ -281,6 +281,10 @@ func PausePipelineRequest(req *protos.PausePipelineRequest) error {
 		return ErrEmptyField("PipelineId")
 	}
 
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
+	}
+
 	return nil
 }
 
@@ -291,6 +295,10 @@ func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
 
 	if req.PipelineId == "" {
 		return ErrEmptyField("PipelineId")
+	}
+
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
 	}
 
 	return nil
@@ -387,6 +395,10 @@ func UpdateNotificationRequest(req *protos.UpdateNotificationRequest) error {
 }
 
 func validateNotificationEmail(email *protos.NotificationEmail) error {
+	if email == nil {
+		return errors.New(".Email cannot be nil")
+	}
+
 	if email.GetFromAddress() == "" {
 		return ErrEmptyField("Email.FromAddress")
 	}
@@ -425,6 +437,10 @@ func validateNotificationEmail(email *protos.NotificationEmail) error {
 }
 
 func validateNotificationSlack(slack *protos.NotificationSlack) error {
+	if slack == nil {
+		return errors.New(".Slack cannot be nil")
+	}
+
 	if slack.BotToken == "" {
 		return ErrEmptyField("Slack.BotToken")
 	}
@@ -436,6 +452,10 @@ func validateNotificationSlack(slack *protos.NotificationSlack) error {
 }
 
 func validateNotificationPagerDuty(pagerduty *protos.NotificationPagerDuty) error {
+	if pagerduty == nil {
+		return errors.New(".PagerDuty cannot be nil")
+	}
+
 	if pagerduty.Token == "" {
 		return ErrEmptyField("PagerDuty.Token")
 	}

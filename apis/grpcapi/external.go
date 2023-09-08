@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/snitch-server/types"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -56,11 +58,91 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	configStrAudience := util.ConvertConfigStrAudience(configs)
 
 	return &protos.GetAllResponse{
-		Live:      liveInfo,
-		Audiences: audiences,
-		Pipelines: pipelines,
-		Config:    configStrAudience,
+		Live:                   liveInfo,
+		Audiences:              audiences,
+		Pipelines:              pipelines,
+		Config:                 configStrAudience,
+		GeneratedAtUnixTsNsUtc: time.Now().UTC().UnixNano(),
 	}, nil
+}
+
+func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.External_GetAllStreamServer) error {
+	if err := validate.GetAllRequest(req); err != nil {
+		return errors.Wrap(err, "invalid get all request")
+	}
+
+	llog := s.log.WithFields(logrus.Fields{
+		"method": "GetAllStream",
+	})
+
+	// Generate initial GetAllResponse
+	resp, err := s.GetAll(server.Context(), req)
+	if err != nil {
+		llog.Errorf("unable to complete initial GetAll: %s", err)
+		return fmt.Errorf("unable to complete initial GetAll: %s", err)
+	}
+
+	// Send initial response
+	if err := server.Send(resp); err != nil {
+		llog.Errorf("unable to send initial GetAll response: %s", err)
+		return fmt.Errorf("unable to send initial GetAll response: %s", err)
+	}
+
+	// Cleanup after Listen()
+	requestID := util.CtxRequestId(server.Context())
+	defer s.Options.PubSubService.Close(types.PubSubChangesTopic, requestID)
+
+	sendInProgress := false
+
+MAIN:
+	for {
+		select {
+		case <-server.Context().Done():
+			llog.Debug("client closed connection")
+			break MAIN
+		case <-s.Options.ShutdownContext.Done():
+			llog.Debug("server shutting down")
+			break MAIN
+		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
+			if sendInProgress {
+				llog.Debug("send in progress, skipping changes message")
+				continue
+			}
+
+			sendInProgress = true
+
+			llog.Debug("launching goroutine to send delayed GetAllResponse")
+
+			// Artificial update slowdown -- we do this to avoid spamming the
+			// client with updates when there are many concurrent Listen() hits
+			go func() {
+				defer func() {
+					sendInProgress = false
+				}()
+
+				time.Sleep(100 * time.Millisecond)
+
+				llog.Debug("received changes message via pubsub")
+
+				// Generate a GetAllResponse
+				resp, err := s.GetAll(server.Context(), req)
+				if err != nil {
+					llog.Errorf("unable to complete GetAll: %s", err)
+					return
+				}
+
+				// Send response
+				if err := server.Send(resp); err != nil {
+					llog.Errorf("unable to send GetAll response: %s", err)
+					return
+				}
+			}()
+		}
+	}
+
+	llog.Debug("closing stream")
+
+	return nil
 }
 
 func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
@@ -533,6 +615,11 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}
 
 	if err := s.Options.StoreService.DeleteAudience(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Broadcast delete to other nodes so that they can emit an event for GetAllStream()
+	if err := s.Options.BusService.BroadcastDeleteAudience(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
