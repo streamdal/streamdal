@@ -2,6 +2,7 @@
 
 
 [![Master build status](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/test_coverage)](https://codeclimate.com/github/streamdal/snitch-python-client/test_coverage)
 
 snitchpy is the python client SDK for Streamdal's open source Snitch server https://github.com/streamdal/snitch
 
@@ -55,7 +56,7 @@ if __name__ == "__main__":
 
 MIT License
 
-Copyright (c) 2023 Batch.sh Inc. DBA Streamdal.com
+Copyright (c) 2023 Batch.sh Inc. D.B.A. Streamdal.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
