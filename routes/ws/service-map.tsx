@@ -2,6 +2,7 @@ import { Handlers, RouteConfig } from "$fresh/src/server/types.ts";
 import { effect } from "@preact/signals";
 import { serviceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { DisplayServiceMap } from "../../lib/serviceMapper.ts";
+import { bigIntStringify } from "../../lib/utils.ts";
 
 export const config: RouteConfig = {
   skipInheritedLayouts: true,
@@ -19,7 +20,7 @@ export const handler: Handlers<DisplayServiceMap> = {
 
     effect(() => {
       if (serviceSignal.value && clientConnected) {
-        socket.send(JSON.stringify({
+        socket.send(bigIntStringify({
           ...serviceSignal.value,
           nodesMap: Array.from(serviceSignal.value.nodesMap.entries()),
           edgesMap: Array.from(serviceSignal.value.edgesMap.entries()),

@@ -115,3 +115,6 @@ export const getAttachedPipeline = (
   pipelines: PipelinesType,
   config: ConfigType,
 ) => pipelines[config[audienceKey(audience)]]?.pipeline;
+
+export const bigIntStringify = (obj: any) =>
+  JSON.stringify(obj, (_, v) => typeof v === "bigint" ? v.toString() : v);
