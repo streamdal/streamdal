@@ -58,13 +58,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         }
     };
 
-    // Handle "static" or "dynamic" mode
+    // Handle "static" or "dynamic" mode - ie. how do we use the provided "key"?
     let mut key;
 
     if wasm_request.step.kv().mode == EnumOrUnknown::from(KVMode::KV_MODE_STATIC) {
+        // Using the key as-is
         key = wasm_request.step.kv().key.clone();
     } else {
-        // Lookup key by finding the path
+        // Lookup what the actual key will be by looking at the value in the JSON path
         key =
             // TODO: This should use detective.parse_field()
             match common::get_value_in_json(wasm_request.step.kv().key.clone(), wasm_request.input)
