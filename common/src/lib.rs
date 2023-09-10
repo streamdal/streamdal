@@ -27,20 +27,22 @@ pub fn read_request(ptr: *mut u8, length: usize, deallocate: bool) -> Result<WAS
 /// Generate a WASMResponse from params, serialize it, add terminators and
 /// return a pointer to the serialized response.
 pub fn write_response(
-    output_payload: &[u8],
-    output_step: &[u8],
+    output_payload: Option<&[u8]>,
+    output_step: Option<&[u8]>,
     exit_code: WASMExitCode,
     exit_msg: String,
 ) -> *mut u8 {
     let mut response = WASMResponse::new();
 
-    response.output_payload = output_payload.to_vec();
+    response.output_payload = match output_payload {
+        Some(payload) => payload.to_vec(),
+        None => vec![],
+    };
 
-    if output_step.len() > 0 {
-        response.output_step = Some(output_step.to_vec());
-    } else {
-        response.output_step = None;
-    }
+    response.output_step = match output_step {
+        Some(step) => Some(step.to_vec()),
+        None => None,
+    };
 
     response.exit_code = protobuf::EnumOrUnknown::from(exit_code);
     response.exit_msg = exit_msg;

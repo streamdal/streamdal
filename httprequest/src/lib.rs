@@ -13,9 +13,9 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     let wasm_request = match common::read_request(ptr, length, false) {
         Ok(req) => req,
         Err(e) => {
-            let output = &[0u8; 0];
             return common::write_response(
-                output,
+                &vec![],
+                &vec![],
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 e.to_string(),
             );
@@ -24,9 +24,9 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        let output = &[0u8; 0];
         return common::write_response(
-            output,
+            &vec![],
+            &vec![],
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             format!("invalid step: {}", err.to_string()),
         );
@@ -61,26 +61,26 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         Ok(res) => {
             if res.code < 200 || res.code > 299 {
                 common::write_response(
+                    wasm_request.input_payload.as_slice(),
                     &res.body,
                     WASMExitCode::WASM_EXIT_CODE_FAILURE,
                     format!("Request returned non-200 response code: {}", res.code),
                 )
             } else {
                 common::write_response(
+                    wasm_request.input_payload.as_slice(),
                     &res.body,
                     WASMExitCode::WASM_EXIT_CODE_SUCCESS,
                     "completed http request".to_string(),
                 )
             }
         }
-        Err(e) => {
-            let output = &[0u8; 0];
-            common::write_response(
-                output,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-                format!("unable to parse response: {}", e.to_string()),
-            )
-        }
+        Err(e) => common::write_response(
+            &vec![].as_slice(),
+            &vec![],
+            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            format!("unable to parse response: {}", e.to_string()),
+        ),
     };
 }
 

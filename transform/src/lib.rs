@@ -40,7 +40,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
             "Successfully transformed payload".to_string(),
         ),
         Err(err) => common::write_response(
-            &wasm_request.input,
+            vec![],
+            vec![].as_slice(),
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
             format!("Unable to transform payload: {:?}", err),
         ),

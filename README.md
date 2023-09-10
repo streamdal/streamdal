@@ -31,3 +31,9 @@ Result is as follows:
 Without any of the size optimizations, the initial binary size is ~4.2MB.
 
 Compile + optimization time is ~45s on an M2.
+
+## Testing
+
+The generated WASM can be tested by running `make test` or `make test/<wasm_name>`.
+
+This will execute a suite of functional tests (written in Go).
