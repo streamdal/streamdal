@@ -57,6 +57,11 @@ pub fn write_response(
     ptr
 }
 
+/// Small helper for write_response
+pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> *mut u8 {
+    write_response(None, None, wasm_exit_code, error)
+}
+
 /// Allocate number of bytes in memory. This function should be used by client
 /// when generating request data that is intended to be passed to a WASM func.
 ///

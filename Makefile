@@ -63,6 +63,18 @@ clean/httprequest: description = Remove httprequest WASM artifacts
 clean/httprequest:
 	rm -rf httprequest/target build/httprequest.wasm
 
+.PHONY: build/kv
+build/kv: description = Build WASM target for kv
+build/kv: clean/kv
+	cd kv && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/kv.wasm target/wasm32-wasi/release/kv.wasm
+
+.PHONY: clean/kv
+clean/kv: description = Remove kv WASM artifacts
+clean/kv:
+	rm -rf kv/target build/kv.wasm
+
 .PHONY: clean
 clean: description = Remove all build artifacts
 clean: clean/detective clean/transform

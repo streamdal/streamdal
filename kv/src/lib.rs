@@ -1,8 +1,8 @@
-use common::write_response;
 use protobuf::{EnumOrUnknown, Message};
 use protos::sp_kv::KVAction;
 use protos::sp_steps_kv::{KVMode, KVStatus, KVStepResponse};
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
+use snitch_detective::detective;
 
 extern "C" {
     fn kvExists(ptr: *mut u8, length: usize) -> *mut u8;
@@ -14,8 +14,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     let wasm_request = match common::read_request(ptr, length, false) {
         Ok(req) => req,
         Err(e) => {
-            return common::write_response(
-                &[0u8; 0],
+            return common::write_error_response(
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 format!("unable to parse request: {}", e.to_string()),
             );
@@ -24,19 +23,45 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        return common::write_response(
-            &[0u8; 0],
+        return common::write_error_response(
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             format!("unable to validate wasm request: {}", err.to_string()),
         );
     }
 
+    // Determine which host func we'll execute (OK to unwrap since we validated)
+    let kv_func = match wasm_request.step.kv().action.unwrap() {
+        KVAction::KV_ACTION_EXISTS => kvExists,
+        _ => {
+            return common::write_error_response(
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("invalid action: {:?}", wasm_request.step.kv().action),
+            );
+        }
+    };
+
+    // Maybe update step key (if dynamic mode is specified)
+    let mut step = wasm_request.step.kv().clone();
+
+    // Handle "static" or "dynamic" mode - ie. how do we use the provided "key"?
+    if wasm_request.step.kv().mode == EnumOrUnknown::from(KVMode::KV_MODE_DYNAMIC) {
+        // Lookup what the actual key will be by looking at the value in the JSON path
+        match detective::parse_field(wasm_request.input_payload.as_slice(), &step.key) {
+            Ok(key_contents) => step.key = key_contents,
+            Err(err) => {
+                return common::write_error_response(
+                    WASMExitCode::WASM_EXIT_CODE_FAILURE, // TODO: This should be exit code from parse call
+                    format!("unable to complete dynamic key lookup: {}", err.to_string()),
+                );
+            }
+        }
+    }
+
     // Serialize step
-    let mut step_bytes = match wasm_request.step.kv().write_to_bytes() {
+    let mut step_bytes = match step.write_to_bytes() {
         Ok(bytes) => bytes,
         Err(e) => {
-            return common::write_response(
-                &[0u8; 0],
+            return common::write_error_response(
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 format!("unable to serialize step: {}", e.to_string()),
             );
@@ -46,44 +71,9 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Get pointer to serialized bytes
     let req_ptr = step_bytes.as_mut_ptr();
 
-    // Determine which host func we'll execute (I think it's ok to unwrap() here?)
-    let kv_func = match wasm_request.step.kv().action.unwrap() {
-        KVAction::KV_ACTION_EXISTS => kvExists,
-        _ => {
-            return common::write_response(
-                &[0u8; 0],
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-                format!("invalid action: {:?}", wasm_request.step.kv().action),
-            );
-        }
-    };
-
-    // Handle "static" or "dynamic" mode - ie. how do we use the provided "key"?
-    let mut key;
-
-    if wasm_request.step.kv().mode == EnumOrUnknown::from(KVMode::KV_MODE_STATIC) {
-        // Using the key as-is
-        key = wasm_request.step.kv().key.clone();
-    } else {
-        // Lookup what the actual key will be by looking at the value in the JSON path
-        key =
-            // TODO: This should use detective.parse_field()
-            match common::get_value_in_json(wasm_request.step.kv().key.clone(), wasm_request.input)
-            {
-                Ok(key_contents) => key_contents,
-                Err(err) => {
-                    return common::write_response(
-                        &[0u8; 0],
-                        WASMExitCode::WASM_EXIT_CODE_FAILURE, // TODO: Is it possible to have an internal failure here?
-                        format!("unable to complete dynamic key lookup: {}", err.to_string()),
-                    );
-                }
-            }
-    }
-
+    // Call host func
     let res_ptr: *mut u8;
 
-    // Call host func
     unsafe {
         res_ptr = kv_func(req_ptr, step_bytes.len());
     }
@@ -96,13 +86,12 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         dealloc(req_ptr, length as i32);
     }
 
-    // TODO: Got back a KVStepResponse - parse it
+    // Parse KVResp
     let kv_step_response: KVStepResponse = match Message::parse_from_bytes(kv_resp_bytes.as_slice())
     {
         Ok(resp) => resp,
         Err(e) => {
-            return common::write_response(
-                &[0u8; 0],
+            return common::write_error_response(
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 format!("unable to parse kv step response: {}", e.to_string()),
             );
@@ -110,15 +99,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     };
 
     // Validate KVResp
-    if let err = validate_kv_step_response(&kv_step_response) {
-        return common::write_response(
-            &[0u8; 0],
+    if let Err(err) = validate_kv_step_response(&kv_step_response) {
+        return common::write_error_response(
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             format!("unable to validate kv step response: {}", err.to_string()),
         );
     }
 
-    let mut wasm_exit_code;
+    let wasm_exit_code;
 
     // Write + return response
     match kv_step_response.status.unwrap() {
@@ -128,20 +116,37 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         _ => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
     }
 
-    common::write_response(
-        &[0u8; 0], // TODO: We should discuss this - what do we return here?
-        wasm_exit_code,
-        format!("kv step response: {:?}", kv_step_response.message),
-    )
+    // This may have been a KVGet that might produce a result - we should populate it (if it's there)
+    // NOTE: Doing this ugly thing to avoid "value does not live long enough" errors
+    if kv_step_response.value.is_some() {
+        common::write_response(
+            Some(wasm_request.input_payload.as_slice()),
+            Some(kv_step_response.value.unwrap().as_slice()),
+            wasm_exit_code,
+            format!("kv step response: {:?}", kv_step_response.message),
+        )
+    } else {
+        common::write_response(
+            Some(wasm_request.input_payload.as_slice()),
+            None,
+            wasm_exit_code,
+            format!("kv step response: {:?}", kv_step_response.message),
+        )
+    }
 }
 
-// pub fn http_response(data: Vec<u8>) -> Result<HttpResponse, String> {
-//     // Decode read request
-//     let request: HttpResponse =
-//         protobuf::Message::parse_from_bytes(data.as_slice()).map_err(|e| e.to_string())?;
-//
-//     Ok(request)
-// }
+fn validate_kv_step_response(kv_step_response: &KVStepResponse) -> Result<(), String> {
+    match kv_step_response.status.enum_value() {
+        Ok(status) => {
+            if status == KVStatus::KV_STATUS_UNSET {
+                return Err("KV status must be set".to_string());
+            }
+        }
+        Err(_) => return Err("unable to get KV status".to_string()),
+    };
+
+    Ok(())
+}
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
     if !req.step.has_kv() {
