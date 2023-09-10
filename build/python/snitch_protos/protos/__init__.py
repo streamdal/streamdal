@@ -862,16 +862,51 @@ class WasmRequest(betterproto.Message):
     """SDK generates a WASM request and passes this to the WASM func"""
 
     step: "PipelineStep" = betterproto.message_field(1)
-    input: bytes = betterproto.bytes_field(2)
+    """
+    The actual step that the WASM func will operate on. This is the same step
+    that is declared in protos.Pipeline.
+    """
+
+    input_payload: bytes = betterproto.bytes_field(2)
+    """Payload data that WASM func will operate on"""
+
+    input_step: Optional[bytes] = betterproto.bytes_field(
+        3, optional=True, group="_input_step"
+    )
+    """
+    Potentially filled out result from previous step. If this is first step in
+    the pipeline, it will be empty.
+    """
 
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):
     """Returned by all WASM functions"""
 
-    output: bytes = betterproto.bytes_field(1)
+    output_payload: bytes = betterproto.bytes_field(1)
+    """
+    Potentially modified input payload. Concept: All WASM funcs accept an
+    input_payload in WASMRequest, WASM func reads input payload, modifies it
+    and writes the modified output to output_payload.
+    """
+
     exit_code: "WasmExitCode" = betterproto.enum_field(2)
+    """
+    Exit code that the WASM func exited with; more info in WASMExitCode's
+    comment
+    """
+
     exit_msg: str = betterproto.string_field(3)
+    """Additional info about the reason a specific exit code was returned"""
+
+    output_step: Optional[bytes] = betterproto.bytes_field(
+        4, optional=True, group="_output_step"
+    )
+    """
+    Potential additional step output - ie. if a WASM func is an HTTPGet,
+    output_step would contain the HTTP response body; if the WASM func is a
+    KVGet, the output_step would be the value of the fetched key.
+    """
 
 
 class ExternalStub(betterproto.ServiceStub):

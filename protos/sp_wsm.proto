@@ -29,13 +29,33 @@ enum WASMExitCode {
 
 // SDK generates a WASM request and passes this to the WASM func
 message WASMRequest {
+  // The actual step that the WASM func will operate on. This is the same step
+  // that is declared in protos.Pipeline.
   protos.PipelineStep step = 1;
-  bytes input = 2;
+
+  // Payload data that WASM func will operate on
+  bytes input_payload = 2;
+
+  // Potentially filled out result from previous step. If this is first step in
+  // the pipeline, it will be empty.
+  optional bytes input_step = 3;
 }
 
 // Returned by all WASM functions
 message WASMResponse {
-  bytes output = 1;
+  // Potentially modified input payload. Concept: All WASM funcs accept an
+  // input_payload in WASMRequest, WASM func reads input payload, modifies it
+  // and writes the modified output to output_payload.
+  bytes output_payload = 1;
+
+  // Exit code that the WASM func exited with; more info in WASMExitCode's comment
   WASMExitCode exit_code = 2;
+
+  // Additional info about the reason a specific exit code was returned
   string exit_msg = 3;
+
+  // Potential additional step output - ie. if a WASM func is an HTTPGet,
+  // output_step would contain the HTTP response body; if the WASM func is a
+  // KVGet, the output_step would be the value of the fetched key.
+  optional bytes output_step = 4;
 }

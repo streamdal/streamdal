@@ -10,13 +10,25 @@ import { PipelineStep } from "./sp_pipeline.js";
  */
 export interface WASMRequest {
     /**
+     * The actual step that the WASM func will operate on. This is the same step
+     * that is declared in protos.Pipeline.
+     *
      * @generated from protobuf field: protos.PipelineStep step = 1;
      */
     step?: PipelineStep;
     /**
-     * @generated from protobuf field: bytes input = 2;
+     * Payload data that WASM func will operate on
+     *
+     * @generated from protobuf field: bytes input_payload = 2;
      */
-    input: Uint8Array;
+    inputPayload: Uint8Array;
+    /**
+     * Potentially filled out result from previous step. If this is first step in
+     * the pipeline, it will be empty.
+     *
+     * @generated from protobuf field: optional bytes input_step = 3;
+     */
+    inputStep?: Uint8Array;
 }
 /**
  * Returned by all WASM functions
@@ -25,17 +37,33 @@ export interface WASMRequest {
  */
 export interface WASMResponse {
     /**
-     * @generated from protobuf field: bytes output = 1;
+     * Potentially modified input payload. Concept: All WASM funcs accept an
+     * input_payload in WASMRequest, WASM func reads input payload, modifies it
+     * and writes the modified output to output_payload.
+     *
+     * @generated from protobuf field: bytes output_payload = 1;
      */
-    output: Uint8Array;
+    outputPayload: Uint8Array;
     /**
+     * Exit code that the WASM func exited with; more info in WASMExitCode's comment
+     *
      * @generated from protobuf field: protos.WASMExitCode exit_code = 2;
      */
     exitCode: WASMExitCode;
     /**
+     * Additional info about the reason a specific exit code was returned
+     *
      * @generated from protobuf field: string exit_msg = 3;
      */
     exitMsg: string;
+    /**
+     * Potential additional step output - ie. if a WASM func is an HTTPGet,
+     * output_step would contain the HTTP response body; if the WASM func is a
+     * KVGet, the output_step would be the value of the fetched key.
+     *
+     * @generated from protobuf field: optional bytes output_step = 4;
+     */
+    outputStep?: Uint8Array;
 }
 /**
  * Included in WASM response; the SDK should use the WASMExitCode to determine
@@ -80,7 +108,8 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
     constructor() {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
-            { no: 2, name: "input", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }
@@ -92,9 +121,10 @@ export const WASMRequest = new WASMRequest$Type();
 class WASMResponse$Type extends MessageType<WASMResponse> {
     constructor() {
         super("protos.WASMResponse", [
-            { no: 1, name: "output", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 1, name: "output_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
-            { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }
