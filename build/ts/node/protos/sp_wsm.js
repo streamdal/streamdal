@@ -47,7 +47,8 @@ class WASMRequest$Type extends MessageType {
     constructor() {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
-            { no: 2, name: "input", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }
@@ -59,9 +60,10 @@ export const WASMRequest = new WASMRequest$Type();
 class WASMResponse$Type extends MessageType {
     constructor() {
         super("protos.WASMResponse", [
-            { no: 1, name: "output", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 1, name: "output_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
-            { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
 }
