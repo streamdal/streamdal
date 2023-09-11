@@ -3,6 +3,7 @@ package grpcapi
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -560,6 +561,10 @@ func (s *ExternalServer) GetNotifications(ctx context.Context, req *protos.GetNo
 		return nil, errors.Wrap(err, "unable to get notification configs")
 	}
 
+	for _, cfg := range cfgs {
+		stripSensitiveFields(cfg)
+	}
+
 	return &protos.GetNotificationsResponse{Notifications: cfgs}, nil
 }
 
@@ -573,7 +578,30 @@ func (s *ExternalServer) GetNotification(ctx context.Context, req *protos.GetNot
 		return nil, errors.Wrap(err, "unable to get notification config")
 	}
 
+	stripSensitiveFields(cfg)
+
 	return &protos.GetNotificationResponse{Notification: cfg}, nil
+}
+
+// stripSensitiveFields blacks out sensitive fields in notification configs, before returning data to the frontend
+func stripSensitiveFields(cfg *protos.NotificationConfig) {
+	switch cfg.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		switch cfg.GetEmail().Type {
+		case protos.NotificationEmail_TYPE_SMTP:
+			smtp := cfg.GetEmail().GetSmtp()
+			smtp.Password = ""
+		case protos.NotificationEmail_TYPE_SES:
+			ses := cfg.GetEmail().GetSes()
+			ses.SesSecretAccessKey = ""
+		}
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		pd := cfg.GetPagerduty()
+		pd.Token = ""
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		slack := cfg.GetSlack()
+		slack.BotToken = ""
+	}
 }
 
 func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.AttachNotificationRequest) (*protos.StandardResponse, error) {
@@ -675,7 +703,44 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	}
 }
 
-func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
+func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.External_GetMetricsServer) error {
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-server.Context().Done():
+			return nil
+		case <-ticker.C:
+			sliceCounters, err := s.Options.MetricsService.FetchCounters(server.Context())
+			if err != nil {
+				s.log.Errorf("error getting counters: %s", err)
+				continue
+			}
+
+			counters := make(map[string]*protos.Metric)
+
+			for _, c := range sliceCounters {
+				counters[counterName(c.Name, c.Labels)] = c
+			}
+
+			if err := server.SendMsg(&protos.GetMetricsResponse{Metrics: counters}); err != nil {
+				s.log.Errorf("error sending metrics: %s", err)
+			}
+		}
+	}
+}
+
+func counterName(name string, labels map[string]string) string {
+	vals := make([]string, 0)
+	for k, v := range labels {
+		vals = append(vals, fmt.Sprintf("%s-%s", k, v))
+	}
+
+	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
+}
+
+func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

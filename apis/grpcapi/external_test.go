@@ -2,6 +2,8 @@ package grpcapi
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -725,14 +727,14 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "test-service",
 			}
 
-			// Put audience key in snitch_config
-			key := store.NATSConfigKey(audience, "test-pipeline-id")
-			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, key, []byte(``))
+			// Put audience key in snitch_audience
+			audKey := store.NATSAudienceKey(util.AudienceToStr(audience))
+			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, audKey, []byte(``))
 			Expect(err).ToNot(HaveOccurred())
 
 			// Put audience-pipeline mapping in snitch_config
-			key = store.NATSConfigKey(audience, "test-pipeline-id")
-			err = natsClient.Put(context.Background(), store.NATSConfigBucket, key, []byte(``))
+			configKey := store.NATSConfigKey(audience, "test-pipeline-id")
+			err = natsClient.Put(context.Background(), store.NATSConfigBucket, configKey, []byte(``))
 			Expect(err).ToNot(HaveOccurred())
 
 			// Try to delete audience
@@ -741,10 +743,17 @@ var _ = Describe("External gRPC API", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp).ToNot(BeNil())
-			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR))
 
-			// Verify key has been deleted from nats
-			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, key)
+			// Verify key still exists in nats
+			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, audKey)
+			Expect(err).ToNot(HaveOccurred())
+
+			// Cleanup key
+			err = natsClient.Delete(context.Background(), store.NATSConfigBucket, configKey)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = natsClient.Delete(context.Background(), store.NATSAudienceBucket, audKey)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -777,6 +786,15 @@ var _ = Describe("External gRPC API", func() {
 	})
 })
 
+func genAESKey() string {
+	bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err.Error())
+	}
+
+	return hex.EncodeToString(bytes)
+}
+
 func runServer() {
 	d, err := deps.New(&config.Config{
 		Debug:                true,
@@ -789,6 +807,7 @@ func runServer() {
 		NATSNumKVReplicas:    1,
 		SessionTTL:           time.Second, // Override TTL to improve test speed
 		WASMDir:              "./assets/wasm",
+		AesKey:               genAESKey(),
 	})
 
 	if err != nil {

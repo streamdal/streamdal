@@ -11,12 +11,14 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/natty"
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/encryption"
 	"github.com/streamdal/snitch-server/services/kv"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
@@ -39,16 +41,17 @@ type Dependencies struct {
 	NATSBackend  natty.INatty
 
 	// Services
-	BusService      bus.IBus
-	NotifyService   notify.INotifier
-	MetricsService  metrics.IMetrics
-	StoreService    store.IStore
-	CmdService      cmd.ICmd
-	KVService       kv.IKV
-	PubSubService   pubsub.IPubSub
-	Health          health.IHealth
-	ShutdownContext context.Context
-	ShutdownFunc    context.CancelFunc
+	BusService        bus.IBus
+	NotifyService     notify.INotifier
+	MetricsService    metrics.IMetrics
+	StoreService      store.IStore
+	CmdService        cmd.ICmd
+	KVService         kv.IKV
+	PubSubService     pubsub.IPubSub
+	EncryptionService encryption.IEncryption
+	Health            health.IHealth
+	ShutdownContext   context.Context
+	ShutdownFunc      context.CancelFunc
 }
 
 func New(cfg *config.Config) (*Dependencies, error) {
@@ -217,6 +220,12 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
+	encryptionService, err := encryption.New(cfg.AesKey)
+	if err != nil {
+		return errors.Wrap(err, "unable to create new encryption service")
+	}
+	d.EncryptionService = encryptionService
+
 	c, err := cmd.New()
 	if err != nil {
 		return errors.Wrap(err, "unable to create new command service")

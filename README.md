@@ -67,6 +67,17 @@ localhost:9090 protos.External/Test
 TODO: There's a scattering of `Id` vs `ID` used throughout the project. 
 We should settle on `ID` as described here: https://github.com/golang/go/wiki/CodeReviewComments#initialisms
 
+# Encryption
+
+To run snitch server, you will have to generate an AES256 key and pass it via `--aes-key` flag or `SNITCH_SERVER_AES_KEY` 
+environment variable.
+
+To generate a key, you can use the following command:
+
+```bash
+openssl enc -aes-256-cbc -k secret -P -md sha1 -pbkdf2
+```
+
 # Testing
 Make sure to run tests via `make test`. This is necessary as we have to set
 certain environment variables for the tests to run properly.

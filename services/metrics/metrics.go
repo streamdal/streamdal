@@ -42,11 +42,6 @@ type defaultCounter struct {
 }
 
 // storeCounter is used to cache counters in NATS
-type storeCounter struct {
-	Name   string            `json:"name"`
-	Labels map[string]string `json:"labels"`
-	Value  float64           `json:"value"`
-}
 
 var defaultCounters = []*defaultCounter{
 	{
@@ -87,6 +82,8 @@ var defaultCounters = []*defaultCounter{
 }
 
 type IMetrics interface {
+	FetchCounters(ctx context.Context) ([]*protos.Metric, error)
+
 	HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error
 }
 
@@ -134,7 +131,7 @@ func New(cfg *Config) (*Metrics, error) {
 }
 
 func (m *Metrics) loadCountersFromStore() error {
-	counters := make([]*storeCounter, 0)
+	counters := make([]*protos.Metric, 0)
 
 	data, err := m.NATSBackend.Get(context.Background(), "snitch_metrics", "counters.json")
 	if err != nil {
@@ -239,29 +236,29 @@ func (m *Metrics) runCounterDumper(looper director.Looper) {
 	})
 }
 
-func (m *Metrics) dumpCounters() error {
+func (m *Metrics) FetchCounters(ctx context.Context) ([]*protos.Metric, error) {
 	client := http.DefaultClient
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/metrics", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:8080/metrics", nil)
 	if err != nil {
-		return errors.Wrap(err, "unable to create request")
+		return nil, errors.Wrap(err, "unable to create request")
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "unable to get metrics")
+		return nil, errors.Wrap(err, "unable to get metrics")
 	}
 
 	defer resp.Body.Close()
 
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return errors.Wrap(err, "unable to read response body")
+		return nil, errors.Wrap(err, "unable to read response body")
 	}
 
 	lines := strings.Split(string(content), "\n")
 
-	counters := make([]*storeCounter, 0)
+	counters := make([]*protos.Metric, 0)
 	for _, line := range lines {
 		if strings.HasPrefix(line, "streamdal_") {
 			storeCounter, err := parseMetricString(line)
@@ -273,6 +270,12 @@ func (m *Metrics) dumpCounters() error {
 			counters = append(counters, storeCounter)
 		}
 	}
+
+	return counters, nil
+}
+
+func (m *Metrics) dumpCounters() error {
+	counters, err := m.FetchCounters(context.Background())
 
 	data, err := json.Marshal(counters)
 	if err != nil {
@@ -287,8 +290,8 @@ func (m *Metrics) dumpCounters() error {
 	return nil
 }
 
-// parseMetricString parses a prometheus metric string into a storeCounter struct for caching in NATS
-func parseMetricString(input string) (*storeCounter, error) {
+// parseMetricString parses a prometheus metric string into a protos.Metric struct for caching in NATS
+func parseMetricString(input string) (*protos.Metric, error) {
 	// Get key-value pairs
 	r := regexp.MustCompile(`(\w+)="([^"]+)"`)
 	matches := r.FindAllStringSubmatch(input, -1)
@@ -315,7 +318,7 @@ func parseMetricString(input string) (*storeCounter, error) {
 
 	name := input[:strings.Index(input, "{")]
 
-	return &storeCounter{
+	return &protos.Metric{
 		Name:   strings.Replace(name, "streamdal_snitch_", "", 1),
 		Labels: labels,
 		Value:  value,
