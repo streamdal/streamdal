@@ -12,7 +12,9 @@ services:
       - ${PWD}/assets/nats/nats-server.conf:/etc/nats/nats-server.conf
     networks:
       - snitch-network
-  snitch-server-1:
+
+  snitch-server:
+    container_name: snitch-server
     image: streamdal/snitch-server:latest
     depends_on:
       - natsjs
@@ -27,7 +29,8 @@ services:
       - snitch-network
     restart: on-failure
 
-  snitch-server-2:
+  snitch-server-1:
+    container_name: snitch-server-1
     image: streamdal/snitch-server:latest
     depends_on:
       - natsjs
@@ -42,7 +45,8 @@ services:
       - snitch-network
     restart: on-failure
 
-  snitch-server-3:
+  snitch-server-2:
+    container_name: snitch-server-2
     image: streamdal/snitch-server:latest
     depends_on:
       - natsjs
@@ -61,12 +65,13 @@ services:
     build:
       context: ${PWD}/assets/envoy
       dockerfile: ${PWD}/assets/envoy/Dockerfile
-    image: grpcweb/envoy
-    container_name: snitch-envoy
+    image: grpcweb/envoy:latest
+    container_name: envoy
     depends_on:
+      - snitch-server
       - snitch-server-1
       - snitch-server-2
-      - snitch-server-3
+
     ports:
       - "9091:9091"
     networks:
@@ -78,7 +83,7 @@ services:
     depends_on:
       - envoy
     environment:
-      - SNITCH_GRPC_WEB_URL="http://envoy:9091"
+      - SNITCH_GRPC_WEB_URL=http://envoy:9091
     ports:
       - "3000:3000"
     networks:
