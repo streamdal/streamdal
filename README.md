@@ -32,3 +32,12 @@ Without any of the size optimizations, the initial binary size is ~4.2MB.
 
 Compile + optimization time is ~45s on an M2.
 
+## Release
+
+Releasing is semi-automatic - you have to manually create and push a new `v0.0.0`
+tag and Github Actions will pick up the commit and create a new release.
+
+```
+git tag v0.0.4
+git push --tags
+```
