@@ -1,4 +1,3 @@
-
 # Snitch Server Docker Deployment
 
 This repository contains the Docker Compose setup to deploy the Snitch Server, NATS, Envoy, and a Web Console for Snitch.
