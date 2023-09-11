@@ -495,6 +495,121 @@ func TestKVRequestStaticModeKeyDoesNotExist(t *testing.T) {
 	}
 }
 
+func TestKVRequestDynamicModeKeyExists(t *testing.T) {
+	key := "object.foo"
+
+	req, err := createWASMRequestForKV(shared.KVAction_KV_ACTION_EXISTS, key, nil, steps.KVMode_KV_MODE_DYNAMIC)
+	if err != nil {
+		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
+	}
+
+	// This should cause lookup to use "bar" for key
+	req.InputPayload = []byte(`{"object":{"foo":"bar"}}"`)
+
+	snitchClient, kvClient, err := createSnitchClient()
+	if err != nil {
+		t.Fatalf("unable to create snitch client for kv test: %s", err)
+	}
+
+	kvClient.Set("bar", "")
+
+	// Create WASM func from request
+	f, err := snitchClient.createFunction(req.Step)
+	if err != nil {
+		t.Fatalf("unable to create func: %s", err)
+	}
+
+	// Function already created from WASM bytes, no need to pass it again (and consume extra WASM mem)
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+	}
+
+	// Exec WASM func; should receive WASMResponse{}
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		t.Fatalf("unable to exec WASM func: %s", err)
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+	}
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
+			protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS,
+			wasmResp.ExitCode,
+			wasmResp.ExitMsg,
+		)
+	}
+
+	expectedMsg := "key 'bar' exists"
+
+	if !strings.Contains(wasmResp.ExitMsg, expectedMsg) {
+		t.Errorf("expected ExitMsg to contain '%s', got = %s", expectedMsg, wasmResp.ExitMsg)
+	}
+}
+
+func TestKVRequestDynamicModeKeyDoesNotExist(t *testing.T) {
+	key := "object.foo"
+
+	req, err := createWASMRequestForKV(shared.KVAction_KV_ACTION_EXISTS, key, nil, steps.KVMode_KV_MODE_DYNAMIC)
+	if err != nil {
+		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
+	}
+
+	req.InputPayload = []byte(`{"object":{"foo":"bar"}}"`)
+
+	snitchClient, _, err := createSnitchClient()
+	if err != nil {
+		t.Fatalf("unable to create snitch client for kv test: %s", err)
+	}
+
+	// Create WASM func from request
+	f, err := snitchClient.createFunction(req.Step)
+	if err != nil {
+		t.Fatalf("unable to create func: %s", err)
+	}
+
+	// Function already created from WASM bytes, no need to pass it again (and consume extra WASM mem)
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+	}
+
+	// Exec WASM func; should receive WASMResponse{}
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		t.Fatalf("unable to exec WASM func: %s", err)
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+	}
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FAILURE {
+		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
+			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			wasmResp.ExitCode,
+			wasmResp.ExitMsg,
+		)
+	}
+
+	expectedMsg := "key 'bar' does not exist"
+
+	if !strings.Contains(wasmResp.ExitMsg, expectedMsg) {
+		t.Errorf("expected ExitMsg to contain '%s', got = %s", expectedMsg, wasmResp.ExitMsg)
+	}
+}
+
 func TestKVRequestStaticModeKeyExists(t *testing.T) {
 	key := "existing-key"
 
