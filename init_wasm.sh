@@ -7,6 +7,7 @@ latest_release=$(curl -s https://api.github.com/repos/streamdal/snitch-wasm/rele
 download_url=$(echo "$latest_release" | grep -o 'https://.*\.zip')
 
 # Step 3: Add debug info
+mkdir -p src
 version=$(echo $download_url | cut -d / -f8)
 echo "WASM artifact version: ${version}" > src/version.txt
 echo "Last updated: $(date)" >> src/version.txt
