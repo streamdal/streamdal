@@ -128,7 +128,7 @@ export const NotificationDetail = (success: SuccessType) => {
                   />
                 </>
               )}
-            <div class="flex flex-row justify-end mr-6 mb-6">
+            <div class="flex flex-row justify-center mr-6 my-6 w-full">
               <button
                 className={`${
                   data.type === "1" ? "btn-heimdal" : "btn-disabled"

@@ -35,7 +35,6 @@ export const handler: Handlers<SuccessType> = {
         },
       );
     }
-    console.log("notification", notification);
 
     const response = await createNotification(notification);
 

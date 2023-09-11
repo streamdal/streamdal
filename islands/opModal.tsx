@@ -3,8 +3,8 @@ import { ProducerIcon } from "../components/icons/producer.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import IconUserCircle from "tabler-icons/tsx/user-circle.tsx";
-import IconCircleChevronRight from "tabler-icons/tsx/circle-chevron-right.tsx";
-import IconCircleChevronLeft from "tabler-icons/tsx/circle-chevron-left.tsx";
+import IconChevronRight from "tabler-icons/tsx/chevron-right.tsx";
+import IconChevronLeft from "tabler-icons/tsx/chevron-left.tsx";
 import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
@@ -57,11 +57,8 @@ export default function OpModal(
           !isOpen && `translate-x-full right-[${OP_MODAL_WIDTH}]`
         } flex flex-row justify-end items-start`}
       >
-        {(opModal.value?.attach && isOpen) && (
-          <OddAttachModal serviceMap={serviceMap} />
-        )}
         <div class="w-[308px] shadow-xl h-full ml-2">
-          <div id="jesus" class="bg-white h-full dark:bg-gray-700">
+          <div class="bg-white h-full dark:bg-gray-700">
             <div class=" flex p-4 justify-between items-center border-b border-purple-100">
               <div class="flex items-center justify-start">
                 <IconUserCircle class="w-12 h-12 mr-4" />
@@ -91,12 +88,12 @@ export default function OpModal(
               </button>
             </div>
             <button
-              class="bg-white mt-[-20px] ml-[-20px] rounded-full shadow-md"
+              class="absolute bg-white mt-[-20px] ml-[-20px] rounded-full shadow-md z-[40] w-10 h-10 flex justify-center items-center"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen
-                ? <IconCircleChevronRight class="w-10 h-10" />
-                : <IconCircleChevronLeft class="w-10 h-10" />}
+                ? <IconChevronRight class="w-8 h-8" />
+                : <IconChevronLeft class="w-8 h-8" />}
             </button>
             {isOpen && (opModal.value == null
               ? (
@@ -108,43 +105,32 @@ export default function OpModal(
               : (
                 <div>
                   <div class="rounded-t flex justify-between">
-                    <div class="flex items-start justify-between p-4">
+                    <div class="z-[20] flex items-start justify-start w-full p-4 bg-web">
                       {opType === "CONSUMER"
                         ? <ConsumerIcon className={"mx-2"} />
                         : <ProducerIcon className={"mx-2"} />}
                       <div class="flex flex-col">
-                        <h3 class="text-lg text-purple-700">
+                        <h3 class="text-lg text-cloud">
                           {audience?.operationName}
                         </h3>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-xs text-cloud">
                           {`${clients || 0} attached client${
                             (clients !== 1) ? "s" : ""
                           }`}
                         </p>
                       </div>
                     </div>
-                    {
-                      /*taking this out but not completely becuase it doesn't seem like the worst user-flow to remove
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     the content of the modal but keep the modal open*/
-                    }
-                    {/*<button*/}
-                    {/*  type="button"*/}
-                    {/*  className="mt-1 mr-1 text-purple-700 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-6 h-6 ml-auto inline-flex justify-center items-center"*/}
-                    {/*  onClick={() => opModal.value = null}*/}
-                    {/*>*/}
-                    {/*  <IconX class="w-4 h-4" />*/}
-                    {/*</button>*/}
                   </div>
-                  <div class="px-4 py-4 rounded bg-purple-500 mx-2">
+                  <div class="px-4 py-4 rounded mx-2">
                     <div class="mb-2 flex justify-between items-center pr-2">
-                      <h3 class="text-white font-bold text-sm">
-                        Attached Pipeline
+                      <h3 class="text-wWEB font-bold text-sm">
+                        Attached Pipelines
                       </h3>
                     </div>
                     {!serviceMap?.pipes.length
                       ? (
                         <a href={"/pipelines"}>
-                          <button class="text-white border bg-white font-medium rounded-sm w-full flex justify-center text-sm px-2 text-xs py-1 text-center inline-flex items-center">
+                          <button class="text-web border border-purple-600 bg-purple-50 font-medium rounded-sm w-full flex justify-center text-sm px-2 text-xs py-1 text-center inline-flex items-center">
                             <IconPlus class="w-4 h-4 mr-1" />
                             Create a new pipeline
                           </button>
@@ -153,7 +139,7 @@ export default function OpModal(
                       : attachedPipeline
                       ? (
                         <div
-                          className={`flex justify-between items-center text-white bg-web border border-gray-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
+                          className={`flex justify-between items-center text-web bg-purple-50 border border-purple-600 font-medium rounded-sm w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
                             opModal.value?.attach &&
                             "ring-1 outline-none active:ring-purple-600"
                           }`}
@@ -214,7 +200,7 @@ export default function OpModal(
                       : (
                         <button
                           id="attach-pipeline"
-                          className="text-purple-200 bg-web border border-gray-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
+                          className="text-web bg-purple-50 border border-purple-600 hover:border-[#8E84AD] font-medium rounded-sm w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
                           type="button"
                           onClick={() =>
                             opModal.value = { ...opModal.value, attach: true }}
@@ -223,6 +209,9 @@ export default function OpModal(
                           <IconLink class="w-4" />
                         </button>
                       )}
+                    {(opModal.value?.attach && isOpen) && (
+                      <OddAttachModal serviceMap={serviceMap} />
+                    )}
                   </div>
                   <div
                     id="pipeline-attach-detach"
@@ -233,30 +222,13 @@ export default function OpModal(
                     <h3 id="collapse-heading-2">
                       <button
                         type="button"
-                        className="flex items-center w-full px-5 py-3 font-medium text-left text-web focus:ring-2"
+                        className="flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
                         data-accordion-target="#collapse-body-2"
                         aria-expanded="true"
                         aria-controls="collapse-body-2"
                       >
-                        <svg
-                          data-accordion-icon
-                          width="10"
-                          height="6"
-                          viewBox="0 0 10 6"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-3 h-3 rotate-180 shrink-0"
-                        >
-                          <path
-                            d="M9 1L5 5L1 1"
-                            stroke="#372D56"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
                         <h3 class="text-web text-sm font-semibold ml-3">
-                          Metrics
+                          Peek
                         </h3>
                       </button>
                     </h3>
@@ -272,28 +244,11 @@ export default function OpModal(
                     <h3 id="collapse-heading-3">
                       <button
                         type="button"
-                        className="flex items-center w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
+                        className="flex items-center border-b border-purple-100 w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
                         data-accordion-target="#collapse-body-3"
                         aria-expanded="false"
                         aria-controls="collapse-body-3"
                       >
-                        <svg
-                          data-accordion-icon
-                          width="10"
-                          height="6"
-                          viewBox="0 0 10 6"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-3 h-3 rotate-180 shrink-0"
-                        >
-                          <path
-                            d="M9 1L5 5L1 1"
-                            stroke="#372D56"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
                         <h3 class="text-web text-sm font-semibold ml-3">
                           Notifications
                         </h3>
@@ -309,6 +264,50 @@ export default function OpModal(
                           Notifications coming soon...
                         </p>
                       </div>
+                    </div>
+                    <h3 id="collapse-heading-4">
+                      <button
+                        type="button"
+                        className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+                        data-accordion-target="#collapse-body-4"
+                        aria-expanded="true"
+                        aria-controls="collapse-body-4"
+                      >
+                        <h3 class="text-web text-sm font-semibold ml-3">
+                          Trends
+                        </h3>
+                      </button>
+                    </h3>
+                    <div
+                      id="collapse-body-4"
+                      class="hidden"
+                      aria-labelledby="collapse-heading-4"
+                    >
+                      <p class="p-5 text-gray-300 text-xs dark:text-gray-400">
+                        Trends coming soon...
+                      </p>
+                    </div>
+                    <h3 id="collapse-heading-5">
+                      <button
+                        type="button"
+                        className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web"
+                        data-accordion-target="#collapse-body-5"
+                        aria-expanded="true"
+                        aria-controls="collapse-body-5"
+                      >
+                        <h3 class="text-web text-sm font-semibold ml-3">
+                          Schema
+                        </h3>
+                      </button>
+                    </h3>
+                    <div
+                      id="collapse-body-5"
+                      class="hidden"
+                      aria-labelledby="collapse-heading-5"
+                    >
+                      <p class="p-5 text-gray-300 text-xs dark:text-gray-400">
+                        Schema coming soon...
+                      </p>
                     </div>
                   </div>
                 </div>
