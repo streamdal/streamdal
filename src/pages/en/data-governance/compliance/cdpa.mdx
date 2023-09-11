@@ -1,14 +1,30 @@
 ---
-title: CDPA
-description: How Snitch helps with CDPA
+title: "CDPA Compliance with Snitch"
+metaTitle: "Achieve CDPA Compliance Seamlessly with Snitch"
+description: "Utilize Snitch to ensure consistent adherence to CDPA standards."
 layout: ../../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+# CDPA Compliance with Snitch
 
-import { Notification } from "accessible-astro-components";
+The Consumer Data Protection Act (CDPA) necessitates rigorous data protection standards, prioritizing consumer rights to access, correct, and delete personal data. With Snitch, ensuring compliance is streamlined and transparent.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+## Snitch's Approach
+
+Using Snitch, you can:
+
+- **Right to Access**: Set up rules that ensure user requests for data access are processed correctly, logging each request to maintain a history of actions taken.
+  
+  ```Example: Create a rule where, upon receiving a data access request, Snitch verifies the authenticity of the request, logs it, and ensures the necessary data is retrieved.```
+
+- **Right to Correct**: Allow for seamless correction of data by creating workflows that process these requests while maintaining an audit trail.
+
+  ```Example: If a user submits a request to correct their address, Snitch ensures the new address meets validation criteria, replaces the old data, and logs the change.```
+
+- **Right to Delete**: Automate the process of data deletion on user request, ensuring data is permanently removed from all systems.
+
+  ```Example: Upon a user's deletion request, Snitch can trigger a rule to remove the user's data, log the deletion, and send a confirmation to the user.```
+
+> **Coming Soon**: An illustrative guide on setting up the apt rules in the Snitch UI for CDPA compliance.
+
+Ensure consumer data rights and maintain CDPA compliance effectively with Snitch.

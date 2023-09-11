@@ -1,14 +1,76 @@
 ---
-title: Core Components Overview
-description: Snitch core components overview
+title: The Snitch SDK
+metaTitle: "Unpacking the Power and Simplicity of the Snitch SDK"
+description: Dive into Streamdal's SDK for Snitch, driving real-time data operations with minimal codebase disruptions.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+<br />
+<br />
+At the heart of Snitch's real-time data operations is the SDK — a robust, flexible, and lightweight tool that translates your rules into actions. The beauty of Streamdal's approach lies in its seamless integration into popular messaging libraries, minimizing the friction often associated with adopting new technologies.
 
-import { Notification } from "accessible-astro-components";
+## Forks of Popular Messaging Libraries: Easy Integration
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+Streamdal has gone the extra mile by maintaining forks of widely-used messaging libraries with the Snitch SDK already integrated. These adaptations, termed "shims", are engineered to allow you to leverage the capabilities of the SDK without making major alterations to your existing codebase.
+
+## Environment Variables: Configuring the SDK
+
+While integrating, the SDK offers the flexibility to be configured via specific environment variables, fetched at runtime. This setup ensures a dynamic approach, allowing changes without frequent code modifications. Here's a breakdown:
+
+| Environment Variable      | Mandatory? | Purpose                                                                                                                              | Default Value    |
+|---------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| `SNITCH_URL`              | Yes        | Connects to your deployed Snitch server instance                                                                                     | `localhost:9090` |
+| `SNITCH_TOKEN`            | Yes        | Authentication token for the Snitch server                                                                                           | `streamdal`      |
+| `SNITCH_DRY_RUN`          | No         | Switch between actual execution and logging-only mode                                                                                | `false`          |
+| `SNITCH_STEP_TIMEOUT`     | No         | Set the maximum duration for wasm execution                                                                                          | `10`             |
+| `SNITCH_PIPELINE_TIMEOUT` | No         | Define the total allowable execution time for the entire pipeline                                                                     | `100`            |
+| `SNITCH_DATA_SOURCE`      | No         | Designate the data source when applying rules, determining the applicable rulesets                                                   | `kafka`          |
+
+## Golang SDK Example
+
+Using the SDK in your Golang applications is straightforward. Here's a simple example to get you started:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/streamdal/snitch-go-client"
+)
+
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sc, err := snitch.New(&snitch.Config{
+		SnitchURL:       "localhost:9090",
+		SnitchToken:     "streadmal",
+		StepTimeout:     time.Millisecond * 10,
+		PipelineTimeout: time.Millisecond * 100,
+		DryRun:          false,
+		ServiceName:     "billing-svc",
+		ShutdownCtx:     ctx,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
+		OperationType: snitch.OperationTypeConsumer,
+		OperationName: "new-order-topic",
+		ComponentName: "kafka",
+		Data:          []byte(`{"object": {"field": true}}`),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%#v\n", resp)
+}
+```
+
+Explore other language-specific SDK documentations to fully harness Snitch's prowess in your applications.
+
