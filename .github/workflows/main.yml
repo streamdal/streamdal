@@ -51,10 +51,14 @@ jobs:
         run: |
           make test/wasm
           pip install coverage
-          coverage run --source=. -m pytest && coverage html
+          coverage run --source=snitchpy -m pytest && coverage html
       - name: Upload coverage information
         run: |
-          GIT_BRANCH=main ./cc-test-reporter after-build -p github.com/streamdal/snitch-python-client -r ${{ secrets.CC_TEST_REPORTER_ID }}
+          cc-test-reporter format-coverage -t coverage.py
+          GIT_BRANCH=main ./cc-test-reporter after-build \
+            -p github.com/streamdal/snitch-python-client \
+            -r ${{ secrets.CC_TEST_REPORTER_ID }} \
+            -t coverage.py
   build:
     outputs:
       new_tag: ${{ steps.create_tag.outputs.new_tag }}
