@@ -17,6 +17,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -88,6 +89,8 @@ type Snitch struct {
 	audiences          map[string]struct{}
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
+	tailsMtx           *sync.RWMutex
+	tails              map[string]map[string]*Tail
 }
 
 type Config struct {
@@ -162,6 +165,8 @@ func New(cfg *Config) (*Snitch, error) {
 		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
+		tailsMtx:           &sync.RWMutex{},
+		tails:              make(map[string]map[string]*Tail),
 	}
 
 	if cfg.DryRun {
@@ -171,7 +176,6 @@ func New(cfg *Config) (*Snitch, error) {
 	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
 		return nil, err
 	}
-
 	errCh := make(chan error, 0)
 
 	// Start register
@@ -184,6 +188,8 @@ func New(cfg *Config) (*Snitch, error) {
 	// Start heartbeat
 	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
 
+	go s.watchForShutdown()
+
 	// Make sure we were able to start without issues
 	select {
 	case err := <-errCh:
@@ -191,6 +197,7 @@ func New(cfg *Config) (*Snitch, error) {
 	case <-time.After(time.Second * 5):
 		return s, nil
 	}
+
 }
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
@@ -259,6 +266,20 @@ func validateConfig(cfg *Config) error {
 	return nil
 }
 
+func (s *Snitch) watchForShutdown() {
+	<-s.config.ShutdownCtx.Done()
+
+	// Shut down all tails
+	s.tailsMtx.RLock()
+	defer s.tailsMtx.RUnlock()
+	for _, tails := range s.tails {
+		for reqID, tail := range tails {
+			s.config.Logger.Debugf("Shutting down tail '%s' for pipeline %s", reqID, tail.Request.GetTail().Request.PipelineId)
+			tail.CancelFunc()
+		}
+	}
+}
+
 func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
 	cmds, err := s.serverClient.GetAttachCommandsByService(ctx, s.config.ServiceName)
 	if err != nil {
@@ -302,6 +323,12 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 		}
 
 		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+			if strings.Contains(err.Error(), "connection refused") {
+				// Snitch server went away, log, sleep, and wait for reconnect
+				s.config.Logger.Warn("failed to send heartbeat, snitch server went away, waiting for reconnect")
+				time.Sleep(ReconnectSleep)
+				return nil
+			}
 			s.config.Logger.Errorf("failed to send heartbeat: %s", err)
 		}
 
@@ -411,6 +438,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	for _, p := range pipelines {
+		originalData := data // Used for tail request
 		pipeline := p.GetAttachPipeline().GetPipeline()
 		labels["pipeline_name"] = pipeline.Name
 		labels["pipeline_id"] = pipeline.Id
@@ -503,6 +531,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		}
 
 		timeoutCxl()
+
+		// Perform tail if necessary
+		s.sendTail(aud, pipeline.Id, originalData, data)
 	}
 
 	// Dry run should not modify anything, but we must allow pipeline to

@@ -2,7 +2,6 @@ package snitch
 
 import (
 	"context"
-	"io"
 	"runtime"
 	"strings"
 	"time"
@@ -81,7 +80,7 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
-			if errors.Is(err, io.EOF) || strings.Contains(err.Error(), "reading from server: EOF") {
+			if strings.Contains(err.Error(), "reading from server: EOF") {
 				// Nicer reconnect messages
 				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
@@ -129,6 +128,25 @@ func (s *Snitch) register(looper director.Looper) error {
 				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
 				return nil
 			}
+		} else if tail := cmd.GetTail(); tail != nil {
+			switch tail.GetRequest().Type {
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
+				s.config.Logger.Debugf("Received start tail command for pipeline '%s'", tail.GetRequest().PipelineId)
+				if err := s.tailPipeline(context.Background(), cmd); err != nil {
+					s.config.Logger.Errorf("Failed to tail pipeline: %s", err)
+					return nil
+				}
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
+				s.config.Logger.Debugf("Received stop tail command for pipeline '%s'", tail.GetRequest().PipelineId)
+				if err := s.stopTailPipeline(context.Background(), cmd); err != nil {
+					s.config.Logger.Errorf("Failed to stop tail pipeline: %s", err)
+					return nil
+				}
+			default:
+				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
+				return nil
+			}
+
 		}
 
 		return nil

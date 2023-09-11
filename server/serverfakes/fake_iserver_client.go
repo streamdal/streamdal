@@ -25,6 +25,19 @@ type FakeIServerClient struct {
 		result1 *protos.GetAttachCommandsByServiceResponse
 		result2 error
 	}
+	GetTailStreamStub        func(context.Context) (protos.Internal_SendTailClient, error)
+	getTailStreamMutex       sync.RWMutex
+	getTailStreamArgsForCall []struct {
+		arg1 context.Context
+	}
+	getTailStreamReturns struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}
+	getTailStreamReturnsOnCall map[int]struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}
 	HeartBeatStub        func(context.Context, string) error
 	heartBeatMutex       sync.RWMutex
 	heartBeatArgsForCall []struct {
@@ -155,6 +168,70 @@ func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, re
 	}
 	fake.getAttachCommandsByServiceReturnsOnCall[i] = struct {
 		result1 *protos.GetAttachCommandsByServiceResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIServerClient) GetTailStream(arg1 context.Context) (protos.Internal_SendTailClient, error) {
+	fake.getTailStreamMutex.Lock()
+	ret, specificReturn := fake.getTailStreamReturnsOnCall[len(fake.getTailStreamArgsForCall)]
+	fake.getTailStreamArgsForCall = append(fake.getTailStreamArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.GetTailStreamStub
+	fakeReturns := fake.getTailStreamReturns
+	fake.recordInvocation("GetTailStream", []interface{}{arg1})
+	fake.getTailStreamMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIServerClient) GetTailStreamCallCount() int {
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
+	return len(fake.getTailStreamArgsForCall)
+}
+
+func (fake *FakeIServerClient) GetTailStreamCalls(stub func(context.Context) (protos.Internal_SendTailClient, error)) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = stub
+}
+
+func (fake *FakeIServerClient) GetTailStreamArgsForCall(i int) context.Context {
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
+	argsForCall := fake.getTailStreamArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeIServerClient) GetTailStreamReturns(result1 protos.Internal_SendTailClient, result2 error) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = nil
+	fake.getTailStreamReturns = struct {
+		result1 protos.Internal_SendTailClient
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIServerClient) GetTailStreamReturnsOnCall(i int, result1 protos.Internal_SendTailClient, result2 error) {
+	fake.getTailStreamMutex.Lock()
+	defer fake.getTailStreamMutex.Unlock()
+	fake.GetTailStreamStub = nil
+	if fake.getTailStreamReturnsOnCall == nil {
+		fake.getTailStreamReturnsOnCall = make(map[int]struct {
+			result1 protos.Internal_SendTailClient
+			result2 error
+		})
+	}
+	fake.getTailStreamReturnsOnCall[i] = struct {
+		result1 protos.Internal_SendTailClient
 		result2 error
 	}{result1, result2}
 }
@@ -480,6 +557,8 @@ func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.getAttachCommandsByServiceMutex.RLock()
 	defer fake.getAttachCommandsByServiceMutex.RUnlock()
+	fake.getTailStreamMutex.RLock()
+	defer fake.getTailStreamMutex.RUnlock()
 	fake.heartBeatMutex.RLock()
 	defer fake.heartBeatMutex.RUnlock()
 	fake.newAudienceMutex.RLock()
