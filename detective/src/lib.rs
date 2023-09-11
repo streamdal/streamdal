@@ -8,12 +8,24 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
     let wasm_request = match common::read_request(ptr, length, true) {
         Ok(req) => req,
-        Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
+        Err(e) => {
+            return common::write_response(
+                None,
+                None,
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to read request: {}", e),
+            );
+        }
     };
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        panic!("invalid step: {}", err) // TODO: Should write response here
+        common::write_response(
+            None,
+            None,
+            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            format!("step validation failed: {}", err),
+        );
     }
 
     // Generate detective request
@@ -28,10 +40,16 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 exit_code = WASMExitCode::WASM_EXIT_CODE_SUCCESS;
             }
 
-            common::write_response(&req.data, exit_code, "completed detective run".to_string())
+            common::write_response(
+                Some(&req.data),
+                None,
+                exit_code,
+                "completed detective run".to_string(),
+            )
         }
         Err(e) => common::write_response(
-            &req.data,
+            None,
+            None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             e.to_string(),
         ),
@@ -41,7 +59,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
     Request {
         match_type: wasm_request.step.detective().type_.clone().unwrap(),
-        data: &wasm_request.input,
+        data: &wasm_request.input_payload,
         path: wasm_request.step.detective().path.clone().unwrap(),
         args: wasm_request.step.detective().args.clone(),
         negate: wasm_request.step.detective().negate.clone().unwrap(),
@@ -49,7 +67,7 @@ fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
 }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
-    if req.input.is_empty() {
+    if req.input_payload.is_empty() {
         return Err("input cannot be empty".to_string());
     }
 

@@ -31,3 +31,4 @@ Result is as follows:
 Without any of the size optimizations, the initial binary size is ~4.2MB.
 
 Compile + optimization time is ~45s on an M2.
+

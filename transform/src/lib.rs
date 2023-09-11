@@ -25,7 +25,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => transform::obfuscate(&transform_request),
         _ => {
             return common::write_response(
-                &wasm_request.input,
+                None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 "Unknown transform type".to_string(),
             )
@@ -35,12 +36,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Inspect result and return potentially transformed payload
     match result {
         Ok(data) => common::write_response(
-            &data.into_bytes(),
+            Some(&data.into_bytes()),
+            None,
             WASMExitCode::WASM_EXIT_CODE_SUCCESS,
             "Successfully transformed payload".to_string(),
         ),
         Err(err) => common::write_response(
-            &wasm_request.input,
+            None,
+            None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
             format!("Unable to transform payload: {:?}", err),
         ),
@@ -49,14 +52,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 
 fn generate_transform_request(wasm_request: &WASMRequest) -> transform::Request {
     transform::Request {
-        data: wasm_request.input.clone(),
+        data: wasm_request.input_payload.clone(),
         path: wasm_request.step.transform().path.clone(),
         value: wasm_request.step.transform().value.clone(),
     }
 }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
-    if req.input.is_empty() {
+    if req.input_payload.is_empty() {
         return Err("input cannot be empty".to_string());
     }
 
