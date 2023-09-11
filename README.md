@@ -2,6 +2,9 @@
 
 
 [![Master build status](https://github.com/streamdal/snitch-go-client/workflows/main/badge.svg)](https://github.com/streamdal/snitch-go-client/actions/workflows/main-test.yml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/test_coverage)](https://codeclimate.com/github/streamdal/snitch-go-client/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/maintainability)](https://codeclimate.com/github/streamdal/snitch-go-client/maintainability)
+
 
 ## Shim usage
 

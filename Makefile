@@ -32,4 +32,4 @@ test/fakes:
 test/coverage: description = Run all tests
 test/coverage:
 	bash ./init_wasm.sh
-	go test ./... -coverprofile c.out
+	go test -coverprofile=c.out `go list ./... | go list ./... | grep -v fake`
