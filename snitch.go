@@ -28,6 +28,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-go-client/kv"
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
@@ -89,6 +90,7 @@ type Snitch struct {
 	audiences          map[string]struct{}
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
+	kv                 kv.IKV
 	tailsMtx           *sync.RWMutex
 	tails              map[string]map[string]*Tail
 }
@@ -152,6 +154,13 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
 
+	kvInstance, err := kv.New(&kv.Config{
+		Logger: cfg.Logger,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to start kv service")
+	}
+
 	s := &Snitch{
 		functions:          make(map[string]*function),
 		functionsMtx:       &sync.RWMutex{},
@@ -165,6 +174,7 @@ func New(cfg *Config) (*Snitch, error) {
 		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
+		kv:                 kvInstance,
 		tailsMtx:           &sync.RWMutex{},
 		tails:              make(map[string]map[string]*Tail),
 	}
@@ -176,6 +186,7 @@ func New(cfg *Config) (*Snitch, error) {
 	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
 		return nil, err
 	}
+
 	errCh := make(chan error, 0)
 
 	// Start register
@@ -197,7 +208,6 @@ func New(cfg *Config) (*Snitch, error) {
 	case <-time.After(time.Second * 5):
 		return s, nil
 	}
-
 }
 func validateConfig(cfg *Config) error {
 	if cfg == nil {

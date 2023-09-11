@@ -1,21 +1,17 @@
 package snitch
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
-	"net/http"
-	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 )
 
 type function struct {
@@ -81,7 +77,7 @@ func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*fun
 		return fc, nil
 	}
 
-	fi, err := createFunction(step)
+	fi, err := s.createFunction(step)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create function")
 	}
@@ -100,8 +96,8 @@ func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
 	return f, ok
 }
 
-func createFunction(step *protos.PipelineStep) (*function, error) {
-	inst, err := createWASMInstance(step.GetXWasmBytes())
+func (s *Snitch) createFunction(step *protos.PipelineStep) (*function, error) {
+	inst, err := s.createWASMInstance(step.GetXWasmBytes())
 	if err != nil {
 		return nil, err
 	}
@@ -133,9 +129,14 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	}, nil
 }
 
-func createWASMInstance(wasmBytes []byte) (api.Module, error) {
+func (s *Snitch) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
+	}
+
+	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) int32{
+		"kvExists":    s.HostFuncKVExists,
+		"httpRequest": HostFuncHTTPRequest,
 	}
 
 	ctx := context.Background()
@@ -152,11 +153,17 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
 
 	// TODO: module name probably needs to be unique
-	_, err := r.NewHostModuleBuilder("env").
-		NewFunctionBuilder().
-		WithFunc(httpRequest).
-		Export("httpRequest").
-		Instantiate(ctx)
+	for name, fn := range hostFuncs {
+		_, err := r.NewHostModuleBuilder("env").
+			NewFunctionBuilder().
+			WithFunc(fn).
+			Export(name).
+			Instantiate(ctx)
+
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to instantiate module for fn '%s'", name)
+		}
+	}
 
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {
@@ -166,94 +173,74 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	return mod, nil
 }
 
-// httpRequest is function that is exported to and called from the Rust WASM module
-func httpRequest(_ context.Context, module api.Module, ptr, length int32) int32 {
-	// Read memory starting from ptr
+// ReadRequestFromMemory is a helper function that reads raw memory starting at
+// 'ptr' for 'length' bytes. Once read, it will attempt to unmarshal the data
+// into the provided proto.Message.
+func ReadRequestFromMemory(module api.Module, msg proto.Message, ptr, length int32) error {
+	if length <= 0 {
+		return errors.New("length must be greater than 0")
+	}
+
+	if module == nil {
+		return errors.New("module cannot be nil")
+	}
+
+	if msg == nil {
+		return errors.New("msg cannot be nil")
+	}
+
 	data, ok := module.Memory().Read(uint32(ptr), uint32(length))
 	if !ok {
-		return httpResponse(module, http.StatusInternalServerError, "unable to read memory", nil)
+		return errors.New("unable to read memory")
 	}
 
-	request := &steps.HttpRequest{}
-	if err := proto.Unmarshal(data, request); err != nil {
-		err = errors.Wrap(err, "unable to unmarshal HttpRequest")
-		return httpResponse(module, 500, err.Error(), nil)
+	if err := proto.Unmarshal(data, msg); err != nil {
+		return errors.Wrap(err, "unable to unmarshal HttpRequest")
 	}
 
-	httpReq, err := http.NewRequest(methodFromProto(request.Method), request.Url, bytes.NewReader(request.Body))
-	if err != nil {
-		err = errors.Wrap(err, "unable to create http request")
-		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
-	}
-
-	resp, err := http.DefaultClient.Do(httpReq)
-	if err != nil {
-		err = errors.Wrap(err, "unable to perform http request")
-		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
-	}
-
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return httpResponse(module, http.StatusInternalServerError, err.Error(), nil)
-	}
-
-	if resp.StatusCode > 299 {
-		return httpResponse(module, resp.StatusCode, string(body), nil)
-	}
-
-	// Get all headers from the response
-	headers := make(map[string]string)
-	for k, v := range resp.Header {
-		headers[k] = strings.Join(v, ", ")
-	}
-
-	return httpResponse(module, resp.StatusCode, string(body), headers)
+	return nil
 }
 
-func httpResponse(module api.Module, code int, body string, headers map[string]string) int32 {
-	if headers == nil {
-		headers = make(map[string]string)
+// WriteResponseToMemory is a helper function that marshals provided message to
+// module memory, appends terminators and returns the pointer to the start of
+// the message.
+func WriteResponseToMemory(module api.Module, msg proto.Message) (int32, error) {
+	if module == nil {
+		return 0, errors.New("module cannot be nil")
 	}
 
-	resp := &steps.HttpResponse{
-		Code:    int32(code),
-		Body:    []byte(body),
-		Headers: headers,
+	if msg == nil {
+		return 0, errors.New("msg cannot be nil")
 	}
 
-	out, err := proto.Marshal(resp)
+	data, err := proto.Marshal(msg)
 	if err != nil {
-		panic("can't marshal")
+		return 0, errors.Wrap(err, "unable to marshal response")
 	}
 
-	// Apply terminator to end of response
-	out = append(out, 166, 166, 166)
+	// Append terminator to end of response
+	data = append(data, 166, 166, 166)
 
 	alloc := module.ExportedFunction("alloc")
+	if alloc == nil {
+		return 0, errors.New("unable to get alloc func")
+	}
 
-	allocRes, err := alloc.Call(context.Background(), uint64(len(out)))
+	// Allocate memory for response
+	allocRes, err := alloc.Call(context.Background(), uint64(len(data)))
 	if err != nil {
-		panic(fmt.Sprintf("failed to allocate memory for http response: %s", err.Error()))
+		return 0, errors.Wrap(err, "unable to allocate memory")
 	}
 
-	ok := module.Memory().Write(uint32(allocRes[0]), out)
+	if len(allocRes) < 1 {
+		return 0, errors.New("alloc returned unexpected number of results")
+	}
+
+	// Write memory to allocated space
+	ok := module.Memory().Write(uint32(allocRes[0]), data)
 	if !ok {
-		panic("unable to write host function results to memory")
+		return 0, errors.New("unable to write host function results to memory")
 	}
 
-	return int32(allocRes[0])
-}
-
-func methodFromProto(m steps.HttpRequestMethod) string {
-	switch m {
-	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_POST:
-		return http.MethodPost
-	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_PUT:
-		return http.MethodPut
-	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_DELETE:
-		return http.MethodDelete
-	default:
-		return http.MethodGet
-	}
+	return int32(allocRes[0]), nil
 }
