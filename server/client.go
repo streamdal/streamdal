@@ -10,8 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/snitch-go-client/types"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IServerClient

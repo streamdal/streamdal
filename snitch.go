@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
