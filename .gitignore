@@ -6,3 +6,5 @@
 *.egg-info
 dist/*
 htmlcov/*
+coverage.xml
+coverage/*

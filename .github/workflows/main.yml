@@ -51,7 +51,7 @@ jobs:
         run: |
           make test/wasm
           pip install coverage
-          coverage run --source=snitchpy -m pytest && coverage html
+          coverage run --source=snitchpy -m pytest && coverage xml
       - name: Upload coverage information
         run: |
           ./cc-test-reporter format-coverage -t coverage.py
