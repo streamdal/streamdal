@@ -130,6 +130,9 @@ class HttpRequestMethod(betterproto.Enum):
     HTTP_REQUEST_METHOD_POST = 2
     HTTP_REQUEST_METHOD_PUT = 3
     HTTP_REQUEST_METHOD_DELETE = 4
+    HTTP_REQUEST_METHOD_PATCH = 5
+    HTTP_REQUEST_METHOD_HEAD = 6
+    HTTP_REQUEST_METHOD_OPTIONS = 7
 
 
 class KvMode(betterproto.Enum):

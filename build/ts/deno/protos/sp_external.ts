@@ -6,6 +6,7 @@ import { TailRequest } from "./sp_common.ts";
 import { StandardResponse } from "./sp_common.ts";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AudienceRate } from "./sp_common.ts";
 import { Metric } from "./sp_common.ts";
 import { NotificationConfig } from "./sp_notify.ts";
 import { Pipeline } from "./sp_pipeline.ts";
@@ -307,6 +308,30 @@ export interface GetMetricsResponse {
     metrics: {
         [key: string]: Metric;
     };
+}
+/**
+ * Nothing needed here, we return all rates
+ *
+ * @generated from protobuf message protos.GetAudienceRatesRequest
+ */
+export interface GetAudienceRatesRequest {
+}
+/**
+ * @generated from protobuf message protos.GetAudienceRatesResponse
+ */
+export interface GetAudienceRatesResponse {
+    /**
+     * @generated from protobuf field: map<string, protos.AudienceRate> rates = 1;
+     */
+    rates: {
+        [key: string]: AudienceRate;
+    }; // Key is an audience string
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -642,6 +667,29 @@ class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
  */
 export const GetMetricsResponse = new GetMetricsResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetAudienceRatesRequest$Type extends MessageType<GetAudienceRatesRequest> {
+    constructor() {
+        super("protos.GetAudienceRatesRequest", []);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAudienceRatesRequest
+ */
+export const GetAudienceRatesRequest = new GetAudienceRatesRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse> {
+    constructor() {
+        super("protos.GetAudienceRatesResponse", [
+            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAudienceRatesResponse
+ */
+export const GetAudienceRatesResponse = new GetAudienceRatesResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -690,5 +738,6 @@ export const External = new ServiceType("protos.External", [
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
+    { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

@@ -96,3 +96,8 @@ message TailResponse {
 
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
+
+message AudienceRate {
+  int64 bytes = 2;
+  int64 processed = 3;
+}

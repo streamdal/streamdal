@@ -152,6 +152,19 @@ export interface TailResponse {
     };
 }
 /**
+ * @generated from protobuf message protos.AudienceRate
+ */
+export interface AudienceRate {
+    /**
+     * @generated from protobuf field: int64 bytes = 2;
+     */
+    bytes: bigint;
+    /**
+     * @generated from protobuf field: int64 processed = 3;
+     */
+    processed: bigint;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -270,4 +283,11 @@ declare class TailResponse$Type extends MessageType<TailResponse> {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export declare const TailResponse: TailResponse$Type;
+declare class AudienceRate$Type extends MessageType<AudienceRate> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.AudienceRate
+ */
+export declare const AudienceRate: AudienceRate$Type;
 export {};

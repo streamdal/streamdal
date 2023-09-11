@@ -72,6 +72,8 @@ service External {
 
   rpc Tail(TailRequest) returns (stream TailResponse);
 
+  rpc GetAudienceRates(GetAudienceRatesRequest) returns (stream GetAudienceRatesResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -204,6 +206,15 @@ message GetMetricsRequest {
 
 message GetMetricsResponse {
   map<string,protos.Metric> metrics = 1;
+}
+
+message GetAudienceRatesRequest {
+  // Nothing needed here, we return all rates
+}
+
+message GetAudienceRatesResponse {
+  map<string,AudienceRate> rates = 1; // Key is an audience string
+  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message TestRequest {

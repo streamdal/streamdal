@@ -33,6 +33,14 @@ class Audience(_message.Message):
     service_name: str
     def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ..., operation_name: _Optional[str] = ...) -> None: ...
 
+class AudienceRate(_message.Message):
+    __slots__ = ["bytes", "processed"]
+    BYTES_FIELD_NUMBER: _ClassVar[int]
+    PROCESSED_FIELD_NUMBER: _ClassVar[int]
+    bytes: int
+    processed: int
+    def __init__(self, bytes: _Optional[int] = ..., processed: _Optional[int] = ...) -> None: ...
+
 class Metric(_message.Message):
     __slots__ = ["labels", "name", "value"]
     class LabelsEntry(_message.Message):

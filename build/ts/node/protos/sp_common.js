@@ -169,4 +169,17 @@ class TailResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export const TailResponse = new TailResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AudienceRate$Type extends MessageType {
+    constructor() {
+        super("protos.AudienceRate", [
+            { no: 2, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 3, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AudienceRate
+ */
+export const AudienceRate = new AudienceRate$Type();
 //# sourceMappingURL=sp_common.js.map

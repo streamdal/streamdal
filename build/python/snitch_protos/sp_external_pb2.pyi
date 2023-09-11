@@ -111,6 +111,32 @@ class GetAllResponse(_message.Message):
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
     def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ...) -> None: ...
 
+class GetAudienceRatesRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetAudienceRatesResponse(_message.Message):
+    __slots__ = ["_metadata", "rates"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class RatesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _sp_common_pb2.AudienceRate
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_common_pb2.AudienceRate, _Mapping]] = ...) -> None: ...
+    RATES_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
+    rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
+    def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class GetMetricsRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...

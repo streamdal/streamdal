@@ -1,5 +1,6 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
@@ -303,6 +304,30 @@ export interface GetMetricsResponse {
     };
 }
 /**
+ * Nothing needed here, we return all rates
+ *
+ * @generated from protobuf message protos.GetAudienceRatesRequest
+ */
+export interface GetAudienceRatesRequest {
+}
+/**
+ * @generated from protobuf message protos.GetAudienceRatesResponse
+ */
+export interface GetAudienceRatesResponse {
+    /**
+     * @generated from protobuf field: map<string, protos.AudienceRate> rates = 1;
+     */
+    rates: {
+        [key: string]: AudienceRate;
+    };
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -502,6 +527,20 @@ declare class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
  * @generated MessageType for protobuf message protos.GetMetricsResponse
  */
 export declare const GetMetricsResponse: GetMetricsResponse$Type;
+declare class GetAudienceRatesRequest$Type extends MessageType<GetAudienceRatesRequest> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAudienceRatesRequest
+ */
+export declare const GetAudienceRatesRequest: GetAudienceRatesRequest$Type;
+declare class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse> {
+    constructor();
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAudienceRatesResponse
+ */
+export declare const GetAudienceRatesResponse: GetAudienceRatesResponse$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
 }

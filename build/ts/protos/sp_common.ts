@@ -155,6 +155,19 @@ export interface TailResponse {
     }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
+ * @generated from protobuf message protos.AudienceRate
+ */
+export interface AudienceRate {
+    /**
+     * @generated from protobuf field: int64 bytes = 2;
+     */
+    bytes: bigint;
+    /**
+     * @generated from protobuf field: int64 processed = 3;
+     */
+    processed: bigint;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -317,3 +330,16 @@ class TailResponse$Type extends MessageType<TailResponse> {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export const TailResponse = new TailResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AudienceRate$Type extends MessageType<AudienceRate> {
+    constructor() {
+        super("protos.AudienceRate", [
+            { no: 2, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 3, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AudienceRate
+ */
+export const AudienceRate = new AudienceRate$Type();

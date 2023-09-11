@@ -200,6 +200,12 @@ class TailResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class AudienceRate(betterproto.Message):
+    bytes: int = betterproto.int64_field(2)
+    processed: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):
     """
     Pipeline is a structure that holds one or more pipeline steps. This
@@ -533,6 +539,21 @@ class GetMetricsRequest(betterproto.Message):
 class GetMetricsResponse(betterproto.Message):
     metrics: Dict[str, "Metric"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass(eq=False, repr=False)
+class GetAudienceRatesRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class GetAudienceRatesResponse(betterproto.Message):
+    rates: Dict[str, "AudienceRate"] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
 
 
@@ -1256,6 +1277,24 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def get_audience_rates(
+        self,
+        get_audience_rates_request: "GetAudienceRatesRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> AsyncIterator["GetAudienceRatesResponse"]:
+        async for response in self._unary_stream(
+            "/protos.External/GetAudienceRates",
+            get_audience_rates_request,
+            GetAudienceRatesResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        ):
+            yield response
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1504,6 +1543,12 @@ class ExternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield TailResponse()
 
+    async def get_audience_rates(
+        self, get_audience_rates_request: "GetAudienceRatesRequest"
+    ) -> AsyncIterator["GetAudienceRatesResponse"]:
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+        yield GetAudienceRatesResponse()
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -1671,6 +1716,17 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_get_audience_rates(
+        self,
+        stream: "grpclib.server.Stream[GetAudienceRatesRequest, GetAudienceRatesResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        await self._call_rpc_handler_server_stream(
+            self.get_audience_rates,
+            stream,
+            request,
+        )
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1805,6 +1861,12 @@ class ExternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_STREAM,
                 TailRequest,
                 TailResponse,
+            ),
+            "/protos.External/GetAudienceRates": grpclib.const.Handler(
+                self.__rpc_get_audience_rates,
+                grpclib.const.Cardinality.UNARY_STREAM,
+                GetAudienceRatesRequest,
+                GetAudienceRatesResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
