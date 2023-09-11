@@ -12,7 +12,9 @@ services:
       - ${PWD}/assets/nats/nats-server.conf:/etc/nats/nats-server.conf
     networks:
       - snitch-network
-  snitch-server-1:
+
+  snitch-server:
+    container_name: snitch-server
     image: streamdal/snitch-server:latest
     depends_on:
       - natsjs
@@ -27,50 +29,18 @@ services:
       - snitch-network
     restart: on-failure
 
-  snitch-server-2:
-    image: streamdal/snitch-server:latest
-    depends_on:
-      - natsjs
-    environment:
-      - SNITCH_SERVER_NODE_NAME=node2
-      - SNITCH_SERVER_AUTH_TOKEN=1234
-      - SNITCH_SERVER_NATSURL=natsjs:4222
-    ports:
-      - "8080"
-      - "9090"
-    networks:
-      - snitch-network
-    restart: on-failure
-
-  snitch-server-3:
-    image: streamdal/snitch-server:latest
-    depends_on:
-      - natsjs
-    environment:
-      - SNITCH_SERVER_NODE_NAME=node3
-      - SNITCH_SERVER_AUTH_TOKEN=1234
-      - SNITCH_SERVER_NATSURL=natsjs:4222
-    ports:
-      - "8080"
-      - "9090"
-    networks:
-      - snitch-network
-    restart: on-failure
-
   envoy:
     build:
       context: ${PWD}/assets/envoy
       dockerfile: ${PWD}/assets/envoy/Dockerfile
-    image: grpcweb/envoy
-    container_name: snitch-envoy
+    container_name: envoy
     depends_on:
-      - snitch-server-1
-      - snitch-server-2
-      - snitch-server-3
+      - snitch-server
     ports:
       - "9091:9091"
     networks:
       - snitch-network
+    restart: on-failure
 
   web:
     image: streamdal/snitch-console:latest
@@ -78,7 +48,7 @@ services:
     depends_on:
       - envoy
     environment:
-      - SNITCH_GRPC_WEB_URL="http://envoy:9091"
+      - SNITCH_GRPC_WEB_URL=http://envoy:9091
     ports:
       - "3000:3000"
     networks:
