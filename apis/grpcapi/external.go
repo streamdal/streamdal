@@ -657,6 +657,52 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
+func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
+	// Each tail request gets its own unique ID so that we can receive messages over
+	// a unique channel from NATS
+	req.Id = util.GenerateUUID()
+
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
+	}
+
+	// Get channel for receiving TailResponse messages that get shipped over NATS.
+	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
+	// messages from NATS
+	sdkReceiveChan := s.Options.PubSubService.Listen(req.Id, util.CtxRequestId(server.Context()))
+
+	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
+		return errors.Wrap(err, "unable to broadcast tail request")
+	}
+
+	defer func() {
+		req.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
+		if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
+			s.log.Error(errors.Wrap(err, "unable to broadcast stop tail request"))
+		}
+	}()
+
+	for {
+		select {
+		case <-server.Context().Done():
+			s.log.Debug("frontend closed tail stream")
+			return nil
+		case <-s.Options.ShutdownContext.Done():
+			s.log.Debug("server shutting down, exiting tail stream")
+			return nil
+		case msg := <-sdkReceiveChan:
+			tr, ok := msg.(*protos.TailResponse)
+			if !ok {
+				s.log.Errorf("unknown message received from connected SDK session: %v", msg)
+				continue
+			}
+			if err := server.Send(tr); err != nil {
+				return errors.Wrap(err, "unable to send tail stream response")
+			}
+		}
+	}
+}
+
 func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.External_GetMetricsServer) error {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()

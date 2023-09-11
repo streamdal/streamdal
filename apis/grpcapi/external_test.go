@@ -351,7 +351,7 @@ var _ = Describe("External gRPC API", func() {
 				createdAudienceIDs = append(createdAudienceIDs, util.AudienceToStr(aud))
 			}
 
-			config := make(map[string]string, 0)
+			config := make(map[string]string)
 
 			// Attach pipelines to audiences
 			for i := 0; i < len(createdPipelineIDs); i++ {

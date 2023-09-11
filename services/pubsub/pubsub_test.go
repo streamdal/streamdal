@@ -61,7 +61,7 @@ var _ = Describe("PubSub", func() {
 						// fmt.Println("received message on test1 (as expected): " + msg)
 						continue
 					case msg := <-ps.Listen("test2"):
-						Fail("received message on wrong topic: " + msg)
+						Fail("received message on wrong topic: " + msg.(string))
 					case <-time.After(1 * time.Second):
 						Succeed()
 						return

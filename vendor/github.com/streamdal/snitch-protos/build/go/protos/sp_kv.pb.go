@@ -20,16 +20,17 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
 type KVAction int32
 
 const (
-	KVAction_KV_ACTION_UNSET  KVAction = 0 // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-	KVAction_KV_ACTION_CREATE KVAction = 1 // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
-	KVAction_KV_ACTION_UPDATE KVAction = 2 // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+	KVAction_KV_ACTION_UNSET  KVAction = 0
+	KVAction_KV_ACTION_CREATE KVAction = 1
+	KVAction_KV_ACTION_UPDATE KVAction = 2
 	// Only "key" and "requested_at_*" needs to be set in *protos.KVInstruction
-	KVAction_KV_ACTION_DELETE KVAction = 3 // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+	KVAction_KV_ACTION_DELETE KVAction = 3
 	// Only "requested_at_*" needs to be set in *protos.KVInstruction
-	KVAction_KV_ACTION_DELETE_ALL KVAction = 4 // protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+	KVAction_KV_ACTION_DELETE_ALL KVAction = 4
 )
 
 // Enum value maps for KVAction.
@@ -77,7 +78,7 @@ func (KVAction) EnumDescriptor() ([]byte, []int) {
 	return file_sp_kv_proto_rawDescGZIP(), []int{0}
 }
 
-// Represents a single KV object
+// KVObject represents a single KV object
 type KVObject struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -3,11 +3,14 @@ package grpcapi
 import (
 	"context"
 	"fmt"
+	"io"
+	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/store"
@@ -73,7 +76,7 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 
 				switch key.Operation() {
 				case nats.KeyValuePut:
-					llog.Debug("detected heartbeat")
+					//llog.Debug("detected heartbeat")
 					lastHeartbeat = time.Now()
 				default:
 					llog.Debug("received non-put operation on key watcher; ignoring")
@@ -160,7 +163,7 @@ MAIN:
 			llog.Debug("register handler detected no heartbeat; disconnecting client")
 			break MAIN
 		case <-ticker.C:
-			llog.Debug("sending heartbeat")
+			//llog.Debug("sending heartbeat")
 
 			if err := server.Send(&protos.Command{
 				Command: &protos.Command_KeepAlive{
@@ -170,6 +173,10 @@ MAIN:
 				llog.WithError(err).Errorf("unable to send heartbeat for session id '%s'", request.SessionId)
 			}
 		case cmd := <-ch:
+			if cmd == nil {
+				llog.Warning("received nil cmd on cmd channel; ignoring")
+				continue
+			}
 			llog.Debug("received cmd on cmd channel")
 
 			// Send cmd to connected client
@@ -223,8 +230,6 @@ MAIN:
 }
 
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
-	s.log.Debugf("received heartbeat request for session id '%s'", req.SessionId)
-
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
@@ -363,4 +368,46 @@ func (s *InternalServer) GetAttachCommandsByService(
 		Active: active,
 		Paused: paused,
 	}, nil
+}
+
+func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
+	// This isn't necessary for go, but other langauge libraries, such as python
+	// require a response to eventually be sent and will throw an exception if
+	// one is not received
+	defer srv.SendAndClose(&protos.StandardResponse{
+		Id:   util.CtxRequestId(srv.Context()),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+	})
+
+	for {
+		select {
+		case <-srv.Context().Done():
+			s.log.Debug("send tail handler detected client disconnect")
+			return nil
+		case <-s.Options.ShutdownContext.Done():
+			s.log.Debug("server shutting down, exiting SendTail() stream")
+			return nil
+		default:
+			tailResp, err := srv.Recv()
+			if err != nil {
+				if strings.Contains(err.Error(), io.EOF.Error()) || strings.Contains(err.Error(), context.Canceled.Error()) {
+					s.log.Debug("client closed tail stream")
+					return nil
+				}
+				s.log.Error(errors.Wrap(err, "unable to receive tail response"))
+			}
+
+			if err := validate.TailResponse(tailResp); err != nil {
+				s.log.Error(errors.Wrap(err, "invalid tail response"))
+				continue
+			}
+
+			if err := s.Options.BusService.BroadcastTailResponse(srv.Context(), tailResp); err != nil {
+				s.log.Error(errors.Wrap(err, "unable to broadcast tail response"))
+				continue
+			}
+
+			s.log.Infof("publishing tail response for session id '%s'", tailResp.SessionId)
+		}
+	}
 }

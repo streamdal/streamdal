@@ -662,3 +662,63 @@ func KVRequest(r *protos.KVRequest) error {
 
 	return nil
 }
+
+func StartTailRequest(r *protos.TailRequest) error {
+	return validateTailRequest(r)
+}
+
+func StopTailRequest(r *protos.TailRequest) error {
+	return validateTailRequest(r)
+}
+
+func validateTailRequest(r *protos.TailRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.Type == protos.TailRequestType_TAIL_REQUEST_TYPE_UNSET {
+		return ErrUnsetEnum("Type")
+	}
+
+	if r.Id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if r.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	if r.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	return nil
+}
+
+func TailResponse(r *protos.TailResponse) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.TailRequestId == "" {
+		return ErrEmptyField("TailRequestId")
+	}
+
+	if r.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	if r.SessionId == "" {
+		return ErrEmptyField("SessionId")
+	}
+
+	if r.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	if r.Type == protos.TailResponseType_TAIL_RESPONSE_TYPE_UNSET {
+		return ErrUnsetEnum("Type")
+	}
+
+	return nil
+}

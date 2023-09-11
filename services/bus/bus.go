@@ -8,9 +8,10 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-server/services/cmd"
 	"github.com/streamdal/snitch-server/services/metrics"
@@ -53,7 +54,11 @@ type IBus interface {
 	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
 	BroadcastKVDelete(ctx context.Context, key string) error
 	BroadcastKVDeleteAll(ctx context.Context) error
+
 	BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error
+
+	BroadcastTailRequest(ctx context.Context, req *protos.TailRequest) error
+	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
 }
 
 type Bus struct {
@@ -229,6 +234,10 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
 		err = b.handleMetricsRequest(shutdownCtx, busEvent.GetMetricsRequest())
 	case *protos.BusEvent_KvRequest:
 		err = b.handleKVRequest(shutdownCtx, busEvent.GetKvRequest())
+	case *protos.BusEvent_TailRequest:
+		err = b.handleTailCommand(shutdownCtx, busEvent.GetTailRequest())
+	case *protos.BusEvent_TailResponse:
+		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
 	default:
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}
