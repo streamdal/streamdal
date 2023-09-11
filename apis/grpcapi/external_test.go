@@ -2,6 +2,8 @@ package grpcapi
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -784,6 +786,15 @@ var _ = Describe("External gRPC API", func() {
 	})
 })
 
+func genAESKey() string {
+	bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err.Error())
+	}
+
+	return hex.EncodeToString(bytes)
+}
+
 func runServer() {
 	d, err := deps.New(&config.Config{
 		Debug:                true,
@@ -796,6 +807,7 @@ func runServer() {
 		NATSNumKVReplicas:    1,
 		SessionTTL:           time.Second, // Override TTL to improve test speed
 		WASMDir:              "./assets/wasm",
+		AesKey:               genAESKey(),
 	})
 
 	if err != nil {
