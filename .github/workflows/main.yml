@@ -56,7 +56,6 @@ jobs:
         run: |
           ./cc-test-reporter format-coverage -t coverage.py
           GIT_BRANCH=main ./cc-test-reporter after-build \
-            -p github.com/streamdal/snitch-python-client \
             -r ${{ secrets.CC_TEST_REPORTER_ID }} \
             -t coverage.py
   build:
