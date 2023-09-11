@@ -25,7 +25,7 @@ setup/darwin:
 
 .PHONY: build
 build: description = Build all targets
-build: build/detective build/transform build/httprequest
+build: clean build/detective build/transform build/httprequest build/kv
 
 .PHONY: build/detective
 build/detective: description = Build WASM target for detective
@@ -77,7 +77,7 @@ clean/kv:
 
 .PHONY: clean
 clean: description = Remove all build artifacts
-clean: clean/detective clean/transform
+clean: clean/detective clean/transform clean/httprequest clean/kv
 
 .PHONY: test
 test: description = Run tests

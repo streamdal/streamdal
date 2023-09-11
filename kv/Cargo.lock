@@ -382,9 +382,9 @@ checksum = "62bb4feee49fdd9f707ef802e22365a35de4b7b299de4763d44bfea899442ff9"
 
 [[package]]
 name = "snitch-detective"
-version = "0.0.24"
+version = "0.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "914e216d062ac73082925d1b07445e2a350e63283ffb7be75390316e060ee65d"
+checksum = "3fc3d15d52f6d55d76c1e2a193463c692904e3bdc85bf0aac8bc7ec51e93440e"
 dependencies = [
  "ajson",
  "bencher",
@@ -404,9 +404,9 @@ dependencies = [
 
 [[package]]
 name = "snitch-protos"
-version = "0.0.90"
+version = "0.0.91"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cedfc733f95e296e827324b4637078560eaa1995726422f2fd063907618233d5"
+checksum = "32346320ea57f3bbbab99f0955a7d48b63177e78f36786d45a5642a2b9eadb90"
 dependencies = [
  "protobuf",
 ]

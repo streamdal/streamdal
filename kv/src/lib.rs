@@ -1,5 +1,5 @@
 use protobuf::{EnumOrUnknown, Message};
-use protos::sp_kv::KVAction;
+use protos::sp_shared::KVAction;
 use protos::sp_steps_kv::{KVMode, KVStatus, KVStepResponse};
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use snitch_detective::detective;
