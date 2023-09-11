@@ -1,14 +1,70 @@
 ---
-title: Snitch-Go
-description: Snitch Go (Golang) support
+title: "Go Client Support for Snitch"
+metaTitle: "Elevate Your Go Applications with Snitch"
+description: "Integrate Snitch seamlessly into your Go projects and optimize your data operations."
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+<br />
+<br />
+Welcome to the Go Client Guide for Snitch! If you're developing with Go and aim to elevate your data operations, you're in the right place. With Snitch's Go client, integrating the power of Snitch into your Go applications has never been simpler.
 
-import { Notification } from "accessible-astro-components";
+## Utilizing Shims for Integration
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+Streamdal offers forks of prominent messaging libraries, having the Snitch SDK effortlessly woven into them. This is what we call **shims**. The essence of these shims is to ensure you can integrate the SDK without any significant overhaul of your existing codebase.
+
+When leveraging these shims, remember to set certain environment variables that the SDK reads during runtime. These variables are:
+
+| Envar                     | Required | Description                                                                                                                             | Default          |
+|---------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| `SNITCH_URL`              | ✅ Yes   | URL pointing to an active Snitch server within your infrastructure.                                                                    | `localhost:9090` |
+| `SNITCH_TOKEN`            | ✅ Yes   | The authentication token for the plumber server (configured through the plumber server).                                               | `streamdal`      |
+| `SNITCH_DRY_RUN`          | No       | A toggle (`true` or `false`). When in dry run mode, the SDK logs the rules to be applied, without actual execution.                     | `false`          |
+| `SNITCH_STEP_TIMEOUT`     | No       | Maximum allowed duration (in milliseconds) for wasm execution.                                                                         | `10`             |
+| `SNITCH_PIPELINE_TIMEOUT` | No       | Overall timeout (in milliseconds) for executing the entire pipeline.                                                                   | `100`            |
+| `SNITCH_DATA_SOURCE`      | No       | Determines the data source for rule application, aiding in rule set selection for the message.                                         | `kafka`          |
+
+## Dive Into an Example
+
+Wondering how it works in action? Here's a simple Go code demonstrating the Snitch integration:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/streamdal/snitch-go-client"
+)
+
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sc, err := snitch.New(&snitch.Config{
+		SnitchURL:       "localhost:9090",
+		SnitchToken:     "streadmal",
+		StepTimeout:     time.Millisecond * 10,
+		PipelineTimeout: time.Millisecond * 100,
+		DryRun:          false,
+		ServiceName:     "billing-svc",
+		ShutdownCtx:     ctx,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
+		OperationType: snitch.OperationTypeConsumer,
+		OperationName: "new-order-topic",
+		ComponentName: "kafka",
+		Data:          []byte(`{"object": {"field": true}}`),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%#v\n", resp)
+}
