@@ -6,9 +6,9 @@ package helper
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero/api"
+	"google.golang.org/protobuf/proto"
 )
 
 // ReadRequestFromMemory is a helper function that reads raw memory starting at

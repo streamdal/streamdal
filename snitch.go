@@ -366,8 +366,8 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
-		Input: data,
-		Step:  step,
+		InputPayload: data,
+		Step:         step,
 	}
 
 	reqBytes, err := proto.Marshal(req)
@@ -507,7 +507,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				if !shouldContinue {
 					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   false,
 						Message: "",
 					}, nil
@@ -521,7 +521,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				if !shouldContinue {
 					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   true,
 						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
 					}, nil
@@ -535,7 +535,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				if !shouldContinue {
 					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   true,
 						Message: "detective step failed:" + wasmResp.ExitMsg,
 					}, nil
@@ -545,7 +545,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
-			data = wasmResp.Output
+			data = wasmResp.OutputPayload
 		}
 
 		timeoutCxl()

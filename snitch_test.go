@@ -2,6 +2,7 @@ package snitch
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"strings"
@@ -12,10 +13,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/streamdal/snitch-go-client/hostfunc"
+	"github.com/streamdal/snitch-go-client/kv"
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
@@ -391,69 +395,162 @@ func boolPtr(in bool) *bool {
 	return &in
 }
 
-//func TestKVRequest(t *testing.T) {
-//	wasmData, err := os.ReadFile("src/kv.wasm")
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	req := &protos.WASMRequest{
-//		Step: &protos.PipelineStep{
-//			Step: &protos.PipelineStep_Kv{
-//				Kv: &steps.KVStep{
-//					Request: &steps.KVStep_KvExistsRequest{
-//						KvExistsRequest: &steps.KVExistsRequest{
-//							Key:  "foo",
-//							Mode: steps.KVExistsMode_KV_EXISTS_MODE_STATIC,
-//						},
-//					},
-//				},
-//			},
-//			XWasmId:       stringPtr(uuid.New().String()),
-//			XWasmFunction: stringPtr("f"),
-//			XWasmBytes:    wasmData,
-//		},
-//		Input: []byte(``),
-//	}
-//
-//	s := &Snitch{
-//		pipelinesMtx: &sync.RWMutex{},
-//		pipelines:    map[string]map[string]*protos.Command{},
-//		audiencesMtx: &sync.RWMutex{},
-//		audiences:    map[string]struct{}{},
-//	}
-//
-//	// Create WASM func from request
-//	f, err := s.createFunction(req.Step)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	// Function already created from WASM bytes, no need to pass it again
-//	req.Step.XWasmBytes = nil
-//
-//	data, err := proto.Marshal(req)
-//	if err != nil {
-//		t.Fatalf("Unable to marshal WASMRequest: %s", err)
-//	}
-//
-//	// Exec WASM func; should receive WASMResponse{}
-//	res, err := f.Exec(context.Background(), data)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	wasmResp := &protos.WASMResponse{}
-//
-//	if err := proto.Unmarshal(res, wasmResp); err != nil {
-//		t.Fatal("unable to unmarshal wasm response: " + err.Error())
-//	}
-//
-//	// WASM func should've exited successfully
-//	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
-//		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
-//	}
-//}
+func createSnitchClient() (*Snitch, *kv.KV, error) {
+	kvClient, err := kv.New(&kv.Config{})
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "unable to create kv client")
+	}
+
+	hfClient, err := hostfunc.New(kvClient, &logger.NoOpLogger{})
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "unable to create hostfunc client")
+	}
+
+	return &Snitch{
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines:    map[string]map[string]*protos.Command{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+		kv:           kvClient,
+		hf:           hfClient,
+	}, kvClient, nil
+}
+
+func createWASMRequestForKV(action shared.KVAction, key string, value []byte, mode steps.KVMode) (*protos.WASMRequest, error) {
+	wasmData, err := os.ReadFile("src/kv.wasm")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read wasm file")
+	}
+
+	// Caller should overwrite whatever fields they need to
+	return &protos.WASMRequest{
+		Step: &protos.PipelineStep{
+			Step: &protos.PipelineStep_Kv{
+				Kv: &steps.KVStep{
+					Action: action,
+					Mode:   mode,
+					Key:    key,
+					Value:  value,
+				},
+			},
+			XWasmId:       stringPtr(uuid.New().String()),
+			XWasmFunction: stringPtr("f"),
+			XWasmBytes:    wasmData,
+		},
+		InputPayload: nil,
+	}, nil
+}
+
+func TestKVRequestStaticModeKeyDoesNotExist(t *testing.T) {
+	key := "does-not-exist"
+
+	req, err := createWASMRequestForKV(shared.KVAction_KV_ACTION_EXISTS, key, nil, steps.KVMode_KV_MODE_STATIC)
+	if err != nil {
+		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
+	}
+
+	snitchClient, _, err := createSnitchClient()
+	if err != nil {
+		t.Fatalf("unable to create snitch client for kv test: %s", err)
+	}
+
+	// Create WASM func from request
+	f, err := snitchClient.createFunction(req.Step)
+	if err != nil {
+		t.Fatalf("unable to create func: %s", err)
+	}
+
+	// Function already created from WASM bytes, no need to pass it again (and consume extra WASM mem)
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+	}
+
+	// Exec WASM func; should receive WASMResponse{}
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		t.Fatalf("unable to exec WASM func: %s", err)
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+	}
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FAILURE {
+		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
+			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			wasmResp.ExitCode,
+			wasmResp.ExitMsg,
+		)
+	}
+
+	expectedMsg := fmt.Sprintf("key '%s' does not exist", key)
+
+	if !strings.Contains(wasmResp.ExitMsg, expectedMsg) {
+		t.Errorf("expected ExitMsg to contain '%s', got = %s", expectedMsg, wasmResp.ExitMsg)
+	}
+}
+
+func TestKVRequestStaticModeKeyExists(t *testing.T) {
+	key := "existing-key"
+
+	req, err := createWASMRequestForKV(shared.KVAction_KV_ACTION_EXISTS, key, nil, steps.KVMode_KV_MODE_STATIC)
+	if err != nil {
+		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
+	}
+
+	snitchClient, kvClient, err := createSnitchClient()
+	if err != nil {
+		t.Fatalf("unable to create snitch client for kv test: %s", err)
+	}
+
+	// Add the key to the KV store
+	kvClient.Set(key, "")
+
+	// Create WASM func from request
+	f, err := snitchClient.createFunction(req.Step)
+	if err != nil {
+		t.Fatalf("unable to create func: %s", err)
+	}
+
+	// Function already created from WASM bytes, no need to pass it again (and consume extra WASM mem)
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+	}
+
+	// Exec WASM func; should receive WASMResponse{}
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		t.Fatalf("unable to exec WASM func: %s", err)
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+	}
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
+			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			wasmResp.ExitCode,
+			wasmResp.ExitMsg,
+		)
+	}
+
+	expectedMsg := fmt.Sprintf("key '%s' exists", key)
+
+	if !strings.Contains(wasmResp.ExitMsg, expectedMsg) {
+		t.Errorf("expected ExitMsg to contain '%s', got = %s", expectedMsg, wasmResp.ExitMsg)
+	}
+}
 
 func TestHttpRequest(t *testing.T) {
 	wasmData, err := os.ReadFile("src/httprequest.wasm")
@@ -476,7 +573,7 @@ func TestHttpRequest(t *testing.T) {
 			XWasmFunction: stringPtr("f"),
 			XWasmBytes:    wasmData,
 		},
-		Input: []byte(``),
+		InputPayload: []byte(``),
 	}
 
 	s := &Snitch{
