@@ -464,7 +464,6 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 }
 
 func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
-	var force bool
 	llog := s.log.WithField("method", "DeleteAudience")
 	llog.Debug("received request to delete audience")
 
@@ -476,8 +475,14 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	}
 
 	// If we have configs and we're not forcing, we can't delete
+	for aud, pipelines := range configs {
+		if util.AudienceEquals(aud, req.Audience) {
+			return fmt.Errorf("cannot delete audience, it is in use by pipeline(s) %s", strings.Join(pipelines, ", "))
+		}
+	}
+
 	pipelines, ok := configs[req.Audience]
-	if ok && !force {
+	if ok {
 		return fmt.Errorf("audience is in use by pipeline '%s', cannot delete", pipelines)
 	}
 
