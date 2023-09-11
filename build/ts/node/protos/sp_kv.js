@@ -2,46 +2,7 @@
 // @generated from protobuf file "sp_kv.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
-/**
- * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
- * Note that only a subset of actions are used for protos.KVCommand (CREATE,
- * UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
- *
- * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
- *
- * @generated from protobuf enum protos.KVAction
- */
-export var KVAction;
-(function (KVAction) {
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
-     */
-    KVAction[KVAction["KV_ACTION_UNSET"] = 0] = "KV_ACTION_UNSET";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_GET = 1;
-     */
-    KVAction[KVAction["KV_ACTION_GET"] = 1] = "KV_ACTION_GET";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 2;
-     */
-    KVAction[KVAction["KV_ACTION_CREATE"] = 2] = "KV_ACTION_CREATE";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 3;
-     */
-    KVAction[KVAction["KV_ACTION_UPDATE"] = 3] = "KV_ACTION_UPDATE";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_EXISTS = 4;
-     */
-    KVAction[KVAction["KV_ACTION_EXISTS"] = 4] = "KV_ACTION_EXISTS";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 5;
-     */
-    KVAction[KVAction["KV_ACTION_DELETE"] = 5] = "KV_ACTION_DELETE";
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 6;
-     */
-    KVAction[KVAction["KV_ACTION_DELETE_ALL"] = 6] = "KV_ACTION_DELETE_ALL";
-})(KVAction || (KVAction = {}));
+import { KVAction } from "./shared/sp_shared.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class KVObject$Type extends MessageType {
     constructor() {
@@ -62,7 +23,7 @@ class KVInstruction$Type extends MessageType {
     constructor() {
         super("protos.KVInstruction", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
+            { no: 2, name: "action", kind: "enum", T: () => ["protos.shared.KVAction", KVAction] },
             { no: 3, name: "object", kind: "message", T: () => KVObject },
             { no: 4, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);

@@ -42,7 +42,8 @@ generate/go: description = Compile protobuf schemas for Go
 generate/go: clean/go
 generate/go:
 	mkdir -p build/go/protos && \
-	mkdir -p build/go/protos/steps
+	mkdir -p build/go/protos/steps && \
+	mkdir -p build/go/protos/shared
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
@@ -50,7 +51,7 @@ generate/go:
  		--go-grpc_out=./build/go/protos \
  		--go-grpc_opt=paths=source_relative \
  		--go_opt=paths=source_relative \
-		protos/*.proto protos/steps/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
 
@@ -64,7 +65,7 @@ generate/ts:
 
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD}/build/ts ${NODE_IMAGE} \
 		./build.sh
-		
+
 	@echo Successfully compiled Typescript Protobuf libs for Node and Deno
 
 .PHONY: generate/rust
@@ -76,7 +77,7 @@ generate/rust:
 	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--rust_out=./build/rust/protos/src \
-		protos/*.proto protos/steps/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
 
@@ -90,6 +91,7 @@ generate/python:
  		--pyi_out=/defs/build/python/snitch_protos \
 		-I /defs/protos/ \
 		-I /defs/protos/steps/ \
+		-I /defs/protos/shared/ \
 		/defs/protos/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
@@ -104,7 +106,7 @@ generate/protoset:
  		--include_imports \
  		-o build/protos.protoset \
  		--proto_path=protos \
-		protos/*.proto protos/steps/*.proto || (exit 1)
+		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
 
 	@echo Successfully generated protoset
 

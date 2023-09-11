@@ -2,7 +2,7 @@
 // @generated from protobuf file "steps/sp_steps_kv.proto" (package "protos.steps", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
-import { KVAction } from "../sp_kv.js";
+import { KVAction } from "../shared/sp_shared.js";
 // !!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // 
 // KV consists of two parts:
@@ -102,7 +102,7 @@ export const KVStepResponse = new KVStepResponse$Type();
 class KVStep$Type extends MessageType {
     constructor() {
         super("protos.steps.KVStep", [
-            { no: 1, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
+            { no: 1, name: "action", kind: "enum", T: () => ["protos.shared.KVAction", KVAction] },
             { no: 2, name: "mode", kind: "enum", T: () => ["protos.steps.KVMode", KVMode] },
             { no: 3, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "value", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
