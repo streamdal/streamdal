@@ -102,13 +102,6 @@ class Metrics:
         self.auth_token = kwargs.get("auth_token")
         self.exit = kwargs.get("exit")
 
-        # TODO: remove after testing
-        # if kwargs.get("exit") is None:
-        #     self.exit = Event()
-        #     events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
-        #     for e in events:
-        #         signal.signal(e, self.shutdown)
-
         self.__start()
 
     def __start(self):
@@ -183,12 +176,10 @@ class Metrics:
 
         req = protos.MetricsRequest()
         req.metrics = [
-            protos.Metrics(name=entry.name, value=entry.value, labels=entry.labels)
+            protos.Metric(name=entry.name, value=entry.value, labels=entry.labels)
         ]
 
-        self.log.debug("Publishing metrics: {}".format(req))
         self.loop.create_task(call(req))
-        self.log.debug("Published metrics: {}".format(req))
 
     def run_publisher_worker(self, id: int) -> None:
         """Counter worker pool is responsible for listening to incr() requests and publish queue"""

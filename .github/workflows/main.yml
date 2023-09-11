@@ -30,7 +30,8 @@ jobs:
       - name: Run Pytest
         run: |
           make test/wasm
-          pytest
+          pip install coverage
+          coverage run --source=. -m pytest && coverage html
   build:
     outputs:
       new_tag: ${{ steps.create_tag.outputs.new_tag }}
