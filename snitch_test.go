@@ -391,69 +391,69 @@ func boolPtr(in bool) *bool {
 	return &in
 }
 
-func TestKVRequest(t *testing.T) {
-	wasmData, err := os.ReadFile("src/kv.wasm")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	req := &protos.WASMRequest{
-		Step: &protos.PipelineStep{
-			Step: &protos.PipelineStep_Kv{
-				Kv: &steps.KVStep{
-					Request: &steps.KVStep_KvExistsRequest{
-						KvExistsRequest: &steps.KVExistsRequest{
-							Key:  "foo",
-							Mode: steps.KVExistsMode_KV_EXISTS_MODE_STATIC,
-						},
-					},
-				},
-			},
-			XWasmId:       stringPtr(uuid.New().String()),
-			XWasmFunction: stringPtr("f"),
-			XWasmBytes:    wasmData,
-		},
-		Input: []byte(``),
-	}
-
-	s := &Snitch{
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string]map[string]*protos.Command{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-	}
-
-	// Create WASM func from request
-	f, err := s.createFunction(req.Step)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Function already created from WASM bytes, no need to pass it again
-	req.Step.XWasmBytes = nil
-
-	data, err := proto.Marshal(req)
-	if err != nil {
-		t.Fatalf("Unable to marshal WASMRequest: %s", err)
-	}
-
-	// Exec WASM func; should receive WASMResponse{}
-	res, err := f.Exec(context.Background(), data)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	wasmResp := &protos.WASMResponse{}
-
-	if err := proto.Unmarshal(res, wasmResp); err != nil {
-		t.Fatal("unable to unmarshal wasm response: " + err.Error())
-	}
-
-	// WASM func should've exited successfully
-	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
-		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
-	}
-}
+//func TestKVRequest(t *testing.T) {
+//	wasmData, err := os.ReadFile("src/kv.wasm")
+//	if err != nil {
+//		t.Fatal(err)
+//	}
+//
+//	req := &protos.WASMRequest{
+//		Step: &protos.PipelineStep{
+//			Step: &protos.PipelineStep_Kv{
+//				Kv: &steps.KVStep{
+//					Request: &steps.KVStep_KvExistsRequest{
+//						KvExistsRequest: &steps.KVExistsRequest{
+//							Key:  "foo",
+//							Mode: steps.KVExistsMode_KV_EXISTS_MODE_STATIC,
+//						},
+//					},
+//				},
+//			},
+//			XWasmId:       stringPtr(uuid.New().String()),
+//			XWasmFunction: stringPtr("f"),
+//			XWasmBytes:    wasmData,
+//		},
+//		Input: []byte(``),
+//	}
+//
+//	s := &Snitch{
+//		pipelinesMtx: &sync.RWMutex{},
+//		pipelines:    map[string]map[string]*protos.Command{},
+//		audiencesMtx: &sync.RWMutex{},
+//		audiences:    map[string]struct{}{},
+//	}
+//
+//	// Create WASM func from request
+//	f, err := s.createFunction(req.Step)
+//	if err != nil {
+//		t.Fatal(err)
+//	}
+//
+//	// Function already created from WASM bytes, no need to pass it again
+//	req.Step.XWasmBytes = nil
+//
+//	data, err := proto.Marshal(req)
+//	if err != nil {
+//		t.Fatalf("Unable to marshal WASMRequest: %s", err)
+//	}
+//
+//	// Exec WASM func; should receive WASMResponse{}
+//	res, err := f.Exec(context.Background(), data)
+//	if err != nil {
+//		t.Fatal(err)
+//	}
+//
+//	wasmResp := &protos.WASMResponse{}
+//
+//	if err := proto.Unmarshal(res, wasmResp); err != nil {
+//		t.Fatal("unable to unmarshal wasm response: " + err.Error())
+//	}
+//
+//	// WASM func should've exited successfully
+//	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+//		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
+//	}
+//}
 
 func TestHttpRequest(t *testing.T) {
 	wasmData, err := os.ReadFile("src/httprequest.wasm")

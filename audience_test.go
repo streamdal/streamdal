@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/streamdal/snitch-go-client/server/serverfakes"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-go-client/server/serverfakes"
 )
 
 func TestAudToStr(t *testing.T) {
