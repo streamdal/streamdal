@@ -2,6 +2,7 @@
 // @generated from protobuf file "sp_kv.proto" (package "protos", syntax proto3)
 // tslint:disable
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVAction } from "./shared/sp_shared.ts";
 /**
  * KVObject represents a single KV object used in protos.KVInstruction; this is
  * constructed by snitch-server and broadcasted out to other snitch-server nodes.
@@ -51,7 +52,7 @@ export interface KVInstruction {
     /**
      * What kind of an action is this?
      *
-     * @generated from protobuf field: protos.KVAction action = 2;
+     * @generated from protobuf field: protos.shared.KVAction action = 2;
      */
     action: KVAction;
     /**
@@ -116,45 +117,6 @@ export interface KVUpdateHTTPRequest {
      */
     kvs: KVObject[];
 }
-/**
- * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
- * Note that only a subset of actions are used for protos.KVCommand (CREATE,
- * UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
- *
- * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
- *
- * @generated from protobuf enum protos.KVAction
- */
-export enum KVAction {
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
-     */
-    KV_ACTION_UNSET = 0,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_GET = 1;
-     */
-    KV_ACTION_GET = 1,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 2;
-     */
-    KV_ACTION_CREATE = 2,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 3;
-     */
-    KV_ACTION_UPDATE = 3,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_EXISTS = 4;
-     */
-    KV_ACTION_EXISTS = 4,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 5;
-     */
-    KV_ACTION_DELETE = 5,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 6;
-     */
-    KV_ACTION_DELETE_ALL = 6
-}
 // @generated message type with reflection information, may provide speed optimized methods
 class KVObject$Type extends MessageType<KVObject> {
     constructor() {
@@ -175,7 +137,7 @@ class KVInstruction$Type extends MessageType<KVInstruction> {
     constructor() {
         super("protos.KVInstruction", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "action", kind: "enum", T: () => ["protos.KVAction", KVAction] },
+            { no: 2, name: "action", kind: "enum", T: () => ["protos.shared.KVAction", KVAction] },
             { no: 3, name: "object", kind: "message", T: () => KVObject },
             { no: 4, name: "requested_at_unix_ts_nano_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);

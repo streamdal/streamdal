@@ -19,7 +19,10 @@ import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
 
-from . import steps
+from . import (
+    shared,
+    steps,
+)
 
 
 if TYPE_CHECKING:
@@ -57,23 +60,6 @@ class TailRequestType(betterproto.Enum):
     TAIL_REQUEST_TYPE_UNSET = 0
     TAIL_REQUEST_TYPE_START = 1
     TAIL_REQUEST_TYPE_STOP = 2
-
-
-class KvAction(betterproto.Enum):
-    """
-    KVAction is a shared type that is used for protos.KVCommand and
-    protos.KVStep. Note that only a subset of actions are used for
-    protos.KVCommand (CREATE, UPDATE, DELETE, DELETE_ALL) while protos.KVStep
-    uses most of them. protolint:disable:next ENUM_FIELD_NAMES_PREFIX
-    """
-
-    KV_ACTION_UNSET = 0
-    KV_ACTION_GET = 1
-    KV_ACTION_CREATE = 2
-    KV_ACTION_UPDATE = 3
-    KV_ACTION_EXISTS = 4
-    KV_ACTION_DELETE = 5
-    KV_ACTION_DELETE_ALL = 6
 
 
 class PipelineStepCondition(betterproto.Enum):
@@ -211,85 +197,6 @@ class TailResponse(betterproto.Message):
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
-
-
-@dataclass(eq=False, repr=False)
-class KvObject(betterproto.Message):
-    """
-    KVObject represents a single KV object used in protos.KVInstruction; this
-    is constructed by snitch-server and broadcasted out to other snitch-server
-    nodes.
-    """
-
-    key: str = betterproto.string_field(1)
-    """Valid key regex: /^[a-zA-Z0-9_-:]+$/)"""
-
-    value: bytes = betterproto.bytes_field(2)
-    """KV value"""
-
-    created_at_unix_ts_nano_utc: int = betterproto.int64_field(3)
-    """When was this object created"""
-
-    updated_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
-    """Last time the object was updated"""
-
-
-@dataclass(eq=False, repr=False)
-class KvInstruction(betterproto.Message):
-    """
-    Container for one or more KVObject's; snitch-server broadcasts KVCommand
-    that contains one or more of these instructions when a "POST /api/v1/kv"
-    request is made.
-    """
-
-    id: str = betterproto.string_field(1)
-    """Unique ID for this instruction"""
-
-    action: "KvAction" = betterproto.enum_field(2)
-    """What kind of an action is this?"""
-
-    object: "KvObject" = betterproto.message_field(3)
-    """KV object"""
-
-    requested_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
-    """
-    When this instruction was requested (usually will be the HTTP API request
-    time)
-    """
-
-
-@dataclass(eq=False, repr=False)
-class KvRequest(betterproto.Message):
-    """
-    Used for broadcasting KV instructions to other snitch-server nodes. NOTE:
-    While this data structure is similar to KVCommand it makes sense to keep
-    them separate. It would cause more confusion if we tried to re-use
-    KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
-    This request structure is used for including all updates -
-    create/update/delete.
-    """
-
-    instructions: List["KvInstruction"] = betterproto.message_field(1)
-    overwrite: bool = betterproto.bool_field(2)
-
-
-@dataclass(eq=False, repr=False)
-class KvCreateHttpRequest(betterproto.Message):
-    """
-    "POST /api/v1/kv" accepts JSON of this type for it's request payload. This
-    is converted by BroadcastKV() to a KVCommand
-    """
-
-    kvs: List["KvObject"] = betterproto.message_field(1)
-    overwrite: bool = betterproto.bool_field(2)
-    """
-    Whether to treat create as upsert -- ie. do not error if key already exists
-    """
-
-
-@dataclass(eq=False, repr=False)
-class KvUpdateHttpRequest(betterproto.Message):
-    kvs: List["KvObject"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -637,6 +544,85 @@ class TestRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TestResponse(betterproto.Message):
     output: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class KvObject(betterproto.Message):
+    """
+    KVObject represents a single KV object used in protos.KVInstruction; this
+    is constructed by snitch-server and broadcasted out to other snitch-server
+    nodes.
+    """
+
+    key: str = betterproto.string_field(1)
+    """Valid key regex: /^[a-zA-Z0-9_-:]+$/)"""
+
+    value: bytes = betterproto.bytes_field(2)
+    """KV value"""
+
+    created_at_unix_ts_nano_utc: int = betterproto.int64_field(3)
+    """When was this object created"""
+
+    updated_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
+    """Last time the object was updated"""
+
+
+@dataclass(eq=False, repr=False)
+class KvInstruction(betterproto.Message):
+    """
+    Container for one or more KVObject's; snitch-server broadcasts KVCommand
+    that contains one or more of these instructions when a "POST /api/v1/kv"
+    request is made.
+    """
+
+    id: str = betterproto.string_field(1)
+    """Unique ID for this instruction"""
+
+    action: "shared.KvAction" = betterproto.enum_field(2)
+    """What kind of an action is this?"""
+
+    object: "KvObject" = betterproto.message_field(3)
+    """KV object"""
+
+    requested_at_unix_ts_nano_utc: int = betterproto.int64_field(4)
+    """
+    When this instruction was requested (usually will be the HTTP API request
+    time)
+    """
+
+
+@dataclass(eq=False, repr=False)
+class KvRequest(betterproto.Message):
+    """
+    Used for broadcasting KV instructions to other snitch-server nodes. NOTE:
+    While this data structure is similar to KVCommand it makes sense to keep
+    them separate. It would cause more confusion if we tried to re-use
+    KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
+    This request structure is used for including all updates -
+    create/update/delete.
+    """
+
+    instructions: List["KvInstruction"] = betterproto.message_field(1)
+    overwrite: bool = betterproto.bool_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class KvCreateHttpRequest(betterproto.Message):
+    """
+    "POST /api/v1/kv" accepts JSON of this type for it's request payload. This
+    is converted by BroadcastKV() to a KVCommand
+    """
+
+    kvs: List["KvObject"] = betterproto.message_field(1)
+    overwrite: bool = betterproto.bool_field(2)
+    """
+    Whether to treat create as upsert -- ie. do not error if key already exists
+    """
+
+
+@dataclass(eq=False, repr=False)
+class KvUpdateHttpRequest(betterproto.Message):
+    kvs: List["KvObject"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

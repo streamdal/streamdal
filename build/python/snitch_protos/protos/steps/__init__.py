@@ -12,7 +12,7 @@ from typing import (
 
 import betterproto
 
-from ... import protos as __protos__
+from .. import shared as _shared__
 
 
 class DetectiveType(betterproto.Enum):
@@ -257,7 +257,7 @@ class KvStep(betterproto.Message):
     Used in PipelineSteps and passed to KV host func; constructed by frontend
     """
 
-    action: "__protos__.KvAction" = betterproto.enum_field(1)
+    action: "_shared__.KvAction" = betterproto.enum_field(1)
     """What type of action this step should perform"""
 
     mode: "KvMode" = betterproto.enum_field(2)

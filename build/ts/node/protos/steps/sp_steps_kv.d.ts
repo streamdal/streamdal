@@ -1,5 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
-import { KVAction } from "../sp_kv.js";
+import { KVAction } from "../shared/sp_shared.js";
 /**
  * Returned by SDK host func and interpreted by KV WASM.
  *
@@ -37,7 +37,7 @@ export interface KVStep {
     /**
      * What type of action this step should perform
      *
-     * @generated from protobuf field: protos.KVAction action = 1;
+     * @generated from protobuf field: protos.shared.KVAction action = 1;
      */
     action: KVAction;
     /**

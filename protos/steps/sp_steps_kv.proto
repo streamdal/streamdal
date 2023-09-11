@@ -3,7 +3,7 @@ syntax = "proto3";
 package protos.steps;
 
 // We are importing this to get access to the KVAction type
-import "sp_kv.proto";
+import "shared/sp_shared.proto";
 
 option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
@@ -78,7 +78,7 @@ message KVStepResponse {
 // Used in PipelineSteps and passed to KV host func; constructed by frontend
 message KVStep {
   // What type of action this step should perform
-  protos.KVAction action = 1;
+  protos.shared.KVAction action = 1;
 
   // How the key field will be used to perform lookup
   KVMode mode = 2;

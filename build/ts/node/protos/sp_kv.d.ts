@@ -1,4 +1,5 @@
 import { MessageType } from "@protobuf-ts/runtime";
+import { KVAction } from "./shared/sp_shared.js";
 /**
  * KVObject represents a single KV object used in protos.KVInstruction; this is
  * constructed by snitch-server and broadcasted out to other snitch-server nodes.
@@ -48,7 +49,7 @@ export interface KVInstruction {
     /**
      * What kind of an action is this?
      *
-     * @generated from protobuf field: protos.KVAction action = 2;
+     * @generated from protobuf field: protos.shared.KVAction action = 2;
      */
     action: KVAction;
     /**
@@ -110,45 +111,6 @@ export interface KVUpdateHTTPRequest {
      * @generated from protobuf field: repeated protos.KVObject kvs = 1;
      */
     kvs: KVObject[];
-}
-/**
- * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
- * Note that only a subset of actions are used for protos.KVCommand (CREATE,
- * UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
- *
- * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
- *
- * @generated from protobuf enum protos.KVAction
- */
-export declare enum KVAction {
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UNSET = 0;
-     */
-    KV_ACTION_UNSET = 0,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_GET = 1;
-     */
-    KV_ACTION_GET = 1,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_CREATE = 2;
-     */
-    KV_ACTION_CREATE = 2,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_UPDATE = 3;
-     */
-    KV_ACTION_UPDATE = 3,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_EXISTS = 4;
-     */
-    KV_ACTION_EXISTS = 4,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE = 5;
-     */
-    KV_ACTION_DELETE = 5,
-    /**
-     * @generated from protobuf enum value: KV_ACTION_DELETE_ALL = 6;
-     */
-    KV_ACTION_DELETE_ALL = 6
 }
 declare class KVObject$Type extends MessageType<KVObject> {
     constructor();
