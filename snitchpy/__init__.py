@@ -344,10 +344,11 @@ class SnitchClient:
                         "Running step '{}' in dry-run mode".format(step.name)
                     )
 
+                if len(wasm_resp.output_payload) > 0:
+                    data = wasm_resp.output_payload
+
                 # If successful, continue to next step, don't need to check conditions
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
-                    data = wasm_resp.output
-
                     if self.cfg.dry_run:
                         self.log.debug(
                             "Step '{}' succeeded, continuing to next step".format(
@@ -741,7 +742,7 @@ class SnitchClient:
     def _call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
         try:
             req = protos.WasmRequest()
-            req.input = copy(data)
+            req.input_payload = copy(data)
             req.step = copy(step)
 
             response_bytes = self._exec_wasm(req)
@@ -750,7 +751,7 @@ class SnitchClient:
             return protos.WasmResponse().parse(response_bytes)
         except Exception as e:
             resp = protos.WasmResponse()
-            resp.output = ""
+            resp.output_payload = ""
             resp.exit_msg = "Failed to execute WASM: {}".format(e)
             resp.exit_code = protos.WasmExitCode.WASM_EXIT_CODE_INTERNAL_ERROR
 

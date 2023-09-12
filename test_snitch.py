@@ -98,7 +98,7 @@ class TestSnitchClient:
 
     def test_process_success(self):
         wasm_resp = protos.WasmResponse(
-            output=b'{"object": {"type": "streamdal"}}',
+            output_payload=b'{"object": {"type": "streamdal"}}',
             exit_code=protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS,
             exit_msg="",
         )
@@ -157,7 +157,7 @@ class TestSnitchClient:
         client.grpc_stub = fake_stub
 
         wasm_resp = protos.WasmResponse(
-            output=b"{}",
+            output_payload=b"{}",
             exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FAILURE,
             exit_msg="field not found",
         )
@@ -207,7 +207,7 @@ class TestSnitchClient:
         assert resp is not None
         assert resp.error is True
         assert resp.message == "field not found"
-        assert resp.data == b'{"object": {"type": "streamdal"}}'
+        assert resp.data == b"{}"
         fake_stub.notify.assert_called_once()
 
     def test_process_failure_dry_run(self):
@@ -215,7 +215,7 @@ class TestSnitchClient:
         client.cfg = SnitchConfig(dry_run=True)
 
         wasm_resp = protos.WasmResponse(
-            output=b'{"object": {"type": "should be replaced by original data on dry run"}}',
+            output_payload=b'{"object": {"type": "should be replaced by original data on dry run"}}',
             exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FAILURE,
             exit_msg="field not found",
         )

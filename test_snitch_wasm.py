@@ -59,7 +59,7 @@ class TestSnitchWasm:
 
         assert res is not None
         assert res.exit_code == 1
-        assert res.output == b'{"object":  {"field": "streamdal@gmail.com"}}'
+        assert res.output_payload == b'{"object":  {"field": "streamdal@gmail.com"}}'
 
         res2 = client._call_wasm(
             step=step, data=b'{"object":  {"field": "mark@gmail.com"}}'
