@@ -35,7 +35,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Run build & push
+      - name: Run build & push (no need to manually push - buildx does it auto)
         run: |
           make docker/build
-          make docker/push
