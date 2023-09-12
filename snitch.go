@@ -545,7 +545,10 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
-			data = wasmResp.OutputPayload
+			// Only update working payload if one is returned
+			if len(wasmResp.OutputPayload) > 0 {
+				data = wasmResp.OutputPayload
+			}
 		}
 
 		timeoutCxl()
