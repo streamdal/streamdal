@@ -38,10 +38,17 @@ setup/darwin:
 ### Dev
 
 .PHONY: run/dev
-run/dev: description = Run service & deps for dev
+run/dev: description = Download snitch-server img and run it + all its deps
 run/dev:
 	docker-compose -f docker-compose.dev.yaml build && \
 	docker-compose -f docker-compose.dev.yaml up -d && \
+	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
+
+.PHONY: run/dev/build
+run/dev/build: description = Build snitch-server img and run it + all its deps
+run/dev/build:
+	docker-compose -f docker-compose.dev.build.yaml build && \
+	docker-compose -f docker-compose.dev.build.yaml up -d && \
 	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
 
 ### Build
