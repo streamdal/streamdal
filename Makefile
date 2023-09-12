@@ -32,14 +32,24 @@ help:
 setup/darwin: description = Setup for darwin
 setup/darwin:
 	brew install go
+	brew install curl
+	brew install grpcurl
 
 ### Dev
 
 .PHONY: run/dev
-run/dev: description = Run service & deps for dev
+run/dev: description = Download snitch-server img and run it + all its deps
 run/dev:
 	docker-compose -f docker-compose.dev.yaml build && \
-	docker-compose -f docker-compose.dev.yaml up -d
+	docker-compose -f docker-compose.dev.yaml up -d && \
+	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
+
+.PHONY: run/dev/build
+run/dev/build: description = Build snitch-server img and run it + all its deps
+run/dev/build:
+	docker-compose -f docker-compose.dev.build.yaml build && \
+	docker-compose -f docker-compose.dev.build.yaml up -d && \
+	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
 
 ### Build
 
@@ -76,6 +86,11 @@ build/darwin-arm64: clean
 clean: description = Remove existing build artifacts
 clean:
 	$(RM) ./build/$(SERVICE)-*
+
+.PHONY: reset
+reset: description = Remove snitch-server docker images + clean NATS
+reset:
+	sh ./test-utils/reset.sh
 
 ### Test
 

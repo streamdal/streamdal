@@ -1,0 +1,44 @@
+version: "3"
+services:
+  snitch-server:
+    # This docker-compose *builds* a snitch-server img instead of downloading
+    # the latest img from dockerhub. This is useful for those actively developing
+    # snitch-server and needing to test the whole stack via docker.
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - natsjs
+    environment:
+      - SNITCH_SERVER_NODE_NAME=node1
+      - SNITCH_SERVER_AUTH_TOKEN=1234
+      - SNITCH_SERVER_NATSURL=natsjs:4222
+      - SNITCH_SERVER_DEBUG=true
+    container_name: snitch-server
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    links:
+      - natsjs
+
+  natsjs:
+    image: nats:2.9.20-alpine3.18
+    ports:
+      - "4222:4222" # NATS Port
+      - "6222:6222"
+      - "8222:8222" # HTTP Monitor
+    container_name: snitch-nats
+    volumes:
+      - ${PWD}/backend-data/jetstream:/data/jetstream
+      - ${PWD}/assets/nats/nats-server.conf:/etc/nats/nats-server.conf
+
+  envoy:
+    build:
+      context: ${PWD}/assets/envoy
+      dockerfile: ${PWD}/assets/envoy/Dockerfile
+    image: grpcweb/envoy
+    container_name: snitch-envoy
+    ports:
+      - "9091:9091"
+    links:
+      - snitch-server

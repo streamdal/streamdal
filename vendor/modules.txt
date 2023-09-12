@@ -246,9 +246,10 @@ github.com/slack-go/slack/slackutilsx
 # github.com/streamdal/natty v0.0.39
 ## explicit; go 1.18
 github.com/streamdal/natty
-# github.com/streamdal/snitch-protos v0.0.88
+# github.com/streamdal/snitch-protos v0.0.91
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
+github.com/streamdal/snitch-protos/build/go/protos/shared
 github.com/streamdal/snitch-protos/build/go/protos/steps
 # github.com/stretchr/testify v1.8.2
 ## explicit; go 1.13

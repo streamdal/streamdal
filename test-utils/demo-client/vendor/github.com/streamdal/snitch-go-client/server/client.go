@@ -10,8 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/snitch-go-client/types"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-go-client/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IServerClient
@@ -32,6 +33,8 @@ type IServerClient interface {
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
+
+	GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error)
 }
 
 const (
@@ -87,7 +90,7 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 	}
 
 	req := &protos.MetricsRequest{
-		Metrics: []*protos.Metrics{
+		Metrics: []*protos.Metric{
 			{
 				Name:   string(counter.Name),
 				Value:  float64(counter.Value),
@@ -135,4 +138,15 @@ func (c *Client) GetAttachCommandsByService(ctx context.Context, service string)
 	}
 
 	return resp, nil
+}
+
+func (c *Client) GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error) {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
+
+	srv, err := c.Server.SendTail(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to talk to snitch server")
+	}
+
+	return srv, nil
 }

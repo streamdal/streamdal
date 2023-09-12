@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -59,7 +60,7 @@ func (b *Bus) BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceR
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
 // it to other snitch-server nodes.
 func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {
-	kvRequest := util.GenerateKVRequest(protos.KVAction_KV_ACTION_CREATE, kvs, overwrite)
+	kvRequest := util.GenerateKVRequest(shared.KVAction_KV_ACTION_CREATE, kvs, overwrite)
 
 	return b.broadcast(ctx, "kv_create", &protos.BusEvent{
 		Event: &protos.BusEvent_KvRequest{
@@ -71,7 +72,7 @@ func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, ove
 // BroadcastKVUpdate will transform the req into a generic KVRequest and broadcast
 // it to other snitch-server nodes.
 func (b *Bus) BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error {
-	kvRequest := util.GenerateKVRequest(protos.KVAction_KV_ACTION_UPDATE, kvs, false)
+	kvRequest := util.GenerateKVRequest(shared.KVAction_KV_ACTION_UPDATE, kvs, false)
 
 	return b.broadcast(ctx, "kv_update", &protos.BusEvent{
 		Event: &protos.BusEvent_KvRequest{
@@ -87,7 +88,7 @@ func (b *Bus) BroadcastKVDelete(ctx context.Context, key string) error {
 				Instructions: []*protos.KVInstruction{
 					{
 						Id:                       util.GenerateUUID(),
-						Action:                   protos.KVAction_KV_ACTION_DELETE,
+						Action:                   shared.KVAction_KV_ACTION_DELETE,
 						Object:                   &protos.KVObject{Key: key},
 						RequestedAtUnixTsNanoUtc: 0,
 					},
@@ -104,7 +105,7 @@ func (b *Bus) BroadcastKVDeleteAll(ctx context.Context) error {
 				Instructions: []*protos.KVInstruction{
 					{
 						Id:                       util.GenerateUUID(),
-						Action:                   protos.KVAction_KV_ACTION_DELETE_ALL,
+						Action:                   shared.KVAction_KV_ACTION_DELETE_ALL,
 						RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
 					},
 				},

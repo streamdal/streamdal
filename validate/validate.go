@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
@@ -635,12 +636,12 @@ func KVInstruction(i *protos.KVInstruction) error {
 
 	checkValue := true
 
-	if i.Action == protos.KVAction_KV_ACTION_DELETE {
+	if i.Action == shared.KVAction_KV_ACTION_DELETE {
 		checkValue = false
 	}
 
 	// Delete all doesn't contain an object - no need to validate
-	if i.Action == protos.KVAction_KV_ACTION_DELETE {
+	if i.Action == shared.KVAction_KV_ACTION_DELETE {
 		if err := KVObject(i.Object, false, checkValue); err != nil {
 			return errors.Wrapf(err, "KVObject validation failed for kv '%s'", i.Object)
 		}

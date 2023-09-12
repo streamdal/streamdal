@@ -2,6 +2,9 @@
 
 
 [![Master build status](https://github.com/streamdal/snitch-go-client/workflows/main/badge.svg)](https://github.com/streamdal/snitch-go-client/actions/workflows/main-test.yml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/test_coverage)](https://codeclimate.com/github/streamdal/snitch-go-client/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/maintainability)](https://codeclimate.com/github/streamdal/snitch-go-client/maintainability)
+
 
 ## Shim usage
 
@@ -38,34 +41,31 @@ func main() {
 	defer cancel()
 
 	sc, err := snitch.New(&snitch.Config{
-		SnitchURL:   "localhost:9090",
-		SnitchToken: "streadmal",
-		StepTimeout:  time.Millisecond * 10,
+		SnitchURL:       "localhost:9090",
+		SnitchToken:     "streadmal",
+		StepTimeout:     time.Millisecond * 10,
 		PipelineTimeout: time.Millisecond * 100,
-		DryRun:       false,
-		DataSource:   "kafka",
-		ShutdownCtx:  ctx,
+		DryRun:          false,
+		ServiceName:     "billing-svc",
+		ShutdownCtx:     ctx,
 	})
 	if err != nil {
 		panic(err)
 	}
 
 	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
-		OperationType:   snitch.Consumer,
-        OperationName:   "new-order-topic",
-        ComponentName:   "kafka",
-        Data:            []byte(`{"object": {"field": true}}`),
-    })
+		OperationType: snitch.OperationTypeConsumer,
+		OperationName: "new-order-topic",
+		ComponentName: "kafka",
+		Data:          []byte(`{"object": {"field": true}}`),
+	})
 	if err != nil {
-		if err == snitch.ErrMessageDropped {
-			// message was dropped, perform some logging
-		} else {
-			panic(err)
-		}
+		panic(err)
 	}
 
 	fmt.Printf("%#v\n", resp)
 }
+
 ```
 
 ### Metrics

@@ -17,16 +17,19 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-go-client/hostfunc"
+	"github.com/streamdal/snitch-go-client/kv"
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
@@ -41,10 +44,10 @@ type ClientType int
 
 const (
 	// Consumer tells Process to run the pipelines against the consume ruleset
-	Consumer OperationType = 1
+	OperationTypeConsumer OperationType = 1
 
-	// Producer tells Process to run the pipelines against the produce ruleset
-	Producer OperationType = 2
+	// OperationTypeProducer tells Process to run the pipelines against the produce ruleset
+	OperationTypeProducer OperationType = 2
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
@@ -88,6 +91,10 @@ type Snitch struct {
 	audiences          map[string]struct{}
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
+	kv                 kv.IKV
+	hf                 *hostfunc.HostFunc
+	tailsMtx           *sync.RWMutex
+	tails              map[string]map[string]*Tail
 }
 
 type Config struct {
@@ -149,6 +156,18 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, errors.Wrap(err, "failed to start metrics service")
 	}
 
+	kvInstance, err := kv.New(&kv.Config{
+		Logger: cfg.Logger,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to start kv service")
+	}
+
+	hf, err := hostfunc.New(kvInstance, cfg.Logger)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create hostfunc instance")
+	}
+
 	s := &Snitch{
 		functions:          make(map[string]*function),
 		functionsMtx:       &sync.RWMutex{},
@@ -162,6 +181,10 @@ func New(cfg *Config) (*Snitch, error) {
 		config:             cfg,
 		metrics:            m,
 		sessionID:          uuid.New().String(),
+		kv:                 kvInstance,
+		hf:                 hf,
+		tailsMtx:           &sync.RWMutex{},
+		tails:              make(map[string]map[string]*Tail),
 	}
 
 	if cfg.DryRun {
@@ -172,13 +195,27 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, err
 	}
 
+	errCh := make(chan error, 0)
+
 	// Start register
-	go s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
+	go func() {
+		if err := s.register(director.NewFreeLooper(director.FOREVER, make(chan error, 1))); err != nil {
+			errCh <- errors.Wrap(err, "register error")
+		}
+	}()
 
 	// Start heartbeat
 	go s.heartbeat(director.NewTimedLooper(director.FOREVER, time.Second, make(chan error, 1)))
 
-	return s, nil
+	go s.watchForShutdown()
+
+	// Make sure we were able to start without issues
+	select {
+	case err := <-errCh:
+		return nil, errors.Wrap(err, "received error on startup")
+	case <-time.After(time.Second * 5):
+		return s, nil
+	}
 }
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
@@ -215,7 +252,7 @@ func validateConfig(cfg *Config) error {
 	if cfg.StepTimeout == 0 {
 		to := os.Getenv("SNITCH_STEP_TIMEOUT")
 		if to == "" {
-			to = "1s"
+			to = "10ms"
 		}
 
 		timeout, err := time.ParseDuration(to)
@@ -229,7 +266,7 @@ func validateConfig(cfg *Config) error {
 	if cfg.PipelineTimeout == 0 {
 		to := os.Getenv("SNITCH_PIPELINE_TIMEOUT")
 		if to == "" {
-			to = "1s"
+			to = "100ms"
 		}
 
 		timeout, err := time.ParseDuration(to)
@@ -245,6 +282,20 @@ func validateConfig(cfg *Config) error {
 	}
 
 	return nil
+}
+
+func (s *Snitch) watchForShutdown() {
+	<-s.config.ShutdownCtx.Done()
+
+	// Shut down all tails
+	s.tailsMtx.RLock()
+	defer s.tailsMtx.RUnlock()
+	for _, tails := range s.tails {
+		for reqID, tail := range tails {
+			s.config.Logger.Debugf("Shutting down tail '%s' for pipeline %s", reqID, tail.Request.GetTail().Request.PipelineId)
+			tail.CancelFunc()
+		}
+	}
 }
 
 func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
@@ -290,6 +341,12 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 		}
 
 		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+			if strings.Contains(err.Error(), "connection refused") {
+				// Snitch server went away, log, sleep, and wait for reconnect
+				s.config.Logger.Warn("failed to send heartbeat, snitch server went away, waiting for reconnect")
+				time.Sleep(ReconnectSleep)
+				return nil
+			}
 			s.config.Logger.Errorf("failed to send heartbeat: %s", err)
 		}
 
@@ -309,8 +366,8 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
-		Input: data,
-		Step:  step,
+		InputPayload: data,
+		Step:         step,
 	}
 
 	reqBytes, err := proto.Marshal(req)
@@ -318,8 +375,11 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 		return nil, errors.Wrap(err, "failed to marshal WASM request")
 	}
 
+	timeoutCtx, cancel := context.WithTimeout(ctx, s.config.StepTimeout)
+	defer cancel()
+
 	// Run WASM module
-	respBytes, err := f.Exec(ctx, reqBytes)
+	respBytes, err := f.Exec(timeoutCtx, reqBytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute wasm module")
 	}
@@ -374,7 +434,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
 	counterBytes := types.ConsumeBytes
-	if req.OperationType == Producer {
+	if req.OperationType == OperationTypeProducer {
 		counterError = types.ProduceErrorCount
 		counterProcessed = types.ProduceProcessedCount
 		counterBytes = types.ProduceBytes
@@ -396,6 +456,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	for _, p := range pipelines {
+		originalData := data // Used for tail request
 		pipeline := p.GetAttachPipeline().GetPipeline()
 		labels["pipeline_name"] = pipeline.Name
 		labels["pipeline_id"] = pipeline.Id
@@ -403,12 +464,29 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1})
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize})
 
+		// If a step
+		timeoutCtx, timeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
+
 		for _, step := range pipeline.Steps {
-			wasmResp, err := s.runStep(ctx, step, data)
+
+			select {
+			case <-timeoutCtx.Done():
+				timeoutCxl()
+				return &ProcessResponse{
+					Data:    req.Data,
+					Error:   true,
+					Message: "pipeline timeout exceeded",
+				}, nil
+			default:
+				// NOOP
+			}
+
+			wasmResp, err := s.runStep(timeoutCtx, step, data)
 			if err != nil {
 				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
 						Data:    req.Data,
 						Error:   true,
@@ -427,8 +505,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   false,
 						Message: "",
 					}, nil
@@ -440,8 +519,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   true,
 						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
 					}, nil
@@ -453,8 +533,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
+					timeoutCxl()
 					return &ProcessResponse{
-						Data:    wasmResp.Output,
+						Data:    wasmResp.OutputPayload,
 						Error:   true,
 						Message: "detective step failed:" + wasmResp.ExitMsg,
 					}, nil
@@ -464,8 +545,16 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
-			data = wasmResp.Output
+			// Only update working payload if one is returned
+			if len(wasmResp.OutputPayload) > 0 {
+				data = wasmResp.OutputPayload
+			}
 		}
+
+		timeoutCxl()
+
+		// Perform tail if necessary
+		s.sendTail(aud, pipeline.Id, originalData, data)
 	}
 
 	// Dry run should not modify anything, but we must allow pipeline to

@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -194,7 +195,7 @@ func AudienceEquals(a, b *protos.Audience) bool {
 
 // GenerateKVRequest is used for converting from plain KVObjects to instructions.
 // This func is used to simplify transforming KV HTTP requests -> KV broadcast requests.
-func GenerateKVRequest(action protos.KVAction, kvs []*protos.KVObject, overwrite bool) *protos.KVRequest {
+func GenerateKVRequest(action shared.KVAction, kvs []*protos.KVObject, overwrite bool) *protos.KVRequest {
 	instructions := make([]*protos.KVInstruction, 0)
 
 	for _, kv := range kvs {
