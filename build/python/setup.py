@@ -15,7 +15,7 @@ setup(
     author='Streamdal.com',
     author_email='engineering@streamdal.com',
     license='MIT',
-    packages=['snitch_protos', 'snitch_protos.protos', 'snitch_protos.protos.steps'],
+    packages=['snitch_protos', 'snitch_protos.protos', 'snitch_protos.protos.steps', 'snitch_protos.protos.shared'],
     install_requires=[''],
     python_requires=">=3.7",
 
