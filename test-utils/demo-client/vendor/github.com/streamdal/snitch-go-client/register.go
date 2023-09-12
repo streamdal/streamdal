@@ -2,25 +2,24 @@ package snitch
 
 import (
 	"context"
-	"errors"
-	"io"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
-func (s *Snitch) register(looper director.Looper) {
+func (s *Snitch) register(looper director.Looper) error {
 	req := &protos.RegisterRequest{
 		ServiceName: s.config.ServiceName,
 		SessionId:   s.sessionID,
 		ClientInfo: &protos.ClientInfo{
 			ClientType:     protos.ClientType(s.config.ClientType),
 			LibraryName:    "snitch-go-client",
-			LibraryVersion: "0.0.1", // TODO: inject via build tag
+			LibraryVersion: "0.0.34",
 			Language:       "go",
 			Arch:           runtime.GOARCH,
 			Os:             runtime.GOOS,
@@ -39,8 +38,9 @@ func (s *Snitch) register(looper director.Looper) {
 
 	srv, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 	if err != nil && !strings.Contains(err.Error(), context.Canceled.Error()) {
-		panic("Failed to register with snitch server: " + err.Error())
+		return errors.Wrap(err, "unable to complete initial registration with snitch server")
 	}
+
 	stream = srv
 
 	looper.Loop(func() error {
@@ -50,6 +50,8 @@ func (s *Snitch) register(looper director.Looper) {
 		}
 
 		if stream == nil {
+			s.config.Logger.Debug("stream is nil, attempting to register")
+
 			newStream, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 			if err != nil {
 				if strings.Contains(err.Error(), context.Canceled.Error()) {
@@ -61,6 +63,7 @@ func (s *Snitch) register(looper director.Looper) {
 
 				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
+
 				return nil
 			}
 
@@ -77,13 +80,13 @@ func (s *Snitch) register(looper director.Looper) {
 				return nil
 			}
 
-			if errors.Is(err, io.EOF) {
+			if strings.Contains(err.Error(), "reading from server: EOF") {
 				// Nicer reconnect messages
 				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 			} else {
-				s.config.Logger.Warnf("Error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
+				s.config.Logger.Warnf("error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
 				time.Sleep(ReconnectSleep)
 			}
 
@@ -125,10 +128,31 @@ func (s *Snitch) register(looper director.Looper) {
 				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
 				return nil
 			}
+		} else if tail := cmd.GetTail(); tail != nil {
+			switch tail.GetRequest().Type {
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
+				s.config.Logger.Debugf("Received start tail command for pipeline '%s'", tail.GetRequest().PipelineId)
+				if err := s.tailPipeline(context.Background(), cmd); err != nil {
+					s.config.Logger.Errorf("Failed to tail pipeline: %s", err)
+					return nil
+				}
+			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
+				s.config.Logger.Debugf("Received stop tail command for pipeline '%s'", tail.GetRequest().PipelineId)
+				if err := s.stopTailPipeline(context.Background(), cmd); err != nil {
+					s.config.Logger.Errorf("Failed to stop tail pipeline: %s", err)
+					return nil
+				}
+			default:
+				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
+				return nil
+			}
+
 		}
 
 		return nil
 	})
+
+	return nil
 }
 
 func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {

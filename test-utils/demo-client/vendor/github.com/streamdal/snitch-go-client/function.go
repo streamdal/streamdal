@@ -6,11 +6,10 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-
-	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
 type function struct {
@@ -57,9 +56,9 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	}
 
 	// Read memory starting from result ptr
-	bytes, err := f.ReadMemory(resultPtr, -1)
+	resBytes, err := f.ReadMemory(resultPtr, -1)
 
-	return bytes, nil
+	return resBytes, nil
 }
 
 func (s *Snitch) setFunctionCache(wasmID string, f *function) {
@@ -76,7 +75,7 @@ func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*fun
 		return fc, nil
 	}
 
-	fi, err := createFunction(step)
+	fi, err := s.createFunction(step)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create function")
 	}
@@ -95,10 +94,10 @@ func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
 	return f, ok
 }
 
-func createFunction(step *protos.PipelineStep) (*function, error) {
-	inst, err := createWASMInstance(step.GetXWasmBytes())
+func (s *Snitch) createFunction(step *protos.PipelineStep) (*function, error) {
+	inst, err := s.createWASMInstance(step.GetXWasmBytes())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to create WASM instance")
 	}
 
 	// This is the actual function we'll be executing
@@ -128,15 +127,21 @@ func createFunction(step *protos.PipelineStep) (*function, error) {
 	}, nil
 }
 
-func createWASMInstance(wasmBytes []byte) (api.Module, error) {
+func (s *Snitch) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
+	}
+
+	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) int32{
+		"kvExists":    s.hf.KVExists,
+		"httpRequest": s.hf.HTTPRequest,
 	}
 
 	ctx := context.Background()
 	r := wazero.NewRuntime(ctx)
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
+
 	cfg := wazero.NewModuleConfig().
 		WithStderr(io.Discard).
 		WithStdout(io.Discard).
@@ -144,6 +149,20 @@ func createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		WithSysNanosleep().
 		WithSysWalltime().
 		WithStartFunctions("") // We don't need _start() to be called for our purposes
+
+	builder := r.NewHostModuleBuilder("env")
+
+	// This is how multiple host funcs are exported:
+	// https://github.com/tetratelabs/wazero/blob/b7e8191cceb83c7335d6b8922b40b957475beecf/examples/import-go/age-calculator.go#L41
+	for name, fn := range hostFuncs {
+		builder = builder.NewFunctionBuilder().
+			WithFunc(fn).
+			Export(name)
+	}
+
+	if _, err := builder.Instantiate(ctx); err != nil {
+		return nil, errors.Wrap(err, "failed to instantiate module")
+	}
 
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {

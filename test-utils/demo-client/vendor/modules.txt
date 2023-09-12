@@ -44,16 +44,21 @@ github.com/rivo/uniseg
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/snitch-go-client v0.0.29
+# github.com/streamdal/snitch-go-client v0.0.35
 ## explicit; go 1.17
 github.com/streamdal/snitch-go-client
+github.com/streamdal/snitch-go-client/helper
+github.com/streamdal/snitch-go-client/hostfunc
+github.com/streamdal/snitch-go-client/kv
 github.com/streamdal/snitch-go-client/logger
 github.com/streamdal/snitch-go-client/metrics
 github.com/streamdal/snitch-go-client/server
 github.com/streamdal/snitch-go-client/types
-# github.com/streamdal/snitch-protos v0.0.67
+github.com/streamdal/snitch-go-client/validation
+# github.com/streamdal/snitch-protos v0.0.91
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
+github.com/streamdal/snitch-protos/build/go/protos/shared
 github.com/streamdal/snitch-protos/build/go/protos/steps
 # github.com/tetratelabs/wazero v1.2.0
 ## explicit; go 1.18
