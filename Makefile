@@ -32,6 +32,8 @@ help:
 setup/darwin: description = Setup for darwin
 setup/darwin:
 	brew install go
+	brew install curl
+	brew install grpcurl
 
 ### Dev
 
@@ -39,7 +41,8 @@ setup/darwin:
 run/dev: description = Run service & deps for dev
 run/dev:
 	docker-compose -f docker-compose.dev.yaml build && \
-	docker-compose -f docker-compose.dev.yaml up -d
+	docker-compose -f docker-compose.dev.yaml up -d && \
+	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
 
 ### Build
 
