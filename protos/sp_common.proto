@@ -49,6 +49,7 @@ message Metric {
   string name = 1;
   map<string, string> labels = 2;
   double value = 3;
+  Audience audience = 4;
 }
 
 message TailRequest {

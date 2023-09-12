@@ -125,7 +125,8 @@ class Metric$Type extends MessageType {
         super("protos.Metric", [
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
-            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
 }

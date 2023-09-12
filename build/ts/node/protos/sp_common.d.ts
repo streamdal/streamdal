@@ -70,6 +70,10 @@ export interface Metric {
      * @generated from protobuf field: double value = 3;
      */
     value: number;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 4;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TailRequest

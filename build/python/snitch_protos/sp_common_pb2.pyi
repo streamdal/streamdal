@@ -42,7 +42,7 @@ class AudienceRate(_message.Message):
     def __init__(self, bytes: _Optional[int] = ..., processed: _Optional[int] = ...) -> None: ...
 
 class Metric(_message.Message):
-    __slots__ = ["labels", "name", "value"]
+    __slots__ = ["audience", "labels", "name", "value"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -50,13 +50,15 @@ class Metric(_message.Message):
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
+    audience: Audience
     labels: _containers.ScalarMap[str, str]
     name: str
     value: float
-    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
 
 class StandardResponse(_message.Message):
     __slots__ = ["code", "id", "message"]

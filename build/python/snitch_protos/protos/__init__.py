@@ -157,6 +157,7 @@ class Metric(betterproto.Message):
         2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     value: float = betterproto.double_field(3)
+    audience: "Audience" = betterproto.message_field(4)
 
 
 @dataclass(eq=False, repr=False)
