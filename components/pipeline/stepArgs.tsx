@@ -62,8 +62,16 @@ export const StepArg = (
 export const StepArgs = (
   { stepIndex, type, data, setData, errors }: StepArgsType,
 ) => {
-  const [args, setArgs] = useState([0]);
-  return oneArgTypes.includes(type)
+  //
+  // Peek into step to see how many args there are so we
+  // can tell the ui how many args to render initiallly
+  const length = data?.steps[stepIndex]
+    ?.step[data?.steps[stepIndex]?.step?.oneofKind]?.args?.length || 0;
+  const [args, setArgs] = useState(Array.from({ length }, (v, k) => k));
+
+  return oneArgTypes.filter((a: string) =>
+      !["STRING_CONTAINS_ANY", "STRING_CONTAINS_ALL"]
+    ).includes(type)
     ? (
       <StepArg
         stepIndex={stepIndex}
