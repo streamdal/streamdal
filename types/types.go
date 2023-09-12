@@ -1,5 +1,7 @@
 package types
 
+import "github.com/streamdal/snitch-protos/build/go/protos"
+
 type CounterName string
 
 const (
@@ -13,7 +15,8 @@ const (
 )
 
 type CounterEntry struct {
-	Name   CounterName // counter name
-	Labels map[string]string
-	Value  int64
+	Name     CounterName // counter name
+	Audience *protos.Audience
+	Labels   map[string]string
+	Value    int64
 }
