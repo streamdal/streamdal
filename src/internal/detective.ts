@@ -80,7 +80,7 @@ export const testDetective = async (data: Uint8Array): Promise<string> => {
         // }),
       },
     },
-    input: data,
+    inputPayload: data,
   });
 
   console.info("sending the payload to transform/mask step");
@@ -96,7 +96,9 @@ export const testDetective = async (data: Uint8Array): Promise<string> => {
   const content = readResponse(returnPtr, completeBufferFromMemory);
 
   const resp = WASMResponse.fromBinary(content);
-  const output: string = JSON.parse(new TextDecoder().decode(resp.output));
+  const output: string = JSON.parse(
+    new TextDecoder().decode(resp.outputPayload)
+  );
   console.info("### end web assembly test");
   return output;
 };

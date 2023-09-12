@@ -62,7 +62,7 @@ export const runWasm = async ({
       onFailure: step.onFailure,
       step: step.step,
     },
-    input: data,
+    inputPayload: data,
   });
 
   const requestBytes = WASMRequest.toBinary(request);

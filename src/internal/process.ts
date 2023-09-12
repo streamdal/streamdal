@@ -152,14 +152,14 @@ export const runStep = async ({
   let data = pipeline.data;
 
   try {
-    const { output, exitCode, exitMsg } = await runWasm({
+    const { outputPayload, exitCode, exitMsg } = await runWasm({
       step,
       data,
     });
 
     //
     // output gets passed back as data for the next function
-    data = output;
+    data = outputPayload;
     stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
     stepStatus.message = exitMsg;
   } catch (error: any) {
