@@ -18,6 +18,7 @@ import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
+import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -182,6 +183,7 @@ export default function ServiceMapComponent(
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
       >
+        {nodes.length === 0 && <EmptyService />}
         <Background style={{ height: "100vh" }} />
       </ReactFlow>
     </div>
