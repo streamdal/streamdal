@@ -74,6 +74,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       path: z.string().min(1, { message: "Required" }),
       args: zfd.repeatable(z.array(z.string()).default([])),
       type: zfd.numeric(DetectiveTypeEnum),
+      negate: z.boolean().default(false),
     }).superRefine((detective, ctx) => {
       if (
         oneArgTypes.includes(DetectiveType[detective.type]) &&
@@ -124,6 +125,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       path: z.string().min(1, { message: "Required" }),
       value: z.string(),
       type: zfd.numeric(TransformTypeEnum),
+      negate: z.boolean().default(false),
     }).superRefine((transform, ctx) => {
       if (
         TransformType[transform.type] ===
@@ -145,18 +147,21 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
     oneofKind: z.literal("encode"),
     encode: z.object({
       id: z.string().min(1, { message: "Required" }),
+      negate: z.boolean().default(false),
     }),
   }),
   z.object({
     oneofKind: z.literal("decode"),
     decode: z.object({
       id: z.string().min(1, { message: "Required" }),
+      negate: z.boolean().default(false),
     }),
   }),
   z.object({
     oneofKind: z.literal("custom"),
     custom: z.object({
       id: z.string().min(1, { message: "Required" }),
+      negate: z.boolean().default(false),
     }),
   }),
 ]);
