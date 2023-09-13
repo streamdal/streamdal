@@ -161,6 +161,13 @@ export interface DetachPipelineRequest {
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
+    /**
+     * Filled out by detach gRPC handler so that broadcast handlers can avoid
+     * performing a lookup in NATS.
+     *
+     * @generated from protobuf field: repeated string _session_ids = 3;
+     */
+    SessionIds: string[]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest
@@ -465,7 +472,8 @@ class DetachPipelineRequest$Type extends MessageType<DetachPipelineRequest> {
     constructor() {
         super("protos.DetachPipelineRequest", [
             { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => Audience }
+            { no: 2, name: "audience", kind: "message", T: () => Audience },
+            { no: 3, name: "_session_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
