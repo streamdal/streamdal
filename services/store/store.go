@@ -64,9 +64,7 @@ type IStore interface {
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
-
 	IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
-
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
 	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
@@ -75,8 +73,9 @@ type IStore interface {
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
-
 	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
+	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
+	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 }
 
 type Options struct {
@@ -990,4 +989,86 @@ func (s *Store) IsPipelineAttached(ctx context.Context, audience *protos.Audienc
 	}
 
 	return true, nil
+}
+
+type PipelineUsage struct {
+	PipelineId string
+	Active     bool
+	NodeName   string
+	SessionId  string
+	Audience   *protos.Audience
+}
+
+// GetPipelineUsage gets usage across the entire cluster
+func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
+	pipelines := make([]*PipelineUsage, 0)
+
+	// Get config for all pipelines & audiences
+	cfgs, err := s.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting configs")
+	}
+
+	// No cfgs == no pipelines
+	if len(cfgs) == 0 {
+		return pipelines, nil
+	}
+
+	// Get live clients
+	live, err := s.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live audiences")
+	}
+
+	// Build list of all used pipelines
+	for aud, pipelineIDs := range cfgs {
+		for _, pid := range pipelineIDs {
+			pu := &PipelineUsage{
+				PipelineId: pid,
+				Audience:   aud,
+			}
+
+			// Check if this pipeline is "active"
+			for _, l := range live {
+				if util.AudienceEquals(l.Audience, aud) {
+					pu.Active = true
+					pu.NodeName = l.NodeName
+					pu.SessionId = l.SessionID
+				}
+			}
+
+			pipelines = append(pipelines, pu)
+		}
+	}
+
+	return pipelines, nil
+}
+
+// GetActivePipelineUsage gets *ACTIVE* pipeline usage on the CURRENT node
+// NOTE: This method is a helper for GetPipelineUsage().
+func (s *Store) GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error) {
+	usage, err := s.GetPipelineUsage(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting pipeline usage")
+	}
+
+	active := make([]*PipelineUsage, 0)
+
+	for _, u := range usage {
+		if !u.Active {
+			continue
+		}
+
+		if u.NodeName != s.options.NodeName {
+			continue
+		}
+
+		if u.PipelineId != pipelineID {
+			continue
+		}
+
+		active = append(active, u)
+	}
+
+	return active, nil
 }

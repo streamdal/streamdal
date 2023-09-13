@@ -26,6 +26,7 @@ func (b *Bus) BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPip
 }
 
 func (b *Bus) BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
+	b.log.Debugf("detach broadcastDetachPipeline: has '%d' session ID's", len(req.XSessionIds))
 	return b.broadcast(ctx, "detach_pipeline", &protos.BusEvent{Event: &protos.BusEvent_DetachPipelineRequest{DetachPipelineRequest: req}})
 }
 

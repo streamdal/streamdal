@@ -54,9 +54,7 @@ type IBus interface {
 	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
 	BroadcastKVDelete(ctx context.Context, key string) error
 	BroadcastKVDeleteAll(ctx context.Context) error
-
 	BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error
-
 	BroadcastTailRequest(ctx context.Context, req *protos.TailRequest) error
 	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
 }

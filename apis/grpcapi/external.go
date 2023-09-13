@@ -408,6 +408,26 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 	}, nil
 }
 
+// Helper for determining what session ID's are using a pipeline ID
+func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
+	usage, err := s.Options.StoreService.GetPipelineUsage(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline usage in getPipelineUsageByPipelineID")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, u := range usage {
+		if u.PipelineId != pipelineID {
+			continue
+		}
+
+		sessionIDs = append(sessionIDs, u.SessionId)
+	}
+
+	return sessionIDs, nil
+}
+
 func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DetachPipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -422,21 +442,33 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists, broadcast delete
+	// What session ID's are using this pipeline ID?
+	sessionIDs, err := s.getSessionIDsByPipelineID(ctx, req.PipelineId)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	s.log.Debugf("detach gRPC handler: found '%d' session ids", len(sessionIDs))
+
+	// Inject session_id's into request
+	req.XSessionIds = make([]string, 0)
+
+	for _, sessionID := range sessionIDs {
+		req.XSessionIds = append(req.XSessionIds, sessionID)
+	}
+
+	s.log.Debugf("injected request contains '%d' session ids", len(req.XSessionIds))
+
+	// Broadcast detach to everyone
 	if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// TODO: figure out a better method for this
-	// Give time for all snitch server instances to receive detach command and send it to active sessions
-	// before removing the config entry, otherwise getActivePipelineUsage() will return incorrect results
-	go func() {
-		time.Sleep(time.Second * 5)
-		// Remove config entry
-		if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
-			s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
-		}
-	}()
+	// We are able to immediately remove the config entry because the broadcast
+	// handlers are not performing a Store lookup.
+	if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
+		s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
+	}
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
