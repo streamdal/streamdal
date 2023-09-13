@@ -25,7 +25,7 @@ jobs:
         working-directory:
         run: |
           npm version --no-git-tag-version --force --allow-same-version ${{ github.event.release.tag_name }} 
-          npm run copy
+          npm run copy:package
 
       - name: Release to npm
         working-directory: ./build

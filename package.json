@@ -24,6 +24,7 @@
   "scripts": {
     "build": "npm run clean && npm run build:main && ./generatePackages.sh",
     "build:main": "npx tsc -p tsconfig.types.json && npx tsc -p tsconfig.esm.json && npx tsc -p tsconfig.cjs.json",
+    "copy:package": "mkdir -p ./build && cp package.json ./build/package.json",
     "clean": "rimraf build",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
