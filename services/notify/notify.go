@@ -126,7 +126,7 @@ func (n *Notify) Queue(ctx context.Context, req *protos.NotifyRequest) error {
 		return errors.Wrap(err, "notify config not found")
 	}
 
-	fmt.Printf("GOT configs for pipeline %s: %+v\n", req.PipelineId, configs)
+	n.log.Debugf("notify got configs for pipeline %s: %+v", req.PipelineId, configs)
 
 	n.eventChan <- &Notification{
 		Req:      req,
