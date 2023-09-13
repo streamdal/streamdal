@@ -43,7 +43,7 @@ type OperationType int
 type ClientType int
 
 const (
-	// Consumer tells Process to run the pipelines against the consume ruleset
+	// OperationTypeConsumer tells Process to run the pipelines against the consume ruleset
 	OperationTypeConsumer OperationType = 1
 
 	// OperationTypeProducer tells Process to run the pipelines against the produce ruleset
@@ -434,11 +434,19 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
 	counterBytes := types.ConsumeBytes
+	rateBytes := types.ConsumeBytesRate
+	rateProcessed := types.ConsumeProcessedRate
 	if req.OperationType == OperationTypeProducer {
 		counterError = types.ProduceErrorCount
 		counterProcessed = types.ProduceProcessedCount
 		counterBytes = types.ProduceBytes
+		rateBytes = types.ProduceBytesRate
+		rateProcessed = types.ProduceProcessedRate
 	}
+
+	// Rate counters
+	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateBytes, Labels: map[string]string{}, Value: 1, Audience: aud})
+	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateProcessed, Labels: map[string]string{}, Value: 1, Audience: aud})
 
 	pipelines := s.getPipelines(ctx, aud)
 	if len(pipelines) == 0 {
