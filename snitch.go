@@ -456,7 +456,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 	if payloadSize > MaxPayloadSize {
 
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
 		s.config.Logger.Warn(msg)
@@ -469,8 +469,8 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		labels["pipeline_name"] = pipeline.Name
 		labels["pipeline_id"] = pipeline.Id
 
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1})
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1, Audience: aud})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize, Audience: aud})
 
 		// If a step
 		timeoutCtx, timeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
@@ -523,7 +523,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
 
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
@@ -537,7 +537,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
 				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
 
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
@@ -549,7 +549,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 					}, nil
 				}
 			default:
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
@@ -600,7 +600,7 @@ func (s *Snitch) handleConditions(
 					"pipeline_name": pipeline.Name,
 					"pipeline_id":   pipeline.Id,
 				}
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1, Audience: aud})
 			}
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT:
 			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
