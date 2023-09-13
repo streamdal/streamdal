@@ -1,14 +1,57 @@
 ---
-title: Changelog
-description: Snitch changelog
+title: Glossary
+description: Snitch Terminology
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+Snitch uses a variety of terms which can have various meanings across 
+industries and use-cases. This section exists to help clear up any ambiguity 
+around Snitch [core-components](/en/core-components/overview/) or functionality.
 
-import { Notification } from "accessible-astro-components";
+### audience
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+A term we have come up with that identifies a specific service + operation 
+type (consumer or producer), name for the operation type and a component. The 
+audience can be referenced using the following slug:
+  - `$service_name:$operation_type:$operation_name:$component_name`
+
+The only exposure to the `audience` concept that an SDK has is via the 
+`NewAudience()` internal gRPC method which is used by the SDK to announce the 
+existence of a new audience. The audience contains the elements needed to be 
+able to draw the most basic service map entry, eg: `service` ↔ `producer` ↔ 
+`component`.
+
+### condition
+
+A condition is associated with a step. It defines how the SDK should react to 
+the result of a step execution. The condition might be configured to **ABORT** 
+the pipeline if a step results in a failure or an error.
+
+### pipeline
+
+A pipeline is a set of steps and conditions. A user would configure one or more 
+steps for a specific producer or consumer - the result would be a pipeline 
+(that is sent to the SDK client via gRPC).
+
+### shims
+
+A wrapper library for popular libraries that incorporate the usage of our SDK 
+to simplify integration and adoption of `snitch`.
+- **Example**: we would develop a shim for Python’s HTTP request library called 
+`requests`. This shim would be a lightweight fork of `requests` that would call 
+on `snitch_sdk.Process(..)` whenever the user would POST, PUT, DELETE or GET 
+data. The shim simplifies and speeds up initial onboarding and  integration.
+
+### step / rule
+
+A step (or a rule) is a single unit of “work” that the SDK will run against a 
+payload.
+- **Example**: User might create a step that ensures that the payload always 
+contains a field called `id` which MUST be of the `uuid` format.
+
+### wasm
+
+WASM is WebAssembly. We use this technology in steps. A step consists of a 
+configuration (ie. what is the name of this step, what WASM function should it 
+run with what parameters, etc.) AND the actual WASM bytes that will be executed 
+by the SDK.

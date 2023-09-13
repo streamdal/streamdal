@@ -4,11 +4,46 @@ description: Snitch roadmap
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
 
-import { Notification } from "accessible-astro-components";
+v1.0.0 - v1.9.9 -- Q4 2023
+- 🎉🎉Release🎉🎉
+- RBAC / Roles / Memberships
+- Launch beta for data governance rules
+- Stale consumer+producer map cleanup
+- Quarantine (Like a dead-letter queue, but smarter and easier!)
+- Better Notifications
+- Quorum for `snitch` nodes / better clustering support
+- Ability to block all data; probably a rule
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+---
+
+v0.0.1 - v0.9.9 -- Q3 2023
+- Create RFC and initial architectural drafts
+- Select design partners and establish feedback pipeline on desired 
+functionality
+- Implement MVP:
+  - "Basic" UI + console design
+  - (Un)assign + exec pipelines
+  - Rules as WASM
+  - Website & website design
+  - Notifications
+  - Prometheus stats
+- Replace NATS with Redis
+  - K/V functionality
+- Display stats (like throughput and metrics on producer/consumers)
+- feature/Peek (like a tail -f, but for data)
+- Shims
+  - Sarama
+  - segmentio/kafka
+  - Rabbit
+  - Python/requests
+  - Logging (TBA)
+- UI tweaks
+  - Auto-layout for consumers+producer map
+- Schemas
+  - Inference
+  - Discovery
+  - Display
+- Rules do not require field paths in rule
+- Public demo env (this should live on https://demo.snitch.build)
+
