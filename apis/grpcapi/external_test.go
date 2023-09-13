@@ -823,6 +823,7 @@ func runServer() {
 		NotifyService:   d.NotifyService,
 		NATSBackend:     d.NATSBackend,
 		PubSubService:   d.PubSubService,
+		MetricsService:  d.MetricsService,
 	})
 
 	if err != nil {
