@@ -73,19 +73,7 @@ export declare enum HttpRequestMethod {
     /**
      * @generated from protobuf enum value: HTTP_REQUEST_METHOD_DELETE = 4;
      */
-    DELETE = 4,
-    /**
-     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_PATCH = 5;
-     */
-    PATCH = 5,
-    /**
-     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_HEAD = 6;
-     */
-    HEAD = 6,
-    /**
-     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_OPTIONS = 7;
-     */
-    OPTIONS = 7
+    DELETE = 4
 }
 declare class HttpRequest$Type extends MessageType<HttpRequest> {
     constructor();
