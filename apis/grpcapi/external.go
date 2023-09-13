@@ -3,7 +3,6 @@ package grpcapi
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,6 +14,11 @@ import (
 	"github.com/streamdal/snitch-server/types"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
+)
+
+const (
+	// audienceRateInterval is how often GetAudienceRates() will send new data to the frontend
+	audienceRateInterval = time.Second
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -753,7 +757,7 @@ func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.E
 			counters := make(map[string]*protos.Metric)
 
 			for _, c := range sliceCounters {
-				counters[counterName(c.Name, c.Labels)] = c
+				counters[util.CounterName(c.Name, c.Labels)] = c
 			}
 
 			if err := server.SendMsg(&protos.GetMetricsResponse{Metrics: counters}); err != nil {
@@ -763,16 +767,39 @@ func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.E
 	}
 }
 
-func counterName(name string, labels map[string]string) string {
-	vals := make([]string, 0)
-	for k, v := range labels {
-		vals = append(vals, fmt.Sprintf("%s-%s", k, v))
-	}
+func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, server protos.External_GetAudienceRatesServer) error {
+	ticker := time.NewTicker(audienceRateInterval)
+	defer ticker.Stop()
 
-	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
+	for {
+		select {
+		case <-server.Context().Done():
+			// User has exited the page
+			return nil
+		case <-ticker.C:
+			rates := s.Options.MetricsService.GetAllRateCounters(server.Context())
+
+			resp := &protos.GetAudienceRatesResponse{
+				Rates: make(map[string]*protos.AudienceRate),
+			}
+
+			for audStr, counter := range rates {
+				row := &protos.AudienceRate{
+					Bytes:     counter.Bytes.Rate() / 10,
+					Processed: counter.Processed.Rate() / 10,
+				}
+
+				resp.Rates[audStr] = row
+			}
+
+			if err := server.Send(resp); err != nil {
+				s.log.Errorf("error sending audience rates: %s", err)
+			}
+		}
+	}
 }
 
-func (s *ExternalServer) Test(ctx context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
+func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

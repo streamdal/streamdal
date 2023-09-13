@@ -201,6 +201,9 @@ github.com/onsi/gomega/types
 # github.com/patrickmn/go-cache v2.1.0+incompatible
 ## explicit
 github.com/patrickmn/go-cache
+# github.com/paulbellamy/ratecounter v0.2.0
+## explicit
+github.com/paulbellamy/ratecounter
 # github.com/philhofer/fwd v1.1.1
 ## explicit
 github.com/philhofer/fwd
@@ -246,7 +249,7 @@ github.com/slack-go/slack/slackutilsx
 # github.com/streamdal/natty v0.0.39
 ## explicit; go 1.18
 github.com/streamdal/natty
-# github.com/streamdal/snitch-protos v0.0.93
+# github.com/streamdal/snitch-protos v0.0.94-0.20230913153556-b0b2d85678c6
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
 github.com/streamdal/snitch-protos/build/go/protos/shared

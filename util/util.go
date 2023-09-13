@@ -8,10 +8,10 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -213,4 +213,13 @@ func GenerateKVRequest(action shared.KVAction, kvs []*protos.KVObject, overwrite
 		Instructions: instructions,
 		Overwrite:    overwrite,
 	}
+}
+
+func CounterName(name string, labels map[string]string) string {
+	vals := make([]string, 0)
+	for k, v := range labels {
+		vals = append(vals, fmt.Sprintf("%s-%s", k, v))
+	}
+
+	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
 }
