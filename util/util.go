@@ -87,21 +87,27 @@ func AudienceToStr(audience *protos.Audience) string {
 
 	str = strings.Replace(str, " ", NormalizeSpace, -1)
 
-	// TODO: Base58 encode
-
 	return str
 }
 
+// AudienceFromStr will parse a string into an Audience. If the string is invalid,
+// nil will be returned.
+//
+// Normalization explanation: Audience is stored in string format as part of the
+// key name in NATS. This means that it must adhere to [a-zA-Z0-9_-]+. To
+// support spaces, we need to normalize the string before storage and
+// de-normalize it on reads. Because there are various funcs and methods that
+// parse the key as-is from NATS, we cannot use something like base58 to encode &
+// decode the whole string and instead have to rely on str replaces.
+// ^ This applies to AudienceToStr() as well.
 func AudienceFromStr(s string) *protos.Audience {
 	if s == "" {
 		return nil
 	}
 
-	// We store the full audience as a str key in NATS which supports only a
-	// small subset of ascii characters, so we have to normalize.
-	// TODO: Base58 decode to normalize
+	normalizedAudience := strings.Replace(s, NormalizeSpace, " ", -1)
 
-	parts := strings.Split(string(normalizedAudience), "/")
+	parts := strings.Split(normalizedAudience, "/")
 	if len(parts) != 4 {
 		return nil
 	}
