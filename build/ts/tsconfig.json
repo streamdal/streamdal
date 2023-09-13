@@ -3,15 +3,12 @@
     "./protos/**/*.ts"
   ],
   "compilerOptions": {
-    "outDir": "node/protos",
-
-    "strict": true,
-    "sourceMap": true,
+    "target": "es2016",
+    "moduleResolution": "node",
+    "outDir": "./node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext"
+    "strict": true,
+    "skipLibCheck": true
   }
 }
