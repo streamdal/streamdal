@@ -72,12 +72,14 @@ class DetachNotificationRequest(_message.Message):
     def __init__(self, notification_id: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
 class DetachPipelineRequest(_message.Message):
-    __slots__ = ["audience", "pipeline_id"]
+    __slots__ = ["_session_ids", "audience", "pipeline_id"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    _SESSION_IDS_FIELD_NUMBER: _ClassVar[int]
+    _session_ids: _containers.RepeatedScalarFieldContainer[str]
     audience: _sp_common_pb2.Audience
     pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., _session_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetAllRequest(_message.Message):
     __slots__ = []

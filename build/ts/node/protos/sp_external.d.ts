@@ -156,6 +156,13 @@ export interface DetachPipelineRequest {
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
+    /**
+     * Filled out by detach gRPC handler so that broadcast handlers can avoid
+     * performing a lookup in NATS.
+     *
+     * @generated from protobuf field: repeated string _session_ids = 3;
+     */
+    SessionIds: string[];
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest
