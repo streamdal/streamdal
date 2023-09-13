@@ -1,19 +1,12 @@
 {
   "include": ["./src/**/*.ts"],
   "compilerOptions": {
-    "outDir": "build",
-    "declaration": false,
-    "strict": true,
-    "sourceMap": true,
+    "target": "es2016",
+    "outDir": "./build",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-  },
-  "references": [
-    {
-      "path": "./examples"
-    },
-  ]
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "nodenext"
+  }
 }

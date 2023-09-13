@@ -1,6 +1,6 @@
-import { Command } from "@streamdal/snitch-protos/protos/sp_command.js";
-import { InternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
-import { Pipeline } from "@streamdal/snitch-protos/protos/sp_pipeline.js";
+import { Command } from "@streamdal/snitch-protos/protos/sp_command";
+import { InternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
+import { Pipeline } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import sinon from "sinon";
 import { v4 as uuidv4 } from "uuid";
 import { describe, expect, it } from "vitest";

@@ -6,7 +6,7 @@ Optionally copy `example.env` -> `.env` and specify any custom env vars.
 
 To use the sdk in your node app:
 
-`npm install @streamdal/node-sdk-client`
+`npm install @streamdal/snitch-node-client`
 
 Then construct an instance of `"@streamdal/snitch-node-client/snitch.js"` and use that
 to process your data:
@@ -41,7 +41,7 @@ export const example = async () => {
 };
 
 ```
-*see ./examples for a runnable example that can be used as a starter*
+*see ./examples for a runnable examples that can be used as a starters*
 
 ## Development  
 

@@ -1,9 +1,8 @@
-import {
-  Audience,
+const {
   OperationType,
   Snitch,
-  SnitchConfigs,
-} from "@streamdal/snitch-node-client/snitch.js";
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+} = require("@streamdal/snitch-node-client/snitch");
 
 const exampleData = {
   boolean_t: true,
@@ -31,7 +30,7 @@ const exampleData = {
   timestamp_rfc3339: "2023-06-29T12:34:56Z",
 };
 
-const config: SnitchConfigs = {
+const config = {
   snitchUrl: "localhost:9091",
   snitchToken: "1234",
   serviceName: "test-service-name",
@@ -40,7 +39,7 @@ const config: SnitchConfigs = {
   dryRun: false,
 };
 
-const audience: Audience = {
+const audience = {
   serviceName: "test-service-name",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
@@ -54,8 +53,17 @@ export const example = async () => {
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });
 
-  console.log("snitch response");
-  console.dir(result, { depth: 20 });
+  if (result.error) {
+    console.error("Pipeline error", result.message);
+    //
+    // Optionally explore more detailed step status information
+    console.dir(result.stepStatuses);
+  } else {
+    console.info("Pipeline success!");
+    //
+    // Process data, which may or may not have been altered depending on your pipeline
+    // doStuff(result.data);
+  }
 };
 
 void example();

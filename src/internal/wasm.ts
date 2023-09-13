@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-unresolved
-import { PipelineStep } from "@streamdal/snitch-protos/protos/sp_pipeline.js";
+import { PipelineStep } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import {
   WASMRequest,
   WASMResponse,
-} from "@streamdal/snitch-protos/protos/sp_wsm.js";
+} from "@streamdal/snitch-protos/protos/sp_wsm";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 

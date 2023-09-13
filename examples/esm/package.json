@@ -1,0 +1,19 @@
+{
+  "name": "snitch-example-node-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/index.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@streamdal/snitch-node-client": "^0.0.7",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.1.6"
+  }
+}

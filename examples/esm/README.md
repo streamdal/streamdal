@@ -1,4 +1,4 @@
-# Example app that uses Streamdal's Snitch Node Client SDK
+# Example app that uses Streamdal's Snitch Node Client SDK with esm modules
 
 ## Getting started
 
@@ -22,9 +22,12 @@ const config: SnitchConfigs = {
 };
 ```
 
+See `.src/index.ts` for full example client.
+
 Then install deps and run as usual:
 
 `npm install`
+
 `npm start`
 
 

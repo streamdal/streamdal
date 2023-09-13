@@ -1,7 +1,9 @@
 {
-  "include": ["./src/**/*.ts"],
+  "include": [
+     "./src/**/*.ts"
+  ],
   "compilerOptions": {
-    "outDir": "build",
+    "outDir": "./build",
     "declaration": true,
     "strict": true,
     "sourceMap": true,

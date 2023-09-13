@@ -13,17 +13,23 @@
     "data quality"
   ],
   "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./types/*.d.ts",
+      "require": "./cjs/*.js",
+      "import": "./esm/*.js",
+      "default": "./esm/*.js"
+    }
+  },
   "scripts": {
-    "build": "npm run clean && npm run type:dts && npm run build:main",
-    "build:main": "tsc",
+    "build": "npm run clean && npm run build:main && ./generatePackages.sh",
+    "build:main": "npx tsc -p tsconfig.types.json && npx tsc -p tsconfig.esm.json && npx tsc -p tsconfig.cjs.json",
     "clean": "rimraf build",
-    "copy": "cp README.md ./build/README.md && rm ./build/internal/*.ts && cp package.json ./build/package.json",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "type:dts": "tsc --emitDeclarationOnly --project tsconfig.build.json",
     "type:check": "tsc --noEmit"
   },
   "repository": {
@@ -39,7 +45,7 @@
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
     "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@streamdal/snitch-protos": "^0.0.91",
+    "@streamdal/snitch-protos": "0.0.94",
     "@types/rwlock": "^5.0.3",
     "@types/sinon": "^10.0.16",
     "dotenv": "^16.3.1",

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["./src/snitch.ts"],
+  "compilerOptions": {
+    "outDir": "./build/types",
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
+}

@@ -1,9 +1,9 @@
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
 import {
   PipelineStep,
   PipelineStepCondition,
-} from "@streamdal/snitch-protos/protos/sp_pipeline.js";
-import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm.js";
+} from "@streamdal/snitch-protos/protos/sp_pipeline";
+import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";

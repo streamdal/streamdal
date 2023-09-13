@@ -1,6 +1,6 @@
-import { Audience } from "@streamdal/snitch-protos/protos/sp_common.js";
-import { ClientType } from "@streamdal/snitch-protos/protos/sp_info.js";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client.js";
+import { Audience } from "@streamdal/snitch-protos/protos/sp_common";
+import { ClientType } from "@streamdal/snitch-protos/protos/sp_info";
+import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
 
 // import { version } from "../../package.json";
 import { InternalPipeline, processResponse } from "./pipeline.js";

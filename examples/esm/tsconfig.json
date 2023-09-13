@@ -1,7 +1,9 @@
 {
-  "include": ["./src/snitch.ts"],
+  "include": [
+     "./src/**/*.ts"
+  ],
   "compilerOptions": {
-    "outDir": "build",
+    "outDir": "./build",
     "declaration": true,
     "strict": true,
     "sourceMap": true,
@@ -10,6 +12,5 @@
     "forceConsistentCasingInFileNames": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
-  },
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
+  }
 }

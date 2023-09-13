@@ -3,11 +3,11 @@ import { GrpcTransport } from "@protobuf-ts/grpc-transport";
 import {
   Audience,
   OperationType,
-} from "@streamdal/snitch-protos/protos/sp_common.js";
+} from "@streamdal/snitch-protos/protos/sp_common";
 import {
   IInternalClient,
   InternalClient,
-} from "@streamdal/snitch-protos/protos/sp_internal.client.js";
+} from "@streamdal/snitch-protos/protos/sp_internal.client";
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudience, addAudiences } from "./internal/audience.js";
