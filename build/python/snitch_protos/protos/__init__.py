@@ -453,6 +453,11 @@ class AttachPipelineRequest(betterproto.Message):
 class DetachPipelineRequest(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
     audience: "Audience" = betterproto.message_field(2)
+    session_ids: List[str] = betterproto.string_field(3)
+    """
+    Filled out by detach gRPC handler so that broadcast handlers can avoid
+    performing a lookup in NATS.
+    """
 
 
 @dataclass(eq=False, repr=False)
