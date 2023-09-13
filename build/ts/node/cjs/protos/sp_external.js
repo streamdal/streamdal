@@ -154,7 +154,8 @@ class DetachPipelineRequest$Type extends runtime_1.MessageType {
     constructor() {
         super("protos.DetachPipelineRequest", [
             { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => sp_common_5.Audience }
+            { no: 2, name: "audience", kind: "message", T: () => sp_common_5.Audience },
+            { no: 3, name: "_session_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
 }
