@@ -107,16 +107,8 @@ func Audience(audience *protos.Audience) error {
 		return ErrEmptyField("Audience.ServiceName")
 	}
 
-	if !ValidCharactersRegex.MatchString(audience.ServiceName) {
-		return ErrInvalidCharacters("ServiceName")
-	}
-
 	if audience.ComponentName == "" {
 		return ErrEmptyField("Audience.ComponentName")
-	}
-
-	if !ValidCharactersRegex.MatchString(audience.ComponentName) {
-		return ErrInvalidCharacters("ComponentName")
 	}
 
 	if audience.OperationType == protos.OperationType_OPERATION_TYPE_UNSET {
@@ -125,10 +117,6 @@ func Audience(audience *protos.Audience) error {
 
 	if audience.OperationName == "" {
 		return ErrEmptyField("Audience.OperationName")
-	}
-
-	if !ValidCharactersRegex.MatchString(audience.OperationName) {
-		return ErrInvalidCharacters("OperationName")
 	}
 
 	return nil
