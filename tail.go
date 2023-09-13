@@ -17,14 +17,26 @@ import (
 	"github.com/streamdal/snitch-go-client/validation"
 )
 
-const NumTailWorkers = 2
+const (
+	// NumTailWorkers is the number of tail workers to start for each tail request
+	// The workers are responsible for reading from the tail channel and streaming
+	// TailResponse messages to the snitch server
+	NumTailWorkers = 2
+
+	// MinTailResponseIntervalMS is how often we send a TailResponse to the snitch server
+	// If this rate is exceeded, we will drop messages rather than flooding the server
+	// This is an int to avoid a .Milliseconds() call
+	MinTailResponseIntervalMS = 10
+)
 
 type Tail struct {
-	Request      *protos.Command
-	Ch           chan *protos.TailResponse
+	Request    *protos.Command
+	CancelFunc context.CancelFunc
+
+	outboundCh   chan *protos.TailResponse
 	snitchServer server.IServerClient
 	cancelCtx    context.Context
-	CancelFunc   context.CancelFunc
+	lastMsg      time.Time
 	log          logger.Logger
 }
 
@@ -45,8 +57,22 @@ func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData 
 			OriginalData:  originalData,
 			NewData:       postPipelineData,
 		}
-		tail.Ch <- tr
+
+		tail.ShipResponse(tr)
 	}
+}
+
+func (t *Tail) ShipResponse(tr *protos.TailResponse) {
+	// If we're sending too fast, drop the message
+	if time.Since(t.lastMsg).Milliseconds() < MinTailResponseIntervalMS {
+		// TODO: we should notify the snitch server that we're dropping messages somehow
+		// TODO: but this needs to be done in a way that only sends once in a while
+		t.log.Debugf("Dropping tail response for %s, too fast", tr.PipelineId)
+		return
+	}
+
+	t.outboundCh <- tr
+	t.lastMsg = time.Now()
 }
 
 func (t *Tail) startWorkers() error {
@@ -94,7 +120,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 			quit = true
 			looper.Quit()
 			return nil
-		case resp := <-t.Ch:
+		case resp := <-t.outboundCh:
 			if err := stream.Send(resp); err != nil {
 				if strings.Contains(err.Error(), io.EOF.Error()) {
 					t.log.Debug("tail worker received EOF, exiting")
@@ -138,11 +164,12 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 	// Start workers
 	t := &Tail{
 		Request:      cmd,
-		Ch:           make(chan *protos.TailResponse, 100),
+		outboundCh:   make(chan *protos.TailResponse, 100),
 		cancelCtx:    ctx,
 		CancelFunc:   cancel,
 		snitchServer: s.serverClient,
 		log:          s.config.Logger,
+		lastMsg:      time.Now(),
 	}
 
 	if err := t.startWorkers(); err != nil {
