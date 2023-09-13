@@ -28,7 +28,7 @@ export default function OpModal(
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
   const opType = OperationType[audience?.operationType];
-  const clients = opModal.value?.clients;
+  const clients = opModal.value?.clients?.length || 0;
 
   const [isOpen, setIsOpen] = useState(false);
   const [peekOpen, setPeekOpen] = useState(false);
@@ -115,7 +115,7 @@ export default function OpModal(
                           {audience?.operationName}
                         </h3>
                         <p class="text-xs text-cloud">
-                          {`${clients || 0} attached client${
+                          {`${clients} attached client${
                             (clients !== 1) ? "s" : ""
                           }`}
                         </p>
@@ -223,16 +223,11 @@ export default function OpModal(
                     <h3 id="collapse-heading-2">
                       <button
                         type="button"
-                        className={`flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web focus:ring-2 ${
-                          attachedPipeline
-                            ? "cursor-pointer"
-                            : "cursor-not-allowed text-gray-300"
-                        }`}
+                        className={`flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web focus:ring-2`}
                         data-accordion-target="#collapse-body-2"
                         aria-expanded="true"
                         aria-controls="collapse-body-2"
-                        onClick={() =>
-                          attachedPipeline && setPeekOpen(!peekOpen)}
+                        onClick={() => setPeekOpen(!peekOpen)}
                       >
                         <h3 class="text-sm font-semibold ml-3">
                           Peek

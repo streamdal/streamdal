@@ -1,9 +1,14 @@
 # Snitch Console
 
-The Snitch Console is a Deno + Fresh project, see:
-https://fresh.deno.dev/docs/getting-started
+Snitch console allows you visualize interact with your services, build and
+attach pipelines to consumers and producers and monitor their operations.
 
-### Usage
+![Snitch Console](./console-screenshot.png)
+
+### Development
+
+The Snitch Console is a Deno + Fresh project that uses Preact, ReactFlow and
+Twind: https://fresh.deno.dev/docs/getting-started
 
 Make sure to install Deno: https://deno.land/manual/getting_started/installation
 
@@ -33,3 +38,9 @@ running it locally.
 
 Update `verstion.ts` to display a new version in the app. See:
 `https://deno.land/x/version_ts@0.2.2` to make this a little easier.
+
+### Running (non-development)
+
+If you just want to run the console and the server together for non-development
+purposes, you can bring them both up with docker, see:
+https://github.com/streamdal/snitch/tree/main/docker/local
