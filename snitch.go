@@ -445,7 +445,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}
 
 	// Rate counters
-	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateBytes, Labels: map[string]string{}, Value: 1, Audience: aud})
+	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateBytes, Labels: map[string]string{}, Value: payloadSize, Audience: aud})
 	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateProcessed, Labels: map[string]string{}, Value: 1, Audience: aud})
 
 	pipelines := s.getPipelines(ctx, aud)
