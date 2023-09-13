@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./node/types/protos",
+    "declaration": true,
+    "emitDeclarationOnly": true
+  }
+}
