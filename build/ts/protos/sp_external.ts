@@ -333,12 +333,6 @@ export interface GetAudienceRatesResponse {
     rates: {
         [key: string]: AudienceRate;
     }; // Key is an audience string
-    /**
-     * @generated from protobuf field: map<string, string> _metadata = 1000;
-     */
-    Metadata: {
-        [key: string]: string;
-    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -688,8 +682,7 @@ export const GetAudienceRatesRequest = new GetAudienceRatesRequest$Type();
 class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse> {
     constructor() {
         super("protos.GetAudienceRatesResponse", [
-            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } },
-            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } }
         ]);
     }
 }

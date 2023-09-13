@@ -202,8 +202,8 @@ class TailResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class AudienceRate(betterproto.Message):
-    bytes: int = betterproto.int64_field(2)
-    processed: int = betterproto.int64_field(3)
+    bytes: int = betterproto.int64_field(1)
+    processed: int = betterproto.int64_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -557,9 +557,6 @@ class GetAudienceRatesRequest(betterproto.Message):
 class GetAudienceRatesResponse(betterproto.Message):
     rates: Dict[str, "AudienceRate"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
-    )
-    metadata: Dict[str, str] = betterproto.map_field(
-        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
 
 

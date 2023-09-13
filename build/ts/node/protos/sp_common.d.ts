@@ -160,11 +160,11 @@ export interface TailResponse {
  */
 export interface AudienceRate {
     /**
-     * @generated from protobuf field: int64 bytes = 2;
+     * @generated from protobuf field: int64 bytes = 1;
      */
     bytes: bigint;
     /**
-     * @generated from protobuf field: int64 processed = 3;
+     * @generated from protobuf field: int64 processed = 2;
      */
     processed: bigint;
 }

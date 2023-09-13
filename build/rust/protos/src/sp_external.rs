@@ -3550,8 +3550,6 @@ pub struct GetAudienceRatesResponse {
     // message fields
     // @@protoc_insertion_point(field:protos.GetAudienceRatesResponse.rates)
     pub rates: ::std::collections::HashMap<::std::string::String, super::sp_common::AudienceRate>,
-    // @@protoc_insertion_point(field:protos.GetAudienceRatesResponse._metadata)
-    pub _metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.GetAudienceRatesResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -3569,17 +3567,12 @@ impl GetAudienceRatesResponse {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
             "rates",
             |m: &GetAudienceRatesResponse| { &m.rates },
             |m: &mut GetAudienceRatesResponse| { &mut m.rates },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
-            "_metadata",
-            |m: &GetAudienceRatesResponse| { &m._metadata },
-            |m: &mut GetAudienceRatesResponse| { &mut m._metadata },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAudienceRatesResponse>(
             "GetAudienceRatesResponse",
@@ -3614,21 +3607,6 @@ impl ::protobuf::Message for GetAudienceRatesResponse {
                     is.pop_limit(old_limit);
                     self.rates.insert(key, value);
                 },
-                8002 => {
-                    let len = is.read_raw_varint32()?;
-                    let old_limit = is.push_limit(len as u64)?;
-                    let mut key = ::std::default::Default::default();
-                    let mut value = ::std::default::Default::default();
-                    while let Some(tag) = is.read_raw_tag_or_eof()? {
-                        match tag {
-                            10 => key = is.read_string()?,
-                            18 => value = is.read_string()?,
-                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
-                        };
-                    }
-                    is.pop_limit(old_limit);
-                    self._metadata.insert(key, value);
-                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -3648,12 +3626,6 @@ impl ::protobuf::Message for GetAudienceRatesResponse {
             entry_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
         };
-        for (k, v) in &self._metadata {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::string_size(2, &v);
-            my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
-        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -3669,15 +3641,6 @@ impl ::protobuf::Message for GetAudienceRatesResponse {
             os.write_raw_varint32(entry_size as u32)?;
             os.write_string(1, &k)?;
             ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
-        };
-        for (k, v) in &self._metadata {
-            let mut entry_size = 0;
-            entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::string_size(2, &v);
-            os.write_raw_varint32(8002)?; // Tag.
-            os.write_raw_varint32(entry_size as u32)?;
-            os.write_string(1, &k)?;
-            os.write_string(2, &v)?;
         };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -3697,7 +3660,6 @@ impl ::protobuf::Message for GetAudienceRatesResponse {
 
     fn clear(&mut self) {
         self.rates.clear();
-        self._metadata.clear();
         self.special_fields.clear();
     }
 
@@ -4024,66 +3986,63 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x07metrics\x18\x01\x20\x03(\x0b2'.protos.GetMetricsResponse.MetricsEntr\
     yR\x07metrics\x1aJ\n\x0cMetricsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\t\
     R\x03key\x12$\n\x05value\x18\x02\x20\x01(\x0b2\x0e.protos.MetricR\x05val\
-    ue:\x028\x01\"\x19\n\x17GetAudienceRatesRequest\"\xb8\x02\n\x18GetAudien\
+    ue:\x028\x01\"\x19\n\x17GetAudienceRatesRequest\"\xad\x01\n\x18GetAudien\
     ceRatesResponse\x12A\n\x05rates\x18\x01\x20\x03(\x0b2+.protos.GetAudienc\
-    eRatesResponse.RatesEntryR\x05rates\x12L\n\t_metadata\x18\xe8\x07\x20\
-    \x03(\x0b2..protos.GetAudienceRatesResponse.MetadataEntryR\x08Metadata\
-    \x1aN\n\nRatesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12*\n\
-    \x05value\x18\x02\x20\x01(\x0b2\x14.protos.AudienceRateR\x05value:\x028\
-    \x01\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\
-    \x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"#\n\x0bTestR\
-    equest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestRespo\
-    nse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\xc5\r\n\x08Extern\
-    al\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllRe\
-    sponse\x12?\n\x0cGetAllStream\x12\x15.protos.GetAllRequest\x1a\x16.proto\
-    s.GetAllResponse0\x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelines\
-    Request\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\
-    \x1a.protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\
-    \x0eCreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.C\
-    reatePipelineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipe\
-    lineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\
-    \x1d.protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\
-    \x0eAttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.S\
-    tandardResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRe\
-    quest\x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.prot\
-    os.PausePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResume\
-    Pipeline\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardRes\
-    ponse\x12Q\n\x12CreateNotification\x12!.protos.CreateNotificationRequest\
-    \x1a\x18.protos.StandardResponse\x12Q\n\x12UpdateNotification\x12!.proto\
-    s.UpdateNotificationRequest\x1a\x18.protos.StandardResponse\x12Q\n\x12De\
-    leteNotification\x12!.protos.DeleteNotificationRequest\x1a\x18.protos.St\
-    andardResponse\x12U\n\x10GetNotifications\x12\x1f.protos.GetNotification\
-    sRequest\x1a\x20.protos.GetNotificationsResponse\x12R\n\x0fGetNotificati\
-    on\x12\x1e.protos.GetNotificationRequest\x1a\x1f.protos.GetNotificationR\
-    esponse\x12Q\n\x12AttachNotification\x12!.protos.AttachNotificationReque\
-    st\x1a\x18.protos.StandardResponse\x12Q\n\x12DetachNotification\x12!.pro\
-    tos.DetachNotificationRequest\x1a\x18.protos.StandardResponse\x12I\n\x0e\
-    DeleteAudience\x12\x1d.protos.DeleteAudienceRequest\x1a\x18.protos.Stand\
-    ardResponse\x12E\n\nGetMetrics\x12\x19.protos.GetMetricsRequest\x1a\x1a.\
-    protos.GetMetricsResponse0\x01\x123\n\x04Tail\x12\x13.protos.TailRequest\
-    \x1a\x14.protos.TailResponse0\x01\x12W\n\x10GetAudienceRates\x12\x1f.pro\
-    tos.GetAudienceRatesRequest\x1a\x20.protos.GetAudienceRatesResponse0\x01\
-    \x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB4\
-    Z2github.com/streamdal/snitch-protos/build/go/protosJ\x8c2\n\x07\x12\x05\
-    \0\0\xe5\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\
-    \x05\0\x17\n\t\n\x02\x03\x02\x12\x03\x06\0\x19\n\t\n\x02\x03\x03\x12\x03\
-    \x07\0\x1b\n\x08\n\x01\x08\x12\x03\t\0I\n\t\n\x02\x08\x0b\x12\x03\t\0I\n\
-    \n\n\x02\x06\0\x12\x04\x0b\0N\x01\n\n\n\x03\x06\0\x01\x12\x03\x0b\x08\
-    \x10\n_\n\x04\x06\0\x02\0\x12\x03\r\x025\x1aR\x20Should\x20return\x20eve\
-    rything\x20that\x20is\x20needed\x20to\x20build\x20the\x20initial\x20view\
-    \x20in\x20the\x20console\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\r\x06\x0c\
-    \n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\r\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\
-    \x12\x03\r%3\n:\n\x04\x06\0\x02\x01\x12\x03\x10\x02B\x1a-\x20Temporary\
-    \x20method\x20to\x20test\x20gRPC-Web\x20streaming\n\n\x0c\n\x05\x06\0\
-    \x02\x01\x01\x12\x03\x10\x06\x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\
-    \x10\x13\x20\n\x0c\n\x05\x06\0\x02\x01\x06\x12\x03\x10+1\n\x0c\n\x05\x06\
-    \0\x02\x01\x03\x12\x03\x102@\n@\n\x04\x06\0\x02\x02\x12\x03\x13\x02G\x1a\
-    3\x20Returns\x20pipelines\x20(_wasm_bytes\x20field\x20is\x20stripped)\n\
-    \n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\x13\x06\x12\n\x0c\n\x05\x06\0\x02\
-    \x02\x02\x12\x03\x13\x13&\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x131E\nH\
-    \n\x04\x06\0\x02\x03\x12\x03\x16\x02D\x1a;\x20Returns\x20a\x20single\x20\
-    pipeline\x20(_wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\
+    eRatesResponse.RatesEntryR\x05rates\x1aN\n\nRatesEntry\x12\x10\n\x03key\
+    \x18\x01\x20\x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.pr\
+    otos.AudienceRateR\x05value:\x028\x01\"#\n\x0bTestRequest\x12\x14\n\x05i\
+    nput\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResponse\x12\x16\n\x06outp\
+    ut\x18\x02\x20\x01(\tR\x06output2\xc5\r\n\x08External\x127\n\x06GetAll\
+    \x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse\x12?\n\x0cGe\
+    tAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse0\
+    \x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.p\
+    rotos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipel\
+    ineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eCreatePipeline\
+    \x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.CreatePipelineRespo\
+    nse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRequest\x1a\
+    \x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.protos.Del\
+    etePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eAttachPipel\
+    ine\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.StandardResponse\
+    \x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\x1a\x18.p\
+    rotos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.PausePipelin\
+    eRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipeline\x12\
+    \x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardResponse\x12Q\n\
+    \x12CreateNotification\x12!.protos.CreateNotificationRequest\x1a\x18.pro\
+    tos.StandardResponse\x12Q\n\x12UpdateNotification\x12!.protos.UpdateNoti\
+    ficationRequest\x1a\x18.protos.StandardResponse\x12Q\n\x12DeleteNotifica\
+    tion\x12!.protos.DeleteNotificationRequest\x1a\x18.protos.StandardRespon\
+    se\x12U\n\x10GetNotifications\x12\x1f.protos.GetNotificationsRequest\x1a\
+    \x20.protos.GetNotificationsResponse\x12R\n\x0fGetNotification\x12\x1e.p\
+    rotos.GetNotificationRequest\x1a\x1f.protos.GetNotificationResponse\x12Q\
+    \n\x12AttachNotification\x12!.protos.AttachNotificationRequest\x1a\x18.p\
+    rotos.StandardResponse\x12Q\n\x12DetachNotification\x12!.protos.DetachNo\
+    tificationRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeleteAudien\
+    ce\x12\x1d.protos.DeleteAudienceRequest\x1a\x18.protos.StandardResponse\
+    \x12E\n\nGetMetrics\x12\x19.protos.GetMetricsRequest\x1a\x1a.protos.GetM\
+    etricsResponse0\x01\x123\n\x04Tail\x12\x13.protos.TailRequest\x1a\x14.pr\
+    otos.TailResponse0\x01\x12W\n\x10GetAudienceRates\x12\x1f.protos.GetAudi\
+    enceRatesRequest\x1a\x20.protos.GetAudienceRatesResponse0\x01\x121\n\x04\
+    Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB4Z2github.co\
+    m/streamdal/snitch-protos/build/go/protosJ\x9a1\n\x07\x12\x05\0\0\xe4\
+    \x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\
+    \x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\
+    \x17\n\t\n\x02\x03\x02\x12\x03\x06\0\x19\n\t\n\x02\x03\x03\x12\x03\x07\0\
+    \x1b\n\x08\n\x01\x08\x12\x03\t\0I\n\t\n\x02\x08\x0b\x12\x03\t\0I\n\n\n\
+    \x02\x06\0\x12\x04\x0b\0N\x01\n\n\n\x03\x06\0\x01\x12\x03\x0b\x08\x10\n_\
+    \n\x04\x06\0\x02\0\x12\x03\r\x025\x1aR\x20Should\x20return\x20everything\
+    \x20that\x20is\x20needed\x20to\x20build\x20the\x20initial\x20view\x20in\
+    \x20the\x20console\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\r\x06\x0c\n\x0c\
+    \n\x05\x06\0\x02\0\x02\x12\x03\r\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\x12\
+    \x03\r%3\n:\n\x04\x06\0\x02\x01\x12\x03\x10\x02B\x1a-\x20Temporary\x20me\
+    thod\x20to\x20test\x20gRPC-Web\x20streaming\n\n\x0c\n\x05\x06\0\x02\x01\
+    \x01\x12\x03\x10\x06\x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x10\x13\
+    \x20\n\x0c\n\x05\x06\0\x02\x01\x06\x12\x03\x10+1\n\x0c\n\x05\x06\0\x02\
+    \x01\x03\x12\x03\x102@\n@\n\x04\x06\0\x02\x02\x12\x03\x13\x02G\x1a3\x20R\
+    eturns\x20pipelines\x20(_wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\
+    \n\x05\x06\0\x02\x02\x01\x12\x03\x13\x06\x12\n\x0c\n\x05\x06\0\x02\x02\
+    \x02\x12\x03\x13\x13&\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x131E\nH\n\
+    \x04\x06\0\x02\x03\x12\x03\x16\x02D\x1a;\x20Returns\x20a\x20single\x20pi\
+    peline\x20(_wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\
     \x02\x03\x01\x12\x03\x16\x06\x11\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\
     \x16\x12$\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\x16/B\nE\n\x04\x06\0\x02\
     \x04\x12\x03\x19\x02M\x1a8\x20Create\x20a\x20new\x20pipeline;\x20id\x20m\
@@ -4298,24 +4257,20 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x12\x04\xd3\x01\x1c#\n\r\n\x05\x04\x19\x02\0\x03\x12\x04\xd3\x01&'\
     \n8\n\x02\x04\x1a\x12\x06\xd6\x01\0\xd8\x01\x01\"*\x20Nothing\x20needed\
     \x20here,\x20we\x20return\x20all\x20rates\n\n\x0b\n\x03\x04\x1a\x01\x12\
-    \x04\xd6\x01\x08\x1f\n\x0c\n\x02\x04\x1b\x12\x06\xda\x01\0\xdd\x01\x01\n\
+    \x04\xd6\x01\x08\x1f\n\x0c\n\x02\x04\x1b\x12\x06\xda\x01\0\xdc\x01\x01\n\
     \x0b\n\x03\x04\x1b\x01\x12\x04\xda\x01\x08\x20\n)\n\x04\x04\x1b\x02\0\
     \x12\x04\xdb\x01\x02%\"\x1b\x20Key\x20is\x20an\x20audience\x20string\n\n\
     \r\n\x05\x04\x1b\x02\0\x06\x12\x04\xdb\x01\x02\x1a\n\r\n\x05\x04\x1b\x02\
     \0\x01\x12\x04\xdb\x01\x1b\x20\n\r\n\x05\x04\x1b\x02\0\x03\x12\x04\xdb\
-    \x01#$\nC\n\x04\x04\x1b\x02\x01\x12\x04\xdc\x01\x02&\"5\x20protolint:dis\
-    able:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\x05\x04\x1b\x02\x01\
-    \x06\x12\x04\xdc\x01\x02\x14\n\r\n\x05\x04\x1b\x02\x01\x01\x12\x04\xdc\
-    \x01\x15\x1e\n\r\n\x05\x04\x1b\x02\x01\x03\x12\x04\xdc\x01!%\n\x0c\n\x02\
-    \x04\x1c\x12\x06\xdf\x01\0\xe1\x01\x01\n\x0b\n\x03\x04\x1c\x01\x12\x04\
-    \xdf\x01\x08\x13\n\x0c\n\x04\x04\x1c\x02\0\x12\x04\xe0\x01\x02\x13\n\r\n\
-    \x05\x04\x1c\x02\0\x05\x12\x04\xe0\x01\x02\x08\n\r\n\x05\x04\x1c\x02\0\
-    \x01\x12\x04\xe0\x01\t\x0e\n\r\n\x05\x04\x1c\x02\0\x03\x12\x04\xe0\x01\
-    \x11\x12\n\x0c\n\x02\x04\x1d\x12\x06\xe3\x01\0\xe5\x01\x01\n\x0b\n\x03\
-    \x04\x1d\x01\x12\x04\xe3\x01\x08\x14\n\x0c\n\x04\x04\x1d\x02\0\x12\x04\
-    \xe4\x01\x02\x14\n\r\n\x05\x04\x1d\x02\0\x05\x12\x04\xe4\x01\x02\x08\n\r\
-    \n\x05\x04\x1d\x02\0\x01\x12\x04\xe4\x01\t\x0f\n\r\n\x05\x04\x1d\x02\0\
-    \x03\x12\x04\xe4\x01\x12\x13b\x06proto3\
+    \x01#$\n\x0c\n\x02\x04\x1c\x12\x06\xde\x01\0\xe0\x01\x01\n\x0b\n\x03\x04\
+    \x1c\x01\x12\x04\xde\x01\x08\x13\n\x0c\n\x04\x04\x1c\x02\0\x12\x04\xdf\
+    \x01\x02\x13\n\r\n\x05\x04\x1c\x02\0\x05\x12\x04\xdf\x01\x02\x08\n\r\n\
+    \x05\x04\x1c\x02\0\x01\x12\x04\xdf\x01\t\x0e\n\r\n\x05\x04\x1c\x02\0\x03\
+    \x12\x04\xdf\x01\x11\x12\n\x0c\n\x02\x04\x1d\x12\x06\xe2\x01\0\xe4\x01\
+    \x01\n\x0b\n\x03\x04\x1d\x01\x12\x04\xe2\x01\x08\x14\n\x0c\n\x04\x04\x1d\
+    \x02\0\x12\x04\xe3\x01\x02\x14\n\r\n\x05\x04\x1d\x02\0\x05\x12\x04\xe3\
+    \x01\x02\x08\n\r\n\x05\x04\x1d\x02\0\x01\x12\x04\xe3\x01\t\x0f\n\r\n\x05\
+    \x04\x1d\x02\0\x03\x12\x04\xe3\x01\x12\x13b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

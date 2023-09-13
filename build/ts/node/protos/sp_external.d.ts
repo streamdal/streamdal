@@ -327,12 +327,6 @@ export interface GetAudienceRatesResponse {
     rates: {
         [key: string]: AudienceRate;
     };
-    /**
-     * @generated from protobuf field: map<string, string> _metadata = 1000;
-     */
-    Metadata: {
-        [key: string]: string;
-    };
 }
 /**
  * @generated from protobuf message protos.TestRequest

@@ -118,14 +118,7 @@ class GetAudienceRatesRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAudienceRatesResponse(_message.Message):
-    __slots__ = ["_metadata", "rates"]
-    class MetadataEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    __slots__ = ["rates"]
     class RatesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -134,10 +127,8 @@ class GetAudienceRatesResponse(_message.Message):
         value: _sp_common_pb2.AudienceRate
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_common_pb2.AudienceRate, _Mapping]] = ...) -> None: ...
     RATES_FIELD_NUMBER: _ClassVar[int]
-    _METADATA_FIELD_NUMBER: _ClassVar[int]
-    _metadata: _containers.ScalarMap[str, str]
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
-    def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []

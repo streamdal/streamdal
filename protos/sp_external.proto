@@ -218,7 +218,6 @@ message GetAudienceRatesRequest {
 
 message GetAudienceRatesResponse {
   map<string,AudienceRate> rates = 1; // Key is an audience string
-  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message TestRequest {

@@ -1106,10 +1106,10 @@ impl ::protobuf::Message for AudienceRate {
     fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
-                16 => {
+                8 => {
                     self.bytes = is.read_int64()?;
                 },
-                24 => {
+                16 => {
                     self.processed = is.read_int64()?;
                 },
                 tag => {
@@ -1125,10 +1125,10 @@ impl ::protobuf::Message for AudienceRate {
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
         if self.bytes != 0 {
-            my_size += ::protobuf::rt::int64_size(2, self.bytes);
+            my_size += ::protobuf::rt::int64_size(1, self.bytes);
         }
         if self.processed != 0 {
-            my_size += ::protobuf::rt::int64_size(3, self.processed);
+            my_size += ::protobuf::rt::int64_size(2, self.processed);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -1137,10 +1137,10 @@ impl ::protobuf::Message for AudienceRate {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if self.bytes != 0 {
-            os.write_int64(2, self.bytes)?;
+            os.write_int64(1, self.bytes)?;
         }
         if self.processed != 0 {
-            os.write_int64(3, self.processed)?;
+            os.write_int64(2, self.processed)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1468,8 +1468,8 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12@\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\".protos.TailResponse.Metad\
     ataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\
     \x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\
-    \x01\"B\n\x0cAudienceRate\x12\x14\n\x05bytes\x18\x02\x20\x01(\x03R\x05by\
-    tes\x12\x1c\n\tprocessed\x18\x03\x20\x01(\x03R\tprocessed*\xc3\x01\n\x0c\
+    \x01\"B\n\x0cAudienceRate\x12\x14\n\x05bytes\x18\x01\x20\x01(\x03R\x05by\
+    tes\x12\x1c\n\tprocessed\x18\x02\x20\x01(\x03R\tprocessed*\xc3\x01\n\x0c\
     ResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\x14\n\x10RESPONS\
     E_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUEST\x10\x02\x12\x1b\
     \n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_CODE_INTERNAL_SERV\

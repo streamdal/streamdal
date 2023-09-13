@@ -163,11 +163,11 @@ export interface TailResponse {
  */
 export interface AudienceRate {
     /**
-     * @generated from protobuf field: int64 bytes = 2;
+     * @generated from protobuf field: int64 bytes = 1;
      */
     bytes: bigint;
     /**
-     * @generated from protobuf field: int64 processed = 3;
+     * @generated from protobuf field: int64 processed = 2;
      */
     processed: bigint;
 }
@@ -339,8 +339,8 @@ export const TailResponse = new TailResponse$Type();
 class AudienceRate$Type extends MessageType<AudienceRate> {
     constructor() {
         super("protos.AudienceRate", [
-            { no: 2, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 3, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 1, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 2, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
 }

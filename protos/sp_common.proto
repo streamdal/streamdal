@@ -99,6 +99,6 @@ message TailResponse {
 }
 
 message AudienceRate {
-  int64 bytes = 2;
-  int64 processed = 3;
+  int64 bytes = 1;
+  int64 processed = 2;
 }

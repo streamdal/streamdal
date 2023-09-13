@@ -343,8 +343,7 @@ export const GetAudienceRatesRequest = new GetAudienceRatesRequest$Type();
 class GetAudienceRatesResponse$Type extends MessageType {
     constructor() {
         super("protos.GetAudienceRatesResponse", [
-            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } },
-            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } }
         ]);
     }
 }
