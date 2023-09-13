@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./node/esm/protos",
+    "module": "esnext",
+  }
+}

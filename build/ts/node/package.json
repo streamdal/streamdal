@@ -2,16 +2,25 @@
   "name": "@streamdal/snitch-protos",
   "version": "0.0.1",
   "description": "Snitch Protobufs",
-  "main": "protos/external_api_client.js",
+  "main": "protos/sp_external.client.js",
+  "exports": {
+    "./protos/*": {
+      "types": "./types/protos/*.d.ts",
+      "require": "./cjs/protos/*.js",
+      "import": "./esm/protos/*.js",
+      "default": "./esm/protos/*.js"
+    }
+  },
   "scripts": {
-    "build": "npm run gen && npm run deno:esm && npm run node:esm && npm run clean && npm run node:compile && npm run copy",
+    "build": "npm run clean && npm run gen && npm run deno:esm && npm run node:compile && npm run copy && npm run packages",
     "node:esm": "node esm-js.js",
-    "node:compile": "tsc",
-    "clean": "rimraf build coverage nyc_output",
-    "copy": "cp DENO.README.md ./deno/README.md && cp NODE.README.md ./node/README.md && cp package.json ./node/package.json",
+    "node:compile": "npx tsc -p ./tsconfig.cjs.json && npx tsc -p ./tsconfig.types.json && npm run node:esm && npx tsc -p ./tsconfig.esm.json ",
+    "clean": "rimraf deno node coverage nyc_output",
+    "copy": "cp DENO.README.md ./deno/README.md && cp NODE.README.md ./node/README.md && cp ./package.json ./node/package.json",
     "deno:esm": "node esm-ts.js",
+    "packages": "./generatePackages.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "type:dts": "tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "type:dts": "tsc -p tsconfig.build.json",
     "gen": "npx protoc --ts_out ./protos --ts_opt optimize_code_size --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto"
   },
   "repository": {
