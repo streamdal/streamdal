@@ -181,10 +181,7 @@ export type StepType = z.infer<typeof stepSchema>;
 
 export const pipelineSchema = zfd.formData({
   id: z.string().optional(),
-  name: z.string().min(1, { message: "Required" }).refine(
-    (value) => !/\s/.test(value),
-    { message: "Pipeline names cannot contain whitespaces" },
-  ),
+  name: z.string().min(1, { message: "Required" }),
   steps: zfd.repeatable(
     z
       .array(stepSchema)
