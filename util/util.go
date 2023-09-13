@@ -18,6 +18,7 @@ import (
 
 const (
 	GRPCRequestIDMetadataKey = "request-id"
+	NormalizeSpace           = "__SPACE__"
 )
 
 func GenerateUUID() string {
@@ -82,7 +83,13 @@ func AudienceToStr(audience *protos.Audience) string {
 		return ""
 	}
 
-	return strings.ToLower(fmt.Sprintf("%s/%s/%s/%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
+	str := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
+
+	str = strings.Replace(str, " ", NormalizeSpace, -1)
+
+	// TODO: Base58 encode
+
+	return str
 }
 
 func AudienceFromStr(s string) *protos.Audience {
@@ -90,7 +97,11 @@ func AudienceFromStr(s string) *protos.Audience {
 		return nil
 	}
 
-	parts := strings.Split(s, "/")
+	// We store the full audience as a str key in NATS which supports only a
+	// small subset of ascii characters, so we have to normalize.
+	// TODO: Base58 decode to normalize
+
+	parts := strings.Split(string(normalizedAudience), "/")
 	if len(parts) != 4 {
 		return nil
 	}
