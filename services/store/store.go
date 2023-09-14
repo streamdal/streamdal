@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -75,6 +76,10 @@ type IStore interface {
 	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
+
+	// WatchKeys returns a channel that will receive empty struct{} any time the key(s) receive a SET command
+	// This command is currently only used for heartbeats. The argument can accept wildcards *)
+	WatchKeys(key string) chan *redis.Message
 }
 
 type Options struct {
@@ -94,6 +99,10 @@ func New(opts *Options) (*Store, error) {
 	if err := opts.validate(); err != nil {
 		return nil, errors.Wrap(err, "error validating options")
 	}
+
+	// https://redis.io/docs/manual/keyspace-notifications/
+	// Set redis to publish "set" events, we need this for heartbeat detection
+	opts.RedisBackend.ConfigSet(opts.ShutdownCtx, "notify-keyspace-events", "KEAs")
 
 	return &Store{
 		options: opts,
@@ -157,7 +166,6 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 		}
 
 		// Same session id - remove the key
-		// TODO: e.Key needs to be new redis key
 		if err := s.options.RedisBackend.Del(ctx, e.Key).Err(); err != nil {
 			s.log.Errorf("unable to remove key '%s' from K/V", e.Key)
 		}
@@ -171,20 +179,18 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 	//llog := s.log.WithField("method", "AddHeartbeat")
 	//llog.Debug("received request to add heartbeat")
 
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisLivePrefix+":*").Result()
+	search := fmt.Sprintf("%s:%s:%s:*", RedisLivePrefix, req.SessionId, s.options.NodeName)
+
+	keys, err := s.options.RedisBackend.Keys(ctx, search).Result()
 	if err != nil {
 		return errors.Wrap(err, "error fetching keys from K/V")
 	}
 
 	for _, k := range keys {
-		if !strings.HasPrefix(k, req.SessionId) {
-			continue
-		}
-
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
 
-		if err := s.options.RedisBackend.ExpireXX(ctx, k, s.options.SessionTTL).Err(); err != nil {
+		if err := s.options.RedisBackend.ExpireGT(ctx, k, s.options.SessionTTL).Err(); err != nil {
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}
@@ -422,7 +428,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	if err := s.options.RedisBackend.Set(
 		ctx,
 		RedisLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
-		nil,
+		[]byte(``),
 		s.options.SessionTTL,
 	).Err(); err != nil {
 		return errors.Wrap(err, "error saving audience to store")
@@ -565,7 +571,9 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
 	cmds := make([]*protos.Command, 0)
 
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisConfigPrefix+":*").Result()
+	search := fmt.Sprintf("%s:%s:*", RedisConfigPrefix, serviceName)
+
+	keys, err := s.options.RedisBackend.Keys(ctx, search).Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching config keys from store")
 	}
@@ -993,4 +1001,51 @@ func (s *Store) GetActivePipelineUsage(ctx context.Context, pipelineID string) (
 	}
 
 	return active, nil
+}
+
+func (s *Store) WatchKeys(key string) chan *redis.Message {
+	ps := s.options.RedisBackend.PSubscribe(s.options.ShutdownCtx, "__keyspace@0__:"+key)
+	defer ps.Close()
+
+	keyChan := make(chan *redis.Message, 1)
+
+	go func() {
+		for {
+			select {
+			case <-s.options.ShutdownCtx.Done():
+				s.log.Debug("exiting WatchKeys()")
+				return
+			default:
+				// NOOP
+			}
+
+			msg, err := ps.Receive(context.Background())
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					// TODO: some kind of reconnect here
+					return
+				}
+
+				if errors.Is(err, redis.ErrClosed) {
+					return
+				}
+
+				s.log.WithError(err).Error("error receiving message from redis")
+				continue
+			}
+			switch msg.(type) {
+			case *redis.Message:
+				//key := strings.Replace(m.Channel, "__keyspace@0__:", "", 1)
+				m := msg.(*redis.Message)
+				action := m.Payload
+
+				switch action {
+				case "set":
+					keyChan <- m
+				}
+			}
+		}
+	}()
+
+	return keyChan
 }

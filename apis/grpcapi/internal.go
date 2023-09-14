@@ -7,14 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/streamdal/snitch-server/services/store"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -53,16 +52,8 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 
 	lastHeartbeat := time.Now()
 
-	fn := func(tx *redis.Tx) error {
-		// TODO: figure this out
-		return nil
-	}
-
-	// Start heartbeat watcher
-	err := s.Options.RedisBackend.Watch(serverCtx, fn, store.RedisRegisterKey(sessionId, s.Options.Config.NodeName))
-	if err != nil {
-		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
-	}
+	regKey := store.RedisRegisterKey(sessionId, s.Options.Config.NodeName)
+	hbChan := s.Options.StoreService.WatchKeys(regKey)
 
 	go func() {
 	MAIN:
@@ -74,20 +65,11 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-s.Options.ShutdownContext.Done():
 				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
 				break MAIN
-				// TODO: Figure this out
-			//case key := <-kw.Updates():
-			//	// Sometimes we can receive nils - ignore
-			//	if key == nil {
-			//		continue
-			//	}
-			//
-			//	switch key.Operation() {
-			//	case nats.KeyValuePut:
-			//		//llog.Debug("detected heartbeat")
-			//		lastHeartbeat = time.Now()
-			//	default:
-			//		llog.Debug("received non-put operation on key watcher; ignoring")
-			//	}
+			case <-hbChan:
+				llog.Debug("detected heartbeat")
+				lastHeartbeat = time.Now()
+			default:
+				llog.Debug("received non-put operation on key watcher; ignoring")
 			case <-time.After(time.Second):
 				// Check if heartbeat is older than session TTL
 				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
