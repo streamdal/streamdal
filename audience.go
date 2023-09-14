@@ -10,12 +10,12 @@ import (
 )
 
 func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
-	s.audiencesMtx.Lock()
-
 	// Don't need to add twice
 	if s.seenAudience(ctx, aud) {
 		return
 	}
+
+	s.audiencesMtx.Lock()
 
 	if s.audiences == nil {
 		s.audiences = make(map[string]struct{})
