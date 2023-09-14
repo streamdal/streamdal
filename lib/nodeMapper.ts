@@ -206,6 +206,7 @@ export const mapNodes = (
 export const mapEdgePair = (
   edgesMap: Map<string, FlowEdge>,
   a: Audience,
+  highlight?: boolean,
 ): Map<string, FlowEdge> => {
   const op = OperationType[a.operationType].toLowerCase();
   edgesMap.set(`${componentKey(a)}-${groupKey(a)}-edge`, {
@@ -223,11 +224,11 @@ export const mapEdgePair = (
       type: MarkerType.Arrow,
       width: 20,
       height: 20,
-      color: "#956CFF",
+      color: "#E6DDFE",
     },
     style: {
       strokeWidth: 1.5,
-      stroke: "#956CFF",
+      stroke: "#E6DDFE",
     },
   });
 
@@ -246,20 +247,19 @@ export const mapEdgePair = (
       type: MarkerType.Arrow,
       width: 20,
       height: 20,
-      color: "#956CFF",
+      color: "#E6DDFE",
     },
     style: {
       strokeWidth: 1.5,
-      stroke: "#956CFF",
+      stroke: "#E6DDFE",
     },
   });
-
   return edgesMap;
 };
 
 export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
   const edgesMap = new Map<string, FlowEdge>();
-  audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a));
+  audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a, false));
   return edgesMap;
 };
 

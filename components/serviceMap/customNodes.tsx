@@ -6,7 +6,7 @@ import { OperationType } from "snitch-protos/protos/sp_common.ts";
 import { ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { removeWhitespace, titleCase } from "../../lib/utils.ts";
+import { getHoverGroup, removeWhitespace, titleCase } from "../../lib/utils.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../../lib/nodeMapper.ts";
 import { opModal } from "./opModalSignal.ts";
@@ -53,10 +53,18 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
 export const GroupNode = ({ data }: { data: NodeData }) => {
   const op = OperationType[data.audience.operationType];
   const producer = op === OperationType[OperationType.PRODUCER];
+  const setHover = () => {
+    getHoverGroup(data.audience, true);
+  };
+  const resetHover = () => {
+    getHoverGroup(data.audience, false);
+  };
 
   return (
     <div
-      class={`rounded-lg shadow-lg border-1 bg-sunset border-purple-200 w-[${GROUP_WIDTH}px] pb-4`}
+      class={`rounded-lg bg-sunset border border-purple-200 w-[${GROUP_WIDTH}px] pb-4 hover:shadow-lg hover:border-purple-600`}
+      onMouseOver={() => setHover()}
+      onMouseLeave={() => resetHover()}
     >
       <div id="dragHandle" class="flex flex-row items-center py-2">
         <IconGripVertical class="w-6 h-6 mx-2 text-purple-100 bg-white border border-purple-200" />

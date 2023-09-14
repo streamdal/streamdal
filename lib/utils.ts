@@ -110,6 +110,24 @@ export const groupKey = (audience: Audience) =>
 
 export const lower = (s: string) => s.toLowerCase();
 
+export const getHoverGroup = (
+  a: Audience,
+  highlight: boolean,
+) => {
+  const allDOMEdges = Array.from(document.getElementsByTagName("g"));
+  const edgeIds = [
+    `${serviceKey(a)}-${groupKey(a)}-edge`,
+    `${componentKey(a)}-${groupKey(a)}-edge`,
+  ];
+  edgeIds.map((e) => {
+    return allDOMEdges.find((edge) => {
+      return edge.dataset.testid === `rf__edge-${e}`;
+    });
+  }).forEach((element) => {
+    element.children[0].style.stroke = `${highlight ? "#956CFF" : "#E6DDFE"}`;
+  });
+};
+
 export const getAttachedPipeline = (
   audience: Audience,
   pipelines: PipelinesType,
