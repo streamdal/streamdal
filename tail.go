@@ -67,7 +67,7 @@ func (t *Tail) ShipResponse(tr *protos.TailResponse) {
 	if time.Since(t.lastMsg).Milliseconds() < MinTailResponseIntervalMS {
 		// TODO: we should notify the snitch server that we're dropping messages somehow
 		// TODO: but this needs to be done in a way that only sends once in a while
-		t.log.Debugf("Dropping tail response for %s, too fast", tr.PipelineId)
+		t.log.Warnf("Dropping tail response for %s, too fast", tr.PipelineId)
 		return
 	}
 
