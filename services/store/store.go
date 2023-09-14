@@ -8,7 +8,6 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
@@ -335,9 +334,7 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 
 	// Delete from paused
 	if err := s.options.RedisBackend.Del(ctx, NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId)).Err(); err != nil {
-		if !errors.Is(err, nats.ErrKeyNotFound) {
-			return errors.Wrap(err, "error deleting pipeline pause state")
-		}
+		return errors.Wrap(err, "error deleting pipeline pause state")
 	}
 
 	return nil

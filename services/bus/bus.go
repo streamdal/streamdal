@@ -77,29 +77,10 @@ func New(opts *Options) (*Bus, error) {
 		return nil, errors.Wrap(err, "error validating params")
 	}
 
-	if err := prepareNATS(opts); err != nil {
-		return nil, errors.Wrap(err, "error creating consumer")
-	}
-
 	return &Bus{
 		options: opts,
 		log:     logrus.WithField("pkg", "bus"),
 	}, nil
-}
-
-func prepareNATS(opts *Options) error {
-	return nil
-	//// Won't error if stream already exists
-	//if err := opts.NATS.CreateStream(opts.ShutdownCtx, StreamName, []string{FullSubject}); err != nil {
-	//	return errors.Wrap(err, "error creating stream")
-	//}
-	//
-	//// Won't error if consumer already exists
-	//if err := opts.NATS.CreateConsumer(opts.ShutdownCtx, StreamName, opts.NodeName, FullSubject); err != nil {
-	//	return errors.Wrap(err, "error creating consumer")
-	//}
-	//
-	//return nil
 }
 
 func (o *Options) validate() error {

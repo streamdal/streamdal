@@ -132,9 +132,6 @@ github.com/josharian/intern
 # github.com/julienschmidt/httprouter v1.3.0
 ## explicit; go 1.7
 github.com/julienschmidt/httprouter
-# github.com/klauspost/compress v1.16.7
-## explicit; go 1.18
-github.com/klauspost/compress/flate
 # github.com/mailru/easyjson v0.7.7
 ## explicit; go 1.12
 github.com/mailru/easyjson
@@ -144,22 +141,6 @@ github.com/mailru/easyjson/jwriter
 # github.com/matttproud/golang_protobuf_extensions v1.0.4
 ## explicit; go 1.9
 github.com/matttproud/golang_protobuf_extensions/pbutil
-# github.com/minio/highwayhash v1.0.2
-## explicit; go 1.15
-# github.com/nats-io/jwt/v2 v2.4.1
-## explicit; go 1.18
-# github.com/nats-io/nats.go v1.27.1
-## explicit; go 1.19
-github.com/nats-io/nats.go
-github.com/nats-io/nats.go/encoders/builtin
-github.com/nats-io/nats.go/internal/parser
-github.com/nats-io/nats.go/util
-# github.com/nats-io/nkeys v0.4.4
-## explicit; go 1.19
-github.com/nats-io/nkeys
-# github.com/nats-io/nuid v1.0.1
-## explicit
-github.com/nats-io/nuid
 # github.com/nxadm/tail v1.4.8
 ## explicit; go 1.13
 github.com/nxadm/tail
@@ -256,9 +237,6 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/natty v0.0.39
-## explicit; go 1.18
-github.com/streamdal/natty
 # github.com/streamdal/snitch-protos v0.0.93
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
@@ -271,15 +249,6 @@ github.com/streamdal/snitch-protos/build/go/protos/steps
 github.com/tinylib/msgp/msgp
 # golang.org/x/crypto v0.11.0
 ## explicit; go 1.17
-golang.org/x/crypto/blake2b
-golang.org/x/crypto/curve25519
-golang.org/x/crypto/curve25519/internal/field
-golang.org/x/crypto/ed25519
-golang.org/x/crypto/internal/alias
-golang.org/x/crypto/internal/poly1305
-golang.org/x/crypto/nacl/box
-golang.org/x/crypto/nacl/secretbox
-golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/net v0.12.0
 ## explicit; go 1.17
@@ -294,7 +263,6 @@ golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
 # golang.org/x/sys v0.10.0
 ## explicit; go 1.17
-golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix

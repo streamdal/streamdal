@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -188,7 +189,7 @@ var _ = Describe("Internal gRPC API", func() {
 
 			data, err = redisClient.Get(ctx, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(err).To(Equal(redis.Nil))
 			Expect(data).To(BeEmpty())
 
 			// Audience keys should disappear as well
@@ -200,7 +201,7 @@ var _ = Describe("Internal gRPC API", func() {
 				)).Result()
 
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(Equal(nats.ErrKeyNotFound))
+				Expect(err).To(Equal(redis.Nil))
 				Expect(data).To(BeEmpty())
 			}
 		})

@@ -74,6 +74,7 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-s.Options.ShutdownContext.Done():
 				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
 				break MAIN
+				// TODO: Figure this out
 			//case key := <-kw.Updates():
 			//	// Sometimes we can receive nils - ignore
 			//	if key == nil {
