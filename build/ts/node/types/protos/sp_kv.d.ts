@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { KVAction } from "./shared/sp_shared";
 /**
@@ -24,13 +29,13 @@ export interface KVObject {
      *
      * @generated from protobuf field: int64 created_at_unix_ts_nano_utc = 3;
      */
-    createdAtUnixTsNanoUtc: bigint;
+    createdAtUnixTsNanoUtc: string;
     /**
      * Last time the object was updated
      *
      * @generated from protobuf field: int64 updated_at_unix_ts_nano_utc = 4;
      */
-    updatedAtUnixTsNanoUtc: bigint;
+    updatedAtUnixTsNanoUtc: string;
 }
 /**
  * Container for one or more KVObject's; snitch-server broadcasts KVCommand that
@@ -63,7 +68,7 @@ export interface KVInstruction {
      *
      * @generated from protobuf field: int64 requested_at_unix_ts_nano_utc = 4;
      */
-    requestedAtUnixTsNanoUtc: bigint;
+    requestedAtUnixTsNanoUtc: string;
 }
 /**
  * Used for broadcasting KV instructions to other snitch-server nodes.
@@ -114,6 +119,9 @@ export interface KVUpdateHTTPRequest {
 }
 declare class KVObject$Type extends MessageType<KVObject> {
     constructor();
+    create(value?: PartialMessage<KVObject>): KVObject;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVObject): KVObject;
+    internalBinaryWrite(message: KVObject, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVObject
@@ -121,6 +129,9 @@ declare class KVObject$Type extends MessageType<KVObject> {
 export declare const KVObject: KVObject$Type;
 declare class KVInstruction$Type extends MessageType<KVInstruction> {
     constructor();
+    create(value?: PartialMessage<KVInstruction>): KVInstruction;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVInstruction): KVInstruction;
+    internalBinaryWrite(message: KVInstruction, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVInstruction
@@ -128,6 +139,9 @@ declare class KVInstruction$Type extends MessageType<KVInstruction> {
 export declare const KVInstruction: KVInstruction$Type;
 declare class KVRequest$Type extends MessageType<KVRequest> {
     constructor();
+    create(value?: PartialMessage<KVRequest>): KVRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVRequest): KVRequest;
+    internalBinaryWrite(message: KVRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVRequest
@@ -135,6 +149,9 @@ declare class KVRequest$Type extends MessageType<KVRequest> {
 export declare const KVRequest: KVRequest$Type;
 declare class KVCreateHTTPRequest$Type extends MessageType<KVCreateHTTPRequest> {
     constructor();
+    create(value?: PartialMessage<KVCreateHTTPRequest>): KVCreateHTTPRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVCreateHTTPRequest): KVCreateHTTPRequest;
+    internalBinaryWrite(message: KVCreateHTTPRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVCreateHTTPRequest
@@ -142,6 +159,9 @@ declare class KVCreateHTTPRequest$Type extends MessageType<KVCreateHTTPRequest> 
 export declare const KVCreateHTTPRequest: KVCreateHTTPRequest$Type;
 declare class KVUpdateHTTPRequest$Type extends MessageType<KVUpdateHTTPRequest> {
     constructor();
+    create(value?: PartialMessage<KVUpdateHTTPRequest>): KVUpdateHTTPRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVUpdateHTTPRequest): KVUpdateHTTPRequest;
+    internalBinaryWrite(message: KVUpdateHTTPRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVUpdateHTTPRequest

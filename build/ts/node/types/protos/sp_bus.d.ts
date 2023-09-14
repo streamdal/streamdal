@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { TailResponse } from "./sp_common";
 import { TailRequest } from "./sp_common";
@@ -140,6 +145,10 @@ export interface BusEvent {
 }
 declare class BusEvent$Type extends MessageType<BusEvent> {
     constructor();
+    create(value?: PartialMessage<BusEvent>): BusEvent;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BusEvent): BusEvent;
+    private binaryReadMap1000;
+    internalBinaryWrite(message: BusEvent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.BusEvent

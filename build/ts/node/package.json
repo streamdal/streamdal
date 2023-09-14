@@ -21,7 +21,7 @@
     "packages": "./generatePackages.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "type:dts": "tsc -p tsconfig.build.json",
-    "gen": "npx protoc --ts_out ./protos --ts_opt optimize_code_size --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto"
+    "gen": "npx protoc --ts_out ./protos --ts_opt long_type_string --proto_path ../../protos ../../protos/**/*.proto ../../protos/*.proto"
   },
   "repository": {
     "type": "git",
