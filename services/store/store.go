@@ -747,7 +747,7 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 	}
 
 	for _, key := range keys {
-		if !strings.HasSuffix(key, "/"+req.NotificationId) {
+		if !strings.HasSuffix(key, ":"+req.NotificationId) {
 			continue
 		}
 
@@ -787,7 +787,7 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 	}
 
 	for _, key := range keys {
-		if !strings.HasPrefix(key, pipelineID+"/") {
+		if !strings.HasPrefix(key, pipelineID+":") {
 			continue
 		}
 

@@ -70,12 +70,13 @@ func CtxRequestId(ctx context.Context) string {
 }
 
 func ParseConfigKey(key string) (*protos.Audience, string) {
-	parts := strings.Split(key, "/")
+	key = strings.TrimPrefix(key, "config:")
+	parts := strings.Split(key, ":")
 	if len(parts) < 5 {
 		return nil, ""
 	}
 
-	audStr := strings.Join(parts[:len(parts)-1], "/")
+	audStr := strings.Join(parts[:len(parts)-1], ":")
 	return AudienceFromStr(audStr), parts[len(parts)-1]
 }
 
@@ -108,7 +109,7 @@ func AudienceFromStr(s string) *protos.Audience {
 
 	normalizedAudience := strings.Replace(s, NormalizeSpace, " ", -1)
 
-	parts := strings.Split(normalizedAudience, "/")
+	parts := strings.Split(normalizedAudience, ":")
 	if len(parts) != 4 {
 		return nil
 	}
