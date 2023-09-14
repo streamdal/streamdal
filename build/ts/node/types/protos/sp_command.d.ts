@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { TailRequest } from "./sp_common";
 import { KVInstruction } from "./sp_kv";
@@ -143,6 +148,9 @@ export interface TailCommand {
 }
 declare class Command$Type extends MessageType<Command> {
     constructor();
+    create(value?: PartialMessage<Command>): Command;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Command): Command;
+    internalBinaryWrite(message: Command, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.Command
@@ -150,6 +158,9 @@ declare class Command$Type extends MessageType<Command> {
 export declare const Command: Command$Type;
 declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor();
+    create(value?: PartialMessage<AttachPipelineCommand>): AttachPipelineCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AttachPipelineCommand): AttachPipelineCommand;
+    internalBinaryWrite(message: AttachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
@@ -157,6 +168,9 @@ declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineComma
 export declare const AttachPipelineCommand: AttachPipelineCommand$Type;
 declare class DetachPipelineCommand$Type extends MessageType<DetachPipelineCommand> {
     constructor();
+    create(value?: PartialMessage<DetachPipelineCommand>): DetachPipelineCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetachPipelineCommand): DetachPipelineCommand;
+    internalBinaryWrite(message: DetachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
@@ -164,6 +178,9 @@ declare class DetachPipelineCommand$Type extends MessageType<DetachPipelineComma
 export declare const DetachPipelineCommand: DetachPipelineCommand$Type;
 declare class PausePipelineCommand$Type extends MessageType<PausePipelineCommand> {
     constructor();
+    create(value?: PartialMessage<PausePipelineCommand>): PausePipelineCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PausePipelineCommand): PausePipelineCommand;
+    internalBinaryWrite(message: PausePipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.PausePipelineCommand
@@ -171,6 +188,9 @@ declare class PausePipelineCommand$Type extends MessageType<PausePipelineCommand
 export declare const PausePipelineCommand: PausePipelineCommand$Type;
 declare class ResumePipelineCommand$Type extends MessageType<ResumePipelineCommand> {
     constructor();
+    create(value?: PartialMessage<ResumePipelineCommand>): ResumePipelineCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResumePipelineCommand): ResumePipelineCommand;
+    internalBinaryWrite(message: ResumePipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.ResumePipelineCommand
@@ -178,6 +198,9 @@ declare class ResumePipelineCommand$Type extends MessageType<ResumePipelineComma
 export declare const ResumePipelineCommand: ResumePipelineCommand$Type;
 declare class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
     constructor();
+    create(value?: PartialMessage<KeepAliveCommand>): KeepAliveCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KeepAliveCommand): KeepAliveCommand;
+    internalBinaryWrite(message: KeepAliveCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KeepAliveCommand
@@ -185,6 +208,9 @@ declare class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
 export declare const KeepAliveCommand: KeepAliveCommand$Type;
 declare class KVCommand$Type extends MessageType<KVCommand> {
     constructor();
+    create(value?: PartialMessage<KVCommand>): KVCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVCommand): KVCommand;
+    internalBinaryWrite(message: KVCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.KVCommand
@@ -192,6 +218,9 @@ declare class KVCommand$Type extends MessageType<KVCommand> {
 export declare const KVCommand: KVCommand$Type;
 declare class TailCommand$Type extends MessageType<TailCommand> {
     constructor();
+    create(value?: PartialMessage<TailCommand>): TailCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TailCommand): TailCommand;
+    internalBinaryWrite(message: TailCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.TailCommand

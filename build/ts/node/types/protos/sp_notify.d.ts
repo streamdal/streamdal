@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
  * @generated from protobuf message protos.NotificationConfig
@@ -214,6 +219,9 @@ export declare enum NotificationType {
 }
 declare class NotificationConfig$Type extends MessageType<NotificationConfig> {
     constructor();
+    create(value?: PartialMessage<NotificationConfig>): NotificationConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationConfig): NotificationConfig;
+    internalBinaryWrite(message: NotificationConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationConfig
@@ -221,6 +229,9 @@ declare class NotificationConfig$Type extends MessageType<NotificationConfig> {
 export declare const NotificationConfig: NotificationConfig$Type;
 declare class NotificationSlack$Type extends MessageType<NotificationSlack> {
     constructor();
+    create(value?: PartialMessage<NotificationSlack>): NotificationSlack;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationSlack): NotificationSlack;
+    internalBinaryWrite(message: NotificationSlack, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationSlack
@@ -228,6 +239,9 @@ declare class NotificationSlack$Type extends MessageType<NotificationSlack> {
 export declare const NotificationSlack: NotificationSlack$Type;
 declare class NotificationEmail$Type extends MessageType<NotificationEmail> {
     constructor();
+    create(value?: PartialMessage<NotificationEmail>): NotificationEmail;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationEmail): NotificationEmail;
+    internalBinaryWrite(message: NotificationEmail, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationEmail
@@ -235,6 +249,9 @@ declare class NotificationEmail$Type extends MessageType<NotificationEmail> {
 export declare const NotificationEmail: NotificationEmail$Type;
 declare class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSMTP> {
     constructor();
+    create(value?: PartialMessage<NotificationEmailSMTP>): NotificationEmailSMTP;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationEmailSMTP): NotificationEmailSMTP;
+    internalBinaryWrite(message: NotificationEmailSMTP, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationEmailSMTP
@@ -242,6 +259,9 @@ declare class NotificationEmailSMTP$Type extends MessageType<NotificationEmailSM
 export declare const NotificationEmailSMTP: NotificationEmailSMTP$Type;
 declare class NotificationEmailSES$Type extends MessageType<NotificationEmailSES> {
     constructor();
+    create(value?: PartialMessage<NotificationEmailSES>): NotificationEmailSES;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationEmailSES): NotificationEmailSES;
+    internalBinaryWrite(message: NotificationEmailSES, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationEmailSES
@@ -249,6 +269,9 @@ declare class NotificationEmailSES$Type extends MessageType<NotificationEmailSES
 export declare const NotificationEmailSES: NotificationEmailSES$Type;
 declare class NotificationPagerDuty$Type extends MessageType<NotificationPagerDuty> {
     constructor();
+    create(value?: PartialMessage<NotificationPagerDuty>): NotificationPagerDuty;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotificationPagerDuty): NotificationPagerDuty;
+    internalBinaryWrite(message: NotificationPagerDuty, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotificationPagerDuty

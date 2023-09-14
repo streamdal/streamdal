@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { PipelineStep } from "./sp_pipeline";
 /**
@@ -102,6 +107,9 @@ export declare enum WASMExitCode {
 }
 declare class WASMRequest$Type extends MessageType<WASMRequest> {
     constructor();
+    create(value?: PartialMessage<WASMRequest>): WASMRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WASMRequest): WASMRequest;
+    internalBinaryWrite(message: WASMRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.WASMRequest
@@ -109,6 +117,9 @@ declare class WASMRequest$Type extends MessageType<WASMRequest> {
 export declare const WASMRequest: WASMRequest$Type;
 declare class WASMResponse$Type extends MessageType<WASMResponse> {
     constructor();
+    create(value?: PartialMessage<WASMResponse>): WASMResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WASMResponse): WASMResponse;
+    internalBinaryWrite(message: WASMResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.WASMResponse

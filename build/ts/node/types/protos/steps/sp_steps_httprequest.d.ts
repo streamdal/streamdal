@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
  * @generated from protobuf message protos.steps.HttpRequest
@@ -77,6 +82,10 @@ export declare enum HttpRequestMethod {
 }
 declare class HttpRequest$Type extends MessageType<HttpRequest> {
     constructor();
+    create(value?: PartialMessage<HttpRequest>): HttpRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: HttpRequest): HttpRequest;
+    private binaryReadMap4;
+    internalBinaryWrite(message: HttpRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.HttpRequest
@@ -84,6 +93,10 @@ declare class HttpRequest$Type extends MessageType<HttpRequest> {
 export declare const HttpRequest: HttpRequest$Type;
 declare class HttpResponse$Type extends MessageType<HttpResponse> {
     constructor();
+    create(value?: PartialMessage<HttpResponse>): HttpResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: HttpResponse): HttpResponse;
+    private binaryReadMap3;
+    internalBinaryWrite(message: HttpResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.HttpResponse
@@ -91,6 +104,9 @@ declare class HttpResponse$Type extends MessageType<HttpResponse> {
 export declare const HttpResponse: HttpResponse$Type;
 declare class HttpRequestStep$Type extends MessageType<HttpRequestStep> {
     constructor();
+    create(value?: PartialMessage<HttpRequestStep>): HttpRequestStep;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: HttpRequestStep): HttpRequestStep;
+    internalBinaryWrite(message: HttpRequestStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.HttpRequestStep

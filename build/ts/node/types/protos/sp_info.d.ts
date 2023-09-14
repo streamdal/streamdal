@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Pipeline } from "./sp_pipeline";
 import { Audience } from "./sp_common";
@@ -103,6 +108,9 @@ export declare enum ClientType {
 }
 declare class LiveInfo$Type extends MessageType<LiveInfo> {
     constructor();
+    create(value?: PartialMessage<LiveInfo>): LiveInfo;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: LiveInfo): LiveInfo;
+    internalBinaryWrite(message: LiveInfo, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.LiveInfo
@@ -110,6 +118,9 @@ declare class LiveInfo$Type extends MessageType<LiveInfo> {
 export declare const LiveInfo: LiveInfo$Type;
 declare class PipelineInfo$Type extends MessageType<PipelineInfo> {
     constructor();
+    create(value?: PartialMessage<PipelineInfo>): PipelineInfo;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineInfo): PipelineInfo;
+    internalBinaryWrite(message: PipelineInfo, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.PipelineInfo
@@ -117,6 +128,9 @@ declare class PipelineInfo$Type extends MessageType<PipelineInfo> {
 export declare const PipelineInfo: PipelineInfo$Type;
 declare class ClientInfo$Type extends MessageType<ClientInfo> {
     constructor();
+    create(value?: PartialMessage<ClientInfo>): ClientInfo;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ClientInfo): ClientInfo;
+    internalBinaryWrite(message: ClientInfo, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.ClientInfo

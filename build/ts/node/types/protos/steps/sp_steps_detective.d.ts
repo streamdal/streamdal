@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
  * @generated from protobuf message protos.steps.DetectiveStep
@@ -255,6 +260,9 @@ export declare enum DetectiveType {
 }
 declare class DetectiveStep$Type extends MessageType<DetectiveStep> {
     constructor();
+    create(value?: PartialMessage<DetectiveStep>): DetectiveStep;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetectiveStep): DetectiveStep;
+    internalBinaryWrite(message: DetectiveStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.DetectiveStep
