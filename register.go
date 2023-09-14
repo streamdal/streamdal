@@ -67,7 +67,14 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
+			s.config.Logger.Debug("successfully reconnected to snitch-server")
+
 			stream = newStream
+
+			// Re-announce audience (if we had any) - this is needed so that
+			// snitch-server repopulates live entry in snitch_live (which is used
+			// for DetachPipeline())
+			s.addAudiences(s.config.ShutdownCtx)
 		}
 
 		// Blocks until something is received
@@ -80,15 +87,19 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
+			// Reset stream - cause re-register on error
+			stream = nil
+
+			// Nicer reconnect messages
 			if strings.Contains(err.Error(), "reading from server: EOF") {
-				// Nicer reconnect messages
-				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
-				time.Sleep(ReconnectSleep)
+			} else if strings.Contains(err.Error(), "server shutting down") {
+				s.config.Logger.Warnf("snitch server is shutting down, retrying in %s...", ReconnectSleep.String())
 			} else {
 				s.config.Logger.Warnf("error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
-				time.Sleep(ReconnectSleep)
 			}
+
+			time.Sleep(ReconnectSleep)
 
 			return nil
 
