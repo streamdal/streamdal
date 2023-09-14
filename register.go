@@ -2,14 +2,18 @@ package snitch
 
 import (
 	"context"
+	"fmt"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/snitch-go-client/validate"
 )
 
 func (s *Snitch) register(looper director.Looper) error {
@@ -115,53 +119,113 @@ func (s *Snitch) register(looper director.Looper) error {
 			return nil
 		}
 
-		if attach := cmd.GetAttachPipeline(); attach != nil {
-			s.config.Logger.Debugf("Received attach pipeline command: %s", attach.Pipeline.Id)
-			if err := s.attachPipeline(context.Background(), cmd); err != nil {
-				s.config.Logger.Errorf("Failed to attach pipeline: %s", err)
+		// Reset error just in case
+		err = nil
+
+		switch cmd.Command.(type) {
+		case *protos.Command_Kv:
+			s.config.Logger.Debug("Received kv command")
+			err = s.handleKVCommand(context.Background(), cmd.GetKv())
+		case *protos.Command_AttachPipeline:
+			s.config.Logger.Debug("Received attach pipeline command")
+			err = s.attachPipeline(context.Background(), cmd)
+		case *protos.Command_DetachPipeline:
+			s.config.Logger.Debug("Received detach pipeline command")
+			err = s.detachPipeline(context.Background(), cmd)
+		case *protos.Command_PausePipeline:
+			s.config.Logger.Debug("Received pause pipeline command")
+			err = s.pausePipeline(context.Background(), cmd)
+		case *protos.Command_ResumePipeline:
+			s.config.Logger.Debug("Received resume pipeline command")
+			err = s.resumePipeline(context.Background(), cmd)
+		case *protos.Command_Tail:
+			tail := cmd.GetTail()
+
+			if tail == nil {
+				s.config.Logger.Errorf("Received tail command with nil tail; full cmd: %+v", cmd)
 				return nil
 			}
-		} else if detach := cmd.GetDetachPipeline(); detach != nil {
-			s.config.Logger.Debugf("Received detach pipeline command: %s", detach.PipelineId)
-			if err := s.detachPipeline(context.Background(), cmd); err != nil {
-				s.config.Logger.Errorf("Failed to detach pipeline: %s", err)
+
+			if tail.GetRequest() == nil {
+				s.config.Logger.Errorf("Received tail command with nil Request; full cmd: %+v", cmd)
 				return nil
 			}
-		} else if pause := cmd.GetPausePipeline(); pause != nil {
-			s.config.Logger.Debugf("Received pause pipeline command: %s", pause.PipelineId)
-			if err := s.pausePipeline(context.Background(), cmd); err != nil {
-				s.config.Logger.Errorf("Failed to pause pipeline: %s", err)
-				return nil
-			}
-		} else if resume := cmd.GetResumePipeline(); resume != nil {
-			s.config.Logger.Debugf("Received resume pipeline command: %s", resume.PipelineId)
-			if err := s.resumePipeline(context.Background(), cmd); err != nil {
-				s.config.Logger.Errorf("Failed to resume pipeline: %s", err)
-				return nil
-			}
-		} else if tail := cmd.GetTail(); tail != nil {
-			switch tail.GetRequest().Type {
+
+			switch cmd.GetTail().GetRequest().Type {
 			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
 				s.config.Logger.Debugf("Received start tail command for pipeline '%s'", tail.GetRequest().PipelineId)
-				if err := s.tailPipeline(context.Background(), cmd); err != nil {
-					s.config.Logger.Errorf("Failed to tail pipeline: %s", err)
-					return nil
-				}
+				err = s.tailPipeline(context.Background(), cmd)
 			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 				s.config.Logger.Debugf("Received stop tail command for pipeline '%s'", tail.GetRequest().PipelineId)
-				if err := s.stopTailPipeline(context.Background(), cmd); err != nil {
-					s.config.Logger.Errorf("Failed to stop tail pipeline: %s", err)
-					return nil
-				}
+				err = s.stopTailPipeline(context.Background(), cmd)
 			default:
 				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
 				return nil
 			}
+		default:
+			err = fmt.Errorf("unknown command type: %+v", cmd.Command)
+		}
 
+		if err != nil {
+			s.config.Logger.Errorf("Failed to handle command: %s", cmd.Command)
+			return nil
 		}
 
 		return nil
 	})
+
+	return nil
+}
+
+// addAudiences is used for RE-adding audiences that may have timed out after
+// a server reconnect. The method will re-add all known audiences to snitch-server
+// via internal gRPC NewAudience() endpoint. This is a non-blocking method.
+func (s *Snitch) addAudiences(ctx context.Context) {
+	fmt.Println("re-adding audiences!!!")
+
+	s.audiencesMtx.RLock()
+	defer s.audiencesMtx.RUnlock()
+
+	for audStr, _ := range s.audiences {
+		aud := strToAud(audStr)
+
+		if aud == nil {
+			s.config.Logger.Errorf("unexpected strToAud resulted in nil audience (audStr: %s)", audStr)
+			continue
+		}
+
+		// Run as goroutine to avoid blocking processing
+		go func() {
+			if err := s.serverClient.NewAudience(ctx, aud, s.sessionID); err != nil {
+				s.config.Logger.Errorf("failed to add audience: %s", err)
+			}
+		}()
+	}
+}
+
+func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error {
+	if err := validate.KVCommand(kv); err != nil {
+		return errors.Wrap(err, "failed to validate kv command")
+	}
+
+	for _, i := range kv.Instructions {
+		if err := validate.KVInstruction(i); err != nil {
+			s.config.Logger.Debugf("KV instruction '%s' failed validate: %s (skipping)", i.Action, err)
+			continue
+		}
+
+		switch i.Action {
+		case shared.KVAction_KV_ACTION_CREATE | shared.KVAction_KV_ACTION_UPDATE:
+			s.kv.Set(i.Object.Key, string(i.Object.Value))
+		case shared.KVAction_KV_ACTION_DELETE:
+			s.kv.Delete(i.Object.Key)
+		case shared.KVAction_KV_ACTION_DELETE_ALL:
+			s.kv.Purge()
+		default:
+			s.config.Logger.Debugf("invalid KV action '%s' - skipping", i.Action)
+			continue
+		}
+	}
 
 	return nil
 }

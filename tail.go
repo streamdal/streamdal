@@ -15,8 +15,7 @@ import (
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/types"
-	"github.com/streamdal/snitch-go-client/validation"
+	"github.com/streamdal/snitch-go-client/validate"
 )
 
 const (
@@ -146,7 +145,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 }
 
 func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
-	if err := validation.ValidateTailRequestStartCommand(cmd); err != nil {
+	if err := validate.TailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
 
@@ -189,7 +188,7 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 }
 
 func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error {
-	if err := validation.ValidateTailRequestStopCommand(cmd); err != nil {
+	if err := validate.TailRequestStopCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail request stop command")
 	}
 

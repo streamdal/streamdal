@@ -188,7 +188,7 @@ func (m *Metrics) getCounters() map[string]*counter {
 }
 
 func (m *Metrics) incr(_ context.Context, entry *types.CounterEntry) error {
-	// No need to validate - no way to reach here without validation
+	// No need to validate - no way to reach here without validate
 	c, ok := m.getCounter(entry)
 	if ok {
 		c.incr(entry)
