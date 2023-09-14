@@ -55,8 +55,8 @@ const (
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to snitch server
 	ReconnectSleep = time.Second * 5
 
-	// MaxPayloadSize is the maximum size of data that can be sent to the WASM module
-	MaxPayloadSize = 1024 * 1024 // 1Mi
+	// MaxWASMPayloadSize is the maximum size of data that can be sent to the WASM module
+	MaxWASMPayloadSize = 1024 * 1024 // 1Mi
 
 	// ClientTypeSDK & ClientTypeShim are referenced by shims and SDKs to specify
 	// which type of client they are upon registration with the snitch-server.
@@ -452,7 +452,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		return &ProcessResponse{Data: data, Message: "No pipelines, message ignored"}, nil
 	}
 
-	if payloadSize > MaxPayloadSize {
+	if payloadSize > MaxWASMPayloadSize {
 
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 
