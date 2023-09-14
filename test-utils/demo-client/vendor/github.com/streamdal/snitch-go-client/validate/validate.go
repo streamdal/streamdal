@@ -1,7 +1,8 @@
-package validation
+package validate
 
 import (
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
@@ -22,7 +23,7 @@ func ErrUnsetEnum(field string) error {
 	return errors.Errorf("enum '%s' cannot be unset", field)
 }
 
-func ValidateAudience(aud *protos.Audience) error {
+func Audience(aud *protos.Audience) error {
 	if aud == nil {
 		return ErrNilInput
 	}
@@ -46,7 +47,23 @@ func ValidateAudience(aud *protos.Audience) error {
 	return nil
 }
 
-func ValidateTailRequestStartCommand(cmd *protos.Command) error {
+func KVInstruction(i *protos.KVInstruction) error {
+	if i == nil {
+		return errors.New("KVInstruction cannot be nil")
+	}
+
+	if i.Action == shared.KVAction_KV_ACTION_UNSET {
+		return errors.New("KVAction cannot be UNSET")
+	}
+
+	if i.Object == nil {
+		return errors.New("KVInstruction.Object cannot be nil")
+	}
+
+	return nil
+}
+
+func TailRequestStartCommand(cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrNilInput
 	}
@@ -65,14 +82,14 @@ func ValidateTailRequestStartCommand(cmd *protos.Command) error {
 		return ErrEmptyField("pipeline_id")
 	}
 
-	if err := ValidateAudience(cmd.Audience); err != nil {
+	if err := Audience(cmd.Audience); err != nil {
 		return errors.Wrap(err, "invalid audience")
 	}
 
 	return nil
 }
 
-func ValidateTailRequestStopCommand(cmd *protos.Command) error {
+func TailRequestStopCommand(cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrNilInput
 	}
@@ -89,6 +106,14 @@ func ValidateTailRequestStopCommand(cmd *protos.Command) error {
 
 	if req.Id == "" {
 		return ErrEmptyField("id")
+	}
+
+	return nil
+}
+
+func KVCommand(kv *protos.KVCommand) error {
+	if kv == nil {
+		return ErrNilInput
 	}
 
 	return nil

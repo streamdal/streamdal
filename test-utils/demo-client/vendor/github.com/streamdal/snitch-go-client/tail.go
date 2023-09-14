@@ -13,18 +13,33 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/validation"
+	"github.com/streamdal/snitch-go-client/types"
+	"github.com/streamdal/snitch-go-client/validate"
 )
 
-const NumTailWorkers = 2
+const (
+	// NumTailWorkers is the number of tail workers to start for each tail request
+	// The workers are responsible for reading from the tail channel and streaming
+	// TailResponse messages to the snitch server
+	NumTailWorkers = 2
+
+	// MinTailResponseIntervalMS is how often we send a TailResponse to the snitch server
+	// If this rate is exceeded, we will drop messages rather than flooding the server
+	// This is an int to avoid a .Milliseconds() call
+	MinTailResponseIntervalMS = 10
+)
 
 type Tail struct {
-	Request      *protos.Command
-	Ch           chan *protos.TailResponse
+	Request    *protos.Command
+	CancelFunc context.CancelFunc
+
+	outboundCh   chan *protos.TailResponse
 	snitchServer server.IServerClient
+	metrics      metrics.IMetrics
 	cancelCtx    context.Context
-	CancelFunc   context.CancelFunc
+	lastMsg      time.Time
 	log          logger.Logger
 }
 
@@ -45,8 +60,25 @@ func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData 
 			OriginalData:  originalData,
 			NewData:       postPipelineData,
 		}
-		tail.Ch <- tr
+
+		tail.ShipResponse(tr)
 	}
+}
+
+func (t *Tail) ShipResponse(tr *protos.TailResponse) {
+	// If we're sending too fast, drop the message
+	if time.Since(t.lastMsg).Milliseconds() < MinTailResponseIntervalMS {
+		_ = t.metrics.Incr(context.Background(), &types.CounterEntry{
+			Name:   types.DroppedTailMessages,
+			Labels: map[string]string{},
+			Value:  1})
+
+		t.log.Warnf("Dropping tail response for %s, too fast", tr.PipelineId)
+		return
+	}
+
+	t.outboundCh <- tr
+	t.lastMsg = time.Now()
 }
 
 func (t *Tail) startWorkers() error {
@@ -94,7 +126,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 			quit = true
 			looper.Quit()
 			return nil
-		case resp := <-t.Ch:
+		case resp := <-t.outboundCh:
 			if err := stream.Send(resp); err != nil {
 				if strings.Contains(err.Error(), io.EOF.Error()) {
 					t.log.Debug("tail worker received EOF, exiting")
@@ -114,7 +146,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 }
 
 func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
-	if err := validation.ValidateTailRequestStartCommand(cmd); err != nil {
+	if err := validate.TailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
 
@@ -138,11 +170,13 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 	// Start workers
 	t := &Tail{
 		Request:      cmd,
-		Ch:           make(chan *protos.TailResponse, 100),
+		outboundCh:   make(chan *protos.TailResponse, 100),
 		cancelCtx:    ctx,
 		CancelFunc:   cancel,
 		snitchServer: s.serverClient,
+		metrics:      s.metrics,
 		log:          s.config.Logger,
+		lastMsg:      time.Now(),
 	}
 
 	if err := t.startWorkers(); err != nil {
@@ -155,7 +189,7 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 }
 
 func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error {
-	if err := validation.ValidateTailRequestStopCommand(cmd); err != nil {
+	if err := validate.TailRequestStopCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail request stop command")
 	}
 
