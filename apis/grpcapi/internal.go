@@ -68,8 +68,6 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-hbChan:
 				llog.Debug("detected heartbeat")
 				lastHeartbeat = time.Now()
-			default:
-				llog.Debug("received non-put operation on key watcher; ignoring")
 			case <-time.After(time.Second):
 				// Check if heartbeat is older than session TTL
 				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
