@@ -517,10 +517,10 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	// <sessionID>:<nodeName>:register
 
 	for _, key := range keys {
-		parts := strings.SplitN(strings.TrimPrefix(RedisLivePrefix+":", key), ":", 3)
+		parts := strings.SplitN(strings.TrimPrefix(key, RedisLivePrefix+":"), ":", 3)
 
 		if len(parts) != 3 {
-			return nil, errors.Errorf("invalid live key '%s'", key)
+			return nil, errors.Errorf("invalid live key '%s', parts: %d", key, len(parts))
 		}
 
 		sessionID := parts[0]
@@ -850,7 +850,7 @@ func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	}
 
 	for _, key := range keys {
-		key = strings.TrimPrefix(RedisAudiencePrefix+":", key)
+		key = strings.TrimPrefix(key, RedisAudiencePrefix+":")
 		aud := util.AudienceFromStr(key)
 		if aud == nil {
 			return nil, errors.Errorf("invalid audience key '%s'", key)

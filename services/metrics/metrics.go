@@ -135,6 +135,10 @@ func (m *Metrics) loadCountersFromStore() error {
 	resp := m.RedisBackend.Get(context.Background(), "counters")
 	data, err := resp.Bytes()
 	if err != nil {
+		if err == redis.Nil {
+			// No counter key yet
+			return nil
+		}
 		return errors.Wrap(err, "unable to get counters from store")
 	}
 

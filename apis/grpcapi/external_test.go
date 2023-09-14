@@ -467,7 +467,7 @@ var _ = Describe("External gRPC API", func() {
 			shouldNotExist, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createdResp.PipelineId)).Result()
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
-			Expect(shouldNotExist).To(BeNil())
+			Expect(shouldNotExist).To(BeEmpty())
 
 			// Get pipeline via external API - should fail
 			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
@@ -520,7 +520,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
 		})
 
-		It("should allow multiple pipelines for a single audience", func() {
+		FIt("should allow multiple pipelines for a single audience", func() {
 			audience := &protos.Audience{
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
@@ -552,6 +552,8 @@ var _ = Describe("External gRPC API", func() {
 
 			getAllResp, err := externalClient.GetAll(ctxWithGoodAuth, &protos.GetAllRequest{})
 			Expect(err).ToNot(HaveOccurred())
+
+			fmt.Printf("getAllResp: %v\n", getAllResp.Pipelines)
 
 			var total int
 			for _, pipe := range getAllResp.Pipelines {
@@ -713,7 +715,7 @@ var _ = Describe("External gRPC API", func() {
 			// Entry should be removed from snitch_paused
 			value, err = redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).To(HaveOccurred())
-			Expect(value).To(BeNil())
+			Expect(value).To(BeEmpty())
 			Expect(err).To(Equal(redis.Nil))
 		})
 	})
