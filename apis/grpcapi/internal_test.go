@@ -157,13 +157,13 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(time.Second)
 
 			// Verify that register K/V is created
-			data, err := redisClient.Get(ctx, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err := redisClient.Get(ctx, store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeEmpty())
 
 			// Verify that audience K/V's are created
 			for _, aud := range registerRequest.Audiences {
-				data, err := redisClient.Get(ctx, store.NATSLiveKey(
+				data, err := redisClient.Get(ctx, store.RedisLiveKey(
 					registerRequest.SessionId,
 					TestNodeName,
 					util.AudienceToStr(aud),
@@ -178,7 +178,7 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(2 * time.Second)
 
 			// Registration should still exist (because of heartbeat)
-			data, err = redisClient.Get(ctx, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err = redisClient.Get(ctx, store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeEmpty())
 
@@ -187,14 +187,14 @@ var _ = Describe("Internal gRPC API", func() {
 
 			time.Sleep(2 * time.Second)
 
-			data, err = redisClient.Get(ctx, store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err = redisClient.Get(ctx, store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
 			Expect(data).To(BeEmpty())
 
 			// Audience keys should disappear as well
 			for _, aud := range registerRequest.Audiences {
-				data, err := redisClient.Get(ctx, store.NATSLiveKey(
+				data, err := redisClient.Get(ctx, store.RedisLiveKey(
 					registerRequest.SessionId,
 					TestNodeName,
 					util.AudienceToStr(aud),
@@ -236,7 +236,7 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(time.Second)
 
 			// Verify that K/V is created
-			data, err := redisClient.Get(context.Background(), store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err := redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeEmpty())
 
@@ -247,7 +247,7 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(2 * time.Second)
 
 			// K/V should be gone
-			data, err = redisClient.Get(context.Background(), store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).To(HaveOccurred())
 			Expect(data).To(BeEmpty())
 
@@ -273,14 +273,14 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(time.Second)
 
 			// Verify that K/V is created
-			data, err := redisClient.Get(context.Background(), store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err := redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeEmpty())
 
 			// Wait another TTL cycle - heartbeat should've kept key alive
 			time.Sleep(2 * time.Second)
 
-			data, err = redisClient.Get(context.Background(), store.NATSRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeEmpty())
 		})
@@ -312,14 +312,14 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(resp.Message).To(ContainSubstring("Audience created"))
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			liveKeys, err := redisClient.Keys(context.Background(), store.NATSLiveBucket+":*").Result()
+			liveKeys, err := redisClient.Keys(context.Background(), store.RedisLivePrefix+":*").Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveKeys).ToNot(BeEmpty())
 
 			// Verify that K/V is created in `snitch_live` bucket
 			liveData, err := redisClient.Get(
 				context.Background(),
-				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
 			).Result()
 
 			Expect(err).ToNot(HaveOccurred())
@@ -328,7 +328,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Verify that entry is created in `snitch_audience` bucket
 			audienceData, err := redisClient.Get(
 				context.Background(),
-				store.NATSAudienceKey(util.AudienceToStr(audience)),
+				store.RedisAudienceKey(util.AudienceToStr(audience)),
 			).Result()
 
 			Expect(err).ToNot(HaveOccurred())
@@ -364,7 +364,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Audience is still in live bucket
 			liveData, err := redisClient.Get(
 				context.Background(),
-				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
 			).Result()
 
 			Expect(err).ToNot(HaveOccurred())
@@ -373,7 +373,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Audience is still in audience bucket
 			audienceData, err := redisClient.Get(
 				context.Background(),
-				store.NATSAudienceKey(util.AudienceToStr(audience)),
+				store.RedisAudienceKey(util.AudienceToStr(audience)),
 			).Result()
 
 			Expect(err).ToNot(HaveOccurred())
@@ -387,7 +387,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Audience should no longer be in live bucket
 			liveData, err = redisClient.Get(
 				context.Background(),
-				store.NATSLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
+				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
 			).Result()
 
 			Expect(err).To(HaveOccurred())

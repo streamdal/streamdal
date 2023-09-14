@@ -59,7 +59,7 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 	}
 
 	// Start heartbeat watcher
-	err := s.Options.RedisBackend.Watch(serverCtx, fn, store.NATSRegisterKey(sessionId, s.Options.Config.NodeName))
+	err := s.Options.RedisBackend.Watch(serverCtx, fn, store.RedisRegisterKey(sessionId, s.Options.Config.NodeName))
 	if err != nil {
 		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
 	}

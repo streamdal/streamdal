@@ -10,60 +10,60 @@ import (
 )
 
 const (
-	NATSLiveBucket = "live"
-	NATSLiveFormat = "live:%s:%s:%s" // K: $session_id:$node_name:$audience
+	RedisLivePrefix = "live"
+	RedisLiveFormat = "live:%s:%s:%s" // K: $session_id:$node_name:$audience
 
-	NATSAudienceBucket    = "audience"
-	NATSAudienceKeyFormat = "audience:%s" // K: $audience V: NONE
+	RedisAudiencePrefix    = "audience"
+	RedisAudienceKeyFormat = "audience:%s" // K: $audience V: NONE
 
-	// NATSRegisterFormat key resides in the NATSLiveBucket
-	NATSRegisterFormat = "live:%s:%s:register" // K: $session_id:$node_name:register; V: NONE
+	// RedisRegisterFormat key resides in the RedisLivePrefix
+	RedisRegisterFormat = "live:%s:%s:register" // K: $session_id:$node_name:register; V: NONE
 
-	NATSPipelineBucket    = "pipeline"
-	NATSPipelineKeyFormat = "pipeline:%s" // K: $pipeline_id V: serialized protos.Pipeline
+	RedisPipelinePrefix    = "pipeline"
+	RedisPipelineKeyFormat = "pipeline:%s" // K: $pipeline_id V: serialized protos.Pipeline
 
-	NATSConfigBucket    = "config"
-	NATSConfigKeyFormat = "config:%s:%s" // K: $audience V: $pipeline_id (string)
+	RedisConfigPrefix    = "config"
+	RedisConfigKeyFormat = "config:%s:%s" // K: $audience V: $pipeline_id (string)
 
-	NATSPausedBucket    = "paused"
-	NATSPausedKeyFormat = "paused:%s:%s" // K: $pipeline_id:$audience V: NONE
+	RedisPausedPrefix    = "paused"
+	RedisPausedKeyFormat = "paused:%s:%s" // K: $pipeline_id:$audience V: NONE
 
-	NATSNotificationConfigBucket    = "notification_config"
-	NATSNotificationConfigKeyFormat = "notification_config:%s" // K: $config_id V: serialized protos.NotificationConfig
+	RedisNotificationConfigPrefix    = "notification_config"
+	RedisNotificationConfigKeyFormat = "notification_config:%s" // K: $config_id V: serialized protos.NotificationConfig
 
-	NATSNotificationAssocBucket = "notification_assoc"
-	NATSNotificationAssocFormat = "notification_assoc:%s:%s" // K: $pipeline_id:$config_id V: NONE
+	RedisNotificationAssocPrefix = "notification_assoc"
+	RedisNotificationAssocFormat = "notification_assoc:%s:%s" // K: $pipeline_id:$config_id V: NONE
 )
 
-func NATSRegisterKey(session, node string) string {
-	return strings.ToLower(fmt.Sprintf(NATSRegisterFormat, session, node))
+func RedisRegisterKey(session, node string) string {
+	return strings.ToLower(fmt.Sprintf(RedisRegisterFormat, session, node))
 }
 
-func NATSAudienceKey(audience string) string {
-	return strings.ToLower(fmt.Sprintf(NATSAudienceKeyFormat, audience))
+func RedisAudienceKey(audience string) string {
+	return strings.ToLower(fmt.Sprintf(RedisAudienceKeyFormat, audience))
 }
 
-func NATSLiveKey(session, node, audience string) string {
-	return strings.ToLower(fmt.Sprintf(NATSLiveFormat, session, node, audience))
+func RedisLiveKey(session, node, audience string) string {
+	return strings.ToLower(fmt.Sprintf(RedisLiveFormat, session, node, audience))
 }
 
-func NATSPipelineKey(pipelineID string) string {
-	return strings.ToLower(fmt.Sprintf(NATSPipelineKeyFormat, pipelineID))
+func RedisPipelineKey(pipelineID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisPipelineKeyFormat, pipelineID))
 }
 
-func NATSConfigKey(audience *protos.Audience, pipelineID string) string {
+func RedisConfigKey(audience *protos.Audience, pipelineID string) string {
 	audStr := util.AudienceToStr(audience)
-	return strings.ToLower(fmt.Sprintf(NATSConfigKeyFormat, audStr, pipelineID))
+	return strings.ToLower(fmt.Sprintf(RedisConfigKeyFormat, audStr, pipelineID))
 }
 
-func NATSPausedKey(audience, pipelineID string) string {
-	return strings.ToLower(fmt.Sprintf(NATSPausedKeyFormat, pipelineID, audience))
+func RedisPausedKey(audience, pipelineID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisPausedKeyFormat, pipelineID, audience))
 }
 
-func NATSNotificationConfigKey(configID string) string {
-	return strings.ToLower(fmt.Sprintf(NATSNotificationConfigKeyFormat, configID))
+func RedisNotificationConfigKey(configID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisNotificationConfigKeyFormat, configID))
 }
 
-func NATSNotificationAssocKey(pipelineID, configID string) string {
-	return strings.ToLower(fmt.Sprintf(NATSNotificationAssocFormat, pipelineID, configID))
+func RedisNotificationAssocKey(pipelineID, configID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisNotificationAssocFormat, pipelineID, configID))
 }
