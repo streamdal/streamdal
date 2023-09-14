@@ -10,6 +10,7 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -146,6 +147,31 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	if err := s.Options.BusService.BroadcastRegister(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to broadcast register")
 	}
+
+	// Send all KVs to client
+	go func() {
+		llog.Debugf("starting initial KV sync")
+
+		kvCommands, err := s.generateInitialKVCommands(server.Context())
+		if err != nil {
+			llog.Errorf("unable to generate initial kv commands: %v", err)
+			return
+		}
+
+		llog.Debugf("generated '%d' kv commands", len(kvCommands))
+
+		for _, cmd := range kvCommands {
+			llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
+
+			ch <- &protos.Command{
+				Command: &protos.Command_Kv{
+					Kv: cmd,
+				},
+			}
+		}
+
+		llog.Debugf("finished initial KV sync")
+	}()
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
@@ -410,4 +436,55 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 			s.log.Infof("publishing tail response for session id '%s'", tailResp.SessionId)
 		}
 	}
+}
+
+// Will generate a batch of KVCommands that are intended to be sent to SDK
+// clients upon registration
+func (s *InternalServer) generateInitialKVCommands(ctx context.Context) ([]*protos.KVCommand, error) {
+	// Fetch all KVs
+	kvs, err := s.Options.KVService.GetAll(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get all KVs")
+	}
+
+	cmds := make([]*protos.KVCommand, 0)
+	instructions := make([]*protos.KVInstruction, 0)
+	size := 0
+
+	// Inject up to 64KB of instructions per KVCommand
+	for _, kv := range kvs {
+		if size > 64*1024 {
+			// Copy instructions
+			instructionsCopy := make([]*protos.KVInstruction, len(instructions))
+			copy(instructionsCopy, instructions)
+
+			// Append a new command w/ instructions
+			cmds = append(cmds, &protos.KVCommand{
+				Instructions: instructionsCopy,
+				Overwrite:    true,
+			})
+
+			// Reset instructions
+			instructions = make([]*protos.KVInstruction, 0)
+			size = 0
+		}
+
+		instructions = append(instructions, &protos.KVInstruction{
+			Id:                       util.GenerateUUID(),
+			Action:                   shared.KVAction_KV_ACTION_CREATE,
+			Object:                   kv,
+			RequestedAtUnixTsNanoUtc: time.Now().UTC().UnixNano(),
+		})
+
+		size += len(kv.Key) + len(kv.Value)
+	}
+
+	// Append remainder to cmds
+	cmds = append(cmds, &protos.KVCommand{
+		Instructions: instructions,
+	})
+
+	s.log.Debugf("generateInitialKVCommands has generated '%d' KV commands", len(cmds))
+
+	return cmds, nil
 }
