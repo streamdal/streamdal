@@ -12,6 +12,11 @@ import (
 func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
 	s.audiencesMtx.Lock()
 
+	// Don't need to add twice
+	if s.seenAudience(ctx, aud) {
+		return
+	}
+
 	if s.audiences == nil {
 		s.audiences = make(map[string]struct{})
 	}
@@ -25,6 +30,42 @@ func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
 			s.config.Logger.Errorf("failed to add audience: %s", err)
 		}
 	}()
+}
+
+// addAudiences is used for RE-adding audiences that may have timed out after
+// a server reconnect. The method will re-add all known audiences to snitch-server
+// via internal gRPC NewAudience() endpoint. This is a non-blocking method.
+func (s *Snitch) addAudiences(ctx context.Context) {
+	s.audiencesMtx.RLock()
+	defer s.audiencesMtx.RUnlock()
+
+	for audStr, _ := range s.audiences {
+		aud := strToAud(audStr)
+
+		if aud == nil {
+			s.config.Logger.Errorf("unexpected strToAud resulted in nil audience (audStr: %s)", audStr)
+			continue
+		}
+
+		// Run as goroutine to avoid blocking processing
+		go func() {
+			if err := s.serverClient.NewAudience(ctx, aud, s.sessionID); err != nil {
+				s.config.Logger.Errorf("failed to add audience: %s", err)
+			}
+		}()
+	}
+}
+
+func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
+	s.audiencesMtx.RLock()
+	defer s.audiencesMtx.RUnlock()
+
+	if s.audiences == nil {
+		return false
+	}
+
+	_, ok := s.audiences[audToStr(aud)]
+	return ok
 }
 
 func audToStr(aud *protos.Audience) string {

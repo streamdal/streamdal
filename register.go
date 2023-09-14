@@ -5,7 +5,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
@@ -165,32 +164,6 @@ func (s *Snitch) register(looper director.Looper) error {
 	})
 
 	return nil
-}
-
-// addAudiences is used for RE-adding audiences that may have timed out after
-// a server reconnect. The method will re-add all known audiences to snitch-server
-// via internal gRPC NewAudience() endpoint. This is a non-blocking method.
-func (s *Snitch) addAudiences(ctx context.Context) {
-	fmt.Println("re-adding audiences!!!")
-
-	s.audiencesMtx.RLock()
-	defer s.audiencesMtx.RUnlock()
-
-	for audStr, _ := range s.audiences {
-		 aud := strToAud(audStr)
-
-		 if aud == nil {
-			 s.config.Logger.Errorf("unexpected strToAud resulted in nil audience (audStr: %s)", audStr)
-			 continue
-		 }
-
-		// Run as goroutine to avoid blocking processing
-		go func() {
-			if err := s.serverClient.NewAudience(ctx, aud, s.sessionID); err != nil {
-				s.config.Logger.Errorf("failed to add audience: %s", err)
-			}
-		}()
-	}
 }
 
 func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {
