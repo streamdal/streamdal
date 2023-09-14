@@ -92,9 +92,10 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 	req := &protos.MetricsRequest{
 		Metrics: []*protos.Metric{
 			{
-				Name:   string(counter.Name),
-				Value:  float64(counter.Value),
-				Labels: labels,
+				Name:     string(counter.Name),
+				Audience: counter.Audience,
+				Value:    float64(counter.Value),
+				Labels:   labels,
 			},
 		},
 	}
