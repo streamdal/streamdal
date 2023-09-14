@@ -19,6 +19,10 @@ import (
 	"github.com/streamdal/snitch-server/validate"
 )
 
+const (
+	MaxKVCommandSizeBytes = 64 * 1024 // 64KB
+)
+
 // InternalServer implements the internal GRPC API interface
 type InternalServer struct {
 	GRPCAPI
@@ -453,7 +457,7 @@ func (s *InternalServer) generateInitialKVCommands(ctx context.Context) ([]*prot
 
 	// Inject up to 64KB of instructions per KVCommand
 	for _, kv := range kvs {
-		if size > 64*1024 {
+		if size > MaxKVCommandSizeBytes {
 			// Copy instructions
 			instructionsCopy := make([]*protos.KVInstruction, len(instructions))
 			copy(instructionsCopy, instructions)
