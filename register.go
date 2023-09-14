@@ -23,7 +23,7 @@ func (s *Snitch) register(looper director.Looper) error {
 		ClientInfo: &protos.ClientInfo{
 			ClientType:     protos.ClientType(s.config.ClientType),
 			LibraryName:    "snitch-go-client",
-			LibraryVersion: "0.0.39",
+			LibraryVersion: "0.0.40", // TODO: Have CI bump this on release
 			Language:       "go",
 			Arch:           runtime.GOARCH,
 			Os:             runtime.GOOS,
