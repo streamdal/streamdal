@@ -222,6 +222,7 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", pipelineId)
 		}
 
+		pipelineId = strings.TrimPrefix(pipelineId, RedisPipelinePrefix+":")
 		pipelines[pipelineId] = pipeline
 	}
 
@@ -310,9 +311,9 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 	}
 
 	// Store attachment in RedisBackend
-	natsKey := RedisConfigKey(req.Audience, req.PipelineId)
+	key := RedisConfigKey(req.Audience, req.PipelineId)
 
-	if err := s.options.RedisBackend.Set(ctx, natsKey, []byte(``), 0).Err(); err != nil {
+	if err := s.options.RedisBackend.Set(ctx, key, []byte(``), 0).Err(); err != nil {
 		return errors.Wrap(err, "error saving pipeline attachment to store")
 	}
 

@@ -242,7 +242,7 @@ var _ = Describe("Internal gRPC API", func() {
 			heartbeatCancel()
 
 			// Wait for RedisBackend to TTL the key
-			time.Sleep(2 * time.Second)
+			time.Sleep(4 * time.Second)
 
 			// K/V should be gone
 			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
