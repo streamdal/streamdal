@@ -520,7 +520,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
 		})
 
-		FIt("should allow multiple pipelines for a single audience", func() {
+		It("should allow multiple pipelines for a single audience", func() {
 			audience := &protos.Audience{
 				ServiceName:   "secret-service",
 				ComponentName: "sqlite",
@@ -552,8 +552,6 @@ var _ = Describe("External gRPC API", func() {
 
 			getAllResp, err := externalClient.GetAll(ctxWithGoodAuth, &protos.GetAllRequest{})
 			Expect(err).ToNot(HaveOccurred())
-
-			fmt.Printf("getAllResp: %v\n", getAllResp.Pipelines)
 
 			var total int
 			for _, pipe := range getAllResp.Pipelines {
