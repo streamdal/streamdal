@@ -10,6 +10,7 @@ const (
 	ProduceProcessedCount CounterName = "counter_produce_processed"
 	ProduceErrorCount     CounterName = "counter_produce_errors"
 	NotifyCount           CounterName = "counter_notify"
+	DroppedTailMessages   CounterName = "counter_dropped_tail_messages"
 )
 
 type CounterEntry struct {

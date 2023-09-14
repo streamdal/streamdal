@@ -63,7 +63,7 @@ func New(cfg *Config) (*Metrics, error) {
 
 	m := &Metrics{
 		Config:              cfg,
-		counterMap:          make(map[string]*counter, 0),
+		counterMap:          make(map[string]*counter),
 		counterMapMutex:     &sync.RWMutex{},
 		counterTickerLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterReaperLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),

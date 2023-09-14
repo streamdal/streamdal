@@ -13,7 +13,9 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
+	"github.com/streamdal/snitch-go-client/types"
 	"github.com/streamdal/snitch-go-client/validation"
 )
 
@@ -35,6 +37,7 @@ type Tail struct {
 
 	outboundCh   chan *protos.TailResponse
 	snitchServer server.IServerClient
+	metrics      metrics.IMetrics
 	cancelCtx    context.Context
 	lastMsg      time.Time
 	log          logger.Logger
@@ -65,8 +68,11 @@ func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData 
 func (t *Tail) ShipResponse(tr *protos.TailResponse) {
 	// If we're sending too fast, drop the message
 	if time.Since(t.lastMsg).Milliseconds() < MinTailResponseIntervalMS {
-		// TODO: we should notify the snitch server that we're dropping messages somehow
-		// TODO: but this needs to be done in a way that only sends once in a while
+		_ = t.metrics.Incr(context.Background(), &types.CounterEntry{
+			Name:   types.DroppedTailMessages,
+			Labels: map[string]string{},
+			Value:  1})
+
 		t.log.Warnf("Dropping tail response for %s, too fast", tr.PipelineId)
 		return
 	}
@@ -168,6 +174,7 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 		cancelCtx:    ctx,
 		CancelFunc:   cancel,
 		snitchServer: s.serverClient,
+		metrics:      s.metrics,
 		log:          s.config.Logger,
 		lastMsg:      time.Now(),
 	}
