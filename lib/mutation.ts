@@ -82,7 +82,7 @@ export const detachPipeline = async (
   audience: Audience,
 ) => {
   try {
-    const request: DetachPipelineRequest = { audience, pipelineId };
+    const request = DetachPipelineRequest.create({ audience, pipelineId });
     const { response } = await client.detachPipeline(
       request,
       meta,
