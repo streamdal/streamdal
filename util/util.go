@@ -85,7 +85,7 @@ func AudienceToStr(audience *protos.Audience) string {
 		return ""
 	}
 
-	str := strings.ToLower(fmt.Sprintf("%s/%s/%s/%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
+	str := strings.ToLower(fmt.Sprintf("%s:%s:%s:%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
 
 	str = strings.Replace(str, " ", NormalizeSpace, -1)
 
