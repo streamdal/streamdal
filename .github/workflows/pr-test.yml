@@ -11,7 +11,7 @@ jobs:
         go-version: '~1.18'
     - uses: actions/checkout@v2
     - name: Start up dependencies
-      run: docker-compose -f docker-compose.dev.yaml up -d natsjs
+      run: docker-compose -f docker-compose.dev.yaml up -d redis
     - name: Wait for dependencies to start up
       uses: jakejarvis/wait-action@master
       with:
