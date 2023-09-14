@@ -58,6 +58,8 @@ const (
 	// MaxPayloadSize is the maximum size of data that can be sent to the WASM module
 	MaxPayloadSize = 1024 * 1024 // 1Mi
 
+	// ClientTypeSDK & ClientTypeShim are referenced by shims and SDKs to specify
+	// which type of client they are upon registration with the snitch-server.
 	ClientTypeSDK  ClientType = 1
 	ClientTypeShim ClientType = 2
 )
@@ -66,12 +68,7 @@ var (
 	ErrEmptyConfig        = errors.New("config cannot be empty")
 	ErrEmptyServiceName   = errors.New("data source cannot be empty")
 	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
-
-	// ErrMessageDropped is returned when a message is dropped by the plumber data pipelines
-	// An end user may check for this error and handle it accordingly in their code
-	//ErrMessageDropped = errors.New("message dropped by plumber data pipelines")
-
-	ErrEmptyCommand = errors.New("command cannot be empty")
+	ErrEmptyCommand       = errors.New("command cannot be empty")
 )
 
 type ISnitch interface {

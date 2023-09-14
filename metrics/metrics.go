@@ -28,10 +28,10 @@ const (
 )
 
 var (
-	ErrMissingPlumberClient = errors.New("PlumberClient cannot be nil")
-	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
-	ErrEmptyName            = errors.New("Name must be set")
-	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
+	ErrMissingSnitchClient = errors.New("SnitchClient cannot be nil")
+	ErrMissingEntry        = errors.New("CounterEntry cannot be nil")
+	ErrEmptyName           = errors.New("Name must be set")
+	ErrMissingShutdownCtx  = errors.New("ShutdownCtx cannot be nil")
 )
 
 type Metrics struct {
@@ -94,7 +94,7 @@ func New(cfg *Config) (*Metrics, error) {
 
 func validateConfig(cfg *Config) error {
 	if cfg.ServerClient == nil {
-		return ErrMissingPlumberClient
+		return ErrMissingSnitchClient
 	}
 
 	if cfg.CounterInterval == 0 {
