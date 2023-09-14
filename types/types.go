@@ -13,6 +13,8 @@ const (
 	ProduceErrorCount     CounterName = "counter_produce_errors"
 	NotifyCount           CounterName = "counter_notify"
 
+	DroppedTailMessages CounterName = "counter_dropped_tail_messages"
+
 	ConsumeBytesRate     CounterName = "counter_consume_bytes_rate"
 	ProduceBytesRate     CounterName = "counter_produce_bytes_rate"
 	ConsumeProcessedRate CounterName = "counter_consume_processed_rate"
