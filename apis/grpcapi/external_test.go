@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/redis/go-redis/v9"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
@@ -835,7 +835,7 @@ func runServer() {
 }
 
 func newExternalClient() (protos.ExternalClient, error) {
-	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
@@ -844,7 +844,7 @@ func newExternalClient() (protos.ExternalClient, error) {
 }
 
 func newInternalClient() (protos.InternalClient, error) {
-	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
