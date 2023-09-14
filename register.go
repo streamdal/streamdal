@@ -106,7 +106,11 @@ func (s *Snitch) register(looper director.Looper) error {
 			time.Sleep(ReconnectSleep)
 
 			return nil
+		}
 
+		if cmd == nil {
+			s.config.Logger.Debug("Received nil command, ignoring")
+			return nil
 		}
 
 		if cmd.GetKeepAlive() != nil {
@@ -114,7 +118,7 @@ func (s *Snitch) register(looper director.Looper) error {
 			return nil
 		}
 
-		if cmd.Audience.ServiceName != s.config.ServiceName {
+		if cmd.Audience != nil && cmd.Audience.ServiceName != s.config.ServiceName {
 			s.config.Logger.Debugf("Received command for different service name: %s, ignoring command", cmd.Audience.ServiceName)
 			return nil
 		}
@@ -214,8 +218,10 @@ func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error 
 			continue
 		}
 
+		s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
+
 		switch i.Action {
-		case shared.KVAction_KV_ACTION_CREATE | shared.KVAction_KV_ACTION_UPDATE:
+		case shared.KVAction_KV_ACTION_CREATE, shared.KVAction_KV_ACTION_UPDATE:
 			s.kv.Set(i.Object.Key, string(i.Object.Value))
 		case shared.KVAction_KV_ACTION_DELETE:
 			s.kv.Delete(i.Object.Key)
