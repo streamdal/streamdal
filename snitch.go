@@ -436,6 +436,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	counterBytes := types.ConsumeBytes
 	rateBytes := types.ConsumeBytesRate
 	rateProcessed := types.ConsumeProcessedRate
+
 	if req.OperationType == OperationTypeProducer {
 		counterError = types.ProduceErrorCount
 		counterProcessed = types.ProduceProcessedCount

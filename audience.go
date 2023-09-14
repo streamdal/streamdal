@@ -10,15 +10,12 @@ import (
 )
 
 func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
-	// Don't need to add twice
-	if s.seenAudience(ctx, aud) {
-		return
-	}
-
 	s.audiencesMtx.Lock()
+
 	if s.audiences == nil {
 		s.audiences = make(map[string]struct{})
 	}
+
 	s.audiences[audToStr(aud)] = struct{}{}
 	s.audiencesMtx.Unlock()
 
@@ -28,18 +25,6 @@ func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
 			s.config.Logger.Errorf("failed to add audience: %s", err)
 		}
 	}()
-}
-
-func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
-	s.audiencesMtx.RLock()
-	defer s.audiencesMtx.RUnlock()
-
-	if s.audiences == nil {
-		return false
-	}
-
-	_, ok := s.audiences[audToStr(aud)]
-	return ok
 }
 
 func audToStr(aud *protos.Audience) string {

@@ -62,36 +62,6 @@ func TestStrToAud(t *testing.T) {
 	})
 }
 
-func TestSeenAudience(t *testing.T) {
-	ctx := context.Background()
-
-	s := &Snitch{
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-	}
-
-	aud := &protos.Audience{
-		ServiceName:   "mysvc1",
-		ComponentName: "kafka",
-		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-		OperationName: "mytopic",
-	}
-
-	t.Run("empty audiences", func(t *testing.T) {
-		if s.seenAudience(ctx, aud) != false {
-			t.Error("expected false")
-		}
-	})
-
-	t.Run("audience seen", func(t *testing.T) {
-		s.audiences[audToStr(aud)] = struct{}{}
-
-		if s.seenAudience(ctx, aud) != true {
-			t.Error("expected true")
-		}
-	})
-}
-
 func TestAddAudience(t *testing.T) {
 	ctx := context.Background()
 

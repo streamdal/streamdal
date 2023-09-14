@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
@@ -67,7 +68,14 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
+			s.config.Logger.Debug("successfully reconnected to snitch-server")
+
 			stream = newStream
+
+			// Re-announce audience (if we had any) - this is needed so that
+			// snitch-server repopulates live entry in snitch_live (which is used
+			// for DetachPipeline())
+			s.addAudiences(s.config.ShutdownCtx)
 		}
 
 		// Blocks until something is received
@@ -80,15 +88,19 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
+			// Reset stream - cause re-register on error
+			stream = nil
+
+			// Nicer reconnect messages
 			if strings.Contains(err.Error(), "reading from server: EOF") {
-				// Nicer reconnect messages
-				stream = nil
 				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
-				time.Sleep(ReconnectSleep)
+			} else if strings.Contains(err.Error(), "server shutting down") {
+				s.config.Logger.Warnf("snitch server is shutting down, retrying in %s...", ReconnectSleep.String())
 			} else {
 				s.config.Logger.Warnf("error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
-				time.Sleep(ReconnectSleep)
 			}
+
+			time.Sleep(ReconnectSleep)
 
 			return nil
 
@@ -153,6 +165,32 @@ func (s *Snitch) register(looper director.Looper) error {
 	})
 
 	return nil
+}
+
+// addAudiences is used for RE-adding audiences that may have timed out after
+// a server reconnect. The method will re-add all known audiences to snitch-server
+// via internal gRPC NewAudience() endpoint. This is a non-blocking method.
+func (s *Snitch) addAudiences(ctx context.Context) {
+	fmt.Println("re-adding audiences!!!")
+
+	s.audiencesMtx.RLock()
+	defer s.audiencesMtx.RUnlock()
+
+	for audStr, _ := range s.audiences {
+		 aud := strToAud(audStr)
+
+		 if aud == nil {
+			 s.config.Logger.Errorf("unexpected strToAud resulted in nil audience (audStr: %s)", audStr)
+			 continue
+		 }
+
+		// Run as goroutine to avoid blocking processing
+		go func() {
+			if err := s.serverClient.NewAudience(ctx, aud, s.sessionID); err != nil {
+				s.config.Logger.Errorf("failed to add audience: %s", err)
+			}
+		}()
+	}
 }
 
 func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {
