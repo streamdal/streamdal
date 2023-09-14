@@ -80,6 +80,7 @@ func run(d *deps.Dependencies) error {
 			NotifyService:   d.NotifyService,
 			NATSBackend:     d.NATSBackend,
 			PubSubService:   d.PubSubService,
+			KVService:       d.KVService,
 		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API setup")
