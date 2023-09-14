@@ -4,6 +4,8 @@ import (
 	"context"
 	"net"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -11,7 +13,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	_ "google.golang.org/grpc/reflection"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/config"
@@ -49,7 +50,7 @@ type Options struct {
 	ShutdownContext context.Context
 	CmdService      cmd.ICmd
 	NotifyService   notify.INotifier
-	NATSBackend     natty.INatty
+	RedisBackend    *redis.Client
 	PubSubService   pubsub.IPubSub
 }
 
@@ -216,8 +217,8 @@ func validateOptions(o *Options) error {
 		return errors.New("options.NotifyService cannot be nil")
 	}
 
-	if o.NATSBackend == nil {
-		return errors.New("options.NATSBackend cannot be nil")
+	if o.RedisBackend == nil {
+		return errors.New("options.RedisBackend cannot be nil")
 	}
 
 	if o.PubSubService == nil {

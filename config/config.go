@@ -20,17 +20,17 @@ type Config struct {
 	AuthToken            string           `help:"Authentication token" required:"true" short:"t"`
 	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8080"`
 	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":9090"`
-	NATSURL              []string         `help:"Address for NATS cluster used by snitch-server" default:"localhost:4222"`
-	NATSUseTLS           bool             `help:"Whether to use TLS for NATS" default:"false"`
+	RedisURL             []string         `help:"Address for Redis cluster used by snitch-server" default:"localhost:4222"`
+	NATSUseTLS           bool             `help:"Whether to use TLS for redis" default:"false"`
 	NATSTLSSkipVerify    bool             `help:"Whether to skip TLS verification" default:"false"`
 	NATSTLSCertFile      string           `help:"TLS cert file"`
 	NATSTLSKeyFile       string           `help:"TLS key file"`
 	NATSTLSCaFile        string           `help:"TLS ca file"`
-	NATSNumKVReplicas    int              `help:"Number of replicas NATS K/V buckets should use" default:"1"`
+	NATSNumKVReplicas    int              `help:"Number of replicas RedisBackend K/V buckets should use" default:"1"`
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
-	SessionTTL           time.Duration    `help:"TTL for session keys in NATS live K/V bucket" default:"5s"`
+	SessionTTL           time.Duration    `help:"TTL for session keys in RedisBackend live K/V bucket" default:"5s"`
 	WASMDir              string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
-	SeedDummyData        bool             `help:"Seed NATS with dummy data for testing" default:"false"`
+	SeedDummyData        bool             `help:"Seed RedisBackend with dummy data for testing" default:"false"`
 
 	// TODO: remove default for release
 	AesKey string `help:"AES256 encryption key to encrypt notification configs at rest" default:"D4BEC3EA5794EE0F38B21B9D4EC69F17F295C62618AB7F2C74814190F1F41ACC"`

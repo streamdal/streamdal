@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -52,8 +53,13 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 
 	lastHeartbeat := time.Now()
 
+	fn := func(tx *redis.Tx) error {
+		// TODO: figure this out
+		return nil
+	}
+
 	// Start heartbeat watcher
-	kw, err := s.Options.NATSBackend.WatchKey(serverCtx, store.NATSLiveBucket, store.NATSRegisterKey(sessionId, s.Options.Config.NodeName))
+	err := s.Options.RedisBackend.Watch(serverCtx, fn, store.NATSRegisterKey(sessionId, s.Options.Config.NodeName))
 	if err != nil {
 		return errors.Wrapf(err, "unable to setup key watcher for session id '%s'", sessionId)
 	}
@@ -68,19 +74,19 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 			case <-s.Options.ShutdownContext.Done():
 				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
 				break MAIN
-			case key := <-kw.Updates():
-				// Sometimes we can receive nils - ignore
-				if key == nil {
-					continue
-				}
-
-				switch key.Operation() {
-				case nats.KeyValuePut:
-					//llog.Debug("detected heartbeat")
-					lastHeartbeat = time.Now()
-				default:
-					llog.Debug("received non-put operation on key watcher; ignoring")
-				}
+			//case key := <-kw.Updates():
+			//	// Sometimes we can receive nils - ignore
+			//	if key == nil {
+			//		continue
+			//	}
+			//
+			//	switch key.Operation() {
+			//	case nats.KeyValuePut:
+			//		//llog.Debug("detected heartbeat")
+			//		lastHeartbeat = time.Now()
+			//	default:
+			//		llog.Debug("received non-put operation on key watcher; ignoring")
+			//	}
 			case <-time.After(time.Second):
 				// Check if heartbeat is older than session TTL
 				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {

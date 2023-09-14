@@ -3,14 +3,13 @@ package bus
 import (
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/cmd"
@@ -33,9 +32,7 @@ should send commands to the client (via the register cmd channel).
 */
 
 const (
-	StreamName    = "snitch_events"
-	StreamSubject = "broadcast"
-	FullSubject   = StreamName + "." + StreamSubject
+	FullSubject = "snitch_events:broadcast"
 )
 
 type IBus interface {
@@ -65,14 +62,14 @@ type Bus struct {
 }
 
 type Options struct {
-	Store       store.IStore
-	NATS        natty.INatty
-	Metrics     metrics.IMetrics
-	Cmd         cmd.ICmd
-	NodeName    string
-	WASMDir     string
-	ShutdownCtx context.Context
-	PubSub      pubsub.IPubSub
+	Store        store.IStore
+	RedisBackend *redis.Client
+	Metrics      metrics.IMetrics
+	Cmd          cmd.ICmd
+	NodeName     string
+	WASMDir      string
+	ShutdownCtx  context.Context
+	PubSub       pubsub.IPubSub
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -91,17 +88,18 @@ func New(opts *Options) (*Bus, error) {
 }
 
 func prepareNATS(opts *Options) error {
-	// Won't error if stream already exists
-	if err := opts.NATS.CreateStream(opts.ShutdownCtx, StreamName, []string{FullSubject}); err != nil {
-		return errors.Wrap(err, "error creating stream")
-	}
-
-	// Won't error if consumer already exists
-	if err := opts.NATS.CreateConsumer(opts.ShutdownCtx, StreamName, opts.NodeName, FullSubject); err != nil {
-		return errors.Wrap(err, "error creating consumer")
-	}
-
 	return nil
+	//// Won't error if stream already exists
+	//if err := opts.NATS.CreateStream(opts.ShutdownCtx, StreamName, []string{FullSubject}); err != nil {
+	//	return errors.Wrap(err, "error creating stream")
+	//}
+	//
+	//// Won't error if consumer already exists
+	//if err := opts.NATS.CreateConsumer(opts.ShutdownCtx, StreamName, opts.NodeName, FullSubject); err != nil {
+	//	return errors.Wrap(err, "error creating consumer")
+	//}
+	//
+	//return nil
 }
 
 func (o *Options) validate() error {
@@ -113,8 +111,8 @@ func (o *Options) validate() error {
 		return errors.New("node name must be provided")
 	}
 
-	if o.NATS == nil {
-		return errors.New("nats backend must be provided")
+	if o.RedisBackend == nil {
+		return errors.New("redis backend must be provided")
 	}
 
 	if o.Store == nil {
@@ -140,9 +138,11 @@ func (o *Options) validate() error {
 	return nil
 }
 
-// RunConsumer is used for consuming message from the snitch NATS stream and
+// RunConsumer is used for consuming message from the snitch RedisBackend stream and
 // executing a message handler.
 func (b *Bus) RunConsumer() error {
+	ps := b.options.RedisBackend.Subscribe(b.options.ShutdownCtx, FullSubject)
+
 MAIN:
 	for {
 		// Hack since natty.Consume() should return err (but doesn't right now)
@@ -154,43 +154,35 @@ MAIN:
 			// NOOP
 		}
 
-		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
-			Subject:      FullSubject,
-			StreamName:   StreamName,
-			ConsumerName: b.options.NodeName,
-		}, b.handler)
-
-		// NOTE: Consumer won't exit on handler err - err is passed errorCh by
-		// natty - error reading should occur elsewhere
+		msg, err := ps.ReceiveMessage(b.options.ShutdownCtx)
 		if err != nil {
-			if err == context.Canceled || strings.Contains(err.Error(), "context deadline exceeded") {
+			if errors.Is(err, context.Canceled) {
 				b.log.Debug("context cancellation detected")
 				break MAIN
 			}
 
 			b.log.WithError(err).Error("error consuming messages")
+			continue
 		}
+
+		b.handler(b.options.ShutdownCtx, msg)
 	}
 
-	b.log.Debug("consumer exiting")
+	b.log.Debug("pubsub consumer exiting")
 
-	return nil
+	return ps.Unsubscribe(context.Background())
 }
 
-// handler every time a new message is received on the NATS broadcast stream.
+// handler every time a new message is received on the RedisBackend broadcast stream.
 // This method is responsible for decoding the message and executing the
 // appropriate msg handler.
-func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
+func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
 	llog := b.log.WithField("method", "handler")
 	llog.Debug("received new broadcast message")
 
-	if err := msg.AckSync(); err != nil {
-		llog.Errorf("unable to ack message: %s", err)
-	}
-
 	busEvent := &protos.BusEvent{}
 
-	if err := proto.Unmarshal(msg.Data, busEvent); err != nil {
+	if err := proto.Unmarshal([]byte(msg.Payload), busEvent); err != nil {
 		return errors.Wrap(err, "error unmarshalling bus event")
 	}
 

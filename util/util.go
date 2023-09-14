@@ -8,8 +8,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -94,10 +95,10 @@ func AudienceToStr(audience *protos.Audience) string {
 // nil will be returned.
 //
 // Normalization explanation: Audience is stored in string format as part of the
-// key name in NATS. This means that it must adhere to [a-zA-Z0-9_-]+. To
+// key name in RedisBackend. This means that it must adhere to [a-zA-Z0-9_-]+. To
 // support spaces, we need to normalize the string before storage and
 // de-normalize it on reads. Because there are various funcs and methods that
-// parse the key as-is from NATS, we cannot use something like base58 to encode &
+// parse the key as-is from RedisBackend, we cannot use something like base58 to encode &
 // decode the whole string and instead have to rely on str replaces.
 // ^ This applies to AudienceToStr() as well.
 func AudienceFromStr(s string) *protos.Audience {

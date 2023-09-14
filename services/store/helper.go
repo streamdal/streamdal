@@ -10,29 +10,29 @@ import (
 )
 
 const (
-	NATSLiveBucket = "snitch_live"
-	NATSLiveFormat = "%s/%s/%s" // K: $session_id/$node_name/$audience
+	NATSLiveBucket = "live"
+	NATSLiveFormat = "live:%s:%s:%s" // K: $session_id:$node_name:$audience
 
-	NATSAudienceBucket    = "snitch_audience"
-	NATSAudienceKeyFormat = "%s" // K: $audience V: NONE
+	NATSAudienceBucket    = "audience"
+	NATSAudienceKeyFormat = "audience:%s" // K: $audience V: NONE
 
 	// NATSRegisterFormat key resides in the NATSLiveBucket
-	NATSRegisterFormat = "%s/%s/register" // K: $session_id/$node_name/register; V: NONE
+	NATSRegisterFormat = "live:%s:%s:register" // K: $session_id:$node_name:register; V: NONE
 
-	NATSPipelineBucket    = "snitch_pipeline"
-	NATSPipelineKeyFormat = "%s" // K: $pipeline_id V: serialized protos.Pipeline
+	NATSPipelineBucket    = "pipeline"
+	NATSPipelineKeyFormat = "pipeline:%s" // K: $pipeline_id V: serialized protos.Pipeline
 
-	NATSConfigBucket    = "snitch_config"
-	NATSConfigKeyFormat = "%s/%s" // K: $audience V: $pipeline_id (string)
+	NATSConfigBucket    = "config"
+	NATSConfigKeyFormat = "config:%s:%s" // K: $audience V: $pipeline_id (string)
 
-	NATSPausedBucket    = "snitch_paused"
-	NATSPausedKeyFormat = "%s/%s" // K: $pipeline_id:$audience V: NONE
+	NATSPausedBucket    = "paused"
+	NATSPausedKeyFormat = "paused:%s:%s" // K: $pipeline_id:$audience V: NONE
 
-	NATSNotificationConfigBucket    = "snitch_notification_config"
-	NATSNotificationConfigKeyFormat = "%s" // K: $config_id V: serialized protos.NotificationConfig
+	NATSNotificationConfigBucket    = "notification_config"
+	NATSNotificationConfigKeyFormat = "notification_config:%s" // K: $config_id V: serialized protos.NotificationConfig
 
-	NATSNotificationAssocBucket = "snitch_notification"
-	NATSNotificationAssocFormat = "%s/%s" // K: $pipeline_id/$config_id V: NONE
+	NATSNotificationAssocBucket = "notification_assoc"
+	NATSNotificationAssocFormat = "notification_assoc:%s:%s" // K: $pipeline_id:$config_id V: NONE
 )
 
 func NATSRegisterKey(session, node string) string {

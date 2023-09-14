@@ -88,9 +88,9 @@ clean:
 	$(RM) ./build/$(SERVICE)-*
 
 .PHONY: reset
-reset: description = Remove snitch-server docker images + clean NATS
+reset: description = Remove snitch-server docker images + clean redis
 reset:
-	sh ./test-utils/reset.sh
+	echo "flushall" | nc localhost 6379
 
 ### Test
 

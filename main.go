@@ -78,7 +78,7 @@ func run(d *deps.Dependencies) error {
 			ShutdownContext: d.ShutdownContext,
 			CmdService:      d.CmdService,
 			NotifyService:   d.NotifyService,
-			NATSBackend:     d.NATSBackend,
+			RedisBackend:    d.RedisBackend,
 			PubSubService:   d.PubSubService,
 		})
 		if err != nil {
@@ -116,7 +116,7 @@ func run(d *deps.Dependencies) error {
 	// Run Messaging service
 	go func() {
 		if err := d.BusService.RunConsumer(); err != nil {
-			errChan <- errors.Wrap(err, "error during NATS consumer run")
+			errChan <- errors.Wrap(err, "error during RedisBackend consumer run")
 		}
 	}()
 

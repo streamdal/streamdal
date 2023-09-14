@@ -691,16 +691,16 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 
 func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
 	// Each tail request gets its own unique ID so that we can receive messages over
-	// a unique channel from NATS
+	// a unique channel from RedisBackend
 	req.Id = util.GenerateUUID()
 
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
 	}
 
-	// Get channel for receiving TailResponse messages that get shipped over NATS.
+	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
-	// messages from NATS
+	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.Id, util.CtxRequestId(server.Context()))
 
 	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {

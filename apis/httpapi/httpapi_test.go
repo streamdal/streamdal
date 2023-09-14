@@ -2,7 +2,7 @@
 
 package httpapi
 
-//// This is a "semi-integration" test suite -- it requires a running NATS server
+//// This is a "semi-integration" test suite -- it requires a running RedisBackend server
 //// but does NOT start an actual HTTP API; the tests test the handlers (rather
 //// than the routes).
 //var _ = Describe("HTTPAPI", func() {

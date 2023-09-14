@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -147,7 +148,7 @@ func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.Bus
 		return errors.Wrap(err, "error marshaling bus message")
 	}
 
-	b.options.NATS.Publish(ctx, FullSubject, data)
+	b.options.RedisBackend.Publish(ctx, FullSubject, data)
 
 	return nil
 }

@@ -6,12 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/encryption"
@@ -32,9 +33,9 @@ https://www.notion.so/streamdal/Snitch-Server-Storage-Spec-417bfa71f04b481082373
 `store` is a service that handles storage and retrieval of data such as service
 registrations and service commands.
 
-`store` is backed by a `natty.INatty` instance, which is a wrapper for NATS.
+`store` is backed by a `natty.INatty` instance, which is a wrapper for RedisBackend.
 
-All reads, writes and deletes are performed via NATS -- snitch-server does NOT
+All reads, writes and deletes are performed via RedisBackend -- snitch-server does NOT
 store any persistent state in memory!
 */
 
@@ -62,7 +63,6 @@ type IStore interface {
 	PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
 	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
-	GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 	IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
@@ -79,11 +79,11 @@ type IStore interface {
 }
 
 type Options struct {
-	Encryption  encryption.IEncryption
-	NATSBackend natty.INatty
-	ShutdownCtx context.Context
-	NodeName    string
-	SessionTTL  time.Duration
+	Encryption   encryption.IEncryption
+	RedisBackend *redis.Client
+	ShutdownCtx  context.Context
+	NodeName     string
+	SessionTTL   time.Duration
 }
 
 type Store struct {
@@ -120,14 +120,8 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 
 	s.log.Debugf("attempting to save registration under key '%s'", registrationKey)
 
-	// Add registration in snitch_live bucket
-	if err := s.options.NATSBackend.Put(
-		ctx,
-		NATSLiveBucket,
-		registrationKey,
-		clientInfoBytes,
-		s.options.SessionTTL,
-	); err != nil {
+	status := s.options.RedisBackend.Set(ctx, registrationKey, clientInfoBytes, s.options.SessionTTL)
+	if err := status.Err(); err != nil {
 		return errors.Wrap(err, "error adding registration to K/V")
 	}
 
@@ -164,7 +158,8 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 		}
 
 		// Same session id - remove the key
-		if err := s.options.NATSBackend.Delete(ctx, NATSLiveBucket, e.Key); err != nil {
+		// TODO: e.Key needs to be new redis key
+		if err := s.options.RedisBackend.Del(ctx, e.Key).Err(); err != nil {
 			s.log.Errorf("unable to remove key '%s' from K/V", e.Key)
 		}
 	}
@@ -177,7 +172,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 	//llog := s.log.WithField("method", "AddHeartbeat")
 	//llog.Debug("received request to add heartbeat")
 
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSLiveBucket+":*").Result()
 	if err != nil {
 		return errors.Wrap(err, "error fetching keys from K/V")
 	}
@@ -190,7 +185,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
 
-		if err := s.options.NATSBackend.Refresh(ctx, NATSLiveBucket, k); err != nil {
+		if err := s.options.RedisBackend.ExpireXX(ctx, k, s.options.SessionTTL).Err(); err != nil {
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}
@@ -202,27 +197,23 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	llog := s.log.WithField("method", "GetPipelines")
 	llog.Debug("received request to get pipelines")
 
-	pipelineIds, err := s.options.NATSBackend.Keys(ctx, NATSPipelineBucket)
+	pipelineIds, err := s.options.RedisBackend.Keys(ctx, NATSPipelineBucket+":*").Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return make(map[string]*protos.Pipeline), nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching pipeline keys from NATS")
+		return nil, errors.Wrap(err, "error fetching pipeline keys from store")
 	}
 
 	// k == pipelineId
 	pipelines := make(map[string]*protos.Pipeline)
 
 	for _, pipelineId := range pipelineIds {
-		pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
+		pipelineData, err := s.options.RedisBackend.Get(ctx, pipelineId).Result()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching pipeline '%s' from NATS", pipelineId)
+			return nil, errors.Wrapf(err, "error fetching pipeline '%s' from store", pipelineId)
 		}
 
 		pipeline := &protos.Pipeline{}
 
-		if err := proto.Unmarshal(pipelineData, pipeline); err != nil {
+		if err := proto.Unmarshal([]byte(pipelineData), pipeline); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", pipelineId)
 		}
 
@@ -236,18 +227,18 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	llog := s.log.WithField("method", "GetPipeline")
 	llog.Debug("received request to get pipeline")
 
-	pipelineData, err := s.options.NATSBackend.Get(ctx, NATSPipelineBucket, pipelineId)
+	pipelineData, err := s.options.RedisBackend.Get(ctx, NATSPipelineKey(pipelineId)).Result()
 	if err != nil {
-		if err == nats.ErrKeyNotFound {
+		if errors.Is(err, redis.Nil) {
 			return nil, ErrPipelineNotFound
 		}
 
-		return nil, errors.Wrap(err, "error fetching pipeline from NATS")
+		return nil, errors.Wrap(err, "error fetching pipeline from store")
 	}
 
 	pipeline := &protos.Pipeline{}
 
-	if err := proto.Unmarshal(pipelineData, pipeline); err != nil {
+	if err := proto.Unmarshal([]byte(pipelineData), pipeline); err != nil {
 		return nil, errors.Wrap(err, "error deserializing pipeline")
 	}
 
@@ -264,8 +255,8 @@ func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 		return errors.Wrap(err, "error serializing pipeline to protobuf")
 	}
 
-	if err := s.options.NATSBackend.Put(ctx, NATSPipelineBucket, NATSPipelineKey(pipeline.Id), pipelineData); err != nil {
-		return errors.Wrap(err, "error saving pipeline to NATS")
+	if err := s.options.RedisBackend.Set(ctx, NATSPipelineKey(pipeline.Id), pipelineData, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving pipeline to store")
 	}
 
 	return nil
@@ -280,8 +271,8 @@ func (s *Store) DeletePipeline(ctx context.Context, pipelineId string) error {
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	if err := s.options.NATSBackend.Delete(ctx, NATSPipelineBucket, NATSPipelineKey(pipelineId)); err != nil {
-		return errors.Wrap(err, "error deleting pipeline from NATS")
+	if err := s.options.RedisBackend.Del(ctx, NATSPipelineKey(pipelineId)).Err(); err != nil {
+		return errors.Wrap(err, "error deleting pipeline from store")
 	}
 
 	return nil
@@ -297,8 +288,8 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 		return errors.Wrap(err, "error serializing pipeline to protobuf")
 	}
 
-	if err := s.options.NATSBackend.Put(ctx, NATSPipelineBucket, NATSPipelineKey(pipeline.Id), pipelineData); err != nil {
-		return errors.Wrap(err, "error saving pipeline to NATS")
+	if err := s.options.RedisBackend.Set(ctx, NATSPipelineKey(pipeline.Id), pipelineData, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving pipeline to store")
 	}
 
 	return nil
@@ -313,11 +304,11 @@ func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRe
 		return errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Store attachment in NATS
+	// Store attachment in RedisBackend
 	natsKey := NATSConfigKey(req.Audience, req.PipelineId)
 
-	if err := s.options.NATSBackend.Put(ctx, NATSConfigBucket, natsKey, []byte(``)); err != nil {
-		return errors.Wrap(err, "error saving pipeline attachment to NATS")
+	if err := s.options.RedisBackend.Set(ctx, natsKey, []byte(``), 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving pipeline attachment to store")
 	}
 
 	return nil
@@ -338,20 +329,12 @@ func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRe
 	}
 
 	// Delete audience association
-	if err := s.options.NATSBackend.Delete(
-		ctx,
-		NATSConfigBucket,
-		NATSConfigKey(req.Audience, req.PipelineId),
-	); err != nil {
-		return errors.Wrap(err, "error deleting pipeline attachment from NATS")
+	if err := s.options.RedisBackend.Del(ctx, NATSConfigKey(req.Audience, req.PipelineId)).Err(); err != nil {
+		return errors.Wrap(err, "error deleting pipeline attachment from store")
 	}
 
 	// Delete from paused
-	if err := s.options.NATSBackend.Delete(
-		ctx,
-		NATSPausedBucket,
-		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
-	); err != nil {
+	if err := s.options.RedisBackend.Del(ctx, NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId)).Err(); err != nil {
 		if !errors.Is(err, nats.ErrKeyNotFound) {
 			return errors.Wrap(err, "error deleting pipeline pause state")
 		}
@@ -381,12 +364,12 @@ func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequ
 
 	llog.Debugf("pipeline '%s' not paused; setting pause state now", req.PipelineId)
 
-	if err := s.options.NATSBackend.Put(
+	if err := s.options.RedisBackend.Set(
 		ctx,
-		NATSPausedBucket,
 		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
-		nil,
-	); err != nil {
+		[]byte(``),
+		0,
+	).Err(); err != nil {
 		return errors.Wrap(err, "error saving pipeline pause state")
 	}
 
@@ -398,11 +381,8 @@ func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelin
 	llog := s.log.WithField("method", "IsPaused")
 	llog.Debug("received request to check if pipeline is paused")
 
-	if _, err := s.options.NATSBackend.Get(ctx,
-		NATSPausedBucket,
-		NATSPausedKey(util.AudienceToStr(audience), pipelineID),
-	); err != nil {
-		if err == nats.ErrKeyNotFound {
+	if err := s.options.RedisBackend.Get(ctx, NATSPausedKey(util.AudienceToStr(audience), pipelineID)).Err(); err != nil {
+		if err == redis.Nil {
 			return false, nil
 		}
 
@@ -427,11 +407,10 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	}
 
 	llog.Debugf("pipeline '%s' paused; removing pause state now", req.PipelineId)
-	if err := s.options.NATSBackend.Delete(
+	if err := s.options.RedisBackend.Del(
 		ctx,
-		NATSPausedBucket,
 		NATSPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
-	); err != nil {
+	).Err(); err != nil {
 		return errors.Wrap(err, "error deleting pipeline pause state")
 	}
 
@@ -443,24 +422,23 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	llog.Debug("received request to add audience")
 
 	// Add it to the live bucket
-	if err := s.options.NATSBackend.Put(
+	if err := s.options.RedisBackend.Set(
 		ctx,
-		NATSLiveBucket,
 		NATSLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
 		nil,
 		s.options.SessionTTL,
-	); err != nil {
-		return errors.Wrap(err, "error saving audience to NATS")
+	).Err(); err != nil {
+		return errors.Wrap(err, "error saving audience to store")
 	}
 
 	// And add it to more permanent storage (that doesn't care about the session id)
-	if err := s.options.NATSBackend.Put(
+	if err := s.options.RedisBackend.Set(
 		ctx,
-		NATSAudienceBucket,
 		NATSAudienceKey(util.AudienceToStr(req.Audience)),
-		nil,
-	); err != nil {
-		return errors.Wrap(err, "error saving audience to NATS")
+		[]byte(``),
+		0,
+	).Err(); err != nil {
+		return errors.Wrap(err, "error saving audience to store")
 	}
 
 	return nil
@@ -495,20 +473,8 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 func (s *Store) deleteAudienceKey(ctx context.Context, aud *protos.Audience) error {
 	// Delete audience from bucket
 	audStr := util.AudienceToStr(aud)
-	if err := s.options.NATSBackend.Delete(
-		ctx,
-		NATSAudienceBucket,
-		NATSAudienceKey(audStr),
-	); err != nil {
-		if err == nats.ErrBucketNotFound {
-			return nil
-		}
-
-		if err == nats.ErrKeyNotFound {
-			s.log.Debugf("audience '%s' not found; nothing to do", audStr)
-			return nil
-		}
-		return errors.Wrap(err, "error deleting audience from NATS")
+	if err := s.options.RedisBackend.Del(ctx, NATSAudienceKey(audStr)).Err(); err != nil {
+		return errors.Wrap(err, "error deleting audience from store")
 	}
 
 	return nil
@@ -517,14 +483,9 @@ func (s *Store) deleteAudienceKey(ctx context.Context, aud *protos.Audience) err
 func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) {
 	cfgs := make(map[*protos.Audience][]string)
 
-	audienceKeys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
+	audienceKeys, err := s.options.RedisBackend.Keys(ctx, NATSConfigBucket+":*").Result()
 	if err != nil {
-		// No bucket == no configs
-		if err == nats.ErrBucketNotFound {
-			return cfgs, nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching config keys from NATS")
+		return nil, errors.Wrap(err, "error fetching config keys from store")
 	}
 
 	for _, aud := range audienceKeys {
@@ -546,25 +507,20 @@ func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, e
 func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	live := make([]*types.LiveEntry, 0)
 
-	// Fetch all live keys from NATS
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSLiveBucket)
+	// Fetch all live keys from store
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSLiveBucket+":*").Result()
 	if err != nil {
-		// No bucket == no live entries yet
-		if err == nats.ErrBucketNotFound {
-			return live, nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching live keys from NATS")
+		return nil, errors.Wrap(err, "error fetching live keys from store")
 	}
 
 	// key is of the format:
 	//
-	// <sessionID>/<nodeName>/<<service>/<operation_type>/<operation_name>/<component_name>>
+	// <sessionID>:<nodeName>:<<service>:<operation_type>:<operation_name>:<component_name>>
 	// OR
-	// <sessionID>/<nodeName>/register
+	// <sessionID>:<nodeName>:register
 
 	for _, key := range keys {
-		parts := strings.SplitN(key, "/", 3)
+		parts := strings.SplitN(strings.TrimPrefix(NATSLiveBucket+":", key), ":", 3)
 
 		if len(parts) != 3 {
 			return nil, errors.Errorf("invalid live key '%s'", key)
@@ -583,13 +539,13 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 		if maybeAud == "register" {
 			entry.Register = true
 
-			registerData, err := s.options.NATSBackend.Get(ctx, NATSLiveBucket, key)
+			registerData, err := s.options.RedisBackend.Get(ctx, key).Result()
 			if err != nil {
 				return nil, errors.Wrapf(err, "error fetching register data for live key '%s'", key)
 			}
 
 			clientInfo := &protos.ClientInfo{}
-			if err := proto.Unmarshal(registerData, clientInfo); err != nil {
+			if err := proto.Unmarshal([]byte(registerData), clientInfo); err != nil {
 				return nil, errors.Wrapf(err, "error unmarshaling register data for live key '%s'", key)
 			}
 
@@ -609,31 +565,12 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	return live, nil
 }
 
-func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audience) (string, error) {
-	audStr := util.AudienceToStr(audience)
-
-	pipelineID, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, audStr)
-	if err != nil {
-		if err == nats.ErrKeyNotFound {
-			return "", ErrConfigNotFound
-		}
-
-		return "", errors.Wrapf(err, "error fetching config for audience '%s'", audStr)
-	}
-
-	return string(pipelineID), nil
-}
-
 func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
 	cmds := make([]*protos.Command, 0)
 
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSConfigBucket)
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSConfigBucket+":*").Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return cmds, nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching config keys from NATS")
+		return nil, errors.Wrap(err, "error fetching config keys from store")
 	}
 
 	for _, key := range keys {
@@ -661,19 +598,19 @@ func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName stri
 }
 
 func (s *Store) GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error) {
-	data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, req.NotificationId)
+	data, err := s.options.RedisBackend.Get(ctx, NATSNotificationConfigKey(req.NotificationId)).Result()
 	if err != nil {
-		return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", req.NotificationId)
+		return nil, errors.Wrapf(err, "error fetching notification config '%s' from store", req.NotificationId)
 	}
 
 	// Decrypt data
-	data, err = s.options.Encryption.Decrypt(data)
+	decrypted, err := s.options.Encryption.Decrypt([]byte(data))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error decrypting notification config '%s'", req.NotificationId)
 	}
 
 	cfg := &protos.NotificationConfig{}
-	if err := proto.Unmarshal(data, cfg); err != nil {
+	if err := proto.Unmarshal(decrypted, cfg); err != nil {
 		return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", req.NotificationId)
 	}
 
@@ -683,29 +620,25 @@ func (s *Store) GetNotificationConfig(ctx context.Context, req *protos.GetNotifi
 func (s *Store) GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error) {
 	notificationConfigs := make(map[string]*protos.NotificationConfig)
 
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationConfigBucket)
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSNotificationConfigBucket+":*").Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return notificationConfigs, nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching notification config keys from NATS")
+		return nil, errors.Wrap(err, "error fetching notification config keys from store")
 	}
 
 	for _, key := range keys {
-		data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, key)
+		data, err := s.options.RedisBackend.Get(ctx, key).Result()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching notification config '%s' from NATS", key)
+			return nil, errors.Wrapf(err, "error fetching notification config '%s' from store", key)
 		}
 
 		// Decrypt data
-		data, err = s.options.Encryption.Decrypt(data)
+		decrypted, err := s.options.Encryption.Decrypt([]byte(data))
 		if err != nil {
 			return nil, errors.Wrapf(err, "error decrypting notification config '%s'", key)
 		}
 
 		notificationConfig := &protos.NotificationConfig{}
-		if err := proto.Unmarshal(data, notificationConfig); err != nil {
+		if err := proto.Unmarshal(decrypted, notificationConfig); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", key)
 		}
 
@@ -728,8 +661,8 @@ func (s *Store) CreateNotificationConfig(ctx context.Context, req *protos.Create
 	}
 
 	key := NATSNotificationConfigKey(*req.Notification.Id)
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
-		return errors.Wrap(err, "error saving notification config to NATS")
+	if err := s.options.RedisBackend.Set(ctx, key, data, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving notification config to store")
 	}
 
 	return nil
@@ -751,8 +684,8 @@ func (s *Store) UpdateNotificationConfig(ctx context.Context, req *protos.Update
 	}
 
 	key := NATSNotificationConfigKey(*req.Notification.Id)
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationConfigBucket, key, data, 0); err != nil {
-		return errors.Wrap(err, "error saving notification config to NATS")
+	if err := s.options.RedisBackend.Set(ctx, key, data, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving notification config to store")
 	}
 
 	return nil
@@ -802,18 +735,15 @@ func (s *Store) fillSensitiveFields(ctx context.Context, req *protos.UpdateNotif
 }
 
 func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error {
-	key := NATSNotificationConfigKey(req.NotificationId)
-	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationConfigBucket, key); err != nil {
-		return errors.Wrap(err, "error deleting notification config from NATS")
+	configKey := NATSNotificationConfigKey(req.NotificationId)
+	if err := s.options.RedisBackend.Del(ctx, configKey).Err(); err != nil {
+		return errors.Wrap(err, "error deleting notification config from store")
 	}
 
-	// Delete all associations
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
+	// Delete all associations with pipelines
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSNotificationAssocBucket+":*").Result()
 	if err != nil {
-		if errors.Is(err, nats.ErrBucketNotFound) {
-			return nil
-		}
-		return errors.Wrap(err, "error fetching notification assoc keys from NATS")
+		return errors.Wrap(err, "error fetching notification assoc keys from store")
 	}
 
 	for _, key := range keys {
@@ -821,8 +751,8 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 			continue
 		}
 
-		if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
-			return errors.Wrap(err, "error deleting notification association from NATS")
+		if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+			return errors.Wrap(err, "error deleting notification association from store")
 		}
 	}
 
@@ -831,8 +761,8 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 
 func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error {
 	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.NATSBackend.Put(ctx, NATSNotificationAssocBucket, key, nil, 0); err != nil {
-		return errors.Wrap(err, "error saving notification association to NATS")
+	if err := s.options.RedisBackend.Set(ctx, key, []byte(``), 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving notification association to store")
 	}
 
 	return nil
@@ -840,8 +770,8 @@ func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.Attach
 
 func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error {
 	key := NATSNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.NATSBackend.Delete(ctx, NATSNotificationAssocBucket, key); err != nil {
-		return errors.Wrap(err, "error deleting notification association from NATS")
+	if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+		return errors.Wrap(err, "error deleting notification association from store")
 	}
 
 	return nil
@@ -850,13 +780,10 @@ func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.Detach
 func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
 	cfgs := make([]*protos.NotificationConfig, 0)
 
-	// Fetch all notify config keys from NATS
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSNotificationAssocBucket)
+	// Fetch all notify config keys from store
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSNotificationAssocBucket).Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return cfgs, nil
-		}
-		return nil, errors.Wrap(err, "error fetching notify config keys from NATS")
+		return nil, errors.Wrap(err, "error fetching notify config keys from store")
 	}
 
 	for _, key := range keys {
@@ -864,7 +791,7 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 			continue
 		}
 
-		parts := strings.Split(key, "/")
+		parts := strings.Split(strings.Trim(NATSNotificationAssocBucket+":", key), ":")
 		if len(parts) != 2 {
 			return nil, errors.Errorf("invalid notify config key '%s'", key)
 		}
@@ -872,13 +799,18 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 		configID := parts[1]
 
 		// Fetch key so we get the notify config
-		data, err := s.options.NATSBackend.Get(ctx, NATSNotificationConfigBucket, configID)
+		data, err := s.options.RedisBackend.Get(ctx, NATSNotificationConfigKey(configID)).Result()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from NATS", configID)
+			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from store", configID)
+		}
+
+		decrypted, err := s.options.Encryption.Decrypt([]byte(data))
+		if err != nil {
+			return nil, errors.Wrapf(err, "error decrypting notification config '%s'", configID)
 		}
 
 		notifyConfig := &protos.NotificationConfig{}
-		if err := proto.Unmarshal(data, notifyConfig); err != nil {
+		if err := proto.Unmarshal(decrypted, notifyConfig); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
 		}
 
@@ -897,8 +829,8 @@ func (o *Options) validate() error {
 		return errors.New("node name cannot be empty")
 	}
 
-	if o.NATSBackend == nil {
-		return errors.New("NATS backend cannot be nil")
+	if o.RedisBackend == nil {
+		return errors.New("RedisBackend backend cannot be nil")
 	}
 
 	if o.ShutdownCtx == nil {
@@ -915,16 +847,13 @@ func (o *Options) validate() error {
 func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	audiences := make([]*protos.Audience, 0)
 
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSAudienceBucket)
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSAudienceBucket+":*").Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return audiences, nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching audience keys from NATS")
+		return nil, errors.Wrap(err, "error fetching audience keys from store")
 	}
 
 	for _, key := range keys {
+		key = strings.TrimPrefix(NATSAudienceBucket+":", key)
 		aud := util.AudienceFromStr(key)
 		if aud == nil {
 			return nil, errors.Errorf("invalid audience key '%s'", key)
@@ -937,13 +866,9 @@ func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 }
 
 func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error) {
-	keys, err := s.options.NATSBackend.Keys(ctx, NATSPausedBucket)
+	keys, err := s.options.RedisBackend.Keys(ctx, NATSPausedBucket).Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return make(map[string]*types.PausedEntry), nil
-		}
-
-		return nil, errors.Wrap(err, "error fetching paused keys from NATS")
+		return nil, errors.Wrap(err, "error fetching paused keys from store")
 	}
 
 	paused := make(map[string]*types.PausedEntry)
@@ -955,7 +880,7 @@ func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, e
 			PipelineID: "",
 		}
 
-		parts := strings.SplitN(key, "/", 2)
+		parts := strings.SplitN(strings.Trim(NATSPausedBucket+":", key), ":", 2)
 		if len(parts) != 2 {
 			return nil, errors.Errorf("invalid paused key '%s' (incorrect number of parts '%d')", key, len(parts))
 		}
@@ -980,12 +905,12 @@ func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, e
 func (s *Store) IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
 	key := NATSConfigKey(audience, pipelineID)
 
-	if _, err := s.options.NATSBackend.Get(ctx, NATSConfigBucket, key); err != nil {
-		if err == nats.ErrKeyNotFound {
+	if err := s.options.RedisBackend.Get(ctx, key).Err(); err != nil {
+		if err == redis.Nil {
 			return false, nil
 		}
 
-		return false, errors.Wrap(err, "error fetching pipeline attachment from NATS")
+		return false, errors.Wrap(err, "error fetching pipeline attachment from store")
 	}
 
 	return true, nil
