@@ -15,6 +15,7 @@ import (
 	"github.com/streamdal/snitch-go-client/logger"
 	"github.com/streamdal/snitch-go-client/metrics"
 	"github.com/streamdal/snitch-go-client/server"
+	"github.com/streamdal/snitch-go-client/types"
 	"github.com/streamdal/snitch-go-client/validate"
 )
 
