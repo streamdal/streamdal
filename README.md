@@ -43,6 +43,17 @@ export const example = async () => {
 ```
 *see ./examples for a runnable examples that can be used as a starters*
 
+## WASM
+In order to run pipelines with a minimal amount of overhead, the Snitch node client ships 
+and executes pipeline rules as WASM, so you'll need to enable WASM functionality in your node app
+by supplying the flag, see:
+
+```
+node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js
+```
+
+More info: [Node WASM Modules](https://nodejs.org/api/all.html#all_esm_wasm-modules)
+
 ## Development  
 
 To do development on the `snitch-node-client`, you can run it locally:

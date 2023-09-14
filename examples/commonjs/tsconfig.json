@@ -10,8 +10,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
     "composite": true
   }
 }
