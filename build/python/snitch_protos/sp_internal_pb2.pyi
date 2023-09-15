@@ -75,3 +75,11 @@ class RegisterRequest(_message.Message):
     service_name: str
     session_id: str
     def __init__(self, service_name: _Optional[str] = ..., session_id: _Optional[str] = ..., client_info: _Optional[_Union[_sp_info_pb2.ClientInfo, _Mapping]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., dry_run: bool = ...) -> None: ...
+
+class SendSchemaRequest(_message.Message):
+    __slots__ = ["audience", "schema"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    schema: bytes
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., schema: _Optional[bytes] = ...) -> None: ...

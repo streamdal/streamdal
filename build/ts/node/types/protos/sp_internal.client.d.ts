@@ -1,5 +1,6 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
+import type { SendSchemaRequest } from "./sp_internal";
 import type { TailResponse } from "./sp_common";
 import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal";
@@ -67,6 +68,10 @@ export interface IInternalClient {
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
+     */
+    sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -128,4 +133,8 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
+     */
+    sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse>;
 }

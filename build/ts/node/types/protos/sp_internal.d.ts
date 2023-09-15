@@ -148,6 +148,19 @@ export interface GetAttachCommandsByServiceResponse {
      */
     paused: Command[];
 }
+/**
+ * @generated from protobuf message protos.SendSchemaRequest
+ */
+export interface SendSchemaRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: bytes schema = 2;
+     */
+    schema: Uint8Array;
+}
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();
     create(value?: PartialMessage<NewAudienceRequest>): NewAudienceRequest;
@@ -228,6 +241,16 @@ declare class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAtt
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export declare const GetAttachCommandsByServiceResponse: GetAttachCommandsByServiceResponse$Type;
+declare class SendSchemaRequest$Type extends MessageType<SendSchemaRequest> {
+    constructor();
+    create(value?: PartialMessage<SendSchemaRequest>): SendSchemaRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SendSchemaRequest): SendSchemaRequest;
+    internalBinaryWrite(message: SendSchemaRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SendSchemaRequest
+ */
+export declare const SendSchemaRequest: SendSchemaRequest$Type;
 /**
  * @generated ServiceType for protobuf service protos.Internal
  */

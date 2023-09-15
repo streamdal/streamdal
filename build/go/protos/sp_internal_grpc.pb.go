@@ -44,6 +44,7 @@ type InternalClient interface {
 	// This is needed because Register() is async
 	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(ctx context.Context, opts ...grpc.CallOption) (Internal_SendTailClient, error)
+	SendSchema(ctx context.Context, in *SendSchemaRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
 type internalClient struct {
@@ -165,6 +166,15 @@ func (x *internalSendTailClient) CloseAndRecv() (*StandardResponse, error) {
 	return m, nil
 }
 
+func (c *internalClient) SendSchema(ctx context.Context, in *SendSchemaRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, "/protos.Internal/SendSchema", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InternalServer is the server API for Internal service.
 // All implementations must embed UnimplementedInternalServer
 // for forward compatibility
@@ -191,6 +201,7 @@ type InternalServer interface {
 	// This is needed because Register() is async
 	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(Internal_SendTailServer) error
+	SendSchema(context.Context, *SendSchemaRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedInternalServer()
 }
 
@@ -218,6 +229,9 @@ func (UnimplementedInternalServer) GetAttachCommandsByService(context.Context, *
 }
 func (UnimplementedInternalServer) SendTail(Internal_SendTailServer) error {
 	return status.Errorf(codes.Unimplemented, "method SendTail not implemented")
+}
+func (UnimplementedInternalServer) SendSchema(context.Context, *SendSchemaRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendSchema not implemented")
 }
 func (UnimplementedInternalServer) mustEmbedUnimplementedInternalServer() {}
 
@@ -369,6 +383,24 @@ func (x *internalSendTailServer) Recv() (*TailResponse, error) {
 	return m, nil
 }
 
+func _Internal_SendSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendSchemaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InternalServer).SendSchema(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.Internal/SendSchema",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InternalServer).SendSchema(ctx, req.(*SendSchemaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Internal_ServiceDesc is the grpc.ServiceDesc for Internal service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -395,6 +427,10 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAttachCommandsByService",
 			Handler:    _Internal_GetAttachCommandsByService_Handler,
+		},
+		{
+			MethodName: "SendSchema",
+			Handler:    _Internal_SendSchema_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -7,6 +7,7 @@ import "steps/sp_steps_decode.proto";
 import "steps/sp_steps_detective.proto";
 import "steps/sp_steps_encode.proto";
 import "steps/sp_steps_httprequest.proto";
+import "steps/sp_steps_inferschema.proto";
 import "steps/sp_steps_kv.proto";
 import "steps/sp_steps_transform.proto";
 
@@ -55,6 +56,7 @@ message PipelineStep {
     steps.CustomStep custom = 1004;
     steps.HttpRequestStep http_request = 1005;
     steps.KVStep kv = 1006;
+    steps.InferSchemaStep infer_schema = 1007;
   }
 
   // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
