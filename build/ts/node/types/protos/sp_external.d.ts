@@ -617,6 +617,9 @@ declare class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
 export declare const GetMetricsResponse: GetMetricsResponse$Type;
 declare class GetAudienceRatesRequest$Type extends MessageType<GetAudienceRatesRequest> {
     constructor();
+    create(value?: PartialMessage<GetAudienceRatesRequest>): GetAudienceRatesRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAudienceRatesRequest): GetAudienceRatesRequest;
+    internalBinaryWrite(message: GetAudienceRatesRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAudienceRatesRequest
@@ -624,6 +627,10 @@ declare class GetAudienceRatesRequest$Type extends MessageType<GetAudienceRatesR
 export declare const GetAudienceRatesRequest: GetAudienceRatesRequest$Type;
 declare class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse> {
     constructor();
+    create(value?: PartialMessage<GetAudienceRatesResponse>): GetAudienceRatesResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAudienceRatesResponse): GetAudienceRatesResponse;
+    private binaryReadMap1;
+    internalBinaryWrite(message: GetAudienceRatesResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAudienceRatesResponse

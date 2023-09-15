@@ -174,11 +174,11 @@ export interface AudienceRate {
     /**
      * @generated from protobuf field: int64 bytes = 1;
      */
-    bytes: bigint;
+    bytes: string;
     /**
      * @generated from protobuf field: int64 processed = 2;
      */
-    processed: bigint;
+    processed: string;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -424,6 +424,9 @@ class Metric$Type extends MessageType<Metric> {
                 case /* double value */ 3:
                     message.value = reader.double();
                     break;
+                case /* protos.Audience audience */ 4:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -461,6 +464,9 @@ class Metric$Type extends MessageType<Metric> {
         /* double value = 3; */
         if (message.value !== 0)
             writer.tag(3, WireType.Bit64).double(message.value);
+        /* protos.Audience audience = 4; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -685,9 +691,50 @@ export const TailResponse = new TailResponse$Type();
 class AudienceRate$Type extends MessageType<AudienceRate> {
     constructor() {
         super("protos.AudienceRate", [
-            { no: 1, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 2, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 1, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+            { no: 2, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
         ]);
+    }
+    create(value?: PartialMessage<AudienceRate>): AudienceRate {
+        const message = { bytes: "0", processed: "0" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<AudienceRate>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AudienceRate): AudienceRate {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int64 bytes */ 1:
+                    message.bytes = reader.int64().toString();
+                    break;
+                case /* int64 processed */ 2:
+                    message.processed = reader.int64().toString();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AudienceRate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* int64 bytes = 1; */
+        if (message.bytes !== "0")
+            writer.tag(1, WireType.Varint).int64(message.bytes);
+        /* int64 processed = 2; */
+        if (message.processed !== "0")
+            writer.tag(2, WireType.Varint).int64(message.processed);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
     }
 }
 /**

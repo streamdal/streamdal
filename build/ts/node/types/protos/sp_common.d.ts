@@ -167,11 +167,11 @@ export interface AudienceRate {
     /**
      * @generated from protobuf field: int64 bytes = 1;
      */
-    bytes: bigint;
+    bytes: string;
     /**
      * @generated from protobuf field: int64 processed = 2;
      */
-    processed: bigint;
+    processed: string;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -312,6 +312,9 @@ declare class TailResponse$Type extends MessageType<TailResponse> {
 export declare const TailResponse: TailResponse$Type;
 declare class AudienceRate$Type extends MessageType<AudienceRate> {
     constructor();
+    create(value?: PartialMessage<AudienceRate>): AudienceRate;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AudienceRate): AudienceRate;
+    internalBinaryWrite(message: AudienceRate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.AudienceRate

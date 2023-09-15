@@ -1320,6 +1320,22 @@ class GetAudienceRatesRequest$Type extends MessageType {
     constructor() {
         super("protos.GetAudienceRatesRequest", []);
     }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        return target !== null && target !== void 0 ? target : this.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
 }
 /**
  * @generated MessageType for protobuf message protos.GetAudienceRatesRequest
@@ -1331,6 +1347,61 @@ class GetAudienceRatesResponse$Type extends MessageType {
         super("protos.GetAudienceRatesResponse", [
             { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } }
         ]);
+    }
+    create(value) {
+        const message = { rates: {} };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* map<string, protos.AudienceRate> rates */ 1:
+                    this.binaryReadMap1(message.rates, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    binaryReadMap1(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = AudienceRate.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetAudienceRatesResponse.rates");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : AudienceRate.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* map<string, protos.AudienceRate> rates = 1; */
+        for (let k of Object.keys(message.rates)) {
+            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            AudienceRate.internalBinaryWrite(message.rates[k], writer, options);
+            writer.join().join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
     }
 }
 /**
