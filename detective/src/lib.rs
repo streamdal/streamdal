@@ -6,7 +6,7 @@ use snitch_detective::detective::{Detective, Request};
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Read request
-    let wasm_request = match common::read_request(ptr, length, true) {
+    let wasm_request = match common::read_request(ptr, length) {
         Ok(req) => req,
         Err(e) => {
             return common::write_response(
