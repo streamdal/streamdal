@@ -155,6 +155,10 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 			mapping, err = wasm.Load("detective", prefix)
 		case *protos.PipelineStep_Transform:
 			mapping, err = wasm.Load("transform", prefix)
+		case *protos.PipelineStep_Kv:
+			mapping, err = wasm.Load("kv", prefix)
+		case *protos.PipelineStep_HttpRequest:
+			mapping, err = wasm.Load("httprequest", prefix)
 		default:
 			return errors.Errorf("unknown pipeline step type: %T", s.Step)
 		}

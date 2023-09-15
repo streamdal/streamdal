@@ -23,6 +23,10 @@ type IKV interface {
 	// was overwritten
 	Set(key string, value string) bool
 
+	// Delete will delete a key from the KV store; return bool indicates if
+	// key existed before deletion
+	Delete(key string) bool
+
 	// Exists checks if a key exists in the KV store
 	Exists(key string) bool
 
@@ -76,6 +80,21 @@ func (k *KV) Set(key string, value string) bool {
 
 	k.kvs[key] = value
 	return false
+}
+
+func (k *KV) Delete(key string) bool {
+	k.kvsMtx.Lock()
+	defer k.kvsMtx.Unlock()
+
+	exists := false
+
+	if _, ok := k.kvs[key]; ok {
+		exists = true
+	}
+
+	delete(k.kvs, key)
+
+	return exists
 }
 
 func (k *KV) Exists(key string) bool {

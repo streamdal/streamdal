@@ -28,10 +28,10 @@ const (
 )
 
 var (
-	ErrMissingPlumberClient = errors.New("PlumberClient cannot be nil")
-	ErrMissingEntry         = errors.New("CounterEntry cannot be nil")
-	ErrEmptyName            = errors.New("Name must be set")
-	ErrMissingShutdownCtx   = errors.New("ShutdownCtx cannot be nil")
+	ErrMissingSnitchClient = errors.New("SnitchClient cannot be nil")
+	ErrMissingEntry        = errors.New("CounterEntry cannot be nil")
+	ErrEmptyName           = errors.New("Name must be set")
+	ErrMissingShutdownCtx  = errors.New("ShutdownCtx cannot be nil")
 )
 
 type Metrics struct {
@@ -63,7 +63,7 @@ func New(cfg *Config) (*Metrics, error) {
 
 	m := &Metrics{
 		Config:              cfg,
-		counterMap:          make(map[string]*counter, 0),
+		counterMap:          make(map[string]*counter),
 		counterMapMutex:     &sync.RWMutex{},
 		counterTickerLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
 		counterReaperLooper: director.NewFreeLooper(director.FOREVER, make(chan error, 1)),
@@ -94,7 +94,7 @@ func New(cfg *Config) (*Metrics, error) {
 
 func validateConfig(cfg *Config) error {
 	if cfg.ServerClient == nil {
-		return ErrMissingPlumberClient
+		return ErrMissingSnitchClient
 	}
 
 	if cfg.CounterInterval == 0 {
@@ -188,7 +188,7 @@ func (m *Metrics) getCounters() map[string]*counter {
 }
 
 func (m *Metrics) incr(_ context.Context, entry *types.CounterEntry) error {
-	// No need to validate - no way to reach here without validation
+	// No need to validate - no way to reach here without validate
 	c, ok := m.getCounter(entry)
 	if ok {
 		c.incr(entry)

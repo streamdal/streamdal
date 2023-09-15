@@ -824,6 +824,7 @@ func runServer() {
 		NATSBackend:     d.NATSBackend,
 		PubSubService:   d.PubSubService,
 		MetricsService:  d.MetricsService,
+		KVService:       d.KVService,
 	})
 
 	if err != nil {
