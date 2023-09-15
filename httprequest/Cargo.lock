@@ -7,7 +7,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.96",
 ]
 
 [[package]]
@@ -16,7 +16,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.91",
 ]
 
 [[package]]
@@ -68,6 +68,14 @@ name = "snitch-protos"
 version = "0.0.91"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32346320ea57f3bbbab99f0955a7d48b63177e78f36786d45a5642a2b9eadb90"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
+name = "snitch-protos"
+version = "0.0.96"
+source = "git+https://github.com/streamdal/snitch-protos.git?branch=blinktag/infer_schema#b3e0890d6a598c7da50d0bc9ef44dc7b7dffd3ae"
 dependencies = [
  "protobuf",
 ]

@@ -22,7 +22,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.96",
 ]
 
 [[package]]
@@ -157,6 +157,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "snitch-protos"
+version = "0.0.96"
+source = "git+https://github.com/streamdal/snitch-protos.git?branch=blinktag/infer_schema#b3e0890d6a598c7da50d0bc9ef44dc7b7dffd3ae"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
 name = "snitch-transform"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -203,7 +211,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "protobuf",
- "snitch-protos",
+ "snitch-protos 0.0.91",
  "snitch-transform",
 ]
 

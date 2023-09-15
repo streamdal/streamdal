@@ -25,7 +25,7 @@ setup/darwin:
 
 .PHONY: build
 build: description = Build all targets
-build: clean build/detective build/transform build/httprequest build/kv
+build: clean build/detective build/transform build/httprequest build/kv build/inferschema
 
 .PHONY: build/detective
 build/detective: description = Build WASM target for detective
@@ -74,6 +74,18 @@ build/kv: clean/kv
 clean/kv: description = Remove kv WASM artifacts
 clean/kv:
 	rm -rf kv/target build/kv.wasm
+
+.PHONY: build/inferschema
+build/inferschema: description = Build WASM target for inferschema
+build/inferschema: clean/inferschema
+	cd inferschema && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/inferschema.wasm target/wasm32-wasi/release/inferschema.wasm
+
+.PHONY: clean/inferschema
+clean/inferschema: description = Remove inferschema WASM artifacts
+clean/inferschema:
+	rm -rf inferschema/target build/inferschema.wasm
 
 .PHONY: clean
 clean: description = Remove all build artifacts

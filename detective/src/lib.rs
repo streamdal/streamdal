@@ -48,7 +48,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
             )
         }
         Err(e) => common::write_response(
-            None,
+            Some(&req.data),
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             e.to_string(),
