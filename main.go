@@ -80,6 +80,7 @@ func run(d *deps.Dependencies) error {
 			NotifyService:   d.NotifyService,
 			NATSBackend:     d.NATSBackend,
 			PubSubService:   d.PubSubService,
+			MetricsService:  d.MetricsService,
 			KVService:       d.KVService,
 		})
 		if err != nil {

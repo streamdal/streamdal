@@ -3,8 +3,9 @@ package validate
 import (
 	"regexp"
 
-	"github.com/pkg/errors"
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+
+	"github.com/pkg/errors"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
@@ -523,6 +524,36 @@ func MetricsRequest(req *protos.MetricsRequest) error {
 
 	if req.Metrics == nil {
 		return ErrNilField("Metrics")
+	}
+
+	for _, metric := range req.Metrics {
+		if err := Metric(metric); err != nil {
+			return errors.Wrap(err, "invalid metric")
+		}
+	}
+
+	return nil
+}
+
+func Metric(metric *protos.Metric) error {
+	if metric == nil {
+		return ErrNilInput
+	}
+
+	if metric.Name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if metric.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	if metric.Value == 0 {
+		return ErrEmptyField("Value")
+	}
+
+	if metric.Labels == nil {
+		metric.Labels = map[string]string{}
 	}
 
 	return nil

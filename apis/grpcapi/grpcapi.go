@@ -226,6 +226,10 @@ func validateOptions(o *Options) error {
 		return errors.New("options.PubSubService cannot be nil")
 	}
 
+	if o.MetricsService == nil {
+		return errors.New("options.MetricsService cannot be nil")
+	}
+
 	if o.KVService == nil {
 		return errors.New("options.KVService cannot be nil")
 	}

@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-server/util"
 )
