@@ -232,8 +232,7 @@ class HttpRequestStep(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class InferSchemaStep(betterproto.Message):
-    payload: bytes = betterproto.bytes_field(1)
-    current_schema: bytes = betterproto.bytes_field(2)
+    current_schema: bytes = betterproto.bytes_field(1)
 
 
 @dataclass(eq=False, repr=False)

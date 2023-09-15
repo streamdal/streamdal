@@ -6,6 +6,5 @@ option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
 
 
 message InferSchemaStep {
-  bytes payload = 1;
-  bytes current_schema = 2;
+  bytes current_schema = 1;
 }

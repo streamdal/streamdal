@@ -29,8 +29,6 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 // @@protoc_insertion_point(message:protos.steps.InferSchemaStep)
 pub struct InferSchemaStep {
     // message fields
-    // @@protoc_insertion_point(field:protos.steps.InferSchemaStep.payload)
-    pub payload: ::std::vec::Vec<u8>,
     // @@protoc_insertion_point(field:protos.steps.InferSchemaStep.current_schema)
     pub current_schema: ::std::vec::Vec<u8>,
     // special fields
@@ -50,13 +48,8 @@ impl InferSchemaStep {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "payload",
-            |m: &InferSchemaStep| { &m.payload },
-            |m: &mut InferSchemaStep| { &mut m.payload },
-        ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "current_schema",
             |m: &InferSchemaStep| { &m.current_schema },
@@ -81,9 +74,6 @@ impl ::protobuf::Message for InferSchemaStep {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.payload = is.read_bytes()?;
-                },
-                18 => {
                     self.current_schema = is.read_bytes()?;
                 },
                 tag => {
@@ -98,11 +88,8 @@ impl ::protobuf::Message for InferSchemaStep {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.payload.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.payload);
-        }
         if !self.current_schema.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(2, &self.current_schema);
+            my_size += ::protobuf::rt::bytes_size(1, &self.current_schema);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -110,11 +97,8 @@ impl ::protobuf::Message for InferSchemaStep {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.payload.is_empty() {
-            os.write_bytes(1, &self.payload)?;
-        }
         if !self.current_schema.is_empty() {
-            os.write_bytes(2, &self.current_schema)?;
+            os.write_bytes(1, &self.current_schema)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -133,14 +117,12 @@ impl ::protobuf::Message for InferSchemaStep {
     }
 
     fn clear(&mut self) {
-        self.payload.clear();
         self.current_schema.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static InferSchemaStep {
         static instance: InferSchemaStep = InferSchemaStep {
-            payload: ::std::vec::Vec::new(),
             current_schema: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -166,19 +148,15 @@ impl ::protobuf::reflect::ProtobufValue for InferSchemaStep {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x20steps/sp_steps_inferschema.proto\x12\x0cprotos.steps\"R\n\x0fInfer\
-    SchemaStep\x12\x18\n\x07payload\x18\x01\x20\x01(\x0cR\x07payload\x12%\n\
-    \x0ecurrent_schema\x18\x02\x20\x01(\x0cR\rcurrentSchemaB:Z8github.com/st\
-    reamdal/snitch-protos/build/go/protos/stepsJ\xb7\x01\n\x06\x12\x04\0\0\n\
-    \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\
-    \x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\x03\x04\0O\n\n\n\x02\
-    \x04\0\x12\x04\x07\0\n\x01\n\n\n\x03\x04\0\x01\x12\x03\x07\x08\x17\n\x0b\
-    \n\x04\x04\0\x02\0\x12\x03\x08\x02\x14\n\x0c\n\x05\x04\0\x02\0\x05\x12\
-    \x03\x08\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x08\x08\x0f\n\x0c\n\
-    \x05\x04\0\x02\0\x03\x12\x03\x08\x12\x13\n\x0b\n\x04\x04\0\x02\x01\x12\
-    \x03\t\x02\x1b\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\t\x02\x07\n\x0c\n\
-    \x05\x04\0\x02\x01\x01\x12\x03\t\x08\x16\n\x0c\n\x05\x04\0\x02\x01\x03\
-    \x12\x03\t\x19\x1ab\x06proto3\
+    \n\x20steps/sp_steps_inferschema.proto\x12\x0cprotos.steps\"8\n\x0fInfer\
+    SchemaStep\x12%\n\x0ecurrent_schema\x18\x01\x20\x01(\x0cR\rcurrentSchema\
+    B:Z8github.com/streamdal/snitch-protos/build/go/protos/stepsJ\x80\x01\n\
+    \x06\x12\x04\0\0\t\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    \x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\
+    \x03\x04\0O\n\n\n\x02\x04\0\x12\x04\x07\0\t\x01\n\n\n\x03\x04\0\x01\x12\
+    \x03\x07\x08\x17\n\x0b\n\x04\x04\0\x02\0\x12\x03\x08\x02\x1b\n\x0c\n\x05\
+    \x04\0\x02\0\x05\x12\x03\x08\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
+    \x08\x08\x16\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x08\x19\x1ab\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

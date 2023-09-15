@@ -7,12 +7,11 @@ import { MessageType } from "@protobuf-ts/runtime";
 class InferSchemaStep$Type extends MessageType {
     constructor() {
         super("protos.steps.InferSchemaStep", [
-            { no: 1, name: "payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "current_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "current_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
-        const message = { payload: new Uint8Array(0), currentSchema: new Uint8Array(0) };
+        const message = { currentSchema: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -23,10 +22,7 @@ class InferSchemaStep$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes payload */ 1:
-                    message.payload = reader.bytes();
-                    break;
-                case /* bytes current_schema */ 2:
+                case /* bytes current_schema */ 1:
                     message.currentSchema = reader.bytes();
                     break;
                 default:
@@ -41,12 +37,9 @@ class InferSchemaStep$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bytes payload = 1; */
-        if (message.payload.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.payload);
-        /* bytes current_schema = 2; */
+        /* bytes current_schema = 1; */
         if (message.currentSchema.length)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.currentSchema);
+            writer.tag(1, WireType.LengthDelimited).bytes(message.currentSchema);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

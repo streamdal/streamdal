@@ -9,11 +9,7 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface InferSchemaStep {
     /**
-     * @generated from protobuf field: bytes payload = 1;
-     */
-    payload: Uint8Array;
-    /**
-     * @generated from protobuf field: bytes current_schema = 2;
+     * @generated from protobuf field: bytes current_schema = 1;
      */
     currentSchema: Uint8Array;
 }
