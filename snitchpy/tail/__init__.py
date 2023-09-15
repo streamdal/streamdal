@@ -1,6 +1,8 @@
 import logging
 import asyncio
 import snitch_protos.protos as protos
+import time
+from snitchpy.metrics import Metrics, CounterEntry, COUNTER_DROPPED_TAIL_MESSAGES
 from grpclib.client import Channel
 from grpclib.exceptions import ProtocolError
 from queue import SimpleQueue, Empty
@@ -8,15 +10,18 @@ from threading import Lock, Event, Thread
 
 # The number of tail worker threads to start
 NUM_TAIL_WORKERS = 2
+MIN_TAIL_RESPONSE_INTERVAL = 10_000_000  # 10ms
 
 
 class Tail:
     request: protos.TailRequest
     auth_token: str
     snitch_url: str
+    metrics: Metrics
     lock: Lock = Lock()
     exit: Event = Event()
     queue: SimpleQueue = SimpleQueue()
+    last_msg: int = 0
     log: logging.Logger = logging.getLogger("snitch-client")
 
     def __init__(
@@ -36,10 +41,25 @@ class Tail:
 
     def tail_iterator(self):
         while not self.exit.is_set():
+            # If we're sending too fast, drop the message
+            if time.time_ns() - self.last_msg < MIN_TAIL_RESPONSE_INTERVAL:
+                self.metrics.incr(
+                    CounterEntry(
+                        name=COUNTER_DROPPED_TAIL_MESSAGES, value=1.0, labels={}
+                    )
+                )
+
+                self.log.warning(
+                    f"Dropping tail response for {self.request.pipeline_id}, too fast"
+                )
+                return
+
             try:
                 yield self.queue.get(timeout=1)
             except Empty:
                 pass
+
+            self.last_msg = time.time_ns()
 
     def start_tail_workers(self):
         for i in range(NUM_TAIL_WORKERS):
