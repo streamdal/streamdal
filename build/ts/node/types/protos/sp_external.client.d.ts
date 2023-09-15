@@ -2,6 +2,8 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external";
 import type { TestRequest } from "./sp_external";
+import type { GetAudienceRatesResponse } from "./sp_external";
+import type { GetAudienceRatesRequest } from "./sp_external";
 import type { TailResponse } from "./sp_common";
 import type { TailRequest } from "./sp_common";
 import type { GetMetricsResponse } from "./sp_external";
@@ -163,6 +165,10 @@ export interface IExternalClient {
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
     /**
+     * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
+     */
+    getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse>;
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
@@ -304,6 +310,10 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
+    /**
+     * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
+     */
+    getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse>;
     /**
      * Test method
      *

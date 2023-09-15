@@ -75,6 +75,10 @@ export interface Metric {
      * @generated from protobuf field: double value = 3;
      */
     value: number;
+    /**
+     * @generated from protobuf field: protos.Audience audience = 4;
+     */
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TailRequest
@@ -155,6 +159,19 @@ export interface TailResponse {
     Metadata: {
         [key: string]: string;
     };
+}
+/**
+ * @generated from protobuf message protos.AudienceRate
+ */
+export interface AudienceRate {
+    /**
+     * @generated from protobuf field: int64 bytes = 1;
+     */
+    bytes: string;
+    /**
+     * @generated from protobuf field: int64 processed = 2;
+     */
+    processed: string;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -293,4 +310,14 @@ declare class TailResponse$Type extends MessageType<TailResponse> {
  * @generated MessageType for protobuf message protos.TailResponse
  */
 export declare const TailResponse: TailResponse$Type;
+declare class AudienceRate$Type extends MessageType<AudienceRate> {
+    constructor();
+    create(value?: PartialMessage<AudienceRate>): AudienceRate;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AudienceRate): AudienceRate;
+    internalBinaryWrite(message: AudienceRate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AudienceRate
+ */
+export declare const AudienceRate: AudienceRate$Type;
 export {};

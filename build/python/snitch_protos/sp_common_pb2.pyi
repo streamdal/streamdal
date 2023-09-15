@@ -33,8 +33,16 @@ class Audience(_message.Message):
     service_name: str
     def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ..., operation_name: _Optional[str] = ...) -> None: ...
 
+class AudienceRate(_message.Message):
+    __slots__ = ["bytes", "processed"]
+    BYTES_FIELD_NUMBER: _ClassVar[int]
+    PROCESSED_FIELD_NUMBER: _ClassVar[int]
+    bytes: int
+    processed: int
+    def __init__(self, bytes: _Optional[int] = ..., processed: _Optional[int] = ...) -> None: ...
+
 class Metric(_message.Message):
-    __slots__ = ["labels", "name", "value"]
+    __slots__ = ["audience", "labels", "name", "value"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -42,13 +50,15 @@ class Metric(_message.Message):
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
+    audience: Audience
     labels: _containers.ScalarMap[str, str]
     name: str
     value: float
-    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
 
 class StandardResponse(_message.Message):
     __slots__ = ["code", "id", "message"]
