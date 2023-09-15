@@ -1,4 +1,9 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { AudienceRate } from "./sp_common";
 import { Metric } from "./sp_common";
@@ -55,7 +60,7 @@ export interface GetAllResponse {
      *
      * @generated from protobuf field: int64 generated_at_unix_ts_ns_utc = 100;
      */
-    generatedAtUnixTsNsUtc: bigint;
+    generatedAtUnixTsNsUtc: string;
 }
 /**
  * Don't think we need anything here
@@ -348,6 +353,9 @@ export interface TestResponse {
 }
 declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor();
+    create(value?: PartialMessage<GetAllRequest>): GetAllRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllRequest): GetAllRequest;
+    internalBinaryWrite(message: GetAllRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAllRequest
@@ -355,6 +363,11 @@ declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
 export declare const GetAllRequest: GetAllRequest$Type;
 declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
     constructor();
+    create(value?: PartialMessage<GetAllResponse>): GetAllResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponse): GetAllResponse;
+    private binaryReadMap3;
+    private binaryReadMap4;
+    internalBinaryWrite(message: GetAllResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAllResponse
@@ -362,6 +375,9 @@ declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
 export declare const GetAllResponse: GetAllResponse$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
+    create(value?: PartialMessage<GetPipelinesRequest>): GetPipelinesRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetPipelinesRequest): GetPipelinesRequest;
+    internalBinaryWrite(message: GetPipelinesRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetPipelinesRequest
@@ -369,6 +385,9 @@ declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> 
 export declare const GetPipelinesRequest: GetPipelinesRequest$Type;
 declare class GetPipelinesResponse$Type extends MessageType<GetPipelinesResponse> {
     constructor();
+    create(value?: PartialMessage<GetPipelinesResponse>): GetPipelinesResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetPipelinesResponse): GetPipelinesResponse;
+    internalBinaryWrite(message: GetPipelinesResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetPipelinesResponse
@@ -376,6 +395,9 @@ declare class GetPipelinesResponse$Type extends MessageType<GetPipelinesResponse
 export declare const GetPipelinesResponse: GetPipelinesResponse$Type;
 declare class GetPipelineRequest$Type extends MessageType<GetPipelineRequest> {
     constructor();
+    create(value?: PartialMessage<GetPipelineRequest>): GetPipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetPipelineRequest): GetPipelineRequest;
+    internalBinaryWrite(message: GetPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetPipelineRequest
@@ -383,6 +405,9 @@ declare class GetPipelineRequest$Type extends MessageType<GetPipelineRequest> {
 export declare const GetPipelineRequest: GetPipelineRequest$Type;
 declare class GetPipelineResponse$Type extends MessageType<GetPipelineResponse> {
     constructor();
+    create(value?: PartialMessage<GetPipelineResponse>): GetPipelineResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetPipelineResponse): GetPipelineResponse;
+    internalBinaryWrite(message: GetPipelineResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetPipelineResponse
@@ -390,6 +415,9 @@ declare class GetPipelineResponse$Type extends MessageType<GetPipelineResponse> 
 export declare const GetPipelineResponse: GetPipelineResponse$Type;
 declare class CreatePipelineRequest$Type extends MessageType<CreatePipelineRequest> {
     constructor();
+    create(value?: PartialMessage<CreatePipelineRequest>): CreatePipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreatePipelineRequest): CreatePipelineRequest;
+    internalBinaryWrite(message: CreatePipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.CreatePipelineRequest
@@ -397,6 +425,9 @@ declare class CreatePipelineRequest$Type extends MessageType<CreatePipelineReque
 export declare const CreatePipelineRequest: CreatePipelineRequest$Type;
 declare class CreatePipelineResponse$Type extends MessageType<CreatePipelineResponse> {
     constructor();
+    create(value?: PartialMessage<CreatePipelineResponse>): CreatePipelineResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreatePipelineResponse): CreatePipelineResponse;
+    internalBinaryWrite(message: CreatePipelineResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.CreatePipelineResponse
@@ -404,6 +435,9 @@ declare class CreatePipelineResponse$Type extends MessageType<CreatePipelineResp
 export declare const CreatePipelineResponse: CreatePipelineResponse$Type;
 declare class UpdatePipelineRequest$Type extends MessageType<UpdatePipelineRequest> {
     constructor();
+    create(value?: PartialMessage<UpdatePipelineRequest>): UpdatePipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdatePipelineRequest): UpdatePipelineRequest;
+    internalBinaryWrite(message: UpdatePipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.UpdatePipelineRequest
@@ -411,6 +445,9 @@ declare class UpdatePipelineRequest$Type extends MessageType<UpdatePipelineReque
 export declare const UpdatePipelineRequest: UpdatePipelineRequest$Type;
 declare class DeletePipelineRequest$Type extends MessageType<DeletePipelineRequest> {
     constructor();
+    create(value?: PartialMessage<DeletePipelineRequest>): DeletePipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeletePipelineRequest): DeletePipelineRequest;
+    internalBinaryWrite(message: DeletePipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DeletePipelineRequest
@@ -418,6 +455,9 @@ declare class DeletePipelineRequest$Type extends MessageType<DeletePipelineReque
 export declare const DeletePipelineRequest: DeletePipelineRequest$Type;
 declare class AttachPipelineRequest$Type extends MessageType<AttachPipelineRequest> {
     constructor();
+    create(value?: PartialMessage<AttachPipelineRequest>): AttachPipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AttachPipelineRequest): AttachPipelineRequest;
+    internalBinaryWrite(message: AttachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.AttachPipelineRequest
@@ -425,6 +465,9 @@ declare class AttachPipelineRequest$Type extends MessageType<AttachPipelineReque
 export declare const AttachPipelineRequest: AttachPipelineRequest$Type;
 declare class DetachPipelineRequest$Type extends MessageType<DetachPipelineRequest> {
     constructor();
+    create(value?: PartialMessage<DetachPipelineRequest>): DetachPipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetachPipelineRequest): DetachPipelineRequest;
+    internalBinaryWrite(message: DetachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DetachPipelineRequest
@@ -432,6 +475,9 @@ declare class DetachPipelineRequest$Type extends MessageType<DetachPipelineReque
 export declare const DetachPipelineRequest: DetachPipelineRequest$Type;
 declare class PausePipelineRequest$Type extends MessageType<PausePipelineRequest> {
     constructor();
+    create(value?: PartialMessage<PausePipelineRequest>): PausePipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PausePipelineRequest): PausePipelineRequest;
+    internalBinaryWrite(message: PausePipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.PausePipelineRequest
@@ -439,6 +485,9 @@ declare class PausePipelineRequest$Type extends MessageType<PausePipelineRequest
 export declare const PausePipelineRequest: PausePipelineRequest$Type;
 declare class ResumePipelineRequest$Type extends MessageType<ResumePipelineRequest> {
     constructor();
+    create(value?: PartialMessage<ResumePipelineRequest>): ResumePipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResumePipelineRequest): ResumePipelineRequest;
+    internalBinaryWrite(message: ResumePipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.ResumePipelineRequest
@@ -446,6 +495,9 @@ declare class ResumePipelineRequest$Type extends MessageType<ResumePipelineReque
 export declare const ResumePipelineRequest: ResumePipelineRequest$Type;
 declare class CreateNotificationRequest$Type extends MessageType<CreateNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<CreateNotificationRequest>): CreateNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateNotificationRequest): CreateNotificationRequest;
+    internalBinaryWrite(message: CreateNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.CreateNotificationRequest
@@ -453,6 +505,9 @@ declare class CreateNotificationRequest$Type extends MessageType<CreateNotificat
 export declare const CreateNotificationRequest: CreateNotificationRequest$Type;
 declare class UpdateNotificationRequest$Type extends MessageType<UpdateNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<UpdateNotificationRequest>): UpdateNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateNotificationRequest): UpdateNotificationRequest;
+    internalBinaryWrite(message: UpdateNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.UpdateNotificationRequest
@@ -460,6 +515,9 @@ declare class UpdateNotificationRequest$Type extends MessageType<UpdateNotificat
 export declare const UpdateNotificationRequest: UpdateNotificationRequest$Type;
 declare class DeleteNotificationRequest$Type extends MessageType<DeleteNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<DeleteNotificationRequest>): DeleteNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteNotificationRequest): DeleteNotificationRequest;
+    internalBinaryWrite(message: DeleteNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DeleteNotificationRequest
@@ -467,6 +525,9 @@ declare class DeleteNotificationRequest$Type extends MessageType<DeleteNotificat
 export declare const DeleteNotificationRequest: DeleteNotificationRequest$Type;
 declare class GetNotificationsRequest$Type extends MessageType<GetNotificationsRequest> {
     constructor();
+    create(value?: PartialMessage<GetNotificationsRequest>): GetNotificationsRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetNotificationsRequest): GetNotificationsRequest;
+    internalBinaryWrite(message: GetNotificationsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetNotificationsRequest
@@ -474,6 +535,10 @@ declare class GetNotificationsRequest$Type extends MessageType<GetNotificationsR
 export declare const GetNotificationsRequest: GetNotificationsRequest$Type;
 declare class GetNotificationsResponse$Type extends MessageType<GetNotificationsResponse> {
     constructor();
+    create(value?: PartialMessage<GetNotificationsResponse>): GetNotificationsResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetNotificationsResponse): GetNotificationsResponse;
+    private binaryReadMap1;
+    internalBinaryWrite(message: GetNotificationsResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetNotificationsResponse
@@ -481,6 +546,9 @@ declare class GetNotificationsResponse$Type extends MessageType<GetNotifications
 export declare const GetNotificationsResponse: GetNotificationsResponse$Type;
 declare class GetNotificationRequest$Type extends MessageType<GetNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<GetNotificationRequest>): GetNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetNotificationRequest): GetNotificationRequest;
+    internalBinaryWrite(message: GetNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetNotificationRequest
@@ -488,6 +556,9 @@ declare class GetNotificationRequest$Type extends MessageType<GetNotificationReq
 export declare const GetNotificationRequest: GetNotificationRequest$Type;
 declare class GetNotificationResponse$Type extends MessageType<GetNotificationResponse> {
     constructor();
+    create(value?: PartialMessage<GetNotificationResponse>): GetNotificationResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetNotificationResponse): GetNotificationResponse;
+    internalBinaryWrite(message: GetNotificationResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetNotificationResponse
@@ -495,6 +566,9 @@ declare class GetNotificationResponse$Type extends MessageType<GetNotificationRe
 export declare const GetNotificationResponse: GetNotificationResponse$Type;
 declare class AttachNotificationRequest$Type extends MessageType<AttachNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<AttachNotificationRequest>): AttachNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AttachNotificationRequest): AttachNotificationRequest;
+    internalBinaryWrite(message: AttachNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
@@ -502,6 +576,9 @@ declare class AttachNotificationRequest$Type extends MessageType<AttachNotificat
 export declare const AttachNotificationRequest: AttachNotificationRequest$Type;
 declare class DetachNotificationRequest$Type extends MessageType<DetachNotificationRequest> {
     constructor();
+    create(value?: PartialMessage<DetachNotificationRequest>): DetachNotificationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetachNotificationRequest): DetachNotificationRequest;
+    internalBinaryWrite(message: DetachNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
@@ -509,6 +586,9 @@ declare class DetachNotificationRequest$Type extends MessageType<DetachNotificat
 export declare const DetachNotificationRequest: DetachNotificationRequest$Type;
 declare class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
     constructor();
+    create(value?: PartialMessage<DeleteAudienceRequest>): DeleteAudienceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudienceRequest): DeleteAudienceRequest;
+    internalBinaryWrite(message: DeleteAudienceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DeleteAudienceRequest
@@ -516,6 +596,9 @@ declare class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceReque
 export declare const DeleteAudienceRequest: DeleteAudienceRequest$Type;
 declare class GetMetricsRequest$Type extends MessageType<GetMetricsRequest> {
     constructor();
+    create(value?: PartialMessage<GetMetricsRequest>): GetMetricsRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetMetricsRequest): GetMetricsRequest;
+    internalBinaryWrite(message: GetMetricsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetMetricsRequest
@@ -523,6 +606,10 @@ declare class GetMetricsRequest$Type extends MessageType<GetMetricsRequest> {
 export declare const GetMetricsRequest: GetMetricsRequest$Type;
 declare class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
     constructor();
+    create(value?: PartialMessage<GetMetricsResponse>): GetMetricsResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetMetricsResponse): GetMetricsResponse;
+    private binaryReadMap1;
+    internalBinaryWrite(message: GetMetricsResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetMetricsResponse
@@ -544,6 +631,9 @@ declare class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRates
 export declare const GetAudienceRatesResponse: GetAudienceRatesResponse$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
+    create(value?: PartialMessage<TestRequest>): TestRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TestRequest): TestRequest;
+    internalBinaryWrite(message: TestRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.TestRequest
@@ -551,6 +641,9 @@ declare class TestRequest$Type extends MessageType<TestRequest> {
 export declare const TestRequest: TestRequest$Type;
 declare class TestResponse$Type extends MessageType<TestResponse> {
     constructor();
+    create(value?: PartialMessage<TestResponse>): TestResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TestResponse): TestResponse;
+    internalBinaryWrite(message: TestResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.TestResponse

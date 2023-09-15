@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { KVAction } from "../shared/sp_shared";
 /**
@@ -118,6 +123,9 @@ export declare enum KVStatus {
 }
 declare class KVStepResponse$Type extends MessageType<KVStepResponse> {
     constructor();
+    create(value?: PartialMessage<KVStepResponse>): KVStepResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVStepResponse): KVStepResponse;
+    internalBinaryWrite(message: KVStepResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.KVStepResponse
@@ -125,6 +133,9 @@ declare class KVStepResponse$Type extends MessageType<KVStepResponse> {
 export declare const KVStepResponse: KVStepResponse$Type;
 declare class KVStep$Type extends MessageType<KVStep> {
     constructor();
+    create(value?: PartialMessage<KVStep>): KVStep;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: KVStep): KVStep;
+    internalBinaryWrite(message: KVStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.steps.KVStep

@@ -1,4 +1,9 @@
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Command } from "./sp_command";
 import { ClientInfo } from "./sp_info";
@@ -54,7 +59,7 @@ export interface NotifyRequest {
     /**
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
-    occurredAtUnixTsUtc: bigint;
+    occurredAtUnixTsUtc: string;
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
@@ -145,6 +150,9 @@ export interface GetAttachCommandsByServiceResponse {
 }
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();
+    create(value?: PartialMessage<NewAudienceRequest>): NewAudienceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NewAudienceRequest): NewAudienceRequest;
+    internalBinaryWrite(message: NewAudienceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NewAudienceRequest
@@ -152,6 +160,9 @@ declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
 export declare const NewAudienceRequest: NewAudienceRequest$Type;
 declare class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor();
+    create(value?: PartialMessage<HeartbeatRequest>): HeartbeatRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: HeartbeatRequest): HeartbeatRequest;
+    internalBinaryWrite(message: HeartbeatRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.HeartbeatRequest
@@ -159,6 +170,9 @@ declare class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
 export declare const HeartbeatRequest: HeartbeatRequest$Type;
 declare class NotifyRequest$Type extends MessageType<NotifyRequest> {
     constructor();
+    create(value?: PartialMessage<NotifyRequest>): NotifyRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: NotifyRequest): NotifyRequest;
+    internalBinaryWrite(message: NotifyRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.NotifyRequest
@@ -166,6 +180,9 @@ declare class NotifyRequest$Type extends MessageType<NotifyRequest> {
 export declare const NotifyRequest: NotifyRequest$Type;
 declare class MetricsRequest$Type extends MessageType<MetricsRequest> {
     constructor();
+    create(value?: PartialMessage<MetricsRequest>): MetricsRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: MetricsRequest): MetricsRequest;
+    internalBinaryWrite(message: MetricsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.MetricsRequest
@@ -173,6 +190,9 @@ declare class MetricsRequest$Type extends MessageType<MetricsRequest> {
 export declare const MetricsRequest: MetricsRequest$Type;
 declare class RegisterRequest$Type extends MessageType<RegisterRequest> {
     constructor();
+    create(value?: PartialMessage<RegisterRequest>): RegisterRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RegisterRequest): RegisterRequest;
+    internalBinaryWrite(message: RegisterRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.RegisterRequest
@@ -180,6 +200,9 @@ declare class RegisterRequest$Type extends MessageType<RegisterRequest> {
 export declare const RegisterRequest: RegisterRequest$Type;
 declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
     constructor();
+    create(value?: PartialMessage<DeregisterRequest>): DeregisterRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeregisterRequest): DeregisterRequest;
+    internalBinaryWrite(message: DeregisterRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.DeregisterRequest
@@ -187,6 +210,9 @@ declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
 export declare const DeregisterRequest: DeregisterRequest$Type;
 declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
     constructor();
+    create(value?: PartialMessage<GetAttachCommandsByServiceRequest>): GetAttachCommandsByServiceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAttachCommandsByServiceRequest): GetAttachCommandsByServiceRequest;
+    internalBinaryWrite(message: GetAttachCommandsByServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
@@ -194,6 +220,9 @@ declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAtta
 export declare const GetAttachCommandsByServiceRequest: GetAttachCommandsByServiceRequest$Type;
 declare class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachCommandsByServiceResponse> {
     constructor();
+    create(value?: PartialMessage<GetAttachCommandsByServiceResponse>): GetAttachCommandsByServiceResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAttachCommandsByServiceResponse): GetAttachCommandsByServiceResponse;
+    internalBinaryWrite(message: GetAttachCommandsByServiceResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse

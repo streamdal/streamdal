@@ -1,3 +1,8 @@
+import type { BinaryWriteOptions } from "@protobuf-ts/runtime";
+import type { IBinaryWriter } from "@protobuf-ts/runtime";
+import type { BinaryReadOptions } from "@protobuf-ts/runtime";
+import type { IBinaryReader } from "@protobuf-ts/runtime";
+import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
  * Common response message for many gRPC methods
@@ -134,7 +139,7 @@ export interface TailResponse {
      *
      * @generated from protobuf field: int64 timestamp_ns = 6;
      */
-    timestampNs: bigint;
+    timestampNs: string;
     /**
      * Payload data. For errors, this will be the error message
      * For payloads, this will be JSON of the payload data, post processing
@@ -254,6 +259,9 @@ export declare enum TailRequestType {
 }
 declare class StandardResponse$Type extends MessageType<StandardResponse> {
     constructor();
+    create(value?: PartialMessage<StandardResponse>): StandardResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: StandardResponse): StandardResponse;
+    internalBinaryWrite(message: StandardResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.StandardResponse
@@ -261,6 +269,9 @@ declare class StandardResponse$Type extends MessageType<StandardResponse> {
 export declare const StandardResponse: StandardResponse$Type;
 declare class Audience$Type extends MessageType<Audience> {
     constructor();
+    create(value?: PartialMessage<Audience>): Audience;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Audience): Audience;
+    internalBinaryWrite(message: Audience, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.Audience
@@ -268,6 +279,10 @@ declare class Audience$Type extends MessageType<Audience> {
 export declare const Audience: Audience$Type;
 declare class Metric$Type extends MessageType<Metric> {
     constructor();
+    create(value?: PartialMessage<Metric>): Metric;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Metric): Metric;
+    private binaryReadMap2;
+    internalBinaryWrite(message: Metric, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.Metric
@@ -275,6 +290,10 @@ declare class Metric$Type extends MessageType<Metric> {
 export declare const Metric: Metric$Type;
 declare class TailRequest$Type extends MessageType<TailRequest> {
     constructor();
+    create(value?: PartialMessage<TailRequest>): TailRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TailRequest): TailRequest;
+    private binaryReadMap1000;
+    internalBinaryWrite(message: TailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.TailRequest
@@ -282,6 +301,10 @@ declare class TailRequest$Type extends MessageType<TailRequest> {
 export declare const TailRequest: TailRequest$Type;
 declare class TailResponse$Type extends MessageType<TailResponse> {
     constructor();
+    create(value?: PartialMessage<TailResponse>): TailResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TailResponse): TailResponse;
+    private binaryReadMap1000;
+    internalBinaryWrite(message: TailResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message protos.TailResponse
