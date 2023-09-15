@@ -37,10 +37,10 @@ func (s *Snitch) register(looper director.Looper) error {
 	}
 
 	var (
-		stream protos.Internal_RegisterClient
-		err error
-		quit bool
-		initialRegister = true
+		stream             protos.Internal_RegisterClient
+		err                error
+		quit               bool
+		initialRegister    = true
 		initialRegisterErr error
 	)
 
@@ -93,9 +93,10 @@ func (s *Snitch) register(looper director.Looper) error {
 		// Blocks until something is received
 		cmd, err := stream.Recv()
 		if err != nil {
-			// This is the first registration attempt and it has failed - we need
-			// to stop the loop and tell the caller that we failed to register.
-			if initialRegister {
+			// This is the first registration attempt and it has failed.
+			// Depending on IgnoreStartupError, we may need to stop the loop
+			// and tell the caller that we failed to complete registration.
+			if initialRegister && !s.config.IgnoreStartupError {
 				initialRegisterErr = err
 				quit = true
 				looper.Quit()
@@ -202,7 +203,9 @@ func (s *Snitch) register(looper director.Looper) error {
 	})
 
 	if initialRegister {
-		return errors.Wrap(initialRegisterErr, "failed to complete initial registration with snitch-server")
+		return errors.Wrap(initialRegisterErr,
+			"failed to complete initial registration with snitch-server (and IgnoreStartupError is set to 'false')",
+		)
 	}
 
 	return nil

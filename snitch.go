@@ -36,18 +36,18 @@ import (
 	"github.com/streamdal/snitch-go-client/types"
 )
 
-// OperationType is a constant that represents whether we are publishing or consuming,
-// it must match the protobuf enum of the rule
+// OperationType is used to indicate if the operation is a consumer or a producer
 type OperationType int
 
+// ClientType is used to indicate if this library is being used by a shim or directly (as an SDK)
 type ClientType int
 
 const (
-	// OperationTypeConsumer tells Process to run the pipelines against the consume ruleset
-	OperationTypeConsumer OperationType = 1
+	// DefaultPipelineTimeoutDurationStr is the default timeout for a pipeline execution
+	DefaultPipelineTimeoutDurationStr = "100ms"
 
-	// OperationTypeProducer tells Process to run the pipelines against the produce ruleset
-	OperationTypeProducer OperationType = 2
+	// DefaultStepTimeoutDurationStr is the default timeout for a single step.
+	DefaultStepTimeoutDurationStr = "10ms"
 
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
@@ -58,17 +58,26 @@ const (
 	// MaxWASMPayloadSize is the maximum size of data that can be sent to the WASM module
 	MaxWASMPayloadSize = 1024 * 1024 // 1Mi
 
-	// ClientTypeSDK & ClientTypeShim are referenced by shims and SDKs to specify
-	// which type of client they are upon registration with the snitch-server.
+	// ClientTypeSDK & ClientTypeShim are referenced by shims and SDKs to indicate
+	// in what context this SDK is being used.
 	ClientTypeSDK  ClientType = 1
 	ClientTypeShim ClientType = 2
+
+	// OperationTypeConsumer and OperationTypeProducer are used to indicate the
+	// type of operation the Process() call is performing.
+	OperationTypeConsumer OperationType = 1
+	OperationTypeProducer OperationType = 2
 )
 
 var (
-	ErrEmptyConfig        = errors.New("config cannot be empty")
-	ErrEmptyServiceName   = errors.New("data source cannot be empty")
-	ErrMissingShutdownCtx = errors.New("shutdown context cannot be nil")
-	ErrEmptyCommand       = errors.New("command cannot be empty")
+	ErrEmptyConfig          = errors.New("config cannot be empty")
+	ErrEmptyServiceName     = errors.New("data source cannot be empty")
+	ErrEmptyOperationName   = errors.New("operation name cannot be empty")
+	ErrInvalidOperationType = errors.New("operation type must be set to either OperationTypeConsumer or OperationTypeProducer")
+	ErrEmptyComponentName   = errors.New("component name cannot be empty")
+	ErrMissingShutdownCtx   = errors.New("shutdown context cannot be nil")
+	ErrEmptyCommand         = errors.New("command cannot be empty")
+	ErrEmptyProcessRequest  = errors.New("process request cannot be empty")
 )
 
 type ISnitch interface {
@@ -95,16 +104,55 @@ type Snitch struct {
 }
 
 type Config struct {
-	SnitchURL       string
-	SnitchToken     string
-	ServiceName     string
+	// SnitchURL ... @MG - let's discuss the nil, nil return if left empty.
+	SnitchURL string
+
+	// SnitchToken ... @MG - let's discuss the nil, nil return if left empty.
+	SnitchToken string
+
+	// ServiceName is the name that this library will identify as in the snitch
+	// UI. Required
+	ServiceName string
+
+	// PipelineTimeout defines how long this library will allow a pipeline to
+	// run. Optional; default: 100ms
 	PipelineTimeout time.Duration
-	StepTimeout     time.Duration
-	DryRun          bool
-	ShutdownCtx     context.Context
-	Logger          logger.Logger
-	ClientType      ClientType
-	Audiences       []*Audience
+
+	// StepTimeout defines how long this library will allow a single step to run.
+	// Optional; default: 10ms
+	StepTimeout time.Duration
+
+	// IgnoreStartupError defines how to handle an error on initial startup via
+	// New(). If left as false, failure to complete startup (such as bad auth)
+	// will cause New() to return an error. If true, the library will block and
+	// continue trying to initialize. You may want to adjust this if you want
+	// your application to behave a certain way on startup when snitch-server
+	// is unavailable. Optional; default: false
+	IgnoreStartupError bool
+
+	// If specified, library will connect to snitch-server but won't apply any
+	// pipelines. Optional; default: false
+	DryRun bool
+
+	// ShutdownCtx is a context that the library will listen to for cancellation
+	// notices. Optional; default: nil
+	ShutdownCtx context.Context
+
+	// Logger is a logger you can inject (such as logrus) to allow this library
+	// to log output. Optional; default: nil
+	Logger logger.Logger
+
+	// Audiences is a list of audiences you can specify at registration time.
+	// This is useful if you know your audiences in advance and want to populate
+	// service groups in the snitch UI _before_ your code executes any .Process()
+	// calls. Optional; default: nil
+	Audiences []*Audience
+
+	// ClientType specifies whether this of the SDK is used in a shim library or
+	// as a standalone SDK. This information is used for both debug info and to
+	// help the library determine whether SnitchURL and SnitchToken should be
+	// optional or required. Optional; default: ClientTypeSDK
+	ClientType ClientType
 }
 
 type Audience struct {
@@ -214,6 +262,7 @@ func New(cfg *Config) (*Snitch, error) {
 		return s, nil
 	}
 }
+
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
 		return ErrEmptyConfig
@@ -249,13 +298,14 @@ func validateConfig(cfg *Config) error {
 	if cfg.StepTimeout == 0 {
 		to := os.Getenv("SNITCH_STEP_TIMEOUT")
 		if to == "" {
-			to = "10ms"
+			to = DefaultStepTimeoutDurationStr
 		}
 
 		timeout, err := time.ParseDuration(to)
 		if err != nil {
-			return errors.Wrap(err, "unable to parse SNITCH_STEP_TIMEOUT")
+			return errors.Wrapf(err, "unable to parse StepTimeout '%s'", to)
 		}
+
 		cfg.StepTimeout = timeout
 	}
 
@@ -263,19 +313,45 @@ func validateConfig(cfg *Config) error {
 	if cfg.PipelineTimeout == 0 {
 		to := os.Getenv("SNITCH_PIPELINE_TIMEOUT")
 		if to == "" {
-			to = "100ms"
+			to = DefaultPipelineTimeoutDurationStr
 		}
 
 		timeout, err := time.ParseDuration(to)
 		if err != nil {
-			return errors.Wrap(err, "unable to parse SNITCH_PIPELINE_TIMEOUT")
+			return errors.Wrapf(err, "unable to parse PipelineTimeout '%s'", to)
 		}
+
 		cfg.PipelineTimeout = timeout
 	}
 
 	// Default to NOOP logger if none is provided
 	if cfg.Logger == nil {
 		cfg.Logger = &logger.NoOpLogger{}
+	}
+
+	// Default to ClientTypeSDK
+	if cfg.ClientType != ClientTypeShim && cfg.ClientType != ClientTypeSDK {
+		cfg.ClientType = ClientTypeSDK
+	}
+
+	return nil
+}
+
+func validateProcessRequest(req *ProcessRequest) error {
+	if req == nil {
+		return ErrEmptyProcessRequest
+	}
+
+	if req.OperationName == "" {
+		return ErrEmptyOperationName
+	}
+
+	if req.ComponentName == "" {
+		return ErrEmptyComponentName
+	}
+
+	if req.OperationType != OperationTypeProducer && req.OperationType != OperationTypeConsumer {
+		return ErrInvalidOperationType
 	}
 
 	return nil
@@ -406,8 +482,8 @@ func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[str
 }
 
 func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
-	if req == nil {
-		return nil, errors.New("request cannot be nil")
+	if err := validateProcessRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid process request")
 	}
 
 	data := req.Data
