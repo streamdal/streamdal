@@ -100,6 +100,10 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		"session_id":   request.SessionId,
 	})
 
+	for _, aud := range request.Audiences {
+		s.log.Debugf("register request with audience: %+v", aud)
+	}
+
 	// Store registration
 	if err := s.Options.StoreService.AddRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")

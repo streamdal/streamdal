@@ -131,8 +131,6 @@ func (r *Register) runClient() error {
 		return errors.Wrap(err, "failed to create snitch client")
 	}
 
-	llog.Debug("after instantiation")
-
 	for {
 		if r.config.Register.ConsumerInputType == "none" {
 			llog.Debug("no input data, nothing to do - noop")
@@ -142,6 +140,8 @@ func (r *Register) runClient() error {
 
 		// Consumer will have input - read input data
 		input := <-r.inputCh
+
+		fmt.Println("component name: ", r.config.Register.ComponentName)
 
 		resp, err := sc.Process(context.Background(), &snitch.ProcessRequest{
 			ComponentName: r.config.Register.ComponentName,

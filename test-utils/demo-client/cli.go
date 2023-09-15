@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strings"
 
 	"github.com/alecthomas/kong"
 )
@@ -64,19 +63,6 @@ func ParseArgs() (*Config, error) {
 }
 
 func validateRegisterArgs(cfg *Config) error {
-	// Replace spaces with underscores
-	cfg.Register.OperationName = strings.Replace(cfg.Register.OperationName, " ", "_", -1)
-	cfg.Register.ComponentName = strings.Replace(cfg.Register.ComponentName, " ", "_", -1)
-
-	// Are either valid?
-	if !ValidNameRegex.MatchString(cfg.Register.OperationName) {
-		return fmt.Errorf("invalid operation name (re: /^[a-zA-Z0-9_-]+$/): %s", cfg.Register.OperationName)
-	}
-
-	if !ValidNameRegex.MatchString(cfg.Register.ComponentName) {
-		return fmt.Errorf("invalid component name (re: /^[a-zA-Z0-9_-]+$/): %s", cfg.Register.ComponentName)
-	}
-
 	//// If input tye is file - ensure file was actually provided
 	//if cfg.Register.ConsumerInputType == "file" && cfg.Register.ConsumerInputFile == nil {
 	//	return fmt.Errorf("consumer input type is 'file' but no file was provided")

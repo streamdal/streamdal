@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -85,8 +86,6 @@ func AudienceToStr(audience *protos.Audience) string {
 	}
 
 	str := strings.ToLower(fmt.Sprintf("%s:%s:%s:%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
-
-	str = strings.Replace(str, " ", NormalizeSpace, -1)
 
 	return str
 }

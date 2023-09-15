@@ -41,6 +41,10 @@ func RegisterRequest(req *protos.RegisterRequest) error {
 		return ErrInvalidCharacters("SessionId")
 	}
 
+	if !ValidCharactersRegex.MatchString(req.ServiceName) {
+		return ErrInvalidCharacters("SessionId")
+	}
+
 	// OK to not have audiences, but if defined, they must contain valid entries
 	for _, v := range req.Audiences {
 		if err := Audience(v); err != nil {
@@ -108,8 +112,16 @@ func Audience(audience *protos.Audience) error {
 		return ErrEmptyField("Audience.ServiceName")
 	}
 
+	if !ValidCharactersRegex.MatchString(audience.ServiceName) {
+		return ErrInvalidCharacters("audience.ServiceName")
+	}
+
 	if audience.ComponentName == "" {
 		return ErrEmptyField("Audience.ComponentName")
+	}
+
+	if !ValidCharactersRegex.MatchString(audience.ComponentName) {
+		return ErrInvalidCharacters("audience.ComponentName")
 	}
 
 	if audience.OperationType == protos.OperationType_OPERATION_TYPE_UNSET {
@@ -118,6 +130,10 @@ func Audience(audience *protos.Audience) error {
 
 	if audience.OperationName == "" {
 		return ErrEmptyField("Audience.OperationName")
+	}
+
+	if !ValidCharactersRegex.MatchString(audience.OperationName) {
+		return ErrInvalidCharacters("audience.OperationName")
 	}
 
 	return nil
@@ -186,10 +202,6 @@ func Pipeline(p *protos.Pipeline, requireId bool) error {
 
 	if p.Name == "" {
 		return ErrEmptyField("Name")
-	}
-
-	if !ValidCharactersRegex.MatchString(p.Name) {
-		return ErrInvalidCharacters("p.Name")
 	}
 
 	if len(p.Steps) == 0 {
