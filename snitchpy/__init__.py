@@ -887,6 +887,12 @@ class SnitchClient:
             response = requests.put(req.url, json=req.body)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
             response = requests.delete(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PATCH:
+            response = requests.patch(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_HEAD:
+            response = requests.head(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
+            response = requests.options(req.url)
         else:
             raise ValueError("Invalid HTTP method provided")
 
