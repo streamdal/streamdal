@@ -80,6 +80,10 @@ type IStore interface {
 	// WatchKeys returns a channel that will receive empty struct{} any time the key(s) receive a SET command
 	// This command is currently only used for heartbeats. The argument can accept wildcards *)
 	WatchKeys(key string) chan *redis.Message
+
+	AddSchema(ctx context.Context, req *protos.SendSchemaRequest) error
+
+	GetSchema(ctx context.Context, aud *protos.Audience) (*protos.Schema, error)
 }
 
 type Options struct {
@@ -1049,4 +1053,53 @@ func (s *Store) WatchKeys(key string) chan *redis.Message {
 	}()
 
 	return keyChan
+}
+
+func (s *Store) GetSchema(ctx context.Context, aud *protos.Audience) (*protos.Schema, error) {
+	audStr := util.AudienceToStr(aud)
+
+	data, err := s.options.RedisBackend.Get(ctx, RedisSchemaKey(audStr)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			// No schema yet, generate empty one
+			return &protos.Schema{
+				XVersion:   0,
+				JsonSchema: []byte(`{"$schema":"http://json-schema.org/draft-07/schema#","properties":{},"required":[],"type":"object"}`),
+			}, nil
+		}
+		return nil, errors.Wrapf(err, "error fetching schema for audience '%s'", audStr)
+	}
+
+	schema := &protos.Schema{}
+	if err := proto.Unmarshal([]byte(data), schema); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling schema for audience '%s'", audStr)
+	}
+
+	return schema, nil
+}
+
+func (s *Store) AddSchema(ctx context.Context, req *protos.SendSchemaRequest) error {
+	// Get existing schema
+	schema, err := s.GetSchema(ctx, req.Audience)
+	if err != nil {
+		return errors.Wrap(err, "error getting existing schema")
+	}
+
+	// Bump version and schema
+	// GetSchema returns an empty schema with version 0 if it doesn't exist yet
+	schema.XVersion++
+	schema.JsonSchema = req.Schema.JsonSchema
+
+	// Save to K/V
+	schemaData, err := proto.Marshal(schema)
+	if err != nil {
+		return errors.Wrap(err, "error serializing schema to protobuf")
+	}
+
+	key := RedisSchemaKey(util.AudienceToStr(req.Audience))
+	if err := s.options.RedisBackend.Set(ctx, key, schemaData, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving schema to store")
+	}
+
+	return nil
 }
