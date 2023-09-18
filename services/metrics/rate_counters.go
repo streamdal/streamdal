@@ -2,13 +2,13 @@ package metrics
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/paulbellamy/ratecounter"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
-
-	"github.com/streamdal/snitch-server/util"
 )
 
 // TODO: needed?
@@ -34,7 +34,7 @@ func (m *Metrics) IncreaseRate(ctx context.Context, t RateCounterType, aud *prot
 }
 
 func (m *Metrics) GetRateCounter(_ context.Context, aud *protos.Audience) *RateCounter {
-	audStr := util.AudienceToStr(aud)
+	audStr := groupAudienceToStr(aud)
 
 	m.rateCountersMtx.RLock()
 	counter, ok := m.rateCounters[audStr]
@@ -61,4 +61,16 @@ func (m *Metrics) GetAllRateCounters(_ context.Context) map[string]*RateCounter 
 	defer m.rateCountersMtx.RUnlock()
 
 	return m.rateCounters
+}
+
+// groupAudienceToStr returns a string representation of an audience, but without the audience's operation name
+// this is used to group rates so we may display a single number on the graph edge in the UI
+func groupAudienceToStr(audience *protos.Audience) string {
+	if audience == nil {
+		return ""
+	}
+
+	str := strings.ToLower(fmt.Sprintf("%s/%s/%s", audience.ServiceName, audience.OperationType, audience.ComponentName))
+
+	return str
 }
