@@ -12,16 +12,17 @@ const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_common_3 = require("./sp_common");
 const sp_command_1 = require("./sp_command");
 const sp_info_1 = require("./sp_info");
-const sp_common_3 = require("./sp_common");
 const sp_common_4 = require("./sp_common");
+const sp_common_5 = require("./sp_common");
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.NewAudienceRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => sp_common_4.Audience }
+            { no: 2, name: "audience", kind: "message", T: () => sp_common_5.Audience }
         ]);
     }
     create(value) {
@@ -40,7 +41,7 @@ class NewAudienceRequest$Type extends runtime_5.MessageType {
                     message.sessionId = reader.string();
                     break;
                 case /* protos.Audience audience */ 2:
-                    message.audience = sp_common_4.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    message.audience = sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -59,7 +60,7 @@ class NewAudienceRequest$Type extends runtime_5.MessageType {
             writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.sessionId);
         /* protos.Audience audience = 2; */
         if (message.audience)
-            sp_common_4.Audience.internalBinaryWrite(message.audience, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_common_5.Audience.internalBinaryWrite(message.audience, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -123,7 +124,7 @@ class NotifyRequest$Type extends runtime_5.MessageType {
         super("protos.NotifyRequest", [
             { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "step_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "audience", kind: "message", T: () => sp_common_4.Audience },
+            { no: 3, name: "audience", kind: "message", T: () => sp_common_5.Audience },
             { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
         ]);
     }
@@ -146,7 +147,7 @@ class NotifyRequest$Type extends runtime_5.MessageType {
                     message.stepName = reader.string();
                     break;
                 case /* protos.Audience audience */ 3:
-                    message.audience = sp_common_4.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    message.audience = sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 case /* int64 occurred_at_unix_ts_utc */ 4:
                     message.occurredAtUnixTsUtc = reader.int64().toString();
@@ -171,7 +172,7 @@ class NotifyRequest$Type extends runtime_5.MessageType {
             writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.stepName);
         /* protos.Audience audience = 3; */
         if (message.audience)
-            sp_common_4.Audience.internalBinaryWrite(message.audience, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_common_5.Audience.internalBinaryWrite(message.audience, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* int64 occurred_at_unix_ts_utc = 4; */
         if (message.occurredAtUnixTsUtc !== "0")
             writer.tag(4, runtime_1.WireType.Varint).int64(message.occurredAtUnixTsUtc);
@@ -189,7 +190,7 @@ exports.NotifyRequest = new NotifyRequest$Type();
 class MetricsRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.MetricsRequest", [
-            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_3.Metric }
+            { no: 1, name: "metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_4.Metric }
         ]);
     }
     create(value) {
@@ -205,7 +206,7 @@ class MetricsRequest$Type extends runtime_5.MessageType {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
                 case /* repeated protos.Metric metrics */ 1:
-                    message.metrics.push(sp_common_3.Metric.internalBinaryRead(reader, reader.uint32(), options));
+                    message.metrics.push(sp_common_4.Metric.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -221,7 +222,7 @@ class MetricsRequest$Type extends runtime_5.MessageType {
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.Metric metrics = 1; */
         for (let i = 0; i < message.metrics.length; i++)
-            sp_common_3.Metric.internalBinaryWrite(message.metrics[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_common_4.Metric.internalBinaryWrite(message.metrics[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -239,7 +240,7 @@ class RegisterRequest$Type extends runtime_5.MessageType {
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "client_info", kind: "message", T: () => sp_info_1.ClientInfo },
-            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_4.Audience },
+            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience },
             { no: 5, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
@@ -265,7 +266,7 @@ class RegisterRequest$Type extends runtime_5.MessageType {
                     message.clientInfo = sp_info_1.ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
                     break;
                 case /* repeated protos.Audience audiences */ 4:
-                    message.audiences.push(sp_common_4.Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    message.audiences.push(sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* bool dry_run */ 5:
                     message.dryRun = reader.bool();
@@ -293,7 +294,7 @@ class RegisterRequest$Type extends runtime_5.MessageType {
             sp_info_1.ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* repeated protos.Audience audiences = 4; */
         for (let i = 0; i < message.audiences.length; i++)
-            sp_common_4.Audience.internalBinaryWrite(message.audiences[i], writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_common_5.Audience.internalBinaryWrite(message.audiences[i], writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* bool dry_run = 5; */
         if (message.dryRun !== false)
             writer.tag(5, runtime_1.WireType.Varint).bool(message.dryRun);
@@ -466,12 +467,11 @@ exports.GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceRespo
 class SendSchemaRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.SendSchemaRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => sp_common_4.Audience },
-            { no: 2, name: "schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "schema", kind: "message", T: () => sp_common_3.Schema }
         ]);
     }
     create(value) {
-        const message = { schema: new Uint8Array(0) };
+        const message = {};
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -482,11 +482,8 @@ class SendSchemaRequest$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = sp_common_4.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                case /* bytes schema */ 2:
-                    message.schema = reader.bytes();
+                case /* protos.Schema schema */ 1:
+                    message.schema = sp_common_3.Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -500,12 +497,9 @@ class SendSchemaRequest$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            sp_common_4.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* bytes schema = 2; */
-        if (message.schema.length)
-            writer.tag(2, runtime_1.WireType.LengthDelimited).bytes(message.schema);
+        /* protos.Schema schema = 1; */
+        if (message.schema)
+            sp_common_3.Schema.internalBinaryWrite(message.schema, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

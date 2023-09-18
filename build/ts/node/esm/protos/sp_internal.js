@@ -9,6 +9,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
 import { ClientInfo } from "./sp_info.js";
 import { Metric } from "./sp_common.js";
@@ -463,12 +464,11 @@ export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByService
 class SendSchemaRequest$Type extends MessageType {
     constructor() {
         super("protos.SendSchemaRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience },
-            { no: 2, name: "schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "schema", kind: "message", T: () => Schema }
         ]);
     }
     create(value) {
-        const message = { schema: new Uint8Array(0) };
+        const message = {};
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -479,11 +479,8 @@ class SendSchemaRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                case /* bytes schema */ 2:
-                    message.schema = reader.bytes();
+                case /* protos.Schema schema */ 1:
+                    message.schema = Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -497,12 +494,9 @@ class SendSchemaRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* bytes schema = 2; */
-        if (message.schema.length)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.schema);
+        /* protos.Schema schema = 1; */
+        if (message.schema)
+            Schema.internalBinaryWrite(message.schema, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

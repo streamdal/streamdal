@@ -174,6 +174,19 @@ export interface AudienceRate {
     processed: string;
 }
 /**
+ * @generated from protobuf message protos.Schema
+ */
+export interface Schema {
+    /**
+     * @generated from protobuf field: bytes json_schema = 1;
+     */
+    jsonSchema: Uint8Array;
+    /**
+     * @generated from protobuf field: int32 _version = 100;
+     */
+    Version: number;
+}
+/**
  * Common status codes used in gRPC method responses
  *
  * @generated from protobuf enum protos.ResponseCode
@@ -320,4 +333,14 @@ declare class AudienceRate$Type extends MessageType<AudienceRate> {
  * @generated MessageType for protobuf message protos.AudienceRate
  */
 export declare const AudienceRate: AudienceRate$Type;
+declare class Schema$Type extends MessageType<Schema> {
+    constructor();
+    create(value?: PartialMessage<Schema>): Schema;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Schema): Schema;
+    internalBinaryWrite(message: Schema, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.Schema
+ */
+export declare const Schema: Schema$Type;
 export {};

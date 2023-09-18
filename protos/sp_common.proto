@@ -102,3 +102,9 @@ message AudienceRate {
   int64 bytes = 1;
   int64 processed = 2;
 }
+
+message Schema {
+  bytes json_schema = 1;
+
+  int32 _version = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}

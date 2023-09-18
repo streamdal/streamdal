@@ -5,6 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common";
 import { Command } from "./sp_command";
 import { ClientInfo } from "./sp_info";
 import { Metric } from "./sp_common";
@@ -153,13 +154,9 @@ export interface GetAttachCommandsByServiceResponse {
  */
 export interface SendSchemaRequest {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: protos.Schema schema = 1;
      */
-    audience?: Audience;
-    /**
-     * @generated from protobuf field: bytes schema = 2;
-     */
-    schema: Uint8Array;
+    schema?: Schema;
 }
 declare class NewAudienceRequest$Type extends MessageType<NewAudienceRequest> {
     constructor();

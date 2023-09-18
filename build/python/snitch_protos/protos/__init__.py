@@ -207,6 +207,12 @@ class AudienceRate(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class Schema(betterproto.Message):
+    json_schema: bytes = betterproto.bytes_field(1)
+    version: int = betterproto.int32_field(100)
+
+
+@dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):
     """
     Pipeline is a structure that holds one or more pipeline steps. This
@@ -825,8 +831,7 @@ class GetAttachCommandsByServiceResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class SendSchemaRequest(betterproto.Message):
-    audience: "Audience" = betterproto.message_field(1)
-    schema: bytes = betterproto.bytes_field(2)
+    schema: "Schema" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

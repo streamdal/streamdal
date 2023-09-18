@@ -107,6 +107,5 @@ message GetAttachCommandsByServiceResponse {
 }
 
 message SendSchemaRequest {
-  Audience audience = 1;
-  bytes schema = 2;
+  Schema schema = 1;
 }
