@@ -26,18 +26,18 @@ class TestSnitchRegisterMethods:
             operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
         aud_str = SnitchClient._aud_to_str(aud)
         self.client.paused_pipelines[aud_str] = {}
         self.client.paused_pipelines[aud_str][pipeline_id] = protos.Command
 
-        assert self.client._is_paused(aud, uuid.uuid4().__str__()) is False
+        assert self.client._is_paused(aud, str(uuid.uuid4())) is False
         assert self.client._is_paused(aud, pipeline_id) is True
 
     def test_attach_pipeline(self):
         """Test set_pipeline adds a pipeline to the pipelines dict"""
 
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
 
         cmd = protos.Command(
             audience=protos.Audience(
@@ -58,7 +58,7 @@ class TestSnitchRegisterMethods:
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
     def test_pop_pipeline(self):
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
 
         cmd = protos.Command(
             audience=protos.Audience(
@@ -80,7 +80,7 @@ class TestSnitchRegisterMethods:
         assert pipeline.attach_pipeline.pipeline.id == pipeline_id
 
     def test_pause_resume_pipeline(self):
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
 
         cmd = protos.Command(
             audience=protos.Audience(
@@ -108,7 +108,7 @@ class TestSnitchRegisterMethods:
             ),
         )
 
-        with pytest.raises(ValueError, match="Command is None"):
+        with pytest.raises(ValueError, match="cmd must be a protos.Command"):
             self.client._pause_pipeline(None)
 
         res = self.client._pause_pipeline(pause_cmd)
@@ -131,7 +131,7 @@ class TestSnitchRegisterMethods:
             ),
         )
 
-        with pytest.raises(ValueError, match="Command is None"):
+        with pytest.raises(ValueError, match="cmd must be a protos.Command"):
             self.client._resume_pipeline(None)
 
         res = self.client._resume_pipeline(resume_cmd)
@@ -144,7 +144,7 @@ class TestSnitchRegisterMethods:
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
     def test_detach_pipeline(self):
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
 
         cmd = protos.Command(
             audience=protos.Audience(
@@ -174,7 +174,7 @@ class TestSnitchRegisterMethods:
             ),
         )
 
-        with pytest.raises(ValueError, match="Command is None"):
+        with pytest.raises(ValueError, match="cmd must be a protos.Command"):
             self.client._detach_pipeline(None)
 
         res = self.client._detach_pipeline(delete_cmd)
@@ -183,7 +183,7 @@ class TestSnitchRegisterMethods:
         assert len(self.client.paused_pipelines) == 0
 
     def test_get_pipelines(self):
-        pipeline_id = uuid.uuid4().__str__()
+        pipeline_id = str(uuid.uuid4())
 
         cmd = protos.Command(
             audience=protos.Audience(

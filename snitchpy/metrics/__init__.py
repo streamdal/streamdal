@@ -20,6 +20,13 @@ COUNTER_PRODUCE_PROCESSED = "counter_produce_processed"
 COUNTER_PRODUCE_ERRORS = "counter_produce_errors"
 COUNTER_NOTIFY = "counter_notify"
 
+COUNTER_DROPPED_TAIL_MESSAGES = "counter_dropped_tail_messages"
+
+COUNTER_CONSUME_BYTES_RATE = "counter_consume_bytes_rate"
+COUNTER_PRODUCE_BYTES_RATE = "counter_produce_bytes_rate"
+COUNTER_CONSUME_PROCESSED_RATE = "counter_consume_processed_rate"
+COUNTER_PRODUCE_PROCESSED_RATE = "counter_produce_processed_rate"
+
 
 @dataclass
 class CounterEntry:
@@ -31,6 +38,7 @@ class CounterEntry:
     """
 
     name: str
+    aud: protos.Audience
     labels: dict = field(default_factory=dict)
     value: float = 0.0
 
@@ -176,7 +184,12 @@ class Metrics:
 
         req = protos.MetricsRequest()
         req.metrics = [
-            protos.Metric(name=entry.name, value=entry.value, labels=entry.labels)
+            protos.Metric(
+                name=entry.name,
+                value=entry.value,
+                labels=entry.labels,
+                audience=entry.aud,
+            )
         ]
 
         self.loop.create_task(call(req))

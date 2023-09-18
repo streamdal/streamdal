@@ -3,6 +3,7 @@
 
 [![Master build status](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/test_coverage)](https://codeclimate.com/github/streamdal/snitch-python-client/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/maintainability)](https://codeclimate.com/github/streamdal/snitch-python-client/maintainability)
 
 snitchpy is the python client SDK for Streamdal's open source Snitch server https://github.com/streamdal/snitch
 

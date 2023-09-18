@@ -31,6 +31,7 @@ class TestMetrics:
             name="test",
             labels={"test": "test", "id": "some-uuid", "unit": "bytes"},
             value=0.0,
+            aud=protos.Audience(),
         )
         assert composite_id(entry) == "test-test-some-uuid-bytes"
 
@@ -38,6 +39,7 @@ class TestMetrics:
         entry = CounterEntry(
             name="test",
             labels={},
+            aud=protos.Audience(),
         )
 
         self.metrics.new_counter(entry)
@@ -52,6 +54,7 @@ class TestMetrics:
         entry = CounterEntry(
             name="test",
             labels={},
+            aud=protos.Audience(),
         )
 
         c = self.metrics.new_counter(entry)
@@ -63,6 +66,7 @@ class TestMetrics:
         entry = CounterEntry(
             name="test",
             labels={},
+            aud=protos.Audience(),
         )
 
         counter = self.metrics.new_counter(entry)
@@ -83,7 +87,9 @@ class TestMetrics:
         )
         worker.start()
 
-        entry = CounterEntry(name="test", labels={"type": "bytes"}, value=3.0)
+        entry = CounterEntry(
+            name="test", labels={"type": "bytes"}, value=3.0, aud=protos.Audience()
+        )
 
         self.metrics.incr(entry=entry)
 
@@ -94,6 +100,7 @@ class TestMetrics:
             CounterEntry(
                 name="test",
                 labels={"type": "bytes"},
+                aud=protos.Audience(),
             )
         )
 
@@ -121,7 +128,7 @@ class TestMetrics:
 
     def test_run_publisher(self):
         counter = Counter(
-            entry=CounterEntry(name="test", labels={}),
+            entry=CounterEntry(name="test", labels={}, aud=protos.Audience()),
         )
         counter.incr(1.0)
         self.metrics.counters = {"test-test": counter}

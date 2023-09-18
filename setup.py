@@ -15,7 +15,7 @@ setup(
     author="Streamdal.com",
     author_email="engineering@streamdal.com",
     license="MIT",
-    packages=["snitchpy", "snitchpy.metrics"],
+    packages=["snitchpy", "snitchpy.metrics", "snitchpy.validation", "snitchpy.tail"],
     install_requires=[""],
     python_requires=">=3.8",
     classifiers=[
