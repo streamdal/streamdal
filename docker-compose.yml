@@ -4,7 +4,7 @@ services:
   web:
     build: .
     container_name: snitch-console-container
-    image: streamdal/snitch-console:v0.1.20
+    image: streamdal/snitch-console:latest
     environment:
       - SNITCH_GRPC_WEB_URL=http://host.docker.internal:9091
       - SNITCH_GRPC_AUTH_TOKEN="1234"
