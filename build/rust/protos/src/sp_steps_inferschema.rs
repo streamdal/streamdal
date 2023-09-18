@@ -25,6 +25,9 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_2_0;
 
+///  InferSchemaStep is a step that infers the schema of a payload.
+///  It is designed to be used directly by the SDK rather than in a pipeline, so that
+///  we can support schema inference without the need for pipelines to be created
 #[derive(PartialEq,Clone,Default,Debug)]
 // @@protoc_insertion_point(message:protos.steps.InferSchemaStep)
 pub struct InferSchemaStep {
@@ -150,13 +153,18 @@ impl ::protobuf::reflect::ProtobufValue for InferSchemaStep {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x20steps/sp_steps_inferschema.proto\x12\x0cprotos.steps\"8\n\x0fInfer\
     SchemaStep\x12%\n\x0ecurrent_schema\x18\x01\x20\x01(\x0cR\rcurrentSchema\
-    B:Z8github.com/streamdal/snitch-protos/build/go/protos/stepsJ\x80\x01\n\
-    \x06\x12\x04\0\0\t\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    B:Z8github.com/streamdal/snitch-protos/build/go/protos/stepsJ\xe4\x02\n\
+    \x06\x12\x04\0\0\x0b\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
     \x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0O\n\t\n\x02\x08\x0b\x12\
-    \x03\x04\0O\n\n\n\x02\x04\0\x12\x04\x07\0\t\x01\n\n\n\x03\x04\0\x01\x12\
-    \x03\x07\x08\x17\n\x0b\n\x04\x04\0\x02\0\x12\x03\x08\x02\x1b\n\x0c\n\x05\
-    \x04\0\x02\0\x05\x12\x03\x08\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
-    \x08\x08\x16\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x08\x19\x1ab\x06proto3\
+    \x03\x04\0O\n\xed\x01\n\x02\x04\0\x12\x04\t\0\x0b\x01\x1a\xe0\x01\x20Inf\
+    erSchemaStep\x20is\x20a\x20step\x20that\x20infers\x20the\x20schema\x20of\
+    \x20a\x20payload.\n\x20It\x20is\x20designed\x20to\x20be\x20used\x20direc\
+    tly\x20by\x20the\x20SDK\x20rather\x20than\x20in\x20a\x20pipeline,\x20so\
+    \x20that\n\x20we\x20can\x20support\x20schema\x20inference\x20without\x20\
+    the\x20need\x20for\x20pipelines\x20to\x20be\x20created\n\n\n\n\x03\x04\0\
+    \x01\x12\x03\t\x08\x17\n\x0b\n\x04\x04\0\x02\0\x12\x03\n\x02\x1b\n\x0c\n\
+    \x05\x04\0\x02\0\x05\x12\x03\n\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\
+    \x03\n\x08\x16\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\n\x19\x1ab\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

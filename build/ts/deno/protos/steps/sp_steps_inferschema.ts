@@ -12,6 +12,10 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
+ * InferSchemaStep is a step that infers the schema of a payload.
+ * It is designed to be used directly by the SDK rather than in a pipeline, so that
+ * we can support schema inference without the need for pipelines to be created
+ *
  * @generated from protobuf message protos.steps.InferSchemaStep
  */
 export interface InferSchemaStep {

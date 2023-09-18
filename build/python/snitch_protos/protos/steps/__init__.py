@@ -232,6 +232,13 @@ class HttpRequestStep(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class InferSchemaStep(betterproto.Message):
+    """
+    InferSchemaStep is a step that infers the schema of a payload. It is
+    designed to be used directly by the SDK rather than in a pipeline, so that
+    we can support schema inference without the need for pipelines to be
+    created
+    """
+
     current_schema: bytes = betterproto.bytes_field(1)
 
 
