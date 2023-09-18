@@ -198,6 +198,18 @@ class GetPipelinesResponse(_message.Message):
     pipelines: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
     def __init__(self, pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ...) -> None: ...
 
+class GetSchemaRequest(_message.Message):
+    __slots__ = ["audience"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+
+class GetSchemaResponse(_message.Message):
+    __slots__ = ["schema"]
+    SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    schema: _sp_common_pb2.Schema
+    def __init__(self, schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
+
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]

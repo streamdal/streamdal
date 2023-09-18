@@ -37,6 +37,9 @@ service Internal {
   rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
 
   rpc SendTail(stream TailResponse) returns (StandardResponse);
+
+  // Used by SDK to send a new schema to the server
+  rpc SendSchema(SendSchemaRequest) returns (StandardResponse);
 }
 
 message NewAudienceRequest {
@@ -101,4 +104,9 @@ message GetAttachCommandsByServiceRequest {
 message GetAttachCommandsByServiceResponse {
   repeated protos.Command active = 1;
   repeated protos.Command paused = 2;
+}
+
+message SendSchemaRequest {
+  Audience audience = 1;
+  Schema schema = 2;
 }

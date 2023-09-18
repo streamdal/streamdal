@@ -9,6 +9,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
 import { ClientInfo } from "./sp_info.js";
 import { Metric } from "./sp_common.js";
@@ -459,6 +460,60 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SendSchemaRequest$Type extends MessageType {
+    constructor() {
+        super("protos.SendSchemaRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "schema", kind: "message", T: () => Schema }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                case /* protos.Schema schema */ 2:
+                    message.schema = Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* protos.Schema schema = 2; */
+        if (message.schema)
+            Schema.internalBinaryWrite(message.schema, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SendSchemaRequest
+ */
+export const SendSchemaRequest = new SendSchemaRequest$Type();
 /**
  * @generated ServiceType for protobuf service protos.Internal
  */
@@ -469,5 +524,6 @@ export const Internal = new ServiceType("protos.Internal", [
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
     { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse },
     { name: "GetAttachCommandsByService", options: {}, I: GetAttachCommandsByServiceRequest, O: GetAttachCommandsByServiceResponse },
-    { name: "SendTail", clientStreaming: true, options: {}, I: TailResponse, O: StandardResponse }
+    { name: "SendTail", clientStreaming: true, options: {}, I: TailResponse, O: StandardResponse },
+    { name: "SendSchema", options: {}, I: SendSchemaRequest, O: StandardResponse }
 ]);

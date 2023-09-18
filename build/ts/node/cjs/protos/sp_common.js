@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AudienceRate = exports.TailResponse = exports.TailRequest = exports.Metric = exports.Audience = exports.StandardResponse = exports.TailRequestType = exports.TailResponseType = exports.OperationType = exports.ResponseCode = void 0;
+exports.Schema = exports.AudienceRate = exports.TailResponse = exports.TailRequest = exports.Metric = exports.Audience = exports.StandardResponse = exports.TailRequestType = exports.TailResponseType = exports.OperationType = exports.ResponseCode = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -571,3 +571,57 @@ class AudienceRate$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.AudienceRate
  */
 exports.AudienceRate = new AudienceRate$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Schema$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.Schema", [
+            { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 100, name: "_version", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { jsonSchema: new Uint8Array(0), Version: 0 };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes json_schema */ 1:
+                    message.jsonSchema = reader.bytes();
+                    break;
+                case /* int32 _version */ 100:
+                    message.Version = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bytes json_schema = 1; */
+        if (message.jsonSchema.length)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.jsonSchema);
+        /* int32 _version = 100; */
+        if (message.Version !== 0)
+            writer.tag(100, runtime_1.WireType.Varint).int32(message.Version);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Schema
+ */
+exports.Schema = new Schema$Type();

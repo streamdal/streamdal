@@ -83,5 +83,14 @@ class InternalClient {
         const method = this.methods[6], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("clientStreaming", this._transport, method, opt);
     }
+    /**
+     * Used by SDK to send a new schema to the server
+     *
+     * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
+     */
+    sendSchema(input, options) {
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
 }
 exports.InternalClient = InternalClient;

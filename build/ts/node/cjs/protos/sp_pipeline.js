@@ -6,6 +6,7 @@ const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_steps_inferschema_1 = require("./steps/sp_steps_inferschema");
 const sp_steps_kv_1 = require("./steps/sp_steps_kv");
 const sp_steps_httprequest_1 = require("./steps/sp_steps_httprequest");
 const sp_steps_custom_1 = require("./steps/sp_steps_custom");
@@ -110,6 +111,7 @@ class PipelineStep$Type extends runtime_5.MessageType {
             { no: 1004, name: "custom", kind: "message", oneof: "step", T: () => sp_steps_custom_1.CustomStep },
             { no: 1005, name: "http_request", kind: "message", oneof: "step", T: () => sp_steps_httprequest_1.HttpRequestStep },
             { no: 1006, name: "kv", kind: "message", oneof: "step", T: () => sp_steps_kv_1.KVStep },
+            { no: 1007, name: "infer_schema", kind: "message", oneof: "step", T: () => sp_steps_inferschema_1.InferSchemaStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
@@ -186,6 +188,12 @@ class PipelineStep$Type extends runtime_5.MessageType {
                         kv: sp_steps_kv_1.KVStep.internalBinaryRead(reader, reader.uint32(), options, message.step.kv)
                     };
                     break;
+                case /* protos.steps.InferSchemaStep infer_schema */ 1007:
+                    message.step = {
+                        oneofKind: "inferSchema",
+                        inferSchema: sp_steps_inferschema_1.InferSchemaStep.internalBinaryRead(reader, reader.uint32(), options, message.step.inferSchema)
+                    };
+                    break;
                 case /* optional string _wasm_id */ 10000:
                     message.WasmId = reader.string();
                     break;
@@ -245,6 +253,9 @@ class PipelineStep$Type extends runtime_5.MessageType {
         /* protos.steps.KVStep kv = 1006; */
         if (message.step.oneofKind === "kv")
             sp_steps_kv_1.KVStep.internalBinaryWrite(message.step.kv, writer.tag(1006, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.steps.InferSchemaStep infer_schema = 1007; */
+        if (message.step.oneofKind === "inferSchema")
+            sp_steps_inferschema_1.InferSchemaStep.internalBinaryWrite(message.step.inferSchema, writer.tag(1007, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* optional string _wasm_id = 10000; */
         if (message.WasmId !== undefined)
             writer.tag(10000, runtime_1.WireType.LengthDelimited).string(message.WasmId);

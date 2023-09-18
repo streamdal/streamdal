@@ -1191,6 +1191,146 @@ impl ::protobuf::reflect::ProtobufValue for AudienceRate {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+#[derive(PartialEq,Clone,Default,Debug)]
+// @@protoc_insertion_point(message:protos.Schema)
+pub struct Schema {
+    // message fields
+    // @@protoc_insertion_point(field:protos.Schema.json_schema)
+    pub json_schema: ::std::vec::Vec<u8>,
+    // @@protoc_insertion_point(field:protos.Schema._version)
+    pub _version: i32,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.Schema.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a Schema {
+    fn default() -> &'a Schema {
+        <Schema as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Schema {
+    pub fn new() -> Schema {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "json_schema",
+            |m: &Schema| { &m.json_schema },
+            |m: &mut Schema| { &mut m.json_schema },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_version",
+            |m: &Schema| { &m._version },
+            |m: &mut Schema| { &mut m._version },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Schema>(
+            "Schema",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for Schema {
+    const NAME: &'static str = "Schema";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.json_schema = is.read_bytes()?;
+                },
+                800 => {
+                    self._version = is.read_int32()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.json_schema.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.json_schema);
+        }
+        if self._version != 0 {
+            my_size += ::protobuf::rt::int32_size(100, self._version);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.json_schema.is_empty() {
+            os.write_bytes(1, &self.json_schema)?;
+        }
+        if self._version != 0 {
+            os.write_int32(100, self._version)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> Schema {
+        Schema::new()
+    }
+
+    fn clear(&mut self) {
+        self.json_schema.clear();
+        self._version = 0;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static Schema {
+        static instance: Schema = Schema {
+            json_schema: ::std::vec::Vec::new(),
+            _version: 0,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for Schema {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("Schema").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for Schema {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Schema {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Common status codes used in gRPC method responses
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.ResponseCode)
@@ -1469,57 +1609,59 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     ataEntryR\x08Metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\
     \x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\
     \x01\"B\n\x0cAudienceRate\x12\x14\n\x05bytes\x18\x01\x20\x01(\x03R\x05by\
-    tes\x12\x1c\n\tprocessed\x18\x02\x20\x01(\x03R\tprocessed*\xc3\x01\n\x0c\
-    ResponseCode\x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\x14\n\x10RESPONS\
-    E_CODE_OK\x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUEST\x10\x02\x12\x1b\
-    \n\x17RESPONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_CODE_INTERNAL_SERV\
-    ER_ERROR\x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC_ERROR\x10\x05*c\n\rO\
-    perationType\x12\x18\n\x14OPERATION_TYPE_UNSET\x10\0\x12\x1b\n\x17OPERAT\
-    ION_TYPE_CONSUMER\x10\x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\x02*n\
-    \n\x10TailResponseType\x12\x1c\n\x18TAIL_RESPONSE_TYPE_UNSET\x10\0\x12\
-    \x1e\n\x1aTAIL_RESPONSE_TYPE_PAYLOAD\x10\x01\x12\x1c\n\x18TAIL_RESPONSE_\
-    TYPE_ERROR\x10\x02*g\n\x0fTailRequestType\x12\x1b\n\x17TAIL_REQUEST_TYPE\
-    _UNSET\x10\0\x12\x1b\n\x17TAIL_REQUEST_TYPE_START\x10\x01\x12\x1a\n\x16T\
-    AIL_REQUEST_TYPE_STOP\x10\x02B4Z2github.com/streamdal/snitch-protos/buil\
-    d/go/protosJ\xa4\x1a\n\x06\x12\x04\0\0g\x01\n\x08\n\x01\x0c\x12\x03\0\0\
-    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\
-    \t\n\x02\x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a\
-    /\x20Common\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\
-    \n\n\x03\x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\
-    \x02\x10\x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20resp\
-    onse\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\
-    \x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\
-    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\
-    \x06\x12\x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\
-    \x12\x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\
-    \x03\x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Co\
-    mmon\x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\
-    \n\n\x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\
-    \x10\x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\
-    \x05\0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\
-    \x11\x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\
-    \x05\x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\
-    \x03\x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\
-    \x12\x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\
-    \x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\
-    \x04\x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\
-    \x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\
-    \x03\x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\
-    \x05\x05\0\x02\x05\x02\x12\x03\x15\x20!\nJ\n\x02\x05\x01\x12\x04\x19\0\
-    \x1d\x01\x1a>\x20Each\x20SDK\x20client\x20is\x20a\x20$service\x20+\x20$c\
-    omponent\x20+\x20$operation_type\n\n\n\n\x03\x05\x01\x01\x12\x03\x19\x05\
-    \x12\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1a\x02\x1b\n\x0c\n\x05\x05\x01\
-    \x02\0\x01\x12\x03\x1a\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x1a\
-    \x19\x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x1b\x02\x1e\n\x0c\n\x05\x05\
-    \x01\x02\x01\x01\x12\x03\x1b\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\
-    \x03\x1b\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\
-    \x05\x05\x01\x02\x02\x01\x12\x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\
-    \x02\x12\x03\x1c\x1c\x1d\n<\n\x02\x04\x01\x12\x04\x20\0-\x01\x1a0\x20Use\
-    d\x20to\x20indicate\x20who\x20a\x20command\x20is\x20intended\x20for\n\n\
-    \n\n\x03\x04\x01\x01\x12\x03\x20\x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\
+    tes\x12\x1c\n\tprocessed\x18\x02\x20\x01(\x03R\tprocessed\"D\n\x06Schema\
+    \x12\x1f\n\x0bjson_schema\x18\x01\x20\x01(\x0cR\njsonSchema\x12\x19\n\
+    \x08_version\x18d\x20\x01(\x05R\x07Version*\xc3\x01\n\x0cResponseCode\
+    \x12\x17\n\x13RESPONSE_CODE_UNSET\x10\0\x12\x14\n\x10RESPONSE_CODE_OK\
+    \x10\x01\x12\x1d\n\x19RESPONSE_CODE_BAD_REQUEST\x10\x02\x12\x1b\n\x17RES\
+    PONSE_CODE_NOT_FOUND\x10\x03\x12'\n#RESPONSE_CODE_INTERNAL_SERVER_ERROR\
+    \x10\x04\x12\x1f\n\x1bRESPONSE_CODE_GENERIC_ERROR\x10\x05*c\n\rOperation\
+    Type\x12\x18\n\x14OPERATION_TYPE_UNSET\x10\0\x12\x1b\n\x17OPERATION_TYPE\
+    _CONSUMER\x10\x01\x12\x1b\n\x17OPERATION_TYPE_PRODUCER\x10\x02*n\n\x10Ta\
+    ilResponseType\x12\x1c\n\x18TAIL_RESPONSE_TYPE_UNSET\x10\0\x12\x1e\n\x1a\
+    TAIL_RESPONSE_TYPE_PAYLOAD\x10\x01\x12\x1c\n\x18TAIL_RESPONSE_TYPE_ERROR\
+    \x10\x02*g\n\x0fTailRequestType\x12\x1b\n\x17TAIL_REQUEST_TYPE_UNSET\x10\
+    \0\x12\x1b\n\x17TAIL_REQUEST_TYPE_START\x10\x01\x12\x1a\n\x16TAIL_REQUES\
+    T_TYPE_STOP\x10\x02B4Z2github.com/streamdal/snitch-protos/build/go/proto\
+    sJ\xe1\x1b\n\x06\x12\x04\0\0m\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
+    \n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\x02\
+    \x08\x0b\x12\x03\x04\0I\n;\n\x02\x04\0\x12\x04\x07\0\x0c\x01\x1a/\x20Com\
+    mon\x20response\x20message\x20for\x20many\x20gRPC\x20methods\n\n\n\n\x03\
+    \x04\0\x01\x12\x03\x07\x08\x18\n8\n\x04\x04\0\x02\0\x12\x03\t\x02\x10\
+    \x1a+\x20Co-relation\x20ID\x20for\x20the\x20request\x20/\x20response\n\n\
+    \x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\
+    \x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\t\x0e\x0f\n\x0b\n\
+    \x04\x04\0\x02\x01\x12\x03\n\x02\x18\n\x0c\n\x05\x04\0\x02\x01\x06\x12\
+    \x03\n\x02\x0e\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\n\x0f\x13\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03\n\x16\x17\n\x0b\n\x04\x04\0\x02\x02\x12\
+    \x03\x0b\x02\x15\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x0b\x02\x08\n\x0c\
+    \n\x05\x04\0\x02\x02\x01\x12\x03\x0b\t\x10\n\x0c\n\x05\x04\0\x02\x02\x03\
+    \x12\x03\x0b\x13\x14\n?\n\x02\x05\0\x12\x04\x0f\0\x16\x01\x1a3\x20Common\
+    \x20status\x20codes\x20used\x20in\x20gRPC\x20method\x20responses\n\n\n\n\
+    \x03\x05\0\x01\x12\x03\x0f\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x10\
+    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x10\x02\x15\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x10\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x11\
+    \x02\x17\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\
+    \x05\0\x02\x01\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
+    \x12\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x1b\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03\x12\x1e\x1f\n\x0b\n\x04\x05\0\x02\x03\x12\
+    \x03\x13\x02\x1e\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x13\x02\x19\n\x0c\
+    \n\x05\x05\0\x02\x03\x02\x12\x03\x13\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\
+    \x12\x03\x14\x02*\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x14\x02%\n\x0c\n\
+    \x05\x05\0\x02\x04\x02\x12\x03\x14()\n\x0b\n\x04\x05\0\x02\x05\x12\x03\
+    \x15\x02\"\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x15\x02\x1d\n\x0c\n\x05\
+    \x05\0\x02\x05\x02\x12\x03\x15\x20!\nJ\n\x02\x05\x01\x12\x04\x19\0\x1d\
+    \x01\x1a>\x20Each\x20SDK\x20client\x20is\x20a\x20$service\x20+\x20$compo\
+    nent\x20+\x20$operation_type\n\n\n\n\x03\x05\x01\x01\x12\x03\x19\x05\x12\
+    \n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1a\x02\x1b\n\x0c\n\x05\x05\x01\x02\0\
+    \x01\x12\x03\x1a\x02\x16\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x1a\x19\
+    \x1a\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x1b\x02\x1e\n\x0c\n\x05\x05\x01\
+    \x02\x01\x01\x12\x03\x1b\x02\x19\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\
+    \x1b\x1c\x1d\n\x0b\n\x04\x05\x01\x02\x02\x12\x03\x1c\x02\x1e\n\x0c\n\x05\
+    \x05\x01\x02\x02\x01\x12\x03\x1c\x02\x19\n\x0c\n\x05\x05\x01\x02\x02\x02\
+    \x12\x03\x1c\x1c\x1d\n<\n\x02\x04\x01\x12\x04\x20\0-\x01\x1a0\x20Used\
+    \x20to\x20indicate\x20who\x20a\x20command\x20is\x20intended\x20for\n\n\n\
+    \n\x03\x04\x01\x01\x12\x03\x20\x08\x10\nm\n\x04\x04\x01\x02\0\x12\x03#\
     \x02\x1a\x1a`\x20Name\x20of\x20the\x20service\x20--\x20let's\x20include\
     \x20the\x20service\x20name\x20on\x20all\x20calls,\x20we\x20can\n\x20opti\
     mize\x20later\x20~DS\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03#\x02\x08\n\
@@ -1616,7 +1758,14 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03e\x10\x11\n\x0b\n\x04\x04\x05\x02\
     \x01\x12\x03f\x02\x16\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03f\x02\x07\n\
     \x0c\n\x05\x04\x05\x02\x01\x01\x12\x03f\x08\x11\n\x0c\n\x05\x04\x05\x02\
-    \x01\x03\x12\x03f\x14\x15b\x06proto3\
+    \x01\x03\x12\x03f\x14\x15\n\n\n\x02\x04\x06\x12\x04i\0m\x01\n\n\n\x03\
+    \x04\x06\x01\x12\x03i\x08\x0e\n\x0b\n\x04\x04\x06\x02\0\x12\x03j\x02\x18\
+    \n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03j\x02\x07\n\x0c\n\x05\x04\x06\x02\
+    \0\x01\x12\x03j\x08\x13\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03j\x16\x17\n\
+    B\n\x04\x04\x06\x02\x01\x12\x03l\x02\x17\"5\x20protolint:disable:this\
+    \x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x06\x02\x01\x05\x12\
+    \x03l\x02\x07\n\x0c\n\x05\x04\x06\x02\x01\x01\x12\x03l\x08\x10\n\x0c\n\
+    \x05\x04\x06\x02\x01\x03\x12\x03l\x13\x16b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1634,13 +1783,14 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(6);
+            let mut messages = ::std::vec::Vec::with_capacity(7);
             messages.push(StandardResponse::generated_message_descriptor_data());
             messages.push(Audience::generated_message_descriptor_data());
             messages.push(Metric::generated_message_descriptor_data());
             messages.push(TailRequest::generated_message_descriptor_data());
             messages.push(TailResponse::generated_message_descriptor_data());
             messages.push(AudienceRate::generated_message_descriptor_data());
+            messages.push(Schema::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(4);
             enums.push(ResponseCode::generated_enum_descriptor_data());
             enums.push(OperationType::generated_enum_descriptor_data());

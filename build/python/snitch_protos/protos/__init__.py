@@ -207,6 +207,12 @@ class AudienceRate(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class Schema(betterproto.Message):
+    json_schema: bytes = betterproto.bytes_field(1)
+    version: int = betterproto.int32_field(100)
+
+
+@dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):
     """
     Pipeline is a structure that holds one or more pipeline steps. This
@@ -255,6 +261,9 @@ class PipelineStep(betterproto.Message):
         1005, group="step"
     )
     kv: "steps.KvStep" = betterproto.message_field(1006, group="step")
+    infer_schema: "steps.InferSchemaStep" = betterproto.message_field(
+        1007, group="step"
+    )
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
@@ -561,6 +570,16 @@ class GetAudienceRatesResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetSchemaRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetSchemaResponse(betterproto.Message):
+    schema: "Schema" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class TestRequest(betterproto.Message):
     input: str = betterproto.string_field(1)
 
@@ -808,6 +827,12 @@ class GetAttachCommandsByServiceRequest(betterproto.Message):
 class GetAttachCommandsByServiceResponse(betterproto.Message):
     active: List["Command"] = betterproto.message_field(1)
     paused: List["Command"] = betterproto.message_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class SendSchemaRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
+    schema: "Schema" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -1298,6 +1323,23 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def get_schema(
+        self,
+        get_schema_request: "GetSchemaRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetSchemaResponse":
+        return await self._unary_unary(
+            "/protos.External/GetSchema",
+            get_schema_request,
+            GetSchemaResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1440,6 +1482,23 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def send_schema(
+        self,
+        send_schema_request: "SendSchemaRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.Internal/SendSchema",
+            send_schema_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
 
 class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
@@ -1551,6 +1610,11 @@ class ExternalBase(ServiceBase):
     ) -> AsyncIterator["GetAudienceRatesResponse"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield GetAudienceRatesResponse()
+
+    async def get_schema(
+        self, get_schema_request: "GetSchemaRequest"
+    ) -> "GetSchemaResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
@@ -1730,6 +1794,13 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_get_schema(
+        self, stream: "grpclib.server.Stream[GetSchemaRequest, GetSchemaResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_schema(request)
+        await stream.send_message(response)
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1871,6 +1942,12 @@ class ExternalBase(ServiceBase):
                 GetAudienceRatesRequest,
                 GetAudienceRatesResponse,
             ),
+            "/protos.External/GetSchema": grpclib.const.Handler(
+                self.__rpc_get_schema,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetSchemaRequest,
+                GetSchemaResponse,
+            ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,
                 grpclib.const.Cardinality.UNARY_UNARY,
@@ -1911,6 +1988,11 @@ class InternalBase(ServiceBase):
 
     async def send_tail(
         self, tail_response_iterator: AsyncIterator["TailResponse"]
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def send_schema(
+        self, send_schema_request: "SendSchemaRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -1967,6 +2049,13 @@ class InternalBase(ServiceBase):
         response = await self.send_tail(request)
         await stream.send_message(response)
 
+    async def __rpc_send_schema(
+        self, stream: "grpclib.server.Stream[SendSchemaRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.send_schema(request)
+        await stream.send_message(response)
+
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
         return {
             "/protos.Internal/Register": grpclib.const.Handler(
@@ -2009,6 +2098,12 @@ class InternalBase(ServiceBase):
                 self.__rpc_send_tail,
                 grpclib.const.Cardinality.STREAM_UNARY,
                 TailResponse,
+                StandardResponse,
+            ),
+            "/protos.Internal/SendSchema": grpclib.const.Handler(
+                self.__rpc_send_schema,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                SendSchemaRequest,
                 StandardResponse,
             ),
         }

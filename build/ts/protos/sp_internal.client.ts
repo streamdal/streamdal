@@ -4,6 +4,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { Internal } from "./sp_internal.js";
+import type { SendSchemaRequest } from "./sp_internal.js";
 import type { TailResponse } from "./sp_common.js";
 import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal.js";
@@ -72,6 +73,12 @@ export interface IInternalClient {
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
+    /**
+     * Used by SDK to send a new schema to the server
+     *
+     * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
+     */
+    sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse>;
 }
 /**
  * @generated from protobuf service protos.Internal
@@ -151,5 +158,14 @@ export class InternalClient implements IInternalClient, ServiceInfo {
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
         const method = this.methods[6], opt = this._transport.mergeOptions(options);
         return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
+    }
+    /**
+     * Used by SDK to send a new schema to the server
+     *
+     * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
+     */
+    sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse> {
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        return stackIntercept<SendSchemaRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
 }

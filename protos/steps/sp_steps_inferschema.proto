@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package protos.steps;
+
+option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
+
+// InferSchemaStep is a step that infers the schema of a payload.
+// It is designed to be used directly by the SDK rather than in a pipeline, so that
+// we can support schema inference without the need for pipelines to be created
+message InferSchemaStep {
+  bytes current_schema = 1;
+}

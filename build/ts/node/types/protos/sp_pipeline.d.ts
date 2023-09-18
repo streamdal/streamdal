@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { InferSchemaStep } from "./steps/sp_steps_inferschema";
 import { KVStep } from "./steps/sp_steps_kv";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest";
 import { CustomStep } from "./steps/sp_steps_custom";
@@ -108,6 +109,12 @@ export interface PipelineStep {
          * @generated from protobuf field: protos.steps.KVStep kv = 1006;
          */
         kv: KVStep;
+    } | {
+        oneofKind: "inferSchema";
+        /**
+         * @generated from protobuf field: protos.steps.InferSchemaStep infer_schema = 1007;
+         */
+        inferSchema: InferSchemaStep;
     } | {
         oneofKind: undefined;
     };

@@ -31,6 +31,18 @@ var HttpRequestMethod;
      * @generated from protobuf enum value: HTTP_REQUEST_METHOD_DELETE = 4;
      */
     HttpRequestMethod[HttpRequestMethod["DELETE"] = 4] = "DELETE";
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_PATCH = 5;
+     */
+    HttpRequestMethod[HttpRequestMethod["PATCH"] = 5] = "PATCH";
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_HEAD = 6;
+     */
+    HttpRequestMethod[HttpRequestMethod["HEAD"] = 6] = "HEAD";
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_METHOD_OPTIONS = 7;
+     */
+    HttpRequestMethod[HttpRequestMethod["OPTIONS"] = 7] = "OPTIONS";
 })(HttpRequestMethod || (exports.HttpRequestMethod = HttpRequestMethod = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class HttpRequest$Type extends runtime_5.MessageType {

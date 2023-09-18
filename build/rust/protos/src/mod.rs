@@ -15,6 +15,7 @@ pub mod sp_steps_decode;
 pub mod sp_steps_detective;
 pub mod sp_steps_encode;
 pub mod sp_steps_httprequest;
+pub mod sp_steps_inferschema;
 pub mod sp_steps_kv;
 pub mod sp_steps_transform;
 pub mod sp_wsm;

@@ -10,6 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
@@ -1409,6 +1410,100 @@ class GetAudienceRatesResponse$Type extends MessageType {
  */
 export const GetAudienceRatesResponse = new GetAudienceRatesResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetSchemaRequest$Type extends MessageType {
+    constructor() {
+        super("protos.GetSchemaRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaRequest
+ */
+export const GetSchemaRequest = new GetSchemaRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetSchemaResponse$Type extends MessageType {
+    constructor() {
+        super("protos.GetSchemaResponse", [
+            { no: 1, name: "schema", kind: "message", T: () => Schema }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Schema schema */ 1:
+                    message.schema = Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.Schema schema = 1; */
+        if (message.schema)
+            Schema.internalBinaryWrite(message.schema, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaResponse
+ */
+export const GetSchemaResponse = new GetSchemaResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType {
     constructor() {
         super("protos.TestRequest", [
@@ -1528,5 +1623,6 @@ export const External = new ServiceType("protos.External", [
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
+    { name: "GetSchema", options: {}, I: GetSchemaRequest, O: GetSchemaResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

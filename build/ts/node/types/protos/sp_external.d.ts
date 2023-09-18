@@ -5,6 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common";
 import { AudienceRate } from "./sp_common";
 import { Metric } from "./sp_common";
 import { NotificationConfig } from "./sp_notify";
@@ -334,6 +335,24 @@ export interface GetAudienceRatesResponse {
     };
 }
 /**
+ * @generated from protobuf message protos.GetSchemaRequest
+ */
+export interface GetSchemaRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+}
+/**
+ * @generated from protobuf message protos.GetSchemaResponse
+ */
+export interface GetSchemaResponse {
+    /**
+     * @generated from protobuf field: protos.Schema schema = 1;
+     */
+    schema?: Schema;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -636,6 +655,26 @@ declare class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRates
  * @generated MessageType for protobuf message protos.GetAudienceRatesResponse
  */
 export declare const GetAudienceRatesResponse: GetAudienceRatesResponse$Type;
+declare class GetSchemaRequest$Type extends MessageType<GetSchemaRequest> {
+    constructor();
+    create(value?: PartialMessage<GetSchemaRequest>): GetSchemaRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSchemaRequest): GetSchemaRequest;
+    internalBinaryWrite(message: GetSchemaRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaRequest
+ */
+export declare const GetSchemaRequest: GetSchemaRequest$Type;
+declare class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
+    constructor();
+    create(value?: PartialMessage<GetSchemaResponse>): GetSchemaResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSchemaResponse): GetSchemaResponse;
+    internalBinaryWrite(message: GetSchemaResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaResponse
+ */
+export declare const GetSchemaResponse: GetSchemaResponse$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
     create(value?: PartialMessage<TestRequest>): TestRequest;

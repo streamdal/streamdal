@@ -74,6 +74,8 @@ service External {
 
   rpc GetAudienceRates(GetAudienceRatesRequest) returns (stream GetAudienceRatesResponse);
 
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -218,6 +220,14 @@ message GetAudienceRatesRequest {
 
 message GetAudienceRatesResponse {
   map<string,AudienceRate> rates = 1; // Key is an audience string
+}
+
+message GetSchemaRequest {
+  protos.Audience audience = 1;
+}
+
+message GetSchemaResponse {
+  Schema schema = 1;
 }
 
 message TestRequest {

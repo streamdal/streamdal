@@ -6,6 +6,8 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.js";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
+import type { GetSchemaResponse } from "./sp_external.js";
+import type { GetSchemaRequest } from "./sp_external.js";
 import type { GetAudienceRatesResponse } from "./sp_external.js";
 import type { GetAudienceRatesRequest } from "./sp_external.js";
 import type { TailResponse } from "./sp_common.js";
@@ -173,6 +175,10 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse>;
+    /**
+     * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
+     */
+    getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
     /**
      * Test method
      *
@@ -384,12 +390,19 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetAudienceRatesRequest, GetAudienceRatesResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
+     */
+    getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse> {
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetSchemaRequest, GetSchemaResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }
