@@ -21,12 +21,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Set version
-        working-directory:
-        run: |
-          npm version --no-git-tag-version --force --allow-same-version ${{ github.event.release.tag_name }} 
-          npm run copy:package
-
       - name: Release to npm
         working-directory: ./build
         run: npm publish --access public

@@ -65,3 +65,10 @@ See `./src/sandbox/index.ts` for an entry point for local dev.
 
 Optionally install and run the [snitch-server](https://github.com/streamdal/snitch-server)
 
+### Releasing
+
+1. `npm version [<newversion> | major | minor | patch]`
+2. git push the generated version tag: `git push origin <tag_name>`
+3. Generate a release from the tag with user-friendly release notes:
+   https://github.com/streamdal/snitch-node-client/releases
+
