@@ -227,7 +227,7 @@ message GetSchemaRequest {
 }
 
 message GetSchemaResponse {
-  bytes schema = 1;
+  Schema schema = 1;
 }
 
 message TestRequest {

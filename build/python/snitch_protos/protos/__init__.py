@@ -576,7 +576,7 @@ class GetSchemaRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetSchemaResponse(betterproto.Message):
-    schema: bytes = betterproto.bytes_field(1)
+    schema: "Schema" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

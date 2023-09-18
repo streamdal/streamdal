@@ -1452,7 +1452,7 @@ type GetSchemaResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Schema []byte `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
+	Schema *Schema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
 }
 
 func (x *GetSchemaResponse) Reset() {
@@ -1487,7 +1487,7 @@ func (*GetSchemaResponse) Descriptor() ([]byte, []int) {
 	return file_sp_external_proto_rawDescGZIP(), []int{29}
 }
 
-func (x *GetSchemaResponse) GetSchema() []byte {
+func (x *GetSchemaResponse) GetSchema() *Schema {
 	if x != nil {
 		return x.Schema
 	}
@@ -1771,10 +1771,11 @@ var file_sp_external_proto_rawDesc = []byte{
 	0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c,
 	0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e,
-	0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x2b, 0x0a, 0x11,
+	0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x3b, 0x0a, 0x11,
 	0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0c, 0x52, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x22, 0x23, 0x0a, 0x0b, 0x54, 0x65, 0x73,
+	0x65, 0x12, 0x26, 0x0a, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d,
+	0x61, 0x52, 0x06, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x22, 0x23, 0x0a, 0x0b, 0x54, 0x65, 0x73,
 	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75,
 	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x22, 0x26,
 	0x0a, 0x0c, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16,
@@ -1953,12 +1954,13 @@ var file_sp_external_proto_goTypes = []interface{}{
 	(*Audience)(nil),                  // 38: protos.Audience
 	(*Pipeline)(nil),                  // 39: protos.Pipeline
 	(*NotificationConfig)(nil),        // 40: protos.NotificationConfig
-	(*PipelineInfo)(nil),              // 41: protos.PipelineInfo
-	(*Metric)(nil),                    // 42: protos.Metric
-	(*AudienceRate)(nil),              // 43: protos.AudienceRate
-	(*TailRequest)(nil),               // 44: protos.TailRequest
-	(*StandardResponse)(nil),          // 45: protos.StandardResponse
-	(*TailResponse)(nil),              // 46: protos.TailResponse
+	(*Schema)(nil),                    // 41: protos.Schema
+	(*PipelineInfo)(nil),              // 42: protos.PipelineInfo
+	(*Metric)(nil),                    // 43: protos.Metric
+	(*AudienceRate)(nil),              // 44: protos.AudienceRate
+	(*TailRequest)(nil),               // 45: protos.TailRequest
+	(*StandardResponse)(nil),          // 46: protos.StandardResponse
+	(*TailResponse)(nil),              // 47: protos.TailResponse
 }
 var file_sp_external_proto_depIdxs = []int32{
 	37, // 0: protos.GetAllResponse.live:type_name -> protos.LiveInfo
@@ -1981,63 +1983,64 @@ var file_sp_external_proto_depIdxs = []int32{
 	35, // 17: protos.GetMetricsResponse.metrics:type_name -> protos.GetMetricsResponse.MetricsEntry
 	36, // 18: protos.GetAudienceRatesResponse.rates:type_name -> protos.GetAudienceRatesResponse.RatesEntry
 	38, // 19: protos.GetSchemaRequest.audience:type_name -> protos.Audience
-	41, // 20: protos.GetAllResponse.PipelinesEntry.value:type_name -> protos.PipelineInfo
-	40, // 21: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
-	42, // 22: protos.GetMetricsResponse.MetricsEntry.value:type_name -> protos.Metric
-	43, // 23: protos.GetAudienceRatesResponse.RatesEntry.value:type_name -> protos.AudienceRate
-	0,  // 24: protos.External.GetAll:input_type -> protos.GetAllRequest
-	0,  // 25: protos.External.GetAllStream:input_type -> protos.GetAllRequest
-	2,  // 26: protos.External.GetPipelines:input_type -> protos.GetPipelinesRequest
-	4,  // 27: protos.External.GetPipeline:input_type -> protos.GetPipelineRequest
-	6,  // 28: protos.External.CreatePipeline:input_type -> protos.CreatePipelineRequest
-	8,  // 29: protos.External.UpdatePipeline:input_type -> protos.UpdatePipelineRequest
-	9,  // 30: protos.External.DeletePipeline:input_type -> protos.DeletePipelineRequest
-	10, // 31: protos.External.AttachPipeline:input_type -> protos.AttachPipelineRequest
-	11, // 32: protos.External.DetachPipeline:input_type -> protos.DetachPipelineRequest
-	12, // 33: protos.External.PausePipeline:input_type -> protos.PausePipelineRequest
-	13, // 34: protos.External.ResumePipeline:input_type -> protos.ResumePipelineRequest
-	14, // 35: protos.External.CreateNotification:input_type -> protos.CreateNotificationRequest
-	15, // 36: protos.External.UpdateNotification:input_type -> protos.UpdateNotificationRequest
-	16, // 37: protos.External.DeleteNotification:input_type -> protos.DeleteNotificationRequest
-	17, // 38: protos.External.GetNotifications:input_type -> protos.GetNotificationsRequest
-	19, // 39: protos.External.GetNotification:input_type -> protos.GetNotificationRequest
-	21, // 40: protos.External.AttachNotification:input_type -> protos.AttachNotificationRequest
-	22, // 41: protos.External.DetachNotification:input_type -> protos.DetachNotificationRequest
-	23, // 42: protos.External.DeleteAudience:input_type -> protos.DeleteAudienceRequest
-	24, // 43: protos.External.GetMetrics:input_type -> protos.GetMetricsRequest
-	44, // 44: protos.External.Tail:input_type -> protos.TailRequest
-	26, // 45: protos.External.GetAudienceRates:input_type -> protos.GetAudienceRatesRequest
-	28, // 46: protos.External.GetSchema:input_type -> protos.GetSchemaRequest
-	30, // 47: protos.External.Test:input_type -> protos.TestRequest
-	1,  // 48: protos.External.GetAll:output_type -> protos.GetAllResponse
-	1,  // 49: protos.External.GetAllStream:output_type -> protos.GetAllResponse
-	3,  // 50: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
-	5,  // 51: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
-	7,  // 52: protos.External.CreatePipeline:output_type -> protos.CreatePipelineResponse
-	45, // 53: protos.External.UpdatePipeline:output_type -> protos.StandardResponse
-	45, // 54: protos.External.DeletePipeline:output_type -> protos.StandardResponse
-	45, // 55: protos.External.AttachPipeline:output_type -> protos.StandardResponse
-	45, // 56: protos.External.DetachPipeline:output_type -> protos.StandardResponse
-	45, // 57: protos.External.PausePipeline:output_type -> protos.StandardResponse
-	45, // 58: protos.External.ResumePipeline:output_type -> protos.StandardResponse
-	45, // 59: protos.External.CreateNotification:output_type -> protos.StandardResponse
-	45, // 60: protos.External.UpdateNotification:output_type -> protos.StandardResponse
-	45, // 61: protos.External.DeleteNotification:output_type -> protos.StandardResponse
-	18, // 62: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
-	20, // 63: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
-	45, // 64: protos.External.AttachNotification:output_type -> protos.StandardResponse
-	45, // 65: protos.External.DetachNotification:output_type -> protos.StandardResponse
-	45, // 66: protos.External.DeleteAudience:output_type -> protos.StandardResponse
-	25, // 67: protos.External.GetMetrics:output_type -> protos.GetMetricsResponse
-	46, // 68: protos.External.Tail:output_type -> protos.TailResponse
-	27, // 69: protos.External.GetAudienceRates:output_type -> protos.GetAudienceRatesResponse
-	29, // 70: protos.External.GetSchema:output_type -> protos.GetSchemaResponse
-	31, // 71: protos.External.Test:output_type -> protos.TestResponse
-	48, // [48:72] is the sub-list for method output_type
-	24, // [24:48] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	41, // 20: protos.GetSchemaResponse.schema:type_name -> protos.Schema
+	42, // 21: protos.GetAllResponse.PipelinesEntry.value:type_name -> protos.PipelineInfo
+	40, // 22: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
+	43, // 23: protos.GetMetricsResponse.MetricsEntry.value:type_name -> protos.Metric
+	44, // 24: protos.GetAudienceRatesResponse.RatesEntry.value:type_name -> protos.AudienceRate
+	0,  // 25: protos.External.GetAll:input_type -> protos.GetAllRequest
+	0,  // 26: protos.External.GetAllStream:input_type -> protos.GetAllRequest
+	2,  // 27: protos.External.GetPipelines:input_type -> protos.GetPipelinesRequest
+	4,  // 28: protos.External.GetPipeline:input_type -> protos.GetPipelineRequest
+	6,  // 29: protos.External.CreatePipeline:input_type -> protos.CreatePipelineRequest
+	8,  // 30: protos.External.UpdatePipeline:input_type -> protos.UpdatePipelineRequest
+	9,  // 31: protos.External.DeletePipeline:input_type -> protos.DeletePipelineRequest
+	10, // 32: protos.External.AttachPipeline:input_type -> protos.AttachPipelineRequest
+	11, // 33: protos.External.DetachPipeline:input_type -> protos.DetachPipelineRequest
+	12, // 34: protos.External.PausePipeline:input_type -> protos.PausePipelineRequest
+	13, // 35: protos.External.ResumePipeline:input_type -> protos.ResumePipelineRequest
+	14, // 36: protos.External.CreateNotification:input_type -> protos.CreateNotificationRequest
+	15, // 37: protos.External.UpdateNotification:input_type -> protos.UpdateNotificationRequest
+	16, // 38: protos.External.DeleteNotification:input_type -> protos.DeleteNotificationRequest
+	17, // 39: protos.External.GetNotifications:input_type -> protos.GetNotificationsRequest
+	19, // 40: protos.External.GetNotification:input_type -> protos.GetNotificationRequest
+	21, // 41: protos.External.AttachNotification:input_type -> protos.AttachNotificationRequest
+	22, // 42: protos.External.DetachNotification:input_type -> protos.DetachNotificationRequest
+	23, // 43: protos.External.DeleteAudience:input_type -> protos.DeleteAudienceRequest
+	24, // 44: protos.External.GetMetrics:input_type -> protos.GetMetricsRequest
+	45, // 45: protos.External.Tail:input_type -> protos.TailRequest
+	26, // 46: protos.External.GetAudienceRates:input_type -> protos.GetAudienceRatesRequest
+	28, // 47: protos.External.GetSchema:input_type -> protos.GetSchemaRequest
+	30, // 48: protos.External.Test:input_type -> protos.TestRequest
+	1,  // 49: protos.External.GetAll:output_type -> protos.GetAllResponse
+	1,  // 50: protos.External.GetAllStream:output_type -> protos.GetAllResponse
+	3,  // 51: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
+	5,  // 52: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
+	7,  // 53: protos.External.CreatePipeline:output_type -> protos.CreatePipelineResponse
+	46, // 54: protos.External.UpdatePipeline:output_type -> protos.StandardResponse
+	46, // 55: protos.External.DeletePipeline:output_type -> protos.StandardResponse
+	46, // 56: protos.External.AttachPipeline:output_type -> protos.StandardResponse
+	46, // 57: protos.External.DetachPipeline:output_type -> protos.StandardResponse
+	46, // 58: protos.External.PausePipeline:output_type -> protos.StandardResponse
+	46, // 59: protos.External.ResumePipeline:output_type -> protos.StandardResponse
+	46, // 60: protos.External.CreateNotification:output_type -> protos.StandardResponse
+	46, // 61: protos.External.UpdateNotification:output_type -> protos.StandardResponse
+	46, // 62: protos.External.DeleteNotification:output_type -> protos.StandardResponse
+	18, // 63: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
+	20, // 64: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
+	46, // 65: protos.External.AttachNotification:output_type -> protos.StandardResponse
+	46, // 66: protos.External.DetachNotification:output_type -> protos.StandardResponse
+	46, // 67: protos.External.DeleteAudience:output_type -> protos.StandardResponse
+	25, // 68: protos.External.GetMetrics:output_type -> protos.GetMetricsResponse
+	47, // 69: protos.External.Tail:output_type -> protos.TailResponse
+	27, // 70: protos.External.GetAudienceRates:output_type -> protos.GetAudienceRatesResponse
+	29, // 71: protos.External.GetSchema:output_type -> protos.GetSchemaResponse
+	31, // 72: protos.External.Test:output_type -> protos.TestResponse
+	49, // [49:73] is the sub-list for method output_type
+	25, // [25:49] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_sp_external_proto_init() }

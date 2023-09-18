@@ -5,6 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common";
 import { AudienceRate } from "./sp_common";
 import { Metric } from "./sp_common";
 import { NotificationConfig } from "./sp_notify";
@@ -347,9 +348,9 @@ export interface GetSchemaRequest {
  */
 export interface GetSchemaResponse {
     /**
-     * @generated from protobuf field: bytes schema = 1;
+     * @generated from protobuf field: protos.Schema schema = 1;
      */
-    schema: Uint8Array;
+    schema?: Schema;
 }
 /**
  * @generated from protobuf message protos.TestRequest

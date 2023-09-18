@@ -207,8 +207,8 @@ class GetSchemaRequest(_message.Message):
 class GetSchemaResponse(_message.Message):
     __slots__ = ["schema"]
     SCHEMA_FIELD_NUMBER: _ClassVar[int]
-    schema: bytes
-    def __init__(self, schema: _Optional[bytes] = ...) -> None: ...
+    schema: _sp_common_pb2.Schema
+    def __init__(self, schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
 
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]

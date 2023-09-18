@@ -15,6 +15,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
@@ -357,9 +358,9 @@ export interface GetSchemaRequest {
  */
 export interface GetSchemaResponse {
     /**
-     * @generated from protobuf field: bytes schema = 1;
+     * @generated from protobuf field: protos.Schema schema = 1;
      */
-    schema: Uint8Array;
+    schema?: Schema;
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -1821,11 +1822,11 @@ export const GetSchemaRequest = new GetSchemaRequest$Type();
 class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
     constructor() {
         super("protos.GetSchemaResponse", [
-            { no: 1, name: "schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "schema", kind: "message", T: () => Schema }
         ]);
     }
     create(value?: PartialMessage<GetSchemaResponse>): GetSchemaResponse {
-        const message = { schema: new Uint8Array(0) };
+        const message = {};
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<GetSchemaResponse>(this, message, value);
@@ -1836,8 +1837,8 @@ class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes schema */ 1:
-                    message.schema = reader.bytes();
+                case /* protos.Schema schema */ 1:
+                    message.schema = Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1851,9 +1852,9 @@ class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
         return message;
     }
     internalBinaryWrite(message: GetSchemaResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes schema = 1; */
-        if (message.schema.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.schema);
+        /* protos.Schema schema = 1; */
+        if (message.schema)
+            Schema.internalBinaryWrite(message.schema, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
