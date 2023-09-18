@@ -1,14 +1,51 @@
 ---
-title: Engineering Concepts Overview
-description: Overview of Snitch engineering concepts
+title: Snitch Engineering Overview
+metaTitle: "Engineering Insights into Snitch"
+description: An overview of the engineering foundations and principles that power Snitch's features.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+## Introduction
 
-import { Notification } from "accessible-astro-components";
+Welcome to the engineering overview of Snitch. Our robust infrastructure, built on advanced protocols and industry standards, ensures a seamless and efficient experience for our users. Dive into the critical components that make Snitch a leader in its domain.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+## Features Deep Dive
+
+### 1. [Snitch Peek](/en/engineering/peek)
+
+**Description**: 
+Snitch Peek is an intuitive real-time monitor allowing users to observe the data flowing through the SDK. This feature proves invaluable when crafting new rules and confirming the expected output, ensuring a consistent and reliable data flow.
+
+**Key Components**:
+- **Real-time Data Monitoring**: View the live stream of data flowing through connected consumers or producers.
+- **gRPC Integration**: This feature utilizes the gRPC protocol for efficient and seamless server-side data streaming to the frontend.
+
+### 2. [Observability](/en/engineering/observability)
+
+**Description**:
+At Snitch's core lies a sophisticated observability system, primarily manifested in its dashboard. The dashboard offers a visual representation of each Snitch service, enlightening users about rulesets, associated consumers and producers, and the topics they operate on.
+
+**Key Components**:
+- **Service Representation**: Each service encapsulates rulesets, consumers, producers, and their respective topics.
+- **Metrics and Insights**: Detailed metrics on message processing and rule execution, vital for performance monitoring and optimization.
+
+### 3. [gRPC Protocol](/en/engineering/grpc)
+
+**Description**:
+Snitch adopts the gRPC protocol for its APIs, prioritizing performance, and efficiency over traditional protocols like HTTP. gRPC facilitates bi-directional streaming, smaller binary payloads, and service-to-service communication, making it an apt choice for Snitch's data-rich environment.
+
+### 4. [Metrics](/en/engineering/metrics)
+
+**Description**:
+Metrics offer a quantitative lens into Snitch's operations. Snitch utilizes the Prometheus metrics format, ensuring a standardized and detailed insight into system behaviors.
+
+**Key Components**:
+- **Prometheus Metrics Format**: A self-descriptive, standardized format providing multi-dimensional data.
+- **Rule Insights**: Through metrics like `snitch_dataqual_rule`, users gain insights into the throughput of specific rules.
+- **Operational Awareness**: Comprehensive metrics provide a clear picture of system performance, potential bottlenecks, and overall health.
+
+## Conclusion
+
+Snitch's engineering foundation is a testament to its commitment to reliability, efficiency, and scalability. By adopting advanced protocols, ensuring robust observability, and providing detailed metrics, Snitch stands at the forefront of its domain, ready to cater to the dynamic needs of its users.
+
+Explore each section to dive deeper into the intricacies of Snitch's engineering marvels.

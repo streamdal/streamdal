@@ -1,14 +1,38 @@
 ---
-title: Tail
-description: Using Snitch-tail
+title: real-time Data Monitoring
+metaTitle: "Explore Real-time Data Flows with Snitch Peek"
+description: Dive deep into your data in real-time using Snitch Tail's intuitive interface.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+## Introducing Snitch Peek
 
-import { Notification } from "accessible-astro-components";
+Snitch Peek is a practical tool integrated into the Snitch console, designed to grant you immediate observability into the real-time flow of data through the SDK. This feature proves invaluable, especially when you're in the process of formulating new rules or validating expected outputs. By allowing you to monitor any actively connected consumer or producer, Snitch Peek ensures you have a clear understanding of your message flows, enabling you to refine your configurations with confidence.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+### How Does it Work?
+
+Here's a step-by-step walkthrough of the user experience:
+
+1. **Starting the Tail**:
+    - Locate the “three dots” on the console and click on them to reveal a context menu.
+    - You'll notice the “Tail” link in the context menu; go ahead and click it.
+    - An L modal will pop up, presenting a non-editable large text box. Initially, it will display “Tail initializing...” 
+
+2. **Observing the Data**:
+    - Once the tail starts, you will witness new data streaming into the console.
+    - The display prioritizes recent data, maintaining a buffer of 1,000 messages or more for your convenience.
+    - Each message is presented in a format that highlights its timestamp and content. For clarity and depth, the content might be segmented into multiple fields, often resembling structured data like JSON.
+    - Each entry you observe is timestamped, allowing you to track the flow of data chronologically.
+
+3. **Ending the Session**:
+    - You can end the tailing session whenever you wish. Once the session is closed, the real-time data monitoring will cease.
+
+### Under the Hood
+
+For those curious about what powers this feature:
+
+- The front-end of the Snitch console initiates a special request to the backend whenever you decide to start a tail session.
+- This request indicates the backend to start streaming data to the front-end.
+- The server then continuously feeds data to the front-end, ensuring you see real-time information. The data stream continues until you decide to close the session or the session ends due to other factors.
+
+By combining an intuitive interface with robust backend mechanisms, Snitch Tail ensures you have a seamless experience, helping you keep a pulse on your data as it flows.
