@@ -208,12 +208,19 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
+     */
+    getSchema(input, options) {
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
 }

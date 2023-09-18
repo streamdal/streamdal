@@ -2,6 +2,8 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external";
 import type { TestRequest } from "./sp_external";
+import type { GetSchemaResponse } from "./sp_external";
+import type { GetSchemaRequest } from "./sp_external";
 import type { GetAudienceRatesResponse } from "./sp_external";
 import type { GetAudienceRatesRequest } from "./sp_external";
 import type { TailResponse } from "./sp_common";
@@ -169,6 +171,10 @@ export interface IExternalClient {
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse>;
     /**
+     * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
+     */
+    getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
@@ -314,6 +320,10 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse>;
+    /**
+     * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
+     */
+    getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
     /**
      * Test method
      *

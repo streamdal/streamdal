@@ -344,6 +344,24 @@ export interface GetAudienceRatesResponse {
     }; // Key is an audience string
 }
 /**
+ * @generated from protobuf message protos.GetSchemaRequest
+ */
+export interface GetSchemaRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+}
+/**
+ * @generated from protobuf message protos.GetSchemaResponse
+ */
+export interface GetSchemaResponse {
+    /**
+     * @generated from protobuf field: bytes schema = 1;
+     */
+    schema: Uint8Array;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -1753,6 +1771,100 @@ class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse
  */
 export const GetAudienceRatesResponse = new GetAudienceRatesResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetSchemaRequest$Type extends MessageType<GetSchemaRequest> {
+    constructor() {
+        super("protos.GetSchemaRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value?: PartialMessage<GetSchemaRequest>): GetSchemaRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetSchemaRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSchemaRequest): GetSchemaRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetSchemaRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaRequest
+ */
+export const GetSchemaRequest = new GetSchemaRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
+    constructor() {
+        super("protos.GetSchemaResponse", [
+            { no: 1, name: "schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetSchemaResponse>): GetSchemaResponse {
+        const message = { schema: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetSchemaResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSchemaResponse): GetSchemaResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes schema */ 1:
+                    message.schema = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetSchemaResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes schema = 1; */
+        if (message.schema.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.schema);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSchemaResponse
+ */
+export const GetSchemaResponse = new GetSchemaResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -1872,5 +1984,6 @@ export const External = new ServiceType("protos.External", [
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
+    { name: "GetSchema", options: {}, I: GetSchemaRequest, O: GetSchemaResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

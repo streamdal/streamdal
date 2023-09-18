@@ -69,6 +69,8 @@ export interface IInternalClient {
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
     /**
+     * Used by SDK to send a new schema to the server
+     *
      * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
      */
     sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse>;
@@ -134,6 +136,8 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse>;
     /**
+     * Used by SDK to send a new schema to the server
+     *
      * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
      */
     sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse>;

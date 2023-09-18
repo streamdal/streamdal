@@ -44,6 +44,7 @@ type InternalClient interface {
 	// This is needed because Register() is async
 	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(ctx context.Context, opts ...grpc.CallOption) (Internal_SendTailClient, error)
+	// Used by SDK to send a new schema to the server
 	SendSchema(ctx context.Context, in *SendSchemaRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
@@ -201,6 +202,7 @@ type InternalServer interface {
 	// This is needed because Register() is async
 	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(Internal_SendTailServer) error
+	// Used by SDK to send a new schema to the server
 	SendSchema(context.Context, *SendSchemaRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedInternalServer()
 }

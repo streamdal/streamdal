@@ -564,6 +564,16 @@ class GetAudienceRatesResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetSchemaRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetSchemaResponse(betterproto.Message):
+    schema: bytes = betterproto.bytes_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class TestRequest(betterproto.Message):
     input: str = betterproto.string_field(1)
 
@@ -1307,6 +1317,23 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def get_schema(
+        self,
+        get_schema_request: "GetSchemaRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetSchemaResponse":
+        return await self._unary_unary(
+            "/protos.External/GetSchema",
+            get_schema_request,
+            GetSchemaResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1578,6 +1605,11 @@ class ExternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield GetAudienceRatesResponse()
 
+    async def get_schema(
+        self, get_schema_request: "GetSchemaRequest"
+    ) -> "GetSchemaResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -1756,6 +1788,13 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_get_schema(
+        self, stream: "grpclib.server.Stream[GetSchemaRequest, GetSchemaResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_schema(request)
+        await stream.send_message(response)
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -1896,6 +1935,12 @@ class ExternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_STREAM,
                 GetAudienceRatesRequest,
                 GetAudienceRatesResponse,
+            ),
+            "/protos.External/GetSchema": grpclib.const.Handler(
+                self.__rpc_get_schema,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetSchemaRequest,
+                GetSchemaResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
                 self.__rpc_test,

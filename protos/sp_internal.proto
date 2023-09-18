@@ -38,6 +38,7 @@ service Internal {
 
   rpc SendTail(stream TailResponse) returns (StandardResponse);
 
+  // Used by SDK to send a new schema to the server
   rpc SendSchema(SendSchemaRequest) returns (StandardResponse);
 }
 

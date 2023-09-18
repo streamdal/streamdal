@@ -81,6 +81,8 @@ export class InternalClient {
         return stackIntercept("clientStreaming", this._transport, method, opt);
     }
     /**
+     * Used by SDK to send a new schema to the server
+     *
      * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
      */
     sendSchema(input, options) {
