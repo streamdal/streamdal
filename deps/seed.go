@@ -38,7 +38,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	}
 
 	if err := util.PopulateWASMFields(pipeline1, d.Config.WASMDir); err != nil {
-		return errors.Wrap(err, "unable to populate WASM fields")
+		return errors.Wrap(err, "unable to populate WASM fields on seed (pipeline1)")
 	}
 
 	if err := d.StoreService.CreatePipeline(ctx, pipeline1); err != nil {
@@ -70,7 +70,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	}
 
 	if err := util.PopulateWASMFields(pipeline2, d.Config.WASMDir); err != nil {
-		return errors.Wrap(err, "unable to populate WASM fields")
+		return errors.Wrap(err, "unable to populate WASM fields on seed (pipeline2)")
 	}
 
 	if err := d.StoreService.CreatePipeline(ctx, pipeline2); err != nil {

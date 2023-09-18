@@ -38,7 +38,8 @@ type IServerClient interface {
 }
 
 const (
-	dialTimeout = time.Second * 5
+	maxGRPCMessageRecvSize = 10 * 1024 * 1024 // 10MB
+	dialTimeout            = time.Second * 5
 )
 
 type Client struct {
@@ -47,12 +48,18 @@ type Client struct {
 	Server protos.InternalClient
 }
 
-// New dials a plumber GRPC server and returns IServerClient
-func New(plumberAddress, plumberToken string) (*Client, error) {
+// New dials a snitch GRPC server and returns IServerClient
+func New(snitchAddress, snitchToken string) (*Client, error) {
 	dialCtx, dialCancel := context.WithTimeout(context.Background(), dialTimeout)
 	defer dialCancel()
 
-	conn, err := grpc.DialContext(dialCtx, plumberAddress, grpc.WithInsecure())
+	opts := make([]grpc.DialOption, 0)
+	opts = append(opts,
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxGRPCMessageRecvSize)),
+		grpc.WithInsecure(),
+	)
+
+	conn, err := grpc.DialContext(dialCtx, snitchAddress, opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not dial GRPC server: %s")
 	}
@@ -60,7 +67,7 @@ func New(plumberAddress, plumberToken string) (*Client, error) {
 	return &Client{
 		Conn:   conn,
 		Server: protos.NewInternalClient(conn),
-		Token:  plumberToken,
+		Token:  snitchToken,
 	}, nil
 }
 
@@ -92,9 +99,10 @@ func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) e
 	req := &protos.MetricsRequest{
 		Metrics: []*protos.Metric{
 			{
-				Name:   string(counter.Name),
-				Value:  float64(counter.Value),
-				Labels: labels,
+				Name:     string(counter.Name),
+				Audience: counter.Audience,
+				Value:    float64(counter.Value),
+				Labels:   labels,
 			},
 		},
 	}

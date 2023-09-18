@@ -18,6 +18,7 @@ import (
 	"github.com/streamdal/snitch-server/config"
 	"github.com/streamdal/snitch-server/services/bus"
 	"github.com/streamdal/snitch-server/services/cmd"
+	"github.com/streamdal/snitch-server/services/kv"
 	"github.com/streamdal/snitch-server/services/metrics"
 	"github.com/streamdal/snitch-server/services/notify"
 	"github.com/streamdal/snitch-server/services/pubsub"
@@ -52,6 +53,7 @@ type Options struct {
 	NotifyService   notify.INotifier
 	RedisBackend    *redis.Client
 	PubSubService   pubsub.IPubSub
+	KVService       kv.IKV
 }
 
 func New(o *Options) (*GRPCAPI, error) {
@@ -223,6 +225,14 @@ func validateOptions(o *Options) error {
 
 	if o.PubSubService == nil {
 		return errors.New("options.PubSubService cannot be nil")
+	}
+
+	if o.MetricsService == nil {
+		return errors.New("options.MetricsService cannot be nil")
+	}
+
+	if o.KVService == nil {
+		return errors.New("options.KVService cannot be nil")
 	}
 
 	return nil

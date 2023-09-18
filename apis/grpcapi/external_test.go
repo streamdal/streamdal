@@ -823,6 +823,8 @@ func runServer() {
 		NotifyService:   d.NotifyService,
 		RedisBackend:    d.RedisBackend,
 		PubSubService:   d.PubSubService,
+		MetricsService:  d.MetricsService,
+		KVService:       d.KVService,
 	})
 
 	if err != nil {

@@ -80,6 +80,8 @@ func run(d *deps.Dependencies) error {
 			NotifyService:   d.NotifyService,
 			RedisBackend:    d.RedisBackend,
 			PubSubService:   d.PubSubService,
+			MetricsService:  d.MetricsService,
+			KVService:       d.KVService,
 		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API setup")

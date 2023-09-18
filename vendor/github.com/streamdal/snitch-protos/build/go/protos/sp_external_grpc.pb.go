@@ -63,6 +63,7 @@ type ExternalClient interface {
 	// Returns all metric counters
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
+	GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -333,6 +334,38 @@ func (x *externalTailClient) Recv() (*TailResponse, error) {
 	return m, nil
 }
 
+func (c *externalClient) GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[3], "/protos.External/GetAudienceRates", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &externalGetAudienceRatesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type External_GetAudienceRatesClient interface {
+	Recv() (*GetAudienceRatesResponse, error)
+	grpc.ClientStream
+}
+
+type externalGetAudienceRatesClient struct {
+	grpc.ClientStream
+}
+
+func (x *externalGetAudienceRatesClient) Recv() (*GetAudienceRatesResponse, error) {
+	m := new(GetAudienceRatesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -387,6 +420,7 @@ type ExternalServer interface {
 	// Returns all metric counters
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
 	Tail(*TailRequest, External_TailServer) error
+	GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -458,6 +492,9 @@ func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMe
 }
 func (UnimplementedExternalServer) Tail(*TailRequest, External_TailServer) error {
 	return status.Errorf(codes.Unimplemented, "method Tail not implemented")
+}
+func (UnimplementedExternalServer) GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAudienceRates not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -862,6 +899,27 @@ func (x *externalTailServer) Send(m *TailResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _External_GetAudienceRates_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetAudienceRatesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExternalServer).GetAudienceRates(m, &externalGetAudienceRatesServer{stream})
+}
+
+type External_GetAudienceRatesServer interface {
+	Send(*GetAudienceRatesResponse) error
+	grpc.ServerStream
+}
+
+type externalGetAudienceRatesServer struct {
+	grpc.ServerStream
+}
+
+func (x *externalGetAudienceRatesServer) Send(m *GetAudienceRatesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -978,6 +1036,11 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Tail",
 			Handler:       _External_Tail_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GetAudienceRates",
+			Handler:       _External_GetAudienceRates_Handler,
 			ServerStreams: true,
 		},
 	},

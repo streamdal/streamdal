@@ -83,14 +83,20 @@ var defaultCounters = []*defaultCounter{
 type IMetrics interface {
 	FetchCounters(ctx context.Context) ([]*protos.Metric, error)
 
+	GetAllRateCounters(_ context.Context) map[string]*RateCounter
+
 	HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error
+
+	IncreaseRate(ctx context.Context, t RateCounterType, aud *protos.Audience, value int64)
 }
 
 type Metrics struct {
 	*Config
-	VecCounters    map[string]*prometheus.CounterVec
-	VecCountersMtx *sync.RWMutex
-	log            *logrus.Entry
+	VecCounters     map[string]*prometheus.CounterVec
+	VecCountersMtx  *sync.RWMutex
+	rateCounters    map[string]*RateCounter
+	rateCountersMtx *sync.RWMutex
+	log             *logrus.Entry
 }
 
 type Config struct {
@@ -104,10 +110,12 @@ func New(cfg *Config) (*Metrics, error) {
 	}
 
 	m := &Metrics{
-		Config:         cfg,
-		VecCounters:    make(map[string]*prometheus.CounterVec),
-		VecCountersMtx: &sync.RWMutex{},
-		log:            logrus.WithField("service", "metrics"),
+		Config:          cfg,
+		VecCounters:     make(map[string]*prometheus.CounterVec),
+		VecCountersMtx:  &sync.RWMutex{},
+		rateCounters:    make(map[string]*RateCounter),
+		rateCountersMtx: &sync.RWMutex{},
+		log:             logrus.WithField("service", "metrics"),
 	}
 
 	for _, counter := range defaultCounters {
@@ -183,6 +191,13 @@ func validateConfig(cfg *Config) error {
 
 func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error {
 	for _, metric := range req.Metrics {
+		// Update rate counter
+		if shouldRecordMetric(metric.Name) {
+			m.increaseRate(ctx, metric)
+			return nil
+		}
+
+		// Update increment counter
 		counter := m.getVecCounter(ctx, metric.Name)
 		if counter == nil {
 			return errors.Errorf("unable to find counter: %s", metric.Name)
@@ -197,6 +212,29 @@ func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsR
 	}
 
 	return nil
+}
+
+func (m *Metrics) increaseRate(ctx context.Context, metric *protos.Metric) {
+	// Get counter based on audience. We need to build audience from labels
+
+	counter := m.GetRateCounter(ctx, metric.Audience)
+
+	m.log.Debugf("increasing rate counter '%s' by '%d'", metric.Name, int64(metric.Value))
+
+	switch metric.Name {
+	case "counter_consume_bytes_rate":
+		fallthrough
+	case "counter_produce_bytes_rate":
+		counter.Bytes.Incr(int64(metric.Value))
+	case "counter_consume_processed_rate":
+		fallthrough
+	case "counter_produce_processed_rate":
+		counter.Processed.Incr(int64(metric.Value))
+	}
+}
+
+func shouldRecordMetric(name string) bool {
+	return strings.HasSuffix(name, "_rate")
 }
 
 func (m *Metrics) getVecCounter(_ context.Context, name string) *prometheus.CounterVec {

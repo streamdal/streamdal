@@ -13,6 +13,7 @@ import (
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -157,6 +158,10 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 			mapping, err = wasm.Load("detective", prefix)
 		case *protos.PipelineStep_Transform:
 			mapping, err = wasm.Load("transform", prefix)
+		case *protos.PipelineStep_Kv:
+			mapping, err = wasm.Load("kv", prefix)
+		case *protos.PipelineStep_HttpRequest:
+			mapping, err = wasm.Load("httprequest", prefix)
 		default:
 			return errors.Errorf("unknown pipeline step type: %T", s.Step)
 		}
@@ -232,4 +237,13 @@ func GenerateKVRequest(action shared.KVAction, kvs []*protos.KVObject, overwrite
 		Instructions: instructions,
 		Overwrite:    overwrite,
 	}
+}
+
+func CounterName(name string, labels map[string]string) string {
+	vals := make([]string, 0)
+	for k, v := range labels {
+		vals = append(vals, fmt.Sprintf("%s-%s", k, v))
+	}
+
+	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
 }
