@@ -115,6 +115,12 @@ export const getHoverGroup = (
   highlight: boolean,
 ) => {
   const allDOMEdges = Array.from(document.getElementsByTagName("g"));
+  // document.getElementById(`${a.serviceName}`).classList.add(
+  //   "border-3",
+  // );
+  // document.getElementById(`${a.serviceName}`).classList.add(
+  //   "border-purple-600",
+  // );
   const edgeIds = [
     `${serviceKey(a)}-${groupKey(a)}-edge`,
     `${componentKey(a)}-${groupKey(a)}-edge`,

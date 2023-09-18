@@ -12,6 +12,7 @@ export const validate = <T>(
     const validated = schema.parse(data);
     return { data: validated, errors: null };
   } catch (error: any) {
+    console.error("Parsing error:  ", error);
     const errors = error?.issues?.reduce(
       (o: any, e: ZodIssue) => ({ ...o, [e.path.join(".")]: e.message }),
       {},
@@ -24,8 +25,10 @@ export const updateData = (
   data: any,
   setData: (arg: any) => void,
   keys: (string | number)[],
-  value: string | number,
-) => setData(setValue(data, keys, value));
+  value: string | number | boolean,
+) => {
+  return setData(setValue(data, keys, value));
+};
 
 export const parsePath = (path: string) =>
   path.split(/[\.\[\]'\"]/).filter((p) => p);
@@ -40,7 +43,7 @@ export const resolveValue = (object: any, path: string) =>
 export const setValue = (
   data: any,
   keys: any[],
-  value: string | number,
+  value: string | number | boolean,
 ) => {
   const [key, ...restKeys] = keys;
 

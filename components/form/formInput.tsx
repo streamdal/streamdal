@@ -20,9 +20,9 @@ export const FormInput = ({
   placeHolder,
   inputClass,
   wrapperClass,
+  isNumber,
 }: FormInputProps) => {
   const value = resolveValue(data, name);
-
   return (
     <div class={`flex flex-col my-2 ${wrapperClass}`}>
       {label && (
@@ -41,7 +41,12 @@ export const FormInput = ({
         } ${inputClass}`}
         value={value}
         onChange={(e) =>
-          updateData(data, setData, parsePath(name), e.target.value)}
+          updateData(
+            data,
+            setData,
+            parsePath(name),
+            e.target.value,
+          )}
         placeholder={placeHolder}
         size={value?.length}
       />
