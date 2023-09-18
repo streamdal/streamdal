@@ -1209,6 +1209,8 @@ impl ::protobuf::reflect::ProtobufValue for GetAttachCommandsByServiceResponse {
 // @@protoc_insertion_point(message:protos.SendSchemaRequest)
 pub struct SendSchemaRequest {
     // message fields
+    // @@protoc_insertion_point(field:protos.SendSchemaRequest.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
     // @@protoc_insertion_point(field:protos.SendSchemaRequest.schema)
     pub schema: ::protobuf::MessageField<super::sp_common::Schema>,
     // special fields
@@ -1228,8 +1230,13 @@ impl SendSchemaRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
+            "audience",
+            |m: &SendSchemaRequest| { &m.audience },
+            |m: &mut SendSchemaRequest| { &mut m.audience },
+        ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Schema>(
             "schema",
             |m: &SendSchemaRequest| { &m.schema },
@@ -1254,6 +1261,9 @@ impl ::protobuf::Message for SendSchemaRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                18 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.schema)?;
                 },
                 tag => {
@@ -1268,6 +1278,10 @@ impl ::protobuf::Message for SendSchemaRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
         if let Some(v) = self.schema.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
@@ -1278,8 +1292,11 @@ impl ::protobuf::Message for SendSchemaRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.schema.as_ref() {
+        if let Some(v) = self.audience.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        if let Some(v) = self.schema.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1298,12 +1315,14 @@ impl ::protobuf::Message for SendSchemaRequest {
     }
 
     fn clear(&mut self) {
+        self.audience.clear();
         self.schema.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static SendSchemaRequest {
         static instance: SendSchemaRequest = SendSchemaRequest {
+            audience: ::protobuf::MessageField::none(),
             schema: ::protobuf::MessageField::none(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -1349,11 +1368,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     achCommandsByServiceRequest\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\
     \x0bserviceName\"v\n\"GetAttachCommandsByServiceResponse\x12'\n\x06activ\
     e\x18\x01\x20\x03(\x0b2\x0f.protos.CommandR\x06active\x12'\n\x06paused\
-    \x18\x02\x20\x03(\x0b2\x0f.protos.CommandR\x06paused\";\n\x11SendSchemaR\
-    equest\x12&\n\x06schema\x18\x01\x20\x01(\x0b2\x0e.protos.SchemaR\x06sche\
-    ma2\xb6\x04\n\x08Internal\x126\n\x08Register\x12\x17.protos.RegisterRequ\
-    est\x1a\x0f.protos.Command0\x01\x12C\n\x0bNewAudience\x12\x1a.protos.New\
-    AudienceRequest\x1a\x18.protos.StandardResponse\x12?\n\tHeartbeat\x12\
+    \x18\x02\x20\x03(\x0b2\x0f.protos.CommandR\x06paused\"i\n\x11SendSchemaR\
+    equest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08\
+    audience\x12&\n\x06schema\x18\x02\x20\x01(\x0b2\x0e.protos.SchemaR\x06sc\
+    hema2\xb6\x04\n\x08Internal\x126\n\x08Register\x12\x17.protos.RegisterRe\
+    quest\x1a\x0f.protos.Command0\x01\x12C\n\x0bNewAudience\x12\x1a.protos.N\
+    ewAudienceRequest\x1a\x18.protos.StandardResponse\x12?\n\tHeartbeat\x12\
     \x18.protos.HeartbeatRequest\x1a\x18.protos.StandardResponse\x129\n\x06N\
     otify\x12\x15.protos.NotifyRequest\x1a\x18.protos.StandardResponse\x12;\
     \n\x07Metrics\x12\x16.protos.MetricsRequest\x1a\x18.protos.StandardRespo\
@@ -1362,7 +1382,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     SendTail\x12\x14.protos.TailResponse\x1a\x18.protos.StandardResponse(\
     \x01\x12A\n\nSendSchema\x12\x19.protos.SendSchemaRequest\x1a\x18.protos.\
     StandardResponseB4Z2github.com/streamdal/snitch-protos/build/go/protosJ\
-    \xb5\x1d\n\x06\x12\x04\0\0n\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \xec\x1d\n\x06\x12\x04\0\0o\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
     \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1a\n\t\n\x02\
     \x03\x01\x12\x03\x05\0\x19\n\t\n\x02\x03\x02\x12\x03\x06\0\x17\n\x08\n\
     \x01\x08\x12\x03\x08\0I\n\t\n\x02\x08\x0b\x12\x03\x08\0I\n\n\n\x02\x06\0\
@@ -1487,10 +1507,13 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0c\n\x05\x04\x07\x02\x01\x04\x12\x03i\x02\n\n\x0c\n\x05\x04\x07\x02\
     \x01\x06\x12\x03i\x0b\x19\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03i\x1a\
     \x20\n\x0c\n\x05\x04\x07\x02\x01\x03\x12\x03i#$\n\n\n\x02\x04\x08\x12\
-    \x04l\0n\x01\n\n\n\x03\x04\x08\x01\x12\x03l\x08\x19\n\x0b\n\x04\x04\x08\
-    \x02\0\x12\x03m\x02\x14\n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03m\x02\x08\n\
-    \x0c\n\x05\x04\x08\x02\0\x01\x12\x03m\t\x0f\n\x0c\n\x05\x04\x08\x02\0\
-    \x03\x12\x03m\x12\x13b\x06proto3\
+    \x04l\0o\x01\n\n\n\x03\x04\x08\x01\x12\x03l\x08\x19\n\x0b\n\x04\x04\x08\
+    \x02\0\x12\x03m\x02\x18\n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03m\x02\n\n\
+    \x0c\n\x05\x04\x08\x02\0\x01\x12\x03m\x0b\x13\n\x0c\n\x05\x04\x08\x02\0\
+    \x03\x12\x03m\x16\x17\n\x0b\n\x04\x04\x08\x02\x01\x12\x03n\x02\x14\n\x0c\
+    \n\x05\x04\x08\x02\x01\x06\x12\x03n\x02\x08\n\x0c\n\x05\x04\x08\x02\x01\
+    \x01\x12\x03n\t\x0f\n\x0c\n\x05\x04\x08\x02\x01\x03\x12\x03n\x12\x13b\
+    \x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

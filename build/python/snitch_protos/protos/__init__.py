@@ -831,7 +831,8 @@ class GetAttachCommandsByServiceResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class SendSchemaRequest(betterproto.Message):
-    schema: "Schema" = betterproto.message_field(1)
+    audience: "Audience" = betterproto.message_field(1)
+    schema: "Schema" = betterproto.message_field(2)
 
 
 @dataclass(eq=False, repr=False)

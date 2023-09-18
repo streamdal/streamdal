@@ -154,7 +154,11 @@ export interface GetAttachCommandsByServiceResponse {
  */
 export interface SendSchemaRequest {
     /**
-     * @generated from protobuf field: protos.Schema schema = 1;
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * @generated from protobuf field: protos.Schema schema = 2;
      */
     schema?: Schema;
 }

@@ -464,7 +464,8 @@ export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByService
 class SendSchemaRequest$Type extends MessageType {
     constructor() {
         super("protos.SendSchemaRequest", [
-            { no: 1, name: "schema", kind: "message", T: () => Schema }
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "schema", kind: "message", T: () => Schema }
         ]);
     }
     create(value) {
@@ -479,7 +480,10 @@ class SendSchemaRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Schema schema */ 1:
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                case /* protos.Schema schema */ 2:
                     message.schema = Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
                     break;
                 default:
@@ -494,9 +498,12 @@ class SendSchemaRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Schema schema = 1; */
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* protos.Schema schema = 2; */
         if (message.schema)
-            Schema.internalBinaryWrite(message.schema, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            Schema.internalBinaryWrite(message.schema, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

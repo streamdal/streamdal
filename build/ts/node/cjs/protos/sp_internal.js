@@ -467,7 +467,8 @@ exports.GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceRespo
 class SendSchemaRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.SendSchemaRequest", [
-            { no: 1, name: "schema", kind: "message", T: () => sp_common_3.Schema }
+            { no: 1, name: "audience", kind: "message", T: () => sp_common_5.Audience },
+            { no: 2, name: "schema", kind: "message", T: () => sp_common_3.Schema }
         ]);
     }
     create(value) {
@@ -482,7 +483,10 @@ class SendSchemaRequest$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Schema schema */ 1:
+                case /* protos.Audience audience */ 1:
+                    message.audience = sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                case /* protos.Schema schema */ 2:
                     message.schema = sp_common_3.Schema.internalBinaryRead(reader, reader.uint32(), options, message.schema);
                     break;
                 default:
@@ -497,9 +501,12 @@ class SendSchemaRequest$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Schema schema = 1; */
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            sp_common_5.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.Schema schema = 2; */
         if (message.schema)
-            sp_common_3.Schema.internalBinaryWrite(message.schema, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_common_3.Schema.internalBinaryWrite(message.schema, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
