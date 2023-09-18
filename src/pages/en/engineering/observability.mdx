@@ -1,14 +1,34 @@
 ---
-title: Observability with Snitch
-description: Snitch observability
+title: Snitch Observability
+metaTitle: "Analyzing Data and Rule Execution with the Snitch Dashboard"
+description: Uncover the power of observability in the Snitch dashboard to better understand your services and message flows.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+## Snitch Dashboard: At a Glance
 
-import { Notification } from "accessible-astro-components";
+Snitch's observability is front and center in our intuitive dashboard, providing a comprehensive visual representation of each snitch service. Designed with clarity in mind, it offers a straightforward way to analyze the intricate data flows and configurations, ensuring that you always have a clear snapshot of your service operations.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+### Dissecting a Snitch Service
+
+Each snitch service is crafted with multiple components that help streamline its function:
+
+1. **Rule Sets**: The guiding principles for data transformation and routing. They define how incoming messages are processed, based on specific conditions and actions.
+
+2. **Consumer**: Responsible for pulling messages from a specific source. This could be a queue, topic, or any other data stream. It's the initial touchpoint for incoming data.
+
+3. **Producer**: Takes the transformed message from the consumer, after rulesets have been applied, and sends it to its destination. This could be another queue, database, or any data endpoint.
+
+4. **Topic**: The particular channel or subject where the rulesets are executed on. It serves as a categorization mechanism, ensuring that relevant rulesets are applied to the right sets of data.
+
+### Metrics and Statistics: Uncovering Insights
+
+With each consumer and producer, the dashboard provides valuable metrics about the ongoing operations:
+
+- **Messages Processed**: Gain insights into the volume of data flowing through your services. Understanding the frequency and quantity of message processing can help in capacity planning and performance tuning.
+
+- **Rules Executed**: Understand which rules are frequently triggered and how they're influencing your data transformations. This metric can be particularly useful in refining your rule definitions and ensuring optimal execution.
+
+## Conclusion
+
+The Snitch dashboard is more than just a visual interface; it's a gateway to understanding your services' intricacies and optimizing them for peak performance. With detailed metrics and service breakdowns, Snitch offers the tools you need to drive effective data processing and rule execution.
