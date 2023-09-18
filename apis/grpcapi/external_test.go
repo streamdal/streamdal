@@ -805,7 +805,7 @@ func runServer() {
 		RedisURL:             []string{"localhost:6379"},
 		NATSTLSSkipVerify:    true,
 		NATSNumKVReplicas:    1,
-		SessionTTL:           time.Second * 2, // Override TTL to improve test speed
+		SessionTTL:           time.Second * 5,
 		WASMDir:              "./assets/wasm",
 		AesKey:               genAESKey(),
 	})

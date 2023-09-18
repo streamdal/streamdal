@@ -183,7 +183,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Stop the heartbeat; registration should be removed
 			heartbeatCancel()
 
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 
 			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
 			Expect(err).To(HaveOccurred())
@@ -242,7 +242,7 @@ var _ = Describe("Internal gRPC API", func() {
 			heartbeatCancel()
 
 			// Wait for RedisBackend to TTL the key
-			time.Sleep(4 * time.Second)
+			time.Sleep(7 * time.Second)
 
 			// K/V should be gone
 			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
@@ -379,7 +379,7 @@ var _ = Describe("Internal gRPC API", func() {
 			// Stop heartbeat
 			cancel()
 
-			time.Sleep(2 * time.Second)
+			time.Sleep(7 * time.Second)
 
 			// Audience should no longer be in live bucket
 			_, err = redisClient.Get(
