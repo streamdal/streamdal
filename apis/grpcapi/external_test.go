@@ -802,7 +802,7 @@ func runServer() {
 		AuthToken:            AuthToken,
 		HTTPAPIListenAddress: HTTPAPIAddress,
 		GRPCAPIListenAddress: GRPCAPIAddress,
-		RedisURL:             []string{"localhost:6379"},
+		RedisURL:             "localhost:6379",
 		SessionTTL:           time.Second * 5,
 		WASMDir:              "./assets/wasm",
 		AesKey:               genAESKey(),
