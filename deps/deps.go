@@ -152,9 +152,9 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 	// Redis backend
 	// TODO: config
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     cfg.RedisURL,
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDatabase,
 		Protocol: 3,
 	})
 

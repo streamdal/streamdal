@@ -20,7 +20,7 @@ type Config struct {
 	AuthToken            string           `help:"Authentication token" required:"true" short:"t"`
 	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8080"`
 	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":9090"`
-	RedisURL             []string         `help:"Address for Redis cluster used by snitch-server" default:"localhost:6379"`
+	RedisURL             string           `help:"Address for Redis cluster used by snitch-server" default:"localhost:6379"`
 	RedisDatabase        int              `help:"Redis database number to use" default:"0"`
 	RedisPassword        string           `help:"Redis password" default:""`
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
