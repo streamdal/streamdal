@@ -1,5 +1,11 @@
-import { Command } from "@streamdal/snitch-protos/protos/sp_command";
-import { Audience } from "@streamdal/snitch-protos/protos/sp_common";
+import {
+  Command,
+  TailCommand,
+} from "@streamdal/snitch-protos/protos/sp_command";
+import {
+  Audience,
+  TailRequestType,
+} from "@streamdal/snitch-protos/protos/sp_common";
 import {
   Pipeline,
   PipelineStep,
@@ -9,7 +15,8 @@ import { Configs } from "../snitch.js";
 import { audienceKey, internal } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
-  paused: boolean;
+  tail?: boolean;
+  paused?: boolean;
 };
 
 export type EnhancedStep = PipelineStep & {
@@ -67,6 +74,9 @@ export const processResponse = (response: Command) => {
         false
       );
       break;
+    case "tail":
+      tailPipeline(response.audience, response.command.tail);
+      break;
   }
 };
 
@@ -90,4 +100,14 @@ export const togglePausePipeline = (
   const key = audienceKey(audience);
   const p = internal.pipelines.get(key);
   pipelineId === p?.id && internal.pipelines.set(key, { ...p, paused });
+};
+
+export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
+  const key = audienceKey(audience);
+  const p = internal.pipelines.get(key);
+  request.pipelineId === p?.id &&
+    internal.pipelines.set(key, {
+      ...p,
+      tail: request.type === TailRequestType.START,
+    } as InternalPipeline);
 };

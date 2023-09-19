@@ -3,7 +3,7 @@
   "workspaces": [
     "examples"
   ],
-  "version": "0.0.1",
+  "version": "0.1.4",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
     "snitch",
@@ -46,7 +46,8 @@
     "@grpc/grpc-js": "^1.8.17",
     "@grpc/proto-loader": "^0.7.7",
     "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@streamdal/snitch-protos": "0.0.95",
+    "@protobuf-ts/runtime-rpc": "^2.9.0",
+    "@streamdal/snitch-protos": "0.0.96",
     "@types/rwlock": "^5.0.3",
     "@types/sinon": "^10.0.16",
     "dotenv": "^16.3.1",

@@ -1,8 +1,11 @@
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { GrpcTransport } from "@protobuf-ts/grpc-transport";
+import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   Audience,
   OperationType,
+  StandardResponse,
+  TailResponse,
 } from "@streamdal/snitch-protos/protos/sp_common";
 import {
   IInternalClient,
@@ -33,6 +36,7 @@ export interface SnitchConfigs {
 
 export interface Configs {
   grpcClient: IInternalClient;
+  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   snitchUrl: string;
   snitchToken: string;
   serviceName: string;
@@ -90,6 +94,9 @@ export class Snitch {
 
     this.configs = {
       grpcClient,
+      tailCall: grpcClient.sendTail({
+        meta: { "auth-token": token },
+      }),
       sessionId: uuidv4(),
       snitchUrl: url,
       snitchToken: token,

@@ -1,4 +1,9 @@
+import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import { Command } from "@streamdal/snitch-protos/protos/sp_command";
+import {
+  StandardResponse,
+  TailResponse,
+} from "@streamdal/snitch-protos/protos/sp_common";
 import { InternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
 import { Pipeline } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import sinon from "sinon";
@@ -12,6 +17,10 @@ const testConfigs = {
   grpcClient: {
     getAttachCommandsByService: () => ({ active: [], paused: [] }),
   } as unknown as InternalClient,
+  tailCall: {} as unknown as ClientStreamingCall<
+    TailResponse,
+    StandardResponse
+  >,
   sessionId: uuidv4(),
   snitchUrl: "localhost:9091",
   snitchToken: "1234",

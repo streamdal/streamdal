@@ -1,9 +1,17 @@
+import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
+import {
+  Audience,
+  StandardResponse,
+  TailResponse,
+  TailResponseType,
+} from "@streamdal/snitch-protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
 import {
   PipelineStep,
   PipelineStepCondition,
 } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
+import { v4 as uuidv4 } from "uuid";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";
@@ -27,8 +35,18 @@ export interface PipelinesStatus {
 
 export interface PipelineConfigs {
   grpcClient: IInternalClient;
+  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   snitchToken: string;
+  sessionId: string;
   dryRun: boolean;
+}
+
+export interface TailRequest {
+  configs: PipelineConfigs;
+  audience: Audience;
+  originalData: Uint8Array;
+  newData: Uint8Array;
+  pipeline: InternalPipeline;
 }
 
 //
@@ -40,6 +58,26 @@ const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
     pipelineId: pipeline.id,
     pipelineName: pipeline.name,
   })) as EnhancedStep[];
+
+export const sendTail = ({
+  configs,
+  pipeline,
+  audience,
+  originalData,
+  newData,
+}: TailRequest) => {
+  void configs.tailCall.requests.send(
+    TailResponse.create({
+      type: TailResponseType.PAYLOAD,
+      tailRequestId: uuidv4(),
+      audience,
+      pipelineId: pipeline.id,
+      sessionId: configs.sessionId,
+      originalData,
+      newData,
+    })
+  );
+};
 
 export const processPipeline = async ({
   configs,
@@ -55,6 +93,9 @@ export const processPipeline = async ({
     return { data, error: true, message };
   }
 
+  //
+  // hold for tail
+  const originalData = data;
   const allSteps = mapAllSteps(pipeline);
 
   //
@@ -78,6 +119,15 @@ export const processPipeline = async ({
       break;
     }
   }
+
+  pipeline.tail &&
+    sendTail({
+      configs,
+      pipeline,
+      audience,
+      originalData,
+      newData: pipelineStatus.data,
+    });
 
   //
   // For now top level response status is synonymous with the last step status
