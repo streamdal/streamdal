@@ -33,12 +33,17 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     }
 
     // Serialize request
-    let mut bytes = wasm_request
-        .step
-        .http_request()
-        .request
-        .write_to_bytes()
-        .unwrap();
+    let mut bytes = match wasm_request.step.http_request().request.write_to_bytes() {
+        Ok(bytes) => bytes,
+        Err(e) => {
+            return common::write_response(
+                None,
+                None,
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to serialize request: {}", e.to_string()),
+            );
+        }
+    };
 
     let req_ptr = bytes.as_mut_ptr();
 
