@@ -228,7 +228,6 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	kvService, err := kv.New(&kv.Options{
 		RedisBackend: d.RedisBackend,
-		NumReplicas:  cfg.NATSNumKVReplicas,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new kv service")
