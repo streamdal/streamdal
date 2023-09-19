@@ -46,7 +46,6 @@ type KV struct {
 
 type Options struct {
 	RedisBackend *redis.Client
-	NumReplicas  int
 }
 
 func New(o *Options) (*KV, error) {
@@ -217,10 +216,6 @@ func (k *KV) GetUsage(ctx context.Context) (*Usage, error) {
 func validateOptions(o *Options) error {
 	if o.RedisBackend == nil {
 		return errors.New("options.RedisBackend cannot be nil")
-	}
-
-	if o.NumReplicas == 0 {
-		return errors.New("options.NumReplicas cannot be 0")
 	}
 
 	return nil
