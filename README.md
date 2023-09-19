@@ -19,7 +19,7 @@ it via `brew`. Otherwise, you will have to install Go manually.
 
 To run the `snitch-server` and its dependencies, run: `make run/dev`
 
-To develop the `snitch-server` itself, you'll want to only run the `NATS` and
+To develop the `snitch-server` itself, you'll want to only run the `redis` and
 `envoy` dependencies and run `go run main.go` manually, on-demand.
 
 ## gRPC API Usage
@@ -82,4 +82,4 @@ openssl enc -aes-256-cbc -k secret -P -md sha1 -pbkdf2
 Make sure to run tests via `make test`. This is necessary as we have to set
 certain environment variables for the tests to run properly.
 
-Use `go run main.go --seed-dummy-data` to seed NATS with test data for use with development and hand-testing
+Use `go run main.go --seed-dummy-data` to seed redis with test data for use with development and hand-testing

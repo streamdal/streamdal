@@ -16,14 +16,19 @@ services:
     ports:
       - "8080:8080"
       - "9090:9090"
-    links:
-      - redis
+    networks:
+      - snitch-network
 
   redis:
     container_name: redis
     image: redis:latest
+    command: redis-server --appendonly yes # This enables AOF persistence
+    volumes:
+      - redis-data:/data # Persist redis data to this volume
     ports:
       - "6379:6379"
+    networks:
+      - snitch-network
 
   envoy:
     build:
@@ -33,5 +38,11 @@ services:
     container_name: snitch-envoy
     ports:
       - "9091:9091"
-    links:
-      - snitch-server
+    networks:
+      - snitch-network
+
+volumes:
+  redis-data: # Define the volume for redis data
+
+networks:
+  snitch-network:

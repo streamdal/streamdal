@@ -20,13 +20,9 @@ type Config struct {
 	AuthToken            string           `help:"Authentication token" required:"true" short:"t"`
 	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8080"`
 	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":9090"`
-	RedisURL             []string         `help:"Address for Redis cluster used by snitch-server" default:"localhost:4222"`
-	NATSUseTLS           bool             `help:"Whether to use TLS for redis" default:"false"`
-	NATSTLSSkipVerify    bool             `help:"Whether to skip TLS verification" default:"false"`
-	NATSTLSCertFile      string           `help:"TLS cert file"`
-	NATSTLSKeyFile       string           `help:"TLS key file"`
-	NATSTLSCaFile        string           `help:"TLS ca file"`
-	NATSNumKVReplicas    int              `help:"Number of replicas RedisBackend K/V buckets should use" default:"1"`
+	RedisURL             string           `help:"Address for Redis cluster used by snitch-server" default:"localhost:6379"`
+	RedisDatabase        int              `help:"Redis database number to use" default:"0"`
+	RedisPassword        string           `help:"Redis password" default:""`
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
 	SessionTTL           time.Duration    `help:"TTL for session keys in RedisBackend live K/V bucket" default:"5s"`
 	WASMDir              string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`

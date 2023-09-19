@@ -179,7 +179,7 @@ func (m *Metrics) loadCountersFromStore() error {
 
 func validateConfig(cfg *Config) error {
 	if cfg.RedisBackend == nil {
-		return errors.New("nats backend is required")
+		return errors.New("redis backend is required")
 	}
 
 	if cfg.ShutdownCtx == nil {

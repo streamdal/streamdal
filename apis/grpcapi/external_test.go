@@ -44,10 +44,10 @@ var (
 func init() {
 	var err error
 
-	// Setup nats client
+	// Setup Redis client
 	redisClient, err = newRedisClient()
 	if err != nil {
-		panic("unable to create new nats client: " + err.Error())
+		panic("unable to create new redis client: " + err.Error())
 	}
 
 	// Clear buckets
@@ -611,7 +611,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(detachResp.Message).To(ContainSubstring("detached"))
 			Expect(detachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// There is a 5s sleep before nats key is deleted
+			// There is a 5s sleep before redis key is deleted
 			time.Sleep(time.Second * 7)
 
 			// Key should be gone from snitch_config
@@ -745,7 +745,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR))
 
-			// Verify key still exists in nats
+			// Verify key still exists in redis
 			err = redisClient.Get(context.Background(), audKey).Err()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -778,7 +778,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Verify key has been deleted from nats
+			// Verify key has been deleted from redis
 			err = redisClient.Get(context.Background(), key).Err()
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
@@ -802,9 +802,7 @@ func runServer() {
 		AuthToken:            AuthToken,
 		HTTPAPIListenAddress: HTTPAPIAddress,
 		GRPCAPIListenAddress: GRPCAPIAddress,
-		RedisURL:             []string{"localhost:6379"},
-		NATSTLSSkipVerify:    true,
-		NATSNumKVReplicas:    1,
+		RedisURL:             "localhost:6379",
 		SessionTTL:           time.Second * 5,
 		WASMDir:              "./assets/wasm",
 		AesKey:               genAESKey(),
