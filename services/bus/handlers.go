@@ -494,7 +494,9 @@ func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) erro
 	// Find registered clients
 	// There may be multiple instances connected to the same snitch server instance with
 	// the same pipeline ID and audience
-	live, err := b.options.Store.GetLive(ctx)
+	// This needs to be it's own context since the parent context will be canceled on shutdown and
+	// thus we won't be able to read from redis in order to send out stop commands
+	live, err := b.options.Store.GetLive(context.Background())
 	if err != nil {
 		return errors.Wrap(err, "unable to get live SDK connections")
 	}
