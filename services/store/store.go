@@ -194,7 +194,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
 
-		if err := s.options.RedisBackend.ExpireXX(ctx, k, s.options.SessionTTL).Err(); err != nil {
+		if err := s.options.RedisBackend.Set(ctx, k, []byte(``), s.options.SessionTTL).Err(); err != nil {
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}
@@ -1010,11 +1010,12 @@ func (s *Store) GetActivePipelineUsage(ctx context.Context, pipelineID string) (
 
 func (s *Store) WatchKeys(key string) chan *redis.Message {
 	ps := s.options.RedisBackend.PSubscribe(s.options.ShutdownCtx, "__keyspace@0__:"+key)
-	defer ps.Close()
 
 	keyChan := make(chan *redis.Message, 1)
 
 	go func() {
+		defer ps.Unsubscribe(s.options.ShutdownCtx, "__keyspace@0__:*"+key)
+
 		for {
 			select {
 			case <-s.options.ShutdownCtx.Done():
@@ -1047,6 +1048,15 @@ func (s *Store) WatchKeys(key string) chan *redis.Message {
 				switch action {
 				case "set":
 					keyChan <- m
+				case "expired":
+					// Check if it's for the register key as audiences might drop
+					// off, but that doesn't mean the client disconnected
+					if strings.HasSuffix(key, ":register") {
+						// TTL expired on register key, exiting key watcher, client disconnected
+						s.log.Debugf("register key '%s' expired, exiting WatchKeys()", key)
+						return
+					}
+
 				}
 			}
 		}
