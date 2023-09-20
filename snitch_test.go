@@ -12,11 +12,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-go-client/hostfunc"
 	"github.com/streamdal/snitch-go-client/kv"
@@ -741,6 +742,176 @@ func TestHttpRequest(t *testing.T) {
 
 	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
 		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
+	}
+}
+
+func TestInferSchema(t *testing.T) {
+	wasmResp, err := inferSchema("json-examples/small.json")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+		t.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
+	}
+
+	if !strings.Contains(wasmResp.ExitMsg, "inferred fresh schema") {
+		t.Errorf("expected ExitMsg to contain 'inferred fresh schema', got = %s", wasmResp.ExitMsg)
+	}
+}
+
+func inferSchema(fileName string) (*protos.WASMResponse, error) {
+	wasmData, err := os.ReadFile("src/inferschema.wasm")
+	if err != nil {
+		return nil, err
+	}
+
+	payloadData, err := os.ReadFile(fileName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to load json file")
+	}
+
+	req := &protos.WASMRequest{
+		Step: &protos.PipelineStep{
+			Step: &protos.PipelineStep_InferSchema{
+				InferSchema: &steps.InferSchemaStep{
+					CurrentSchema: nil,
+				},
+			},
+			XWasmId:       stringPtr(uuid.New().String()),
+			XWasmFunction: stringPtr("f"),
+			XWasmBytes:    wasmData,
+		},
+		InputPayload: payloadData,
+	}
+
+	s := &Snitch{
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines:    map[string]map[string]*protos.Command{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+	}
+
+	f, err := s.createFunction(req.Step)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Step.XWasmBytes = nil
+
+	data, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := f.Exec(context.Background(), data)
+	if err != nil {
+		return nil, err
+	}
+
+	wasmResp := &protos.WASMResponse{}
+
+	if err := proto.Unmarshal(res, wasmResp); err != nil {
+		return nil, fmt.Errorf("unable to unmarshal wasm response: %s", err)
+	}
+
+	return wasmResp, nil
+}
+
+func BenchmarkInferSchema_FreshSchema(b *testing.B) {
+	b.Run("small.json", func(b *testing.B) {
+		benchmarkInferSchema("json-examples/small.json", nil, b)
+	})
+
+	b.Run("medium.json", func(b *testing.B) {
+		benchmarkInferSchema("json-examples/medium.json", nil, b)
+	})
+
+	b.Run("large.json", func(b *testing.B) {
+		benchmarkInferSchema("json-examples/large.json", nil, b)
+	})
+}
+
+func BenchmarkInferSchema_MatchExisting(b *testing.B) {
+	// Each test will infer a schema first for the payload and then
+	// use that schema to match the payload again, simulating a never changing schema
+	b.Run("small.json", func(b *testing.B) {
+		wasmResp, _ := inferSchema("json-examples/small.json")
+		benchmarkInferSchema("json-examples/small.json", wasmResp.OutputStep, b)
+	})
+
+	b.Run("medium.json", func(b *testing.B) {
+		wasmResp, _ := inferSchema("json-examples/medium.json")
+		benchmarkInferSchema("json-examples/medium.json", wasmResp.OutputStep, b)
+	})
+
+	b.Run("large.json", func(b *testing.B) {
+		wasmResp, _ := inferSchema("json-examples/large.json")
+		benchmarkInferSchema("json-examples/large.json", wasmResp.OutputStep, b)
+	})
+}
+
+func benchmarkInferSchema(fileName string, currentSchema []byte, b *testing.B) {
+	wasmData, err := os.ReadFile("src/inferschema.wasm")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	payloadData, err := os.ReadFile(fileName)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	req := &protos.WASMRequest{
+		Step: &protos.PipelineStep{
+			Step: &protos.PipelineStep_InferSchema{
+				InferSchema: &steps.InferSchemaStep{
+					CurrentSchema: currentSchema,
+				},
+			},
+			XWasmId:       stringPtr(uuid.New().String()),
+			XWasmFunction: stringPtr("f"),
+			XWasmBytes:    wasmData,
+		},
+		InputPayload: payloadData,
+	}
+
+	s := &Snitch{
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines:    map[string]map[string]*protos.Command{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+	}
+
+	f, err := s.createFunction(req.Step)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	req.Step.XWasmBytes = nil
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		data, err := proto.Marshal(req)
+		if err != nil {
+			b.Fatalf("Unable to marshal WASMRequest: %s", err)
+		}
+
+		res, err := f.Exec(context.Background(), data)
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		wasmResp := &protos.WASMResponse{}
+
+		if err := proto.Unmarshal(res, wasmResp); err != nil {
+			b.Fatal("unable to unmarshal wasm response: " + err.Error())
+		}
+
+		if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+			b.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
+		}
 	}
 }
 
