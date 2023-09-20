@@ -44,6 +44,14 @@ var (
 	ErrConfigNotFound   = errors.New("config not found")
 )
 
+const (
+	// RedisKeyWatchPrefix is the key under which redis publishes key events.
+	// The format is  __keyspace@{$database_number}__
+	// We're always defaulting to db 0, so we can use this prefix to watch for key changes
+	// See https://redis.io/docs/manual/keyspace-notifications/
+	RedisKeyWatchPrefix = "__keyspace@0__:"
+)
+
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
@@ -194,7 +202,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
 
-		if err := s.options.RedisBackend.ExpireXX(ctx, k, s.options.SessionTTL).Err(); err != nil {
+		if err := s.options.RedisBackend.Set(ctx, k, []byte(fmt.Sprintf("%d", time.Now().UTC().UnixNano())), s.options.SessionTTL).Err(); err != nil {
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}
@@ -1009,12 +1017,13 @@ func (s *Store) GetActivePipelineUsage(ctx context.Context, pipelineID string) (
 }
 
 func (s *Store) WatchKeys(key string) chan *redis.Message {
-	ps := s.options.RedisBackend.PSubscribe(s.options.ShutdownCtx, "__keyspace@0__:"+key)
-	defer ps.Close()
+	ps := s.options.RedisBackend.PSubscribe(s.options.ShutdownCtx, RedisKeyWatchPrefix+key)
 
 	keyChan := make(chan *redis.Message, 1)
 
 	go func() {
+		defer ps.Unsubscribe(s.options.ShutdownCtx, RedisKeyWatchPrefix+key)
+
 		for {
 			select {
 			case <-s.options.ShutdownCtx.Done():
@@ -1047,6 +1056,15 @@ func (s *Store) WatchKeys(key string) chan *redis.Message {
 				switch action {
 				case "set":
 					keyChan <- m
+				case "expired":
+					// Check if it's for the register key as audiences might drop
+					// off, but that doesn't mean the client disconnected
+					if strings.HasSuffix(key, ":register") {
+						// TTL expired on register key, exiting key watcher, client disconnected
+						s.log.Debugf("register key '%s' expired, exiting WatchKeys()", key)
+						return
+					}
+
 				}
 			}
 		}
