@@ -147,6 +147,8 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 			// TODO: Display filter modal
 		case types.StepSearch:
 			// TODO: Display search modal
+		case types.StepPause:
+
 		default:
 			c.log.Errorf("unknown step: %s", respAction.Step)
 			return nil, fmt.Errorf("unknown step: %d", respAction.Step)
@@ -174,22 +176,35 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 	i := 0
 
 	dataCh := make(chan string, 1)
+	var paused bool
 
 	// TODO: Getting peek data from snitch-server
 	go func() {
 		for {
+			if paused {
+				i = 0
+				continue
+			}
+
 			dataCh <- fmt.Sprintf("Component '%s': line %d", component, i)
 			time.Sleep(200 * time.Millisecond)
-
 			i++
 		}
 	}()
 
-	// Display peek data in textview + listen to user commands and forward them
-	// back to the caller for handling
+	// Display peek data in textview + listen to user commands and maybe forward
+	// them back to the caller
 	for {
 		select {
 		case cmd := <-actionCh:
+			if cmd.Step == types.StepPause {
+				// Tell peek reader to pause/resume
+				paused = !paused
+
+				// Update the menu pause button
+				c.options.Console.SetPause()
+			}
+
 			return cmd, nil
 		case data := <-dataCh:
 			if _, err := fmt.Fprint(textView, data+"\n"); err != nil {

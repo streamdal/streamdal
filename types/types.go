@@ -7,6 +7,7 @@ const (
 	StepSearch
 	StepPeek
 	StepQuit
+	StepPause
 )
 
 type Step int

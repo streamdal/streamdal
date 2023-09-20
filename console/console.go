@@ -3,6 +3,7 @@ package console
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -15,6 +16,13 @@ import (
 )
 
 const (
+	MenuString = `Q ["Q"][darkcyan]Quit[white][""]  ` +
+		`S ["S"][darkcyan]Select Component[white][""]  ` +
+		`R ["R"][darkcyan]Set Sample Rate[white][""]  ` +
+		`F ["F"][darkcyan]Filter[white][""]  ` +
+		`P ["P"][darkcyan]Pause[white][""]  ` +
+		`/ ["Search"][darkcyan]Search[white][""]`
+
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
 	PrimitiveErrorModal = "error_modal"
@@ -60,6 +68,47 @@ func New(opts *Options) (*Console, error) {
 	return c, nil
 }
 
+func (c *Console) SetPause() {
+	menu := c.menu.GetText(false)
+
+	isPaused := c.isPaused(menu)
+
+	c.log.Infof("current paused state: %v", isPaused)
+
+	var updatedMenu string
+
+	if c.isPaused(menu) {
+		updatedMenu = c.removePause(menu)
+	} else {
+		updatedMenu = c.addPause(menu)
+	}
+
+	c.log.Infof("updated menu: %v", updatedMenu)
+
+	c.menu.Clear()
+	fmt.Fprint(c.menu, updatedMenu)
+
+	c.app.Draw()
+}
+
+func (c *Console) isPaused(menu string) bool {
+	if strings.Contains(menu, "[lightcyan]Pause[-]") {
+		return true
+	}
+
+	return false
+}
+
+func (c *Console) removePause(menu string) string {
+	return strings.Replace(menu, "[lightcyan]Pause[-]", "Pause", -1)
+}
+
+func (c *Console) addPause(menu string) string {
+	return strings.Replace(menu, "Pause", "[lightcyan]Pause[-]", -1)
+}
+
+// DisplayPeek will display peek + write any actions we receive from the user
+// to the action channel; the action channel is read by the peek() method.
 func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tview.TextView {
 	c.Start()
 
@@ -67,7 +116,7 @@ func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tvie
 	pagePeek.SetBorder(true)
 	pagePeek.SetTitle(title)
 
-	c.menu.Highlight("Q", "S", "R", "F", "Search")
+	c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
 
 	c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
@@ -79,6 +128,12 @@ func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tvie
 		if event.Key() == tcell.KeyRune && event.Rune() == 's' {
 			actionCh <- &types.Action{
 				Step: types.StepSelect,
+			}
+		}
+
+		if event.Key() == tcell.KeyRune && event.Rune() == 'p' {
+			actionCh <- &types.Action{
+				Step: types.StepPause,
 			}
 		}
 
@@ -228,8 +283,14 @@ func (c *Console) DisplaySelectList(title string, items []string, output chan<- 
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
-	for _, item := range items {
-		selectComponent = selectComponent.AddItem(item, "N/A", 0, func() {
+	c.log.Infof("items passed to DisplaySelectList: %s", items)
+
+	for i, v := range items {
+		c.log.Infof("adding item (%d): %s", i, v)
+		item := v
+
+		selectComponent.AddItem(v, "Awesome thing", 0, func() {
+			c.log.Infof("selected item (%d): %s", i, item)
 			output <- item
 		})
 	}
@@ -270,7 +331,7 @@ func (c *Console) initializeComponents() error {
 func (c *Console) newMenu() *tview.TextView {
 	menu := tview.NewTextView().SetWrap(false).SetDynamicColors(true)
 
-	fmt.Fprint(menu, `Q ["Q"][darkcyan]Quit[white][""]  S ["S"][darkcyan]Select Component[white][""]  R ["R"][darkcyan]Set Sample Rate[white][""]  F ["F"][darkcyan]Filter[white][""]  / ["Search"][darkcyan]Search[white][""]`)
+	fmt.Fprint(menu, MenuString)
 
 	return menu
 }
