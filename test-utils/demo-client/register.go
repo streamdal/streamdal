@@ -141,8 +141,6 @@ func (r *Register) runClient() error {
 		// Consumer will have input - read input data
 		input := <-r.inputCh
 
-		fmt.Println("component name: ", r.config.Register.ComponentName)
-
 		resp, err := sc.Process(context.Background(), &snitch.ProcessRequest{
 			ComponentName: r.config.Register.ComponentName,
 			OperationType: snitch.OperationType(r.config.Register.OperationType),
