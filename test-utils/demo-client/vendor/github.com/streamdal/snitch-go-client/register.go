@@ -23,7 +23,7 @@ func (s *Snitch) register(looper director.Looper) error {
 		ClientInfo: &protos.ClientInfo{
 			ClientType:     protos.ClientType(s.config.ClientType),
 			LibraryName:    "snitch-go-client",
-			LibraryVersion: "0.0.40", // TODO: Have CI bump this on release
+			LibraryVersion: "0.0.42",
 			Language:       "go",
 			Arch:           runtime.GOARCH,
 			Os:             runtime.GOOS,
@@ -36,12 +36,18 @@ func (s *Snitch) register(looper director.Looper) error {
 		req.Audiences = append(req.Audiences, aud.ToProto())
 	}
 
-	var stream protos.Internal_RegisterClient
-	var err error
-	var quit bool
+	var (
+		stream             protos.Internal_RegisterClient
+		err                error
+		quit               bool
+		initialRegister    = true
+		initialRegisterErr error
+	)
 
+	// This might not error even if the handler returns an err - need to attempt
+	// to perform a recv to verify.
 	srv, err := s.serverClient.Register(s.config.ShutdownCtx, req)
-	if err != nil && !strings.Contains(err.Error(), context.Canceled.Error()) {
+	if err != nil {
 		return errors.Wrap(err, "unable to complete initial registration with snitch server")
 	}
 
@@ -53,6 +59,8 @@ func (s *Snitch) register(looper director.Looper) error {
 			return nil
 		}
 
+		// No way to hit this case for a "first register attempt" because
+		// "stream" won't be nil on initial launch.
 		if stream == nil {
 			s.config.Logger.Debug("stream is nil, attempting to register")
 
@@ -62,6 +70,7 @@ func (s *Snitch) register(looper director.Looper) error {
 					s.config.Logger.Debug("context cancelled during connect")
 					quit = true
 					looper.Quit()
+
 					return nil
 				}
 
@@ -84,6 +93,17 @@ func (s *Snitch) register(looper director.Looper) error {
 		// Blocks until something is received
 		cmd, err := stream.Recv()
 		if err != nil {
+			// This is the first registration attempt and it has failed.
+			// Depending on IgnoreStartupError, we may need to stop the loop
+			// and tell the caller that we failed to complete registration.
+			if initialRegister && !s.config.IgnoreStartupError {
+				initialRegisterErr = err
+				quit = true
+				looper.Quit()
+
+				return nil
+			}
+
 			if err.Error() == "rpc error: code = Canceled desc = context canceled" {
 				s.config.Logger.Errorf("context cancelled during recv: %s", err)
 				quit = true
@@ -107,6 +127,10 @@ func (s *Snitch) register(looper director.Looper) error {
 
 			return nil
 		}
+
+		// Initial registration has succeeded - no longer need to bail out if we
+		// encounter any errors
+		initialRegister = false
 
 		if cmd == nil {
 			s.config.Logger.Debug("Received nil command, ignoring")
@@ -177,6 +201,12 @@ func (s *Snitch) register(looper director.Looper) error {
 
 		return nil
 	})
+
+	if initialRegister {
+		return errors.Wrap(initialRegisterErr,
+			"failed to complete initial registration with snitch-server (and IgnoreStartupError is set to 'false')",
+		)
+	}
 
 	return nil
 }

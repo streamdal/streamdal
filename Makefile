@@ -91,6 +91,7 @@ clean:
 reset: description = Remove snitch-server docker images + clean redis
 reset:
 	echo "flushall" | nc localhost 6379
+	docker images | grep -i snitch | awk {'print $$3'} | xargs docker rmi -f
 
 ### Test
 
