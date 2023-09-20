@@ -64,6 +64,7 @@ type ExternalClient interface {
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
 	GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error)
+	GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*GetSchemaResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -366,6 +367,15 @@ func (x *externalGetAudienceRatesClient) Recv() (*GetAudienceRatesResponse, erro
 	return m, nil
 }
 
+func (c *externalClient) GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*GetSchemaResponse, error) {
+	out := new(GetSchemaResponse)
+	err := c.cc.Invoke(ctx, "/protos.External/GetSchema", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, "/protos.External/Test", in, out, opts...)
@@ -421,6 +431,7 @@ type ExternalServer interface {
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
 	Tail(*TailRequest, External_TailServer) error
 	GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error
+	GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -495,6 +506,9 @@ func (UnimplementedExternalServer) Tail(*TailRequest, External_TailServer) error
 }
 func (UnimplementedExternalServer) GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAudienceRates not implemented")
+}
+func (UnimplementedExternalServer) GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -920,6 +934,24 @@ func (x *externalGetAudienceRatesServer) Send(m *GetAudienceRatesResponse) error
 	return x.ServerStream.SendMsg(m)
 }
 
+func _External_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSchemaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetSchema(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.External/GetSchema",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetSchema(ctx, req.(*GetSchemaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -1016,6 +1048,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAudience",
 			Handler:    _External_DeleteAudience_Handler,
+		},
+		{
+			MethodName: "GetSchema",
+			Handler:    _External_GetSchema_Handler,
 		},
 		{
 			MethodName: "Test",

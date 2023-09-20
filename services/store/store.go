@@ -51,6 +51,7 @@ type IStore interface {
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
+	GetConfigByAudience(ctx context.Context, audience *protos.Audience) ([]string, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
@@ -456,23 +457,14 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	llog := s.log.WithField("method", "DeleteAudience")
 	llog.Debug("received request to delete audience")
 
-	// Check if there are configs
-	configs, err := s.GetConfig(ctx)
+	// Check if there are any attached audiences
+	attached, err := s.GetConfigByAudience(ctx, req.Audience)
 	if err != nil {
-		s.log.Error(err)
-		return s.deleteAudienceKey(ctx, req.Audience)
+		return errors.Wrapf(err, "error fetching configs for audience '%s'", util.AudienceToStr(req.Audience))
 	}
 
-	// If we have configs and we're not forcing, we can't delete
-	for aud, pipelines := range configs {
-		if util.AudienceEquals(aud, req.Audience) {
-			return fmt.Errorf("cannot delete audience, it is in use by pipeline(s) %s", strings.Join(pipelines, ", "))
-		}
-	}
-
-	pipelines, ok := configs[req.Audience]
-	if ok {
-		return fmt.Errorf("audience is in use by pipeline '%s', cannot delete", pipelines)
+	if len(attached) > 0 {
+		return fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
 	}
 
 	return s.deleteAudienceKey(ctx, req.Audience)
@@ -510,6 +502,24 @@ func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, e
 	}
 
 	return cfgs, nil
+}
+
+// GetConfigByAudience returns a list of pipeline IDs attached to given audience
+func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audience) ([]string, error) {
+	cfgs, err := s.GetConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching config from store")
+	}
+
+	pipelineIDs := make([]string, 0)
+
+	for aud, ids := range cfgs {
+		if util.AudienceEquals(aud, audience) {
+			pipelineIDs = append(pipelineIDs, ids...)
+		}
+	}
+
+	return pipelineIDs, nil
 }
 
 func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
