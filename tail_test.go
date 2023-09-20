@@ -4,11 +4,13 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
-func TestSetTailing(t *testing.T) {
+func TestTailCRUD(t *testing.T) {
 	s := &Snitch{
 		tailsMtx: &sync.RWMutex{},
 		tails:    make(map[string]map[string]*Tail),
@@ -16,6 +18,9 @@ func TestSetTailing(t *testing.T) {
 			Logger: &loggerfakes.FakeLogger{},
 		},
 	}
+
+	pipelineID := uuid.New().String()
+	tailID := uuid.New().String()
 
 	aud := &protos.Audience{
 		OperationName: "test-operation",
@@ -29,19 +34,49 @@ func TestSetTailing(t *testing.T) {
 			Command: &protos.Command_Tail{
 				Tail: &protos.TailCommand{
 					Request: &protos.TailRequest{
-						Id:       "test-tail",
-						Audience: aud,
+						Id:         tailID,
+						Audience:   aud,
+						PipelineId: pipelineID,
 					},
 				},
 			},
 		},
 	}
 
-	s.setTailing(tail)
+	t.Run("set", func(t *testing.T) {
+		s.setTailing(tail)
 
-	if len(s.tails) != 1 {
-		t.Errorf("expected tails to have 1 item, got %d", len(s.tails))
-	}
+		if len(s.tails) != 1 {
+			t.Errorf("expected tails to have 1 item, got %d", len(s.tails))
+		}
+	})
+
+	t.Run("get", func(t *testing.T) {
+		tail := s.getTail(aud, pipelineID)
+
+		if len(tail) != 1 {
+			t.Errorf("expected tails to have 1 item, got %d", len(tail))
+		}
+	})
+
+	t.Run("remove", func(t *testing.T) {
+		//s.setTailing(tail)
+		//tail := s.getTail(aud, pipelineID)
+		//
+		//if len(tail) != 1 {
+		//	t.Errorf("expected tails to have 1 item, got %d", len(tail))
+		//}
+
+		s.removeTail(aud, pipelineID, tailID)
+
+		if len(s.tails) != 0 {
+			t.Errorf("expected tails to have 0 item, got %d", len(s.tails))
+		}
+	})
+}
+
+func TestGetTail(t *testing.T) {
+
 }
 
 func TestSendTail(t *testing.T) {

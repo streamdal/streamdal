@@ -238,7 +238,15 @@ func (s *Snitch) removeTail(aud *protos.Audience, pipelineID, tailID string) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
+	if _, ok := s.tails[tailKey(aud, pipelineID)]; !ok {
+		return
+	}
+
 	delete(s.tails[tailKey(aud, pipelineID)], tailID)
+
+	if len(s.tails[tailKey(aud, pipelineID)]) == 0 {
+		delete(s.tails, tailKey(aud, pipelineID))
+	}
 }
 
 func (s *Snitch) setTailing(tail *Tail) {
