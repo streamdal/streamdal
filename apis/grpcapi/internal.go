@@ -114,8 +114,6 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		llog.Debugf("channel already exists for session id '%s'", request.SessionId)
 	}
 
-	llog.Debug("beginning register cmd loop")
-
 	var (
 		shutdown    bool
 		noHeartbeat bool
@@ -140,7 +138,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	// Send all KVs to client
 	go func() {
-		llog.Debugf("starting initial KV sync")
+		llog.Debug("starting initial KV sync")
 
 		kvCommands, err := s.generateInitialKVCommands(server.Context())
 		if err != nil {
@@ -160,7 +158,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 			}
 		}
 
-		llog.Debugf("finished initial KV sync")
+		llog.Debug("finished initial KV sync")
 	}()
 
 	// Listen for cmds from external API; forward them to connected clients

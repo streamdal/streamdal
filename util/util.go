@@ -8,17 +8,16 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-server/wasm"
 )
 
 const (
 	GRPCRequestIDMetadataKey = "request-id"
-	NormalizeSpace           = "__SPACE__"
 )
 
 func GenerateUUID() string {
@@ -86,29 +85,17 @@ func AudienceToStr(audience *protos.Audience) string {
 
 	str := strings.ToLower(fmt.Sprintf("%s:%s:%s:%s", audience.ServiceName, audience.OperationType, audience.OperationName, audience.ComponentName))
 
-	str = strings.Replace(str, " ", NormalizeSpace, -1)
-
 	return str
 }
 
 // AudienceFromStr will parse a string into an Audience. If the string is invalid,
 // nil will be returned.
-//
-// Normalization explanation: Audience is stored in string format as part of the
-// key name in RedisBackend. This means that it must adhere to [a-zA-Z0-9_-]+. To
-// support spaces, we need to normalize the string before storage and
-// de-normalize it on reads. Because there are various funcs and methods that
-// parse the key as-is from RedisBackend, we cannot use something like base58 to encode &
-// decode the whole string and instead have to rely on str replaces.
-// ^ This applies to AudienceToStr() as well.
 func AudienceFromStr(s string) *protos.Audience {
 	if s == "" {
 		return nil
 	}
 
-	normalizedAudience := strings.Replace(s, NormalizeSpace, " ", -1)
-
-	parts := strings.Split(normalizedAudience, ":")
+	parts := strings.Split(s, ":")
 	if len(parts) != 4 {
 		return nil
 	}

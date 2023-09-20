@@ -438,6 +438,10 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	llog := s.log.WithField("method", "AddAudience")
 	llog.Debug("received request to add audience")
 
+	audStr := util.AudienceToStr(req.Audience)
+
+	s.log.Debugf("audience contents: %+v; audience as str: %s", req.Audience, audStr)
+
 	// Add it to the live bucket
 	if err := s.options.RedisBackend.Set(
 		ctx,

@@ -131,8 +131,6 @@ func (r *Register) runClient() error {
 		return errors.Wrap(err, "failed to create snitch client")
 	}
 
-	llog.Debug("after instantiation")
-
 	for {
 		if r.config.Register.ConsumerInputType == "none" {
 			llog.Debug("no input data, nothing to do - noop")
