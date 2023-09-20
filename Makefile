@@ -89,7 +89,7 @@ clean/inferschema:
 
 .PHONY: clean
 clean: description = Remove all build artifacts
-clean: clean/detective clean/transform clean/httprequest clean/kv
+clean: clean/detective clean/transform clean/httprequest clean/kv clean/inferschema
 
 .PHONY: test
 test: description = Run tests
