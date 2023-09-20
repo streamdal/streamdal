@@ -10,6 +10,7 @@ require (
 	github.com/charmbracelet/log v0.2.4
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	github.com/rivo/tview v0.0.0-20230909130259-ba6a2a345459
 )
 
@@ -28,7 +29,6 @@ require (
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
