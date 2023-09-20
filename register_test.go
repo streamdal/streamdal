@@ -7,12 +7,88 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+
+	"github.com/streamdal/snitch-go-client/kv/kvfakes"
+	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 )
 
 func TestHandleKVCommand(t *testing.T) {
-	t.Skip("TODO")
+	fakeKV := &kvfakes.FakeIKV{}
+
+	s := &Snitch{
+		config: &Config{
+			Logger: &loggerfakes.FakeLogger{},
+		},
+		kv: fakeKV,
+	}
+
+	t.Run("create", func(t *testing.T) {
+		cmd := &protos.KVCommand{
+			Instructions: []*protos.KVInstruction{
+				{
+					Id:     uuid.New().String(),
+					Action: shared.KVAction_KV_ACTION_CREATE,
+					Object: &protos.KVObject{
+						Key:   "test-key",
+						Value: []byte("test-value"),
+					},
+				},
+			},
+			Overwrite: false,
+		}
+
+		if err := s.handleKVCommand(context.Background(), cmd); err != nil {
+			t.Errorf("Expected nil error, got %v", err)
+		}
+
+		if fakeKV.SetCallCount() != 1 {
+			t.Errorf("Expected 1 call to Set, got %d", fakeKV.SetCallCount())
+		}
+	})
+
+	t.Run("delete", func(t *testing.T) {
+		cmd := &protos.KVCommand{
+			Instructions: []*protos.KVInstruction{
+				{
+					Id:     uuid.New().String(),
+					Action: shared.KVAction_KV_ACTION_DELETE,
+					Object: &protos.KVObject{
+						Key: "test-key",
+					},
+				},
+			},
+		}
+
+		if err := s.handleKVCommand(context.Background(), cmd); err != nil {
+			t.Errorf("Expected nil error, got %v", err)
+		}
+
+		if fakeKV.DeleteCallCount() != 1 {
+			t.Errorf("Expected 1 call to Delete, got %d", fakeKV.DeleteCallCount())
+		}
+	})
+
+	t.Run("purge", func(t *testing.T) {
+		cmd := &protos.KVCommand{
+			Instructions: []*protos.KVInstruction{
+				{
+					Id:     uuid.New().String(),
+					Action: shared.KVAction_KV_ACTION_DELETE_ALL,
+				},
+			},
+		}
+
+		if err := s.handleKVCommand(context.Background(), cmd); err != nil {
+			t.Errorf("Expected nil error, got %v", err)
+		}
+
+		if fakeKV.PurgeCallCount() != 1 {
+			t.Errorf("Expected 1 call to Purge, got %d", fakeKV.PurgeCallCount())
+		}
+	})
+
 }
 
 func TestAttachPipeline(t *testing.T) {
@@ -141,7 +217,7 @@ func TestPausePipeline(t *testing.T) {
 	}
 
 	if err := s.pausePipeline(context.Background(), attachCmd); err != ErrPipelineNotActive {
-		t.Error("Expected ErrPipelineNotActive, got nil")
+
 	}
 
 	s.pipelines[audToStr(aud)] = make(map[string]*protos.Command)

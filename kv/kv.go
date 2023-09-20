@@ -19,6 +19,7 @@ type KV struct {
 	log    logger.Logger
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IKV
 type IKV interface {
 	// Get gets a value from the KV store; bool indicates if value exists
 	Get(key string) (string, bool)

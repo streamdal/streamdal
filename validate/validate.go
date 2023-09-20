@@ -2,9 +2,9 @@ package validate
 
 import (
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 )
 
 var (
@@ -56,7 +56,7 @@ func KVInstruction(i *protos.KVInstruction) error {
 		return errors.New("KVAction cannot be UNSET")
 	}
 
-	if i.Object == nil {
+	if i.Action != shared.KVAction_KV_ACTION_DELETE_ALL && i.Object == nil {
 		return errors.New("KVInstruction.Object cannot be nil")
 	}
 

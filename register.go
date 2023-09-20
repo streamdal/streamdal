@@ -228,14 +228,15 @@ func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error 
 			continue
 		}
 
-		s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
-
 		switch i.Action {
 		case shared.KVAction_KV_ACTION_CREATE, shared.KVAction_KV_ACTION_UPDATE:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
 			s.kv.Set(i.Object.Key, string(i.Object.Value))
 		case shared.KVAction_KV_ACTION_DELETE:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
 			s.kv.Delete(i.Object.Key)
 		case shared.KVAction_KV_ACTION_DELETE_ALL:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction", i.Action)
 			s.kv.Purge()
 		default:
 			s.config.Logger.Debugf("invalid KV action '%s' - skipping", i.Action)
