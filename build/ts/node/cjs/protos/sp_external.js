@@ -1183,7 +1183,8 @@ exports.DetachNotificationRequest = new DetachNotificationRequest$Type();
 class DeleteAudienceRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.DeleteAudienceRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => sp_common_7.Audience }
+            { no: 1, name: "audience", kind: "message", T: () => sp_common_7.Audience },
+            { no: 2, name: "force", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -1201,6 +1202,9 @@ class DeleteAudienceRequest$Type extends runtime_5.MessageType {
                 case /* protos.Audience audience */ 1:
                     message.audience = sp_common_7.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
+                case /* optional bool force */ 2:
+                    message.force = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1216,6 +1220,9 @@ class DeleteAudienceRequest$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 1; */
         if (message.audience)
             sp_common_7.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* optional bool force = 2; */
+        if (message.force !== undefined)
+            writer.tag(2, runtime_1.WireType.Varint).bool(message.force);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

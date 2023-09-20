@@ -297,6 +297,12 @@ export interface DeleteAudienceRequest {
      * @generated from protobuf field: protos.Audience audience = 1;
      */
     audience?: Audience;
+    /**
+     * If true, will also detach all pipelines from the audience (if it has any)
+     *
+     * @generated from protobuf field: optional bool force = 2;
+     */
+    force?: boolean;
 }
 /**
  * Nothing needed here, we return all metrics currently

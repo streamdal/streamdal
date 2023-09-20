@@ -204,6 +204,9 @@ message DetachNotificationRequest {
 
 message DeleteAudienceRequest {
   protos.Audience audience = 1;
+
+  // If true, will also detach all pipelines from the audience (if it has any)
+  optional bool force = 2;
 }
 
 message GetMetricsRequest {
