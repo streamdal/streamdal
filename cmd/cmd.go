@@ -15,6 +15,7 @@ import (
 )
 
 type Cmd struct {
+	paused  bool
 	options *Options
 	log     *log.Logger
 }
@@ -176,13 +177,12 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 	i := 0
 
 	dataCh := make(chan string, 1)
-	var paused bool
 
 	// TODO: Getting peek data from snitch-server
 	go func() {
 		for {
-			if paused {
-				i = 0
+			if c.paused {
+				time.Sleep(200 * time.Millisecond)
 				continue
 			}
 
@@ -199,7 +199,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		case cmd := <-actionCh:
 			if cmd.Step == types.StepPause {
 				// Tell peek reader to pause/resume
-				paused = !paused
+				c.paused = !c.paused
 
 				// Update the menu pause button
 				c.options.Console.SetPause()

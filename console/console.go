@@ -71,10 +71,6 @@ func New(opts *Options) (*Console, error) {
 func (c *Console) SetPause() {
 	menu := c.menu.GetText(false)
 
-	isPaused := c.isPaused(menu)
-
-	c.log.Infof("current paused state: %v", isPaused)
-
 	var updatedMenu string
 
 	if c.isPaused(menu) {
@@ -82,8 +78,6 @@ func (c *Console) SetPause() {
 	} else {
 		updatedMenu = c.addPause(menu)
 	}
-
-	c.log.Infof("updated menu: %v", updatedMenu)
 
 	c.menu.Clear()
 	fmt.Fprint(c.menu, updatedMenu)
@@ -283,14 +277,10 @@ func (c *Console) DisplaySelectList(title string, items []string, output chan<- 
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
-	c.log.Infof("items passed to DisplaySelectList: %s", items)
-
-	for i, v := range items {
-		c.log.Infof("adding item (%d): %s", i, v)
+	for _, v := range items {
 		item := v
 
 		selectComponent.AddItem(v, "Awesome thing", 0, func() {
-			c.log.Infof("selected item (%d): %s", i, item)
 			output <- item
 		})
 	}
