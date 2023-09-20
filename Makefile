@@ -88,9 +88,9 @@ clean:
 	$(RM) ./build/$(SERVICE)-*
 
 .PHONY: reset
-reset: description = Remove snitch-server docker images + clean NATS
+reset: description = Remove snitch-server docker images + clean redis
 reset:
-	sh ./test-utils/reset.sh
+	echo "flushall" | nc localhost 6379
 
 ### Test
 
@@ -105,7 +105,7 @@ test:
 .PHONY: docker/build/local
 docker/build/local: description = Build docker image locally (needed for M1+)
 docker/build/local:
-	docker build --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
+	docker build --load --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
 	-t streamdal/$(SERVICE):$(VERSION) \
 	-t streamdal/$(SERVICE):latest \
 	-f ./Dockerfile .

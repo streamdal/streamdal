@@ -4,18 +4,19 @@ import (
 	"context"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/natty"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/validate"
 )
 
 const (
-	BucketName = "snitch_kv"
+	Prefix = "kv:"
 )
 
 type IKV interface {
@@ -35,7 +36,7 @@ type Usage struct {
 
 	// This includes history entries (ie. when you delete a KV, a copy of it is
 	// kept around until the key is purged or the bucket is compacted)
-	NumBytes int `json:"num_bytes"`
+	NumBytes int64 `json:"num_bytes"`
 }
 
 type KV struct {
@@ -44,8 +45,7 @@ type KV struct {
 }
 
 type Options struct {
-	NATS        natty.INatty
-	NumReplicas int
+	RedisBackend *redis.Client
 }
 
 func New(o *Options) (*KV, error) {
@@ -62,19 +62,14 @@ func New(o *Options) (*KV, error) {
 func (k *KV) GetAll(ctx context.Context) ([]*protos.KVObject, error) {
 	objects := make([]*protos.KVObject, 0)
 
-	// Fetch all keys in bucket
-	keys, err := k.Options.NATS.Keys(ctx, BucketName)
+	keys, err := k.Options.RedisBackend.Keys(ctx, Prefix+"*").Result()
 	if err != nil {
-		if err == nats.ErrBucketNotFound {
-			return objects, nil
-		}
-
 		return nil, errors.Wrap(err, "failed to fetch keys")
 	}
 
 	// Fetch every returned key
 	for _, key := range keys {
-		value, err := k.Options.NATS.Get(ctx, BucketName, key)
+		value, err := k.Options.RedisBackend.Get(ctx, key).Bytes()
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to fetch kv '%s'", key)
 		}
@@ -96,12 +91,8 @@ func (k *KV) Get(ctx context.Context, key string) (*protos.KVObject, error) {
 		return nil, errors.New("key cannot be empty")
 	}
 
-	value, err := k.Options.NATS.Get(ctx, BucketName, key)
+	value, err := k.Options.RedisBackend.Get(ctx, KVKey(key)).Bytes()
 	if err != nil {
-		if err == nats.ErrKeyNotFound || err == nats.ErrBucketNotFound {
-			return nil, nats.ErrKeyNotFound
-		}
-
 		return nil, errors.Wrapf(err, "failed to fetch kv '%s'", key)
 	}
 
@@ -114,7 +105,7 @@ func (k *KV) Get(ctx context.Context, key string) (*protos.KVObject, error) {
 	return object, nil
 }
 
-// Create creates a kv object in NATS. "overwrite" allows you to adjust create
+// Create creates a kv object in RedisBackend. "overwrite" allows you to adjust create
 // behavior - if set and the key already exists - it the method will overwrite
 // the key. If not set and the key already exists - it will error.
 //
@@ -138,9 +129,14 @@ func (k *KV) Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool)
 		}
 
 		if overwrite {
-			err = k.Options.NATS.Put(ctx, BucketName, kv.Key, serialized)
+			_, err = k.Options.RedisBackend.Set(ctx, KVKey(kv.Key), serialized, 0).Result()
 		} else {
-			err = k.Options.NATS.Create(ctx, BucketName, kv.Key, serialized)
+			// check if key exists
+			if _, err := k.Options.RedisBackend.Get(ctx, KVKey(kv.Key)).Result(); err == nil {
+				return errors.Errorf("key '%s' already exists", kv.Key)
+			} else {
+				_, err = k.Options.RedisBackend.Set(ctx, KVKey(kv.Key), serialized, 0).Result()
+			}
 		}
 
 		if err != nil {
@@ -158,12 +154,12 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 	}
 
 	// Key should exist
-	_, err := k.Options.NATS.Get(ctx, BucketName, kv.Key)
+	_, err := k.Options.RedisBackend.Get(ctx, KVKey(kv.Key)).Bytes()
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to fetch key '%s'", kv.Key)
 	}
 
-	// KV is valid, set an updated timestamp + serialize + save to NATS
+	// KV is valid, set an updated timestamp + serialize + save to RedisBackend
 	kv.UpdatedAtUnixTsNanoUtc = time.Now().UTC().UnixNano()
 
 	serialized, err := proto.Marshal(kv)
@@ -171,7 +167,7 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 		return nil, errors.Wrapf(err, "failed to marshal kv '%s' to protobuf", kv.Key)
 	}
 
-	if err := k.Options.NATS.Put(ctx, BucketName, kv.Key, serialized); err != nil {
+	if err := k.Options.RedisBackend.Set(ctx, KVKey(kv.Key), serialized, 0).Err(); err != nil {
 		return nil, errors.Wrapf(err, "failed to update kv '%s'", kv.Key)
 	}
 
@@ -180,50 +176,51 @@ func (k *KV) Update(ctx context.Context, kv *protos.KVObject) (*protos.KVObject,
 
 func (k *KV) Delete(ctx context.Context, key string) error {
 	// Delete no-ops if bucket or key does not exist so we can just use this as-is
-	return k.Options.NATS.Delete(ctx, BucketName, key)
+	return k.Options.RedisBackend.Del(ctx, KVKey(key)).Err()
 }
 
 // DeleteAll will delete all kv entries by deleting and re-creating the bucket
 func (k *KV) DeleteAll(ctx context.Context) error {
-	// Delete & re-create bucket
-	if err := k.Options.NATS.DeleteBucket(ctx, BucketName); err != nil {
-		return errors.Wrap(err, "failed to delete bucket during delete all")
+	// Delete all keys with prefix kv:
+	keys, err := k.Options.RedisBackend.Keys(ctx, Prefix+"*").Result()
+	if err != nil {
+		return errors.Wrap(err, "failed to fetch keys")
 	}
 
-	// Re-create bucket
-	if err := k.Options.NATS.CreateBucket(ctx, BucketName, 0, k.Options.NumReplicas); err != nil {
-		return errors.Wrap(err, "failed to re-create bucket during delete all")
+	// Delete all keys
+	if err := k.Options.RedisBackend.Del(ctx, keys...).Err(); err != nil {
+		return errors.Wrap(err, "failed to delete keys during delete all")
 	}
 
 	return nil
 }
 
 func (k *KV) GetUsage(ctx context.Context) (*Usage, error) {
-	status, err := k.Options.NATS.Status(ctx, BucketName)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch status")
-	}
-
-	// We have to do this because .Values() includes historical entries as well
-	keys, err := k.Options.NATS.Keys(ctx, BucketName)
+	keys, err := k.Options.RedisBackend.Keys(ctx, Prefix+"*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch keys (for status)")
 	}
 
+	var total int64
+
+	for _, key := range keys {
+		total += k.Options.RedisBackend.MemoryUsage(ctx, key).Val()
+	}
+
 	return &Usage{
 		NumItems: len(keys),
-		NumBytes: int(status.Bytes()),
+		NumBytes: total,
 	}, nil
 }
 
 func validateOptions(o *Options) error {
-	if o.NATS == nil {
-		return errors.New("options.NATS cannot be nil")
-	}
-
-	if o.NumReplicas == 0 {
-		return errors.New("options.NumReplicas cannot be 0")
+	if o.RedisBackend == nil {
+		return errors.New("options.RedisBackend cannot be nil")
 	}
 
 	return nil
+}
+
+func KVKey(key string) string {
+	return Prefix + key
 }

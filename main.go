@@ -78,7 +78,7 @@ func run(d *deps.Dependencies) error {
 			ShutdownContext: d.ShutdownContext,
 			CmdService:      d.CmdService,
 			NotifyService:   d.NotifyService,
-			NATSBackend:     d.NATSBackend,
+			RedisBackend:    d.RedisBackend,
 			PubSubService:   d.PubSubService,
 			MetricsService:  d.MetricsService,
 			KVService:       d.KVService,
@@ -118,9 +118,20 @@ func run(d *deps.Dependencies) error {
 	// Run Messaging service
 	go func() {
 		if err := d.BusService.RunConsumer(); err != nil {
-			errChan <- errors.Wrap(err, "error during NATS consumer run")
+			errChan <- errors.Wrap(err, "error during RedisBackend consumer run")
 		}
 	}()
+
+	// Tail/peek consumers are separate from the main consumer to avoid
+	// bogging down the main consumer with traffic during a peek
+	for i := 0; i <= d.Config.NumTailConsumers; i++ {
+		go func() {
+			if err := d.BusService.RunTailConsumer(); err != nil {
+				errChan <- errors.Wrap(err, "error during RedisBackend tail consumer run")
+				return
+			}
+		}()
+	}
 
 	displayInfo(d)
 

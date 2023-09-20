@@ -7,10 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/nats-io/nats.go"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -60,7 +62,7 @@ func (a *HTTPAPI) getKVHandler(rw http.ResponseWriter, r *http.Request) {
 		statusCode := http.StatusInternalServerError
 		statusMsg := fmt.Sprintf("unable to fetch kv object '%s': %s", key, err)
 
-		if err == nats.ErrKeyNotFound {
+		if err == redis.Nil {
 			statusCode = http.StatusNotFound
 			statusMsg = fmt.Sprintf("kv object '%s' not found", key)
 		}
@@ -203,7 +205,7 @@ func (a *HTTPAPI) deleteKVHandler(rw http.ResponseWriter, r *http.Request) {
 
 	// Does this kv exist?
 	if _, err := a.Options.KVService.Get(r.Context(), key); err != nil {
-		if err == nats.ErrKeyNotFound {
+		if strings.Contains(err.Error(), redis.Nil.Error()) {
 			Write(rw, http.StatusNotFound, "kv with key '%s' not found", key)
 			return
 		}

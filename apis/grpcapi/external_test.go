@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nats-io/nats.go"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 
@@ -30,11 +30,11 @@ const (
 	GRPCAPIAddress = ":19090"
 	HTTPAPIAddress = ":19091"
 	AuthToken      = "1234"
-	NATSAddress    = "localhost:4222"
+	RedisAddress   = "localhost:6379"
 )
 
 var (
-	natsClient natty.INatty
+	redisClient *redis.Client
 
 	ctxWithNoAuth   = context.Background()
 	ctxWithBadAuth  = metadata.NewOutgoingContext(context.Background(), metadata.New(map[string]string{"auth-token": "incorrect"}))
@@ -44,14 +44,14 @@ var (
 func init() {
 	var err error
 
-	// Setup nats client
-	natsClient, err = newNATSClient()
+	// Setup Redis client
+	redisClient, err = newRedisClient()
 	if err != nil {
-		panic("unable to create new nats client: " + err.Error())
+		panic("unable to create new redis client: " + err.Error())
 	}
 
 	// Clear buckets
-	rmBuckets()
+	clearRedis()
 
 	// Start gRPC server
 	go runServer()
@@ -222,13 +222,13 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp.Message).To(ContainSubstring("Pipeline created successfully"))
 			Expect(resp.PipelineId).ToNot(BeEmpty())
 
-			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, resp.PipelineId)
+			data, err := redisClient.Get(context.Background(), store.RedisPipelineKey(resp.PipelineId)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeNil())
 
 			// Verify that data can be unmarshalled into protos.Pipeline
 			pipeline := &protos.Pipeline{}
-			err = proto.Unmarshal(data, pipeline)
+			err = proto.Unmarshal([]byte(data), pipeline)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(pipeline.Id).To(Equal(resp.PipelineId))
 		})
@@ -255,7 +255,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(getResp).ToNot(BeNil())
 
 			// Fetch pipeline directly from bucket
-			data, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createResp.PipelineId)
+			data, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createResp.PipelineId)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(data).ToNot(BeNil())
 		})
@@ -398,12 +398,12 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Fetch it from bucket, verify has correct name
-			createdPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
+			createdPipeline, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createdResp.PipelineId)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(createdPipeline).ToNot(BeNil())
 
 			createdPipelineProto := &protos.Pipeline{}
-			err = proto.Unmarshal(createdPipeline, createdPipelineProto)
+			err = proto.Unmarshal([]byte(createdPipeline), createdPipelineProto)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(createdPipelineProto.Name).To(Equal(pipeline.Name))
@@ -421,14 +421,14 @@ var _ = Describe("External gRPC API", func() {
 			Expect(updatedResponse.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Fetch it from the bucket
-			updatedPipelineData, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
+			updatedPipelineData, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createdResp.PipelineId)).Result()
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(updatedPipelineData).ToNot(BeNil())
 
 			// Verify it has the updated data
 			updatedPipelineProto := &protos.Pipeline{}
-			err = proto.Unmarshal(updatedPipelineData, updatedPipelineProto)
+			err = proto.Unmarshal([]byte(updatedPipelineData), updatedPipelineProto)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(updatedPipelineProto.Name).To(Equal(pipeline.Name))
@@ -450,7 +450,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
 			// Get the pipeline
-			fetchedPipeline, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
+			fetchedPipeline, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createdResp.PipelineId)).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fetchedPipeline).ToNot(BeNil())
 
@@ -464,10 +464,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp.Message).To(ContainSubstring("deleted"))
 
 			// Get the pipeline again - should fail
-			shouldNotExist, err := natsClient.Get(context.Background(), store.NATSPipelineBucket, createdResp.PipelineId)
+			shouldNotExist, err := redisClient.Get(context.Background(), store.RedisPipelineKey(createdResp.PipelineId)).Result()
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(nats.ErrKeyNotFound))
-			Expect(shouldNotExist).To(BeNil())
+			Expect(err).To(Equal(redis.Nil))
+			Expect(shouldNotExist).To(BeEmpty())
 
 			// Get pipeline via external API - should fail
 			getResp, err := externalClient.GetPipeline(ctxWithGoodAuth, &protos.GetPipelineRequest{
@@ -511,8 +511,8 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Should have an entry in snitch_config
-			key := store.NATSConfigKey(audience, createdResp.PipelineId)
-			_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, key)
+			key := store.RedisConfigKey(audience, createdResp.PipelineId)
+			err = redisClient.Get(context.Background(), key).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			_, storedPipelineID := util.ParseConfigKey(key)
@@ -597,7 +597,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Key should be in snitch_config
-			_, err = natsClient.Get(context.Background(), store.NATSConfigBucket, store.NATSConfigKey(audience, createdResp.PipelineId))
+			err = redisClient.Get(context.Background(), store.RedisConfigKey(audience, createdResp.PipelineId)).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			// Now detach it
@@ -611,14 +611,14 @@ var _ = Describe("External gRPC API", func() {
 			Expect(detachResp.Message).To(ContainSubstring("detached"))
 			Expect(detachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// There is a 5s sleep before nats key is deleted
+			// There is a 5s sleep before redis key is deleted
 			time.Sleep(time.Second * 7)
 
 			// Key should be gone from snitch_config
-			shouldBeNil, err := natsClient.Get(context.Background(), store.NATSConfigBucket, store.NATSConfigKey(audience, createdResp.PipelineId))
+			shouldBeEmpty, err := redisClient.Get(context.Background(), store.RedisConfigKey(audience, createdResp.PipelineId)).Result()
 			Expect(err).To(HaveOccurred())
-			Expect(shouldBeNil).To(BeNil())
-			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(shouldBeEmpty).To(BeEmpty())
+			Expect(err).To(Equal(redis.Nil))
 		})
 	})
 
@@ -653,10 +653,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
+			pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
 			// Should have an entry in snitch_paused
-			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
+			value, err := redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(BeEmpty())
 		})
@@ -693,10 +693,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			configKey := store.NATSPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
+			pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
 			// Should have an entry in snitch_paused
-			value, err := natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
+			value, err := redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(BeEmpty())
 
@@ -711,10 +711,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resumeResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
 			// Entry should be removed from snitch_paused
-			value, err = natsClient.Get(context.Background(), store.NATSPausedBucket, configKey)
+			value, err = redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).To(HaveOccurred())
-			Expect(value).To(BeNil())
-			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(value).To(BeEmpty())
+			Expect(err).To(Equal(redis.Nil))
 		})
 	})
 
@@ -728,13 +728,13 @@ var _ = Describe("External gRPC API", func() {
 			}
 
 			// Put audience key in snitch_audience
-			audKey := store.NATSAudienceKey(util.AudienceToStr(audience))
-			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, audKey, []byte(``))
+			audKey := store.RedisAudienceKey(util.AudienceToStr(audience))
+			err := redisClient.Set(context.Background(), audKey, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			// Put audience-pipeline mapping in snitch_config
-			configKey := store.NATSConfigKey(audience, "test-pipeline-id")
-			err = natsClient.Put(context.Background(), store.NATSConfigBucket, configKey, []byte(``))
+			configKey := store.RedisConfigKey(audience, "test-pipeline-id")
+			err = redisClient.Set(context.Background(), configKey, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			// Try to delete audience
@@ -745,15 +745,15 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR))
 
-			// Verify key still exists in nats
-			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, audKey)
+			// Verify key still exists in redis
+			err = redisClient.Get(context.Background(), audKey).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			// Cleanup key
-			err = natsClient.Delete(context.Background(), store.NATSConfigBucket, configKey)
+			err = redisClient.Del(context.Background(), configKey).Err()
 			Expect(err).ToNot(HaveOccurred())
 
-			err = natsClient.Delete(context.Background(), store.NATSAudienceBucket, audKey)
+			err = redisClient.Del(context.Background(), audKey).Err()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -766,8 +766,8 @@ var _ = Describe("External gRPC API", func() {
 			}
 
 			// Put audience key in snitch_config
-			key := store.NATSAudienceKey(util.AudienceToStr(audience))
-			err := natsClient.Put(context.Background(), store.NATSAudienceBucket, key, []byte(``))
+			key := store.RedisAudienceKey(util.AudienceToStr(audience))
+			err := redisClient.Set(context.Background(), key, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())
 
 			// Delete audience
@@ -778,10 +778,10 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Verify key has been deleted from nats
-			_, err = natsClient.Get(context.Background(), store.NATSAudienceBucket, key)
+			// Verify key has been deleted from redis
+			err = redisClient.Get(context.Background(), key).Err()
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(nats.ErrKeyNotFound))
+			Expect(err).To(Equal(redis.Nil))
 		})
 	})
 })
@@ -802,10 +802,8 @@ func runServer() {
 		AuthToken:            AuthToken,
 		HTTPAPIListenAddress: HTTPAPIAddress,
 		GRPCAPIListenAddress: GRPCAPIAddress,
-		NATSURL:              []string{"localhost:4222"},
-		NATSTLSSkipVerify:    true,
-		NATSNumKVReplicas:    1,
-		SessionTTL:           time.Second, // Override TTL to improve test speed
+		RedisURL:             "localhost:6379",
+		SessionTTL:           time.Second * 5,
 		WASMDir:              "./assets/wasm",
 		AesKey:               genAESKey(),
 	})
@@ -821,7 +819,7 @@ func runServer() {
 		ShutdownContext: d.ShutdownContext,
 		CmdService:      d.CmdService,
 		NotifyService:   d.NotifyService,
-		NATSBackend:     d.NATSBackend,
+		RedisBackend:    d.RedisBackend,
 		PubSubService:   d.PubSubService,
 		MetricsService:  d.MetricsService,
 		KVService:       d.KVService,
@@ -837,7 +835,7 @@ func runServer() {
 }
 
 func newExternalClient() (protos.ExternalClient, error) {
-	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
@@ -846,7 +844,7 @@ func newExternalClient() (protos.ExternalClient, error) {
 }
 
 func newInternalClient() (protos.InternalClient, error) {
-	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(GRPCAPIAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, errors.Wrap(err, "can not connect with server")
 	}
@@ -854,10 +852,10 @@ func newInternalClient() (protos.InternalClient, error) {
 	return protos.NewInternalClient(conn), nil
 }
 
-func newNATSClient() (natty.INatty, error) {
-	return natty.New(&natty.Config{
-		NatsURL: []string{NATSAddress},
-	})
+func newRedisClient() (*redis.Client, error) {
+	return redis.NewClient(&redis.Options{
+		Addr: RedisAddress,
+	}), nil
 }
 
 func newPipeline() *protos.Pipeline {
@@ -891,14 +889,8 @@ func newPipeline() *protos.Pipeline {
 	}
 }
 
-func rmBuckets() {
-	buckets := []string{"snitch_live", "snitch_config", "snitch_pipeline", "snitch_paused"}
-
-	for _, b := range buckets {
-		if err := natsClient.DeleteBucket(context.Background(), b); err != nil {
-			if err != nats.ErrBucketNotFound {
-				panic(fmt.Sprintf("error deleting bucket '%s': %s", b, err.Error()))
-			}
-		}
+func clearRedis() {
+	if err := redisClient.FlushAll(context.Background()).Err(); err != nil {
+		panic(fmt.Sprintf("error flushing redis: %s", err.Error()))
 	}
 }

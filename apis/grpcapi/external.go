@@ -695,16 +695,16 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 
 func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
 	// Each tail request gets its own unique ID so that we can receive messages over
-	// a unique channel from NATS
+	// a unique channel from RedisBackend
 	req.Id = util.GenerateUUID()
 
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
 	}
 
-	// Get channel for receiving TailResponse messages that get shipped over NATS.
+	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
-	// messages from NATS
+	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.Id, util.CtxRequestId(server.Context()))
 
 	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
@@ -797,6 +797,21 @@ func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, ser
 			}
 		}
 	}
+}
+
+func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaRequest) (*protos.GetSchemaResponse, error) {
+	if err := validate.GetSchemaRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get schema request")
+	}
+
+	schema, err := s.Options.StoreService.GetSchema(ctx, req.Audience)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get schema")
+	}
+
+	return &protos.GetSchemaResponse{
+		Schema: schema,
+	}, nil
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {

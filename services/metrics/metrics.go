@@ -11,14 +11,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/relistan/go-director"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 )
 
@@ -29,7 +29,7 @@ const (
 	// subsystem is the prometheus subsystem for all metrics
 	subsystem = "snitch"
 
-	// counterDumperInterval is how often we will dump metrics to NATS
+	// counterDumperInterval is how often we will dump metrics to RedisBackend
 	counterDumperInterval = time.Second * 10
 )
 
@@ -40,7 +40,7 @@ type defaultCounter struct {
 	Labels      []string
 }
 
-// storeCounter is used to cache counters in NATS
+// storeCounter is used to cache counters in RedisBackend
 
 var defaultCounters = []*defaultCounter{
 	{
@@ -100,8 +100,8 @@ type Metrics struct {
 }
 
 type Config struct {
-	NATSBackend natty.INatty
-	ShutdownCtx context.Context
+	RedisBackend *redis.Client
+	ShutdownCtx  context.Context
 }
 
 func New(cfg *Config) (*Metrics, error) {
@@ -140,10 +140,11 @@ func New(cfg *Config) (*Metrics, error) {
 func (m *Metrics) loadCountersFromStore() error {
 	counters := make([]*protos.Metric, 0)
 
-	data, err := m.NATSBackend.Get(context.Background(), "snitch_metrics", "counters.json")
+	resp := m.RedisBackend.Get(context.Background(), "counters")
+	data, err := resp.Bytes()
 	if err != nil {
-		if errors.Is(err, nats.ErrKeyNotFound) {
-			// No saved counters yet, ignore
+		if err == redis.Nil {
+			// No counter key yet
 			return nil
 		}
 		return errors.Wrap(err, "unable to get counters from store")
@@ -177,8 +178,8 @@ func (m *Metrics) loadCountersFromStore() error {
 }
 
 func validateConfig(cfg *Config) error {
-	if cfg.NATSBackend == nil {
-		return errors.New("nats backend is required")
+	if cfg.RedisBackend == nil {
+		return errors.New("redis backend is required")
 	}
 
 	if cfg.ShutdownCtx == nil {
@@ -319,15 +320,15 @@ func (m *Metrics) dumpCounters() error {
 		return errors.Wrap(err, "unable to marshal counters")
 	}
 
-	err = m.NATSBackend.Put(context.Background(), "snitch_metrics", "counters.json", data)
-	if err != nil {
+	resp := m.RedisBackend.Set(context.Background(), "counters", data, 0)
+	if _, err := resp.Result(); err != nil {
 		return errors.Wrap(err, "unable to put counters to store")
 	}
 
 	return nil
 }
 
-// parseMetricString parses a prometheus metric string into a protos.Metric struct for caching in NATS
+// parseMetricString parses a prometheus metric string into a protos.Metric struct for caching in RedisBackend
 func parseMetricString(input string) (*protos.Metric, error) {
 	// Get key-value pairs
 	r := regexp.MustCompile(`(\w+)="([^"]+)"`)

@@ -2,6 +2,7 @@ package bus
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -124,13 +125,25 @@ func (b *Bus) BroadcastTailRequest(ctx context.Context, req *protos.TailRequest)
 }
 
 func (b *Bus) BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error {
-	// TODO: this should probably go over a unique stream based on the TailRequestID
-	// TODO: but that will involve creating the stream and then cleaning up the stream after the TailRequest is complete
-	return b.broadcast(ctx, "tail", &protos.BusEvent{
+	event := &protos.BusEvent{
 		Event: &protos.BusEvent_TailResponse{
 			TailResponse: resp,
 		},
-	})
+		XMetadata: util.CtxMetadata(ctx),
+		Source:    b.options.NodeName,
+	}
+
+	data, err := proto.Marshal(event)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling bus message")
+	}
+
+	topic := fmt.Sprintf("%s:%s", TailSubjectPrefix, resp.TailRequestId)
+	if err := b.options.RedisBackend.Publish(ctx, topic, data).Err(); err != nil {
+		return errors.Wrap(err, "error publishing tail response")
+	}
+
+	return nil
 }
 
 // TODO: Use generics
@@ -147,7 +160,7 @@ func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.Bus
 		return errors.Wrap(err, "error marshaling bus message")
 	}
 
-	b.options.NATS.Publish(ctx, FullSubject, data)
+	b.options.RedisBackend.Publish(ctx, FullSubject, data)
 
 	return nil
 }

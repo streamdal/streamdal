@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/natty"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-server/services/cmd"
@@ -33,29 +34,72 @@ should send commands to the client (via the register cmd channel).
 */
 
 const (
-	StreamName    = "snitch_events"
-	StreamSubject = "broadcast"
-	FullSubject   = StreamName + "." + StreamSubject
+	// FullSubject is for non-tail/peek RedisBackend pubsub messages
+	FullSubject = "snitch_events:broadcast"
+
+	// TailSubjectPrefix is the prefix for the RedisBackend wildcard pubsub topic for tail/peek responses
+	TailSubjectPrefix = "snitch_events:tail"
 )
 
 type IBus interface {
+	// RunConsumer runs a redis consumer that listens for messages on the snitch broadcast topic
 	RunConsumer() error
+
+	// RunTailConsumer is used for consuming message from the snitch RedisBackend wildcard pubsub topic
+	// This method is different from RunConsumer() because we must call PSubscribe() and PUnsubscribe()
+	// instead of Subscribe() and Unsubscribe() respectively.
+	// See: https://redis.io/commands/psubscribe
+	RunTailConsumer() error
+
+	// BroadcastRegister broadcasts a RegisterRequest to all nodes in the cluster
 	BroadcastRegister(ctx context.Context, req *protos.RegisterRequest) error
+
+	// BroadcastDeregister broadcasts a DeregisterRequest to all nodes in the cluster
 	BroadcastDeregister(ctx context.Context, req *protos.DeregisterRequest) error
+
+	// BroadcastDeleteAudience broadcasts a DeleteAudienceRequest to all nodes in the cluster
 	BroadcastDeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
+
+	// BroadcastUpdatePipeline broadcasts a UpdatePipelineRequest to all nodes in the cluster
 	BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error
+
+	// BroadcastDeletePipeline broadcasts a DeletePipelineRequest to all nodes in the cluster
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
+
+	// BroadcastAttachPipeline broadcasts a AttachPipelineRequest to all nodes in the cluster
 	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
+
+	// BroadcastDetachPipeline broadcasts a DetachPipelineRequest to all nodes in the cluster
 	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
+
+	// BroadcastPausePipeline broadcasts a PausePipelineRequest to all nodes in the cluster
 	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
+
+	// BroadcastResumePipeline broadcasts a ResumePipelineRequest to all nodes in the cluster
 	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+
+	// BroadcastMetrics broadcasts a MetricsRequest to all nodes in the cluster
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
+
+	// BroadcastKVCreate broadcasts a KVRequest to all nodes in the cluster
 	BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error
+
+	// BroadcastKVUpdate broadcasts a KVRequest to all nodes in the cluster
 	BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error
+
+	// BroadcastKVDelete broadcasts a KVRequest to all nodes in the cluster
 	BroadcastKVDelete(ctx context.Context, key string) error
+
+	// BroadcastKVDeleteAll broadcasts a KVRequest to all nodes in the cluster
 	BroadcastKVDeleteAll(ctx context.Context) error
+
+	// BroadcastNewAudience broadcasts a NewAudienceRequest to all nodes in the cluster
 	BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error
+
+	// BroadcastTailRequest broadcasts a TailRequest to all nodes in the cluster
 	BroadcastTailRequest(ctx context.Context, req *protos.TailRequest) error
+
+	// BroadcastTailResponse broadcasts a TailResponse to all nodes in the cluster
 	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
 }
 
@@ -65,14 +109,14 @@ type Bus struct {
 }
 
 type Options struct {
-	Store       store.IStore
-	NATS        natty.INatty
-	Metrics     metrics.IMetrics
-	Cmd         cmd.ICmd
-	NodeName    string
-	WASMDir     string
-	ShutdownCtx context.Context
-	PubSub      pubsub.IPubSub
+	Store        store.IStore
+	RedisBackend *redis.Client
+	Metrics      metrics.IMetrics
+	Cmd          cmd.ICmd
+	NodeName     string
+	WASMDir      string
+	ShutdownCtx  context.Context
+	PubSub       pubsub.IPubSub
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -80,28 +124,10 @@ func New(opts *Options) (*Bus, error) {
 		return nil, errors.Wrap(err, "error validating params")
 	}
 
-	if err := prepareNATS(opts); err != nil {
-		return nil, errors.Wrap(err, "error creating consumer")
-	}
-
 	return &Bus{
 		options: opts,
 		log:     logrus.WithField("pkg", "bus"),
 	}, nil
-}
-
-func prepareNATS(opts *Options) error {
-	// Won't error if stream already exists
-	if err := opts.NATS.CreateStream(opts.ShutdownCtx, StreamName, []string{FullSubject}); err != nil {
-		return errors.Wrap(err, "error creating stream")
-	}
-
-	// Won't error if consumer already exists
-	if err := opts.NATS.CreateConsumer(opts.ShutdownCtx, StreamName, opts.NodeName, FullSubject); err != nil {
-		return errors.Wrap(err, "error creating consumer")
-	}
-
-	return nil
 }
 
 func (o *Options) validate() error {
@@ -113,8 +139,8 @@ func (o *Options) validate() error {
 		return errors.New("node name must be provided")
 	}
 
-	if o.NATS == nil {
-		return errors.New("nats backend must be provided")
+	if o.RedisBackend == nil {
+		return errors.New("redis backend must be provided")
 	}
 
 	if o.Store == nil {
@@ -140,12 +166,15 @@ func (o *Options) validate() error {
 	return nil
 }
 
-// RunConsumer is used for consuming message from the snitch NATS stream and
+// RunConsumer is used for consuming message from the snitch RedisBackend stream and
 // executing a message handler.
 func (b *Bus) RunConsumer() error {
+	ps := b.options.RedisBackend.Subscribe(b.options.ShutdownCtx, FullSubject)
+
 MAIN:
 	for {
-		// Hack since natty.Consume() should return err (but doesn't right now)
+		// redis.ReceiveMessage() does not expect context cancellation, so we have to
+		// check for it manually and use redis.ReceiveTimeout()
 		select {
 		case <-b.options.ShutdownCtx.Done():
 			b.log.Debug("context cancellation detected")
@@ -154,43 +183,91 @@ MAIN:
 			// NOOP
 		}
 
-		err := b.options.NATS.Consume(b.options.ShutdownCtx, &natty.ConsumerConfig{
-			Subject:      FullSubject,
-			StreamName:   StreamName,
-			ConsumerName: b.options.NodeName,
-		}, b.handler)
-
-		// NOTE: Consumer won't exit on handler err - err is passed errorCh by
-		// natty - error reading should occur elsewhere
+		msg, err := ps.ReceiveTimeout(b.options.ShutdownCtx, 2*time.Second)
 		if err != nil {
-			if err == context.Canceled || strings.Contains(err.Error(), "context deadline exceeded") {
+			if strings.Contains(err.Error(), "timeout") {
+				continue
+			}
+			if errors.Is(err, context.Canceled) {
 				b.log.Debug("context cancellation detected")
 				break MAIN
 			}
 
 			b.log.WithError(err).Error("error consuming messages")
+			continue
+		}
+
+		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
+		switch msg := msg.(type) {
+		case *redis.Message:
+			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
+				b.log.WithError(err).Error("error handling message")
+				continue
+			}
 		}
 	}
 
-	b.log.Debug("consumer exiting")
+	b.log.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
 
-	return nil
+	return ps.Unsubscribe(context.Background())
 }
 
-// handler every time a new message is received on the NATS broadcast stream.
+func (b *Bus) RunTailConsumer() error {
+	topic := TailSubjectPrefix + ":*"
+	ps := b.options.RedisBackend.PSubscribe(b.options.ShutdownCtx, topic)
+
+MAIN:
+	for {
+		// redis.ReceiveMessage() does not expect context cancellation, so we have to
+		// check for it manually and use redis.ReceiveTimeout()
+		select {
+		case <-b.options.ShutdownCtx.Done():
+			b.log.Debug("context cancellation detected")
+			break MAIN
+		default:
+			// NOOP
+		}
+
+		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
+		msg, err := ps.ReceiveTimeout(b.options.ShutdownCtx, 2*time.Second)
+		if err != nil {
+			if strings.Contains(err.Error(), "timeout") {
+				continue
+			}
+			if errors.Is(err, context.Canceled) {
+				b.log.Debug("context cancellation detected")
+				break MAIN
+			}
+
+			b.log.WithError(err).Error("error consuming messages")
+			continue
+		}
+
+		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
+		switch msg := msg.(type) {
+		case *redis.Message:
+			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
+				b.log.WithError(err).Error("error handling message")
+				continue
+			}
+		}
+	}
+
+	b.log.Debugf("pubsub consumer for topic '%s' exiting", topic)
+
+	return ps.PUnsubscribe(context.Background())
+}
+
+// handler every time a new message is received on the RedisBackend broadcast stream.
 // This method is responsible for decoding the message and executing the
 // appropriate msg handler.
-func (b *Bus) handler(shutdownCtx context.Context, msg *nats.Msg) error {
+func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
 	llog := b.log.WithField("method", "handler")
 	llog.Debug("received new broadcast message")
 
-	if err := msg.AckSync(); err != nil {
-		llog.Errorf("unable to ack message: %s", err)
-	}
-
 	busEvent := &protos.BusEvent{}
 
-	if err := proto.Unmarshal(msg.Data, busEvent); err != nil {
+	if err := proto.Unmarshal([]byte(msg.Payload), busEvent); err != nil {
 		return errors.Wrap(err, "error unmarshalling bus event")
 	}
 

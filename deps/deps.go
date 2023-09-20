@@ -2,17 +2,13 @@ package deps
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-
-	"github.com/streamdal/natty"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/streamdal/snitch-server/backends/cache"
 	"github.com/streamdal/snitch-server/config"
@@ -38,7 +34,7 @@ type Dependencies struct {
 
 	// Backends
 	CacheBackend cache.ICache
-	NATSBackend  natty.INatty
+	RedisBackend *redis.Client
 
 	// Services
 	BusService        bus.IBus
@@ -91,54 +87,7 @@ func New(cfg *config.Config) (*Dependencies, error) {
 		return nil, errors.Wrap(err, "unable to setup services")
 	}
 
-	if err := d.preCreateBuckets(); err != nil {
-		return nil, errors.Wrap(err, "unable to pre-create buckets in NATS")
-	}
-
 	return d, nil
-}
-
-func (d *Dependencies) preCreateBuckets() error {
-	buckets := map[string]time.Duration{
-		store.NATSAudienceBucket:           0,
-		store.NATSLiveBucket:               d.Config.SessionTTL,
-		store.NATSPipelineBucket:           0,
-		store.NATSPausedBucket:             0,
-		store.NATSNotificationConfigBucket: 0,
-		store.NATSNotificationAssocBucket:  0,
-	}
-
-	for bucketName, ttl := range buckets {
-		logrus.Debugf("attempting to pre-create NATS bucket '%s' with TTL '%s'", bucketName, ttl)
-
-		if err := d.NATSBackend.CreateBucket(d.ShutdownContext, bucketName, ttl, d.Config.NATSNumKVReplicas); err != nil {
-			if err == nats.ErrStreamNameAlreadyInUse {
-				// Bucket already exists, verify its settings
-				if err := d.verifyBucketSettings(d.ShutdownContext, bucketName, ttl); err != nil {
-					return errors.Wrap(err, "bucket settings verification failed")
-				}
-
-				continue
-			}
-
-			return fmt.Errorf("unable to pre-create bucket '%s': %s", bucketName, err)
-		}
-	}
-
-	return nil
-}
-
-func (d *Dependencies) verifyBucketSettings(ctx context.Context, bucketName string, ttl time.Duration) error {
-	status, err := d.NATSBackend.Status(ctx, bucketName)
-	if err != nil {
-		return errors.Wrapf(err, "unable to get status for bucket '%s'", bucketName)
-	}
-
-	if status.TTL() != ttl {
-		return errors.Errorf("bucket '%s' has incorrect TTL: '%s' (expected '%s')", bucketName, status.TTL(), d.Config.SessionTTL)
-	}
-
-	return nil
 }
 
 func (d *Dependencies) validateWASM() error {
@@ -200,21 +149,16 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 
 	d.CacheBackend = cb
 
-	// NATS backend
-	n, err := natty.New(&natty.Config{
-		NatsURL:           cfg.NATSURL,
-		UseTLS:            cfg.NATSUseTLS,
-		TLSCACertFile:     cfg.NATSTLSCaFile,
-		TLSClientCertFile: cfg.NATSTLSCertFile,
-		TLSClientKeyFile:  cfg.NATSTLSKeyFile,
-		Logger:            logrus.WithField("pkg", "natty"),
+	// Redis backend
+	// TODO: config
+	client := redis.NewClient(&redis.Options{
+		Addr:     cfg.RedisURL,
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDatabase,
+		Protocol: 3,
 	})
 
-	if err != nil {
-		return errors.Wrap(err, "unable to create new store backend")
-	}
-
-	d.NATSBackend = n
+	d.RedisBackend = client
 
 	return nil
 }
@@ -234,8 +178,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.CmdService = c
 
 	metricsService, err := metrics.New(&metrics.Config{
-		NATSBackend: d.NATSBackend,
-		ShutdownCtx: d.ShutdownContext,
+		RedisBackend: d.RedisBackend,
+		ShutdownCtx:  d.ShutdownContext,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new metrics service")
@@ -243,10 +187,10 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.MetricsService = metricsService
 
 	storeService, err := store.New(&store.Options{
-		NATSBackend: d.NATSBackend,
-		ShutdownCtx: d.ShutdownContext,
-		NodeName:    cfg.NodeName,
-		SessionTTL:  cfg.SessionTTL,
+		RedisBackend: d.RedisBackend,
+		ShutdownCtx:  d.ShutdownContext,
+		NodeName:     cfg.NodeName,
+		SessionTTL:   cfg.SessionTTL,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
@@ -257,14 +201,14 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.PubSubService = pubsub.New()
 
 	busService, err := bus.New(&bus.Options{
-		Store:       storeService,
-		NATS:        d.NATSBackend,
-		Cmd:         d.CmdService,
-		NodeName:    d.Config.NodeName,
-		ShutdownCtx: d.ShutdownContext,
-		WASMDir:     d.Config.WASMDir,
-		Metrics:     d.MetricsService,
-		PubSub:      d.PubSubService,
+		Store:        storeService,
+		RedisBackend: d.RedisBackend,
+		Cmd:          d.CmdService,
+		NodeName:     d.Config.NodeName,
+		ShutdownCtx:  d.ShutdownContext,
+		WASMDir:      d.Config.WASMDir,
+		Metrics:      d.MetricsService,
+		PubSub:       d.PubSubService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")
@@ -283,8 +227,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.NotifyService = notifyService
 
 	kvService, err := kv.New(&kv.Options{
-		NATS:        d.NATSBackend,
-		NumReplicas: cfg.NATSNumKVReplicas,
+		RedisBackend: d.RedisBackend,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new kv service")
