@@ -46,10 +46,12 @@ class CreatePipelineResponse(_message.Message):
     def __init__(self, message: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
 class DeleteAudienceRequest(_message.Message):
-    __slots__ = ["audience"]
+    __slots__ = ["audience", "force"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    FORCE_FIELD_NUMBER: _ClassVar[int]
     audience: _sp_common_pb2.Audience
-    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    force: bool
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., force: bool = ...) -> None: ...
 
 class DeleteNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]

@@ -543,6 +543,10 @@ class DetachNotificationRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class DeleteAudienceRequest(betterproto.Message):
     audience: "Audience" = betterproto.message_field(1)
+    force: Optional[bool] = betterproto.bool_field(2, optional=True, group="_force")
+    """
+    If true, will also detach all pipelines from the audience (if it has any)
+    """
 
 
 @dataclass(eq=False, repr=False)

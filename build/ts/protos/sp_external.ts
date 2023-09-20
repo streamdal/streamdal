@@ -307,6 +307,12 @@ export interface DeleteAudienceRequest {
      * @generated from protobuf field: protos.Audience audience = 1;
      */
     audience?: Audience;
+    /**
+     * If true, will also detach all pipelines from the audience (if it has any)
+     *
+     * @generated from protobuf field: optional bool force = 2;
+     */
+    force?: boolean;
 }
 /**
  * Nothing needed here, we return all metrics currently
@@ -1542,7 +1548,8 @@ export const DetachNotificationRequest = new DetachNotificationRequest$Type();
 class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
     constructor() {
         super("protos.DeleteAudienceRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "force", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<DeleteAudienceRequest>): DeleteAudienceRequest {
@@ -1560,6 +1567,9 @@ class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
                 case /* protos.Audience audience */ 1:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
+                case /* optional bool force */ 2:
+                    message.force = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1575,6 +1585,9 @@ class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
         /* protos.Audience audience = 1; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* optional bool force = 2; */
+        if (message.force !== undefined)
+            writer.tag(2, WireType.Varint).bool(message.force);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
