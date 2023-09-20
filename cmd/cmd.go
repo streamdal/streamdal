@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -73,7 +74,7 @@ func (c *Cmd) run(action *types.Action) error {
 }
 
 func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
-	msg := fmt.Sprintf("Connecting to %s ", c.options.Config.SnitchServerURL)
+	msg := fmt.Sprintf("Connecting to %s ", c.options.Config.Server)
 
 	inputCh := make(chan error, 1)
 	outputCh := make(chan error, 1)
@@ -158,7 +159,7 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) connect() error {
-	time.Sleep(5 * time.Second)
+	time.Sleep(3 * time.Second)
 	//return errors.New("something broke because of Erick")
 	return nil
 }
@@ -174,7 +175,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 	component := action.Args[0]
 
-	i := 0
+	i := 1
 
 	dataCh := make(chan string, 1)
 
@@ -203,11 +204,22 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 				// Update the menu pause button
 				c.options.Console.SetPause()
+
+				pausedStatus := " PAUSED @ " + time.Now().Format("15:04:05")
+
+				if !c.paused {
+					pausedStatus = " RESUMED @ " + time.Now().Format("15:04:05")
+				}
+
+				pauseLine := "[gray:black]" + strings.Repeat("░", 16) + pausedStatus + strings.Repeat("░", 16) + "[-:-]"
+				fmt.Fprint(textView, pauseLine+"\n")
 			}
 
 			return cmd, nil
 		case data := <-dataCh:
-			if _, err := fmt.Fprint(textView, data+"\n"); err != nil {
+			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, i)
+
+			if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
 				c.log.Errorf("unable to write to textview: %s", err)
 			}
 

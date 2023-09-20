@@ -109,6 +109,7 @@ func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tvie
 	pagePeek := tview.NewTextView()
 	pagePeek.SetBorder(true)
 	pagePeek.SetTitle(title)
+	pagePeek.SetDynamicColors(true)
 
 	c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
 

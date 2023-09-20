@@ -14,8 +14,8 @@ const (
 type Config struct {
 	Version           kong.VersionFlag `help:"Show version and exit" short:"v" env:"-"`
 	Debug             bool             `help:"Enable debug logging" short:"d" default:"false"`
-	AuthToken         string           `help:"Authentication token" required:"true" short:"t"`
-	SnitchServerURL   string           `help:"Snitch server URL (gRPC)" default:"localhost:9090"`
+	Auth              string           `help:"Authentication token" required:"true" short:"a"`
+	Server            string           `help:"Snitch server URL (gRPC)" default:"localhost:9090"`
 	EnableFileLogging bool             `help:"Enable file logging" default:"false"`
 	LogFile           string           `help:"Log file" default:"./snitch-cli.log"`
 
