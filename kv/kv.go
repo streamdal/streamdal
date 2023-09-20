@@ -8,6 +8,10 @@ import (
 	"github.com/streamdal/snitch-go-client/logger"
 )
 
+var (
+	ErrNilConfig = errors.New("config cannot be nil")
+)
+
 type KV struct {
 	cfg    *Config
 	kvs    map[string]string
@@ -119,13 +123,16 @@ func (k *KV) Purge() int64 {
 }
 
 func (k *KV) Keys() []string {
-	keys := make([]string, 0, len(k.kvs))
+	k.kvsMtx.RLock()
+	defer k.kvsMtx.RUnlock()
+
+	keys := make([]string, len(k.kvs))
 
 	i := 0
 
-	for k, _ := range k.kvs {
-		keys[i] = k
-		i += 1
+	for key, _ := range k.kvs {
+		keys[i] = key
+		i++
 	}
 
 	return keys
@@ -140,7 +147,7 @@ func (k *KV) Items() int64 {
 
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
-		return errors.New("config cannot be nil")
+		return ErrNilConfig
 	}
 
 	if cfg.Logger == nil {

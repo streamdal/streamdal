@@ -9,6 +9,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 	"github.com/streamdal/snitch-go-client/server/serverfakes"
 )
 
@@ -69,7 +70,6 @@ func TestAddAudience(t *testing.T) {
 
 	s := &Snitch{
 		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
 		serverClient: fakeClient,
 	}
 
@@ -87,5 +87,43 @@ func TestAddAudience(t *testing.T) {
 
 	if fakeClient.NewAudienceCallCount() != 1 {
 		t.Error("expected NewAudience to be called")
+	}
+}
+
+func TestAddAudiences(t *testing.T) {
+	ctx := context.Background()
+
+	fakeClient := &serverfakes.FakeIServerClient{}
+
+	s := &Snitch{
+		config: &Config{
+			Logger: &loggerfakes.FakeLogger{},
+		},
+		audiencesMtx: &sync.RWMutex{},
+		audiences: map[string]struct{}{
+			audToStr(&protos.Audience{
+				ServiceName:   "mysvc1",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "mytopic",
+			}): {},
+			audToStr(&protos.Audience{
+				ServiceName:   "mysvc2",
+				ComponentName: "rabbitmq",
+				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+				OperationName: "events.orders.#",
+			}): {},
+			"bad-audience": {},
+		},
+		serverClient: fakeClient,
+	}
+	s.addAudiences(ctx)
+
+	// Allow time for goroutine to run
+	time.Sleep(time.Second)
+
+	callCount := fakeClient.NewAudienceCallCount()
+	if callCount != 2 {
+		t.Errorf("expected NewAudience to be called 2 times, actual was '%d'", callCount)
 	}
 }
