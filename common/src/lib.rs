@@ -7,7 +7,7 @@ use std::mem;
 const MAX_READ_SIZE: usize = 1024 * 1024; // 1 MB
 
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
-pub fn read_request(ptr: *mut u8, length: usize, deallocate: bool) -> Result<WASMRequest, String> {
+pub fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> {
     let request_bytes = read_memory_with_length(ptr, length);
 
     // Decode read request
@@ -15,10 +15,8 @@ pub fn read_request(ptr: *mut u8, length: usize, deallocate: bool) -> Result<WAS
         protobuf::Message::parse_from_bytes(request_bytes.as_slice()).map_err(|e| e.to_string())?;
 
     // Dealloc request bytes
-    if deallocate {
-        unsafe {
-            dealloc(ptr, length as i32);
-        }
+    unsafe {
+        dealloc(ptr, length as i32);
     }
 
     Ok(request)
@@ -47,7 +45,12 @@ pub fn write_response(
     response.exit_code = protobuf::EnumOrUnknown::from(exit_code);
     response.exit_msg = exit_msg;
 
-    let mut bytes = protobuf::Message::write_to_bytes(&response).unwrap();
+    let mut bytes = match protobuf::Message::write_to_bytes(&response) {
+        Ok(bytes) => bytes,
+        Err(_) => {
+            Vec::new()
+        }
+    };
 
     // Append 3 terminators (ascii code 166 = ¦)
     bytes.extend_from_slice(&[166, 166, 166]);
@@ -72,7 +75,9 @@ pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> *mut
 /// This function is unsafe because it operates with raw memory so the compiler
 /// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
-    let mut buffer = Vec::with_capacity(size as usize);
+    // We multiply size by 3 here to allow for both request and response to fit into
+    // Memory + a buffer to allow for transform to mutate data into a bigger size
+    let mut buffer = Vec::with_capacity(size as usize * 3);
 
     let pointer = buffer.as_mut_ptr();
 
