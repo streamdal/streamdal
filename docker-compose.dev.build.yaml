@@ -1,20 +1,16 @@
 version: "3"
 services:
   snitch-server:
-    # This docker-compose *builds* a snitch-server img instead of downloading
-    # the latest img from dockerhub. This is useful for those actively developing
-    # snitch-server and needing to test the whole stack via docker.
     build:
       context: ./
       dockerfile: Dockerfile
     depends_on:
-      - natsjs
+      - redis
     environment:
       - SNITCH_SERVER_NODE_NAME=node1
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_REDIS_URL=redis:6379
       - SNITCH_SERVER_DEBUG=true
-      - SNITCH_SERVER_SEED_DUMMY_DATA=false
     container_name: snitch-server
     ports:
       - "8080:8080"
