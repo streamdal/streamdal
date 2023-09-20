@@ -61,7 +61,7 @@ func New(snitchAddress, snitchToken string) (*Client, error) {
 
 	conn, err := grpc.DialContext(dialCtx, snitchAddress, opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "Could not dial GRPC server: %s")
+		return nil, errors.Wrap(err, "could not dial GRPC server: %s")
 	}
 
 	return &Client{

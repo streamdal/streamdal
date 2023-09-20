@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 	"github.com/tetratelabs/wazero/api"
+
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 
 	"github.com/streamdal/snitch-go-client/helper"
 )
@@ -81,6 +82,12 @@ func methodFromProto(m steps.HttpRequestMethod) string {
 		return http.MethodPut
 	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_DELETE:
 		return http.MethodDelete
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_PATCH:
+		return http.MethodPatch
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_HEAD:
+		return http.MethodHead
+	case steps.HttpRequestMethod_HTTP_REQUEST_METHOD_OPTIONS:
+		return http.MethodOptions
 	default:
 		return http.MethodGet
 	}
