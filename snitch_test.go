@@ -92,6 +92,32 @@ func TestValidateConfig(t *testing.T) {
 	})
 }
 
+func TestToProto(t *testing.T) {
+	audPublic := Audience{
+		ServiceName:   "test-service",
+		ComponentName: "test-component",
+		OperationType: OperationTypeProducer,
+		OperationName: "test-operation",
+	}
+
+	audProto := audPublic.ToProto()
+	if audProto.ServiceName != audPublic.ServiceName {
+		t.Errorf("expected ServiceName '%s', got '%s'", audPublic.ServiceName, audProto.ServiceName)
+	}
+
+	if audProto.ComponentName != audPublic.ComponentName {
+		t.Errorf("expected ComponentName '%s', got '%s'", audPublic.ComponentName, audProto.ComponentName)
+	}
+
+	if audProto.OperationType != protos.OperationType_OPERATION_TYPE_PRODUCER {
+		t.Errorf("expected OperationType '%d', got '%d'", protos.OperationType_OPERATION_TYPE_PRODUCER, audProto.OperationType)
+	}
+
+	if audProto.OperationName != audPublic.OperationName {
+		t.Errorf("expected OperationName '%s', got '%s'", audPublic.OperationName, audProto.OperationName)
+	}
+}
+
 type InternalServer struct {
 	// Must be implemented in order to satisfy the protos InternalServer interface
 	protos.UnimplementedInternalServer

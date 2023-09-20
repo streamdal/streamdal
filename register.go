@@ -9,11 +9,17 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-go-client/validate"
+)
+
+var (
+	ErrPipelineNotPaused = errors.New("pipeline not paused")
+	ErrPipelineNotActive = errors.New("pipeline not active or does not exist")
 )
 
 func (s *Snitch) register(looper director.Looper) error {
@@ -222,14 +228,15 @@ func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error 
 			continue
 		}
 
-		s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
-
 		switch i.Action {
 		case shared.KVAction_KV_ACTION_CREATE, shared.KVAction_KV_ACTION_UPDATE:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
 			s.kv.Set(i.Object.Key, string(i.Object.Value))
 		case shared.KVAction_KV_ACTION_DELETE:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction for key '%s'", i.Action, i.Object.Key)
 			s.kv.Delete(i.Object.Key)
 		case shared.KVAction_KV_ACTION_DELETE_ALL:
+			s.config.Logger.Debugf("attempting to perform '%s' KV instruction", i.Action)
 			s.kv.Purge()
 		default:
 			s.config.Logger.Debugf("invalid KV action '%s' - skipping", i.Action)
@@ -267,11 +274,17 @@ func (s *Snitch) detachPipeline(_ context.Context, cmd *protos.Command) error {
 	s.pipelinesMtx.Lock()
 	defer s.pipelinesMtx.Unlock()
 
-	if _, ok := s.pipelines[audToStr(cmd.Audience)]; !ok {
+	audStr := audToStr(cmd.Audience)
+
+	if _, ok := s.pipelines[audStr]; !ok {
 		return nil
 	}
 
-	delete(s.pipelines[audToStr(cmd.Audience)], cmd.GetDetachPipeline().PipelineId)
+	delete(s.pipelines[audStr], cmd.GetDetachPipeline().PipelineId)
+
+	if len(s.pipelines[audStr]) == 0 {
+		delete(s.pipelines, audStr)
+	}
 
 	s.config.Logger.Debugf("Detached pipeline %s", cmd.GetDetachPipeline().PipelineId)
 
@@ -288,22 +301,28 @@ func (s *Snitch) pausePipeline(_ context.Context, cmd *protos.Command) error {
 	s.pipelinesPausedMtx.Lock()
 	defer s.pipelinesPausedMtx.Unlock()
 
-	if _, ok := s.pipelines[audToStr(cmd.Audience)]; !ok {
-		return errors.New("pipeline not active or does not exist")
+	audStr := audToStr(cmd.Audience)
+
+	if _, ok := s.pipelines[audStr]; !ok {
+		return ErrPipelineNotActive
 	}
 
-	pipeline, ok := s.pipelines[audToStr(cmd.Audience)][cmd.GetPausePipeline().PipelineId]
+	pipeline, ok := s.pipelines[audStr][cmd.GetPausePipeline().PipelineId]
 	if !ok {
-		return errors.New("pipeline not active or does not exist")
+		return ErrPipelineNotActive
 	}
 
-	if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
-		s.pipelinesPaused[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
+	if _, ok := s.pipelinesPaused[audStr]; !ok {
+		s.pipelinesPaused[audStr] = make(map[string]*protos.Command)
 	}
 
-	s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetPausePipeline().PipelineId] = pipeline
+	s.pipelinesPaused[audStr][cmd.GetPausePipeline().PipelineId] = pipeline
 
-	delete(s.pipelines[audToStr(cmd.Audience)], cmd.GetPausePipeline().PipelineId)
+	delete(s.pipelines[audStr], cmd.GetPausePipeline().PipelineId)
+
+	if len(s.pipelines[audStr]) == 0 {
+		delete(s.pipelines, audStr)
+	}
 
 	return nil
 }
@@ -318,22 +337,28 @@ func (s *Snitch) resumePipeline(_ context.Context, cmd *protos.Command) error {
 	s.pipelinesPausedMtx.Lock()
 	defer s.pipelinesPausedMtx.Unlock()
 
-	if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
-		return errors.New("pipeline not paused")
+	audStr := audToStr(cmd.Audience)
+
+	if _, ok := s.pipelinesPaused[audStr]; !ok {
+		return ErrPipelineNotPaused
 	}
 
-	pipeline, ok := s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetResumePipeline().PipelineId]
+	pipeline, ok := s.pipelinesPaused[audStr][cmd.GetResumePipeline().PipelineId]
 	if !ok {
-		return errors.New("pipeline not paused")
+		return ErrPipelineNotPaused
 	}
 
-	if _, ok := s.pipelines[audToStr(cmd.Audience)]; !ok {
-		s.pipelines[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
+	if _, ok := s.pipelines[audStr]; !ok {
+		s.pipelines[audStr] = make(map[string]*protos.Command)
 	}
 
-	s.pipelines[audToStr(cmd.Audience)][cmd.GetResumePipeline().PipelineId] = pipeline
+	s.pipelines[audStr][cmd.GetResumePipeline().PipelineId] = pipeline
 
-	delete(s.pipelinesPaused[audToStr(cmd.Audience)], cmd.GetResumePipeline().PipelineId)
+	delete(s.pipelinesPaused[audStr], cmd.GetResumePipeline().PipelineId)
+
+	if len(s.pipelinesPaused[audStr]) == 0 {
+		delete(s.pipelinesPaused, audStr)
+	}
 
 	return nil
 }
