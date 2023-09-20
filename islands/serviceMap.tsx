@@ -19,6 +19,7 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
+import { ServiceMapType } from "../lib/fetch.ts";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -86,10 +87,11 @@ export const updateEdges = (
 };
 
 export default function ServiceMapComponent(
-  { initNodes, initEdges, blur = false }: {
+  { initNodes, initEdges, blur = false, serviceMap }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
     blur?: boolean;
+    serviceMap: ServiceMapType;
   },
 ) {
   const wrapper = useRef(null);

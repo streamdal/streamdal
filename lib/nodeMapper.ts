@@ -9,7 +9,6 @@ import {
   operationKey,
   serviceKey,
 } from "./utils.ts";
-import { MarkerType } from "reactflow";
 import { OpUpdate } from "../islands/serviceMap.tsx";
 import { ServiceMapper } from "./serviceMapper.ts";
 import {
@@ -26,6 +25,7 @@ export type Operation = {
 export type NodeData = {
   audience: Audience;
   ops?: Operation[];
+  serviceMap: ServiceMapper;
 };
 
 export type FlowNode = {
@@ -50,7 +50,9 @@ export type FlowEdge = {
   source: string;
   target: string;
   markerEnd: any;
+  type: string;
   style: any;
+  data: any;
 };
 
 //
@@ -142,6 +144,7 @@ export const mapOperation = (
             serviceMap.config,
           ),
         }],
+        serviceMap,
       },
     });
   }
@@ -176,7 +179,7 @@ export const mapNodes = (
           ),
           y: 0,
         },
-        data: { audience: a },
+        data: { audience: a, serviceMap },
       });
 
       mapOperation(nodesMap, a, serviceMap);
@@ -191,7 +194,7 @@ export const mapNodes = (
           x: offset(cKey, nodesMap.components),
           y: 450 + (max - 1) * 76,
         },
-        data: { audience: a },
+        data: { audience: a, serviceMap },
       });
     },
   );
@@ -206,7 +209,7 @@ export const mapNodes = (
 export const mapEdgePair = (
   edgesMap: Map<string, FlowEdge>,
   a: Audience,
-  highlight?: boolean,
+  audiences: Audience[],
 ): Map<string, FlowEdge> => {
   const op = OperationType[a.operationType].toLowerCase();
   edgesMap.set(`${componentKey(a)}-${groupKey(a)}-edge`, {
@@ -220,16 +223,18 @@ export const mapEdgePair = (
         source: groupKey(a),
         target: componentKey(a),
       },
+    animated: true,
     markerEnd: {
-      type: MarkerType.Arrow,
       width: 20,
       height: 20,
       color: "#E6DDFE",
     },
+    type: "interactiveEdge",
     style: {
       strokeWidth: 1.5,
       stroke: "#E6DDFE",
     },
+    data: { audiences, a },
   });
 
   edgesMap.set(`${serviceKey(a)}-${groupKey(a)}-edge`, {
@@ -243,23 +248,25 @@ export const mapEdgePair = (
         source: serviceKey(a),
         target: groupKey(a),
       },
+    animated: true,
     markerEnd: {
-      type: MarkerType.Arrow,
       width: 20,
       height: 20,
       color: "#E6DDFE",
     },
+    type: "interactiveEdge",
     style: {
       strokeWidth: 1.5,
       stroke: "#E6DDFE",
     },
+    data: { audiences, a },
   });
   return edgesMap;
 };
 
 export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
   const edgesMap = new Map<string, FlowEdge>();
-  audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a, false));
+  audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a, audiences));
   return edgesMap;
 };
 

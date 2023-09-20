@@ -6,7 +6,13 @@ import { OperationType } from "snitch-protos/protos/sp_common.ts";
 import { ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
-import { getHoverGroup, removeWhitespace, titleCase } from "../../lib/utils.ts";
+import {
+  getComponentGroup,
+  getOperationHoverGroup,
+  getServiceGroup,
+  removeWhitespace,
+  titleCase,
+} from "../../lib/utils.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../../lib/nodeMapper.ts";
 import { opModal } from "./opModalSignal.ts";
@@ -15,11 +21,28 @@ export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
 
 export const ServiceNode = ({ data }: { data: NodeData }) => {
+  const setHover = () => {
+    getServiceGroup(
+      data.audience.serviceName,
+      data.serviceMap.audiences,
+      true,
+    );
+  };
+  const resetHover = () => {
+    getServiceGroup(
+      data.audience.serviceName,
+      data.serviceMap.audiences,
+      false,
+    );
+  };
+
   return (
     <div>
       <div
-        class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg shadow-lg z-10 border-1 border-purple-200 px-2"
-        id="dragHandle"
+        class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg z-10 px-2 border hover:border-purple-600 hover:shadow-lg"
+        id={data.audience.serviceName}
+        onMouseOver={() => setHover()}
+        onMouseLeave={() => resetHover()}
       >
         <div class="flex flex-row items-center">
           <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
@@ -54,10 +77,11 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
   const op = OperationType[data.audience.operationType];
   const producer = op === OperationType[OperationType.PRODUCER];
   const setHover = () => {
-    getHoverGroup(data.audience, true);
+    getOperationHoverGroup(data.audience, true);
   };
+
   const resetHover = () => {
-    getHoverGroup(data.audience, false);
+    getOperationHoverGroup(data.audience, false);
   };
 
   return (
@@ -162,6 +186,20 @@ export const ComponentImage = (
 };
 
 export const ComponentNode = ({ data }: { data: NodeData }) => {
+  const setHover = () => {
+    getComponentGroup(
+      data.audience.componentName,
+      data.serviceMap.audiences,
+      true,
+    );
+  };
+  const resetHover = () => {
+    getComponentGroup(
+      data.audience.componentName,
+      data.serviceMap.audiences,
+      false,
+    );
+  };
   return (
     <div>
       <div className={"flex w-1/2 justify-between mb"}>
@@ -177,8 +215,10 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
         />
       </div>
       <div
-        id="dragHandle"
-        class="z-0 flex justify-center items-center bg-web rounded-md border-1 border-black h-[145px] w-[145px] shadow-xl"
+        id={data.audience.componentName}
+        class="z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px]"
+        onMouseOver={() => setHover()}
+        onMouseLeave={() => resetHover()}
       >
         <div class="flex justify-center flex-col items-center">
           <ComponentImage componentName={data.audience.componentName} />
