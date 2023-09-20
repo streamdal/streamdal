@@ -203,7 +203,13 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
 
-		if err := s.options.RedisBackend.Set(ctx, k, []byte(fmt.Sprintf("%d", time.Now().UTC().UnixNano())), s.options.SessionTTL).Err(); err != nil {
+		// Get value
+		val, err := s.options.RedisBackend.Get(ctx, k).Result()
+		if err != nil {
+			return errors.Wrap(err, "error fetching key for refresh")
+		}
+
+		if err := s.options.RedisBackend.Set(ctx, k, []byte(val), s.options.SessionTTL).Err(); err != nil {
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}
