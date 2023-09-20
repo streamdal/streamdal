@@ -66,20 +66,27 @@ func TestValidateConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid wasm timeout duration", func(t *testing.T) {
+	t.Run("invalid step timeout duration", func(t *testing.T) {
 		_ = os.Setenv("SNITCH_STEP_TIMEOUT", "foo")
 		cfg := &Config{
-			ServiceName: "mysvc1",
-			ShutdownCtx: context.Background(),
-			SnitchURL:   "http://localhost:9090",
-			SnitchToken: "foo",
-			DryRun:      false,
-			Logger:      &logger.NoOpLogger{},
+			SnitchURL:       "localhost:9090",
+			SnitchToken:     "foo",
+			ServiceName:     "mysvc1",
+			PipelineTimeout: 0,
+			StepTimeout:     0,
+			DryRun:          false,
+			ShutdownCtx:     context.Background(),
+			Logger:          &logger.NoOpLogger{},
 		}
 		err := validateConfig(cfg)
-		if err == nil || !strings.Contains(err.Error(), "unable to parse SNITCH_STEP_TIMEOUT") {
-			t.Error("expected time.ParseDuration error")
+		if err == nil {
+			t.Error("expected error but got nil")
 		}
+
+		if err != nil && !strings.Contains(err.Error(), "unable to parse StepTimeout") {
+			t.Errorf("expected error to contain 'unable to Parse StepTimeout' error; got '%+v'", err)
+		}
+
 		_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
 	})
 }
@@ -91,6 +98,14 @@ type InternalServer struct {
 
 func (i *InternalServer) GetAttachCommandsByService(ctx context.Context, req *protos.GetAttachCommandsByServiceRequest) (*protos.GetAttachCommandsByServiceResponse, error) {
 	return &protos.GetAttachCommandsByServiceResponse{}, nil
+}
+
+func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Internal_RegisterServer) error {
+	for {
+		if err := srv.Send(&protos.Command{}); err != nil {
+			return errors.Wrap(err, "unable to send cmd")
+		}
+	}
 }
 
 func TestNew(t *testing.T) {
@@ -107,6 +122,9 @@ func TestNew(t *testing.T) {
 			panic("failed to serve: " + err.Error())
 		}
 	}()
+
+	// Give gRPC a moment to startup
+	time.Sleep(time.Second)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -214,7 +232,7 @@ func TestHandleConditions(t *testing.T) {
 func TestProcess_nil(t *testing.T) {
 	s := &Snitch{}
 	_, err := s.Process(context.Background(), nil)
-	if err == nil || !strings.Contains(err.Error(), "request cannot be nil") {
+	if err == nil || !strings.Contains(err.Error(), "request cannot be empty") {
 		t.Error("expected error")
 	}
 }
