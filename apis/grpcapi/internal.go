@@ -7,14 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/streamdal/snitch-server/services/store"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
+	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -478,4 +477,28 @@ func (s *InternalServer) generateInitialKVCommands(ctx context.Context) ([]*prot
 	s.log.Debugf("generateInitialKVCommands has generated '%d' KV commands", len(cmds))
 
 	return cmds, nil
+}
+
+func (s *InternalServer) SendSchema(ctx context.Context, req *protos.SendSchemaRequest) (*protos.StandardResponse, error) {
+	if err := validate.SendSchemaRequest(req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			Message: fmt.Sprintf("invalid request: %s", err.Error()),
+		}, nil
+	}
+
+	if err := s.Options.StoreService.AddSchema(ctx, req); err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: fmt.Sprintf("unable to save schema: %s", err.Error()),
+		}, nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Schema received",
+	}, nil
 }

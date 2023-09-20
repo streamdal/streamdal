@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"encoding/json"
 	"regexp"
 
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
@@ -738,6 +739,43 @@ func TailResponse(r *protos.TailResponse) error {
 
 	if r.Type == protos.TailResponseType_TAIL_RESPONSE_TYPE_UNSET {
 		return ErrUnsetEnum("Type")
+	}
+
+	return nil
+}
+
+func SendSchemaRequest(r *protos.SendSchemaRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.Schema == nil {
+		return ErrNilField("Schema")
+	}
+
+	if r.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	var js map[string]interface{}
+	if err := json.Unmarshal(r.Schema.JsonSchema, &js); err != nil {
+		return errors.Wrap(err, "invalid json")
+	}
+
+	return nil
+}
+
+func GetSchemaRequest(r *protos.GetSchemaRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.Audience == nil {
+		return ErrNilField("Audience")
+	}
+
+	if err := Audience(r.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
 	}
 
 	return nil

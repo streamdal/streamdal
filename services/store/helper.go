@@ -33,6 +33,9 @@ const (
 
 	RedisNotificationAssocPrefix = "notification_assoc"
 	RedisNotificationAssocFormat = "notification_assoc:%s:%s" // K: $pipeline_id:$config_id V: NONE
+
+	RedisSchemaPrefix = "schema"
+	RedisSchemaFormat = "schema:%s" // K: $audience V: serialized protos.Schema
 )
 
 func RedisRegisterKey(session, node string) string {
@@ -66,4 +69,8 @@ func RedisNotificationConfigKey(configID string) string {
 
 func RedisNotificationAssocKey(pipelineID, configID string) string {
 	return strings.ToLower(fmt.Sprintf(RedisNotificationAssocFormat, pipelineID, configID))
+}
+
+func RedisSchemaKey(audience string) string {
+	return strings.ToLower(fmt.Sprintf(RedisSchemaFormat, audience))
 }

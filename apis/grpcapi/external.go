@@ -799,6 +799,21 @@ func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, ser
 	}
 }
 
+func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaRequest) (*protos.GetSchemaResponse, error) {
+	if err := validate.GetSchemaRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid get schema request")
+	}
+
+	schema, err := s.Options.StoreService.GetSchema(ctx, req.Audience)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get schema")
+	}
+
+	return &protos.GetSchemaResponse{
+		Schema: schema,
+	}, nil
+}
+
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
