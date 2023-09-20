@@ -677,6 +677,50 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	// Determine if the audience is attached to any pipelines
+	attached, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	s.log.Debugf("request contents: %+v", req)
+
+	// Force delete - detach audiences from pipelines
+	if req.Force != nil && *req.Force {
+		s.log.Debug("force delete requested")
+
+		for _, pipelineID := range attached {
+			s.log.Debugf("request to force delete audience '%s'; attempting to detach pipeline '%s'",
+				util.AudienceToStr(req.Audience), pipelineID)
+
+			resp, err := s.DetachPipeline(ctx, &protos.DetachPipelineRequest{
+				PipelineId: pipelineID,
+				Audience:   req.Audience,
+			})
+
+			// DetachPipeline can return both an error and a resp - need to check both
+			if err != nil {
+				return util.StandardResponse(
+					ctx,
+					protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+					fmt.Sprintf("received err during force detach for pipeline '%s', audience '%s': %s", pipelineID,
+						util.AudienceToStr(req.Audience), err),
+				), nil
+			}
+
+			if resp != nil && resp.Code != protos.ResponseCode_RESPONSE_CODE_OK {
+				return util.StandardResponse(
+					ctx,
+					protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+					fmt.Sprintf("received non-OK response during force detach for pipeline '%s', audience '%s': %s", pipelineID,
+						util.AudienceToStr(req.Audience), resp.Message),
+				), nil
+			}
+
+			s.log.Debugf("successfully force detached pipeline '%s' from audience '%s'", pipelineID, util.AudienceToStr(req.Audience))
+		}
+	}
+
 	if err := s.Options.StoreService.DeleteAudience(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}

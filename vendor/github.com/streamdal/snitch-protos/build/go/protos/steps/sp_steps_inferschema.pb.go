@@ -20,6 +20,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// InferSchemaStep is a step that infers the schema of a payload.
+// It is designed to be used directly by the SDK rather than in a pipeline, so that
+// we can support schema inference without the need for pipelines to be created
 type InferSchemaStep struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
