@@ -109,6 +109,11 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 	c.Start()
 
+	// Remove all menu highlights - you cannot access menu while in filter view
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight()
+	})
+
 	var hit bool
 	var input string
 

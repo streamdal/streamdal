@@ -17,11 +17,11 @@ import (
 )
 
 type Cmd struct {
-	textview *tview.TextView
-	paused   bool
-	filter   string
-	options  *Options
-	log      *log.Logger
+	textview       *tview.TextView
+	paused         bool
+	announceFilter bool
+	options        *Options
+	log            *log.Logger
 }
 
 type Options struct {
@@ -85,8 +85,6 @@ func (c *Cmd) run(action *types.Action) error {
 // Filter view can only be triggered if we came from peek so it makes sense
 // for us to go back to peek() after the filter view is closed.
 func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
-	// TODO: Remove highlights for everything in menu
-
 	// Disable input capture while in Filter
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
@@ -112,6 +110,8 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 	} else {
 		c.options.Console.SetMenuEntryOff("Filter")
 	}
+
+	c.announceFilter = true
 
 	// We want to go back to peek() with the same component as before + set the
 	// new filter string.
@@ -288,6 +288,14 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 	i := 1
 
 	dataCh := make(chan string, 1)
+
+	if c.announceFilter {
+		filterStatus := fmt.Sprintf(" Filter set to '%s' @ "+time.Now().Format("15:04:05"), action.PeekFilter)
+		filterLine := "[gray:black]" + strings.Repeat("░", 16) + filterStatus + strings.Repeat("░", 16) + "[-:-]"
+		fmt.Fprintf(textView, filterLine+"\n")
+
+		c.announceFilter = false
+	}
 
 	// TODO: Getting peek data from snitch-server
 	go func() {
