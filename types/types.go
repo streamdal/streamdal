@@ -15,4 +15,9 @@ type Step int
 type Action struct {
 	Step Step
 	Args []string
+
+	// Args specifically used by peek()
+	PeekComponent string
+	PeekFilter    string
+	PeekSearch    string
 }

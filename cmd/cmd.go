@@ -17,6 +17,7 @@ import (
 
 type Cmd struct {
 	paused  bool
+	filter  string
 	options *Options
 	log     *log.Logger
 }
@@ -46,6 +47,10 @@ func (c *Cmd) Run() error {
 	})
 }
 
+// Run is a recursive method because the next step that will be executed is
+// determined by the current step (which passes back a resp). run() accepts
+// an action because it might contain arguments that the requested step might
+// use. NOTE: First run() call defines the *first* step that will be executed.
 func (c *Cmd) run(action *types.Action) error {
 	var (
 		resp *types.Action
@@ -59,6 +64,8 @@ func (c *Cmd) run(action *types.Action) error {
 		resp, err = c.actionSelect(action)
 	case types.StepPeek:
 		resp, err = c.actionPeek(action)
+	case types.StepFilter:
+		resp, err = c.actionFilter(action)
 	case types.StepQuit:
 		c.options.Console.Stop()
 		os.Exit(0)
@@ -71,6 +78,41 @@ func (c *Cmd) run(action *types.Action) error {
 	}
 
 	return c.run(resp)
+}
+
+// Filter view can only be triggered if we came from peek so it makes sense
+// for us to go back to peek() after the filter view is closed.
+func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
+	// TODO: Disable everything except "Q" in menu
+	// TODO: Remove highlights for everything in menu except "Q"
+
+	// Display modal
+	answerCh := make(chan string)
+
+	// Disable input capture while in Filter
+	origCapture := c.options.Console.GetInputCapture()
+	c.options.Console.SetInputCapture(nil)
+	defer c.options.Console.SetInputCapture(origCapture)
+
+	go func() {
+		c.options.Console.DisplayFilter(action.PeekFilter, answerCh)
+	}()
+
+	// Wait for an answer; if the user selects "Cancel", we will get back
+	// the original filter (if any); if the user selects "Reset" - we will get
+	// back an empty space; if the user clicks "OK" - we will get back the
+	// filter string they chose.
+	filterStr := <-answerCh
+
+	c.log.Infof("received filter setting back: %s", filterStr)
+
+	// We want to go back to peek() with the same component as before + set the
+	// new filter string.
+	return &types.Action{
+		Step:          types.StepPeek,
+		PeekComponent: action.PeekComponent,
+		PeekFilter:    filterStr,
+	}, nil
 }
 
 func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
@@ -114,24 +156,40 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	component := <-componentCh
 
 	return &types.Action{
-		Step: types.StepPeek,
-		Args: []string{component},
+		Step:          types.StepPeek,
+		Args:          []string{component},
+		PeekComponent: component,
 	}, nil
 }
 
+// actionPeek launches the actual peek via server + displaying the peek view.
+//
+// The flow here is that peek() will block until it receives a command that
+// the caller (actionPeek) should know about. When peek() returns, it will
+// return a response action. This action is evaluated to determine IF actionPeek
+// should send the command all the way back to run() which will execute the
+// step in the response.
+//
+// It makes sense to send the resp command all the way back if the step requires
+// us to draw/display a new screen (such as "StepFilter" or "StepSelect").
+// We would NOT want to send the command back if the step is "StepPause" since
+// pause does not display a modal and can be handled entirely inside peek().
+//
+// We pass the actionCh to DisplayPeek() so it can WRITE commands it has seen to
+// the channel that is read by peek().
 func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if len(action.Args) < 1 {
-		return nil, errors.New("missing arg (component name)")
+	if action.PeekComponent == "" {
+		return nil, errors.New("actionPeek(): bug? PeekComponent cannot be empty")
 	}
 
 	actionCh := make(chan *types.Action, 1)
 
 	// Ready to peek; display peek view
-	textView := c.options.Console.DisplayPeek(action.Args[0], actionCh)
+	textView := c.options.Console.DisplayPeek(action.PeekComponent, actionCh)
 
 	for {
 		respAction, err := c.peek(action, textView, actionCh)
@@ -141,16 +199,24 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 
 		switch respAction.Step {
 		case types.StepQuit:
+			// Pass action back to run so that it can handle exit
 			return respAction, nil
 		case types.StepSelect:
-			// Go back to select screen
+			// Pass action back to run which will display select screen
 			return respAction, nil
 		case types.StepFilter:
-			// TODO: Display filter modal
+			// Pass action back to run which will display filter screen
+			return respAction, nil
 		case types.StepSearch:
-			// TODO: Display search modal
+			// Pass action back to run which will display search screen
+			return respAction, nil
 		case types.StepPause:
-
+			// Do nothing because pause does not display a modal - it only
+			// updates the <menu> entry to show that is selected + causes
+			// peek() to not read any data from the dataCh while paused.
+			//
+			// We *specifically* do not pass the action back to run() because
+			// that will cause actionPeek to end.
 		default:
 			c.log.Errorf("unknown step: %s", respAction.Step)
 			return nil, fmt.Errorf("unknown step: %d", respAction.Step)
@@ -169,11 +235,9 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if len(action.Args) < 1 {
-		return nil, errors.New("peek requires at least one argument")
+	if action.PeekComponent == "" {
+		return nil, errors.New("peek(): bug? *Action.PeekComponent cannot be empty")
 	}
-
-	component := action.Args[0]
 
 	i := 1
 
@@ -187,22 +251,32 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
-			dataCh <- fmt.Sprintf("Component '%s': line %d", component, i)
+			dataCh <- fmt.Sprintf("Component '%s': line %d", action.PeekComponent, i)
 			time.Sleep(200 * time.Millisecond)
 			i++
 		}
 	}()
 
-	// Display peek data in textview + listen to user commands and maybe forward
-	// them back to the caller
+	// Commands read here have been passed down from DisplayPeek(); we need access
+	// to them here so we can potentially modify how we're interacting with the
+	// textView component.
+	//
+	// For example: When we detect a pause -> send a "pause" line to textView.
+	// Or when we detect a sampling update - which would trigger us to re-start
+	// peek with updated settings).
+	// Or when we detect a filter update - we will update the local filter which
+	// is read by <- dataCh: case.
 	for {
 		select {
 		case cmd := <-actionCh:
+			// If this is a filter step -> pass action back to peek() so it can
+			// return it to the main display loop.
+
 			if cmd.Step == types.StepPause {
 				// Tell peek reader to pause/resume
 				c.paused = !c.paused
 
-				// Update the menu pause button
+				// Update the menu pause button visual
 				c.options.Console.SetPause()
 
 				pausedStatus := " PAUSED @ " + time.Now().Format("15:04:05")
@@ -215,8 +289,15 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				fmt.Fprint(textView, pauseLine+"\n")
 			}
 
+			// Re-inject component
+			cmd.PeekComponent = action.PeekComponent
+
 			return cmd, nil
 		case data := <-dataCh:
+			if !strings.Contains(data, c.filter) {
+				continue
+			}
+
 			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, i)
 
 			if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {

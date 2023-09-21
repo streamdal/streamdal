@@ -28,12 +28,14 @@ const (
 	PrimitiveErrorModal = "error_modal"
 	PrimitiveList       = "list"
 	PrimitivePeekView   = "peek_view"
+	PrimitiveFilter     = "filter"
 
 	PageConnectionAttempt = "page_" + PrimitiveInfoModal
 	PageConnectionRetry   = "page_" + PrimitiveRetryModal
 	PageSelectComponent   = "page_" + PrimitiveList
 	PagePeekError         = "page_" + PrimitiveErrorModal
 	PagePeekView          = "page_" + PrimitivePeekView
+	PageFilter            = "page_" + PrimitiveFilter
 )
 
 type Console struct {
@@ -68,6 +70,14 @@ func New(opts *Options) (*Console, error) {
 	return c, nil
 }
 
+func (c *Console) SetInputCapture(f func(event *tcell.EventKey) *tcell.EventKey) {
+	c.app.SetInputCapture(f)
+}
+
+func (c *Console) GetInputCapture() func(event *tcell.EventKey) *tcell.EventKey {
+	return c.app.GetInputCapture()
+}
+
 func (c *Console) SetPause() {
 	menu := c.menu.GetText(false)
 
@@ -79,10 +89,10 @@ func (c *Console) SetPause() {
 		updatedMenu = c.addPause(menu)
 	}
 
-	c.menu.Clear()
-	fmt.Fprint(c.menu, updatedMenu)
-
-	c.app.Draw()
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Clear()
+		fmt.Fprint(c.menu, updatedMenu)
+	})
 }
 
 func (c *Console) isPaused(menu string) bool {
@@ -101,6 +111,34 @@ func (c *Console) addPause(menu string) string {
 	return strings.Replace(menu, "Pause", "[lightcyan]Pause[-]", -1)
 }
 
+func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
+	c.Start()
+
+	var input string
+
+	form := tview.NewForm().
+		AddInputField("", defaultValue, 30, nil, func(text string) {
+			input = text
+		}).
+		AddButton("OK", func() {
+			answerCh <- input
+		}).
+		AddButton("Reset", func() {
+			answerCh <- ""
+		}).
+		AddButton("Cancel", func() {
+			// Return the original value
+			answerCh <- defaultValue
+		})
+
+	form.SetBorder(true).SetTitle("Set filter")
+	form.SetButtonsAlign(tview.AlignCenter)
+
+	inputDialog := Center(form, 36, 7)
+	c.pages.AddPage(PageFilter, inputDialog, true, true)
+	//c.pages.SwitchToPage(PageFilter)
+}
+
 // DisplayPeek will display peek + write any actions we receive from the user
 // to the action channel; the action channel is read by the peek() method.
 func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tview.TextView {
@@ -115,20 +153,35 @@ func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tvie
 
 	c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+			c.log.Debug("quit keypress")
+
 			actionCh <- &types.Action{
 				Step: types.StepQuit,
 			}
 		}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 's' {
+			c.log.Debug("select keypress")
+
 			actionCh <- &types.Action{
 				Step: types.StepSelect,
 			}
 		}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 'p' {
+			c.log.Debug("pause keypress")
+
 			actionCh <- &types.Action{
 				Step: types.StepPause,
+			}
+		}
+
+		if event.Key() == tcell.KeyRune && event.Rune() == 'f' {
+			c.log.Debug("filter keypress")
+
+			actionCh <- &types.Action{
+				Step:          types.StepFilter,
+				PeekComponent: title,
 			}
 		}
 
@@ -269,6 +322,16 @@ func (c *Console) DisplayErrorModal(msg string) {
 	c.pages.AddPage(PagePeekError, retryModal, true, true)
 	c.pages.SwitchToPage(PagePeekError)
 	c.app.Draw()
+}
+
+func Center(p tview.Primitive, width, height int) tview.Primitive {
+	return tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(p, height, 1, true).
+			AddItem(nil, 0, 1, false), width, 1, true).
+		AddItem(nil, 0, 1, false)
 }
 
 // DisplaySelectList will display a list of items and return the select item on the
