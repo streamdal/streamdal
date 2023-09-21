@@ -259,7 +259,7 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 
 	actionCh := make(chan *types.Action, 1)
 
-	// Ready to peek; display peek view
+	// Create a new textview if this is a new peek; otherwise re-use existing view
 	if c.textview == nil {
 		c.textview = c.options.Console.DisplayPeek(nil, action.PeekComponent, actionCh)
 	} else {
@@ -388,6 +388,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			// Re-inject settings
 			cmd.PeekComponent = action.PeekComponent
 			cmd.PeekFilter = action.PeekFilter
+			cmd.PeekSearch = action.PeekSearch
 
 			return cmd, nil
 		case data := <-dataCh:

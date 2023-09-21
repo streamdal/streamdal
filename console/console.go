@@ -103,9 +103,7 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 		replaceNew = "[darkcyan]" + text
 	}
 
-	c.log.Infof("menu BEFORE: %s", menu)
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
-	c.log.Infof("menu AFTER: %s", updatedMenu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
@@ -154,6 +152,8 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 
 func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 	c.Start()
+
+	c.log.Infof("search has '%s' default value", defaultValue)
 
 	// Remove all menu highlights - you cannot access menu while in search view
 	c.app.QueueUpdateDraw(func() {
