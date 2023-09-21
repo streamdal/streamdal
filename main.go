@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"syscall"
 
 	"github.com/charmbracelet/log"
 
@@ -21,6 +22,8 @@ func main() {
 		if err != nil {
 			log.Fatalf("unable to open log file: %s", err)
 		}
+
+		redirectStdErr(f)
 
 		logger.SetOutput(f)
 		logger.SetFormatter(log.JSONFormatter)
@@ -54,5 +57,16 @@ func main() {
 	// Do the dance
 	if err := c.Run(); err != nil {
 		log.Fatalf("error during cmd run: %s", err)
+	}
+}
+
+func redirectStdErr(f *os.File) {
+	if f == nil {
+		panic("file passed to redirectStdErr cannot be nil")
+	}
+
+	err := syscall.Dup2(int(f.Fd()), int(os.Stderr.Fd()))
+	if err != nil {
+		log.Fatalf("Failed to redirect stderr to file '%s': %v", f.Name(), err)
 	}
 }

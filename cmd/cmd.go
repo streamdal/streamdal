@@ -312,7 +312,7 @@ func (c *Cmd) connect(ctx context.Context) error {
 	for {
 		select {
 		// Happy path - nothing went wrong
-		case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
+		case <-time.After(10 * time.Second): // WARNING: This is here for demo purposes!
 			return nil
 			//return errors.New("something broke")
 		case <-ctx.Done():
