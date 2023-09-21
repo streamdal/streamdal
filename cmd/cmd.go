@@ -68,6 +68,8 @@ func (c *Cmd) run(action *types.Action) error {
 		resp, err = c.actionPeek(action)
 	case types.StepFilter:
 		resp, err = c.actionFilter(action)
+	case types.StepSearch:
+		resp, err = c.actionSearch(action)
 	case types.StepQuit:
 		c.options.Console.Stop()
 		os.Exit(0)
@@ -119,6 +121,42 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 		Step:          types.StepPeek,
 		PeekComponent: action.PeekComponent,
 		PeekFilter:    filterStr,
+	}, nil
+}
+
+func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
+	// Disable input capture while in Search
+	origCapture := c.options.Console.GetInputCapture()
+	c.options.Console.SetInputCapture(nil)
+	defer c.options.Console.SetInputCapture(origCapture)
+
+	// Channel used for reading resp from filter dialog
+	answerCh := make(chan string)
+
+	// Display modal
+	go func() {
+		c.options.Console.DisplaySearch(action.PeekSearch, answerCh)
+	}()
+
+	// Wait for an answer; if the user selects "Cancel", we will get back
+	// the original search (if any); if the user selects "Reset" - we will get
+	// back an empty string; if the user clicks "OK" - we will get back the
+	// search string they chose.
+	searchStr := <-answerCh
+
+	// Turn on/off "Filter" menu entry depending on if filter is set
+	if searchStr != "" {
+		c.options.Console.SetMenuEntryOn("Search")
+	} else {
+		c.options.Console.SetMenuEntryOff("Search")
+	}
+
+	// We want to go back to peek() with the same component as before + enable
+	// the search.
+	return &types.Action{
+		Step:          types.StepPeek,
+		PeekComponent: action.PeekComponent,
+		PeekSearch:    searchStr,
 	}, nil
 }
 

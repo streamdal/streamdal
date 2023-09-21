@@ -29,6 +29,7 @@ const (
 	PrimitiveList       = "list"
 	PrimitivePeekView   = "peek_view"
 	PrimitiveFilter     = "filter"
+	PrimitiveSearch     = "search"
 
 	PageConnectionAttempt = "page_" + PrimitiveInfoModal
 	PageConnectionRetry   = "page_" + PrimitiveRetryModal
@@ -36,6 +37,7 @@ const (
 	PagePeekError         = "page_" + PrimitiveErrorModal
 	PagePeekView          = "page_" + PrimitivePeekView
 	PageFilter            = "page_" + PrimitiveFilter
+	PageSearch            = "page_" + PrimitiveSearch
 )
 
 type Console struct {
@@ -89,16 +91,21 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := text
+	c.log.Infof("Requested to toggle text '%s' as %v: %s", text, on, menu)
+
+	replaceOld := "[darkcyan]" + text
 	replaceNew := "[lightcyan]" + text + "[-]"
-	updatedMenu := ""
+
+	var updatedMenu string
 
 	if !on {
-		replaceOld = replaceNew
-		replaceNew = text
+		replaceOld = "[lightcyan]" + text + "[-]"
+		replaceNew = "[darkcyan]" + text
 	}
 
+	c.log.Infof("menu BEFORE: %s", menu)
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
+	c.log.Infof("menu AFTER: %s", updatedMenu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
@@ -138,11 +145,50 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 			answerCh <- defaultValue
 		})
 
-	form.SetBorder(true).SetTitle("Set filter")
+	form.SetBorder(true).SetTitle("Filter")
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
 	c.pages.AddPage(PageFilter, inputDialog, true, true)
+}
+
+func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
+	c.Start()
+
+	// Remove all menu highlights - you cannot access menu while in search view
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight()
+	})
+
+	var hit bool
+	var input string
+
+	form := tview.NewForm().
+		AddInputField("", defaultValue, 30, nil, func(text string) {
+			hit = true
+			input = text
+		}).
+		AddButton("OK", func() {
+			// Use the original value if te user didn't edit input field
+			if !hit {
+				input = defaultValue
+			}
+
+			answerCh <- input
+		}).
+		AddButton("Reset", func() {
+			answerCh <- ""
+		}).
+		AddButton("Cancel", func() {
+			// Return the original value
+			answerCh <- defaultValue
+		})
+
+	form.SetBorder(true).SetTitle("Search")
+	form.SetButtonsAlign(tview.AlignCenter)
+
+	inputDialog := Center(form, 36, 7)
+	c.pages.AddPage(PageSearch, inputDialog, true, true)
 }
 
 // DisplayPeek will display peek + write any actions we receive from the user
@@ -190,11 +236,24 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 			}
 		}
 
+		// Pass along PeekComponent name so that once filter view is done,
+		// peek knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == 'f' {
 			c.log.Debug("filter keypress")
 
 			actionCh <- &types.Action{
 				Step:          types.StepFilter,
+				PeekComponent: title,
+			}
+		}
+
+		// Pass along PeekComponent name so that once search view is done,
+		// peek knows what component it was operating on.
+		if event.Key() == tcell.KeyRune && event.Rune() == '/' {
+			c.log.Debug("search keypress")
+
+			actionCh <- &types.Action{
+				Step:          types.StepSearch,
 				PeekComponent: title,
 			}
 		}
