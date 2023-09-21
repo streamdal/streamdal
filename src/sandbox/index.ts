@@ -112,7 +112,13 @@ const logTest = async (snitch: any, audience: Audience, input: any) => {
   console.log("error", error);
   console.log("message", message);
   console.log("data:");
-  console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 });
+  try {
+    data && data.length > 0
+      ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
+      : console.log("no data returned");
+  } catch (e) {
+    console.error("could not parse data", e);
+  }
   console.log("pipeline request done");
   console.log("--------------------------------");
   console.log("\n");
@@ -142,11 +148,42 @@ export const exampleStaggered = async () => {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const tailFriendly = async () => {
+  const snitchA = new Snitch(serviceAConfig);
   const snitchB = new Snitch(serviceBConfig);
+
+  void logTest(snitchA, audienceAConsumer, exampleData);
+
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+    exampleData
+  );
+
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+    exampleData
+  );
+
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData
+  );
+
+  void logTest(snitchA, audienceAProducer, exampleData);
 
   setInterval(() => {
     void logTest(snitchB, audienceBConsumer, exampleData);
   }, 1000);
+
+  void logTest(snitchB, audienceBProducer, exampleData);
+
+  void logTest(
+    snitchB,
+    { ...audienceBProducer, componentName: "kafka" },
+    exampleData
+  );
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
@@ -277,4 +314,4 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
     }, 2000);
   };
 
-void exampleStaggered();
+void tailFriendly();

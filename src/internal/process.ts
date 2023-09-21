@@ -213,7 +213,8 @@ export const runStep = async ({
 
     //
     // output gets passed back as data for the next function
-    data = outputPayload;
+    data =
+      exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS ? outputPayload : data;
     stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
     stepStatus.message = exitMsg;
   } catch (error: any) {
