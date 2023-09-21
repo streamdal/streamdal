@@ -262,8 +262,6 @@ func (c *Console) Start() {
 func (c *Console) DisplayRetryModal(msg string, answerCh chan bool) {
 	c.Start()
 
-	// There is no need to re-use the component here, as it does not get updates
-
 	retryModal := tview.NewModal().
 		SetText(msg).
 		AddButtons([]string{"Retry", "Quit"}).

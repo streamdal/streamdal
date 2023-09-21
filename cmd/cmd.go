@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -123,28 +124,54 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 	msg := fmt.Sprintf("Connecting to %s ", c.options.Config.Server)
 
+	userQuit := false
 	inputCh := make(chan error, 1)
 	outputCh := make(chan error, 1)
 
+	// Channel to tell outputCh reader goroutine to exit
+	quitCh := make(chan struct{}, 1)
+	defer close(quitCh)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
 	c.options.Console.DisplayInfoModal(msg, inputCh, outputCh)
 
-	// TODO: Should read from outputCh to detect user cancellation
+	// Goroutine used for reading user resp
+	go func() {
+		for {
+			select {
+			case <-outputCh:
+				userQuit = true
+				cancel()
+				return
+			case <-quitCh:
+				// Tell connect() to exit early
+				cancel()
+				return
+			}
+		}
+	}()
 
 	// Launch connection attempt
-	if err := c.connect(); err != nil {
+	if err := c.connect(ctx); err != nil {
 		retryMsg := fmt.Sprintf("[white:red]ERROR: Unable to connect![white:red]\n\n%s", err)
-		inputCh <- errors.New(retryMsg) // tell displayInfoModal to quit
+		inputCh <- errors.New(retryMsg) // tell displayInfoModal to quit because of error
 
+		// Display retry modal
 		retryCh := make(chan bool, 1)
 
 		c.options.Console.DisplayRetryModal(retryMsg, retryCh)
 		retry := <-retryCh
-
+		
 		if retry {
 			return &types.Action{Step: types.StepConnect}, nil
 		} else {
 			return &types.Action{Step: types.StepQuit}, nil
 		}
+	}
+
+	if userQuit {
+		return &types.Action{Step: types.StepQuit}, nil
 	}
 
 	return &types.Action{
@@ -229,10 +256,19 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 	}
 }
 
-func (c *Cmd) connect() error {
-	time.Sleep(3 * time.Second)
-	//return errors.New("something broke because of Erick")
-	return nil
+// Dummy connect - this should be actual snitch server connect code
+func (c *Cmd) connect(ctx context.Context) error {
+	for {
+		select {
+		// Happy path - nothing went wrong
+		case <-time.After(5 * time.Second):
+			//return nil
+			return errors.New("something broke")
+		case <-ctx.Done():
+			return nil
+		}
+	}
+
 }
 
 func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-chan *types.Action) (*types.Action, error) {
