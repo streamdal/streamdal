@@ -11,7 +11,7 @@ import {
 } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 
-import { signal } from "@preact/signals";
+import { effect, signal } from "@preact/signals";
 import { parseDate } from "../islands/peek.tsx";
 
 export const MAX_PEEK_SIZE = 10000;
@@ -20,6 +20,7 @@ export const peekSignal = signal<TailResponse[] | []>(
   [],
 );
 
+export const peekingSignal = signal<boolean>(false);
 export const peekPausedSignal = signal<boolean>(false);
 export const peekSamplingSignal = signal<boolean>(false);
 export const peekSamplingRateSignal = signal<number>(1);
@@ -34,6 +35,8 @@ export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
     baseUrl: grpcUrl,
     format: "binary",
   });
+  const abortController = new AbortController();
+
   const client: IExternalClient = new ExternalClient(transport);
   const tailRequest = TailRequest.create({
     id: crypto.randomUUID(),
@@ -42,11 +45,20 @@ export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
     type: TailRequestType.START,
   });
 
+  effect(() => {
+    if (!peekingSignal.value) {
+      abortController.abort();
+      peekSignal.value = [];
+      return;
+    }
+  });
+
   try {
     const tailCall: any = client.tail(
       tailRequest,
       {
         meta: { "auth-token": grpcToken },
+        abort: abortController.signal,
       },
     );
 

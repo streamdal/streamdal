@@ -20,10 +20,13 @@ import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useState } from "preact/hooks";
 import { useSignalEffect } from "@preact/signals";
 import { Peek } from "./peek.tsx";
-import { initFlowbite } from "flowbite";
 import { Toggle } from "../components/form/switch.tsx";
 import { isNumeric } from "../lib/utils.ts";
-import { peekSamplingRateSignal, peekSamplingSignal } from "../lib/peek.ts";
+import {
+  peekingSignal,
+  peekSamplingRateSignal,
+  peekSamplingSignal,
+} from "../lib/peek.ts";
 
 export const OP_MODAL_WIDTH = "80px";
 export const OP_MODAL_OPEN_WIDTH = "308px";
@@ -42,7 +45,6 @@ export default function OpModal(
 
   const [isOpen, setIsOpen] = useState(false);
   const [peekNavOpen, setPeekNavOpen] = useState(false);
-  const [peeking, setPeeking] = useState(false);
 
   useSignalEffect(() => {
     if (opModal.value) {
@@ -65,14 +67,13 @@ export default function OpModal(
         />
       )}
       <div class="flex flex-row">
-        {peeking && (
+        {peekingSignal.value && (
           <Peek
             audience={audience}
             pipeline={attachedPipeline}
             modalExpanded={isOpen}
             grpcUrl={grpcUrl}
             grpcToken={grpcToken}
-            close={() => setPeeking(false)}
           />
         )}
         <div
@@ -310,13 +311,15 @@ export default function OpModal(
                               <button
                                 onClick={() =>
                                   attachedPipeline
-                                    ? setPeeking(!peeking)
+                                    ? peekingSignal.value = !peekingSignal.value
                                     : null}
                                 className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-${
                                   attachedPipeline ? "pointer" : "not-allowed"
                                 }`}
                               >
-                                {peeking ? "Stop Peeking" : "Start Peeking"}
+                                {peekingSignal.value
+                                  ? "Stop Peeking"
+                                  : "Start Peeking"}
                               </button>
                             </div>
                           )

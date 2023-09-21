@@ -8,7 +8,12 @@ import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { peek, peekPausedSignal, peekSignal } from "../lib/peek.ts";
+import {
+  peek,
+  peekingSignal,
+  peekPausedSignal,
+  peekSignal,
+} from "../lib/peek.ts";
 import { effect } from "@preact/signals";
 
 export const parseData = (data: Uint8Array) => {
@@ -71,14 +76,12 @@ export const Peek = (
     modalExpanded,
     grpcToken,
     grpcUrl,
-    close,
   }: {
     audience: Audience;
     pipeline: Pipeline;
     modalExpanded: boolean;
     grpcUrl: string;
     grpcToken: string;
-    close: () => void;
   },
 ) => {
   const [peekData, setPeekData] = useState();
@@ -140,7 +143,7 @@ export const Peek = (
             </div>
             <div
               className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
-              onClick={close}
+              onClick={() => peekingSignal.value = false}
             >
               <IconX class="w-6 h-6 text-white" />
             </div>
