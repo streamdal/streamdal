@@ -141,6 +141,24 @@ export const exampleStaggered = async () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
+export const tailFriendly = async () => {
+  const snitchB = new Snitch(serviceBConfig);
+
+  setInterval(() => {
+    void logTest(snitchB, audienceBConsumer, exampleData);
+  }, 1000);
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export const tailFast = async () => {
+  const snitchB = new Snitch(serviceBConfig);
+
+  setInterval(() => {
+    void logTest(snitchB, audienceBConsumer, exampleData);
+  }, 100);
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
 export const exampleConcurrent = async () => {
   const snitchA = new Snitch(serviceAConfig);
   const snitchB = new Snitch(serviceBConfig);

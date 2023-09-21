@@ -16,6 +16,7 @@ import { audienceKey, internal } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
   tail?: boolean;
+  tailRequestId?: string;
   paused?: boolean;
 };
 
@@ -109,5 +110,6 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
     internal.pipelines.set(key, {
       ...p,
       tail: request.type === TailRequestType.START,
+      tailRequestId: request.id,
     } as InternalPipeline);
 };

@@ -11,7 +11,6 @@ import {
   PipelineStepCondition,
 } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
-import { v4 as uuidv4 } from "uuid";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";
@@ -66,17 +65,22 @@ export const sendTail = ({
   originalData,
   newData,
 }: TailRequest) => {
-  void configs.tailCall.requests.send(
-    TailResponse.create({
-      type: TailResponseType.PAYLOAD,
-      tailRequestId: uuidv4(),
-      audience,
-      pipelineId: pipeline.id,
-      sessionId: configs.sessionId,
-      originalData,
-      newData,
-    })
-  );
+  try {
+    void configs.tailCall.requests.send(
+      TailResponse.create({
+        timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
+        type: TailResponseType.PAYLOAD,
+        tailRequestId: pipeline.tailRequestId,
+        audience,
+        pipelineId: pipeline.id,
+        sessionId: configs.sessionId,
+        originalData,
+        newData,
+      })
+    );
+  } catch (e) {
+    console.error("Error sending tail request", e);
+  }
 };
 
 export const processPipeline = async ({
