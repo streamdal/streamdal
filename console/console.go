@@ -78,6 +78,34 @@ func (c *Console) GetInputCapture() func(event *tcell.EventKey) *tcell.EventKey 
 	return c.app.GetInputCapture()
 }
 
+func (c *Console) SetMenuEntryOn(item string) {
+	c.toggleMenuEntry(item, true)
+}
+
+func (c *Console) SetMenuEntryOff(item string) {
+	c.toggleMenuEntry(item, false)
+}
+
+func (c *Console) toggleMenuEntry(text string, on bool) {
+	menu := c.menu.GetText(false)
+
+	replaceOld := text
+	replaceNew := "[lightcyan]" + text + "[-]"
+	updatedMenu := ""
+
+	if !on {
+		replaceOld = replaceNew
+		replaceNew = text
+	}
+
+	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
+
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Clear()
+		fmt.Fprint(c.menu, updatedMenu)
+	})
+}
+
 func (c *Console) SetPause() {
 	menu := c.menu.GetText(false)
 
@@ -114,13 +142,20 @@ func (c *Console) addPause(menu string) string {
 func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 	c.Start()
 
+	var hit bool
 	var input string
 
 	form := tview.NewForm().
 		AddInputField("", defaultValue, 30, nil, func(text string) {
+			hit = true
 			input = text
 		}).
 		AddButton("OK", func() {
+			// Use the original value if te user didn't edit input field
+			if !hit {
+				input = defaultValue
+			}
+
 			answerCh <- input
 		}).
 		AddButton("Reset", func() {

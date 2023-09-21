@@ -83,17 +83,17 @@ func (c *Cmd) run(action *types.Action) error {
 // Filter view can only be triggered if we came from peek so it makes sense
 // for us to go back to peek() after the filter view is closed.
 func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
-	// TODO: Disable everything except "Q" in menu
-	// TODO: Remove highlights for everything in menu except "Q"
-
-	// Display modal
-	answerCh := make(chan string)
+	// TODO: Remove highlights for everything in menu
 
 	// Disable input capture while in Filter
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
 	defer c.options.Console.SetInputCapture(origCapture)
 
+	// Channel used for reading resp from filter dialog
+	answerCh := make(chan string)
+
+	// Display modal
 	go func() {
 		c.options.Console.DisplayFilter(action.PeekFilter, answerCh)
 	}()
@@ -104,7 +104,12 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 	// filter string they chose.
 	filterStr := <-answerCh
 
-	c.log.Infof("received filter setting back: %s", filterStr)
+	// Turn on/off "Filter" menu entry depending on if filter is set
+	if filterStr != "" {
+		c.options.Console.SetMenuEntryOn("Filter")
+	} else {
+		c.options.Console.SetMenuEntryOff("Filter")
+	}
 
 	// We want to go back to peek() with the same component as before + set the
 	// new filter string.
@@ -289,12 +294,13 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				fmt.Fprint(textView, pauseLine+"\n")
 			}
 
-			// Re-inject component
+			// Re-inject settings
 			cmd.PeekComponent = action.PeekComponent
+			cmd.PeekFilter = action.PeekFilter
 
 			return cmd, nil
 		case data := <-dataCh:
-			if !strings.Contains(data, c.filter) {
+			if !strings.Contains(data, action.PeekFilter) {
 				continue
 			}
 
