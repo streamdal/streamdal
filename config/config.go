@@ -18,6 +18,7 @@ type Config struct {
 	Server            string           `help:"Snitch server URL (gRPC)" default:"localhost:9090"`
 	EnableFileLogging bool             `help:"Enable file logging" default:"false"`
 	LogFile           string           `help:"Log file" default:"./snitch-cli.log"`
+	MaxOutputLines    int              `help:"Maximum number of output lines" default:"5000"`
 
 	KongContext *kong.Context `kong:"-"`
 }

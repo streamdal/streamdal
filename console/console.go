@@ -155,11 +155,13 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 
 	if pagePeek == nil {
 		pagePeek = tview.NewTextView()
+		pagePeek.SetBorder(true)
+		pagePeek.SetDynamicColors(true)
+		pagePeek.SetMaxLines(c.options.Config.MaxOutputLines)
 	}
 
-	pagePeek.SetBorder(true)
+	// Always update title
 	pagePeek.SetTitle(title)
-	pagePeek.SetDynamicColors(true)
 
 	c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
 

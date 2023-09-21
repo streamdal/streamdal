@@ -357,6 +357,10 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
+			if action.PeekFilter != "" {
+				data = strings.Replace(data, action.PeekFilter, "[green:gray]"+action.PeekFilter+"[-:-]", -1)
+			}
+
 			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, i)
 
 			if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
