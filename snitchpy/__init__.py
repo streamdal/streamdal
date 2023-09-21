@@ -83,7 +83,6 @@ class Audience:
     We use a dataclass here instead of the protobuf Audience in order to keep the public interface clean
     """
 
-    service_name: str
     operation_type: int
     operation_name: str
     component_name: str
@@ -304,8 +303,8 @@ class SnitchClient:
                 await self.grpc_stub.new_audience(
                     req, timeout=self.grpc_timeout, metadata=self._get_metadata()
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.debug(f"Failed to re-announce audience: {e}")
 
         for aud in self.audiences.keys():
             self.grpc_loop.run_until_complete(call())
@@ -561,9 +560,9 @@ class SnitchClient:
                 return await self.grpc_stub.heartbeat(
                     req, timeout=self.grpc_timeout, metadata=self._get_metadata()
                 )
-            except Exception:
+            except Exception as e:
                 # Lost connection. Retry will occur in register
-                pass
+                self.log.debug(f"unable to send heartbeat: {e}")
 
         asyncio.set_event_loop(self.grpc_loop)
         while not self.exit.is_set():
