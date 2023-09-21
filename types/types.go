@@ -17,7 +17,8 @@ type Action struct {
 	Args []string
 
 	// Args specifically used by peek()
-	PeekComponent string
-	PeekFilter    string
-	PeekSearch    string
+	PeekComponent  string
+	PeekFilter     string
+	PeekSearch     string
+	PeekSearchPrev string
 }

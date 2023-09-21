@@ -16,8 +16,13 @@ import (
 	"github.com/streamdal/snitch-cli/types"
 )
 
+const (
+	SearchHighlightFmt = "[blue:gray]%s[-:-]"
+)
+
 type Cmd struct {
 	textview       *tview.TextView
+	previousSearch string
 	paused         bool
 	announceFilter bool
 	options        *Options
@@ -151,12 +156,13 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 		c.options.Console.SetMenuEntryOff("Search")
 	}
 
-	// We want to go back to peek() with the same component as before + enable
-	// the search.
+	// Only way to get to "search" is via peek, so the next step is to go back
+	// to peek view (with the same component as before search).
 	return &types.Action{
-		Step:          types.StepPeek,
-		PeekComponent: action.PeekComponent,
-		PeekSearch:    searchStr,
+		Step:           types.StepPeek,
+		PeekComponent:  action.PeekComponent,
+		PeekSearch:     searchStr,
+		PeekSearchPrev: action.PeekSearch,
 	}, nil
 }
 
@@ -301,10 +307,12 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 
 // Dummy connect - this should be actual snitch server connect code
 func (c *Cmd) connect(ctx context.Context) error {
+	// Attempt to talk to snitch server
+
 	for {
 		select {
 		// Happy path - nothing went wrong
-		case <-time.After(5 * time.Second):
+		case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
 			return nil
 			//return errors.New("something broke")
 		case <-ctx.Done():
@@ -348,6 +356,49 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			i++
 		}
 	}()
+
+	// Search highlighting logic
+	if action.PeekSearch != "" || action.PeekSearchPrev != "" {
+		// We need to split so that search does not hit line num and/or timestamp field
+		splitData := strings.Split(textView.GetText(false), "\n")
+
+		var updatedData string
+
+		for _, line := range splitData {
+			if line == "" {
+				continue
+			}
+
+			splitLine := strings.SplitN(line, " ", 3)
+
+			if len(splitLine) < 3 {
+				updatedData += line + "\n"
+				continue
+			}
+
+			// splitLine[0]: line num
+			// splitLine[1]: timestamp
+			// splitLine[2]: content
+
+			updatedContent := splitLine[2]
+
+			// If we are coming from a previous search, clear the old highlights first
+			if action.PeekSearchPrev != "" {
+				updatedContent = strings.Replace(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearchPrev), action.PeekSearchPrev, -1)
+			}
+
+			// If this is a new search, highlight all instances of the search term
+			if action.PeekSearch != "" {
+				updatedContent = strings.Replace(updatedContent, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
+			}
+
+			updatedData += splitLine[0] + " " + splitLine[1] + " " + updatedContent + "\n"
+		}
+
+		//existingData := textView.GetText(false)
+		//existingData = strings.Replace(existingData, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
+		textView.SetText(updatedData)
+	}
 
 	// Commands read here have been passed down from DisplayPeek(); we need access
 	// to them here so we can potentially modify how we're interacting with the
@@ -396,8 +447,18 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
+			// Highlight filtered data
 			if action.PeekFilter != "" {
 				data = strings.Replace(data, action.PeekFilter, "[green:gray]"+action.PeekFilter+"[-:-]", -1)
+			}
+
+			// This will highlight the search term + underline the entire entry
+			// for any new incoming data.
+			if action.PeekSearch != "" {
+				if strings.Contains(data, action.PeekSearch) {
+					// Highlight just the search term
+					data = strings.Replace(data, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
+				}
 			}
 
 			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, i)
