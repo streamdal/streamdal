@@ -1,6 +1,7 @@
 {
   "version": "2",
   "remote": {
+    "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js": "5d648999e719c3098f8996c9e201e40bee42fc898d62e8ad470f25311b095440",
     "https://deno.land/std@0.140.0/_util/assert.ts": "e94f2eb37cebd7f199952e242c77654e43333c1ac4c5c700e929ea3aa5489f74",
     "https://deno.land/std@0.140.0/_util/os.ts": "3b4c6e27febd119d36a416d7a97bd3b0251b77c88942c8f16ee5953ea13e2e49",
     "https://deno.land/std@0.140.0/bytes/bytes_list.ts": "67eb118e0b7891d2f389dad4add35856f4ad5faab46318ff99653456c23b025d",
@@ -307,6 +308,7 @@
     "https://deno.land/x/fresh@1.4.2/dev.ts": "720dd3a64b62b852db7b6ae471c246c5c605cf4a3091c4cbc802790f36d43e4c",
     "https://deno.land/x/fresh@1.4.2/plugins/twind.ts": "b20ab6004318eb56538976c49b23c125560845650cf2b2d69b463c31b16da06f",
     "https://deno.land/x/fresh@1.4.2/plugins/twind/shared.ts": "ad8ccde3874b305be13a996e6f1c774bb9f611505f98a0995f5f7be368c5949c",
+    "https://deno.land/x/fresh@1.4.2/runtime.ts": "b02ec1e2e32cf73a33d262b7c9dcab9468ce16cd89fd424196c71003698a4ab0",
     "https://deno.land/x/fresh@1.4.2/server.ts": "f379c9aad24471a71e58fb887fa57e5cc27ad9df035987eb260541c78df38e84",
     "https://deno.land/x/fresh@1.4.2/src/build/deps.ts": "e6f52b4d8814cd40db62f98f78ad050b232d7fac79b4df586429408d14456f23",
     "https://deno.land/x/fresh@1.4.2/src/build/esbuild.ts": "10518c16f639b44c61698aca97d95adbd19eb0e91eb1167d7c3022e18b032471",

@@ -25,6 +25,10 @@ export default async function App(
           href="https://esm.sh/reactflow@11.8.2/dist/base.css"
         />
         <link rel="stylesheet" type="text/css" href="/style.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css"
+        />
       </Head>
       <body className="h-screen bg-purple-50 m-0 overflow-hidden">
         <ctx.Component />
