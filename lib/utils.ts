@@ -88,9 +88,9 @@ export const getOpRoute = (
 //snitch server serialized audiences a bit oddly
 //and we need to do the same to interpret config keys
 export const audienceKey = (audience: Audience) =>
-  `${audience.serviceName}/operation_type_${
+  `${audience.serviceName}:operation_type_${
     OperationType[audience.operationType]
-  }/${audience.operationName}/${audience.componentName}`.toLowerCase();
+  }:${audience.operationName}:${audience.componentName}`.toLowerCase();
 
 export const serviceKey = (audience: Audience) =>
   lower(`${audience.serviceName}-service`.toLowerCase());
