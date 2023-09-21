@@ -180,7 +180,12 @@ class Metrics:
 
     def publish_metrics(self, entry: CounterEntry) -> None:
         async def call(request: protos.MetricsRequest):
-            await self.stub.metrics(request, metadata={"auth-token": self.auth_token})
+            try:
+                await self.stub.metrics(
+                    request, metadata={"auth-token": self.auth_token}
+                )
+            except Exception as e:
+                self.log.warning("Failed to publish metrics")
 
         req = protos.MetricsRequest()
         req.metrics = [
