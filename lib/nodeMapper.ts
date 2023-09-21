@@ -53,6 +53,7 @@ export type FlowEdge = {
   type: string;
   style: any;
   data: any;
+  animated?: boolean;
 };
 
 //

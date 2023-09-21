@@ -7,10 +7,10 @@ import { ServiceNodeMenu } from "./nodeMenu.tsx";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
 import {
-  getComponentGroup,
-  getOperationHoverGroup,
-  getServiceGroup,
   removeWhitespace,
+  setComponentGroup,
+  setOperationHoverGroup,
+  setServiceGroup,
   titleCase,
 } from "../../lib/utils.ts";
 import { Tooltip } from "../tooltip/tooltip.tsx";
@@ -22,14 +22,14 @@ export const GROUP_MARGIN = 45;
 
 export const ServiceNode = ({ data }: { data: NodeData }) => {
   const setHover = () => {
-    getServiceGroup(
+    setServiceGroup(
       data.audience.serviceName,
       data.serviceMap.audiences,
       true,
     );
   };
   const resetHover = () => {
-    getServiceGroup(
+    setServiceGroup(
       data.audience.serviceName,
       data.serviceMap.audiences,
       false,
@@ -77,11 +77,11 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
   const op = OperationType[data.audience.operationType];
   const producer = op === OperationType[OperationType.PRODUCER];
   const setHover = () => {
-    getOperationHoverGroup(data.audience, true);
+    setOperationHoverGroup(data.audience, true);
   };
 
   const resetHover = () => {
-    getOperationHoverGroup(data.audience, false);
+    setOperationHoverGroup(data.audience, false);
   };
 
   return (
@@ -187,14 +187,14 @@ export const ComponentImage = (
 
 export const ComponentNode = ({ data }: { data: NodeData }) => {
   const setHover = () => {
-    getComponentGroup(
+    setComponentGroup(
       data.audience.componentName,
       data.serviceMap.audiences,
       true,
     );
   };
   const resetHover = () => {
-    getComponentGroup(
+    setComponentGroup(
       data.audience.componentName,
       data.serviceMap.audiences,
       false,

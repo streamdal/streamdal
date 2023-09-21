@@ -25,6 +25,8 @@ export default {
         twilight: "#E6DDFE",
         drab: "#F7E7CC",
         burnt: "#AF8E3A",
+        gloaming: "#F3EEFF",
+        cobweb: "#948EA4",
       },
       fontFamily: {
         sans: ["Inter"],
