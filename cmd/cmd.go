@@ -17,10 +17,11 @@ import (
 )
 
 type Cmd struct {
-	paused  bool
-	filter  string
-	options *Options
-	log     *log.Logger
+	textview *tview.TextView
+	paused   bool
+	filter   string
+	options  *Options
+	log      *log.Logger
 }
 
 type Options struct {
@@ -162,7 +163,7 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 
 		c.options.Console.DisplayRetryModal(retryMsg, retryCh)
 		retry := <-retryCh
-		
+
 		if retry {
 			return &types.Action{Step: types.StepConnect}, nil
 		} else {
@@ -221,10 +222,14 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 	actionCh := make(chan *types.Action, 1)
 
 	// Ready to peek; display peek view
-	textView := c.options.Console.DisplayPeek(action.PeekComponent, actionCh)
+	if c.textview == nil {
+		c.textview = c.options.Console.DisplayPeek(nil, action.PeekComponent, actionCh)
+	} else {
+		c.options.Console.DisplayPeek(c.textview, action.PeekComponent, actionCh)
+	}
 
 	for {
-		respAction, err := c.peek(action, textView, actionCh)
+		respAction, err := c.peek(action, c.textview, actionCh)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to peek")
 		}
@@ -262,8 +267,8 @@ func (c *Cmd) connect(ctx context.Context) error {
 		select {
 		// Happy path - nothing went wrong
 		case <-time.After(5 * time.Second):
-			//return nil
-			return errors.New("something broke")
+			return nil
+			//return errors.New("something broke")
 		case <-ctx.Done():
 			return nil
 		}
@@ -318,7 +323,11 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				c.paused = !c.paused
 
 				// Update the menu pause button visual
-				c.options.Console.SetPause()
+				if c.paused {
+					c.options.Console.SetMenuEntryOn("Pause")
+				} else {
+					c.options.Console.SetMenuEntryOff("Pause")
+				}
 
 				pausedStatus := " PAUSED @ " + time.Now().Format("15:04:05")
 

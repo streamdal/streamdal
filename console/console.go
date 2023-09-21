@@ -106,39 +106,6 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 	})
 }
 
-func (c *Console) SetPause() {
-	menu := c.menu.GetText(false)
-
-	var updatedMenu string
-
-	if c.isPaused(menu) {
-		updatedMenu = c.removePause(menu)
-	} else {
-		updatedMenu = c.addPause(menu)
-	}
-
-	c.app.QueueUpdateDraw(func() {
-		c.menu.Clear()
-		fmt.Fprint(c.menu, updatedMenu)
-	})
-}
-
-func (c *Console) isPaused(menu string) bool {
-	if strings.Contains(menu, "[lightcyan]Pause[-]") {
-		return true
-	}
-
-	return false
-}
-
-func (c *Console) removePause(menu string) string {
-	return strings.Replace(menu, "[lightcyan]Pause[-]", "Pause", -1)
-}
-
-func (c *Console) addPause(menu string) string {
-	return strings.Replace(menu, "Pause", "[lightcyan]Pause[-]", -1)
-}
-
 func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 	c.Start()
 
@@ -171,15 +138,20 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 
 	inputDialog := Center(form, 36, 7)
 	c.pages.AddPage(PageFilter, inputDialog, true, true)
-	//c.pages.SwitchToPage(PageFilter)
 }
 
 // DisplayPeek will display peek + write any actions we receive from the user
 // to the action channel; the action channel is read by the peek() method.
-func (c *Console) DisplayPeek(title string, actionCh chan<- *types.Action) *tview.TextView {
+// Accepts an _optional_ pagePeek to facilitate re-use of the peek view. This
+// is needed so that when filter/pause is applied, the peek view retains the
+// data captured within it.
+func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh chan<- *types.Action) *tview.TextView {
 	c.Start()
 
-	pagePeek := tview.NewTextView()
+	if pagePeek == nil {
+		pagePeek = tview.NewTextView()
+	}
+
 	pagePeek.SetBorder(true)
 	pagePeek.SetTitle(title)
 	pagePeek.SetDynamicColors(true)
