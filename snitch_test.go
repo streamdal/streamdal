@@ -94,15 +94,14 @@ func TestValidateConfig(t *testing.T) {
 
 func TestToProto(t *testing.T) {
 	audPublic := Audience{
-		ServiceName:   "test-service",
 		ComponentName: "test-component",
 		OperationType: OperationTypeProducer,
 		OperationName: "test-operation",
 	}
 
-	audProto := audPublic.ToProto()
-	if audProto.ServiceName != audPublic.ServiceName {
-		t.Errorf("expected ServiceName '%s', got '%s'", audPublic.ServiceName, audProto.ServiceName)
+	audProto := audPublic.ToProto("service")
+	if audProto.ServiceName != "service" {
+		t.Errorf("expected ServiceName '%s', got '%s'", "service", audProto.ServiceName)
 	}
 
 	if audProto.ComponentName != audPublic.ComponentName {

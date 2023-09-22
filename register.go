@@ -39,7 +39,7 @@ func (s *Snitch) register(looper director.Looper) error {
 	}
 
 	for _, aud := range s.config.Audiences {
-		req.Audiences = append(req.Audiences, aud.ToProto())
+		req.Audiences = append(req.Audiences, aud.ToProto(s.config.ServiceName))
 	}
 
 	var (

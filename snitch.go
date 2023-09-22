@@ -158,7 +158,6 @@ type Config struct {
 }
 
 type Audience struct {
-	ServiceName   string
 	ComponentName string
 	OperationType OperationType
 	OperationName string
@@ -703,9 +702,9 @@ func (s *Snitch) handleConditions(
 	return shouldContinue
 }
 
-func (a *Audience) ToProto() *protos.Audience {
+func (a *Audience) ToProto(serviceName string) *protos.Audience {
 	return &protos.Audience{
-		ServiceName:   a.ServiceName,
+		ServiceName:   serviceName,
 		ComponentName: a.ComponentName,
 		OperationType: protos.OperationType(a.OperationType),
 		OperationName: a.OperationName,
