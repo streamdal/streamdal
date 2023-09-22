@@ -432,6 +432,7 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 
 func (s *Snitch) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
+
 	// Get WASM module
 	f, err := s.getFunction(ctx, step)
 	if err != nil {
@@ -465,7 +466,9 @@ func (s *Snitch) runStep(ctx context.Context, aud *protos.Audience, step *protos
 		return nil, errors.Wrap(err, "failed to unmarshal WASM response")
 	}
 
-	s.handleSchema(ctx, aud, step, resp)
+	// Don't use parent context here since it will be cancelled by the time
+	// the goroutine in handleSchema runs
+	s.handleSchema(context.Background(), aud, step, resp)
 
 	return resp, nil
 }
