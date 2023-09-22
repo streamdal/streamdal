@@ -1,39 +1,59 @@
 apiVersion: v1
 entries:
-  nats:
-  - apiVersion: v2
-    appVersion: 2.9.20
-    created: "2023-08-22T18:10:09.658009619Z"
-    description: A Helm chart for the NATS.io High Speed Cloud Native Distributed
-      Communications Technology.
-    digest: efd2db6b480286011e8f8cc39abbb98ca5c8857ba31f4b725f3efe512cedad81
-    home: http://github.com/nats-io/k8s
-    icon: https://nats.io/img/nats-icon-color.png
+  redis:
+  - annotations:
+      category: Database
+      images: |
+        - name: os-shell
+          image: docker.io/bitnami/os-shell:11-debian-11-r60
+        - name: redis-exporter
+          image: docker.io/bitnami/redis-exporter:1.54.0-debian-11-r0
+        - name: redis-sentinel
+          image: docker.io/bitnami/redis-sentinel:7.2.1-debian-11-r0
+        - name: redis
+          image: docker.io/bitnami/redis:7.2.1-debian-11-r0
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 7.2.1
+    created: "2023-09-22T13:26:09.050117533Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Redis(R) is an open source, advanced key-value store. It is often
+      referred to as a data structure server since keys can contain strings, hashes,
+      lists, sets and sorted sets.
+    digest: a61910e9120f71137e634d320edd0334dc591b5348f3c7f20bccd10e833159e1
+    home: https://bitnami.com
+    icon: https://bitnami.com/assets/stacks/redis/img/redis-stack-220x234.png
     keywords:
-    - nats
-    - messaging
-    - cncf
+    - redis
+    - keyvalue
+    - database
     maintainers:
-    - email: info@nats.io
-      name: The NATS Authors
-      url: https://github.com/nats-io
-    name: nats
+    - name: VMware, Inc.
+      url: https://github.com/bitnami/charts
+    name: redis
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/redis
     urls:
-    - https://streamdal.github.io/snitch/helm-charts/snitch-server/charts/nats-1.0.0.tgz
-    version: 1.0.0
+    - https://streamdal.github.io/snitch/helm-charts/snitch-server/charts/redis-18.0.4.tgz
+    version: 18.0.4
   snitch-server:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-22T18:10:09.651485289Z"
+    created: "2023-09-22T13:26:09.044471109Z"
     dependencies:
-    - name: nats
-      repository: https://nats-io.github.io/k8s/helm/charts/
-      version: 1.0.0
+    - name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.0.4
     description: A Helm chart for Kubernetes
-    digest: 4edd2e071ca3e29d24dadc162067b04b86bb88d0b5ac51f2a8207ba410cc0c74
+    digest: 6945f73e282d092bc211d51dea76e7d59fa3fad858e5896cba4f3f791d2702e9
     name: snitch-server
     type: application
     urls:
     - https://streamdal.github.io/snitch/helm-charts/snitch-server/snitch-server-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-22T18:10:09.63843193Z"
+generated: "2023-09-22T13:26:09.015079582Z"
