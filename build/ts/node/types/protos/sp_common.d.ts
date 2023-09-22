@@ -89,17 +89,17 @@ export interface TailRequest {
      */
     type: TailRequestType;
     /**
-     * @generated from protobuf field: string id = 2;
+     * @generated from protobuf field: optional string id = 2;
      */
-    id: string;
+    id?: string;
     /**
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 4;
+     * @generated from protobuf field: optional string pipeline_id = 4;
      */
-    pipelineId: string;
+    pipelineId?: string;
     /**
      * @generated from protobuf field: map<string, string> _metadata = 1000;
      */
