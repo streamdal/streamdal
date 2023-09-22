@@ -94,24 +94,6 @@ env:
     value: "1234"
 ```
 
-### NATS Configuration:
-
-JetStream and Memory/File storage configurations for NATS:
-
-```yaml
-nats:
-  config:
-    jetstream:
-      enabled: true
-      memStorage:
-        enabled: true
-        size: 1Gi
-      fileStorage:
-        enabled: true
-        storageDirectory: /data
-        size: 5Gi
-```
-
 ## Customizing Values
 
 To override the default values, create a `values.yaml` file and then:
