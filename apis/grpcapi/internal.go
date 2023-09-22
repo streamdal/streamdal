@@ -12,7 +12,6 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
-
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
@@ -87,6 +86,28 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 	}()
 
 	return nil
+}
+
+func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
+	// Get all audiences for this session
+	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
+	if err != nil {
+		s.log.Errorf("unable to get audiences by session id '%s': %v", sessionID, err)
+		return
+	}
+
+	for _, aud := range audiences {
+		// Create a new pipeline whose only step is an inferschema step
+		attachCmd := util.GenInferSchemaPipeline(aud)
+
+		// Inject WASM data
+		if err := util.PopulateWASMFields(attachCmd.GetAttachPipeline().Pipeline, s.Options.Config.WASMDir); err != nil {
+			s.log.Errorf("unable to populate WASM fields for inferschema: %v", err)
+			return
+		}
+
+		cmdCh <- attachCmd
+	}
 }
 
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
@@ -329,6 +350,10 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 			Message: fmt.Sprintf("unable to save audience: %s", err.Error()),
 		}, nil
 	}
+
+	// Send AttachCommand to client with ephemeral inferschema pipeline
+	cmdCh := s.Options.CmdService.GetChannel(req.SessionId)
+	s.sendInferSchemaPipelines(ctx, cmdCh, req.SessionId)
 
 	// Broadcast audience creation so that we can notify UI GetAllStream clients
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
