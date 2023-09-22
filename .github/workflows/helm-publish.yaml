@@ -20,6 +20,10 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "github-actions@github.com"
 
+    - name: Ensure helm-charts-packages directory exists
+      run: |
+        mkdir -p helm-charts-packages
+
     - name: Install Helm
       run: |
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
@@ -28,8 +32,7 @@ jobs:
 
     - name: Package Helm Chart
       run: |
-        cd helm-charts/snitch-server
-        helm package . -d ../../../helm-charts-packages
+        helm package helm-charts/snitch-server -d helm-charts-packages
 
     - name: Update Helm repo index
       run: |
