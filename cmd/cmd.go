@@ -254,7 +254,10 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	componentCh := make(chan string, 1)
 
 	// TODO: We are connected, display list of available components
-	c.options.Console.DisplaySelectList("Select component", []string{"Component 1", "Component 2"}, componentCh)
+	c.options.Console.DisplaySelectList("Select component", map[string]string{
+		"my-reader": "web-api / consumer / kafka",
+		"my-writer": "billing-api / producer / sqs",
+	}, componentCh)
 
 	// Listen for "quit" or for component selection
 	select {
@@ -361,7 +364,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
-			dataCh <- fmt.Sprintf("Component '%s': line %d", action.PeekComponent, i)
+			dataCh <- fmt.Sprintf("%s: line %d", action.PeekComponent, i)
 			time.Sleep(200 * time.Millisecond)
 			i++
 		}

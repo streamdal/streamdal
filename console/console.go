@@ -396,16 +396,17 @@ func (c *Console) Redraw(f func()) {
 
 // DisplaySelectList will display a list of items and return the select item on the
 // output channel
-func (c *Console) DisplaySelectList(title string, items []string, output chan<- string) {
+func (c *Console) DisplaySelectList(title string, itemMap map[string]string, output chan<- string) {
 	selectComponent := tview.NewList()
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
-	for _, v := range items {
-		item := v
+	for tmpName, tmpDesc := range itemMap {
+		name := tmpName
+		desc := tmpDesc
 
-		selectComponent.AddItem(v, "Awesome thing", 0, func() {
-			output <- item
+		selectComponent.AddItem(name, desc, 0, func() {
+			output <- name
 		})
 	}
 
