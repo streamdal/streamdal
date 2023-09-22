@@ -29,13 +29,13 @@ jobs:
     - name: Package Helm Chart
       run: |
         cd helm-charts/snitch-server
-        helm package .
+        helm package . -d ../../../helm-charts-packages
 
     - name: Update Helm repo index
       run: |
-        helm repo index helm-charts/snitch-server --url https://streamdal.github.io/snitch/helm-charts/snitch-server
-        git add helm-charts/snitch-server/index.yaml
-        git add helm-charts/snitch-server/*.tgz
+        helm repo index helm-charts-packages --url https://streamdal.github.io/snitch/helm-charts-packages
+        git add helm-charts-packages/index.yaml
+        git add helm-charts-packages/*.tgz
 
     - name: Push changes
       run: |
