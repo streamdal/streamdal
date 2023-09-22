@@ -185,13 +185,15 @@ func (s *Snitch) register(looper director.Looper) error {
 				return nil
 			}
 
+			audStr := audToStr(tail.GetRequest().Audience)
+
 			switch cmd.GetTail().GetRequest().Type {
 			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
-				s.config.Logger.Debugf("Received start tail command for pipeline '%s'", tail.GetRequest().PipelineId)
-				err = s.tailPipeline(context.Background(), cmd)
+				s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
+				err = s.startTailAudience(context.Background(), cmd)
 			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
-				s.config.Logger.Debugf("Received stop tail command for pipeline '%s'", tail.GetRequest().PipelineId)
-				err = s.stopTailPipeline(context.Background(), cmd)
+				s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
+				err = s.stopTailAudience(context.Background(), cmd)
 			default:
 				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
 				return nil

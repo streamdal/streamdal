@@ -78,8 +78,8 @@ func TailRequestStartCommand(cmd *protos.Command) error {
 		return ErrNilField("request")
 	}
 
-	if req.PipelineId == "" {
-		return ErrEmptyField("pipeline_id")
+	if *req.Id == "" {
+		return ErrEmptyField("id")
 	}
 
 	if err := Audience(cmd.Audience); err != nil {
@@ -104,7 +104,7 @@ func TailRequestStopCommand(cmd *protos.Command) error {
 		return ErrNilField("request")
 	}
 
-	if req.Id == "" {
+	if *req.Id == "" {
 		return ErrEmptyField("id")
 	}
 

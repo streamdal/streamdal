@@ -101,6 +101,8 @@ type Snitch struct {
 	hf                 *hostfunc.HostFunc
 	tailsMtx           *sync.RWMutex
 	tails              map[string]map[string]*Tail
+	schemas            map[string]*protos.Schema
+	schemasMtx         *sync.RWMutex
 }
 
 type Config struct {
@@ -230,6 +232,8 @@ func New(cfg *Config) (*Snitch, error) {
 		hf:                 hf,
 		tailsMtx:           &sync.RWMutex{},
 		tails:              make(map[string]map[string]*Tail),
+		schemasMtx:         &sync.RWMutex{},
+		schemas:            make(map[string]*protos.Schema),
 	}
 
 	if cfg.DryRun {
@@ -427,7 +431,7 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 	})
 }
 
-func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
+func (s *Snitch) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 	// Get WASM module
 	f, err := s.getFunction(ctx, step)
@@ -461,6 +465,8 @@ func (s *Snitch) runStep(ctx context.Context, step *protos.PipelineStep, data []
 	if err := proto.Unmarshal(respBytes, resp); err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal WASM response")
 	}
+
+	s.handleSchema(ctx, aud, step, resp)
 
 	return resp, nil
 }
@@ -537,8 +543,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		return &ProcessResponse{Data: data, Error: true, Message: msg}, nil
 	}
 
+	originalData := data // Used for tail request
+
 	for _, p := range pipelines {
-		originalData := data // Used for tail request
 		pipeline := p.GetAttachPipeline().GetPipeline()
 		labels["pipeline_name"] = pipeline.Name
 		labels["pipeline_id"] = pipeline.Id
@@ -563,12 +570,13 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				// NOOP
 			}
 
-			wasmResp, err := s.runStep(timeoutCtx, step, data)
+			wasmResp, err := s.runStep(timeoutCtx, aud, step, data)
 			if err != nil {
 				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
 					return &ProcessResponse{
 						Data:    req.Data,
 						Error:   true,
@@ -588,6 +596,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
 					return &ProcessResponse{
 						Data:    wasmResp.OutputPayload,
 						Error:   false,
@@ -602,6 +611,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
 					return &ProcessResponse{
 						Data:    wasmResp.OutputPayload,
 						Error:   true,
@@ -616,6 +626,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
 					return &ProcessResponse{
 						Data:    wasmResp.OutputPayload,
 						Error:   true,
@@ -635,9 +646,10 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 		timeoutCxl()
 
-		// Perform tail if necessary
-		s.sendTail(aud, pipeline.Id, originalData, data)
 	}
+
+	// Perform tail if necessary
+	s.sendTail(aud, "", originalData, data)
 
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly

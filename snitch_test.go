@@ -398,6 +398,8 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 			PipelineTimeout: time.Millisecond * 100,
 		},
 		metrics:      &metricsfakes.FakeIMetrics{},
+		tails:        map[string]map[string]*Tail{},
+		tailsMtx:     &sync.RWMutex{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
 			audToStr(aud): {

@@ -2,7 +2,6 @@ package snitch
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"strings"
 	"time"
@@ -44,7 +43,7 @@ type Tail struct {
 }
 
 func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
-	tails := s.getTail(aud, pipelineID)
+	tails := s.getTail(aud)
 	if len(tails) == 0 {
 		return
 	}
@@ -52,7 +51,7 @@ func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData 
 	for _, tail := range tails {
 		tr := &protos.TailResponse{
 			Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-			TailRequestId: tail.Request.GetTail().Request.Id,
+			TailRequestId: *tail.Request.GetTail().Request.Id,
 			Audience:      aud,
 			PipelineId:    pipelineID,
 			SessionId:     s.sessionID,
@@ -145,25 +144,19 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 	})
 }
 
-func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Snitch) startTailAudience(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
 
 	// Check if we have this audience
-	pipelines, ok := s.pipelines[audToStr(cmd.Audience)]
-	if !ok {
-		s.config.Logger.Debugf("Received tail command for unknown audience: %s", audToStr(cmd.Audience))
+	audStr := audToStr(cmd.Audience)
+	if _, ok := s.audiences[audStr]; !ok {
+		s.config.Logger.Debugf("Received tail command for unknown audience: '%s'", audStr)
 		return nil
 	}
 
-	// Check if we have this pipeline
-	if _, ok := pipelines[cmd.GetTail().Request.PipelineId]; !ok {
-		s.config.Logger.Debugf("Received tail command for unknown pipeline: %s", cmd.GetTail().Request.PipelineId)
-		return nil
-	}
-
-	s.config.Logger.Debugf("Tailing audience %s", cmd.GetTail().Request.PipelineId)
+	s.config.Logger.Debugf("Tailing audience '%s'", audStr)
 
 	ctx, cancel := context.WithCancel(s.config.ShutdownCtx)
 
@@ -188,16 +181,15 @@ func (s *Snitch) tailPipeline(_ context.Context, cmd *protos.Command) error {
 	return nil
 }
 
-func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Snitch) stopTailAudience(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStopCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail request stop command")
 	}
 
 	aud := cmd.GetTail().Request.Audience
-	pipelineID := cmd.GetTail().Request.PipelineId
-	tailID := cmd.GetTail().Request.Id
+	tailID := *cmd.GetTail().Request.Id
 
-	tails := s.getTail(aud, pipelineID)
+	tails := s.getTail(aud)
 	if len(tails) == 0 {
 		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
 		return nil
@@ -212,14 +204,14 @@ func (s *Snitch) stopTailPipeline(_ context.Context, cmd *protos.Command) error 
 	// Cancel workers
 	tail.CancelFunc()
 
-	s.removeTail(aud, pipelineID, tailID)
+	s.removeTail(aud, tailID)
 
 	return nil
 }
 
-func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) map[string]*Tail {
+func (s *Snitch) getTail(aud *protos.Audience) map[string]*Tail {
 	s.tailsMtx.RLock()
-	tails, ok := s.tails[tailKey(aud, pipelineID)]
+	tails, ok := s.tails[audToStr(aud)]
 	s.tailsMtx.RUnlock()
 
 	if ok {
@@ -234,18 +226,21 @@ func (s *Snitch) getTail(aud *protos.Audience, pipelineID string) map[string]*Ta
 
 	return nil
 }
-func (s *Snitch) removeTail(aud *protos.Audience, pipelineID, tailID string) {
+
+func (s *Snitch) removeTail(aud *protos.Audience, tailID string) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
-	if _, ok := s.tails[tailKey(aud, pipelineID)]; !ok {
+	audStr := audToStr(aud)
+
+	if _, ok := s.tails[audStr]; !ok {
 		return
 	}
 
-	delete(s.tails[tailKey(aud, pipelineID)], tailID)
+	delete(s.tails[audStr], tailID)
 
-	if len(s.tails[tailKey(aud, pipelineID)]) == 0 {
-		delete(s.tails, tailKey(aud, pipelineID))
+	if len(s.tails[audStr]) == 0 {
+		delete(s.tails, audStr)
 	}
 }
 
@@ -255,13 +250,11 @@ func (s *Snitch) setTailing(tail *Tail) {
 
 	tr := tail.Request.GetTail().Request
 
-	if _, ok := s.tails[tailKey(tr.Audience, tr.PipelineId)]; !ok {
-		s.tails[tailKey(tr.Audience, tr.PipelineId)] = make(map[string]*Tail)
+	audStr := audToStr(tr.Audience)
+
+	if _, ok := s.tails[audStr]; !ok {
+		s.tails[audStr] = make(map[string]*Tail)
 	}
 
-	s.tails[tailKey(tr.Audience, tr.PipelineId)][tr.Id] = tail
-}
-
-func tailKey(aud *protos.Audience, pipelineID string) string {
-	return fmt.Sprintf("%s-%s", audToStr(aud), pipelineID)
+	s.tails[audStr][*tr.Id] = tail
 }
