@@ -401,13 +401,29 @@ func (c *Console) DisplaySelectList(title string, itemMap map[string]string, out
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
+	// I spent a good 15 minutes trying to find how to dynamically generate a
+	// rune from an int - couldn't find anything. So, this is what we're doing.
+	// ¯\_(ツ)_/¯
+	i := 0
+	shortcuts := []rune{'1', '2', '3', '4', '5', '6', '7', '8', '9'}
+
 	for tmpName, tmpDesc := range itemMap {
 		name := tmpName
 		desc := tmpDesc
 
-		selectComponent.AddItem(name, desc, 0, func() {
+		var shortcut rune
+
+		if i >= len(shortcuts) {
+			shortcut = '0'
+		} else {
+			shortcut = shortcuts[i]
+		}
+
+		selectComponent.AddItem(name, desc, shortcut, func() {
 			output <- name
 		})
+
+		i++
 	}
 
 	// Put this in a flex primitive so we can center it
