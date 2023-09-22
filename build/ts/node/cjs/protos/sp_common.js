@@ -312,7 +312,7 @@ class TailRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.TailRequest", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.TailRequestType", TailRequestType, "TAIL_REQUEST_TYPE_"] },
-            { no: 2, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => exports.Audience },
             { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
@@ -333,8 +333,8 @@ class TailRequest$Type extends runtime_5.MessageType {
                 case /* protos.TailRequestType type */ 1:
                     message.type = reader.int32();
                     break;
-                case /* optional string id */ 2:
-                    message.id = reader.string();
+                case /* optional string _id */ 2:
+                    message.Id = reader.string();
                     break;
                 case /* protos.Audience audience */ 3:
                     message.audience = exports.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
@@ -376,9 +376,9 @@ class TailRequest$Type extends runtime_5.MessageType {
         /* protos.TailRequestType type = 1; */
         if (message.type !== 0)
             writer.tag(1, runtime_1.WireType.Varint).int32(message.type);
-        /* optional string id = 2; */
-        if (message.id !== undefined)
-            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.id);
+        /* optional string _id = 2; */
+        if (message.Id !== undefined)
+            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.Id);
         /* protos.Audience audience = 3; */
         if (message.audience)
             exports.Audience.internalBinaryWrite(message.audience, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();

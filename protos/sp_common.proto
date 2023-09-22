@@ -54,7 +54,7 @@ message Metric {
 
 message TailRequest {
   TailRequestType type = 1;
-  optional string id = 2; // Filled out by server
+  optional string _id = 2;  // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
   Audience audience = 3;
   optional string pipeline_id = 4;
   map<string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE

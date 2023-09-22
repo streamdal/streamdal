@@ -163,7 +163,7 @@ class Metric(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TailRequest(betterproto.Message):
     type: "TailRequestType" = betterproto.enum_field(1)
-    id: Optional[str] = betterproto.string_field(2, optional=True, group="_id")
+    id: Optional[str] = betterproto.string_field(2, optional=True, group="X_id")
     audience: "Audience" = betterproto.message_field(3)
     pipeline_id: Optional[str] = betterproto.string_field(
         4, optional=True, group="_pipeline_id"
