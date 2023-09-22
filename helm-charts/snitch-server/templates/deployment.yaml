@@ -32,8 +32,8 @@ spec:
               containerPort: 9090
               protocol: TCP
           env: 
-            - name: SNITCH_SERVER_NATSURL
-              value: "{{ .Release.Name }}-nats:4222"
+            - name: SNITCH_SERVER_REDIS_URL
+              value: "{{ .Release.Name }}-redis-master:6379"
             - name: SNITCH_SERVER_NODE_ID
               valueFrom:
                 fieldRef:

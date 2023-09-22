@@ -1,15 +1,13 @@
 version: "3.8"
 services:
-  natsjs:
-    image: nats:2.9.20-alpine3.18
-    ports:
-      - "4222:4222" # NATS Port
-      - "6222:6222"
-      - "8222:8222" # HTTP Monitor
-    container_name: snitch-nats
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server --appendonly yes
     volumes:
-      - jetstream-data:/data/jetstream
-      - ${PWD}/assets/nats/nats-server.conf:/etc/nats/nats-server.conf
+      - redis-data:/data 
+    ports:
+      - "6379:6379"
     networks:
       - snitch-network
 
@@ -17,11 +15,11 @@ services:
     container_name: snitch-server
     image: streamdal/snitch-server:latest
     depends_on:
-      - natsjs
+      - redis
     environment:
       - SNITCH_SERVER_NODE_NAME=node1
       - SNITCH_SERVER_AUTH_TOKEN=1234
-      - SNITCH_SERVER_NATSURL=natsjs:4222
+      - SNITCH_SERVER_REDIS_URL=redis:6379
     ports:
       - "8080:8080"
       - "9090:9090"
@@ -55,7 +53,7 @@ services:
       - snitch-network
 
 volumes:
-  jetstream-data:
+  redis-data:
 
 networks:
   snitch-network:
