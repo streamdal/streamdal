@@ -80,6 +80,18 @@ func (c *Console) GetInputCapture() func(event *tcell.EventKey) *tcell.EventKey 
 	return c.app.GetInputCapture()
 }
 
+func (c *Console) ToggleAllMenuHighlights() {
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight(c.menu.GetHighlights()...)
+	})
+}
+
+func (c *Console) ToggleMenuHighlight(regions ...string) {
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight(regions...)
+	})
+}
+
 func (c *Console) SetMenuEntryOn(item string) {
 	c.toggleMenuEntry(item, true)
 }
@@ -263,7 +275,6 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 
 	c.pages.AddPage(PagePeekView, pagePeek, true, true)
 	c.pages.SwitchToPage(PagePeekView)
-	c.app.Draw()
 
 	return pagePeek
 }
@@ -313,7 +324,6 @@ func (c *Console) DisplayRetryModal(msg string, answerCh chan bool) {
 
 	c.pages.AddPage(PageConnectionRetry, retryModal, true, true)
 	c.pages.SwitchToPage(PageConnectionRetry)
-	c.app.Draw()
 }
 
 // DisplayInfoModal will display an animated modal with the given message.
@@ -367,7 +377,6 @@ func (c *Console) DisplayInfoModal(msg string, inputCh, outputCh chan error) {
 
 	c.pages.AddPage(PageConnectionAttempt, infoModal, true, true)
 	c.pages.SwitchToPage(PageConnectionAttempt)
-	c.app.Draw()
 }
 
 func (c *Console) Stop() {
@@ -392,7 +401,6 @@ func (c *Console) DisplayErrorModal(msg string) {
 
 	c.pages.AddPage(PagePeekError, retryModal, true, true)
 	c.pages.SwitchToPage(PagePeekError)
-	c.app.Draw()
 }
 
 func Center(p tview.Primitive, width, height int) tview.Primitive {
@@ -433,7 +441,6 @@ func (c *Console) DisplaySelectList(title string, items []string, output chan<- 
 	// Add Page
 	c.pages.AddPage(PageSelectComponent, selectComponentFlex, true, true)
 	c.pages.SwitchToPage(PageSelectComponent)
-	c.app.Draw()
 }
 
 func (c *Console) initializeComponents() error {

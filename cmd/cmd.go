@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/gdamore/tcell/v2"
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
 
@@ -225,18 +226,45 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
+	// Disable all input capture except "q" to quit; we must do this because
+	// we may have reached this view from peek() which has input capture for
+	// most keyboard shortcuts and if this view gets a keypress, it will
+	// cause the app to deadlock.
+
+	quitCh := make(chan struct{}, 1)
+
+	// Grab the original input capture so we can reset it when the method exits
+	origCapture := c.options.Console.GetInputCapture()
+	c.options.Console.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+			quitCh <- struct{}{}
+		}
+
+		return event
+	})
+
+	defer c.options.Console.SetInputCapture(origCapture)
+
+	c.options.Console.ToggleAllMenuHighlights()
+	c.options.Console.ToggleMenuHighlight("Q")
+
 	componentCh := make(chan string, 1)
 
 	// TODO: We are connected, display list of available components
 	c.options.Console.DisplaySelectList("Select component", []string{"Component 1", "Component 2"}, componentCh)
 
-	component := <-componentCh
-
-	return &types.Action{
-		Step:          types.StepPeek,
-		Args:          []string{component},
-		PeekComponent: component,
-	}, nil
+	// Listen for "quit" or for component selection
+	select {
+	case <-quitCh:
+		return &types.Action{
+			Step: types.StepQuit,
+		}, nil
+	case component := <-componentCh:
+		return &types.Action{
+			Step:          types.StepPeek,
+			PeekComponent: component,
+		}, nil
+	}
 }
 
 // actionPeek launches the actual peek via server + displaying the peek view.
@@ -312,7 +340,7 @@ func (c *Cmd) connect(ctx context.Context) error {
 	for {
 		select {
 		// Happy path - nothing went wrong
-		case <-time.After(10 * time.Second): // WARNING: This is here for demo purposes!
+		case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
 			return nil
 			//return errors.New("something broke")
 		case <-ctx.Done():
