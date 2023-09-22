@@ -96,17 +96,17 @@ export interface TailRequest {
      */
     type: TailRequestType;
     /**
-     * @generated from protobuf field: string id = 2;
+     * @generated from protobuf field: optional string _id = 2;
      */
-    id: string;
+    Id?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
     /**
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: string pipeline_id = 4;
+     * @generated from protobuf field: optional string pipeline_id = 4;
      */
-    pipelineId: string;
+    pipelineId?: string;
     /**
      * @generated from protobuf field: map<string, string> _metadata = 1000;
      */
@@ -495,14 +495,14 @@ class TailRequest$Type extends MessageType<TailRequest> {
     constructor() {
         super("protos.TailRequest", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.TailRequestType", TailRequestType, "TAIL_REQUEST_TYPE_"] },
-            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
-            { no: 4, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<TailRequest>): TailRequest {
-        const message = { type: 0, id: "", pipelineId: "", Metadata: {} };
+        const message = { type: 0, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<TailRequest>(this, message, value);
@@ -516,13 +516,13 @@ class TailRequest$Type extends MessageType<TailRequest> {
                 case /* protos.TailRequestType type */ 1:
                     message.type = reader.int32();
                     break;
-                case /* string id */ 2:
-                    message.id = reader.string();
+                case /* optional string _id */ 2:
+                    message.Id = reader.string();
                     break;
                 case /* protos.Audience audience */ 3:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* string pipeline_id */ 4:
+                case /* optional string pipeline_id */ 4:
                     message.pipelineId = reader.string();
                     break;
                 case /* map<string, string> _metadata */ 1000:
@@ -559,14 +559,14 @@ class TailRequest$Type extends MessageType<TailRequest> {
         /* protos.TailRequestType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
-        /* string id = 2; */
-        if (message.id !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.id);
+        /* optional string _id = 2; */
+        if (message.Id !== undefined)
+            writer.tag(2, WireType.LengthDelimited).string(message.Id);
         /* protos.Audience audience = 3; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* string pipeline_id = 4; */
-        if (message.pipelineId !== "")
+        /* optional string pipeline_id = 4; */
+        if (message.pipelineId !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.pipelineId);
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
