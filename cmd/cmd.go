@@ -79,6 +79,9 @@ func (c *Cmd) run(action *types.Action) error {
 	case types.StepQuit:
 		c.options.Console.Stop()
 		os.Exit(0)
+	case types.StepPause:
+		// Pause is only possible from peek() so that's where we want to go back
+		resp, err = c.actionPeek(action)
 	default:
 		err = errors.Errorf("unknown action step: %d", action.Step)
 	}
@@ -306,30 +309,8 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 			return nil, errors.Wrap(err, "unable to peek")
 		}
 
-		switch respAction.Step {
-		case types.StepQuit:
-			// Pass action back to run so that it can handle exit
-			return respAction, nil
-		case types.StepSelect:
-			// Pass action back to run which will display select screen
-			return respAction, nil
-		case types.StepFilter:
-			// Pass action back to run which will display filter screen
-			return respAction, nil
-		case types.StepSearch:
-			// Pass action back to run which will display search screen
-			return respAction, nil
-		case types.StepPause:
-			// Do nothing because pause does not display a modal - it only
-			// updates the <menu> entry to show that is selected + causes
-			// peek() to not read any data from the dataCh while paused.
-			//
-			// We *specifically* do not pass the action back to run() because
-			// that will cause actionPeek to end.
-		default:
-			c.log.Errorf("unknown step: %s", respAction.Step)
-			return nil, fmt.Errorf("unknown step: %d", respAction.Step)
-		}
+		// Pass back to run() which can decide what to do next
+		return respAction, nil
 	}
 }
 
@@ -363,6 +344,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 	dataCh := make(chan string, 1)
 
+	// If this is the first time we are seeing this filter, announce it
 	if c.announceFilter {
 		filterStatus := fmt.Sprintf(" Filter set to '%s' @ "+time.Now().Format("15:04:05"), action.PeekFilter)
 		filterLine := "[gray:black]" + strings.Repeat("░", 16) + filterStatus + strings.Repeat("░", 16) + "[-:-]"
@@ -371,7 +353,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		c.announceFilter = false
 	}
 
-	// TODO: Getting peek data from snitch-server
+	// TODO: This is where we'd get data from snitch-server
 	go func() {
 		for {
 			if c.paused {
@@ -385,7 +367,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		}
 	}()
 
-	// Search highlighting logic
+	// Set/unset search highlight
 	if action.PeekSearch != "" || action.PeekSearchPrev != "" {
 		// We need to split so that search does not hit line num and/or timestamp field
 		splitData := strings.Split(textView.GetText(false), "\n")
@@ -411,21 +393,27 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			updatedContent := splitLine[2]
 
 			// If we are coming from a previous search, clear the old highlights first
-			if action.PeekSearchPrev != "" {
+			if action.PeekSearchPrev != "" &&
+				strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearchPrev)) {
+
 				updatedContent = strings.Replace(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearchPrev), action.PeekSearchPrev, -1)
 			}
 
-			// If this is a new search, highlight all instances of the search term
-			if action.PeekSearch != "" {
+			// This is a new search - highlight it but only if it's not already highlighted
+			if action.PeekSearch != "" &&
+				!strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch)) &&
+				strings.Contains(updatedContent, action.PeekSearch) {
+
 				updatedContent = strings.Replace(updatedContent, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
 			}
 
 			updatedData += splitLine[0] + " " + splitLine[1] + " " + updatedContent + "\n"
 		}
 
-		//existingData := textView.GetText(false)
-		//existingData = strings.Replace(existingData, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
-		textView.SetText(updatedData)
+		// SetText() does not auto-redraw, need to ask app to do it
+		c.options.Console.Redraw(func() {
+			textView.SetText(updatedData)
+		})
 	}
 
 	// Commands read here have been passed down from DisplayPeek(); we need access
@@ -440,9 +428,10 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 	for {
 		select {
 		case cmd := <-actionCh:
-			// If this is a filter step -> pass action back to peek() so it can
-			// return it to the main display loop.
-
+			// "Pause" is special in that it does not display a modal so we
+			// handle all UI/related pieces from here. For all other commands,
+			// we pass the cmd back to the caller peek() (which will decide if
+			// it should pass the cmd/action back to run()).
 			if cmd.Step == types.StepPause {
 				// Tell peek reader to pause/resume
 				c.paused = !c.paused
@@ -468,6 +457,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			cmd.PeekComponent = action.PeekComponent
 			cmd.PeekFilter = action.PeekFilter
 			cmd.PeekSearch = action.PeekSearch
+			cmd.PeekSearchPrev = action.PeekSearchPrev
 
 			return cmd, nil
 		case data := <-dataCh:

@@ -2,7 +2,6 @@ package console
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -103,8 +102,6 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	c.log.Infof("Requested to toggle text '%s' as %v: %s", text, on, menu)
-
 	replaceOld := "[darkcyan]" + text
 	replaceNew := "[lightcyan]" + text + "[-]"
 
@@ -165,8 +162,6 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 	c.Start()
 
-	c.log.Infof("search has '%s' default value", defaultValue)
-
 	// Remove all menu highlights - you cannot access menu while in search view
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Highlight()
@@ -225,24 +220,18 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 
 	c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
-			c.log.Debug("quit keypress")
-
 			actionCh <- &types.Action{
 				Step: types.StepQuit,
 			}
 		}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 's' {
-			c.log.Debug("select keypress")
-
 			actionCh <- &types.Action{
 				Step: types.StepSelect,
 			}
 		}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 'p' {
-			c.log.Debug("pause keypress")
-
 			actionCh <- &types.Action{
 				Step: types.StepPause,
 			}
@@ -251,8 +240,6 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 		// Pass along PeekComponent name so that once filter view is done,
 		// peek knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == 'f' {
-			c.log.Debug("filter keypress")
-
 			actionCh <- &types.Action{
 				Step:          types.StepFilter,
 				PeekComponent: title,
@@ -262,8 +249,6 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 		// Pass along PeekComponent name so that once search view is done,
 		// peek knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == '/' {
-			c.log.Debug("search keypress")
-
 			actionCh <- &types.Action{
 				Step:          types.StepSearch,
 				PeekComponent: title,
@@ -287,20 +272,12 @@ func (c *Console) Start() {
 	go func() {
 		c.app.SetRoot(c.layout, true).SetFocus(c.pages)
 
-		// Set global captures
-		c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
-				c.app.Stop()
-				os.Exit(0)
-			}
-
-			return event
-		})
-
 		if err := c.app.Run(); err != nil {
 			panic("unable to .Run app")
 		}
 	}()
+
+	time.Sleep(100 * time.Millisecond) // Hack to give tview app enough time to start
 
 	c.started = true
 
@@ -411,6 +388,10 @@ func Center(p tview.Primitive, width, height int) tview.Primitive {
 			AddItem(p, height, 1, true).
 			AddItem(nil, 0, 1, false), width, 1, true).
 		AddItem(nil, 0, 1, false)
+}
+
+func (c *Console) Redraw(f func()) {
+	c.app.QueueUpdateDraw(f)
 }
 
 // DisplaySelectList will display a list of items and return the select item on the
