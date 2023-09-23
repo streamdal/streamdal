@@ -33,7 +33,7 @@ func TestTailCRUD(t *testing.T) {
 			Command: &protos.Command_Tail{
 				Tail: &protos.TailCommand{
 					Request: &protos.TailRequest{
-						Id:       &tailID,
+						XId:      &tailID,
 						Audience: aud,
 					},
 				},

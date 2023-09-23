@@ -51,7 +51,7 @@ func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData 
 	for _, tail := range tails {
 		tr := &protos.TailResponse{
 			Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-			TailRequestId: *tail.Request.GetTail().Request.Id,
+			TailRequestId: tail.Request.GetTail().Request.GetXId(),
 			Audience:      aud,
 			PipelineId:    pipelineID,
 			SessionId:     s.sessionID,
@@ -187,7 +187,7 @@ func (s *Snitch) stopTailAudience(_ context.Context, cmd *protos.Command) error 
 	}
 
 	aud := cmd.GetTail().Request.Audience
-	tailID := *cmd.GetTail().Request.Id
+	tailID := cmd.GetTail().Request.GetXId()
 
 	tails := s.getTail(aud)
 	if len(tails) == 0 {
@@ -256,5 +256,5 @@ func (s *Snitch) setTailing(tail *Tail) {
 		s.tails[audStr] = make(map[string]*Tail)
 	}
 
-	s.tails[audStr][*tr.Id] = tail
+	s.tails[audStr][tr.GetXId()] = tail
 }
