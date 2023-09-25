@@ -193,16 +193,6 @@ class SnitchClient:
         for e in events:
             signal.signal(e, self.shutdown)
 
-        # Add audiences passed on config
-        for aud in self.cfg.audiences:
-            aud = protos.Audience(
-                service_name=cfg.service_name,
-                operation_type=protos.OperationType(aud.operation_type),
-                operation_name=aud.operation_name,
-                component_name=aud.component_name,
-            )
-            self._add_audience(aud)
-
         # Pull initial pipelines
         self._pull_initial_pipelines()
 
@@ -292,7 +282,7 @@ class SnitchClient:
 
         # We haven't seen it yet, add to local map and send to snitch-server
         self.audiences[self._aud_to_str(aud)] = aud
-        self.grpc_loop.run_until_complete(call())
+        self.grpc_loop.create_task(call())
 
     def _add_audiences(self) -> None:
         """This method is used to re-announce audiences after a disconnect"""
@@ -372,7 +362,9 @@ class SnitchClient:
         # Get rules based on operation and component
         pipelines = self._get_pipelines(aud)
 
-        for _, cmd in pipelines.items():
+        pipes = pipelines.copy()
+
+        for _, cmd in pipes.items():
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
@@ -398,6 +390,8 @@ class SnitchClient:
 
                 if len(wasm_resp.output_payload) > 0:
                     data = wasm_resp.output_payload
+
+                self._handle_schema(aud, step, wasm_resp)
 
                 # If successful, continue to next step, don't need to check conditions
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
@@ -607,7 +601,18 @@ class SnitchClient:
                 arch=platform.processor(),
                 os=platform.system(),
             ),
+            audiences=[],
         )
+
+        # Add audiences passed on config
+        for aud in self.cfg.audiences:
+            aud = protos.Audience(
+                service_name=self.cfg.service_name,
+                operation_type=protos.OperationType(aud.operation_type),
+                operation_name=aud.operation_name,
+                component_name=aud.component_name,
+            )
+            req.audiences.append(aud)
 
         async def call():
             self.log.debug("Registering with snitch server")
@@ -1125,7 +1130,7 @@ class SnitchClient:
     ) -> None:
         # Only handle schema steps
         (step_type, _) = which_one_of(step, "step")
-        if step_type != "schema":
+        if step_type != "infer_schema":
             return
 
         # Only successful schema inferences
@@ -1148,4 +1153,5 @@ class SnitchClient:
             )
             self.log.debug(f"Published schema for audience '{self._aud_to_str(aud)}'")
 
+        self._set_schema(aud, resp.output_step)
         self.grpc_loop.create_task(call())
