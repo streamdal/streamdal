@@ -14,11 +14,12 @@ import * as $8 from "./routes/pipelines/[id]/index.tsx";
 import * as $9 from "./routes/pipelines/add.tsx";
 import * as $10 from "./routes/pipelines/index.tsx";
 import * as $11 from "./routes/pipelines/save.tsx";
-import * as $12 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
-import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
-import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
-import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $16 from "./routes/ws/service-map.tsx";
+import * as $12 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
+import * as $13 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
+import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
+import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
+import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
+import * as $17 from "./routes/ws/service-map.tsx";
 import * as $$0 from "./islands/notifications.tsx";
 import * as $$1 from "./islands/opModal.tsx";
 import * as $$2 from "./islands/peek.tsx";
@@ -40,15 +41,17 @@ const manifest = {
     "./routes/pipelines/add.tsx": $9,
     "./routes/pipelines/index.tsx": $10,
     "./routes/pipelines/save.tsx": $11,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx":
       $12,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx":
       $13,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
       $14,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
       $15,
-    "./routes/ws/service-map.tsx": $16,
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
+      $16,
+    "./routes/ws/service-map.tsx": $17,
   },
   islands: {
     "./islands/notifications.tsx": $$0,

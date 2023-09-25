@@ -1,6 +1,13 @@
 import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
 import { ConfigType, PipelinesType } from "./fetch.ts";
 
+export type AudienceParams = {
+  service: string;
+  component: string;
+  operationType: string;
+  operationName: string;
+};
+
 const UNITS = [
   "byte",
   "kilobyte",
@@ -74,6 +81,15 @@ export const getAudienceOpRoute = (
     encodeURIComponent(audience.operationName)
   }`;
 
+export const getAudienceFromParams = (params: AudienceParams) => {
+  return {
+    serviceName: params.service,
+    componentName: params.component,
+    operationType: OperationType[params.operationType],
+    operationName: params.operationName,
+  };
+};
+
 export const getOpRoute = (
   service: string,
   component: string,
@@ -144,12 +160,12 @@ export const setHighlightedEdges = (a: Audience, highlight: boolean) => {
 
   if (componentEdge) {
     componentEdge.children[0].style.stroke = `${
-      highlight ? "#956CFF" : "#E6DDFE"
+      highlight ? "#956CFF" : "#d2c1ff"
     }`;
   }
   if (serviceEdge) {
     serviceEdge.children[0].style.stroke = `${
-      highlight ? "#956CFF" : "#E6DDFE"
+      highlight ? "#956CFF" : "#d2c1ff"
     }`;
   }
 };
@@ -174,7 +190,17 @@ export const getAttachedPipeline = (
   audience: Audience,
   pipelines: PipelinesType,
   config: ConfigType,
-) => pipelines[config[audienceKey(audience)]]?.pipeline;
+) => {
+  return pipelines[config[audienceKey(audience)]]?.pipeline;
+};
 
 export const bigIntStringify = (obj: any) =>
   JSON.stringify(obj, (_, v) => typeof v === "bigint" ? v.toString() : v);
+
+export const addClass = (id: string, item: string) => {
+  return document.getElementById(id).classList.add(item);
+};
+
+export const removeClass = (id: string, item: string) => {
+  return document.getElementById(id).classList.remove(item);
+};

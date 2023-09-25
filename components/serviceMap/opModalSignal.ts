@@ -9,6 +9,7 @@ export type OpModalType = {
   attach?: boolean;
   pause?: boolean;
   detach?: boolean;
+  delete?: boolean;
 };
 
 export const opModal = signal<OpModalType | null>(null);

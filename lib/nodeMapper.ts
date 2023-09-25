@@ -15,6 +15,7 @@ import {
   GROUP_MARGIN,
   GROUP_WIDTH,
 } from "../components/serviceMap/customNodes.tsx";
+import { MarkerType } from "reactflow";
 
 export type Operation = {
   audience: Audience;
@@ -226,14 +227,15 @@ export const mapEdgePair = (
       },
     animated: true,
     markerEnd: {
-      width: 20,
-      height: 20,
-      color: "#E6DDFE",
+      type: MarkerType.Arrow,
+      width: 15,
+      height: 15,
+      color: "#d2c1ff",
     },
     type: "interactiveEdge",
     style: {
-      strokeWidth: 1.5,
-      stroke: "#E6DDFE",
+      strokeWidth: 2,
+      stroke: "#d2c1ff",
     },
     data: { audiences, a },
   });
@@ -251,14 +253,15 @@ export const mapEdgePair = (
       },
     animated: true,
     markerEnd: {
-      width: 20,
-      height: 20,
-      color: "#E6DDFE",
+      type: MarkerType.Arrow,
+      width: 15,
+      height: 15,
+      color: "#d2c1ff",
     },
     type: "interactiveEdge",
     style: {
-      strokeWidth: 1.5,
-      stroke: "#E6DDFE",
+      strokeWidth: 2,
+      stroke: "#d2c1ff",
     },
     data: { audiences, a },
   });

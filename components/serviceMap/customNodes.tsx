@@ -16,6 +16,7 @@ import {
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../../lib/nodeMapper.ts";
 import { opModal } from "./opModalSignal.ts";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
@@ -124,13 +125,12 @@ export const OperationNode = (
   { operation, css }: { operation: Operation; css: string },
 ) => {
   const toolTipId = removeWhitespace(operation.audience.operationName);
-
   return (
     <div
       type="button"
       class={`flex items-center justify-between w-[260px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2 ${css}`}
     >
-      <div class="w-[170px] whitespace-nowrap text-ellipsis overflow-hidden">
+      <div class="w-fit whitespace-nowrap text-ellipsis overflow-hidden">
         <div
           class={"flex flex-col justify-start p-1 cursor-pointer"}
           onClick={() =>
@@ -157,6 +157,18 @@ export const OperationNode = (
           </h3>
         </div>
       </div>
+      <button
+        onClick={() =>
+          opModal.value = {
+            audience: operation.audience,
+            attachedPipeline: operation.attachedPipeline,
+            clients: operation.clients,
+            delete: true,
+          }}
+        className={"p-2 rounded hover:bg-red-50"}
+      >
+        <IconTrash class="w-6 h-6 text-streamdalRed" />
+      </button>
     </div>
   );
 };
