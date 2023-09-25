@@ -110,6 +110,6 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
     internal.pipelines.set(key, {
       ...p,
       tail: request.type === TailRequestType.START,
-      tailRequestId: request.id,
+      tailRequestId: request.Id,
     } as InternalPipeline);
 };

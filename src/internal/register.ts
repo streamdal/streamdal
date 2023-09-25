@@ -63,6 +63,10 @@ export const register = async ({
         console.debug("processing response command...", response);
       processResponse(response);
     }
+
+    //
+    // TODO: check status for errors
+    // const { status, trailers } = await call;
   } catch (error) {
     console.error("Error registering with grpc server", error);
   }
