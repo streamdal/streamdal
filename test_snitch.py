@@ -29,6 +29,8 @@ class TestSnitchClient:
         client.pipelines = {}
         client.paused_pipelines = {}
         client.audiences = {}
+        client.tails = {}
+        client.schemas = {}
 
         self.client = client
 
