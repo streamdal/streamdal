@@ -353,7 +353,12 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 
 	// Send AttachCommand to client with ephemeral inferschema pipeline
 	cmdCh := s.Options.CmdService.GetChannel(req.SessionId)
-	s.sendInferSchemaPipelines(ctx, cmdCh, req.SessionId)
+	if cmdCh == nil {
+		s.log.Errorf("no command channel found for session id '%s'", req.SessionId)
+	} else {
+		s.sendInferSchemaPipelines(ctx, cmdCh, req.SessionId)
+		s.log.Debugf("sending inferschema pipeline to session id '%s'", req.SessionId)
+	}
 
 	// Broadcast audience creation so that we can notify UI GetAllStream clients
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
