@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
 
+	"github.com/streamdal/snitch-cli/api"
 	"github.com/streamdal/snitch-cli/config"
 	"github.com/streamdal/snitch-cli/console"
 	"github.com/streamdal/snitch-cli/types"
@@ -22,6 +23,7 @@ const (
 )
 
 type Cmd struct {
+	api            *api.API
 	textview       *tview.TextView
 	previousSearch string
 	paused         bool
@@ -42,6 +44,8 @@ func New(opts *Options) (*Cmd, error) {
 	}
 
 	return &Cmd{
+		// TODO: Create an interface for API
+		//api:     api.NewUninitialized(),
 		options: opts,
 		log:     opts.Logger.WithPrefix("cmd"),
 	}, nil
@@ -319,18 +323,42 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 
 // Dummy connect - this should be actual snitch server connect code
 func (c *Cmd) connect(ctx context.Context) error {
-	// Attempt to talk to snitch server
+	// Give user a chance to see the "connecting" message
+	time.Sleep(time.Second)
 
-	for {
-		select {
-		// Happy path - nothing went wrong
-		case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
-			return nil
-			//return errors.New("something broke")
-		case <-ctx.Done():
-			return nil
-		}
+	// Attempt to talk to snitch server
+	a, err := api.New(&api.Options{
+		Address:        c.options.Config.Server,
+		AuthToken:      c.options.Config.Auth,
+		ConnectTimeout: c.options.Config.ConnectTimeout,
+		DisableTLS:     c.options.Config.DisableTLS,
+	})
+	if err != nil {
+		return errors.Wrap(err, "unable to create server client")
 	}
+
+	// Attempt to call test method
+	ctx, cancel := context.WithTimeout(ctx, c.options.Config.ConnectTimeout)
+	defer cancel()
+
+	if err := a.Test(ctx); err != nil {
+		return errors.Wrap(err, "unable to complete connection test")
+	}
+
+	c.api = a
+
+	return nil
+
+	//for {
+	//	select {
+	//	// Happy path - nothing went wrong
+	//	case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
+	//		return nil
+	//		//return errors.New("something broke")
+	//	case <-ctx.Done():
+	//		return nil
+	//	}
+	//}
 
 }
 

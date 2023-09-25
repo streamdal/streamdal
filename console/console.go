@@ -300,7 +300,10 @@ func (c *Console) DisplayRetryModal(msg string, answerCh chan bool) {
 		})
 
 	c.pages.AddPage(PageConnectionRetry, retryModal, true, true)
-	c.pages.SwitchToPage(PageConnectionRetry)
+
+	c.app.QueueUpdateDraw(func() {
+		c.pages.SwitchToPage(PageConnectionRetry)
+	})
 }
 
 // DisplayInfoModal will display an animated modal with the given message.

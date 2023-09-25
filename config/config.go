@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/alecthomas/kong"
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
@@ -16,6 +18,8 @@ type Config struct {
 	Debug             bool             `help:"Enable debug logging" short:"d" default:"false"`
 	Auth              string           `help:"Authentication token" required:"true" short:"a"`
 	Server            string           `help:"Snitch server URL (gRPC)" default:"localhost:9090"`
+	ConnectTimeout    time.Duration    `help:"Initial gRPC connection timeout in seconds" default:"5s"`
+	DisableTLS        bool             `help:"Disable TLS" default:"false"`
 	EnableFileLogging bool             `help:"Enable file logging" default:"false"`
 	LogFile           string           `help:"Log file" default:"./snitch-cli.log"`
 	MaxOutputLines    int              `help:"Maximum number of output lines" default:"5000"`
