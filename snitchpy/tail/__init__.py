@@ -31,6 +31,7 @@ class Tail:
         exit: Event,
         auth_token: str,
         log: logging.Logger,
+        metrics: Metrics,
     ):
         self.request = request
         self.queue = SimpleQueue()
@@ -38,22 +39,10 @@ class Tail:
         self.log = log
         self.auth_token = auth_token
         self.snitch_url = snitch_url
+        self.metrics = metrics
 
     def tail_iterator(self):
         while not self.exit.is_set():
-            # If we're sending too fast, drop the message
-            if time.time_ns() - self.last_msg < MIN_TAIL_RESPONSE_INTERVAL:
-                self.metrics.incr(
-                    CounterEntry(
-                        name=COUNTER_DROPPED_TAIL_MESSAGES, value=1.0, labels={}
-                    )
-                )
-
-                self.log.warning(
-                    f"Dropping tail response for {self.request.pipeline_id}, too fast"
-                )
-                return
-
             try:
                 yield self.queue.get(timeout=1)
             except Empty:
@@ -79,6 +68,21 @@ class Tail:
 
         async def call():
             try:
+                # If we're sending too fast, drop the message
+                if time.time_ns() - self.last_msg < MIN_TAIL_RESPONSE_INTERVAL:
+                    self.metrics.incr(
+                        CounterEntry(
+                            name=COUNTER_DROPPED_TAIL_MESSAGES,
+                            value=1.0,
+                            labels={},
+                            aud=self.request.audience,
+                        )
+                    )
+
+                    self.log.warning(
+                        f"Dropping tail response for {self.request.pipeline_id}, too fast"
+                    )
+
                 await stub.send_tail(
                     tail_response_iterator=self.tail_iterator(),
                     metadata={"auth-token": self.auth_token},

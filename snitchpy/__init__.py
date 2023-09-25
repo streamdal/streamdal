@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import grpclib
 import logging
 import os
 import platform
@@ -34,6 +35,7 @@ from wasmtime import (
 
 DEFAULT_SNITCH_URL = "localhost:9090"
 DEFAULT_SNITCH_TOKEN = "1234"
+DEFAULT_GRPC_RECONNECT_INTERVAL = 5  # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10  # 100 milliseconds
 DEFAULT_STEP_TIMEOUT = 1 / 100  # 10 milliseconds
 DEFAULT_GRPC_TIMEOUT = 5  # 5 seconds
@@ -81,7 +83,6 @@ class Audience:
     We use a dataclass here instead of the protobuf Audience in order to keep the public interface clean
     """
 
-    service_name: str
     operation_type: int
     operation_name: str
     component_name: str
@@ -127,6 +128,8 @@ class SnitchClient:
     workers: list
     audiences: dict
     tails: dict
+    host: str
+    port: int
 
     # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
     # channels for register and tail requests. All other unary operations can use the same
@@ -150,14 +153,18 @@ class SnitchClient:
         log.setLevel(logging.DEBUG)
 
         (host, port) = cfg.snitch_url.split(":")
+        self.host = host
+        self.port = port
 
         register_loop = asyncio.new_event_loop()
-        self.register_channel = Channel(host=host, port=port, loop=register_loop)
+        self.register_channel = Channel(
+            host=self.host, port=self.port, loop=register_loop
+        )
         self.register_stub = protos.InternalStub(channel=self.register_channel)
         self.register_loop = register_loop
 
         grpc_loop = asyncio.new_event_loop()
-        self.grpc_channel = Channel(host=host, port=port, loop=grpc_loop)
+        self.grpc_channel = Channel(host=self.host, port=self.port, loop=grpc_loop)
         self.grpc_stub = protos.InternalStub(channel=self.grpc_channel)
         self.grpc_loop = grpc_loop
 
@@ -284,6 +291,23 @@ class SnitchClient:
         # We haven't seen it yet, add to local map and send to snitch-server
         self.audiences[self._aud_to_str(aud)] = aud
         self.grpc_loop.run_until_complete(call())
+
+    def _add_audiences(self) -> None:
+        """This method is used to re-announce audiences after a disconnect"""
+
+        async def call():
+            try:
+                req = protos.NewAudienceRequest(
+                    audience=aud, session_id=self.session_id
+                )
+                await self.grpc_stub.new_audience(
+                    req, timeout=self.grpc_timeout, metadata=self._get_metadata()
+                )
+            except Exception as e:
+                self.log.debug(f"Failed to re-announce audience: {e}")
+
+        for aud in self.audiences.keys():
+            self.grpc_loop.run_until_complete(call())
 
     def process(self, req: ProcessRequest) -> ProcessResponse:
         """Apply pipelines to a component+operation"""
@@ -528,13 +552,17 @@ class SnitchClient:
 
     def _heartbeat(self):
         async def call():
-            req = protos.HeartbeatRequest(
-                session_id=self.session_id,
-            )
+            try:
+                req = protos.HeartbeatRequest(
+                    session_id=self.session_id,
+                )
 
-            return await self.grpc_stub.heartbeat(
-                req, timeout=self.grpc_timeout, metadata=self._get_metadata()
-            )
+                return await self.grpc_stub.heartbeat(
+                    req, timeout=self.grpc_timeout, metadata=self._get_metadata()
+                )
+            except Exception as e:
+                # Lost connection. Retry will occur in register
+                self.log.debug(f"unable to send heartbeat: {e}")
 
         asyncio.set_event_loop(self.grpc_loop)
         while not self.exit.is_set():
@@ -589,6 +617,8 @@ class SnitchClient:
                         pass
                     elif command == "tail":
                         self._tail_request(cmd)
+                    elif command == "kv":
+                        self._handle_kv(cmd)
                     else:
                         self.log.error(f"Unknown response type: {cmd}")
                 except ValueError as e:
@@ -596,7 +626,25 @@ class SnitchClient:
 
         self.log.debug("Starting register looper")
         asyncio.set_event_loop(self.register_loop)
-        self.register_loop.run_until_complete(call())
+
+        while not self.exit.is_set():
+            try:
+                self.register_loop.run_until_complete(call())
+            except Exception as e:
+                self.log.debug(
+                    f"Register looper lost connection, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
+                )
+                try:
+                    time.sleep(DEFAULT_GRPC_RECONNECT_INTERVAL)
+                    self.register_channel = Channel(
+                        host=self.host, port=self.port, loop=self.register_loop
+                    )
+                    self.grpc_channel = Channel(
+                        host=self.host, port=self.port, loop=self.grpc_loop
+                    )
+                    self._add_audiences()
+                except Exception as e:
+                    self.log.error(f"reconnection failed: {e}")
 
         # Wait for all pending tasks to complete before exiting thread, to avoid exception
         self.register_loop.run_until_complete(
@@ -729,6 +777,10 @@ class SnitchClient:
             f"Resuming pipeline {cmd.resume_pipeline.pipeline_id} for audience {cmd.audience.service_name}"
         )
 
+        return True
+
+    def _handle_kv(self, cmd: protos.Command) -> bool:
+        # Not implemented yet
         return True
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
