@@ -20,7 +20,7 @@ services:
       - snitch-network
 
   redis:
-    container_name: redis
+    container_name: snitch-redis
     image: redis:latest
     command: redis-server --appendonly yes # This enables AOF persistence
     volumes:
@@ -38,6 +38,7 @@ services:
     container_name: snitch-envoy
     ports:
       - "9091:9091"
+      - "9901:9901"
     networks:
       - snitch-network
 
