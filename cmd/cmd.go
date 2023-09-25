@@ -240,6 +240,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	inputCh := make(chan error, 1)
 	outputCh := make(chan error, 1)
 	fetchDoneCh := make(chan struct{}, 1)
+
 	defer close(fetchDoneCh)
 
 	// Channel to tell outputCh reader goroutine to exit
@@ -252,7 +253,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 
 	// Goroutine used for reading user resp
 	go func() {
-		defer c.log.Info("fetchComponents dialog goroutine existing")
+		defer c.log.Info("fetchComponents dialog goroutine exiting")
 
 		for {
 			select {
