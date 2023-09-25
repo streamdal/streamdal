@@ -38,6 +38,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: SNITCH_SERVER_AES_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: snitch-server-aes-key
+                  key: SNITCH_SERVER_AES_KEY
             {{- toYaml .Values.env | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

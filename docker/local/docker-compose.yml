@@ -1,5 +1,13 @@
 version: "3.8"
+
 services:
+  snitch-aes-gen:
+    image: busybox
+    volumes:
+      - ${PWD}/assets/env:/assets/env
+    command: sh -c "/assets/env/script.sh"
+    restart: "no"
+
   redis:
     container_name: redis
     image: redis:latest
@@ -15,11 +23,14 @@ services:
     container_name: snitch-server
     image: streamdal/snitch-server:latest
     depends_on:
+      - snitch-aes-gen
       - redis
     environment:
       - SNITCH_SERVER_NODE_NAME=node1
       - SNITCH_SERVER_AUTH_TOKEN=1234
       - SNITCH_SERVER_REDIS_URL=redis:6379
+    env_file:
+      - ${PWD}/assets/env/.env
     ports:
       - "8080:8080"
       - "9090:9090"
