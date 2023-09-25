@@ -182,6 +182,9 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		llog.Debug("finished initial KV sync")
 	}()
 
+	// Send ephemeral schema inference pipeline for each announced audience
+	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
+
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
