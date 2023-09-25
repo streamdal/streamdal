@@ -83,6 +83,8 @@ func (a *API) Test(ctx context.Context) error {
 // GetAllLiveAudiences returns all live audiences -- clients that are actively
 // connected to the snitch server and have announced one or more audiences)
 func (a *API) GetAllLiveAudiences(ctx context.Context) ([]*protos.Audience, error) {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(AuthTokenMetadata, a.options.AuthToken))
+
 	getAllResp, err := a.client.GetAll(ctx, &protos.GetAllRequest{})
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to complete get all request")

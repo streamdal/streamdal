@@ -16,6 +16,7 @@ import (
 	"github.com/streamdal/snitch-cli/config"
 	"github.com/streamdal/snitch-cli/console"
 	"github.com/streamdal/snitch-cli/types"
+	"github.com/streamdal/snitch-cli/util"
 )
 
 const (
@@ -213,7 +214,7 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 		// Display retry modal
 		retryCh := make(chan bool, 1)
 
-		c.options.Console.DisplayRetryModal(retryMsg, retryCh)
+		c.options.Console.DisplayRetryModal(retryMsg, "page_connection_retry", retryCh)
 		retry := <-retryCh
 
 		if retry {
@@ -233,18 +234,83 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
+	// Display "Fetching live component list ..." modal
+	userQuit := false
+
+	inputCh := make(chan error, 1)
+	outputCh := make(chan error, 1)
+	fetchDoneCh := make(chan struct{}, 1)
+	defer close(fetchDoneCh)
+
+	// Channel to tell outputCh reader goroutine to exit
+	fetchQuitCh := make(chan struct{}, 1)
+	defer close(fetchQuitCh)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c.options.Console.DisplayInfoModal("Fetching live component list", inputCh, outputCh)
+
+	// Goroutine used for reading user resp
+	go func() {
+		defer c.log.Info("fetchComponents dialog goroutine existing")
+
+		for {
+			select {
+			case <-outputCh:
+				userQuit = true
+				cancel()
+				return
+			case <-fetchQuitCh:
+				// Tell fetchComponents() to exit early
+				cancel()
+				return
+			case <-fetchDoneCh:
+				// Component fetch modal is done
+				c.log.Info("component fetch goroutine got signal on fetchDoneCh")
+				return
+			}
+		}
+	}()
+
+	// Fetch the list of audiences; if it errors, display retry
+	audiences, err := c.api.GetAllLiveAudiences(ctx)
+	if err != nil {
+		retryMsg := fmt.Sprintf("[white:red]ERROR: Unable to fetch live components![white:red]\n\n%s", err)
+		inputCh <- errors.New(retryMsg) // tell displayInfoModal to quit because of error
+
+		// Display retry modal
+		retryCh := make(chan bool, 1)
+
+		c.options.Console.DisplayRetryModal(retryMsg, "page_select_retry", retryCh)
+		retry := <-retryCh
+
+		if retry {
+			return &types.Action{Step: types.StepSelect}, nil
+		} else {
+			return &types.Action{Step: types.StepQuit}, nil
+		}
+	}
+
+	if userQuit {
+		return &types.Action{Step: types.StepQuit}, nil
+	}
+
+	// -----------------------------------------------------
+	// OK we have a list of components, display select modal
+	// -----------------------------------------------------
+
 	// Disable all input capture except "q" to quit; we must do this because
 	// we may have reached this view from peek() which has input capture for
 	// most keyboard shortcuts and if this view gets a keypress, it will
 	// cause the app to deadlock.
 
-	quitCh := make(chan struct{}, 1)
+	selectQuitCh := make(chan struct{}, 1)
 
 	// Grab the original input capture so we can reset it when the method exits
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
-			quitCh <- struct{}{}
+			selectQuitCh <- struct{}{}
 		}
 
 		return event
@@ -255,21 +321,18 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	c.options.Console.ToggleAllMenuHighlights()
 	c.options.Console.ToggleMenuHighlight("Q")
 
-	componentCh := make(chan string, 1)
+	selectedComponentCh := make(chan string, 1)
 
-	// TODO: We are connected, display list of available components
-	c.options.Console.DisplaySelectList("Select component", map[string]string{
-		"my-reader": "web-api / consumer / kafka",
-		"my-writer": "billing-api / producer / sqs",
-	}, componentCh)
+	// Display select list
+	c.options.Console.DisplaySelectList("Select component", util.AudiencesToComponentMap(audiences), selectedComponentCh)
 
 	// Listen for "quit" or for component selection
 	select {
-	case <-quitCh:
+	case <-selectQuitCh:
 		return &types.Action{
 			Step: types.StepQuit,
 		}, nil
-	case component := <-componentCh:
+	case component := <-selectedComponentCh:
 		return &types.Action{
 			Step:          types.StepPeek,
 			PeekComponent: component,

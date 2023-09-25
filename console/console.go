@@ -285,7 +285,7 @@ func (c *Console) Start() {
 }
 
 // DisplayRetryModal will display a modal with a given message + retry/quit buttons.
-func (c *Console) DisplayRetryModal(msg string, answerCh chan bool) {
+func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 	c.Start()
 
 	retryModal := tview.NewModal().
@@ -299,10 +299,10 @@ func (c *Console) DisplayRetryModal(msg string, answerCh chan bool) {
 			}
 		})
 
-	c.pages.AddPage(PageConnectionRetry, retryModal, true, true)
+	c.pages.AddPage(pageName, retryModal, true, true)
 
 	c.app.QueueUpdateDraw(func() {
-		c.pages.SwitchToPage(PageConnectionRetry)
+		c.pages.SwitchToPage(pageName)
 	})
 }
 

@@ -37,3 +37,21 @@ func ContainsAudience(a *protos.Audience, b []*protos.Audience) bool {
 
 	return false
 }
+
+func AudiencesToComponentMap(audiences []*protos.Audience) map[string]string {
+	componentMap := make(map[string]string)
+
+	for _, aud := range audiences {
+		operationType := "consumer"
+
+		if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
+			operationType = "producer"
+		}
+
+		componentMap[aud.OperationName] = fmt.Sprintf("[::b]%s[-:-:-] / [::b]%s / [::b]%s[-:-:-]", aud.ServiceName, operationType, aud.ComponentName)
+	}
+
+	return componentMap
+}
+
+// Service: service  Type: OPERATION_TYPE_CO
