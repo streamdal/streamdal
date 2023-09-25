@@ -18,6 +18,8 @@ import {
 } from "../lib/peek.ts";
 import { effect } from "@preact/signals";
 
+export const MAX_PEEK_UI_SIZE = 150;
+
 export const parseData = (data: Uint8Array) => {
   const decoded = new TextDecoder().decode(data);
 
@@ -168,7 +170,7 @@ export const Peek = (
             }px)] overflow-y-scroll rounded-md bg-black text-white`}
           >
             {peekData?.map((p: TailResponse, i: number) => (
-              <PeekRow row={p} index={i} />
+              i <= MAX_PEEK_UI_SIZE && <PeekRow row={p} index={i} />
             ))}
           </div>
         </div>
