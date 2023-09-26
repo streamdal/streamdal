@@ -3,8 +3,6 @@ package bus
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -166,55 +164,47 @@ func (o *Options) validate() error {
 	return nil
 }
 
-// RunConsumer is used for consuming message from the snitch RedisBackend stream and
-// executing a message handler.
+// RunConsumer is used for consuming message from the snitch broadcast stream
+// and executing a message handler. It automatically recovers from Redis
+// connection errors.
 func (b *Bus) RunConsumer() error {
+	llog := b.log.WithField("method", "RunConsumer")
+	llog.Debug("starting dedicated consumer for channel '%s'", FullSubject)
+
+	// Subscribe automatically reconnects on error
 	ps := b.options.RedisBackend.Subscribe(b.options.ShutdownCtx, FullSubject)
 
 MAIN:
 	for {
-		// redis.ReceiveMessage() does not expect context cancellation, so we have to
-		// check for it manually and use redis.ReceiveTimeout()
 		select {
 		case <-b.options.ShutdownCtx.Done():
-			b.log.Debug("context cancellation detected")
+			llog.Debug("context cancellation detected")
 			break MAIN
-		default:
-			// NOOP
-		}
+		case msg := <-ps.Channel():
+			llog.Debugf("received message on channel '%s'", msg.Channel)
 
-		msg, err := ps.ReceiveTimeout(b.options.ShutdownCtx, 2*time.Second)
-		if err != nil {
-			if strings.Contains(err.Error(), "timeout") {
-				continue
-			}
-			if errors.Is(err, context.Canceled) {
-				b.log.Debug("context cancellation detected")
-				break MAIN
-			}
-
-			b.log.WithError(err).Error("error consuming messages")
-			continue
-		}
-
-		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
-		switch msg := msg.(type) {
-		case *redis.Message:
 			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
-				b.log.WithError(err).Error("error handling message")
+				llog.WithError(err).Errorf("error handling broadcast message on channel '%s'", msg.Channel)
 				continue
 			}
 		}
 	}
 
-	b.log.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
+	llog.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
 
 	return ps.Unsubscribe(context.Background())
 }
 
+// RunTailConsumer is a dedicated consumer that listens for tail messages on a
+// channel with a * pattern. It automatically recovers from connection errors.
 func (b *Bus) RunTailConsumer() error {
-	topic := TailSubjectPrefix + ":*"
-	ps := b.options.RedisBackend.PSubscribe(b.options.ShutdownCtx, topic)
+	llog := b.log.WithField("method", "RunTailConsumer")
+
+	channel := TailSubjectPrefix + ":*"
+
+	llog.Debug("starting dedicated consumer on channel '%s'", channel)
+
+	ps := b.options.RedisBackend.PSubscribe(b.options.ShutdownCtx, channel)
 
 MAIN:
 	for {
@@ -222,38 +212,17 @@ MAIN:
 		// check for it manually and use redis.ReceiveTimeout()
 		select {
 		case <-b.options.ShutdownCtx.Done():
-			b.log.Debug("context cancellation detected")
+			llog.Debug("context cancellation detected")
 			break MAIN
-		default:
-			// NOOP
-		}
-
-		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
-		msg, err := ps.ReceiveTimeout(b.options.ShutdownCtx, 2*time.Second)
-		if err != nil {
-			if strings.Contains(err.Error(), "timeout") {
-				continue
-			}
-			if errors.Is(err, context.Canceled) {
-				b.log.Debug("context cancellation detected")
-				break MAIN
-			}
-
-			b.log.WithError(err).Error("error consuming messages")
-			continue
-		}
-
-		// msg can be a *redis.Message or *redis.Subscription or *redis.Pong
-		switch msg := msg.(type) {
-		case *redis.Message:
+		case msg := <-ps.Channel():
 			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
-				b.log.WithError(err).Error("error handling message")
+				llog.WithError(err).Error("error handling tail message on channel '%s'", msg.Channel)
 				continue
 			}
 		}
 	}
 
-	b.log.Debugf("pubsub consumer for topic '%s' exiting", topic)
+	llog.Debugf("pubsub consumer for channel '%s' exiting", channel)
 
 	return ps.PUnsubscribe(context.Background())
 }
