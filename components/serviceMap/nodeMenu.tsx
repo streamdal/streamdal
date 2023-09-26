@@ -129,14 +129,11 @@ export const NodeMenu = (
 };
 
 export const ServiceNodeMenu = ({ data }: { data: NodeData }) => {
-  const sKey = serviceKey(data.audience);
   const [open, setOpen] = useState(false);
 
   return (
     <div className={"flex flex-col"}>
       <div
-        data-dropdown-toggle={`${sKey}-menu`}
-        data-dropdown-placement="top"
         type="button"
         class="rounded bg-purple-50 ml-4 cursor-pointer"
         onClick={() => setOpen(!open)}
@@ -145,7 +142,6 @@ export const ServiceNodeMenu = ({ data }: { data: NodeData }) => {
       </div>
       {open && (
         <div
-          id={`${sKey}-menu`}
           class={`absolute z-[51] left-[-10x] top-[-60px] bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px]`}
           onMouseLeave={() => setOpen(false)}
         >

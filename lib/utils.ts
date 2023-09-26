@@ -204,3 +204,13 @@ export const addClass = (id: string, item: string) => {
 export const removeClass = (id: string, item: string) => {
   return document.getElementById(id).classList.remove(item);
 };
+
+export const longDateFormat = {
+  year: "numeric" as const,
+  month: "numeric" as const,
+  day: "numeric" as const,
+  hour: "numeric" as const,
+  hour12: true,
+  minute: "numeric" as const,
+  fractionalSecondDigits: 3,
+} as DateTimeFormatOptions;

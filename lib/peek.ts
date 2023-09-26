@@ -9,12 +9,11 @@ import {
   TailRequestType,
   TailResponse,
 } from "snitch-protos/protos/sp_common.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 
 import { effect, signal } from "@preact/signals";
 import { parseDate } from "../islands/peek.tsx";
 
-export const MAX_PEEK_SIZE = 1000;
+export const MAX_PEEK_SIZE = 200;
 
 export const peekSignal = signal<TailResponse[] | []>(
   [],
@@ -25,9 +24,8 @@ export const peekPausedSignal = signal<boolean>(false);
 export const peekSamplingSignal = signal<boolean>(false);
 export const peekSamplingRateSignal = signal<number>(1);
 
-export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
+export const peek = async ({ audience, grpcUrl, grpcToken }: {
   audience: Audience;
-  pipeline: Pipeline;
   grpcUrl: string;
   grpcToken: string;
 }) => {
@@ -50,7 +48,6 @@ export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
     const tailRequest = TailRequest.create({
       Id: crypto.randomUUID(),
       audience: audience,
-      pipelineId: pipeline?.id,
       type: TailRequestType.START,
     });
 
@@ -85,7 +82,7 @@ export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
     }
 
     const { status } = await tailCall;
-    console.info("grpc tail status", status);
+    status && console.info("grpc tail status", status);
   } catch (e) {
     console.error("received grpc tail error", e);
   }
