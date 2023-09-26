@@ -11,7 +11,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
             return common::write_response(
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 e.to_string(),
             );
         }
@@ -20,14 +20,36 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_response(
+            Some(wasm_request.input_payload.as_slice()),
             None,
-            None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FAILURE,
             format!("invalid step: {}", err.to_string()),
         );
-    }
+    };
 
-    let parsed_json = serde_json::from_str(from_utf8(wasm_request.input_payload.as_slice()).unwrap()).unwrap();
+    let payload = match from_utf8(wasm_request.input_payload.as_slice()) {
+        Ok(json) => json,
+        Err(err) => {
+            return common::write_response(
+                Some(wasm_request.input_payload.as_slice()),
+                None,
+                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                format!("invalid json: {}", err.to_string()),
+            );
+        }
+    };
+
+    let parsed_json = match serde_json::from_str(payload) {
+        Ok(json) => json,
+        Err(err) => {
+            return common::write_response(
+                Some(wasm_request.input_payload.as_slice()),
+                None,
+                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                format!("invalid json: {}", err.to_string()),
+            );
+        }
+    };
 
     let payload_schema = infer(&parsed_json);
 
@@ -41,7 +63,29 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         );
     }
 
-    let current_schema = serde_json::from_str(from_utf8(wasm_request.step.infer_schema().current_schema.as_slice()).unwrap()).unwrap();
+    let current_schema_data = match from_utf8(wasm_request.step.infer_schema().current_schema.as_slice()) {
+        Ok(json) => json,
+        Err(err) => {
+            return common::write_response(
+                Some(wasm_request.input_payload.as_slice()),
+                None,
+                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                format!("unable to parse: {}", err.to_string()),
+            );
+        }
+    };
+
+    let current_schema = match serde_json::from_str(current_schema_data) {
+        Ok(json) => json,
+        Err(err) => {
+            return common::write_response(
+                Some(wasm_request.input_payload.as_slice()),
+                None,
+                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                format!("unable to parse: {}", err.to_string()),
+            );
+        }
+    };
 
     // Perform diff
     let diff = serde_json_diff::values(
