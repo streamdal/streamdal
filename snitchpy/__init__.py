@@ -345,9 +345,7 @@ class SnitchClient:
                 req.data,
                 req.data,
             )
-            return ProcessResponse(
-                data=req.data, error=False, message="no pipelines to run"
-            )
+            return ProcessResponse(data=req.data, error=False, message="")
 
         bytes_counter = metrics.COUNTER_CONSUME_BYTES
         errors_counter = metrics.COUNTER_CONSUME_ERRORS
