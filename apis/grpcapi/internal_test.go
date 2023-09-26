@@ -3,7 +3,6 @@ package grpcapi
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -16,6 +15,13 @@ import (
 	"github.com/streamdal/snitch-server/util"
 )
 
+// These tests expect the gRPC server and redis to be running. The server is
+// launched automatically via init() in external_test. Redis should be started
+// outside the test.
+//
+// NOTE: We are using 5s TTLs for register and live* keys in Redis. If they are
+// any lower, they might not get cleaned up in time by Redis and this will cause
+// tests to fail.
 var _ = Describe("Internal gRPC API", func() {
 	var (
 		internalClientErr error
@@ -116,10 +122,13 @@ var _ = Describe("Internal gRPC API", func() {
 	Describe("Register", func() {
 		// Testing a streaming RPC is not great - the test is flakey because of
 		// the sleeps but should get the job done for now. ~DS 08/2023
-		It("should register a new externalClient", func() {
+		//
+		// This tests the following:
+		// - Registering a new SDK client works
+		// - Registering a new SDK client creates register & live* keys in Redis
+		// - When registration is cancelled, register & live* keys are auto-deleted
+		It("should register a new internal client", func() {
 			ctx, cancel := context.WithCancel(context.Background())
-			heartbeatCtx, heartbeatCancel := context.WithCancel(context.Background())
-			defer heartbeatCancel()
 			defer cancel()
 
 			registerRequest := newRegisterRequest()
@@ -129,21 +138,7 @@ var _ = Describe("Internal gRPC API", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(resp).ToNot(BeNil())
 
-				// Launch a heartbeat goroutine
-				go func() {
-					for {
-						select {
-						case <-heartbeatCtx.Done():
-							break
-						default:
-							resp, err := internalClient.Heartbeat(ctxWithGoodAuth, &protos.HeartbeatRequest{SessionId: registerRequest.SessionId})
-							Expect(err).ToNot(HaveOccurred())
-							Expect(resp).ToNot(BeNil())
-
-							time.Sleep(200 * time.Millisecond)
-						}
-					}
-				}()
+				// TODO: Test that server sends periodic keepalives
 
 				// Run until context is cancelled
 				<-ctx.Done()
@@ -152,7 +147,7 @@ var _ = Describe("Internal gRPC API", func() {
 				Expect(resp.CloseSend()).ToNot(HaveOccurred())
 			}()
 
-			// Wait a little bit for register to go through
+			// Wait a little bit for register to go through + create KVs + send keepalive
 			time.Sleep(time.Second)
 
 			// Verify that register K/V is created
@@ -171,21 +166,14 @@ var _ = Describe("Internal gRPC API", func() {
 				Expect(err).ToNot(HaveOccurred())
 			}
 
+			// Tell register to quit -> live* keys should be removed
 			cancel()
 
-			time.Sleep(2 * time.Second)
-
-			// Registration should still exist (because of heartbeat)
-			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(data).ToNot(BeEmpty())
-
-			// Stop the heartbeat; registration should be removed
-			heartbeatCancel()
-
-			time.Sleep(5 * time.Second)
+			// Allow for the TTL to hit (because Register is not running and auto-refreshing)
+			time.Sleep(7 * time.Second)
 
 			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
+			fmt.Println("received data from redis: ", data)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
 			Expect(data).To(BeEmpty())
@@ -217,74 +205,6 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("field 'SessionId' cannot be empty"))
 			Expect(cmd).To(BeNil())
-		})
-
-		It("should disconnect client without heartbeat", func() {
-			registerCtx, registerCancel := context.WithCancel(ctxWithGoodAuth)
-			heartbeatCtx, heartbeatCancel := context.WithCancel(ctxWithGoodAuth)
-			registerExitCh := make(chan struct{}, 1)
-			registerRequest := newRegisterRequest()
-
-			defer registerCancel() // JIC
-
-			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
-			startHeartbeat(heartbeatCtx, internalClient, registerRequest.SessionId)
-
-			// Wait for everything to startup
-			time.Sleep(time.Second)
-
-			// Verify that K/V is created
-			data, err := redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(data).ToNot(BeEmpty())
-
-			// Stop heartbeat
-			heartbeatCancel()
-
-			// Wait for RedisBackend to TTL the key
-			time.Sleep(7 * time.Second)
-
-			// K/V should be gone
-			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			Expect(err).To(HaveOccurred())
-			Expect(data).To(BeEmpty())
-
-			// Register goroutine should've exited as well
-			Eventually(registerExitCh).Should(Receive())
-		})
-	})
-
-	Describe("Heartbeat", func() {
-		It("heartbeat should update all session keys in live bucket", func() {
-			registerCtx, registerCancel := context.WithCancel(ctxWithGoodAuth)
-			heartbeatCtx, heartbeatCancel := context.WithCancel(ctxWithGoodAuth)
-			registerExitCh := make(chan struct{}, 1)
-			registerRequest := newRegisterRequest()
-
-			defer registerCancel()
-			defer heartbeatCancel()
-
-			startRegister(registerCtx, internalClient, registerRequest, registerExitCh)
-			startHeartbeat(heartbeatCtx, internalClient, registerRequest.SessionId)
-
-			// Wait for everything to startup
-			time.Sleep(time.Second)
-
-			// Verify that K/V is created
-			data, err := redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(data).ToNot(BeEmpty())
-
-			// Wait another TTL cycle - heartbeat should've kept key alive
-			time.Sleep(2 * time.Second)
-
-			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(data).ToNot(BeEmpty())
-		})
-
-		It("keys should disappear without heartbeat", func() {
-			// Tested in Register()
 		})
 	})
 
@@ -332,64 +252,6 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(audienceData).ToNot(BeNil())
 		})
-
-		It("audience depends on heartbeat", func() {
-			sessionID := util.GenerateUUID()
-			audience := &protos.Audience{
-				ServiceName:   "test-service",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-				OperationName: "main",
-			}
-
-			Expect(sessionID).ToNot(BeEmpty())
-
-			// Launch heartbeat
-			cancelCtx, cancel := context.WithCancel(ctxWithGoodAuth)
-
-			startHeartbeat(cancelCtx, internalClient, sessionID)
-
-			resp, err := internalClient.NewAudience(ctxWithGoodAuth, &protos.NewAudienceRequest{
-				SessionId: sessionID,
-				Audience:  audience,
-			})
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(resp).ToNot(BeNil())
-
-			time.Sleep(2 * time.Second)
-
-			// Audience is still in live bucket
-			_, err = redisClient.Get(
-				context.Background(),
-				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
-			).Result()
-
-			Expect(err).ToNot(HaveOccurred())
-
-			// Audience is still in audience bucket
-			audienceData, err := redisClient.Get(
-				context.Background(),
-				store.RedisAudienceKey(util.AudienceToStr(audience)),
-			).Result()
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(audienceData).ToNot(BeNil())
-
-			// Stop heartbeat
-			cancel()
-
-			time.Sleep(7 * time.Second)
-
-			// Audience should no longer be in live bucket
-			_, err = redisClient.Get(
-				context.Background(),
-				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
-			).Result()
-
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("redis: nil"))
-		})
 	})
 
 	Describe("Metrics", func() {
@@ -429,81 +291,4 @@ func newRegisterRequest() *protos.RegisterRequest {
 		},
 		DryRun: false,
 	}
-}
-
-func startRegister(ctx context.Context, client protos.InternalClient, req *protos.RegisterRequest, registerExit chan struct{}) {
-	go func() {
-		defer GinkgoRecover()
-
-		resp, err := client.Register(ctx, req)
-
-		Expect(err).ToNot(HaveOccurred())
-		Expect(resp).ToNot(BeNil())
-
-	MAIN:
-		for {
-			select {
-			case <-ctx.Done():
-				fmt.Println("startRegister: context done")
-				break MAIN
-			default:
-				// Continue
-			}
-
-			// Try to recv; only fail test if error is not EOF or context cancelled
-			//
-			// NOTE: The ctx might've gotten cancelled mid-flight so we need to
-			// check for that err condition
-			_, recvErr := resp.Recv()
-			if recvErr != nil {
-				if strings.Contains(recvErr.Error(), "EOF") {
-					fmt.Println("startRegister: EOF")
-					break MAIN
-				} else if strings.Contains(recvErr.Error(), "context canceled") {
-					fmt.Println("startRegister: context canceled")
-					break MAIN
-				} else {
-					fmt.Println("startRegister: recv unexpected error: ", recvErr)
-					Expect(recvErr).ToNot(HaveOccurred())
-				}
-			}
-		}
-
-		fmt.Println("startRegister: exiting")
-		registerExit <- struct{}{}
-	}()
-}
-
-// Send heartbeat every 200ms
-func startHeartbeat(ctx context.Context, client protos.InternalClient, sessionID string) {
-	go func() {
-		defer GinkgoRecover()
-
-	MAIN:
-		for {
-			select {
-			case <-ctx.Done():
-				fmt.Println("startHeartbeat: context done")
-				break MAIN
-			default:
-				// Continue
-			}
-
-			// NOTE: The ctx might've gotten cancelled mid-flight so we need to
-			// check for that err condition
-			resp, err := client.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: sessionID})
-			if err != nil {
-				if strings.Contains(err.Error(), "context canceled") {
-					break MAIN
-				}
-
-				Expect(err).ToNot(HaveOccurred())
-				Expect(resp).ToNot(BeNil())
-			}
-
-			time.Sleep(200 * time.Millisecond)
-		}
-
-		fmt.Println("startHeartbeat: exiting")
-	}()
 }
