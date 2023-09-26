@@ -411,11 +411,12 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
     constructor() {
         super("protos.GetAttachCommandsByServiceResponse", [
             { no: 1, name: "active", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
-            { no: 2, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command }
+            { no: 2, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
+            { no: 3, name: "wasm_modules", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => WasmModule } }
         ]);
     }
     create(value) {
-        const message = { active: [], paused: [] };
+        const message = { active: [], paused: [], wasmModules: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -432,6 +433,90 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
                 case /* repeated protos.Command paused */ 2:
                     message.paused.push(Command.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* map<string, protos.WasmModule> wasm_modules */ 3:
+                    this.binaryReadMap3(message.wasmModules, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    binaryReadMap3(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = WasmModule.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetAttachCommandsByServiceResponse.wasm_modules");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : WasmModule.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.Command active = 1; */
+        for (let i = 0; i < message.active.length; i++)
+            Command.internalBinaryWrite(message.active[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Command paused = 2; */
+        for (let i = 0; i < message.paused.length; i++)
+            Command.internalBinaryWrite(message.paused[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.WasmModule> wasm_modules = 3; */
+        for (let k of Object.keys(message.wasmModules)) {
+            writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            WasmModule.internalBinaryWrite(message.wasmModules[k], writer, options);
+            writer.join().join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
+ */
+export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class WasmModule$Type extends MessageType {
+    constructor() {
+        super("protos.WasmModule", [
+            { no: 1, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* optional string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* optional bytes bytes */ 2:
+                    message.bytes = reader.bytes();
+                    break;
+                case /* optional string function */ 3:
+                    message.function = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -444,12 +529,15 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.Command active = 1; */
-        for (let i = 0; i < message.active.length; i++)
-            Command.internalBinaryWrite(message.active[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated protos.Command paused = 2; */
-        for (let i = 0; i < message.paused.length; i++)
-            Command.internalBinaryWrite(message.paused[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* optional string id = 1; */
+        if (message.id !== undefined)
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* optional bytes bytes = 2; */
+        if (message.bytes !== undefined)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.bytes);
+        /* optional string function = 3; */
+        if (message.function !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.function);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -457,9 +545,9 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
+ * @generated MessageType for protobuf message protos.WasmModule
  */
-export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();
+export const WasmModule = new WasmModule$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class SendSchemaRequest$Type extends MessageType {
     constructor() {
