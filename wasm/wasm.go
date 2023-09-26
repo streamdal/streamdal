@@ -19,19 +19,23 @@ type Mapping struct {
 var (
 	Config = map[string]Mapping{
 		"detective": {
-			Filename: "detective_0_0_4.wasm",
+			Filename: "detective_0_0_5.wasm",
 			FuncName: "f",
 		},
 		"transform": {
-			Filename: "transform_0_0_4.wasm",
+			Filename: "transform_0_0_5.wasm",
 			FuncName: "f",
 		},
 		"httprequest": {
-			Filename: "httprequest_0_0_4.wasm",
+			Filename: "httprequest_0_0_5.wasm",
 			FuncName: "f",
 		},
 		"kv": {
-			Filename: "kv_0_0_4.wasm",
+			Filename: "kv_0_0_5.wasm",
+			FuncName: "f",
+		},
+		"inferschema": {
+			Filename: "inferschema_0_0_5.wasm",
 			FuncName: "f",
 		},
 	}

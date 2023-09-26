@@ -86,6 +86,11 @@ type IStore interface {
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 
+	// GetAudiencesBySessionID returns all audiences for a given session id
+	// This is needed to inject an inferschema pipeline for each announced audience
+	// to the session via a goroutine in internal.Register()
+	GetAudiencesBySessionID(ctx context.Context, sessionID string) ([]*protos.Audience, error)
+
 	// WatchKeys returns a channel that will receive empty struct{} any time the key(s) receive a SET command
 	// This command is currently only used for heartbeats. The argument can accept wildcards *)
 	WatchKeys(key string) chan *redis.Message
@@ -206,6 +211,10 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		// Get value
 		val, err := s.options.RedisBackend.Get(ctx, k).Result()
 		if err != nil {
+			// Race condition where SDK disconnected during a heartbeat
+			if errors.Is(err, context.Canceled) {
+				return nil
+			}
 			return errors.Wrap(err, "error fetching key for refresh")
 		}
 
@@ -1140,4 +1149,37 @@ func (s *Store) AddSchema(ctx context.Context, req *protos.SendSchemaRequest) er
 	}
 
 	return nil
+}
+
+func (s *Store) GetAudiencesBySessionID(ctx context.Context, sessionID string) ([]*protos.Audience, error) {
+	// Get audiences by session ID
+	prefix := RedisLivePrefix + ":" + sessionID
+	keys, err := s.options.RedisBackend.Keys(ctx, prefix+":*").Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching live keys from store")
+	}
+
+	// Looking for format: <sessionID>:<nodeName>:<<service>:<operation_type>:<operation_name>:<component_name>>
+	// Ignoring format: <sessionID>:<nodeName>:register
+
+	live := make([]*protos.Audience, 0)
+	for _, key := range keys {
+		// Trim <sessionID>:<nodeName>: from key
+		// Remaining key should just be <service>:<operation_type>:<operation_name>:<component_name>
+		audStr := strings.TrimPrefix(key, prefix+":"+s.options.NodeName+":")
+		parts := strings.Split(audStr, ":")
+		if len(parts) != 4 {
+			// This is a :registerKey, ignore these, we only want audiences
+			continue
+		}
+
+		aud := util.AudienceFromStr(audStr)
+		if aud == nil {
+			return nil, errors.Errorf("invalid live key '%s'", key)
+		}
+
+		live = append(live, aud)
+	}
+
+	return live, nil
 }

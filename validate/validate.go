@@ -713,12 +713,8 @@ func validateTailRequest(r *protos.TailRequest) error {
 		return ErrUnsetEnum("Type")
 	}
 
-	if r.Id == "" {
-		return ErrEmptyField("Id")
-	}
-
-	if r.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
+	if r.GetXId() == "" {
+		return ErrEmptyField("XId")
 	}
 
 	if r.Audience == nil {
@@ -735,10 +731,6 @@ func TailResponse(r *protos.TailResponse) error {
 
 	if r.TailRequestId == "" {
 		return ErrEmptyField("TailRequestId")
-	}
-
-	if r.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
 	}
 
 	if r.SessionId == "" {

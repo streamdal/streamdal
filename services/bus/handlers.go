@@ -512,14 +512,15 @@ func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) erro
 			continue
 		}
 
-		isAttached, err := b.options.Store.IsPipelineAttached(ctx, req.Audience, req.PipelineId)
-		if err != nil {
-			b.log.Error(errors.Wrap(err, "unable to verify pipeline is attached"))
-			continue
-		}
-		if !isAttached {
-			continue
-		}
+		// Scrapping peek<->pipeline association as of 2023-09-22 ~ MG
+		//isAttached, err := b.options.Store.IsPipelineAttached(ctx, req.Audience, req.PipelineId)
+		//if err != nil {
+		//	b.log.Error(errors.Wrap(err, "unable to verify pipeline is attached"))
+		//	continue
+		//}
+		//if !isAttached {
+		//	continue
+		//}
 
 		// Get channel for the connected client. This allows us to send commands
 		// to a client that is connected via the Register() method

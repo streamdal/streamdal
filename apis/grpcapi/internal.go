@@ -12,7 +12,6 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
-
 	"github.com/streamdal/snitch-server/services/store"
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
@@ -89,6 +88,28 @@ func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessio
 	return nil
 }
 
+func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
+	// Get all audiences for this session
+	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
+	if err != nil {
+		s.log.Errorf("unable to get audiences by session id '%s': %v", sessionID, err)
+		return
+	}
+
+	for _, aud := range audiences {
+		// Create a new pipeline whose only step is an inferschema step
+		attachCmd := util.GenInferSchemaPipeline(aud)
+
+		// Inject WASM data
+		if err := util.PopulateWASMFields(attachCmd.GetAttachPipeline().Pipeline, s.Options.Config.WASMDir); err != nil {
+			s.log.Errorf("unable to populate WASM fields for inferschema: %v", err)
+			return
+		}
+
+		cmdCh <- attachCmd
+	}
+}
+
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
 	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
@@ -160,6 +181,9 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 		llog.Debug("finished initial KV sync")
 	}()
+
+	// Send ephemeral schema inference pipeline for each announced audience
+	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
@@ -329,6 +353,16 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 			Message: fmt.Sprintf("unable to save audience: %s", err.Error()),
 		}, nil
 	}
+
+	// Send AttachCommand to client with ephemeral inferschema pipeline
+	cmdCh, isNewCh := s.Options.CmdService.AddChannel(req.SessionId)
+	if isNewCh {
+		s.log.Debugf("new channel created for session id '%s'", req.SessionId)
+	} else {
+		s.log.Debugf("channel already exists for session id '%s'", req.SessionId)
+	}
+
+	go s.sendInferSchemaPipelines(ctx, cmdCh, req.SessionId)
 
 	// Broadcast audience creation so that we can notify UI GetAllStream clients
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {

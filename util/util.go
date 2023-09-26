@@ -6,12 +6,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-server/wasm"
 )
@@ -147,6 +149,8 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 			mapping, err = wasm.Load("kv", prefix)
 		case *protos.PipelineStep_HttpRequest:
 			mapping, err = wasm.Load("httprequest", prefix)
+		case *protos.PipelineStep_InferSchema:
+			mapping, err = wasm.Load("inferschema", prefix)
 		default:
 			return errors.Errorf("unknown pipeline step type: %T", s.Step)
 		}
@@ -231,4 +235,28 @@ func CounterName(name string, labels map[string]string) string {
 	}
 
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
+}
+
+func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
+	return &protos.Command{
+		Audience: aud,
+		Command: &protos.Command_AttachPipeline{
+			AttachPipeline: &protos.AttachPipelineCommand{
+				Pipeline: &protos.Pipeline{
+					Id:   GenerateUUID(),
+					Name: "Schema Inference",
+					Steps: []*protos.PipelineStep{
+						{
+							Name: "Infer Schema",
+							Step: &protos.PipelineStep_InferSchema{
+								InferSchema: &steps.InferSchemaStep{
+									CurrentSchema: make([]byte, 0), // TODO: get this from storage
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 }
