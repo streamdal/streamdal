@@ -26,7 +26,7 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
     if (internal.audiences.has(audienceKey(audience))) {
       return;
     }
-    internal.audiences.add(audienceKey(audience));
+    internal.audiences.set(audienceKey(audience), {});
     const { response } = await configs.grpcClient.newAudience(
       {
         sessionId: configs.sessionId,

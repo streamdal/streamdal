@@ -15,7 +15,7 @@ import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
 import { lock, metrics } from "./metrics.js";
 import { EnhancedStep, InternalPipeline } from "./pipeline.js";
-import { audienceKey, internal } from "./register.js";
+import { audienceKey, internal, TailStatus } from "./register.js";
 import { runWasm } from "./wasm.js";
 
 export interface StepStatus {
@@ -42,10 +42,10 @@ export interface PipelineConfigs {
 
 export interface TailRequest {
   configs: PipelineConfigs;
+  tailStatus: TailStatus;
   audience: Audience;
   originalData: Uint8Array;
-  newData: Uint8Array;
-  pipeline: InternalPipeline;
+  newData?: Uint8Array;
 }
 
 //
@@ -60,24 +60,25 @@ const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
 
 export const sendTail = ({
   configs,
-  pipeline,
+  tailStatus,
   audience,
   originalData,
   newData,
 }: TailRequest) => {
   try {
-    void configs.tailCall.requests.send(
-      TailResponse.create({
+    if (tailStatus.tail) {
+      const tailResponse = TailResponse.create({
         timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
         type: TailResponseType.PAYLOAD,
-        tailRequestId: pipeline.tailRequestId,
+        tailRequestId: tailStatus.tailRequestId,
         audience,
-        pipelineId: pipeline.id,
         sessionId: configs.sessionId,
         originalData,
         newData,
-      })
-    );
+      });
+      console.debug("sending tail response", tailResponse);
+      void configs.tailCall.requests.send(tailResponse);
+    }
   } catch (e) {
     console.error("Error sending tail request", e);
   }
@@ -88,12 +89,22 @@ export const processPipeline = async ({
   audience,
   data,
 }: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
-  const pipeline = internal.pipelines.get(audienceKey(audience));
+  const key = audienceKey(audience);
+  const pipeline = internal.pipelines.get(key);
+  const tailStatus = internal.audiences.get(key);
 
   if (!pipeline || pipeline.paused) {
     const message =
       "no active pipeline found for this audience, returning data";
     console.debug(message);
+    tailStatus &&
+      sendTail({
+        configs,
+        tailStatus,
+        audience,
+        originalData: data,
+      });
+
     return { data, error: true, message };
   }
 
@@ -124,13 +135,13 @@ export const processPipeline = async ({
     }
   }
 
-  pipeline.tail &&
+  tailStatus &&
     sendTail({
       configs,
-      pipeline,
+      tailStatus,
       audience,
       originalData,
-      newData: pipelineStatus.data,
+      newData: data,
     });
 
   //

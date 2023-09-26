@@ -15,8 +15,6 @@ import { Configs } from "../snitch.js";
 import { audienceKey, internal } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
-  tail?: boolean;
-  tailRequestId?: string;
   paused?: boolean;
 };
 
@@ -104,12 +102,8 @@ export const togglePausePipeline = (
 };
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
-  const key = audienceKey(audience);
-  const p = internal.pipelines.get(key);
-  request.pipelineId === p?.id &&
-    internal.pipelines.set(key, {
-      ...p,
-      tail: request.type === TailRequestType.START,
-      tailRequestId: request.Id,
-    } as InternalPipeline);
+  internal.audiences.set(audienceKey(audience), {
+    tail: request.type === TailRequestType.START,
+    tailRequestId: request.Id,
+  });
 };

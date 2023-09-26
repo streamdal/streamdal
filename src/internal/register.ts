@@ -14,13 +14,18 @@ export interface RegisterConfigs {
   audiences?: Audience[];
 }
 
+export interface TailStatus {
+  tail?: boolean;
+  tailRequestId?: string;
+}
+
 //
 // fyi, the init flag is because we can't await pipeline initialization
 // in our constructor so we do it on processPipeline only if needed
 export const internal = {
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
-  audiences: new Set<string>(),
+  audiences: new Map<string, TailStatus>(),
 };
 
 export const audienceKey = (audience: Audience) =>
