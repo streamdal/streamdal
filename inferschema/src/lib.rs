@@ -34,7 +34,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("invalid json: {}", err.to_string()),
+                format!("invalid payload json: {}", err.to_string()),
             );
         }
     };
@@ -46,7 +46,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("invalid json: {}", err.to_string()),
+                format!("invalid payload json: {}", err.to_string()),
             );
         }
     };
@@ -70,7 +70,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("unable to parse: {}", err.to_string()),
+                format!("unable to parse current schema into string: {}", err.to_string()),
             );
         }
     };
@@ -82,7 +82,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("unable to parse: {}", err.to_string()),
+                format!("unable to parse current schema json: {}", err.to_string()),
             );
         }
     };
