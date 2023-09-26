@@ -38,9 +38,13 @@ func (s *Snitch) register(looper director.Looper) error {
 		DryRun:    s.config.DryRun,
 	}
 
+	s.audiencesMtx.Lock()
 	for _, aud := range s.config.Audiences {
-		req.Audiences = append(req.Audiences, aud.ToProto(s.config.ServiceName))
+		pAud := aud.ToProto(s.config.ServiceName)
+		req.Audiences = append(req.Audiences, pAud)
+		s.audiences[audToStr(pAud)] = struct{}{}
 	}
+	s.audiencesMtx.Unlock()
 
 	var (
 		stream             protos.Internal_RegisterClient
