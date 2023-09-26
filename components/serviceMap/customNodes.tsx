@@ -8,6 +8,7 @@ import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
 import {
   removeWhitespace,
+  serviceKey,
   setComponentGroup,
   setOperationHoverGroup,
   setServiceGroup,
@@ -41,7 +42,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
     <div>
       <div
         class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg z-10 px-2 border hover:border-purple-600 hover:shadow-lg"
-        id={data.audience.serviceName}
+        id={`${serviceKey(data.audience)}-draghandle`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
       >

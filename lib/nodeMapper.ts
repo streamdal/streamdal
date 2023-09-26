@@ -173,7 +173,7 @@ export const mapNodes = (
       nodesMap.nodes.set(sKey, {
         id: sKey,
         type: "service",
-        dragHandle: "#dragHandle",
+        dragHandle: `#${sKey}-draghandle`,
         position: {
           x: 25 + offset(
             sKey,
