@@ -19,7 +19,6 @@ func TestTailCRUD(t *testing.T) {
 		},
 	}
 
-	pipelineID := uuid.New().String()
 	tailID := uuid.New().String()
 
 	aud := &protos.Audience{
@@ -34,9 +33,8 @@ func TestTailCRUD(t *testing.T) {
 			Command: &protos.Command_Tail{
 				Tail: &protos.TailCommand{
 					Request: &protos.TailRequest{
-						Id:         tailID,
-						Audience:   aud,
-						PipelineId: pipelineID,
+						XId:      &tailID,
+						Audience: aud,
 					},
 				},
 			},
@@ -52,7 +50,7 @@ func TestTailCRUD(t *testing.T) {
 	})
 
 	t.Run("get", func(t *testing.T) {
-		tail := s.getTail(aud, pipelineID)
+		tail := s.getTail(aud)
 
 		if len(tail) != 1 {
 			t.Errorf("expected tails to have 1 item, got %d", len(tail))
@@ -60,23 +58,12 @@ func TestTailCRUD(t *testing.T) {
 	})
 
 	t.Run("remove", func(t *testing.T) {
-		//s.setTailing(tail)
-		//tail := s.getTail(aud, pipelineID)
-		//
-		//if len(tail) != 1 {
-		//	t.Errorf("expected tails to have 1 item, got %d", len(tail))
-		//}
-
-		s.removeTail(aud, pipelineID, tailID)
+		s.removeTail(aud, tailID)
 
 		if len(s.tails) != 0 {
 			t.Errorf("expected tails to have 0 item, got %d", len(s.tails))
 		}
 	})
-}
-
-func TestGetTail(t *testing.T) {
-
 }
 
 func TestSendTail(t *testing.T) {

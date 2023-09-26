@@ -94,15 +94,14 @@ func TestValidateConfig(t *testing.T) {
 
 func TestToProto(t *testing.T) {
 	audPublic := Audience{
-		ServiceName:   "test-service",
 		ComponentName: "test-component",
 		OperationType: OperationTypeProducer,
 		OperationName: "test-operation",
 	}
 
-	audProto := audPublic.ToProto()
-	if audProto.ServiceName != audPublic.ServiceName {
-		t.Errorf("expected ServiceName '%s', got '%s'", audPublic.ServiceName, audProto.ServiceName)
+	audProto := audPublic.ToProto("service")
+	if audProto.ServiceName != "service" {
+		t.Errorf("expected ServiceName '%s', got '%s'", "service", audProto.ServiceName)
 	}
 
 	if audProto.ComponentName != audPublic.ComponentName {
@@ -398,6 +397,8 @@ func TestProcess_matchfail_and_abort(t *testing.T) {
 			PipelineTimeout: time.Millisecond * 100,
 		},
 		metrics:      &metricsfakes.FakeIMetrics{},
+		tails:        map[string]map[string]*Tail{},
+		tailsMtx:     &sync.RWMutex{},
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines: map[string]map[string]*protos.Command{
 			audToStr(aud): {

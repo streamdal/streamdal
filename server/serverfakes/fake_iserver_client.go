@@ -103,6 +103,19 @@ type FakeIServerClient struct {
 	sendMetricsReturnsOnCall map[int]struct {
 		result1 error
 	}
+	SendSchemaStub        func(context.Context, *protos.Audience, []byte) error
+	sendSchemaMutex       sync.RWMutex
+	sendSchemaArgsForCall []struct {
+		arg1 context.Context
+		arg2 *protos.Audience
+		arg3 []byte
+	}
+	sendSchemaReturns struct {
+		result1 error
+	}
+	sendSchemaReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -552,6 +565,74 @@ func (fake *FakeIServerClient) SendMetricsReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeIServerClient) SendSchema(arg1 context.Context, arg2 *protos.Audience, arg3 []byte) error {
+	var arg3Copy []byte
+	if arg3 != nil {
+		arg3Copy = make([]byte, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.sendSchemaMutex.Lock()
+	ret, specificReturn := fake.sendSchemaReturnsOnCall[len(fake.sendSchemaArgsForCall)]
+	fake.sendSchemaArgsForCall = append(fake.sendSchemaArgsForCall, struct {
+		arg1 context.Context
+		arg2 *protos.Audience
+		arg3 []byte
+	}{arg1, arg2, arg3Copy})
+	stub := fake.SendSchemaStub
+	fakeReturns := fake.sendSchemaReturns
+	fake.recordInvocation("SendSchema", []interface{}{arg1, arg2, arg3Copy})
+	fake.sendSchemaMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeIServerClient) SendSchemaCallCount() int {
+	fake.sendSchemaMutex.RLock()
+	defer fake.sendSchemaMutex.RUnlock()
+	return len(fake.sendSchemaArgsForCall)
+}
+
+func (fake *FakeIServerClient) SendSchemaCalls(stub func(context.Context, *protos.Audience, []byte) error) {
+	fake.sendSchemaMutex.Lock()
+	defer fake.sendSchemaMutex.Unlock()
+	fake.SendSchemaStub = stub
+}
+
+func (fake *FakeIServerClient) SendSchemaArgsForCall(i int) (context.Context, *protos.Audience, []byte) {
+	fake.sendSchemaMutex.RLock()
+	defer fake.sendSchemaMutex.RUnlock()
+	argsForCall := fake.sendSchemaArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeIServerClient) SendSchemaReturns(result1 error) {
+	fake.sendSchemaMutex.Lock()
+	defer fake.sendSchemaMutex.Unlock()
+	fake.SendSchemaStub = nil
+	fake.sendSchemaReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIServerClient) SendSchemaReturnsOnCall(i int, result1 error) {
+	fake.sendSchemaMutex.Lock()
+	defer fake.sendSchemaMutex.Unlock()
+	fake.SendSchemaStub = nil
+	if fake.sendSchemaReturnsOnCall == nil {
+		fake.sendSchemaReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendSchemaReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -569,6 +650,8 @@ func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	defer fake.registerMutex.RUnlock()
 	fake.sendMetricsMutex.RLock()
 	defer fake.sendMetricsMutex.RUnlock()
+	fake.sendSchemaMutex.RLock()
+	defer fake.sendSchemaMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
