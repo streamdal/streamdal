@@ -504,6 +504,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		OperationName: req.OperationName,
 	}
 
+	// Always attempt to add audience. We need it when operating in tail only mode
+	s.addAudience(ctx, aud)
+
 	labels := map[string]string{
 		"service":       s.config.ServiceName,
 		"component":     req.ComponentName,
@@ -532,6 +535,9 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 
 	pipelines := s.getPipelines(ctx, aud)
 	if len(pipelines) == 0 {
+		// Send tail if there is any. Tails do not require a pipeline to operate
+		s.sendTail(aud, "", data, data)
+
 		// No pipelines for this mode, nothing to do
 		return &ProcessResponse{Data: data, Message: "No pipelines, message ignored"}, nil
 	}
