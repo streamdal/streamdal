@@ -310,7 +310,7 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 // InputCh is used by caller to indicate that the modal can be closed (in this
 // case, it will cause the method to stop the animation goroutine).
 // OutputCh is used by method to inform caller that the user has exited the modal.
-func (c *Console) DisplayInfoModal(msg string, inputCh, outputCh chan error) {
+func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh chan error) {
 	c.Start()
 
 	// Needed to improve the way the "animation" looks

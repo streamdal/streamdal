@@ -179,7 +179,7 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 	msg := fmt.Sprintf("Connecting to %s ", c.options.Config.Server)
 
 	userQuit := false
-	inputCh := make(chan error, 1)
+	inputCh := make(chan struct{}, 1)
 	outputCh := make(chan error, 1)
 
 	// Channel to tell outputCh reader goroutine to exit
@@ -209,7 +209,7 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 	// Launch connection attempt
 	if err := c.connect(ctx); err != nil {
 		retryMsg := fmt.Sprintf("[white:red]ERROR: Unable to connect![white:red]\n\n%s", err)
-		inputCh <- errors.New(retryMsg) // tell displayInfoModal to quit because of error
+		inputCh <- struct{}{} // tell displayInfoModal to quit because of error
 
 		// Display retry modal
 		retryCh := make(chan bool, 1)
@@ -233,23 +233,43 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 	}, nil
 }
 
+func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo string) (*types.Action, error) {
+	// Display retry modal
+	retryCh := make(chan bool, 1)
+
+	c.options.Console.DisplayRetryModal(msg, pageToSwitchTo, retryCh)
+	retry := <-retryCh
+
+	if retry {
+		return &types.Action{Step: retryStep}, nil
+	} else {
+		return &types.Action{Step: types.StepQuit}, nil
+	}
+}
+
 func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
-	// Display "Fetching live component list ..." modal
+	// Set by dialog watching goroutine to tell us to return a quit step
 	userQuit := false
 
-	inputCh := make(chan error, 1)
-	outputCh := make(chan error, 1)
+	// Channel is used to indicate to DisplayInfoModal that it should quit
+	// ie. because fetchComponents() completed.
+	quitDisplayInfoChan := make(chan struct{}, 1)
+
+	// Channel is written to by DisplayInfoModal() when user clicks "Quit"
+	userQuitInfoModalCh := make(chan error, 1)
+
+	// Channel used to signal dialog goroutine to exit
 	fetchDoneCh := make(chan struct{}, 1)
 
 	defer close(fetchDoneCh)
 
-	// Channel to tell outputCh reader goroutine to exit
+	// Channel to tell userQuitInfoModalCh reader goroutine to exit
 	fetchQuitCh := make(chan struct{}, 1)
 	defer close(fetchQuitCh)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	c.options.Console.DisplayInfoModal("Fetching live component list", inputCh, outputCh)
+	c.options.Console.DisplayInfoModal("Fetching live component list", quitDisplayInfoChan, userQuitInfoModalCh)
 
 	// Goroutine used for reading user resp
 	go func() {
@@ -257,7 +277,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 
 		for {
 			select {
-			case <-outputCh:
+			case <-userQuitInfoModalCh:
 				userQuit = true
 				cancel()
 				return
@@ -276,29 +296,37 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	// Fetch the list of audiences; if it errors, display retry
 	audiences, err := c.api.GetAllLiveAudiences(ctx)
 	if err != nil {
-		retryMsg := fmt.Sprintf("[white:red]ERROR: Unable to fetch live components![white:red]\n\n%s", err)
-		inputCh <- errors.New(retryMsg) // tell displayInfoModal to quit because of error
+		// Tell InfoModal to quit
+		quitDisplayInfoChan <- struct{}{}
 
-		// Display retry modal
-		retryCh := make(chan bool, 1)
-
-		c.options.Console.DisplayRetryModal(retryMsg, "page_select_retry", retryCh)
-		retry := <-retryCh
-
-		if retry {
-			return &types.Action{Step: types.StepSelect}, nil
-		} else {
-			return &types.Action{Step: types.StepQuit}, nil
-		}
+		return c.actionRetry(
+			fmt.Sprintf("[white:red]ERROR: Unable to fetch live components![white:red]\n\n%s", err),
+			types.StepSelect,
+			"page_select_retry",
+		)
 	}
 
 	if userQuit {
 		return &types.Action{Step: types.StepQuit}, nil
 	}
 
-	// -----------------------------------------------------
-	// OK we have a list of components, display select modal
-	// -----------------------------------------------------
+	// -------------------------------------------------------
+	// OK we have a list of components, are there any to show?
+	// -------------------------------------------------------
+
+	if len(audiences) == 0 {
+		quitDisplayInfoChan <- struct{}{} // tell displayInfoModal to quit because of error
+
+		return c.actionRetry(
+			fmt.Sprint("No [::b]live[-:-:-] components!\n\nRetry fetching live components?"),
+			types.StepSelect,
+			"page_select_retry",
+		)
+	}
+
+	// ------------------------------------------
+	// We have a list of components, display them
+	// ------------------------------------------
 
 	// Disable all input capture except "q" to quit; we must do this because
 	// we may have reached this view from peek() which has input capture for
