@@ -278,16 +278,21 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
 // Because reactflow doesn't work with ssr, some updates are made in
 // unrouted modals client-side and those changes need to be reflected
 // in the already rendered nodes
-export const updateNode = (nodes: FlowNode[], update: OpUpdate) =>
-  nodes.map((n: FlowNode) =>
+export const updateNode = (nodes: FlowNode[], update: OpUpdate) => {
+  return nodes.map((n: FlowNode) =>
     n.id ===
-        operationKey(update.audience)
+        groupKey(update.audience)
       ? {
         ...n,
         data: {
           ...n.data,
-          attachedPipeline: update.attachedPipeline,
+          ops: n.data?.ops?.map((o) =>
+            operationKey(o.audience) === operationKey(update.audience)
+              ? { ...o, attachedPipeline: update.attachedPipeline }
+              : o
+          ),
         },
       }
       : n
   );
+};

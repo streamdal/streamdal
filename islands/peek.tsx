@@ -1,6 +1,6 @@
 import { Audience, TailResponse } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { OP_MODAL_OPEN_WIDTH, OP_MODAL_WIDTH } from "./opModal.tsx";
+import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
@@ -42,7 +42,7 @@ export const parseDate = (timestampNs: string) => {
 };
 
 export const PeekRow = (
-  { row, index }: { row: TailResponse; index: number },
+  { row }: { row: TailResponse; index: number },
 ) => {
   const lastRef = useRef();
 
@@ -79,13 +79,11 @@ export const Peek = (
   {
     audience,
     pipeline,
-    modalExpanded,
     grpcToken,
     grpcUrl,
   }: {
     audience: Audience;
     pipeline: Pipeline;
-    modalExpanded: boolean;
     grpcUrl: string;
     grpcToken: string;
   },
@@ -105,8 +103,6 @@ export const Peek = (
     }
   });
 
-  const width = modalExpanded ? OP_MODAL_OPEN_WIDTH : OP_MODAL_WIDTH;
-
   return (
     <>
       <Head>
@@ -116,7 +112,7 @@ export const Peek = (
         />
       </Head>
       <div
-        class={`relative flex flex-col h-screen w-[calc(100vw-${width})]`}
+        class={`relative flex flex-col h-screen w-[calc(100vw-${OP_MODAL_WIDTH})]`}
       >
         <div class="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span class="opacity-50">Home</span> / Peek
@@ -170,7 +166,7 @@ export const Peek = (
             }px)] overflow-y-scroll rounded-md bg-black text-white`}
           >
             {peekData?.map((p: TailResponse, i: number) => (
-              i <= MAX_PEEK_UI_SIZE && <PeekRow row={p} index={i} />
+              i <= MAX_PEEK_UI_SIZE && <PeekRow row={p} />
             ))}
           </div>
         </div>

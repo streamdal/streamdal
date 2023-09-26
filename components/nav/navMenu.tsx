@@ -17,13 +17,13 @@ export const NavMenu = () => {
         id="nav-menu"
         tabIndex={-1}
         aria-hidden="true"
-        class="fixed top-[90px] left-4 w-64 hidden p-4 bg-white rounded border shadow flex flex-col shadow-2xl shadow-stormCloud"
+        className="fixed top-0 left-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 "
       >
-        <ul class="font-medium w-full">
+        <ul class="font-medium bg-white absolute top-[70px] left-0 ml-4 w-64 rounded border shadow">
           <li>
             <a
               href="/"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group "
+              className="flex items-center p-2 text-gray-900 hover:bg-sunset group "
             >
               <svg
                 className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -41,7 +41,7 @@ export const NavMenu = () => {
           <li>
             <a
               href="/pipelines"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group"
+              className="flex items-center p-2 text-gray-900 hover:bg-sunset group"
             >
               <IconListCheck class="w-6 h-6 text-gray-500" />
               <span class="ml-3">Pipelines</span>
@@ -50,14 +50,14 @@ export const NavMenu = () => {
           <li>
             <a
               href="/notifications"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group"
+              className="flex items-center p-2 text-gray-900 hover:bg-sunset group"
             >
               <IconBell class="w-6 h-6 text-gray-500" />
               <span class="ml-3">Notifications</span>
             </a>
           </li>
           <li class="cursor-not-allowed">
-            <div className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group cursor-not-allowed">
+            <div className="flex items-center p-2 text-gray-900 hover:bg-sunset group cursor-not-allowed">
               <svg
                 className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"
@@ -71,7 +71,7 @@ export const NavMenu = () => {
             </div>
           </li>
           <li>
-            <div class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-sunset group cursor-not-allowed">
+            <div class="flex items-center p-2 text-gray-900 hover:bg-sunset group cursor-not-allowed">
               <svg
                 className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 aria-hidden="true"

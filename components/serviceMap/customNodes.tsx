@@ -130,15 +130,17 @@ export const OperationNode = (
       type="button"
       class={`flex items-center justify-between w-[260px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2 ${css}`}
     >
-      <div class="w-fit whitespace-nowrap text-ellipsis overflow-hidden">
+      <div
+        class="whitespace-nowrap text-ellipsis overflow-hidden w-full"
+        onClick={() =>
+          opModal.value = {
+            audience: operation.audience,
+            attachedPipeline: operation.attachedPipeline,
+            clients: operation.clients,
+          }}
+      >
         <div
           class={"flex flex-col justify-start p-1 cursor-pointer"}
-          onClick={() =>
-            opModal.value = {
-              audience: operation.audience,
-              attachedPipeline: operation.attachedPipeline,
-              clients: operation.clients,
-            }}
         >
           <h2
             data-tooltip-target={toolTipId}
@@ -158,13 +160,14 @@ export const OperationNode = (
         </div>
       </div>
       <button
-        onClick={() =>
+        onClick={() => {
           opModal.value = {
             audience: operation.audience,
             attachedPipeline: operation.attachedPipeline,
             clients: operation.clients,
             delete: true,
-          }}
+          };
+        }}
         className={"p-2 rounded hover:bg-red-50"}
       >
         <IconTrash class="w-6 h-6 text-streamdalRed" />

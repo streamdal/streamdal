@@ -18,13 +18,6 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
   const allServices = await getAll();
   setServiceSignal(allServices);
 
-  if (ctx.data?.success?.message) {
-    toastSignal.value = {
-      id: "notifications",
-      type: ctx.data?.success?.status ? "success" : "error",
-      message: ctx.data?.success?.message,
-    };
-  }
   return (
     <>
       <NavBar />
@@ -33,7 +26,6 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
         grpcUrl={url}
         grpcToken={token}
       />
-      <Toast id="notifications" />
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />

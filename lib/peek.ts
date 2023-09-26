@@ -84,9 +84,8 @@ export const peek = async ({ audience, pipeline, grpcUrl, grpcToken }: {
       }
     }
 
-    //
-    // TODO: check status for errors
-    // const { status, trailers } = await tailCall;
+    const { status } = await tailCall;
+    console.info("grpc tail status", status);
   } catch (e) {
     console.error("received grpc tail error", e);
   }
