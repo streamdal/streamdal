@@ -16,7 +16,7 @@ import {
   peekPausedSignal,
   peekSignal,
 } from "../lib/peek.ts";
-import { effect } from "@preact/signals";
+import { useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../lib/utils.ts";
 
 export const MAX_PEEK_UI_SIZE = 50;
@@ -82,27 +82,24 @@ export const PeekRow = (
 export const Peek = (
   {
     audience,
-    pipeline,
     grpcToken,
     grpcUrl,
   }: {
     audience: Audience;
-    pipeline: Pipeline;
     grpcUrl: string;
     grpcToken: string;
   },
 ) => {
-  const [peekData, setPeekData] = useState();
+  const [peekData, setPeekData] = useState(peekSignal.value);
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    if (pipeline) {
-      void peek({ audience, pipeline, grpcUrl, grpcToken });
-    }
+    peekPausedSignal.value = false;
+    void peek({ audience, grpcUrl, grpcToken });
   }, []);
 
-  effect(() => {
-    if (peekSignal.value && !peekPausedSignal.value) {
+  useSignalEffect(() => {
+    if (!peekPausedSignal.value) {
       setPeekData(peekSignal.value);
     }
   });

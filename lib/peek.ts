@@ -29,6 +29,13 @@ export const peek = async ({ audience, grpcUrl, grpcToken }: {
   grpcUrl: string;
   grpcToken: string;
 }) => {
+  const appendResponse = (response: TailResponse) =>
+    peekSignal.value = [
+      ...peekSignal.value.slice(
+        -MAX_PEEK_SIZE,
+      ),
+      response,
+    ];
   const abortController = new AbortController();
 
   effect(() => {
@@ -42,7 +49,6 @@ export const peek = async ({ audience, grpcUrl, grpcToken }: {
     const transport = new GrpcWebFetchTransport({
       baseUrl: grpcUrl,
     });
-    const abortController = new AbortController();
 
     const client: IExternalClient = new ExternalClient(transport);
     const tailRequest = TailRequest.create({
@@ -62,9 +68,7 @@ export const peek = async ({ audience, grpcUrl, grpcToken }: {
 
     for await (const response of tailCall?.responses) {
       if (!peekSamplingSignal.value || peekSignal.value.length === 0) {
-        peekSignal.value = [...peekSignal.value, response].slice(
-          -MAX_PEEK_SIZE,
-        );
+        appendResponse(response);
       }
 
       const last = parseDate(peekSignal.value?.at(-1)?.timestampNs!);
@@ -75,9 +79,7 @@ export const peek = async ({ audience, grpcUrl, grpcToken }: {
         ((current.getTime() - last.getTime()) / 1000 >
           peekSamplingRateSignal.value)
       ) {
-        peekSignal.value = [...peekSignal.value, response].slice(
-          -MAX_PEEK_SIZE,
-        );
+        appendResponse(response);
       }
     }
 

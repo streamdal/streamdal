@@ -23,6 +23,7 @@ import {
   peekingSignal,
   peekSamplingRateSignal,
   peekSamplingSignal,
+  peekSignal,
 } from "../lib/peek.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 
@@ -65,7 +66,6 @@ export default function OpModal(
         {peekingSignal.value && (
           <Peek
             audience={audience}
-            pipeline={attachedPipeline}
             grpcUrl={grpcUrl}
             grpcToken={grpcToken}
           />
@@ -259,61 +259,52 @@ export default function OpModal(
                               ? "View your pipeline data in realtime"
                               : "You must attach a pipeline first"}
                           </div>
-                          {attachedPipeline
-                            ? (
-                              <div class="flex flex-col">
-                                <div class="flex flex-row justify-start items-center mb-3">
-                                  <Toggle
-                                    label="Sampling"
-                                    value={peekSamplingSignal.value}
-                                    setValue={(value) =>
-                                      peekSamplingSignal.value = value}
-                                  />
-                                  {peekSamplingSignal.value &&
-                                    (
-                                      <label className="relative inline-flex items-center cursor-pointer ml-2">
-                                        <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                          Sample Setting
-                                        </span>
+                          <div class="flex flex-col">
+                            <div class="flex flex-row justify-start items-center mb-3">
+                              <Toggle
+                                label="Sampling"
+                                value={peekSamplingSignal.value}
+                                setValue={(value) =>
+                                  peekSamplingSignal.value = value}
+                              />
+                              {peekSamplingSignal.value &&
+                                (
+                                  <label className="relative inline-flex items-center cursor-pointer ml-2">
+                                    <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                      Sample Setting
+                                    </span>
 
-                                        <input
-                                          class={`w-[${
-                                            (String(
-                                              peekSamplingRateSignal.value,
-                                            )
-                                              .length) * 12
-                                          }px] mr-2`}
-                                          value={peekSamplingRateSignal.value}
-                                          onChange={(e) => {
-                                            if (isNumeric(e.target.value)) {
-                                              peekSamplingRateSignal.value =
-                                                e.target.value;
-                                            }
-                                          }}
-                                        />
-                                        <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                          /s
-                                        </span>
-                                      </label>
-                                    )}
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    attachedPipeline
-                                      ? peekingSignal.value = !peekingSignal
-                                        .value
-                                      : null}
-                                  className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-${
-                                    attachedPipeline ? "pointer" : "not-allowed"
-                                  }`}
-                                >
-                                  {peekingSignal.value
-                                    ? "Stop Peeking"
-                                    : "Start Peeking"}
-                                </button>
-                              </div>
-                            )
-                            : null}
+                                    <input
+                                      class={`w-[${
+                                        (String(
+                                          peekSamplingRateSignal.value,
+                                        )
+                                          .length) * 12
+                                      }px] mr-2`}
+                                      value={peekSamplingRateSignal.value}
+                                      onChange={(e) => {
+                                        if (isNumeric(e.target.value)) {
+                                          peekSamplingRateSignal.value =
+                                            e.target.value;
+                                        }
+                                      }}
+                                    />
+                                    <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                      /s
+                                    </span>
+                                  </label>
+                                )}
+                            </div>
+                            <button
+                              onClick={() =>
+                                peekingSignal.value = !peekingSignal.value}
+                              className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
+                            >
+                              {peekingSignal.value
+                                ? "Stop Peeking"
+                                : "Start Peeking"}
+                            </button>
+                          </div>
                         </div>
                         <h3 id="collapse-heading-3">
                           <button

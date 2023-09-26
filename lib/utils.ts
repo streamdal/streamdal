@@ -198,11 +198,11 @@ export const bigIntStringify = (obj: any) =>
   JSON.stringify(obj, (_, v) => typeof v === "bigint" ? v.toString() : v);
 
 export const addClass = (id: string, item: string) => {
-  return document.getElementById(id).classList.add(item);
+  return document.getElementById(id)?.classList.add(item);
 };
 
 export const removeClass = (id: string, item: string) => {
-  return document.getElementById(id).classList.remove(item);
+  return document.getElementById(id)?.classList.remove(item);
 };
 
 export const longDateFormat = {
