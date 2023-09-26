@@ -173,21 +173,21 @@ export interface WasmModule {
     /**
      * ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
      *
-     * @generated from protobuf field: optional string id = 1;
+     * @generated from protobuf field: string id = 1;
      */
-    id?: string;
+    id: string;
     /**
      * WASM module bytes (set by snitch-server)
      *
-     * @generated from protobuf field: optional bytes bytes = 2;
+     * @generated from protobuf field: bytes bytes = 2;
      */
-    bytes?: Uint8Array;
+    bytes: Uint8Array;
     /**
      * WASM function name to execute (set by snitch-server)
      *
-     * @generated from protobuf field: optional string function = 3;
+     * @generated from protobuf field: string function = 3;
      */
-    function?: string;
+    function: string;
 }
 /**
  * @generated from protobuf message protos.SendSchemaRequest

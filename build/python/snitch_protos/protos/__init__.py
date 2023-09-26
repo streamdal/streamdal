@@ -854,17 +854,13 @@ class WasmModule(betterproto.Message):
     over-sized payloads on SDK startup
     """
 
-    id: Optional[str] = betterproto.string_field(1, optional=True, group="_id")
+    id: str = betterproto.string_field(1)
     """ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server"""
 
-    bytes: Optional[builtins.bytes] = betterproto.bytes_field(
-        2, optional=True, group="_bytes"
-    )
+    bytes: builtins.bytes = betterproto.bytes_field(2)
     """WASM module bytes (set by snitch-server)"""
 
-    function: Optional[str] = betterproto.string_field(
-        3, optional=True, group="_function"
-    )
+    function: str = betterproto.string_field(3)
     """WASM function name to execute (set by snitch-server)"""
 
 

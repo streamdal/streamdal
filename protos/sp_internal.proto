@@ -118,13 +118,13 @@ message GetAttachCommandsByServiceResponse {
 // over-sized payloads on SDK startup
 message WasmModule {
   // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
-  optional string id = 1;
+  string id = 1;
 
   // WASM module bytes (set by snitch-server)
-  optional bytes bytes = 2;
+  bytes bytes = 2;
 
   // WASM function name to execute (set by snitch-server)
-  optional string function = 3;
+  string function = 3;
 }
 
 message SendSchemaRequest {

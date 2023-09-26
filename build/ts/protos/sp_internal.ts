@@ -182,21 +182,21 @@ export interface WasmModule {
     /**
      * ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
      *
-     * @generated from protobuf field: optional string id = 1;
+     * @generated from protobuf field: string id = 1;
      */
-    id?: string;
+    id: string;
     /**
      * WASM module bytes (set by snitch-server)
      *
-     * @generated from protobuf field: optional bytes bytes = 2;
+     * @generated from protobuf field: bytes bytes = 2;
      */
-    bytes?: Uint8Array;
+    bytes: Uint8Array;
     /**
      * WASM function name to execute (set by snitch-server)
      *
-     * @generated from protobuf field: optional string function = 3;
+     * @generated from protobuf field: string function = 3;
      */
-    function?: string;
+    function: string;
 }
 /**
  * @generated from protobuf message protos.SendSchemaRequest
@@ -688,13 +688,13 @@ export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByService
 class WasmModule$Type extends MessageType<WasmModule> {
     constructor() {
         super("protos.WasmModule", [
-            { no: 1, name: "id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "function", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<WasmModule>): WasmModule {
-        const message = {};
+        const message = { id: "", bytes: new Uint8Array(0), function: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<WasmModule>(this, message, value);
@@ -705,13 +705,13 @@ class WasmModule$Type extends MessageType<WasmModule> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional string id */ 1:
+                case /* string id */ 1:
                     message.id = reader.string();
                     break;
-                case /* optional bytes bytes */ 2:
+                case /* bytes bytes */ 2:
                     message.bytes = reader.bytes();
                     break;
-                case /* optional string function */ 3:
+                case /* string function */ 3:
                     message.function = reader.string();
                     break;
                 default:
@@ -726,14 +726,14 @@ class WasmModule$Type extends MessageType<WasmModule> {
         return message;
     }
     internalBinaryWrite(message: WasmModule, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional string id = 1; */
-        if (message.id !== undefined)
+        /* string id = 1; */
+        if (message.id !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.id);
-        /* optional bytes bytes = 2; */
-        if (message.bytes !== undefined)
+        /* bytes bytes = 2; */
+        if (message.bytes.length)
             writer.tag(2, WireType.LengthDelimited).bytes(message.bytes);
-        /* optional string function = 3; */
-        if (message.function !== undefined)
+        /* string function = 3; */
+        if (message.function !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.function);
         let u = options.writeUnknownFields;
         if (u !== false)
