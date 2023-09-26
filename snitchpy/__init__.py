@@ -130,7 +130,7 @@ class SnitchClient:
     tails: dict
     host: str
     port: int
-    schemas: dict[str, protos.Schema]
+    schemas: dict
 
     # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
     # channels for register and tail requests. All other unary operations can use the same
