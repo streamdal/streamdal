@@ -219,7 +219,7 @@ func (m *Metrics) increaseRate(ctx context.Context, metric *protos.Metric) {
 
 	counter := m.GetRateCounter(ctx, metric.Audience)
 
-	m.log.Debugf("increasing rate counter '%s' by '%d'", metric.Name, int64(metric.Value))
+	//m.log.Debugf("increasing rate counter '%s' by '%d'", metric.Name, int64(metric.Value))
 
 	switch metric.Name {
 	case "counter_consume_bytes_rate":

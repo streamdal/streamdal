@@ -394,7 +394,7 @@ func (b *Bus) handleMetricsRequest(ctx context.Context, req *protos.MetricsReque
 		return errors.Wrap(err, "error handling metrics request")
 	}
 
-	b.log.Debug("handled metrics request bus event")
+	//b.log.Debug("handled metrics request bus event")
 
 	return nil
 }

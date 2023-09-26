@@ -12,7 +12,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/streamdal/snitch-protos/build/go/protos/shared"
-	"github.com/streamdal/snitch-server/services/store"
+
 	"github.com/streamdal/snitch-server/util"
 	"github.com/streamdal/snitch-server/validate"
 )
@@ -34,59 +34,64 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 	}
 }
 
-func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessionId string, noHeartbeatCh chan struct{}) error {
-	// Validate inputs
-	if serverCtx == nil {
-		return errors.New("server context cannot be nil")
-	}
-
-	if sessionId == "" {
-		return errors.New("session id cannot be empty")
-	}
-
-	if noHeartbeatCh == nil {
-		return errors.New("heartbeatCh cannot be nil")
-	}
-
-	llog := s.log.WithFields(logrus.Fields{
-		"method":     "startHeartbeatWatcher",
-		"session_id": sessionId,
-	})
-
-	lastHeartbeat := time.Now()
-
-	regKey := store.RedisRegisterKey(sessionId, s.Options.Config.NodeName)
-	hbChan := s.Options.StoreService.WatchKeys(regKey)
-
-	go func() {
-	MAIN:
-		for {
-			select {
-			case <-serverCtx.Done():
-				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
-				break MAIN
-			case <-s.Options.ShutdownContext.Done():
-				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
-				break MAIN
-			case <-hbChan:
-				llog.Debug("detected heartbeat")
-				lastHeartbeat = time.Now()
-			case <-time.After(time.Second):
-				// Check if heartbeat is older than session TTL
-				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
-					llog.Debugf("no heartbeat received for session id '%s' during the last '%v'; sending disconnect cmd and exiting",
-						sessionId, s.Options.Config.SessionTTL)
-					noHeartbeatCh <- struct{}{}
-					break MAIN
-				}
-			}
-		}
-
-		llog.Debug("heartbeat watcher exiting")
-	}()
-
-	return nil
-}
+// As of 09/26/23 snitch-server does not require clients to send heartbeats -
+// heartbeats are handled server-side.
+//func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessionId string, noHeartbeatCh chan struct{}) error {
+//	// Validate inputs
+//	if serverCtx == nil {
+//		return errors.New("server context cannot be nil")
+//	}
+//
+//	if sessionId == "" {
+//		return errors.New("session id cannot be empty")
+//	}
+//
+//	if noHeartbeatCh == nil {
+//		return errors.New("heartbeatCh cannot be nil")
+//	}
+//
+//	llog := s.log.WithFields(logrus.Fields{
+//		"method":     "startHeartbeatWatcher",
+//		"session_id": sessionId,
+//	})
+//
+//	lastHeartbeat := time.Now()
+//
+//	quitCtx, quitCancel := context.WithCancel(serverCtx)
+//	defer quitCancel()
+//
+//	regKey := store.RedisRegisterKey(sessionId, s.Options.Config.NodeName)
+//	hbChan := s.Options.StoreService.WatchKeys(quitCtx, regKey)
+//
+//	go func() {
+//	MAIN:
+//		for {
+//			select {
+//			case <-serverCtx.Done():
+//				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
+//				break MAIN
+//			case <-s.Options.ShutdownContext.Done():
+//				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
+//				break MAIN
+//			case <-hbChan:
+//				llog.Debug("detected heartbeat")
+//				lastHeartbeat = time.Now()
+//			case <-time.After(time.Second):
+//				// Check if heartbeat is older than session TTL
+//				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
+//					llog.Debugf("no heartbeat received for session id '%s' during the last '%v'; sending disconnect cmd and exiting",
+//						sessionId, s.Options.Config.SessionTTL)
+//					noHeartbeatCh <- struct{}{}
+//					break MAIN
+//				}
+//			}
+//		}
+//
+//		llog.Debug("heartbeat watcher exiting")
+//	}()
+//
+//	return nil
+//}
 
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
 	// Get all audiences for this session
@@ -136,20 +141,11 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	}
 
 	var (
-		shutdown    bool
-		noHeartbeat bool
+		shutdown bool
 	)
 
 	// Send a keepalive every tick
 	ticker := time.NewTicker(1 * time.Second)
-
-	noHeartbeatCh := make(chan struct{})
-
-	// Launch heartbeat watcher
-	if err := s.startHeartbeatWatcher(server.Context(), request.SessionId, noHeartbeatCh); err != nil {
-		llog.Errorf("unable to start heartbeat watcher: %v", err)
-		return errors.Wrapf(err, "unable to start heartbeat watcher for session id '%s'", request.SessionId)
-	}
 
 	// Broadcast registration to all nodes which will trigger handlers to push
 	// an update to GetAllStream() chan
@@ -196,10 +192,6 @@ MAIN:
 			llog.Debug("register handler detected shutdown context cancellation")
 			shutdown = true
 			break MAIN
-		case <-noHeartbeatCh:
-			noHeartbeat = true
-			llog.Debug("register handler detected no heartbeat; disconnecting client")
-			break MAIN
 		case <-ticker.C:
 			//llog.Debug("sending heartbeat")
 
@@ -208,7 +200,17 @@ MAIN:
 					KeepAlive: &protos.KeepAliveCommand{},
 				},
 			}); err != nil {
+				// TODO: If unable to send heartbeat to client X times, stop request/exit loop
 				llog.WithError(err).Errorf("unable to send heartbeat for session id '%s'", request.SessionId)
+				continue
+			}
+
+			// Save heartbeat every tick; this will update all live:* keys
+			if err := s.Options.StoreService.AddHeartbeat(server.Context(), &protos.HeartbeatRequest{
+				SessionId: request.SessionId,
+			}); err != nil {
+				s.log.Errorf("unable to save heartbeat: %s", err.Error())
+				// TODO: What do we do if we're unable to save heartbeat X times? Stop request/exit loop?
 			}
 		case cmd := <-ch:
 			if cmd == nil {
@@ -236,11 +238,7 @@ MAIN:
 		return GRPCServerShutdownError
 	}
 
-	if noHeartbeat {
-		llog.Debugf("client with session id '%s' forcefully disconnected (due to no heartbeat); de-registering", request.SessionId)
-	} else {
-		llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
-	}
+	llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
 
 	// Remove command channel
 	if ok := s.Options.CmdService.RemoveChannel(request.SessionId); ok {
@@ -267,6 +265,9 @@ MAIN:
 	return nil
 }
 
+// Heartbeat ... as of 09/26/23, clients are not required to send heartbeats -
+// heartbeats are handled entirely server-side. This handler remains here for
+// backwards compatibility.
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
@@ -276,15 +277,15 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	if err := s.Options.StoreService.AddHeartbeat(ctx, req); err != nil {
-		s.log.Errorf("unable to save heartbeat: %s", err.Error())
-
-		return &protos.StandardResponse{
-			Id:      util.CtxRequestId(ctx),
-			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-			Message: fmt.Sprintf("unable to save heartbeat: %s", err.Error()),
-		}, nil
-	}
+	//if err := s.Options.StoreService.AddHeartbeat(ctx, req); err != nil {
+	//	s.log.Errorf("unable to save heartbeat: %s", err.Error())
+	//
+	//	return &protos.StandardResponse{
+	//		Id:      util.CtxRequestId(ctx),
+	//		Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+	//		Message: fmt.Sprintf("unable to save heartbeat: %s", err.Error()),
+	//	}, nil
+	//}
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
