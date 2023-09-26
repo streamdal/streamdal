@@ -2,9 +2,9 @@ package validate
 
 import (
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/snitch-protos/build/go/protos/shared"
 )
 
 var (
@@ -56,7 +56,7 @@ func KVInstruction(i *protos.KVInstruction) error {
 		return errors.New("KVAction cannot be UNSET")
 	}
 
-	if i.Object == nil {
+	if i.Action != shared.KVAction_KV_ACTION_DELETE_ALL && i.Object == nil {
 		return errors.New("KVInstruction.Object cannot be nil")
 	}
 
@@ -70,16 +70,16 @@ func TailRequestStartCommand(cmd *protos.Command) error {
 
 	tail := cmd.GetTail()
 	if tail == nil {
-		return ErrNilField("tail")
+		return ErrNilField("Tail")
 	}
 
 	req := tail.GetRequest()
 	if req == nil {
-		return ErrNilField("request")
+		return ErrNilField("Request")
 	}
 
-	if req.PipelineId == "" {
-		return ErrEmptyField("pipeline_id")
+	if req.GetXId() == "" {
+		return ErrEmptyField("XId")
 	}
 
 	if err := Audience(cmd.Audience); err != nil {
@@ -96,16 +96,16 @@ func TailRequestStopCommand(cmd *protos.Command) error {
 
 	tail := cmd.GetTail()
 	if tail == nil {
-		return ErrNilField("tail")
+		return ErrNilField("Tail")
 	}
 
 	req := tail.GetRequest()
 	if req == nil {
-		return ErrNilField("request")
+		return ErrNilField("Request")
 	}
 
-	if req.Id == "" {
-		return ErrEmptyField("id")
+	if req.GetXId() == "" {
+		return ErrEmptyField("XId")
 	}
 
 	return nil
