@@ -477,12 +477,10 @@ func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[str
 	s.pipelinesMtx.RLock()
 	defer s.pipelinesMtx.RUnlock()
 
+	s.addAudience(ctx, aud)
+
 	pipelines, ok := s.pipelines[audToStr(aud)]
 	if !ok {
-		// No pipelines for this audience key
-		// But we should notify snitch server we've seen it
-		s.addAudience(ctx, aud)
-
 		return make(map[string]*protos.Command)
 	}
 
