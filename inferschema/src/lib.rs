@@ -57,7 +57,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
     if wasm_request.step.infer_schema().current_schema.is_empty() {
         return common::write_response(
             Some(wasm_request.input_payload.as_slice()),
-            Some(payload_schema.to_string().as_bytes()),
+            Some(payload_schema.clone().to_string().as_bytes()),
             WASMExitCode::WASM_EXIT_CODE_SUCCESS,
             "inferred fresh schema".to_string(),
         );
