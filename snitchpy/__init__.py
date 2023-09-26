@@ -623,7 +623,12 @@ class SnitchClient:
                 operation_name=aud.operation_name,
                 component_name=aud.component_name,
             )
+
+            # Add to register request
             req.audiences.append(aud)
+
+            # Note in local map that we've seen this audience
+            self.audiences[self._aud_to_str(aud)] = aud
 
         async def call():
             self.log.debug("Registering with snitch server")
