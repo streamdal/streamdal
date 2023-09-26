@@ -504,9 +504,6 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 		OperationName: req.OperationName,
 	}
 
-	// Always attempt to add audience. We need it when operating in tail only mode
-	s.addAudience(ctx, aud)
-
 	labels := map[string]string{
 		"service":       s.config.ServiceName,
 		"component":     req.ComponentName,
