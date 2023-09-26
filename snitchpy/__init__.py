@@ -335,6 +335,20 @@ class SnitchClient:
             )
             return ProcessResponse(data=req.data, error=False, message="")
 
+        # Get rules based on operation and component
+        pipelines = self._get_pipelines(aud)
+
+        if len(pipelines) == 0:
+            self._send_tail(
+                aud,
+                "",
+                req.data,
+                req.data,
+            )
+            return ProcessResponse(
+                data=req.data, error=False, message="no pipelines to run"
+            )
+
         bytes_counter = metrics.COUNTER_CONSUME_BYTES
         errors_counter = metrics.COUNTER_CONSUME_ERRORS
         total_counter = metrics.COUNTER_CONSUME_PROCESSED
@@ -358,9 +372,6 @@ class SnitchClient:
 
         # Needed for send_tail()
         original_data = data
-
-        # Get rules based on operation and component
-        pipelines = self._get_pipelines(aud)
 
         pipes = pipelines.copy()
 
