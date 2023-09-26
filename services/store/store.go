@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"io"
 	"strings"
 	"time"
 
@@ -91,9 +90,11 @@ type IStore interface {
 	// to the session via a goroutine in internal.Register()
 	GetAudiencesBySessionID(ctx context.Context, sessionID string) ([]*protos.Audience, error)
 
-	// WatchKeys returns a channel that will receive empty struct{} any time the key(s) receive a SET command
-	// This command is currently only used for heartbeats. The argument can accept wildcards *)
-	WatchKeys(key string) chan *redis.Message
+	// WatchKeys will watch for key changes for given key pattern; every time key
+	// is updated, it will send a message on the return channel.
+	// WatchKeys launches a dedicated goroutine for the watch - it can be stopped
+	// via the provided context.
+	WatchKeys(quitCtx context.Context, key string) chan struct{}
 
 	AddSchema(ctx context.Context, req *protos.SendSchemaRequest) error
 
@@ -1045,59 +1046,38 @@ func (s *Store) GetActivePipelineUsage(ctx context.Context, pipelineID string) (
 	return active, nil
 }
 
-func (s *Store) WatchKeys(key string) chan *redis.Message {
+// WatchKeys will watch for key changes for given key pattern; every time key
+// is updated, it will send a message on the return channel.
+func (s *Store) WatchKeys(quitCtx context.Context, key string) chan struct{} {
+	s.log.Infof("launching dedicated WatchKeys goroutine for key '%s'", key)
+
 	ps := s.options.RedisBackend.PSubscribe(s.options.ShutdownCtx, RedisKeyWatchPrefix+key)
 
-	keyChan := make(chan *redis.Message, 1)
+	// OK to buffer since the contents are so small
+	keyChan := make(chan struct{}, 100_000)
 
 	go func() {
-		defer ps.Unsubscribe(s.options.ShutdownCtx, RedisKeyWatchPrefix+key)
+		defer func() {
+			if err := ps.Unsubscribe(s.options.ShutdownCtx, RedisKeyWatchPrefix+key); err != nil {
+				s.log.Errorf("error unsubscribing from key '%s': %s", key, err)
+			}
+		}()
 
 		for {
 			select {
 			case <-s.options.ShutdownCtx.Done():
-				s.log.Debug("exiting WatchKeys()")
+				s.log.Debug("shutdown detected - exiting WatchKeys()")
 				return
-			default:
-				// NOOP
-			}
-
-			msg, err := ps.Receive(context.Background())
-			if err != nil {
-				if errors.Is(err, io.EOF) {
-					// TODO: some kind of reconnect here
-					return
-				}
-
-				if errors.Is(err, redis.ErrClosed) {
-					return
-				}
-
-				s.log.WithError(err).Error("error receiving message from redis")
-				continue
-			}
-			switch msg.(type) {
-			case *redis.Message:
-				//key := strings.Replace(m.Channel, "__keyspace@0__:", "", 1)
-				m := msg.(*redis.Message)
-				action := m.Payload
-
-				switch action {
-				case "set":
-					keyChan <- m
-				case "expired":
-					// Check if it's for the register key as audiences might drop
-					// off, but that doesn't mean the client disconnected
-					if strings.HasSuffix(key, ":register") {
-						// TTL expired on register key, exiting key watcher, client disconnected
-						s.log.Debugf("register key '%s' expired, exiting WatchKeys()", key)
-						return
-					}
-
-				}
+			case <-ps.Channel():
+				keyChan <- struct{}{}
+			case <-quitCtx.Done():
+				s.log.Debug("quit detected - exiting WatchKeys()")
+				return
 			}
 		}
 	}()
+
+	s.log.Infof("dedicated WatchKeys goroutine for key '%s' exiting", key)
 
 	return keyChan
 }

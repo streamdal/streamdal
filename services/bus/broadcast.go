@@ -153,7 +153,7 @@ func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.Bus
 	event.XMetadata = util.CtxMetadata(ctx)
 	event.Source = b.options.NodeName
 
-	b.log.Debugf("broadcasting event '%v' metadata: '%+v", eventType, event.XMetadata)
+	b.log.Debugf("broadcasting event '%v'", eventType)
 
 	data, err := proto.Marshal(event)
 	if err != nil {

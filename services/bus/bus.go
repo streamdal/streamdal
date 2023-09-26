@@ -169,7 +169,7 @@ func (o *Options) validate() error {
 // connection errors.
 func (b *Bus) RunConsumer() error {
 	llog := b.log.WithField("method", "RunConsumer")
-	llog.Debug("starting dedicated consumer for channel '%s'", FullSubject)
+	//llog.Debugf("starting dedicated consumer for channel '%s'", FullSubject)
 
 	// Subscribe automatically reconnects on error
 	ps := b.options.RedisBackend.Subscribe(b.options.ShutdownCtx, FullSubject)
@@ -181,7 +181,7 @@ MAIN:
 			llog.Debug("context cancellation detected")
 			break MAIN
 		case msg := <-ps.Channel():
-			llog.Debugf("received message on channel '%s'", msg.Channel)
+			//llog.Debugf("received message on channel '%s'", msg.Channel)
 
 			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
 				llog.WithError(err).Errorf("error handling broadcast message on channel '%s'", msg.Channel)
@@ -190,7 +190,7 @@ MAIN:
 		}
 	}
 
-	llog.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
+	//llog.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
 
 	return ps.Unsubscribe(context.Background())
 }
@@ -202,7 +202,7 @@ func (b *Bus) RunTailConsumer() error {
 
 	channel := TailSubjectPrefix + ":*"
 
-	llog.Debug("starting dedicated consumer on channel '%s'", channel)
+	llog.Debugf("starting dedicated consumer on channel '%s'", channel)
 
 	ps := b.options.RedisBackend.PSubscribe(b.options.ShutdownCtx, channel)
 
@@ -249,7 +249,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
 		"source":   busEvent.Source,
 	})
 
-	llog.Debug("received message successfully unmarshalled and validated; passing to handler")
+	//llog.Debug("received message successfully unmarshalled and validated; passing to handler")
 
 	var err error
 
