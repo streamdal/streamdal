@@ -458,7 +458,7 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 				continue
 			}
 
-			s.log.Infof("publishing tail response for session id '%s'", tailResp.SessionId)
+			s.log.Debugf("publishing tail response for session id '%s'", tailResp.SessionId)
 		}
 	}
 }
