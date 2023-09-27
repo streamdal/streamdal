@@ -52,13 +52,11 @@ export interface TailRequest {
 // add pipeline information to the steps so we can log/notify
 // appropriately as we go
 const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
-  pipeline.steps
-    .filter((s: PipelineStep) => s.name !== "Infer Schema")
-    .map((s: PipelineStep) => ({
-      ...s,
-      pipelineId: pipeline.id,
-      pipelineName: pipeline.name,
-    })) as EnhancedStep[];
+  pipeline.steps.map((s: PipelineStep) => ({
+    ...s,
+    pipelineId: pipeline.id,
+    pipelineName: pipeline.name,
+  })) as EnhancedStep[];
 
 export const sendTail = ({
   configs,

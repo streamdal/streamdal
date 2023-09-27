@@ -80,6 +80,7 @@ export const processResponse = (response: Command) => {
 };
 
 export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
+  pipeline.name !== "Schema Inference" &&
   internal.pipelines.set(audienceKey(audience), {
     ...pipeline,
     paused: false,
