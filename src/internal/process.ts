@@ -13,7 +13,7 @@ import {
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
-import { lock, metrics } from "./metrics.js";
+import { pipelineMetrics, stepMetrics } from "./metrics.js";
 import { EnhancedStep, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 import { runWasm } from "./wasm.js";
@@ -47,6 +47,8 @@ export interface TailRequest {
   originalData: Uint8Array;
   newData?: Uint8Array;
 }
+
+const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1 megabyte
 
 //
 // add pipeline information to the steps so we can log/notify
@@ -126,7 +128,12 @@ export const processPipeline = async ({
       `running pipeline step ${step.pipelineName} - ${step.name}...`
     );
 
-    pipelineStatus = await runStep({ configs, step, pipeline: pipelineStatus });
+    pipelineStatus = await runStep({
+      audience,
+      configs,
+      step,
+      pipeline: pipelineStatus,
+    });
 
     console.debug(`pipeline step ${step.pipelineName} - ${step.name} complete`);
 
@@ -134,6 +141,8 @@ export const processPipeline = async ({
       break;
     }
   }
+
+  void pipelineMetrics(audience, data.length);
 
   tailStatus &&
     sendTail({
@@ -181,27 +190,13 @@ export const resultCondition = (
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const stepMetrics = async (stepStatus: StepStatus) => {
-  lock.writeLock((release) => {
-    metrics.push({
-      name: "Rule run",
-      value: 1,
-      labels: {
-        pipeLineId: stepStatus.pipelineId,
-        stepName: stepStatus.stepName,
-        result: stepStatus.error ? "failure" : "success",
-      },
-    });
-    release();
-  });
-};
-
 export const runStep = async ({
+  audience,
   configs,
   step,
   pipeline,
 }: {
+  audience: Audience;
   configs: PipelineConfigs;
   step: EnhancedStep;
   pipeline: PipelinesStatus;
@@ -215,12 +210,20 @@ export const runStep = async ({
   };
 
   let data = pipeline.data;
+  const payloadSize = data.length;
 
   try {
-    const { outputPayload, exitCode, exitMsg } = await runWasm({
-      step,
-      data,
-    });
+    const { outputPayload, exitCode, exitMsg } =
+      payloadSize < MAX_PAYLOAD_SIZE
+        ? await runWasm({
+            step,
+            data,
+          })
+        : {
+            outputPayload: new Uint8Array(),
+            exitCode: WASMExitCode.WASM_EXIT_CODE_FAILURE,
+            exitMsg: "Payload exceeds maximum size",
+          };
 
     //
     // output gets passed back as data for the next function
@@ -239,7 +242,7 @@ export const runStep = async ({
     stepStatus.error ? step.onFailure : step.onSuccess,
     stepStatus
   );
-  void stepMetrics(stepStatus);
+  void stepMetrics(audience, stepStatus, payloadSize);
 
   return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };
 };

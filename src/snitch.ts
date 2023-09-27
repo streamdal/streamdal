@@ -14,7 +14,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudience, addAudiences } from "./internal/audience.js";
-import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
+import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { initPipelines } from "./internal/pipeline.js";
 import {
   processPipeline as internalProcessPipeline,
@@ -108,15 +108,14 @@ export class Snitch {
       audiences,
     };
 
-    setInterval(() => {
-      void heartbeat(this.configs);
-    }, HEARTBEAT_INTERVAL);
-
-    //
-    // TODO: sort out what this sends
+    // Heartbeat is obsolete
     // setInterval(() => {
-    //   void sendMetrics(this.configs);
-    // }, METRIC_INTERVAL);
+    //   void heartbeat(this.configs);
+    // }, HEARTBEAT_INTERVAL);
+
+    setInterval(() => {
+      void sendMetrics(this.configs);
+    }, METRIC_INTERVAL);
 
     void addAudiences(this.configs);
     void register(this.configs);
