@@ -19,7 +19,7 @@ import {
 import { useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../lib/utils.ts";
 
-export const MAX_PEEK_UI_SIZE = 50;
+export const MAX_PEEK_UI_SIZE = 100;
 
 export const parseData = (data: Uint8Array) => {
   const decoded = new TextDecoder().decode(data);
@@ -68,12 +68,15 @@ export const PeekRow = (
             longDateFormat,
           )}
         </div>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: hljs.highlightAuto(parseData(row.newData)).value,
-          }}
-        >
-        </div>
+        <pre>
+          <code>
+            <div dangerouslySetInnerHTML={{
+                __html: hljs.highlightAuto(parseData(row.newData)).value,
+              }}
+            >
+            </div>
+          </code>
+        </pre>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ import {
 import { effect, signal } from "@preact/signals";
 import { parseDate } from "../islands/peek.tsx";
 
-export const MAX_PEEK_SIZE = 200;
+export const MAX_PEEK_SIZE = 500;
 
 export const peekSignal = signal<TailResponse[] | []>(
   [],
