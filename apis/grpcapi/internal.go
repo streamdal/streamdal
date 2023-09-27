@@ -363,7 +363,9 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		s.log.Debugf("channel already exists for session id '%s'", req.SessionId)
 	}
 
-	go s.sendInferSchemaPipelines(ctx, cmdCh, req.SessionId)
+	// This is context.Background() because it's ran as a gouroutine and the request
+	// context may be finished by the time it eventually runs
+	go s.sendInferSchemaPipelines(context.Background(), cmdCh, req.SessionId)
 
 	// Broadcast audience creation so that we can notify UI GetAllStream clients
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {

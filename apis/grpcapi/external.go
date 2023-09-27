@@ -755,6 +755,12 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		return errors.Wrap(err, "unable to broadcast tail request")
 	}
 
+	// When the connection to the endpoint is closed, emit a STOP event which will be broadcast
+	// to all snitch server instances and their connected clients so that they can stop tailing.
+	//
+	// handlers.handleTailCommand() will close the intra-server golang channel preventing
+	// any more messages from being sent to the client. Any unread messages still in the redis
+	// pubsub topic "snitch_events:tail:{$tail_request_id}" will be discarded.
 	defer func() {
 		req.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
 		if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
@@ -770,7 +776,13 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		case <-s.Options.ShutdownContext.Done():
 			s.log.Debug("server shutting down, exiting tail stream")
 			return nil
-		case msg := <-sdkReceiveChan:
+		case msg, isOpen := <-sdkReceiveChan:
+			// Just in case there is a race between stop emitted from another server and the channel read
+			if !isOpen {
+				s.log.Errorf("BUG: tried to read from closed channel '%s', tail is already closed", req.GetXId())
+				return nil
+			}
+
 			tr, ok := msg.(*protos.TailResponse)
 			if !ok {
 				s.log.Errorf("unknown message received from connected SDK session: %v", msg)

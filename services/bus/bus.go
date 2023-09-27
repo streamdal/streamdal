@@ -107,14 +107,15 @@ type Bus struct {
 }
 
 type Options struct {
-	Store        store.IStore
-	RedisBackend *redis.Client
-	Metrics      metrics.IMetrics
-	Cmd          cmd.ICmd
-	NodeName     string
-	WASMDir      string
-	ShutdownCtx  context.Context
-	PubSub       pubsub.IPubSub
+	Store            store.IStore
+	RedisBackend     *redis.Client
+	Metrics          metrics.IMetrics
+	Cmd              cmd.ICmd
+	NodeName         string
+	WASMDir          string
+	ShutdownCtx      context.Context
+	PubSub           pubsub.IPubSub
+	NumTailConsumers int
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -206,6 +207,18 @@ func (b *Bus) RunTailConsumer() error {
 
 	ps := b.options.RedisBackend.PSubscribe(b.options.ShutdownCtx, channel)
 
+	if err := ps.Ping(context.Background(), "ping"); err != nil {
+		return fmt.Errorf("unable to subscribe to redis pubsub channel '%s': %s", channel, err)
+	}
+
+	// This channel is shared between all tail workers
+	sharedWorkerCh := make(chan *redis.Message, 3)
+
+	// Start workers
+	for i := 0; i < b.options.NumTailConsumers; i++ {
+		go b.runTailConsumerWorker(sharedWorkerCh)
+	}
+
 MAIN:
 	for {
 		// redis.ReceiveMessage() does not expect context cancellation, so we have to
@@ -215,16 +228,38 @@ MAIN:
 			llog.Debug("context cancellation detected")
 			break MAIN
 		case msg := <-ps.Channel():
-			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
-				llog.WithError(err).Error("error handling tail message on channel '%s'", msg.Channel)
-				continue
-			}
+			llog.Debugf("received tail response on channel '%s', sending to worker", msg.Channel)
+			sharedWorkerCh <- msg
 		}
 	}
 
 	llog.Debugf("pubsub consumer for channel '%s' exiting", channel)
 
-	return ps.PUnsubscribe(context.Background())
+	if err := ps.PUnsubscribe(context.Background()); err != nil {
+		llog.Errorf("error unsubscribing from channel '%s'", channel)
+	}
+
+	return nil
+}
+
+func (b *Bus) runTailConsumerWorker(ch chan *redis.Message) {
+	llog := b.log.WithField("method", "runTailConsumerWorker")
+
+	// Loop forever, waiting for either the shutdown signal or a message on the channel
+	// The message will then be passed to the handler. This way ensures only one tail
+	// worker handles a TailResponse, per server
+	for {
+		select {
+		case <-b.options.ShutdownCtx.Done():
+			llog.Debug("context cancellation detected")
+			return
+		case msg := <-ch:
+			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
+				llog.WithError(err).Error("error handling tail response")
+				continue
+			}
+		}
+	}
 }
 
 // handler every time a new message is received on the RedisBackend broadcast stream.

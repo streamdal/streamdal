@@ -9,10 +9,29 @@ import (
 )
 
 type IPubSub interface {
+	// HaveTopic determines if there are any open pubsub channels for a given topic
 	HaveTopic(topic string) bool
+
+	// Listen will "subscribe" to a topic and return a channel that will receive
+	// any messages that are published to that topic. Listen accepts an optional
+	// identifier that will be used to identify a specific listener. The identifier
+	// is useful for being able to close a _specific_ channel.
 	Listen(topic string, channelID ...string) chan interface{}
+
+	// Publish will publish a message to a topic, which may have multiple channels associated
+	// with it. Each channel will receive the message
 	Publish(topic string, m interface{})
+
+	// Close will delete the channel from the topic map and close the channel.
+	// WARNING: Make sure to call Close() only on listeners that no longer Listen()'ing
 	Close(topic, channelID string)
+
+	// CloseTopic is used when a tail request is stopped to close all associated channels
+	// and prevent a dead-lock
+	CloseTopic(topic string) bool
+
+	// Reset will delete all channels from the topic map and close all channels;
+	// use this when you are finished
 	Reset()
 }
 
@@ -30,10 +49,6 @@ func New() *PubSub {
 	}
 }
 
-// Listen will "subscribe" to a topic and return a channel that will receive
-// any messages that are published to that topic. Listen accepts an optional
-// identifier that will be used to identify a specific listener. The identifier
-// is useful for being able to close a _specific_ channel.
 func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 	var id string
 
@@ -57,8 +72,6 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 	return ch
 }
 
-// Reset will delete all channels from the topic map and close all channels;
-// use this when you are finished
 func (ps *PubSub) Reset() {
 	ps.mtx.Lock()
 	defer ps.mtx.Unlock()
@@ -72,8 +85,6 @@ func (ps *PubSub) Reset() {
 	ps.topics = make(map[string]map[string]chan interface{})
 }
 
-// Close will delete the channel from the topic map and close the channel.
-// WARNING: Make sure to call Close() only on listeners that no longer Listen()'ing
 func (ps *PubSub) Close(topic, channelID string) {
 	ps.mtx.Lock()
 	defer ps.mtx.Unlock()
@@ -89,6 +100,24 @@ func (ps *PubSub) Close(topic, channelID string) {
 	if ch != nil {
 		close(ch)
 	}
+}
+
+func (ps *PubSub) CloseTopic(topic string) bool {
+	ps.mtx.Lock()
+	defer ps.mtx.Unlock()
+
+	channels, ok := ps.topics[topic]
+	if !ok {
+		return false
+	}
+
+	for _, ch := range channels {
+		close(ch)
+	}
+
+	delete(ps.topics, topic)
+
+	return true
 }
 
 func (ps *PubSub) Publish(topic string, m interface{}) {

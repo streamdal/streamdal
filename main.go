@@ -124,14 +124,11 @@ func run(d *deps.Dependencies) error {
 
 	// Tail/peek consumers are separate from the main consumer to avoid
 	// bogging down the main consumer with traffic during a peek
-	for i := 0; i <= d.Config.NumTailConsumers; i++ {
-		go func() {
-			if err := d.BusService.RunTailConsumer(); err != nil {
-				errChan <- errors.Wrap(err, "error during RedisBackend tail consumer run")
-				return
-			}
-		}()
-	}
+	go func() {
+		if err := d.BusService.RunTailConsumer(); err != nil {
+			errChan <- errors.Wrap(err, "error during RedisBackend consumer run")
+		}
+	}()
 
 	displayInfo(d)
 
