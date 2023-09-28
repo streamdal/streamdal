@@ -16,9 +16,9 @@ import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useState } from "preact/hooks";
 import { DeleteOperationModal } from "../components/modals/deleteOperationModal.tsx";
-import { Peek } from "./peek.tsx";
+import { parseData, Peek } from "./peek.tsx";
 import { Toggle } from "../components/form/switch.tsx";
-import { isNumeric } from "../lib/utils.ts";
+import { getAudienceOpRoute, isNumeric } from "../lib/utils.ts";
 import {
   peekingSignal,
   peekSamplingRateSignal,
@@ -26,6 +26,9 @@ import {
   peekSignal,
 } from "../lib/peek.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { useEffect } from "preact/hooks";
+import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
+import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -38,9 +41,28 @@ export default function OpModal(
 ) {
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
+  const clients = opModal.value?.clients;
   const opType = OperationType[audience?.operationType];
 
   const [peekNavOpen, setPeekNavOpen] = useState(false);
+  const [schemaNavOpen, setSchemaNavOpen] = useState(false);
+
+  const getSchema = async () => {
+    const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
+      method: "GET",
+    });
+    return response.json();
+  };
+
+  useEffect(async () => {
+    if (opModal.value) {
+      const schema = await getSchema();
+      opModal.value = {
+        ...opModal.value,
+        schema: JSON.stringify(schema.schema, null, 2),
+      };
+    }
+  }, [audience]);
 
   return (
     <>
@@ -124,11 +146,11 @@ export default function OpModal(
                             <h3 class="text-lg text-cloud">
                               {audience?.operationName}
                             </h3>
-                            {/*<p class="text-xs text-cloud">*/}
-                            {/*    {`${clients} attached client${*/}
-                            {/*        (clients !== 1) ? "s" : ""*/}
-                            {/*    }`}*/}
-                            {/*</p>*/}
+                            <p class="text-xs text-cloud">
+                              {`${clients} attached client${
+                                (clients !== 1) ? "s" : ""
+                              }`}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -255,56 +277,58 @@ export default function OpModal(
                           aria-labelledby="collapse-heading-2"
                         >
                           <div class="text-cobweb font-medium text-xs my-3">
-                            {attachedPipeline
+                            {clients
                               ? "View your pipeline data in realtime"
-                              : "You must attach a pipeline first"}
+                              : "You must attach a client first"}
                           </div>
-                          <div class="flex flex-col">
-                            <div class="flex flex-row justify-start items-center mb-3">
-                              <Toggle
-                                label="Sampling"
-                                value={peekSamplingSignal.value}
-                                setValue={(value) =>
-                                  peekSamplingSignal.value = value}
-                              />
-                              {peekSamplingSignal.value &&
-                                (
-                                  <label className="relative inline-flex items-center cursor-pointer ml-2">
-                                    <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                      Sample Setting
-                                    </span>
+                          {clients && (
+                            <div class="flex flex-col">
+                              <div class="flex flex-row justify-start items-center mb-3">
+                                <Toggle
+                                  label="Sampling"
+                                  value={peekSamplingSignal.value}
+                                  setValue={(value) =>
+                                    peekSamplingSignal.value = value}
+                                />
+                                {peekSamplingSignal.value &&
+                                  (
+                                    <label className="relative inline-flex items-center cursor-pointer ml-2">
+                                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                        Sample Setting
+                                      </span>
 
-                                    <input
-                                      class={`w-[${
-                                        (String(
-                                          peekSamplingRateSignal.value,
-                                        )
-                                          .length) * 12
-                                      }px] mr-2`}
-                                      value={peekSamplingRateSignal.value}
-                                      onChange={(e) => {
-                                        if (isNumeric(e.target.value)) {
-                                          peekSamplingRateSignal.value =
-                                            e.target.value;
-                                        }
-                                      }}
-                                    />
-                                    <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                      /s
-                                    </span>
-                                  </label>
-                                )}
+                                      <input
+                                        class={`w-[${
+                                          (String(
+                                            peekSamplingRateSignal.value,
+                                          )
+                                            .length) * 12
+                                        }px] mr-2`}
+                                        value={peekSamplingRateSignal.value}
+                                        onChange={(e) => {
+                                          if (isNumeric(e.target.value)) {
+                                            peekSamplingRateSignal.value =
+                                              e.target.value;
+                                          }
+                                        }}
+                                      />
+                                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                        /s
+                                      </span>
+                                    </label>
+                                  )}
+                              </div>
+                              <button
+                                onClick={() =>
+                                  peekingSignal.value = !peekingSignal.value}
+                                className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
+                              >
+                                {peekingSignal.value
+                                  ? "Stop Peeking"
+                                  : "Start Peeking"}
+                              </button>
                             </div>
-                            <button
-                              onClick={() =>
-                                peekingSignal.value = !peekingSignal.value}
-                              className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
-                            >
-                              {peekingSignal.value
-                                ? "Stop Peeking"
-                                : "Start Peeking"}
-                            </button>
-                          </div>
+                          )}
                         </div>
                         <h3 id="collapse-heading-3">
                           <button
@@ -355,25 +379,46 @@ export default function OpModal(
                         <h3 id="collapse-heading-5">
                           <button
                             type="button"
-                            className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web"
+                            className={`flex items-center w-full px-5 ${
+                              !schemaNavOpen && "border-b"
+                            }  border-purple-100 py-3 font-medium text-left text-web`}
                             data-accordion-target="#collapse-body-5"
                             aria-expanded="true"
                             aria-controls="collapse-body-5"
+                            onClick={() => setSchemaNavOpen(!schemaNavOpen)}
                           >
-                            <h3 class="text-web text-sm font-semibold ml-3">
+                            <h3 class={"text-web text-sm font-semibold ml-3"}>
                               Schema
                             </h3>
                           </button>
                         </h3>
-                        <div
-                          id="collapse-body-5"
-                          class="hidden"
-                          aria-labelledby="collapse-heading-5"
-                        >
-                          <p class="p-5 text-gray-300 text-xs dark:text-gray-400">
-                            Schema coming soon...
-                          </p>
-                        </div>
+                        {schemaNavOpen && (
+                          <div
+                            id="collapse-body-5"
+                            aria-labelledby="collapse-heading-5"
+                            class={"flex flex-col items-center justify-center p-4"}
+                          >
+                            <p class="mb-5 w-full text-left text-gray-500 text-xs dark:text-gray-400">
+                              Displaying JSON
+                            </p>
+                            <div className="w-full rounded flex overflow-x-scroll bg-black text-white py-2 px-4 text-sm flex flex-col justify-start">
+                              <pre>
+                                <code>
+                                  <div
+                                      dangerouslySetInnerHTML={{
+                                        __html: `${
+                                            hljs.highlight(`${opModal.value.schema}`, {language: 'json'})
+                                                .value
+                                        }`,
+                                      }}
+                                      class={"font-sm"}
+                                  >
+                                  </div>
+                                </code>
+                              </pre>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <button

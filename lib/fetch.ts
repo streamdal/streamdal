@@ -46,3 +46,8 @@ export const getNotifications = async () => {
 
   return response.notifications;
 };
+
+export const getSchema = async (audience: Audience) => {
+  const { response } = await client.getSchema({ audience }, meta);
+  return response;
+};

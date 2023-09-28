@@ -19,7 +19,8 @@ import * as $13 from "./routes/service/[service]/component/[component]/[operatio
 import * as $14 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
 import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
 import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $17 from "./routes/ws/service-map.tsx";
+import * as $17 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
+import * as $18 from "./routes/ws/service-map.tsx";
 import * as $$0 from "./islands/notifications.tsx";
 import * as $$1 from "./islands/opModal.tsx";
 import * as $$2 from "./islands/peek.tsx";
@@ -51,7 +52,9 @@ const manifest = {
       $15,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
       $16,
-    "./routes/ws/service-map.tsx": $17,
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
+      $17,
+    "./routes/ws/service-map.tsx": $18,
   },
   islands: {
     "./islands/notifications.tsx": $$0,

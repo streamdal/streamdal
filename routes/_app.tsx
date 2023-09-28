@@ -27,7 +27,7 @@ export default async function App(
         <link rel="stylesheet" type="text/css" href="/style.css" />
         <link
           rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/base16/dark-violet.min.css"
         />
       </Head>
       <body className="h-screen bg-purple-50 m-0 overflow-hidden">
