@@ -15,12 +15,13 @@ import (
 )
 
 const (
-	MenuString = `Q ["Q"][darkcyan]Quit[white][""]  ` +
-		`S ["S"][darkcyan]Select Component[white][""]  ` +
-		`R ["R"][darkcyan]Set Sample Rate[white][""]  ` +
-		`F ["F"][darkcyan]Filter[white][""]  ` +
-		`P ["P"][darkcyan]Pause[white][""]  ` +
-		`/ ["Search"][darkcyan]Search[white][""]`
+	MenuString = `` +
+		`[white]Q[-] ["Q"][darkcyan]Quit[-][""]  ` +
+		`[white]S[-] ["S"][darkcyan]Select Component[-][""]  ` +
+		`[white]R[-] ["R"][darkcyan]Set Sample Rate[-][""]  ` +
+		`[white]F[-] ["F"][darkcyan]Filter[-][""]  ` +
+		`[white]P[-] ["P"][darkcyan]Pause[-][""]  ` +
+		`[white]/[-] ["Search"][darkcyan]Search[-][""]`
 
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
@@ -102,17 +103,21 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := "[darkcyan]" + text
+	replaceOld := "[darkcyan]" + text + "[-]"
 	replaceNew := "[lightcyan]" + text + "[-]"
 
 	var updatedMenu string
 
 	if !on {
 		replaceOld = "[lightcyan]" + text + "[-]"
-		replaceNew = "[darkcyan]" + text
+		replaceNew = "[darkcyan]" + text + "[-]"
 	}
 
+	c.log.Debugf("Replacing '%s' with '%s'; menu contents BEFORE: '%s'", replaceOld, replaceNew, menu)
+
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
+
+	c.log.Debugf("Replacing '%s' with '%s'; menu contents AFTER: '%s'", replaceOld, replaceNew, updatedMenu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
