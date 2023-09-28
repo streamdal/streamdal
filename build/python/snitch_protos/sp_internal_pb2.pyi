@@ -23,12 +23,21 @@ class GetAttachCommandsByServiceRequest(_message.Message):
     def __init__(self, service_name: _Optional[str] = ...) -> None: ...
 
 class GetAttachCommandsByServiceResponse(_message.Message):
-    __slots__ = ["active", "paused"]
+    __slots__ = ["active", "paused", "wasm_modules"]
+    class WasmModulesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: WasmModule
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WasmModule, _Mapping]] = ...) -> None: ...
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     PAUSED_FIELD_NUMBER: _ClassVar[int]
+    WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
     active: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
     paused: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
-    def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ...) -> None: ...
+    wasm_modules: _containers.MessageMap[str, WasmModule]
+    def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["session_id"]
@@ -83,3 +92,13 @@ class SendSchemaRequest(_message.Message):
     audience: _sp_common_pb2.Audience
     schema: _sp_common_pb2.Schema
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
+
+class WasmModule(_message.Message):
+    __slots__ = ["bytes", "function", "id"]
+    BYTES_FIELD_NUMBER: _ClassVar[int]
+    FUNCTION_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    bytes: bytes
+    function: str
+    id: str
+    def __init__(self, id: _Optional[str] = ..., bytes: _Optional[bytes] = ..., function: _Optional[str] = ...) -> None: ...

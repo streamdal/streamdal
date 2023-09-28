@@ -2,7 +2,7 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
-
+import builtins
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -832,7 +832,36 @@ class GetAttachCommandsByServiceRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class GetAttachCommandsByServiceResponse(betterproto.Message):
     active: List["Command"] = betterproto.message_field(1)
+    """AttachCommands for all active pipelines"""
+
     paused: List["Command"] = betterproto.message_field(2)
+    """
+    AttachCommands, but ones which are paused The SDK still needs to have these
+    to support un-pausing
+    """
+
+    wasm_modules: Dict[str, "WasmModule"] = betterproto.map_field(
+        3, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+    """ID = wasm ID"""
+
+
+@dataclass(eq=False, repr=False)
+class WasmModule(betterproto.Message):
+    """
+    WasmModule is used to ensure we only send the wasm module once per request
+    instead of duplicated in every pipeline where it is used. This prevents
+    over-sized payloads on SDK startup
+    """
+
+    id: str = betterproto.string_field(1)
+    """ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server"""
+
+    bytes: builtins.bytes = betterproto.bytes_field(2)
+    """WASM module bytes (set by snitch-server)"""
+
+    function: str = betterproto.string_field(3)
+    """WASM function name to execute (set by snitch-server)"""
 
 
 @dataclass(eq=False, repr=False)
