@@ -1,152 +1,124 @@
 package kv
 
 import (
-	"testing"
-
 	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
 	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
 )
 
-func newKV(t *testing.T) IKV {
-	cfg := &Config{
-		Logger: &loggerfakes.FakeLogger{},
-	}
-	kv, err := New(cfg)
-	if err != nil {
-		t.Error(err)
-	}
+var _ = Describe("KV", func() {
+	var kv IKV
 
-	if kv == nil {
-		t.Error("New() returned nil")
-	}
-
-	return kv
-}
-
-func TestValidateConfig(t *testing.T) {
-	if err := validateConfig(nil); err != ErrNilConfig {
-		t.Errorf("validateConfig() returned nil, expected error '%s'", ErrNilConfig.Error())
-	}
-
-	if err := validateConfig(&Config{}); err != nil {
-		t.Errorf("validateConfig() returned error, expected nil: %s", err)
-	}
-}
-
-func TestSet(t *testing.T) {
-	kv := newKV(t)
-
-	t.Run("key is not set yet", func(t *testing.T) {
-		ok := kv.Set("foo", "value")
-		if ok {
-			t.Error("Set() returned false, expected true")
-		}
+	BeforeEach(func() {
+		var err error
+		kv, err = New(&Config{
+			Logger: &loggerfakes.FakeLogger{},
+		})
+		Expect(err).To(BeNil())
 	})
 
-	t.Run("key is already set", func(t *testing.T) {
-		kv.Purge()
-		kv.Set("foo", "value")
-		ok := kv.Set("foo", "value")
-		if !ok {
-			t.Error("Set() returned false, expected true")
-		}
-	})
-}
+	Context("validateConfig", func() {
+		It("should return an error if the config is nil", func() {
+			err := validateConfig(nil)
+			Expect(err).To(Equal(ErrNilConfig))
+		})
 
-func TestGet(t *testing.T) {
-	kv := newKV(t)
-	key := uuid.New().String()
-	want := "value"
-
-	t.Run("key is set", func(t *testing.T) {
-		kv.Set(key, want)
-
-		got, ok := kv.Get(key)
-		if !ok {
-			t.Error("Get() returned false, expected true")
-		}
-
-		if got != want {
-			t.Errorf("Get() returned '%s', expected '%s'", got, want)
-		}
+		It("passes validation", func() {
+			err := validateConfig(&Config{})
+			Expect(err).To(BeNil())
+		})
 	})
 
-	t.Run("key is not set", func(t *testing.T) {
-		got, ok := kv.Get(uuid.New().String())
-		if ok {
-			t.Error("Get() returned true, expected false")
-		}
+	Context("set", func() {
+		It("should return false if the key is already set", func() {
+			overridden := kv.Set("foo", "value")
+			Expect(overridden).To(BeFalse())
+		})
 
-		if got != "" {
-			t.Errorf("Get() returned '%s', expected empty string", got)
-		}
+		It("should return true if the key is already set", func() {
+			kv.Set("foo", "value")
+			overridden := kv.Set("foo", "value")
+			Expect(overridden).To(BeTrue())
+		})
 	})
 
-}
+	Context("get", func() {
+		It("should return false if the key is not set", func() {
+			_, ok := kv.Get("foo")
+			Expect(ok).To(BeFalse())
+		})
 
-func TestDelete(t *testing.T) {
-	kv := newKV(t)
-	key := uuid.New().String()
-	kv.Set(key, "value")
+		It("should return true if the key is set", func() {
+			key := uuid.New().String()
 
-	if kv.Items() != 1 {
-		t.Error("Expected 1 key to be in map")
-	}
+			kv.Set(key, "value")
+			val, ok := kv.Get(key)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal("value"))
+		})
+	})
 
-	ok := kv.Delete(key)
-	if !ok {
-		t.Error("Delete() returned false, expected true")
-	}
+	Context("delete", func() {
+		It("should return false if the key is not set", func() {
+			key := uuid.New().String()
+			deleted := kv.Delete(key)
+			Expect(deleted).To(BeFalse())
+		})
 
-	if kv.Items() != 0 {
-		t.Error("Expected 0 keys to be in map")
-	}
-}
+		It("should return true if the key is set", func() {
+			key := uuid.New().String()
+			kv.Set(key, "value")
+			deleted := kv.Delete(key)
+			Expect(deleted).To(BeTrue())
 
-func TestExists(t *testing.T) {
-	kv := newKV(t)
-	key := uuid.New().String()
-	kv.Set(key, "value")
+			_, ok := kv.Get(key)
+			Expect(ok).To(BeFalse())
+		})
+	})
 
-	if ok := kv.Exists(uuid.New().String()); ok {
-		t.Error("Exists() returned true, expected false")
-	}
+	Context("exists", func() {
+		It("should return false if the key is not set", func() {
+			ok := kv.Exists(uuid.New().String())
+			Expect(ok).To(BeFalse())
+		})
 
-	if ok := kv.Exists(key); !ok {
-		t.Error("Exiexts() returned false, expected true")
-	}
-}
+		It("should return true if the key is set", func() {
+			key := uuid.New().String()
+			kv.Set(key, "value")
+			ok := kv.Exists(key)
+			Expect(ok).To(BeTrue())
+		})
+	})
 
-func TestKeys(t *testing.T) {
-	kv := newKV(t)
-	kv.Set(uuid.New().String(), "value")
-	kv.Set(uuid.New().String(), "value")
+	Context("keys", func() {
+		It("should return a list of keys", func() {
+			kv.Set(uuid.New().String(), "value")
+			kv.Set(uuid.New().String(), "value")
 
-	keys := kv.Keys()
-	if len(keys) != 2 {
-		t.Errorf("Expected 2 keys, got '%d'", len(keys))
-	}
-}
+			keys := kv.Keys()
+			Expect(len(keys)).To(Equal(2))
+		})
+	})
 
-func TestItems(t *testing.T) {
-	kv := newKV(t)
-	kv.Set(uuid.New().String(), "value")
-	kv.Set(uuid.New().String(), "value")
+	Context("items", func() {
+		It("should return the number of items", func() {
+			kv.Set(uuid.New().String(), "value")
+			kv.Set(uuid.New().String(), "value")
 
-	items := kv.Items()
-	if items != 2 {
-		t.Errorf("Expected 2 items, got '%d'", items)
-	}
-}
+			items := kv.Items()
+			Expect(items).To(Equal(int64(2)))
+		})
+	})
 
-func TestPurge(t *testing.T) {
-	kv := newKV(t)
-	kv.Set(uuid.New().String(), "value")
-	kv.Set(uuid.New().String(), "value")
+	Context("purge", func() {
+		It("should return the number of items", func() {
+			kv.Set(uuid.New().String(), "value")
+			kv.Set(uuid.New().String(), "value")
 
-	purged := kv.Purge()
-	if purged != 2 {
-		t.Errorf("Purge returned '%d', expected 2", purged)
-	}
-}
+			purged := kv.Purge()
+			Expect(purged).To(Equal(int64(2)))
+		})
+	})
+})
