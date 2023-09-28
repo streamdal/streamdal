@@ -11,10 +11,7 @@ import {
 } from "./utils.ts";
 import { OpUpdate } from "../islands/serviceMap.tsx";
 import { ServiceMapper } from "./serviceMapper.ts";
-import {
-  GROUP_MARGIN,
-  GROUP_WIDTH,
-} from "../components/serviceMap/customNodes.tsx";
+import { GROUP_MARGIN, GROUP_WIDTH } from "../islands/customNodes.tsx";
 import { MarkerType } from "reactflow";
 
 export type Operation = {
@@ -133,7 +130,7 @@ export const mapOperation = (
         x: nodesMap.operationGroups.size === 1
           ? 25
           : (nodesMap.operationGroups.size - 1) * (GROUP_WIDTH + GROUP_MARGIN),
-        y: 200,
+        y: 300,
       },
       data: {
         audience: a,
@@ -194,7 +191,7 @@ export const mapNodes = (
         dragHandle: "#dragHandle",
         position: {
           x: offset(cKey, nodesMap.components),
-          y: 450 + (max - 1) * 76,
+          y: 650 + (max - 1) * 76,
         },
         data: { audience: a, serviceMap },
       });
@@ -228,11 +225,12 @@ export const mapEdgePair = (
     animated: true,
     markerEnd: {
       type: MarkerType.Arrow,
-      width: 15,
-      height: 15,
+      width: 25,
+      height: 25,
+      strokeWidth: 1.5,
       color: "#d2c1ff",
     },
-    type: "interactiveEdge",
+    type: "componentEdge",
     style: {
       strokeWidth: 2,
       stroke: "#d2c1ff",
@@ -254,11 +252,12 @@ export const mapEdgePair = (
     animated: true,
     markerEnd: {
       type: MarkerType.Arrow,
-      width: 15,
-      height: 15,
+      width: 25,
+      height: 25,
+      strokeWidth: 1.5,
       color: "#d2c1ff",
     },
-    type: "interactiveEdge",
+    type: "serviceEdge",
     style: {
       strokeWidth: 2,
       stroke: "#d2c1ff",

@@ -1,6 +1,10 @@
 import { AppContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
-import { streamServiceMap } from "../lib/stream.ts";
+import {
+  streamEdgeMetrics,
+  streamMetrics,
+  streamServiceMap,
+} from "../lib/stream.ts";
 
 export default async function App(
   req: Request,

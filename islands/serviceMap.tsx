@@ -1,5 +1,6 @@
 import ReactFlow, {
   Background,
+  EdgeTypes,
   ReactFlowInstance,
   useEdgesState,
   useNodesState,
@@ -10,7 +11,7 @@ import {
   GroupNode,
   OperationNode,
   ServiceNode,
-} from "../components/serviceMap/customNodes.tsx";
+} from "./customNodes.tsx";
 import { signal, useSignalEffect } from "@preact/signals";
 import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
@@ -19,7 +20,11 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
-import { ServiceMapType } from "../lib/fetch.ts";
+import { getEdgeMetrics } from "../lib/edgeMetrics.ts";
+import {
+  ComponentEdge,
+  ServiceEdge,
+} from "../components/serviceMap/customEdge.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -37,6 +42,11 @@ export const nodeTypes = {
   producerGroup: GroupNode,
   producer: OperationNode,
   consumer: OperationNode,
+};
+
+const edgeTypes: EdgeTypes = {
+  serviceEdge: ServiceEdge,
+  componentEdge: ComponentEdge,
 };
 
 const serialize = async (instance: any) => {
@@ -87,13 +97,15 @@ export const updateEdges = (
 };
 
 export default function ServiceMapComponent(
-  { initNodes, initEdges, blur = false, serviceMap }: {
+  { initNodes, initEdges, grpcUrl, grpcToken, blur = false }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
+    grpcUrl: string;
+    grpcToken: string;
     blur?: boolean;
-    serviceMap: ServiceMapType;
   },
 ) {
+  void getEdgeMetrics({ grpcUrl, grpcToken });
   const wrapper = useRef(null);
 
   const [rfInstance, setRfInstance] = useState(null);
@@ -184,6 +196,7 @@ export default function ServiceMapComponent(
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
+        edgeTypes={edgeTypes}
       >
         {nodes.length === 0 && <EmptyService />}
         <Background style={{ height: "100vh" }} />

@@ -3,20 +3,22 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "twind";
 import { OperationType } from "snitch-protos/protos/sp_common.ts";
-import { ServiceNodeMenu } from "./nodeMenu.tsx";
-import { ProducerIcon } from "../icons/producer.tsx";
-import { ConsumerIcon } from "../icons/consumer.tsx";
+import { ServiceNodeMenu } from "../components/serviceMap/nodeMenu.tsx";
+import { ProducerIcon } from "../components/icons/producer.tsx";
+import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import {
+  audienceKey,
+  edgeKey,
   removeWhitespace,
   serviceKey,
   setComponentGroup,
   setOperationHoverGroup,
   setServiceGroup,
   titleCase,
-} from "../../lib/utils.ts";
-import { Tooltip } from "../tooltip/tooltip.tsx";
-import { NodeData, Operation } from "../../lib/nodeMapper.ts";
-import { opModal } from "./opModalSignal.ts";
+} from "../lib/utils.ts";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
+import { NodeData, Operation } from "../lib/nodeMapper.ts";
+import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 
 export const GROUP_WIDTH = 280;
@@ -88,7 +90,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 
   return (
     <div
-      class={`rounded-lg bg-sunset border border-purple-200 w-[${GROUP_WIDTH}px] pb-4 hover:shadow-lg hover:border-purple-600`}
+      className={`rounded-lg bg-sunset border border-purple-200 w-[${GROUP_WIDTH}px] pb-4 hover:shadow-lg hover:border-purple-600`}
       onMouseOver={() => setHover()}
       onMouseLeave={() => resetHover()}
     >
@@ -113,6 +115,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
         position={producer ? Position.Bottom : Position.Top}
         className="opacity-0"
       />
+
       <Handle
         type="target"
         position={producer ? Position.Top : Position.Bottom}

@@ -12,7 +12,7 @@
   },
   "lint": {
     "rules": {
-      "exclude": ["no-explicit-any", "require-await"]
+      "exclude": ["no-explicit-any", "require-await", "no-await-in-sync-fn"]
     }
   }
 }

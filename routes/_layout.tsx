@@ -32,6 +32,8 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
           <ServiceMapComponent
             initNodes={Array.from(serviceSignal.value.nodesMap.values())}
             initEdges={Array.from(serviceSignal.value.edgesMap.values())}
+            grpcUrl={url}
+            grpcToken={token}
             blur={req.url.includes("pipelines") ||
               req.url.includes("notifications")}
           />

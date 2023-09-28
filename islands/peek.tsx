@@ -1,5 +1,4 @@
 import { Audience, TailResponse } from "snitch-protos/protos/sp_common.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";

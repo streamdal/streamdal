@@ -108,6 +108,11 @@ export const audienceKey = (audience: Audience) =>
     OperationType[audience.operationType]
   }:${audience.operationName}:${audience.componentName}`.toLowerCase();
 
+export const edgeKey = (audience: Audience) =>
+  `${audience.serviceName}/operation_type_${
+    OperationType[audience.operationType]
+  }/${audience.componentName}`.toLowerCase();
+
 export const serviceKey = (audience: Audience) =>
   lower(`${audience.serviceName}-service`.toLowerCase());
 

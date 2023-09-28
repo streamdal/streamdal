@@ -3,7 +3,7 @@ import { removeWhitespace, serviceKey } from "../../lib/utils.ts";
 import { opModal } from "./opModalSignal.ts";
 import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { NodeData } from "./customNodes.tsx";
+import { NodeData } from "../../islands/customNodes.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconLink from "tabler-icons/tsx/link.tsx";

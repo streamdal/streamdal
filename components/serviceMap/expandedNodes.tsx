@@ -1,6 +1,6 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import { useRef } from "preact/hooks";
-import { OperationNode } from "./customNodes.tsx";
+import { OperationNode } from "../../islands/customNodes.tsx";
 
 export const ExpandedNodes = ({ nodes, params }) => {
   const actorType = params.operationType === "consumer" ? 1 : 2;
