@@ -393,8 +393,24 @@ func (s *InternalServer) GetAttachCommandsByService(
 
 	active := make([]*protos.Command, 0)
 	paused := make([]*protos.Command, 0)
+	wasmModules := make(map[string]*protos.WasmModule)
 
 	for _, a := range attaches {
+		// Inject WASM data into it's own map and zero out the bytes in the steps
+		// This is to prevent the WASM data from being duplicated in the response
+		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
+			if _, ok := wasmModules[step.GetXWasmId()]; !ok {
+				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+					Id:       step.GetXWasmId(),
+					Bytes:    step.GetXWasmBytes(),
+					Function: step.GetXWasmFunction(),
+				}
+			}
+
+			// Always wipe bytes. SDK Client will handle lookup
+			step.XWasmBytes = nil
+		}
+
 		pausedEntry, ok := pausedMap[a.GetAttachPipeline().Pipeline.Id]
 		if !ok {
 			// Pipeline ID is not present in map, it is not paused
@@ -414,8 +430,9 @@ func (s *InternalServer) GetAttachCommandsByService(
 	}
 
 	return &protos.GetAttachCommandsByServiceResponse{
-		Active: active,
-		Paused: paused,
+		Active:      active,
+		Paused:      paused,
+		WasmModules: wasmModules,
 	}, nil
 }
 

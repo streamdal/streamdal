@@ -220,6 +220,11 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		}
 
 		if err := s.options.RedisBackend.Set(ctx, k, []byte(val), s.options.SessionTTL).Err(); err != nil {
+			if errors.Is(err, context.Canceled) {
+				// This can happen when Register() is exited before the heartbeat is saved
+				return nil
+			}
+
 			return errors.Wrap(err, "error refreshing key")
 		}
 	}

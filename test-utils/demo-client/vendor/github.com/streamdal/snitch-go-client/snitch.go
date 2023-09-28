@@ -382,6 +382,17 @@ func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
 
 	for _, cmd := range cmds.Active {
 		s.config.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
+
+		// Fill in WASM data from the deduplication map
+		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
+			wasmData, ok := cmds.WasmModules[step.GetXWasmId()]
+			if !ok {
+				return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
+			}
+
+			step.XWasmBytes = wasmData.Bytes
+		}
+
 		if err := s.attachPipeline(ctx, cmd); err != nil {
 			s.config.Logger.Errorf("failed to attach pipeline: %s", err)
 		}
