@@ -212,7 +212,7 @@ func (b *Bus) RunTailConsumer() error {
 	}
 
 	// This channel is shared between all tail workers
-	sharedWorkerCh := make(chan *redis.Message, 3)
+	sharedWorkerCh := make(chan *redis.Message, b.options.NumTailConsumers)
 
 	// Start workers
 	for i := 0; i < b.options.NumTailConsumers; i++ {
