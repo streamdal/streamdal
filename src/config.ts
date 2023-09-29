@@ -131,7 +131,7 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/console-ui",
           },
           {
-            text: "Libraries [Shims] (Coming Soon!)",
+            text: "Libraries/Shims (Coming Soon!)",
             slug: "libraries-shiums",
             link: "en/core-components/libraries-shims",
           },
@@ -188,22 +188,22 @@ export const SIDEBAR: Sidebar = {
         text: "Data Governance",
         children: [
           {
-            text: "Overview",
+            text: "Overview (Coming Soon!)",
             slug: "overview",
             link: "en/data-governance/overview"
           },
           {
-            text: "Data Quality",
+            text: "Data Quality (Coming Soon!)",
             slug: "data-quality",
             link: "en/data-governance/data-quality"
           },
           {
-            text: "Internal Governance",
+            text: "Internal Governance (Coming Soon!)",
             slug: "internal-governance",
             link: "en/data-governance/internal-governance"
           },
           {
-            text: "Governance for Compliance",
+            text: "Governance for Compliance (Coming Soon!)",
             children: [
               {
                 text: "CCPA/CPRA",
@@ -306,12 +306,7 @@ export const SIDEBAR: Sidebar = {
             text: "Glossary",
             slug: "glossary",
             link: "en/resources-support/glossary",
-          },
-          {
-            text: "Known Issues",
-            slug: "known-issues",
-            link: "en/resources-support/known-issues",
-          },
+          },  
           {
             text: "License & Use",
             slug: "license",

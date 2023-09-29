@@ -1,14 +1,45 @@
 ---
-title: Snitch-Scala
+title: Scala Client Support (Coming Soon!)
 description: Snitch Scala support (Coming Soon!)
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
-
+import note from "@images/icons/note.png";
 import { Notification } from "accessible-astro-components";
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
+Support for Scala is currently not available, but we're planning to add it.
+
+*However, we could use your input!* 👇
+
+## Libraries
+Along with additional language support, we plan forking specific libraries that 
+would be impactful to have the Snitch functionality. Read more about our 
+[Libraries \[Shims\]](/en/core-components/libraries-shims).
+
+Below are some additions we are considering based on feedback from our design 
+partners and current users:
+
+
+|  <u>Messaging Systems</u> |  <u>Database</u> |
+|---|---|
+|alpakka-kafka|doobie|
+|rabbitmq-java|mongo-scala|
+|akka-http|slick|
+|scala_nats/nats.java|anorm|
+
+
+---
+
+<Notification type="note">
+  <img src={note} alt="Note" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>Think we should consider or prioritize other libraries?</p>
+  </div>
 </Notification>
+
+Join our [discord](https://discord.gg/KU2k3zMB) and participate in the polls! 
+The discussions and feedback our users and the open source community brings 
+will be incredibly value to feature development.
+
+For more information on the progress for Scala support, check out our 
+[roadmap](/en/resources-support/roadmap)
