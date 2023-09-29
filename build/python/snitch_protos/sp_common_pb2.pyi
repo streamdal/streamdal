@@ -61,12 +61,21 @@ class Metric(_message.Message):
     def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
 
 class Schema(_message.Message):
-    __slots__ = ["_version", "json_schema"]
+    __slots__ = ["_metadata", "_version", "json_schema"]
+    class MetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     JSON_SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    _METADATA_FIELD_NUMBER: _ClassVar[int]
     _VERSION_FIELD_NUMBER: _ClassVar[int]
+    _metadata: _containers.ScalarMap[str, str]
     _version: int
     json_schema: bytes
-    def __init__(self, json_schema: _Optional[bytes] = ..., _version: _Optional[int] = ...) -> None: ...
+    def __init__(self, json_schema: _Optional[bytes] = ..., _version: _Optional[int] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class StandardResponse(_message.Message):
     __slots__ = ["code", "id", "message"]

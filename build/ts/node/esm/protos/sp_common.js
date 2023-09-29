@@ -573,11 +573,12 @@ class Schema$Type extends MessageType {
     constructor() {
         super("protos.Schema", [
             { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 100, name: "_version", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 100, name: "_version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value) {
-        const message = { jsonSchema: new Uint8Array(0), Version: 0 };
+        const message = { jsonSchema: new Uint8Array(0), Version: 0, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -594,6 +595,9 @@ class Schema$Type extends MessageType {
                 case /* int32 _version */ 100:
                     message.Version = reader.int32();
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -605,6 +609,22 @@ class Schema$Type extends MessageType {
         }
         return message;
     }
+    binaryReadMap1000(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.Schema._metadata");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : "";
+    }
     internalBinaryWrite(message, writer, options) {
         /* bytes json_schema = 1; */
         if (message.jsonSchema.length)
@@ -612,6 +632,9 @@ class Schema$Type extends MessageType {
         /* int32 _version = 100; */
         if (message.Version !== 0)
             writer.tag(100, WireType.Varint).int32(message.Version);
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

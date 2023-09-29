@@ -212,6 +212,9 @@ class AudienceRate(betterproto.Message):
 class Schema(betterproto.Message):
     json_schema: bytes = betterproto.bytes_field(1)
     version: int = betterproto.int32_field(100)
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
 
 
 @dataclass(eq=False, repr=False)

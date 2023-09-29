@@ -192,6 +192,12 @@ export interface Schema {
      * @generated from protobuf field: int32 _version = 100;
      */
     Version: number; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Common status codes used in gRPC method responses
@@ -759,11 +765,12 @@ class Schema$Type extends MessageType<Schema> {
     constructor() {
         super("protos.Schema", [
             { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 100, name: "_version", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 100, name: "_version", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<Schema>): Schema {
-        const message = { jsonSchema: new Uint8Array(0), Version: 0 };
+        const message = { jsonSchema: new Uint8Array(0), Version: 0, Metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Schema>(this, message, value);
@@ -780,6 +787,9 @@ class Schema$Type extends MessageType<Schema> {
                 case /* int32 _version */ 100:
                     message.Version = reader.int32();
                     break;
+                case /* map<string, string> _metadata */ 1000:
+                    this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -791,6 +801,22 @@ class Schema$Type extends MessageType<Schema> {
         }
         return message;
     }
+    private binaryReadMap1000(map: Schema["Metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof Schema["Metadata"] | undefined, val: Schema["Metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.Schema._metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
+    }
     internalBinaryWrite(message: Schema, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* bytes json_schema = 1; */
         if (message.jsonSchema.length)
@@ -798,6 +824,9 @@ class Schema$Type extends MessageType<Schema> {
         /* int32 _version = 100; */
         if (message.Version !== 0)
             writer.tag(100, WireType.Varint).int32(message.Version);
+        /* map<string, string> _metadata = 1000; */
+        for (let k of Object.keys(message.Metadata))
+            writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
