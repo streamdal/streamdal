@@ -14,22 +14,19 @@ import { PausePipelineModal } from "../components/modals/pausePipelineModal.tsx"
 import { DetachPipelineModal } from "../components/modals/detachPipelineModal.tsx";
 import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { DeleteOperationModal } from "../components/modals/deleteOperationModal.tsx";
-import { parseData, Peek } from "./peek.tsx";
+import { Peek } from "./peek.tsx";
 import { Toggle } from "../components/form/switch.tsx";
 import { getAudienceOpRoute, isNumeric } from "../lib/utils.ts";
 import {
   peekingSignal,
   peekSamplingRateSignal,
   peekSamplingSignal,
-  peekSignal,
 } from "../lib/peek.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { useEffect } from "preact/hooks";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
-import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
-import { opUpdateSignal } from "./serviceMap.tsx";
+
 export const OP_MODAL_WIDTH = "308px";
 
 export default function OpModal(
@@ -43,12 +40,6 @@ export default function OpModal(
   const attachedPipeline = opModal.value?.attachedPipeline;
   const clients = opModal.value?.clients;
   const opType = OperationType[audience?.operationType];
-
-  useEffect(() => {
-    if (opModal.value?.audience) {
-      opUpdateSignal.value = { audience };
-    }
-  }, [opModal.value]);
 
   const [peekNavOpen, setPeekNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(false);
@@ -68,7 +59,7 @@ export default function OpModal(
         schema: JSON.stringify(schema.schema, null, 2),
       };
     }
-  }, [audience]);
+  }, [audience, schemaNavOpen]);
 
   return (
     <>
@@ -153,8 +144,8 @@ export default function OpModal(
                               {audience?.operationName}
                             </h3>
                             <p class="text-xs text-cloud">
-                              {`${clients.length} attached client${
-                                (clients.length !== 1) ? "s" : ""
+                              {`${clients?.length || 0} attached client${
+                                (clients?.length !== 1) ? "s" : ""
                               }`}
                             </p>
                           </div>
@@ -166,7 +157,7 @@ export default function OpModal(
                             Attached Pipelines
                           </h3>
                         </div>
-                        {!serviceMap?.pipes.length
+                        {!serviceMap?.pipes?.length
                           ? (
                             <a href={"/pipelines"}>
                               <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">

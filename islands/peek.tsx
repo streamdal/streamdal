@@ -70,7 +70,7 @@ export const PeekRow = (
         <pre>
           <code>
             <div dangerouslySetInnerHTML={{
-                __html: hljs.highlightAuto(parseData(row.newData)).value,
+                __html: hljs.highlightAuto(parseData(row.newData && row.newData.length > 0 ? row.newData : row.originalData)).value,
               }}
             >
             </div>

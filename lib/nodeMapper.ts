@@ -192,7 +192,7 @@ export const mapNodes = (
         dragHandle: `#${cKey}-dragHandle`,
         position: {
           x: offset(cKey, nodesMap.components),
-          y: 650 + (max - 1) * 76,
+          y: 550 + (max - 1) * 76,
         },
         data: { audience: a, serviceMap },
       });
@@ -226,12 +226,12 @@ export const mapEdgePair = (
     animated: true,
     markerEnd: {
       type: MarkerType.Arrow,
-      width: 25,
-      height: 25,
-      strokeWidth: 1.5,
+      width: 15,
+      height: 15,
+      strokeWidth: 1,
       color: "#d2c1ff",
     },
-    type: "componentEdge",
+    type: "default",
     style: {
       strokeWidth: 2,
       stroke: "#d2c1ff",

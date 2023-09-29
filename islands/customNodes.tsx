@@ -7,8 +7,8 @@ import { ServiceNodeMenu } from "../components/serviceMap/nodeMenu.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import {
-  componentKey,
   audienceKey,
+  componentKey,
   edgeKey,
   removeWhitespace,
   serviceKey,
