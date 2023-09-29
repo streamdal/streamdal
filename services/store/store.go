@@ -1111,19 +1111,8 @@ func (s *Store) GetSchema(ctx context.Context, aud *protos.Audience) (*protos.Sc
 }
 
 func (s *Store) AddSchema(ctx context.Context, req *protos.SendSchemaRequest) error {
-	// Get existing schema
-	schema, err := s.GetSchema(ctx, req.Audience)
-	if err != nil {
-		return errors.Wrap(err, "error getting existing schema")
-	}
-
-	// Bump version and schema
-	// GetSchema returns an empty schema with version 0 if it doesn't exist yet
-	schema.XVersion++
-	schema.JsonSchema = req.Schema.JsonSchema
-
 	// Save to K/V
-	schemaData, err := proto.Marshal(schema)
+	schemaData, err := proto.Marshal(req.Schema)
 	if err != nil {
 		return errors.Wrap(err, "error serializing schema to protobuf")
 	}
