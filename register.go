@@ -29,7 +29,7 @@ func (s *Snitch) register(looper director.Looper) error {
 		ClientInfo: &protos.ClientInfo{
 			ClientType:     protos.ClientType(s.config.ClientType),
 			LibraryName:    "snitch-go-client",
-			LibraryVersion: "0.0.50",
+			LibraryVersion: "0.0.51",
 			Language:       "go",
 			Arch:           runtime.GOARCH,
 			Os:             runtime.GOOS,
