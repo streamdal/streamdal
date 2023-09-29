@@ -540,6 +540,28 @@ func (s *InternalServer) SendSchema(ctx context.Context, req *protos.SendSchemaR
 		}, nil
 	}
 
+	// Get existing schema
+	schema, err := s.Options.StoreService.GetSchema(ctx, req.Audience)
+	if err != nil {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			Message: errors.Wrap(err, "error getting existing schema").Error(),
+		}, nil
+	}
+
+	// Bump version and timestamp
+	// GetSchema returns an empty schema with version 0 if it doesn't exist yet
+	schema.XVersion++
+	schema.JsonSchema = req.Schema.JsonSchema
+	schema.XMetadata = req.Schema.XMetadata
+
+	if req.Schema.XMetadata == nil {
+		req.Schema.XMetadata = make(map[string]string)
+	}
+
+	req.Schema.XMetadata["last_updated"] = time.Now().UTC().Format(time.RFC3339)
+
 	if err := s.Options.StoreService.AddSchema(ctx, req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),
