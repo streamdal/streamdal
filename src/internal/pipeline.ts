@@ -6,6 +6,7 @@ import {
   Audience,
   TailRequestType,
 } from "@streamdal/snitch-protos/protos/sp_common";
+import { GetAttachCommandsByServiceResponse } from "@streamdal/snitch-protos/protos/sp_internal";
 import {
   Pipeline,
   PipelineStep,
@@ -24,12 +25,17 @@ export type EnhancedStep = PipelineStep & {
 };
 
 export const initPipelines = async (configs: Configs) => {
-  const { response } = await configs.grpcClient.getAttachCommandsByService(
-    {
-      serviceName: configs.serviceName.toLowerCase(),
-    },
-    { meta: { "auth-token": configs.snitchToken } }
-  );
+  const { response }: { response: GetAttachCommandsByServiceResponse } =
+    await configs.grpcClient.getAttachCommandsByService(
+      {
+        serviceName: configs.serviceName.toLowerCase(),
+      },
+      { meta: { "auth-token": configs.snitchToken } }
+    );
+
+  for (const [k, v] of Object.entries(response.wasmModules)) {
+    internal.wasmModules.set(k, v);
+  }
 
   for (const command of response.active) {
     processResponse(command);
@@ -79,10 +85,20 @@ export const processResponse = (response: Command) => {
   }
 };
 
+export const buildPipeline = (pipeline: Pipeline) => ({
+  ...pipeline,
+  steps: pipeline.steps.map((step: PipelineStep) => ({
+    ...step,
+    ...(step.WasmId
+      ? { WasmBytes: internal.wasmModules.get(step.WasmId)?.bytes }
+      : {}),
+  })),
+});
+
 export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
   pipeline.name !== "Schema Inference" &&
   internal.pipelines.set(audienceKey(audience), {
-    ...pipeline,
+    ...buildPipeline(pipeline),
     paused: false,
   });
 
@@ -103,6 +119,7 @@ export const togglePausePipeline = (
 };
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
+  console.debug("enabling tail", request);
   internal.audiences.set(audienceKey(audience), {
     tail: request.type === TailRequestType.START,
     tailRequestId: request.Id,

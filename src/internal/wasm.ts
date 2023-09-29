@@ -7,11 +7,14 @@ import {
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 
+const [nodeVersionMajor] = process.versions.node.split(".");
+
 const wasi = new WASI({
+  ...(Number(nodeVersionMajor) >= 20 ? { version: "preview1" } : {}),
   preopens: {
     "/sandbox": "./",
   },
-});
+} as any);
 
 export const readResponse = (pointer: number, buffer: Uint8Array) => {
   let nullHits = 0;

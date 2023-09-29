@@ -32,8 +32,8 @@ Then install deps and run as usual:
 
 ## WASM
 In order to run pipelines with a minimal amount of overhead, the Snitch node client ships
-and executes pipeline rules as WASM, so you'll need to enable WASM functionality in your node app
-by supplying the flag, see:
+and executes pipeline rules as WASM. If you are using Node version < 20.* you'll need to enable
+WASM functionality in your node app by supplying the flag, see:
 
 ```
 node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js

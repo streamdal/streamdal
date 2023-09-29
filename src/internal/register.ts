@@ -1,5 +1,6 @@
 import { Audience } from "@streamdal/snitch-protos/protos/sp_common";
 import { ClientType } from "@streamdal/snitch-protos/protos/sp_info";
+import { WasmModule } from "@streamdal/snitch-protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
 
 // import { version } from "../../package.json";
@@ -26,6 +27,7 @@ export const internal = {
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
   audiences: new Map<string, TailStatus>(),
+  wasmModules: new Map<string, WasmModule>(),
 };
 
 export const audienceKey = (audience: Audience) =>

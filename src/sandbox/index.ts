@@ -124,13 +124,45 @@ const logTest = async (snitch: any, audience: Audience, input: any) => {
   console.log("\n");
 };
 
+const randomInterval = async (snitch: any, audience: Audience, input: any) => {
+  console.log("--------------------------------");
+  console.log(new Date());
+  console.log(
+    `sending pipeline request for ${audience.serviceName} - ${OperationType[
+      audience.operationType
+    ].toLowerCase()}`
+  );
+  const { error, message, data } = await snitch.processPipeline({
+    audience: audience,
+    data: new TextEncoder().encode(JSON.stringify(input)),
+  });
+  console.log("error", error);
+  console.log("message", message);
+  console.log("data:");
+  try {
+    data && data.length > 0
+      ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
+      : console.log("no data returned");
+  } catch (e) {
+    console.error("could not parse data", e);
+  }
+  console.log("pipeline request done");
+  console.log("--------------------------------");
+  console.log("\n");
+  setTimeout(
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    () => randomInterval(snitch, audience, input),
+    Math.random() * 5000
+  );
+};
+
 // eslint-disable-next-line @typescript-eslint/require-await
 export const exampleStaggered = async () => {
   const snitchA = new Snitch(serviceAConfig);
   const snitchB = new Snitch(serviceBConfig);
 
   setInterval(() => {
-    void logTest(snitchA, audienceAConsumer, exampleData);
+    void randomInterval(snitchA, audienceAConsumer, exampleData);
   }, 2000);
 
   setTimeout(() => {
@@ -180,6 +212,44 @@ export const tailFriendly = async () => {
   void logTest(snitchB, audienceBProducer, exampleData);
 
   void logTest(
+    snitchB,
+    { ...audienceBProducer, componentName: "kafka" },
+    exampleData
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export const throughputFriendly = async () => {
+  const snitchA = new Snitch(serviceAConfig);
+  const snitchB = new Snitch(serviceBConfig);
+
+  void randomInterval(snitchA, audienceAConsumer, exampleData);
+
+  void randomInterval(
+    snitchA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+    exampleData
+  );
+
+  void randomInterval(
+    snitchA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+    exampleData
+  );
+
+  void randomInterval(
+    snitchA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData
+  );
+
+  void randomInterval(snitchA, audienceAProducer, exampleData);
+
+  void randomInterval(snitchB, audienceBConsumer, exampleData);
+
+  void randomInterval(snitchB, audienceBProducer, exampleData);
+
+  void randomInterval(
     snitchB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData

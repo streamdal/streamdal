@@ -15,7 +15,10 @@ import { audienceKey, internal } from "../internal/register.js";
 
 const testConfigs = {
   grpcClient: {
-    getAttachCommandsByService: () => ({ active: [], paused: [] }),
+    getAttachCommandsByService: () => ({
+      active: [],
+      paused: [],
+    }),
   } as unknown as InternalClient,
   tailCall: {} as unknown as ClientStreamingCall<
     TailResponse,
@@ -97,6 +100,7 @@ const testAttachCommandByServiceResponse = {
   response: {
     active: [testAttachCommand],
     paused: [],
+    wasmModules: { test: { id: "test", bytes: new Uint8Array() } },
   },
 };
 
