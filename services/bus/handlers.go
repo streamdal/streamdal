@@ -470,24 +470,39 @@ func (b *Bus) handleTailCommand(ctx context.Context, req *protos.TailRequest) er
 
 	switch req.Type {
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
-		b.log.Debugf("handling tail start command")
-		if err := validate.StartTailRequest(req); err != nil {
-			return errors.Wrap(err, "invalid tail request")
-		}
-
-		return b.sendTailCommand(ctx, req)
+		return b.handleTailRequestStart(ctx, req)
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
-		b.log.Debugf("handling tail stop command")
-		if err := validate.StopTailRequest(req); err != nil {
-			return errors.Wrap(err, "invalid tail request")
-		}
-
-		return b.sendTailCommand(ctx, req)
+		return b.handleTailRequestStop(ctx, req)
 	default:
 		b.log.Debugf("unknown tail command type: %v", req.Type)
 	}
 
 	return nil
+}
+
+func (b *Bus) handleTailRequestStart(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail start command")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
+	}
+
+	return b.sendTailCommand(ctx, req)
+}
+
+func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail stop command")
+	if err := validate.StopTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
+	}
+
+	// Close any pubsub channel
+	if ok := b.options.PubSub.CloseTopic(req.GetXId()); ok {
+		b.log.Debugf("closed pubsub topic '%s'", req.GetXId())
+	} else {
+		b.log.Debugf("no pubsub topic '%s' found to close", req.GetXId())
+	}
+
+	return b.sendTailCommand(ctx, req)
 }
 
 func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) error {
@@ -511,16 +526,6 @@ func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) erro
 		if l.NodeName != b.options.NodeName {
 			continue
 		}
-
-		// Scrapping peek<->pipeline association as of 2023-09-22 ~ MG
-		//isAttached, err := b.options.Store.IsPipelineAttached(ctx, req.Audience, req.PipelineId)
-		//if err != nil {
-		//	b.log.Error(errors.Wrap(err, "unable to verify pipeline is attached"))
-		//	continue
-		//}
-		//if !isAttached {
-		//	continue
-		//}
 
 		// Get channel for the connected client. This allows us to send commands
 		// to a client that is connected via the Register() method
