@@ -42,12 +42,12 @@ https://github.com/streamdal/snitch/tree/main/docker/local
 
 ### Releasing
 
-We use https://deno.land/x/version_ts@0.2.2 to help set our release version. To
+We use https://deno.land/x/version@v1.1.1 to help set our release version. To
 generate a release:
 
-1. Install `version_ts` if you don't already have it:
-   `deno install -f -r --allow-read=version.ts --allow-write=version.ts --allow-run=git https://deno.land/x/version_ts/main.ts`
-2. Bump the release number: `version_ts [major|minor|patch] --commit --tag`
+1. Install `version` if you don't already have it:
+   `deno install -n version -r -A https://deno.land/x/version/index.ts`
+2. Bump the release number: `version [major|minor|patch]`
 3. git push the generated version tag: `git push origin <tag_name>`
 4. Generate a release from the tag with user-friendly release notes:
    https://github.com/streamdal/snitch-node-client/releases
