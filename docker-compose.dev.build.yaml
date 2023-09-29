@@ -29,6 +29,15 @@ services:
     networks:
       - snitch-network
 
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    ports:
+      - "9121:9121" # Expose the exporter's port
+    networks:
+      - snitch-network
+    command:
+      - '--redis.addr=redis:6379' # Address of the Redis server
+
   envoy:
     build:
       context: ${PWD}/assets/envoy
@@ -40,9 +49,38 @@ services:
       - "9901:9901"
     networks:
       - snitch-network
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9191:9090
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/assets/prometheus:/etc/prometheus
+      - prom-data:/prometheus
+    networks:
+      - snitch-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3001:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ${PWD}/assets/grafana:/etc/grafana/provisioning/datasources
+      - ${PWD}/assets/grafana-data:/var/lib/grafana
+    networks:
+      - snitch-network
 
 volumes:
   redis-data: # Define the volume for redis data
+  prom-data:
 
 networks:
   snitch-network:
