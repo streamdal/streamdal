@@ -1,10 +1,19 @@
 ---
-title: Data Governance Overview
+title: Data Governance Overview (Coming Soon!)
 description: Snitch Data Governance Overview
 layout: ../../../layouts/MainLayout.astro
 ---
+import info from "@images/icons/info.png";
 
-Snitch is primarily used to provide real-time validation and integrity for any 
+import { Notification } from "accessible-astro-components";
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data governance features of Snitch are 
+  not yet ready for 1.0 release.</p>
+</Notification>
+
+These features will enable you to add real-time validation and integrity to any 
 data system. It will deliver preventive and proactive measures for data 
 governance and compliance initiatives. 
 
@@ -21,7 +30,7 @@ studies complete.
 
 _Don't see your regulation below? 
 [Let us know](/en/resources-support/get-support/) so we can clarify 
-applicability, and add it to the list or roadmap._
+applicability._
 
 <div class="pc-tabx w-full max-w-2xl m-0">
   <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
@@ -85,3 +94,10 @@ applicability, and add it to the list or roadmap._
 </p>
   </div>
 </div>
+
+Be sure to periodically check out our 
+[roadmap](https://github.com/orgs/streamdal/projects/1/views/9) for updates on 
+development.
+
+Also, join our [Discord](https://discord.gg/KU2k3zMB) to view and participate 
+in all the discussions about the data governance features!

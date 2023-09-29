@@ -4,11 +4,20 @@ description: Snitch Quarantine
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+_Quarantine is not yet ready for 1.0 release._  
 
-import { Notification } from "accessible-astro-components";
+It will be a feature 
+that allows data to be _quarantined_ when a 
+[pipeline](/en/resources-support/glossary#pipeline) succeeds or fails. It will 
+store the data in S3, so that it can be reviewed (and fixed/repaired/etc.) by 
+authorized users. 
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+It's essentially an option that you can enable for successful or failed 
+pipeline executions. Think of it somewhat like an advanced deadletter queue. 
+More information will be released as we near the development finishline, but 
+in the meantime check out our 
+[roadmap](https://github.com/orgs/streamdal/projects/1) periodically to keep 
+tabs on progress.
+
+Also, join our [Discord](https://discord.gg/KU2k3zMB) to participate in a 
+greater range of feature discussions!
