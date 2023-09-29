@@ -126,6 +126,10 @@ func (i *InternalServer) GetAttachCommandsByService(ctx context.Context, req *pr
 	return &protos.GetAttachCommandsByServiceResponse{}, nil
 }
 
+func (i *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
+	return nil
+}
+
 func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Internal_RegisterServer) error {
 	for {
 		if err := srv.Send(&protos.Command{}); err != nil {

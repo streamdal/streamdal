@@ -28,22 +28,22 @@ func (s *Snitch) setSchema(_ context.Context, aud *protos.Audience, schema []byt
 }
 
 // handleSchema will handle the schema step in the pipeline, if necessary
-func (s *Snitch) handleSchema(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, resp *protos.WASMResponse) {
+func (s *Snitch) handleSchema(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, resp *protos.WASMResponse) bool {
 	inferSchema := step.GetInferSchema()
 
 	if inferSchema == nil {
 		// nothing to do
-		return
+		return false
 	}
 	if resp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
-		return
+		return false
 	}
 	// Get existing schema for audience
 	existingSchema := s.getSchema(ctx, aud)
 
 	if string(resp.OutputStep) == string(existingSchema) {
 		// Schema matches what we have in memory, noting to do
-		return
+		return false
 	}
 
 	// Schema is new or modified, update in memory and send to snitch server
@@ -57,4 +57,6 @@ func (s *Snitch) handleSchema(ctx context.Context, aud *protos.Audience, step *p
 
 		s.config.Logger.Debugf("published schema for audience '%s'", audToStr(aud))
 	}()
+
+	return true
 }
