@@ -7,3 +7,8 @@ datasources:
   isDefault: true
   access: proxy
   editable: true
+- name: Loki
+  type: loki
+  url: http://loki:3100
+  access: proxy
+  editable: true
