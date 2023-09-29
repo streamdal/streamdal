@@ -30,7 +30,7 @@ export type FlowNode = {
   id: string;
   type?: string;
   dragHandle?: string;
-  draggable?: boolean;
+  draggable?: true;
   position?: {
     x: number;
     y: number;
@@ -171,6 +171,7 @@ export const mapNodes = (
         id: sKey,
         type: "service",
         dragHandle: `#${sKey}-draghandle`,
+        draggable: true,
         position: {
           x: 25 + offset(
             sKey,
@@ -188,7 +189,7 @@ export const mapNodes = (
       nodesMap.nodes.set(cKey, {
         id: cKey,
         type: "component",
-        dragHandle: "#dragHandle",
+        dragHandle: `#${cKey}-dragHandle`,
         position: {
           x: offset(cKey, nodesMap.components),
           y: 650 + (max - 1) * 76,

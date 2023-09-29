@@ -7,6 +7,7 @@ import { ServiceNodeMenu } from "../components/serviceMap/nodeMenu.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import {
+  componentKey,
   audienceKey,
   edgeKey,
   removeWhitespace,
@@ -20,6 +21,7 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../lib/nodeMapper.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { opUpdateSignal } from "./serviceMap.tsx";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
@@ -109,13 +111,11 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
           />
         ))}
       </div>
-
       <Handle
         type="source"
         position={producer ? Position.Bottom : Position.Top}
         className="opacity-0"
       />
-
       <Handle
         type="target"
         position={producer ? Position.Top : Position.Bottom}
@@ -129,10 +129,15 @@ export const OperationNode = (
   { operation, css }: { operation: Operation; css: string },
 ) => {
   const toolTipId = removeWhitespace(operation.audience.operationName);
+  const highlight = operation?.audience === opModal.value?.audience;
+  const trashActive = opModal.value?.delete;
+
   return (
     <div
       type="button"
-      class={`flex items-center justify-between w-[260px] h-[64px] bg-white rounded-lg shadow-lg border-1 border-purple-200 pl-1 pr-2 ${css}`}
+      class={`flex items-center justify-between w-[260px] h-[64px] group bg-white rounded-lg shadow-lg ${
+        highlight ? "border-2 border-purple-600" : "border-1 border-purple-200"
+      } pl-1 pr-2 ${css}`}
     >
       <div
         class="whitespace-nowrap text-ellipsis overflow-hidden w-full"
@@ -172,9 +177,13 @@ export const OperationNode = (
             delete: true,
           };
         }}
-        className={"p-2 rounded hover:bg-red-50"}
+        className={"p-2 rounded"}
       >
-        <IconTrash class="w-6 h-6 text-streamdalRed" />
+        <IconTrash
+          class={`w-5 h-5 hover:text-streamdalRed invisible z-50 ${
+            trashActive ? "text-streamdalRed" : "text-gray-300"
+          } group-hover:visible ${highlight && "visible"}`}
+        />
       </button>
     </div>
   );
@@ -219,6 +228,8 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
       false,
     );
   };
+
+  const cKey = componentKey(data.audience);
   return (
     <div>
       <div className={"flex w-1/2 justify-between mb"}>
@@ -234,7 +245,7 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
         />
       </div>
       <div
-        id={data.audience.componentName}
+        id={`${cKey}-dragHandle`}
         class="z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px]"
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
