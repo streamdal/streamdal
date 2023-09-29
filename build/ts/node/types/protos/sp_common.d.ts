@@ -185,6 +185,12 @@ export interface Schema {
      * @generated from protobuf field: int32 _version = 100;
      */
     Version: number;
+    /**
+     * @generated from protobuf field: map<string, string> _metadata = 1000;
+     */
+    Metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * Common status codes used in gRPC method responses
@@ -337,6 +343,7 @@ declare class Schema$Type extends MessageType<Schema> {
     constructor();
     create(value?: PartialMessage<Schema>): Schema;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Schema): Schema;
+    private binaryReadMap1000;
     internalBinaryWrite(message: Schema, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**

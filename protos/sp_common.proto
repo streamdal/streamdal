@@ -107,4 +107,6 @@ message Schema {
   bytes json_schema = 1;
 
   int32 _version = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
