@@ -78,6 +78,24 @@ services:
     networks:
       - snitch-network
 
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - snitch-network
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./assets/promtrail/docker-config.yaml:/etc/promtail/docker-config.yaml
+    command: -config.file=/etc/promtail/docker-config.yaml
+    networks:
+      - snitch-network
+
 volumes:
   redis-data: # Define the volume for redis data
   prom-data:
