@@ -560,7 +560,7 @@ func (s *InternalServer) SendSchema(ctx context.Context, req *protos.SendSchemaR
 		req.Schema.XMetadata = make(map[string]string)
 	}
 
-	req.Schema.XMetadata["last_updated"] = time.Now().Format(time.RFC3339)
+	req.Schema.XMetadata["last_updated"] = time.Now().UTC().Format(time.RFC3339)
 
 	if err := s.Options.StoreService.AddSchema(ctx, req); err != nil {
 		return &protos.StandardResponse{
