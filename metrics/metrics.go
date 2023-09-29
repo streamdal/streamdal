@@ -21,13 +21,24 @@ type IMetrics interface {
 }
 
 const (
-	DefaultCounterInterval       = time.Second
-	DefaultReaperCounterInterval = 10 * time.Second
-	DefaultReaperCounterTTL      = 10 * time.Second
-	DefaultCounterWorkerPoolSize = 10
+	// DefaultIncrInterval defines how often we process the increase queue
+	DefaultIncrInterval = time.Second
+
+	// DefaultReaperInterval is how often the reaper goroutine will delete stale counters
+	// A stale counter is one with zero value and last updated time > ReaperTTL
+	DefaultReaperInterval = 10 * time.Second
+
+	// DefaultReaperTTL is how long a counter can be stale before it is reaped
+	// A stale counter is one with zero value and last updated time > ReaperTTL
+	DefaultReaperTTL = 10 * time.Second
+
+	// DefaultWorkerPoolSize is how many counter workers will be spun up.
+	// These workers are responsible for processing the counterIncrCh and counterPublishCh channels
+	DefaultWorkerPoolSize = 10
 )
 
 var (
+	ErrMissingConfig       = errors.New("config cannot be nil")
 	ErrMissingSnitchClient = errors.New("SnitchClient cannot be nil")
 	ErrMissingEntry        = errors.New("CounterEntry cannot be nil")
 	ErrEmptyName           = errors.New("Name must be set")
@@ -47,13 +58,13 @@ type Metrics struct {
 }
 
 type Config struct {
-	CounterInterval       time.Duration
-	ReaperCounterInterval time.Duration
-	ReaperCounterTTL      time.Duration
-	CounterWorkerPoolSize int
-	ServerClient          server.IServerClient
-	ShutdownCtx           context.Context
-	Log                   logger.Logger
+	IncrInterval   time.Duration
+	ReaperInterval time.Duration
+	ReaperTTL      time.Duration
+	WorkerPoolSize int
+	ServerClient   server.IServerClient
+	ShutdownCtx    context.Context
+	Log            logger.Logger
 }
 
 func New(cfg *Config) (*Metrics, error) {
@@ -73,7 +84,7 @@ func New(cfg *Config) (*Metrics, error) {
 	}
 
 	// Launch counter worker pool
-	for i := 0; i < m.Config.CounterWorkerPoolSize; i++ {
+	for i := 0; i < m.Config.WorkerPoolSize; i++ {
 		m.wg.Add(1)
 		go m.runCounterWorkerPool(
 			fmt.Sprintf("worker-%d", i),
@@ -93,39 +104,47 @@ func New(cfg *Config) (*Metrics, error) {
 }
 
 func validateConfig(cfg *Config) error {
+	if cfg == nil {
+		return ErrMissingConfig
+	}
+
 	if cfg.ServerClient == nil {
 		return ErrMissingSnitchClient
-	}
-
-	if cfg.CounterInterval == 0 {
-		cfg.CounterInterval = DefaultCounterInterval
-	}
-
-	if cfg.ReaperCounterInterval == 0 {
-		cfg.ReaperCounterInterval = DefaultReaperCounterInterval
-	}
-
-	if cfg.ReaperCounterTTL == 0 {
-		cfg.ReaperCounterTTL = DefaultReaperCounterTTL
-	}
-
-	if cfg.CounterWorkerPoolSize == 0 {
-		cfg.CounterWorkerPoolSize = DefaultCounterWorkerPoolSize
-	}
-
-	if cfg.Log == nil {
-		cfg.Log = &logger.NoOpLogger{}
 	}
 
 	if cfg.ShutdownCtx == nil {
 		return ErrMissingShutdownCtx
 	}
 
+	applyDefaults(cfg)
+
 	return nil
 }
 
+func applyDefaults(cfg *Config) {
+	if cfg.IncrInterval == 0 {
+		cfg.IncrInterval = DefaultIncrInterval
+	}
+
+	if cfg.ReaperInterval == 0 {
+		cfg.ReaperInterval = DefaultReaperInterval
+	}
+
+	if cfg.ReaperTTL == 0 {
+		cfg.ReaperTTL = DefaultReaperTTL
+	}
+
+	if cfg.WorkerPoolSize == 0 {
+		cfg.WorkerPoolSize = DefaultWorkerPoolSize
+	}
+
+	if cfg.Log == nil {
+		cfg.Log = &logger.NoOpLogger{}
+	}
+}
+
 func (m *Metrics) Incr(ctx context.Context, entry *types.CounterEntry) error {
-	if err := m.validateCounterEntry(entry); err != nil {
+	if err := validateCounterEntry(entry); err != nil {
 		return errors.Wrap(err, "unable to validate counter entry")
 	}
 
@@ -136,7 +155,7 @@ func (m *Metrics) Incr(ctx context.Context, entry *types.CounterEntry) error {
 	return nil
 }
 
-func (m *Metrics) validateCounterEntry(entry *types.CounterEntry) error {
+func validateCounterEntry(entry *types.CounterEntry) error {
 	if entry == nil {
 		return ErrMissingEntry
 	}
@@ -253,7 +272,7 @@ func (m *Metrics) runCounterTicker() {
 
 	var shutdown bool
 
-	ticker := time.NewTicker(m.Config.CounterInterval)
+	ticker := time.NewTicker(m.Config.IncrInterval)
 
 	m.counterTickerLooper.Loop(func() error {
 		// Give looper a moment to catch up
@@ -300,7 +319,7 @@ func (m *Metrics) runCounterReaper() {
 
 	var shutdown bool
 
-	ticker := time.NewTicker(m.Config.ReaperCounterInterval)
+	ticker := time.NewTicker(m.Config.ReaperInterval)
 
 	m.counterReaperLooper.Loop(func() error {
 		if shutdown {
@@ -319,7 +338,7 @@ func (m *Metrics) runCounterReaper() {
 					continue
 				}
 
-				if time.Now().Sub(counter.getLastUpdated()) < m.Config.ReaperCounterTTL {
+				if time.Now().Sub(counter.getLastUpdated()) < m.Config.ReaperTTL {
 					m.Log.Debugf("skipping reaping for non-stale counter '%s'", counter.entry)
 					continue
 				}
