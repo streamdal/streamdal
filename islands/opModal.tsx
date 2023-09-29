@@ -96,7 +96,7 @@ export default function OpModal(
           class={`fixed z-50 h-screen top-0 right-0 transition-transform ${`translate-x-full right-[${OP_MODAL_WIDTH}]`} flex flex-row justify-end items-start`}
         >
           <div class="w-[308px] shadow-xl h-full">
-            <div class="bg-white h-full dark:bg-gray-700">
+            <div class="bg-white h-full">
               {/*<div class="flex h-16 p-4 justify-between items-center border-b border-purple-100">*/}
               {/*  <div class="flex items-center justify-start">*/}
               {/*    <IconUserCircle class="w-12 h-12 mr-4" />*/}
@@ -252,7 +252,7 @@ export default function OpModal(
                       <div
                         id="pipeline-attach-detach"
                         data-accordion="open"
-                        data-active-classes="bg-blue-100 dark:bg-gray-800 text-blue-600"
+                        data-active-classes="bg-blue-100 text-blue-600"
                         class="py-2"
                       >
                         <h3 id="collapse-heading-2">
@@ -349,7 +349,7 @@ export default function OpModal(
                           aria-labelledby="collapse-heading-3"
                         >
                           <div class="p-5">
-                            <p class="text-gray-300 text-xs dark:text-gray-400">
+                            <p class="text-gray-300 text-xs">
                               Notifications coming soon...
                             </p>
                           </div>
@@ -372,7 +372,7 @@ export default function OpModal(
                           class="hidden"
                           aria-labelledby="collapse-heading-4"
                         >
-                          <p class="p-5 text-gray-300 text-xs dark:text-gray-400">
+                          <p class="p-5 text-gray-300 text-xs">
                             Trends coming soon...
                           </p>
                         </div>
@@ -398,7 +398,7 @@ export default function OpModal(
                             aria-labelledby="collapse-heading-5"
                             class={"flex flex-col items-center justify-center p-4"}
                           >
-                            <p class="mb-5 w-full text-left text-gray-500 text-xs dark:text-gray-400">
+                            <p class="mb-5 w-full text-left text-gray-500 text-xs">
                               Displaying JSON
                             </p>
                             <div className="w-full rounded flex overflow-x-scroll bg-black text-white py-2 px-4 text-sm flex flex-col justify-start">

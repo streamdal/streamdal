@@ -25,13 +25,13 @@ export const LoginFormInput = ({
         <div>
           <label
             for={name}
-            class="text-sm font-medium text-gray-900 dark:text-white"
+            class="text-sm font-medium text-gray-900"
           >
             {label}
           </label>
           <input
             id={name}
-            class="bg-purple-50 border h-10 pl-3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            class="bg-purple-50 border h-10 pl-3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full"
             required
           />
         </div>

@@ -26,7 +26,7 @@ export const NavMenu = () => {
               className="flex items-center p-2 text-gray-900 hover:bg-sunset group "
             >
               <svg
-                className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="w-5 h-5 text-gray-500 transition duration-75"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -59,7 +59,7 @@ export const NavMenu = () => {
           <li class="cursor-not-allowed">
             <div className="flex items-center p-2 text-gray-900 hover:bg-sunset group cursor-not-allowed">
               <svg
-                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -73,7 +73,7 @@ export const NavMenu = () => {
           <li>
             <div class="flex items-center p-2 text-gray-900 hover:bg-sunset group cursor-not-allowed">
               <svg
-                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

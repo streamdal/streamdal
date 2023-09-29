@@ -15,10 +15,10 @@ export const PipelineMenu = ({ id }: { id?: string }) => (
 
     <div
       id="pipeline-menu"
-      class="z-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+      class="z-40 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
     >
       <ul
-        class="py-2 text-sm text-gray-700 dark:text-gray-200"
+        class="py-2 text-sm text-gray-700"
         aria-labelledby="pipelineMenuButton"
       >
         <li className="flex flex-start items-center px-2 py-2 hover:bg-sunset text-sm cursor-not-allowed">
