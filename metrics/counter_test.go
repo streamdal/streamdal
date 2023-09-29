@@ -64,14 +64,4 @@ var _ = Describe("Counter", func() {
 			Expect(c.getValue()).To(Equal(int64(0)))
 		})
 	})
-
-	Context("CompositeID", func() {
-		It("should return a composite ID for a counter", func() {
-			c.entry.Name = types.ConsumeBytes
-			c.entry.Labels = map[string]string{
-				"foo": "bar",
-			}
-			Expect(CompositeID(c.entry)).To(Equal("counter_consume_bytes-bar"))
-		})
-	})
 })

@@ -1,3 +1,4 @@
+// Package metrics is responsible for tracking and publishing metrics to the Snitch server.
 package metrics
 
 import (
@@ -17,24 +18,26 @@ import (
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics
 type IMetrics interface {
+	// Incr increases a counter with the given entry.
+	// If a counter does not exist for this entry yet, one will be created.
 	Incr(ctx context.Context, entry *types.CounterEntry) error
 }
 
 const (
-	// DefaultIncrInterval defines how often we process the increase queue
-	DefaultIncrInterval = time.Second
+	// defaultIncrInterval defines how often we process the increase queue
+	defaultIncrInterval = time.Second
 
-	// DefaultReaperInterval is how often the reaper goroutine will delete stale counters
+	// defaultReaperInterval is how often the reaper goroutine will delete stale counters
 	// A stale counter is one with zero value and last updated time > ReaperTTL
-	DefaultReaperInterval = 10 * time.Second
+	defaultReaperInterval = 10 * time.Second
 
-	// DefaultReaperTTL is how long a counter can be stale before it is reaped
+	// defaultReaperTTL is how long a counter can be stale before it is reaped
 	// A stale counter is one with zero value and last updated time > ReaperTTL
-	DefaultReaperTTL = 10 * time.Second
+	defaultReaperTTL = 10 * time.Second
 
-	// DefaultWorkerPoolSize is how many counter workers will be spun up.
+	// defaultWorkerPoolSize is how many counter workers will be spun up.
 	// These workers are responsible for processing the counterIncrCh and counterPublishCh channels
-	DefaultWorkerPoolSize = 10
+	defaultWorkerPoolSize = 10
 )
 
 var (
@@ -123,19 +126,19 @@ func validateConfig(cfg *Config) error {
 
 func applyDefaults(cfg *Config) {
 	if cfg.IncrInterval == 0 {
-		cfg.IncrInterval = DefaultIncrInterval
+		cfg.IncrInterval = defaultIncrInterval
 	}
 
 	if cfg.ReaperInterval == 0 {
-		cfg.ReaperInterval = DefaultReaperInterval
+		cfg.ReaperInterval = defaultReaperInterval
 	}
 
 	if cfg.ReaperTTL == 0 {
-		cfg.ReaperTTL = DefaultReaperTTL
+		cfg.ReaperTTL = defaultReaperTTL
 	}
 
 	if cfg.WorkerPoolSize == 0 {
-		cfg.WorkerPoolSize = DefaultWorkerPoolSize
+		cfg.WorkerPoolSize = defaultWorkerPoolSize
 	}
 
 	if cfg.Log == nil {
@@ -143,7 +146,7 @@ func applyDefaults(cfg *Config) {
 	}
 }
 
-func (m *Metrics) Incr(ctx context.Context, entry *types.CounterEntry) error {
+func (m *Metrics) Incr(_ context.Context, entry *types.CounterEntry) error {
 	if err := validateCounterEntry(entry); err != nil {
 		return errors.Wrap(err, "unable to validate counter entry")
 	}
@@ -176,7 +179,7 @@ func (m *Metrics) newCounter(e *types.CounterEntry) *counter {
 		countMutex: &sync.RWMutex{},
 	}
 
-	m.counterMap[CompositeID(e)] = c
+	m.counterMap[compositeID(e)] = c
 
 	return c
 }
@@ -185,7 +188,7 @@ func (m *Metrics) getCounter(e *types.CounterEntry) (*counter, bool) {
 	m.counterMapMutex.RLock()
 	defer m.counterMapMutex.RUnlock()
 
-	if counter, ok := m.counterMap[CompositeID(e)]; ok {
+	if counter, ok := m.counterMap[compositeID(e)]; ok {
 		return counter, true
 	}
 

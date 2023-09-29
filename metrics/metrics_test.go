@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/streamdal/snitch-protos/build/go/protos"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/relistan/go-director"
@@ -15,6 +17,25 @@ import (
 )
 
 var _ = Describe("Metrics", func() {
+	Context("compositeID", func() {
+		It("should return a composite ID for a counter", func() {
+			c := &counter{
+				countMutex: &sync.RWMutex{},
+				entry: &types.CounterEntry{
+					Name:     types.ConsumeBytes,
+					Labels:   map[string]string{},
+					Audience: &protos.Audience{},
+				},
+			}
+
+			c.entry.Name = types.ConsumeBytes
+			c.entry.Labels = map[string]string{
+				"foo": "bar",
+			}
+			Expect(compositeID(c.entry)).To(Equal("counter_consume_bytes-bar"))
+		})
+	})
+
 	Context("validateConfig", func() {
 		It("should return missing client", func() {
 			err := validateConfig(nil)
@@ -95,7 +116,7 @@ var _ = Describe("Metrics", func() {
 			m.newCounter(entry)
 			counters := m.getCounters()
 			Expect(len(counters)).To(Equal(1))
-			Expect(counters).To(HaveKey(CompositeID(entry)))
+			Expect(counters).To(HaveKey(compositeID(entry)))
 		})
 	})
 
@@ -132,8 +153,8 @@ var _ = Describe("Metrics", func() {
 
 			counters := m.getCounters()
 			Expect(len(counters)).To(Equal(1))
-			Expect(counters).To(HaveKey(CompositeID(entry)))
-			Expect(counters[CompositeID(entry)].getValue()).To(Equal(int64(1)))
+			Expect(counters).To(HaveKey(compositeID(entry)))
+			Expect(counters[compositeID(entry)].getValue()).To(Equal(int64(1)))
 		})
 	})
 
@@ -171,8 +192,8 @@ var _ = Describe("Metrics", func() {
 
 			counters := m.getCounters()
 			Expect(len(counters)).To(Equal(1))
-			Expect(counters).To(HaveKey(CompositeID(entry)))
-			Expect(counters[CompositeID(entry)].getValue()).To(Equal(int64(1)))
+			Expect(counters).To(HaveKey(compositeID(entry)))
+			Expect(counters[compositeID(entry)].getValue()).To(Equal(int64(1)))
 
 			m.wg.Add(1)
 			m.counterTickerLooper = director.NewFreeLooper(1, make(chan error, 1))
@@ -181,7 +202,7 @@ var _ = Describe("Metrics", func() {
 			time.Sleep(time.Second)
 
 			counters = m.getCounters()
-			Expect(counters[CompositeID(entry)].getValue()).To(Equal(int64(0)))
+			Expect(counters[compositeID(entry)].getValue()).To(Equal(int64(0)))
 		})
 	})
 
@@ -204,7 +225,7 @@ var _ = Describe("Metrics", func() {
 					ReaperTTL:      0,
 				},
 				counterMap: map[string]*counter{
-					CompositeID(entry): {
+					compositeID(entry): {
 						entry:      entry,
 						count:      0,
 						countMutex: &sync.RWMutex{},
