@@ -33,7 +33,7 @@ const (
 	ColorInactiveButtonBg = tcell.Color188 // off-white
 	ColorInactiveButtonFg = tcell.ColorBlack
 	ColorMenuActiveBg     = tcell.Color188
-	ColorMenuInactiveFg   = tcell.Color56
+	ColorMenuInactiveFg   = tcell.Color141
 
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
@@ -115,21 +115,17 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := fmt.Sprintf("[#%X]%s[-]", ColorTextSecondary.Hex(), text)
-	replaceNew := "[#D7D7D7]" + text + "[-]"
+	replaceOld := fmt.Sprintf("[#%X]%s[-]", ColorMenuInactiveFg.Hex(), text)
+	replaceNew := fmt.Sprintf("[#%X]%s[-]", ColorMenuActiveBg.Hex(), text)
 
 	var updatedMenu string
 
 	if !on {
-		replaceOld = "[#D7D7D7]" + text + "[-]"
-		replaceNew = fmt.Sprintf("[#%X]%s[-]", ColorTextSecondary.Hex(), text)
+		replaceOld = fmt.Sprintf("[#%X]%s[-]", ColorMenuActiveBg.Hex(), text)
+		replaceNew = fmt.Sprintf("[#%X]%s[-]", ColorMenuInactiveFg.Hex(), text)
 	}
 
-	c.log.Debugf("Replacing '%s' with '%s'; menu contents BEFORE: '%s'", replaceOld, replaceNew, menu)
-
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
-
-	c.log.Debugf("Replacing '%s' with '%s'; menu contents AFTER: '%s'", replaceOld, replaceNew, updatedMenu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
