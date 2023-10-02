@@ -29,11 +29,13 @@ const (
 	ColorTextAccent2      = tcell.Color44  // cyan
 	ColorTextAccent3      = tcell.Color203 // red
 	ColorActiveButtonBg   = tcell.Color203 // red
-	ColorActiveButtonText = tcell.ColorWhite
-	ColorInactiveButtonBg = tcell.Color188 // off-white
-	ColorInactiveButtonFg = tcell.ColorBlack
+	ColorActiveButtonFg   = tcell.ColorWhite
+	ColorInactiveButtonBg = tcell.Color188 // dark off-white
+	ColorInactiveButtonFg = tcell.Color239 // dark gray
 	ColorMenuActiveBg     = tcell.Color188
 	ColorMenuInactiveFg   = tcell.Color141
+	ColorInputFieldFg     = tcell.Color234 // very dark gray
+	ColorInputFieldBg     = tcell.Color254 // light off-white
 
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
@@ -166,6 +168,12 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 		})
 
 	form.SetBorder(true).SetTitle("Filter")
+	form.SetBackgroundColor(ColorWindowBg)
+	form.SetTitleColor(ColorTextPrimary)
+	form.SetFieldBackgroundColor(ColorInputFieldBg)
+	form.SetFieldTextColor(ColorInputFieldFg)
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
+	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
@@ -205,6 +213,12 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 		})
 
 	form.SetBorder(true).SetTitle("Search")
+	form.SetBackgroundColor(ColorWindowBg)
+	form.SetTitleColor(ColorTextPrimary)
+	form.SetFieldBackgroundColor(ColorInputFieldBg)
+	form.SetFieldTextColor(ColorInputFieldFg)
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
+	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
@@ -313,7 +327,7 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 		}).
 		SetBackgroundColor(ColorWindowBg).
 		SetTextColor(tcell.ColorWhite).
-		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonText)).
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg)).
 		SetButtonStyle(tcell.StyleDefault.Foreground(ColorInactiveButtonFg).Background(ColorInactiveButtonBg))
 
 	c.pages.AddPage(pageName, retryModal, true, true)
@@ -343,7 +357,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 		}).
 		SetBackgroundColor(ColorWindowBg).
 		SetTextColor(ColorTextPrimary).
-		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonText))
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
 
 	// First time seeing this component - launch progress update goroutine; once
 	// goroutine exits, it removes the component from the primitives map as well
