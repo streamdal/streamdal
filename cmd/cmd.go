@@ -176,7 +176,7 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
-	msg := fmt.Sprintf("Connecting to %s ", c.options.Config.Server)
+	msg := fmt.Sprintf("Connecting to [::u]%s[::-] ", c.options.Config.Server)
 
 	userQuit := false
 	inputCh := make(chan struct{}, 1)
@@ -413,10 +413,10 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 	}
 }
 
-// Dummy connect - this should be actual snitch server connect code
+// Attempt to connect and query test endpoint in snitch-server
 func (c *Cmd) connect(ctx context.Context) error {
 	// Give user a chance to see the "connecting" message
-	time.Sleep(time.Second)
+	time.Sleep(5 * time.Second)
 
 	// Attempt to talk to snitch server
 	a, err := api.New(&api.Options{

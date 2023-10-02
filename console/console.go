@@ -15,29 +15,23 @@ import (
 )
 
 const (
-	MenuString = `[white]Q[-] ["Q"][#FF5F5F]Quit[-][""]  ` +
-		`[white]S[-] ["S"][#FF5F5F]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][#FF5F5F]Set Sample Rate[-][""]  ` +
-		`[white]F[-] ["F"][#FF5F5F]Filter[-][""]  ` +
-		`[white]P[-] ["P"][#FF5F5F]Pause[-][""]  ` +
-		`[white]/[-] ["Search"][#FF5F5F]Search[-][""]`
+	MenuString = `[white]Q[-] ["Q"][#AF87FF]Quit[-][""]  ` +
+		`[white]S[-] ["S"][#AF87FF]Select Component[-][""]  ` +
+		`[white]R[-] ["R"][#AF87FF]Set Sample Rate[-][""]  ` +
+		`[white]F[-] ["F"][#AF87FF]Filter[-][""]  ` +
+		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
+		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
 
-	ColorHexWindowBg         = "#00005F" // dark blue/purple
-	ColorHexWindowBorder     = "#FFFFFF" // white
-	ColorHexTextPrimary      = "#AF87FF" // light purple
-	ColorHexTextAccent1      = "#FFD75F" // yellow
-	ColorHexTextAccent2      = "#00CCCB" // cyan
-	ColorHexInactiveMenuText = "#FF5F5F" // red
-	ColorHexActiveMenuText   = "#CB4A00" // dark red / orange
-
-	ColorHexActiveButtonBg = "#FF5F5F" // red
-
-	ColorWindowBg         = tcell.Color17
-	ColorWindowBorder     = tcell.ColorWhite
-	ColorTextPrimary      = tcell.Color140
-	ColorTextAccent1      = tcell.Color221
-	ColorTextAccent2      = tcell.Color44
+	ColorWindowBg         = tcell.Color56
+	ColorTextPrimary      = tcell.ColorWhite
+	ColorTextSecondary    = tcell.Color140 // light purple
+	ColorTextAccent1      = tcell.Color221 // yellow
+	ColorTextAccent2      = tcell.Color44  // cyan
+	ColorTextAccent3      = tcell.Color203 // red
 	ColorActiveButtonBg   = tcell.Color203
+	ColorActiveButtonText = tcell.ColorWhite
+	ColorInactiveButtonBg = tcell.Color188 // off-white
+	ColorInactiveButtonFg = tcell.ColorBlack
 	ColorInactiveMenuText = tcell.Color203
 	ColorActiveMenuText   = tcell.Color166
 
@@ -320,7 +314,11 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 			} else {
 				answerCh <- false
 			}
-		})
+		}).
+		SetBackgroundColor(ColorWindowBg).
+		SetTextColor(tcell.ColorWhite).
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonText)).
+		SetButtonStyle(tcell.StyleDefault.Foreground(ColorInactiveButtonFg).Background(ColorInactiveButtonBg))
 
 	c.pages.AddPage(pageName, retryModal, true, true)
 
@@ -346,7 +344,10 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 			if buttonIndex == 0 {
 				outputCh <- errors.New("user cancelled modal")
 			}
-		})
+		}).
+		SetBackgroundColor(ColorWindowBg).
+		SetTextColor(ColorTextPrimary).
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonText))
 
 	// First time seeing this component - launch progress update goroutine; once
 	// goroutine exits, it removes the component from the primitives map as well
@@ -370,7 +371,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 				}
 
 				c.app.QueueUpdateDraw(func() {
-					infoModal.SetText(fmt.Sprintf("%s[gray]%s[white]", msg, animationElements[iter]))
+					infoModal.SetText(fmt.Sprintf("%s[#%X]%s[-]", msg, ColorTextAccent3.Hex(), animationElements[iter]))
 				})
 
 				iter += 1
@@ -424,6 +425,10 @@ func (c *Console) Redraw(f func()) {
 // output channel
 func (c *Console) DisplaySelectList(title string, itemMap map[string]string, output chan<- string) {
 	selectComponent := tview.NewList()
+
+	selectComponent.SetBackgroundColor(ColorWindowBg)
+	selectComponent.SetMainTextColor(ColorTextPrimary)
+	selectComponent.SetSecondaryTextColor(ColorTextSecondary)
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
