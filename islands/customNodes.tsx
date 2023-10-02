@@ -128,7 +128,7 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 export const OperationNode = (
   { operation, css }: { operation: Operation; css: string },
 ) => {
-  const toolTipId = removeWhitespace(operation.audience.operationName);
+  const toolTipId = audienceKey(operation.audience);
   const highlight = operation?.audience === opModal.value?.audience;
   const trashActive = opModal.value?.delete;
 
