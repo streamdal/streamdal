@@ -81,6 +81,8 @@ func (c *Cmd) run(action *types.Action) error {
 		resp, err = c.actionFilter(action)
 	case types.StepSearch:
 		resp, err = c.actionSearch(action)
+	case types.StepRate:
+		resp, err = c.actionRate(action)
 	case types.StepQuit:
 		c.options.Console.Stop()
 		os.Exit(0)
@@ -172,6 +174,39 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 		PeekComponent:  action.PeekComponent,
 		PeekSearch:     searchStr,
 		PeekSearchPrev: action.PeekSearch,
+	}, nil
+}
+
+func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
+	// Disable input capture while in Rate
+	origCapture := c.options.Console.GetInputCapture()
+	c.options.Console.SetInputCapture(nil)
+	defer c.options.Console.SetInputCapture(origCapture)
+
+	// Channel used for reading resp from rate dialog
+	answerCh := make(chan int)
+
+	// Display modal
+	go func() {
+		c.options.Console.DisplayRate(action.PeekRate, answerCh)
+	}()
+
+	// OK == rate the user chose; Cancel == original rate; Reset == 0
+	rate := <-answerCh
+
+	// Turn on/off "Rate" menu entry depending on if Rate is not 0
+	if rate != 0 {
+		c.options.Console.SetMenuEntryOn("R")
+	} else {
+		c.options.Console.SetMenuEntryOff("R")
+	}
+
+	// Only way to get to "set sample rate" is via Peek so we always tell resp
+	// to go back to that view.
+	return &types.Action{
+		Step:          types.StepPeek,
+		PeekComponent: action.PeekComponent,
+		PeekRate:      rate,
 	}, nil
 }
 

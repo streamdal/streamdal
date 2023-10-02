@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -44,6 +45,7 @@ const (
 	PrimitivePeekView   = "peek_view"
 	PrimitiveFilter     = "filter"
 	PrimitiveSearch     = "search"
+	PrimitiveRate       = "rate"
 
 	PageConnectionAttempt = "page_" + PrimitiveInfoModal
 	PageConnectionRetry   = "page_" + PrimitiveRetryModal
@@ -52,6 +54,7 @@ const (
 	PagePeekView          = "page_" + PrimitivePeekView
 	PageFilter            = "page_" + PrimitiveFilter
 	PageSearch            = "page_" + PrimitiveSearch
+	PageRate              = "page_" + PrimitiveRate
 )
 
 type Console struct {
@@ -197,7 +200,7 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 			input = text
 		}).
 		AddButton("OK", func() {
-			// Use the original value if te user didn't edit input field
+			// Use the original value if the user didn't edit input field
 			if !hit {
 				input = defaultValue
 			}
@@ -223,6 +226,60 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 
 	inputDialog := Center(form, 36, 7)
 	c.pages.AddPage(PageSearch, inputDialog, true, true)
+}
+
+// TODO: Value needs to persist + set menu to active + make peek use it
+func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
+	c.Start()
+
+	// Remove all menu highlights - you cannot access menu while in rate view
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight()
+	})
+
+	var hit bool
+	var inputStr string
+	var inputInt int
+
+	form := tview.NewForm().
+		AddInputField("Rate Per Second", strconv.Itoa(defaultValue), 15, tview.InputFieldInteger, func(text string) {
+			hit = true
+			inputStr = text
+		}).
+		AddButton("OK", func() {
+			// Use the original value if te user didn't edit input field
+			if !hit {
+				inputStr = strconv.Itoa(defaultValue)
+			}
+
+			var err error
+
+			inputInt, err = strconv.Atoi(inputStr)
+			if err != nil {
+				panic(fmt.Sprintf("unexpected rate '%s' cannot be converted to int: %s", inputStr, err))
+			}
+
+			answerCh <- inputInt
+		}).
+		AddButton("Reset", func() {
+			answerCh <- 0
+		}).
+		AddButton("Cancel", func() {
+			// Return the original value
+			answerCh <- defaultValue
+		})
+
+	form.SetBorder(true).SetTitle("Set Sample Rate")
+	form.SetBackgroundColor(ColorWindowBg)
+	form.SetTitleColor(ColorTextPrimary)
+	form.SetFieldBackgroundColor(ColorInputFieldBg)
+	form.SetFieldTextColor(ColorInputFieldFg)
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
+	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
+	form.SetButtonsAlign(tview.AlignCenter)
+
+	inputDialog := Center(form, 36, 7)
+	c.pages.AddPage(PageRate, inputDialog, true, true)
 }
 
 // DisplayPeek will display peek + write any actions we receive from the user
@@ -255,6 +312,12 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 		if event.Key() == tcell.KeyRune && event.Rune() == 's' {
 			actionCh <- &types.Action{
 				Step: types.StepSelect,
+			}
+		}
+
+		if event.Key() == tcell.KeyRune && event.Rune() == 'r' {
+			actionCh <- &types.Action{
+				Step: types.StepRate,
 			}
 		}
 

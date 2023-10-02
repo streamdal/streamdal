@@ -8,6 +8,7 @@ const (
 	StepPeek
 	StepQuit
 	StepPause
+	StepRate
 )
 
 type Step int
@@ -21,4 +22,5 @@ type Action struct {
 	PeekFilter     string
 	PeekSearch     string
 	PeekSearchPrev string
+	PeekRate       int
 }
