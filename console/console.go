@@ -15,13 +15,31 @@ import (
 )
 
 const (
-	MenuString = `` +
-		`[white]Q[-] ["Q"][darkcyan]Quit[-][""]  ` +
-		`[white]S[-] ["S"][darkcyan]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][darkcyan]Set Sample Rate[-][""]  ` +
-		`[white]F[-] ["F"][darkcyan]Filter[-][""]  ` +
-		`[white]P[-] ["P"][darkcyan]Pause[-][""]  ` +
-		`[white]/[-] ["Search"][darkcyan]Search[-][""]`
+	MenuString = `[white]Q[-] ["Q"][#FF5F5F]Quit[-][""]  ` +
+		`[white]S[-] ["S"][#FF5F5F]Select Component[-][""]  ` +
+		`[white]R[-] ["R"][#FF5F5F]Set Sample Rate[-][""]  ` +
+		`[white]F[-] ["F"][#FF5F5F]Filter[-][""]  ` +
+		`[white]P[-] ["P"][#FF5F5F]Pause[-][""]  ` +
+		`[white]/[-] ["Search"][#FF5F5F]Search[-][""]`
+
+	ColorHexWindowBg         = "#00005F" // dark blue/purple
+	ColorHexWindowBorder     = "#FFFFFF" // white
+	ColorHexTextPrimary      = "#AF87FF" // light purple
+	ColorHexTextAccent1      = "#FFD75F" // yellow
+	ColorHexTextAccent2      = "#00CCCB" // cyan
+	ColorHexInactiveMenuText = "#FF5F5F" // red
+	ColorHexActiveMenuText   = "#CB4A00" // dark red / orange
+
+	ColorHexActiveButtonBg = "#FF5F5F" // red
+
+	ColorWindowBg         = tcell.Color17
+	ColorWindowBorder     = tcell.ColorWhite
+	ColorTextPrimary      = tcell.Color140
+	ColorTextAccent1      = tcell.Color221
+	ColorTextAccent2      = tcell.Color44
+	ColorActiveButtonBg   = tcell.Color203
+	ColorInactiveMenuText = tcell.Color203
+	ColorActiveMenuText   = tcell.Color166
 
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
@@ -103,14 +121,14 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := "[darkcyan]" + text + "[-]"
-	replaceNew := "[lightcyan]" + text + "[-]"
+	replaceOld := "[#FF5F5F]" + text + "[-]"
+	replaceNew := "[#D7D7D7]" + text + "[-]"
 
 	var updatedMenu string
 
 	if !on {
-		replaceOld = "[lightcyan]" + text + "[-]"
-		replaceNew = "[darkcyan]" + text + "[-]"
+		replaceOld = "[#D7D7D7]" + text + "[-]"
+		replaceNew = "[#FF5F5F]" + text + "[-]"
 	}
 
 	c.log.Debugf("Replacing '%s' with '%s'; menu contents BEFORE: '%s'", replaceOld, replaceNew, menu)
