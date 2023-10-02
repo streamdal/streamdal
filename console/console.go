@@ -242,7 +242,7 @@ func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 	var inputInt int
 
 	form := tview.NewForm().
-		AddInputField("Rate Per Second", strconv.Itoa(defaultValue), 15, tview.InputFieldInteger, func(text string) {
+		AddInputField("Rate Per Second", strconv.Itoa(defaultValue), 8, tview.InputFieldInteger, func(text string) {
 			hit = true
 			inputStr = text
 		}).
