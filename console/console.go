@@ -22,18 +22,18 @@ const (
 		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
 		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
 
-	ColorWindowBg         = tcell.Color56
+	ColorWindowBg         = tcell.Color56 // Semi-dark purple
 	ColorTextPrimary      = tcell.ColorWhite
-	ColorTextSecondary    = tcell.Color140 // light purple
+	ColorTextSecondary    = tcell.Color141 // light purple
 	ColorTextAccent1      = tcell.Color221 // yellow
 	ColorTextAccent2      = tcell.Color44  // cyan
 	ColorTextAccent3      = tcell.Color203 // red
-	ColorActiveButtonBg   = tcell.Color203
+	ColorActiveButtonBg   = tcell.Color203 // red
 	ColorActiveButtonText = tcell.ColorWhite
 	ColorInactiveButtonBg = tcell.Color188 // off-white
 	ColorInactiveButtonFg = tcell.ColorBlack
-	ColorInactiveMenuText = tcell.Color203
-	ColorActiveMenuText   = tcell.Color166
+	ColorMenuActiveBg     = tcell.Color188
+	ColorMenuInactiveFg   = tcell.Color56
 
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
@@ -115,14 +115,14 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := "[#FF5F5F]" + text + "[-]"
+	replaceOld := fmt.Sprintf("[#%X]%s[-]", ColorTextSecondary.Hex(), text)
 	replaceNew := "[#D7D7D7]" + text + "[-]"
 
 	var updatedMenu string
 
 	if !on {
 		replaceOld = "[#D7D7D7]" + text + "[-]"
-		replaceNew = "[#FF5F5F]" + text + "[-]"
+		replaceNew = fmt.Sprintf("[#%X]%s[-]", ColorTextSecondary.Hex(), text)
 	}
 
 	c.log.Debugf("Replacing '%s' with '%s'; menu contents BEFORE: '%s'", replaceOld, replaceNew, menu)

@@ -416,7 +416,7 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 // Attempt to connect and query test endpoint in snitch-server
 func (c *Cmd) connect(ctx context.Context) error {
 	// Give user a chance to see the "connecting" message
-	time.Sleep(5 * time.Second)
+	time.Sleep(time.Second)
 
 	// Attempt to talk to snitch server
 	a, err := api.New(&api.Options{
