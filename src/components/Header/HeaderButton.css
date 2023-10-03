@@ -5,7 +5,9 @@
   --text-color-default: var(--theme-text-light);
   --text-color-hocus: var(--theme-text);
   box-sizing: border-box;
-  margin: 0;
+  /* Added next two lines to search box overlapping logo on mobile */
+  margin: auto;
+  max-width: fit-content;
   /* padding: 0.5rem; */
   overflow: visible;
   background-color: var(--background-color-default);
