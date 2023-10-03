@@ -1,10 +1,18 @@
 ---
 title: Quarantine
-description: Snitch Quarantine
+description: Streamdal Quarantine
 layout: ../../../layouts/MainLayout.astro
 ---
 
-_Quarantine is not yet ready for 1.0 release._  
+import info from "@images/icons/info.png";
+
+import { Notification } from "accessible-astro-components";
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <p style="font-weight: lighter;">Quarantine is not yet ready for 1.0 
+  release.</p>
+</Notification>
 
 It will be a feature 
 that allows data to be _quarantined_ when a 

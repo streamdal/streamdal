@@ -1,6 +1,6 @@
 ---
-title: Contributing to Snitch
-description: How to contribute to Snitch
+title: Contributing to Streamdal
+description: How to contribute to Streamdal
 layout: ../../../layouts/MainLayout.astro
 ---
 
@@ -8,14 +8,14 @@ import checked from "@images/icons/checked.png";
 import { Notification } from "accessible-astro-components";
 
 Thank you for participating in open source! We're open to contributions for 
-Snitch, and for feature proposals. Be sure to check out the
+Streamdal, and for feature proposals. Be sure to check out the
 [code of conduct](#code-of-conduct),  [roadmap](/en/resources-support/roadmap/)
 , and [known-issues](/en/resources-support/known-issues/) to gauge our current 
 progress. Alternatively, if you are new to open source, you might find some 
-[good first issues](https://github.com/streamdal/snitch/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+[good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 
 ## Technology Stack
-The Snitch SDK is meant to be implemented in every language and relevant 
+The Streamdal SDK is meant to be implemented in every language and relevant 
 library _eventually._ The current technology stack includes:
 
 - WASM (functions and governance rules)
@@ -26,7 +26,7 @@ library _eventually._ The current technology stack includes:
 - React
 - Flowbite
 - Deno (console-ui)
-- NATS (snitch server; will be replaced with Redis eventually)
+- NATS (Streamdal server; will be replaced with Redis eventually)
 - Envoy (load balancing+proxy)
 
 ## Adding an Issue
@@ -35,13 +35,13 @@ Before adding an issue, thoroughly read through the documentation
 of each section in [core components](/en/core-components/overview/). You should 
 also search for existing issues in their respective repositories:
 <ul>
-- [Snitch main repo](https://github.com/streamdal/snitch/issues)
-- [Snitch-Console-UI](https://github.com/streamdal/snitch-console/issues)
-- [Snitch-Server](https://github.com/streamdal/snitch-server/issues)
+- [Streamdal main repo](https://github.com/streamdal/Streamdal/issues)
+- [Streamdal-Console-UI](https://github.com/streamdal/console/issues)
+- [Streamdal-Server](https://github.com/streamdal/server/issues)
 <br />
 _For everything else, including language specific shims or client SDKs, 
 you can find those repositories listed on the 
-[main repo](https://github.com/streamdal/snitch/) readme or by searching 
+[main repo](https://github.com/streamdal/Streamdal/) readme or by searching 
 through the [Streamdal public repositories](https://github.com/streamdal/)._
 </ul>
 
@@ -74,28 +74,28 @@ issue:
 
 2. List the version of everything you are using:
 <ul>
-  - Snitch server. The version can be curl'd from the server REST API endpoint 
-  by adding /version:
+  - Streamdal server. The version can be curl'd from the server REST API 
+  endpoint by adding /version:
   <br />
   ```
-  curl https://snitch.server:8080/version
+  curl https://streamdal.server:8080/version
   ```
   <br />
-  - Snitch SDK. This is language specific. You can find this in /releases of 
+  - Streamdal SDK. This is language specific. You can find this in /releases of 
   the url (Replace `%lang` with the language you are using.):
   <br />
   ```
-  https://github.com/streamdal/snitch-$lang-client/releases
+  https://github.com/streamdal/$lang-client/releases
   ```
   <br />
-  - Snitch console-ui. `cat` the `version.ts` file located in 
+  - Streamdal console-ui. `cat` the `version.ts` file located in 
   the root directory where the console-ui is running.
 </ul>
 
 ## Contributing - Pull Requests
 
 All contributions come through pull requests. Follow these guidelines when 
-contributing code or docs to Snitch:
+contributing code or docs to Streamdal:
 
 1. Make sure there's an issue (bug or proposal) raised, which sets the 
 expectations for the contribution you are about to make
@@ -110,7 +110,7 @@ sign-off and open a PR
 maintainer of the project will be assigned, and you can expect a review within 
 a few days
 
-Any contribution that you make to Snitch repositories will be under the Apache 
+Any contribution that you make to Streamdal repositories will be under the Apache 
 2.0 License, as dictated by that 
 [license](https://www.apache.org/licenses/LICENSE-2.0.html):
 
@@ -262,7 +262,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-[snitch.build/contact](https://www.snitch.build/contact).
+[Streamdal.com/contact](https://www.Streamdal.com/contact).
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

@@ -1,12 +1,13 @@
 ---
 title: Glossary
-description: Snitch Terminology
+description: Streamdal Terminology
 layout: ../../../layouts/MainLayout.astro
 ---
 
-Snitch uses a variety of terms which can have various meanings across 
+Streamdal uses a variety of terms which can have various meanings across 
 industries and use-cases. This section exists to help clear up any ambiguity 
-around Snitch [core-components](/en/core-components/overview/) or functionality.
+around Streamdal [core-components](/en/core-components/overview/) or 
+functionality.
 
 ### audience
 
@@ -36,10 +37,10 @@ steps for a specific producer or consumer - the result would be a pipeline
 ### shims
 
 A wrapper library for popular libraries that incorporate the usage of our SDK 
-to simplify integration and adoption of `snitch`.
+to simplify integration and adoption of `streamdal`.
 - **Example**: we would develop a shim for Python’s HTTP request library called 
 `requests`. This shim would be a lightweight fork of `requests` that would call 
-on `snitch_sdk.Process(..)` whenever the user would POST, PUT, DELETE or GET 
+on `streamdal_sdk.Process(..)` whenever the user would POST, PUT, DELETE or GET 
 data. The shim simplifies and speeds up initial onboarding and  integration.
 
 ### step / rule
