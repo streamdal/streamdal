@@ -3,7 +3,7 @@
   "workspaces": [
     "examples"
   ],
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Streamdal's Snitch Node Client",
   "keywords": [
     "snitch",
