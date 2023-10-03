@@ -27,6 +27,8 @@ export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
 
 export const ServiceNode = ({ data }: { data: NodeData }) => {
+  const highlighted = data?.audience === opModal.value?.audience &&
+    opModal.value?.displayType === "service";
   const setHover = () => {
     setServiceGroup(
       data.audience.serviceName,
@@ -43,12 +45,23 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   };
 
   return (
-    <div>
+    <div
+      onClick={() => {
+        opModal.value = {
+          audience: data.audience,
+          displayType: "service",
+        };
+      }}
+    >
       <div
-        class="min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg z-10 px-2 border hover:border-purple-600 hover:shadow-lg"
-        id={`${serviceKey(data.audience)}-draghandle`}
+        class={`min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg z-10 px-2 hover:border-purple-600 hover:shadow-lg ${
+          highlighted
+            ? "border-2 border-purple-600"
+            : "border-1 border-purple-200"
+        }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
+        id={`${serviceKey(data.audience)}-draghandle`}
       >
         <div class="flex flex-row items-center">
           <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
@@ -128,8 +141,9 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 export const OperationNode = (
   { operation, css }: { operation: Operation; css: string },
 ) => {
-  const toolTipId = audienceKey(operation.audience);
-  const highlight = operation?.audience === opModal.value?.audience;
+  const toolTipId = removeWhitespace(operation.audience.operationName);
+  const highlight = operation?.audience === opModal.value?.audience &&
+    opModal.value?.displayType === "operation";
   const trashActive = opModal.value?.delete;
 
   return (
@@ -144,6 +158,7 @@ export const OperationNode = (
         onClick={() =>
           opModal.value = {
             audience: operation.audience,
+            displayType: "operation",
             attachedPipeline: operation.attachedPipeline,
             clients: operation.clients,
           }}
@@ -172,6 +187,7 @@ export const OperationNode = (
         onClick={() => {
           opModal.value = {
             audience: operation.audience,
+            displayType: "operation",
             attachedPipeline: operation.attachedPipeline,
             clients: operation.clients,
             delete: true,
@@ -190,13 +206,13 @@ export const OperationNode = (
 };
 
 export const ComponentImage = (
-  { componentName }: { componentName: string },
+  { componentName, className }: { componentName: string; className: string },
 ) => {
   if (componentName.toLowerCase().includes("kafka")) {
     return (
       <img
         src={"/images/kafka-dark.svg"}
-        className="w-[30px]"
+        className={className}
       />
     );
   }
@@ -205,7 +221,7 @@ export const ComponentImage = (
     return (
       <img
         src={"/images/postgresql.svg"}
-        className="w-[30px]"
+        className={className}
       />
     );
   }
@@ -214,6 +230,8 @@ export const ComponentImage = (
 };
 
 export const ComponentNode = ({ data }: { data: NodeData }) => {
+  const highlighted = data?.audience === opModal.value?.audience &&
+    opModal.value?.displayType === "component";
   const setHover = () => {
     setComponentGroup(
       data.audience.componentName,
@@ -231,7 +249,14 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
 
   const cKey = componentKey(data.audience);
   return (
-    <div>
+    <div
+      onClick={() => {
+        opModal.value = {
+          audience: data.audience,
+          displayType: "component",
+        };
+      }}
+    >
       <div className={"flex w-1/2 justify-between mb"}>
         <Handle
           type="source"
@@ -246,12 +271,17 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
       </div>
       <div
         id={`${cKey}-dragHandle`}
-        class="z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px]"
+        class={`z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px] ${
+          highlighted && "border-4 border-purple-600"
+        }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
       >
         <div class="flex justify-center flex-col items-center">
-          <ComponentImage componentName={data.audience.componentName} />
+          <ComponentImage
+            componentName={data.audience.componentName}
+            className={"w-[30px]"}
+          />
           <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
         </div>
       </div>

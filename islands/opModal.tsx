@@ -26,7 +26,9 @@ import {
 } from "../lib/tail.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
-
+import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
+import { opUpdateSignal } from "./serviceMap.tsx";
+import { ComponentImage } from "./customNodes.tsx";
 export const OP_MODAL_WIDTH = "308px";
 
 export default function OpModal(
@@ -36,10 +38,42 @@ export default function OpModal(
     grpcToken: string;
   },
 ) {
+  const displayType = opModal.value?.displayType;
+  const itemName = () => {
+    switch (displayType) {
+      case "operation":
+        return opModal.value?.audience?.operationName;
+      case "service":
+        return opModal.value?.audience?.serviceName;
+      case "component":
+        return opModal.value?.audience.componentName;
+    }
+  };
+
+  const iconDisplay = () => {
+    if (displayType === "operation") {
+      return opType === "CONSUMER"
+        ? <ConsumerIcon className={"mx-2"} />
+        : <ProducerIcon className={"mx-2"} />;
+    }
+    if (displayType === "component") {
+      return (
+        <ComponentImage componentName={displayName} className={"w-6 mx-2"} />
+      );
+    }
+    return (
+      <img
+        src={"/images/placeholder-icon.png"}
+        className={"w-7 mx-2"}
+      />
+    );
+  };
+
   const audience = opModal.value?.audience;
   const attachedPipeline = opModal.value?.attachedPipeline;
   const clients = opModal.value?.clients;
   const opType = OperationType[audience?.operationType];
+  const displayName = itemName();
 
   const [tailNavOpen, setTailNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(false);
@@ -94,34 +128,6 @@ export default function OpModal(
         >
           <div class="w-[308px] shadow-xl h-full">
             <div class="bg-white h-full">
-              {/*<div class="flex h-16 p-4 justify-between items-center border-b border-purple-100">*/}
-              {/*  <div class="flex items-center justify-start">*/}
-              {/*    <IconUserCircle class="w-12 h-12 mr-4" />*/}
-              {/*    <h2 class="text-web font-semibold">User Name</h2>*/}
-              {/*  </div>*/}
-              {/*  <button class="p-1 rounded hover:bg-purple-100">*/}
-              {/*    <svg*/}
-              {/*      width="18"*/}
-              {/*      height="18"*/}
-              {/*      viewBox="0 0 18 18"*/}
-              {/*      fill="none"*/}
-              {/*      xmlns="http://www.w3.org/2000/svg"*/}
-              {/*    >*/}
-              {/*      <path*/}
-              {/*        fill-rule="evenodd"*/}
-              {/*        clip-rule="evenodd"*/}
-              {/*        d="M3.53975 11.479C3.75942 11.2593 4.11558 11.2593 4.33525 11.479L8.67992 15.8236C8.75314 15.8969 8.87186 15.8969 8.94508 15.8236L13.2898 11.479C13.5094 11.2593 13.8656 11.2593 14.0852 11.479C14.3049 11.6986 14.3049 12.0548 14.0852 12.2745L9.74058 16.6191C9.22801 17.1317 8.39699 17.1317 7.88442 16.6191L3.53975 12.2745C3.32008 12.0548 3.32008 11.6986 3.53975 11.479Z"*/}
-              {/*        fill="#372D56"*/}
-              {/*      />*/}
-              {/*      <path*/}
-              {/*        fill-rule="evenodd"*/}
-              {/*        clip-rule="evenodd"*/}
-              {/*        d="M3.53975 6.64946C3.75942 6.86913 4.11558 6.86913 4.33525 6.64946L8.67992 2.30479C8.75314 2.23156 8.87186 2.23157 8.94508 2.30479L13.2898 6.64946C13.5094 6.86913 13.8656 6.86913 14.0852 6.64946C14.3049 6.42979 14.3049 6.07363 14.0852 5.85396L9.74058 1.50929C9.22801 0.996729 8.39699 0.996731 7.88442 1.50929L3.53975 5.85396C3.32008 6.07363 3.32008 6.42979 3.53975 6.64946Z"*/}
-              {/*        fill="#372D56"*/}
-              {/*      />*/}
-              {/*    </svg>*/}
-              {/*  </button>*/}
-              {/*</div>*/}
               {opModal.value == null
                 ? (
                   <div class="w-full h-4/5 flex flex-col justify-center items-center">
@@ -136,271 +142,279 @@ export default function OpModal(
                     <div>
                       <div class="rounded-t flex justify-between">
                         <div class="z-[20] flex items-center justify-start px-4 w-full h-16 bg-web">
-                          {opType === "CONSUMER"
-                            ? <ConsumerIcon className={"mx-2"} />
-                            : <ProducerIcon className={"mx-2"} />}
+                          {iconDisplay()}
                           <div class="flex flex-col">
                             <h3 class="text-lg text-cloud">
-                              {audience?.operationName}
+                              {displayName}
                             </h3>
-                            <p class="text-xs text-cloud">
-                              {`${clients?.length || 0} attached client${
-                                (clients?.length !== 1) ? "s" : ""
-                              }`}
-                            </p>
+                            {displayType === "operation" && (
+                              <p class="text-xs text-cloud">
+                                {`${clients?.length || 0} attached client${
+                                  (clients?.length !== 1) ? "s" : ""
+                                }`}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
-                      <div class="px-4 py-4 rounded-md mx-2">
-                        <div class="mb-2 flex justify-between items-center pr-2">
-                          <h3 class="text-web font-bold text-sm">
-                            Attached Pipelines
-                          </h3>
-                        </div>
-                        {!serviceMap?.pipes?.length
-                          ? (
-                            <a href={"/pipelines"}>
-                              <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">
-                                <IconPlus class="w-4 h-4 mr-1" />
-                                Create a new pipeline
-                              </button>
-                            </a>
-                          )
-                          : attachedPipeline
-                          ? (
-                            <div
-                              className={`flex justify-between items-center text-web bg-purple-50 border border-purple-600 font-medium rounded-md w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
-                                opModal.value?.attach &&
-                                "ring-1 outline-none active:ring-purple-600"
-                              }`}
-                            >
-                              {attachedPipeline?.name}
-
-                              <div class="py-1 flex flex-row items-center">
-                                <button
-                                  data-tooltip-target="pipeline-pause"
-                                  type="button"
-                                  onClick={() =>
-                                    opModal.value = {
-                                      ...opModal.value,
-                                      pause: true,
-                                    }}
-                                  class="mr-2"
-                                >
-                                  <IconPlayerPause class="w-4 h-4 text-gray-400" />
-                                </button>
-                                <Tooltip
-                                  targetId="pipeline-pause"
-                                  message={"Click to pause pipelines"}
-                                />
-                                <button
-                                  data-tooltip-target="pipeline-unlink"
-                                  type="button"
-                                  class="mr-2"
-                                  onClick={() =>
-                                    opModal.value = {
-                                      ...opModal.value,
-                                      detach: true,
-                                    }}
-                                >
-                                  <IconUnlink class="w-4 h-4 text-gray-400" />
-                                </button>
-                                <Tooltip
-                                  targetId="pipeline-unlink"
-                                  message={"Click to detach pipeline"}
-                                />
-                                <a
-                                  href={"/pipelines"}
-                                  className="flex items-center"
-                                >
-                                  <button
-                                    type="button"
-                                    data-tooltip-target="pipeline-edit"
+                      {displayType === "operation"
+                        ? (
+                          <>
+                            <div class="px-4 py-4 rounded-md mx-2">
+                              <div class="mb-2 flex justify-between items-center pr-2">
+                                <h3 class="text-web font-bold text-sm">
+                                  Attached Pipelines
+                                </h3>
+                              </div>
+                              {!serviceMap?.pipes.length
+                                ? (
+                                  <a href={"/pipelines"}>
+                                    <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">
+                                      <IconPlus class="w-4 h-4 mr-1" />
+                                      Create a new pipeline
+                                    </button>
+                                  </a>
+                                )
+                                : attachedPipeline
+                                ? (
+                                  <div
+                                    className={`flex justify-between items-center text-web bg-purple-50 border border-purple-600 font-medium rounded-md w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600 ${
+                                      opModal.value?.attach &&
+                                      "ring-1 outline-none active:ring-purple-600"
+                                    }`}
                                   >
-                                    <IconAdjustmentsHorizontal class="w-4 h-4 text-gray-400" />
-                                  </button>
-                                  <Tooltip
-                                    targetId="pipeline-edit"
-                                    message={"Edit Pipelines"}
-                                  />
-                                </a>
-                              </div>
-                            </div>
-                          )
-                          : (
-                            <button
-                              id="attach-pipeline"
-                              className="text-web font-semibold bg-purple-50 border border-purple-600 hover:border-[#8E84AD] font-medium rounded-md w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
-                              type="button"
-                              onClick={() =>
-                                opModal.value = {
-                                  ...opModal.value,
-                                  attach: true,
-                                }}
-                            >
-                              Attach a pipeline
-                              <IconLink class="w-4" />
-                            </button>
-                          )}
-                        {(opModal.value?.attach) && (
-                          <OddAttachModal serviceMap={serviceMap} />
-                        )}
-                      </div>
-                      <div
-                        id="pipeline-attach-detach"
-                        data-accordion="open"
-                        data-active-classes="bg-blue-100 text-blue-600"
-                        class="py-2"
-                      >
-                        <h3 id="collapse-heading-2">
-                          <button
-                            type="button"
-                            className={`flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web `}
-                            data-accordion-target="#collapse-body-2"
-                            aria-expanded="true"
-                            aria-controls="collapse-body-2"
-                            onClick={() => setTailNavOpen(!tailNavOpen)}
-                          >
-                            <h3 class="text-sm font-semibold ml-3">
-                              Tail
-                            </h3>
-                          </button>
-                        </h3>
-                        <div
-                          id="collapse-body-2"
-                          class={`border-b border-purple-100 pl-7 ${
-                            tailNavOpen ? "" : "hidden"
-                          }`}
-                          aria-labelledby="collapse-heading-2"
-                        >
-                          <div class="text-cobweb font-medium text-xs my-3">
-                            {clients
-                              ? "View your pipeline data in realtime"
-                              : "You must attach a client first"}
-                          </div>
-                          {clients && (
-                            <div class="flex flex-col">
-                              <div class="flex flex-row justify-start items-center mb-3">
-                                <Toggle
-                                  label="Sampling"
-                                  value={tailSamplingSignal.value}
-                                  setValue={(value) =>
-                                    tailSamplingSignal.value = value}
-                                />
-                                {tailSamplingSignal.value &&
-                                  (
-                                    <label className="relative inline-flex items-center cursor-pointer ml-2">
-                                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                        Sample Setting
-                                      </span>
+                                    {attachedPipeline?.name}
 
-                                      <input
-                                        class={`w-[${
-                                          (String(
-                                            tailSamplingRateSignal.value,
-                                          )
-                                            .length) * 12
-                                        }px] mr-2`}
-                                        value={tailSamplingRateSignal.value}
-                                        onChange={(e) => {
-                                          if (isNumeric(e.target.value)) {
-                                            tailSamplingRateSignal.value =
-                                              e.target.value;
-                                          }
-                                        }}
+                                    <div class="py-1 flex flex-row items-center">
+                                      <button
+                                        data-tooltip-target="pipeline-pause"
+                                        type="button"
+                                        onClick={() =>
+                                          opModal.value = {
+                                            ...opModal.value,
+                                            pause: true,
+                                          }}
+                                        class="mr-2"
+                                      >
+                                        <IconPlayerPause class="w-4 h-4 text-gray-400" />
+                                      </button>
+                                      <Tooltip
+                                        targetId="pipeline-pause"
+                                        message={"Click to pause pipelines"}
                                       />
-                                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                                        /s
-                                      </span>
-                                    </label>
-                                  )}
-                              </div>
-                              <button
-                                onClick={() =>
-                                  tailEnabledSignal.value = !tailEnabledSignal
-                                    .value}
-                                className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
-                              >
-                                {tailEnabledSignal.value
-                                  ? "Stop Tail"
-                                  : "Start Tail"}
-                              </button>
+                                      <button
+                                        data-tooltip-target="pipeline-unlink"
+                                        type="button"
+                                        class="mr-2"
+                                        onClick={() =>
+                                          opModal.value = {
+                                            ...opModal.value,
+                                            detach: true,
+                                          }}
+                                      >
+                                        <IconUnlink class="w-4 h-4 text-gray-400" />
+                                      </button>
+                                      <Tooltip
+                                        targetId="pipeline-unlink"
+                                        message={"Click to detach pipeline"}
+                                      />
+                                      <a
+                                        href={"/pipelines"}
+                                        className="flex items-center"
+                                      >
+                                        <button
+                                          type="button"
+                                          data-tooltip-target="pipeline-edit"
+                                        >
+                                          <IconAdjustmentsHorizontal class="w-4 h-4 text-gray-400" />
+                                        </button>
+                                        <Tooltip
+                                          targetId="pipeline-edit"
+                                          message={"Edit Pipelines"}
+                                        />
+                                      </a>
+                                    </div>
+                                  </div>
+                                )
+                                : (
+                                  <button
+                                    id="attach-pipeline"
+                                    className="text-web font-semibold bg-purple-50 border border-purple-600 hover:border-[#8E84AD] font-medium rounded-md w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
+                                    type="button"
+                                    onClick={() =>
+                                      opModal.value = {
+                                        ...opModal.value,
+                                        attach: true,
+                                      }}
+                                  >
+                                    Attach a pipeline
+                                    <IconLink class="w-4" />
+                                  </button>
+                                )}
+                              {(opModal.value?.attach) && (
+                                <OddAttachModal serviceMap={serviceMap} />
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <h3 id="collapse-heading-3">
-                          <button
-                            type="button"
-                            className="flex items-center border-b border-purple-100 w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
-                            data-accordion-target="#collapse-body-3"
-                            aria-expanded="true"
-                            aria-controls="collapse-body-3"
-                          >
-                            <h3 class="text-web text-sm font-semibold ml-3">
-                              Notifications
-                            </h3>
-                          </button>
-                        </h3>
-                        <div
-                          id="collapse-body-3"
-                          class="hidden"
-                          aria-labelledby="collapse-heading-3"
-                        >
-                          <div class="p-5">
-                            <p class="text-gray-300 text-xs">
-                              Notifications coming soon...
-                            </p>
-                          </div>
-                        </div>
-                        <h3 id="collapse-heading-4">
-                          <button
-                            type="button"
-                            className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
-                            data-accordion-target="#collapse-body-4"
-                            aria-expanded="true"
-                            aria-controls="collapse-body-4"
-                          >
-                            <h3 class="text-web text-sm font-semibold ml-3">
-                              Trends
-                            </h3>
-                          </button>
-                        </h3>
-                        <div
-                          id="collapse-body-4"
-                          class="hidden"
-                          aria-labelledby="collapse-heading-4"
-                        >
-                          <p class="p-5 text-gray-300 text-xs">
-                            Trends coming soon...
-                          </p>
-                        </div>
-                        <h3 id="collapse-heading-5">
-                          <button
-                            type="button"
-                            className={`flex items-center w-full px-5 ${
-                              !schemaNavOpen && "border-b"
-                            }  border-purple-100 py-3 font-medium text-left text-web`}
-                            data-accordion-target="#collapse-body-5"
-                            aria-expanded="true"
-                            aria-controls="collapse-body-5"
-                            onClick={() => setSchemaNavOpen(!schemaNavOpen)}
-                          >
-                            <h3 class={"text-web text-sm font-semibold ml-3"}>
-                              Schema
-                            </h3>
-                          </button>
-                        </h3>
-                        {schemaNavOpen && (
-                          <div
-                            id="collapse-body-5"
-                            aria-labelledby="collapse-heading-5"
-                            class={"flex flex-col items-center justify-center p-4"}
-                          >
-                            <p class="mb-5 w-full text-left text-gray-500 text-xs">
-                              Displaying JSON
-                            </p>
-                            <div className="w-full rounded flex overflow-x-scroll bg-black text-white py-2 px-4 text-sm flex flex-col justify-start">
-                              <pre>
+                            <div
+                              id="pipeline-attach-detach"
+                              data-accordion="open"
+                              data-active-classes="bg-blue-100 text-blue-600"
+                              class="py-2"
+                            >
+                              <h3 id="collapse-heading-2">
+                                <button
+                                  type="button"
+                                  className={`flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web `}
+                                  data-accordion-target="#collapse-body-2"
+                                  aria-expanded="true"
+                                  aria-controls="collapse-body-2"
+                                  onClick={() => setTailNavOpen(!tailNavOpen)}
+                                >
+                                  <h3 class="text-sm font-semibold ml-3">
+                                    Tail
+                                  </h3>
+                                </button>
+                              </h3>
+                              <div
+                                id="collapse-body-2"
+                                class={`border-b border-purple-100 pl-7 ${
+                                  tailNavOpen ? "" : "hidden"
+                                }`}
+                                aria-labelledby="collapse-heading-2"
+                              >
+                                <div class="text-cobweb font-medium text-xs my-3">
+                                  {clients
+                                    ? "View your pipeline data in realtime"
+                                    : "You must attach a client first"}
+                                </div>
+                                {clients && (
+                                  <div class="flex flex-col">
+                                    <div class="flex flex-row justify-start items-center mb-3">
+                                      <Toggle
+                                        label="Sampling"
+                                        value={tailSamplingSignal.value}
+                                        setValue={(value) =>
+                                          tailSamplingSignal.value = value}
+                                      />
+                                      {tailSamplingSignal.value &&
+                                        (
+                                          <label className="relative inline-flex items-center cursor-pointer ml-2">
+                                            <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                              Sample Setting
+                                            </span>
+
+                                            <input
+                                              class={`w-[${
+                                                (String(
+                                                  tailSamplingRateSignal.value,
+                                                )
+                                                  .length) * 12
+                                              }px] mr-2`}
+                                              value={tailSamplingRateSignal
+                                                .value}
+                                              onChange={(e) => {
+                                                if (isNumeric(e.target.value)) {
+                                                  tailSamplingRateSignal.value =
+                                                    e.target.value;
+                                                }
+                                              }}
+                                            />
+                                            <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
+                                              /s
+                                            </span>
+                                          </label>
+                                        )}
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        tailEnabledSignal.value =
+                                          !tailEnabledSignal
+                                            .value}
+                                      className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
+                                    >
+                                      {tailEnabledSignal.value
+                                        ? "Stop Tail"
+                                        : "Start Tail"}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              <h3 id="collapse-heading-3">
+                                <button
+                                  type="button"
+                                  className="flex items-center border-b border-purple-100 w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
+                                  data-accordion-target="#collapse-body-3"
+                                  aria-expanded="true"
+                                  aria-controls="collapse-body-3"
+                                >
+                                  <h3 class="text-web text-sm font-semibold ml-3">
+                                    Notifications
+                                  </h3>
+                                </button>
+                              </h3>
+                              <div
+                                id="collapse-body-3"
+                                class="hidden"
+                                aria-labelledby="collapse-heading-3"
+                              >
+                                <div class="p-5">
+                                  <p class="text-gray-300 text-xs">
+                                    Notifications coming soon...
+                                  </p>
+                                </div>
+                              </div>
+                              <h3 id="collapse-heading-4">
+                                <button
+                                  type="button"
+                                  className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+                                  data-accordion-target="#collapse-body-4"
+                                  aria-expanded="true"
+                                  aria-controls="collapse-body-4"
+                                >
+                                  <h3 class="text-web text-sm font-semibold ml-3">
+                                    Trends
+                                  </h3>
+                                </button>
+                              </h3>
+                              <div
+                                id="collapse-body-4"
+                                class="hidden"
+                                aria-labelledby="collapse-heading-4"
+                              >
+                                <p class="p-5 text-gray-300 text-xs">
+                                  Trends coming soon...
+                                </p>
+                              </div>
+                              <h3 id="collapse-heading-5">
+                                <button
+                                  type="button"
+                                  className={`flex items-center w-full px-5 ${
+                                    !schemaNavOpen && "border-b"
+                                  }  border-purple-100 py-3 font-medium text-left text-web`}
+                                  data-accordion-target="#collapse-body-5"
+                                  aria-expanded="true"
+                                  aria-controls="collapse-body-5"
+                                  onClick={() =>
+                                    setSchemaNavOpen(!schemaNavOpen)}
+                                >
+                                  <h3
+                                    class={"text-web text-sm font-semibold ml-3"}
+                                  >
+                                    Schema
+                                  </h3>
+                                </button>
+                              </h3>
+                              {schemaNavOpen && (
+                                <div
+                                  id="collapse-body-5"
+                                  aria-labelledby="collapse-heading-5"
+                                  class={"flex flex-col items-center justify-center p-4"}
+                                >
+                                  <p class="mb-5 w-full text-left text-gray-500 text-xs">
+                                    Displaying JSON
+                                  </p>
+                                  <div className="w-full rounded flex overflow-x-scroll bg-black text-white py-2 px-4 text-sm flex flex-col justify-start">
+                                    <pre>
                                 <code>
                                   <div
                                       dangerouslySetInnerHTML={{
@@ -413,11 +427,40 @@ export default function OpModal(
                                   >
                                   </div>
                                 </code>
-                              </pre>
+                                    </pre>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          </div>
+                          </>
+                        )
+                        : (
+                          <>
+                            <h3 id="collapse-heading-10">
+                              <button
+                                type="button"
+                                className="flex items-center border-b border-purple-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
+                                data-accordion-target="#collapse-body-3"
+                                aria-expanded="true"
+                                aria-controls="collapse-body-10"
+                              >
+                                <h3 class="text-web text-sm font-semibold ml-10">
+                                  Metrics
+                                </h3>
+                              </button>
+                            </h3>
+                            <div
+                              id="collapse-body-10"
+                              aria-labelledby="collapse-heading-10"
+                            >
+                              <div class="p-5">
+                                <p class="text-gray-300 text-xs">
+                                  Metrics coming soon...
+                                </p>
+                              </div>
+                            </div>
+                          </>
                         )}
-                      </div>
                     </div>
                     <button
                       data-tooltip-target="delete-operation"

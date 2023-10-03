@@ -4,6 +4,7 @@ import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
 
 export type OpModalType = {
   audience: Audience;
+  displayType: string;
   attachedPipeline?: Pipeline;
   clients: number;
   attach?: boolean;

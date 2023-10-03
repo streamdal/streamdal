@@ -25,6 +25,7 @@ import {
   ComponentEdge,
   ServiceEdge,
 } from "../components/serviceMap/customEdge.tsx";
+import { opModal } from "../components/serviceMap/opModalSignal.ts";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -179,6 +180,12 @@ export default function ServiceMapComponent(
     }
   });
 
+  const clearModal = (e) => {
+    if (e.target.className === "react-flow__pane react-flow__pane") {
+      opModal.value = null;
+    }
+  };
+
   return (
     <div
       class={`w-full h-screen m-0 ${
@@ -197,9 +204,12 @@ export default function ServiceMapComponent(
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
         edgeTypes={edgeTypes}
+        onClick={(e) => clearModal(e)}
       >
         {nodes.length === 0 && <EmptyService />}
-        <Background style={{ height: "100vh" }} />
+        <Background
+          style={{ height: "100vh" }}
+        />
       </ReactFlow>
     </div>
   );
