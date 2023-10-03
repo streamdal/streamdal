@@ -101,9 +101,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/guides/instrumentation",
           },
           {
-            text: "Quarantine",
-            slug: "quarantine",
-            link: "en/guides/quarantine",
+            text: "Tail",
+            slug: "tail",
+            link: "en/guides/tail",
           },
         ],
       },
@@ -176,9 +176,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/language-support/ruby"
           },
           {
-            text: "C++ (Coming Soon!)",
-            slug: "c++",
-            link: "en/language-support/c++"
+            text: ".NET (Coming Soon!)",
+            slug: "dotnet",
+            link: "en/language-support/dotnet"
           },
         ],
       },
@@ -343,9 +343,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/engineering/observability",
           },
           {
-            text: "Peek",
-            slug: "peek",
-            link: "en/engineering/peek",
+            text: "Quarantine",
+            slug: "quarantine",
+            link: "en/engineering/quarantine",
           },
         ],
       },
