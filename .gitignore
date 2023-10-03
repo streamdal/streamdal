@@ -9,3 +9,6 @@
 # macOS-specific files
 .DS_Store
 .idea
+
+# Fresh build directory
+_fresh/

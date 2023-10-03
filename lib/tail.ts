@@ -11,37 +11,37 @@ import {
 } from "snitch-protos/protos/sp_common.ts";
 
 import { effect, signal } from "@preact/signals";
-import { parseDate } from "../islands/peek.tsx";
+import { parseDate } from "../islands/tail.tsx";
 
-export const MAX_PEEK_SIZE = 500;
+export const MAX_TAIL_SIZE = 500;
 
-export const peekSignal = signal<TailResponse[] | []>(
+export const tailSignal = signal<TailResponse[] | []>(
   [],
 );
 
-export const peekingSignal = signal<boolean>(false);
-export const peekPausedSignal = signal<boolean>(false);
-export const peekSamplingSignal = signal<boolean>(false);
-export const peekSamplingRateSignal = signal<number>(1);
+export const tailEnabledSignal = signal<boolean>(false);
+export const tailPausedSignal = signal<boolean>(false);
+export const tailSamplingSignal = signal<boolean>(false);
+export const tailSamplingRateSignal = signal<number>(1);
 
-export const peek = async ({ audience, grpcUrl, grpcToken }: {
+export const tail = async ({ audience, grpcUrl, grpcToken }: {
   audience: Audience;
   grpcUrl: string;
   grpcToken: string;
 }) => {
   const appendResponse = (response: TailResponse) =>
-    peekSignal.value = [
-      ...peekSignal.value.slice(
-        -MAX_PEEK_SIZE,
+    tailSignal.value = [
+      ...tailSignal.value.slice(
+        -MAX_TAIL_SIZE,
       ),
       response,
     ];
   const abortController = new AbortController();
 
   effect(() => {
-    if (!peekingSignal.value) {
+    if (!tailEnabledSignal.value) {
       abortController.abort();
-      peekSignal.value = [];
+      tailSignal.value = [];
     }
   });
 
@@ -67,17 +67,17 @@ export const peek = async ({ audience, grpcUrl, grpcToken }: {
       );
 
     for await (const response of tailCall?.responses) {
-      if (!peekSamplingSignal.value || peekSignal.value.length === 0) {
+      if (!tailSamplingSignal.value || tailSignal.value.length === 0) {
         appendResponse(response);
       }
 
-      const last = parseDate(peekSignal.value?.at(-1)?.timestampNs!);
+      const last = parseDate(tailSignal.value?.at(-1)?.timestampNs!);
       const current = parseDate(response.timestampNs);
 
       if (
         !current || !last ||
         ((current.getTime() - last.getTime()) / 1000 >
-          peekSamplingRateSignal.value)
+          tailSamplingRateSignal.value)
       ) {
         appendResponse(response);
       }

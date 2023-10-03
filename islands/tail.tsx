@@ -10,15 +10,15 @@ import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/
 
 import { useEffect, useRef, useState } from "preact/hooks";
 import {
-  peek,
-  peekingSignal,
-  peekPausedSignal,
-  peekSignal,
-} from "../lib/peek.ts";
+  tail,
+  tailEnabledSignal,
+  tailPausedSignal,
+  tailSignal,
+} from "../lib/tail.ts";
 import { useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../lib/utils.ts";
 
-export const MAX_PEEK_UI_SIZE = 100;
+export const MAX_TAIL_UI_SIZE = 100;
 
 export const parseData = (data: Uint8Array) => {
   const decoded = new TextDecoder().decode(data);
@@ -27,7 +27,7 @@ export const parseData = (data: Uint8Array) => {
     const parsed = JSON.parse(decoded);
     return JSON.stringify(parsed, null, 2);
   } catch (e) {
-    console.error("Error parsing peek data, returning decoded data instead", e);
+    console.error("Error parsing tail data, returning decoded data instead", e);
   }
   return decoded;
 };
@@ -41,7 +41,7 @@ export const parseDate = (timestampNs: string) => {
   return null;
 };
 
-export const PeekRow = (
+export const TailRow = (
   { row }: { row: TailResponse; index: number },
 ) => {
   const lastRef = useRef();
@@ -81,7 +81,7 @@ export const PeekRow = (
   );
 };
 
-export const Peek = (
+export const Tail = (
   {
     audience,
     grpcToken,
@@ -92,17 +92,17 @@ export const Peek = (
     grpcToken: string;
   },
 ) => {
-  const [peekData, setPeekData] = useState(peekSignal.value);
+  const [tailData, setTailData] = useState(tailSignal.value);
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    peekPausedSignal.value = false;
-    void peek({ audience, grpcUrl, grpcToken });
+    tailPausedSignal.value = false;
+    void tail({ audience, grpcUrl, grpcToken });
   }, []);
 
   useSignalEffect(() => {
-    if (!peekPausedSignal.value) {
-      setPeekData(peekSignal.value);
+    if (!tailPausedSignal.value) {
+      setTailData(tailSignal.value);
     }
   });
 
@@ -118,7 +118,7 @@ export const Peek = (
         class={`relative flex flex-col h-screen w-[calc(100vw-${OP_MODAL_WIDTH})]`}
       >
         <div class="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
-          <span class="opacity-50">Home</span> / Peek
+          <span class="opacity-50">Home</span> / Tail
         </div>
         <div
           class={`h-full flex flex-col bg-white p-4 ${
@@ -133,15 +133,15 @@ export const Peek = (
             }%]`}
           >
             <div>
-              Peeking{" "}
+              Tail{" "}
               <span class="text-streamdalPurple">{audience.operationName}</span>
             </div>
             <div class="flex flex-row justify-end items-center">
               <div
                 class="flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
-                onClick={() => peekPausedSignal.value = !peekPausedSignal.value}
+                onClick={() => tailPausedSignal.value = !tailPausedSignal.value}
               >
-                {peekPausedSignal.value
+                {tailPausedSignal.value
                   ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
                   : <IconPlayerPauseFilled class="w-6 h-6 text-white" />}
               </div>
@@ -155,7 +155,7 @@ export const Peek = (
               </div>
               <div
                 className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
-                onClick={() => peekingSignal.value = false}
+                onClick={() => tailEnabledSignal.value = false}
               >
                 <IconX class="w-6 h-6 text-white" />
               </div>
@@ -168,9 +168,9 @@ export const Peek = (
               fullScreen ? "200" : "260"
             }px)] overflow-y-scroll rounded-md bg-black text-white`}
           >
-            {peekData?.slice(-MAX_PEEK_UI_SIZE).map((
+            {tailData?.slice(-MAX_TAIL_UI_SIZE).map((
               p: TailResponse,
-            ) => <PeekRow row={p} />)}
+            ) => <TailRow row={p} />)}
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@ export default async function App(
       <Head>
         <title>{"Snitch Console"}</title>
         <meta
+          charSet="UTF-8"
           content="Streamdal's Snitch Console"
           name="description"
         />
@@ -26,7 +27,7 @@ export default async function App(
         />
         <link
           rel="stylesheet"
-          href="https://esm.sh/reactflow@11.8.2/dist/base.css"
+          href="https://esm.sh/v132/reactflow@11.8.2/dist/base.css"
         />
         <link rel="stylesheet" type="text/css" href="/style.css" />
         <link

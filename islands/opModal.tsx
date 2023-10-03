@@ -16,14 +16,14 @@ import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useEffect, useState } from "preact/hooks";
 import { DeleteOperationModal } from "../components/modals/deleteOperationModal.tsx";
-import { Peek } from "./peek.tsx";
+import { Tail } from "./tail.tsx";
 import { Toggle } from "../components/form/switch.tsx";
 import { getAudienceOpRoute, isNumeric } from "../lib/utils.ts";
 import {
-  peekingSignal,
-  peekSamplingRateSignal,
-  peekSamplingSignal,
-} from "../lib/peek.ts";
+  tailEnabledSignal,
+  tailSamplingRateSignal,
+  tailSamplingSignal,
+} from "../lib/tail.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
 
@@ -41,7 +41,7 @@ export default function OpModal(
   const clients = opModal.value?.clients;
   const opType = OperationType[audience?.operationType];
 
-  const [peekNavOpen, setPeekNavOpen] = useState(false);
+  const [tailNavOpen, setTailNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(false);
 
   const getSchema = async () => {
@@ -82,8 +82,8 @@ export default function OpModal(
         />
       )}
       <div class="flex flex-row">
-        {peekingSignal.value && (
-          <Peek
+        {tailEnabledSignal.value && (
+          <Tail
             audience={audience}
             grpcUrl={grpcUrl}
             grpcToken={grpcToken}
@@ -259,17 +259,17 @@ export default function OpModal(
                             data-accordion-target="#collapse-body-2"
                             aria-expanded="true"
                             aria-controls="collapse-body-2"
-                            onClick={() => setPeekNavOpen(!peekNavOpen)}
+                            onClick={() => setTailNavOpen(!tailNavOpen)}
                           >
                             <h3 class="text-sm font-semibold ml-3">
-                              Peek
+                              Tail
                             </h3>
                           </button>
                         </h3>
                         <div
                           id="collapse-body-2"
                           class={`border-b border-purple-100 pl-7 ${
-                            peekNavOpen ? "" : "hidden"
+                            tailNavOpen ? "" : "hidden"
                           }`}
                           aria-labelledby="collapse-heading-2"
                         >
@@ -283,11 +283,11 @@ export default function OpModal(
                               <div class="flex flex-row justify-start items-center mb-3">
                                 <Toggle
                                   label="Sampling"
-                                  value={peekSamplingSignal.value}
+                                  value={tailSamplingSignal.value}
                                   setValue={(value) =>
-                                    peekSamplingSignal.value = value}
+                                    tailSamplingSignal.value = value}
                                 />
-                                {peekSamplingSignal.value &&
+                                {tailSamplingSignal.value &&
                                   (
                                     <label className="relative inline-flex items-center cursor-pointer ml-2">
                                       <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
@@ -297,14 +297,14 @@ export default function OpModal(
                                       <input
                                         class={`w-[${
                                           (String(
-                                            peekSamplingRateSignal.value,
+                                            tailSamplingRateSignal.value,
                                           )
                                             .length) * 12
                                         }px] mr-2`}
-                                        value={peekSamplingRateSignal.value}
+                                        value={tailSamplingRateSignal.value}
                                         onChange={(e) => {
                                           if (isNumeric(e.target.value)) {
-                                            peekSamplingRateSignal.value =
+                                            tailSamplingRateSignal.value =
                                               e.target.value;
                                           }
                                         }}
@@ -317,12 +317,13 @@ export default function OpModal(
                               </div>
                               <button
                                 onClick={() =>
-                                  peekingSignal.value = !peekingSignal.value}
+                                  tailEnabledSignal.value = !tailEnabledSignal
+                                    .value}
                                 className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
                               >
-                                {peekingSignal.value
-                                  ? "Stop Peeking"
-                                  : "Start Peeking"}
+                                {tailEnabledSignal.value
+                                  ? "Stop Tail"
+                                  : "Start Tail"}
                               </button>
                             </div>
                           )}

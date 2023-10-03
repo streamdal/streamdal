@@ -1,6 +1,5 @@
-import { getSchema } from "../../../../../../../../lib/fetch.ts";
-import { getAudienceFromParams } from "../../../../../../../../lib/utils.ts";
-import { parseData } from "../../../../../../../../islands/peek.tsx";
+import { getSchema } from "root/lib/fetch.ts";
+import { getAudienceFromParams } from "root/lib/utils.ts";
 
 export const handler: Handers<> = {
   async GET(req, ctx) {
