@@ -26,6 +26,8 @@ import {
 } from "../lib/tail.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
+import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
+import { SchemaModal } from "../components/modals/schemaModal.tsx";
 import { useSignalEffect } from "https://esm.sh/v131/@preact/signals@1.1.3/denonext/signals.mjs";
 import { opUpdateSignal } from "./serviceMap.tsx";
 import { ComponentImage } from "./customNodes.tsx";
@@ -77,6 +79,7 @@ export default function OpModal(
 
   const [tailNavOpen, setTailNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(false);
+  const [schemaModalOpen, setSchemaModalOpen] = useState(false);
 
   const getSchema = async () => {
     const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
@@ -85,12 +88,19 @@ export default function OpModal(
     return response.json();
   };
 
+  const handleClose = () => {
+    setSchemaModalOpen(false);
+  };
+
   useEffect(async () => {
     if (opModal.value) {
       const schema = await getSchema();
       opModal.value = {
         ...opModal.value,
-        schema: JSON.stringify(schema.schema, null, 2),
+        schemaInfo: {
+          schema: JSON.stringify(schema.schema, null, 2),
+          version: schema.version,
+        },
       };
     }
   }, [audience, schemaNavOpen]);
@@ -113,6 +123,13 @@ export default function OpModal(
         <DeleteOperationModal
           audience={audience}
           pipeline={attachedPipeline || null}
+        />
+      )}
+      {schemaModalOpen && (
+        <SchemaModal
+          schema={opModal.value.schemaInfo.schema}
+          version={opModal.value.schemaInfo.version}
+          setClose={handleClose}
         />
       )}
       <div class="flex flex-row">
@@ -410,25 +427,43 @@ export default function OpModal(
                                   aria-labelledby="collapse-heading-5"
                                   class={"flex flex-col items-center justify-center p-4"}
                                 >
-                                  <p class="mb-5 w-full text-left text-gray-500 text-xs">
-                                    Displaying JSON
-                                  </p>
-                                  <div className="w-full rounded flex overflow-x-scroll bg-black text-white py-2 px-4 text-sm flex flex-col justify-start">
-                                    <pre>
-                                <code>
-                                  <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: `${
-                                            hljs.highlight(`${opModal.value.schema}`, {language: 'json'})
-                                                .value
-                                        }`,
-                                      }}
-                                      class={"font-sm"}
-                                  >
-                                  </div>
-                                </code>
-                                    </pre>
-                                  </div>
+                                  {!schemaModalOpen && (
+                                    <>
+                                      <p class="mb-5 w-full text-left text-gray-500 text-xs">
+                                        Displaying JSON
+                                      </p>
+                                      <div className="w-full rounded flex overflow-x-scroll bg-black text-white pt-2 pb-6 px-4 text-sm flex flex-col justify-start">
+                                        <div class={"w-full flex justify-end"}>
+                                          <button
+                                            class={"cursor-pointer"}
+                                            onClick={() =>
+                                              setSchemaModalOpen(true)}
+                                            data-tooltip-target="maximize"
+                                          >
+                                            <IconWindowMaximize class="w-5 h-5 text-white mx-1 my-1" />
+                                          </button>
+                                          <Tooltip
+                                            targetId="maximize"
+                                            message={"Click to maximize schema"}
+                                          />
+                                        </div>
+                                        <pre>
+                                          <code>
+                                            <div
+                                            dangerouslySetInnerHTML={{
+                                            __html: `${
+                                            hljs.highlight(`${opModal.value.schemaInfo?.schema}`, {language: 'json'})
+                                            .value
+                                          }`,
+                                          }}
+                                          class={"font-sm"}
+                                              >
+                                            </div>
+                                          </code>
+                                        </pre>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               )}
                             </div>
