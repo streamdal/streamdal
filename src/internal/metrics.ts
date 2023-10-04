@@ -10,7 +10,7 @@ import { StepStatus } from "./process.js";
 
 export const METRIC_INTERVAL = 1000;
 
-export const metrics: Metric[] = [];
+export const metrics = new Map<string, Metric>();
 export const lock = new ReadWriteLock();
 
 export interface MetricsConfigs {
@@ -36,27 +36,33 @@ export const stepMetrics = async (
     const opName =
       audience.operationType === OperationType.CONSUMER ? "consume" : "produce";
 
+    const labels = getStepLabels(audience, stepStatus);
+    const stepErrorKey = `counter_${opName}_errors`;
+    const stepProcessedKey = `counter_${opName}_processed`;
+    const stepBytesKey = `counter_${opName}_bytes`;
+
     stepStatus.error &&
-      metrics.push({
-        name: `counter_${opName}_errors`,
-        value: 1,
-        labels: getStepLabels(audience, stepStatus),
+      metrics.set(stepErrorKey, {
+        name: stepErrorKey,
+        value: (metrics.get(stepErrorKey)?.value ?? 0) + 1,
+        labels,
         audience,
       });
 
-    metrics.push({
-      name: `counter_${opName}_processed`,
-      value: 1,
-      labels: getStepLabels(audience, stepStatus),
+    metrics.set(stepProcessedKey, {
+      name: stepProcessedKey,
+      value: (metrics.get(stepProcessedKey)?.value ?? 0) + 1,
+      labels,
       audience,
     });
 
-    metrics.push({
-      name: `counter_${opName}_bytes`,
-      value: payloadSize,
-      labels: getStepLabels(audience, stepStatus),
+    metrics.set(stepBytesKey, {
+      name: stepBytesKey,
+      value: (metrics.get(stepBytesKey)?.value ?? 0) + payloadSize,
+      labels,
       audience,
     });
+
     release();
   });
 };
@@ -71,25 +77,30 @@ export const pipelineMetrics = async (
     const opName =
       audience.operationType === OperationType.CONSUMER ? "consume" : "produce";
 
-    metrics.push({
-      name: `counter_${opName}_bytes_rate`,
-      value: payloadSize,
+    const bytesProcessedKey = `counter_${opName}_bytes_rate`;
+    const processedKey = `counter_${opName}_processed_rate`;
+
+    metrics.set(processedKey, {
+      name: processedKey,
+      value: (metrics.get(processedKey)?.value ?? 0) + 1,
       labels: {},
       audience,
     });
-    metrics.push({
-      name: `counter_${opName}_processed_rate`,
-      value: 1,
+
+    metrics.set(bytesProcessedKey, {
+      name: bytesProcessedKey,
+      value: (metrics.get(bytesProcessedKey)?.value ?? 0) + payloadSize,
       labels: {},
       audience,
     });
+
     release();
   });
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const sendMetrics = async (configs: MetricsConfigs) => {
-  if (!metrics.length) {
+  if (!metrics.size) {
     console.debug(`### no metrics found, skipping`);
     return;
   }
@@ -99,13 +110,18 @@ export const sendMetrics = async (configs: MetricsConfigs) => {
     try {
       const call = configs.grpcClient.metrics(
         {
-          metrics,
+          metrics: Array.from(metrics.values()).map((m: Metric) => ({
+            ...m,
+            //
+            // Make sure we always send data per second
+            value: m.value / (METRIC_INTERVAL / 1000),
+          })),
         },
         { meta: { "auth-token": configs.snitchToken } }
       );
       const status = await call.status;
       console.debug("metrics send status", status);
-      metrics.length = 0;
+      metrics.clear();
     } catch (e) {
       console.error("error sending metrics", e);
     }

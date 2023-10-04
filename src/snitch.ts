@@ -91,13 +91,14 @@ export class Snitch {
     });
 
     const grpcClient = new InternalClient(this.transport);
+    const sessionId = uuidv4();
 
     this.configs = {
       grpcClient,
       tailCall: grpcClient.sendTail({
         meta: { "auth-token": token },
       }),
-      sessionId: uuidv4(),
+      sessionId,
       snitchUrl: url,
       snitchToken: token,
       serviceName: name,

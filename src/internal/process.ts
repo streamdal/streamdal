@@ -42,7 +42,7 @@ export interface PipelineConfigs {
 
 export interface TailRequest {
   configs: PipelineConfigs;
-  tailStatus: TailStatus;
+  tailStatus?: TailStatus;
   audience: Audience;
   originalData: Uint8Array;
   newData?: Uint8Array;
@@ -68,7 +68,7 @@ export const sendTail = ({
   newData,
 }: TailRequest) => {
   try {
-    if (tailStatus.tail) {
+    if (tailStatus?.tail) {
       const tailResponse = TailResponse.create({
         timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
         type: TailResponseType.PAYLOAD,
@@ -99,13 +99,13 @@ export const processPipeline = async ({
     const message =
       "no active pipeline found for this audience, returning data";
     console.debug(message);
-    tailStatus &&
-      sendTail({
-        configs,
-        tailStatus,
-        audience,
-        originalData: data,
-      });
+
+    sendTail({
+      configs,
+      tailStatus,
+      audience,
+      originalData: data,
+    });
 
     return { data, error: true, message };
   }
@@ -144,14 +144,13 @@ export const processPipeline = async ({
 
   void pipelineMetrics(audience, data.length);
 
-  tailStatus &&
-    sendTail({
-      configs,
-      tailStatus,
-      audience,
-      originalData,
-      newData: data,
-    });
+  sendTail({
+    configs,
+    tailStatus,
+    audience,
+    originalData,
+    newData: data,
+  });
 
   //
   // For now top level response status is synonymous with the last step status
