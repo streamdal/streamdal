@@ -203,7 +203,7 @@ func (b *Bus) RunBroadcastConsumer() error {
 
 	// Launch a worker group for broadcast handlers
 	for i := 0; i < b.options.NumBroadcastWorkers; i++ {
-		b.runBroadcastWorker(i, sharedWorkerCh)
+		go b.runBroadcastWorker(i, sharedWorkerCh)
 	}
 
 	// Subscribe automatically reconnects on error
