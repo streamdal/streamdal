@@ -97,6 +97,8 @@ reset:
 	docker ps | grep -i -e snitch -e redis | awk {'print $$1'} | xargs docker rm -f || true
 	docker images | grep -i -e snitch -e redis | awk {'print $$3'} | xargs docker rmi -f || true
 	docker volume rm -f redis-data || true
+	docker volume ls | grep -i redis | awk {'print $2'} | xargs docker volume rm -f || true
+
 
 ### Test
 
