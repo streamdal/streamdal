@@ -44,6 +44,14 @@ const (
 	// TailChannelBufferSize is the size of the tail channel. This buffer size
 	// is intentionally large so that we can survive a burst of tail responses.
 	TailChannelBufferSize = 10_000
+
+	// DefaultNumTailWorkers is the default number of tail workers that will be
+	// set if the config value is not set.
+	DefaultNumTailWorkers = 4
+
+	// DefaultNumBroadcastWorkers is the default number of broadcast workers
+	// that will be set if the config value is not set.
+	DefaultNumBroadcastWorkers = 4
 )
 
 type IBus interface {
@@ -172,11 +180,11 @@ func (o *Options) validate() error {
 	}
 
 	if o.NumTailWorkers <= 0 {
-		return errors.New("num tail workers must be greater than zero")
+		o.NumTailWorkers = DefaultNumTailWorkers
 	}
 
 	if o.NumBroadcastWorkers <= 0 {
-		return errors.New("num broadcast workers must be greater than zero")
+		o.NumBroadcastWorkers = DefaultNumBroadcastWorkers
 	}
 
 	return nil
@@ -259,7 +267,7 @@ func (b *Bus) RunTailConsumer() error {
 	sharedWorkerCh := make(chan *redis.Message, TailChannelBufferSize)
 
 	// Start workers
-	for i := 0; i < b.options.NumConsumerWorkers; i++ {
+	for i := 0; i < b.options.NumTailWorkers; i++ {
 		go b.runTailConsumerWorker(i, sharedWorkerCh)
 	}
 
