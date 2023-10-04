@@ -41,7 +41,7 @@ const (
 
 type IBus interface {
 	// RunConsumer runs a redis consumer that listens for messages on the snitch broadcast topic
-	RunConsumer() error
+	RunBroadcastConsumer() error
 
 	// RunTailConsumer is used for consuming message from the snitch RedisBackend wildcard pubsub topic
 	// This method is different from RunConsumer() because we must call PSubscribe() and PUnsubscribe()
@@ -165,11 +165,11 @@ func (o *Options) validate() error {
 	return nil
 }
 
-// RunConsumer is used for consuming message from the snitch broadcast stream
-// and executing a message handler. It automatically recovers from Redis
+// RunBroadcastConsumer is used for consuming message from the snitch broadcast
+// stream and executing a message handler. It automatically recovers from Redis
 // connection errors.
-func (b *Bus) RunConsumer() error {
-	llog := b.log.WithField("method", "RunConsumer")
+func (b *Bus) RunBroadcastConsumer() error {
+	llog := b.log.WithField("method", "RunBroadcastConsumer")
 	//llog.Debugf("starting dedicated consumer for channel '%s'", FullSubject)
 
 	// Subscribe automatically reconnects on error

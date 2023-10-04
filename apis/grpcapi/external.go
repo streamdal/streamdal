@@ -788,6 +788,8 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 				s.log.Errorf("unknown message received from connected SDK session: %v", msg)
 				continue
 			}
+
+			// Send tail response to client
 			if err := server.Send(tr); err != nil {
 				return errors.Wrap(err, "unable to send tail stream response")
 			}

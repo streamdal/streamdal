@@ -117,13 +117,13 @@ func run(d *deps.Dependencies) error {
 
 	// Run Messaging service
 	go func() {
-		if err := d.BusService.RunConsumer(); err != nil {
+		if err := d.BusService.RunBroadcastConsumer(); err != nil {
 			errChan <- errors.Wrap(err, "error during RedisBackend consumer run")
 		}
 	}()
 
 	// Tail/peek consumers are separate from the main consumer to avoid
-	// bogging down the main consumer with traffic during a peek
+	// bogging down the main consumer with traffic during an active tail
 	go func() {
 		if err := d.BusService.RunTailConsumer(); err != nil {
 			errChan <- errors.Wrap(err, "error during RedisBackend consumer run")
