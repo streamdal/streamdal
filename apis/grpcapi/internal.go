@@ -34,65 +34,6 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 	}
 }
 
-// As of 09/26/23 snitch-server does not require clients to send heartbeats -
-// heartbeats are handled server-side.
-//func (s *InternalServer) startHeartbeatWatcher(serverCtx context.Context, sessionId string, noHeartbeatCh chan struct{}) error {
-//	// Validate inputs
-//	if serverCtx == nil {
-//		return errors.New("server context cannot be nil")
-//	}
-//
-//	if sessionId == "" {
-//		return errors.New("session id cannot be empty")
-//	}
-//
-//	if noHeartbeatCh == nil {
-//		return errors.New("heartbeatCh cannot be nil")
-//	}
-//
-//	llog := s.log.WithFields(logrus.Fields{
-//		"method":     "startHeartbeatWatcher",
-//		"session_id": sessionId,
-//	})
-//
-//	lastHeartbeat := time.Now()
-//
-//	quitCtx, quitCancel := context.WithCancel(serverCtx)
-//	defer quitCancel()
-//
-//	regKey := store.RedisRegisterKey(sessionId, s.Options.Config.NodeName)
-//	hbChan := s.Options.StoreService.WatchKeys(quitCtx, regKey)
-//
-//	go func() {
-//	MAIN:
-//		for {
-//			select {
-//			case <-serverCtx.Done():
-//				llog.Debug("heartbeat watcher detected request context cancellation; exiting")
-//				break MAIN
-//			case <-s.Options.ShutdownContext.Done():
-//				llog.Debug("heartbeat watcher detected shutdown context cancellation; exiting")
-//				break MAIN
-//			case <-hbChan:
-//				llog.Debug("detected heartbeat")
-//				lastHeartbeat = time.Now()
-//			case <-time.After(time.Second):
-//				// Check if heartbeat is older than session TTL
-//				if time.Now().Sub(lastHeartbeat) > s.Options.Config.SessionTTL {
-//					llog.Debugf("no heartbeat received for session id '%s' during the last '%v'; sending disconnect cmd and exiting",
-//						sessionId, s.Options.Config.SessionTTL)
-//					noHeartbeatCh <- struct{}{}
-//					break MAIN
-//				}
-//			}
-//		}
-//
-//		llog.Debug("heartbeat watcher exiting")
-//	}()
-//
-//	return nil
-//}
-
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
 	// Get all audiences for this session
 	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
@@ -148,7 +89,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	ticker := time.NewTicker(1 * time.Second)
 
 	// Broadcast registration to all nodes which will trigger handlers to push
-	// an update to GetAllStream() chan
+	// an update to GetAllStream() chan (so UI knows that a change has occurred)
 	if err := s.Options.BusService.BroadcastRegister(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to broadcast register")
 	}
@@ -462,7 +403,9 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 					s.log.Debug("client closed tail stream")
 					return nil
 				}
+
 				s.log.Error(errors.Wrap(err, "unable to receive tail response"))
+				continue
 			}
 
 			if err := validate.TailResponse(tailResp); err != nil {

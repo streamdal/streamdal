@@ -751,6 +751,8 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
 
+	// Need to broadcast tail request because an SDK might be connected to a
+	// different server instance.
 	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
 		return errors.Wrap(err, "unable to broadcast tail request")
 	}
