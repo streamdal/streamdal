@@ -442,7 +442,7 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 }
 
 func (b *Bus) handleRegisterRequest(_ context.Context, req *protos.RegisterRequest) error {
-	b.log.Debugf("handling delete audience request bus event: %v", req)
+	b.log.Debugf("handling register request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register handler")
 	return nil
 }
@@ -505,7 +505,7 @@ func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest
 	return b.sendTailCommand(ctx, req)
 }
 
-func (b *Bus) sendTailCommand(ctx context.Context, req *protos.TailRequest) error {
+func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error {
 	// Find registered clients
 	// There may be multiple instances connected to the same snitch server instance with
 	// the same pipeline ID and audience

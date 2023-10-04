@@ -205,15 +205,16 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.PubSubService = pubsub.New()
 
 	busService, err := bus.New(&bus.Options{
-		Store:            storeService,
-		RedisBackend:     d.RedisBackend,
-		Cmd:              d.CmdService,
-		NodeName:         d.Config.NodeName,
-		ShutdownCtx:      d.ShutdownContext,
-		WASMDir:          d.Config.WASMDir,
-		Metrics:          d.MetricsService,
-		PubSub:           d.PubSubService,
-		NumTailConsumers: cfg.NumTailConsumers,
+		Store:               storeService,
+		RedisBackend:        d.RedisBackend,
+		Cmd:                 d.CmdService,
+		NodeName:            d.Config.NodeName,
+		ShutdownCtx:         d.ShutdownContext,
+		WASMDir:             d.Config.WASMDir,
+		Metrics:             d.MetricsService,
+		PubSub:              d.PubSubService,
+		NumTailWorkers:      cfg.NumTailWorkers,
+		NumBroadcastWorkers: cfg.NumBroadcastWorkers,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")

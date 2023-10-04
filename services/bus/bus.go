@@ -37,15 +37,31 @@ const (
 
 	// TailSubjectPrefix is the prefix for the RedisBackend wildcard pubsub topic for tail/peek responses
 	TailSubjectPrefix = "snitch_events:tail"
+
+	// BroadcastChannelBufferSize is the size of the shared broadcast channel.
+	BroadcastChannelBufferSize = 1000
+
+	// TailChannelBufferSize is the size of the tail channel. This buffer size
+	// is intentionally large so that we can survive a burst of tail responses.
+	TailChannelBufferSize = 10_000
+
+	// DefaultNumTailWorkers is the default number of tail workers that will be
+	// set if the config value is not set.
+	DefaultNumTailWorkers = 4
+
+	// DefaultNumBroadcastWorkers is the default number of broadcast workers
+	// that will be set if the config value is not set.
+	DefaultNumBroadcastWorkers = 4
 )
 
 type IBus interface {
-	// RunConsumer runs a redis consumer that listens for messages on the snitch broadcast topic
-	RunConsumer() error
+	// RunBroadcastConsumer runs a redis consumer that listens for messages on the snitch broadcast topic
+	RunBroadcastConsumer() error
 
-	// RunTailConsumer is used for consuming message from the snitch RedisBackend wildcard pubsub topic
-	// This method is different from RunConsumer() because we must call PSubscribe() and PUnsubscribe()
-	// instead of Subscribe() and Unsubscribe() respectively.
+	// RunTailConsumer is used for consuming message from the RedisBackend
+	// wildcard pubsub topic. This method is different from RunBroadcastConsumer()
+	// because we must call PSubscribe() and PUnsubscribe() instead of
+	// Subscribe() and Unsubscribe() respectively.
 	// See: https://redis.io/commands/psubscribe
 	RunTailConsumer() error
 
@@ -107,15 +123,16 @@ type Bus struct {
 }
 
 type Options struct {
-	Store            store.IStore
-	RedisBackend     *redis.Client
-	Metrics          metrics.IMetrics
-	Cmd              cmd.ICmd
-	NodeName         string
-	WASMDir          string
-	ShutdownCtx      context.Context
-	PubSub           pubsub.IPubSub
-	NumTailConsumers int
+	Store               store.IStore
+	RedisBackend        *redis.Client
+	Metrics             metrics.IMetrics
+	Cmd                 cmd.ICmd
+	NodeName            string
+	WASMDir             string
+	ShutdownCtx         context.Context
+	PubSub              pubsub.IPubSub
+	NumBroadcastWorkers int
+	NumTailWorkers      int
 }
 
 func New(opts *Options) (*Bus, error) {
@@ -162,15 +179,32 @@ func (o *Options) validate() error {
 		return errors.New("pubsub must be provided")
 	}
 
+	if o.NumTailWorkers <= 0 {
+		o.NumTailWorkers = DefaultNumTailWorkers
+	}
+
+	if o.NumBroadcastWorkers <= 0 {
+		o.NumBroadcastWorkers = DefaultNumBroadcastWorkers
+	}
+
 	return nil
 }
 
-// RunConsumer is used for consuming message from the snitch broadcast stream
-// and executing a message handler. It automatically recovers from Redis
+// RunBroadcastConsumer is used for consuming message from the snitch broadcast
+// stream and executing a message handler. It automatically recovers from Redis
 // connection errors.
-func (b *Bus) RunConsumer() error {
-	llog := b.log.WithField("method", "RunConsumer")
-	//llog.Debugf("starting dedicated consumer for channel '%s'", FullSubject)
+func (b *Bus) RunBroadcastConsumer() error {
+	llog := b.log.WithField("method", "RunBroadcastConsumer").WithField("channel", FullSubject)
+
+	llog.Debug("starting")
+
+	// This channel is shared between all tail workers
+	sharedWorkerCh := make(chan *redis.Message, BroadcastChannelBufferSize)
+
+	// Launch a worker group for broadcast handlers
+	for i := 0; i < b.options.NumBroadcastWorkers; i++ {
+		b.runBroadcastWorker(i, sharedWorkerCh)
+	}
 
 	// Subscribe automatically reconnects on error
 	ps := b.options.RedisBackend.Subscribe(b.options.ShutdownCtx, FullSubject)
@@ -182,18 +216,36 @@ MAIN:
 			llog.Debug("context cancellation detected")
 			break MAIN
 		case msg := <-ps.Channel():
-			//llog.Debugf("received message on channel '%s'", msg.Channel)
+			sharedWorkerCh <- msg
+		}
+	}
 
+	llog.Debug("exiting")
+
+	return ps.Unsubscribe(context.Background())
+}
+
+func (b *Bus) runBroadcastWorker(id int, sharedBroadcastCh chan *redis.Message) {
+	llog := b.log.WithField("method", "runBroadcastWorker").WithField("worker_id", id)
+
+	defer func() {
+		llog.Debug("exiting")
+	}()
+
+	llog.Debug("starting")
+
+	for {
+		select {
+		case <-b.options.ShutdownCtx.Done():
+			llog.Debug("context cancellation detected")
+			return
+		case msg := <-sharedBroadcastCh:
 			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
 				llog.WithError(err).Errorf("error handling broadcast message on channel '%s'", msg.Channel)
 				continue
 			}
 		}
 	}
-
-	//llog.Debugf("pubsub consumer for topic '%s' exiting", FullSubject)
-
-	return ps.Unsubscribe(context.Background())
 }
 
 // RunTailConsumer is a dedicated consumer that listens for tail messages on a
@@ -212,11 +264,11 @@ func (b *Bus) RunTailConsumer() error {
 	}
 
 	// This channel is shared between all tail workers
-	sharedWorkerCh := make(chan *redis.Message, b.options.NumTailConsumers)
+	sharedWorkerCh := make(chan *redis.Message, TailChannelBufferSize)
 
 	// Start workers
-	for i := 0; i < b.options.NumTailConsumers; i++ {
-		go b.runTailConsumerWorker(sharedWorkerCh)
+	for i := 0; i < b.options.NumTailWorkers; i++ {
+		go b.runTailConsumerWorker(i, sharedWorkerCh)
 	}
 
 MAIN:
@@ -242,8 +294,14 @@ MAIN:
 	return nil
 }
 
-func (b *Bus) runTailConsumerWorker(ch chan *redis.Message) {
-	llog := b.log.WithField("method", "runTailConsumerWorker")
+func (b *Bus) runTailConsumerWorker(id int, ch chan *redis.Message) {
+	llog := b.log.WithField("method", "runTailConsumerWorker").WithField("worker_id", id)
+
+	defer func() {
+		llog.Debug("exiting")
+	}()
+
+	llog.Debug("starting")
 
 	// Loop forever, waiting for either the shutdown signal or a message on the channel
 	// The message will then be passed to the handler. This way ensures only one tail

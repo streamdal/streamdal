@@ -8,6 +8,10 @@ import (
 	"github.com/streamdal/snitch-server/util"
 )
 
+// IPubSub is an interface for an internal, in-memory pub/sub system. We use it
+// to signal events to subscribers (such as when new clients Register() to the
+// server or when disconnects occur). This is used to tell the frontend that
+// a change has occurred (and the frontend must refresh its view.
 type IPubSub interface {
 	// HaveTopic determines if there are any open pubsub channels for a given topic
 	HaveTopic(topic string) bool
