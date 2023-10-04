@@ -3,13 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
 
 	"github.com/alecthomas/kong"
-)
-
-var (
-	ValidNameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 )
 
 type Config struct {
@@ -17,6 +12,9 @@ type Config struct {
 		OperationType     int64    `kong:"help='Audience component name (1 = Consumer, 2 = Producer)',enum='1,2',default='1'"`
 		OperationName     string   `kong:"help='Audience operation name',required,default='demo-operation'"`
 		ComponentName     string   `kong:"help='Audience component name',required,default='demo-component'"`
+		NumInstances      int      `kong:"help='Number of instances of SDK to register',required,default='1'"`
+		ReconnectRandom   bool     `kong:"help='Randomly disconnects and reconnects to server (useful for testing concurrency in server)',default='false'"`
+		ReconnectInterval int      `kong:"help='Seconds between reconnects (rand(0..ReconnectInterval) if ReconnectRandom is true)',default='0'"`
 		ConsumerInputType string   `kong:"help='Consumer input type', enum='none,file',default='none'"`
 		ConsumerInputFile *os.File `kong:"help='Path to file to use as consumer input'"`
 	} `kong:"cmd='register',help='Run client in register mode',xor='register,another'"`
@@ -30,6 +28,8 @@ type Config struct {
 	SnitchAddress string `kong:"help='Snitch server address',default='localhost:9090',required"`
 	SnitchToken   string `kong:"help='Snitch server token',default='1234',required"`
 	Debug         bool   `kong:"help='Enable debug output',short='d'"`
+	Quiet         bool   `kong:"help='Disable showing pre/post output',short='q'"`
+	InjectLogger  bool   `kong:"help='Inject logger into SDK',default='false'"`
 
 	// Internal bits
 	Ctx *kong.Context `kong:"-"`

@@ -16,6 +16,10 @@ help:
 run: description = Run with defaults
 run:
 	go run *.go register -d \
+	--quiet \
+	--num-instances 4 \
+	--reconnect-interval 10 \
+	--reconnect-random \
 	--service-name "service" \
 	--component-name "kafka" \
 	--operation-name  "demo-operation" \
