@@ -162,5 +162,7 @@ func (b *Bus) broadcast(ctx context.Context, eventType string, event *protos.Bus
 
 	b.options.RedisBackend.Publish(ctx, FullSubject, data)
 
+	b.log.Debugf("broadcast for event '%v' complete", eventType)
+
 	return nil
 }

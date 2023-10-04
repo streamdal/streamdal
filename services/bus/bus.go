@@ -216,7 +216,9 @@ MAIN:
 			llog.Debug("context cancellation detected")
 			break MAIN
 		case msg := <-ps.Channel():
+			b.log.WithField("channel", msg.Channel).Debug("received message")
 			sharedWorkerCh <- msg
+			b.log.WithField("channel", msg.Channel).Debug("sent message to worker chan")
 		}
 	}
 
@@ -240,10 +242,14 @@ func (b *Bus) runBroadcastWorker(id int, sharedBroadcastCh chan *redis.Message) 
 			llog.Debug("context cancellation detected")
 			return
 		case msg := <-sharedBroadcastCh:
+			llog.WithField("channel", msg.Channel).Debug("received message from shared channel")
+
 			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
 				llog.WithError(err).Errorf("error handling broadcast message on channel '%s'", msg.Channel)
 				continue
 			}
+
+			llog.WithField("channel", msg.Channel).Debug("handled message")
 		}
 	}
 }
