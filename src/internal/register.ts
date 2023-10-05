@@ -26,7 +26,7 @@ export interface TailStatus {
 export const internal = {
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
-  audiences: new Map<string, TailStatus>(),
+  audiences: new Map<string, Map<string, TailStatus>>(),
   wasmModules: new Map<string, WasmModule>(),
 };
 

@@ -13,7 +13,7 @@ import {
 } from "@streamdal/snitch-protos/protos/sp_pipeline";
 
 import { Configs } from "../snitch.js";
-import { audienceKey, internal } from "./register.js";
+import { audienceKey, internal, TailStatus } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
   paused?: boolean;
@@ -119,9 +119,37 @@ export const togglePausePipeline = (
 };
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
-  console.debug("enabling tail", request);
-  internal.audiences.set(audienceKey(audience), {
-    tail: request.type === TailRequestType.START,
-    tailRequestId: request.Id,
-  });
+  console.debug("received a tail command for audience", audience);
+  switch (request.type) {
+    case TailRequestType.START: {
+      console.debug(
+        "received a START tail: adding entry to audiences for tail id",
+        audience
+      );
+      // Create inner map if it doesn't exist
+      if (!internal.audiences.has(audienceKey(audience))) {
+        internal.audiences.set(
+          audienceKey(audience),
+          new Map<string, TailStatus>()
+        );
+      }
+      // Add entry (@JH, OK if overwritten?)
+      internal.audiences.get(audienceKey(audience))?.set(request.Id, {
+        tail: request.type === TailRequestType.START,
+        tailRequestId: request.Id,
+      });
+      break;
+    }
+    case TailRequestType.STOP: {
+      console.debug(
+        "received a STOP tail: removing entry from audiences for tail id",
+        request.Id
+      );
+      internal.audiences.get(audienceKey(audience))?.delete(request.Id);
+      break;
+    }
+    default:
+      console.error("unknown tail request type ", request.type);
+      break;
+  }
 };

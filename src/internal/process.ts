@@ -42,7 +42,7 @@ export interface PipelineConfigs {
 
 export interface TailRequest {
   configs: PipelineConfigs;
-  tailStatus?: TailStatus;
+  tails?: Map<string, TailStatus>;
   audience: Audience;
   originalData: Uint8Array;
   newData?: Uint8Array;
@@ -62,28 +62,30 @@ const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
 
 export const sendTail = ({
   configs,
-  tailStatus,
+  tails,
   audience,
   originalData,
   newData,
 }: TailRequest) => {
-  try {
-    if (tailStatus?.tail) {
-      const tailResponse = TailResponse.create({
-        timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
-        type: TailResponseType.PAYLOAD,
-        tailRequestId: tailStatus.tailRequestId,
-        audience,
-        sessionId: configs.sessionId,
-        originalData,
-        newData,
-      });
-      console.debug("sending tail response", tailResponse);
-      void configs.tailCall.requests.send(tailResponse);
+  tails?.forEach((tailStatus, tailRequestId) => {
+    try {
+      if (tailStatus.tail) {
+        const tailResponse = TailResponse.create({
+          timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
+          type: TailResponseType.PAYLOAD,
+          tailRequestId: tailRequestId,
+          audience,
+          sessionId: configs.sessionId,
+          originalData,
+          newData,
+        });
+        console.debug("sending tail response", tailResponse);
+        void configs.tailCall.requests.send(tailResponse);
+      }
+    } catch (e) {
+      console.error("Error sending tail request", e);
     }
-  } catch (e) {
-    console.error("Error sending tail request", e);
-  }
+  });
 };
 
 export const processPipeline = async ({
@@ -93,7 +95,7 @@ export const processPipeline = async ({
 }: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
   const key = audienceKey(audience);
   const pipeline = internal.pipelines.get(key);
-  const tailStatus = internal.audiences.get(key);
+  const tails = internal.audiences.get(key);
 
   if (!pipeline || pipeline.paused) {
     const message =
@@ -102,7 +104,7 @@ export const processPipeline = async ({
 
     sendTail({
       configs,
-      tailStatus,
+      tails,
       audience,
       originalData: data,
     });
@@ -146,7 +148,7 @@ export const processPipeline = async ({
 
   sendTail({
     configs,
-    tailStatus,
+    tails,
     audience,
     originalData,
     newData: data,
