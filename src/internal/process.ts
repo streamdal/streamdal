@@ -13,7 +13,7 @@ import {
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
 
 import { SnitchRequest, SnitchResponse } from "../snitch.js";
-import { pipelineMetrics, stepMetrics } from "./metrics.js";
+import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { EnhancedStep, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 import { runWasm } from "./wasm.js";
@@ -97,6 +97,8 @@ export const processPipeline = async ({
   const pipeline = internal.pipelines.get(key);
   const tails = internal.audiences.get(key);
 
+  void audienceMetrics(audience, data.length);
+
   if (!pipeline || pipeline.paused) {
     const message =
       "no active pipeline found for this audience, returning data";
@@ -143,8 +145,6 @@ export const processPipeline = async ({
       break;
     }
   }
-
-  void pipelineMetrics(audience, data.length);
 
   sendTail({
     configs,

@@ -152,7 +152,7 @@ const randomInterval = async (snitch: any, audience: Audience, input: any) => {
   setTimeout(
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     () => randomInterval(snitch, audience, input),
-    Math.random() * 5000
+    Math.floor(Math.random() * (3000 - 500 + 1) + 3000)
   );
 };
 
@@ -216,6 +216,66 @@ export const tailFriendly = async () => {
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export const highVolumeTail = async () => {
+  const snitchA = new Snitch(serviceAConfig);
+  const snitchB = new Snitch(serviceBConfig);
+
+  setInterval(() => {
+    void logTest(snitchA, audienceAConsumer, exampleData);
+  }, 500);
+
+  setInterval(() => {
+    void logTest(
+      snitchA,
+      { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+      exampleData
+    );
+  }, 500);
+
+  setInterval(() => {
+    void logTest(
+      snitchA,
+      { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+      exampleData
+    );
+  }, 1000);
+
+  setInterval(() => {
+    void logTest(
+      snitchA,
+      { ...audienceAConsumer, componentName: "another-kafka" },
+      exampleData
+    );
+  }, 500);
+
+  void logTest(
+    snitchA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData
+  );
+
+  setInterval(() => {
+    void logTest(snitchA, audienceAProducer, exampleData);
+  }, 2000);
+
+  setInterval(() => {
+    void logTest(snitchB, audienceBConsumer, exampleData);
+  }, 250);
+
+  setInterval(() => {
+    void logTest(snitchB, audienceBProducer, exampleData);
+  }, 500);
+
+  setInterval(() => {
+    void logTest(
+      snitchB,
+      { ...audienceBProducer, componentName: "kafka" },
+      exampleData
+    );
+  }, 500);
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await

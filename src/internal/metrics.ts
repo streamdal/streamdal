@@ -67,7 +67,7 @@ export const stepMetrics = async (
   });
 };
 
-export const pipelineMetrics = async (
+export const audienceMetrics = async (
   audience: Audience,
   payloadSize: number
 
@@ -80,16 +80,16 @@ export const pipelineMetrics = async (
     const bytesProcessedKey = `counter_${opName}_bytes_rate`;
     const processedKey = `counter_${opName}_processed_rate`;
 
-    metrics.set(processedKey, {
-      name: processedKey,
-      value: (metrics.get(processedKey)?.value ?? 0) + 1,
+    metrics.set(bytesProcessedKey, {
+      name: bytesProcessedKey,
+      value: (metrics.get(bytesProcessedKey)?.value ?? 0) + payloadSize,
       labels: {},
       audience,
     });
 
-    metrics.set(bytesProcessedKey, {
-      name: bytesProcessedKey,
-      value: (metrics.get(bytesProcessedKey)?.value ?? 0) + payloadSize,
+    metrics.set(processedKey, {
+      name: processedKey,
+      value: (metrics.get(processedKey)?.value ?? 0) + 1,
       labels: {},
       audience,
     });
@@ -108,14 +108,18 @@ export const sendMetrics = async (configs: MetricsConfigs) => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   lock.writeLock(async (release) => {
     try {
+      const metricsData = Array.from(metrics.values()).map((m: Metric) => ({
+        ...m,
+        //
+        // Make sure we always send data per second
+        value: m.value / (METRIC_INTERVAL / 1000),
+      }));
+
+      console.debug("sending metrics", metricsData);
+
       const call = configs.grpcClient.metrics(
         {
-          metrics: Array.from(metrics.values()).map((m: Metric) => ({
-            ...m,
-            //
-            // Make sure we always send data per second
-            value: m.value / (METRIC_INTERVAL / 1000),
-          })),
+          metrics: metricsData,
         },
         { meta: { "auth-token": configs.snitchToken } }
       );
