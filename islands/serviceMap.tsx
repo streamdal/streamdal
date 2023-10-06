@@ -20,12 +20,12 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
-import { getEdgeMetrics } from "../lib/edgeMetrics.ts";
 import {
   ComponentEdge,
   ServiceEdge,
 } from "../components/serviceMap/customEdge.tsx";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
+import { audienceMetricsSocket, serviceMapSocket } from "../lib/sockets.ts";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -106,37 +106,16 @@ export default function ServiceMapComponent(
     blur?: boolean;
   },
 ) {
-  void getEdgeMetrics({ grpcUrl, grpcToken });
   const wrapper = useRef(null);
-
   const [rfInstance, setRfInstance] = useState(null);
 
   useEffect(() => {
-    const url = new URL("./ws/service-map", location.href);
-    url.protocol = url.protocol.replace("http", "ws");
-    const webSocket = new WebSocket(url);
-
-    webSocket.addEventListener("open", (event) => {
-      webSocket.send("ping");
-    });
-
-    webSocket.addEventListener("message", (event) => {
-      if (event.data === "pong") {
-        console.debug("got server pong");
-        return;
-      }
-
-      try {
-        const parsedData = JSON.parse(event.data);
-        serviceSignal.value = {
-          ...parsedData,
-          nodesMap: new Map(parsedData.nodesMap),
-          edgesMap: new Map(parsedData.edgesMap),
-        };
-      } catch (e) {
-        console.error("error parsing server data", e);
-      }
-    });
+    const serviceSocket = serviceMapSocket("./ws/service-map");
+    const audienceSocket = audienceMetricsSocket("./ws/audience-metrics");
+    return () => {
+      serviceSocket?.close();
+      audienceSocket?.close();
+    };
   }, []);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initNodes);

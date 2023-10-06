@@ -5,16 +5,21 @@ import {
   getBezierPath,
 } from "reactflow";
 import { edgeKey } from "../../lib/utils.ts";
-import { edgeMetricsSignal } from "../../lib/edgeMetrics.ts";
 import { OperationType } from "snitch-protos/protos/sp_common.ts";
+import { signal } from "@preact/signals";
 
-function EdgeLabel(
+type RateMetrics = { bytes: string; processed: string };
+export const audienceMetricsSignal = signal<{ [key in string]: RateMetrics }>(
+  {},
+);
+
+const EdgeLabel = (
   { transform, bytes, processed }: {
     transform: string;
     bytes: string;
     processed: string;
   },
-) {
+) => {
   return (
     <div
       style={{
@@ -32,7 +37,7 @@ function EdgeLabel(
       </div>
     </div>
   );
-}
+};
 
 export const ServiceEdge = ({
   id,
@@ -65,9 +70,9 @@ export const ServiceEdge = ({
     : targetY;
 
   const key = edgeKey(data?.a);
-  const metrics = edgeMetricsSignal.value &&
-      edgeMetricsSignal.value[key]
-    ? edgeMetricsSignal.value[key]
+  const metrics = audienceMetricsSignal.value &&
+      audienceMetricsSignal.value[key]
+    ? audienceMetricsSignal.value[key]
     : { bytes: "0", processed: "0" };
 
   return (
@@ -120,9 +125,9 @@ export const ComponentEdge = ({
     : targetY;
 
   const key = edgeKey(data?.a);
-  const metrics = edgeMetricsSignal.value &&
-      edgeMetricsSignal.value[key]
-    ? edgeMetricsSignal.value[key]
+  const metrics = audienceMetricsSignal.value &&
+      audienceMetricsSignal.value[key]
+    ? audienceMetricsSignal.value[key]
     : { bytes: "0", processed: "0" };
 
   return (

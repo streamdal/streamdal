@@ -21,11 +21,7 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
   return (
     <>
       <NavBar />
-      <OpModal
-        serviceMap={serviceSignal.value}
-        grpcUrl={url}
-        grpcToken={token}
-      />
+      <OpModal serviceMap={serviceSignal.value} />
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />

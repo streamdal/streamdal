@@ -1,4 +1,4 @@
-import { Audience, TailResponse } from "snitch-protos/protos/sp_common.ts";
+import { Audience } from "snitch-protos/protos/sp_common.ts";
 import { OP_MODAL_WIDTH } from "./opModal.tsx";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
@@ -9,45 +9,40 @@ import { Head } from "$fresh/runtime.ts";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import {
-  tail,
-  tailEnabledSignal,
-  tailPausedSignal,
-  tailSignal,
-} from "../lib/tail.ts";
-import { useSignalEffect } from "@preact/signals";
-import { longDateFormat } from "../lib/utils.ts";
+import { signal } from "@preact/signals";
+import { audienceKey, longDateFormat } from "../lib/utils.ts";
+import { tailSocket } from "../lib/sockets.ts";
 
-export const MAX_TAIL_UI_SIZE = 100;
+export const MAX_TAIL_SIZE = 100;
 
-export const parseData = (data: Uint8Array) => {
-  const decoded = new TextDecoder().decode(data);
+export const tailSignal = signal<{ [key in string]: TailData[] }>(
+  {},
+);
 
+export const tailEnabledSignal = signal<boolean>(false);
+export const tailPausedSignal = signal<boolean>(false);
+export const tailSamplingSignal = signal<boolean>(false);
+export const tailSamplingRateSignal = signal<number>(1);
+
+export type TailData = { timestamp: Date; data: string };
+
+export const parseData = (data: string) => {
   try {
-    const parsed = JSON.parse(decoded);
+    const parsed = JSON.parse(data);
     return JSON.stringify(parsed, null, 2);
   } catch (e) {
-    console.error("Error parsing tail data, returning decoded data instead", e);
+    console.debug("Error parsing tail data, returning raw data instead");
   }
-  return decoded;
-};
-
-export const parseDate = (timestampNs: string) => {
-  try {
-    return new Date(Number(BigInt(timestampNs) / BigInt(1e6)));
-  } catch (e) {
-    console.error("error parsing", timestampNs);
-  }
-  return null;
+  return data;
 };
 
 export const TailRow = (
-  { row }: { row: TailResponse; index: number },
+  { row }: { row: TailData; index: number },
 ) => {
   const lastRef = useRef();
 
   useEffect(() => {
-    lastRef.current &&
+    tailPausedSignal.value === false && lastRef.current &&
       lastRef.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
@@ -62,7 +57,7 @@ export const TailRow = (
         className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start"
       >
         <div className="text-stream">
-          {parseDate(row.timestampNs)?.toLocaleDateString(
+          {row.timestamp?.toLocaleDateString(
             "en-us",
             longDateFormat,
           )}
@@ -70,7 +65,7 @@ export const TailRow = (
         <pre>
           <code>
             <div dangerouslySetInnerHTML={{
-                __html: hljs.highlightAuto(parseData(row.newData && row.newData.length > 0 ? row.newData : row.originalData)).value,
+                __html: hljs.highlightAuto(parseData(row.data)).value,
               }}
             >
             </div>
@@ -81,30 +76,16 @@ export const TailRow = (
   );
 };
 
-export const Tail = (
-  {
-    audience,
-    grpcToken,
-    grpcUrl,
-  }: {
-    audience: Audience;
-    grpcUrl: string;
-    grpcToken: string;
-  },
-) => {
-  const [tailData, setTailData] = useState(tailSignal.value);
+export const Tail = ({ audience }: { audience: Audience }) => {
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    tailPausedSignal.value = false;
-    void tail({ audience, grpcUrl, grpcToken });
-  }, []);
+    const socket = tailSocket("./ws/tail", audience);
 
-  useSignalEffect(() => {
-    if (!tailPausedSignal.value) {
-      setTailData(tailSignal.value);
-    }
-  });
+    return () => {
+      socket?.close();
+    };
+  }, [tailSamplingSignal.value, tailSamplingRateSignal.value]);
 
   return (
     <>
@@ -168,9 +149,9 @@ export const Tail = (
               fullScreen ? "200" : "260"
             }px)] overflow-y-scroll rounded-md bg-black text-white`}
           >
-            {tailData?.slice(-MAX_TAIL_UI_SIZE).map((
-              p: TailResponse,
-            ) => <TailRow row={p} />)}
+            {tailSignal.value[audienceKey(audience)]?.map((
+              tail: TailData,
+            ) => <TailRow row={tail} />)}
           </div>
         </div>
       </div>
