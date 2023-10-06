@@ -738,24 +738,34 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 }
 
 func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
+	s.log.Info("external.Tail(): received tail request")
+
 	// Each tail request gets its own unique ID so that we can receive messages over
 	// a unique channel from RedisBackend
 	req.XId = util.StringPtr(util.GenerateUUID())
 
+	s.log.Info("external.Tail(): after str ptr")
+
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
 	}
+
+	s.log.Info("external.Tail(): after validate")
 
 	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
 	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
 
+	s.log.Info("external.Tail(): after listen")
+
 	// Need to broadcast tail request because an SDK might be connected to a
 	// different server instance.
 	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
 		return errors.Wrap(err, "unable to broadcast tail request")
 	}
+
+	s.log.Info("external.Tail(): after broadcast")
 
 	// When the connection to the endpoint is closed, emit a STOP event which will be broadcast
 	// to all snitch server instances and their connected clients so that they can stop tailing.

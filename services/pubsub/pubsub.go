@@ -1,6 +1,7 @@
 package pubsub
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -64,6 +65,8 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 
 	ch := make(chan interface{}, 1)
 
+	fmt.Println("pubsub.Listen: before lock")
+
 	ps.mtx.Lock()
 	if _, ok := ps.topics[topic]; !ok {
 		ps.topics[topic] = make(map[string]chan interface{})
@@ -72,6 +75,8 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 	ps.topics[topic][id] = ch
 
 	ps.mtx.Unlock()
+
+	fmt.Println("pubsub.Listen: after unlock")
 
 	return ch
 }
@@ -132,8 +137,12 @@ func (ps *PubSub) Publish(topic string, m interface{}) {
 		return
 	}
 
-	for _, ch := range ps.topics[topic] {
-		ch <- m
+	for _, tmpCh := range ps.topics[topic] {
+		go func(ch chan interface{}) {
+			ps.log.Debugf("pubsub.Publish: before topic '%s' write", topic)
+			ch <- m
+			ps.log.Debugf("pubsub.Publish: after topic '%s' write", topic)
+		}(tmpCh)
 	}
 }
 

@@ -408,15 +408,21 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 				continue
 			}
 
+			s.log.Debugf("Tail() after Recv(), before validation for session id '%s'", tailResp.SessionId)
+
 			if err := validate.TailResponse(tailResp); err != nil {
 				s.log.Error(errors.Wrap(err, "invalid tail response"))
 				continue
 			}
 
+			s.log.Debugf("Tail() after validation, before BroadcastTailResponse for session id '%s'", tailResp.SessionId)
+
 			if err := s.Options.BusService.BroadcastTailResponse(srv.Context(), tailResp); err != nil {
 				s.log.Error(errors.Wrap(err, "unable to broadcast tail response"))
 				continue
 			}
+
+			s.log.Debugf("Tail() after BroadcastTailResponse for session id '%s'", tailResp.SessionId)
 
 			s.log.Debugf("publishing tail response for session id '%s'", tailResp.SessionId)
 		}

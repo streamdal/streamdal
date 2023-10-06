@@ -325,6 +325,7 @@ func (b *Bus) runTailConsumerWorker(id int, ch chan *redis.Message) {
 // appropriate msg handler.
 func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
 	llog := b.log.WithField("method", "handler")
+
 	llog.Debug("received new broadcast message")
 
 	busEvent := &protos.BusEvent{}

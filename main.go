@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -89,6 +90,8 @@ func run(d *deps.Dependencies) error {
 		}
 
 		if err := api.Run(); err != nil {
+			fmt.Println("grpc server error - what now!!!")
+
 			errChan <- errors.Wrap(err, "error during gRPC API run")
 			return
 		}
@@ -141,6 +144,7 @@ func run(d *deps.Dependencies) error {
 	// If shutting down, no need to listen for errCh
 	select {
 	case err := <-errChan:
+		fmt.Println("received an error on errChan in run(): ", err)
 		return err
 	case <-d.ShutdownContext.Done():
 		// Give components a moment to shutdown
