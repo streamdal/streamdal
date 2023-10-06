@@ -1,19 +1,15 @@
 import { NotificationConfigModal } from "../../components/modals/notificationConfigModal.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { SuccessType } from "../_middleware.ts";
+import { SuccessRoute, SuccessType } from "../_middleware.ts";
 
 export type NotificationsRoute = {
   success?: SuccessType;
 };
 
-export const handler: Handlers<SuccessType> = {
+export const handler: Handlers<SuccessRoute> = {
   async POST(req, ctx) {
     const { session } = ctx.state;
-    const success = session.get("success");
-    //
-    // TODO: unsetting after read because session.flash doesn't seem to work
-    // find another middleware or roll our own
-    session.set("success", null);
+    const success = session.flash("success");
     return ctx.render({
       success,
     });

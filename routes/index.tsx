@@ -1,20 +1,16 @@
-import { SuccessType } from "./_middleware.ts";
+import { SuccessRoute, SuccessType } from "./_middleware.ts";
 import { Handlers } from "$fresh/src/server/types.ts";
 
-export const handler: Handlers<SuccessType> = {
+export const handler: Handlers<SuccessRoute> = {
   async POST(req, ctx) {
     const { session } = ctx.state;
-    const success = session.get("success");
-    //
-    // TODO: unsetting after read because session.flash doesn't seem to work
-    // find another middleware or roll our own
-    session.set("success", null);
+    const success = session.flash("success");
     return ctx.render({
       success,
     });
   },
 };
 
-export default function IndexRoute(props) {
+export default function IndexRoute() {
   return;
 }

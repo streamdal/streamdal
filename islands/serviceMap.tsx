@@ -24,8 +24,11 @@ import {
   ComponentEdge,
   ServiceEdge,
 } from "../components/serviceMap/customEdge.tsx";
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { audienceMetricsSocket, serviceMapSocket } from "../lib/sockets.ts";
+import {
+  OP_MODAL_KEY,
+  opModal,
+} from "../components/serviceMap/opModalSignal.ts";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -48,10 +51,6 @@ export const nodeTypes = {
 const edgeTypes: EdgeTypes = {
   serviceEdge: ServiceEdge,
   componentEdge: ComponentEdge,
-};
-
-const serialize = async (instance: any) => {
-  localStorage.setItem(LAYOUT_KEY, JSON.stringify(instance.toObject()));
 };
 
 //
@@ -98,15 +97,14 @@ export const updateEdges = (
 };
 
 export default function ServiceMapComponent(
-  { initNodes, initEdges, grpcUrl, grpcToken, blur = false }: {
+  { initNodes, initEdges, blur = false }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
-    grpcUrl: string;
-    grpcToken: string;
     blur?: boolean;
   },
 ) {
   const wrapper = useRef(null);
+
   const [rfInstance, setRfInstance] = useState(null);
 
   useEffect(() => {
@@ -127,13 +125,6 @@ export default function ServiceMapComponent(
     zoom: .85,
   };
 
-  useSignalEffect(() => {
-    if (opUpdateSignal.value) {
-      const updated = updateNode(nodes, opUpdateSignal.value);
-      setNodes(updated);
-    }
-  });
-
   const fit = (nodes: FlowNode[], rfInstance) => {
     const { right } = wrapper?.current?.getBoundingClientRect();
     if (
@@ -147,6 +138,13 @@ export default function ServiceMapComponent(
   };
 
   useSignalEffect(() => {
+    localStorage.setItem(OP_MODAL_KEY, JSON.stringify(opModal.value));
+
+    if (opUpdateSignal.value) {
+      const updated = updateNode(nodes, opUpdateSignal.value);
+      setNodes(updated);
+    }
+
     if (serviceSignal.value) {
       const nodes: FlowNode[] = Array.from(
         serviceSignal.value.nodesMap.values(),

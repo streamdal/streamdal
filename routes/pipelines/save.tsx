@@ -21,7 +21,7 @@ export const handler: Handlers<SuccessType> = {
     const { session } = ctx.state;
 
     if (errors) {
-      session.set("success", {
+      session.flash("success", {
         status: false,
         message: "Validation failed",
         errors,
@@ -37,7 +37,7 @@ export const handler: Handlers<SuccessType> = {
 
     const response = await upsertPipeline(pipeline);
 
-    session.set("success", {
+    session.flash("success", {
       status: response.code === ResponseCode.OK,
       message: response.code === ResponseCode.OK
         ? "Success!"

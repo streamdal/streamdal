@@ -9,8 +9,6 @@ import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import {
   audienceKey,
   componentKey,
-  edgeKey,
-  removeWhitespace,
   serviceKey,
   setComponentGroup,
   setOperationHoverGroup,
@@ -21,7 +19,6 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../lib/nodeMapper.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { opUpdateSignal } from "./serviceMap.tsx";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
@@ -141,9 +138,9 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
 export const OperationNode = (
   { operation, css }: { operation: Operation; css: string },
 ) => {
-  const toolTipId = removeWhitespace(operation.audience.operationName);
-  const highlight = operation?.audience === opModal.value?.audience &&
-    opModal.value?.displayType === "operation";
+  const key = audienceKey(operation.audience);
+  const highlight = opModal.value?.audience &&
+    key === audienceKey(opModal.value?.audience);
   const trashActive = opModal.value?.delete;
 
   return (
@@ -167,13 +164,13 @@ export const OperationNode = (
           class={"flex flex-col justify-start p-1 cursor-pointer"}
         >
           <h2
-            data-tooltip-target={toolTipId}
+            data-tooltip-target={key}
             class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
           >
             {operation.audience.operationName}
           </h2>
           <Tooltip
-            targetId={toolTipId}
+            targetId={key}
             message={"Click to attach and detach pipelines"}
           />
           <h3 class="text-xs text-streamdalPurple font-semibold">

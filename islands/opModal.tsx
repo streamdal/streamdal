@@ -31,8 +31,6 @@ import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import { SchemaModal } from "../components/modals/schemaModal.tsx";
 import { ComponentImage } from "./customNodes.tsx";
 import { useSignalEffect } from "@preact/signals";
-import { updateNode } from "../lib/nodeMapper.ts";
-import { opUpdateSignal } from "./serviceMap.tsx";
 
 import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 export const OP_MODAL_WIDTH = "308px";
@@ -404,14 +402,12 @@ export default function OpModal(
                                   className={`flex items-center w-full px-5 ${
                                     !schemaNavOpen && "border-b"
                                   }  border-purple-100 py-3 font-medium text-left text-web`}
-                                  data-accordion-target="#collapse-body-5"
                                   aria-expanded="true"
-                                  aria-controls="collapse-body-5"
                                   onClick={() =>
                                     setSchemaNavOpen(!schemaNavOpen)}
                                 >
                                   <h3
-                                    class={"text-web text-sm font-semibold ml-3"}
+                                    className={"text-web text-sm font-semibold ml-3"}
                                   >
                                     Schema
                                   </h3>
@@ -540,7 +536,6 @@ export default function OpModal(
                         )}
                     </div>
                     <button
-                      data-tooltip-target="delete-operation"
                       type="button"
                       onClick={() =>
                         opModal.value = {

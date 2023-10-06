@@ -14,4 +14,17 @@ export type OpModalType = {
   delete?: boolean;
 };
 
-export const opModal = signal<OpModalType | null>(null);
+export const OP_MODAL_KEY = "OP_MODAL_VALUE";
+
+export const deserializeOp = () => {
+  try {
+    const savedOperation = localStorage.getItem(OP_MODAL_KEY);
+    const parsedOperation = JSON.parse(savedOperation!);
+    return parsedOperation;
+  } catch (e) {
+    console.log("failed to deserialize and parse saved audience", e);
+  }
+  return null;
+};
+
+export const opModal = signal<OpModalType | null>(deserializeOp());
