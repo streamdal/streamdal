@@ -34,6 +34,7 @@ import { useSignalEffect } from "@preact/signals";
 import { updateNode } from "../lib/nodeMapper.ts";
 import { opUpdateSignal } from "./serviceMap.tsx";
 
+import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 export const OP_MODAL_WIDTH = "308px";
 
 export default function OpModal(
@@ -163,13 +164,6 @@ export default function OpModal(
                             <h3 class="text-lg text-cloud">
                               {displayName}
                             </h3>
-                            {displayType === "operation" && (
-                              <p class="text-xs text-cloud">
-                                {`${clients?.length || 0} attached client${
-                                  (clients?.length !== 1) ? "s" : ""
-                                }`}
-                              </p>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -177,10 +171,11 @@ export default function OpModal(
                         ? (
                           <>
                             <div class="px-4 py-4 rounded-md mx-2">
-                              <div class="mb-2 flex justify-between items-center pr-2">
+                              <div class="mb-2 flex items-center pr-2">
                                 <h3 class="text-web font-bold text-sm">
-                                  Attached Pipelines
+                                  Pipelines
                                 </h3>
+                                <BetaTag class={"ml-2"} />
                               </div>
                               {!serviceMap?.pipes.length
                                 ? (
@@ -363,9 +358,10 @@ export default function OpModal(
                                   aria-expanded="true"
                                   aria-controls="collapse-body-3"
                                 >
-                                  <h3 class="text-web text-sm font-semibold ml-3">
+                                  <h3 class="text-gray-400 text-sm font-semibold ml-3">
                                     Notifications
                                   </h3>
+                                  <ComingSoonTag class={"ml-2"} />
                                 </button>
                               </h3>
                               <div
@@ -387,9 +383,10 @@ export default function OpModal(
                                   aria-expanded="true"
                                   aria-controls="collapse-body-4"
                                 >
-                                  <h3 class="text-web text-sm font-semibold ml-3">
+                                  <h3 class="text-gray-400 text-sm font-semibold ml-3">
                                     Trends
                                   </h3>
+                                  <ComingSoonTag class={"ml-2"} />
                                 </button>
                               </h3>
                               <div
@@ -418,6 +415,7 @@ export default function OpModal(
                                   >
                                     Schema
                                   </h3>
+                                  <BetaTag class={"ml-2"} />
                                 </button>
                               </h3>
                               {schemaNavOpen && (
@@ -428,9 +426,54 @@ export default function OpModal(
                                 >
                                   {!schemaModalOpen && (
                                     <>
-                                      <p class="mb-5 w-full text-left text-gray-500 text-xs">
-                                        Displaying JSON
-                                      </p>
+                                      <div
+                                        class={"flex w-full items-center justify-start mb-5 "}
+                                      >
+                                        <p class="text-left text-gray-400 mr-2 text-sm">
+                                          Display
+                                        </p>
+                                        <button
+                                          id="dropdownCheckboxButton"
+                                          data-dropdown-toggle="dropdownDefaultCheckbox"
+                                          className="text-web font-medium text-sm text-center inline-flex items-center"
+                                          type="button"
+                                        >
+                                          JSON
+                                          <svg
+                                            class="w-2.5 h-2.5 ml-2.5"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 10 6"
+                                          >
+                                            <path
+                                              stroke="currentColor"
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              stroke-width="2"
+                                              d="m1 1 4 4 4-4"
+                                            />
+                                          </svg>
+                                        </button>
+                                        <div
+                                          id="dropdownDefaultCheckbox"
+                                          class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow"
+                                        >
+                                          <ul
+                                            class="py-2 text-sm text-gray-700"
+                                            aria-labelledby="dropdownDefaultButton"
+                                          >
+                                            <li>
+                                              <a
+                                                href="#"
+                                                className="block px-4 py-2 hover:bg-gray-100"
+                                              >
+                                                Dashboard
+                                              </a>
+                                            </li>
+                                          </ul>
+                                        </div>
+                                      </div>
                                       <div className="w-full rounded flex overflow-x-scroll bg-black text-white pt-2 pb-6 px-4 text-sm flex flex-col justify-start">
                                         <div class={"w-full flex justify-end"}>
                                           <button
