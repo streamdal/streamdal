@@ -23,21 +23,6 @@ const (
 		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
 		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
 
-	ColorWindowBg         = tcell.Color56 // Semi-dark purple
-	ColorTextPrimary      = tcell.ColorWhite
-	ColorTextSecondary    = tcell.Color141 // light purple
-	ColorTextAccent1      = tcell.Color221 // yellow
-	ColorTextAccent2      = tcell.Color44  // cyan
-	ColorTextAccent3      = tcell.Color203 // red
-	ColorActiveButtonBg   = tcell.Color203 // red
-	ColorActiveButtonFg   = tcell.ColorWhite
-	ColorInactiveButtonBg = tcell.Color188 // dark off-white
-	ColorInactiveButtonFg = tcell.Color239 // dark gray
-	ColorMenuActiveBg     = tcell.Color188
-	ColorMenuInactiveFg   = tcell.Color141
-	ColorInputFieldFg     = tcell.Color234 // very dark gray
-	ColorInputFieldBg     = tcell.Color254 // light off-white
-
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
 	PrimitiveErrorModal = "error_modal"
@@ -120,14 +105,14 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := fmt.Sprintf("[#%X]%s[-]", ColorMenuInactiveFg.Hex(), text)
-	replaceNew := fmt.Sprintf("[#%X]%s[-]", ColorMenuActiveBg.Hex(), text)
+	replaceOld := fmt.Sprintf("[#%s]%s[-]", Hex(MenuInactiveFg), text)
+	replaceNew := fmt.Sprintf("[#%s]%s[-]", Hex(MenuActiveBg), text)
 
 	var updatedMenu string
 
 	if !on {
-		replaceOld = fmt.Sprintf("[#%X]%s[-]", ColorMenuActiveBg.Hex(), text)
-		replaceNew = fmt.Sprintf("[#%X]%s[-]", ColorMenuInactiveFg.Hex(), text)
+		replaceOld = fmt.Sprintf("[#%X]%s[-]", Hex(MenuActiveBg), text)
+		replaceNew = fmt.Sprintf("[#%X]%s[-]", Hex(MenuInactiveFg), text)
 	}
 
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
@@ -171,12 +156,12 @@ func (c *Console) DisplayFilter(defaultValue string, answerCh chan<- string) {
 		})
 
 	form.SetBorder(true).SetTitle("Filter")
-	form.SetBackgroundColor(ColorWindowBg)
-	form.SetTitleColor(ColorTextPrimary)
-	form.SetFieldBackgroundColor(ColorInputFieldBg)
-	form.SetFieldTextColor(ColorInputFieldFg)
-	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
-	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
+	form.SetBackgroundColor(Tcell(WindowBg))
+	form.SetTitleColor(Tcell(TextPrimary))
+	form.SetFieldBackgroundColor(Tcell(InputFieldBg))
+	form.SetFieldTextColor(Tcell(InputFieldFg))
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+	form.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
@@ -216,12 +201,12 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 		})
 
 	form.SetBorder(true).SetTitle("Search")
-	form.SetBackgroundColor(ColorWindowBg)
-	form.SetTitleColor(ColorTextPrimary)
-	form.SetFieldBackgroundColor(ColorInputFieldBg)
-	form.SetFieldTextColor(ColorInputFieldFg)
-	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
-	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
+	form.SetBackgroundColor(Tcell(WindowBg))
+	form.SetTitleColor(Tcell(TextPrimary))
+	form.SetFieldBackgroundColor(Tcell(InputFieldBg))
+	form.SetFieldTextColor(Tcell(InputFieldFg))
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+	form.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
@@ -270,12 +255,12 @@ func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 		})
 
 	form.SetBorder(true).SetTitle("Set Sample Rate")
-	form.SetBackgroundColor(ColorWindowBg)
-	form.SetTitleColor(ColorTextPrimary)
-	form.SetFieldBackgroundColor(ColorInputFieldBg)
-	form.SetFieldTextColor(ColorInputFieldFg)
-	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
-	form.SetButtonStyle(tcell.StyleDefault.Background(ColorInactiveButtonBg).Foreground(ColorInactiveButtonFg))
+	form.SetBackgroundColor(Tcell(WindowBg))
+	form.SetTitleColor(Tcell(TextPrimary))
+	form.SetFieldBackgroundColor(Tcell(InputFieldBg))
+	form.SetFieldTextColor(Tcell(InputFieldFg))
+	form.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+	form.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
 	form.SetButtonsAlign(tview.AlignCenter)
 
 	inputDialog := Center(form, 36, 7)
@@ -388,10 +373,10 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 				answerCh <- false
 			}
 		}).
-		SetBackgroundColor(ColorWindowBg).
+		SetBackgroundColor(Tcell(WindowBg)).
 		SetTextColor(tcell.ColorWhite).
-		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg)).
-		SetButtonStyle(tcell.StyleDefault.Foreground(ColorInactiveButtonFg).Background(ColorInactiveButtonBg))
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg))).
+		SetButtonStyle(tcell.StyleDefault.Foreground(Tcell(InactiveButtonFg)).Background(Tcell(InactiveButtonBg)))
 
 	c.pages.AddPage(pageName, retryModal, true, true)
 
@@ -418,9 +403,9 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 				outputCh <- errors.New("user cancelled modal")
 			}
 		}).
-		SetBackgroundColor(ColorWindowBg).
-		SetTextColor(ColorTextPrimary).
-		SetButtonActivatedStyle(tcell.StyleDefault.Background(ColorActiveButtonBg).Foreground(ColorActiveButtonFg))
+		SetBackgroundColor(Tcell(WindowBg)).
+		SetTextColor(Tcell(TextPrimary)).
+		SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
 
 	// First time seeing this component - launch progress update goroutine; once
 	// goroutine exits, it removes the component from the primitives map as well
@@ -444,7 +429,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 				}
 
 				c.app.QueueUpdateDraw(func() {
-					infoModal.SetText(fmt.Sprintf("%s[#%X]%s[-]", msg, ColorTextAccent3.Hex(), animationElements[iter]))
+					infoModal.SetText(fmt.Sprintf("%s[#%X]%s[-]", msg, Hex(TextAccent3), animationElements[iter]))
 				})
 
 				iter += 1
@@ -499,9 +484,9 @@ func (c *Console) Redraw(f func()) {
 func (c *Console) DisplaySelectList(title string, itemMap map[string]string, output chan<- string) {
 	selectComponent := tview.NewList()
 
-	selectComponent.SetBackgroundColor(ColorWindowBg)
-	selectComponent.SetMainTextColor(ColorTextPrimary)
-	selectComponent.SetSecondaryTextColor(ColorTextSecondary)
+	selectComponent.SetBackgroundColor(Tcell(WindowBg))
+	selectComponent.SetMainTextColor(Tcell(TextPrimary))
+	selectComponent.SetSecondaryTextColor(Tcell(TextSecondary))
 	selectComponent.SetBorder(true)
 	selectComponent.SetTitle(title)
 
