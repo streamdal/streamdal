@@ -16,13 +16,6 @@ import (
 )
 
 const (
-	MenuString = `[white]Q[-] ["Q"][#AF87FF]Quit[-][""]  ` +
-		`[white]S[-] ["S"][#AF87FF]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][#AF87FF]Set Sample Rate[-][""]  ` +
-		`[white]F[-] ["F"][#AF87FF]Filter[-][""]  ` +
-		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
-		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
-
 	PrimitiveInfoModal  = "info_modal"
 	PrimitiveRetryModal = "retry_modal"
 	PrimitiveErrorModal = "error_modal"
@@ -40,6 +33,26 @@ const (
 	PageFilter            = "page_" + PrimitiveFilter
 	PageSearch            = "page_" + PrimitiveSearch
 	PageRate              = "page_" + PrimitiveRate
+)
+
+//var (
+//	// [-] resets color; [""] ends block;
+//
+//	MenuString = fmt.Sprintf(`[%s]Q[-] ["Q"][%s]Quit[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
+//		fmt.Sprintf(`[%s]S[-] ["S"][%s]Select Component[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
+//		fmt.Sprintf(`[%s]R[-] ["R"][%s]Set Sample Rate[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
+//		fmt.Sprintf(`[%s]F[-] ["F"][%s]Filter[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
+//		fmt.Sprintf(`[%s]P[-] ["P"][%s]Pause[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
+//		fmt.Sprintf(`[%s]/[-] ["Search"][%s]Search[-][""]`, Hex(TextPrimary), Hex(TextSecondary))
+//)
+
+var (
+	MenuString = `[white]Q[-] ["Q"][#AF87FF]Quit[-][""]  ` +
+		`[white]S[-] ["S"][#AF87FF]Select Component[-][""]  ` +
+		`[white]R[-] ["R"][#AF87FF]Set Sample Rate[-][""]  ` +
+		`[white]F[-] ["F"][#AF87FF]Filter[-][""]  ` +
+		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
+		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
 )
 
 type Console struct {
@@ -105,14 +118,14 @@ func (c *Console) SetMenuEntryOff(item string) {
 func (c *Console) toggleMenuEntry(text string, on bool) {
 	menu := c.menu.GetText(false)
 
-	replaceOld := fmt.Sprintf("[#%s]%s[-]", Hex(MenuInactiveFg), text)
-	replaceNew := fmt.Sprintf("[#%s]%s[-]", Hex(MenuActiveBg), text)
+	replaceOld := fmt.Sprintf("[%s]%s[-]", Hex(MenuInactiveFg), text)
+	replaceNew := fmt.Sprintf("[%s]%s[-]", Hex(MenuActiveBg), text)
 
 	var updatedMenu string
 
 	if !on {
-		replaceOld = fmt.Sprintf("[#%X]%s[-]", Hex(MenuActiveBg), text)
-		replaceNew = fmt.Sprintf("[#%X]%s[-]", Hex(MenuInactiveFg), text)
+		replaceOld = fmt.Sprintf("[%s]%s[-]", Hex(MenuActiveBg), text)
+		replaceNew = fmt.Sprintf("[%s]%s[-]", Hex(MenuInactiveFg), text)
 	}
 
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
@@ -429,7 +442,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 				}
 
 				c.app.QueueUpdateDraw(func() {
-					infoModal.SetText(fmt.Sprintf("%s[#%X]%s[-]", msg, Hex(TextAccent3), animationElements[iter]))
+					infoModal.SetText(fmt.Sprintf("%s[%s]%s[-]", msg, Hex(TextAccent3), animationElements[iter]))
 				})
 
 				iter += 1
