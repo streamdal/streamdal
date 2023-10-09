@@ -295,25 +295,25 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	// Set by dialog watching goroutine to tell us to return a quit step
 	userQuit := false
 
-	// Channel is used to indicate to DisplayInfoModal that it should quit
-	// ie. because fetchComponents() completed.
-	quitDisplayInfoChan := make(chan struct{}, 1)
+	// Channel used to tell animation goroutine in DisplayInfoModal to quit
+	quitAnimationCh := make(chan struct{}, 1)
+	defer close(quitAnimationCh)
 
 	// Channel is written to by DisplayInfoModal() when user clicks "Quit"
-	userQuitInfoModalCh := make(chan error, 1)
+	answerCh := make(chan error, 1)
 
 	// Channel used to signal dialog goroutine to exit
 	fetchDoneCh := make(chan struct{}, 1)
 
 	defer close(fetchDoneCh)
 
-	// Channel to tell userQuitInfoModalCh reader goroutine to exit
+	// Channel to tell answerCh reader goroutine to exit
 	fetchQuitCh := make(chan struct{}, 1)
 	defer close(fetchQuitCh)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	c.options.Console.DisplayInfoModal("Fetching live component list", quitDisplayInfoChan, userQuitInfoModalCh)
+	c.options.Console.DisplayInfoModal("Fetching live component list", quitAnimationCh, answerCh)
 
 	// Goroutine used for reading user resp
 	go func() {
@@ -321,7 +321,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 
 		for {
 			select {
-			case <-userQuitInfoModalCh:
+			case <-answerCh:
 				userQuit = true
 				cancel()
 				return
@@ -330,7 +330,8 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 				cancel()
 				return
 			case <-fetchDoneCh:
-				// Component fetch modal is done
+				// Channel gets closed when actionSelect() exits; way to tell
+				// this goroutine to exit
 				c.log.Info("component fetch goroutine got signal on fetchDoneCh")
 				return
 			}
@@ -340,8 +341,12 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	// Fetch the list of audiences; if it errors, display retry
 	audiences, err := c.api.GetAllLiveAudiences(ctx)
 	if err != nil {
-		// Tell InfoModal to quit
-		quitDisplayInfoChan <- struct{}{}
+		if userQuit {
+			return &types.Action{Step: types.StepQuit}, nil
+		}
+
+		//// Tell InfoModal to quit
+		//quitAnimationCh <- struct{}{}
 
 		return c.actionRetry(
 			fmt.Sprintf("[white:red]ERROR: Unable to fetch live components![white:red]\n\n%s", err),
@@ -359,8 +364,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	// -------------------------------------------------------
 
 	if len(audiences) == 0 {
-		quitDisplayInfoChan <- struct{}{} // tell displayInfoModal to quit because of error
-
+		//quitAnimationCh <- struct{}{} // tell displayInfoModal to quit because of error
 		return c.actionRetry(
 			fmt.Sprint("No [::b]live[-:-:-] components!\n\nRetry fetching live components?"),
 			types.StepSelect,
@@ -459,9 +463,11 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 
 // Attempt to connect and query test endpoint in snitch-server
 func (c *Cmd) connect(ctx context.Context) error {
-	// Give user a chance to see the "connecting" message
+	// We need this here so that the "connecting" message is visible to the user
+	// AND so that we can stop sleeping and breaking out if the user quit the
+	// modal.
 	select {
-	case <-time.After(5 * time.Second):
+	case <-time.After(time.Second):
 		break
 	case <-ctx.Done():
 		return fmt.Errorf("context canceled before connecting to server")

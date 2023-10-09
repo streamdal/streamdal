@@ -411,7 +411,7 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 // InputCh is used by caller to indicate that the modal can be closed (in this
 // case, it will cause the method to stop the animation goroutine).
 // OutputCh is used by method to inform caller that the user has exited the modal.
-func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh chan error) {
+func (c *Console) DisplayInfoModal(msg string, quitAnimationCh chan struct{}, answerCh chan error) {
 	c.Start()
 
 	// Needed to improve the way the "animation" looks
@@ -422,7 +422,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 		AddButtons([]string{"Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonIndex == 0 {
-				outputCh <- errors.New("user pressed 'cancel' button to quit")
+				answerCh <- errors.New("user pressed 'cancel' button to quit")
 			}
 		}).
 		SetBackgroundColor(Tcell(WindowBg)).
@@ -432,7 +432,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 	// Capture 'q' keypress to quit
 	infoModal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
-			outputCh <- errors.New("user pressed 'q' to quit")
+			answerCh <- errors.New("user pressed 'q' to quit")
 		}
 
 		return event
@@ -451,7 +451,7 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 	MAIN:
 		for {
 			select {
-			case <-inputCh:
+			case <-quitAnimationCh:
 				// Told to quit
 				break MAIN
 			case <-ticker.C:

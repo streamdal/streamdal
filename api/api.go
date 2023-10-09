@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -83,8 +84,13 @@ func (a *API) Test(ctx context.Context) error {
 // GetAllLiveAudiences returns all live audiences -- clients that are actively
 // connected to the snitch server and have announced one or more audiences)
 func (a *API) GetAllLiveAudiences(ctx context.Context) ([]*protos.Audience, error) {
-	// Allow fetch modal to show up
-	time.Sleep(time.Second)
+	// Same as cmd.connect() - we want to show the user that we are fetching audiences
+	select {
+	case <-time.After(5 * time.Second):
+		break
+	case <-ctx.Done():
+		return nil, fmt.Errorf("context canceled before connecting to server")
+	}
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(AuthTokenMetadata, a.options.AuthToken))
 
