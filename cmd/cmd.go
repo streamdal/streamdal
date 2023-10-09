@@ -345,9 +345,6 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 			return &types.Action{Step: types.StepQuit}, nil
 		}
 
-		//// Tell InfoModal to quit
-		//quitAnimationCh <- struct{}{}
-
 		return c.actionRetry(
 			fmt.Sprintf("[white:red]ERROR: Unable to fetch live components![white:red]\n\n%s", err),
 			types.StepSelect,
@@ -364,7 +361,6 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 	// -------------------------------------------------------
 
 	if len(audiences) == 0 {
-		//quitAnimationCh <- struct{}{} // tell displayInfoModal to quit because of error
 		return c.actionRetry(
 			fmt.Sprint("No [::b]live[-:-:-] components!\n\nRetry fetching live components?"),
 			types.StepSelect,
