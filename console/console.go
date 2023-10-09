@@ -47,12 +47,12 @@ const (
 //)
 
 var (
-	MenuString = `[white]Q[-] ["Q"][#AF87FF]Quit[-][""]  ` +
-		`[white]S[-] ["S"][#AF87FF]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][#AF87FF]Set Sample Rate[-][""]  ` +
-		`[white]F[-] ["F"][#AF87FF]Filter[-][""]  ` +
-		`[white]P[-] ["P"][#AF87FF]Pause[-][""]  ` +
-		`[white]/[-] ["Search"][#AF87FF]Search[-][""]`
+	MenuString = `[white]Q[-] ["Q"][#9D87D7]Quit[-][""]  ` +
+		`[white]S[-] ["S"][#9D87D7]Select Component[-][""]  ` +
+		`[white]R[-] ["R"][#9D87D7]Set Sample Rate[-][""]  ` +
+		`[white]F[-] ["F"][#9D87D7]Filter[-][""]  ` +
+		`[white]P[-] ["P"][#9D87D7]Pause[-][""]  ` +
+		`[white]/[-] ["Search"][#9D87D7]Search[-][""]`
 )
 
 type Console struct {
@@ -128,7 +128,9 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 		replaceNew = fmt.Sprintf("[%s]%s[-]", Hex(MenuInactiveFg), text)
 	}
 
+	c.log.Infof("BEFORE: (OP: %v) Replacing '%s' with '%s' in menu '%s'", on, replaceOld, replaceNew, menu)
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
+	c.log.Infof("AFTER: (OP: %v) Replacing '%s' with '%s'; result: '%s'", on, replaceOld, replaceNew, menu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
@@ -361,7 +363,7 @@ func (c *Console) Start() {
 		c.app.SetRoot(c.layout, true).SetFocus(c.pages)
 
 		if err := c.app.Run(); err != nil {
-			panic("unable to .Run app")
+			panic("unable to .Run app: " + err.Error())
 		}
 	}()
 

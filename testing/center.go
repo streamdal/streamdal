@@ -37,7 +37,7 @@ func main() {
 		prim = form
 	}
 	if err := app.SetRoot(prim, true).EnableMouse(true).Run(); err != nil {
-		panic(err)
+		panic("unable to SetRoot: " + err.Error())
 	}
 }
 
