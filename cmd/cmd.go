@@ -291,7 +291,7 @@ func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo strin
 	}
 }
 
-func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
+func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 	// Only highlight 'q'
 	c.options.Console.ToggleAllMenuHighlights()
 	c.options.Console.ToggleMenuHighlight("Q")
@@ -413,6 +413,7 @@ func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
 		return &types.Action{
 			Step:          types.StepPeek,
 			PeekComponent: component,
+			PeekSearch:    a.PeekSearch,
 		}, nil
 	}
 }
@@ -542,6 +543,11 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 		for _, line := range splitData {
 			if line == "" {
+				continue
+			}
+
+			if strings.Contains(line, "░░░") {
+				updatedData += line + "\n"
 				continue
 			}
 

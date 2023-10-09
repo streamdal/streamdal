@@ -35,17 +35,6 @@ const (
 	PageRate              = "page_" + PrimitiveRate
 )
 
-//var (
-//	// [-] resets color; [""] ends block;
-//
-//	MenuString = fmt.Sprintf(`[%s]Q[-] ["Q"][%s]Quit[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
-//		fmt.Sprintf(`[%s]S[-] ["S"][%s]Select Component[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
-//		fmt.Sprintf(`[%s]R[-] ["R"][%s]Set Sample Rate[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
-//		fmt.Sprintf(`[%s]F[-] ["F"][%s]Filter[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
-//		fmt.Sprintf(`[%s]P[-] ["P"][%s]Pause[-][""]  `, Hex(TextPrimary), Hex(TextSecondary)) +
-//		fmt.Sprintf(`[%s]/[-] ["Search"][%s]Search[-][""]`, Hex(TextPrimary), Hex(TextSecondary))
-//)
-
 var (
 	MenuString = `[white]Q[-] ["Q"][#9D87D7]Quit[-][""]  ` +
 		`[white]S[-] ["S"][#9D87D7]Select Component[-][""]  ` +
@@ -128,9 +117,7 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 		replaceNew = fmt.Sprintf("[%s]%s[-]", Hex(MenuInactiveFg), text)
 	}
 
-	c.log.Infof("BEFORE: (OP: %v) Replacing '%s' with '%s' in menu '%s'", on, replaceOld, replaceNew, menu)
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
-	c.log.Infof("AFTER: (OP: %v) Replacing '%s' with '%s'; result: '%s'", on, replaceOld, replaceNew, menu)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()
