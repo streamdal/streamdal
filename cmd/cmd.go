@@ -229,7 +229,10 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 	go func() {
 		for {
 			select {
+			// user pressed "cancel" - tell connect() to exit early
 			case <-outputCh:
+
+				c.log.Error("user pressed cancel")
 				userQuit = true
 				cancel()
 				return
@@ -243,6 +246,11 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 
 	// Launch connection attempt
 	if err := c.connect(ctx); err != nil {
+		// If user pressed "cancel" - no need to display retry modal
+		if userQuit {
+			return &types.Action{Step: types.StepQuit}, nil
+		}
+
 		retryMsg := fmt.Sprintf("[white:red]ERROR: Unable to connect![white:red]\n\n%s", err)
 		inputCh <- struct{}{} // tell displayInfoModal to quit because of error
 
@@ -259,6 +267,7 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 		}
 	}
 
+	// Need this in here in case user quit while we were connecting
 	if userQuit {
 		return &types.Action{Step: types.StepQuit}, nil
 	}
@@ -451,7 +460,12 @@ func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
 // Attempt to connect and query test endpoint in snitch-server
 func (c *Cmd) connect(ctx context.Context) error {
 	// Give user a chance to see the "connecting" message
-	time.Sleep(time.Second)
+	select {
+	case <-time.After(5 * time.Second):
+		break
+	case <-ctx.Done():
+		return fmt.Errorf("context canceled before connecting to server")
+	}
 
 	// Attempt to talk to snitch server
 	a, err := api.New(&api.Options{
@@ -475,18 +489,6 @@ func (c *Cmd) connect(ctx context.Context) error {
 	c.api = a
 
 	return nil
-
-	//for {
-	//	select {
-	//	// Happy path - nothing went wrong
-	//	case <-time.After(1 * time.Second): // WARNING: This is here for demo purposes!
-	//		return nil
-	//		//return errors.New("something broke")
-	//	case <-ctx.Done():
-	//		return nil
-	//	}
-	//}
-
 }
 
 func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-chan *types.Action) (*types.Action, error) {

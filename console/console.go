@@ -391,6 +391,15 @@ func (c *Console) DisplayRetryModal(msg, pageName string, answerCh chan bool) {
 		SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg))).
 		SetButtonStyle(tcell.StyleDefault.Foreground(Tcell(InactiveButtonFg)).Background(Tcell(InactiveButtonBg)))
 
+	// Capture 'q' keypress to quit and tell caller to stop retrying
+	retryModal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+			answerCh <- false
+		}
+
+		return event
+	})
+
 	c.pages.AddPage(pageName, retryModal, true, true)
 
 	c.app.QueueUpdateDraw(func() {
@@ -413,12 +422,21 @@ func (c *Console) DisplayInfoModal(msg string, inputCh chan struct{}, outputCh c
 		AddButtons([]string{"Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonIndex == 0 {
-				outputCh <- errors.New("user cancelled modal")
+				outputCh <- errors.New("user pressed 'cancel' button to quit")
 			}
 		}).
 		SetBackgroundColor(Tcell(WindowBg)).
 		SetTextColor(Tcell(TextPrimary)).
 		SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+
+	// Capture 'q' keypress to quit
+	infoModal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyRune && event.Rune() == 'q' {
+			outputCh <- errors.New("user pressed 'q' to quit")
+		}
+
+		return event
+	})
 
 	// First time seeing this component - launch progress update goroutine; once
 	// goroutine exits, it removes the component from the primitives map as well
