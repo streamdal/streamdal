@@ -413,7 +413,11 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 		return &types.Action{
 			Step:          types.StepPeek,
 			PeekComponent: component,
-			PeekSearch:    a.PeekSearch,
+
+			// Passing these along in case we originally came from a peek w/ existing settings
+			PeekSearch: a.PeekSearch,
+			PeekFilter: a.PeekFilter,
+			PeekRate:   a.PeekRate,
 		}, nil
 	}
 }
@@ -434,6 +438,8 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 // We pass the actionCh to DisplayPeek() so it can WRITE commands it has seen to
 // the channel that is read by peek().
 func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
+	c.log.Info("rate setting: %d", action.PeekRate)
+
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
 	}
