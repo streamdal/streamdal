@@ -86,7 +86,7 @@ func (a *API) Test(ctx context.Context) error {
 func (a *API) GetAllLiveAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	// Same as cmd.connect() - we want to show the user that we are fetching audiences
 	select {
-	case <-time.After(5 * time.Second):
+	case <-time.After(time.Second):
 		break
 	case <-ctx.Done():
 		return nil, fmt.Errorf("context canceled before connecting to server")

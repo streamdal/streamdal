@@ -292,6 +292,10 @@ func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo strin
 }
 
 func (c *Cmd) actionSelect(_ *types.Action) (*types.Action, error) {
+	// Only highlight 'q'
+	c.options.Console.ToggleAllMenuHighlights()
+	c.options.Console.ToggleMenuHighlight("Q")
+
 	// Set by dialog watching goroutine to tell us to return a quit step
 	userQuit := false
 
