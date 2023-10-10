@@ -99,37 +99,31 @@ export const audienceMetrics = async (
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export const sendMetrics = async (configs: MetricsConfigs) => {
-  if (!metrics.size) {
-    console.debug(`### no metrics found, skipping`);
-    return;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  lock.writeLock(async (release) => {
+export const sendMetrics = async (configs: MetricsConfigs) =>
+  lock.writeLock((release) => {
     try {
+      if (!metrics.size) {
+        console.debug(`### no metrics found, skipping`);
+        release();
+        return;
+      }
       const metricsData = Array.from(metrics.values()).map((m: Metric) => ({
         ...m,
         //
         // Make sure we always send data per second
         value: m.value / (METRIC_INTERVAL / 1000),
       }));
-
       console.debug("sending metrics", metricsData);
 
-      const call = configs.grpcClient.metrics(
+      void configs.grpcClient.metrics(
         {
           metrics: metricsData,
         },
         { meta: { "auth-token": configs.snitchToken } }
       );
-      const status = await call.status;
-      console.debug("metrics send status", status);
       metrics.clear();
     } catch (e) {
       console.error("error sending metrics", e);
     }
-
     release();
   });
-};
