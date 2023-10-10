@@ -90,6 +90,8 @@ type IStore interface {
 	// to the session via a goroutine in internal.Register()
 	GetAudiencesBySessionID(ctx context.Context, sessionID string) ([]*protos.Audience, error)
 
+	GetAudiencesByService(ctx context.Context, serviceName string) ([]*protos.Audience, error)
+
 	// WatchKeys will watch for key changes for given key pattern; every time key
 	// is updated, it will send a message on the return channel.
 	// WatchKeys launches a dedicated goroutine for the watch - it can be stopped
@@ -901,6 +903,27 @@ func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	audiences := make([]*protos.Audience, 0)
 
 	keys, err := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":*").Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching audience keys from store")
+	}
+
+	for _, key := range keys {
+		key = strings.TrimPrefix(key, RedisAudiencePrefix+":")
+		aud := util.AudienceFromStr(key)
+		if aud == nil {
+			return nil, errors.Errorf("invalid audience key '%s'", key)
+		}
+
+		audiences = append(audiences, aud)
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) GetAudiencesByService(ctx context.Context, serviceName string) ([]*protos.Audience, error) {
+	audiences := make([]*protos.Audience, 0)
+
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+serviceName+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching audience keys from store")
 	}

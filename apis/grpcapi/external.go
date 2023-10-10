@@ -686,38 +686,11 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	s.log.Debugf("request contents: %+v", req)
 
 	// Force delete - detach audiences from pipelines
-	if req.Force != nil && *req.Force {
+	if req.GetForce() {
 		s.log.Debug("force delete requested")
-
-		for _, pipelineID := range attached {
-			s.log.Debugf("request to force delete audience '%s'; attempting to detach pipeline '%s'",
-				util.AudienceToStr(req.Audience), pipelineID)
-
-			resp, err := s.DetachPipeline(ctx, &protos.DetachPipelineRequest{
-				PipelineId: pipelineID,
-				Audience:   req.Audience,
-			})
-
-			// DetachPipeline can return both an error and a resp - need to check both
-			if err != nil {
-				return util.StandardResponse(
-					ctx,
-					protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-					fmt.Sprintf("received err during force detach for pipeline '%s', audience '%s': %s", pipelineID,
-						util.AudienceToStr(req.Audience), err),
-				), nil
-			}
-
-			if resp != nil && resp.Code != protos.ResponseCode_RESPONSE_CODE_OK {
-				return util.StandardResponse(
-					ctx,
-					protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-					fmt.Sprintf("received non-OK response during force detach for pipeline '%s', audience '%s': %s", pipelineID,
-						util.AudienceToStr(req.Audience), resp.Message),
-				), nil
-			}
-
-			s.log.Debugf("successfully force detached pipeline '%s' from audience '%s'", pipelineID, util.AudienceToStr(req.Audience))
+		resp := s.forceDeleteAudience(ctx, attached, req.Audience)
+		if resp != nil {
+			return resp, nil
 		}
 	}
 
@@ -734,6 +707,95 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: "Audience deleted",
+	}, nil
+}
+
+func (s *ExternalServer) forceDeleteAudience(ctx context.Context, attached []string, audience *protos.Audience) *protos.StandardResponse {
+	for _, pipelineID := range attached {
+		s.log.Debugf("request to force delete audience '%s'; attempting to detach pipeline '%s'",
+			util.AudienceToStr(audience), pipelineID)
+
+		resp, err := s.DetachPipeline(ctx, &protos.DetachPipelineRequest{
+			PipelineId: pipelineID,
+			Audience:   audience,
+		})
+
+		// DetachPipeline can return both an error and a resp - need to check both
+		if err != nil {
+			return util.StandardResponse(
+				ctx,
+				protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("received err during force detach for pipeline '%s', audience '%s': %s", pipelineID,
+					util.AudienceToStr(audience), err),
+			)
+		}
+
+		if resp != nil && resp.Code != protos.ResponseCode_RESPONSE_CODE_OK {
+			return util.StandardResponse(
+				ctx,
+				protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("received non-OK response during force detach for pipeline '%s', audience '%s': %s", pipelineID,
+					util.AudienceToStr(audience), resp.Message),
+			)
+		}
+
+		s.log.Debugf("successfully force detached pipeline '%s' from audience '%s'", pipelineID, util.AudienceToStr(audience))
+	}
+
+	return nil
+}
+
+func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteServiceRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// find all audiences for the service
+	audiences, err := s.Options.StoreService.GetAudiencesByService(ctx, req.ServiceName)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Determine if the audience is attached to any pipelines
+	for _, audience := range audiences {
+		attached, err := s.Options.StoreService.GetConfigByAudience(ctx, audience)
+		if err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		}
+
+		// If we're not forcing, and there are attached pipelines, return an error
+		if !req.GetForce() {
+			if len(attached) > 0 {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, fmt.Sprintf("service '%s' still has attached pipelines, specify force to remove", req.ServiceName)), nil
+			}
+		}
+
+		// We're forcing, so detach all pipelines
+		s.log.Debug("force delete requested")
+		resp := s.forceDeleteAudience(ctx, attached, audience)
+		if resp != nil {
+			return resp, nil
+		}
+
+		deleteReq := &protos.DeleteAudienceRequest{
+			Audience: audience,
+			Force:    util.BoolPtr(true),
+		}
+
+		if err := s.Options.StoreService.DeleteAudience(ctx, deleteReq); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		}
+
+		// Broadcast delete to other nodes so that they can emit an event for GetAllStream()
+		if err := s.Options.BusService.BroadcastDeleteAudience(ctx, deleteReq); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		}
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Service and audiences deleted",
 	}, nil
 }
 

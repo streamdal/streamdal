@@ -600,6 +600,18 @@ func DeleteAudienceRequest(req *protos.DeleteAudienceRequest) error {
 	return nil
 }
 
+func DeleteServiceRequest(req *protos.DeleteServiceRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.ServiceName == "" {
+		return ErrEmptyField("ServiceName")
+	}
+
+	return nil
+}
+
 func KVCreateHTTPRequest(r *protos.KVCreateHTTPRequest) error {
 	if r == nil {
 		return ErrNilInput
