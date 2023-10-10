@@ -17,7 +17,6 @@ import (
 	"github.com/streamdal/snitch-cli/config"
 	"github.com/streamdal/snitch-cli/console"
 	"github.com/streamdal/snitch-cli/types"
-	"github.com/streamdal/snitch-cli/util"
 )
 
 const (
@@ -368,7 +367,7 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 	}
 
 	// -------------------------------------------------------
-	// OK we have a list of components, are there any to show?
+	// OK we got a response, are there any to show?
 	// -------------------------------------------------------
 
 	if len(audiences) == 0 {
@@ -405,10 +404,10 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 	c.options.Console.ToggleAllMenuHighlights()
 	c.options.Console.ToggleMenuHighlight("Q")
 
-	selectedComponentCh := make(chan string, 1)
+	selectedComponentCh := make(chan *types.TailComponent, 1)
 
 	// Display select list
-	c.options.Console.DisplaySelectList("Select component", util.AudiencesToComponentMap(audiences), selectedComponentCh)
+	c.options.Console.DisplaySelectList("Select component", audiences, selectedComponentCh)
 
 	// Listen for "quit" or for component selection
 	select {
@@ -416,10 +415,10 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 		return &types.Action{
 			Step: types.StepQuit,
 		}, nil
-	case component := <-selectedComponentCh:
+	case tailComponent := <-selectedComponentCh:
 		return &types.Action{
 			Step:          types.StepTail,
-			TailComponent: component,
+			TailComponent: tailComponent,
 
 			// Passing these along in case we originally came from a tail w/ existing settings
 			TailSearch: a.TailSearch,
@@ -449,8 +448,8 @@ func (c *Cmd) actionTail(action *types.Action) (*types.Action, error) {
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if action.TailComponent == "" {
-		return nil, errors.New("actionTail(): bug? TailComponent cannot be empty")
+	if action.TailComponent == nil {
+		return nil, errors.New("actionTail(): bug? TailComponent cannot be nil")
 	}
 
 	actionCh := make(chan *types.Action, 1)
@@ -462,6 +461,7 @@ func (c *Cmd) actionTail(action *types.Action) (*types.Action, error) {
 		c.options.Console.DisplayTail(c.textview, action.TailComponent, actionCh)
 	}
 
+	// TODO: Why is this a for loop?
 	for {
 		respAction, err := c.tail(action, c.textview, actionCh)
 		if err != nil {
@@ -514,14 +514,14 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if action.TailComponent == "" {
-		return nil, errors.New("tail(): bug? *Action.TailComponent cannot be empty")
+	if action.TailComponent == nil {
+		return nil, errors.New("tail(): bug? *action.TailComponent cannot be nil")
 	}
 
 	lineNum := 1
 	lineNumMtx := &sync.RWMutex{}
 
-	dataCh := make(chan string, 1)
+	//dataCh := make(chan string, 1)
 
 	// If this is the first time we are seeing this filter, announce it
 	if c.announceFilter {
@@ -532,21 +532,32 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		c.announceFilter = false
 	}
 
-	// TODO: This is where we'd get data from snitch-server
-	go func() {
-		for {
-			if c.paused {
-				time.Sleep(200 * time.Millisecond)
-				continue
-			}
+	tailCtx, tailCancel := context.WithCancel(context.Background())
+	defer tailCancel() // This will stop the tail goroutine when this method exits
 
-			dataCh <- fmt.Sprintf("%s: line %d", action.TailComponent, lineNum)
-			time.Sleep(200 * time.Millisecond)
-			lineNumMtx.Lock()
-			lineNum++
-			lineNumMtx.Unlock()
-		}
-	}()
+	tailCh, err := c.api.Tail(tailCtx, action.TailComponent.Audience)
+	if err != nil {
+		return nil, errors.Wrap(err, "error calling gRPC tail endpoint in server")
+	}
+
+	c.log.Info("got past Tail() call in cmd.go")
+
+	//// TODO: This is where we'd get data from snitch-server
+	//go func() {
+	//	defer c.log.Info("tail goroutine exiting")
+	//
+	//MAIN:
+	//	for {
+	//		select {
+	//		case tailResp := <-tailCh:
+	//			if tailResp == nil {
+	//				continue MAIN
+	//			}
+	//		case <-tailCtx.Done():
+	//			c.log.Info("detected context cancellation in tail goroutine")
+	//		}
+	//	}
+	//}()
 
 	// Set/unset search highlight
 	if action.TailSearch != "" || action.TailSearchPrev != "" {
@@ -647,7 +658,19 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 			cmd.TailRate = action.TailRate
 
 			return cmd, nil
-		case data := <-dataCh:
+		case tailResp := <-tailCh:
+			c.log.Infof("received tailResp on tailCh in cmd.go: %+v", tailResp)
+
+			if tailResp == nil {
+				c.log.Infof("got nil resp on tailCh - ignoring")
+				continue
+			}
+
+			// TODO: Differentiate between error and good payload
+			data := string(tailResp.OriginalData)
+
+			c.log.Infof("data contents: %s", data)
+
 			if !strings.Contains(data, action.TailFilter) {
 				continue
 			}

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -114,6 +115,56 @@ func (a *API) GetAllLiveAudiences(ctx context.Context) ([]*protos.Audience, erro
 	}
 
 	return liveAudiences, nil
+}
+
+func (a *API) Tail(ctx context.Context, audience *protos.Audience) (chan *protos.TailResponse, error) {
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(AuthTokenMetadata, a.options.AuthToken))
+
+	a.log.Infof("sending Tail request for audience: %+v", audience)
+
+	grpcCall, err := a.client.Tail(ctx, &protos.TailRequest{
+		Type:     protos.TailRequestType_TAIL_REQUEST_TYPE_START,
+		Audience: audience,
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to complete tail request")
+	}
+
+	tailRespCh := make(chan *protos.TailResponse, 1)
+
+	a.log.Info("reached goroutine launch in api.Tail()")
+
+	go func() {
+		defer a.log.Info("api.Tail() goroutine exiting")
+
+		for {
+			resp, err := grpcCall.Recv()
+			if err != nil {
+				if strings.Contains(err.Error(), "context canceled") {
+					a.log.Info("detected context cancellation in api.Tail() during Recv()")
+					return
+				}
+
+				a.log.Errorf("unable to receive tail response: %s", err)
+				time.Sleep(time.Second)
+				continue
+			}
+
+			a.log.Info("before select in api.Tail()")
+
+			select {
+			case tailRespCh <- resp:
+				// Successfully sent msg to tail receiver
+				a.log.Infof("sent tail response to tail receiver")
+			case <-ctx.Done():
+				a.log.Infof("detected context cancellation in api.Tail()")
+				return
+			}
+		}
+	}()
+
+	return tailRespCh, nil
 }
 
 func validateGetAllResp(resp *protos.GetAllResponse) error {

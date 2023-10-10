@@ -10,9 +10,11 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
+	"github.com/streamdal/snitch-protos/build/go/protos"
 
 	"github.com/streamdal/snitch-cli/config"
 	"github.com/streamdal/snitch-cli/types"
+	"github.com/streamdal/snitch-cli/util"
 )
 
 const (
@@ -273,7 +275,7 @@ func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 // Accepts an _optional_ pageTail to facilitate re-use of the tail view. This
 // is needed so that when filter/pause is applied, the tail view retains the
 // data captured within it.
-func (c *Console) DisplayTail(pageTail *tview.TextView, title string, actionCh chan<- *types.Action) *tview.TextView {
+func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.TailComponent, actionCh chan<- *types.Action) *tview.TextView {
 	c.Start()
 
 	if pageTail == nil {
@@ -284,7 +286,7 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, title string, actionCh c
 	}
 
 	// Always update title
-	pageTail.SetTitle(title)
+	pageTail.SetTitle(tailComponent.Name)
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
@@ -315,21 +317,21 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, title string, actionCh c
 			}
 		}
 
-		// Pass along TailComponent name so that once filter view is done,
-		// tail() knows what component it was operating on.
+		// Pass along TailComponent so that once filter view is done, tail()
+		// knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == 'f' {
 			actionCh <- &types.Action{
 				Step:          types.StepFilter,
-				TailComponent: title,
+				TailComponent: tailComponent,
 			}
 		}
 
-		// Pass along TailComponent name so that once search view is done,
-		// tail() knows what component it was operating on.
+		// Pass along TailComponent so that once search view is done, tail()
+		// knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == '/' {
 			actionCh <- &types.Action{
 				Step:          types.StepSearch,
-				TailComponent: title,
+				TailComponent: tailComponent,
 			}
 		}
 
@@ -502,7 +504,7 @@ func (c *Console) Redraw(f func()) {
 
 // DisplaySelectList will display a list of items and return the select item on the
 // output channel
-func (c *Console) DisplaySelectList(title string, itemMap map[string]string, output chan<- string) {
+func (c *Console) DisplaySelectList(title string, audiences []*protos.Audience, answerCh chan<- *types.TailComponent) {
 	selectComponent := tview.NewList()
 
 	selectComponent.SetBackgroundColor(Tcell(WindowBg))
@@ -517,9 +519,13 @@ func (c *Console) DisplaySelectList(title string, itemMap map[string]string, out
 	i := 0
 	shortcuts := []rune{'1', '2', '3', '4', '5', '6', '7', '8', '9'}
 
-	for tmpName, tmpDesc := range itemMap {
-		name := tmpName
-		desc := tmpDesc
+	for _, aud := range audiences {
+		name := aud.OperationName
+		desc := fmt.Sprintf("[::b]%s[-:-:-] / [::b]%s / [::b]%s[-:-:-]",
+			aud.ServiceName,
+			util.ProtosOperationTypeToStr(aud.OperationType),
+			aud.ComponentName,
+		)
 
 		var shortcut rune
 
@@ -530,7 +536,7 @@ func (c *Console) DisplaySelectList(title string, itemMap map[string]string, out
 		}
 
 		selectComponent.AddItem(name, desc, shortcut, func() {
-			output <- name
+			answerCh <- util.SelectedToTailComponent(name, desc)
 		})
 
 		i++
