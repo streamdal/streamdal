@@ -11,6 +11,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
+	"github.com/tidwall/pretty"
 
 	"github.com/streamdal/snitch-cli/api"
 	"github.com/streamdal/snitch-cli/config"
@@ -685,8 +686,17 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, lineNum)
 
+			formattedData := pretty.Ugly([]byte(data))
+			formattedData = pretty.Color(formattedData, nil)
+
+			//formattedData, err := prettyjson.Format([]byte(data))
+			//if err != nil {
+			//	//c.log.Errorf("unable to format JSON (reverting to no formatting): %s", err)
+			//	formattedData = []byte(data)
+			//}
+
 			if !c.paused {
-				if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
+				if _, err := fmt.Fprint(textView, prefix+tview.TranslateANSI(string(formattedData))+"\n"); err != nil {
 					c.log.Errorf("unable to write to textview: %s", err)
 				}
 
