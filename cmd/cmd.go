@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -329,8 +330,6 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 
 	// Goroutine used for reading user resp
 	go func() {
-		defer c.log.Info("fetchComponents dialog goroutine exiting")
-
 		for {
 			select {
 			case <-answerCh:
@@ -446,8 +445,6 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 // We pass the actionCh to DisplayTail() so it can WRITE commands it has seen to
 // the channel that is read by tail().
 func (c *Cmd) actionTail(action *types.Action) (*types.Action, error) {
-	c.log.Infof("rate setting: %d", action.TailRate)
-
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
 	}
@@ -521,7 +518,8 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.New("tail(): bug? *Action.TailComponent cannot be empty")
 	}
 
-	i := 1
+	lineNum := 1
+	lineNumMtx := &sync.RWMutex{}
 
 	dataCh := make(chan string, 1)
 
@@ -542,9 +540,11 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
-			dataCh <- fmt.Sprintf("%s: line %d", action.TailComponent, i)
+			dataCh <- fmt.Sprintf("%s: line %d", action.TailComponent, lineNum)
 			time.Sleep(200 * time.Millisecond)
-			i++
+			lineNumMtx.Lock()
+			lineNum++
+			lineNumMtx.Unlock()
 		}
 	}()
 
@@ -666,7 +666,9 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 				}
 			}
 
-			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, i)
+			lineNumMtx.RLock()
+			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, lineNum)
+			lineNumMtx.RUnlock()
 
 			if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
 				c.log.Errorf("unable to write to textview: %s", err)
