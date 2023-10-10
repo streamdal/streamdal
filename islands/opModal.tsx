@@ -31,6 +31,7 @@ import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import { SchemaModal } from "../components/modals/schemaModal.tsx";
 import { ComponentImage } from "./customNodes.tsx";
 import { useSignalEffect } from "@preact/signals";
+import { initFlowbite } from "flowbite";
 
 import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 export const OP_MODAL_WIDTH = "308px";
@@ -97,6 +98,9 @@ export default function OpModal(
   });
 
   useEffect(async () => {
+    //
+    // Flowbite breaks on audience change for some reason
+    initFlowbite();
     if (opModal.value) {
       const schema = await getSchema();
       opModal.value = {
