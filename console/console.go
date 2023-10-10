@@ -117,7 +117,9 @@ func (c *Console) toggleMenuEntry(text string, on bool) {
 		replaceNew = fmt.Sprintf("[%s]%s[-]", Hex(MenuInactiveFg), text)
 	}
 
+	c.log.Infof("BEFORE: Replacing '%s' with '%s'; menu: '%s", replaceOld, replaceNew, menu)
 	updatedMenu = strings.Replace(menu, replaceOld, replaceNew, -1)
+	c.log.Infof("AFTER: ")
 
 	c.app.QueueUpdateDraw(func() {
 		c.menu.Clear()

@@ -136,6 +136,8 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 	return &types.Action{
 		Step:          types.StepPeek,
 		PeekComponent: action.PeekComponent,
+		PeekSearch:    action.PeekSearch,
+		PeekRate:      action.PeekRate,
 		PeekFilter:    filterStr,
 	}, nil
 }
@@ -172,6 +174,8 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 	return &types.Action{
 		Step:           types.StepPeek,
 		PeekComponent:  action.PeekComponent,
+		PeekRate:       action.PeekRate,
+		PeekFilter:     action.PeekFilter,
 		PeekSearch:     searchStr,
 		PeekSearchPrev: action.PeekSearch,
 	}, nil
@@ -196,9 +200,9 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 
 	// Turn on/off "Rate" menu entry depending on if Rate is not 0
 	if rate != 0 {
-		c.options.Console.SetMenuEntryOn("R")
+		c.options.Console.SetMenuEntryOn("Set Sample Rate")
 	} else {
-		c.options.Console.SetMenuEntryOff("R")
+		c.options.Console.SetMenuEntryOff("Set Sample Rate")
 	}
 
 	// Only way to get to "set sample rate" is via Peek so we always tell resp
@@ -207,6 +211,8 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 		Step:          types.StepPeek,
 		PeekComponent: action.PeekComponent,
 		PeekRate:      rate,
+		PeekSearch:    action.PeekSearch,
+		PeekFilter:    action.PeekFilter,
 	}, nil
 }
 
@@ -438,7 +444,7 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 // We pass the actionCh to DisplayPeek() so it can WRITE commands it has seen to
 // the channel that is read by peek().
 func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
-	c.log.Info("rate setting: %d", action.PeekRate)
+	c.log.Infof("rate setting: %d", action.PeekRate)
 
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
@@ -636,6 +642,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			cmd.PeekFilter = action.PeekFilter
 			cmd.PeekSearch = action.PeekSearch
 			cmd.PeekSearchPrev = action.PeekSearchPrev
+			cmd.PeekRate = action.PeekRate
 
 			return cmd, nil
 		case data := <-dataCh:
