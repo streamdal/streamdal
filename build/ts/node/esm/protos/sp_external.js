@@ -1234,12 +1234,12 @@ export const DeleteAudienceRequest = new DeleteAudienceRequest$Type();
 class DeleteServiceRequest$Type extends MessageType {
     constructor() {
         super("protos.DeleteServiceRequest", [
-            { no: 1, name: "service", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "force", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { service: "" };
+        const message = { serviceName: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1250,8 +1250,8 @@ class DeleteServiceRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string service */ 1:
-                    message.service = reader.string();
+                case /* string service_name */ 1:
+                    message.serviceName = reader.string();
                     break;
                 case /* optional bool force */ 2:
                     message.force = reader.bool();
@@ -1268,9 +1268,9 @@ class DeleteServiceRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string service = 1; */
-        if (message.service !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.service);
+        /* string service_name = 1; */
+        if (message.serviceName !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serviceName);
         /* optional bool force = 2; */
         if (message.force !== undefined)
             writer.tag(2, WireType.Varint).bool(message.force);

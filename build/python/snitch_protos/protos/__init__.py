@@ -556,7 +556,7 @@ class DeleteAudienceRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class DeleteServiceRequest(betterproto.Message):
-    service: str = betterproto.string_field(1)
+    service_name: str = betterproto.string_field(1)
     force: Optional[bool] = betterproto.bool_field(2, optional=True, group="_force")
 
 

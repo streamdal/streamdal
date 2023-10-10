@@ -309,9 +309,9 @@ export interface DeleteAudienceRequest {
  */
 export interface DeleteServiceRequest {
     /**
-     * @generated from protobuf field: string service = 1;
+     * @generated from protobuf field: string service_name = 1;
      */
-    service: string;
+    serviceName: string;
     /**
      * @generated from protobuf field: optional bool force = 2;
      */

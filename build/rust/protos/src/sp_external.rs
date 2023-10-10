@@ -3219,8 +3219,8 @@ impl ::protobuf::reflect::ProtobufValue for DeleteAudienceRequest {
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct DeleteServiceRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.DeleteServiceRequest.service)
-    pub service: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.DeleteServiceRequest.service_name)
+    pub service_name: ::std::string::String,
     // @@protoc_insertion_point(field:protos.DeleteServiceRequest.force)
     pub force: ::std::option::Option<bool>,
     // special fields
@@ -3243,9 +3243,9 @@ impl DeleteServiceRequest {
         let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "service",
-            |m: &DeleteServiceRequest| { &m.service },
-            |m: &mut DeleteServiceRequest| { &mut m.service },
+            "service_name",
+            |m: &DeleteServiceRequest| { &m.service_name },
+            |m: &mut DeleteServiceRequest| { &mut m.service_name },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "force",
@@ -3271,7 +3271,7 @@ impl ::protobuf::Message for DeleteServiceRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.service = is.read_string()?;
+                    self.service_name = is.read_string()?;
                 },
                 16 => {
                     self.force = ::std::option::Option::Some(is.read_bool()?);
@@ -3288,8 +3288,8 @@ impl ::protobuf::Message for DeleteServiceRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.service.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.service);
+        if !self.service_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.service_name);
         }
         if let Some(v) = self.force {
             my_size += 1 + 1;
@@ -3300,8 +3300,8 @@ impl ::protobuf::Message for DeleteServiceRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.service.is_empty() {
-            os.write_string(1, &self.service)?;
+        if !self.service_name.is_empty() {
+            os.write_string(1, &self.service_name)?;
         }
         if let Some(v) = self.force {
             os.write_bool(2, v)?;
@@ -3323,14 +3323,14 @@ impl ::protobuf::Message for DeleteServiceRequest {
     }
 
     fn clear(&mut self) {
-        self.service.clear();
+        self.service_name.clear();
         self.force = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static DeleteServiceRequest {
         static instance: DeleteServiceRequest = DeleteServiceRequest {
-            service: ::std::string::String::new(),
+            service_name: ::std::string::String::new(),
             force: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -4388,37 +4388,37 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     ipeline_id\x18\x02\x20\x01(\tR\npipelineId\"j\n\x15DeleteAudienceRequest\
     \x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audien\
     ce\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05force\x88\x01\x01B\x08\
-    \n\x06_force\"U\n\x14DeleteServiceRequest\x12\x18\n\x07service\x18\x01\
-    \x20\x01(\tR\x07service\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05f\
-    orce\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMetricsRequest\"\xa3\x01\
-    \n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\x20\x03(\x0b2'.protos\
-    .GetMetricsResponse.MetricsEntryR\x07metrics\x1aJ\n\x0cMetricsEntry\x12\
-    \x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\x05value\x18\x02\x20\x01\
-    (\x0b2\x0e.protos.MetricR\x05value:\x028\x01\"\x19\n\x17GetAudienceRates\
-    Request\"\xad\x01\n\x18GetAudienceRatesResponse\x12A\n\x05rates\x18\x01\
-    \x20\x03(\x0b2+.protos.GetAudienceRatesResponse.RatesEntryR\x05rates\x1a\
-    N\n\nRatesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12*\n\x05va\
-    lue\x18\x02\x20\x01(\x0b2\x14.protos.AudienceRateR\x05value:\x028\x01\"@\
-    \n\x10GetSchemaRequest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.prot\
-    os.AudienceR\x08audience\";\n\x11GetSchemaResponse\x12&\n\x06schema\x18\
-    \x01\x20\x01(\x0b2\x0e.protos.SchemaR\x06schema\"#\n\x0bTestRequest\x12\
-    \x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResponse\x12\
-    \x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\xd0\x0e\n\x08External\
-    \x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResp\
-    onse\x12?\n\x0cGetAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos.\
-    GetAllResponse0\x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesRe\
-    quest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.\
-    protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eC\
-    reatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.Create\
-    PipelineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineR\
-    equest\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.\
-    protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eA\
-    ttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.Standa\
-    rdResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\
-    \x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.Pa\
-    usePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipel\
-    ine\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardResponse\
-    \x12Q\n\x12CreateNotification\x12!.protos.CreateNotificationRequest\x1a\
+    \n\x06_force\"^\n\x14DeleteServiceRequest\x12!\n\x0cservice_name\x18\x01\
+    \x20\x01(\tR\x0bserviceName\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\
+    \x05force\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMetricsRequest\"\
+    \xa3\x01\n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\x20\x03(\x0b2\
+    '.protos.GetMetricsResponse.MetricsEntryR\x07metrics\x1aJ\n\x0cMetricsEn\
+    try\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\x05value\x18\x02\
+    \x20\x01(\x0b2\x0e.protos.MetricR\x05value:\x028\x01\"\x19\n\x17GetAudie\
+    nceRatesRequest\"\xad\x01\n\x18GetAudienceRatesResponse\x12A\n\x05rates\
+    \x18\x01\x20\x03(\x0b2+.protos.GetAudienceRatesResponse.RatesEntryR\x05r\
+    ates\x1aN\n\nRatesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12*\
+    \n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.AudienceRateR\x05value:\x02\
+    8\x01\"@\n\x10GetSchemaRequest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\
+    \x10.protos.AudienceR\x08audience\";\n\x11GetSchemaResponse\x12&\n\x06sc\
+    hema\x18\x01\x20\x01(\x0b2\x0e.protos.SchemaR\x06schema\"#\n\x0bTestRequ\
+    est\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResponse\
+    \x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output2\xd0\x0e\n\x08Externa\
+    l\x127\n\x06GetAll\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllRes\
+    ponse\x12?\n\x0cGetAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos\
+    .GetAllResponse0\x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesR\
+    equest\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a\
+    .protos.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0e\
+    CreatePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.Creat\
+    ePipelineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipeline\
+    Request\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d\
+    .protos.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0e\
+    AttachPipeline\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.Stand\
+    ardResponse\x12I\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineReques\
+    t\x1a\x18.protos.StandardResponse\x12G\n\rPausePipeline\x12\x1c.protos.P\
+    ausePipelineRequest\x1a\x18.protos.StandardResponse\x12I\n\x0eResumePipe\
+    line\x12\x1d.protos.ResumePipelineRequest\x1a\x18.protos.StandardRespons\
+    e\x12Q\n\x12CreateNotification\x12!.protos.CreateNotificationRequest\x1a\
     \x18.protos.StandardResponse\x12Q\n\x12UpdateNotification\x12!.protos.Up\
     dateNotificationRequest\x1a\x18.protos.StandardResponse\x12Q\n\x12Delete\
     Notification\x12!.protos.DeleteNotificationRequest\x1a\x18.protos.Standa\
@@ -4676,9 +4676,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x04\xd3\x01\x10\x15\n\r\n\x05\x04\x17\x02\x01\x03\x12\x04\xd3\x01\
     \x18\x19\n\x0c\n\x02\x04\x18\x12\x06\xd6\x01\0\xda\x01\x01\n\x0b\n\x03\
     \x04\x18\x01\x12\x04\xd6\x01\x08\x1c\n\x0c\n\x04\x04\x18\x02\0\x12\x04\
-    \xd7\x01\x02\x15\n\r\n\x05\x04\x18\x02\0\x05\x12\x04\xd7\x01\x02\x08\n\r\
-    \n\x05\x04\x18\x02\0\x01\x12\x04\xd7\x01\t\x10\n\r\n\x05\x04\x18\x02\0\
-    \x03\x12\x04\xd7\x01\x13\x14\n\x0c\n\x04\x04\x18\x02\x01\x12\x04\xd9\x01\
+    \xd7\x01\x02\x1a\n\r\n\x05\x04\x18\x02\0\x05\x12\x04\xd7\x01\x02\x08\n\r\
+    \n\x05\x04\x18\x02\0\x01\x12\x04\xd7\x01\t\x15\n\r\n\x05\x04\x18\x02\0\
+    \x03\x12\x04\xd7\x01\x18\x19\n\x0c\n\x04\x04\x18\x02\x01\x12\x04\xd9\x01\
     \x02\x1a\n\r\n\x05\x04\x18\x02\x01\x04\x12\x04\xd9\x01\x02\n\n\r\n\x05\
     \x04\x18\x02\x01\x05\x12\x04\xd9\x01\x0b\x0f\n\r\n\x05\x04\x18\x02\x01\
     \x01\x12\x04\xd9\x01\x10\x15\n\r\n\x05\x04\x18\x02\x01\x03\x12\x04\xd9\
