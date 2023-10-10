@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -518,10 +517,7 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.New("tail(): bug? *action.TailComponent cannot be nil")
 	}
 
-	lineNum := 1
-	lineNumMtx := &sync.RWMutex{}
-
-	//dataCh := make(chan string, 1)
+	var lineNum int
 
 	// If this is the first time we are seeing this filter, announce it
 	if c.announceFilter {
@@ -659,8 +655,6 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 			return cmd, nil
 		case tailResp := <-tailCh:
-			c.log.Infof("received tailResp on tailCh in cmd.go: %+v", tailResp)
-
 			if tailResp == nil {
 				c.log.Infof("got nil resp on tailCh - ignoring")
 				continue
@@ -669,11 +663,11 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 			// TODO: Differentiate between error and good payload
 			data := string(tailResp.OriginalData)
 
-			c.log.Infof("data contents: %s", data)
-
 			if !strings.Contains(data, action.TailFilter) {
 				continue
 			}
+
+			lineNum++
 
 			// Highlight filtered data
 			if action.TailFilter != "" {
@@ -689,15 +683,15 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 				}
 			}
 
-			lineNumMtx.RLock()
 			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, lineNum)
-			lineNumMtx.RUnlock()
 
-			if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
-				c.log.Errorf("unable to write to textview: %s", err)
+			if !c.paused {
+				if _, err := fmt.Fprint(textView, prefix+data+"\n"); err != nil {
+					c.log.Errorf("unable to write to textview: %s", err)
+				}
+
+				textView.ScrollToEnd()
 			}
-
-			textView.ScrollToEnd()
 		}
 	}
 }
