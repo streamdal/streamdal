@@ -20,7 +20,7 @@ const (
 	PrimitiveRetryModal = "retry_modal"
 	PrimitiveErrorModal = "error_modal"
 	PrimitiveList       = "list"
-	PrimitivePeekView   = "peek_view"
+	PrimitiveTailView   = "tail_view"
 	PrimitiveFilter     = "filter"
 	PrimitiveSearch     = "search"
 	PrimitiveRate       = "rate"
@@ -28,8 +28,8 @@ const (
 	PageConnectionAttempt = "page_" + PrimitiveInfoModal
 	PageConnectionRetry   = "page_" + PrimitiveRetryModal
 	PageSelectComponent   = "page_" + PrimitiveList
-	PagePeekError         = "page_" + PrimitiveErrorModal
-	PagePeekView          = "page_" + PrimitivePeekView
+	PageTailError         = "page_" + PrimitiveErrorModal
+	PageTailView          = "page_" + PrimitiveTailView
 	PageFilter            = "page_" + PrimitiveFilter
 	PageSearch            = "page_" + PrimitiveSearch
 	PageRate              = "page_" + PrimitiveRate
@@ -217,7 +217,6 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 	c.pages.AddPage(PageSearch, inputDialog, true, true)
 }
 
-// TODO: Value needs to persist + set menu to active + make peek use it
 func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 	c.Start()
 
@@ -271,23 +270,23 @@ func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 	c.pages.AddPage(PageRate, inputDialog, true, true)
 }
 
-// DisplayPeek will display peek + write any actions we receive from the user
-// to the action channel; the action channel is read by the peek() method.
-// Accepts an _optional_ pagePeek to facilitate re-use of the peek view. This
-// is needed so that when filter/pause is applied, the peek view retains the
+// DisplayTail will display tail + write any actions we receive from the user
+// to the action channel; the action channel is read by the tail() method.
+// Accepts an _optional_ pageTail to facilitate re-use of the tail view. This
+// is needed so that when filter/pause is applied, the tail view retains the
 // data captured within it.
-func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh chan<- *types.Action) *tview.TextView {
+func (c *Console) DisplayTail(pageTail *tview.TextView, title string, actionCh chan<- *types.Action) *tview.TextView {
 	c.Start()
 
-	if pagePeek == nil {
-		pagePeek = tview.NewTextView()
-		pagePeek.SetBorder(true)
-		pagePeek.SetDynamicColors(true)
-		pagePeek.SetMaxLines(c.options.Config.MaxOutputLines)
+	if pageTail == nil {
+		pageTail = tview.NewTextView()
+		pageTail.SetBorder(true)
+		pageTail.SetDynamicColors(true)
+		pageTail.SetMaxLines(c.options.Config.MaxOutputLines)
 	}
 
 	// Always update title
-	pagePeek.SetTitle(title)
+	pageTail.SetTitle(title)
 
 	c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
 
@@ -316,31 +315,31 @@ func (c *Console) DisplayPeek(pagePeek *tview.TextView, title string, actionCh c
 			}
 		}
 
-		// Pass along PeekComponent name so that once filter view is done,
-		// peek knows what component it was operating on.
+		// Pass along TailComponent name so that once filter view is done,
+		// tail() knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == 'f' {
 			actionCh <- &types.Action{
 				Step:          types.StepFilter,
-				PeekComponent: title,
+				TailComponent: title,
 			}
 		}
 
-		// Pass along PeekComponent name so that once search view is done,
-		// peek knows what component it was operating on.
+		// Pass along TailComponent name so that once search view is done,
+		// tail() knows what component it was operating on.
 		if event.Key() == tcell.KeyRune && event.Rune() == '/' {
 			actionCh <- &types.Action{
 				Step:          types.StepSearch,
-				PeekComponent: title,
+				TailComponent: title,
 			}
 		}
 
 		return event
 	})
 
-	c.pages.AddPage(PagePeekView, pagePeek, true, true)
-	c.pages.SwitchToPage(PagePeekView)
+	c.pages.AddPage(PageTailView, pageTail, true, true)
+	c.pages.SwitchToPage(PageTailView)
 
-	return pagePeek
+	return pageTail
 }
 
 func (c *Console) Start() {
@@ -483,8 +482,8 @@ func (c *Console) DisplayErrorModal(msg string) {
 			}
 		})
 
-	c.pages.AddPage(PagePeekError, retryModal, true, true)
-	c.pages.SwitchToPage(PagePeekError)
+	c.pages.AddPage(PageTailError, retryModal, true, true)
+	c.pages.SwitchToPage(PageTailError)
 }
 
 func Center(p tview.Primitive, width, height int) tview.Primitive {

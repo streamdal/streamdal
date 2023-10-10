@@ -75,8 +75,8 @@ func (c *Cmd) run(action *types.Action) error {
 		resp, err = c.actionConnect(action)
 	case types.StepSelect:
 		resp, err = c.actionSelect(action)
-	case types.StepPeek:
-		resp, err = c.actionPeek(action)
+	case types.StepTail:
+		resp, err = c.actionTail(action)
 	case types.StepFilter:
 		resp, err = c.actionFilter(action)
 	case types.StepSearch:
@@ -87,8 +87,8 @@ func (c *Cmd) run(action *types.Action) error {
 		c.options.Console.Stop()
 		os.Exit(0)
 	case types.StepPause:
-		// Pause is only possible from peek() so that's where we want to go back
-		resp, err = c.actionPeek(action)
+		// Pause is only possible from tail() so that's where we want to go back
+		resp, err = c.actionTail(action)
 	default:
 		err = errors.Errorf("unknown action step: %d", action.Step)
 	}
@@ -100,8 +100,8 @@ func (c *Cmd) run(action *types.Action) error {
 	return c.run(resp)
 }
 
-// Filter view can only be triggered if we came from peek so it makes sense
-// for us to go back to peek() after the filter view is closed.
+// Filter view can only be triggered if we came from tail so it makes sense
+// for us to go back to tail() after the filter view is closed.
 func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 	// Disable input capture while in Filter
 	origCapture := c.options.Console.GetInputCapture()
@@ -113,7 +113,7 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 
 	// Display modal
 	go func() {
-		c.options.Console.DisplayFilter(action.PeekFilter, answerCh)
+		c.options.Console.DisplayFilter(action.TailFilter, answerCh)
 	}()
 
 	// Wait for an answer; if the user selects "Cancel", we will get back
@@ -131,14 +131,14 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 
 	c.announceFilter = true
 
-	// We want to go back to peek() with the same component as before + set the
+	// We want to go back to tail() with the same component as before + set the
 	// new filter string.
 	return &types.Action{
-		Step:          types.StepPeek,
-		PeekComponent: action.PeekComponent,
-		PeekSearch:    action.PeekSearch,
-		PeekRate:      action.PeekRate,
-		PeekFilter:    filterStr,
+		Step:          types.StepTail,
+		TailComponent: action.TailComponent,
+		TailSearch:    action.TailSearch,
+		TailRate:      action.TailRate,
+		TailFilter:    filterStr,
 	}, nil
 }
 
@@ -153,7 +153,7 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 
 	// Display modal
 	go func() {
-		c.options.Console.DisplaySearch(action.PeekSearch, answerCh)
+		c.options.Console.DisplaySearch(action.TailSearch, answerCh)
 	}()
 
 	// Wait for an answer; if the user selects "Cancel", we will get back
@@ -169,15 +169,15 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 		c.options.Console.SetMenuEntryOff("Search")
 	}
 
-	// Only way to get to "search" is via peek, so the next step is to go back
-	// to peek view (with the same component as before search).
+	// Only way to get to "search" is via tail, so the next step is to go back
+	// to tail view (with the same component as before search).
 	return &types.Action{
-		Step:           types.StepPeek,
-		PeekComponent:  action.PeekComponent,
-		PeekRate:       action.PeekRate,
-		PeekFilter:     action.PeekFilter,
-		PeekSearch:     searchStr,
-		PeekSearchPrev: action.PeekSearch,
+		Step:           types.StepTail,
+		TailComponent:  action.TailComponent,
+		TailRate:       action.TailRate,
+		TailFilter:     action.TailFilter,
+		TailSearch:     searchStr,
+		TailSearchPrev: action.TailSearch,
 	}, nil
 }
 
@@ -192,11 +192,13 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 
 	// Display modal
 	go func() {
-		c.options.Console.DisplayRate(action.PeekRate, answerCh)
+		c.options.Console.DisplayRate(action.TailRate, answerCh)
 	}()
 
 	// OK == rate the user chose; Cancel == original rate; Reset == 0
 	rate := <-answerCh
+
+	// TODO: Set sample rate on server
 
 	// Turn on/off "Rate" menu entry depending on if Rate is not 0
 	if rate != 0 {
@@ -205,14 +207,14 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 		c.options.Console.SetMenuEntryOff("Set Sample Rate")
 	}
 
-	// Only way to get to "set sample rate" is via Peek so we always tell resp
+	// Only way to get to "set sample rate" is via Tail so we always tell resp
 	// to go back to that view.
 	return &types.Action{
-		Step:          types.StepPeek,
-		PeekComponent: action.PeekComponent,
-		PeekRate:      rate,
-		PeekSearch:    action.PeekSearch,
-		PeekFilter:    action.PeekFilter,
+		Step:          types.StepTail,
+		TailComponent: action.TailComponent,
+		TailRate:      rate,
+		TailSearch:    action.TailSearch,
+		TailFilter:    action.TailFilter,
 	}, nil
 }
 
@@ -383,7 +385,7 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 	// ------------------------------------------
 
 	// Disable all input capture except "q" to quit; we must do this because
-	// we may have reached this view from peek() which has input capture for
+	// we may have reached this view from tail() which has input capture for
 	// most keyboard shortcuts and if this view gets a keypress, it will
 	// cause the app to deadlock.
 
@@ -417,56 +419,56 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 		}, nil
 	case component := <-selectedComponentCh:
 		return &types.Action{
-			Step:          types.StepPeek,
-			PeekComponent: component,
+			Step:          types.StepTail,
+			TailComponent: component,
 
-			// Passing these along in case we originally came from a peek w/ existing settings
-			PeekSearch: a.PeekSearch,
-			PeekFilter: a.PeekFilter,
-			PeekRate:   a.PeekRate,
+			// Passing these along in case we originally came from a tail w/ existing settings
+			TailSearch: a.TailSearch,
+			TailFilter: a.TailFilter,
+			TailRate:   a.TailRate,
 		}, nil
 	}
 }
 
-// actionPeek launches the actual peek via server + displaying the peek view.
+// actionTail launches the actual tail via server + displaying the tail view.
 //
-// The flow here is that peek() will block until it receives a command that
-// the caller (actionPeek) should know about. When peek() returns, it will
-// return a response action. This action is evaluated to determine IF actionPeek
+// The flow here is that tail() will block until it receives a command that
+// the caller (actionTail) should know about. When tail() returns, it will
+// return a response action. This action is evaluated to determine IF actionTail
 // should send the command all the way back to run() which will execute the
 // step in the response.
 //
 // It makes sense to send the resp command all the way back if the step requires
 // us to draw/display a new screen (such as "StepFilter" or "StepSelect").
 // We would NOT want to send the command back if the step is "StepPause" since
-// pause does not display a modal and can be handled entirely inside peek().
+// pause does not display a modal and can be handled entirely inside tail().
 //
-// We pass the actionCh to DisplayPeek() so it can WRITE commands it has seen to
-// the channel that is read by peek().
-func (c *Cmd) actionPeek(action *types.Action) (*types.Action, error) {
-	c.log.Infof("rate setting: %d", action.PeekRate)
+// We pass the actionCh to DisplayTail() so it can WRITE commands it has seen to
+// the channel that is read by tail().
+func (c *Cmd) actionTail(action *types.Action) (*types.Action, error) {
+	c.log.Infof("rate setting: %d", action.TailRate)
 
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if action.PeekComponent == "" {
-		return nil, errors.New("actionPeek(): bug? PeekComponent cannot be empty")
+	if action.TailComponent == "" {
+		return nil, errors.New("actionTail(): bug? TailComponent cannot be empty")
 	}
 
 	actionCh := make(chan *types.Action, 1)
 
-	// Create a new textview if this is a new peek; otherwise re-use existing view
+	// Create a new textview if this is a new tail; otherwise re-use existing view
 	if c.textview == nil {
-		c.textview = c.options.Console.DisplayPeek(nil, action.PeekComponent, actionCh)
+		c.textview = c.options.Console.DisplayTail(nil, action.TailComponent, actionCh)
 	} else {
-		c.options.Console.DisplayPeek(c.textview, action.PeekComponent, actionCh)
+		c.options.Console.DisplayTail(c.textview, action.TailComponent, actionCh)
 	}
 
 	for {
-		respAction, err := c.peek(action, c.textview, actionCh)
+		respAction, err := c.tail(action, c.textview, actionCh)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to peek")
+			return nil, errors.Wrap(err, "unable to tail")
 		}
 
 		// Pass back to run() which can decide what to do next
@@ -510,13 +512,13 @@ func (c *Cmd) connect(ctx context.Context) error {
 	return nil
 }
 
-func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-chan *types.Action) (*types.Action, error) {
+func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-chan *types.Action) (*types.Action, error) {
 	if action == nil {
 		return nil, errors.New("action cannot be nil")
 	}
 
-	if action.PeekComponent == "" {
-		return nil, errors.New("peek(): bug? *Action.PeekComponent cannot be empty")
+	if action.TailComponent == "" {
+		return nil, errors.New("tail(): bug? *Action.TailComponent cannot be empty")
 	}
 
 	i := 1
@@ -525,7 +527,7 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 	// If this is the first time we are seeing this filter, announce it
 	if c.announceFilter {
-		filterStatus := fmt.Sprintf(" Filter set to '%s' @ "+time.Now().Format("15:04:05"), action.PeekFilter)
+		filterStatus := fmt.Sprintf(" Filter set to '%s' @ "+time.Now().Format("15:04:05"), action.TailFilter)
 		filterLine := "[gray:black]" + strings.Repeat("░", 16) + filterStatus + strings.Repeat("░", 16) + "[-:-]"
 		fmt.Fprintf(textView, filterLine+"\n")
 
@@ -540,14 +542,14 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
-			dataCh <- fmt.Sprintf("%s: line %d", action.PeekComponent, i)
+			dataCh <- fmt.Sprintf("%s: line %d", action.TailComponent, i)
 			time.Sleep(200 * time.Millisecond)
 			i++
 		}
 	}()
 
 	// Set/unset search highlight
-	if action.PeekSearch != "" || action.PeekSearchPrev != "" {
+	if action.TailSearch != "" || action.TailSearchPrev != "" {
 		// We need to split so that search does not hit line num and/or timestamp field
 		splitData := strings.Split(textView.GetText(false), "\n")
 
@@ -577,18 +579,18 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			updatedContent := splitLine[2]
 
 			// If we are coming from a previous search, clear the old highlights first
-			if action.PeekSearchPrev != "" &&
-				strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearchPrev)) {
+			if action.TailSearchPrev != "" &&
+				strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.TailSearchPrev)) {
 
-				updatedContent = strings.Replace(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearchPrev), action.PeekSearchPrev, -1)
+				updatedContent = strings.Replace(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.TailSearchPrev), action.TailSearchPrev, -1)
 			}
 
 			// This is a new search - highlight it but only if it's not already highlighted
-			if action.PeekSearch != "" &&
-				!strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch)) &&
-				strings.Contains(updatedContent, action.PeekSearch) {
+			if action.TailSearch != "" &&
+				!strings.Contains(updatedContent, fmt.Sprintf(SearchHighlightFmt, action.TailSearch)) &&
+				strings.Contains(updatedContent, action.TailSearch) {
 
-				updatedContent = strings.Replace(updatedContent, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
+				updatedContent = strings.Replace(updatedContent, action.TailSearch, fmt.Sprintf(SearchHighlightFmt, action.TailSearch), -1)
 			}
 
 			updatedData += splitLine[0] + " " + splitLine[1] + " " + updatedContent + "\n"
@@ -600,13 +602,13 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		})
 	}
 
-	// Commands read here have been passed down from DisplayPeek(); we need access
+	// Commands read here have been passed down from DisplayTail(); we need access
 	// to them here so we can potentially modify how we're interacting with the
 	// textView component.
 	//
 	// For example: When we detect a pause -> send a "pause" line to textView.
 	// Or when we detect a sampling update - which would trigger us to re-start
-	// peek with updated settings).
+	// tail with updated settings).
 	// Or when we detect a filter update - we will update the local filter which
 	// is read by <- dataCh: case.
 	for {
@@ -614,10 +616,10 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 		case cmd := <-actionCh:
 			// "Pause" is special in that it does not display a modal so we
 			// handle all UI/related pieces from here. For all other commands,
-			// we pass the cmd back to the caller peek() (which will decide if
+			// we pass the cmd back to the caller tail() (which will decide if
 			// it should pass the cmd/action back to run()).
 			if cmd.Step == types.StepPause {
-				// Tell peek reader to pause/resume
+				// Tell tail reader to pause/resume
 				c.paused = !c.paused
 
 				// Update the menu pause button visual
@@ -638,29 +640,29 @@ func (c *Cmd) peek(action *types.Action, textView *tview.TextView, actionCh <-ch
 			}
 
 			// Re-inject settings
-			cmd.PeekComponent = action.PeekComponent
-			cmd.PeekFilter = action.PeekFilter
-			cmd.PeekSearch = action.PeekSearch
-			cmd.PeekSearchPrev = action.PeekSearchPrev
-			cmd.PeekRate = action.PeekRate
+			cmd.TailComponent = action.TailComponent
+			cmd.TailFilter = action.TailFilter
+			cmd.TailSearch = action.TailSearch
+			cmd.TailSearchPrev = action.TailSearchPrev
+			cmd.TailRate = action.TailRate
 
 			return cmd, nil
 		case data := <-dataCh:
-			if !strings.Contains(data, action.PeekFilter) {
+			if !strings.Contains(data, action.TailFilter) {
 				continue
 			}
 
 			// Highlight filtered data
-			if action.PeekFilter != "" {
-				data = strings.Replace(data, action.PeekFilter, "[green:gray]"+action.PeekFilter+"[-:-]", -1)
+			if action.TailFilter != "" {
+				data = strings.Replace(data, action.TailFilter, "[green:gray]"+action.TailFilter+"[-:-]", -1)
 			}
 
 			// This will highlight the search term + underline the entire entry
 			// for any new incoming data.
-			if action.PeekSearch != "" {
-				if strings.Contains(data, action.PeekSearch) {
+			if action.TailSearch != "" {
+				if strings.Contains(data, action.TailSearch) {
 					// Highlight just the search term
-					data = strings.Replace(data, action.PeekSearch, fmt.Sprintf(SearchHighlightFmt, action.PeekSearch), -1)
+					data = strings.Replace(data, action.TailSearch, fmt.Sprintf(SearchHighlightFmt, action.TailSearch), -1)
 				}
 			}
 

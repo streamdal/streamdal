@@ -5,7 +5,7 @@ const (
 	StepSelect
 	StepFilter
 	StepSearch
-	StepPeek
+	StepTail
 	StepQuit
 	StepPause
 	StepRate
@@ -17,10 +17,10 @@ type Action struct {
 	Step Step
 	Args []string
 
-	// Args specifically used by peek()
-	PeekComponent  string
-	PeekFilter     string
-	PeekSearch     string
-	PeekSearchPrev string
-	PeekRate       int
+	// Args specifically used by tail()
+	TailComponent  string
+	TailFilter     string
+	TailSearch     string
+	TailSearchPrev string
+	TailRate       int
 }
