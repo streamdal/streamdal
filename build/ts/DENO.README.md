@@ -1,17 +1,17 @@
-## Typescript Client Protobuf Library for Snitch
+## Streamdal Typescript Protobuf Library for Deno
 
 A Deno compatible Typescript client library based on [protobuf-ts](https://github.com/timostamm/protobuf-ts) 
-for Snitch Protobuf and GRPC. 
+for Streamdal's Protobuf and GRPC. 
 
 Example use:
 
 ```typescript
 
-import { ExternalClient } from "snitch-protos/protos/external_api.client";
+import { ExternalClient } from "protos/protos/external_api.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 
 const transport = new GrpcWebFetchTransport({
-  baseUrl: `${await getEnv("SNITCH_GRPC_WEB_URL") || "http://localhost:9091"}`,
+  baseUrl: `${await getEnv("STREAMDAL_GRPC_WEB_URL") || "http://localhost:9091"}`,
   format: "binary",
 });
 
@@ -28,4 +28,4 @@ try {
 
 ```
 
-For a more complete example, see the [snitch-console](https://github.com/streamdal/snitch-console)
+For a more complete example, see the [console](https://github.com/streamdal/console)
