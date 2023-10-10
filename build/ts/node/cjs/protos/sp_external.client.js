@@ -176,7 +176,7 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
-     * Delete an un-attached audience
+     * Delete an audience
      *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
@@ -185,33 +185,42 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a service and all associated audiences
+     *
+     * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
+     */
+    deleteService(input, options) {
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
      * Returns all metric counters
      *
      * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
      */
     getMetrics(input, options) {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input, options) {
-        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        const method = this.methods[21], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input, options) {
-        const method = this.methods[21], opt = this._transport.mergeOptions(options);
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input, options) {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
@@ -220,7 +229,7 @@ class ExternalClient {
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
 }

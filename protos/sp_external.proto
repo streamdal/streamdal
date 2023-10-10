@@ -64,8 +64,11 @@ service External {
   // Detach a notification config from a pipeline
   rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
 
-  // Delete an un-attached audience
+  // Delete an audience
   rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
+
+  // Delete a service and all associated audiences
+  rpc DeleteService(DeleteServiceRequest) returns (protos.StandardResponse);
 
   // Returns all metric counters
   rpc GetMetrics(GetMetricsRequest) returns (stream GetMetricsResponse);
@@ -206,6 +209,12 @@ message DeleteAudienceRequest {
   protos.Audience audience = 1;
 
   // If true, will also detach all pipelines from the audience (if it has any)
+  optional bool force = 2;
+}
+
+message DeleteServiceRequest {
+  string service = 1;
+
   optional bool force = 2;
 }
 

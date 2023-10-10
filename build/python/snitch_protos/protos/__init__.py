@@ -555,6 +555,12 @@ class DeleteAudienceRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class DeleteServiceRequest(betterproto.Message):
+    service: str = betterproto.string_field(1)
+    force: Optional[bool] = betterproto.bool_field(2, optional=True, group="_force")
+
+
+@dataclass(eq=False, repr=False)
 class GetMetricsRequest(betterproto.Message):
     pass
 
@@ -1307,6 +1313,23 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def delete_service(
+        self,
+        delete_service_request: "DeleteServiceRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/DeleteService",
+            delete_service_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def get_metrics(
         self,
         get_metrics_request: "GetMetricsRequest",
@@ -1633,6 +1656,11 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def delete_service(
+        self, delete_service_request: "DeleteServiceRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def get_metrics(
         self, get_metrics_request: "GetMetricsRequest"
     ) -> AsyncIterator["GetMetricsResponse"]:
@@ -1801,6 +1829,13 @@ class ExternalBase(ServiceBase):
         response = await self.delete_audience(request)
         await stream.send_message(response)
 
+    async def __rpc_delete_service(
+        self, stream: "grpclib.server.Stream[DeleteServiceRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.delete_service(request)
+        await stream.send_message(response)
+
     async def __rpc_get_metrics(
         self, stream: "grpclib.server.Stream[GetMetricsRequest, GetMetricsResponse]"
     ) -> None:
@@ -1960,6 +1995,12 @@ class ExternalBase(ServiceBase):
                 self.__rpc_delete_audience,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 DeleteAudienceRequest,
+                StandardResponse,
+            ),
+            "/protos.External/DeleteService": grpclib.const.Handler(
+                self.__rpc_delete_service,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                DeleteServiceRequest,
                 StandardResponse,
             ),
             "/protos.External/GetMetrics": grpclib.const.Handler(

@@ -65,6 +65,14 @@ class DeletePipelineRequest(_message.Message):
     pipeline_id: str
     def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
 
+class DeleteServiceRequest(_message.Message):
+    __slots__ = ["force", "service"]
+    FORCE_FIELD_NUMBER: _ClassVar[int]
+    SERVICE_FIELD_NUMBER: _ClassVar[int]
+    force: bool
+    service: str
+    def __init__(self, service: _Optional[str] = ..., force: bool = ...) -> None: ...
+
 class DetachNotificationRequest(_message.Message):
     __slots__ = ["notification_id", "pipeline_id"]
     NOTIFICATION_ID_FIELD_NUMBER: _ClassVar[int]
