@@ -37,7 +37,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --frozen
+          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --locked
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
