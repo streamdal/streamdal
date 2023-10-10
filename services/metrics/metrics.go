@@ -194,7 +194,7 @@ func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsR
 		// Update rate counter
 		if shouldRecordMetric(metric.Name) {
 			m.increaseRate(ctx, metric)
-			return nil
+			continue
 		}
 
 		// Update increment counter
