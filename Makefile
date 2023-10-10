@@ -1,4 +1,4 @@
-PROTOC_IMAGE = rvolosatovs/protoc:4.0
+PROTOC_IMAGE = rvolosatovs/protoc:development
 NODE_IMAGE = node:lts-alpine
 
 # Pattern #1 example: "example : description = Description for example target"
