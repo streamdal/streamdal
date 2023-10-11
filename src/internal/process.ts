@@ -67,7 +67,8 @@ export const sendTail = ({
   originalData,
   newData,
 }: TailRequest) => {
-  tails?.forEach((tailStatus, tailRequestId) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  tails?.forEach(async (tailStatus, tailRequestId) => {
     try {
       if (tailStatus.tail) {
         const tailResponse = TailResponse.create({
@@ -80,7 +81,19 @@ export const sendTail = ({
           newData,
         });
         console.debug("sending tail response", tailResponse);
-        void configs.tailCall.requests.send(tailResponse);
+        await configs.tailCall.requests.send(tailResponse);
+
+        const headers = await configs.tailCall.headers;
+        console.debug("got tail response headers: ", headers);
+
+        const response = await configs.tailCall.response;
+        console.debug("got tail response message: ", response);
+
+        const status = await configs.tailCall.status;
+        console.debug("got tail status: ", status);
+
+        const trailers = await configs.tailCall.trailers;
+        console.debug("got tail trailers: ", trailers);
       }
     } catch (e) {
       console.error("Error sending tail request", e);
