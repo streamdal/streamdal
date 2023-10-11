@@ -1,8 +1,8 @@
 const {
   OperationType,
-  Snitch,
+  Streamdal,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require("@streamdal/snitch-node-client/snitch");
+} = require("@streamdal/node-sdk/streamdal");
 
 const exampleData = {
   boolean_t: true,
@@ -31,8 +31,8 @@ const exampleData = {
 };
 
 const config = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",
   stepTimeout: "10",
@@ -47,8 +47,8 @@ const audience = {
 };
 
 export const example = async () => {
-  const snitch = new Snitch(config);
-  const result = await snitch.processPipeline({
+  const streamdal = new Streamdal(config);
+  const result = await streamdal.processPipeline({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

@@ -1,5 +1,5 @@
-import { ResponseCode } from "@streamdal/snitch-protos/protos/sp_common";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
+import { ResponseCode } from "@streamdal/protos/protos/sp_common";
+import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
 export const HEARTBEAT_INTERVAL = 1000;
 

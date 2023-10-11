@@ -1,7 +1,4 @@
-import {
-  Audience,
-  ResponseCode,
-} from "@streamdal/snitch-protos/protos/sp_common";
+import { Audience, ResponseCode } from "@streamdal/protos/protos/sp_common";
 
 import { Configs } from "../streamdal.js";
 import { audienceKey, internal, TailStatus } from "./register.js";

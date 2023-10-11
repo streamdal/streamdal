@@ -1,12 +1,9 @@
-import { PipelineStepCondition } from "@streamdal/snitch-protos/protos/sp_pipeline";
-import {
-  WASMRequest,
-  WASMResponse,
-} from "@streamdal/snitch-protos/protos/sp_wsm";
+import { PipelineStepCondition } from "@streamdal/protos/protos/sp_pipeline";
+import { WASMRequest, WASMResponse } from "@streamdal/protos/protos/sp_wsm";
 import {
   TransformStep,
   TransformType,
-} from "@streamdal/snitch-protos/protos/steps/sp_steps_transform";
+} from "@streamdal/protos/protos/steps/sp_steps_transform";
 import * as fs from "fs";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";

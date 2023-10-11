@@ -12,7 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@streamdal/snitch-node-client": "0.1.3",
+    "@streamdal/node-sdk": "^0.1.7",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.1.6"
   }

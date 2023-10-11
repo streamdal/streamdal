@@ -1,7 +1,7 @@
-import { Audience } from "@streamdal/snitch-protos/protos/sp_common";
-import { ClientType } from "@streamdal/snitch-protos/protos/sp_info";
-import { WasmModule } from "@streamdal/snitch-protos/protos/sp_internal";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
+import { Audience } from "@streamdal/protos/protos/sp_common";
+import { ClientType } from "@streamdal/protos/protos/sp_info";
+import { WasmModule } from "@streamdal/protos/protos/sp_internal";
+import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
 // import { version } from "../../package.json";
 import { InternalPipeline, processResponse } from "./pipeline.js";

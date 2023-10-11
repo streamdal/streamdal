@@ -1,11 +1,10 @@
 import {
   Audience,
   OperationType,
-  Snitch,
-  SnitchConfigs,
-} from "@streamdal/snitch-node-client/snitch";
-
-import { StreamdalResponse } from "../../../src/streamdal.js";
+  Streamdal,
+  StreamdalConfigs,
+  StreamdalResponse,
+} from "@streamdal/node-sdk/streamdal";
 
 const exampleData = {
   boolean_t: true,
@@ -33,9 +32,9 @@ const exampleData = {
   timestamp_rfc3339: "2023-06-29T12:34:56Z",
 };
 
-const config: SnitchConfigs = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+const config: StreamdalConfigs = {
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",
   stepTimeout: "10",
@@ -50,8 +49,8 @@ const audience: Audience = {
 };
 
 export const example = async () => {
-  const snitch = new Snitch(config);
-  const result: StreamdalResponse = await snitch.processPipeline({
+  const streamdal = new Streamdal(config);
+  const result: StreamdalResponse = await streamdal.processPipeline({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

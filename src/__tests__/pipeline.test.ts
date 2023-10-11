@@ -1,11 +1,11 @@
 import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
-import { Command } from "@streamdal/snitch-protos/protos/sp_command";
+import { Command } from "@streamdal/protos/protos/sp_command";
 import {
   StandardResponse,
   TailResponse,
-} from "@streamdal/snitch-protos/protos/sp_common";
-import { InternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
-import { Pipeline } from "@streamdal/snitch-protos/protos/sp_pipeline";
+} from "@streamdal/protos/protos/sp_common";
+import { InternalClient } from "@streamdal/protos/protos/sp_internal.client";
+import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
 import sinon from "sinon";
 import { v4 as uuidv4 } from "uuid";
 import { describe, expect, it } from "vitest";

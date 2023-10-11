@@ -1,16 +1,7 @@
-import {
-  Command,
-  TailCommand,
-} from "@streamdal/snitch-protos/protos/sp_command";
-import {
-  Audience,
-  TailRequestType,
-} from "@streamdal/snitch-protos/protos/sp_common";
-import { GetAttachCommandsByServiceResponse } from "@streamdal/snitch-protos/protos/sp_internal";
-import {
-  Pipeline,
-  PipelineStep,
-} from "@streamdal/snitch-protos/protos/sp_pipeline";
+import { Command, TailCommand } from "@streamdal/protos/protos/sp_command";
+import { Audience, TailRequestType } from "@streamdal/protos/protos/sp_common";
+import { GetAttachCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
+import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
 import { Configs } from "../streamdal.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
@@ -120,6 +111,11 @@ export const togglePausePipeline = (
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
   console.debug("received a tail command for audience", audience);
+  if (!request) {
+    console.debug("no tail reqeuest details specified, skipping");
+    return;
+  }
+
   switch (request.type) {
     case TailRequestType.START: {
       console.debug(
@@ -134,10 +130,11 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         );
       }
       // Add entry (@JH, OK if overwritten?)
-      internal.audiences.get(audienceKey(audience))?.set(request.Id, {
-        tail: request.type === TailRequestType.START,
-        tailRequestId: request.Id,
-      });
+      request.Id &&
+        internal.audiences.get(audienceKey(audience))?.set(request.Id, {
+          tail: request.type === TailRequestType.START,
+          tailRequestId: request.Id,
+        });
       break;
     }
     case TailRequestType.STOP: {
@@ -145,7 +142,8 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         "received a STOP tail: removing entry from audiences for tail id",
         request.Id
       );
-      internal.audiences.get(audienceKey(audience))?.delete(request.Id);
+      request.Id &&
+        internal.audiences.get(audienceKey(audience))?.delete(request.Id);
       break;
     }
     default:

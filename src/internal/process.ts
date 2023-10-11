@@ -4,13 +4,13 @@ import {
   StandardResponse,
   TailResponse,
   TailResponseType,
-} from "@streamdal/snitch-protos/protos/sp_common";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
+} from "@streamdal/protos/protos/sp_common";
+import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import {
   PipelineStep,
   PipelineStepCondition,
-} from "@streamdal/snitch-protos/protos/sp_pipeline";
-import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
+} from "@streamdal/protos/protos/sp_pipeline";
+import { WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
 import { StreamdalRequest, StreamdalResponse } from "../streamdal.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
@@ -186,7 +186,7 @@ const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
     {
       pipelineId: step.pipelineId,
       stepName: step.stepName,
-      occurredAtUnixTsUtc: BigInt(Date.now()),
+      occurredAtUnixTsUtc: Date.now().toString(),
     },
     { meta: { "auth-token": configs.streamdalToken } }
   );

@@ -2,8 +2,8 @@ import {
   Audience,
   Metric,
   OperationType,
-} from "@streamdal/snitch-protos/protos/sp_common";
-import { IInternalClient } from "@streamdal/snitch-protos/protos/sp_internal.client";
+} from "@streamdal/protos/protos/sp_common";
+import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import ReadWriteLock from "rwlock";
 
 import { StepStatus } from "./process.js";
