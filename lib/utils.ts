@@ -1,4 +1,4 @@
-import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { ConfigType, PipelinesType } from "./fetch.ts";
 
 export type AudienceParams = {
@@ -101,7 +101,7 @@ export const getOpRoute = (
   }/${OperationType[opType]}/op/${encodeURIComponent(opName)}`;
 
 //
-//snitch server serialized audiences a bit oddly
+//stramdal server serialized audiences a bit oddly
 //and we need to do the same to interpret config keys
 export const audienceKey = (audience: Audience) =>
   `${audience.serviceName}:operation_type_${

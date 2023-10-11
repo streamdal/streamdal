@@ -13,8 +13,8 @@ import {
   ServiceNode,
 } from "./customNodes.tsx";
 import { signal, useSignalEffect } from "@preact/signals";
-import { Audience } from "snitch-protos/protos/sp_common.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";

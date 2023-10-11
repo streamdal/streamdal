@@ -8,9 +8,9 @@ import {
   Pipeline,
   PipelineStep,
   PipelineStepCondition,
-} from "snitch-protos/protos/sp_pipeline.ts";
-import { DetectiveType } from "snitch-protos/protos/steps/sp_steps_detective.ts";
-import { TransformType } from "snitch-protos/protos/steps/sp_steps_transform.ts";
+} from "streamdal-protos/protos/sp_pipeline.ts";
+import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
+import { TransformType } from "streamdal-protos/protos/steps/sp_steps_transform.ts";
 import { zfd } from "zod-form-data";
 import * as z from "zod/index.ts";
 

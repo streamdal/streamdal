@@ -1,7 +1,7 @@
-import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
-import { OperationType } from "snitch-protos/protos/sp_common.ts";
-import { DetectiveType } from "snitch-protos/protos/steps/sp_steps_detective.ts";
-import { ClientType } from "snitch-protos/protos/sp_info.ts";
+import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
+import { OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
+import { ClientType } from "streamdal-protos/protos/sp_info.ts";
 import { audienceKey } from "./utils.ts";
 
 export const dummyPipelines = [{
@@ -147,7 +147,7 @@ export const dummyLive = [{
   audiences: [dummyAudiences[0]],
   client: {
     clientType: ClientType.SDK,
-    libraryName: "snitch-node-client",
+    libraryName: "node-sdk",
     libraryVersion: "0.0.1",
     language: "typescript",
     arch: "m1",

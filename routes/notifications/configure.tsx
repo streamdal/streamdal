@@ -3,8 +3,8 @@ import { Handlers } from "$fresh/src/server/types.ts";
 import { ErrorType, validate } from "../../components/form/validate.ts";
 import { NotificationSchema } from "../../islands/notifications.tsx";
 import { createNotification } from "../../lib/mutation.ts";
-import { NotificationConfig } from "snitch-protos/protos/sp_notify.ts";
-import { ResponseCode } from "snitch-protos/protos/sp_common.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {

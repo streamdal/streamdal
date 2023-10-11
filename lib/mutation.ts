@@ -2,17 +2,17 @@ import {
   Audience,
   ResponseCode,
   StandardResponse,
-} from "snitch-protos/protos/sp_common.ts";
+} from "streamdal-protos/protos/sp_common.ts";
 import { client, meta } from "./grpc.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import {
   AttachPipelineRequest,
   CreateNotificationRequest,
   DeleteAudienceRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
-} from "snitch-protos/protos/sp_external.ts";
-import { NotificationConfig } from "snitch-protos/protos/sp_notify.ts";
+} from "streamdal-protos/protos/sp_external.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;

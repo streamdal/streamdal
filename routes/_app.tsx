@@ -10,10 +10,10 @@ export default async function App(
   return (
     <html lang="en">
       <Head>
-        <title>{"Snitch Console"}</title>
+        <title>{"Streamdal Console"}</title>
         <meta
           charSet="UTF-8"
-          content="Streamdal's Snitch Console"
+          content="Streamdal's Console"
           name="description"
         />
         <link rel="icon" type="image/png" href="/images/favicon.png" />

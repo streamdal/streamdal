@@ -1,6 +1,9 @@
 import { Handlers } from "$fresh/src/server/types.ts";
 import { SuccessType } from "../../../../../../../../../_middleware.ts";
-import { OperationType, ResponseCode } from "snitch-protos/protos/sp_common.ts";
+import {
+  OperationType,
+  ResponseCode,
+} from "streamdal-protos/protos/sp_common.ts";
 import { detachPipeline } from "../../../../../../../../../../lib/mutation.ts";
 import { HandlerContext } from "$fresh/server.ts";
 

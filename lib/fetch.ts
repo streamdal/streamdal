@@ -1,7 +1,7 @@
 import { client, meta } from "./grpc.ts";
-import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
-import { PipelineInfo } from "snitch-protos/protos/sp_info.ts";
-import { Audience } from "snitch-protos/protos/sp_common.ts";
+import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
+import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
 
 export type ConfigType = { [key: string]: string };
 export type PipelinesType = { [key: string]: PipelineInfo };

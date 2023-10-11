@@ -1,14 +1,14 @@
-# Snitch Console
+# Console
 
-Snitch console allows you visualize interact with your services, build and
+Streamdal's console allows you visualize interact with your services, build and
 attach pipelines to consumers and producers and monitor their operations.
 
-![Snitch Console](./console-screenshot.png)
+![Console](./console-screenshot.png)
 
 ### Development
 
-The Snitch Console is a Deno + Fresh project that uses Preact, ReactFlow and
-Twind: https://fresh.deno.dev/docs/getting-started
+The Console is a Deno + Fresh project that uses Preact, ReactFlow and Twind:
+https://fresh.deno.dev/docs/getting-started
 
 Make sure to install Deno: https://deno.land/manual/getting_started/installation
 
@@ -30,15 +30,15 @@ gets confused, you can force update the Deno lib cache with
 
 ### Server
 
-This console needs a snitch-server to run against. See
-[snitch-server](https://github.com/streamdal/snitch-server) for instructions on
-running it locally.
+This console needs a streamdal-server to run against. See
+[streamdal-server](https://github.com/streamdal/streamdal-server) for
+instructions on running it locally.
 
 ### Running (non-development)
 
 If you just want to run the console and the server together for non-development
 purposes, you can bring them both up with docker, see:
-https://github.com/streamdal/snitch/tree/main/docker/local
+https://github.com/streamdal/streamdal/tree/main/docker/local
 
 ### Releasing
 
@@ -50,4 +50,4 @@ generate a release:
 2. Bump the release number: `version [major|minor|patch]`
 3. git push the generated version tag: `git push origin <tag_name>`
 4. Generate a release from the tag with user-friendly release notes:
-   https://github.com/streamdal/snitch-node-client/releases
+   https://github.com/streamdal/streamdal-node-client/releases

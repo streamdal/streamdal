@@ -10,7 +10,7 @@ import {
   NotificationEmail_Type,
   NotificationPagerDuty_Urgency,
   NotificationType,
-} from "snitch-protos/protos/sp_notify.ts";
+} from "streamdal-protos/protos/sp_notify.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 
 const slack = {

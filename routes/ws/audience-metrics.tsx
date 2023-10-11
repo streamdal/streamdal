@@ -1,5 +1,5 @@
 import { Handlers, RouteConfig } from "$fresh/src/server/types.ts";
-import { TailResponse } from "snitch-protos/protos/sp_common.ts";
+import { TailResponse } from "streamdal-protos/protos/sp_common.ts";
 import {
   audienceMetricsAbortSignal,
   getAudienceMetrics,

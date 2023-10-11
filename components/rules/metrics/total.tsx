@@ -8,7 +8,7 @@ export const metricColor = (kind: MetricsKind, value: number) => {
   }
 
   switch (kind) {
-    case "streamdal_snitch_failure_trigger":
+    case "streamdal_failure_trigger":
       return value > 0 ? "streamdalRed" : "streamdalGreen";
     default:
       return value > 0 ? "streamdalGreen" : "streamdalRed";

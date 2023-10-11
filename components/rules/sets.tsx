@@ -86,7 +86,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
                       <Total
                         metrics={data?.metrics}
                         id={r.id}
-                        kind="streamdal_snitch_rule"
+                        kind="streamdal_rule"
                         type="bytes"
                       />
                     </div>
@@ -95,7 +95,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
                       <Total
                         metrics={data?.metrics}
                         id={r.id}
-                        kind="streamdal_snitch_rule"
+                        kind="streamdal_rule"
                         type="count"
                       />
                     </div>
@@ -104,7 +104,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
                       <Total
                         metrics={data?.metrics}
                         id={r.id}
-                        kind="streamdal_snitch_failure_trigger"
+                        kind="streamdal_failure_trigger"
                         type="bytes"
                       />
                     </div>
@@ -113,7 +113,7 @@ export const RuleSets = ({ data }: { data: RuleSetType }) => {
                       <Total
                         metrics={data?.metrics}
                         id={r.id}
-                        kind="streamdal_snitch_failure_trigger"
+                        kind="streamdal_failure_trigger"
                         type="count"
                       />
                     </div>

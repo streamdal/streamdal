@@ -1,6 +1,6 @@
 import { ErrorType } from "../form/validate.ts";
 import { CheckboxGroup } from "../form/checkboxGroup.tsx";
-import { PipelineStepCondition } from "snitch-protos/protos/sp_pipeline.ts";
+import { PipelineStepCondition } from "streamdal-protos/protos/sp_pipeline.ts";
 
 export type StepConditionType = {
   stepIndex: number;

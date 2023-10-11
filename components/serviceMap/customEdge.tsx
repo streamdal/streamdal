@@ -5,7 +5,7 @@ import {
   getBezierPath,
 } from "reactflow";
 import { edgeKey } from "../../lib/utils.ts";
-import { OperationType } from "snitch-protos/protos/sp_common.ts";
+import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { signal } from "@preact/signals";
 
 type RateMetrics = { bytes: string; processed: string };

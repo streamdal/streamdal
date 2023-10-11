@@ -7,7 +7,7 @@ import {
   deleteAudience,
   detachPipeline,
 } from "../../../../../../../../lib/mutation.ts";
-import { ResponseCode } from "snitch-protos/protos/sp_common.ts";
+import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { serviceSignal } from "../../../../../../../../components/serviceMap/serviceSignal.ts";
 
 export const handler: Handlers<> = {

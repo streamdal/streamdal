@@ -1,6 +1,6 @@
-import { Audience, OperationType } from "snitch-protos/protos/sp_common.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
-import { ClientInfo } from "snitch-protos/protos/sp_info.ts";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
+import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
 import {
   audienceKey,
   componentKey,

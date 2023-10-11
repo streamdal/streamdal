@@ -1,10 +1,10 @@
-import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
+import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
 import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
 import {
   ClientInfo,
   LiveInfo,
   PipelineInfo,
-} from "snitch-protos/protos/sp_info.ts";
+} from "streamdal-protos/protos/sp_info.ts";
 import { audienceKey } from "./utils.ts";
 
 export type ServiceMapper = GetAllResponse & {

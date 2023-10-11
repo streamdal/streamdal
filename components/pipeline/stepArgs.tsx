@@ -1,4 +1,4 @@
-import { DetectiveType } from "snitch-protos/protos/steps/sp_steps_detective.ts";
+import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 import { FormInput } from "../form/formInput.tsx";
 import { ErrorType } from "../form/validate.ts";
 import { useState } from "preact/hooks";

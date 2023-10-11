@@ -1,7 +1,7 @@
 import {
   ExternalClient,
   IExternalClient,
-} from "snitch-protos/protos/sp_external.client.ts";
+} from "streamdal-protos/protos/sp_external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import { grpcToken, grpcUrl } from "./configs.ts";
 

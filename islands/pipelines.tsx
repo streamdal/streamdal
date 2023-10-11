@@ -1,7 +1,7 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import PipelineDetail, { newPipeline } from "./pipeline.tsx";
 import { SuccessType } from "../routes/_middleware.ts";

@@ -3,7 +3,7 @@ import {
   TailRequest,
   TailRequestType,
   TailResponse,
-} from "snitch-protos/protos/sp_common.ts";
+} from "streamdal-protos/protos/sp_common.ts";
 
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";

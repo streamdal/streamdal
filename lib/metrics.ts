@@ -1,7 +1,7 @@
 export type MetricsType = "count" | "bytes";
 export type MetricsKind =
-  | "streamdal_snitch_failure_trigger"
-  | "streamdal_snitch_rule";
+  | "streamdal_failure_trigger"
+  | "streamdal_rule";
 
 export type Metric = {
   rule_id: string;
@@ -27,7 +27,7 @@ export const parseDetails = (l: string) => {
 
 export const parseMetrics = (raw: any) => {
   const lines = raw.trim().split("\n");
-  const plumber = lines.filter((l: string) => l.startsWith("streamdal_snitch"));
+  const plumber = lines.filter((l: string) => l.startsWith("streamdal"));
 
   return plumber?.map((l: string) => ({
     ...parseDetails(l),

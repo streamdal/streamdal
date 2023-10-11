@@ -6,7 +6,7 @@ import {
   tailSamplingSignal,
   tailSignal,
 } from "../islands/tail.tsx";
-import { Audience } from "snitch-protos/protos/sp_common.ts";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "./utils.ts";
 
 export const getSocket = (path: string) => {

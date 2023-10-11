@@ -5,7 +5,7 @@ import {
   mapServiceResponse,
   ServiceMapper,
 } from "../../lib/serviceMapper.ts";
-import { GetAllResponse } from "snitch-protos/protos/sp_external.ts";
+import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
 
 export type ServiceSignal = ServiceMapper & DisplayServiceMap;
 

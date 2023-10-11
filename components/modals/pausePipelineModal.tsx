@@ -1,7 +1,7 @@
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
-import { Audience } from "snitch-protos/protos/sp_common.ts";
-import { Pipeline } from "snitch-protos/protos/sp_pipeline.ts";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";

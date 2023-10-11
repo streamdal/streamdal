@@ -1,4 +1,4 @@
-import { PipelineInfo } from "snitch-protos/protos/sp_info.ts";
+import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
