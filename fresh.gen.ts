@@ -26,10 +26,11 @@ import * as $20 from "./routes/ws/tail.tsx";
 import * as $$0 from "./islands/customNodes.tsx";
 import * as $$1 from "./islands/notifications.tsx";
 import * as $$2 from "./islands/opModal.tsx";
-import * as $$3 from "./islands/pipeline.tsx";
-import * as $$4 from "./islands/pipelines.tsx";
-import * as $$5 from "./islands/serviceMap.tsx";
-import * as $$6 from "./islands/tail.tsx";
+import * as $$3 from "./islands/operationOpModal.tsx";
+import * as $$4 from "./islands/pipeline.tsx";
+import * as $$5 from "./islands/pipelines.tsx";
+import * as $$6 from "./islands/serviceMap.tsx";
+import * as $$7 from "./islands/tail.tsx";
 
 const manifest = {
   routes: {
@@ -65,10 +66,11 @@ const manifest = {
     "./islands/customNodes.tsx": $$0,
     "./islands/notifications.tsx": $$1,
     "./islands/opModal.tsx": $$2,
-    "./islands/pipeline.tsx": $$3,
-    "./islands/pipelines.tsx": $$4,
-    "./islands/serviceMap.tsx": $$5,
-    "./islands/tail.tsx": $$6,
+    "./islands/operationOpModal.tsx": $$3,
+    "./islands/pipeline.tsx": $$4,
+    "./islands/pipelines.tsx": $$5,
+    "./islands/serviceMap.tsx": $$6,
+    "./islands/tail.tsx": $$7,
   },
   baseUrl: import.meta.url,
 };

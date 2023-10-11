@@ -50,4 +50,4 @@ generate a release:
 2. Bump the release number: `version [major|minor|patch]`
 3. git push the generated version tag: `git push origin <tag_name>`
 4. Generate a release from the tag with user-friendly release notes:
-   https://github.com/streamdal/streamdal-node-client/releases
+   https://github.com/streamdal/console/releases

@@ -7,7 +7,6 @@ export type OpModalType = {
   displayType: string;
   attachedPipeline?: Pipeline;
   clients: number;
-  attach?: boolean;
   schema?: any;
   pause?: boolean;
   detach?: boolean;
