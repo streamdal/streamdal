@@ -25,7 +25,7 @@ message Registration {
   string email = 1;
 
   // Used for storage on ui-bff backend
-  string _code = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  int32 _code = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message Verify {

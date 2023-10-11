@@ -950,7 +950,7 @@ class RegistrationStatus(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class Registration(betterproto.Message):
     email: str = betterproto.string_field(1)
-    code: str = betterproto.string_field(100)
+    code: int = betterproto.int32_field(100)
     """Used for storage on ui-bff backend"""
 
 

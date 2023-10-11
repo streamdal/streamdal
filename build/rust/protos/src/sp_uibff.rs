@@ -230,7 +230,7 @@ pub struct Registration {
     pub email: ::std::string::String,
     ///  Used for storage on ui-bff backend
     // @@protoc_insertion_point(field:protos.Registration._code)
-    pub _code: ::std::string::String,
+    pub _code: i32,
     // special fields
     // @@protoc_insertion_point(special_field:protos.Registration.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -281,8 +281,8 @@ impl ::protobuf::Message for Registration {
                 10 => {
                     self.email = is.read_string()?;
                 },
-                802 => {
-                    self._code = is.read_string()?;
+                800 => {
+                    self._code = is.read_int32()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -299,8 +299,8 @@ impl ::protobuf::Message for Registration {
         if !self.email.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.email);
         }
-        if !self._code.is_empty() {
-            my_size += ::protobuf::rt::string_size(100, &self._code);
+        if self._code != 0 {
+            my_size += ::protobuf::rt::int32_size(100, self._code);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -311,8 +311,8 @@ impl ::protobuf::Message for Registration {
         if !self.email.is_empty() {
             os.write_string(1, &self.email)?;
         }
-        if !self._code.is_empty() {
-            os.write_string(100, &self._code)?;
+        if self._code != 0 {
+            os.write_int32(100, self._code)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -332,14 +332,14 @@ impl ::protobuf::Message for Registration {
 
     fn clear(&mut self) {
         self.email.clear();
-        self._code.clear();
+        self._code = 0;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static Registration {
         static instance: Registration = Registration {
             email: ::std::string::String::new(),
-            _code: ::std::string::String::new(),
+            _code: 0,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -509,11 +509,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x06status\"Q\n\x06Status\x12\x10\n\x0cSTATUS_UNSET\x10\0\x12\x11\n\rSTA\
     TUS_SUBMIT\x10\x01\x12\x11\n\rSTATUS_VERIFY\x10\x02\x12\x0f\n\x0bSTATUS_\
     DONE\x10\x03\"9\n\x0cRegistration\x12\x14\n\x05email\x18\x01\x20\x01(\tR\
-    \x05email\x12\x13\n\x05_code\x18d\x20\x01(\tR\x04Code\"2\n\x06Verify\x12\
-    \x14\n\x05email\x18\x01\x20\x01(\tR\x05email\x12\x12\n\x04code\x18\x02\
-    \x20\x01(\tR\x04codeB4Z2github.com/streamdal/snitch-protos/build/go/prot\
-    osJ\xde\x06\n\x06\x12\x04\0\0\"\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
-    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\
+    \x05email\x12\x13\n\x05_code\x18d\x20\x01(\x05R\x04Code\"2\n\x06Verify\
+    \x12\x14\n\x05email\x18\x01\x20\x01(\tR\x05email\x12\x12\n\x04code\x18\
+    \x02\x20\x01(\tR\x04codeB4Z2github.com/streamdal/snitch-protos/build/go/\
+    protosJ\xde\x06\n\x06\x12\x04\0\0\"\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\
+    \n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0I\n\t\n\
     \x02\x08\x0b\x12\x03\x04\0I\n\n\n\x02\x04\0\x12\x04\x06\0\x15\x01\n\n\n\
     \x03\x04\0\x01\x12\x03\x06\x08\x1a\n\x0c\n\x04\x04\0\x04\0\x12\x04\x07\
     \x02\x12\x03\n\x0c\n\x05\x04\0\x04\0\x01\x12\x03\x07\x07\r\n\r\n\x06\x04\
@@ -536,11 +536,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x18\x02\x13\n\x0c\n\x05\x04\
     \x01\x02\0\x05\x12\x03\x18\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\
     \x18\t\x0e\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x18\x11\x12\nh\n\x04\
-    \x04\x01\x02\x01\x12\x03\x1b\x02\x15\x1a$\x20Used\x20for\x20storage\x20o\
+    \x04\x01\x02\x01\x12\x03\x1b\x02\x14\x1a$\x20Used\x20for\x20storage\x20o\
     n\x20ui-bff\x20backend\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOW\
-    ER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x1b\x02\x08\n\
-    \x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x1b\t\x0e\n\x0c\n\x05\x04\x01\x02\
-    \x01\x03\x12\x03\x1b\x11\x14\n\n\n\x02\x04\x02\x12\x04\x1e\0\"\x01\n\n\n\
+    ER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\x1b\x02\x07\n\
+    \x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x1b\x08\r\n\x0c\n\x05\x04\x01\x02\
+    \x01\x03\x12\x03\x1b\x10\x13\n\n\n\x02\x04\x02\x12\x04\x1e\0\"\x01\n\n\n\
     \x03\x04\x02\x01\x12\x03\x1e\x08\x0e\n\x0b\n\x04\x04\x02\x02\0\x12\x03\
     \x1f\x02\x13\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03\x1f\x02\x08\n\x0c\n\
     \x05\x04\x02\x02\0\x01\x12\x03\x1f\t\x0e\n\x0c\n\x05\x04\x02\x02\0\x03\

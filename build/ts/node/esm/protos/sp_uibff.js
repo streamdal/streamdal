@@ -83,11 +83,11 @@ class Registration$Type extends MessageType {
     constructor() {
         super("protos.Registration", [
             { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 100, name: "_code", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 100, name: "_code", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { email: "", Code: "" };
+        const message = { email: "", Code: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -101,8 +101,8 @@ class Registration$Type extends MessageType {
                 case /* string email */ 1:
                     message.email = reader.string();
                     break;
-                case /* string _code */ 100:
-                    message.Code = reader.string();
+                case /* int32 _code */ 100:
+                    message.Code = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -119,9 +119,9 @@ class Registration$Type extends MessageType {
         /* string email = 1; */
         if (message.email !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.email);
-        /* string _code = 100; */
-        if (message.Code !== "")
-            writer.tag(100, WireType.LengthDelimited).string(message.Code);
+        /* int32 _code = 100; */
+        if (message.Code !== 0)
+            writer.tag(100, WireType.Varint).int32(message.Code);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
