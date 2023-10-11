@@ -945,7 +945,6 @@ class BusEvent(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class RegistrationStatus(betterproto.Message):
     status: "RegistrationStatusStatus" = betterproto.enum_field(1)
-    email: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)

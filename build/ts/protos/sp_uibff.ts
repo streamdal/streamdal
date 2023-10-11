@@ -19,10 +19,6 @@ export interface RegistrationStatus {
      * @generated from protobuf field: protos.RegistrationStatus.Status status = 1;
      */
     status: RegistrationStatus_Status;
-    /**
-     * @generated from protobuf field: string email = 2;
-     */
-    email: string;
 }
 /**
  * @generated from protobuf enum protos.RegistrationStatus.Status
@@ -83,12 +79,11 @@ export interface Verify {
 class RegistrationStatus$Type extends MessageType<RegistrationStatus> {
     constructor() {
         super("protos.RegistrationStatus", [
-            { no: 1, name: "status", kind: "enum", T: () => ["protos.RegistrationStatus.Status", RegistrationStatus_Status, "STATUS_"] },
-            { no: 2, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "status", kind: "enum", T: () => ["protos.RegistrationStatus.Status", RegistrationStatus_Status, "STATUS_"] }
         ]);
     }
     create(value?: PartialMessage<RegistrationStatus>): RegistrationStatus {
-        const message = { status: 0, email: "" };
+        const message = { status: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<RegistrationStatus>(this, message, value);
@@ -101,9 +96,6 @@ class RegistrationStatus$Type extends MessageType<RegistrationStatus> {
             switch (fieldNo) {
                 case /* protos.RegistrationStatus.Status status */ 1:
                     message.status = reader.int32();
-                    break;
-                case /* string email */ 2:
-                    message.email = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -120,9 +112,6 @@ class RegistrationStatus$Type extends MessageType<RegistrationStatus> {
         /* protos.RegistrationStatus.Status status = 1; */
         if (message.status !== 0)
             writer.tag(1, WireType.Varint).int32(message.status);
-        /* string email = 2; */
-        if (message.email !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.email);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

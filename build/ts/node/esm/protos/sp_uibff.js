@@ -35,12 +35,11 @@ export var RegistrationStatus_Status;
 class RegistrationStatus$Type extends MessageType {
     constructor() {
         super("protos.RegistrationStatus", [
-            { no: 1, name: "status", kind: "enum", T: () => ["protos.RegistrationStatus.Status", RegistrationStatus_Status, "STATUS_"] },
-            { no: 2, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "status", kind: "enum", T: () => ["protos.RegistrationStatus.Status", RegistrationStatus_Status, "STATUS_"] }
         ]);
     }
     create(value) {
-        const message = { status: 0, email: "" };
+        const message = { status: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -53,9 +52,6 @@ class RegistrationStatus$Type extends MessageType {
             switch (fieldNo) {
                 case /* protos.RegistrationStatus.Status status */ 1:
                     message.status = reader.int32();
-                    break;
-                case /* string email */ 2:
-                    message.email = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -72,9 +68,6 @@ class RegistrationStatus$Type extends MessageType {
         /* protos.RegistrationStatus.Status status = 1; */
         if (message.status !== 0)
             writer.tag(1, WireType.Varint).int32(message.status);
-        /* string email = 2; */
-        if (message.email !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.email);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

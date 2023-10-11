@@ -12,10 +12,6 @@ export interface RegistrationStatus {
      * @generated from protobuf field: protos.RegistrationStatus.Status status = 1;
      */
     status: RegistrationStatus_Status;
-    /**
-     * @generated from protobuf field: string email = 2;
-     */
-    email: string;
 }
 /**
  * @generated from protobuf enum protos.RegistrationStatus.Status
