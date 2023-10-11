@@ -26,6 +26,7 @@ export const GROUP_MARGIN = 45;
 export const ServiceNode = ({ data }: { data: NodeData }) => {
   const highlighted = data?.audience === opModal.value?.audience &&
     opModal.value?.displayType === "service";
+
   const setHover = () => {
     setServiceGroup(
       data.audience.serviceName,
@@ -140,7 +141,8 @@ export const OperationNode = (
 ) => {
   const key = audienceKey(operation.audience);
   const highlight = opModal.value?.audience &&
-    key === audienceKey(opModal.value?.audience);
+    key === audienceKey(opModal.value?.audience) &&
+    opModal.value?.displayType === "operation";
   const trashActive = opModal.value?.delete;
 
   return (
