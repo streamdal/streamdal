@@ -19,8 +19,6 @@ message RegistrationStatus {
   }
 
   Status status = 1;
-
-  string email = 2;
 }
 
 message Registration {
