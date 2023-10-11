@@ -9,9 +9,9 @@ class Registration(_message.Message):
     __slots__ = ["_code", "email"]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     _CODE_FIELD_NUMBER: _ClassVar[int]
-    _code: int
+    _code: str
     email: str
-    def __init__(self, email: _Optional[str] = ..., _code: _Optional[int] = ...) -> None: ...
+    def __init__(self, email: _Optional[str] = ..., _code: _Optional[str] = ...) -> None: ...
 
 class RegistrationStatus(_message.Message):
     __slots__ = ["status"]

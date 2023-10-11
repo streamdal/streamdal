@@ -51,9 +51,9 @@ export interface Registration {
     /**
      * Used for storage on ui-bff backend
      *
-     * @generated from protobuf field: int32 _code = 100;
+     * @generated from protobuf field: string _code = 100;
      */
-    Code: number;
+    Code: string;
 }
 /**
  * @generated from protobuf message protos.Verify
