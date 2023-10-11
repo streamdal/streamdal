@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/snitch.ts"],
+  "include": [
+    "./src/streamdal.ts"
+  ],
   "compilerOptions": {
     "outDir": "./build/types",
     "declaration": true,

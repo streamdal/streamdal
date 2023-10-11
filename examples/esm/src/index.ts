@@ -5,7 +5,7 @@ import {
   SnitchConfigs,
 } from "@streamdal/snitch-node-client/snitch";
 
-import { SnitchResponse } from "../../../src/snitch.js";
+import { StreamdalResponse } from "../../../src/streamdal.js";
 
 const exampleData = {
   boolean_t: true,
@@ -51,7 +51,7 @@ const audience: Audience = {
 
 export const example = async () => {
   const snitch = new Snitch(config);
-  const result: SnitchResponse = await snitch.processPipeline({
+  const result: StreamdalResponse = await snitch.processPipeline({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

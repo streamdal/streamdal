@@ -4,12 +4,12 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       ENV: "test" | "dev" | "prod";
-      SNITCH_URL?: string;
-      SNITCH_TOKEN?: string;
-      SNITCH_SERVICE_NAME?: string;
-      SNITCH_PIPELINE_TIMEOUT?: string;
-      SNITCH_STEP_TIMEOUT?: string;
-      SNITCH_DRY_RUN?: string;
+      STREAMDAL_URL?: string;
+      STREAMDAL_TOKEN?: string;
+      STREAMDAL_SERVICE_NAME?: string;
+      STREAMDAL_PIPELINE_TIMEOUT?: string;
+      STREAMDAL_STEP_TIMEOUT?: string;
+      STREAMDAL_DRY_RUN?: string;
     }
   }
 }

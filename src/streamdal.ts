@@ -24,9 +24,9 @@ import { internal, register } from "./internal/register.js";
 
 export { Audience, OperationType };
 
-export interface SnitchConfigs {
-  snitchUrl?: string;
-  snitchToken?: string;
+export interface StreamdalConfigs {
+  streamdalUrl?: string;
+  streamdalToken?: string;
   serviceName?: string;
   pipelineTimeout?: string;
   stepTimeout?: string;
@@ -37,8 +37,8 @@ export interface SnitchConfigs {
 export interface Configs {
   grpcClient: IInternalClient;
   tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
-  snitchUrl: string;
-  snitchToken: string;
+  streamdalUrl: string;
+  streamdalToken: string;
   serviceName: string;
   pipelineTimeout: string;
   stepTimeout: string;
@@ -47,42 +47,42 @@ export interface Configs {
   audiences?: Audience[];
 }
 
-export interface SnitchRequest {
+export interface StreamdalRequest {
   audience: Audience;
   data: Uint8Array;
 }
 
-export interface SnitchResponse {
+export interface StreamdalResponse {
   data: Uint8Array;
   error: boolean;
   message?: string;
   stepStatuses?: StepStatus[];
 }
 
-export class Snitch {
+export class Streamdal {
   private configs: Configs;
   private readonly transport: GrpcTransport;
 
   constructor({
-    snitchUrl,
-    snitchToken,
+    streamdalUrl,
+    streamdalToken,
     serviceName,
     pipelineTimeout,
     stepTimeout,
     dryRun,
     audiences,
-  }: SnitchConfigs) {
+  }: StreamdalConfigs) {
     if (process.env.NODE_ENV === "production") {
       console.debug = () => null;
     }
 
-    const url = snitchUrl ? snitchUrl : process.env.SNITCH_URL;
-    const token = snitchToken ? snitchToken : process.env.SNITCH_TOKEN;
-    const name = serviceName ? serviceName : process.env.SNITCH_SERVICE_NAME;
+    const url = streamdalUrl ? streamdalUrl : process.env.STREAMDAL_URL;
+    const token = streamdalToken ? streamdalToken : process.env.STREAMDAL_TOKEN;
+    const name = serviceName ? serviceName : process.env.STREAMDAL_SERVICE_NAME;
 
     if (!url || !token || !name) {
-      throw new Error(`Required configs are missing. You must provide configs snitchUrl, snitchToken and serviceName 
-        either as constructor arguments to Snitch() or as environment variables in the form of SNITCH_URL, SNITCH_TOKEN and SNITCH_SERVICE_NAME`);
+      throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName 
+        either as constructor arguments to Streamdal() or as environment variables in the form of STREAMDAL_URL, STREAMDAL_TOKEN and STREAMDAL_SERVICE_NAME`);
     }
 
     this.transport = new GrpcTransport({
@@ -99,13 +99,13 @@ export class Snitch {
         meta: { "auth-token": token },
       }),
       sessionId,
-      snitchUrl: url,
-      snitchToken: token,
+      streamdalUrl: url,
+      streamdalToken: token,
       serviceName: name,
       pipelineTimeout:
-        pipelineTimeout ?? process.env.SNITCH_PIPELINE_TIMEOUT ?? "100",
-      stepTimeout: stepTimeout ?? process.env.SNITCH_STEP_TIMEOUT ?? "10",
-      dryRun: dryRun ?? !!process.env.SNITCH_DRY_RUN,
+        pipelineTimeout ?? process.env.STREAMDAL_PIPELINE_TIMEOUT ?? "100",
+      stepTimeout: stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
+      dryRun: dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
       audiences,
     };
 
@@ -125,7 +125,7 @@ export class Snitch {
   async processPipeline({
     audience,
     data,
-  }: SnitchRequest): Promise<SnitchResponse> {
+  }: StreamdalRequest): Promise<StreamdalResponse> {
     if (!internal.pipelineInitialized) {
       await initPipelines(this.configs);
     }

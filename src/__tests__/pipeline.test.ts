@@ -25,8 +25,8 @@ const testConfigs = {
     StandardResponse
   >,
   sessionId: uuidv4(),
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "test-service",
   pipelineTimeout: "100",
   stepTimeout: "10",

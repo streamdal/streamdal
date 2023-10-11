@@ -1,6 +1,6 @@
 import { Audience } from "@streamdal/snitch-protos/protos/sp_common";
 
-import { OperationType, Snitch, SnitchConfigs } from "../snitch.js";
+import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
 
 const exampleData = {
   boolean_t: true,
@@ -28,27 +28,27 @@ const exampleData = {
   timestamp_rfc3339: "2023-06-29T12:34:56Z",
 };
 
-const serviceAConfig: SnitchConfigs = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+const serviceAConfig: StreamdalConfigs = {
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "test-service",
   pipelineTimeout: "100",
   stepTimeout: "10",
   dryRun: false,
 };
 
-const serviceBConfig: SnitchConfigs = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+const serviceBConfig: StreamdalConfigs = {
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "another-test-service",
   pipelineTimeout: "100",
   stepTimeout: "10",
   dryRun: false,
 };
 
-const serviceCConfig: SnitchConfigs = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+const serviceCConfig: StreamdalConfigs = {
+  streamdalUrl: "localhost:9091",
+  streamdalToken: "1234",
   serviceName: "third-service",
   pipelineTimeout: "100",
   stepTimeout: "10",
@@ -97,7 +97,7 @@ const audienceCProducer: Audience = {
   operationName: "kafka-consumer",
 };
 
-const logTest = async (snitch: any, audience: Audience, input: any) => {
+const logTest = async (streamdal: any, audience: Audience, input: any) => {
   console.log("--------------------------------");
   console.log(new Date());
   console.log(
@@ -105,7 +105,7 @@ const logTest = async (snitch: any, audience: Audience, input: any) => {
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, message, data } = await snitch.processPipeline({
+  const { error, message, data } = await streamdal.processPipeline({
     audience: audience,
     data: new TextEncoder().encode(JSON.stringify(input)),
   });
@@ -124,7 +124,11 @@ const logTest = async (snitch: any, audience: Audience, input: any) => {
   console.log("\n");
 };
 
-const randomInterval = async (snitch: any, audience: Audience, input: any) => {
+const randomInterval = async (
+  streamdal: any,
+  audience: Audience,
+  input: any
+) => {
   console.log("--------------------------------");
   console.log(new Date());
   console.log(
@@ -132,7 +136,7 @@ const randomInterval = async (snitch: any, audience: Audience, input: any) => {
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, message, data } = await snitch.processPipeline({
+  const { error, message, data } = await streamdal.processPipeline({
     audience: audience,
     data: new TextEncoder().encode(JSON.stringify(input)),
   });
@@ -151,68 +155,68 @@ const randomInterval = async (snitch: any, audience: Audience, input: any) => {
   console.log("\n");
   setTimeout(
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    () => randomInterval(snitch, audience, input),
+    () => randomInterval(streamdal, audience, input),
     Math.floor(Math.random() * (3000 - 500 + 1) + 3000)
   );
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const exampleStaggered = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
   setInterval(() => {
-    void randomInterval(snitchA, audienceAConsumer, exampleData);
+    void randomInterval(streamdalA, audienceAConsumer, exampleData);
   }, 2000);
 
   setTimeout(() => {
-    void logTest(snitchA, audienceAProducer, exampleData);
+    void logTest(streamdalA, audienceAProducer, exampleData);
   }, 4000);
 
   setTimeout(() => {
-    void logTest(snitchB, audienceBConsumer, exampleData);
+    void logTest(streamdalB, audienceBConsumer, exampleData);
   }, 8000);
 
   setTimeout(() => {
-    void logTest(snitchB, audienceBProducer, exampleData);
+    void logTest(streamdalB, audienceBProducer, exampleData);
   }, 12000);
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const tailFriendly = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(snitchA, audienceAConsumer, exampleData);
+  void logTest(streamdalA, audienceAConsumer, exampleData);
 
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
 
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-three" },
     exampleData
   );
 
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
-  void logTest(snitchA, audienceAProducer, exampleData);
+  void logTest(streamdalA, audienceAProducer, exampleData);
 
   setInterval(() => {
-    void logTest(snitchB, audienceBConsumer, exampleData);
+    void logTest(streamdalB, audienceBConsumer, exampleData);
   }, 1000);
 
-  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(streamdalB, audienceBProducer, exampleData);
 
   void logTest(
-    snitchB,
+    streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
@@ -220,16 +224,16 @@ export const tailFriendly = async () => {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const highVolumeTail = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
   setInterval(() => {
-    void logTest(snitchA, audienceAConsumer, exampleData);
+    void logTest(streamdalA, audienceAConsumer, exampleData);
   }, 500);
 
   setInterval(() => {
     void logTest(
-      snitchA,
+      streamdalA,
       { ...audienceAConsumer, operationName: "kafka-consumer-two" },
       exampleData
     );
@@ -237,7 +241,7 @@ export const highVolumeTail = async () => {
 
   setInterval(() => {
     void logTest(
-      snitchA,
+      streamdalA,
       { ...audienceAConsumer, operationName: "kafka-consumer-three" },
       exampleData
     );
@@ -245,33 +249,33 @@ export const highVolumeTail = async () => {
 
   setInterval(() => {
     void logTest(
-      snitchA,
+      streamdalA,
       { ...audienceAConsumer, componentName: "another-kafka" },
       exampleData
     );
   }, 500);
 
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
   setInterval(() => {
-    void logTest(snitchA, audienceAProducer, exampleData);
+    void logTest(streamdalA, audienceAProducer, exampleData);
   }, 2000);
 
   setInterval(() => {
-    void logTest(snitchB, audienceBConsumer, exampleData);
+    void logTest(streamdalB, audienceBConsumer, exampleData);
   }, 250);
 
   setInterval(() => {
-    void logTest(snitchB, audienceBProducer, exampleData);
+    void logTest(streamdalB, audienceBProducer, exampleData);
   }, 500);
 
   setInterval(() => {
     void logTest(
-      snitchB,
+      streamdalB,
       { ...audienceBProducer, componentName: "kafka" },
       exampleData
     );
@@ -280,37 +284,37 @@ export const highVolumeTail = async () => {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const throughputFriendly = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
-  void randomInterval(snitchA, audienceAConsumer, exampleData);
+  void randomInterval(streamdalA, audienceAConsumer, exampleData);
 
   void randomInterval(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
 
   void randomInterval(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-three" },
     exampleData
   );
 
   void randomInterval(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
-  void randomInterval(snitchA, audienceAProducer, exampleData);
+  void randomInterval(streamdalA, audienceAProducer, exampleData);
 
-  void randomInterval(snitchB, audienceBConsumer, exampleData);
+  void randomInterval(streamdalB, audienceBConsumer, exampleData);
 
-  void randomInterval(snitchB, audienceBProducer, exampleData);
+  void randomInterval(streamdalB, audienceBProducer, exampleData);
 
   void randomInterval(
-    snitchB,
+    streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
@@ -318,42 +322,42 @@ export const throughputFriendly = async () => {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const tailFast = async () => {
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
   setInterval(() => {
-    void logTest(snitchB, audienceBConsumer, exampleData);
+    void logTest(streamdalB, audienceBConsumer, exampleData);
   }, 100);
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const exampleConcurrent = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
   setInterval(() => {
-    void logTest(snitchA, audienceAConsumer, exampleData);
+    void logTest(streamdalA, audienceAConsumer, exampleData);
   }, 4000);
 
-  void logTest(snitchA, audienceAProducer, exampleData);
-  void logTest(snitchB, audienceBConsumer, exampleData);
-  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(streamdalA, audienceAProducer, exampleData);
+  void logTest(streamdalB, audienceBConsumer, exampleData);
+  void logTest(streamdalB, audienceBProducer, exampleData);
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const exampleMultipleGroup = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(snitchA, audienceAConsumer, exampleData);
+  void logTest(streamdalA, audienceAConsumer, exampleData);
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
-  void logTest(snitchA, audienceAProducer, exampleData);
-  void logTest(snitchB, audienceBConsumer, exampleData);
-  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(streamdalA, audienceAProducer, exampleData);
+  void logTest(streamdalB, audienceBConsumer, exampleData);
+  void logTest(streamdalB, audienceBProducer, exampleData);
   void logTest(
-    snitchB,
+    streamdalB,
     { ...audienceBProducer, operationName: "kafka-producer-two" },
     exampleData
   );
@@ -361,20 +365,20 @@ export const exampleMultipleGroup = async () => {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const exampleMultipleComponentsPerService = async () => {
-  const snitchA = new Snitch(serviceAConfig);
-  const snitchB = new Snitch(serviceBConfig);
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(snitchA, audienceAConsumer, exampleData);
+  void logTest(streamdalA, audienceAConsumer, exampleData);
   void logTest(
-    snitchA,
+    streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
-  void logTest(snitchA, audienceAProducer, exampleData);
-  void logTest(snitchB, audienceBConsumer, exampleData);
-  void logTest(snitchB, audienceBProducer, exampleData);
+  void logTest(streamdalA, audienceAProducer, exampleData);
+  void logTest(streamdalB, audienceBConsumer, exampleData);
+  void logTest(streamdalB, audienceBProducer, exampleData);
   void logTest(
-    snitchB,
+    streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
@@ -383,17 +387,17 @@ export const exampleMultipleComponentsPerService = async () => {
 export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
   // eslint-disable-next-line @typescript-eslint/require-await
   async () => {
-    const snitchA = new Snitch(serviceAConfig);
-    const snitchB = new Snitch(serviceBConfig);
-    const snitchC = new Snitch(serviceCConfig);
+    const streamdalA = new Streamdal(serviceAConfig);
+    const streamdalB = new Streamdal(serviceBConfig);
+    const streamdalC = new Streamdal(serviceCConfig);
 
     setInterval(() => {
-      void logTest(snitchA, audienceAConsumer, exampleData);
+      void logTest(streamdalA, audienceAConsumer, exampleData);
     }, 2000);
 
     setInterval(() => {
       void logTest(
-        snitchA,
+        streamdalA,
         { ...audienceAConsumer, operationName: "kafka-consumer-two" },
         exampleData
       );
@@ -401,7 +405,7 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
 
     setInterval(() => {
       void logTest(
-        snitchA,
+        streamdalA,
         { ...audienceAConsumer, operationName: "kafka-consumer-three" },
         exampleData
       );
@@ -409,38 +413,38 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
 
     setInterval(() => {
       void logTest(
-        snitchA,
+        streamdalA,
         { ...audienceAConsumer, componentName: "another-kafka" },
         exampleData
       );
     }, 8000);
 
     setInterval(() => {
-      void logTest(snitchA, audienceAProducer, exampleData);
+      void logTest(streamdalA, audienceAProducer, exampleData);
     }, 10000);
 
     setInterval(() => {
-      void logTest(snitchB, audienceBConsumer, exampleData);
+      void logTest(streamdalB, audienceBConsumer, exampleData);
     }, 12000);
 
     setInterval(() => {
-      void logTest(snitchB, audienceBProducer, exampleData);
+      void logTest(streamdalB, audienceBProducer, exampleData);
     }, 14000);
 
     setInterval(() => {
       void logTest(
-        snitchB,
+        streamdalB,
         { ...audienceBProducer, componentName: "kafka" },
         exampleData
       );
     }, 16000);
 
     setInterval(() => {
-      void logTest(snitchC, audienceCConsumer, exampleData);
+      void logTest(streamdalC, audienceCConsumer, exampleData);
     }, 2000);
 
     setInterval(() => {
-      void logTest(snitchC, audienceCProducer, exampleData);
+      void logTest(streamdalC, audienceCProducer, exampleData);
     }, 2000);
   };
 

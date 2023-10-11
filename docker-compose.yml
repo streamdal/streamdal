@@ -3,9 +3,9 @@ version: "3"
 services:
   console:
     build: .
-    container_name: snitch-console-container
-    image: snitch-console-image
+    container_name: streamdal-console-container
+    image: streamdal-console-image
     environment:
-      - SNITCH_API_URL=http://host.docker.internal:9191
+      - STREAMDAL_API_URL=http://host.docker.internal:9191
     ports:
       - "3000:3000"

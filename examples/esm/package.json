@@ -1,5 +1,5 @@
 {
-  "name": "snitch-example-node-client",
+  "name": "streamdal-example-node-sdk-client",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",

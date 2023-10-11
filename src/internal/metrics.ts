@@ -15,7 +15,7 @@ export const lock = new ReadWriteLock();
 
 export interface MetricsConfigs {
   grpcClient: IInternalClient;
-  snitchToken: string;
+  streamdalToken: string;
 }
 
 export const getStepLabels = (audience: Audience, stepStatus: StepStatus) => ({
@@ -119,7 +119,7 @@ export const sendMetrics = async (configs: MetricsConfigs) =>
         {
           metrics: metricsData,
         },
-        { meta: { "auth-token": configs.snitchToken } }
+        { meta: { "auth-token": configs.streamdalToken } }
       );
       metrics.clear();
     } catch (e) {

@@ -1,4 +1,4 @@
-name: Snitch Node Client - Pull Request
+name: Node SDK - Pull Request
 on:
   pull_request:
     branches: [ main ]

@@ -1,12 +1,11 @@
 {
-  "name": "@streamdal/snitch-node-client",
+  "name": "@streamdal/node-sdk",
   "workspaces": [
     "examples"
   ],
   "version": "0.1.5",
-  "description": "Streamdal's Snitch Node Client",
+  "description": "Streamdal's Node SDK",
   "keywords": [
-    "snitch",
     "streamdal",
     "typescript",
     "node",
@@ -35,13 +34,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/streamdal/snitch-node-client.git"
+    "url": "git+https://github.com/streamdal/node-sdk.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/streamdal/snitch-node-client/issues"
+    "url": "https://github.com/streamdal/node-sdk/issues"
   },
-  "homepage": "https://github.com/streamdal/snitch-node-client#readme",
+  "homepage": "https://github.com/streamdal/node-sdk#readme",
   "dependencies": {
     "@grpc/grpc-js": "1.8.17",
     "@grpc/proto-loader": "0.7.7",

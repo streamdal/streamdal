@@ -1,4 +1,4 @@
-name: Snitch Node Client - Release
+name: Node SDK - Release
 on:
   release:
     types: [published]

@@ -3,7 +3,7 @@ import {
   ResponseCode,
 } from "@streamdal/snitch-protos/protos/sp_common";
 
-import { Configs } from "../snitch.js";
+import { Configs } from "../streamdal.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 
 export interface AddAudience {
@@ -31,7 +31,7 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
         sessionId: configs.sessionId,
         audience,
       },
-      { meta: { "auth-token": configs.snitchToken } }
+      { meta: { "auth-token": configs.streamdalToken } }
     );
 
     if (response.code === ResponseCode.OK) {

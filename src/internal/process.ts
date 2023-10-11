@@ -12,7 +12,7 @@ import {
 } from "@streamdal/snitch-protos/protos/sp_pipeline";
 import { WASMExitCode } from "@streamdal/snitch-protos/protos/sp_wsm";
 
-import { SnitchRequest, SnitchResponse } from "../snitch.js";
+import { StreamdalRequest, StreamdalResponse } from "../streamdal.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { EnhancedStep, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
@@ -35,7 +35,7 @@ export interface PipelinesStatus {
 export interface PipelineConfigs {
   grpcClient: IInternalClient;
   tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
-  snitchToken: string;
+  streamdalToken: string;
   sessionId: string;
   dryRun: boolean;
 }
@@ -105,7 +105,9 @@ export const processPipeline = async ({
   configs,
   audience,
   data,
-}: { configs: PipelineConfigs } & SnitchRequest): Promise<SnitchResponse> => {
+}: {
+  configs: PipelineConfigs;
+} & StreamdalRequest): Promise<StreamdalResponse> => {
   const key = audienceKey(audience);
   const pipeline = internal.pipelines.get(key);
   const tails = internal.audiences.get(key);
@@ -186,7 +188,7 @@ const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
       stepName: step.stepName,
       occurredAtUnixTsUtc: BigInt(Date.now()),
     },
-    { meta: { "auth-token": configs.snitchToken } }
+    { meta: { "auth-token": configs.streamdalToken } }
   );
 };
 

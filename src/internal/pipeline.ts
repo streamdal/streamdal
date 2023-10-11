@@ -12,7 +12,7 @@ import {
   PipelineStep,
 } from "@streamdal/snitch-protos/protos/sp_pipeline";
 
-import { Configs } from "../snitch.js";
+import { Configs } from "../streamdal.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 
 export type InternalPipeline = Pipeline & {
@@ -30,7 +30,7 @@ export const initPipelines = async (configs: Configs) => {
       {
         serviceName: configs.serviceName.toLowerCase(),
       },
-      { meta: { "auth-token": configs.snitchToken } }
+      { meta: { "auth-token": configs.streamdalToken } }
     );
 
   for (const [k, v] of Object.entries(response.wasmModules)) {

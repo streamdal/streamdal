@@ -9,7 +9,7 @@ import { InternalPipeline, processResponse } from "./pipeline.js";
 export interface RegisterConfigs {
   grpcClient: IInternalClient;
   sessionId: string;
-  snitchToken: string;
+  streamdalToken: string;
   serviceName: string;
   dryRun: boolean;
   audiences?: Audience[];
@@ -37,7 +37,7 @@ export const register = async ({
   grpcClient,
   sessionId,
   serviceName,
-  snitchToken,
+  streamdalToken,
   dryRun,
   audiences,
 }: RegisterConfigs) => {
@@ -51,7 +51,7 @@ export const register = async ({
         dryRun,
         clientInfo: {
           clientType: ClientType.SDK,
-          libraryName: "snitch-node-client",
+          libraryName: "node-sdk",
           libraryVersion: "0.0.1",
           language: "Typescript",
           arch: process.arch,
@@ -60,7 +60,7 @@ export const register = async ({
         ...(audiences ? { audiences } : { audiences: [] }),
       },
       {
-        meta: { "auth-token": snitchToken },
+        meta: { "auth-token": streamdalToken },
       }
     );
 

@@ -6,19 +6,19 @@ export const HEARTBEAT_INTERVAL = 1000;
 export interface HearbeatConfigs {
   grpcClient: IInternalClient;
   sessionId: string;
-  snitchToken: string;
+  streamdalToken: string;
 }
 
 export const heartbeat = async ({
   grpcClient,
   sessionId,
-  snitchToken,
+  streamdalToken,
 }: HearbeatConfigs) => {
   const call = grpcClient.heartbeat(
     {
       sessionId,
     },
-    { meta: { "auth-token": snitchToken } }
+    { meta: { "auth-token": streamdalToken } }
   );
 
   const response = await call.response;
