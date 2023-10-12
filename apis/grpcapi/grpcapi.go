@@ -54,6 +54,7 @@ type Options struct {
 	RedisBackend    *redis.Client
 	PubSubService   pubsub.IPubSub
 	KVService       kv.IKV
+	DemoMode        bool
 }
 
 func New(o *Options) (*GRPCAPI, error) {

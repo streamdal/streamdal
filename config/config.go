@@ -29,6 +29,7 @@ type Config struct {
 	SeedDummyData        bool             `help:"Seed RedisBackend with dummy data for testing" default:"false"`
 	NumTailWorkers       int              `help:"Number of tail workers to run" default:"4"`
 	NumBroadcastWorkers  int              `help:"Number of broadcast workers to run" default:"4"`
+	DemoMode             bool             `help:"Run server in demo mode. This disables modifications" default:"false"`
 
 	// TODO: remove default for release
 	AesKey string `help:"AES256 encryption key to encrypt notification configs at rest" default:"D4BEC3EA5794EE0F38B21B9D4EC69F17F295C62618AB7F2C74814190F1F41ACC"`
