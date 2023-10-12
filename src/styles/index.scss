@@ -69,8 +69,8 @@ ol {
   list-style: auto;
   margin-left: 1rem;
 }
-// .accordion_wrapper is an external astro component
-ul:not(details > ul, .nav-groups, .accordion__wrapper) {
+
+ul:not(details > ul, .nav-groups) {
   list-style: disc;
   margin-left: 1rem;
 }
