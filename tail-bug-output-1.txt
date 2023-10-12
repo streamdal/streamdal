@@ -1,0 +1,300 @@
+❯ docker logs -f cf3a2cdfdc4c 2>&1 | grep -v -i metrics
+{"level":"debug","msg":"Starting checker","name":"health-check","time":"2023-10-11T18:56:33Z"}
+{"level":"info","msg":"version: 3c18e40","time":"2023-10-11T18:56:33Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"starting dedicated consumer on channel 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:56:33Z"}
+{"channel":"snitch_events:broadcast","level":"debug","method":"RunBroadcastConsumer","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z"}
+{"level":"debug","method":"runBroadcastWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":3}
+{"level":"debug","method":"runBroadcastWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":0}
+{"level":"debug","method":"runBroadcastWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":1}
+{"level":"debug","method":"runBroadcastWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":2}
+{"level":"info","method":"Run","msg":"HTTPAPI server running on ':8080'","pkg":"httpapi","time":"2023-10-11T18:56:33Z"}
+{"level":"info","method":"Run","msg":"GRPCAPI server listening on :9090","pkg":"grpcapi","time":"2023-10-11T18:56:33Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":2}
+{"level":"debug","method":"runTailConsumerWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":0}
+{"level":"debug","method":"runTailConsumerWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":3}
+{"level":"debug","method":"runTailConsumerWorker","msg":"starting","pkg":"bus","time":"2023-10-11T18:56:33Z","worker_id":1}
+{"level":"debug","method":"AddRegistration","msg":"received request to add registration","pkg":"store","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"attempting to save registration under key 'live:f92fbd74-5f98-4aec-ace3-67cac67e2c91:node1:register'","pkg":"store","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"new channel created for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"broadcasting event 'register'","pkg":"bus","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"broadcast for event 'register' complete","pkg":"bus","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"8f9de25c-3662-446d-bf90-df308ea0d6ae","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received RegisterRequest","pkg":"bus","source":"node1","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"handling register request bus event: service_name:\"service\"  session_id:\"f92fbd74-5f98-4aec-ace3-67cac67e2c91\"  client_info:{client_type:CLIENT_TYPE_SDK  library_name:\"snitch-go-client\"  library_version:\"0.0.49\"  language:\"go\"  arch:\"arm64\"  os:\"darwin\"  _session_id:\"f92fbd74-5f98-4aec-ace3-67cac67e2c91\"  _service_name:\"service\"  _node_name:\"node1\"}","pkg":"bus","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"pubsub.Publish: no such topic 'changes' - skipping publish","pkg":"pubsub","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"starting initial KV sync","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"generateInitialKVCommands has generated '1' KV commands","pkg":"grpcapi","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"generated '1' kv commands","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"sending '0' KV instructions","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"finished initial KV sync","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:10Z"}
+{"level":"debug","msg":"received new audience request for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"grpcapi","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","method":"AddAudience","msg":"received request to add audience","pkg":"store","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"audience contents: service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"; audience as str: service:operation_type_consumer:demo-operation:kafka","pkg":"store","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"channel already exists for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"grpcapi","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"broadcasting event 'new_audience'","pkg":"bus","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"88681de5-adcc-48f3-849a-093290ae0ed3","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received NewAudienceRequest","pkg":"bus","source":"node1","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"handling new audience request bus event: session_id:\"f92fbd74-5f98-4aec-ace3-67cac67e2c91\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"pubsub.Publish: no such topic 'changes' - skipping publish","pkg":"pubsub","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"broadcast for event 'new_audience' complete","pkg":"bus","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:15Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:57:15Z"}
+
+
+<going to start tail now via cli>
+
+{"level":"debug","method":"GetPipelines","msg":"received request to get pipelines","pkg":"store","time":"2023-10-11T18:59:19Z"}
+pubsub.Listen: before lock
+pubsub.Listen: after unlock
+{"level":"info","msg":"external.Tail(): received tail request","pkg":"grpcapi","time":"2023-10-11T18:59:24Z"}
+{"level":"info","msg":"external.Tail(): after str ptr","pkg":"grpcapi","time":"2023-10-11T18:59:24Z"}
+{"level":"info","msg":"external.Tail(): after validate","pkg":"grpcapi","time":"2023-10-11T18:59:24Z"}
+{"level":"info","msg":"external.Tail(): after listen","pkg":"grpcapi","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-11T18:59:24Z"}
+{"level":"info","msg":"external.Tail(): after broadcast","pkg":"grpcapi","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_START  _id:\"c0608707-0f00-4112-b5f2-88ee6597d821\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"handling tail start command","pkg":"bus","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"channel already exists for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"bus","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:59:24Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:25Z","worker_id":2}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"435156eb-4710-4376-8707-0dd7d78003f5","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:25Z","worker_id":2}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:25Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:26Z","worker_id":0}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:26Z","worker_id":0}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:26Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:27Z","worker_id":3}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"435156eb-4710-4376-8707-0dd7d78003f5","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:27Z","worker_id":3}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:27Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:28Z","worker_id":1}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:28Z","worker_id":1}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:28Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:29Z","worker_id":2}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"435156eb-4710-4376-8707-0dd7d78003f5","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:29Z","worker_id":2}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:29Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:30Z","worker_id":0}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:30Z","worker_id":0}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:30Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821', sending to worker","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T18:59:31Z","worker_id":3}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"435156eb-4710-4376-8707-0dd7d78003f5","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'c0608707-0f00-4112-b5f2-88ee6597d821","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"c0608707-0f00-4112-b5f2-88ee6597d821","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:c0608707-0f00-4112-b5f2-88ee6597d821' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T18:59:31Z","worker_id":3}
+{"level":"debug","msg":"pubsub.Publish: before topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'c0608707-0f00-4112-b5f2-88ee6597d821' write","pkg":"pubsub","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"frontend closed tail stream","pkg":"grpcapi","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_STOP  _id:\"c0608707-0f00-4112-b5f2-88ee6597d821\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"handling tail stop command","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"closed pubsub topic 'c0608707-0f00-4112-b5f2-88ee6597d821'","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"channel already exists for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"bus","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"client closed stream","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"sending final tail response","pkg":"grpcapi","request_id":"6a367865-d3d6-4bb9-96f7-cbea448bce7b","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"client closed stream","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:31Z"}
+{"level":"debug","method":"SendTail","msg":"sending final tail response","pkg":"grpcapi","request_id":"435156eb-4710-4376-8707-0dd7d78003f5","time":"2023-10-11T18:59:31Z"}
+
+<stopped cli tail>
+
+<another cli tail attempt>
+
+{"level":"debug","method":"GetPipelines","msg":"received request to get pipelines","pkg":"store","time":"2023-10-11T19:08:43Z"}
+{"level":"info","msg":"external.Tail(): received tail request","pkg":"grpcapi","time":"2023-10-11T19:08:46Z"}
+pubsub.Listen: before lock
+pubsub.Listen: after unlock
+{"level":"info","msg":"external.Tail(): after str ptr","pkg":"grpcapi","time":"2023-10-11T19:08:46Z"}
+{"level":"info","msg":"external.Tail(): after validate","pkg":"grpcapi","time":"2023-10-11T19:08:46Z"}
+{"level":"info","msg":"external.Tail(): after listen","pkg":"grpcapi","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_START  _id:\"a5a46982-8cae-408f-aa2b-551bc85f7ff0\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"handling tail start command","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"channel already exists for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"info","msg":"external.Tail(): after broadcast","pkg":"grpcapi","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0', sending to worker","pkg":"bus","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T19:08:46Z","worker_id":1}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"8879ba72-c105-4460-b852-5022f269dc6c","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T19:08:46Z","worker_id":1}
+{"level":"debug","msg":"pubsub.Publish: before topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:46Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0', sending to worker","pkg":"bus","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T19:08:47Z","worker_id":2}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T19:08:47Z","worker_id":2}
+{"level":"debug","msg":"pubsub.Publish: before topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:47Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0', sending to worker","pkg":"bus","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T19:08:48Z","worker_id":0}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"8879ba72-c105-4460-b852-5022f269dc6c","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"handleTailResponse","msg":"before publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"handleTailResponse","msg":"after publish to pubsub topic '%s'a5a46982-8cae-408f-aa2b-551bc85f7ff0","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T19:08:48Z","worker_id":0}
+{"level":"debug","msg":"pubsub.Publish: before topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","msg":"pubsub.Publish: after topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0' write","pkg":"pubsub","time":"2023-10-11T19:08:48Z"}
+{"level":"debug","msg":"frontend closed tail stream","pkg":"grpcapi","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"after srv.Recv(), before validation for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"after validation, before BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"before marshal","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after marshal, before publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_STOP  _id:\"a5a46982-8cae-408f-aa2b-551bc85f7ff0\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"handling tail stop command","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"closed pubsub topic 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"RunTailConsumer","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0', sending to worker","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"received tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*', sending to handler","pkg":"bus","time":"2023-10-11T19:08:49Z","worker_id":3}
+{"level":"debug","metadata":{":authority":"localhost:9090","auth-token":"1234","content-type":"application/grpc","request-id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","user-agent":"grpc-go/1.40.0"},"method":"handler","msg":"received TailResponse","pkg":"bus","source":"node1","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"BroadcastTailResponse","msg":"after publish to topic 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"after BroadcastTailResponse() for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91', tail request id 'a5a46982-8cae-408f-aa2b-551bc85f7ff0'","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"channel already exists for session id 'f92fbd74-5f98-4aec-ace3-67cac67e2c91'","pkg":"bus","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"received cmd on cmd channel","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","msg":"sent cmd to client","pkg":"grpcapi","service_name":"service","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"handleTailResponse","msg":"handling tail response bus event","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"handleTailResponse","msg":"no pubsub topic - skipping","pkg":"bus","session_id":"f92fbd74-5f98-4aec-ace3-67cac67e2c91","tail_request_id":"a5a46982-8cae-408f-aa2b-551bc85f7ff0","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"runTailConsumerWorker","msg":"finished handling tail response on channel 'snitch_events:tail:a5a46982-8cae-408f-aa2b-551bc85f7ff0' and pattern 'snitch_events:tail:*'","pkg":"bus","time":"2023-10-11T19:08:49Z","worker_id":3}
+{"level":"debug","method":"SendTail","msg":"client closed stream","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"sending final tail response","pkg":"grpcapi","request_id":"15e8f3ab-03b5-4ebe-bd96-913f2542cfec","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"client closed stream","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:49Z"}
+{"level":"debug","method":"SendTail","msg":"sending final tail response","pkg":"grpcapi","request_id":"8879ba72-c105-4460-b852-5022f269dc6c","time":"2023-10-11T19:08:49Z"}
+
+
+<cli client stopped>
+
+wpubsub.Listen: before lock
+pubsub.Listen: after unlock
+{"level":"info","msg":"external.Tail(): received tail request","pkg":"grpcapi","time":"2023-10-12T13:46:23Z"}
+{"level":"info","msg":"external.Tail(): after str ptr","pkg":"grpcapi","time":"2023-10-12T13:46:23Z"}
+{"level":"info","msg":"external.Tail(): after validate","pkg":"grpcapi","time":"2023-10-12T13:46:23Z"}
+{"level":"info","msg":"external.Tail(): after listen","pkg":"grpcapi","time":"2023-10-12T13:46:23Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-12T13:46:23Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-12T13:46:23Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_START  _id:\"d8667b77-f832-45c4-97c3-41465e358f6c\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-12T13:46:23Z"}
+{"level":"debug","msg":"handling tail start command","pkg":"bus","time":"2023-10-12T13:46:23Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-12T13:46:23Z"}
+{"level":"info","msg":"external.Tail(): after broadcast","pkg":"grpcapi","time":"2023-10-12T13:46:23Z"}
+
+<attempting to tail ^>
+{"level":"debug","msg":"frontend closed tail stream","pkg":"grpcapi","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","msg":"broadcasting event 'tail'","pkg":"bus","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","metadata":null,"method":"handler","msg":"received TailRequest","pkg":"bus","source":"node1","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","msg":"handling tail request bus event: type:TAIL_REQUEST_TYPE_STOP  _id:\"d8667b77-f832-45c4-97c3-41465e358f6c\"  audience:{service_name:\"service\"  component_name:\"kafka\"  operation_type:OPERATION_TYPE_CONSUMER  operation_name:\"demo-operation\"}","pkg":"bus","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","msg":"handling tail stop command","pkg":"bus","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","msg":"closed pubsub topic 'd8667b77-f832-45c4-97c3-41465e358f6c'","pkg":"bus","time":"2023-10-12T13:46:39Z"}
+{"level":"debug","msg":"broadcast for event 'tail' complete","pkg":"bus","time":"2023-10-12T13:46:39Z"}
+
+<stopped attempt to tail ^>
+

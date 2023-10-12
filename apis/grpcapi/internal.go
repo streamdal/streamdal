@@ -148,7 +148,8 @@ MAIN:
 				llog.Warning("received nil cmd on cmd channel; ignoring")
 				continue
 			}
-			llog.Debug("received cmd on cmd channel")
+
+			llog.Debugf("received cmd on cmd channel; sending cmd to client session id '%s'", request.SessionId)
 
 			// Send cmd to connected client
 			if err := server.Send(cmd); err != nil {
@@ -169,13 +170,13 @@ MAIN:
 		return GRPCServerShutdownError
 	}
 
-	llog.Debugf("client with session id '%s' has disconnected; de-registering", request.SessionId)
+	llog.Debug("client has disconnected; de-registering")
 
 	// Remove command channel
 	if ok := s.Options.CmdService.RemoveChannel(request.SessionId); ok {
-		llog.Debugf("removed channel for session id '%s'", request.SessionId)
+		llog.Debug("removed cmd channel")
 	} else {
-		llog.Debugf("no channel found for session id '%s'", request.SessionId)
+		llog.Debug("no cmd channel found")
 	}
 
 	deregisterRequest := &protos.DeregisterRequest{
@@ -183,14 +184,18 @@ MAIN:
 		SessionId:   request.SessionId,
 	}
 
+	llog.Debug("deleting registration from store")
+
 	if err := s.Options.StoreService.DeleteRegistration(server.Context(), deregisterRequest); err != nil {
 		return errors.Wrap(err, "unable to delete registration")
 	}
 
-	// TODO: Announce de-registration - the UI will still display the audience(s) but
+	llog.Debug("announcing de-registration")
+
+	// Announce de-registration - the UI will still display the audience(s) but
 	// they no longer will be live (ie. attached clients will decrease)
 	if err := s.Options.BusService.BroadcastDeregister(server.Context(), deregisterRequest); err != nil {
-		llog.Errorf("unable to broadcast deregister event for session id '%s': %v", deregisterRequest.SessionId, err)
+		llog.Errorf("unable to broadcast deregister event: %s", err)
 	}
 
 	return nil
@@ -377,51 +382,64 @@ func (s *InternalServer) GetAttachCommandsByService(
 }
 
 func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
+	llog := s.log.WithFields(logrus.Fields{
+		"method":     "SendTail",
+		"request_id": util.CtxRequestId(srv.Context()),
+	})
+
 	// This isn't necessary for go, but other langauge libraries, such as python
 	// require a response to eventually be sent and will throw an exception if
 	// one is not received
-	defer srv.SendAndClose(&protos.StandardResponse{
-		Id:   util.CtxRequestId(srv.Context()),
-		Code: protos.ResponseCode_RESPONSE_CODE_OK,
-	})
+	defer func() {
+		llog.Debug("sending final tail response")
+
+		srv.SendAndClose(&protos.StandardResponse{
+			Id:   util.CtxRequestId(srv.Context()),
+			Code: protos.ResponseCode_RESPONSE_CODE_OK,
+		})
+	}()
 
 	for {
 		select {
 		case <-srv.Context().Done():
-			s.log.Debug("send tail handler detected client disconnect")
+			llog.Debug("detected client disconnect")
 			return nil
 		case <-s.Options.ShutdownContext.Done():
-			s.log.Debug("server shutting down, exiting SendTail() stream")
+			llog.Debug("server shutting down, exiting stream")
 			return nil
 		default:
 			tailResp, err := srv.Recv()
 			if err != nil {
 				if strings.Contains(err.Error(), io.EOF.Error()) || strings.Contains(err.Error(), context.Canceled.Error()) {
-					s.log.Debug("client closed tail stream")
+					llog.Debug("client closed stream")
 					return nil
 				}
 
-				s.log.Error(errors.Wrap(err, "unable to receive tail response"))
+				llog.Error(errors.Wrap(err, "unable to receive tail response"))
 				continue
 			}
 
-			s.log.Debugf("Tail() after Recv(), before validation for session id '%s'", tailResp.SessionId)
+			llog.Debugf("after srv.Recv(), before validation for session id '%s', tail request id '%s'",
+				tailResp.SessionId, tailResp.TailRequestId)
 
 			if err := validate.TailResponse(tailResp); err != nil {
-				s.log.Error(errors.Wrap(err, "invalid tail response"))
+				llog.Error(errors.Wrapf(err, "invalid tail response for session id '%s', tail request id '%s'",
+					tailResp.SessionId, tailResp.TailRequestId))
 				continue
 			}
 
-			s.log.Debugf("Tail() after validation, before BroadcastTailResponse for session id '%s'", tailResp.SessionId)
+			llog.Debugf("after validation, before BroadcastTailResponse() for session id '%s', tail request id '%s'",
+				tailResp.SessionId, tailResp.TailRequestId)
 
 			if err := s.Options.BusService.BroadcastTailResponse(srv.Context(), tailResp); err != nil {
-				s.log.Error(errors.Wrap(err, "unable to broadcast tail response"))
+				llog.Error(errors.Wrapf(err, "unable to broadcast tail response for session id '%s', tail request id '%s'",
+					tailResp.SessionId, tailResp.TailRequestId))
+
 				continue
 			}
 
-			s.log.Debugf("Tail() after BroadcastTailResponse for session id '%s'", tailResp.SessionId)
-
-			s.log.Debugf("publishing tail response for session id '%s'", tailResp.SessionId)
+			llog.Debugf("after BroadcastTailResponse() for session id '%s', tail request id '%s'",
+				tailResp.SessionId, tailResp.TailRequestId)
 		}
 	}
 }

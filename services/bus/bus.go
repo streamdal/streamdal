@@ -240,7 +240,7 @@ func (b *Bus) runBroadcastWorker(id int, sharedBroadcastCh chan *redis.Message) 
 			llog.Debug("context cancellation detected")
 			return
 		case msg := <-sharedBroadcastCh:
-			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
+			if err := b.handler(b.options.ShutdownCtx, msg, "runBroadcastWorker"); err != nil {
 				llog.WithError(err).Errorf("error handling broadcast message on channel '%s'", msg.Channel)
 				continue
 			}
@@ -312,29 +312,38 @@ func (b *Bus) runTailConsumerWorker(id int, ch chan *redis.Message) {
 			llog.Debug("context cancellation detected")
 			return
 		case msg := <-ch:
-			if err := b.handler(b.options.ShutdownCtx, msg); err != nil {
+			llog.Debugf("received tail response on channel '%s' and pattern '%s', sending to handler", msg.Channel, msg.Pattern)
+
+			if err := b.handler(b.options.ShutdownCtx, msg, "runTailConsumerWorker"); err != nil {
 				llog.WithError(err).Error("error handling tail response")
 				continue
 			}
+
+			llog.Debugf("finished handling tail response on channel '%s' and pattern '%s'", msg.Channel, msg.Pattern)
 		}
 	}
 }
 
-// handler every time a new message is received on the RedisBackend broadcast stream.
+// handler is executed every time a new message is received on the RedisBackend
+// broadcast streams.
 // This method is responsible for decoding the message and executing the
-// appropriate msg handler.
-func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
-	llog := b.log.WithField("method", "handler")
-
-	llog.Debug("received new broadcast message")
+// appropriate msg handler. "source" is used to identify the source of the
+// handler() call.
+func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source string) error {
+	llog := b.log.WithFields(logrus.Fields{
+		"method": "handler",
+		"source": source,
+	})
 
 	busEvent := &protos.BusEvent{}
 
 	if err := proto.Unmarshal([]byte(msg.Payload), busEvent); err != nil {
+		llog.Errorf("unmarshal error: %s", err)
 		return errors.Wrap(err, "error unmarshalling bus event")
 	}
 
 	if err := validate.BusEvent(busEvent); err != nil {
+		llog.Errorf("validation error: %s", err)
 		return errors.Wrap(err, "validation error")
 	}
 
@@ -349,39 +358,54 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message) error {
 
 	switch t := busEvent.Event.(type) {
 	case *protos.BusEvent_RegisterRequest:
+		llog.Debug("received RegisterRequest")
 		err = b.handleRegisterRequest(shutdownCtx, busEvent.GetRegisterRequest())
 	case *protos.BusEvent_DeregisterRequest:
+		llog.Debug("received DeregisterRequest")
 		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_NewAudienceRequest:
+		llog.Debug("received NewAudienceRequest")
 		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
+		llog.Debug("received DeleteAudienceRequest")
 		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:
+		llog.Debug("received UpdatePipelineRequest")
 		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
 	case *protos.BusEvent_DeletePipelineRequest:
+		llog.Debug("received DeletePipelineRequest")
 		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
 	case *protos.BusEvent_AttachPipelineRequest:
+		llog.Debug("received AttachPipelineRequest")
 		err = b.handleAttachPipelineRequest(shutdownCtx, busEvent.GetAttachPipelineRequest())
 	case *protos.BusEvent_DetachPipelineRequest:
+		llog.Debug("received DetachPipelineRequest")
 		err = b.handleDetachPipelineRequest(shutdownCtx, busEvent.GetDetachPipelineRequest())
 	case *protos.BusEvent_PausePipelineRequest:
+		llog.Debug("received PausePipelineRequest")
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
 	case *protos.BusEvent_ResumePipelineRequest:
+		llog.Debug("received ResumePipelineRequest")
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	case *protos.BusEvent_MetricsRequest:
+		llog.Debug("received MetricsRequest")
 		err = b.handleMetricsRequest(shutdownCtx, busEvent.GetMetricsRequest())
 	case *protos.BusEvent_KvRequest:
+		llog.Debug("received KvRequest")
 		err = b.handleKVRequest(shutdownCtx, busEvent.GetKvRequest())
 	case *protos.BusEvent_TailRequest:
+		llog.Debug("received TailRequest")
 		err = b.handleTailCommand(shutdownCtx, busEvent.GetTailRequest())
 	case *protos.BusEvent_TailResponse:
+		llog.Debug("received TailResponse")
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
 	default:
+		llog.Debug("received unknown event type")
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
 	}
 
 	if err != nil {
-		b.log.Error(err)
+		b.log.Errorf("error handling bus event: %s", err)
 		return errors.Wrap(err, "error handling bus event")
 	}
 
