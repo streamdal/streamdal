@@ -1239,6 +1239,61 @@ func (x *DeleteAudienceRequest) GetForce() bool {
 	return false
 }
 
+type DeleteServiceRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
+	Force       *bool  `protobuf:"varint,2,opt,name=force,proto3,oneof" json:"force,omitempty"`
+}
+
+func (x *DeleteServiceRequest) Reset() {
+	*x = DeleteServiceRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_external_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteServiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteServiceRequest) ProtoMessage() {}
+
+func (x *DeleteServiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_external_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteServiceRequest.ProtoReflect.Descriptor instead.
+func (*DeleteServiceRequest) Descriptor() ([]byte, []int) {
+	return file_sp_external_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *DeleteServiceRequest) GetServiceName() string {
+	if x != nil {
+		return x.ServiceName
+	}
+	return ""
+}
+
+func (x *DeleteServiceRequest) GetForce() bool {
+	if x != nil && x.Force != nil {
+		return *x.Force
+	}
+	return false
+}
+
 type GetMetricsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1248,7 +1303,7 @@ type GetMetricsRequest struct {
 func (x *GetMetricsRequest) Reset() {
 	*x = GetMetricsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[24]
+		mi := &file_sp_external_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1261,7 +1316,7 @@ func (x *GetMetricsRequest) String() string {
 func (*GetMetricsRequest) ProtoMessage() {}
 
 func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[24]
+	mi := &file_sp_external_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1274,7 +1329,7 @@ func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsRequest.ProtoReflect.Descriptor instead.
 func (*GetMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{24}
+	return file_sp_external_proto_rawDescGZIP(), []int{25}
 }
 
 type GetMetricsResponse struct {
@@ -1288,7 +1343,7 @@ type GetMetricsResponse struct {
 func (x *GetMetricsResponse) Reset() {
 	*x = GetMetricsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[25]
+		mi := &file_sp_external_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1301,7 +1356,7 @@ func (x *GetMetricsResponse) String() string {
 func (*GetMetricsResponse) ProtoMessage() {}
 
 func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[25]
+	mi := &file_sp_external_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1314,7 +1369,7 @@ func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsResponse.ProtoReflect.Descriptor instead.
 func (*GetMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{25}
+	return file_sp_external_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetMetricsResponse) GetMetrics() map[string]*Metric {
@@ -1333,7 +1388,7 @@ type GetAudienceRatesRequest struct {
 func (x *GetAudienceRatesRequest) Reset() {
 	*x = GetAudienceRatesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[26]
+		mi := &file_sp_external_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1346,7 +1401,7 @@ func (x *GetAudienceRatesRequest) String() string {
 func (*GetAudienceRatesRequest) ProtoMessage() {}
 
 func (x *GetAudienceRatesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[26]
+	mi := &file_sp_external_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1359,7 +1414,7 @@ func (x *GetAudienceRatesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAudienceRatesRequest.ProtoReflect.Descriptor instead.
 func (*GetAudienceRatesRequest) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{26}
+	return file_sp_external_proto_rawDescGZIP(), []int{27}
 }
 
 type GetAudienceRatesResponse struct {
@@ -1373,7 +1428,7 @@ type GetAudienceRatesResponse struct {
 func (x *GetAudienceRatesResponse) Reset() {
 	*x = GetAudienceRatesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[27]
+		mi := &file_sp_external_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1386,7 +1441,7 @@ func (x *GetAudienceRatesResponse) String() string {
 func (*GetAudienceRatesResponse) ProtoMessage() {}
 
 func (x *GetAudienceRatesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[27]
+	mi := &file_sp_external_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1399,7 +1454,7 @@ func (x *GetAudienceRatesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAudienceRatesResponse.ProtoReflect.Descriptor instead.
 func (*GetAudienceRatesResponse) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{27}
+	return file_sp_external_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetAudienceRatesResponse) GetRates() map[string]*AudienceRate {
@@ -1420,7 +1475,7 @@ type GetSchemaRequest struct {
 func (x *GetSchemaRequest) Reset() {
 	*x = GetSchemaRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[28]
+		mi := &file_sp_external_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1433,7 +1488,7 @@ func (x *GetSchemaRequest) String() string {
 func (*GetSchemaRequest) ProtoMessage() {}
 
 func (x *GetSchemaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[28]
+	mi := &file_sp_external_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1446,7 +1501,7 @@ func (x *GetSchemaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSchemaRequest.ProtoReflect.Descriptor instead.
 func (*GetSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{28}
+	return file_sp_external_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetSchemaRequest) GetAudience() *Audience {
@@ -1467,7 +1522,7 @@ type GetSchemaResponse struct {
 func (x *GetSchemaResponse) Reset() {
 	*x = GetSchemaResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[29]
+		mi := &file_sp_external_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1480,7 +1535,7 @@ func (x *GetSchemaResponse) String() string {
 func (*GetSchemaResponse) ProtoMessage() {}
 
 func (x *GetSchemaResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[29]
+	mi := &file_sp_external_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1493,7 +1548,7 @@ func (x *GetSchemaResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSchemaResponse.ProtoReflect.Descriptor instead.
 func (*GetSchemaResponse) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{29}
+	return file_sp_external_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetSchemaResponse) GetSchema() *Schema {
@@ -1514,7 +1569,7 @@ type TestRequest struct {
 func (x *TestRequest) Reset() {
 	*x = TestRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[30]
+		mi := &file_sp_external_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1527,7 +1582,7 @@ func (x *TestRequest) String() string {
 func (*TestRequest) ProtoMessage() {}
 
 func (x *TestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[30]
+	mi := &file_sp_external_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1540,7 +1595,7 @@ func (x *TestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TestRequest.ProtoReflect.Descriptor instead.
 func (*TestRequest) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{30}
+	return file_sp_external_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *TestRequest) GetInput() string {
@@ -1561,7 +1616,7 @@ type TestResponse struct {
 func (x *TestResponse) Reset() {
 	*x = TestResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sp_external_proto_msgTypes[31]
+		mi := &file_sp_external_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1574,7 +1629,7 @@ func (x *TestResponse) String() string {
 func (*TestResponse) ProtoMessage() {}
 
 func (x *TestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sp_external_proto_msgTypes[31]
+	mi := &file_sp_external_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1587,7 +1642,7 @@ func (x *TestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TestResponse.ProtoReflect.Descriptor instead.
 func (*TestResponse) Descriptor() ([]byte, []int) {
-	return file_sp_external_proto_rawDescGZIP(), []int{31}
+	return file_sp_external_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *TestResponse) GetOutput() string {
@@ -1754,6 +1809,12 @@ var file_sp_external_proto_rawDesc = []byte{
 	0x73, 0x2e, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69,
 	0x65, 0x6e, 0x63, 0x65, 0x12, 0x19, 0x0a, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x88, 0x01, 0x01, 0x42,
+	0x08, 0x0a, 0x06, 0x5f, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x22, 0x5e, 0x0a, 0x14, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x21, 0x0a, 0x0c, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x4e, 0x61, 0x6d, 0x65, 0x12, 0x19, 0x0a, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x88, 0x01, 0x01, 0x42,
 	0x08, 0x0a, 0x06, 0x5f, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x22, 0x13, 0x0a, 0x11, 0x47, 0x65, 0x74,
 	0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xa3,
 	0x01, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73,
@@ -1791,7 +1852,7 @@ var file_sp_external_proto_rawDesc = []byte{
 	0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e,
 	0x70, 0x75, 0x74, 0x22, 0x26, 0x0a, 0x0c, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x32, 0x87, 0x0e, 0x0a, 0x08,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x32, 0xd0, 0x0e, 0x0a, 0x08,
 	0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x12, 0x37, 0x0a, 0x06, 0x47, 0x65, 0x74, 0x41,
 	0x6c, 0x6c, 0x12, 0x15, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x41,
 	0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74,
@@ -1883,32 +1944,36 @@ var file_sp_external_proto_rawDesc = []byte{
 	0x63, 0x65, 0x12, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x6c, 0x65,
 	0x74, 0x65, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x1a, 0x18, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x53, 0x74, 0x61, 0x6e, 0x64,
-	0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x45, 0x0a, 0x0a, 0x47,
-	0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65,
-	0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x30, 0x01, 0x12, 0x33, 0x0a, 0x04, 0x54, 0x61, 0x69, 0x6c, 0x12, 0x13, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x12, 0x57, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x41, 0x75,
-	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x12, 0x1f, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65,
-	0x52, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63,
-	0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01,
-	0x12, 0x40, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x18, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73,
-	0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x31, 0x0a, 0x04, 0x54, 0x65, 0x73, 0x74, 0x12, 0x13, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x73, 0x2e, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x34, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e,
-	0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c,
-	0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x0d, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x1c, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x73, 0x2e, 0x53, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x45, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69,
+	0x63, 0x73, 0x12, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4d,
+	0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x12, 0x33, 0x0a, 0x04, 0x54,
+	0x61, 0x69, 0x6c, 0x12, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x61, 0x69,
+	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01,
+	0x12, 0x57, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52,
+	0x61, 0x74, 0x65, 0x73, 0x12, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65,
+	0x74, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47,
+	0x65, 0x74, 0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x12, 0x40, 0x0a, 0x09, 0x47, 0x65, 0x74,
+	0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x12, 0x18, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e,
+	0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68,
+	0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x04, 0x54,
+	0x65, 0x73, 0x74, 0x12, 0x13, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x54, 0x65, 0x73,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x54, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x34,
+	0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72,
+	0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x6e, 0x69, 0x74, 0x63, 0x68, 0x2d, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1923,7 +1988,7 @@ func file_sp_external_proto_rawDescGZIP() []byte {
 	return file_sp_external_proto_rawDescData
 }
 
-var file_sp_external_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
+var file_sp_external_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_sp_external_proto_goTypes = []interface{}{
 	(*GetAllRequest)(nil),             // 0: protos.GetAllRequest
 	(*GetAllResponse)(nil),            // 1: protos.GetAllResponse
@@ -1949,57 +2014,58 @@ var file_sp_external_proto_goTypes = []interface{}{
 	(*AttachNotificationRequest)(nil), // 21: protos.AttachNotificationRequest
 	(*DetachNotificationRequest)(nil), // 22: protos.DetachNotificationRequest
 	(*DeleteAudienceRequest)(nil),     // 23: protos.DeleteAudienceRequest
-	(*GetMetricsRequest)(nil),         // 24: protos.GetMetricsRequest
-	(*GetMetricsResponse)(nil),        // 25: protos.GetMetricsResponse
-	(*GetAudienceRatesRequest)(nil),   // 26: protos.GetAudienceRatesRequest
-	(*GetAudienceRatesResponse)(nil),  // 27: protos.GetAudienceRatesResponse
-	(*GetSchemaRequest)(nil),          // 28: protos.GetSchemaRequest
-	(*GetSchemaResponse)(nil),         // 29: protos.GetSchemaResponse
-	(*TestRequest)(nil),               // 30: protos.TestRequest
-	(*TestResponse)(nil),              // 31: protos.TestResponse
-	nil,                               // 32: protos.GetAllResponse.PipelinesEntry
-	nil,                               // 33: protos.GetAllResponse.ConfigEntry
-	nil,                               // 34: protos.GetNotificationsResponse.NotificationsEntry
-	nil,                               // 35: protos.GetMetricsResponse.MetricsEntry
-	nil,                               // 36: protos.GetAudienceRatesResponse.RatesEntry
-	(*LiveInfo)(nil),                  // 37: protos.LiveInfo
-	(*Audience)(nil),                  // 38: protos.Audience
-	(*Pipeline)(nil),                  // 39: protos.Pipeline
-	(*NotificationConfig)(nil),        // 40: protos.NotificationConfig
-	(*Schema)(nil),                    // 41: protos.Schema
-	(*PipelineInfo)(nil),              // 42: protos.PipelineInfo
-	(*Metric)(nil),                    // 43: protos.Metric
-	(*AudienceRate)(nil),              // 44: protos.AudienceRate
-	(*TailRequest)(nil),               // 45: protos.TailRequest
-	(*StandardResponse)(nil),          // 46: protos.StandardResponse
-	(*TailResponse)(nil),              // 47: protos.TailResponse
+	(*DeleteServiceRequest)(nil),      // 24: protos.DeleteServiceRequest
+	(*GetMetricsRequest)(nil),         // 25: protos.GetMetricsRequest
+	(*GetMetricsResponse)(nil),        // 26: protos.GetMetricsResponse
+	(*GetAudienceRatesRequest)(nil),   // 27: protos.GetAudienceRatesRequest
+	(*GetAudienceRatesResponse)(nil),  // 28: protos.GetAudienceRatesResponse
+	(*GetSchemaRequest)(nil),          // 29: protos.GetSchemaRequest
+	(*GetSchemaResponse)(nil),         // 30: protos.GetSchemaResponse
+	(*TestRequest)(nil),               // 31: protos.TestRequest
+	(*TestResponse)(nil),              // 32: protos.TestResponse
+	nil,                               // 33: protos.GetAllResponse.PipelinesEntry
+	nil,                               // 34: protos.GetAllResponse.ConfigEntry
+	nil,                               // 35: protos.GetNotificationsResponse.NotificationsEntry
+	nil,                               // 36: protos.GetMetricsResponse.MetricsEntry
+	nil,                               // 37: protos.GetAudienceRatesResponse.RatesEntry
+	(*LiveInfo)(nil),                  // 38: protos.LiveInfo
+	(*Audience)(nil),                  // 39: protos.Audience
+	(*Pipeline)(nil),                  // 40: protos.Pipeline
+	(*NotificationConfig)(nil),        // 41: protos.NotificationConfig
+	(*Schema)(nil),                    // 42: protos.Schema
+	(*PipelineInfo)(nil),              // 43: protos.PipelineInfo
+	(*Metric)(nil),                    // 44: protos.Metric
+	(*AudienceRate)(nil),              // 45: protos.AudienceRate
+	(*TailRequest)(nil),               // 46: protos.TailRequest
+	(*StandardResponse)(nil),          // 47: protos.StandardResponse
+	(*TailResponse)(nil),              // 48: protos.TailResponse
 }
 var file_sp_external_proto_depIdxs = []int32{
-	37, // 0: protos.GetAllResponse.live:type_name -> protos.LiveInfo
-	38, // 1: protos.GetAllResponse.audiences:type_name -> protos.Audience
-	32, // 2: protos.GetAllResponse.pipelines:type_name -> protos.GetAllResponse.PipelinesEntry
-	33, // 3: protos.GetAllResponse.config:type_name -> protos.GetAllResponse.ConfigEntry
-	39, // 4: protos.GetPipelinesResponse.pipelines:type_name -> protos.Pipeline
-	39, // 5: protos.GetPipelineResponse.pipeline:type_name -> protos.Pipeline
-	39, // 6: protos.CreatePipelineRequest.pipeline:type_name -> protos.Pipeline
-	39, // 7: protos.UpdatePipelineRequest.pipeline:type_name -> protos.Pipeline
-	38, // 8: protos.AttachPipelineRequest.audience:type_name -> protos.Audience
-	38, // 9: protos.DetachPipelineRequest.audience:type_name -> protos.Audience
-	38, // 10: protos.PausePipelineRequest.audience:type_name -> protos.Audience
-	38, // 11: protos.ResumePipelineRequest.audience:type_name -> protos.Audience
-	40, // 12: protos.CreateNotificationRequest.notification:type_name -> protos.NotificationConfig
-	40, // 13: protos.UpdateNotificationRequest.notification:type_name -> protos.NotificationConfig
-	34, // 14: protos.GetNotificationsResponse.notifications:type_name -> protos.GetNotificationsResponse.NotificationsEntry
-	40, // 15: protos.GetNotificationResponse.notification:type_name -> protos.NotificationConfig
-	38, // 16: protos.DeleteAudienceRequest.audience:type_name -> protos.Audience
-	35, // 17: protos.GetMetricsResponse.metrics:type_name -> protos.GetMetricsResponse.MetricsEntry
-	36, // 18: protos.GetAudienceRatesResponse.rates:type_name -> protos.GetAudienceRatesResponse.RatesEntry
-	38, // 19: protos.GetSchemaRequest.audience:type_name -> protos.Audience
-	41, // 20: protos.GetSchemaResponse.schema:type_name -> protos.Schema
-	42, // 21: protos.GetAllResponse.PipelinesEntry.value:type_name -> protos.PipelineInfo
-	40, // 22: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
-	43, // 23: protos.GetMetricsResponse.MetricsEntry.value:type_name -> protos.Metric
-	44, // 24: protos.GetAudienceRatesResponse.RatesEntry.value:type_name -> protos.AudienceRate
+	38, // 0: protos.GetAllResponse.live:type_name -> protos.LiveInfo
+	39, // 1: protos.GetAllResponse.audiences:type_name -> protos.Audience
+	33, // 2: protos.GetAllResponse.pipelines:type_name -> protos.GetAllResponse.PipelinesEntry
+	34, // 3: protos.GetAllResponse.config:type_name -> protos.GetAllResponse.ConfigEntry
+	40, // 4: protos.GetPipelinesResponse.pipelines:type_name -> protos.Pipeline
+	40, // 5: protos.GetPipelineResponse.pipeline:type_name -> protos.Pipeline
+	40, // 6: protos.CreatePipelineRequest.pipeline:type_name -> protos.Pipeline
+	40, // 7: protos.UpdatePipelineRequest.pipeline:type_name -> protos.Pipeline
+	39, // 8: protos.AttachPipelineRequest.audience:type_name -> protos.Audience
+	39, // 9: protos.DetachPipelineRequest.audience:type_name -> protos.Audience
+	39, // 10: protos.PausePipelineRequest.audience:type_name -> protos.Audience
+	39, // 11: protos.ResumePipelineRequest.audience:type_name -> protos.Audience
+	41, // 12: protos.CreateNotificationRequest.notification:type_name -> protos.NotificationConfig
+	41, // 13: protos.UpdateNotificationRequest.notification:type_name -> protos.NotificationConfig
+	35, // 14: protos.GetNotificationsResponse.notifications:type_name -> protos.GetNotificationsResponse.NotificationsEntry
+	41, // 15: protos.GetNotificationResponse.notification:type_name -> protos.NotificationConfig
+	39, // 16: protos.DeleteAudienceRequest.audience:type_name -> protos.Audience
+	36, // 17: protos.GetMetricsResponse.metrics:type_name -> protos.GetMetricsResponse.MetricsEntry
+	37, // 18: protos.GetAudienceRatesResponse.rates:type_name -> protos.GetAudienceRatesResponse.RatesEntry
+	39, // 19: protos.GetSchemaRequest.audience:type_name -> protos.Audience
+	42, // 20: protos.GetSchemaResponse.schema:type_name -> protos.Schema
+	43, // 21: protos.GetAllResponse.PipelinesEntry.value:type_name -> protos.PipelineInfo
+	41, // 22: protos.GetNotificationsResponse.NotificationsEntry.value:type_name -> protos.NotificationConfig
+	44, // 23: protos.GetMetricsResponse.MetricsEntry.value:type_name -> protos.Metric
+	45, // 24: protos.GetAudienceRatesResponse.RatesEntry.value:type_name -> protos.AudienceRate
 	0,  // 25: protos.External.GetAll:input_type -> protos.GetAllRequest
 	0,  // 26: protos.External.GetAllStream:input_type -> protos.GetAllRequest
 	2,  // 27: protos.External.GetPipelines:input_type -> protos.GetPipelinesRequest
@@ -2019,37 +2085,39 @@ var file_sp_external_proto_depIdxs = []int32{
 	21, // 41: protos.External.AttachNotification:input_type -> protos.AttachNotificationRequest
 	22, // 42: protos.External.DetachNotification:input_type -> protos.DetachNotificationRequest
 	23, // 43: protos.External.DeleteAudience:input_type -> protos.DeleteAudienceRequest
-	24, // 44: protos.External.GetMetrics:input_type -> protos.GetMetricsRequest
-	45, // 45: protos.External.Tail:input_type -> protos.TailRequest
-	26, // 46: protos.External.GetAudienceRates:input_type -> protos.GetAudienceRatesRequest
-	28, // 47: protos.External.GetSchema:input_type -> protos.GetSchemaRequest
-	30, // 48: protos.External.Test:input_type -> protos.TestRequest
-	1,  // 49: protos.External.GetAll:output_type -> protos.GetAllResponse
-	1,  // 50: protos.External.GetAllStream:output_type -> protos.GetAllResponse
-	3,  // 51: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
-	5,  // 52: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
-	7,  // 53: protos.External.CreatePipeline:output_type -> protos.CreatePipelineResponse
-	46, // 54: protos.External.UpdatePipeline:output_type -> protos.StandardResponse
-	46, // 55: protos.External.DeletePipeline:output_type -> protos.StandardResponse
-	46, // 56: protos.External.AttachPipeline:output_type -> protos.StandardResponse
-	46, // 57: protos.External.DetachPipeline:output_type -> protos.StandardResponse
-	46, // 58: protos.External.PausePipeline:output_type -> protos.StandardResponse
-	46, // 59: protos.External.ResumePipeline:output_type -> protos.StandardResponse
-	46, // 60: protos.External.CreateNotification:output_type -> protos.StandardResponse
-	46, // 61: protos.External.UpdateNotification:output_type -> protos.StandardResponse
-	46, // 62: protos.External.DeleteNotification:output_type -> protos.StandardResponse
-	18, // 63: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
-	20, // 64: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
-	46, // 65: protos.External.AttachNotification:output_type -> protos.StandardResponse
-	46, // 66: protos.External.DetachNotification:output_type -> protos.StandardResponse
-	46, // 67: protos.External.DeleteAudience:output_type -> protos.StandardResponse
-	25, // 68: protos.External.GetMetrics:output_type -> protos.GetMetricsResponse
-	47, // 69: protos.External.Tail:output_type -> protos.TailResponse
-	27, // 70: protos.External.GetAudienceRates:output_type -> protos.GetAudienceRatesResponse
-	29, // 71: protos.External.GetSchema:output_type -> protos.GetSchemaResponse
-	31, // 72: protos.External.Test:output_type -> protos.TestResponse
-	49, // [49:73] is the sub-list for method output_type
-	25, // [25:49] is the sub-list for method input_type
+	24, // 44: protos.External.DeleteService:input_type -> protos.DeleteServiceRequest
+	25, // 45: protos.External.GetMetrics:input_type -> protos.GetMetricsRequest
+	46, // 46: protos.External.Tail:input_type -> protos.TailRequest
+	27, // 47: protos.External.GetAudienceRates:input_type -> protos.GetAudienceRatesRequest
+	29, // 48: protos.External.GetSchema:input_type -> protos.GetSchemaRequest
+	31, // 49: protos.External.Test:input_type -> protos.TestRequest
+	1,  // 50: protos.External.GetAll:output_type -> protos.GetAllResponse
+	1,  // 51: protos.External.GetAllStream:output_type -> protos.GetAllResponse
+	3,  // 52: protos.External.GetPipelines:output_type -> protos.GetPipelinesResponse
+	5,  // 53: protos.External.GetPipeline:output_type -> protos.GetPipelineResponse
+	7,  // 54: protos.External.CreatePipeline:output_type -> protos.CreatePipelineResponse
+	47, // 55: protos.External.UpdatePipeline:output_type -> protos.StandardResponse
+	47, // 56: protos.External.DeletePipeline:output_type -> protos.StandardResponse
+	47, // 57: protos.External.AttachPipeline:output_type -> protos.StandardResponse
+	47, // 58: protos.External.DetachPipeline:output_type -> protos.StandardResponse
+	47, // 59: protos.External.PausePipeline:output_type -> protos.StandardResponse
+	47, // 60: protos.External.ResumePipeline:output_type -> protos.StandardResponse
+	47, // 61: protos.External.CreateNotification:output_type -> protos.StandardResponse
+	47, // 62: protos.External.UpdateNotification:output_type -> protos.StandardResponse
+	47, // 63: protos.External.DeleteNotification:output_type -> protos.StandardResponse
+	18, // 64: protos.External.GetNotifications:output_type -> protos.GetNotificationsResponse
+	20, // 65: protos.External.GetNotification:output_type -> protos.GetNotificationResponse
+	47, // 66: protos.External.AttachNotification:output_type -> protos.StandardResponse
+	47, // 67: protos.External.DetachNotification:output_type -> protos.StandardResponse
+	47, // 68: protos.External.DeleteAudience:output_type -> protos.StandardResponse
+	47, // 69: protos.External.DeleteService:output_type -> protos.StandardResponse
+	26, // 70: protos.External.GetMetrics:output_type -> protos.GetMetricsResponse
+	48, // 71: protos.External.Tail:output_type -> protos.TailResponse
+	28, // 72: protos.External.GetAudienceRates:output_type -> protos.GetAudienceRatesResponse
+	30, // 73: protos.External.GetSchema:output_type -> protos.GetSchemaResponse
+	32, // 74: protos.External.Test:output_type -> protos.TestResponse
+	50, // [50:75] is the sub-list for method output_type
+	25, // [25:50] is the sub-list for method input_type
 	25, // [25:25] is the sub-list for extension type_name
 	25, // [25:25] is the sub-list for extension extendee
 	0,  // [0:25] is the sub-list for field type_name
@@ -2354,7 +2422,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetMetricsRequest); i {
+			switch v := v.(*DeleteServiceRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2366,7 +2434,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetMetricsResponse); i {
+			switch v := v.(*GetMetricsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2378,7 +2446,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAudienceRatesRequest); i {
+			switch v := v.(*GetMetricsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2390,7 +2458,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAudienceRatesResponse); i {
+			switch v := v.(*GetAudienceRatesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2402,7 +2470,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSchemaRequest); i {
+			switch v := v.(*GetAudienceRatesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2414,7 +2482,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSchemaResponse); i {
+			switch v := v.(*GetSchemaRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2426,7 +2494,7 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TestRequest); i {
+			switch v := v.(*GetSchemaResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2438,6 +2506,18 @@ func file_sp_external_proto_init() {
 			}
 		}
 		file_sp_external_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TestRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sp_external_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TestResponse); i {
 			case 0:
 				return &v.state
@@ -2451,13 +2531,14 @@ func file_sp_external_proto_init() {
 		}
 	}
 	file_sp_external_proto_msgTypes[23].OneofWrappers = []interface{}{}
+	file_sp_external_proto_msgTypes[24].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sp_external_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   37,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

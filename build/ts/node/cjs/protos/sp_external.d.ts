@@ -305,6 +305,19 @@ export interface DeleteAudienceRequest {
     force?: boolean;
 }
 /**
+ * @generated from protobuf message protos.DeleteServiceRequest
+ */
+export interface DeleteServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+    /**
+     * @generated from protobuf field: optional bool force = 2;
+     */
+    force?: boolean;
+}
+/**
  * Nothing needed here, we return all metrics currently
  *
  * @generated from protobuf message protos.GetMetricsRequest
@@ -619,6 +632,16 @@ declare class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceReque
  * @generated MessageType for protobuf message protos.DeleteAudienceRequest
  */
 export declare const DeleteAudienceRequest: DeleteAudienceRequest$Type;
+declare class DeleteServiceRequest$Type extends MessageType<DeleteServiceRequest> {
+    constructor();
+    create(value?: PartialMessage<DeleteServiceRequest>): DeleteServiceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteServiceRequest): DeleteServiceRequest;
+    internalBinaryWrite(message: DeleteServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteServiceRequest
+ */
+export declare const DeleteServiceRequest: DeleteServiceRequest$Type;
 declare class GetMetricsRequest$Type extends MessageType<GetMetricsRequest> {
     constructor();
     create(value?: PartialMessage<GetMetricsRequest>): GetMetricsRequest;

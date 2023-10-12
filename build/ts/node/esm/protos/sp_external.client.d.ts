@@ -10,6 +10,7 @@ import type { TailResponse } from "./sp_common.js";
 import type { TailRequest } from "./sp_common.js";
 import type { GetMetricsResponse } from "./sp_external.js";
 import type { GetMetricsRequest } from "./sp_external.js";
+import type { DeleteServiceRequest } from "./sp_external.js";
 import type { DeleteAudienceRequest } from "./sp_external.js";
 import type { DetachNotificationRequest } from "./sp_external.js";
 import type { AttachNotificationRequest } from "./sp_external.js";
@@ -151,11 +152,17 @@ export interface IExternalClient {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Delete an un-attached audience
+     * Delete an audience
      *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse>;
+    /**
+     * Delete a service and all associated audiences
+     *
+     * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
+     */
+    deleteService(input: DeleteServiceRequest, options?: RpcOptions): UnaryCall<DeleteServiceRequest, StandardResponse>;
     /**
      * Returns all metric counters
      *
@@ -301,11 +308,17 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Delete an un-attached audience
+     * Delete an audience
      *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse>;
+    /**
+     * Delete a service and all associated audiences
+     *
+     * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
+     */
+    deleteService(input: DeleteServiceRequest, options?: RpcOptions): UnaryCall<DeleteServiceRequest, StandardResponse>;
     /**
      * Returns all metric counters
      *

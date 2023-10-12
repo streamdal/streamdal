@@ -38,6 +38,7 @@ const (
 	External_AttachNotification_FullMethodName = "/protos.External/AttachNotification"
 	External_DetachNotification_FullMethodName = "/protos.External/DetachNotification"
 	External_DeleteAudience_FullMethodName     = "/protos.External/DeleteAudience"
+	External_DeleteService_FullMethodName      = "/protos.External/DeleteService"
 	External_GetMetrics_FullMethodName         = "/protos.External/GetMetrics"
 	External_Tail_FullMethodName               = "/protos.External/Tail"
 	External_GetAudienceRates_FullMethodName   = "/protos.External/GetAudienceRates"
@@ -85,8 +86,10 @@ type ExternalClient interface {
 	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Detach a notification config from a pipeline
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
-	// Delete an un-attached audience
+	// Delete an audience
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Delete a service and all associated audiences
+	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
@@ -298,6 +301,15 @@ func (c *externalClient) DeleteAudience(ctx context.Context, in *DeleteAudienceR
 	return out, nil
 }
 
+func (c *externalClient) DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_DeleteService_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[1], External_GetMetrics_FullMethodName, opts...)
 	if err != nil {
@@ -452,8 +464,10 @@ type ExternalServer interface {
 	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
 	// Detach a notification config from a pipeline
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
-	// Delete an un-attached audience
+	// Delete an audience
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
+	// Delete a service and all associated audiences
+	DeleteService(context.Context, *DeleteServiceRequest) (*StandardResponse, error)
 	// Returns all metric counters
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
 	Tail(*TailRequest, External_TailServer) error
@@ -524,6 +538,9 @@ func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNo
 }
 func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAudience not implemented")
+}
+func (UnimplementedExternalServer) DeleteService(context.Context, *DeleteServiceRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
 }
 func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetMetrics not implemented")
@@ -898,6 +915,24 @@ func _External_DeleteAudience_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_DeleteService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DeleteService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_DeleteService_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DeleteService(ctx, req.(*DeleteServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_GetMetrics_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GetMetricsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -1075,6 +1110,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAudience",
 			Handler:    _External_DeleteAudience_Handler,
+		},
+		{
+			MethodName: "DeleteService",
+			Handler:    _External_DeleteService_Handler,
 		},
 		{
 			MethodName: "GetSchema",
