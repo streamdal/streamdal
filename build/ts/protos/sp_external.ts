@@ -315,6 +315,19 @@ export interface DeleteAudienceRequest {
     force?: boolean;
 }
 /**
+ * @generated from protobuf message protos.DeleteServiceRequest
+ */
+export interface DeleteServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+    /**
+     * @generated from protobuf field: optional bool force = 2;
+     */
+    force?: boolean;
+}
+/**
  * Nothing needed here, we return all metrics currently
  *
  * @generated from protobuf message protos.GetMetricsRequest
@@ -1599,6 +1612,60 @@ class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
  */
 export const DeleteAudienceRequest = new DeleteAudienceRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class DeleteServiceRequest$Type extends MessageType<DeleteServiceRequest> {
+    constructor() {
+        super("protos.DeleteServiceRequest", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "force", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value?: PartialMessage<DeleteServiceRequest>): DeleteServiceRequest {
+        const message = { serviceName: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<DeleteServiceRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteServiceRequest): DeleteServiceRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string service_name */ 1:
+                    message.serviceName = reader.string();
+                    break;
+                case /* optional bool force */ 2:
+                    message.force = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeleteServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string service_name = 1; */
+        if (message.serviceName !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serviceName);
+        /* optional bool force = 2; */
+        if (message.force !== undefined)
+            writer.tag(2, WireType.Varint).bool(message.force);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteServiceRequest
+ */
+export const DeleteServiceRequest = new DeleteServiceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class GetMetricsRequest$Type extends MessageType<GetMetricsRequest> {
     constructor() {
         super("protos.GetMetricsRequest", []);
@@ -1995,6 +2062,7 @@ export const External = new ServiceType("protos.External", [
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
+    { name: "DeleteService", options: {}, I: DeleteServiceRequest, O: StandardResponse },
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },

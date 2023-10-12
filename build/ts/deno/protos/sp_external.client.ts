@@ -14,6 +14,7 @@ import type { TailResponse } from "./sp_common.ts";
 import type { TailRequest } from "./sp_common.ts";
 import type { GetMetricsResponse } from "./sp_external.ts";
 import type { GetMetricsRequest } from "./sp_external.ts";
+import type { DeleteServiceRequest } from "./sp_external.ts";
 import type { DeleteAudienceRequest } from "./sp_external.ts";
 import type { DetachNotificationRequest } from "./sp_external.ts";
 import type { AttachNotificationRequest } from "./sp_external.ts";
@@ -156,11 +157,17 @@ export interface IExternalClient {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Delete an un-attached audience
+     * Delete an audience
      *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse>;
+    /**
+     * Delete a service and all associated audiences
+     *
+     * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
+     */
+    deleteService(input: DeleteServiceRequest, options?: RpcOptions): UnaryCall<DeleteServiceRequest, StandardResponse>;
     /**
      * Returns all metric counters
      *
@@ -358,7 +365,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DetachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * Delete an un-attached audience
+     * Delete an audience
      *
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
@@ -367,33 +374,42 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DeleteAudienceRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Delete a service and all associated audiences
+     *
+     * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
+     */
+    deleteService(input: DeleteServiceRequest, options?: RpcOptions): UnaryCall<DeleteServiceRequest, StandardResponse> {
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        return stackIntercept<DeleteServiceRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Returns all metric counters
      *
      * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse> {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetMetricsRequest, GetMetricsResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse> {
-        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        const method = this.methods[21], opt = this._transport.mergeOptions(options);
         return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse> {
-        const method = this.methods[21], opt = this._transport.mergeOptions(options);
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAudienceRatesRequest, GetAudienceRatesResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse> {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetSchemaRequest, GetSchemaResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -402,7 +418,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }
