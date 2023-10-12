@@ -16,23 +16,27 @@ export type EnhancedStep = PipelineStep & {
 };
 
 export const initPipelines = async (configs: Configs) => {
-  const { response }: { response: GetAttachCommandsByServiceResponse } =
-    await configs.grpcClient.getAttachCommandsByService(
-      {
-        serviceName: configs.serviceName.toLowerCase(),
-      },
-      { meta: { "auth-token": configs.streamdalToken } }
-    );
+  try {
+    console.debug("initializing pipelines");
+    const { response }: { response: GetAttachCommandsByServiceResponse } =
+      await configs.grpcClient.getAttachCommandsByService(
+        {
+          serviceName: configs.serviceName.toLowerCase(),
+        },
+        { meta: { "auth-token": configs.streamdalToken } }
+      );
 
-  for (const [k, v] of Object.entries(response.wasmModules)) {
-    internal.wasmModules.set(k, v);
-  }
+    for (const [k, v] of Object.entries(response.wasmModules)) {
+      internal.wasmModules.set(k, v);
+    }
 
-  for (const command of response.active) {
-    processResponse(command);
+    for (const command of response.active) {
+      processResponse(command);
+    }
+    internal.pipelineInitialized = true;
+  } catch (e) {
+    console.error("Error initializing pipelines", e);
   }
-  internal.pipelineInitialized = true;
-  return;
 };
 
 export const processResponse = (response: Command) => {

@@ -384,6 +384,12 @@ export const exampleMultipleComponentsPerService = async () => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
+export const exampleSimple = async () => {
+  const streamdalA = new Streamdal(serviceAConfig);
+  void logTest(streamdalA, audienceAConsumer, exampleData);
+};
+
 export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
   // eslint-disable-next-line @typescript-eslint/require-await
   async () => {
@@ -448,4 +454,4 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
     }, 2000);
   };
 
-void throughputFriendly();
+void tailFriendly();

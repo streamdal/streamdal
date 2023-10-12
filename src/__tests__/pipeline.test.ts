@@ -14,6 +14,7 @@ import { initPipelines, processResponse } from "../internal/pipeline.js";
 import { audienceKey, internal } from "../internal/register.js";
 
 const testConfigs = {
+  registered: true,
   grpcClient: {
     getAttachCommandsByService: () => ({
       active: [],

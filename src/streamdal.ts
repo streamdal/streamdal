@@ -1,5 +1,3 @@
-import { ChannelCredentials } from "@grpc/grpc-js";
-import { GrpcTransport } from "@protobuf-ts/grpc-transport";
 import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   Audience,
@@ -7,20 +5,18 @@ import {
   StandardResponse,
   TailResponse,
 } from "@streamdal/protos/protos/sp_common";
-import {
-  IInternalClient,
-  InternalClient,
-} from "@streamdal/protos/protos/sp_internal.client";
+import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudience, addAudiences } from "./internal/audience.js";
+import { client } from "./internal/grpc.js";
 import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { initPipelines } from "./internal/pipeline.js";
 import {
   processPipeline as internalProcessPipeline,
   StepStatus,
 } from "./internal/process.js";
-import { internal, register } from "./internal/register.js";
+import { internal, retryRegister } from "./internal/register.js";
 
 export { Audience, OperationType };
 
@@ -61,7 +57,7 @@ export interface StreamdalResponse {
 
 export class Streamdal {
   private configs: Configs;
-  private readonly transport: GrpcTransport;
+  private register: Promise<boolean | undefined>;
 
   constructor({
     streamdalUrl,
@@ -85,13 +81,8 @@ export class Streamdal {
         either as constructor arguments to Streamdal() or as environment variables in the form of STREAMDAL_URL, STREAMDAL_TOKEN and STREAMDAL_SERVICE_NAME`);
     }
 
-    this.transport = new GrpcTransport({
-      host: url,
-      channelCredentials: ChannelCredentials.createInsecure(),
-    });
-
-    const grpcClient = new InternalClient(this.transport);
     const sessionId = uuidv4();
+    const grpcClient = client(url);
 
     this.configs = {
       grpcClient,
@@ -119,13 +110,33 @@ export class Streamdal {
     }, METRIC_INTERVAL);
 
     void addAudiences(this.configs);
-    void register(this.configs);
+    //
+    // Since we can't async await in a constructor we assign the promise
+    // here so we can check it and wait for it on the initial pipeline request
+    this.register = retryRegister(this.configs);
   }
 
   async processPipeline({
     audience,
     data,
   }: StreamdalRequest): Promise<StreamdalResponse> {
+    if (!internal.registered) {
+      //
+      // Initial server registration may not have completed yet
+      const register = await this.register;
+      if (!register) {
+        console.error(
+          "Node SDK not yet registered with the server, skipping pipeline"
+        );
+        return Promise.resolve({
+          data,
+          error: true,
+          message:
+            "Node SDK not registered with the server, is the server running?",
+        });
+      }
+    }
+
     if (!internal.pipelineInitialized) {
       await initPipelines(this.configs);
     }

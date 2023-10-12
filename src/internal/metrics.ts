@@ -7,6 +7,7 @@ import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import ReadWriteLock from "rwlock";
 
 import { StepStatus } from "./process.js";
+import { internal } from "./register.js";
 
 export const METRIC_INTERVAL = 1000;
 

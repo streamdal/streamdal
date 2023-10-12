@@ -6,6 +6,9 @@ import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 // import { version } from "../../package.json";
 import { InternalPipeline, processResponse } from "./pipeline.js";
 
+const MAX_REGISTER_RETRIES = 20;
+const RETRY_INTERVAL = 5000;
+
 export interface RegisterConfigs {
   grpcClient: IInternalClient;
   sessionId: string;
@@ -24,6 +27,7 @@ export interface TailStatus {
 // fyi, the init flag is because we can't await pipeline initialization
 // in our constructor so we do it on processPipeline only if needed
 export const internal = {
+  registered: false,
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
   audiences: new Map<string, Map<string, TailStatus>>(),
@@ -32,6 +36,30 @@ export const internal = {
 
 export const audienceKey = (audience: Audience) =>
   JSON.stringify(audience).toLowerCase();
+
+//
+// Wait for the initial registration attempt, but not any thereafter so we don't
+// block too long
+export const retryRegister = async (configs: RegisterConfigs) => {
+  const registered = await register(configs);
+  if (registered) {
+    return Promise.resolve(true);
+  }
+  let retries = 1;
+  const intervalId = setInterval(() => {
+    if (retries > MAX_REGISTER_RETRIES || internal.registered) {
+      clearInterval(intervalId);
+    } else {
+      retries++;
+      console.debug(
+        `retrying registration, ${retries} of ${MAX_REGISTER_RETRIES} times`
+      );
+      void register(configs);
+    }
+  }, RETRY_INTERVAL);
+
+  return Promise.resolve(false);
+};
 
 export const register = async ({
   grpcClient,
@@ -42,7 +70,7 @@ export const register = async ({
   audiences,
 }: RegisterConfigs) => {
   try {
-    console.info(`### registering with grpc server...`);
+    console.info(`### attempting to register with grpc server...`);
 
     const call = grpcClient.register(
       {
@@ -64,17 +92,25 @@ export const register = async ({
       }
     );
 
+    await call.headers;
     console.info(`### registered with grpc server`);
-    for await (const response of call.responses) {
-      response.command.oneofKind !== "keepAlive" &&
-        console.debug("processing response command...", response);
-      processResponse(response);
-    }
-
     //
-    // TODO: check status for errors
-    // const { status, trailers } = await call;
+    // considering response headers without errors as registered
+    internal.registered = true;
+    //
+    // await responses asynchronously so we can let upstream know we've registered
+    void responseHandler(call);
+    return Promise.resolve(true);
   } catch (error) {
-    console.error("Error registering with grpc server", error);
+    console.error("error registering with grpc server", error);
+    return Promise.resolve(false);
+  }
+};
+
+const responseHandler = async (call: any) => {
+  for await (const response of call.responses) {
+    response.command.oneofKind !== "keepAlive" &&
+      console.debug("processing response command...", response);
+    processResponse(response);
   }
 };

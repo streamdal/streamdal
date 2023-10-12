@@ -143,6 +143,13 @@ export const processPipeline = async ({
   };
 
   for (const step of allSteps) {
+    if (configs.dryRun) {
+      console.debug(
+        `Dry run set. Found pipeline step ${step.pipelineName} - ${step.name}...not running.`
+      );
+      continue;
+    }
+
     console.debug(
       `running pipeline step ${step.pipelineName} - ${step.name}...`
     );
