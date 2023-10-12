@@ -69,8 +69,8 @@ ol {
   list-style: auto;
   margin-left: 1rem;
 }
-
-ul:not(details > ul, .nav-groups) {
+// .accordion_wrapper is an external astro component
+ul:not(details > ul, .nav-groups, .accordion__wrapper) {
   list-style: disc;
   margin-left: 1rem;
 }
@@ -235,16 +235,15 @@ strong {
 
 code {
   --border-radius: 3px;
-  --padding-block: 0.2rem;
-  --padding-inline: 0.33rem;
-
   margin-top: 2px;
   font-family: var(--font-mono);
   font-size: 0.85em;
-  // color: var(--color-purple-bright);
-  background-color: var(--theme-code-inline-bg);
+  background-color: var(--color-purple-code);
+  color: var(--color-orange-code);
   border-radius: var(--border-radius);
   word-break: break-word;
+  padding-left: 0.125em;
+  padding-right: 0.125em;
 }
 
 pre.astro-code > code {

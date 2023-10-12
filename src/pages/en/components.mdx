@@ -12,15 +12,16 @@ import warning from "@images/icons/warning.png";
 import tip from "@images/icons/tip.png";
 
 import { Notification } from "accessible-astro-components";
+import Accordion from "@components/Accordion/Accordion.astro";
 import "../../styles/index.scss";
 
-# Headings
+## Headings
 
 <div>
   ``` # Big heading ## Medium heading ### Small heading #### Smaller heading ```
 </div>
 
-# Lists
+## Lists
 
 Numbered:
 
@@ -36,7 +37,7 @@ Numbered:
 1. Three
 ```
 
-# Code blocks
+## Code blocks
 
 Inline `code blurb` with backticks.
 
@@ -51,11 +52,12 @@ $ some-multi-line-cmd --with-arg foo \
     --another-arg bar
 ```
 
-# Callouts
+## Callouts
 
-Requires you to specify to add the following statements at the top of the mdx file:
+Requires you to specify to add the following statements at the top of the mdx 
+file:
 
-```
+```javascript
 import { Notification } from 'accessible-astro-components';
 ```
 
@@ -94,13 +96,48 @@ import { Notification } from 'accessible-astro-components';
   </div>
 </Notification>
 
-# Horizontal line
+## Accordions
+
+Requires you to specify to add the following statements at the top of the mdx 
+file:
+
+```javascript
+import Accordion from "@components/Accordion/Accordion.astro";
+```
+<Accordion 
+title="This is your header title">
+<p>This is your accordion content</p>
+</Accordion>
+<Accordion 
+title="This is your subsequent header. It can be quite as long as you need it 
+to be, or as short as you want it to be. Utilize <br /> for line breaks inside 
+of <Accordion>.">
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+culpa qui officia deserunt mollit anim id est laborum.
+</p> 
+<br />
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+culpa qui officia deserunt mollit anim id est laborum.
+</p>
+</Accordion>
+
+## Horizontal line
 
 ```
 ---
 ```
 
-# Tabs
+## Tabs
 
 <div class="pc-tabx w-full max-w-2xl m-0">
   <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
@@ -134,7 +171,5 @@ import { Notification } from 'accessible-astro-components';
     <p>Tab 3 contents</p>
   </div>
 </div>
-
-# Media
 
 
