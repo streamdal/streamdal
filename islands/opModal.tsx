@@ -150,7 +150,7 @@ export default function OpModal(
             <div class="bg-white min-h-screen">
               {opModal.value == null
                 ? (
-                  <div class="w-full h-4/5 flex flex-col justify-center items-center">
+                  <div class="w-full h-screen flex flex-col justify-center items-center">
                     <EmptyStateBird class="mb-2" />
                     <h2 class="text-[#8E84AD]">No Items Selected</h2>
                   </div>

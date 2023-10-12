@@ -6,7 +6,7 @@ import { opModal } from "../serviceMap/opModalSignal.ts";
 import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 
 export const OddAttachModal = (
-  { serviceMap, setAttachSelectOpen, attachSelectOpen }: {
+  { serviceMap, setAttachSelectionOpen, attachSelectionOpen }: {
     serviceMap: ServiceMap;
     setAttachSelectOpen: () => void;
     attachSelectOpen: boolean;
@@ -50,7 +50,7 @@ export const OddAttachModal = (
         ...opModal.value,
         attachedPipeline: newPipeline,
       };
-      setAttachSelectOpen(!attachSelectOpen);
+      setAttachSelectionOpen(!attachSelectionOpen);
       opUpdateSignal.value = {
         audience,
         attachedPipeline: newPipeline,
