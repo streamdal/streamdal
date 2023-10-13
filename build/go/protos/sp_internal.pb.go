@@ -85,7 +85,8 @@ type HeartbeatRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Session ID for this instance of the SDK.
-	SessionId string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId string      `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Audiences []*Audience `protobuf:"bytes,2,rep,name=audiences,proto3" json:"audiences,omitempty"`
 }
 
 func (x *HeartbeatRequest) Reset() {
@@ -125,6 +126,13 @@ func (x *HeartbeatRequest) GetSessionId() string {
 		return x.SessionId
 	}
 	return ""
+}
+
+func (x *HeartbeatRequest) GetAudiences() []*Audience {
+	if x != nil {
+		return x.Audiences
+	}
+	return nil
 }
 
 type NotifyRequest struct {
@@ -643,10 +651,13 @@ var file_sp_internal_proto_rawDesc = []byte{
 	0x49, 0x64, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75,
 	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65,
-	0x22, 0x31, 0x0a, 0x10, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x52, 0x65, 0x71,
+	0x22, 0x61, 0x0a, 0x10, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f,
 	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f,
-	0x6e, 0x49, 0x64, 0x22, 0xb1, 0x01, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65,
+	0x6e, 0x49, 0x64, 0x12, 0x2e, 0x0a, 0x09, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x73,
+	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e,
+	0x41, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x09, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e,
+	0x63, 0x65, 0x73, 0x22, 0xb1, 0x01, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
 	0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65,
 	0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x74, 0x65, 0x70, 0x5f, 0x6e,
@@ -792,37 +803,38 @@ var file_sp_internal_proto_goTypes = []interface{}{
 }
 var file_sp_internal_proto_depIdxs = []int32{
 	11, // 0: protos.NewAudienceRequest.audience:type_name -> protos.Audience
-	11, // 1: protos.NotifyRequest.audience:type_name -> protos.Audience
-	12, // 2: protos.MetricsRequest.metrics:type_name -> protos.Metric
-	13, // 3: protos.RegisterRequest.client_info:type_name -> protos.ClientInfo
-	11, // 4: protos.RegisterRequest.audiences:type_name -> protos.Audience
-	14, // 5: protos.GetAttachCommandsByServiceResponse.active:type_name -> protos.Command
-	14, // 6: protos.GetAttachCommandsByServiceResponse.paused:type_name -> protos.Command
-	10, // 7: protos.GetAttachCommandsByServiceResponse.wasm_modules:type_name -> protos.GetAttachCommandsByServiceResponse.WasmModulesEntry
-	11, // 8: protos.SendSchemaRequest.audience:type_name -> protos.Audience
-	15, // 9: protos.SendSchemaRequest.schema:type_name -> protos.Schema
-	8,  // 10: protos.GetAttachCommandsByServiceResponse.WasmModulesEntry.value:type_name -> protos.WasmModule
-	4,  // 11: protos.Internal.Register:input_type -> protos.RegisterRequest
-	0,  // 12: protos.Internal.NewAudience:input_type -> protos.NewAudienceRequest
-	1,  // 13: protos.Internal.Heartbeat:input_type -> protos.HeartbeatRequest
-	2,  // 14: protos.Internal.Notify:input_type -> protos.NotifyRequest
-	3,  // 15: protos.Internal.Metrics:input_type -> protos.MetricsRequest
-	6,  // 16: protos.Internal.GetAttachCommandsByService:input_type -> protos.GetAttachCommandsByServiceRequest
-	16, // 17: protos.Internal.SendTail:input_type -> protos.TailResponse
-	9,  // 18: protos.Internal.SendSchema:input_type -> protos.SendSchemaRequest
-	14, // 19: protos.Internal.Register:output_type -> protos.Command
-	17, // 20: protos.Internal.NewAudience:output_type -> protos.StandardResponse
-	17, // 21: protos.Internal.Heartbeat:output_type -> protos.StandardResponse
-	17, // 22: protos.Internal.Notify:output_type -> protos.StandardResponse
-	17, // 23: protos.Internal.Metrics:output_type -> protos.StandardResponse
-	7,  // 24: protos.Internal.GetAttachCommandsByService:output_type -> protos.GetAttachCommandsByServiceResponse
-	17, // 25: protos.Internal.SendTail:output_type -> protos.StandardResponse
-	17, // 26: protos.Internal.SendSchema:output_type -> protos.StandardResponse
-	19, // [19:27] is the sub-list for method output_type
-	11, // [11:19] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 1: protos.HeartbeatRequest.audiences:type_name -> protos.Audience
+	11, // 2: protos.NotifyRequest.audience:type_name -> protos.Audience
+	12, // 3: protos.MetricsRequest.metrics:type_name -> protos.Metric
+	13, // 4: protos.RegisterRequest.client_info:type_name -> protos.ClientInfo
+	11, // 5: protos.RegisterRequest.audiences:type_name -> protos.Audience
+	14, // 6: protos.GetAttachCommandsByServiceResponse.active:type_name -> protos.Command
+	14, // 7: protos.GetAttachCommandsByServiceResponse.paused:type_name -> protos.Command
+	10, // 8: protos.GetAttachCommandsByServiceResponse.wasm_modules:type_name -> protos.GetAttachCommandsByServiceResponse.WasmModulesEntry
+	11, // 9: protos.SendSchemaRequest.audience:type_name -> protos.Audience
+	15, // 10: protos.SendSchemaRequest.schema:type_name -> protos.Schema
+	8,  // 11: protos.GetAttachCommandsByServiceResponse.WasmModulesEntry.value:type_name -> protos.WasmModule
+	4,  // 12: protos.Internal.Register:input_type -> protos.RegisterRequest
+	0,  // 13: protos.Internal.NewAudience:input_type -> protos.NewAudienceRequest
+	1,  // 14: protos.Internal.Heartbeat:input_type -> protos.HeartbeatRequest
+	2,  // 15: protos.Internal.Notify:input_type -> protos.NotifyRequest
+	3,  // 16: protos.Internal.Metrics:input_type -> protos.MetricsRequest
+	6,  // 17: protos.Internal.GetAttachCommandsByService:input_type -> protos.GetAttachCommandsByServiceRequest
+	16, // 18: protos.Internal.SendTail:input_type -> protos.TailResponse
+	9,  // 19: protos.Internal.SendSchema:input_type -> protos.SendSchemaRequest
+	14, // 20: protos.Internal.Register:output_type -> protos.Command
+	17, // 21: protos.Internal.NewAudience:output_type -> protos.StandardResponse
+	17, // 22: protos.Internal.Heartbeat:output_type -> protos.StandardResponse
+	17, // 23: protos.Internal.Notify:output_type -> protos.StandardResponse
+	17, // 24: protos.Internal.Metrics:output_type -> protos.StandardResponse
+	7,  // 25: protos.Internal.GetAttachCommandsByService:output_type -> protos.GetAttachCommandsByServiceResponse
+	17, // 26: protos.Internal.SendTail:output_type -> protos.StandardResponse
+	17, // 27: protos.Internal.SendSchema:output_type -> protos.StandardResponse
+	20, // [20:28] is the sub-list for method output_type
+	12, // [12:20] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_sp_internal_proto_init() }

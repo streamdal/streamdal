@@ -49,6 +49,10 @@ export interface HeartbeatRequest {
      * @generated from protobuf field: string session_id = 1;
      */
     sessionId: string;
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     */
+    audiences: Audience[];
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
@@ -269,11 +273,12 @@ export const NewAudienceRequest = new NewAudienceRequest$Type();
 class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor() {
         super("protos.HeartbeatRequest", [
-            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
         ]);
     }
     create(value?: PartialMessage<HeartbeatRequest>): HeartbeatRequest {
-        const message = { sessionId: "" };
+        const message = { sessionId: "", audiences: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<HeartbeatRequest>(this, message, value);
@@ -286,6 +291,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
             switch (fieldNo) {
                 case /* string session_id */ 1:
                     message.sessionId = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 2:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -302,6 +310,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
         /* string session_id = 1; */
         if (message.sessionId !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.sessionId);
+        /* repeated protos.Audience audiences = 2; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

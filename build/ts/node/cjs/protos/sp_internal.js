@@ -75,11 +75,12 @@ exports.NewAudienceRequest = new NewAudienceRequest$Type();
 class HeartbeatRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.HeartbeatRequest", [
-            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience }
         ]);
     }
     create(value) {
-        const message = { sessionId: "" };
+        const message = { sessionId: "", audiences: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -92,6 +93,9 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* string session_id */ 1:
                     message.sessionId = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 2:
+                    message.audiences.push(sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -108,6 +112,9 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
         /* string session_id = 1; */
         if (message.sessionId !== "")
             writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.sessionId);
+        /* repeated protos.Audience audiences = 2; */
+        for (let i = 0; i < message.audiences.length; i++)
+            sp_common_5.Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
