@@ -7,8 +7,8 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common";
 import { Command } from "./sp_command";
-import { ClientInfo } from "./sp_info";
 import { Metric } from "./sp_common";
+import { ClientInfo } from "./sp_info";
 import { Audience } from "./sp_common";
 /**
  * @generated from protobuf message protos.NewAudienceRequest
@@ -44,6 +44,10 @@ export interface HeartbeatRequest {
      * @generated from protobuf field: repeated protos.Audience audiences = 2;
      */
     audiences: Audience[];
+    /**
+     * @generated from protobuf field: protos.ClientInfo client_info = 3;
+     */
+    clientInfo?: ClientInfo;
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
