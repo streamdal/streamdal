@@ -242,7 +242,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 			SessionId: req.SessionId,
 			Audience:  aud,
 		}); err != nil {
-			return errors.Wrap(err, "error adding audience")
+			s.log.Error(errors.Wrapf(err, "error adding audience for session '%s'", req.SessionId))
 		}
 	}
 
