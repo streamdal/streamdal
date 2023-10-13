@@ -26,7 +26,7 @@ const testConfigs = {
     StandardResponse
   >,
   sessionId: uuidv4(),
-  streamdalUrl: "localhost:9091",
+  streamdalUrl: "localhost:9090",
   streamdalToken: "1234",
   serviceName: "test-service",
   pipelineTimeout: "100",

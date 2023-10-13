@@ -13,7 +13,7 @@ copying `example.env` -> `.env` and setting values there. For constructor args, 
 
 ```typescript
 const config: StreamdalConfigs = {
-  streamdalUrl: "localhost:9091",
+  streamdalUrl: "localhost:9090",
   streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",
