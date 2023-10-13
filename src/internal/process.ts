@@ -1,7 +1,5 @@
-import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   Audience,
-  StandardResponse,
   TailResponse,
   TailResponseType,
 } from "@streamdal/protos/protos/sp_common";
@@ -34,7 +32,6 @@ export interface PipelinesStatus {
 
 export interface PipelineConfigs {
   grpcClient: IInternalClient;
-  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   streamdalToken: string;
   sessionId: string;
   dryRun: boolean;
@@ -67,6 +64,10 @@ export const sendTail = ({
   originalData,
   newData,
 }: TailRequest) => {
+  const tailCall = configs.grpcClient.sendTail({
+    meta: { "auth-token": configs.streamdalToken },
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   tails?.forEach(async (tailStatus, tailRequestId) => {
     try {
@@ -81,18 +82,18 @@ export const sendTail = ({
           newData,
         });
         console.debug("sending tail response", tailResponse);
-        await configs.tailCall.requests.send(tailResponse);
+        await tailCall.requests.send(tailResponse);
 
-        const headers = await configs.tailCall.headers;
+        const headers = await tailCall.headers;
         console.debug("got tail response headers: ", headers);
 
-        const response = await configs.tailCall.response;
+        const response = await tailCall.response;
         console.debug("got tail response message: ", response);
 
-        const status = await configs.tailCall.status;
+        const status = await tailCall.status;
         console.debug("got tail status: ", status);
 
-        const trailers = await configs.tailCall.trailers;
+        const trailers = await tailCall.trailers;
         console.debug("got tail trailers: ", trailers);
       }
     } catch (e) {

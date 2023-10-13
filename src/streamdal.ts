@@ -1,10 +1,4 @@
-import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
-import {
-  Audience,
-  OperationType,
-  StandardResponse,
-  TailResponse,
-} from "@streamdal/protos/protos/sp_common";
+import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { v4 as uuidv4 } from "uuid";
 
@@ -32,7 +26,6 @@ export interface StreamdalConfigs {
 
 export interface Configs {
   grpcClient: IInternalClient;
-  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   streamdalUrl: string;
   streamdalToken: string;
   serviceName: string;
@@ -86,9 +79,6 @@ export class Streamdal {
 
     this.configs = {
       grpcClient,
-      tailCall: grpcClient.sendTail({
-        meta: { "auth-token": token },
-      }),
       sessionId,
       streamdalUrl: url,
       streamdalToken: token,
@@ -125,14 +115,13 @@ export class Streamdal {
       // Initial server registration may not have completed yet
       const register = await this.register;
       if (!register) {
-        console.error(
-          "Node SDK not yet registered with the server, skipping pipeline"
-        );
+        const message =
+          "Node SDK not yet registered with the server, skipping pipeline. Is the server running?";
+        console.error(message);
         return Promise.resolve({
           data,
           error: true,
-          message:
-            "Node SDK not registered with the server, is the server running?",
+          message,
         });
       }
     }
