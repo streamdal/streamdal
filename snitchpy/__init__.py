@@ -583,8 +583,13 @@ class SnitchClient:
     def _heartbeat(self):
         async def call():
             try:
+                audiences = []
+                for aud in self.audiences.values():
+                    audiences.append(aud)
+
                 req = protos.HeartbeatRequest(
                     session_id=self.session_id,
+                    audiences=audiences,
                 )
 
                 return await self.grpc_stub.heartbeat(
