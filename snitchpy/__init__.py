@@ -130,6 +130,7 @@ class SnitchClient:
     tails: dict
     host: str
     port: int
+    schemas: dict
 
     # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
     # channels for register and tail requests. All other unary operations can use the same
@@ -174,6 +175,7 @@ class SnitchClient:
         self.paused_pipelines = {}
         self.audiences = {}
         self.tails = {}
+        self.schemas = {}
         self.log = log
         self.exit = cfg.exit
         self.metrics = Metrics(
@@ -190,16 +192,6 @@ class SnitchClient:
         events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
         for e in events:
             signal.signal(e, self.shutdown)
-
-        # Add audiences passed on config
-        for aud in self.cfg.audiences:
-            aud = protos.Audience(
-                service_name=cfg.service_name,
-                operation_type=protos.OperationType(aud.operation_type),
-                operation_name=aud.operation_name,
-                component_name=aud.component_name,
-            )
-            self._add_audience(aud)
 
         # Pull initial pipelines
         self._pull_initial_pipelines()
@@ -301,7 +293,7 @@ class SnitchClient:
 
         # We haven't seen it yet, add to local map and send to snitch-server
         self.audiences[self._aud_to_str(aud)] = aud
-        self.grpc_loop.run_until_complete(call())
+        self.grpc_loop.create_task(call())
 
     def _add_audiences(self) -> None:
         """This method is used to re-announce audiences after a disconnect"""
@@ -354,6 +346,18 @@ class SnitchClient:
             )
             return ProcessResponse(data=req.data, error=False, message="")
 
+        # Get rules based on operation and component
+        pipelines = self._get_pipelines(aud)
+
+        if len(pipelines) == 0:
+            self._send_tail(
+                aud,
+                "",
+                req.data,
+                req.data,
+            )
+            return ProcessResponse(data=req.data, error=False, message="")
+
         bytes_counter = metrics.COUNTER_CONSUME_BYTES
         errors_counter = metrics.COUNTER_CONSUME_ERRORS
         total_counter = metrics.COUNTER_CONSUME_PROCESSED
@@ -375,11 +379,12 @@ class SnitchClient:
         # Ensure no side-effects are propagated to outside the library
         data = copy(req.data)
 
-        # Get rules based on operation and component
-        pipelines = self._get_pipelines(aud)
+        # Needed for send_tail()
+        original_data = data
 
-        for _, cmd in pipelines.items():
-            original_data = data  # Needed for send_tail()
+        pipes = pipelines.copy()
+
+        for _, cmd in pipes.items():
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
@@ -405,6 +410,8 @@ class SnitchClient:
 
                 if len(wasm_resp.output_payload) > 0:
                     data = wasm_resp.output_payload
+
+                self._handle_schema(aud, step, wasm_resp)
 
                 # If successful, continue to next step, don't need to check conditions
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
@@ -436,6 +443,12 @@ class SnitchClient:
 
                     # Not continuing, exit function early
                     if should_continue is False and self.cfg.dry_run is False:
+                        self._send_tail(
+                            cmd.audience,
+                            pipeline.id,
+                            original_data,
+                            wasm_resp.output_payload,
+                        )
                         return ProcessResponse(
                             data=data, error=True, message=wasm_resp.exit_msg
                         )
@@ -466,11 +479,17 @@ class SnitchClient:
 
                 # Not continuing, exit function early
                 if should_continue is False and self.cfg.dry_run is False:
+                    self._send_tail(
+                        cmd.audience,
+                        pipeline.id,
+                        original_data,
+                        wasm_resp.output_payload,
+                    )
                     return ProcessResponse(
                         data=data, error=True, message=wasm_resp.exit_msg
                     )
 
-            self._send_tail(cmd.audience, pipeline.id, original_data, data)
+        self._send_tail(aud, "", original_data, data)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
@@ -602,7 +621,23 @@ class SnitchClient:
                 arch=platform.processor(),
                 os=platform.system(),
             ),
+            audiences=[],
         )
+
+        # Add audiences passed on config
+        for aud in self.cfg.audiences:
+            aud = protos.Audience(
+                service_name=self.cfg.service_name,
+                operation_type=protos.OperationType(aud.operation_type),
+                operation_name=aud.operation_name,
+                component_name=aud.component_name,
+            )
+
+            # Add to register request
+            req.audiences.append(aud)
+
+            # Note in local map that we've seen this audience
+            self.audiences[self._aud_to_str(aud)] = aud
 
         async def call():
             self.log.debug("Registering with snitch server")
@@ -1000,7 +1035,7 @@ class SnitchClient:
         original_data: bytes,
         new_data: bytes,
     ):
-        tails = self._get_tails(aud, pipeline_id)
+        tails = self._get_tails(aud)
         if len(tails) == 0:
             return
 
@@ -1018,7 +1053,8 @@ class SnitchClient:
             running_tail.queue.put_nowait(tr)
 
     def _start_tail(self, cmd: protos.Command):
-        # TODO: Validate cmd
+        validation.tail_request(cmd)
+
         req = cmd.tail.request
 
         pipelines = self._get_pipelines(req.audience)
@@ -1034,7 +1070,9 @@ class SnitchClient:
             )
             return
 
-        self.log.debug(f"Tailing pipeline: {req.pipeline_id}")
+        aud_str = self._aud_to_str(req.audience)
+
+        self.log.debug(f"Tailing audience: {aud_str}")
 
         t = Tail(
             request=req,
@@ -1050,7 +1088,7 @@ class SnitchClient:
         self._set_tail(t)
 
     def _set_tail(self, t: Tail):
-        key = self._tail_key(t.request.audience, t.request.pipeline_id)
+        key = self._aud_to_str(t.request.audience)
 
         if key not in self.tails:
             self.tails[key] = {}
@@ -1058,13 +1096,12 @@ class SnitchClient:
         self.tails[key][t.request.id] = t
 
     def _stop_tail(self, cmd: protos.Command):
-        # TODO: validate proto command
+        validation.tail_request(cmd)
 
         aud = cmd.tail.request.audience
-        pipeline_id = cmd.tail.request.pipeline_id
         tail_id = cmd.tail.request.id
 
-        tails = self._get_tails(aud, pipeline_id)
+        tails = self._get_tails(aud)
         if len(tails) == 0:
             self.log.debug(
                 f"received stop tail command for non-existent tail: {tail_id}"
@@ -1081,17 +1118,20 @@ class SnitchClient:
 
         tails[tail_id].exit.set()
 
-        self._remove_tail(aud, pipeline_id, tail_id)
+        self._remove_tail(aud, tail_id)
 
-    def _get_tails(self, aud: protos.Audience, pipeline_id: str) -> dict:
-        key = self._tail_key(aud, pipeline_id)
+    def _get_tails(
+        self,
+        aud: protos.Audience,
+    ) -> dict:
+        key = self._aud_to_str(aud)
         if key in self.tails:
             return self.tails[key]
 
         return {}
 
-    def _remove_tail(self, aud: protos.Audience, pipeline_id: str, tail_id: str):
-        key = self._tail_key(aud, pipeline_id)
+    def _remove_tail(self, aud: protos.Audience, tail_id: str):
+        key = self._aud_to_str(aud)
         if key not in self.tails:
             return
 
@@ -1100,5 +1140,43 @@ class SnitchClient:
 
         del self.tails[key][tail_id]
 
-    def _tail_key(self, aud: protos.Audience, pipeline_id: str) -> str:
-        return f"{self._aud_to_str(aud)}.{pipeline_id}"
+    def _get_schema(self, aud: protos.Audience) -> bytes:
+        schema = self.schemas.get(self._aud_to_str(aud))
+        if schema is None:
+            return b""
+
+        return schema.json_schema
+
+    def _set_schema(self, aud: protos.Audience, schema: bytes) -> None:
+        self.schemas[self._aud_to_str(aud)] = protos.Schema(json_schema=schema)
+
+    def _handle_schema(
+        self, aud: protos.Audience, step: protos.PipelineStep, resp: protos.WasmResponse
+    ) -> None:
+        # Only handle schema steps
+        (step_type, _) = which_one_of(step, "step")
+        if step_type != "infer_schema":
+            return
+
+        # Only successful schema inferences
+        if resp.exit_code != protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+            return
+
+        # If existing schema matches, do nothing
+        existing_schema = self._get_schema(aud)
+        if existing_schema == resp.output_step:
+            return
+
+        # New or updated schema, send to server
+        async def call():
+            req = protos.SendSchemaRequest(
+                audience=aud,
+                schema=protos.Schema(json_schema=resp.output_step),
+            )
+            await self.grpc_stub.send_schema(
+                send_schema_request=req, metadata=self._get_metadata()
+            )
+            self.log.debug(f"Published schema for audience '{self._aud_to_str(aud)}'")
+
+        self._set_schema(aud, resp.output_step)
+        self.grpc_loop.create_task(call())

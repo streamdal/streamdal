@@ -15,9 +15,6 @@ def tail_request(cmd: protos.Command):
     if not isinstance(req.audience, protos.Audience):
         raise ValueError("cmd.tail.request.audience must be a protos.Audience")
 
-    if req.pipeline_id == "":
-        raise ValueError("cmd.tail.request.pipeline_id must be non-empty")
-
     if req.id == "":
         raise ValueError("cmd.tail.request.id must be non-empty")
 
