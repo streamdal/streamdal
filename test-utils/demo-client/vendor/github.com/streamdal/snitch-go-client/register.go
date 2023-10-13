@@ -22,20 +22,24 @@ var (
 	ErrPipelineNotActive = errors.New("pipeline not active or does not exist")
 )
 
+func (s *Snitch) genClientInfo() *protos.ClientInfo {
+	return &protos.ClientInfo{
+		ClientType:     protos.ClientType(s.config.ClientType),
+		LibraryName:    "snitch-go-client",
+		LibraryVersion: "0.0.51",
+		Language:       "go",
+		Arch:           runtime.GOARCH,
+		Os:             runtime.GOOS,
+	}
+}
+
 func (s *Snitch) register(looper director.Looper) error {
 	req := &protos.RegisterRequest{
 		ServiceName: s.config.ServiceName,
 		SessionId:   s.sessionID,
-		ClientInfo: &protos.ClientInfo{
-			ClientType:     protos.ClientType(s.config.ClientType),
-			LibraryName:    "snitch-go-client",
-			LibraryVersion: "0.0.49",
-			Language:       "go",
-			Arch:           runtime.GOARCH,
-			Os:             runtime.GOOS,
-		},
-		Audiences: make([]*protos.Audience, 0),
-		DryRun:    s.config.DryRun,
+		ClientInfo:  s.genClientInfo(),
+		Audiences:   make([]*protos.Audience, 0),
+		DryRun:      s.config.DryRun,
 	}
 
 	s.audiencesMtx.Lock()
