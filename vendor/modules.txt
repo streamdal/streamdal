@@ -240,7 +240,7 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/snitch-protos v0.0.106-0.20231010211049-4e65e47b0eb9
+# github.com/streamdal/snitch-protos v0.0.108
 ## explicit; go 1.20
 github.com/streamdal/snitch-protos/build/go/protos
 github.com/streamdal/snitch-protos/build/go/protos/shared

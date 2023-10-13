@@ -207,6 +207,7 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 		return errors.Wrap(err, "error fetching keys from K/V")
 	}
 
+	// Refresh TTL on all existing keys for the node/sessionID
 	for _, k := range keys {
 		// Key has session_id prefix, refresh it
 		//llog.Debugf("attempting to refresh key '%s'", k)
@@ -228,6 +229,20 @@ func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) 
 			}
 
 			return errors.Wrap(err, "error refreshing key")
+		}
+	}
+
+	// Create live entries for all audiences in the heartbeat request
+	// This is necessary as redis will lose all live keys on disconnect
+	// and any connected client SDKs will not know this, and not re-announce
+	// their audiences, getting us into a limbo state where a gRPC connection
+	// from the SDK to server exists, but the server has no idea about it.
+	for _, aud := range req.Audiences {
+		if err := s.AddAudience(ctx, &protos.NewAudienceRequest{
+			SessionId: req.SessionId,
+			Audience:  aud,
+		}); err != nil {
+			return errors.Wrap(err, "error adding audience")
 		}
 	}
 
