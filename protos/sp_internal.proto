@@ -55,6 +55,8 @@ message NewAudienceRequest {
 message HeartbeatRequest {
   // Session ID for this instance of the SDK.
   string session_id = 1;
+
+  repeated Audience audiences = 2;
 }
 
 message NotifyRequest {

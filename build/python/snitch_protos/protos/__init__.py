@@ -792,6 +792,8 @@ class HeartbeatRequest(betterproto.Message):
     session_id: str = betterproto.string_field(1)
     """Session ID for this instance of the SDK."""
 
+    audiences: List["Audience"] = betterproto.message_field(2)
+
 
 @dataclass(eq=False, repr=False)
 class NotifyRequest(betterproto.Message):

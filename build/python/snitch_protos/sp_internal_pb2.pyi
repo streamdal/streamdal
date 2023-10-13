@@ -40,10 +40,12 @@ class GetAttachCommandsByServiceResponse(_message.Message):
     def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
-    __slots__ = ["session_id"]
+    __slots__ = ["audiences", "session_id"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
     session_id: str
-    def __init__(self, session_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, session_id: _Optional[str] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class MetricsRequest(_message.Message):
     __slots__ = ["metrics"]

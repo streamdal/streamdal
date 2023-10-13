@@ -40,6 +40,10 @@ export interface HeartbeatRequest {
      * @generated from protobuf field: string session_id = 1;
      */
     sessionId: string;
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     */
+    audiences: Audience[];
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
