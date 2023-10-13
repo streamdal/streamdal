@@ -427,7 +427,7 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 			// NOOP
 		}
 
-		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID); err != nil {
+		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, s.sessionID, s.getCurrentAudiences()); err != nil {
 			if strings.Contains(err.Error(), "connection refused") {
 				// Snitch server went away, log, sleep, and wait for reconnect
 				s.config.Logger.Warn("failed to send heartbeat, snitch server went away, waiting for reconnect")

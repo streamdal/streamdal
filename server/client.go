@@ -25,7 +25,7 @@ type IServerClient interface {
 	GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error)
 
 	// HeartBeat sends a heartbeat to the snitch server
-	HeartBeat(ctx context.Context, sessionID string) error
+	HeartBeat(ctx context.Context, sessionID string, audiences []*protos.Audience) error
 
 	// NewAudience announces a new audience to the snitch server
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
@@ -138,10 +138,13 @@ func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience, sessionI
 	return err
 }
 
-func (c *Client) HeartBeat(ctx context.Context, sessionID string) error {
+func (c *Client) HeartBeat(ctx context.Context, sessionID string, audiences []*protos.Audience) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
-	_, err := c.Server.Heartbeat(ctx, &protos.HeartbeatRequest{SessionId: sessionID})
+	_, err := c.Server.Heartbeat(ctx, &protos.HeartbeatRequest{
+		SessionId: sessionID,
+		Audiences: audiences,
+	})
 	return err
 }
 
