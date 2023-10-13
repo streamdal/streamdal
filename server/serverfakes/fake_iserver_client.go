@@ -38,11 +38,11 @@ type FakeIServerClient struct {
 		result1 protos.Internal_SendTailClient
 		result2 error
 	}
-	HeartBeatStub        func(context.Context, string) error
+	HeartBeatStub        func(context.Context, *protos.HeartbeatRequest) error
 	heartBeatMutex       sync.RWMutex
 	heartBeatArgsForCall []struct {
 		arg1 context.Context
-		arg2 string
+		arg2 *protos.HeartbeatRequest
 	}
 	heartBeatReturns struct {
 		result1 error
@@ -249,12 +249,12 @@ func (fake *FakeIServerClient) GetTailStreamReturnsOnCall(i int, result1 protos.
 	}{result1, result2}
 }
 
-func (fake *FakeIServerClient) HeartBeat(arg1 context.Context, arg2 string) error {
+func (fake *FakeIServerClient) HeartBeat(arg1 context.Context, arg2 *protos.HeartbeatRequest) error {
 	fake.heartBeatMutex.Lock()
 	ret, specificReturn := fake.heartBeatReturnsOnCall[len(fake.heartBeatArgsForCall)]
 	fake.heartBeatArgsForCall = append(fake.heartBeatArgsForCall, struct {
 		arg1 context.Context
-		arg2 string
+		arg2 *protos.HeartbeatRequest
 	}{arg1, arg2})
 	stub := fake.HeartBeatStub
 	fakeReturns := fake.heartBeatReturns
@@ -275,13 +275,13 @@ func (fake *FakeIServerClient) HeartBeatCallCount() int {
 	return len(fake.heartBeatArgsForCall)
 }
 
-func (fake *FakeIServerClient) HeartBeatCalls(stub func(context.Context, string) error) {
+func (fake *FakeIServerClient) HeartBeatCalls(stub func(context.Context, *protos.HeartbeatRequest) error) {
 	fake.heartBeatMutex.Lock()
 	defer fake.heartBeatMutex.Unlock()
 	fake.HeartBeatStub = stub
 }
 
-func (fake *FakeIServerClient) HeartBeatArgsForCall(i int) (context.Context, string) {
+func (fake *FakeIServerClient) HeartBeatArgsForCall(i int) (context.Context, *protos.HeartbeatRequest) {
 	fake.heartBeatMutex.RLock()
 	defer fake.heartBeatMutex.RUnlock()
 	argsForCall := fake.heartBeatArgsForCall[i]
