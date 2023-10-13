@@ -182,6 +182,10 @@ func StringPtr(in string) *string {
 	return &in
 }
 
+func BoolPtr(in bool) *bool {
+	return &in
+}
+
 func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]string {
 	if config == nil {
 		return nil

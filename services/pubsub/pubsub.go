@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -65,7 +64,7 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 
 	ch := make(chan interface{}, 1)
 
-	fmt.Println("pubsub.Listen: before lock")
+	ps.log.Debug("pubsub.Listen: before lock")
 
 	ps.mtx.Lock()
 	if _, ok := ps.topics[topic]; !ok {
@@ -76,7 +75,7 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 
 	ps.mtx.Unlock()
 
-	fmt.Println("pubsub.Listen: after unlock")
+	ps.log.Debug("pubsub.Listen: after unlock")
 
 	return ch
 }
