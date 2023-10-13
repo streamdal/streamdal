@@ -295,6 +295,13 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		return nil, errors.Wrap(err, "invalid create pipeline request")
 	}
 
+	if s.Options.DemoMode {
+		return &protos.CreatePipelineResponse{
+			Message:    "Demo mode, request ignored",
+			PipelineId: req.Pipeline.Id,
+		}, nil
+	}
+
 	// Create ID for pipeline
 	req.Pipeline.Id = util.GenerateUUID()
 
@@ -316,6 +323,10 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
 	}
 
 	// Is this a known pipeline?
@@ -356,6 +367,10 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
@@ -385,6 +400,10 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.AttachPipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
 	}
 
 	// Does this pipeline exist?
@@ -437,6 +456,10 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
@@ -486,6 +509,10 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
 		if err == store.ErrPipelineNotFound {
@@ -514,6 +541,10 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
 	}
 
 	// Does this pipeline exist?
@@ -547,6 +578,10 @@ func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.Cre
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	req.Notification.Id = util.StringPtr(util.GenerateUUID())
 
 	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
@@ -564,6 +599,10 @@ func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.Upd
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	if err := s.Options.StoreService.UpdateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -578,6 +617,10 @@ func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.Upd
 func (s *ExternalServer) DeleteNotification(ctx context.Context, req *protos.DeleteNotificationRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteNotificationRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
 	}
 
 	if err := s.Options.StoreService.DeleteNotificationConfig(ctx, req); err != nil {
@@ -645,6 +688,10 @@ func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.Att
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	if err := s.Options.StoreService.AttachNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -661,6 +708,10 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
+	}
+
 	if err := s.Options.StoreService.DetachNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -675,6 +726,10 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteAudienceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	if s.Options.DemoMode {
+		return demoResponse(ctx)
 	}
 
 	// Determine if the audience is attached to any pipelines
@@ -887,5 +942,13 @@ func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaReq
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
+	}, nil
+}
+
+func demoResponse(ctx context.Context) (*protos.StandardResponse, error) {
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Demo mode, request ignored",
 	}, nil
 }
