@@ -14,8 +14,8 @@ const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
 const sp_common_3 = require("./sp_common");
 const sp_command_1 = require("./sp_command");
-const sp_info_1 = require("./sp_info");
 const sp_common_4 = require("./sp_common");
+const sp_info_1 = require("./sp_info");
 const sp_common_5 = require("./sp_common");
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends runtime_5.MessageType {
@@ -76,7 +76,8 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience }
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience },
+            { no: 3, name: "client_info", kind: "message", T: () => sp_info_1.ClientInfo }
         ]);
     }
     create(value) {
@@ -97,6 +98,9 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
                 case /* repeated protos.Audience audiences */ 2:
                     message.audiences.push(sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* protos.ClientInfo client_info */ 3:
+                    message.clientInfo = sp_info_1.ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -115,6 +119,9 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
         /* repeated protos.Audience audiences = 2; */
         for (let i = 0; i < message.audiences.length; i++)
             sp_common_5.Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.ClientInfo client_info = 3; */
+        if (message.clientInfo)
+            sp_info_1.ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

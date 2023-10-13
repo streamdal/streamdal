@@ -57,6 +57,8 @@ message HeartbeatRequest {
   string session_id = 1;
 
   repeated Audience audiences = 2;
+
+  protos.ClientInfo client_info = 3;
 }
 
 message NotifyRequest {

@@ -16,8 +16,8 @@ import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
-import { ClientInfo } from "./sp_info.js";
 import { Metric } from "./sp_common.js";
+import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 /**
  * @generated from protobuf message protos.NewAudienceRequest
@@ -53,6 +53,10 @@ export interface HeartbeatRequest {
      * @generated from protobuf field: repeated protos.Audience audiences = 2;
      */
     audiences: Audience[];
+    /**
+     * @generated from protobuf field: protos.ClientInfo client_info = 3;
+     */
+    clientInfo?: ClientInfo;
 }
 /**
  * @generated from protobuf message protos.NotifyRequest
@@ -274,7 +278,8 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 3, name: "client_info", kind: "message", T: () => ClientInfo }
         ]);
     }
     create(value?: PartialMessage<HeartbeatRequest>): HeartbeatRequest {
@@ -295,6 +300,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
                 case /* repeated protos.Audience audiences */ 2:
                     message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* protos.ClientInfo client_info */ 3:
+                    message.clientInfo = ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -313,6 +321,9 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
         /* repeated protos.Audience audiences = 2; */
         for (let i = 0; i < message.audiences.length; i++)
             Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* protos.ClientInfo client_info = 3; */
+        if (message.clientInfo)
+            ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
