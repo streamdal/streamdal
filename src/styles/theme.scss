@@ -85,6 +85,13 @@
   --color-purple-bright: var(--color-base-purple), 68%;
   --color-red: var(--color-base-red), 54%;
   --color-yellow: var(--color-base-yellow), 59%;
+  --color-orange-code: orange;
+  --color-purple-code: #382e57c6;
+  --color-purple-500: #C1AAFD;
+  --color-purple-600: #956CFF;
+  --color-purple-700: #372D56;
+  --color-purple-900: #28203F;
+  --color-purple-1000: #161223;
 
   /* default dark theme */
   color-scheme: dark;
@@ -131,12 +138,6 @@
     path.dark-logo {
       fill: white;
     }
-  }
-  code {
-    background-color: #382e57c6; 
-    color: orange;
-    padding-left: 0.125em;
-    padding-right: 0.125em;
   }
 }
 

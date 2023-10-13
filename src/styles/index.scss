@@ -235,16 +235,15 @@ strong {
 
 code {
   --border-radius: 3px;
-  --padding-block: 0.2rem;
-  --padding-inline: 0.33rem;
-
   margin-top: 2px;
   font-family: var(--font-mono);
   font-size: 0.85em;
-  // color: var(--color-purple-bright);
-  background-color: var(--theme-code-inline-bg);
+  background-color: var(--color-purple-code);
+  color: var(--color-orange-code);
   border-radius: var(--border-radius);
   word-break: break-word;
+  padding-left: 0.125em;
+  padding-right: 0.125em;
 }
 
 pre.astro-code > code {
@@ -270,18 +269,89 @@ pre {
   margin-left: calc(var(--padding-inline) * -1);
   margin-right: calc(var(--padding-inline) * -1);
   font-family: var(--font-mono);
-
+  border-radius: 15px;
   line-height: 1.5;
   font-size: 0.85em;
   overflow-y: hidden;
   overflow-x: auto;
 }
 
+/* Additional table design */
 table {
+  overflow: hidden;
   width: 100%;
   padding: var(--padding-block) 0;
   margin: 0;
-  border-collapse: collapse;
+  background-color: var(--color-purple-1000);
+
+  th, td {
+    background-color: var(--color-purple-1000);
+  }
+
+  thead tr:first-child th:first-child,
+  tbody tr:first-child, 
+  tfoot tr:first-child td:first-child {
+    border-top-left-radius: 0.9375em;
+  }
+
+  thead tr:first-child th:last-child,
+  tbody tr:first-child,
+  tfoot tr:first-child td:last-child {
+    border-top-right-radius: 0.9375em;
+  }
+
+  tbody tr:last-child td:first-child,
+  tfoot tr:last-child td:first-child {
+    border-bottom-left-radius: 0.9375em;
+  }
+
+  tbody tr:last-child td:last-child,
+  tfoot tr:last-child td:last-child {
+    border-bottom-right-radius: 0.9375em;
+  }
+}
+
+table thead tr:first-child th {
+  border-bottom: 0.0625em solid var(--color-purple-900);
+}
+
+table tr:not(:last-child) td,
+table thead tr:not(:last-child) th {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 0.0625em solid var(--color-purple-900);
+  }
+}
+
+table tr:not(:last-child) td:first-child::before,
+table thead tr:not(:last-child) th:first-child::before {
+    left: 1.25em;
+}
+
+table thead tr:first-child th,
+table tbody tr:first-child td {
+  padding-top: 0.9375em;
+}
+
+table tbody tr:last-child td,
+table tfoot tr:last-child td {
+  padding-bottom: 0.9375em;
+}
+
+table tr > th:first-child,
+table tr > td:first-child {
+  padding-left: 1.25em;
+}
+
+table tr > th:last-child,
+table tr > td:last-child {
+  padding-right: 1.25em;
 }
 
 /* Zebra striping */
