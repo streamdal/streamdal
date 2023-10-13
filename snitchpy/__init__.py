@@ -218,9 +218,20 @@ class SnitchClient:
             )
 
             for cmd in cmds.active:
+                for step in cmd.attach_pipeline.pipeline.steps:
+                    if step.wasm_id in cmds.wasm_modules:
+                        step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
+                    else:
+                        self.log.error(f"BUG: missing wasm module {step.wasm_id}")
                 self._attach_pipeline(cmd)
 
             for cmd in cmds.paused:
+                for step in cmd.attach_pipeline.pipeline.steps:
+                    if step.wasm_id in cmds.wasm_modules:
+                        step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
+                    else:
+                        self.log.error(f"BUG: missing wasm module {step.wasm_id}")
+
                 aud_str = self._aud_to_str(cmd.audience)
 
                 if self.paused_pipelines.get(aud_str) is None:
