@@ -583,8 +583,15 @@ class SnitchClient:
     def _heartbeat(self):
         async def call():
             try:
+                audiences = []
+                for aud in self.audiences.values():
+                    audiences.append(aud)
+
                 req = protos.HeartbeatRequest(
                     session_id=self.session_id,
+                    audiences=audiences,
+                    client_info=self._gen_client_info(),
+                    service_name=self.cfg.service_name,
                 )
 
                 return await self.grpc_stub.heartbeat(
@@ -607,20 +614,23 @@ class SnitchClient:
         self.grpc_channel.close()
         self.log.debug("Heartbeat thread exiting")
 
+    def _gen_client_info(self) -> protos.ClientInfo:
+        return protos.ClientInfo(
+            client_type=protos.ClientType(self.cfg.client_type),
+            library_name="snitch-python-client",
+            library_version="0.0.0",
+            language="python",
+            arch=platform.processor(),
+            os=platform.system(),
+        )
+
     def _register(self) -> None:
         """Register the service with the Snitch Server and receive a stream of commands to execute"""
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
             service_name=self.cfg.service_name,
             session_id=self.session_id,
-            client_info=protos.ClientInfo(
-                client_type=protos.ClientType(self.cfg.client_type),
-                library_name="snitch-python-client",
-                library_version="0.0.0",
-                language="python",
-                arch=platform.processor(),
-                os=platform.system(),
-            ),
+            client_info=self._gen_client_info(),
             audiences=[],
         )
 
