@@ -9,7 +9,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.4.6
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/snitch-go-client v0.0.50-0.20230927000306-076089c6b162
+	github.com/streamdal/snitch-go-client v0.0.52
 )
 
 require (
@@ -20,10 +20,10 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/streamdal/snitch-protos v0.0.100-0.20230926235651-77f507b9e42a // indirect
+	github.com/streamdal/snitch-protos v0.0.110 // indirect
 	github.com/tetratelabs/wazero v1.2.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.40.0 // indirect

@@ -134,8 +134,6 @@ MAIN:
 			shutdown = true
 			break MAIN
 		case <-ticker.C:
-			//llog.Debug("sending heartbeat")
-
 			if err := server.Send(&protos.Command{
 				Command: &protos.Command_KeepAlive{
 					KeepAlive: &protos.KeepAliveCommand{},
@@ -144,14 +142,6 @@ MAIN:
 				// TODO: If unable to send heartbeat to client X times, stop request/exit loop
 				llog.WithError(err).Errorf("unable to send heartbeat for session id '%s'", request.SessionId)
 				continue
-			}
-
-			// Save heartbeat every tick; this will update all live:* keys
-			if err := s.Options.StoreService.AddHeartbeat(server.Context(), &protos.HeartbeatRequest{
-				SessionId: request.SessionId,
-			}); err != nil {
-				s.log.Errorf("unable to save heartbeat: %s", err.Error())
-				// TODO: What do we do if we're unable to save heartbeat X times? Stop request/exit loop?
 			}
 		case cmd := <-ch:
 			if cmd == nil {
@@ -206,9 +196,6 @@ MAIN:
 	return nil
 }
 
-// Heartbeat ... as of 09/26/23, clients are not required to send heartbeats -
-// heartbeats are handled entirely server-side. This handler remains here for
-// backwards compatibility.
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
@@ -218,15 +205,25 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	//if err := s.Options.StoreService.AddHeartbeat(ctx, req); err != nil {
-	//	s.log.Errorf("unable to save heartbeat: %s", err.Error())
-	//
-	//	return &protos.StandardResponse{
-	//		Id:      util.CtxRequestId(ctx),
-	//		Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-	//		Message: fmt.Sprintf("unable to save heartbeat: %s", err.Error()),
-	//	}, nil
-	//}
+	// Refresh register key
+	// This method also refreshes audience live keys
+	if err := s.Options.StoreService.AddRegistration(ctx, &protos.RegisterRequest{
+		ServiceName: req.ServiceName,
+		SessionId:   req.SessionId,
+		ClientInfo:  req.ClientInfo,
+		Audiences:   req.Audiences,
+	}); err != nil {
+		err = errors.Wrap(err, "unable to save heartbeat")
+		s.log.Error(err)
+
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+
+	s.log.Debug("Saved heartbeat")
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),

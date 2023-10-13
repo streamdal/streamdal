@@ -68,6 +68,18 @@ func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
 	return ok
 }
 
+func (s *Snitch) getCurrentAudiences() []*protos.Audience {
+	s.audiencesMtx.RLock()
+	defer s.audiencesMtx.RUnlock()
+
+	auds := make([]*protos.Audience, 0)
+	for aud := range s.audiences {
+		auds = append(auds, strToAud(aud))
+	}
+
+	return auds
+}
+
 func audToStr(aud *protos.Audience) string {
 	if aud == nil {
 		return ""

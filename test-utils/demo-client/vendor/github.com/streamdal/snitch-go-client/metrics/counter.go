@@ -45,7 +45,7 @@ func (c *counter) getEntry() types.CounterEntry {
 	return *e
 }
 
-func CompositeID(e *types.CounterEntry) string {
+func compositeID(e *types.CounterEntry) string {
 	labelVals := make([]string, 0)
 	labelVals = append(labelVals, string(e.Name))
 	for _, v := range e.Labels {

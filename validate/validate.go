@@ -100,6 +100,10 @@ func HeartbeatRequest(req *protos.HeartbeatRequest) error {
 		return ErrInvalidCharacters("SessionId")
 	}
 
+	if req.ClientInfo == nil {
+		return ErrNilField("ClientInfo")
+	}
+
 	return nil
 }
 

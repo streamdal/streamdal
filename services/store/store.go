@@ -54,7 +54,6 @@ const (
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
-	AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
@@ -189,45 +188,6 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 		// Same session id - remove the key
 		if err := s.options.RedisBackend.Del(ctx, e.Key).Err(); err != nil {
 			s.log.Errorf("unable to remove key '%s' from K/V", e.Key)
-		}
-	}
-
-	return nil
-}
-
-// AddHeartbeat updates the TTL for registration and all audiences in snitch_live bucket
-func (s *Store) AddHeartbeat(ctx context.Context, req *protos.HeartbeatRequest) error {
-	//llog := s.log.WithField("method", "AddHeartbeat")
-	//llog.Debug("received request to add heartbeat")
-
-	search := fmt.Sprintf("%s:%s:%s:*", RedisLivePrefix, req.SessionId, s.options.NodeName)
-
-	keys, err := s.options.RedisBackend.Keys(ctx, search).Result()
-	if err != nil {
-		return errors.Wrap(err, "error fetching keys from K/V")
-	}
-
-	for _, k := range keys {
-		// Key has session_id prefix, refresh it
-		//llog.Debugf("attempting to refresh key '%s'", k)
-
-		// Get value
-		val, err := s.options.RedisBackend.Get(ctx, k).Result()
-		if err != nil {
-			// Race condition where SDK disconnected during a heartbeat
-			if errors.Is(err, context.Canceled) {
-				return nil
-			}
-			return errors.Wrap(err, "error fetching key for refresh")
-		}
-
-		if err := s.options.RedisBackend.Set(ctx, k, []byte(val), s.options.SessionTTL).Err(); err != nil {
-			if errors.Is(err, context.Canceled) {
-				// This can happen when Register() is exited before the heartbeat is saved
-				return nil
-			}
-
-			return errors.Wrap(err, "error refreshing key")
 		}
 	}
 

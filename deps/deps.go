@@ -150,7 +150,6 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 	d.CacheBackend = cb
 
 	// Redis backend
-	// TODO: config
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.RedisURL,
 		Password: cfg.RedisPassword,
