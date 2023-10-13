@@ -50,11 +50,22 @@ export interface HeartbeatRequest {
      */
     sessionId: string;
     /**
-     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     * Name of the service that is sending the heartbeat. Used for refreshing registration
+     *
+     * @generated from protobuf field: string service_name = 2;
+     */
+    serviceName: string;
+    /**
+     * Used for refreshing live audience keys in the event that backing store
+     * connection is lost and TTLed audience keys are lost
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 3;
      */
     audiences: Audience[];
     /**
-     * @generated from protobuf field: protos.ClientInfo client_info = 3;
+     * Used for refreshing registration
+     *
+     * @generated from protobuf field: protos.ClientInfo client_info = 4;
      */
     clientInfo?: ClientInfo;
 }
@@ -278,12 +289,13 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
-            { no: 3, name: "client_info", kind: "message", T: () => ClientInfo }
+            { no: 2, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 4, name: "client_info", kind: "message", T: () => ClientInfo }
         ]);
     }
     create(value?: PartialMessage<HeartbeatRequest>): HeartbeatRequest {
-        const message = { sessionId: "", audiences: [] };
+        const message = { sessionId: "", serviceName: "", audiences: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<HeartbeatRequest>(this, message, value);
@@ -297,10 +309,13 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
                 case /* string session_id */ 1:
                     message.sessionId = reader.string();
                     break;
-                case /* repeated protos.Audience audiences */ 2:
+                case /* string service_name */ 2:
+                    message.serviceName = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 3:
                     message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* protos.ClientInfo client_info */ 3:
+                case /* protos.ClientInfo client_info */ 4:
                     message.clientInfo = ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
                     break;
                 default:
@@ -318,12 +333,15 @@ class HeartbeatRequest$Type extends MessageType<HeartbeatRequest> {
         /* string session_id = 1; */
         if (message.sessionId !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.sessionId);
-        /* repeated protos.Audience audiences = 2; */
+        /* string service_name = 2; */
+        if (message.serviceName !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.serviceName);
+        /* repeated protos.Audience audiences = 3; */
         for (let i = 0; i < message.audiences.length; i++)
-            Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* protos.ClientInfo client_info = 3; */
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* protos.ClientInfo client_info = 4; */
         if (message.clientInfo)
-            ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+            ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

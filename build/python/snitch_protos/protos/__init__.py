@@ -792,8 +792,20 @@ class HeartbeatRequest(betterproto.Message):
     session_id: str = betterproto.string_field(1)
     """Session ID for this instance of the SDK."""
 
-    audiences: List["Audience"] = betterproto.message_field(2)
-    client_info: "ClientInfo" = betterproto.message_field(3)
+    service_name: str = betterproto.string_field(2)
+    """
+    Name of the service that is sending the heartbeat. Used for refreshing
+    registration
+    """
+
+    audiences: List["Audience"] = betterproto.message_field(3)
+    """
+    Used for refreshing live audience keys in the event that backing store
+    connection is lost and TTLed audience keys are lost
+    """
+
+    client_info: "ClientInfo" = betterproto.message_field(4)
+    """Used for refreshing registration"""
 
 
 @dataclass(eq=False, repr=False)

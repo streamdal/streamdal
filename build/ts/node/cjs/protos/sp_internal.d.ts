@@ -41,11 +41,22 @@ export interface HeartbeatRequest {
      */
     sessionId: string;
     /**
-     * @generated from protobuf field: repeated protos.Audience audiences = 2;
+     * Name of the service that is sending the heartbeat. Used for refreshing registration
+     *
+     * @generated from protobuf field: string service_name = 2;
+     */
+    serviceName: string;
+    /**
+     * Used for refreshing live audience keys in the event that backing store
+     * connection is lost and TTLed audience keys are lost
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 3;
      */
     audiences: Audience[];
     /**
-     * @generated from protobuf field: protos.ClientInfo client_info = 3;
+     * Used for refreshing registration
+     *
+     * @generated from protobuf field: protos.ClientInfo client_info = 4;
      */
     clientInfo?: ClientInfo;
 }

@@ -76,12 +76,13 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience },
-            { no: 3, name: "client_info", kind: "message", T: () => sp_info_1.ClientInfo }
+            { no: 2, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_5.Audience },
+            { no: 4, name: "client_info", kind: "message", T: () => sp_info_1.ClientInfo }
         ]);
     }
     create(value) {
-        const message = { sessionId: "", audiences: [] };
+        const message = { sessionId: "", serviceName: "", audiences: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -95,10 +96,13 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
                 case /* string session_id */ 1:
                     message.sessionId = reader.string();
                     break;
-                case /* repeated protos.Audience audiences */ 2:
+                case /* string service_name */ 2:
+                    message.serviceName = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 3:
                     message.audiences.push(sp_common_5.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* protos.ClientInfo client_info */ 3:
+                case /* protos.ClientInfo client_info */ 4:
                     message.clientInfo = sp_info_1.ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
                     break;
                 default:
@@ -116,12 +120,15 @@ class HeartbeatRequest$Type extends runtime_5.MessageType {
         /* string session_id = 1; */
         if (message.sessionId !== "")
             writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.sessionId);
-        /* repeated protos.Audience audiences = 2; */
+        /* string service_name = 2; */
+        if (message.serviceName !== "")
+            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.serviceName);
+        /* repeated protos.Audience audiences = 3; */
         for (let i = 0; i < message.audiences.length; i++)
-            sp_common_5.Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.ClientInfo client_info = 3; */
+            sp_common_5.Audience.internalBinaryWrite(message.audiences[i], writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.ClientInfo client_info = 4; */
         if (message.clientInfo)
-            sp_info_1.ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_info_1.ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
