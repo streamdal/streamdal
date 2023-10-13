@@ -56,9 +56,15 @@ message HeartbeatRequest {
   // Session ID for this instance of the SDK.
   string session_id = 1;
 
-  repeated Audience audiences = 2;
+  // Name of the service that is sending the heartbeat. Used for refreshing registration
+  string service_name = 2;
 
-  protos.ClientInfo client_info = 3;
+  // Used for refreshing live audience keys in the event that backing store
+  // connection is lost and TTLed audience keys are lost
+  repeated Audience audiences = 3;
+
+  // Used for refreshing registration
+  protos.ClientInfo client_info = 4;
 }
 
 message NotifyRequest {

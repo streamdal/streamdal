@@ -73,12 +73,13 @@ class HeartbeatRequest$Type extends MessageType {
     constructor() {
         super("protos.HeartbeatRequest", [
             { no: 1, name: "session_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
-            { no: 3, name: "client_info", kind: "message", T: () => ClientInfo }
+            { no: 2, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 4, name: "client_info", kind: "message", T: () => ClientInfo }
         ]);
     }
     create(value) {
-        const message = { sessionId: "", audiences: [] };
+        const message = { sessionId: "", serviceName: "", audiences: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -92,10 +93,13 @@ class HeartbeatRequest$Type extends MessageType {
                 case /* string session_id */ 1:
                     message.sessionId = reader.string();
                     break;
-                case /* repeated protos.Audience audiences */ 2:
+                case /* string service_name */ 2:
+                    message.serviceName = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 3:
                     message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* protos.ClientInfo client_info */ 3:
+                case /* protos.ClientInfo client_info */ 4:
                     message.clientInfo = ClientInfo.internalBinaryRead(reader, reader.uint32(), options, message.clientInfo);
                     break;
                 default:
@@ -113,12 +117,15 @@ class HeartbeatRequest$Type extends MessageType {
         /* string session_id = 1; */
         if (message.sessionId !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.sessionId);
-        /* repeated protos.Audience audiences = 2; */
+        /* string service_name = 2; */
+        if (message.serviceName !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.serviceName);
+        /* repeated protos.Audience audiences = 3; */
         for (let i = 0; i < message.audiences.length; i++)
-            Audience.internalBinaryWrite(message.audiences[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* protos.ClientInfo client_info = 3; */
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* protos.ClientInfo client_info = 4; */
         if (message.clientInfo)
-            ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+            ClientInfo.internalBinaryWrite(message.clientInfo, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
