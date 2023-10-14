@@ -212,6 +212,10 @@ class TailResponse(betterproto.Message):
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
+    keepalive: Optional[bool] = betterproto.bool_field(
+        1001, optional=True, group="X_keepalive"
+    )
+    """Set by server to indicate that the response is a keepalive message"""
 
 
 @dataclass(eq=False, repr=False)
@@ -434,6 +438,11 @@ class GetAllResponse(betterproto.Message):
     the latest update when using GetAllStream().
     """
 
+    keepalive: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="X_keepalive"
+    )
+    """Set by server to indicate that the response is a keepalive message"""
+
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesRequest(betterproto.Message):
@@ -582,6 +591,10 @@ class GetMetricsResponse(betterproto.Message):
     metrics: Dict[str, "Metric"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
+    keepalive: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="X_keepalive"
+    )
+    """Set by server to indicate that the response is a keepalive message"""
 
 
 @dataclass(eq=False, repr=False)
@@ -594,6 +607,10 @@ class GetAudienceRatesResponse(betterproto.Message):
     rates: Dict[str, "AudienceRate"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
+    keepalive: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="X_keepalive"
+    )
+    """Set by server to indicate that the response is a keepalive message"""
 
 
 @dataclass(eq=False, repr=False)

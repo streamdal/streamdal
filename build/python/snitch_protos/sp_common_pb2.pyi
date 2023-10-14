@@ -109,7 +109,7 @@ class TailRequest(_message.Message):
     def __init__(self, type: _Optional[_Union[TailRequestType, str]] = ..., _id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TailResponse(_message.Message):
-    __slots__ = ["_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "tail_request_id", "timestamp_ns", "type"]
+    __slots__ = ["_keepalive", "_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "tail_request_id", "timestamp_ns", "type"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -125,7 +125,9 @@ class TailResponse(_message.Message):
     TAIL_REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_NS_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
+    _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
+    _keepalive: bool
     _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     new_data: bytes
@@ -135,7 +137,7 @@ class TailResponse(_message.Message):
     tail_request_id: str
     timestamp_ns: int
     type: TailResponseType
-    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., tail_request_id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., session_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., original_data: _Optional[bytes] = ..., new_data: _Optional[bytes] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TailResponseType, str]] = ..., tail_request_id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., session_id: _Optional[str] = ..., timestamp_ns: _Optional[int] = ..., original_data: _Optional[bytes] = ..., new_data: _Optional[bytes] = ..., _metadata: _Optional[_Mapping[str, str]] = ..., _keepalive: bool = ...) -> None: ...
 
 class ResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

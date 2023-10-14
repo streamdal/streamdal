@@ -55,7 +55,8 @@ class GetAllResponse$Type extends runtime_5.MessageType {
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_7.Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_info_1.PipelineInfo } },
             { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
-            { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -84,6 +85,9 @@ class GetAllResponse$Type extends runtime_5.MessageType {
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
                     message.generatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -148,6 +152,9 @@ class GetAllResponse$Type extends runtime_5.MessageType {
         /* int64 generated_at_unix_ts_ns_utc = 100; */
         if (message.generatedAtUnixTsNsUtc !== "0")
             writer.tag(100, runtime_1.WireType.Varint).int64(message.generatedAtUnixTsNsUtc);
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, runtime_1.WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1317,7 +1324,8 @@ exports.GetMetricsRequest = new GetMetricsRequest$Type();
 class GetMetricsResponse$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.GetMetricsResponse", [
-            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_common_6.Metric } }
+            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_common_6.Metric } },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -1334,6 +1342,9 @@ class GetMetricsResponse$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* map<string, protos.Metric> metrics */ 1:
                     this.binaryReadMap1(message.metrics, reader, options);
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1370,6 +1381,9 @@ class GetMetricsResponse$Type extends runtime_5.MessageType {
             sp_common_6.Metric.internalBinaryWrite(message.metrics[k], writer, options);
             writer.join().join();
         }
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, runtime_1.WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1410,7 +1424,8 @@ exports.GetAudienceRatesRequest = new GetAudienceRatesRequest$Type();
 class GetAudienceRatesResponse$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.GetAudienceRatesResponse", [
-            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_common_5.AudienceRate } }
+            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_common_5.AudienceRate } },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -1427,6 +1442,9 @@ class GetAudienceRatesResponse$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* map<string, protos.AudienceRate> rates */ 1:
                     this.binaryReadMap1(message.rates, reader, options);
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1463,6 +1481,9 @@ class GetAudienceRatesResponse$Type extends runtime_5.MessageType {
             sp_common_5.AudienceRate.internalBinaryWrite(message.rates[k], writer, options);
             writer.join().join();
         }
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, runtime_1.WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

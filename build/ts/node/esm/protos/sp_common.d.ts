@@ -159,6 +159,12 @@ export interface TailResponse {
     Metadata: {
         [key: string]: string;
     };
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1001;
+     */
+    Keepalive?: boolean;
 }
 /**
  * @generated from protobuf message protos.AudienceRate
