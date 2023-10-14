@@ -249,10 +249,6 @@ func CounterName(name string, labels map[string]string) string {
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
 }
 
-func BoolPtr(in bool) *bool {
-	return &in
-}
-
 func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
 	return &protos.Command{
 		Audience: aud,
