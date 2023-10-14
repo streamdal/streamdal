@@ -96,6 +96,9 @@ message TailResponse {
   bytes new_data = 8;
 
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message AudienceRate {

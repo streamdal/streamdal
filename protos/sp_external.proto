@@ -106,6 +106,9 @@ message GetAllResponse {
   // When was this response generated. This is useful for determining what is
   // the latest update when using GetAllStream().
   int64 generated_at_unix_ts_ns_utc = 100;
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message GetPipelinesRequest {
@@ -224,6 +227,9 @@ message GetMetricsRequest {
 
 message GetMetricsResponse {
   map<string,protos.Metric> metrics = 1;
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message GetAudienceRatesRequest {
@@ -232,6 +238,9 @@ message GetAudienceRatesRequest {
 
 message GetAudienceRatesResponse {
   map<string,AudienceRate> rates = 1; // Key is an audience string
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message GetSchemaRequest {

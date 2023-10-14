@@ -96,7 +96,7 @@ class GetAllRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAllResponse(_message.Message):
-    __slots__ = ["audiences", "config", "generated_at_unix_ts_ns_utc", "live", "pipelines"]
+    __slots__ = ["_keepalive", "audiences", "config", "generated_at_unix_ts_ns_utc", "live", "pipelines"]
     class ConfigEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -116,19 +116,21 @@ class GetAllResponse(_message.Message):
     GENERATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
     LIVE_FIELD_NUMBER: _ClassVar[int]
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
+    _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
+    _keepalive: bool
     audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
     config: _containers.ScalarMap[str, str]
     generated_at_unix_ts_ns_utc: int
     live: _containers.RepeatedCompositeFieldContainer[_sp_info_pb2.LiveInfo]
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
-    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ...) -> None: ...
+    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, str]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class GetAudienceRatesResponse(_message.Message):
-    __slots__ = ["rates"]
+    __slots__ = ["_keepalive", "rates"]
     class RatesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -137,15 +139,17 @@ class GetAudienceRatesResponse(_message.Message):
         value: _sp_common_pb2.AudienceRate
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_common_pb2.AudienceRate, _Mapping]] = ...) -> None: ...
     RATES_FIELD_NUMBER: _ClassVar[int]
+    _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
+    _keepalive: bool
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
-    def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ...) -> None: ...
+    def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class GetMetricsResponse(_message.Message):
-    __slots__ = ["metrics"]
+    __slots__ = ["_keepalive", "metrics"]
     class MetricsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -154,8 +158,10 @@ class GetMetricsResponse(_message.Message):
         value: _sp_common_pb2.Metric
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_common_pb2.Metric, _Mapping]] = ...) -> None: ...
     METRICS_FIELD_NUMBER: _ClassVar[int]
+    _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
+    _keepalive: bool
     metrics: _containers.MessageMap[str, _sp_common_pb2.Metric]
-    def __init__(self, metrics: _Optional[_Mapping[str, _sp_common_pb2.Metric]] = ...) -> None: ...
+    def __init__(self, metrics: _Optional[_Mapping[str, _sp_common_pb2.Metric]] = ..., _keepalive: bool = ...) -> None: ...
 
 class GetNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]

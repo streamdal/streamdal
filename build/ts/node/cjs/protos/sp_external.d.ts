@@ -62,6 +62,12 @@ export interface GetAllResponse {
      * @generated from protobuf field: int64 generated_at_unix_ts_ns_utc = 100;
      */
     generatedAtUnixTsNsUtc: string;
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean;
 }
 /**
  * Don't think we need anything here
@@ -334,6 +340,12 @@ export interface GetMetricsResponse {
     metrics: {
         [key: string]: Metric;
     };
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean;
 }
 /**
  * Nothing needed here, we return all rates
@@ -352,6 +364,12 @@ export interface GetAudienceRatesResponse {
     rates: {
         [key: string]: AudienceRate;
     };
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean;
 }
 /**
  * @generated from protobuf message protos.GetSchemaRequest

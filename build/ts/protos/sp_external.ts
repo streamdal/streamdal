@@ -72,6 +72,12 @@ export interface GetAllResponse {
      * @generated from protobuf field: int64 generated_at_unix_ts_ns_utc = 100;
      */
     generatedAtUnixTsNsUtc: string;
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Don't think we need anything here
@@ -344,6 +350,12 @@ export interface GetMetricsResponse {
     metrics: {
         [key: string]: Metric;
     };
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Nothing needed here, we return all rates
@@ -362,6 +374,12 @@ export interface GetAudienceRatesResponse {
     rates: {
         [key: string]: AudienceRate;
     }; // Key is an audience string
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1000;
+     */
+    Keepalive?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.GetSchemaRequest
@@ -433,7 +451,8 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
             { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
-            { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<GetAllResponse>): GetAllResponse {
@@ -462,6 +481,9 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
                     message.generatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -526,6 +548,9 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
         /* int64 generated_at_unix_ts_ns_utc = 100; */
         if (message.generatedAtUnixTsNsUtc !== "0")
             writer.tag(100, WireType.Varint).int64(message.generatedAtUnixTsNsUtc);
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1695,7 +1720,8 @@ export const GetMetricsRequest = new GetMetricsRequest$Type();
 class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
     constructor() {
         super("protos.GetMetricsResponse", [
-            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Metric } }
+            { no: 1, name: "metrics", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => Metric } },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<GetMetricsResponse>): GetMetricsResponse {
@@ -1712,6 +1738,9 @@ class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
             switch (fieldNo) {
                 case /* map<string, protos.Metric> metrics */ 1:
                     this.binaryReadMap1(message.metrics, reader, options);
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1748,6 +1777,9 @@ class GetMetricsResponse$Type extends MessageType<GetMetricsResponse> {
             Metric.internalBinaryWrite(message.metrics[k], writer, options);
             writer.join().join();
         }
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1788,7 +1820,8 @@ export const GetAudienceRatesRequest = new GetAudienceRatesRequest$Type();
 class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse> {
     constructor() {
         super("protos.GetAudienceRatesResponse", [
-            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } }
+            { no: 1, name: "rates", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => AudienceRate } },
+            { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<GetAudienceRatesResponse>): GetAudienceRatesResponse {
@@ -1805,6 +1838,9 @@ class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse
             switch (fieldNo) {
                 case /* map<string, protos.AudienceRate> rates */ 1:
                     this.binaryReadMap1(message.rates, reader, options);
+                    break;
+                case /* optional bool _keepalive */ 1000:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1841,6 +1877,9 @@ class GetAudienceRatesResponse$Type extends MessageType<GetAudienceRatesResponse
             AudienceRate.internalBinaryWrite(message.rates[k], writer, options);
             writer.join().join();
         }
+        /* optional bool _keepalive = 1000; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

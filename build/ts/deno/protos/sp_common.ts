@@ -166,6 +166,12 @@ export interface TailResponse {
     Metadata: {
         [key: string]: string;
     }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Set by server to indicate that the response is a keepalive message
+     *
+     * @generated from protobuf field: optional bool _keepalive = 1001;
+     */
+    Keepalive?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.AudienceRate
@@ -599,7 +605,8 @@ class TailResponse$Type extends MessageType<TailResponse> {
             { no: 6, name: "timestamp_ns", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
             { no: 7, name: "original_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 8, name: "new_data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 1001, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<TailResponse>): TailResponse {
@@ -640,6 +647,9 @@ class TailResponse$Type extends MessageType<TailResponse> {
                     break;
                 case /* map<string, string> _metadata */ 1000:
                     this.binaryReadMap1000(message.Metadata, reader, options);
+                    break;
+                case /* optional bool _keepalive */ 1001:
+                    message.Keepalive = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -696,6 +706,9 @@ class TailResponse$Type extends MessageType<TailResponse> {
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
+        /* optional bool _keepalive = 1001; */
+        if (message.Keepalive !== undefined)
+            writer.tag(1001, WireType.Varint).bool(message.Keepalive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
