@@ -65,6 +65,14 @@ func CtxStringValue(ctx context.Context, key string) string {
 	return values[0]
 }
 
+func PtrStr(s *string) string {
+	if s == nil {
+		return ""
+	}
+
+	return *s
+}
+
 func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
 }
@@ -239,6 +247,10 @@ func CounterName(name string, labels map[string]string) string {
 	}
 
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
+}
+
+func BoolPtr(in bool) *bool {
+	return &in
 }
 
 func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
