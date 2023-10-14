@@ -40,7 +40,7 @@ const (
 var (
 	MenuString = `[white]Q[-] ["Q"][#9D87D7]Quit[-][""]  ` +
 		`[white]S[-] ["S"][#9D87D7]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][#9D87D7]Set Sample Rate[-][""]  ` +
+		`[white]R[-] ["R"][#9D87D7::s]Set Sample Rate[-:-:-][""]  ` +
 		`[white]F[-] ["F"][#9D87D7]Filter[-][""]  ` +
 		`[white]P[-] ["P"][#9D87D7]Pause[-][""]  ` +
 		`[white]/[-] ["Search"][#9D87D7]Search[-][""]`
@@ -305,11 +305,12 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 			}
 		}
 
-		if event.Key() == tcell.KeyRune && event.Rune() == 'r' {
-			actionCh <- &types.Action{
-				Step: types.StepRate,
-			}
-		}
+		// TODO: Disabled until sampling is fully implemented in SDKs
+		//if event.Key() == tcell.KeyRune && event.Rune() == 'r' {
+		//	actionCh <- &types.Action{
+		//		Step: types.StepRate,
+		//	}
+		//}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 'p' {
 			actionCh <- &types.Action{
@@ -577,7 +578,9 @@ func (c *Console) initializeComponents() error {
 func (c *Console) newMenu() *tview.TextView {
 	menu := tview.NewTextView().SetWrap(false).SetDynamicColors(true)
 
-	fmt.Fprint(menu, MenuString)
+	if _, err := fmt.Fprint(menu, MenuString); err != nil {
+		c.log.Infof("error writing menu: %s", err)
+	}
 
 	return menu
 }

@@ -537,25 +537,6 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.Wrap(err, "error calling gRPC tail endpoint in server")
 	}
 
-	c.log.Info("got past Tail() call in cmd.go")
-
-	//// TODO: This is where we'd get data from snitch-server
-	//go func() {
-	//	defer c.log.Info("tail goroutine exiting")
-	//
-	//MAIN:
-	//	for {
-	//		select {
-	//		case tailResp := <-tailCh:
-	//			if tailResp == nil {
-	//				continue MAIN
-	//			}
-	//		case <-tailCtx.Done():
-	//			c.log.Info("detected context cancellation in tail goroutine")
-	//		}
-	//	}
-	//}()
-
 	// Set/unset search highlight
 	if action.TailSearch != "" || action.TailSearchPrev != "" {
 		// We need to split so that search does not hit line num and/or timestamp field
