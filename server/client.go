@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -63,6 +64,18 @@ func New(snitchAddress, snitchToken string) (*Client, error) {
 
 	opts := make([]grpc.DialOption, 0)
 	opts = append(opts,
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			// Enable keepalive; ping every 10s
+			Time: 10 * time.Second,
+
+			// Close stream if there is still no activity after 30s.
+			//
+			// NOTE: there should ALWAYS be activity on the streams because the
+			// server sends periodic heartbeats to the client AND the client
+			// sends periodic heartbeats to the server. If stream is disconnected,
+			// client will auto re-establish connectivity with the server.
+			Timeout: 30 * time.Second,
+		}),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxGRPCMessageRecvSize)),
 		grpc.WithInsecure(),
 	)

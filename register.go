@@ -73,8 +73,8 @@ func (s *Snitch) register(looper director.Looper) error {
 			return nil
 		}
 
-		// No way to hit this case for a "first register attempt" because
-		// "stream" won't be nil on initial launch.
+		// This is here to enable reconnects; no way to hit this case for a
+		// "first register attempt" because "stream" won't be nil on initial launch.
 		if stream == nil {
 			s.config.Logger.Debug("stream is nil, attempting to register")
 
