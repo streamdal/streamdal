@@ -13,6 +13,7 @@ const (
 	StepQuit
 	StepPause
 	StepRate
+	StepViewOptions
 )
 
 type Step int
@@ -22,11 +23,12 @@ type Action struct {
 	Args []string
 
 	// Args specifically used by tail()
-	TailComponent  *TailComponent
-	TailFilter     string
-	TailSearch     string
-	TailSearchPrev string
-	TailRate       int
+	TailComponent   *TailComponent
+	TailFilter      string
+	TailSearch      string
+	TailSearchPrev  string
+	TailRate        int
+	TailViewOptions *ViewOptions
 }
 
 // TailComponent is used to display audiences in the "select component" view
@@ -34,4 +36,11 @@ type TailComponent struct {
 	Name        string
 	Description string
 	Audience    *protos.Audience
+}
+
+type ViewOptions struct {
+	PrettyJSON         bool
+	EnableColors       bool
+	DisplayTimestamp   bool
+	DisplayLineNumbers bool
 }

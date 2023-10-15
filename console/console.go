@@ -35,6 +35,11 @@ const (
 	PageFilter            = "page_" + PrimitiveFilter
 	PageSearch            = "page_" + PrimitiveSearch
 	PageRate              = "page_" + PrimitiveRate
+
+	DefaultViewOptionsPrettyJSON         = true
+	DefaultViewOptionsEnableColors       = true
+	DefaultViewOptionsDisplayLineNumbers = true
+	DefaultViewOptionsDisplayTimestamp   = true
 )
 
 var (
@@ -43,6 +48,7 @@ var (
 		`[white]R[-] ["R"][#9D87D7::s]Set Sample Rate[-:-:-][""]  ` +
 		`[white]F[-] ["F"][#9D87D7]Filter[-][""]  ` +
 		`[white]P[-] ["P"][#9D87D7]Pause[-][""]  ` +
+		`[white]O[-] ["O"][#9D87D7]View Options[-][""] ` +
 		`[white]/[-] ["Search"][#9D87D7]Search[-][""]`
 )
 
@@ -217,6 +223,67 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 	c.pages.AddPage(PageSearch, inputDialog, true, true)
 }
 
+func (c *Console) DisplayViewOptions(defaultViewOptions *types.ViewOptions, answerCh chan<- *types.ViewOptions) {
+	if defaultViewOptions == nil {
+		defaultViewOptions = &types.ViewOptions{
+			PrettyJSON:         DefaultViewOptionsPrettyJSON,
+			EnableColors:       DefaultViewOptionsEnableColors,
+			DisplayLineNumbers: DefaultViewOptionsDisplayLineNumbers,
+			DisplayTimestamp:   DefaultViewOptionsDisplayTimestamp,
+		}
+	}
+
+	c.Start()
+
+	// Remove all menu highlights - you cannot access menu while in rate view
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight()
+	})
+
+	selectedOptions := &types.ViewOptions{
+		PrettyJSON:         defaultViewOptions.PrettyJSON,
+		EnableColors:       defaultViewOptions.EnableColors,
+		DisplayLineNumbers: defaultViewOptions.DisplayLineNumbers,
+		DisplayTimestamp:   defaultViewOptions.DisplayTimestamp,
+	}
+
+	optsDialog := tview.NewForm().
+		AddCheckbox("Pretty JSON", defaultViewOptions.PrettyJSON, func(checked bool) {
+			selectedOptions.PrettyJSON = checked
+		}).
+		AddCheckbox("Enable Colors", defaultViewOptions.EnableColors, func(checked bool) {
+			selectedOptions.EnableColors = checked
+		}).
+		AddCheckbox("Display Timestamp", defaultViewOptions.DisplayTimestamp, func(checked bool) {
+			selectedOptions.DisplayTimestamp = checked
+		}).
+		AddCheckbox("Display Line Numbers", defaultViewOptions.DisplayLineNumbers, func(checked bool) {
+			selectedOptions.DisplayLineNumbers = checked
+		}).
+		AddButton("OK", func() {
+			answerCh <- selectedOptions
+		}).
+		AddButton("Reset", func() {
+			answerCh <- &types.ViewOptions{}
+		}).
+		AddButton("Cancel", func() {
+			// Return the original value
+			answerCh <- defaultViewOptions
+		})
+
+	optsDialog.SetBorder(true).SetTitle("View Options")
+	optsDialog.SetBackgroundColor(Tcell(WindowBg))
+	optsDialog.SetTitleColor(Tcell(TextPrimary))
+	optsDialog.SetFieldBackgroundColor(Tcell(InputFieldBg))
+	optsDialog.SetFieldTextColor(Tcell(InputFieldFg))
+	optsDialog.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+	optsDialog.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
+	optsDialog.SetButtonsAlign(tview.AlignCenter)
+
+	viewOptionsDialog := Center(optsDialog, 30, 13)
+	c.pages.AddPage(PageRate, viewOptionsDialog, true, true)
+}
+
 func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 	c.Start()
 
@@ -288,8 +355,9 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 	// Always update title
 	pageTail.SetTitle(tailComponent.Name)
 
+	// Highlight available keystrokes
 	c.app.QueueUpdateDraw(func() {
-		c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
+		c.menu.Highlight("Q", "S", "P", "R", "F", "O", "Search")
 	})
 
 	c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -302,6 +370,12 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 		if event.Key() == tcell.KeyRune && event.Rune() == 's' {
 			actionCh <- &types.Action{
 				Step: types.StepSelect,
+			}
+		}
+
+		if event.Key() == tcell.KeyRune && event.Rune() == 'o' {
+			actionCh <- &types.Action{
+				Step: types.StepViewOptions,
 			}
 		}
 

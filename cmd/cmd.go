@@ -57,6 +57,12 @@ func (c *Cmd) Run() error {
 	// Start with a connection attempt and go from there
 	return c.run(&types.Action{
 		Step: types.StepConnect,
+		TailViewOptions: &types.ViewOptions{
+			PrettyJSON:         true,
+			EnableColors:       true,
+			DisplayTimestamp:   true,
+			DisplayLineNumbers: true,
+		},
 	})
 }
 
@@ -83,6 +89,8 @@ func (c *Cmd) run(action *types.Action) error {
 		resp, err = c.actionSearch(action)
 	case types.StepRate:
 		resp, err = c.actionRate(action)
+	case types.StepViewOptions:
+		resp, err = c.actionViewOptions(action)
 	case types.StepQuit:
 		c.options.Console.Stop()
 		os.Exit(0)
@@ -133,13 +141,10 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 
 	// We want to go back to tail() with the same component as before + set the
 	// new filter string.
-	return &types.Action{
-		Step:          types.StepTail,
-		TailComponent: action.TailComponent,
-		TailSearch:    action.TailSearch,
-		TailRate:      action.TailRate,
-		TailFilter:    filterStr,
-	}, nil
+	action.Step = types.StepTail
+	action.TailFilter = filterStr
+
+	return action, nil
 }
 
 func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
@@ -171,14 +176,10 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 
 	// Only way to get to "search" is via tail, so the next step is to go back
 	// to tail view (with the same component as before search).
-	return &types.Action{
-		Step:           types.StepTail,
-		TailComponent:  action.TailComponent,
-		TailRate:       action.TailRate,
-		TailFilter:     action.TailFilter,
-		TailSearch:     searchStr,
-		TailSearchPrev: action.TailSearch,
-	}, nil
+	action.Step = types.StepTail
+	action.TailSearch = searchStr
+
+	return action, nil
 }
 
 func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
@@ -209,16 +210,37 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 
 	// Only way to get to "set sample rate" is via Tail so we always tell resp
 	// to go back to that view.
-	return &types.Action{
-		Step:          types.StepTail,
-		TailComponent: action.TailComponent,
-		TailRate:      rate,
-		TailSearch:    action.TailSearch,
-		TailFilter:    action.TailFilter,
-	}, nil
+	action.Step = types.StepTail
+	action.TailRate = rate
+
+	return action, nil
 }
 
-func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
+func (c *Cmd) actionViewOptions(action *types.Action) (*types.Action, error) {
+	// Disable input capture while in view options
+	origCapture := c.options.Console.GetInputCapture()
+	c.options.Console.SetInputCapture(nil)
+	defer c.options.Console.SetInputCapture(origCapture)
+
+	// Channel used for reading resp from rate dialog
+	answerCh := make(chan *types.ViewOptions)
+
+	// Display modal
+	go func() {
+		c.options.Console.DisplayViewOptions(action.TailViewOptions, answerCh)
+	}()
+
+	opts := <-answerCh
+
+	// Only way to get to "view options" is via Tail so we always tell resp
+	// to go back to that view.
+	action.Step = types.StepTail
+	action.TailViewOptions = opts
+
+	return action, nil
+}
+
+func (c *Cmd) actionConnect(action *types.Action) (*types.Action, error) {
 	msg := fmt.Sprintf("Connecting to [::u]%s[::-] ", c.options.Config.Server)
 
 	userQuit := false
@@ -280,9 +302,9 @@ func (c *Cmd) actionConnect(_ *types.Action) (*types.Action, error) {
 		return &types.Action{Step: types.StepQuit}, nil
 	}
 
-	return &types.Action{
-		Step: types.StepSelect,
-	}, nil
+	action.Step = types.StepSelect
+
+	return action, nil
 }
 
 func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo string) (*types.Action, error) {
@@ -299,7 +321,7 @@ func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo strin
 	}
 }
 
-func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
+func (c *Cmd) actionSelect(action *types.Action) (*types.Action, error) {
 	// Only highlight 'q'
 	c.options.Console.ToggleAllMenuHighlights()
 	c.options.Console.ToggleMenuHighlight("Q")
@@ -416,15 +438,10 @@ func (c *Cmd) actionSelect(a *types.Action) (*types.Action, error) {
 			Step: types.StepQuit,
 		}, nil
 	case tailComponent := <-selectedComponentCh:
-		return &types.Action{
-			Step:          types.StepTail,
-			TailComponent: tailComponent,
+		action.Step = types.StepTail
+		action.TailComponent = tailComponent
 
-			// Passing these along in case we originally came from a tail w/ existing settings
-			TailSearch: a.TailSearch,
-			TailFilter: a.TailFilter,
-			TailRate:   a.TailRate,
-		}, nil
+		return action, nil
 	}
 }
 
@@ -634,6 +651,7 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 			cmd.TailSearch = action.TailSearch
 			cmd.TailSearchPrev = action.TailSearchPrev
 			cmd.TailRate = action.TailRate
+			cmd.TailViewOptions = action.TailViewOptions
 
 			return cmd, nil
 		case tailResp := <-tailCh:
@@ -665,24 +683,44 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 				}
 			}
 
-			prefix := fmt.Sprintf(`%d: [gray:black]`+time.Now().Format("15:04:05")+`[-:-] `, lineNum)
+			var (
+				prefix        string
+				formattedData []byte
+			)
 
-			//formattedData := pretty.Ugly([]byte(data))
-			//formattedData = pretty.Color(formattedData, nil)
-			var formattedData []byte
+			formatter := pretty.NewFormatter(true)
+			formatter.Indent = 0
+			formatter.Newline = ""
+			formatter.DisabledColor = true
 
-			if formatted, err := pretty.NewFormatter(true).Format([]byte(data)); err != nil {
-				//c.log.Errorf("unable to format JSON (reverting to no formatting): %s", err)
+			if action.TailViewOptions != nil {
+				// Enable colors
+				if action.TailViewOptions.EnableColors {
+					formatter.DisabledColor = false
+				}
+
+				// Enable pretty JSON output
+				if action.TailViewOptions.PrettyJSON {
+					formatter.Indent = 2
+					formatter.Newline = "\n"
+				}
+
+				// Enable TS
+				if action.TailViewOptions.DisplayTimestamp {
+					prefix = `[gray:black]` + time.Now().Format("15:04:05") + `[-:-] `
+				}
+
+				// Enable line numbers
+				if action.TailViewOptions.DisplayLineNumbers {
+					prefix = fmt.Sprintf("[gray:gray]%d:[-:-] ", lineNum) + prefix
+				}
+			}
+
+			if formatted, err := formatter.Format([]byte(data)); err != nil {
 				formattedData = []byte(data)
 			} else {
 				formattedData = formatted
 			}
-
-			//formattedData, err := prettyjson.Format([]byte(data))
-			//if err != nil {
-			//	//c.log.Errorf("unable to format JSON (reverting to no formatting): %s", err)
-			//	formattedData = []byte(data)
-			//}
 
 			if !c.paused {
 				if _, err := fmt.Fprint(textView, prefix+(string(formattedData))+"\n"); err != nil {
