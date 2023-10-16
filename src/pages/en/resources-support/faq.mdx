@@ -1,14 +1,258 @@
 ---
-title: Frequently Asked Questions (FAQ)
-description: Snitch frequently asked questions (FAQ)
+title: Frequently Asked Questions 
+description: Streamdal frequently asked questions
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+import Accordion from "@components/Accordion/Accordion.astro";
 
-import { Notification } from "accessible-astro-components";
+Get clarification or answers for the most common questions we receive about 
+Streamdal. Can't find what you're looking for or need more details? Get in 
+touch with us.
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
-</Notification>
+<Accordion 
+title="What is Streamdal?">
+<p>
+Streamdal is a data observability and governance tool designed to give the most 
+upstream, actionable view of all of your producers and consumers. By using our 
+SDK and deploying it's server, you'll get a dynamic graph of your producers and 
+consumers as they scale up and down, with the ability to tap in and view all 
+the real-time data flowing through them.
+</p>
+<br />
+<p>
+The views into your data are like having a UI on top of a `tail -f`, but for 
+_real-time data_, not data at rest. With Streamdal, you'll but able to detect 
+and resolve data incidents faster, as well as proactively act on and govern 
+data in real time.
+</p>
+</Accordion>
+
+<Accordion 
+title="How do I use Streamdal, and where is it deployed?">
+<p>
+1. Import our SDK for your language.
+2. Weave the `Process()` method into the fabric of your code where 
+data production or consumption takes place.
+3. Deploy the Streamdal server where the services using the Streamdal SDK are 
+running.
+</p>
+<br />
+<p> 
+You can find more details in our guides on 
+[instrumentation](/en/guides/instrumentation/) and 
+[deployment](/en/guides/deployment/).
+</p>
+</Accordion>
+
+<Accordion 
+title="What language SDKs do you support?">
+<p>
+Currently we support [Go](/en/language-support/go/), 
+[Node](/en/language-support/node/), and [Python](/en/language-support/python/). 
+More language support will be coming in the future. Check out the 
+[roadmap](/en/resources-support/roadmap/) for more details.
+</p>
+</Accordion>
+
+<Accordion 
+title="What data sources and destinations are supported?">
+<p>
+Any source, and any destination. The way Streamdal is instrumented, there isn't 
+a need for connectors or interfacing with various API's. The SDK uses a 
+`Process()` method that is wrapped around the parts of your code where data 
+production and consumption take place.
+</p>
+</Accordion>
+
+<Accordion 
+title="Will this cause HTTP bottlenecks, or impact my app performance in any 
+way?">
+<p>
+Using Streamdal adds < 1% of overhead to existing calls. The Streamdal server 
+is _normally_ deployed locally where your services run, so there is no 
+additional network hop for existing messages, events, calls, etc. Current 
+benchmarks handle ~144,000 req/s.
+</p>
+<br />
+<p>
+Check out our 
+[benchmark tests](https://github.com/streamdal/snitch-detective/blob/main/src/test_bench.rs) 
+on github.
+</p>
+</Accordion>
+
+<Accordion 
+title="Why aren't my services, producers, or consumers showing up on the data 
+graph?">
+<p>
+In order for the data graph to visually populate services:
+</p>
+<br />
+<p>
+1. The Streamdal SDK should be imported and properly instrumented for your 
+language. See the [Golang example](/en/core-components/sdk/#golang-sdk-example) 
+on importing the SDK.
+2. The Streamdal server should be deployed where the services you instrumented 
+the SDK are running. If you have confirmed the containers are up, try running 
+`curl <server-address>:8080/metrics`. Read more on the 
+[endpoints exposed](/en/core-components/server#multi-faceted-api-endpoints) 
+by the server component. 
+   - The `STREAMDAL_URL` default 
+  [environment variable](/en/core-components/sdk/#environment-variables-configuring-the-sdk) 
+  value is 
+  `localhost:9090`. If you are running the server somewhere other than where 
+  your instrumented services live _(which is generally not recommended)_, you 
+  will need to update this value to the correct address.
+</p>
+</Accordion>
+
+<Accordion 
+title="Rules are listed as 'Coming Soon' but I see them in the console (as 
+'beta'). Can I already use them?">
+<p>
+We are currently beta-testing the data governance features of Streamdal with a 
+select group of contributors, companies, and design partners. If you would like 
+to become a design partner, [contact us](mailto:support@streamdal.com)
+or hit us up on [discord](/en/resources-support/community/).
+</p>
+</Accordion>
+
+{/* TODO: Add launch manifesto link here once available */}
+<Accordion 
+title="What is open source, what is free, and what is paid? Will this change in 
+the future?">
+<p>
+The observability aspects and features of Streamdal, including
+[Tail](/en/guides/tail/), will always be free and open source under the 
+[Apache License v2.0](/en/resources-support/license/). Currently, the data 
+governance features are in beta, but once they are fully fleshed out and 
+developed it will be a paid feature. Check out our 
+[launch manifesto](#link-to-launch-manifesto) for details on this design 
+decision.
+</p>
+</Accordion>
+
+<Accordion 
+title="When will you support <this-feature-language-or-library>?">
+<p>
+Our [roadmap](/en/resources-support/roadmap/) is publicly available on Github. 
+Don't see your library, or think a feature timeline should be shifted? Join our 
+community [discord](/en/resources-support/community/) and let us know!
+</p>
+</Accordion>
+
+<Accordion 
+title="How do I maintain the data graph?">
+<p>
+The data graph is real-time and dynamic, and so long as the
+[server components](/en/core-components/server/)
+are running, and new services are instrumented with the 
+[SDK](/en/core-components/sdk/), it will not require maintenance. The view you 
+get will always be an accurate representation of data flowing through your 
+systems regardless of scale.
+</p>
+</Accordion>
+
+<Accordion 
+title="How do I manage schemas?">
+<p>
+Currently there is no need to manage schemas. Once you have instrumented the 
+[SDK](/en/core-components/sdk/), you will be able to view the active schemas of 
+data throughout your systems. 
+</p>
+<br />
+<p>
+When you weave the `Process()` method throughout your code, behind the scenes 
+the SDK will infer and decode schemas, and present them in a human-readable 
+format via the [console UI](en/core-components/console-ui/).
+</p>
+</Accordion>
+
+<Accordion 
+title="What is Tail?">
+<p>
+Tail gets its name from the bash command and argument `tail -f`. It is a 
+feature that can be used via the console UI, or command line, which will allow 
+you to tap into any of your producers or consumers and view the real-time data 
+flowing through them.
+</p>
+<br />
+<p>
+Because schemas are inferred and decoded, you'll be able to observe your data 
+in a human-readable format.
+</p>
+</Accordion>
+
+<Accordion 
+title="What are Shims?">
+<p>
+[Shims](/en/resources-support/glossary/#shims) are a 'wrapper library' for 
+popular libraries that incorporate the usage of our SDK to simplify integration 
+and adoption of Streamdal. As of [v1.0](/en/resources-support/changelog/) 
+release, we have not yet implemented this style of instrumentation yet. Check 
+our [roadmap](/en/resources-support/roadmap/) for a better idea on when we will 
+begin these implementations.
+</p>
+</Accordion>
+
+<Accordion 
+title="What is Observability?">
+<p>
+Observability can be a really loaded term. Depending on what you're working 
+with or who you're speaking to, it can mean many different things. 
+</p>
+<br />
+<p>
+When we say observability, we mean:  
+> _The ability to simply see the actual real-time data, its schema, and the 
+services generating data or interacting with it._
+</p>
+<br />
+<p>
+DORA (DevOps Research and Assessment) also has a good definition on 
+[observability](https://dora.dev/devops-capabilities/technical/monitoring-and-observability/#:~:text=Observability%20is%20tooling%20or%20a%20technical%20solution%20that%20allows%20teams%20to%20actively%20debug%20their%20system.%20Observability%20is%20based%20on%20exploring%20properties%20and%20patterns%20not%20defined%20in%20advance.) 
+within this context, which defines it as:  
+  
+> _...tooling or a technical solution that allows teams to actively debug their 
+system. Observability is based on exploring properties and patterns not defined 
+in advance._
+</p>
+</Accordion>
+
+<Accordion 
+title="What is WASM?">
+<p>
+WASM is [WebAssembly](https://webassembly.org/).
+</p>
+</Accordion>
+
+<Accordion 
+title="How do I contribute or become a design partner?">
+<p>
+Anyone can [contribute](/en/resources-support/contributing/) 
+to Streamdal. It's an open-source project under the Apache License v2.0.  
+</p>
+<br />
+<p>
+After reviewing the contributing information, and you would like more 
+information on becoming a design partner, 
+[get in touch](mailto:support@streamdal.com) with us or @ us on 
+[discord](/en/resources-support/community/).
+</p>
+</Accordion>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
