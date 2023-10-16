@@ -1468,7 +1468,7 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
-    async def app_is_registered(
+    async def app_registration_status(
         self,
         app_registration_status_request: "AppRegistrationStatusRequest",
         *,
@@ -1477,7 +1477,7 @@ class ExternalStub(betterproto.ServiceStub):
         metadata: Optional["MetadataLike"] = None
     ) -> "AppRegistrationStatusResponse":
         return await self._unary_unary(
-            "/protos.External/AppIsRegistered",
+            "/protos.External/AppRegistrationStatus",
             app_registration_status_request,
             AppRegistrationStatusResponse,
             timeout=timeout,
@@ -1800,7 +1800,7 @@ class ExternalBase(ServiceBase):
     ) -> "GetSchemaResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def app_is_registered(
+    async def app_registration_status(
         self, app_registration_status_request: "AppRegistrationStatusRequest"
     ) -> "AppRegistrationStatusResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
@@ -2007,12 +2007,12 @@ class ExternalBase(ServiceBase):
         response = await self.get_schema(request)
         await stream.send_message(response)
 
-    async def __rpc_app_is_registered(
+    async def __rpc_app_registration_status(
         self,
         stream: "grpclib.server.Stream[AppRegistrationStatusRequest, AppRegistrationStatusResponse]",
     ) -> None:
         request = await stream.recv_message()
-        response = await self.app_is_registered(request)
+        response = await self.app_registration_status(request)
         await stream.send_message(response)
 
     async def __rpc_app_register(
@@ -2183,8 +2183,8 @@ class ExternalBase(ServiceBase):
                 GetSchemaRequest,
                 GetSchemaResponse,
             ),
-            "/protos.External/AppIsRegistered": grpclib.const.Handler(
-                self.__rpc_app_is_registered,
+            "/protos.External/AppRegistrationStatus": grpclib.const.Handler(
+                self.__rpc_app_registration_status,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 AppRegistrationStatusRequest,
                 AppRegistrationStatusResponse,

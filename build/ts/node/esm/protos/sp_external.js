@@ -1937,7 +1937,7 @@ export const External = new ServiceType("protos.External", [
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
     { name: "GetSchema", options: {}, I: GetSchemaRequest, O: GetSchemaResponse },
-    { name: "AppIsRegistered", options: {}, I: AppRegistrationStatusRequest, O: AppRegistrationStatusResponse },
+    { name: "AppRegistrationStatus", options: {}, I: AppRegistrationStatusRequest, O: AppRegistrationStatusResponse },
     { name: "AppRegister", options: {}, I: AppRegistrationRequest, O: StandardResponse },
     { name: "AppVerifyRegistration", options: {}, I: AppVerifyRegistrationRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }

@@ -79,7 +79,7 @@ service External {
 
   rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
 
-  rpc AppIsRegistered(AppRegistrationStatusRequest) returns (AppRegistrationStatusResponse);
+  rpc AppRegistrationStatus(AppRegistrationStatusRequest) returns (AppRegistrationStatusResponse);
 
   rpc AppRegister(AppRegistrationRequest) returns (StandardResponse);
 

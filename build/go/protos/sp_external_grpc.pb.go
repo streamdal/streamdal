@@ -43,7 +43,7 @@ const (
 	External_Tail_FullMethodName                  = "/protos.External/Tail"
 	External_GetAudienceRates_FullMethodName      = "/protos.External/GetAudienceRates"
 	External_GetSchema_FullMethodName             = "/protos.External/GetSchema"
-	External_AppIsRegistered_FullMethodName       = "/protos.External/AppIsRegistered"
+	External_AppRegistrationStatus_FullMethodName = "/protos.External/AppRegistrationStatus"
 	External_AppRegister_FullMethodName           = "/protos.External/AppRegister"
 	External_AppVerifyRegistration_FullMethodName = "/protos.External/AppVerifyRegistration"
 	External_Test_FullMethodName                  = "/protos.External/Test"
@@ -98,7 +98,7 @@ type ExternalClient interface {
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
 	GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error)
 	GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*GetSchemaResponse, error)
-	AppIsRegistered(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error)
+	AppRegistrationStatus(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error)
 	AppRegister(ctx context.Context, in *AppRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	AppVerifyRegistration(ctx context.Context, in *AppVerifyRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
@@ -421,9 +421,9 @@ func (c *externalClient) GetSchema(ctx context.Context, in *GetSchemaRequest, op
 	return out, nil
 }
 
-func (c *externalClient) AppIsRegistered(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error) {
+func (c *externalClient) AppRegistrationStatus(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error) {
 	out := new(AppRegistrationStatusResponse)
-	err := c.cc.Invoke(ctx, External_AppIsRegistered_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, External_AppRegistrationStatus_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -506,7 +506,7 @@ type ExternalServer interface {
 	Tail(*TailRequest, External_TailServer) error
 	GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error
 	GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error)
-	AppIsRegistered(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error)
+	AppRegistrationStatus(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error)
 	AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error)
 	AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error)
 	// Test method
@@ -590,8 +590,8 @@ func (UnimplementedExternalServer) GetAudienceRates(*GetAudienceRatesRequest, Ex
 func (UnimplementedExternalServer) GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
 }
-func (UnimplementedExternalServer) AppIsRegistered(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AppIsRegistered not implemented")
+func (UnimplementedExternalServer) AppRegistrationStatus(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppRegistrationStatus not implemented")
 }
 func (UnimplementedExternalServer) AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppRegister not implemented")
@@ -1059,20 +1059,20 @@ func _External_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _External_AppIsRegistered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _External_AppRegistrationStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AppRegistrationStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExternalServer).AppIsRegistered(ctx, in)
+		return srv.(ExternalServer).AppRegistrationStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: External_AppIsRegistered_FullMethodName,
+		FullMethod: External_AppRegistrationStatus_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalServer).AppIsRegistered(ctx, req.(*AppRegistrationStatusRequest))
+		return srv.(ExternalServer).AppRegistrationStatus(ctx, req.(*AppRegistrationStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1219,8 +1219,8 @@ var External_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _External_GetSchema_Handler,
 		},
 		{
-			MethodName: "AppIsRegistered",
-			Handler:    _External_AppIsRegistered_Handler,
+			MethodName: "AppRegistrationStatus",
+			Handler:    _External_AppRegistrationStatus_Handler,
 		},
 		{
 			MethodName: "AppRegister",

@@ -186,9 +186,9 @@ export interface IExternalClient {
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
     /**
-     * @generated from protobuf rpc: AppIsRegistered(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
      */
-    appIsRegistered(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
+    appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
     /**
      * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
      */
@@ -354,9 +354,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
     /**
-     * @generated from protobuf rpc: AppIsRegistered(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
      */
-    appIsRegistered(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
+    appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
     /**
      * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
      */

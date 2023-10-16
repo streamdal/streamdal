@@ -1940,7 +1940,7 @@ exports.External = new runtime_rpc_1.ServiceType("protos.External", [
     { name: "Tail", serverStreaming: true, options: {}, I: sp_common_2.TailRequest, O: sp_common_1.TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: exports.GetAudienceRatesRequest, O: exports.GetAudienceRatesResponse },
     { name: "GetSchema", options: {}, I: exports.GetSchemaRequest, O: exports.GetSchemaResponse },
-    { name: "AppIsRegistered", options: {}, I: exports.AppRegistrationStatusRequest, O: exports.AppRegistrationStatusResponse },
+    { name: "AppRegistrationStatus", options: {}, I: exports.AppRegistrationStatusRequest, O: exports.AppRegistrationStatusResponse },
     { name: "AppRegister", options: {}, I: exports.AppRegistrationRequest, O: sp_common_3.StandardResponse },
     { name: "AppVerifyRegistration", options: {}, I: exports.AppVerifyRegistrationRequest, O: sp_common_3.StandardResponse },
     { name: "Test", options: {}, I: exports.TestRequest, O: exports.TestResponse }

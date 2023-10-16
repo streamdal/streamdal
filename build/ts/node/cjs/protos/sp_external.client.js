@@ -224,9 +224,9 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: AppIsRegistered(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
      */
-    appIsRegistered(input, options) {
+    appRegistrationStatus(input, options) {
         const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
