@@ -19,31 +19,34 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	External_GetAll_FullMethodName             = "/protos.External/GetAll"
-	External_GetAllStream_FullMethodName       = "/protos.External/GetAllStream"
-	External_GetPipelines_FullMethodName       = "/protos.External/GetPipelines"
-	External_GetPipeline_FullMethodName        = "/protos.External/GetPipeline"
-	External_CreatePipeline_FullMethodName     = "/protos.External/CreatePipeline"
-	External_UpdatePipeline_FullMethodName     = "/protos.External/UpdatePipeline"
-	External_DeletePipeline_FullMethodName     = "/protos.External/DeletePipeline"
-	External_AttachPipeline_FullMethodName     = "/protos.External/AttachPipeline"
-	External_DetachPipeline_FullMethodName     = "/protos.External/DetachPipeline"
-	External_PausePipeline_FullMethodName      = "/protos.External/PausePipeline"
-	External_ResumePipeline_FullMethodName     = "/protos.External/ResumePipeline"
-	External_CreateNotification_FullMethodName = "/protos.External/CreateNotification"
-	External_UpdateNotification_FullMethodName = "/protos.External/UpdateNotification"
-	External_DeleteNotification_FullMethodName = "/protos.External/DeleteNotification"
-	External_GetNotifications_FullMethodName   = "/protos.External/GetNotifications"
-	External_GetNotification_FullMethodName    = "/protos.External/GetNotification"
-	External_AttachNotification_FullMethodName = "/protos.External/AttachNotification"
-	External_DetachNotification_FullMethodName = "/protos.External/DetachNotification"
-	External_DeleteAudience_FullMethodName     = "/protos.External/DeleteAudience"
-	External_DeleteService_FullMethodName      = "/protos.External/DeleteService"
-	External_GetMetrics_FullMethodName         = "/protos.External/GetMetrics"
-	External_Tail_FullMethodName               = "/protos.External/Tail"
-	External_GetAudienceRates_FullMethodName   = "/protos.External/GetAudienceRates"
-	External_GetSchema_FullMethodName          = "/protos.External/GetSchema"
-	External_Test_FullMethodName               = "/protos.External/Test"
+	External_GetAll_FullMethodName                = "/protos.External/GetAll"
+	External_GetAllStream_FullMethodName          = "/protos.External/GetAllStream"
+	External_GetPipelines_FullMethodName          = "/protos.External/GetPipelines"
+	External_GetPipeline_FullMethodName           = "/protos.External/GetPipeline"
+	External_CreatePipeline_FullMethodName        = "/protos.External/CreatePipeline"
+	External_UpdatePipeline_FullMethodName        = "/protos.External/UpdatePipeline"
+	External_DeletePipeline_FullMethodName        = "/protos.External/DeletePipeline"
+	External_AttachPipeline_FullMethodName        = "/protos.External/AttachPipeline"
+	External_DetachPipeline_FullMethodName        = "/protos.External/DetachPipeline"
+	External_PausePipeline_FullMethodName         = "/protos.External/PausePipeline"
+	External_ResumePipeline_FullMethodName        = "/protos.External/ResumePipeline"
+	External_CreateNotification_FullMethodName    = "/protos.External/CreateNotification"
+	External_UpdateNotification_FullMethodName    = "/protos.External/UpdateNotification"
+	External_DeleteNotification_FullMethodName    = "/protos.External/DeleteNotification"
+	External_GetNotifications_FullMethodName      = "/protos.External/GetNotifications"
+	External_GetNotification_FullMethodName       = "/protos.External/GetNotification"
+	External_AttachNotification_FullMethodName    = "/protos.External/AttachNotification"
+	External_DetachNotification_FullMethodName    = "/protos.External/DetachNotification"
+	External_DeleteAudience_FullMethodName        = "/protos.External/DeleteAudience"
+	External_DeleteService_FullMethodName         = "/protos.External/DeleteService"
+	External_GetMetrics_FullMethodName            = "/protos.External/GetMetrics"
+	External_Tail_FullMethodName                  = "/protos.External/Tail"
+	External_GetAudienceRates_FullMethodName      = "/protos.External/GetAudienceRates"
+	External_GetSchema_FullMethodName             = "/protos.External/GetSchema"
+	External_AppIsRegistered_FullMethodName       = "/protos.External/AppIsRegistered"
+	External_AppRegister_FullMethodName           = "/protos.External/AppRegister"
+	External_AppVerifyRegistration_FullMethodName = "/protos.External/AppVerifyRegistration"
+	External_Test_FullMethodName                  = "/protos.External/Test"
 )
 
 // ExternalClient is the client API for External service.
@@ -95,6 +98,9 @@ type ExternalClient interface {
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
 	GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error)
 	GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*GetSchemaResponse, error)
+	AppIsRegistered(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error)
+	AppRegister(ctx context.Context, in *AppRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	AppVerifyRegistration(ctx context.Context, in *AppVerifyRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -415,6 +421,33 @@ func (c *externalClient) GetSchema(ctx context.Context, in *GetSchemaRequest, op
 	return out, nil
 }
 
+func (c *externalClient) AppIsRegistered(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error) {
+	out := new(AppRegistrationStatusResponse)
+	err := c.cc.Invoke(ctx, External_AppIsRegistered_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) AppRegister(ctx context.Context, in *AppRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_AppRegister_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) AppVerifyRegistration(ctx context.Context, in *AppVerifyRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_AppVerifyRegistration_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, External_Test_FullMethodName, in, out, opts...)
@@ -473,6 +506,9 @@ type ExternalServer interface {
 	Tail(*TailRequest, External_TailServer) error
 	GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error
 	GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error)
+	AppIsRegistered(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error)
+	AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error)
+	AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -553,6 +589,15 @@ func (UnimplementedExternalServer) GetAudienceRates(*GetAudienceRatesRequest, Ex
 }
 func (UnimplementedExternalServer) GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
+}
+func (UnimplementedExternalServer) AppIsRegistered(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppIsRegistered not implemented")
+}
+func (UnimplementedExternalServer) AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppRegister not implemented")
+}
+func (UnimplementedExternalServer) AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppVerifyRegistration not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -1014,6 +1059,60 @@ func _External_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_AppIsRegistered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppRegistrationStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).AppIsRegistered(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_AppIsRegistered_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).AppIsRegistered(ctx, req.(*AppRegistrationStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_AppRegister_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).AppRegister(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_AppRegister_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).AppRegister(ctx, req.(*AppRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_AppVerifyRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppVerifyRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).AppVerifyRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_AppVerifyRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).AppVerifyRegistration(ctx, req.(*AppVerifyRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -1118,6 +1217,18 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSchema",
 			Handler:    _External_GetSchema_Handler,
+		},
+		{
+			MethodName: "AppIsRegistered",
+			Handler:    _External_AppIsRegistered_Handler,
+		},
+		{
+			MethodName: "AppRegister",
+			Handler:    _External_AppRegister_Handler,
+		},
+		{
+			MethodName: "AppVerifyRegistration",
+			Handler:    _External_AppVerifyRegistration_Handler,
 		},
 		{
 			MethodName: "Test",

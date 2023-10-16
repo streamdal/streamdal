@@ -6,6 +6,10 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.ts";
 import type { TestResponse } from "./sp_external.ts";
 import type { TestRequest } from "./sp_external.ts";
+import type { AppVerifyRegistrationRequest } from "./sp_external.ts";
+import type { AppRegistrationRequest } from "./sp_external.ts";
+import type { AppRegistrationStatusResponse } from "./sp_external.ts";
+import type { AppRegistrationStatusRequest } from "./sp_external.ts";
 import type { GetSchemaResponse } from "./sp_external.ts";
 import type { GetSchemaRequest } from "./sp_external.ts";
 import type { GetAudienceRatesResponse } from "./sp_external.ts";
@@ -186,6 +190,18 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
+    /**
+     * @generated from protobuf rpc: AppIsRegistered(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     */
+    appIsRegistered(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
+    /**
+     * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse>;
     /**
      * Test method
      *
@@ -413,12 +429,33 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetSchemaRequest, GetSchemaResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: AppIsRegistered(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     */
+    appIsRegistered(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse> {
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        return stackIntercept<AppRegistrationStatusRequest, AppRegistrationStatusResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse> {
+        const method = this.methods[25], opt = this._transport.mergeOptions(options);
+        return stackIntercept<AppRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse> {
+        const method = this.methods[26], opt = this._transport.mergeOptions(options);
+        return stackIntercept<AppVerifyRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

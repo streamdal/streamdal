@@ -390,6 +390,79 @@ export interface GetSchemaResponse {
     schema?: Schema;
 }
 /**
+ * @generated from protobuf message protos.AppRegistrationStatusRequest
+ */
+export interface AppRegistrationStatusRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+}
+/**
+ * @generated from protobuf message protos.AppRegistrationStatusResponse
+ */
+export interface AppRegistrationStatusResponse {
+    /**
+     * @generated from protobuf field: protos.AppRegistrationStatusResponse.Status status = 1;
+     */
+    status: AppRegistrationStatusResponse_Status;
+}
+/**
+ * @generated from protobuf enum protos.AppRegistrationStatusResponse.Status
+ */
+export declare enum AppRegistrationStatusResponse_Status {
+    /**
+     * @generated from protobuf enum value: STATUS_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * Submit means the user is not registered yet
+     *
+     * @generated from protobuf enum value: STATUS_SUBMIT = 1;
+     */
+    SUBMIT = 1,
+    /**
+     * Verify means the user is registered but not verified yet
+     *
+     * @generated from protobuf enum value: STATUS_VERIFY = 2;
+     */
+    VERIFY = 2,
+    /**
+     * Done means the user is registered and verified
+     *
+     * @generated from protobuf enum value: STATUS_DONE = 3;
+     */
+    DONE = 3
+}
+/**
+ * @generated from protobuf message protos.AppRegistrationRequest
+ */
+export interface AppRegistrationRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+    /**
+     * Used for storage on ui-bff backend
+     *
+     * @generated from protobuf field: string _code = 100;
+     */
+    Code: string;
+}
+/**
+ * @generated from protobuf message protos.AppVerifyRegistrationRequest
+ */
+export interface AppVerifyRegistrationRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: string code = 2;
+     */
+    code: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -722,6 +795,46 @@ declare class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
  * @generated MessageType for protobuf message protos.GetSchemaResponse
  */
 export declare const GetSchemaResponse: GetSchemaResponse$Type;
+declare class AppRegistrationStatusRequest$Type extends MessageType<AppRegistrationStatusRequest> {
+    constructor();
+    create(value?: PartialMessage<AppRegistrationStatusRequest>): AppRegistrationStatusRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationStatusRequest): AppRegistrationStatusRequest;
+    internalBinaryWrite(message: AppRegistrationStatusRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationStatusRequest
+ */
+export declare const AppRegistrationStatusRequest: AppRegistrationStatusRequest$Type;
+declare class AppRegistrationStatusResponse$Type extends MessageType<AppRegistrationStatusResponse> {
+    constructor();
+    create(value?: PartialMessage<AppRegistrationStatusResponse>): AppRegistrationStatusResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationStatusResponse): AppRegistrationStatusResponse;
+    internalBinaryWrite(message: AppRegistrationStatusResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationStatusResponse
+ */
+export declare const AppRegistrationStatusResponse: AppRegistrationStatusResponse$Type;
+declare class AppRegistrationRequest$Type extends MessageType<AppRegistrationRequest> {
+    constructor();
+    create(value?: PartialMessage<AppRegistrationRequest>): AppRegistrationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationRequest): AppRegistrationRequest;
+    internalBinaryWrite(message: AppRegistrationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationRequest
+ */
+export declare const AppRegistrationRequest: AppRegistrationRequest$Type;
+declare class AppVerifyRegistrationRequest$Type extends MessageType<AppVerifyRegistrationRequest> {
+    constructor();
+    create(value?: PartialMessage<AppVerifyRegistrationRequest>): AppVerifyRegistrationRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppVerifyRegistrationRequest): AppVerifyRegistrationRequest;
+    internalBinaryWrite(message: AppVerifyRegistrationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AppVerifyRegistrationRequest
+ */
+export declare const AppVerifyRegistrationRequest: AppVerifyRegistrationRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
     create(value?: PartialMessage<TestRequest>): TestRequest;
