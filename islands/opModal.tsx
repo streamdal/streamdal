@@ -35,6 +35,7 @@ import { initFlowbite } from "flowbite";
 
 import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 import { OperationOpModalInfo } from "./operationOpModal.tsx";
+import { DeleteServiceModal } from "../components/modals/deleteServiceModal.tsx";
 export const OP_MODAL_WIDTH = "308px";
 
 export default function OpModal(
@@ -140,6 +141,9 @@ export default function OpModal(
           version={opModal.value.schemaInfo.version}
           setClose={handleClose}
         />
+      )}
+      {opModal.value?.deleteService && (
+        <DeleteServiceModal audience={audience} />
       )}
       <div class="flex flex-row">
         {tailEnabledSignal.value && <Tail audience={audience} />}

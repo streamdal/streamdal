@@ -26,6 +26,7 @@ export const GROUP_MARGIN = 45;
 export const ServiceNode = ({ data }: { data: NodeData }) => {
   const highlighted = data?.audience === opModal.value?.audience &&
     opModal.value?.displayType === "service";
+  const trashActive = opModal.value?.deleteService;
 
   const setHover = () => {
     setServiceGroup(
@@ -43,16 +44,9 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   };
 
   return (
-    <div
-      onClick={() => {
-        opModal.value = {
-          audience: data.audience,
-          displayType: "service",
-        };
-      }}
-    >
+    <div>
       <div
-        class={`min-h-[80px] w-[320px] flex items-center justify-between bg-white rounded-lg z-10 px-2 hover:border-purple-600 hover:shadow-lg ${
+        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 px-2 hover:border-purple-600 hover:shadow-lg ${
           highlighted
             ? "border-2 border-purple-600"
             : "border-1 border-purple-200"
@@ -61,7 +55,15 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
         onMouseLeave={() => resetHover()}
         id={`${serviceKey(data.audience)}-draghandle`}
       >
-        <div class="flex flex-row items-center">
+        <div
+          class="flex flex-row items-center"
+          onClick={() => {
+            opModal.value = {
+              audience: data.audience,
+              displayType: "service",
+            };
+          }}
+        >
           <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
           <img
             src={"/images/placeholder-icon.png"}
@@ -71,7 +73,21 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
             <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>
         </div>
-        <ServiceNodeMenu data={data} />
+        <button
+          onClick={() =>
+            opModal.value = {
+              audience: data.audience,
+              displayType: "service",
+              deleteService: true,
+            }}
+          className={"p-2 rounded"}
+        >
+          <IconTrash
+            class={`w-5 h-5 hover:text-streamdalRed invisible z-50 ${
+              trashActive ? "text-streamdalRed" : "text-gray-300"
+            } group-hover:visible ${highlighted && "visible"}`}
+          />
+        </button>
       </div>
 
       <div className={"flex justify-evenly w-1/2 mt"}>

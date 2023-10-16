@@ -9,6 +9,7 @@ import {
   AttachPipelineRequest,
   CreateNotificationRequest,
   DeleteAudienceRequest,
+  DeleteServiceRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
 } from "streamdal-protos/protos/sp_external.ts";
@@ -153,6 +154,24 @@ export const deleteAudience = async (audience: Audience, force: boolean) => {
     console.error("error deleting audience", error);
     return {
       id: "deleteAudienceRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const deleteService = async (serviceName: string) => {
+  try {
+    const request: DeleteServiceRequest = { serviceName, force: true };
+    const { response } = await client.deleteService(
+      request,
+      meta,
+    );
+    return response;
+  } catch (error) {
+    console.error("error deleting service", error);
+    return {
+      id: "deleteServiceRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };

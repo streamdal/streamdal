@@ -11,6 +11,7 @@ export type OpModalType = {
   pause?: boolean;
   detach?: boolean;
   delete?: boolean;
+  deleteService?: boolean;
 };
 
 export const OP_MODAL_KEY = "OP_MODAL_VALUE";

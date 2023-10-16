@@ -10,6 +10,7 @@ import IconLink from "tabler-icons/tsx/link.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import { useState } from "preact/hooks";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
 
 export const NodeMenu = (
   { audience, attachedPipeline }: {
@@ -133,35 +134,53 @@ export const ServiceNodeMenu = ({ data }: { data: NodeData }) => {
 
   return (
     <div className={"flex flex-col"}>
-      <div
-        type="button"
-        class="rounded bg-purple-50 ml-4 cursor-pointer"
-        onClick={() => setOpen(!open)}
+      <button
+        onClick={() =>
+          opModal.value = {
+            audience: data?.audience,
+            deleteService: true,
+          }}
+        className={"p-2 rounded"}
       >
-        <IconDots class="w-6 h-6 text-gray-400" aria-hidden="true" />
-      </div>
-      {open && (
-        <div
-          class={`absolute z-[51] left-[-10x] top-[-60px] bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px]`}
-          onMouseLeave={() => setOpen(false)}
-        >
-          <ul
-            class="py-2 text-sm text-gray-700"
-            aria-labelledby="dropdownButton"
-          >
-            <a href="/pipelines">
-              <li className="flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm">
-                <Edit className="text-red mr-2" />
-                Edit Pipelines
-              </li>
-            </a>
-            <li className="flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm cursor-not-allowed">
-              <Silence className="text-web mr-2" />
-              Silence Notifications
-            </li>
-          </ul>
-        </div>
-      )}
+        <IconTrash
+          class={`w-5 h-5 hover:text-streamdalRed invisible z-50 ${
+            trashActive ? "text-streamdalRed" : "text-gray-300"
+          } group-hover:visible ${highlight && "visible"}`}
+        />
+      </button>
+      {/*{open && (*/}
+      {/*  <div*/}
+      {/*    class={`absolute z-[51] left-[-10x] top-[-60px] bg-white divide-y divide-gray-100 rounded-lg shadow w-[200px]`}*/}
+      {/*    onMouseLeave={() => setOpen(false)}*/}
+      {/*  >*/}
+      {/*    <ul*/}
+      {/*      class="py-2 text-sm text-gray-700"*/}
+      {/*      aria-labelledby="dropdownButton"*/}
+      {/*    >*/}
+      {/*      <a href="/pipelines">*/}
+      {/*        <li className="flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm">*/}
+      {/*          <Edit className="text-red mr-2" />*/}
+      {/*          Edit Pipelines*/}
+      {/*        </li>*/}
+      {/*      </a>*/}
+      {/*      <li className="flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm cursor-not-allowed">*/}
+      {/*        <Silence className="text-web mr-2" />*/}
+      {/*        Silence Notifications*/}
+      {/*      </li>*/}
+      {/*      <li*/}
+      {/*        className="flex w-full flex-start items-center py-2 px-2 hover:bg-sunset text-sm cursor-pointer"*/}
+      {/*        onClick={() =>*/}
+      {/*          opModal.value = {*/}
+      {/*            audience: data?.audience,*/}
+      {/*            deleteService: true,*/}
+      {/*          }}*/}
+      {/*      >*/}
+      {/*        <IconTrash className="w-4 h-4 text-red mr-2" />*/}
+      {/*        Delete Service*/}
+      {/*      </li>*/}
+      {/*    </ul>*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   );
 };
