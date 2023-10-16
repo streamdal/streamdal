@@ -1051,26 +1051,33 @@ func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaReq
 	}, nil
 }
 
-func (s *ExternalServer) AppRegistrationStatus(ctx context.Context, req *protos.AppRegistrationStatusRequest) (*protos.AppRegistrationStatusResponse, error) {
+func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.AppRegistrationStatusRequest) (*protos.AppRegistrationStatusResponse, error) {
 	u, err := url.Parse(uibffEndpoint + "/v1/registration")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to parse url")
 	}
 
-	u.Query().Add("email", req.Email)
+	params := url.Values{}
+	params.Add("email", req.Email)
+	u.RawQuery = params.Encode()
 
-	res, err := http.DefaultClient.Get(u.String())
+	println(u.String())
+
+	resp, err := http.DefaultClient.Get(u.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to make request")
 	}
 
+	defer resp.Body.Close()
+
 	// Decode response from jsonpb into proto message
-	var resp *protos.AppRegistrationStatusResponse
-	if err := jsonpb.Unmarshal(res.Body, resp); err != nil {
+	status := &protos.AppRegistrationStatusResponse{}
+
+	if err := jsonpb.Unmarshal(resp.Body, status); err != nil {
 		return nil, errors.Wrap(err, "unable to unmarshal response")
 	}
 
-	return resp, nil
+	return status, nil
 }
 
 func (s *ExternalServer) AppRegister(_ context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
@@ -1092,6 +1099,8 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to marshal request")
 	}
+
+	println("Making request with payload: ", data)
 
 	res, err := http.DefaultClient.Post(u.String(), "application/json", bytes.NewBuffer([]byte(data)))
 	if err != nil {
