@@ -1,10 +1,15 @@
 package grpcapi
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+	"net/url"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -22,6 +27,8 @@ const (
 
 	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
 	streamKeepaliveInterval = 10 * time.Second
+
+	uibffEndpoint = "http://localhost:8080"
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -1042,6 +1049,62 @@ func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaReq
 	return &protos.GetSchemaResponse{
 		Schema: schema,
 	}, nil
+}
+
+func (s *ExternalServer) AppRegistrationStatus(ctx context.Context, req *protos.AppRegistrationStatusRequest) (*protos.AppRegistrationStatusResponse, error) {
+	u, err := url.Parse(uibffEndpoint + "/v1/registration")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to parse url")
+	}
+
+	u.Query().Add("email", req.Email)
+
+	res, err := http.DefaultClient.Get(u.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to make request")
+	}
+
+	// Decode response from jsonpb into proto message
+	var resp *protos.AppRegistrationStatusResponse
+	if err := jsonpb.Unmarshal(res.Body, resp); err != nil {
+		return nil, errors.Wrap(err, "unable to unmarshal response")
+	}
+
+	return resp, nil
+}
+
+func (s *ExternalServer) AppRegister(_ context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
+	return s.uibffPostRequest("/v1/register", req)
+}
+
+func (s *ExternalServer) AppVerifyRegistration(_ context.Context, req *protos.AppVerifyRegistrationRequest) (*protos.StandardResponse, error) {
+	return s.uibffPostRequest("/v1/verify", req)
+}
+
+func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {
+	u, err := url.Parse(uibffEndpoint + endpoint)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to parse url '%s'", uibffEndpoint+endpoint)
+	}
+
+	marshaler := jsonpb.Marshaler{}
+	data, err := marshaler.MarshalToString(m)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to marshal request")
+	}
+
+	res, err := http.DefaultClient.Post(u.String(), "application/json", bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to make request")
+	}
+
+	// Decode response from jsonpb into proto message
+	var resp *protos.StandardResponse
+	if err := jsonpb.Unmarshal(res.Body, resp); err != nil {
+		return nil, errors.Wrap(err, "unable to unmarshal response")
+	}
+
+	return resp, nil
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
