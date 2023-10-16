@@ -65,6 +65,14 @@ func CtxStringValue(ctx context.Context, key string) string {
 	return values[0]
 }
 
+func PtrStr(s *string) string {
+	if s == nil {
+		return ""
+	}
+
+	return *s
+}
+
 func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
 }

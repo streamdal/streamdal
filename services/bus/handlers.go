@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
@@ -511,21 +512,39 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 	// the same pipeline ID and audience
 	// This needs to be it's own context since the parent context will be canceled on shutdown and
 	// thus we won't be able to read from redis in order to send out stop commands
+	llog := b.log.WithFields(logrus.Fields{
+		"method":          "sendTailCommand",
+		"tail_request_id": req.GetXId(),
+		"audience":        req.Audience,
+		"audience_str":    util.AudienceToStr(req.Audience),
+	})
+
+	llog.Debug("before get live")
+
 	live, err := b.options.Store.GetLive(context.Background())
 	if err != nil {
+		llog.Errorf("unable to get live SDK connections: %v", err)
 		return errors.Wrap(err, "unable to get live SDK connections")
 	}
+
+	llog.Debugf("after get live; num live elements: %d", len(live))
 
 	for _, l := range live {
 		// Check if the audience matches
 		if !util.AudienceEquals(l.Audience, req.Audience) {
+			llog.Debugf("audience '%s' does not match '%s'", util.AudienceToStr(l.Audience), util.AudienceToStr(req.Audience))
 			continue
 		}
 
+		llog.Debugf("audience '%s' matches '%s'", util.AudienceToStr(l.Audience), util.AudienceToStr(req.Audience))
+
 		// Session isn't talking to this node
 		if l.NodeName != b.options.NodeName {
+			llog.Debugf("live connection is not on the same node (our node: '%s', connection node '%s')", b.options.NodeName, l.NodeName)
 			continue
 		}
+
+		llog.Debugf("live connection is on the same node (our node: '%s', connection node '%s')", b.options.NodeName, l.NodeName)
 
 		// Get channel for the connected client. This allows us to send commands
 		// to a client that is connected via the Register() method
@@ -540,6 +559,8 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 		// This causes the client to call SendTail() on it's end, which initiates a stream of TailResponse messages
 		// that will come in via internal gRPC API and then get shipped over RedisBackend for each snitch server instance
 		// to possibly receive and then further send to the front end
+		llog.Debugf("sending tail command to session id '%s'", l.SessionID)
+
 		sdkCommandChan <- &protos.Command{
 			Audience: req.Audience,
 			Command: &protos.Command_Tail{
@@ -554,16 +575,26 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 }
 
 func (b *Bus) handleTailResponse(_ context.Context, req *protos.TailResponse) error {
-	b.log.Debugf("handling tail response bus event: %v", req)
+	llog := b.log.WithFields(logrus.Fields{
+		"session_id":      req.SessionId,
+		"tail_request_id": req.TailRequestId,
+		"method":          "handleTailResponse",
+	})
+
+	llog.Debug("handling tail response bus event")
 
 	// Check if there is a pubsub topic.
 	// If not, we're not the instance that the frontend is connected to and can ignore the event.
 	if !b.options.PubSub.HaveTopic(req.TailRequestId) {
-		b.log.Debugf("no pubsub topic for session id '%s' - skipping", req.SessionId)
+		llog.Debug("no pubsub topic - skipping")
 		return nil
 	}
 
+	llog.Debug("before publish to pubsub topic '%s'", req.TailRequestId)
+
 	b.options.PubSub.Publish(req.TailRequestId, req)
+
+	llog.Debug("after publish to pubsub topic '%s'", req.TailRequestId)
 
 	return nil
 }

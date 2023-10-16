@@ -19,6 +19,9 @@ import (
 const (
 	// audienceRateInterval is how often GetAudienceRates() will send new data to the frontend
 	audienceRateInterval = time.Second
+
+	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
+	streamKeepaliveInterval = 10 * time.Second
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -98,6 +101,9 @@ func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.E
 
 	sendInProgress := false
 
+	keepaliveTicker := time.NewTicker(streamKeepaliveInterval)
+	defer keepaliveTicker.Stop()
+
 MAIN:
 	for {
 		select {
@@ -141,6 +147,12 @@ MAIN:
 					return
 				}
 			}()
+		case <-keepaliveTicker.C:
+			if err := server.Send(&protos.GetAllResponse{
+				XKeepalive: util.BoolPtr(true),
+			}); err != nil {
+				s.log.Errorf("GetAllStream(): unable to send keepalive message: %v", err)
+			}
 		}
 	}
 
@@ -855,26 +867,26 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 }
 
 func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_TailServer) error {
-	s.log.Info("external.Tail(): received tail request")
+	s.log.Debug("external.Tail(): received tail request")
 
 	// Each tail request gets its own unique ID so that we can receive messages over
 	// a unique channel from RedisBackend
 	req.XId = util.StringPtr(util.GenerateUUID())
 
-	s.log.Info("external.Tail(): after str ptr")
+	s.log.Debug("external.Tail(): after str ptr")
 
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
 	}
 
-	s.log.Info("external.Tail(): after validate")
+	s.log.Debug("external.Tail(): after validate")
 
 	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
 	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
 
-	s.log.Info("external.Tail(): after listen")
+	s.log.Debug("external.Tail(): after listen")
 
 	// Need to broadcast tail request because an SDK might be connected to a
 	// different server instance.
@@ -882,7 +894,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		return errors.Wrap(err, "unable to broadcast tail request")
 	}
 
-	s.log.Info("external.Tail(): after broadcast")
+	s.log.Debug("external.Tail(): after broadcast")
 
 	// When the connection to the endpoint is closed, emit a STOP event which will be broadcast
 	// to all snitch server instances and their connected clients so that they can stop tailing.
@@ -896,6 +908,9 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			s.log.Error(errors.Wrap(err, "unable to broadcast stop tail request"))
 		}
 	}()
+
+	keepaliveTicker := time.NewTicker(streamKeepaliveInterval)
+	defer keepaliveTicker.Stop()
 
 	for {
 		select {
@@ -922,13 +937,26 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			if err := server.Send(tr); err != nil {
 				return errors.Wrap(err, "unable to send tail stream response")
 			}
+		case <-keepaliveTicker.C:
+			if err := server.Send(&protos.TailResponse{
+				XKeepalive: util.BoolPtr(true),
+			}); err != nil {
+				s.log.Errorf("Tail(): error sending keepalive message: %s", err)
+			}
 		}
+
 	}
 }
 
 func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.External_GetMetricsServer) error {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
+
+	// Technically, GetMetrics() does not need a Keepalive since it will send
+	// metrics every 1s, even if there are no new metrics. However, to keep
+	// things uniform, we send keepalive msgs for all streaming endpoints.
+	keepaliveTicker := time.NewTicker(streamKeepaliveInterval)
+	defer keepaliveTicker.Stop()
 
 	for {
 		select {
@@ -950,6 +978,12 @@ func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.E
 			if err := server.SendMsg(&protos.GetMetricsResponse{Metrics: counters}); err != nil {
 				s.log.Errorf("error sending metrics: %s", err)
 			}
+		case <-keepaliveTicker.C:
+			if err := server.Send(&protos.GetMetricsResponse{
+				XKeepalive: util.BoolPtr(true),
+			}); err != nil {
+				s.log.Errorf("GetMetrics(): error sending keepalive message: %s", err)
+			}
 		}
 	}
 }
@@ -957,6 +991,9 @@ func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.E
 func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, server protos.External_GetAudienceRatesServer) error {
 	ticker := time.NewTicker(audienceRateInterval)
 	defer ticker.Stop()
+
+	keepaliveTicker := time.NewTicker(streamKeepaliveInterval)
+	defer keepaliveTicker.Stop()
 
 	for {
 		select {
@@ -981,6 +1018,12 @@ func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, ser
 
 			if err := server.Send(resp); err != nil {
 				s.log.Errorf("error sending audience rates: %s", err)
+			}
+		case <-keepaliveTicker.C:
+			if err := server.Send(&protos.GetAudienceRatesResponse{
+				XKeepalive: util.BoolPtr(true),
+			}); err != nil {
+				s.log.Errorf("GetAudienceRates(): error sending keepalive message: %s", err)
 			}
 		}
 	}

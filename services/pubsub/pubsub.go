@@ -133,6 +133,7 @@ func (ps *PubSub) Publish(topic string, m interface{}) {
 	defer ps.mtx.RUnlock()
 
 	if _, ok := ps.topics[topic]; !ok {
+		ps.log.Debugf("pubsub.Publish: no such topic '%s' - skipping publish", topic)
 		return
 	}
 

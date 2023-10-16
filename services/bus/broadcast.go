@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -133,15 +134,28 @@ func (b *Bus) BroadcastTailResponse(ctx context.Context, resp *protos.TailRespon
 		Source:    b.options.NodeName,
 	}
 
+	llog := b.log.WithFields(logrus.Fields{
+		"tail_request_id": resp.TailRequestId,
+		"session_id":      resp.SessionId,
+		"method":          "BroadcastTailResponse",
+	})
+
+	llog.Debug("before marshal")
+
 	data, err := proto.Marshal(event)
 	if err != nil {
 		return errors.Wrap(err, "error marshaling bus message")
 	}
 
 	topic := fmt.Sprintf("%s:%s", TailSubjectPrefix, resp.TailRequestId)
+
+	llog.Debugf("after marshal, before publish to topic '%s'", topic)
+
 	if err := b.options.RedisBackend.Publish(ctx, topic, data).Err(); err != nil {
 		return errors.Wrap(err, "error publishing tail response")
 	}
+
+	llog.Debugf("after publish to topic '%s'", topic)
 
 	return nil
 }
