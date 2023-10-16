@@ -85,8 +85,6 @@ service External {
 
   rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
 
-
-
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
