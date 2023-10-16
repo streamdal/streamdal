@@ -1,9 +1,10 @@
+import { readFileSync } from "node:fs";
+
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
 import { WasmModule } from "@streamdal/protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
-// import { version } from "../../package.json";
 import { InternalPipeline, processResponse } from "./pipeline.js";
 
 const MAX_REGISTER_RETRIES = 20;
@@ -15,7 +16,6 @@ export interface RegisterConfigs {
   streamdalToken: string;
   serviceName: string;
   dryRun: boolean;
-  audiences?: Audience[];
 }
 
 export interface TailStatus {
@@ -30,12 +30,34 @@ export const internal = {
   registered: false,
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
-  audiences: new Map<string, Map<string, TailStatus>>(),
+  audiences: new Map<
+    string,
+    { audience: Audience; tails: Map<string, TailStatus> }
+  >(),
   wasmModules: new Map<string, WasmModule>(),
 };
 
 export const audienceKey = (audience: Audience) =>
   JSON.stringify(audience).toLowerCase();
+
+export const clientInfo = () => ({
+  clientType: ClientType.SDK,
+  libraryName: "node-sdk",
+  libraryVersion: version(),
+  language: "Typescript",
+  arch: process.arch,
+  os: process.platform,
+});
+
+export const version = (): string => {
+  try {
+    const pkg = JSON.parse(readFileSync("./package.json").toString());
+    return pkg?.version as string;
+  } catch (e) {
+    console.error("Error getting package version");
+  }
+  return "unknown";
+};
 
 //
 // Wait for the initial registration attempt, but not any thereafter so we don't
@@ -67,7 +89,6 @@ export const register = async ({
   serviceName,
   streamdalToken,
   dryRun,
-  audiences,
 }: RegisterConfigs) => {
   try {
     console.info(`### attempting to register with grpc server...`);
@@ -77,15 +98,10 @@ export const register = async ({
         sessionId,
         serviceName,
         dryRun,
-        clientInfo: {
-          clientType: ClientType.SDK,
-          libraryName: "node-sdk",
-          libraryVersion: "0.0.1",
-          language: "Typescript",
-          arch: process.arch,
-          os: process.platform,
-        },
-        ...(audiences ? { audiences } : { audiences: [] }),
+        clientInfo: clientInfo(),
+        audiences: Array.from(internal.audiences.values()).map(
+          (a) => a.audience
+        ),
       },
       {
         meta: { "auth-token": streamdalToken },

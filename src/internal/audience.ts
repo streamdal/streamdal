@@ -32,10 +32,10 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
     );
 
     if (response.code === ResponseCode.OK) {
-      internal.audiences.set(
-        audienceKey(audience),
-        new Map<string, TailStatus>()
-      );
+      internal.audiences.set(audienceKey(audience), {
+        audience,
+        tails: new Map<string, TailStatus>(),
+      });
     } else {
       console.error("error adding audience", response.message);
     }

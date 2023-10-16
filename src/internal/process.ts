@@ -111,7 +111,7 @@ export const processPipeline = async ({
 } & StreamdalRequest): Promise<StreamdalResponse> => {
   const key = audienceKey(audience);
   const pipeline = internal.pipelines.get(key);
-  const tails = internal.audiences.get(key);
+  const tails = internal.audiences.get(key)?.tails;
 
   void audienceMetrics(audience, data.length);
 

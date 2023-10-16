@@ -80,7 +80,7 @@ export const processResponse = (response: Command) => {
   }
 };
 
-export const buildPipeline = (pipeline: Pipeline) => ({
+export const buildPipeline = (pipeline: Pipeline): Pipeline => ({
   ...pipeline,
   steps: pipeline.steps.map((step: PipelineStep) => ({
     ...step,
@@ -128,14 +128,14 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
       );
       // Create inner map if it doesn't exist
       if (!internal.audiences.has(audienceKey(audience))) {
-        internal.audiences.set(
-          audienceKey(audience),
-          new Map<string, TailStatus>()
-        );
+        internal.audiences.set(audienceKey(audience), {
+          audience,
+          tails: new Map<string, TailStatus>(),
+        });
       }
       // Add entry (@JH, OK if overwritten?)
       request.Id &&
-        internal.audiences.get(audienceKey(audience))?.set(request.Id, {
+        internal.audiences.get(audienceKey(audience))?.tails.set(request.Id, {
           tail: request.type === TailRequestType.START,
           tailRequestId: request.Id,
         });
@@ -147,7 +147,7 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         request.Id
       );
       request.Id &&
-        internal.audiences.get(audienceKey(audience))?.delete(request.Id);
+        internal.audiences.get(audienceKey(audience))?.tails.delete(request.Id);
       break;
     }
     default:

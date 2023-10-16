@@ -32,7 +32,7 @@ const testConfigs = {
   pipelineTimeout: "100",
   stepTimeout: "10",
   dryRun: false,
-  audiences: undefined,
+  audiences: [],
 };
 
 const testAudience = {

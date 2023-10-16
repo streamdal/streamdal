@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { addAudience, addAudiences } from "./internal/audience.js";
 import { client } from "./internal/grpc.js";
+import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
 import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { initPipelines } from "./internal/pipeline.js";
 import {
@@ -91,9 +92,9 @@ export class Streamdal {
     };
 
     // Heartbeat is obsolete
-    // setInterval(() => {
-    //   void heartbeat(this.configs);
-    // }, HEARTBEAT_INTERVAL);
+    setInterval(() => {
+      void heartbeat(this.configs);
+    }, HEARTBEAT_INTERVAL);
 
     setInterval(() => {
       void sendMetrics(this.configs);
