@@ -286,6 +286,7 @@ table {
 
   th, td {
     background-color: var(--color-purple-1000);
+    padding: 6px;
   }
 
   thead tr:first-child th:first-child,
@@ -352,21 +353,6 @@ table tr > td:first-child {
 table tr > th:last-child,
 table tr > td:last-child {
   padding-right: 1.25em;
-}
-
-/* Zebra striping */
-tr:nth-of-type(odd) {
-  background: var(--theme-bg-hover);
-}
-th {
-  background: var(--color-black);
-  color: var(--theme-color);
-  font-weight: bold;
-}
-td,
-th {
-  padding: 6px;
-  text-align: left;
 }
 
 pre {
