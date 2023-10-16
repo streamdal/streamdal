@@ -2,6 +2,10 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
+import type { AppVerifyRegistrationRequest } from "./sp_external.js";
+import type { AppRegistrationRequest } from "./sp_external.js";
+import type { AppRegistrationStatusResponse } from "./sp_external.js";
+import type { AppRegistrationStatusRequest } from "./sp_external.js";
 import type { GetSchemaResponse } from "./sp_external.js";
 import type { GetSchemaRequest } from "./sp_external.js";
 import type { GetAudienceRatesResponse } from "./sp_external.js";
@@ -182,6 +186,18 @@ export interface IExternalClient {
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
     /**
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     */
+    appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
+    /**
+     * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse>;
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
@@ -337,6 +353,18 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse>;
+    /**
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     */
+    appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse>;
+    /**
+     * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse>;
     /**
      * Test method
      *

@@ -400,6 +400,79 @@ export interface GetSchemaResponse {
     schema?: Schema;
 }
 /**
+ * @generated from protobuf message protos.AppRegistrationStatusRequest
+ */
+export interface AppRegistrationStatusRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+}
+/**
+ * @generated from protobuf message protos.AppRegistrationStatusResponse
+ */
+export interface AppRegistrationStatusResponse {
+    /**
+     * @generated from protobuf field: protos.AppRegistrationStatusResponse.Status status = 1;
+     */
+    status: AppRegistrationStatusResponse_Status;
+}
+/**
+ * @generated from protobuf enum protos.AppRegistrationStatusResponse.Status
+ */
+export enum AppRegistrationStatusResponse_Status {
+    /**
+     * @generated from protobuf enum value: STATUS_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * Submit means the user is not registered yet
+     *
+     * @generated from protobuf enum value: STATUS_SUBMIT = 1;
+     */
+    SUBMIT = 1,
+    /**
+     * Verify means the user is registered but not verified yet
+     *
+     * @generated from protobuf enum value: STATUS_VERIFY = 2;
+     */
+    VERIFY = 2,
+    /**
+     * Done means the user is registered and verified
+     *
+     * @generated from protobuf enum value: STATUS_DONE = 3;
+     */
+    DONE = 3
+}
+/**
+ * @generated from protobuf message protos.AppRegistrationRequest
+ */
+export interface AppRegistrationRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+    /**
+     * Used for storage on ui-bff backend
+     *
+     * @generated from protobuf field: string _code = 100;
+     */
+    Code: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+/**
+ * @generated from protobuf message protos.AppVerifyRegistrationRequest
+ */
+export interface AppVerifyRegistrationRequest {
+    /**
+     * @generated from protobuf field: string email = 1;
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: string code = 2;
+     */
+    code: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -1985,6 +2058,208 @@ class GetSchemaResponse$Type extends MessageType<GetSchemaResponse> {
  */
 export const GetSchemaResponse = new GetSchemaResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class AppRegistrationStatusRequest$Type extends MessageType<AppRegistrationStatusRequest> {
+    constructor() {
+        super("protos.AppRegistrationStatusRequest", [
+            { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<AppRegistrationStatusRequest>): AppRegistrationStatusRequest {
+        const message = { email: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<AppRegistrationStatusRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationStatusRequest): AppRegistrationStatusRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string email */ 1:
+                    message.email = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AppRegistrationStatusRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string email = 1; */
+        if (message.email !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.email);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationStatusRequest
+ */
+export const AppRegistrationStatusRequest = new AppRegistrationStatusRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AppRegistrationStatusResponse$Type extends MessageType<AppRegistrationStatusResponse> {
+    constructor() {
+        super("protos.AppRegistrationStatusResponse", [
+            { no: 1, name: "status", kind: "enum", T: () => ["protos.AppRegistrationStatusResponse.Status", AppRegistrationStatusResponse_Status, "STATUS_"] }
+        ]);
+    }
+    create(value?: PartialMessage<AppRegistrationStatusResponse>): AppRegistrationStatusResponse {
+        const message = { status: 0 };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<AppRegistrationStatusResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationStatusResponse): AppRegistrationStatusResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.AppRegistrationStatusResponse.Status status */ 1:
+                    message.status = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AppRegistrationStatusResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.AppRegistrationStatusResponse.Status status = 1; */
+        if (message.status !== 0)
+            writer.tag(1, WireType.Varint).int32(message.status);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationStatusResponse
+ */
+export const AppRegistrationStatusResponse = new AppRegistrationStatusResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AppRegistrationRequest$Type extends MessageType<AppRegistrationRequest> {
+    constructor() {
+        super("protos.AppRegistrationRequest", [
+            { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 100, name: "_code", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<AppRegistrationRequest>): AppRegistrationRequest {
+        const message = { email: "", Code: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<AppRegistrationRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegistrationRequest): AppRegistrationRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string email */ 1:
+                    message.email = reader.string();
+                    break;
+                case /* string _code */ 100:
+                    message.Code = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AppRegistrationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string email = 1; */
+        if (message.email !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.email);
+        /* string _code = 100; */
+        if (message.Code !== "")
+            writer.tag(100, WireType.LengthDelimited).string(message.Code);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegistrationRequest
+ */
+export const AppRegistrationRequest = new AppRegistrationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AppVerifyRegistrationRequest$Type extends MessageType<AppVerifyRegistrationRequest> {
+    constructor() {
+        super("protos.AppVerifyRegistrationRequest", [
+            { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "code", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<AppVerifyRegistrationRequest>): AppVerifyRegistrationRequest {
+        const message = { email: "", code: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<AppVerifyRegistrationRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppVerifyRegistrationRequest): AppVerifyRegistrationRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string email */ 1:
+                    message.email = reader.string();
+                    break;
+                case /* string code */ 2:
+                    message.code = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AppVerifyRegistrationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string email = 1; */
+        if (message.email !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.email);
+        /* string code = 2; */
+        if (message.code !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.code);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AppVerifyRegistrationRequest
+ */
+export const AppVerifyRegistrationRequest = new AppVerifyRegistrationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -2106,5 +2381,8 @@ export const External = new ServiceType("protos.External", [
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
     { name: "GetSchema", options: {}, I: GetSchemaRequest, O: GetSchemaResponse },
+    { name: "AppRegistrationStatus", options: {}, I: AppRegistrationStatusRequest, O: AppRegistrationStatusResponse },
+    { name: "AppRegister", options: {}, I: AppRegistrationRequest, O: StandardResponse },
+    { name: "AppVerifyRegistration", options: {}, I: AppVerifyRegistrationRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

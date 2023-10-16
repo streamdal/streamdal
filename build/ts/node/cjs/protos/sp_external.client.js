@@ -224,12 +224,33 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
+     */
+    appRegistrationStatus(input, options) {
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appRegister(input, options) {
+        const method = this.methods[25], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
+     */
+    appVerifyRegistration(input, options) {
+        const method = this.methods[26], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
 }

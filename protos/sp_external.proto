@@ -79,6 +79,12 @@ service External {
 
   rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
 
+  rpc AppRegistrationStatus(AppRegistrationStatusRequest) returns (AppRegistrationStatusResponse);
+
+  rpc AppRegister(AppRegistrationRequest) returns (StandardResponse);
+
+  rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -249,6 +255,40 @@ message GetSchemaRequest {
 
 message GetSchemaResponse {
   Schema schema = 1;
+}
+
+message AppRegistrationStatusRequest {
+  string email = 1;
+}
+
+message AppRegistrationStatusResponse {
+  enum Status {
+    STATUS_UNSET = 0;
+
+    // Submit means the user is not registered yet
+    STATUS_SUBMIT = 1;
+
+    // Verify means the user is registered but not verified yet
+    STATUS_VERIFY = 2;
+
+    // Done means the user is registered and verified
+    STATUS_DONE = 3;
+  }
+
+  Status status = 1;
+}
+
+message AppRegistrationRequest {
+  string email = 1;
+
+  // Used for storage on ui-bff backend
+  string _code = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message AppVerifyRegistrationRequest {
+  string email = 1;
+
+  string code = 2;
 }
 
 message TestRequest {

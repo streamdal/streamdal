@@ -3,11 +3,46 @@ import sp_info_pb2 as _sp_info_pb2
 import sp_notify_pb2 as _sp_notify_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class AppRegistrationRequest(_message.Message):
+    __slots__ = ["_code", "email"]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    _CODE_FIELD_NUMBER: _ClassVar[int]
+    _code: str
+    email: str
+    def __init__(self, email: _Optional[str] = ..., _code: _Optional[str] = ...) -> None: ...
+
+class AppRegistrationStatusRequest(_message.Message):
+    __slots__ = ["email"]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    email: str
+    def __init__(self, email: _Optional[str] = ...) -> None: ...
+
+class AppRegistrationStatusResponse(_message.Message):
+    __slots__ = ["status"]
+    class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+    STATUS_DONE: AppRegistrationStatusResponse.Status
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    STATUS_SUBMIT: AppRegistrationStatusResponse.Status
+    STATUS_UNSET: AppRegistrationStatusResponse.Status
+    STATUS_VERIFY: AppRegistrationStatusResponse.Status
+    status: AppRegistrationStatusResponse.Status
+    def __init__(self, status: _Optional[_Union[AppRegistrationStatusResponse.Status, str]] = ...) -> None: ...
+
+class AppVerifyRegistrationRequest(_message.Message):
+    __slots__ = ["code", "email"]
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    code: str
+    email: str
+    def __init__(self, email: _Optional[str] = ..., code: _Optional[str] = ...) -> None: ...
 
 class AttachNotificationRequest(_message.Message):
     __slots__ = ["notification_id", "pipeline_id"]
