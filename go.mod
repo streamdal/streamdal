@@ -11,7 +11,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // TODO: Switch this to bigcache
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/snitch-protos v0.0.112-0.20231016210341-4dbee0d88fa4
+	github.com/streamdal/snitch-protos v0.0.112
 	golang.org/x/crypto v0.11.0
 	google.golang.org/grpc v1.56.2
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
@@ -22,6 +22,7 @@ require (
 	github.com/alecthomas/kong v0.8.0
 	github.com/aws/aws-sdk-go v1.34.28
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/golang/protobuf v1.5.3
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/prometheus/client_golang v1.16.0
@@ -46,7 +47,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang/glog v1.1.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
