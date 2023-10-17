@@ -67,7 +67,9 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("transform is required".to_string());
     }
 
-    if req.step.transform().type_.unwrap() == TransformType::TRANSFORM_TYPE_UNKNOWN {
+    let transform_type = req.step.transform().type_.enum_value_or_default();
+
+    if transform_type == TransformType::TRANSFORM_TYPE_UNKNOWN {
         return Err("transform type cannot be unknown".to_string());
     }
 

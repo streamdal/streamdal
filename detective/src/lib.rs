@@ -79,7 +79,12 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("detective type cannot be unknown".to_string());
     }
 
-    if req.step.detective().path.clone().unwrap() == "" {
+    let path = match req.step.detective().path.clone() {
+        Some(v) => v,
+        None => return Err("detective path must be set".to_string()),
+    };
+
+    if path == "" {
         return Err("detective path cannot be empty".to_string());
     }
 
