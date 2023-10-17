@@ -29,7 +29,6 @@ export const handler: Handlers<{ tail: TailResponse }> = {
 
     socket.addEventListener("open", () => {
       clientConnected = true;
-      audienceMetricsAbortSignal.value = false;
       console.info("audience metrics socket client connected!");
     });
 

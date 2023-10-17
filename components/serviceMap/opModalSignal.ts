@@ -22,7 +22,7 @@ export const deserializeOp = () => {
     const parsedOperation = JSON.parse(savedOperation!);
     return parsedOperation;
   } catch (e) {
-    console.log("failed to deserialize and parse saved audience", e);
+    console.error("failed to deserialize and parse saved audience", e);
   }
   return null;
 };

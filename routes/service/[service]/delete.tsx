@@ -12,7 +12,6 @@ export const handler: Handlers<> = {
   async POST(req, ctx) {
     const serviceName = ctx.params.service;
     const response = await deleteService(serviceName);
-    console.log(response);
 
     return new Response(
       JSON.stringify({
