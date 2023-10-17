@@ -9,5 +9,9 @@
 # macOS-specific files
 .DS_Store
 
+# IDEs
+.idea/
+.vscode/
+
 # Fresh build directory
 _fresh/
