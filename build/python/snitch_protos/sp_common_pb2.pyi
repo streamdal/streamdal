@@ -37,9 +37,9 @@ class AudienceRate(_message.Message):
     __slots__ = ["bytes", "processed"]
     BYTES_FIELD_NUMBER: _ClassVar[int]
     PROCESSED_FIELD_NUMBER: _ClassVar[int]
-    bytes: int
-    processed: int
-    def __init__(self, bytes: _Optional[int] = ..., processed: _Optional[int] = ...) -> None: ...
+    bytes: float
+    processed: float
+    def __init__(self, bytes: _Optional[float] = ..., processed: _Optional[float] = ...) -> None: ...
 
 class Metric(_message.Message):
     __slots__ = ["audience", "labels", "name", "value"]
