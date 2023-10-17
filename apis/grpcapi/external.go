@@ -1016,8 +1016,8 @@ func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, ser
 
 			for audStr, counter := range rates {
 				row := &protos.AudienceRate{
-					Bytes:     counter.Bytes.Rate() / 10,
-					Processed: counter.Processed.Rate() / 10,
+					Bytes:     float64(counter.Bytes.Rate()) / 10,
+					Processed: float64(counter.Processed.Rate()) / 10,
 				}
 
 				resp.Rates[audStr] = row

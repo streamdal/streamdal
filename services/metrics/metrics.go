@@ -219,8 +219,6 @@ func (m *Metrics) increaseRate(ctx context.Context, metric *protos.Metric) {
 
 	counter := m.GetRateCounter(ctx, metric.Audience)
 
-	//m.log.Debugf("increasing rate counter '%s' by '%d'", metric.Name, int64(metric.Value))
-
 	switch metric.Name {
 	case "counter_consume_bytes_rate":
 		fallthrough
@@ -277,6 +275,7 @@ func (m *Metrics) runCounterDumper(looper director.Looper) {
 func (m *Metrics) FetchCounters(ctx context.Context) ([]*protos.Metric, error) {
 	client := http.DefaultClient
 
+	// TODO: this needs to support HttpListenAddress from config instead of being hardcoded
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:8080/metrics", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create request")
