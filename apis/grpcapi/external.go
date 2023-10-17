@@ -28,7 +28,7 @@ const (
 	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
 	streamKeepaliveInterval = 10 * time.Second
 
-	uibffEndpoint = "http://localhost:8080"
+	uibffEndpoint = "https://api.dev.streamdal.com"
 )
 
 // ExternalServer implements the external GRPC API interface
