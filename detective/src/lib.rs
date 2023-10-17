@@ -79,9 +79,9 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("detective type cannot be unknown".to_string());
     }
 
-    let path = match req.step.detective().path {
-        Ok(v) => v,
-        Err(_) => return Err("unable to get detective path".to_string()),
+    let path = match req.step.detective().path.clone() {
+        Some(v) => v,
+        None => return Err("detective path must be set".to_string()),
     };
 
     if path == "" {
