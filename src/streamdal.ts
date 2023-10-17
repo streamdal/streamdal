@@ -2,16 +2,12 @@ import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { v4 as uuidv4 } from "uuid";
 
-import { addAudience, addAudiences } from "./internal/audience.js";
+import { addAudiences } from "./internal/audience.js";
 import { client } from "./internal/grpc.js";
 import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
 import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
-import { initPipelines } from "./internal/pipeline.js";
-import {
-  processPipeline as internalProcessPipeline,
-  StepStatus,
-} from "./internal/process.js";
-import { internal, retryRegister } from "./internal/register.js";
+import { retryProcessPipeline, StepStatus } from "./internal/process.js";
+import { register } from "./internal/register.js";
 
 export { Audience, OperationType };
 
@@ -51,7 +47,6 @@ export interface StreamdalResponse {
 
 export class Streamdal {
   private configs: Configs;
-  private register: Promise<boolean | undefined>;
 
   constructor({
     streamdalUrl,
@@ -101,37 +96,13 @@ export class Streamdal {
     }, METRIC_INTERVAL);
 
     void addAudiences(this.configs);
-    //
-    // Since we can't async await in a constructor we assign the promise
-    // here so we can check it and wait for it on the initial pipeline request
-    this.register = retryRegister(this.configs);
+    void register(this.configs);
   }
 
   async processPipeline({
     audience,
     data,
   }: StreamdalRequest): Promise<StreamdalResponse> {
-    if (!internal.registered) {
-      //
-      // Initial server registration may not have completed yet
-      const register = await this.register;
-      if (!register) {
-        const message =
-          "Node SDK not yet registered with the server, skipping pipeline. Is the server running?";
-        console.error(message);
-        return Promise.resolve({
-          data,
-          error: true,
-          message,
-        });
-      }
-    }
-
-    if (!internal.pipelineInitialized) {
-      await initPipelines(this.configs);
-    }
-
-    await addAudience({ configs: this.configs, audience });
-    return internalProcessPipeline({ configs: this.configs, audience, data });
+    return retryProcessPipeline({ configs: this.configs, audience, data });
   }
 }

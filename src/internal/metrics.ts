@@ -7,7 +7,6 @@ import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import ReadWriteLock from "rwlock";
 
 import { StepStatus } from "./process.js";
-import { internal } from "./register.js";
 
 export const METRIC_INTERVAL = 1000;
 
@@ -99,8 +98,7 @@ export const audienceMetrics = async (
   });
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const sendMetrics = async (configs: MetricsConfigs) =>
+export const sendMetrics = (configs: MetricsConfigs) =>
   lock.writeLock((release) => {
     try {
       if (!metrics.size) {

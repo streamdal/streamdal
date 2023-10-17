@@ -5,10 +5,10 @@ import { ClientType } from "@streamdal/protos/protos/sp_info";
 import { WasmModule } from "@streamdal/protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
+import { Configs } from "../streamdal.js";
 import { InternalPipeline, processResponse } from "./pipeline.js";
 
-const MAX_REGISTER_RETRIES = 20;
-const RETRY_INTERVAL = 5000;
+const REGISTRATION_RETRY_INTERVAL = 5000;
 
 export interface RegisterConfigs {
   grpcClient: IInternalClient;
@@ -23,10 +23,9 @@ export interface TailStatus {
   tailRequestId?: string;
 }
 
-//
-// fyi, the init flag is because we can't await pipeline initialization
-// in our constructor so we do it on processPipeline only if needed
 export const internal = {
+  // we track registered status because we can't await registering
+  // in the streamdal constructor
   registered: false,
   pipelineInitialized: false,
   pipelines: new Map<string, InternalPipeline>(),
@@ -59,52 +58,21 @@ export const version = (): string => {
   return "unknown";
 };
 
-//
-// Wait for the initial registration attempt, but not any thereafter so we don't
-// block too long
-export const retryRegister = async (configs: RegisterConfigs) => {
-  const registered = await register(configs);
-  if (registered) {
-    return Promise.resolve(true);
-  }
-  let retries = 1;
-  const intervalId = setInterval(() => {
-    if (retries > MAX_REGISTER_RETRIES || internal.registered) {
-      clearInterval(intervalId);
-    } else {
-      retries++;
-      console.debug(
-        `retrying registration, ${retries} of ${MAX_REGISTER_RETRIES} times`
-      );
-      void register(configs);
-    }
-  }, RETRY_INTERVAL);
-
-  return Promise.resolve(false);
-};
-
-export const register = async ({
-  grpcClient,
-  sessionId,
-  serviceName,
-  streamdalToken,
-  dryRun,
-}: RegisterConfigs) => {
+export const register = async (configs: Configs) => {
   try {
-    console.info(`### attempting to register with grpc server...`);
-
-    const call = grpcClient.register(
+    console.info(`### registering with grpc server...`);
+    const call = configs.grpcClient.register(
       {
-        sessionId,
-        serviceName,
-        dryRun,
+        sessionId: configs.sessionId,
+        serviceName: configs.serviceName,
+        dryRun: configs.dryRun,
         clientInfo: clientInfo(),
         audiences: Array.from(internal.audiences.values()).map(
           (a) => a.audience
         ),
       },
       {
-        meta: { "auth-token": streamdalToken },
+        meta: { "auth-token": configs.streamdalToken },
       }
     );
 
@@ -113,20 +81,22 @@ export const register = async ({
     //
     // considering response headers without errors as registered
     internal.registered = true;
-    //
-    // await responses asynchronously so we can let upstream know we've registered
-    void responseHandler(call);
-    return Promise.resolve(true);
-  } catch (error) {
-    console.error("error registering with grpc server", error);
-    return Promise.resolve(false);
-  }
-};
 
-const responseHandler = async (call: any) => {
-  for await (const response of call.responses) {
-    response.command.oneofKind !== "keepAlive" &&
-      console.debug("processing response command...", response);
-    processResponse(response);
+    for await (const response of call.responses) {
+      response.command.oneofKind !== "keepAlive" &&
+        console.debug("processing response command...", response);
+      processResponse(response);
+    }
+  } catch (error) {
+    internal.registered = false;
+    console.error("error registering with grpc server", error);
+    setTimeout(() => {
+      console.info(
+        `retrying registering with grpc server in ${
+          REGISTRATION_RETRY_INTERVAL / 1000
+        } seconds...`
+      );
+      void register(configs);
+    }, REGISTRATION_RETRY_INTERVAL);
   }
 };

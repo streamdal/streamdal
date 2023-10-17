@@ -10,9 +10,10 @@ import {
 } from "@streamdal/protos/protos/sp_pipeline";
 import { WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
-import { StreamdalRequest, StreamdalResponse } from "../streamdal.js";
+import { Configs, StreamdalRequest, StreamdalResponse } from "../streamdal.js";
+import { addAudience } from "./audience.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
-import { EnhancedStep, InternalPipeline } from "./pipeline.js";
+import { EnhancedStep, initPipelines, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 import { runWasm } from "./wasm.js";
 
@@ -46,6 +47,8 @@ export interface TailRequest {
 }
 
 const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1 megabyte
+const MAX_PIPELINE_RETRIES = 10;
+const PIPELINE_RETRY_INTERVAL = 1000;
 
 //
 // add pipeline information to the steps so we can log/notify
@@ -64,13 +67,13 @@ export const sendTail = ({
   originalData,
   newData,
 }: TailRequest) => {
-  const tailCall = configs.grpcClient.sendTail({
-    meta: { "auth-token": configs.streamdalToken },
-  });
+  try {
+    const tailCall = configs.grpcClient.sendTail({
+      meta: { "auth-token": configs.streamdalToken },
+    });
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  tails?.forEach(async (tailStatus, tailRequestId) => {
-    try {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    tails?.forEach(async (tailStatus, tailRequestId) => {
       if (tailStatus.tail) {
         const tailResponse = TailResponse.create({
           timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
@@ -96,9 +99,68 @@ export const sendTail = ({
         const trailers = await tailCall.trailers;
         console.debug("got tail trailers: ", trailers);
       }
-    } catch (e) {
-      console.error("Error sending tail request", e);
+    });
+  } catch (e) {
+    console.error("Error sending tail request", e);
+  }
+};
+
+export const retryProcessPipeline = async ({
+  configs,
+  audience,
+  data,
+}: {
+  configs: Configs;
+} & StreamdalRequest): Promise<StreamdalResponse> => {
+  let retries = 1;
+  try {
+    if (internal.registered) {
+      return processPipeline({
+        configs,
+        audience,
+        data,
+      });
     }
+    console.info(
+      `not yet registered with the grpc server, retrying process pipeline in ${
+        PIPELINE_RETRY_INTERVAL / 1000
+      } seconds...`
+    );
+    return new Promise((resolve) => {
+      const intervalId = setInterval(() => {
+        retries++;
+        if (MAX_PIPELINE_RETRIES && retries >= MAX_PIPELINE_RETRIES) {
+          clearInterval(intervalId);
+          return;
+        }
+        if (internal.registered) {
+          console.debug(`retrying process pipeline...`);
+          clearInterval(intervalId);
+          return resolve(
+            processPipeline({
+              configs,
+              audience,
+              data,
+            })
+          );
+        }
+        console.debug(
+          `retrying process pipeline in ${
+            PIPELINE_RETRY_INTERVAL / 1000
+          } seconds; ${retries} of ${MAX_PIPELINE_RETRIES} retries`
+        );
+      }, PIPELINE_RETRY_INTERVAL);
+    });
+  } catch (e) {
+    console.error("Error running process pipeline", e);
+  }
+  const message =
+    "Node SDK not registered with the server, skipping pipeline. Is the server running?";
+  console.error(message);
+  return Promise.resolve({
+    data,
+    error: true,
+    message,
   });
 };
 
@@ -107,8 +169,14 @@ export const processPipeline = async ({
   audience,
   data,
 }: {
-  configs: PipelineConfigs;
+  configs: Configs;
 } & StreamdalRequest): Promise<StreamdalResponse> => {
+  if (!internal.pipelineInitialized) {
+    await initPipelines(configs);
+  }
+
+  await addAudience({ configs: configs, audience });
+
   const key = audienceKey(audience);
   const pipeline = internal.pipelines.get(key);
   const tails = internal.audiences.get(key)?.tails;
@@ -190,14 +258,18 @@ export const processPipeline = async ({
 
 const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
   console.debug("notifying error step", step);
-  await configs.grpcClient.notify(
-    {
-      pipelineId: step.pipelineId,
-      stepName: step.stepName,
-      occurredAtUnixTsUtc: Date.now().toString(),
-    },
-    { meta: { "auth-token": configs.streamdalToken } }
-  );
+  try {
+    await configs.grpcClient.notify(
+      {
+        pipelineId: step.pipelineId,
+        stepName: step.stepName,
+        occurredAtUnixTsUtc: Date.now().toString(),
+      },
+      { meta: { "auth-token": configs.streamdalToken } }
+    );
+  } catch (e) {
+    console.error("error sending notification to server", e);
+  }
 };
 
 export const resultCondition = (
