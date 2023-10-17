@@ -1100,15 +1100,13 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 		return nil, errors.Wrap(err, "unable to marshal request")
 	}
 
-	println("Making request with payload: ", data)
-
 	res, err := http.DefaultClient.Post(u.String(), "application/json", bytes.NewBuffer([]byte(data)))
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to make request")
 	}
 
 	// Decode response from jsonpb into proto message
-	var resp *protos.StandardResponse
+	resp := &protos.StandardResponse{}
 	if err := jsonpb.Unmarshal(res.Body, resp); err != nil {
 		return nil, errors.Wrap(err, "unable to unmarshal response")
 	}
