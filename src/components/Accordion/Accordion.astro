@@ -7,12 +7,12 @@ const { title } = Astro.props;
     background-color: #161223;
     justify-content: space-between;
     border-radius: 15px;
+    border-bottom: 1px solid transparent;
     align-items: center;
     color: white;
     cursor: pointer;
     padding: 18px;
     width: 100%;
-    border: none;
     text-align: left;
     outline: none;
     margin-bottom: -20px;
@@ -21,7 +21,7 @@ const { title } = Astro.props;
   .collapsible.active {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    border-bottom: 1px solid #28203F;
+    border-bottom-color: #28203F;
   }
   .wrapper {
     height: 0;
