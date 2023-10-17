@@ -1105,6 +1105,10 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 		return nil, errors.Wrap(err, "unable to make request")
 	}
 
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("non-OK status code: %d", res.StatusCode)
+	}
+
 	// Decode response from jsonpb into proto message
 	resp := &protos.StandardResponse{}
 	if err := jsonpb.Unmarshal(res.Body, resp); err != nil {
