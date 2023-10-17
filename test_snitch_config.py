@@ -1,5 +1,4 @@
 import pytest
-import snitchpy
 from snitchpy import SnitchClient, SnitchConfig
 
 

@@ -6,7 +6,7 @@ def tail_request(cmd: protos.Command):
         raise ValueError("cmd must be a protos.Command")
 
     if not isinstance(cmd.tail, protos.TailCommand):
-        raise ValueError("cmd.tail must be a protos.TailRequest")
+        raise ValueError("cmd.tail must be a protos.TailCommand")
 
     req = cmd.tail.request
     if not isinstance(req, protos.TailRequest):
