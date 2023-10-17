@@ -178,13 +178,13 @@ export interface TailResponse {
  */
 export interface AudienceRate {
     /**
-     * @generated from protobuf field: int64 bytes = 1;
+     * @generated from protobuf field: double bytes = 1;
      */
-    bytes: string;
+    bytes: number;
     /**
-     * @generated from protobuf field: int64 processed = 2;
+     * @generated from protobuf field: double processed = 2;
      */
-    processed: string;
+    processed: number;
 }
 /**
  * @generated from protobuf message protos.Schema
@@ -723,12 +723,12 @@ export const TailResponse = new TailResponse$Type();
 class AudienceRate$Type extends MessageType<AudienceRate> {
     constructor() {
         super("protos.AudienceRate", [
-            { no: 1, name: "bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
-            { no: 2, name: "processed", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 1, name: "bytes", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "processed", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<AudienceRate>): AudienceRate {
-        const message = { bytes: "0", processed: "0" };
+        const message = { bytes: 0, processed: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<AudienceRate>(this, message, value);
@@ -739,11 +739,11 @@ class AudienceRate$Type extends MessageType<AudienceRate> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int64 bytes */ 1:
-                    message.bytes = reader.int64().toString();
+                case /* double bytes */ 1:
+                    message.bytes = reader.double();
                     break;
-                case /* int64 processed */ 2:
-                    message.processed = reader.int64().toString();
+                case /* double processed */ 2:
+                    message.processed = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -757,12 +757,12 @@ class AudienceRate$Type extends MessageType<AudienceRate> {
         return message;
     }
     internalBinaryWrite(message: AudienceRate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* int64 bytes = 1; */
-        if (message.bytes !== "0")
-            writer.tag(1, WireType.Varint).int64(message.bytes);
-        /* int64 processed = 2; */
-        if (message.processed !== "0")
-            writer.tag(2, WireType.Varint).int64(message.processed);
+        /* double bytes = 1; */
+        if (message.bytes !== 0)
+            writer.tag(1, WireType.Bit64).double(message.bytes);
+        /* double processed = 2; */
+        if (message.processed !== 0)
+            writer.tag(2, WireType.Bit64).double(message.processed);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

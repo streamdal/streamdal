@@ -171,13 +171,13 @@ export interface TailResponse {
  */
 export interface AudienceRate {
     /**
-     * @generated from protobuf field: int64 bytes = 1;
+     * @generated from protobuf field: double bytes = 1;
      */
-    bytes: string;
+    bytes: number;
     /**
-     * @generated from protobuf field: int64 processed = 2;
+     * @generated from protobuf field: double processed = 2;
      */
-    processed: string;
+    processed: number;
 }
 /**
  * @generated from protobuf message protos.Schema

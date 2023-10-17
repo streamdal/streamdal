@@ -1074,9 +1074,9 @@ impl ::protobuf::reflect::ProtobufValue for TailResponse {
 pub struct AudienceRate {
     // message fields
     // @@protoc_insertion_point(field:protos.AudienceRate.bytes)
-    pub bytes: i64,
+    pub bytes: f64,
     // @@protoc_insertion_point(field:protos.AudienceRate.processed)
-    pub processed: i64,
+    pub processed: f64,
     // special fields
     // @@protoc_insertion_point(special_field:protos.AudienceRate.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -1124,11 +1124,11 @@ impl ::protobuf::Message for AudienceRate {
     fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
-                8 => {
-                    self.bytes = is.read_int64()?;
+                9 => {
+                    self.bytes = is.read_double()?;
                 },
-                16 => {
-                    self.processed = is.read_int64()?;
+                17 => {
+                    self.processed = is.read_double()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -1142,11 +1142,11 @@ impl ::protobuf::Message for AudienceRate {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if self.bytes != 0 {
-            my_size += ::protobuf::rt::int64_size(1, self.bytes);
+        if self.bytes != 0. {
+            my_size += 1 + 8;
         }
-        if self.processed != 0 {
-            my_size += ::protobuf::rt::int64_size(2, self.processed);
+        if self.processed != 0. {
+            my_size += 1 + 8;
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -1154,11 +1154,11 @@ impl ::protobuf::Message for AudienceRate {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if self.bytes != 0 {
-            os.write_int64(1, self.bytes)?;
+        if self.bytes != 0. {
+            os.write_double(1, self.bytes)?;
         }
-        if self.processed != 0 {
-            os.write_int64(2, self.processed)?;
+        if self.processed != 0. {
+            os.write_double(2, self.processed)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1177,15 +1177,15 @@ impl ::protobuf::Message for AudienceRate {
     }
 
     fn clear(&mut self) {
-        self.bytes = 0;
-        self.processed = 0;
+        self.bytes = 0.;
+        self.processed = 0.;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static AudienceRate {
         static instance: AudienceRate = AudienceRate {
-            bytes: 0,
-            processed: 0,
+            bytes: 0.,
+            processed: 0.,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1702,7 +1702,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     eepalive\x88\x01\x01\x1a;\n\rMetadataEntry\x12\x10\n\x03key\x18\x01\x20\
     \x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\
     \x01B\r\n\x0bX_keepalive\"B\n\x0cAudienceRate\x12\x14\n\x05bytes\x18\x01\
-    \x20\x01(\x03R\x05bytes\x12\x1c\n\tprocessed\x18\x02\x20\x01(\x03R\tproc\
+    \x20\x01(\x01R\x05bytes\x12\x1c\n\tprocessed\x18\x02\x20\x01(\x01R\tproc\
     essed\"\xbd\x01\n\x06Schema\x12\x1f\n\x0bjson_schema\x18\x01\x20\x01(\
     \x0cR\njsonSchema\x12\x19\n\x08_version\x18d\x20\x01(\x05R\x07Version\
     \x12:\n\t_metadata\x18\xe8\x07\x20\x03(\x0b2\x1c.protos.Schema.MetadataE\
@@ -1857,13 +1857,13 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x02\t\x04\x12\x03d\x02\n\n\x0c\n\x05\x04\x04\x02\t\x05\x12\x03d\x0b\
     \x0f\n\x0c\n\x05\x04\x04\x02\t\x01\x12\x03d\x10\x1a\n\x0c\n\x05\x04\x04\
     \x02\t\x03\x12\x03d\x1d!\n\n\n\x02\x04\x05\x12\x04g\0j\x01\n\n\n\x03\x04\
-    \x05\x01\x12\x03g\x08\x14\n\x0b\n\x04\x04\x05\x02\0\x12\x03h\x02\x12\n\
-    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03h\x02\x07\n\x0c\n\x05\x04\x05\x02\0\
-    \x01\x12\x03h\x08\r\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03h\x10\x11\n\x0b\
-    \n\x04\x04\x05\x02\x01\x12\x03i\x02\x16\n\x0c\n\x05\x04\x05\x02\x01\x05\
-    \x12\x03i\x02\x07\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03i\x08\x11\n\x0c\
-    \n\x05\x04\x05\x02\x01\x03\x12\x03i\x14\x15\n\n\n\x02\x04\x06\x12\x04l\0\
-    r\x01\n\n\n\x03\x04\x06\x01\x12\x03l\x08\x0e\n\x0b\n\x04\x04\x06\x02\0\
+    \x05\x01\x12\x03g\x08\x14\n\x0b\n\x04\x04\x05\x02\0\x12\x03h\x02\x13\n\
+    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03h\x02\x08\n\x0c\n\x05\x04\x05\x02\0\
+    \x01\x12\x03h\t\x0e\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03h\x11\x12\n\x0b\
+    \n\x04\x04\x05\x02\x01\x12\x03i\x02\x17\n\x0c\n\x05\x04\x05\x02\x01\x05\
+    \x12\x03i\x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03i\t\x12\n\x0c\n\
+    \x05\x04\x05\x02\x01\x03\x12\x03i\x15\x16\n\n\n\x02\x04\x06\x12\x04l\0r\
+    \x01\n\n\n\x03\x04\x06\x01\x12\x03l\x08\x0e\n\x0b\n\x04\x04\x06\x02\0\
     \x12\x03m\x02\x18\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03m\x02\x07\n\x0c\n\
     \x05\x04\x06\x02\0\x01\x12\x03m\x08\x13\n\x0c\n\x05\x04\x06\x02\0\x03\
     \x12\x03m\x16\x17\nB\n\x04\x04\x06\x02\x01\x12\x03o\x02\x17\"5\x20protol\

@@ -220,8 +220,8 @@ class TailResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class AudienceRate(betterproto.Message):
-    bytes: int = betterproto.int64_field(1)
-    processed: int = betterproto.int64_field(2)
+    bytes: float = betterproto.double_field(1)
+    processed: float = betterproto.double_field(2)
 
 
 @dataclass(eq=False, repr=False)
