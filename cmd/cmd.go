@@ -441,6 +441,9 @@ func (c *Cmd) actionSelect(action *types.Action) (*types.Action, error) {
 		action.Step = types.StepTail
 		action.TailComponent = tailComponent
 
+		// Reset line num when component is selected
+		action.TailLineNum = 0
+
 		return action, nil
 	}
 }
@@ -706,13 +709,21 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 				// Enable TS
 				if action.TailViewOptions.DisplayTimestamp {
-					prefix = `[gray:black]` + time.Now().Format("15:04:05") + `[-:-] `
+					prefix = `[gray:black]` + time.Now().Format("15:04:05") + ` [-:-:-]`
 				}
 
 				// Enable line numbers
 				if action.TailViewOptions.DisplayLineNumbers {
-					prefix = fmt.Sprintf("[gray:black"+
-						"]%d:[-:-] ", action.TailLineNum) + prefix
+					// If we already have a TS, add a space to separate it from the line num
+					if action.TailViewOptions.DisplayTimestamp {
+						prefix = " " + prefix
+					}
+					prefix = fmt.Sprintf("[gray:black:b][%d][-:-:-]", action.TailLineNum) + prefix
+				}
+
+				// If prefix exists, add a space to make it look better
+				if prefix != "" {
+					prefix += " "
 				}
 			}
 
