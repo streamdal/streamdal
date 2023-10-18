@@ -49,6 +49,11 @@ const (
 	// We're always defaulting to db 0, so we can use this prefix to watch for key changes
 	// See https://redis.io/docs/manual/keyspace-notifications/
 	RedisKeyWatchPrefix = "__keyspace@0__:"
+
+	// StreamdalIDKey is a unique ID for this streamdal server cluster
+	// Each cluster will get a unique UUID. This is used to track the number of
+	// installs for telemetry and is completely random for anonymization purposes.
+	StreamdalIDKey = "streamdal_id"
 )
 
 type IStore interface {
@@ -100,6 +105,10 @@ type IStore interface {
 	AddSchema(ctx context.Context, req *protos.SendSchemaRequest) error
 
 	GetSchema(ctx context.Context, aud *protos.Audience) (*protos.Schema, error)
+
+	// GetStreamdalID returns the unique ID for this cluster.
+	// If an ID has not been set yet, a new one is generated and returned
+	GetStreamdalID(ctx context.Context) (string, error)
 }
 
 type Options struct {
@@ -1139,4 +1148,39 @@ func (s *Store) GetAudiencesBySessionID(ctx context.Context, sessionID string) (
 	}
 
 	return live, nil
+}
+
+func (s *Store) GetStreamdalID(ctx context.Context) (string, error) {
+	v, err := s.options.RedisBackend.Get(ctx, StreamdalIDKey).Result()
+	if errors.Is(err, redis.Nil) {
+		id, setErr := s.setStreamdalID(ctx)
+		if setErr != nil {
+			return "", setErr
+		}
+		return id, nil
+	} else if err != nil {
+		return "", errors.Wrap(err, "unable to query cluster ID")
+	}
+
+	return v, nil
+}
+
+func (s *Store) setStreamdalID(ctx context.Context) (string, error) {
+	id, err := s.options.RedisBackend.Get(ctx, StreamdalIDKey).Result()
+	if errors.Is(err, redis.Nil) {
+		// Create new ID
+		id := util.GenerateUUID()
+		err := s.options.RedisBackend.Set(ctx, StreamdalIDKey, id, 0).Err()
+		if err != nil {
+			return "", errors.Wrap(err, "unable to set cluster ID")
+		}
+
+		s.log.Debugf("Set cluster ID '%s'", id)
+		return id, nil
+	} else if err != nil {
+		return "", errors.Wrap(err, "unable to query cluster ID")
+	}
+
+	// Streamdal cluster ID already set
+	return id, nil
 }
