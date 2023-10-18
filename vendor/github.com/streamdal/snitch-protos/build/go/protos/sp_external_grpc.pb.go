@@ -46,6 +46,7 @@ const (
 	External_AppRegistrationStatus_FullMethodName = "/protos.External/AppRegistrationStatus"
 	External_AppRegister_FullMethodName           = "/protos.External/AppRegister"
 	External_AppVerifyRegistration_FullMethodName = "/protos.External/AppVerifyRegistration"
+	External_AppRegisterReject_FullMethodName     = "/protos.External/AppRegisterReject"
 	External_Test_FullMethodName                  = "/protos.External/Test"
 )
 
@@ -101,6 +102,7 @@ type ExternalClient interface {
 	AppRegistrationStatus(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error)
 	AppRegister(ctx context.Context, in *AppRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	AppVerifyRegistration(ctx context.Context, in *AppVerifyRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	AppRegisterReject(ctx context.Context, in *AppRegisterRejectRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -448,6 +450,15 @@ func (c *externalClient) AppVerifyRegistration(ctx context.Context, in *AppVerif
 	return out, nil
 }
 
+func (c *externalClient) AppRegisterReject(ctx context.Context, in *AppRegisterRejectRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_AppRegisterReject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, External_Test_FullMethodName, in, out, opts...)
@@ -509,6 +520,7 @@ type ExternalServer interface {
 	AppRegistrationStatus(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error)
 	AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error)
 	AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error)
+	AppRegisterReject(context.Context, *AppRegisterRejectRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -598,6 +610,9 @@ func (UnimplementedExternalServer) AppRegister(context.Context, *AppRegistration
 }
 func (UnimplementedExternalServer) AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppVerifyRegistration not implemented")
+}
+func (UnimplementedExternalServer) AppRegisterReject(context.Context, *AppRegisterRejectRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppRegisterReject not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -1113,6 +1128,24 @@ func _External_AppVerifyRegistration_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_AppRegisterReject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppRegisterRejectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).AppRegisterReject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_AppRegisterReject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).AppRegisterReject(ctx, req.(*AppRegisterRejectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -1229,6 +1262,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AppVerifyRegistration",
 			Handler:    _External_AppVerifyRegistration_Handler,
+		},
+		{
+			MethodName: "AppRegisterReject",
+			Handler:    _External_AppRegisterReject_Handler,
 		},
 		{
 			MethodName: "Test",

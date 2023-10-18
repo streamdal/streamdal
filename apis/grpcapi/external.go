@@ -1081,11 +1081,15 @@ func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.Ap
 }
 
 func (s *ExternalServer) AppRegister(_ context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
-	return s.uibffPostRequest("/v1/register", req)
+	return s.uibffPostRequest("/v1/app/register/create", req)
 }
 
 func (s *ExternalServer) AppVerifyRegistration(_ context.Context, req *protos.AppVerifyRegistrationRequest) (*protos.StandardResponse, error) {
-	return s.uibffPostRequest("/v1/verify", req)
+	return s.uibffPostRequest("/v1/app/register/verify", req)
+}
+
+func (s *ExternalServer) AppRegisterReject(_ context.Context, req *protos.AppRegisterRejectRequest) (*protos.StandardResponse, error) {
+	return s.uibffPostRequest("/v1/app/register/reject", req)
 }
 
 func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {
