@@ -78,6 +78,14 @@ func (s *Snitch) register(looper director.Looper) error {
 		if stream == nil {
 			s.config.Logger.Debug("stream is nil, attempting to register")
 
+			if err := s.serverClient.Reconnect(); err != nil {
+				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				time.Sleep(ReconnectSleep)
+				return nil
+			}
+
+			s.config.Logger.Debug("successfully reconnected to streamdal server")
+
 			newStream, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 			if err != nil {
 				if strings.Contains(err.Error(), context.Canceled.Error()) {
@@ -88,18 +96,18 @@ func (s *Snitch) register(looper director.Looper) error {
 					return nil
 				}
 
-				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				s.config.Logger.Errorf("Failed to re-register with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 
 				return nil
 			}
 
-			s.config.Logger.Debug("successfully reconnected to snitch-server")
+			s.config.Logger.Debug("successfully re-registered to streamdal server")
 
 			stream = newStream
 
 			// Re-announce audience (if we had any) - this is needed so that
-			// snitch-server repopulates live entry in snitch_live (which is used
+			// streamdal server repopulates live entry in snitch_live (which is used
 			// for DetachPipeline())
 			s.addAudiences(s.config.ShutdownCtx)
 		}
@@ -220,7 +228,7 @@ func (s *Snitch) register(looper director.Looper) error {
 
 	if initialRegister {
 		return errors.Wrap(initialRegisterErr,
-			"failed to complete initial registration with snitch-server (and IgnoreStartupError is set to 'false')",
+			"failed to complete initial registration with streamdal server (and IgnoreStartupError is set to 'false')",
 		)
 	}
 
