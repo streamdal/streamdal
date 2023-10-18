@@ -198,11 +198,6 @@ export const SIDEBAR: Sidebar = {
             link: "en/data-governance/data-quality"
           },
           {
-            text: "Internal Governance (Coming Soon!)",
-            slug: "internal-governance",
-            link: "en/data-governance/internal-governance"
-          },
-          {
             text: "Governance for Compliance (Coming Soon!)",
             children: [
               {
