@@ -23,7 +23,7 @@ export const heartbeat = async ({
       sessionId,
       serviceName,
       audiences: Array.from(internal.audiences.values()).map((a) => a.audience),
-      clientInfo: clientInfo(),
+      clientInfo,
     };
     console.debug("sending heartbeat", heartbeatRequest);
 

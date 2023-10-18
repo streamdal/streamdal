@@ -39,15 +39,6 @@ export const internal = {
 export const audienceKey = (audience: Audience) =>
   JSON.stringify(audience).toLowerCase();
 
-export const clientInfo = () => ({
-  clientType: ClientType.SDK,
-  libraryName: "node-sdk",
-  libraryVersion: version(),
-  language: "Typescript",
-  arch: process.arch,
-  os: process.platform,
-});
-
 export const version = (): string => {
   try {
     const pkg = JSON.parse(readFileSync("./package.json").toString());
@@ -58,15 +49,25 @@ export const version = (): string => {
   return "unknown";
 };
 
+export const clientInfo = {
+  clientType: ClientType.SDK,
+  libraryName: "node-sdk",
+  libraryVersion: version(),
+  language: "Typescript",
+  arch: process.arch,
+  os: process.platform,
+};
+
 export const register = async (configs: Configs) => {
   try {
+    console.info(`### running node-sdk version: ${clientInfo.libraryVersion}`);
     console.info(`### registering with grpc server...`);
     const call = configs.grpcClient.register(
       {
         sessionId: configs.sessionId,
         serviceName: configs.serviceName,
         dryRun: configs.dryRun,
-        clientInfo: clientInfo(),
+        clientInfo,
         audiences: Array.from(internal.audiences.values()).map(
           (a) => a.audience
         ),

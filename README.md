@@ -68,7 +68,7 @@ Optionally install and run the Streamdal [server](https://github.com/streamdal/s
 ### Releasing
 
 1. `npm version [<newversion> | major | minor | patch]`
-2. git push the generated version tag: `git push origin <tag_name>`
+2. git push the updated package.json and generated version tag: `git push && git push origin <tag_name>`
 3. Generate a release from the tag with user-friendly release notes:
    https://github.com/streamdal/node-sdk/releases
 

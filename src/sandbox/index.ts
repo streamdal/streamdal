@@ -156,7 +156,7 @@ const randomInterval = async (
   setTimeout(
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     () => randomInterval(streamdal, audience, input),
-    Math.floor(Math.random() * (3000 - 500 + 1) + 3000)
+    Math.floor(Math.random() * (3000 - 250) + 3000)
   );
 };
 
