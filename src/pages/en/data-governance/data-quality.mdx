@@ -4,23 +4,31 @@ description: Data Quality with Streamdal
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
-
+import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">The data quality features of Streamdal are 
-  not yet ready for 1.0 release.</p>
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data quality-enforcing parts of 
+  Streamdal are not yet ready for release. We are beta-testing these features 
+  with a select group of contributors, companies, and design partners. If you 
+  would like to participate in the beta, please 
+  [reach out to us](/en/resources-support/get-support/).</p>
 </Notification>
 
-These features will enable you to add real-time validation and integrity to any 
-data system. It will deliver preventive and proactive measures for data 
-governance and compliance initiatives. 
+As briefly mentioned in the [overview](/en/data-governance/overview), Streamdal 
+can also be used to ensure data quality across your team or organization _with 
+breathtaking swiftness_. Once we are out of beta, this section will detail how 
+you can use [rules](/en/resources-support/glossary/#step--rule), 
+[pipelines](/en/resources-support/glossary/#pipeline), and 
+[functions](/en/resources-support/glossary/#wasm) to ensure data quality, 
+design data contracts, and streamline data validation.
+
+---
 
 Be sure to periodically check out our 
-[roadmap](https://github.com/orgs/streamdal/projects/1/views/9) for updates on 
+[roadmap](/en/resources-support/roadmap) for updates on 
 development.
 
-Also, join our [Discord](https://discord.gg/KU2k3zMB) to view and participate 
-in all the discussions about the data governance features!
+In the meantime, join our [Discord](https://discord.gg/dDuzmS58sb) to read and 
+participate in all the discussions about the data governance features!

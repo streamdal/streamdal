@@ -1,22 +1,67 @@
 ---
-title: "CCPA/CPRA Compliance with Snitch"
-metaTitle: "Ensure CCPA/CPRA Compliance Seamlessly with Snitch"
-description: "Employ Snitch to guarantee adherence to CCPA/CPRA standards effortlessly."
+title: "CCPA/CPRA Compliance with Streamdal"
+metaTitle: "Ensure CCPA/CPRA Compliance Seamlessly with Streamdal"
+description: "Employ Streamdal to guarantee adherence to CCPA/CPRA data standards effortlessly."
 layout:  ../../../../layouts/MainLayout.astro
 ---
 
-# CCPA/CPRA Compliance with Snitch
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
 
-The California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA) demand strict data protection standards. Snitch can help you navigate these waters efficiently.
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance parts of Streamdal are 
+  not yet ready for release. We are beta-testing these features with a select 
+  group of contributors, companies, and design partners. If you would like to 
+  participate in the beta, please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
 
-## Snitch's Approach
 
-With Snitch's advanced features, you can:
+The California Consumer Privacy Act (CCPA) and California Privacy Rights Act 
+(CPRA) demand strict data protection standards. Streamdal can help you navigate 
+these regulations efficiently.
 
-- Establish robust rules to ensure data processing is in line with CCPA/CPRA requirements.
+## Streamdal's Approach
+
+With Streamdal's data compliance features, you can:
+
+- Establish robust rules to ensure data processing is in line with CCPA/CPRA 
+requirements.
 - Receive real-time alerts on potential data breaches or violations.
 - Store and analyze data operation logs for CCPA/CPRA audit readiness.
 
-> **Coming Soon**: An illustrative guide on setting up the appropriate rules in the Snitch UI for CCPA/CPRA compliance.
+> **Coming post-beta**: An illustrative guide on setting up the appropriate rules in 
+the Streamdal UI for CCPA/CPRA compliance.
 
-Safeguard consumer privacy and ensure you're CCPA/CPRA compliant with Snitch.
+## Regulatory Insights
+
+Understanding the "legalese" of various laws and regulations can be a daunting 
+task. Many times this is left to a legal department/entity to help 
+organizations understand regulatory compliance. While a one-size-fits-all tool 
+does not exist for a complete compliance solution, Streamdal will _greatly 
+reduce_ the time, effort, and headache around data and _revolutionize now you 
+can govern it!_
+
+Below are a few sections taken from the CCPA/CPRA[^1] text with how Streamdal 
+helps with compliance.
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 7002 (a)-(1)(2): Restrictions on the Collection and Use of Personal Information. | The Streamdal SDK can enforce rules on consumers and producers to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization. |
+| § 7021: Timelines for Responding to Requests to Delete, Requests to Correct, and Requests to Know | Streamdal can greatly assist with the timeliness of these requests in two ways: <br /><br /> <ol><li>The UI can visually indicate which producers and consumers are handling PII, and this information can be used to map their end systems, helping reduce discovery time.</li> <br /><li>The SDK rules can be set up to strip, restrict, obfuscate, mask data, as well as rules on time fields, helping enforce data policies around retention, transmission, and consumption of PI/PI. This can greatly reduce time spent servicing these requests.</li></ol> |
+| § 7027 (g): Requests to Limit Use and Disclosure of Sensitive Personal Information. | For the same reasons listed in the above two cells, Streamdal can help limit the use and disclosure of sensitive PI/PII. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>_Did you know: CCPA requirements for the timeliness for responding to 
+    requests to delete, requests to correct, and requests to know are <u>no later 
+    than 10 business days?</u>_</p>
+  </div>
+</Notification>
+
+Safeguard consumer privacy and ensure you're CCPA/CPRA compliant with Streamdal.
+
+[^1]: <a href="https://cppa.ca.gov/regulations/pdf/20230329_final_regs_text.pdf" target="_blank">CCPA/CPRA PDF link</a>

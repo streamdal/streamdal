@@ -3,30 +3,39 @@ title: Data Governance Overview (Coming Soon!)
 description: Streamdal Data Governance Overview
 layout: ../../../layouts/MainLayout.astro
 ---
-import info from "@images/icons/info.png";
 
+import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">The data governance features of Streamdal 
-  are not yet ready for 1.0 release.</p>
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data governance parts of Streamdal are 
+  not yet ready for release. We are beta-testing these features with a select 
+  group of contributors, companies, and design partners. If you would like to 
+  participate in the beta, please 
+  [reach out to us](/en/resources-support/get-support/).</p>
 </Notification>
 
-These features will enable you to add real-time validation and integrity to any 
-data system. It will deliver preventive and proactive measures for data 
-governance and compliance initiatives. 
+The data governance features of Streamdal will essentially give anyone the 
+ability to control what data is produced or consumed by applications. It will 
+greatly simplify debugging, data validation efforts, enforcement of data 
+content requirements, and effectively automate PII data protection. All without 
+affecting CI/CD, and eliminating time-consuming re-compiling of services that 
+can follow debugging efforts or incident resolutions.
 
-Whether you're ensuring [data quality](/en/data-governance/data-quality), 
-acquiring new or fortifying existing compliance certifications, or enforcing 
-[internal data governance](/en/data-governance/internal-governance) policies 
-for your organization or business partners, Streamdal will drive consistency 
-and protection wherever data moves.
+Whether you’re ensuring [data quality](/en/data-governance/data-quality) 
+or getting started with [data contracts](/en/data-governance/data-quality), 
+acquiring new or fortifying existing 
+[compliance certifications](/en/data-governance/overview/#data-compliance--certifications), 
+or enforcing [internal data governance](/en/data-governance/data-quality#internal-data-governance) 
+policies across your organization, Streamdal will drive consistency, 
+enforcement, and protection wherever data moves. 
 
 ### Data Compliance & Certifications
 
-The lists below will continue to grow as more use cases surface and case 
-studies complete.
+The lists below represent the relevant data laws and regulations that Streamdal 
+can greatly assist in achieving compliance with. These lists may continue to 
+grow in scope as more use cases surface and case studies are completed.
 
 _Don't see your regulation below? 
 [Let us know](/en/resources-support/get-support/) so we can clarify 
@@ -97,9 +106,11 @@ applicability._
   </div>
 </div>
 
+---
+
 Be sure to periodically check out our 
-[roadmap](https://github.com/orgs/streamdal/projects/1/views/9) for updates on 
+[roadmap](/en/resources-support/roadmap) for updates on 
 development.
 
-Also, join our [Discord](https://discord.gg/KU2k3zMB) to view and participate 
-in all the discussions about the data governance features!
+In the meantime, join our [Discord](https://discord.gg/dDuzmS58sb) to read and 
+participate in all the discussions about the data governance features!
