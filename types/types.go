@@ -29,6 +29,7 @@ type Action struct {
 	TailSearchPrev  string
 	TailRate        int
 	TailViewOptions *ViewOptions
+	TailLineNum     int // line num we are at in tail view
 }
 
 // TailComponent is used to display audiences in the "select component" view

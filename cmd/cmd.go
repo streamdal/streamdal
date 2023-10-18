@@ -535,8 +535,6 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 		return nil, errors.New("tail(): bug? *action.TailComponent cannot be nil")
 	}
 
-	var lineNum int
-
 	// If this is the first time we are seeing this filter, announce it
 	if c.announceFilter {
 		filterStatus := fmt.Sprintf(" Filter set to '%s' @ "+time.Now().Format("15:04:05"), action.TailFilter)
@@ -652,6 +650,7 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 			cmd.TailSearchPrev = action.TailSearchPrev
 			cmd.TailRate = action.TailRate
 			cmd.TailViewOptions = action.TailViewOptions
+			cmd.TailLineNum = action.TailLineNum
 
 			return cmd, nil
 		case tailResp := <-tailCh:
@@ -667,7 +666,7 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 				continue
 			}
 
-			lineNum++
+			action.TailLineNum++
 
 			// Highlight filtered data
 			if action.TailFilter != "" {
@@ -712,7 +711,8 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 				// Enable line numbers
 				if action.TailViewOptions.DisplayLineNumbers {
-					prefix = fmt.Sprintf("[gray:gray]%d:[-:-] ", lineNum) + prefix
+					prefix = fmt.Sprintf("[gray:black"+
+						"]%d:[-:-] ", action.TailLineNum) + prefix
 				}
 			}
 
