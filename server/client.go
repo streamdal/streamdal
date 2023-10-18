@@ -117,6 +117,7 @@ func (c *Client) Reconnect() error {
 	}
 
 	c.Conn = conn
+	c.Server = protos.NewInternalClient(conn)
 
 	return nil
 }
