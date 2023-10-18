@@ -139,6 +139,12 @@ func (ps *PubSub) Publish(topic string, m interface{}) {
 
 	for _, tmpCh := range ps.topics[topic] {
 		go func(ch chan interface{}) {
+			defer func() {
+				if r := recover(); r != nil {
+					ps.log.Debug("BUG: pubsub.Publish: tried to write to closed channel")
+				}
+			}()
+
 			ps.log.Debugf("pubsub.Publish: before topic '%s' write", topic)
 			ch <- m
 			ps.log.Debugf("pubsub.Publish: after topic '%s' write", topic)
