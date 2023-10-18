@@ -1,41 +1,23 @@
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
-import IconUnlink from "tabler-icons/tsx/unlink.tsx";
-import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { ServiceMapType } from "../lib/fetch.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
-import IconLink from "tabler-icons/tsx/link.tsx";
-import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import { Toast } from "../components/toasts/toast.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { PausePipelineModal } from "../components/modals/pausePipelineModal.tsx";
 import { DetachPipelineModal } from "../components/modals/detachPipelineModal.tsx";
-import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { EmptyStateBird } from "../components/icons/emptyStateBird.tsx";
 import { useEffect, useState } from "preact/hooks";
 import { DeleteOperationModal } from "../components/modals/deleteOperationModal.tsx";
-import {
-  Tail,
-  tailEnabledSignal,
-  tailSamplingRateSignal,
-  tailSamplingSignal,
-  tailSignal,
-} from "./tail.tsx";
-import { Toggle } from "../components/form/switch.tsx";
-import { getAudienceOpRoute, isNumeric } from "../lib/utils.ts";
-import IconTrash from "tabler-icons/tsx/trash.tsx";
-import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
-import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
+import { Tail, tailEnabledSignal, tailSignal } from "./tail.tsx";
+import { getAudienceOpRoute } from "../lib/utils.ts";
 import { SchemaModal } from "../components/modals/schemaModal.tsx";
 import { ComponentImage } from "./customNodes.tsx";
 import { useSignalEffect } from "@preact/signals";
 import { initFlowbite } from "flowbite";
-
-import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 import { OperationOpModalInfo } from "./operationOpModal.tsx";
 import { DeleteServiceModal } from "../components/modals/deleteServiceModal.tsx";
+
 export const OP_MODAL_WIDTH = "308px";
 
 export default function OpModal(
@@ -104,14 +86,18 @@ export default function OpModal(
     // Flowbite breaks on audience change for some reason
     initFlowbite();
     if (opModal.value) {
-      const schema = await getSchema();
-      opModal.value = {
-        ...opModal.value,
-        schemaInfo: {
-          schema: JSON.stringify(schema.schema, null, 2),
-          version: schema.version,
-        },
-      };
+      try {
+        const schema = await getSchema();
+        opModal.value = {
+          ...opModal.value,
+          schemaInfo: {
+            schema: JSON.stringify(schema.schema, null, 2),
+            version: schema.version,
+          },
+        };
+      } catch (e) {
+        console.error("Error fetching schema", e);
+      }
     }
   }, [audience, schemaNavOpen]);
 

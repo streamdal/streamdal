@@ -1,15 +1,16 @@
 import { effect, signal } from "@preact/signals";
 import { client, meta } from "./grpc.ts";
 import { CONNECT_RETRY_INTERVAL } from "./stream.ts";
+import { SERVER_ERROR, serverErrorSignal } from "./serverError.ts";
 
 type RateMetrics = { bytes: string; processed: string };
-export const audienceMetricsAbortSignal = signal<boolean>(false);
+export const audienceMetricsConnected = signal<boolean>(false);
 
 export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
   const abortController = new AbortController();
 
   effect(() => {
-    if (audienceMetricsAbortSignal.value) {
+    if (!audienceMetricsConnected.value) {
       abortController.abort();
     }
   });
@@ -24,11 +25,13 @@ export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
         },
       );
 
+    await audienceMetricsCall.headers;
+    serverErrorSignal.value = "";
+
     for await (const response of audienceMetricsCall?.responses) {
       for (const [key, value] of Object.entries(response?.rates)) {
-        !response?.Keepalive && socket.send(
-          JSON.stringify({ [key]: value as RateMetrics }),
-        );
+        !response?.Keepalive &&
+          sendMetrics({ [key]: value as RateMetrics }, socket);
       }
     }
 
@@ -44,6 +47,8 @@ export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
       return;
     }
 
+    serverErrorSignal.value = SERVER_ERROR;
+
     setTimeout(() => {
       console.info(
         `retrying grpc getAudienceRates connection in ${
@@ -52,5 +57,13 @@ export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
       );
       getAudienceMetrics({ socket });
     }, CONNECT_RETRY_INTERVAL);
+  }
+};
+
+const sendMetrics = (metric: any, socket: WebSocket) => {
+  try {
+    socket.send(JSON.stringify(metric));
+  } catch (e) {
+    console.error("failed to send audience metrics over socket", e);
   }
 };

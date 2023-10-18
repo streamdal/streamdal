@@ -8,12 +8,14 @@ import {
 } from "../islands/tail.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "./utils.ts";
+import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
   url.protocol = url.protocol.replace("http", "ws");
   return new WebSocket(url);
 };
+
 export const serviceMapSocket = (path: string) => {
   const webSocket = getSocket(path);
   webSocket.addEventListener("open", () => {
@@ -105,6 +107,23 @@ export const tailSocket = (path: string, audience: Audience) => {
     } catch (e) {
       console.error("error parsing tail data", e);
     }
+  });
+  return webSocket;
+};
+
+export const serverErrorSocket = (path: string) => {
+  const webSocket = getSocket(path);
+  webSocket.addEventListener("open", () => {
+    webSocket.send("ping");
+  });
+
+  webSocket.addEventListener("message", (event) => {
+    if (event.data === "pong") {
+      console.debug("got server pong");
+      return;
+    }
+
+    serverErrorSignal.value = event.data;
   });
   return webSocket;
 };

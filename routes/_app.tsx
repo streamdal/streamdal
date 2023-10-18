@@ -6,7 +6,6 @@ export default async function App(
   req: Request,
   ctx: AppContext,
 ) {
-  streamServiceMap();
   return (
     <html lang="en">
       <Head>

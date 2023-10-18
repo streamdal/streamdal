@@ -3,7 +3,10 @@ import { effect } from "@preact/signals";
 import { serviceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { DisplayServiceMap } from "../../lib/serviceMapper.ts";
 import { bigIntStringify } from "../../lib/utils.ts";
-import { serviceStreamAbortSignal } from "../../lib/stream.ts";
+import {
+  serviceStreamConnectedSignal,
+  streamServiceMap,
+} from "../../lib/stream.ts";
 
 export const config: RouteConfig = {
   skipInheritedLayouts: true,
@@ -12,7 +15,6 @@ export const config: RouteConfig = {
 
 export const handler: Handlers<DisplayServiceMap> = {
   async GET(req, ctx) {
-    let clientConnected = false;
     if (req.headers.get("upgrade") != "websocket") {
       return new Response(null, { status: 501 });
     }
@@ -20,29 +22,32 @@ export const handler: Handlers<DisplayServiceMap> = {
     const { socket, response } = Deno.upgradeWebSocket(req);
 
     effect(() => {
-      if (serviceSignal.value && clientConnected) {
+      try {
         socket.send(bigIntStringify({
           ...serviceSignal.value,
           nodesMap: Array.from(serviceSignal.value.nodesMap.entries()),
           edgesMap: Array.from(serviceSignal.value.edgesMap.entries()),
         }));
+      } catch (e) {
+        console.error("failed to send service map over socket", e);
       }
     });
 
-    socket.addEventListener("message", (event) => {
+    socket.addEventListener("message", async (event) => {
       if (event.data === "ping") {
         socket.send("pong");
       }
+
+      await streamServiceMap();
     });
 
     socket.addEventListener("open", () => {
-      clientConnected = true;
+      serviceStreamConnectedSignal.value = true;
       console.info("service map socket client connected!");
     });
 
     socket.addEventListener("close", () => {
-      clientConnected = false;
-      serviceStreamAbortSignal.value = false;
+      serviceStreamConnectedSignal.value = false;
       console.info("service map socket client closed!");
     });
 

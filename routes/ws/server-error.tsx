@@ -1,17 +1,13 @@
 import { Handlers, RouteConfig } from "$fresh/src/server/types.ts";
-import { TailResponse } from "streamdal-protos/protos/sp_common.ts";
-import {
-  audienceMetricsAbortSignal,
-  audienceMetricsConnected,
-  getAudienceMetrics,
-} from "../../lib/audienceMetrics.ts";
+import { effect } from "@preact/signals";
+import { serverErrorSignal } from "../../lib/serverError.ts";
 
 export const config: RouteConfig = {
   skipInheritedLayouts: true,
   skipAppWrapper: true,
 };
 
-export const handler: Handlers<{ tail: TailResponse }> = {
+export const handler: Handlers<{ message: string | null }> = {
   async GET(req, ctx) {
     if (req.headers.get("upgrade") != "websocket") {
       return new Response(null, { status: 501 });
@@ -19,22 +15,27 @@ export const handler: Handlers<{ tail: TailResponse }> = {
 
     const { socket, response } = Deno.upgradeWebSocket(req);
 
-    socket.addEventListener("message", async (event) => {
+    effect(() => {
+      try {
+        socket.send(serverErrorSignal.value);
+      } catch (e) {
+        console.error("failed to send server error over socket", e);
+      }
+    });
+
+    socket.addEventListener("message", (event) => {
       if (event.data === "ping") {
         socket.send("pong");
       }
-
-      await getAudienceMetrics({ socket });
     });
 
     socket.addEventListener("open", () => {
-      audienceMetricsConnected.value = true;
-      console.info("audience metrics socket client connected!");
+      console.info("server error socket client connected!");
+      socket.send(serverErrorSignal.value);
     });
 
     socket.addEventListener("close", () => {
-      audienceMetricsConnected.value = false;
-      console.info("audience metrics socket client closed!");
+      console.info("server error socket client closed!");
     });
 
     return response;

@@ -24,11 +24,17 @@ import {
   ComponentEdge,
   ServiceEdge,
 } from "../components/serviceMap/customEdge.tsx";
-import { audienceMetricsSocket, serviceMapSocket } from "../lib/sockets.ts";
+import {
+  audienceMetricsSocket,
+  serverErrorSocket,
+  serviceMapSocket,
+} from "../lib/sockets.ts";
 import {
   OP_MODAL_KEY,
   opModal,
 } from "../components/serviceMap/opModalSignal.ts";
+import { ServerError } from "../components/error/server.tsx";
+import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -110,9 +116,11 @@ export default function ServiceMapComponent(
   useEffect(() => {
     const serviceSocket = serviceMapSocket("./ws/service-map");
     const audienceSocket = audienceMetricsSocket("./ws/audience-metrics");
+    const errorSocket = serverErrorSocket("./ws/server-error");
     return () => {
       serviceSocket?.close();
       audienceSocket?.close();
+      errorSocket?.close();
     };
   }, []);
 
@@ -144,7 +152,9 @@ export default function ServiceMapComponent(
       const updated = updateNode(nodes, opUpdateSignal.value);
       setNodes(updated);
     }
+  });
 
+  useSignalEffect(() => {
     if (serviceSignal.value) {
       const nodes: FlowNode[] = Array.from(
         serviceSignal.value.nodesMap.values(),
@@ -170,6 +180,9 @@ export default function ServiceMapComponent(
       } w-[calc(100vw-${OP_MODAL_WIDTH})]`}
       ref={wrapper}
     >
+      {serverErrorSignal.value
+        ? <ServerError message={serverErrorSignal.value} />
+        : null}
       <ReactFlow
         onInit={(reactFlowInstance: ReactFlowInstance) => {
           setRfInstance(reactFlowInstance, fit(nodes, reactFlowInstance));
@@ -183,7 +196,7 @@ export default function ServiceMapComponent(
         edgeTypes={edgeTypes}
         onClick={(e) => clearModal(e)}
       >
-        {nodes.length === 0 && <EmptyService />}
+        {!serverErrorSignal.value && nodes.length === 0 && <EmptyService />}
         <Background
           style={{ height: "100vh" }}
         />

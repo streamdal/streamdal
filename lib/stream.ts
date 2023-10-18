@@ -6,15 +6,16 @@ import {
   GetAllResponse,
 } from "streamdal-protos/protos/sp_external.ts";
 import { effect, signal } from "@preact/signals";
+import { SERVER_ERROR, serverErrorSignal } from "./serverError.ts";
 
 export const CONNECT_RETRY_INTERVAL = 3000;
-export const serviceStreamAbortSignal = signal<boolean>(false);
+export const serviceStreamConnectedSignal = signal<boolean>(false);
 
 export const streamServiceMap = async () => {
   const abortController = new AbortController();
 
   effect(() => {
-    if (serviceStreamAbortSignal.value) {
+    if (!serviceStreamConnectedSignal.value) {
       abortController.abort();
     }
   });
@@ -23,10 +24,15 @@ export const streamServiceMap = async () => {
     const call: ServerStreamingCall<GetAllRequest, GetAllResponse> = client
       .getAllStream({}, { ...meta, abort: abortController.signal });
 
-    void processResponses(call);
+    await call.headers;
+    serverErrorSignal.value = "";
 
-    const status = await call.status;
-    status && console.debug("received grpc getAllStream status: ", status);
+    for await (const response of call.responses) {
+      !response?.Keepalive && setServiceSignal(response);
+    }
+
+    const { status } = await call;
+    status && console.info("received grpc getAllStream status", status);
   } catch (e) {
     console.error("received grpc getAllStream error", e);
 
@@ -37,6 +43,8 @@ export const streamServiceMap = async () => {
       return;
     }
 
+    serverErrorSignal.value = SERVER_ERROR;
+
     setTimeout(() => {
       console.info(
         `retrying grpc getAllStream connection in ${
@@ -45,13 +53,5 @@ export const streamServiceMap = async () => {
       );
       streamServiceMap();
     }, CONNECT_RETRY_INTERVAL);
-  }
-};
-
-const processResponses = async (
-  call: ServerStreamingCall<GetAllRequest, GetAllResponse>,
-) => {
-  for await (const response of call.responses) {
-    !response?.Keepalive && setServiceSignal(response);
   }
 };
