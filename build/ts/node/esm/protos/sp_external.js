@@ -1712,11 +1712,12 @@ class AppRegistrationRequest$Type extends MessageType {
     constructor() {
         super("protos.AppRegistrationRequest", [
             { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "cluster_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 100, name: "_code", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { email: "", Code: "" };
+        const message = { email: "", clusterId: "", Code: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1729,6 +1730,9 @@ class AppRegistrationRequest$Type extends MessageType {
             switch (fieldNo) {
                 case /* string email */ 1:
                     message.email = reader.string();
+                    break;
+                case /* string cluster_id */ 2:
+                    message.clusterId = reader.string();
                     break;
                 case /* string _code */ 100:
                     message.Code = reader.string();
@@ -1748,6 +1752,9 @@ class AppRegistrationRequest$Type extends MessageType {
         /* string email = 1; */
         if (message.email !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.email);
+        /* string cluster_id = 2; */
+        if (message.clusterId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.clusterId);
         /* string _code = 100; */
         if (message.Code !== "")
             writer.tag(100, WireType.LengthDelimited).string(message.Code);
@@ -1815,6 +1822,53 @@ class AppVerifyRegistrationRequest$Type extends MessageType {
  * @generated MessageType for protobuf message protos.AppVerifyRegistrationRequest
  */
 export const AppVerifyRegistrationRequest = new AppVerifyRegistrationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AppRegisterRejectRequest$Type extends MessageType {
+    constructor() {
+        super("protos.AppRegisterRejectRequest", [
+            { no: 1, name: "cluster_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = { clusterId: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string cluster_id */ 1:
+                    message.clusterId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* string cluster_id = 1; */
+        if (message.clusterId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.clusterId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegisterRejectRequest
+ */
+export const AppRegisterRejectRequest = new AppRegisterRejectRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType {
     constructor() {
@@ -1940,5 +1994,6 @@ export const External = new ServiceType("protos.External", [
     { name: "AppRegistrationStatus", options: {}, I: AppRegistrationStatusRequest, O: AppRegistrationStatusResponse },
     { name: "AppRegister", options: {}, I: AppRegistrationRequest, O: StandardResponse },
     { name: "AppVerifyRegistration", options: {}, I: AppVerifyRegistrationRequest, O: StandardResponse },
+    { name: "AppRegisterReject", options: {}, I: AppRegisterRejectRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

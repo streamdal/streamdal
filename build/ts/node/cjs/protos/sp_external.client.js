@@ -245,12 +245,19 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
+     */
+    appRegisterReject(input, options) {
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        const method = this.methods[28], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
 }

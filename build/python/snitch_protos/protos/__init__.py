@@ -636,6 +636,7 @@ class AppRegistrationStatusResponse(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class AppRegistrationRequest(betterproto.Message):
     email: str = betterproto.string_field(1)
+    cluster_id: str = betterproto.string_field(2)
     code: str = betterproto.string_field(100)
     """Used for storage on ui-bff backend"""
 
@@ -644,6 +645,11 @@ class AppRegistrationRequest(betterproto.Message):
 class AppVerifyRegistrationRequest(betterproto.Message):
     email: str = betterproto.string_field(1)
     code: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class AppRegisterRejectRequest(betterproto.Message):
+    cluster_id: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1519,6 +1525,23 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def app_register_reject(
+        self,
+        app_register_reject_request: "AppRegisterRejectRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/AppRegisterReject",
+            app_register_reject_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -1815,6 +1838,11 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def app_register_reject(
+        self, app_register_reject_request: "AppRegisterRejectRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -2030,6 +2058,14 @@ class ExternalBase(ServiceBase):
         response = await self.app_verify_registration(request)
         await stream.send_message(response)
 
+    async def __rpc_app_register_reject(
+        self,
+        stream: "grpclib.server.Stream[AppRegisterRejectRequest, StandardResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.app_register_reject(request)
+        await stream.send_message(response)
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -2199,6 +2235,12 @@ class ExternalBase(ServiceBase):
                 self.__rpc_app_verify_registration,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 AppVerifyRegistrationRequest,
+                StandardResponse,
+            ),
+            "/protos.External/AppRegisterReject": grpclib.const.Handler(
+                self.__rpc_app_register_reject,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                AppRegisterRejectRequest,
                 StandardResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
