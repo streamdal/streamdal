@@ -26,7 +26,7 @@ func (s *Snitch) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "snitch-go-client",
-		LibraryVersion: "0.0.51",
+		LibraryVersion: "0.0.54",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
@@ -73,10 +73,18 @@ func (s *Snitch) register(looper director.Looper) error {
 			return nil
 		}
 
-		// No way to hit this case for a "first register attempt" because
-		// "stream" won't be nil on initial launch.
+		// This is here to enable reconnects; no way to hit this case for a
+		// "first register attempt" because "stream" won't be nil on initial launch.
 		if stream == nil {
 			s.config.Logger.Debug("stream is nil, attempting to register")
+
+			if err := s.serverClient.Reconnect(); err != nil {
+				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				time.Sleep(ReconnectSleep)
+				return nil
+			}
+
+			s.config.Logger.Debug("successfully reconnected to streamdal server")
 
 			newStream, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 			if err != nil {
@@ -88,18 +96,18 @@ func (s *Snitch) register(looper director.Looper) error {
 					return nil
 				}
 
-				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				s.config.Logger.Errorf("Failed to re-register with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 
 				return nil
 			}
 
-			s.config.Logger.Debug("successfully reconnected to snitch-server")
+			s.config.Logger.Debug("successfully re-registered to streamdal server")
 
 			stream = newStream
 
 			// Re-announce audience (if we had any) - this is needed so that
-			// snitch-server repopulates live entry in snitch_live (which is used
+			// streamdal server repopulates live entry in snitch_live (which is used
 			// for DetachPipeline())
 			s.addAudiences(s.config.ShutdownCtx)
 		}
@@ -146,71 +154,7 @@ func (s *Snitch) register(looper director.Looper) error {
 		// encounter any errors
 		initialRegister = false
 
-		if cmd == nil {
-			s.config.Logger.Debug("Received nil command, ignoring")
-			return nil
-		}
-
-		if cmd.GetKeepAlive() != nil {
-			s.config.Logger.Debug("Received keep alive")
-			return nil
-		}
-
-		if cmd.Audience != nil && cmd.Audience.ServiceName != s.config.ServiceName {
-			s.config.Logger.Debugf("Received command for different service name: %s, ignoring command", cmd.Audience.ServiceName)
-			return nil
-		}
-
-		// Reset error just in case
-		err = nil
-
-		switch cmd.Command.(type) {
-		case *protos.Command_Kv:
-			s.config.Logger.Debug("Received kv command")
-			err = s.handleKVCommand(context.Background(), cmd.GetKv())
-		case *protos.Command_AttachPipeline:
-			s.config.Logger.Debug("Received attach pipeline command")
-			err = s.attachPipeline(context.Background(), cmd)
-		case *protos.Command_DetachPipeline:
-			s.config.Logger.Debug("Received detach pipeline command")
-			err = s.detachPipeline(context.Background(), cmd)
-		case *protos.Command_PausePipeline:
-			s.config.Logger.Debug("Received pause pipeline command")
-			err = s.pausePipeline(context.Background(), cmd)
-		case *protos.Command_ResumePipeline:
-			s.config.Logger.Debug("Received resume pipeline command")
-			err = s.resumePipeline(context.Background(), cmd)
-		case *protos.Command_Tail:
-			tail := cmd.GetTail()
-
-			if tail == nil {
-				s.config.Logger.Errorf("Received tail command with nil tail; full cmd: %+v", cmd)
-				return nil
-			}
-
-			if tail.GetRequest() == nil {
-				s.config.Logger.Errorf("Received tail command with nil Request; full cmd: %+v", cmd)
-				return nil
-			}
-
-			audStr := audToStr(tail.GetRequest().Audience)
-
-			switch cmd.GetTail().GetRequest().Type {
-			case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
-				s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
-				err = s.startTailAudience(context.Background(), cmd)
-			case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
-				s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
-				err = s.stopTailAudience(context.Background(), cmd)
-			default:
-				s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
-				return nil
-			}
-		default:
-			err = fmt.Errorf("unknown command type: %+v", cmd.Command)
-		}
-
-		if err != nil {
+		if err := s.handleCommand(cmd); err != nil {
 			s.config.Logger.Errorf("Failed to handle command: %s", cmd.Command)
 			return nil
 		}
@@ -220,11 +164,78 @@ func (s *Snitch) register(looper director.Looper) error {
 
 	if initialRegister {
 		return errors.Wrap(initialRegisterErr,
-			"failed to complete initial registration with snitch-server (and IgnoreStartupError is set to 'false')",
+			"failed to complete initial registration with streamdal server (and IgnoreStartupError is set to 'false')",
 		)
 	}
 
 	return nil
+}
+
+func (s *Snitch) handleCommand(cmd *protos.Command) error {
+	if cmd == nil {
+		s.config.Logger.Debug("Received nil command, ignoring")
+		return nil
+	}
+
+	if cmd.GetKeepAlive() != nil {
+		s.config.Logger.Debug("Received keep alive")
+		return nil
+	}
+
+	if cmd.Audience != nil && cmd.Audience.ServiceName != s.config.ServiceName {
+		s.config.Logger.Debugf("Received command for different service name: %s, ignoring command", cmd.Audience.ServiceName)
+		return nil
+	}
+
+	var err error
+
+	switch cmd.Command.(type) {
+	case *protos.Command_Kv:
+		s.config.Logger.Debug("Received kv command")
+		err = s.handleKVCommand(context.Background(), cmd.GetKv())
+	case *protos.Command_AttachPipeline:
+		s.config.Logger.Debug("Received attach pipeline command")
+		err = s.attachPipeline(context.Background(), cmd)
+	case *protos.Command_DetachPipeline:
+		s.config.Logger.Debug("Received detach pipeline command")
+		err = s.detachPipeline(context.Background(), cmd)
+	case *protos.Command_PausePipeline:
+		s.config.Logger.Debug("Received pause pipeline command")
+		err = s.pausePipeline(context.Background(), cmd)
+	case *protos.Command_ResumePipeline:
+		s.config.Logger.Debug("Received resume pipeline command")
+		err = s.resumePipeline(context.Background(), cmd)
+	case *protos.Command_Tail:
+		tail := cmd.GetTail()
+
+		if tail == nil {
+			s.config.Logger.Errorf("Received tail command with nil tail; full cmd: %+v", cmd)
+			return nil
+		}
+
+		if tail.GetRequest() == nil {
+			s.config.Logger.Errorf("Received tail command with nil Request; full cmd: %+v", cmd)
+			return nil
+		}
+
+		audStr := audToStr(tail.GetRequest().Audience)
+
+		switch cmd.GetTail().GetRequest().Type {
+		case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
+			s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
+			err = s.startTailAudience(context.Background(), cmd)
+		case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
+			s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
+			err = s.stopTailAudience(context.Background(), cmd)
+		default:
+			s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
+			return nil
+		}
+	default:
+		err = fmt.Errorf("unknown command type: %+v", cmd.Command)
+	}
+
+	return err
 }
 
 func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error {

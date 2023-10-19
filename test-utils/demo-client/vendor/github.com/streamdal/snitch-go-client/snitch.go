@@ -87,21 +87,21 @@ type ISnitch interface {
 type Snitch struct {
 	config             *Config
 	functions          map[string]*function
-	pipelines          map[string]map[string]*protos.Command
-	pipelinesPaused    map[string]map[string]*protos.Command
+	pipelines          map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
+	pipelinesPaused    map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
 	functionsMtx       *sync.RWMutex
 	pipelinesMtx       *sync.RWMutex
 	pipelinesPausedMtx *sync.RWMutex
 	serverClient       server.IServerClient
 	metrics            metrics.IMetrics
-	audiences          map[string]struct{}
+	audiences          map[string]struct{} // k: audienceStr
 	audiencesMtx       *sync.RWMutex
 	sessionID          string
 	kv                 kv.IKV
 	hf                 *hostfunc.HostFunc
 	tailsMtx           *sync.RWMutex
-	tails              map[string]map[string]*Tail
-	schemas            map[string]*protos.Schema
+	tails              map[string]map[string]*Tail // k1: audienceStr k2: tailID
+	schemas            map[string]*protos.Schema   // k: audienceStr
 	schemasMtx         *sync.RWMutex
 }
 
@@ -731,4 +731,12 @@ func (a *Audience) ToProto(serviceName string) *protos.Audience {
 		OperationType: protos.OperationType(a.OperationType),
 		OperationName: a.OperationName,
 	}
+}
+
+func stringPtr(in string) *string {
+	return &in
+}
+
+func boolPtr(in bool) *bool {
+	return &in
 }
