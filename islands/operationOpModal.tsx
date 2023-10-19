@@ -239,9 +239,7 @@ export const OperationOpModalInfo = (
           aria-labelledby="collapse-heading-5"
           class={"flex flex-col items-center justify-center p-4"}
         >
-          {!schemaModalOpen && (
-            <Schema setSchemaModalOpen={setSchemaModalOpen} />
-          )}
+          <Schema setSchemaModalOpen={setSchemaModalOpen} />
         </div>
       </div>
     </>

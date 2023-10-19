@@ -37,6 +37,7 @@ export const Schema = (
           </svg>
         </button>
       </div>
+
       <div className="w-full rounded flex overflow-x-scroll bg-black text-white pt-2 pb-6 px-4 text-sm flex flex-col justify-start">
         <div class={"w-full flex justify-end"}>
           <button
@@ -52,18 +53,17 @@ export const Schema = (
           />
         </div>
         <pre>
-                  <code>
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: `${
-                                hljs.highlight(`${opModal.value.schemaInfo?.schema}`, {language: 'json'})
-                                    .value
-                            }`,
-                        }}
-                        class={"font-sm"}
-                    >
-                    </div>
-                  </code>
+          <code>
+            <div
+              class={"font-sm"}
+              dangerouslySetInnerHTML={{
+                  __html: opModal.value.schemaInfo?.schema ?
+                    `${ hljs.highlight(`${opModal.value.schemaInfo?.schema }`, { language: 'json' }).value}` :
+                    ""
+              }}
+            >
+            </div>
+          </code>
         </pre>
       </div>
     </>

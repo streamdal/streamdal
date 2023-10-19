@@ -61,7 +61,6 @@ export default function OpModal(
   const displayName = itemName();
 
   const [tailNavOpen, setTailNavOpen] = useState(false);
-  const [schemaNavOpen, setSchemaNavOpen] = useState(false);
   const [schemaModalOpen, setSchemaModalOpen] = useState(false);
 
   const getSchema = async () => {
@@ -99,7 +98,7 @@ export default function OpModal(
         console.error("Error fetching schema", e);
       }
     }
-  }, [audience, schemaNavOpen]);
+  }, [audience]);
 
   return (
     <>
