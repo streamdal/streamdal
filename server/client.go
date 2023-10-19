@@ -43,8 +43,8 @@ type IServerClient interface {
 	// such as AttachPipeline, DetachPipeline, etc
 	Register(ctx context.Context, req *protos.RegisterRequest) (protos.Internal_RegisterClient, error)
 
-	// SendMetrics ships counter(s) to the streamdal server
-	SendMetrics(ctx context.Context, counter *types.CounterEntry) error
+	// SendMetrics ships counter(s) to the snitch server
+	SendMetrics(ctx context.Context, counters []*types.CounterEntry) error
 
 	// SendSchema sends a schema to the streamdal server
 	SendSchema(ctx context.Context, aud *protos.Audience, jsonSchema []byte) error
@@ -139,23 +139,25 @@ func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *pr
 	return nil
 }
 
-func (c *Client) SendMetrics(ctx context.Context, counter *types.CounterEntry) error {
+func (c *Client) SendMetrics(ctx context.Context, counters []*types.CounterEntry) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
-	labels := make(map[string]string)
-	for k, v := range counter.Labels {
-		labels[k] = v
+	req := &protos.MetricsRequest{
+		Metrics: make([]*protos.Metric, 0),
 	}
 
-	req := &protos.MetricsRequest{
-		Metrics: []*protos.Metric{
-			{
-				Name:     string(counter.Name),
-				Audience: counter.Audience,
-				Value:    float64(counter.Value),
-				Labels:   labels,
-			},
-		},
+	for _, counter := range counters {
+		labels := make(map[string]string)
+		for k, v := range counter.Labels {
+			labels[k] = v
+		}
+
+		req.Metrics = append(req.Metrics, &protos.Metric{
+			Name:     string(counter.Name),
+			Audience: counter.Audience,
+			Value:    float64(counter.Value),
+			Labels:   labels,
+		})
 	}
 
 	if _, err := c.Server.Metrics(ctx, req); err != nil {

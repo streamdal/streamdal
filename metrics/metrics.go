@@ -38,6 +38,12 @@ const (
 	// defaultWorkerPoolSize is how many counter workers will be spun up.
 	// These workers are responsible for processing the counterIncrCh and counterPublishCh channels
 	defaultWorkerPoolSize = 10
+
+	// serverFlushTimeout is the maximum amount of time to wait before flushing metrics to the server
+	serverFlushTimeout = time.Second * 2
+
+	// serverFlushMaxBatchSize is the largest a batch of metrics will grow before being flushed to the server
+	serverFlushMaxBatchSize = 100
 )
 
 var (
@@ -233,6 +239,10 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 		shutdown bool
 	)
 
+	// Batch metrics entries to send to server
+	metricsEntries := make([]*types.CounterEntry, 0)
+	lastFlush := time.Now().UTC()
+
 	looper.Loop(func() error {
 		// Give looper a moment to catch up
 		if shutdown {
@@ -245,13 +255,7 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 			err = m.incr(context.Background(), entry)
 		case entry := <-m.counterPublishCh: // Coming from ticker runner
 			m.Log.Debugf("received publish for counter '%s', getValue: %d", entry.Name, entry.Value)
-			err = m.ServerClient.SendMetrics(context.Background(), entry)
-			if err != nil && strings.Contains(err.Error(), "connection refused") {
-				// Snitch server went away, log, sleep, and wait for reconnect
-				m.Log.Warn("failed to send metrics, snitch server went away, waiting for reconnect")
-				time.Sleep(time.Second * 5)
-				return nil
-			}
+			metricsEntries = append(metricsEntries, entry)
 		case <-m.ShutdownCtx.Done():
 			m.Log.Debugf("received notice to shutdown")
 			looper.Quit()
@@ -262,6 +266,21 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 
 		if err != nil {
 			m.Log.Errorf("worker pool error: %s", err)
+		}
+
+		if len(metricsEntries) > serverFlushMaxBatchSize || time.Now().UTC().Sub(lastFlush) > serverFlushTimeout {
+			err = m.ServerClient.SendMetrics(context.Background(), metricsEntries)
+
+			// Reset regardless of errors. We don't want to eat up memory or block channels
+			metricsEntries = make([]*types.CounterEntry, 0)
+			lastFlush = time.Now().UTC()
+
+			if err != nil && strings.Contains(err.Error(), "connection refused") {
+				// Snitch server went away, log, sleep, and wait for reconnect
+				m.Log.Warn("failed to send metrics, snitch server went away, waiting for reconnect")
+				time.Sleep(time.Second * 5)
+				return nil
+			}
 		}
 
 		return nil
