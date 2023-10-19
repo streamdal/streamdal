@@ -26,7 +26,7 @@ func (s *Snitch) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "snitch-go-client",
-		LibraryVersion: "0.0.54",
+		LibraryVersion: "0.0.55",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
