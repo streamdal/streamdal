@@ -141,6 +141,13 @@ func run(d *deps.Dependencies) error {
 		}
 	}
 
+	clusterID, err := d.StoreService.GetStreamdalID(d.ShutdownContext)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	logrus.Debugf("Cluster ID '%s'", clusterID)
+
 	// If shutting down, no need to listen for errCh
 	select {
 	case err := <-errChan:
