@@ -77,6 +77,16 @@ type FakeIServerClient struct {
 	notifyReturnsOnCall map[int]struct {
 		result1 error
 	}
+	ReconnectStub        func() error
+	reconnectMutex       sync.RWMutex
+	reconnectArgsForCall []struct {
+	}
+	reconnectReturns struct {
+		result1 error
+	}
+	reconnectReturnsOnCall map[int]struct {
+		result1 error
+	}
 	RegisterStub        func(context.Context, *protos.RegisterRequest) (protos.Internal_RegisterClient, error)
 	registerMutex       sync.RWMutex
 	registerArgsForCall []struct {
@@ -438,6 +448,59 @@ func (fake *FakeIServerClient) NotifyReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeIServerClient) Reconnect() error {
+	fake.reconnectMutex.Lock()
+	ret, specificReturn := fake.reconnectReturnsOnCall[len(fake.reconnectArgsForCall)]
+	fake.reconnectArgsForCall = append(fake.reconnectArgsForCall, struct {
+	}{})
+	stub := fake.ReconnectStub
+	fakeReturns := fake.reconnectReturns
+	fake.recordInvocation("Reconnect", []interface{}{})
+	fake.reconnectMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeIServerClient) ReconnectCallCount() int {
+	fake.reconnectMutex.RLock()
+	defer fake.reconnectMutex.RUnlock()
+	return len(fake.reconnectArgsForCall)
+}
+
+func (fake *FakeIServerClient) ReconnectCalls(stub func() error) {
+	fake.reconnectMutex.Lock()
+	defer fake.reconnectMutex.Unlock()
+	fake.ReconnectStub = stub
+}
+
+func (fake *FakeIServerClient) ReconnectReturns(result1 error) {
+	fake.reconnectMutex.Lock()
+	defer fake.reconnectMutex.Unlock()
+	fake.ReconnectStub = nil
+	fake.reconnectReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIServerClient) ReconnectReturnsOnCall(i int, result1 error) {
+	fake.reconnectMutex.Lock()
+	defer fake.reconnectMutex.Unlock()
+	fake.ReconnectStub = nil
+	if fake.reconnectReturnsOnCall == nil {
+		fake.reconnectReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.reconnectReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeIServerClient) Register(arg1 context.Context, arg2 *protos.RegisterRequest) (protos.Internal_RegisterClient, error) {
 	fake.registerMutex.Lock()
 	ret, specificReturn := fake.registerReturnsOnCall[len(fake.registerArgsForCall)]
@@ -646,6 +709,8 @@ func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	defer fake.newAudienceMutex.RUnlock()
 	fake.notifyMutex.RLock()
 	defer fake.notifyMutex.RUnlock()
+	fake.reconnectMutex.RLock()
+	defer fake.reconnectMutex.RUnlock()
 	fake.registerMutex.RLock()
 	defer fake.registerMutex.RUnlock()
 	fake.sendMetricsMutex.RLock()

@@ -22,27 +22,31 @@ type IServerClient interface {
 	// before we allow the client to start processing.
 	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
 
-	// GetTailStream returns a gRPC client stream used to send TailResponses to the snitch server
+	// GetTailStream returns a gRPC client stream used to send TailResponses to the streamdal server
 	GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error)
 
-	// HeartBeat sends a heartbeat to the snitch server
+	// HeartBeat sends a heartbeat to the streamdal server
 	HeartBeat(ctx context.Context, req *protos.HeartbeatRequest) error
 
-	// NewAudience announces a new audience to the snitch server
+	// NewAudience announces a new audience to the streamdal server
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 
-	// Notify calls to snitch server to trigger the configured notification rules for the specified step
+	// Notify calls to streamdal server to trigger the configured notification rules for the specified step
 	Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error
 
-	// Register registers a new client with the snitch server.
-	// This is ran in a goroutine and constantly listens for commands from the snitch server
+	// Reconnect closes any open gRPC connection to the streamdal server and re-establishes a new connection
+	// This method won't perform retries as that should be determined by the caller
+	Reconnect() error
+
+	// Register registers a new client with the streamdal server.
+	// This is ran in a goroutine and constantly listens for commands from the streamdal server
 	// such as AttachPipeline, DetachPipeline, etc
 	Register(ctx context.Context, req *protos.RegisterRequest) (protos.Internal_RegisterClient, error)
 
-	// SendMetrics ships counter(s) to the snitch server
+	// SendMetrics ships counter(s) to the streamdal server
 	SendMetrics(ctx context.Context, counter *types.CounterEntry) error
 
-	// SendSchema sends a schema to the snitch server
+	// SendSchema sends a schema to the streamdal server
 	SendSchema(ctx context.Context, aud *protos.Audience, jsonSchema []byte) error
 }
 
@@ -52,13 +56,28 @@ const (
 )
 
 type Client struct {
-	Token  string
-	Conn   *grpc.ClientConn
-	Server protos.InternalClient
+	ServerAddr string
+	Token      string
+	Conn       *grpc.ClientConn
+	Server     protos.InternalClient
 }
 
-// New dials a snitch GRPC server and returns IServerClient
-func New(snitchAddress, snitchToken string) (*Client, error) {
+// New dials a streamdal GRPC server and returns IServerClient
+func New(serverAddr, serverToken string) (*Client, error) {
+	conn, err := dialServer(serverAddr)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to dial streamdal server")
+	}
+
+	return &Client{
+		Conn:       conn,
+		Server:     protos.NewInternalClient(conn),
+		Token:      serverToken,
+		ServerAddr: serverAddr,
+	}, nil
+}
+
+func dialServer(serverAddr string) (*grpc.ClientConn, error) {
 	dialCtx, dialCancel := context.WithTimeout(context.Background(), dialTimeout)
 	defer dialCancel()
 
@@ -80,16 +99,27 @@ func New(snitchAddress, snitchToken string) (*Client, error) {
 		grpc.WithInsecure(),
 	)
 
-	conn, err := grpc.DialContext(dialCtx, snitchAddress, opts...)
+	conn, err := grpc.DialContext(dialCtx, serverAddr, opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not dial GRPC server: %s")
 	}
 
-	return &Client{
-		Conn:   conn,
-		Server: protos.NewInternalClient(conn),
-		Token:  snitchToken,
-	}, nil
+	return conn, nil
+}
+
+func (c *Client) Reconnect() error {
+	// Don't care about any error here, the connection might be open or closed
+	_ = c.Conn.Close()
+
+	conn, err := dialServer(c.ServerAddr)
+	if err != nil {
+		return errors.Wrap(err, "unable to reconnect to streamdal server")
+	}
+
+	c.Conn = conn
+	c.Server = protos.NewInternalClient(conn)
+
+	return nil
 }
 
 func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error {
@@ -174,7 +204,7 @@ func (c *Client) GetTailStream(ctx context.Context) (protos.Internal_SendTailCli
 
 	srv, err := c.Server.SendTail(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to talk to snitch server")
+		return nil, errors.Wrap(err, "unable to talk to streamdal server")
 	}
 
 	return srv, nil
