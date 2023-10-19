@@ -1,17 +1,22 @@
 ---
-title: The Snitch SDK
-metaTitle: "Unpacking the Power and Simplicity of the Snitch SDK"
-description: Dive into Streamdal's SDK for Snitch, driving real-time data operations with minimal codebase disruptions.
+title: The Streamdal SDK
+metaTitle: "Unpacking the Power and Simplicity of the Streamdal SDK"
+description: Dive into Streamdal's SDK, driving real-time data operations with minimal codebase disruptions.
 layout: ../../../layouts/MainLayout.astro
 ---
+import sdkDiagram from '../../../images/core-components/StreamdalSdk.png';
 
 <br />
 <br />
-At the heart of Snitch's real-time data operations is the SDK — a robust, flexible, and lightweight tool that translates your rules into actions. The beauty of Streamdal's approach lies in its seamless integration into popular messaging libraries, minimizing the friction often associated with adopting new technologies.
+At the heart of Streamdal's real-time data operations is its SDK — a robust, flexible, and lightweight tool that translates your rules into actions. The beauty of Streamdal's approach lies in its seamless integration into popular messaging libraries, minimizing the friction often associated with adopting new technologies.
 
-## Forks of Popular Messaging Libraries: Easy Integration
+## Forks of Popular Messaging Libraries: Easy Integration (Coming Soon)
 
-Streamdal has gone the extra mile by maintaining forks of widely-used messaging libraries with the Snitch SDK already integrated. These adaptations, termed "shims", are engineered to allow you to leverage the capabilities of the SDK without making major alterations to your existing codebase.
+Streamdal has gone the extra mile by maintaining forks of widely-used messaging libraries with its SDK already integrated. These adaptations, termed "shims", are engineered to allow you to leverage the capabilities of the SDK without making major alterations to your existing codebase.
+
+## SDK High Level Architecture
+
+<img src={sdkDiagram} alt="Streamdal SDK Arch" />
 
 ## Environment Variables: Configuring the SDK
 
@@ -19,12 +24,12 @@ While integrating, the SDK offers the flexibility to be configured via specific 
 
 | Environment Variable      | Mandatory? | Purpose                                                                                                                              | Default Value    |
 |---------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| `SNITCH_URL`              | Yes        | Connects to your deployed Snitch server instance                                                                                     | `localhost:9090` |
-| `SNITCH_TOKEN`            | Yes        | Authentication token for the Snitch server                                                                                           | `streamdal`      |
-| `SNITCH_DRY_RUN`          | No         | Switch between actual execution and logging-only mode                                                                                | `false`          |
-| `SNITCH_STEP_TIMEOUT`     | No         | Set the maximum duration for wasm execution                                                                                          | `10`             |
-| `SNITCH_PIPELINE_TIMEOUT` | No         | Define the total allowable execution time for the entire pipeline                                                                     | `100`            |
-| `SNITCH_DATA_SOURCE`      | No         | Designate the data source when applying rules, determining the applicable rulesets                                                   | `kafka`          |
+| `STREAMDAL_URL`           | Yes        | Connects to your deployed Streamdal server instance                                                                                  | `localhost:9090` |
+| `STREAMDAL_TOKEN`         | Yes        | Authentication token for the Streamdal server                                                                                       | `streamdal`      |
+| `STREAMDAL_DRY_RUN`       | No         | Switch between actual execution and logging-only mode                                                                                | `false`          |
+| `STREAMDAL_STEP_TIMEOUT`  | No         | Set the maximum duration for wasm execution                                                                                          | `10`             |
+| `STREAMDAL_PIPELINE_TIMEOUT`| No       | Define the total allowable execution time for the entire pipeline                                                                     | `100`            |
+| `STREAMDAL_DATA_SOURCE`   | No         | Designate the data source when applying rules, determining the applicable rulesets                                                   | `kafka`          |
 
 ## Golang SDK Example
 
@@ -38,16 +43,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/streamdal/snitch-go-client"
+	"github.com/streamdal-go-client"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sc, err := snitch.New(&snitch.Config{
-		SnitchURL:       "localhost:9090",
-		SnitchToken:     "streadmal",
+	sc, err := streamdal.New(&streamdal.Config{
+		StreamdalURL:     "localhost:9090",
+		StreamdalToken:   "streamdal",
 		StepTimeout:     time.Millisecond * 10,
 		PipelineTimeout: time.Millisecond * 100,
 		DryRun:          false,
@@ -58,8 +63,10 @@ func main() {
 		panic(err)
 	}
 
-	resp, err := sc.Process(ctx, &snitch.ProcessRequest{
-		OperationType: snitch.OperationTypeConsumer,
+	resp, err := sc.Process(ctx, &streamdal.Process
+
+	resp, err := sc.Process(ctx, &streamdal.ProcessRequest{
+		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
 		Data:          []byte(`{"object": {"field": true}}`),
@@ -72,5 +79,14 @@ func main() {
 }
 ```
 
-Explore other language-specific SDK documentations to fully harness Snitch's prowess in your applications.
+Explore other language-specific SDK documentations to fully harness Streamdal's prowess in your applications.
+
+## Available SDKs
+
+Streamdal offers SDKs for various languages to help developers integrate with their services effortlessly. Below are the official SDKs:
+
+- [Go SDK](https://github.com/streamdal/go-client)
+- [Node.js SDK](https://github.com/streamdal/node-sdk)
+- [Python SDK](https://github.com/streamdal/python-client)
+
 

@@ -1,42 +1,41 @@
 ---
-title: Snitch Core Components
-metaTitle: "The Heart and Soul of Snitch: Server, UI, and SDK"
-description: A comprehensive exploration of Snitch's main components and their interconnected functionalities.
+title: Streamdal Core Components
+metaTitle: "The Heart and Soul of Streamdal: Server, UI, and SDK"
+description: A comprehensive exploration of Streamdal's main components and their interconnected observability features.
 layout: ../../../layouts/MainLayout.astro
 ---
 
 <br />
 <br />
-Snitch's power emerges from the intricate collaboration of its primary components. Together, the Snitch Server, Console UI, and SDK form a cohesive framework, driving real-time data operations with an emphasis on flexibility, security, and efficiency.
+Streamdal's strength lies in its comprehensive observability capabilities. The Streamdal Server, Console UI, and SDK offers an intuitive and detailed view of your service, consumers, and producers in real-time.
 
-## The Snitch Server: Rule Translation Hub
+## Streamdal Server: Your Live Observability Hub
 
-Acting as a pivotal connector, the Snitch Server receives rules formulated via the Console UI. It then seamlessly translates these rules into **WebAssembly (WASM)**, ensuring that the SDK can execute them in real-time. This dynamic WASM translation ensures rules are not just stored but are transformed into actionable directives, enabling immediate data operations.
+Streamdal Server is more than just a connector; it's your observability powerhouse. It provides a live map of your service, highlighting the intricacies of consumers and producers. This live view is complemented with detailed metrics on messages published, consumed per second, and bytes per second.
 
-With diverse API offerings:
-- The **gRPC API on port 9090** serves the SDK, transmitting WASM-translated rules.
-- The **gRPC-Web API on port 9091** integrates with the Console UI, reflecting rule updates.
-- The **REST API on port 8080** provides utility functions, including metrics and health checks.
+With robust API offerings:
+- The **gRPC API on port 9090** aids the SDK, ensuring seamless communication.
+- The **gRPC-Web API on port 9091** links with the Console UI, ensuring all updates are reflected in real-time.
+- The **REST API on port 8080** provides utility functions, including metrics, health checks, and the novel "tail" feature to view message flow in a JSON format.
 
-## Console UI: The Visual Command Center
+## Console UI: The Observability Command Center
 
-The Console UI serves as the interactive platform for rule creation, visualization, and management. Users can craft dynamic rules and visualize 'pipelines' which provide insights into consumers, producers, and topics.
+The Console UI is an all-in-one platform that showcases the live map, metrics, and schema views. This is where you can visually trace the flow of messages, view them, and understand the schema based on recent events.
 
-With two primary views:
-- The **Dashboard View** offers a graphical representation of pipelines, alongside stats on consumers and producers.
-- The **Pipeline View** lets users mold rules revolving around detection (PII), encoding, decoding, and data transformation.
+- **Dashboard View** offering graphical insights into data flow and statistics.
+Coming soon:
+- **Pipeline View** allowing users to set and manage rules around data (PII) detection, encoding, decoding, and more.
 
-## SDK: The Execution Engine
+## SDK: Bridging Real-time Data Flow
 
-Snitch's SDK is more than just a communicator. Streamdal ensures the SDK's easy integration by maintaining forks of popular messaging libraries. This approach allows existing applications to adopt Snitch's capabilities without massive code overhauls.
+Streamdal's SDK ensures quick and effortless integration by maintaining forks of renowned messaging libraries. This facilitates the adaptation of Streamdal's features without requiring a complete code rewrite.
 
-Users can configure the SDK using environment variables, which cater to:
-- Connectivity settings like `SNITCH_URL` and `SNITCH_TOKEN`.
-- Execution preferences such as timeouts and dry runs.
-- Designating the data source using `SNITCH_DATA_SOURCE`.
+Users can tweak the SDK with environment variables to:
+- Set up connectivity with variables like `STREAMDAL_URL` and `STREAMDAL_TOKEN`.
+- Specify execution settings and data source with variables like `STREAMDAL_DATA_SOURCE`.
 
-Moreover, the Golang version of the SDK offers a glimpse into its simplicity and effectiveness, making data operations a breeze.
+Additionally, the Golang version of the SDK showcases its simplicity and efficiency, streamlining data operations.
 
 ---
 
-Together, the synergy of the Snitch Server's translation prowess, Console UI's visualization and rule creation, and the SDK's real-time execution creates an ecosystem where data security, transformation, and compliance are actualized with unmatched efficiency. Dive deeper into each core component to understand and harness the full potential of Snitch in your data operations.
+In essence, Streamdal brings together the observability features of its Server, the visualization capabilities of the Console UI, and the real-time data flow of the SDK. Together, they form an ecosystem where monitoring, tracing, and data analysis reach new heights. Immerse yourself in each component to unlock the full potential of Streamdal for your operations.

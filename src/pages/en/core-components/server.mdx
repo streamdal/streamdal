@@ -1,21 +1,21 @@
 ---
-title: The Snitch Server
-metaTitle: "Deciphering the Snitch Server's Core Functions"
-description: A deep dive into the Snitch Server and how it bridges the gap between rule creation and real-time execution.
+title: The Streamdal Server
+metaTitle: "Deciphering the Streamdal Server's Core Functions"
+description: A deep dive into the Streamdal Server and how it bridges the gap between rule creation and real-time execution.
 layout: ../../../layouts/MainLayout.astro
 ---
 
 <br />
 <br />
-The Snitch Server stands as the vital intermediary in Snitch's architecture, ensuring that the rules crafted in the Console UI seamlessly manifest into real-time operations. Engineered for high availability, this server doesn't just store rules; it translates them into **WebAssembly (WASM)**, the very format that the SDK understands and executes.
+The Streamdal Server stands as the vital intermediary in Streamdal's architecture, ensuring that the rules crafted in the Console UI seamlessly manifest into real-time operations. Engineered for high availability, this server doesn't just store rules; it translates them into **WebAssembly (WASM)**, the very format that the SDK understands and executes.
 
 ## Real-time WASM Translation: From Rules to Actions
 
-The server's primary role revolves around its capability to take in rules formulated via the Snitch UI. Once received, it embarks on the task of converting these intricate rules into WASM code, optimizing for both efficiency and speed. With the translated rules now in WASM format, the SDK can fetch and execute them in real-time, ensuring data operations reflect the most recent directives.
+The server's primary role revolves around its capability to take in rules formulated via the Streamdal UI. Once received, it embarks on the task of converting these intricate rules into WASM code, optimizing for both efficiency and speed. With the translated rules now in WASM format, the SDK can fetch and execute them in real-time, ensuring data operations reflect the most recent directives.
 
 ## Multi-faceted API Endpoints
 
-To cater to varied components and usage scenarios, the Snitch Server hosts multiple APIs:
+To cater to varied components and usage scenarios, the Streamdal Server hosts multiple APIs:
 
 - **gRPC API on port 9090**: 
   - Designed explicitly for SDKs, it's the primary channel through which WASM-translated rules are transmitted to the SDK for execution.
@@ -28,4 +28,4 @@ To cater to varied components and usage scenarios, the Snitch Server hosts multi
 
 ---
 
-The Snitch Server is the unspoken hero in Snitch's data management story. Acting as the bridge between intention (rule creation) and action (rule execution), it guarantees that data compliance, transformation, and security are not mere concepts, but are brought to life every second of operation. Dive deeper to grasp its intricate mechanisms and learn how to maximize its potential in your data pipeline.
+The Streamdal Server is the unspoken hero in Streamdal's data management story. Acting as the bridge between intention (rule creation) and action (rule execution), it guarantees that data compliance, transformation, and security are not mere concepts, but are brought to life every second of operation. Dive deeper to grasp its intricate mechanisms and learn how to maximize its potential in your data pipeline.
