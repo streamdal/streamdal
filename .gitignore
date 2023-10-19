@@ -1,4 +1,5 @@
 .idea
 .env
-snitch-cli.log
+streamdal-cli.log
 build/*
+.DS_Store
