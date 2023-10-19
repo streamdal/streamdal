@@ -10,13 +10,21 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class AppRegisterRejectRequest(_message.Message):
+    __slots__ = ["cluster_id"]
+    CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
+    cluster_id: str
+    def __init__(self, cluster_id: _Optional[str] = ...) -> None: ...
+
 class AppRegistrationRequest(_message.Message):
-    __slots__ = ["_code", "email"]
+    __slots__ = ["_code", "cluster_id", "email"]
+    CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     _CODE_FIELD_NUMBER: _ClassVar[int]
     _code: str
+    cluster_id: str
     email: str
-    def __init__(self, email: _Optional[str] = ..., _code: _Optional[str] = ...) -> None: ...
+    def __init__(self, email: _Optional[str] = ..., cluster_id: _Optional[str] = ..., _code: _Optional[str] = ...) -> None: ...
 
 class AppRegistrationStatusRequest(_message.Message):
     __slots__ = ["email"]

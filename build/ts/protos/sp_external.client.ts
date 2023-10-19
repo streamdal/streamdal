@@ -6,6 +6,7 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.js";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
+import type { AppRegisterRejectRequest } from "./sp_external.js";
 import type { AppVerifyRegistrationRequest } from "./sp_external.js";
 import type { AppRegistrationRequest } from "./sp_external.js";
 import type { AppRegistrationStatusResponse } from "./sp_external.js";
@@ -202,6 +203,10 @@ export interface IExternalClient {
      * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
      */
     appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
+     */
+    appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
     /**
      * Test method
      *
@@ -450,12 +455,19 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<AppVerifyRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
+     */
+    appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse> {
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        return stackIntercept<AppRegisterRejectRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        const method = this.methods[28], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

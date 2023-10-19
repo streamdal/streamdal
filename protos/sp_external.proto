@@ -85,6 +85,8 @@ service External {
 
   rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
 
+  rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -281,6 +283,8 @@ message AppRegistrationStatusResponse {
 message AppRegistrationRequest {
   string email = 1;
 
+  string cluster_id = 2;
+
   // Used for storage on ui-bff backend
   string _code = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
@@ -289,6 +293,10 @@ message AppVerifyRegistrationRequest {
   string email = 1;
 
   string code = 2;
+}
+
+message AppRegisterRejectRequest {
+  string cluster_id = 1;
 }
 
 message TestRequest {

@@ -443,6 +443,10 @@ export interface AppRegistrationRequest {
      */
     email: string;
     /**
+     * @generated from protobuf field: string cluster_id = 2;
+     */
+    clusterId: string;
+    /**
      * Used for storage on ui-bff backend
      *
      * @generated from protobuf field: string _code = 100;
@@ -461,6 +465,15 @@ export interface AppVerifyRegistrationRequest {
      * @generated from protobuf field: string code = 2;
      */
     code: string;
+}
+/**
+ * @generated from protobuf message protos.AppRegisterRejectRequest
+ */
+export interface AppRegisterRejectRequest {
+    /**
+     * @generated from protobuf field: string cluster_id = 1;
+     */
+    clusterId: string;
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -835,6 +848,16 @@ declare class AppVerifyRegistrationRequest$Type extends MessageType<AppVerifyReg
  * @generated MessageType for protobuf message protos.AppVerifyRegistrationRequest
  */
 export declare const AppVerifyRegistrationRequest: AppVerifyRegistrationRequest$Type;
+declare class AppRegisterRejectRequest$Type extends MessageType<AppRegisterRejectRequest> {
+    constructor();
+    create(value?: PartialMessage<AppRegisterRejectRequest>): AppRegisterRejectRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppRegisterRejectRequest): AppRegisterRejectRequest;
+    internalBinaryWrite(message: AppRegisterRejectRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.AppRegisterRejectRequest
+ */
+export declare const AppRegisterRejectRequest: AppRegisterRejectRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
     create(value?: PartialMessage<TestRequest>): TestRequest;
