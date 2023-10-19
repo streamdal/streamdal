@@ -90,8 +90,8 @@ github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d/go.mod h1
 github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIKYqbNC9s=
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
-github.com/streamdal/snitch-go-client v0.0.52 h1:PHgmQsyc5ELkmPO6OgSzsILEiG6eApwjD9BUQDRvlUY=
-github.com/streamdal/snitch-go-client v0.0.52/go.mod h1:NFeUnZi5LzSKjbgT7l0o+1u26tzqLf0n36uHtOeMXlk=
+github.com/streamdal/snitch-go-client v0.0.55 h1:wseQv4luteVjUGBuPPL2tTHsptzz1ia//OvmXNw9j1U=
+github.com/streamdal/snitch-go-client v0.0.55/go.mod h1:NFeUnZi5LzSKjbgT7l0o+1u26tzqLf0n36uHtOeMXlk=
 github.com/streamdal/snitch-protos v0.0.110 h1:gpn3+rU4IRedKIXBffvTAebrK2HcEIwsMSE6OnXOBHg=
 github.com/streamdal/snitch-protos v0.0.110/go.mod h1:d2vp82VnY5w+EdsEASYtHs3L8LPab4I9lwEVxhBKrKA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
