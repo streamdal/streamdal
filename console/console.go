@@ -224,6 +224,7 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 }
 
 func (c *Console) DisplayViewOptions(defaultViewOptions *types.ViewOptions, answerCh chan<- *types.ViewOptions) {
+	// We probably won't have any view options on initial load - set the defaults
 	if defaultViewOptions == nil {
 		defaultViewOptions = &types.ViewOptions{
 			PrettyJSON:         DefaultViewOptionsPrettyJSON,
@@ -274,11 +275,21 @@ func (c *Console) DisplayViewOptions(defaultViewOptions *types.ViewOptions, answ
 	optsDialog.SetBorder(true).SetTitle("View Options")
 	optsDialog.SetBackgroundColor(Tcell(WindowBg))
 	optsDialog.SetTitleColor(Tcell(TextPrimary))
-	optsDialog.SetFieldBackgroundColor(Tcell(InputFieldBg))
-	optsDialog.SetFieldTextColor(Tcell(InputFieldFg))
+	optsDialog.SetFieldBackgroundColor(Tcell(TextAccent3))
+	optsDialog.SetFieldTextColor(Tcell(ActiveButtonFg))
 	optsDialog.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
 	optsDialog.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
 	optsDialog.SetButtonsAlign(tview.AlignCenter)
+
+	optsDialog.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			answerCh <- defaultViewOptions
+		}
+
+		// TODO: Figure out left/right/up/down capture + SetFocus (doesn't seem to work?)
+
+		return event
+	})
 
 	viewOptionsDialog := Center(optsDialog, 30, 13)
 	c.pages.AddPage(PageRate, viewOptionsDialog, true, true)
