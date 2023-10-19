@@ -16,7 +16,7 @@ var _ = Describe("Config", func() {
 
 	BeforeEach(func() {
 		// Node name needs to be set
-		os.Setenv("SNITCH_SERVER_NODE_NAME", "testName")
+		os.Setenv("STREAMDAL_SERVER_NODE_NAME", "testName")
 
 		cfg = New(testVersion)
 	})

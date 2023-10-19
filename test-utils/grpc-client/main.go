@@ -6,9 +6,10 @@ import (
 	"io"
 	"log"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 func main() {
@@ -47,7 +48,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("cannot receive %v", err)
 			}
-			log.Printf("Resp received: %s", resp.Type.String())
+			log.Printf("Resp received: %s", resp.GetCommand())
 		}
 	}()
 

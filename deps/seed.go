@@ -6,10 +6,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/util"
 )
 
 func (d *Dependencies) Seed(ctx context.Context) error {
@@ -82,7 +82,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 		Audience: &protos.Audience{
 			ComponentName: "kafka",
 			OperationName: "some-producer",
-			ServiceName:   "snitchtest",
+			ServiceName:   "test-service",
 			OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
 		},
 	}
@@ -95,7 +95,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 		Audience: &protos.Audience{
 			ComponentName: "kafka",
 			OperationName: "some-consumer",
-			ServiceName:   "snitchtest",
+			ServiceName:   "test-service",
 			OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
 		},
 	}
@@ -108,7 +108,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 		Audience: &protos.Audience{
 			ComponentName: "rabbitmq",
 			OperationName: "some-rabbit-producer",
-			ServiceName:   "snitchtest",
+			ServiceName:   "test-service",
 			OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
 		},
 	}
@@ -121,7 +121,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 		Audience: &protos.Audience{
 			ComponentName: "rabbitmq",
 			OperationName: "some-rabbit-consumer",
-			ServiceName:   "snitchtest",
+			ServiceName:   "test-service",
 			OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
 		},
 	}
@@ -149,7 +149,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	labels1 := map[string]string{
 		"component":     "kafka",
 		"operation":     "some-producer",
-		"service":       "snitchtest",
+		"service":       "test-service",
 		"pipeline_id":   pipelineID1,
 		"pipeline_name": pipeline1.Name,
 	}
@@ -157,7 +157,7 @@ func (d *Dependencies) Seed(ctx context.Context) error {
 	labels2 := map[string]string{
 		"component":     "kafka",
 		"operation":     "some-consumer",
-		"service":       "snitchtest",
+		"service":       "test-service",
 		"pipeline_id":   pipelineID1,
 		"pipeline_name": pipeline1.Name,
 	}

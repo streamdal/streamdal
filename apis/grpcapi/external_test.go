@@ -16,13 +16,13 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
-	"github.com/streamdal/snitch-server/config"
-	"github.com/streamdal/snitch-server/deps"
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/config"
+	"github.com/streamdal/server/deps"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/util"
 )
 
 const (
@@ -510,7 +510,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Message).To(ContainSubstring("attached"))
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Should have an entry in snitch_config
+			// Should have an entry in streamdal_config
 			key := store.RedisConfigKey(audience, createdResp.PipelineId)
 			err = redisClient.Get(context.Background(), key).Err()
 			Expect(err).ToNot(HaveOccurred())
@@ -596,7 +596,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Message).To(ContainSubstring("attached"))
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Key should be in snitch_config
+			// Key should be in streamdal_config
 			err = redisClient.Get(context.Background(), store.RedisConfigKey(audience, createdResp.PipelineId)).Err()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -614,7 +614,7 @@ var _ = Describe("External gRPC API", func() {
 			// There is a 5s sleep before redis key is deleted
 			time.Sleep(time.Second * 7)
 
-			// Key should be gone from snitch_config
+			// Key should be gone from streamdal_config
 			shouldBeEmpty, err := redisClient.Get(context.Background(), store.RedisConfigKey(audience, createdResp.PipelineId)).Result()
 			Expect(err).To(HaveOccurred())
 			Expect(shouldBeEmpty).To(BeEmpty())
@@ -655,7 +655,7 @@ var _ = Describe("External gRPC API", func() {
 
 			pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
-			// Should have an entry in snitch_paused
+			// Should have an entry in streamdal_paused
 			value, err := redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(BeEmpty())
@@ -695,7 +695,7 @@ var _ = Describe("External gRPC API", func() {
 
 			pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
 
-			// Should have an entry in snitch_paused
+			// Should have an entry in streamdal_paused
 			value, err := redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(BeEmpty())
@@ -710,7 +710,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resumeResp).ToNot(BeNil())
 			Expect(resumeResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Entry should be removed from snitch_paused
+			// Entry should be removed from streamdal_paused
 			value, err = redisClient.Get(context.Background(), pausedKey).Result()
 			Expect(err).To(HaveOccurred())
 			Expect(value).To(BeEmpty())
@@ -727,12 +727,12 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "test-service",
 			}
 
-			// Put audience key in snitch_audience
+			// Put audience key in streamdal_audience
 			audKey := store.RedisAudienceKey(util.AudienceToStr(audience))
 			err := redisClient.Set(context.Background(), audKey, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())
 
-			// Put audience-pipeline mapping in snitch_config
+			// Put audience-pipeline mapping in streamdal_config
 			configKey := store.RedisConfigKey(audience, "test-pipeline-id")
 			err = redisClient.Set(context.Background(), configKey, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())
@@ -765,7 +765,7 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "test-service",
 			}
 
-			// Put audience key in snitch_config
+			// Put audience key in streamdal_config
 			key := store.RedisAudienceKey(util.AudienceToStr(audience))
 			err := redisClient.Set(context.Background(), key, []byte(``), 0).Err()
 			Expect(err).ToNot(HaveOccurred())

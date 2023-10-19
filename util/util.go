@@ -6,16 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
-	"github.com/streamdal/snitch-server/wasm"
+	"github.com/streamdal/server/wasm"
 )
 
 const (

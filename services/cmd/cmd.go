@@ -4,7 +4,8 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 type ICmd interface {

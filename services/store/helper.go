@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/util"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 const (

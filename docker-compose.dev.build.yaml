@@ -1,25 +1,25 @@
 version: "3"
 services:
-  snitch-server:
+  streamdal-server:
     build:
       context: ./
       dockerfile: Dockerfile
     depends_on:
       - redis
     environment:
-      - SNITCH_SERVER_NODE_NAME=node1
-      - SNITCH_SERVER_AUTH_TOKEN=1234
-      - SNITCH_SERVER_REDIS_URL=redis:6379
-      - SNITCH_SERVER_DEBUG=true
-    container_name: snitch-server
+      - STREAMDAL_SERVER_NODE_NAME=node1
+      - STREAMDAL_SERVER_AUTH_TOKEN=1234
+      - STREAMDAL_SERVER_REDIS_URL=redis:6379
+      - STREAMDAL_SERVER_DEBUG=true
+    container_name: streamdal-server
     ports:
       - "8080:8080"
       - "9090:9090"
     networks:
-      - snitch-network
+      - streamdal-network
 
   redis:
-    container_name: snitch-redis
+    container_name: streamdal-redis
     image: redis:latest
     command: redis-server --appendonly yes # This enables AOF persistence
     volumes:
@@ -27,14 +27,14 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - snitch-network
+      - streamdal-network
 
   redis-exporter:
     image: oliver006/redis_exporter:latest
     ports:
       - "9121:9121" # Expose the exporter's port
     networks:
-      - snitch-network
+      - streamdal-network
     command:
       - '--redis.addr=redis:6379' # Address of the Redis server
 
@@ -43,12 +43,12 @@ services:
       context: ${PWD}/assets/envoy
       dockerfile: ${PWD}/assets/envoy/Dockerfile
     image: grpcweb/envoy
-    container_name: snitch-envoy
+    container_name: streamdal-envoy
     ports:
       - "9091:9091"
       - "9901:9901"
     networks:
-      - snitch-network
+      - streamdal-network
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -61,7 +61,7 @@ services:
       - ${PWD}/assets/prometheus:/etc/prometheus
       - prom-data:/prometheus
     networks:
-      - snitch-network
+      - streamdal-network
 
   grafana:
     image: grafana/grafana
@@ -76,7 +76,7 @@ services:
       - ${PWD}/assets/grafana:/etc/grafana/provisioning/datasources
       - ${PWD}/assets/grafana-data:/var/lib/grafana
     networks:
-      - snitch-network
+      - streamdal-network
 
   loki:
     image: grafana/loki:latest
@@ -84,7 +84,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - snitch-network
+      - streamdal-network
 
   promtail:
     image: grafana/promtail:latest
@@ -94,11 +94,11 @@ services:
       - ./assets/promtrail/docker-config.yaml:/etc/promtail/docker-config.yaml
     command: -config.file=/etc/promtail/docker-config.yaml
     networks:
-      - snitch-network
+      - streamdal-network
 
 volumes:
   redis-data: # Define the volume for redis data
   prom-data:
 
 networks:
-  snitch-network:
+  streamdal-network:

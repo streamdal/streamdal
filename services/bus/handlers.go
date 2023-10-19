@@ -6,12 +6,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/types"
-	"github.com/streamdal/snitch-server/util"
-	"github.com/streamdal/snitch-server/validate"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/types"
+	"github.com/streamdal/server/util"
+	"github.com/streamdal/server/validate"
 )
 
 // Pipeline was updated - check if this service has an active registration that
@@ -508,7 +508,7 @@ func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest
 
 func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error {
 	// Find registered clients
-	// There may be multiple instances connected to the same snitch server instance with
+	// There may be multiple instances connected to the same server instance with
 	// the same pipeline ID and audience
 	// This needs to be it's own context since the parent context will be canceled on shutdown and
 	// thus we won't be able to read from redis in order to send out stop commands
@@ -557,7 +557,7 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 
 		// Send TailCommand to connected client
 		// This causes the client to call SendTail() on it's end, which initiates a stream of TailResponse messages
-		// that will come in via internal gRPC API and then get shipped over RedisBackend for each snitch server instance
+		// that will come in via internal gRPC API and then get shipped over RedisBackend for each server instance
 		// to possibly receive and then further send to the front end
 		llog.Debugf("sending tail command to session id '%s'", l.SessionID)
 

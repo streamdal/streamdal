@@ -23,5 +23,5 @@ func (a *HTTPAPI) versionHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	rw.WriteHeader(http.StatusOK)
 
-	Write(rw, http.StatusOK, "streamdal/snitch-server "+a.Options.Version)
+	Write(rw, http.StatusOK, "streamdal/server "+a.Options.Version)
 }

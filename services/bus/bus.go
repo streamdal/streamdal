@@ -10,13 +10,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/cmd"
-	"github.com/streamdal/snitch-server/services/metrics"
-	"github.com/streamdal/snitch-server/services/pubsub"
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/validate"
+	"github.com/streamdal/server/services/cmd"
+	"github.com/streamdal/server/services/metrics"
+	"github.com/streamdal/server/services/pubsub"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/validate"
 )
 
 /*
@@ -33,10 +33,10 @@ should send commands to the client (via the register cmd channel).
 
 const (
 	// FullSubject is for non-tail/peek RedisBackend pubsub messages
-	FullSubject = "snitch_events:broadcast"
+	FullSubject = "streamdal_events:broadcast"
 
 	// TailSubjectPrefix is the prefix for the RedisBackend wildcard pubsub topic for tail/peek responses
-	TailSubjectPrefix = "snitch_events:tail"
+	TailSubjectPrefix = "streamdal_events:tail"
 
 	// BroadcastChannelBufferSize is the size of the shared broadcast channel.
 	BroadcastChannelBufferSize = 1000
@@ -55,7 +55,7 @@ const (
 )
 
 type IBus interface {
-	// RunBroadcastConsumer runs a redis consumer that listens for messages on the snitch broadcast topic
+	// RunBroadcastConsumer runs a redis consumer that listens for messages on the broadcast topic
 	RunBroadcastConsumer() error
 
 	// RunTailConsumer is used for consuming message from the RedisBackend
@@ -190,8 +190,8 @@ func (o *Options) validate() error {
 	return nil
 }
 
-// RunBroadcastConsumer is used for consuming message from the snitch broadcast
-// stream and executing a message handler. It automatically recovers from Redis
+// RunBroadcastConsumer is used for consuming message from the broadcast stream
+// and executing a message handler. It automatically recovers from Redis
 // connection errors.
 func (b *Bus) RunBroadcastConsumer() error {
 	llog := b.log.WithField("method", "RunBroadcastConsumer").WithField("channel", FullSubject)

@@ -12,11 +12,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/encryption"
-	"github.com/streamdal/snitch-server/services/store/types"
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/services/encryption"
+	"github.com/streamdal/server/services/store/types"
+	"github.com/streamdal/server/util"
 )
 
 /*
@@ -25,7 +25,7 @@ import (
 
 Storage strategy is defined here:
 
-https://www.notion.so/streamdal/Snitch-Server-Storage-Spec-417bfa71f04b481082373ad18cbdb0e9
+https://www.notion.so/streamdal/server-Storage-Spec-417bfa71f04b481082373ad18cbdb0e9
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -34,7 +34,7 @@ registrations and service commands.
 
 `store` is backed by a `natty.INatty` instance, which is a wrapper for RedisBackend.
 
-All reads, writes and deletes are performed via RedisBackend -- snitch-server does NOT
+All reads, writes and deletes are performed via RedisBackend -- server does NOT
 store any persistent state in memory!
 */
 

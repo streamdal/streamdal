@@ -16,8 +16,8 @@ package httpapi
 //	)
 //
 //	BeforeEach(func() {
-//		os.Setenv("SNITCH_SERVER_NODE_NAME", "test-node")
-//		os.Setenv("SNITCH_SERVER_AUTH_TOKEN", "1234")
+//		os.Setenv("STREAMDAL_SERVER_NODE_NAME", "test-node")
+//		os.Setenv("STREAMDAL_SERVER_AUTH_TOKEN", "1234")
 //
 //		cfg = config.New(testVersion)
 //		cfg.WASMDir = "./assets/wasm"

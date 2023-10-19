@@ -26,12 +26,12 @@ ARG TARGETOS
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy bin & WASM
-COPY --from=builder /build/snitch-server-$TARGETOS-$TARGETARCH /snitch-server
+COPY --from=builder /build/server-$TARGETOS-$TARGETARCH /server
 COPY --from=builder /assets/wasm/* /assets/wasm/
 
-RUN chmod +x /snitch-server
+RUN chmod +x /server
 
 EXPOSE 8080
 EXPOSE 9090
 
-CMD ["/snitch-server", "--debug"]
+CMD ["/server", "--debug"]

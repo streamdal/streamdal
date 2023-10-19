@@ -25,8 +25,8 @@ type Config struct {
 	//} `kong:"cmd='another',help='Run client in another mode',xor='register,another'"`
 
 	ServiceName   string `kong:"help='Service name',required,default='demo-client'"`
-	SnitchAddress string `kong:"help='Snitch server address',default='localhost:9090',required"`
-	SnitchToken   string `kong:"help='Snitch server token',default='1234',required"`
+	ServerAddress string `kong:"help='Streamdal server address',default='localhost:9090',required"`
+	ServerToken   string `kong:"help='Streamdal server token',default='1234',required"`
 	Debug         bool   `kong:"help='Enable debug output',short='d'"`
 	Quiet         bool   `kong:"help='Disable showing pre/post output',short='q'"`
 	InjectLogger  bool   `kong:"help='Inject logger into SDK',default='false'"`
@@ -39,7 +39,7 @@ func ParseArgs() (*Config, error) {
 	cfg := &Config{}
 	cfg.Ctx = kong.Parse(cfg,
 		kong.Name("demo-client"),
-		kong.Description("A demo client for snitch"),
+		kong.Description("A demo client for streamdal go-sdk and server"),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,

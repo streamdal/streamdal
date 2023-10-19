@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
-	"github.com/streamdal/snitch-server/util"
-	"github.com/streamdal/snitch-server/validate"
+	"github.com/streamdal/server/util"
+	"github.com/streamdal/server/validate"
 )
 
 const (
