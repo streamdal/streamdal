@@ -13,10 +13,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
 
-	"github.com/streamdal/snitch-cli/api"
-	"github.com/streamdal/snitch-cli/config"
-	"github.com/streamdal/snitch-cli/console"
-	"github.com/streamdal/snitch-cli/types"
+	"github.com/streamdal/cli/api"
+	"github.com/streamdal/cli/config"
+	"github.com/streamdal/cli/console"
+	"github.com/streamdal/cli/types"
 )
 
 const (
@@ -493,7 +493,7 @@ func (c *Cmd) actionTail(action *types.Action) (*types.Action, error) {
 	}
 }
 
-// Attempt to connect and query test endpoint in snitch-server
+// Attempt to connect and query test endpoint in streamdal server
 func (c *Cmd) connect(ctx context.Context) error {
 	// We need this here so that the "connecting" message is visible to the user
 	// AND so that we can stop sleeping and breaking out if the user quit the
@@ -505,7 +505,7 @@ func (c *Cmd) connect(ctx context.Context) error {
 		return fmt.Errorf("context canceled before connecting to server")
 	}
 
-	// Attempt to talk to snitch server
+	// Attempt to talk to streamdal server
 	a, err := api.New(&api.Options{
 		Address:        c.options.Config.Server,
 		AuthToken:      c.options.Config.Auth,

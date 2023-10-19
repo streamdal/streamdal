@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/snitch-cli/util"
+	"github.com/streamdal/cli/util"
 )
 
 const (
@@ -83,7 +83,7 @@ func (a *API) Test(ctx context.Context) error {
 }
 
 // GetAllLiveAudiences returns all live audiences -- clients that are actively
-// connected to the snitch server and have announced one or more audiences)
+// connected to the streamdal server and have announced one or more audiences)
 func (a *API) GetAllLiveAudiences(ctx context.Context) ([]*protos.Audience, error) {
 	// Same as cmd.connect() - we want to show the user that we are fetching audiences
 	select {

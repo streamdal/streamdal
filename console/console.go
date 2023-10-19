@@ -12,9 +12,9 @@ import (
 	"github.com/rivo/tview"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
-	"github.com/streamdal/snitch-cli/config"
-	"github.com/streamdal/snitch-cli/types"
-	"github.com/streamdal/snitch-cli/util"
+	"github.com/streamdal/cli/config"
+	"github.com/streamdal/cli/types"
+	"github.com/streamdal/cli/util"
 )
 
 const (

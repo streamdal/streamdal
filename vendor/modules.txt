@@ -97,7 +97,6 @@ github.com/muesli/reflow/wrap
 github.com/muesli/termenv
 # github.com/nwidger/jsoncolor v0.3.2
 ## explicit; go 1.13
-github.com/nwidger/jsoncolor
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors

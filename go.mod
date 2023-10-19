@@ -1,24 +1,22 @@
-module github.com/streamdal/snitch-cli
+module github.com/streamdal/cli
 
 go 1.20
 
 require (
 	github.com/alecthomas/kong v0.8.0
 	github.com/charmbracelet/log v0.2.4
+	github.com/dselans/go-prettyjson-tview v0.0.0-20231014145821-c9dc5384407d
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/nwidger/jsoncolor v0.3.2
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/tview v0.0.0-20230909130259-ba6a2a345459
 	github.com/streamdal/snitch-protos v0.0.99
-	github.com/tidwall/pretty v1.2.1
 	google.golang.org/grpc v1.58.2
 )
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v0.8.0 // indirect
-	github.com/dselans/go-prettyjson-tview v0.0.0-20231014145821-c9dc5384407d // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
