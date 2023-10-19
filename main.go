@@ -2,18 +2,22 @@ package main
 
 import (
 	"os"
-	"syscall"
 
 	"github.com/charmbracelet/log"
 
-	"github.com/streamdal/snitch-cli/cmd"
-	"github.com/streamdal/snitch-cli/config"
-	"github.com/streamdal/snitch-cli/console"
+	"github.com/streamdal/cli/cmd"
+	"github.com/streamdal/cli/config"
+	"github.com/streamdal/cli/console"
+	"github.com/streamdal/cli/util"
+)
+
+var (
+	VERSION = "unset"
 )
 
 func main() {
 	// Read CLI args
-	cfg := config.New("unset")
+	cfg := config.New(VERSION)
 
 	logger := log.Default()
 
@@ -23,7 +27,7 @@ func main() {
 			log.Fatalf("unable to open log file: %s", err)
 		}
 
-		redirectStdErr(f)
+		util.RedirectStdErr(f)
 
 		logger.SetOutput(f)
 		logger.SetFormatter(log.JSONFormatter)
@@ -57,16 +61,5 @@ func main() {
 	// Do the dance
 	if err := c.Run(); err != nil {
 		log.Fatalf("error during cmd run: %s", err)
-	}
-}
-
-func redirectStdErr(f *os.File) {
-	if f == nil {
-		panic("file passed to redirectStdErr cannot be nil")
-	}
-
-	err := syscall.Dup2(int(f.Fd()), int(os.Stderr.Fd()))
-	if err != nil {
-		log.Fatalf("Failed to redirect stderr to file '%s': %v", f.Name(), err)
 	}
 }

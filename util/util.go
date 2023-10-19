@@ -6,7 +6,7 @@ import (
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
-	"github.com/streamdal/snitch-cli/types"
+	"github.com/streamdal/cli/types"
 )
 
 func AudienceEquals(a, b *protos.Audience) bool {

@@ -1,3 +1,4 @@
 .idea
 .env
 snitch-cli.log
+build/*

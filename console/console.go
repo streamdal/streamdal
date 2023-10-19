@@ -12,9 +12,9 @@ import (
 	"github.com/rivo/tview"
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
-	"github.com/streamdal/snitch-cli/config"
-	"github.com/streamdal/snitch-cli/types"
-	"github.com/streamdal/snitch-cli/util"
+	"github.com/streamdal/cli/config"
+	"github.com/streamdal/cli/types"
+	"github.com/streamdal/cli/util"
 )
 
 const (
@@ -35,14 +35,20 @@ const (
 	PageFilter            = "page_" + PrimitiveFilter
 	PageSearch            = "page_" + PrimitiveSearch
 	PageRate              = "page_" + PrimitiveRate
+
+	DefaultViewOptionsPrettyJSON         = true
+	DefaultViewOptionsEnableColors       = true
+	DefaultViewOptionsDisplayLineNumbers = true
+	DefaultViewOptionsDisplayTimestamp   = true
 )
 
 var (
 	MenuString = `[white]Q[-] ["Q"][#9D87D7]Quit[-][""]  ` +
 		`[white]S[-] ["S"][#9D87D7]Select Component[-][""]  ` +
-		`[white]R[-] ["R"][#9D87D7]Set Sample Rate[-][""]  ` +
+		`[white]R[-] ["R"][#9D87D7::s]Set Sample Rate[-:-:-][""]  ` +
 		`[white]F[-] ["F"][#9D87D7]Filter[-][""]  ` +
 		`[white]P[-] ["P"][#9D87D7]Pause[-][""]  ` +
+		`[white]O[-] ["O"][#9D87D7]View Options[-][""] ` +
 		`[white]/[-] ["Search"][#9D87D7]Search[-][""]`
 )
 
@@ -217,6 +223,78 @@ func (c *Console) DisplaySearch(defaultValue string, answerCh chan<- string) {
 	c.pages.AddPage(PageSearch, inputDialog, true, true)
 }
 
+func (c *Console) DisplayViewOptions(defaultViewOptions *types.ViewOptions, answerCh chan<- *types.ViewOptions) {
+	// We probably won't have any view options on initial load - set the defaults
+	if defaultViewOptions == nil {
+		defaultViewOptions = &types.ViewOptions{
+			PrettyJSON:         DefaultViewOptionsPrettyJSON,
+			EnableColors:       DefaultViewOptionsEnableColors,
+			DisplayLineNumbers: DefaultViewOptionsDisplayLineNumbers,
+			DisplayTimestamp:   DefaultViewOptionsDisplayTimestamp,
+		}
+	}
+
+	c.Start()
+
+	// Remove all menu highlights - you cannot access menu while in rate view
+	c.app.QueueUpdateDraw(func() {
+		c.menu.Highlight()
+	})
+
+	selectedOptions := &types.ViewOptions{
+		PrettyJSON:         defaultViewOptions.PrettyJSON,
+		EnableColors:       defaultViewOptions.EnableColors,
+		DisplayLineNumbers: defaultViewOptions.DisplayLineNumbers,
+		DisplayTimestamp:   defaultViewOptions.DisplayTimestamp,
+	}
+
+	optsDialog := tview.NewForm().
+		AddCheckbox("Pretty JSON", defaultViewOptions.PrettyJSON, func(checked bool) {
+			selectedOptions.PrettyJSON = checked
+		}).
+		AddCheckbox("Enable Colors", defaultViewOptions.EnableColors, func(checked bool) {
+			selectedOptions.EnableColors = checked
+		}).
+		AddCheckbox("Display Timestamp", defaultViewOptions.DisplayTimestamp, func(checked bool) {
+			selectedOptions.DisplayTimestamp = checked
+		}).
+		AddCheckbox("Display Line Numbers", defaultViewOptions.DisplayLineNumbers, func(checked bool) {
+			selectedOptions.DisplayLineNumbers = checked
+		}).
+		AddButton("OK", func() {
+			answerCh <- selectedOptions
+		}).
+		AddButton("Reset", func() {
+			answerCh <- &types.ViewOptions{}
+		}).
+		AddButton("Cancel", func() {
+			// Return the original value
+			answerCh <- defaultViewOptions
+		})
+
+	optsDialog.SetBorder(true).SetTitle("View Options")
+	optsDialog.SetBackgroundColor(Tcell(WindowBg))
+	optsDialog.SetTitleColor(Tcell(TextPrimary))
+	optsDialog.SetFieldBackgroundColor(Tcell(TextAccent3))
+	optsDialog.SetFieldTextColor(Tcell(ActiveButtonFg))
+	optsDialog.SetButtonActivatedStyle(tcell.StyleDefault.Background(Tcell(ActiveButtonBg)).Foreground(Tcell(ActiveButtonFg)))
+	optsDialog.SetButtonStyle(tcell.StyleDefault.Background(Tcell(InactiveButtonBg)).Foreground(Tcell(InactiveButtonFg)))
+	optsDialog.SetButtonsAlign(tview.AlignCenter)
+
+	optsDialog.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			answerCh <- defaultViewOptions
+		}
+
+		// TODO: Figure out left/right/up/down capture + SetFocus (doesn't seem to work?)
+
+		return event
+	})
+
+	viewOptionsDialog := Center(optsDialog, 30, 13)
+	c.pages.AddPage(PageRate, viewOptionsDialog, true, true)
+}
+
 func (c *Console) DisplayRate(defaultValue int, answerCh chan<- int) {
 	c.Start()
 
@@ -288,8 +366,9 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 	// Always update title
 	pageTail.SetTitle(tailComponent.Name)
 
+	// Highlight available keystrokes
 	c.app.QueueUpdateDraw(func() {
-		c.menu.Highlight("Q", "S", "P", "R", "F", "Search")
+		c.menu.Highlight("Q", "S", "P", "R", "F", "O", "Search")
 	})
 
 	c.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -305,11 +384,18 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 			}
 		}
 
-		if event.Key() == tcell.KeyRune && event.Rune() == 'r' {
+		if event.Key() == tcell.KeyRune && event.Rune() == 'o' {
 			actionCh <- &types.Action{
-				Step: types.StepRate,
+				Step: types.StepViewOptions,
 			}
 		}
+
+		// TODO: Disabled until sampling is fully implemented in SDKs
+		//if event.Key() == tcell.KeyRune && event.Rune() == 'r' {
+		//	actionCh <- &types.Action{
+		//		Step: types.StepRate,
+		//	}
+		//}
 
 		if event.Key() == tcell.KeyRune && event.Rune() == 'p' {
 			actionCh <- &types.Action{
@@ -577,7 +663,9 @@ func (c *Console) initializeComponents() error {
 func (c *Console) newMenu() *tview.TextView {
 	menu := tview.NewTextView().SetWrap(false).SetDynamicColors(true)
 
-	fmt.Fprint(menu, MenuString)
+	if _, err := fmt.Fprint(menu, MenuString); err != nil {
+		c.log.Errorf("error writing menu: %s", err)
+	}
 
 	return menu
 }
