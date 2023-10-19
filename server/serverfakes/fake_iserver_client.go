@@ -101,11 +101,11 @@ type FakeIServerClient struct {
 		result1 protos.Internal_RegisterClient
 		result2 error
 	}
-	SendMetricsStub        func(context.Context, *types.CounterEntry) error
+	SendMetricsStub        func(context.Context, []*types.CounterEntry) error
 	sendMetricsMutex       sync.RWMutex
 	sendMetricsArgsForCall []struct {
 		arg1 context.Context
-		arg2 *types.CounterEntry
+		arg2 []*types.CounterEntry
 	}
 	sendMetricsReturns struct {
 		result1 error
@@ -566,16 +566,21 @@ func (fake *FakeIServerClient) RegisterReturnsOnCall(i int, result1 protos.Inter
 	}{result1, result2}
 }
 
-func (fake *FakeIServerClient) SendMetrics(arg1 context.Context, arg2 *types.CounterEntry) error {
+func (fake *FakeIServerClient) SendMetrics(arg1 context.Context, arg2 []*types.CounterEntry) error {
+	var arg2Copy []*types.CounterEntry
+	if arg2 != nil {
+		arg2Copy = make([]*types.CounterEntry, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.sendMetricsMutex.Lock()
 	ret, specificReturn := fake.sendMetricsReturnsOnCall[len(fake.sendMetricsArgsForCall)]
 	fake.sendMetricsArgsForCall = append(fake.sendMetricsArgsForCall, struct {
 		arg1 context.Context
-		arg2 *types.CounterEntry
-	}{arg1, arg2})
+		arg2 []*types.CounterEntry
+	}{arg1, arg2Copy})
 	stub := fake.SendMetricsStub
 	fakeReturns := fake.sendMetricsReturns
-	fake.recordInvocation("SendMetrics", []interface{}{arg1, arg2})
+	fake.recordInvocation("SendMetrics", []interface{}{arg1, arg2Copy})
 	fake.sendMetricsMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
@@ -592,13 +597,13 @@ func (fake *FakeIServerClient) SendMetricsCallCount() int {
 	return len(fake.sendMetricsArgsForCall)
 }
 
-func (fake *FakeIServerClient) SendMetricsCalls(stub func(context.Context, *types.CounterEntry) error) {
+func (fake *FakeIServerClient) SendMetricsCalls(stub func(context.Context, []*types.CounterEntry) error) {
 	fake.sendMetricsMutex.Lock()
 	defer fake.sendMetricsMutex.Unlock()
 	fake.SendMetricsStub = stub
 }
 
-func (fake *FakeIServerClient) SendMetricsArgsForCall(i int) (context.Context, *types.CounterEntry) {
+func (fake *FakeIServerClient) SendMetricsArgsForCall(i int) (context.Context, []*types.CounterEntry) {
 	fake.sendMetricsMutex.RLock()
 	defer fake.sendMetricsMutex.RUnlock()
 	argsForCall := fake.sendMetricsArgsForCall[i]
