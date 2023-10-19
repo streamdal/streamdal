@@ -1,19 +1,19 @@
-# snitchpy
+# python-sdk
 
 
-[![Master build status](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/snitch-python-client/actions/workflows/main.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/test_coverage)](https://codeclimate.com/github/streamdal/snitch-python-client/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/maintainability)](https://codeclimate.com/github/streamdal/snitch-python-client/maintainability)
+[![Master build status](https://github.com/streamdal/python-sdk/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/python-sdk/actions/workflows/main.yml)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability)
 
-snitchpy is the python client SDK for Streamdal's open source Snitch server https://github.com/streamdal/snitch
+python-sdk is the python client SDK for Streamdal's open source observability server https://github.com/streamdal/server
 
 ### Documentation
 
-See https://docs.snitch.build
+See https://docs.streamdal.com
 
 ### Installation
 ```
-python -m pip install snitchpy
+python -m pip install streamdal
 ```
 
 ### Requirements
@@ -25,18 +25,18 @@ python -m pip install snitchpy
 
 ```python
 import pprint
-from snitchpy import (MODE_CONSUMER, ProcessRequest, SnitchClient, SnitchConfig)
+from streamdal import (MODE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+
 
 def main():
-    client = SnitchClient(
-        cfg=SnitchConfig(
+    client = StreamdalClient(
+        cfg=StreamdalConfig(
             service_name="order-ingest",
             dry_run=True,
-            snitch_url="snitch-server.dev.svc.cluster.local:9090",
-            snitch_token="1234",
+            streamdal_url="streamdal-server.dev.svc.cluster.local:9090",
+            streamdal_token="1234",
         )
     )
-
 
     res = client.process(
         ProcessRequest(
@@ -48,6 +48,7 @@ def main():
     )
 
     pprint.pprint(res)
+
 
 if __name__ == "__main__":
     main()

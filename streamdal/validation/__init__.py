@@ -1,4 +1,4 @@
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 
 
 def tail_request(cmd: protos.Command):

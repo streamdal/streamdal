@@ -1,17 +1,17 @@
 import pytest
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 import uuid
 import unittest.mock as mock
-from snitchpy import SnitchClient, SnitchConfig
+from streamdal import StreamdalClient, StreamdalConfig
 
 
-class TestSnitchRegisterMethods:
-    client: SnitchClient
+class TestStreamdalRegisterMethods:
+    client: StreamdalClient
 
     @pytest.fixture(autouse=True)
     def before_each(self):
-        client = object.__new__(SnitchClient)
-        client.cfg = SnitchConfig(service_name="testing")
+        client = object.__new__(StreamdalClient)
+        client.cfg = StreamdalConfig(service_name="testing")
         client.pipelines = {}
         client.paused_pipelines = {}
         client.log = mock.Mock()
@@ -27,7 +27,7 @@ class TestSnitchRegisterMethods:
         )
 
         pipeline_id = str(uuid.uuid4())
-        aud_str = SnitchClient._aud_to_str(aud)
+        aud_str = StreamdalClient._aud_to_str(aud)
         self.client.paused_pipelines[aud_str] = {}
         self.client.paused_pipelines[aud_str][pipeline_id] = protos.Command
 
@@ -53,7 +53,7 @@ class TestSnitchRegisterMethods:
 
         self.client._attach_pipeline(cmd)
 
-        aud_str = SnitchClient._aud_to_str(cmd.audience)
+        aud_str = StreamdalClient._aud_to_str(cmd.audience)
         assert self.client.pipelines[aud_str] is not None
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
@@ -74,7 +74,9 @@ class TestSnitchRegisterMethods:
 
         self.client._attach_pipeline(cmd)
 
-        pipeline = SnitchClient._pop_pipeline(self.client.pipelines, cmd, pipeline_id)
+        pipeline = StreamdalClient._pop_pipeline(
+            self.client.pipelines, cmd, pipeline_id
+        )
 
         assert pipeline is not None
         assert pipeline.attach_pipeline.pipeline.id == pipeline_id
@@ -114,7 +116,7 @@ class TestSnitchRegisterMethods:
         res = self.client._pause_pipeline(pause_cmd)
         assert res is True
 
-        aud_str = SnitchClient._aud_to_str(cmd.audience)
+        aud_str = StreamdalClient._aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 1
         assert len(self.client.pipelines) == 0
         assert self.client.paused_pipelines[aud_str] is not None
@@ -137,7 +139,7 @@ class TestSnitchRegisterMethods:
         res = self.client._resume_pipeline(resume_cmd)
         assert res is True
 
-        aud_str = SnitchClient._aud_to_str(cmd.audience)
+        aud_str = StreamdalClient._aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 0
         assert len(self.client.pipelines) == 1
         assert self.client.pipelines[aud_str] is not None

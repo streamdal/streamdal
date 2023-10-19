@@ -1,22 +1,21 @@
 import asyncio
 import datetime
-import grpclib
 import logging
 import os
 import platform
 import signal
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 import socket
 import time
 import uuid
 import requests
-import snitchpy.validation
+import streamdal.validation
 from betterproto import which_one_of
 from copy import copy
 from dataclasses import dataclass, field
 from grpclib.client import Channel
-from snitchpy.metrics import Metrics, CounterEntry
-from snitchpy.tail import Tail
+from streamdal.metrics import Metrics, CounterEntry
+from streamdal.tail import Tail
 
 from threading import Thread, Event
 from wasmtime import (
@@ -33,8 +32,8 @@ from wasmtime import (
     Caller,
 )
 
-DEFAULT_SNITCH_URL = "localhost:9090"
-DEFAULT_SNITCH_TOKEN = "1234"
+DEFAULT_SERVER_URL = "localhost:9090"
+DEFAULT_SERVER_TOKEN = "1234"
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5  # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10  # 100 milliseconds
 DEFAULT_STEP_TIMEOUT = 1 / 100  # 10 milliseconds
@@ -49,14 +48,14 @@ CLIENT_TYPE_SDK = 1
 CLIENT_TYPE_SHIM = 2
 
 
-class SnitchException(Exception):
-    """Raised for any exception caused by snitch"""
+class StreamdalException(Exception):
+    """Raised for any exception caused by python-sdk"""
 
     pass
 
 
-class SnitchRegisterException(SnitchException):
-    """Raised when a service fails to register with snitch"""
+class StreamdalRegisterException(StreamdalException):
+    """Raised when a service fails to register with streamdal server"""
 
     pass
 
@@ -79,7 +78,7 @@ class ProcessResponse:
 @dataclass(frozen=True)
 class Audience:
     """Audience is a dataclass that holds information about an audience. It is passed into the config when
-    creating a new instance of SnitchClient, in order to pre-announce audiences to the snitch server.
+    creating a new instance of StreamdalClient, in order to pre-announce audiences to the streamdal server.
     We use a dataclass here instead of the protobuf Audience in order to keep the public interface clean
     """
 
@@ -89,18 +88,18 @@ class Audience:
 
 
 @dataclass(frozen=True)
-class SnitchConfig:
-    """SnitchConfig is a dataclass that holds configuration for the SnitchClient"""
+class StreamdalConfig:
+    """StreamdalConfig is a dataclass that holds configuration for the StreamdalClient"""
 
-    snitch_url: str = os.getenv("SNITCH_URL", DEFAULT_SNITCH_URL)
-    snitch_token: str = os.getenv("SNITCH_TOKEN", DEFAULT_SNITCH_TOKEN)
-    grpc_timeout: int = os.getenv("SNITCH_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
+    streamdal_url: str = os.getenv("STREAMDAL_SERVER_URL", DEFAULT_SERVER_URL)
+    streamdal_token: str = os.getenv("STREAMDAL_SERVER_TOKEN", DEFAULT_SERVER_TOKEN)
+    grpc_timeout: int = os.getenv("STREAMDAL_SERVER_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
     pipeline_timeout: int = os.getenv(
-        "SNITCH_PIPELINE_TIMEOUT", DEFAULT_PIPELINE_TIMEOUT
+        "STREAMDAL_PIPELINE_TIMEOUT", DEFAULT_PIPELINE_TIMEOUT
     )
-    step_timeout: int = os.getenv("SNITCH_STEP_TIMEOUT", DEFAULT_STEP_TIMEOUT)
-    service_name: str = os.getenv("SNITCH_SERVICE_NAME", socket.getfqdn())
-    dry_run: bool = os.getenv("SNITCH_DRY_RUN", False)
+    step_timeout: int = os.getenv("STREAMDAL_STEP_TIMEOUT", DEFAULT_STEP_TIMEOUT)
+    service_name: str = os.getenv("STREAMDAL_SERVICE_NAME", socket.getfqdn())
+    dry_run: bool = os.getenv("STREAMDAL_DRY_RUN", False)
     client_type: int = CLIENT_TYPE_SDK
     exit: Event = Event()
     audiences: list = field(default_factory=list)
@@ -108,14 +107,14 @@ class SnitchConfig:
     def validate(self) -> None:
         if self.service_name == "":
             raise ValueError("service_name is required")
-        elif self.snitch_url == "":
-            raise ValueError("snitch_url is required")
-        elif self.snitch_token == "":
-            raise ValueError("snitch_token is required")
+        elif self.streamdal_url == "":
+            raise ValueError("streamdal_url is required")
+        elif self.streamdal_token == "":
+            raise ValueError("streamdal_token is required")
 
 
-class SnitchClient:
-    cfg: SnitchConfig
+class StreamdalClient:
+    cfg: StreamdalConfig
     pipelines: dict
     paused_pipelines: dict
     log: logging.Logger
@@ -142,18 +141,18 @@ class SnitchClient:
     register_stub: protos.InternalStub
     register_loop: asyncio.AbstractEventLoop
 
-    def __init__(self, cfg: SnitchConfig):
-        if not isinstance(cfg, SnitchConfig):
-            raise ValueError("cfg must be of type SnitchConfig")
+    def __init__(self, cfg: StreamdalConfig):
+        if not isinstance(cfg, StreamdalConfig):
+            raise ValueError("cfg must be of type StreamdalConfig")
         else:
             cfg.validate()
 
         self.cfg = cfg
 
-        log = logging.getLogger("snitch-client")
+        log = logging.getLogger("streamdal-python-sdk")
         log.setLevel(logging.DEBUG)
 
-        (host, port) = cfg.snitch_url.split(":")
+        (host, port) = cfg.streamdal_url.split(":")
         self.host = host
         self.port = port
 
@@ -169,7 +168,7 @@ class SnitchClient:
         self.grpc_stub = protos.InternalStub(channel=self.grpc_channel)
         self.grpc_loop = grpc_loop
 
-        self.auth_token = cfg.snitch_token
+        self.auth_token = cfg.streamdal_token
         self.grpc_timeout = 5
         self.pipelines = {}
         self.paused_pipelines = {}
@@ -248,15 +247,15 @@ class SnitchClient:
         self.grpc_loop.run_until_complete(call())
 
     @staticmethod
-    def _validate_config(cfg: SnitchConfig) -> None:
+    def _validate_config(cfg: StreamdalConfig) -> None:
         if cfg is None:
             raise ValueError("cfg is required")
         elif cfg.service_name == "":
             raise ValueError("service_name is required")
-        elif cfg.snitch_url == "":
-            raise ValueError("snitch_url is required")
-        elif cfg.snitch_token == "":
-            raise ValueError("snitch_token is required")
+        elif cfg.streamdal_url == "":
+            raise ValueError("streamdal_url is required")
+        elif cfg.streamdal_token == "":
+            raise ValueError("streamdal_token is required")
 
     @staticmethod
     def _aud_to_str(aud: protos.Audience) -> str:
@@ -281,7 +280,7 @@ class SnitchClient:
         return self.audiences.get(self._aud_to_str(aud)) is not None
 
     def _add_audience(self, aud: protos.Audience) -> None:
-        """Add an audience to the local map and send to snitch-server"""
+        """Add an audience to the local map and send to server"""
         if self.seen_audience(aud):
             return
 
@@ -291,7 +290,7 @@ class SnitchClient:
                 req, timeout=self.grpc_timeout, metadata=self._get_metadata()
             )
 
-        # We haven't seen it yet, add to local map and send to snitch-server
+        # We haven't seen it yet, add to local map and send to server
         self.audiences[self._aud_to_str(aud)] = aud
         self.grpc_loop.create_task(call())
 
@@ -617,7 +616,7 @@ class SnitchClient:
     def _gen_client_info(self) -> protos.ClientInfo:
         return protos.ClientInfo(
             client_type=protos.ClientType(self.cfg.client_type),
-            library_name="snitch-python-client",
+            library_name="python-sdk",
             library_version="0.0.0",
             language="python",
             arch=platform.processor(),
@@ -625,7 +624,7 @@ class SnitchClient:
         )
 
     def _register(self) -> None:
-        """Register the service with the Snitch Server and receive a stream of commands to execute"""
+        """Register the service with the Streamdal Server and receive a stream of commands to execute"""
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
             service_name=self.cfg.service_name,
@@ -650,7 +649,7 @@ class SnitchClient:
             self.audiences[self._aud_to_str(aud)] = aud
 
         async def call():
-            self.log.debug("Registering with snitch server")
+            self.log.debug("Registering with streamdal server")
 
             async for cmd in self.register_stub.register(
                 req, timeout=None, metadata=self._get_metadata()
@@ -716,7 +715,7 @@ class SnitchClient:
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
         """Set pipeline in internal map of pipelines"""
-        aud_str = SnitchClient._aud_to_str(cmd.audience)
+        aud_str = StreamdalClient._aud_to_str(cmd.audience)
 
         # Create audience key if it doesn't exist
         if pipes_map.get(aud_str) is None:
@@ -729,7 +728,7 @@ class SnitchClient:
         pipes_map: dict, cmd: protos.Command, pipeline_id: str
     ) -> protos.Command:
         """Grab pipeline in internal map of pipelines and remove it"""
-        aud_str = SnitchClient._aud_to_str(cmd.audience)
+        aud_str = StreamdalClient._aud_to_str(cmd.audience)
 
         if pipes_map.get(aud_str) is None:
             return None
@@ -905,7 +904,7 @@ class SnitchClient:
         try:
             instance, store = self._get_function(req.step)
         except Exception as e:
-            raise SnitchException("Failed to instantiate function: {}".format(e))
+            raise StreamdalException("Failed to instantiate function: {}".format(e))
 
         req = copy(req)
         req.step.wasm_bytes = None  # Don't need to write this
@@ -937,7 +936,7 @@ class SnitchClient:
 
         # Ensure we aren't reading out of bounds
         if result_ptr > mem_len or result_ptr + length > mem_len:
-            raise SnitchException("WASM memory pointer out of bounds")
+            raise StreamdalException("WASM memory pointer out of bounds")
 
         # TODO: can we avoid reading the entire buffer somehow?
         result_data = memory.read(store, result_ptr, mem_len)
@@ -967,7 +966,7 @@ class SnitchClient:
             )
 
         if count == len(result_data) and nulls != 3:
-            raise SnitchException(
+            raise StreamdalException(
                 "unable to read response from wasm - no terminators found in response data"
             )
 
@@ -1088,7 +1087,7 @@ class SnitchClient:
             request=req,
             log=self.log,
             exit=Event(),
-            snitch_url=self.cfg.snitch_url,
+            streamdal_url=self.cfg.streamdal_url,
             auth_token=self.auth_token,
             metrics=self.metrics,
         )

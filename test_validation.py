@@ -1,6 +1,6 @@
 import pytest
-import snitchpy.validation as validation
-import snitch_protos.protos as protos
+import streamdal.validation as validation
+import streamdal_protos.protos as protos
 
 
 class TestTailRequest:

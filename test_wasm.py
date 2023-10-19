@@ -1,12 +1,10 @@
-import pprint
-
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 import uuid
-from snitchpy import SnitchClient
+from streamdal import StreamdalClient
 from wasmtime import Store, Memory, MemoryType, Limits
 
 
-class TestSnitchWasm:
+class TestStreamdalWasm:
     def test_read_memory_within_bounds(self):
         """Test reading within bounds of memory"""
         store = Store()
@@ -14,7 +12,7 @@ class TestSnitchWasm:
         data = b"Hello, World!\xa6\xa6\xa6"
         memory.write(store, data, 0)
 
-        result = SnitchClient._read_memory(memory, store, 0, len(data))
+        result = StreamdalClient._read_memory(memory, store, 0, len(data))
         assert result == b"Hello, World!"
 
     def test_read_memory_with_interspersed_pointers(self):
@@ -24,7 +22,7 @@ class TestSnitchWasm:
         data = b"Hel\xa6lo,\xa6 W\xa6orld!\xa6\xa6\xa6"
         memory.write(store, data, 0)
 
-        result = SnitchClient._read_memory(memory, store, 0)
+        result = StreamdalClient._read_memory(memory, store, 0)
         assert (
             result == b"Hel\xa6lo,\xa6 W\xa6orld!"
         )  # Should NOT stop at the third terminator character
@@ -32,7 +30,7 @@ class TestSnitchWasm:
     def test_call_wasm(self):
         """Test we can execute a wasm file"""
 
-        client = object.__new__(SnitchClient)
+        client = object.__new__(StreamdalClient)
         client.functions = {}
 
         with open("./assets/test/detective.wasm", "rb") as file:
@@ -71,7 +69,7 @@ class TestSnitchWasm:
     def test_http_request(self):
         """Test we can execute a wasm file"""
 
-        client = object.__new__(SnitchClient)
+        client = object.__new__(StreamdalClient)
         client.functions = {}
 
         with open("./assets/test/httprequest.wasm", "rb") as file:
