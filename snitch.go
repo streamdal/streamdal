@@ -732,3 +732,11 @@ func (a *Audience) ToProto(serviceName string) *protos.Audience {
 		OperationName: a.OperationName,
 	}
 }
+
+func stringPtr(in string) *string {
+	return &in
+}
+
+func boolPtr(in bool) *bool {
+	return &in
+}

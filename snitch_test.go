@@ -10,9 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+
+	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/snitch-protos/build/go/protos"
@@ -26,96 +29,6 @@ import (
 	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
 	"github.com/streamdal/snitch-go-client/server/serverfakes"
 )
-
-func TestValidateConfig(t *testing.T) {
-	t.Run("invalid config", func(t *testing.T) {
-		err := validateConfig(nil)
-		if !errors.Is(err, ErrEmptyConfig) {
-			t.Error("expected error but got nil")
-		}
-	})
-
-	t.Run("empty data source", func(t *testing.T) {
-		cfg := &Config{
-			ServiceName: "",
-			ShutdownCtx: context.Background(),
-			SnitchURL:   "http://localhost:9090",
-			SnitchToken: "foo",
-			DryRun:      false,
-			StepTimeout: time.Second,
-			Logger:      &logger.NoOpLogger{},
-		}
-		err := validateConfig(cfg)
-		if !errors.Is(err, ErrEmptyServiceName) {
-			t.Error("expected ErrEmptyServiceName")
-		}
-	})
-
-	t.Run("empty context", func(t *testing.T) {
-		cfg := &Config{
-			ServiceName: "mysvc1",
-			ShutdownCtx: nil,
-			SnitchURL:   "http://localhost:9090",
-			SnitchToken: "foo",
-			DryRun:      false,
-			StepTimeout: time.Second,
-			Logger:      &logger.NoOpLogger{},
-		}
-		err := validateConfig(cfg)
-		if !errors.Is(err, ErrMissingShutdownCtx) {
-			t.Error("expected ErrMissingShutdownCtx")
-		}
-	})
-
-	t.Run("invalid step timeout duration", func(t *testing.T) {
-		_ = os.Setenv("SNITCH_STEP_TIMEOUT", "foo")
-		cfg := &Config{
-			SnitchURL:       "localhost:9090",
-			SnitchToken:     "foo",
-			ServiceName:     "mysvc1",
-			PipelineTimeout: 0,
-			StepTimeout:     0,
-			DryRun:          false,
-			ShutdownCtx:     context.Background(),
-			Logger:          &logger.NoOpLogger{},
-		}
-		err := validateConfig(cfg)
-		if err == nil {
-			t.Error("expected error but got nil")
-		}
-
-		if err != nil && !strings.Contains(err.Error(), "unable to parse StepTimeout") {
-			t.Errorf("expected error to contain 'unable to Parse StepTimeout' error; got '%+v'", err)
-		}
-
-		_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
-	})
-}
-
-func TestToProto(t *testing.T) {
-	audPublic := Audience{
-		ComponentName: "test-component",
-		OperationType: OperationTypeProducer,
-		OperationName: "test-operation",
-	}
-
-	audProto := audPublic.ToProto("service")
-	if audProto.ServiceName != "service" {
-		t.Errorf("expected ServiceName '%s', got '%s'", "service", audProto.ServiceName)
-	}
-
-	if audProto.ComponentName != audPublic.ComponentName {
-		t.Errorf("expected ComponentName '%s', got '%s'", audPublic.ComponentName, audProto.ComponentName)
-	}
-
-	if audProto.OperationType != protos.OperationType_OPERATION_TYPE_PRODUCER {
-		t.Errorf("expected OperationType '%d', got '%d'", protos.OperationType_OPERATION_TYPE_PRODUCER, audProto.OperationType)
-	}
-
-	if audProto.OperationName != audPublic.OperationName {
-		t.Errorf("expected OperationName '%s', got '%s'", audPublic.OperationName, audProto.OperationName)
-	}
-}
 
 type InternalServer struct {
 	// Must be implemented in order to satisfy the protos InternalServer interface
@@ -138,312 +51,341 @@ func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Intern
 	}
 }
 
-func TestNew(t *testing.T) {
-	lis, err := net.Listen("tcp", ":9090")
-	if err != nil {
-		t.Fatalf("failed to listen: %v", err)
-	}
+var _ = Describe("Snitch", func() {
+	Context("validateConfig", func() {
+		var cfg *Config
 
-	srv := grpc.NewServer()
-	protos.RegisterInternalServer(srv, &InternalServer{})
+		BeforeEach(func() {
+			cfg = &Config{
+				ServiceName: "service",
+				ShutdownCtx: context.Background(),
+				SnitchURL:   "http://localhost:9090",
+				SnitchToken: "foo",
+				DryRun:      false,
+				StepTimeout: 0,
+				Logger:      &logger.NoOpLogger{},
+			}
+		})
 
-	go func() {
-		if err := srv.Serve(lis); err != nil {
-			panic("failed to serve: " + err.Error())
-		}
-	}()
+		It("should return error if config is nil", func() {
+			err := validateConfig(nil)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(ErrEmptyConfig))
+		})
 
-	// Give gRPC a moment to startup
-	time.Sleep(time.Second)
+		It("should error on empty service name", func() {
+			cfg.ServiceName = ""
+			err := validateConfig(cfg)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(ErrEmptyServiceName))
+		})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+		It("should error on missing shutdown context", func() {
+			cfg.ShutdownCtx = nil
+			err := validateConfig(cfg)
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(Equal(ErrMissingShutdownCtx))
+		})
 
-	cfg := &Config{
-		ServiceName: "mysvc1",
-		ShutdownCtx: ctx,
-		SnitchURL:   "localhost:9090",
-		SnitchToken: "foo",
-		DryRun:      false,
-		Logger:      &loggerfakes.FakeLogger{},
-	}
-
-	if _, err := New(cfg); err != nil {
-		t.Fatalf("unexpected error: %s", err)
-	}
-}
-
-func TestGetPipelines(t *testing.T) {
-	ctx := context.Background()
-
-	fakeClient := &serverfakes.FakeIServerClient{}
-
-	s := &Snitch{
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string]map[string]*protos.Command{},
-		serverClient: fakeClient,
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-	}
-
-	aud := &protos.Audience{
-		ServiceName:   "mysvc1",
-		ComponentName: "kafka",
-		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-		OperationName: "mytopic",
-	}
-
-	t.Run("no pipelines", func(t *testing.T) {
-		pipelines := s.getPipelines(ctx, aud)
-		if len(pipelines) != 0 {
-			t.Error("expected empty map")
-		}
-
-		// Allow time for goroutine to run
-		time.Sleep(time.Millisecond * 500)
-
-		// Audience should be created on the server
-		if fakeClient.NewAudienceCallCount() != 1 {
-			t.Error("expected NewAudience to be called")
-		}
+		It("should error on invalid step timeout duration", func() {
+			_ = os.Setenv("SNITCH_STEP_TIMEOUT", "foo")
+			err := validateConfig(cfg)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("unable to parse StepTimeout"))
+			_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
+		})
 	})
 
-	t.Run("single pipeline", func(t *testing.T) {
-		s.pipelines[audToStr(aud)] = map[string]*protos.Command{
-			uuid.New().String(): {},
-		}
+	Context("ToProto", func() {
+		It("should convert public Audience struct to protobuf version", func() {
+			audPublic := Audience{
+				ComponentName: "test-component",
+				OperationType: OperationTypeProducer,
+				OperationName: "test-operation",
+			}
 
-		if len(s.getPipelines(ctx, aud)) != 1 {
-			t.Error("expected 1 pipeline")
-		}
-	})
-}
-
-func TestHandleConditions(t *testing.T) {
-	fakeClient := &serverfakes.FakeIServerClient{}
-
-	s := &Snitch{
-		serverClient: fakeClient,
-		metrics:      &metricsfakes.FakeIMetrics{},
-		config: &Config{
-			Logger: &loggerfakes.FakeLogger{},
-			DryRun: false,
-		},
-	}
-
-	aud := &protos.Audience{}
-	pipeline := &protos.Pipeline{}
-	step := &protos.PipelineStep{}
-	req := &ProcessRequest{}
-
-	t.Run("notify condition", func(t *testing.T) {
-		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
-
-		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-		if got != true {
-			t.Error("handleConditions() should return true")
-		}
-		if fakeClient.NotifyCallCount() != 1 {
-			t.Error("expected Notify() to be called")
-		}
+			audProto := audPublic.ToProto("service")
+			Expect(audProto.ServiceName).To(Equal("service"))
+			Expect(audProto.ComponentName).To(Equal(audPublic.ComponentName))
+			Expect(audProto.OperationType).To(Equal(protos.OperationType_OPERATION_TYPE_PRODUCER))
+			Expect(audProto.OperationName).To(Equal(audPublic.OperationName))
+		})
 	})
 
-	t.Run("abort condition", func(t *testing.T) {
-		conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT}
+	Context("New", func() {
+		It("returns a new instance of Snitch", func() {
+			lis, err := net.Listen("tcp", ":9090")
+			Expect(err).ToNot(HaveOccurred())
 
-		got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-		if got != false {
-			t.Error("handleConditions() should return false")
-		}
+			srv := grpc.NewServer()
+			protos.RegisterInternalServer(srv, &InternalServer{})
+
+			go func() {
+				if err := srv.Serve(lis); err != nil {
+					panic("failed to serve: " + err.Error())
+				}
+			}()
+
+			// Give gRPC a moment to startup
+			time.Sleep(time.Second)
+
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			cfg := &Config{
+				ServiceName: "mysvc1",
+				ShutdownCtx: ctx,
+				SnitchURL:   "localhost:9090",
+				SnitchToken: "foo",
+				DryRun:      false,
+				Logger:      &loggerfakes.FakeLogger{},
+			}
+
+			_, err = New(cfg)
+			Expect(err).ToNot(HaveOccurred())
+		})
 	})
 
-}
+	Context("getPipelines", func() {
+		ctx := context.Background()
 
-func TestProcess_nil(t *testing.T) {
-	s := &Snitch{}
-	_, err := s.Process(context.Background(), nil)
-	if err == nil || !strings.Contains(err.Error(), "request cannot be empty") {
-		t.Error("expected error")
-	}
-}
+		fakeClient := &serverfakes.FakeIServerClient{}
 
-func TestProcess_success(t *testing.T) {
-	aud := &protos.Audience{
-		ServiceName:   "mysvc1",
-		ComponentName: "kafka",
-		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-		OperationName: "mytopic",
-	}
+		s := &Snitch{
+			pipelinesMtx: &sync.RWMutex{},
+			pipelines:    map[string]map[string]*protos.Command{},
+			serverClient: fakeClient,
+			audiencesMtx: &sync.RWMutex{},
+			audiences:    map[string]struct{}{},
+		}
 
-	wasmData, err := os.ReadFile("src/detective.wasm")
-	if err != nil {
-		t.Fatal(err)
-	}
+		aud := &protos.Audience{
+			ServiceName:   "mysvc1",
+			ComponentName: "kafka",
+			OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+			OperationName: "mytopic",
+		}
 
-	pipeline := &protos.Pipeline{
-		Id:   uuid.New().String(),
-		Name: "Test Pipeline",
-		Steps: []*protos.PipelineStep{
-			{
-				Name:          "Step 1",
-				XWasmId:       stringPtr(uuid.New().String()),
-				XWasmBytes:    wasmData,
-				XWasmFunction: stringPtr("f"),
-				OnSuccess:     make([]protos.PipelineStepCondition, 0),
-				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
-				Step: &protos.PipelineStep_Detective{
-					Detective: &steps.DetectiveStep{
-						Path:   stringPtr("object.payload"),
-						Args:   []string{"gmail.com"},
-						Negate: boolPtr(false),
-						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-					},
+		It("returns no pipelines bur announces the audience", func() {
+			pipelines := s.getPipelines(ctx, aud)
+			Expect(len(pipelines)).To(Equal(0))
+
+			// Allow time for goroutine to run
+			time.Sleep(time.Millisecond * 500)
+
+			// Audience should be created on the server
+			Expect(fakeClient.NewAudienceCallCount()).To(Equal(1))
+		})
+
+		It("returns a single pipeline", func() {
+			s.pipelines[audToStr(aud)] = map[string]*protos.Command{
+				uuid.New().String(): {},
+			}
+			Expect(len(s.getPipelines(ctx, aud))).To(Equal(1))
+		})
+	})
+
+	Context("handleConditions", func() {
+		var fakeClient *serverfakes.FakeIServerClient
+		var s *Snitch
+		var pipeline *protos.Pipeline
+		var step *protos.PipelineStep
+		var aud *protos.Audience
+		var req *ProcessRequest
+
+		BeforeEach(func() {
+			fakeClient = &serverfakes.FakeIServerClient{}
+
+			s = &Snitch{
+				serverClient: fakeClient,
+				metrics:      &metricsfakes.FakeIMetrics{},
+				config: &Config{
+					Logger: &loggerfakes.FakeLogger{},
+					DryRun: false,
 				},
-			},
-		},
-	}
+			}
 
-	s := &Snitch{
-		serverClient: &serverfakes.FakeIServerClient{},
-		functionsMtx: &sync.RWMutex{},
-		functions:    map[string]*function{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-		tails:        map[string]map[string]*Tail{},
-		tailsMtx:     &sync.RWMutex{},
-		config: &Config{
-			ServiceName:     "mysvc1",
-			Logger:          &logger.NoOpLogger{},
-			StepTimeout:     time.Millisecond * 10,
-			PipelineTimeout: time.Millisecond * 100,
-		},
-		metrics:      &metricsfakes.FakeIMetrics{},
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines: map[string]map[string]*protos.Command{
-			audToStr(aud): {
-				pipeline.Id: {
-					Audience: aud,
-					Command: &protos.Command_AttachPipeline{
-						AttachPipeline: &protos.AttachPipelineCommand{
-							Pipeline: pipeline,
+			aud = &protos.Audience{}
+			pipeline = &protos.Pipeline{}
+			step = &protos.PipelineStep{}
+			req = &ProcessRequest{}
+		})
+
+		It("handles notify condition", func() {
+			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
+
+			got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(got).To(BeTrue())
+			Expect(fakeClient.NotifyCallCount()).To(Equal(1))
+		})
+
+		It("handles abort condition", func() {
+			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT}
+
+			got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(got).To(BeFalse())
+		})
+	})
+
+	Context("Process", func() {
+		It("return error when process request is nil", func() {
+			s := &Snitch{}
+			_, err := s.Process(context.Background(), nil)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(ErrEmptyProcessRequest.Error()))
+		})
+
+		It("processes successfully", func() {
+			aud := &protos.Audience{
+				ServiceName:   "mysvc1",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "mytopic",
+			}
+
+			wasmData, err := os.ReadFile("src/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Step 1",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnSuccess:     make([]protos.PipelineStepCondition, 0),
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
 						},
 					},
 				},
-			},
-		},
-	}
+			}
 
-	resp, err := s.Process(context.Background(), &ProcessRequest{
-		ComponentName: aud.ComponentName,
-		OperationType: OperationType(aud.OperationType),
-		OperationName: aud.OperationName,
-		Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if resp.Error {
-		t.Error(resp.Message)
-	}
-
-	if resp.Message == "No pipelines, message ignored" {
-		t.Error("no pipelines, message ignored")
-	}
-}
-
-func TestProcess_matchfail_and_abort(t *testing.T) {
-	aud := &protos.Audience{
-		ServiceName:   "mysvc1",
-		ComponentName: "kafka",
-		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-		OperationName: "mytopic",
-	}
-
-	wasmData, err := os.ReadFile("src/detective.wasm")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	pipeline := &protos.Pipeline{
-		Id:   uuid.New().String(),
-		Name: "Test Pipeline",
-		Steps: []*protos.PipelineStep{
-			{
-				Name:          "Step 1",
-				XWasmId:       stringPtr(uuid.New().String()),
-				XWasmBytes:    wasmData,
-				XWasmFunction: stringPtr("f"),
-				OnSuccess:     make([]protos.PipelineStepCondition, 0),
-				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
-				Step: &protos.PipelineStep_Detective{
-					Detective: &steps.DetectiveStep{
-						Path:   stringPtr("object.payload"),
-						Args:   []string{"gmail.com"},
-						Negate: boolPtr(false),
-						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-					},
+			s := &Snitch{
+				serverClient: &serverfakes.FakeIServerClient{},
+				functionsMtx: &sync.RWMutex{},
+				functions:    map[string]*function{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+				tails:        map[string]map[string]*Tail{},
+				tailsMtx:     &sync.RWMutex{},
+				config: &Config{
+					ServiceName:     "mysvc1",
+					Logger:          &logger.NoOpLogger{},
+					StepTimeout:     time.Millisecond * 10,
+					PipelineTimeout: time.Millisecond * 100,
 				},
-			},
-		},
-	}
-
-	s := &Snitch{
-		serverClient: &serverfakes.FakeIServerClient{},
-		functionsMtx: &sync.RWMutex{},
-		functions:    map[string]*function{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-		config: &Config{
-			ServiceName:     "mysvc1",
-			Logger:          &logger.NoOpLogger{},
-			StepTimeout:     time.Millisecond * 10,
-			PipelineTimeout: time.Millisecond * 100,
-		},
-		metrics:      &metricsfakes.FakeIMetrics{},
-		tails:        map[string]map[string]*Tail{},
-		tailsMtx:     &sync.RWMutex{},
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines: map[string]map[string]*protos.Command{
-			audToStr(aud): {
-				pipeline.Id: {
-					Audience: aud,
-					Command: &protos.Command_AttachPipeline{
-						AttachPipeline: &protos.AttachPipelineCommand{
-							Pipeline: pipeline,
+				metrics:      &metricsfakes.FakeIMetrics{},
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines: map[string]map[string]*protos.Command{
+					audToStr(aud): {
+						pipeline.Id: {
+							Audience: aud,
+							Command: &protos.Command_AttachPipeline{
+								AttachPipeline: &protos.AttachPipelineCommand{
+									Pipeline: pipeline,
+								},
+							},
 						},
 					},
 				},
-			},
-		},
-	}
+			}
 
-	resp, err := s.Process(context.Background(), &ProcessRequest{
-		ComponentName: aud.ComponentName,
-		OperationType: OperationType(aud.OperationType),
-		OperationName: aud.OperationName,
-		Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
+			resp, err := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp.Error).To(BeFalse())
+			Expect(resp.Message).ToNot(Equal("No pipelines, message ignored"))
+		})
+
+		It("fails on a detective match and aborts", func() {
+			aud := &protos.Audience{
+				ServiceName:   "mysvc1",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "mytopic",
+			}
+
+			wasmData, err := os.ReadFile("src/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Step 1",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnSuccess:     make([]protos.PipelineStepCondition, 0),
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+				},
+			}
+
+			s := &Snitch{
+				serverClient: &serverfakes.FakeIServerClient{},
+				functionsMtx: &sync.RWMutex{},
+				functions:    map[string]*function{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+				config: &Config{
+					ServiceName:     "mysvc1",
+					Logger:          &logger.NoOpLogger{},
+					StepTimeout:     time.Millisecond * 10,
+					PipelineTimeout: time.Millisecond * 100,
+				},
+				metrics:      &metricsfakes.FakeIMetrics{},
+				tails:        map[string]map[string]*Tail{},
+				tailsMtx:     &sync.RWMutex{},
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines: map[string]map[string]*protos.Command{
+					audToStr(aud): {
+						pipeline.Id: {
+							Audience: aud,
+							Command: &protos.Command_AttachPipeline{
+								AttachPipeline: &protos.AttachPipelineCommand{
+									Pipeline: pipeline,
+								},
+							},
+						},
+					},
+				},
+			}
+
+			resp, err := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp.Error).To(BeTrue())
+			Expect(resp.Message).To(Equal("detective step failed"))
+		})
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !resp.Error {
-		t.Error("expected ProcessResponse.Error = true")
-	}
-
-	if resp.Message != "detective step failed" {
-		t.Error("Expected ProcessResponse.Message = 'detective step failed'")
-	}
-}
-
-func stringPtr(in string) *string {
-	return &in
-}
-
-func boolPtr(in bool) *bool {
-	return &in
-}
+})
 
 func createSnitchClient() (*Snitch, *kv.KV, error) {
 	kvClient, err := kv.New(&kv.Config{})
