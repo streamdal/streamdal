@@ -1,30 +1,41 @@
 ---
-title: The Console UI Snitch's Command Center
-metaTitle: "An Inside Look into Snitch's Console User Interface"
-description: Exploring the Console UI's design and functionality, driving Snitch's data operations.
+title: The Streamdal Console UI 
+metaTitle: "An Inside Look into Streamdal's Console User Interface"
+description: Exploring the Console UI's design and functionality, driving Streamdal's data operations.
 layout: ../../../layouts/MainLayout.astro
 ---
+import consoleDashboard from '../../../images/core-components/console-dashboard.png';
+import consolePipeline from '../../../images/core-components/console-pipeline.png';
+
 
 <br />
 <br />
 
-The Console UI of Snitch is more than just a user interface; it's the cockpit from which the complexities of data operations are orchestrated with grace and precision. Built atop a powerful GRPC framework, it offers a seamless communication channel with the Console Server, providing users with a visual playground to create, manage, and monitor their data rules and pipelines.
+The Console UI of Streamdal is more than just a user interface; it's the cockpit from which the complexities of data operations are orchestrated with grace and precision. Built atop a powerful GRPC framework, it offers a seamless communication channel with the Console Server, providing users with a visual playground to create, manage, and monitor their data rules and pipelines.
 
-## Dashboard View: Your Real-time Pipeline Overview
+## Dashboard View: Your Real-time Data Flow
 
-The Dashboard View is the nerve center of the Console UI, providing users with a holistic representation of their 'pipelines'. Here, you'll witness:
+The Dashboard View remains the nerve center of the Console UI, offering:
 
-- **Visual Representations**: A graphic layout depicting the interconnections between consumers, producers, and topics in each pipeline.
-- **Real-time Stats**: Gain insights into the performance, consumption, and production rates of each entity within your pipelines. Stay updated on how much data is flowing, where it's going, and how fast it's being processed.
+- **Visual Representations**: A graphic layout showcasing the relationship between consumers, producers, and topics in each pipeline.
+- **Real-time Stats**: Gain insights into performance, consumption, and production rates of each entity.
+- **Tail View**: Observe your pipeline data in real-time, ensuring immediate feedback on operations.
+- **Schema Discovery**: Explore and define schemas, generated based on events that flow across your schemas 
+
+<img src={consoleDashboard} alt="Streamdal Console Dashboard" />
 
 ## Pipeline View: The Rule Crafting Studio
 
-Switch to the Pipeline View, and you're welcomed into Snitch's rule-crafting domain. Here, users have the flexibility to:
+Dive into the Pipeline View to engage in Streamdal's rule-crafting domain:
 
-- **Detective (PII) Rules**: Establish guidelines that swiftly pinpoint and manage Personal Identifiable Information (PII), safeguarding user privacy.
-- **Encode & Decode Rules**: Define how data is encoded before transmission and decoded upon reception. This ensures data remains consistent and authentic.
-- **Transformation Rules**: Set parameters for real-time data transformation, allowing for data to be reshaped and repurposed as per evolving requirements.
+- **Detective (PII) Rules**: Establish guidelines for managing Personal Identifiable Information (PII).
+- **Encode & Decode Rules**: Determine data encoding before transmission and decoding upon reception (Coming Soon).
+- **Transformation Rules**: Set real-time data transformation parameters, catering to dynamic requirements.
+
+<img src={consolePipeline} alt="Streamdal Console Dashboard" />
 
 ---
 
-The Console UI is where the raw power of Snitch gets harnessed into streamlined operations. It's the interface where intricate data mechanics are translated into visual stories, where users don't just see their data move – they feel its pulse. Dive deeper into each feature, understanding its potential, and leverage the Console UI to drive your data's narrative forward.
+The Streamdal Console UI translates intricate data mechanics into intuitive visual narratives. It's where users not only visualize their data's journey but actively shape its trajectory. Delve deeper into each feature to unlock its full potential and guide your data's narrative with precision.```
+
+Remember to incorporate images for the Service View, Tail View, and Schema Discovery as you mentioned.

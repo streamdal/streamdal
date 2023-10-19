@@ -1,27 +1,27 @@
 ---
-title: Snitch Deployment Guide
-metaTitle: "Step-by-step Guide for Snitch"
-description: A detailed guide to deploying Snitch Server on Kubernetes, Docker, and AWS.
+title: Stremdal Deployment Guide
+metaTitle: "Step-by-step Guide for Streamdal"
+description: A detailed guide to deploying Streamdal Server on Kubernetes, Docker, and AWS.
 layout: ../../../layouts/MainLayout.astro
 ---
 <br />
 <br />
 
-## Helm Deployment for Snitch Server
+## Helm Deployment for Streamdal Server
 
-Deploying Snitch Server on Kubernetes using Helm has never been easier. Follow the steps below to get your Snitch Server up and running.
+Deploying Streamdal Server on Kubernetes using Helm has never been easier. Follow the steps below to get your Streamdal Server up and running.
 
 ### **Pre-requisites**
 
 - Helm (version 3 or above)
 - An active Kubernetes cluster (version 1.16 or above)
 
-### **1. Add the Snitch Helm Repository**
+### **1. Add the Streamdal Helm Repository**
 
-Start by adding the Snitch Helm repository:
+Start by adding the Streamdal Helm repository:
 
 ```bash
-helm repo add snitch https://streamdal.github.io/snitch/helm-charts/snitch-server
+helm repo add streamdal https://streamdal.github.io/streamdal/helm-charts/streamdal-server
 ```
 
 ### **2. Update the Repositories**
@@ -30,26 +30,26 @@ After adding, ensure you update the Helm repositories:
 ```bash
 helm repo update
 ```
-### **3. Install Snitch Server**
-With the repo added and updated, you can now install the Snitch Server:
+### **3. Install Streamdal Server**
+With the repo added and updated, you can now install the Streamdal Server:
 
 ```bash
-helm install snitch snitch/snitch-server
+helm install streamdal streamdal/streamdal-server
 ```
 
-### **4. Access the Snitch Console**
+### **4. Access the Streamdal Console**
 
-Once installed, you might want to access the Snitch console. Forward the console port to do so:
+Once installed, you might want to access the Streamdal console. Forward the console port to do so:
 
 ```bash
-kubectl port-forward svc/snitch-snitch-server-console 3000:3000 
+kubectl port-forward svc/streamdal-streamdal-server-console 3000:3000 
 ```
 
 Then open your browser and navigate to http://127.0.0.1:3000.
 
 ### **5. Customizing Your Deployment with values.yaml**
 
-Snitch Helm chart comes with a set of default configurations. However, you might want to tailor the installation to your needs. This is where values.yaml comes into play.
+Streamdal Helm chart comes with a set of default configurations. However, you might want to tailor the installation to your needs. This is where values.yaml comes into play.
 
 For instance, you might want to change the default authentication token or configure NATS storage.
 
@@ -65,10 +65,10 @@ Here's a brief overview of what you can configure:
 To customize, create a values.yaml file, define your settings, and then deploy using:
 
 ```bash
-helm install [RELEASE_NAME] snitch/snitch-server -f values.yaml
+helm install [RELEASE_NAME] streamdal/streamdal-server -f values.yaml
 ```
 
 For a detailed list of all configuration options, refer to the default values.yaml file provided in the Helm chart.
 
 ## Final Thoughts
-Deploying Snitch Server with Helm allows for a streamlined Kubernetes deployment, and with the flexibility of the values.yaml file, you can adjust the installation to perfectly fit your environment and requirements.
+Deploying Streamdal Server with Helm allows for a streamlined Kubernetes deployment, and with the flexibility of the values.yaml file, you can adjust the installation to perfectly fit your environment and requirements.

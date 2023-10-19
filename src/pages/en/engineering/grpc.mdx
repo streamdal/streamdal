@@ -1,7 +1,7 @@
 ---
-title: Understanding gRPC in Snitch
-metaTitle: "gRPC vs. HTTP: Delving into Snitch's API Design Choice"
-description: Explore the reasons why Snitch utilizes gRPC for its API infrastructure and how it compares to traditional HTTP.
+title: Understanding gRPC in Streamdal
+metaTitle: "gRPC vs. HTTP: Delving into Streamdal's API Design Choice"
+description: Explore the reasons why Streamdal utilizes gRPC for its API infrastructure and how it compares to traditional HTTP.
 layout: ../../../layouts/MainLayout.astro
 ---
 
@@ -27,13 +27,13 @@ gRPC is a high-performance, open-source, and universal RPC (Remote Procedure Cal
    - **gRPC**: Supports bidirectional streaming, enabling both the client and server to send a sequence of messages using a single TCP connection.
    - **HTTP**: Typically limited to request-response style communication.
 
-## Why gRPC is the Choice for Snitch's API
+## Why gRPC is the Choice for Streamdal's API
 
-Given its capabilities, gRPC offers various advantages that resonated with Snitch's design and performance goals:
+Given its capabilities, gRPC offers various advantages that resonated with Streamdal's design and performance goals:
 
 1. **Performance**: With Protocol Buffers, gRPC allows for efficient serialization, reducing the payload size and speeding up both the network transmission and serialization processes.
 
-2. **Language-Agnostic**: gRPC's support for numerous languages enables Snitch to interact seamlessly with diverse systems and applications.
+2. **Language-Agnostic**: gRPC's support for numerous languages enables Streamdal to interact seamlessly with diverse systems and applications.
 
 3. **Streaming Capabilities**: gRPC's bidirectional streaming ensures real-time communication, ideal for our use-cases where timely data exchange is crucial.
 
@@ -43,4 +43,4 @@ Given its capabilities, gRPC offers various advantages that resonated with Snitc
 
 ## Conclusion
 
-gRPC's performance, efficiency, and versatility make it a compelling choice for modern API-driven applications. For Snitch, the benefits of adopting gRPC were clear, ensuring efficient communication, scalability, and robustness in our system interactions.
+gRPC's performance, efficiency, and versatility make it a compelling choice for modern API-driven applications. For Streamdal, the benefits of adopting gRPC were clear, ensuring efficient communication, scalability, and robustness in our system interactions.
