@@ -1080,7 +1080,14 @@ func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.Ap
 	return status, nil
 }
 
-func (s *ExternalServer) AppRegister(_ context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) AppRegister(ctx context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
+	clusterID, err := s.Options.StoreService.GetStreamdalID(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get streamdal ID")
+	}
+
+	req.ClusterId = clusterID
+
 	return s.uibffPostRequest("/v1/app/register/create", req)
 }
 
@@ -1088,7 +1095,14 @@ func (s *ExternalServer) AppVerifyRegistration(_ context.Context, req *protos.Ap
 	return s.uibffPostRequest("/v1/app/register/verify", req)
 }
 
-func (s *ExternalServer) AppRegisterReject(_ context.Context, req *protos.AppRegisterRejectRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppRegisterRejectRequest) (*protos.StandardResponse, error) {
+	clusterID, err := s.Options.StoreService.GetStreamdalID(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get streamdal ID")
+	}
+
+	req.ClusterId = clusterID
+
 	return s.uibffPostRequest("/v1/app/register/reject", req)
 }
 
