@@ -364,7 +364,7 @@ func (c *Cmd) actionSelect(action *types.Action) (*types.Action, error) {
 			case <-fetchDoneCh:
 				// Channel gets closed when actionSelect() exits; way to tell
 				// this goroutine to exit
-				c.log.Info("component fetch goroutine got signal on fetchDoneCh")
+				c.log.Debug("component fetch goroutine got signal on fetchDoneCh")
 				return
 			}
 		}
@@ -658,7 +658,7 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 			return cmd, nil
 		case tailResp := <-tailCh:
 			if tailResp == nil {
-				c.log.Infof("got nil resp on tailCh - ignoring")
+				c.log.Debug("got nil resp on tailCh - ignoring")
 				continue
 			}
 

@@ -664,7 +664,7 @@ func (c *Console) newMenu() *tview.TextView {
 	menu := tview.NewTextView().SetWrap(false).SetDynamicColors(true)
 
 	if _, err := fmt.Fprint(menu, MenuString); err != nil {
-		c.log.Infof("error writing menu: %s", err)
+		c.log.Errorf("error writing menu: %s", err)
 	}
 
 	return menu
