@@ -34,4 +34,4 @@ RUN chmod +x /server
 EXPOSE 8080
 EXPOSE 9090
 
-CMD ["/streamdal-server", "--debug"]
+CMD ["/server", "--debug"]
