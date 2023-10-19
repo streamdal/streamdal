@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
-func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
+func (s *Streamdal) addAudience(ctx context.Context, aud *protos.Audience) {
 	// Don't need to add twice
 	if s.seenAudience(ctx, aud) {
 		return
@@ -33,9 +33,9 @@ func (s *Snitch) addAudience(ctx context.Context, aud *protos.Audience) {
 }
 
 // addAudiences is used for RE-adding audiences that may have timed out after
-// a server reconnect. The method will re-add all known audiences to snitch-server
+// a server reconnect. The method will re-add all known audiences to the server
 // via internal gRPC NewAudience() endpoint. This is a non-blocking method.
-func (s *Snitch) addAudiences(ctx context.Context) {
+func (s *Streamdal) addAudiences(ctx context.Context) {
 	s.audiencesMtx.RLock()
 	defer s.audiencesMtx.RUnlock()
 
@@ -56,7 +56,7 @@ func (s *Snitch) addAudiences(ctx context.Context) {
 	}
 }
 
-func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
+func (s *Streamdal) seenAudience(_ context.Context, aud *protos.Audience) bool {
 	s.audiencesMtx.RLock()
 	defer s.audiencesMtx.RUnlock()
 
@@ -68,7 +68,7 @@ func (s *Snitch) seenAudience(_ context.Context, aud *protos.Audience) bool {
 	return ok
 }
 
-func (s *Snitch) getCurrentAudiences() []*protos.Audience {
+func (s *Streamdal) getCurrentAudiences() []*protos.Audience {
 	s.audiencesMtx.RLock()
 	defer s.audiencesMtx.RUnlock()
 

@@ -4,7 +4,7 @@ package kvfakes
 import (
 	"sync"
 
-	"github.com/streamdal/snitch-go-client/kv"
+	"github.com/streamdal/go-sdk/kv"
 )
 
 type FakeIKV struct {

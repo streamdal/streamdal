@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-go-client/types"
+	"github.com/streamdal/go-sdk/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IServerClient
@@ -43,7 +43,7 @@ type IServerClient interface {
 	// such as AttachPipeline, DetachPipeline, etc
 	Register(ctx context.Context, req *protos.RegisterRequest) (protos.Internal_RegisterClient, error)
 
-	// SendMetrics ships counter(s) to the snitch server
+	// SendMetrics ships counter(s) to the server
 	SendMetrics(ctx context.Context, counters []*types.CounterEntry) error
 
 	// SendSchema sends a schema to the streamdal server

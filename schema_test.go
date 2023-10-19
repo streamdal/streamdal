@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -8,19 +8,19 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
-	"github.com/streamdal/snitch-go-client/server/serverfakes"
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/server/serverfakes"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/steps"
 )
 
 var _ = Describe("Schema", func() {
 
-	var s *Snitch
+	var s *Streamdal
 	var aud *protos.Audience
 
 	BeforeEach(func() {
-		s = &Snitch{
+		s = &Streamdal{
 			schemasMtx: &sync.RWMutex{},
 			schemas:    make(map[string]*protos.Schema),
 			config: &Config{

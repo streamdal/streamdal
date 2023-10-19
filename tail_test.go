@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/snitch-go-client/server"
+	"github.com/streamdal/go-sdk/server"
 
 	"google.golang.org/grpc"
 
@@ -14,21 +14,21 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
-	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
-	"github.com/streamdal/snitch-go-client/server/serverfakes"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/metrics/metricsfakes"
+	"github.com/streamdal/go-sdk/server/serverfakes"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 var _ = Describe("Tail", func() {
 	Context("CRUD methods", func() {
-		var s *Snitch
+		var s *Streamdal
 		var aud *protos.Audience
 		var tail *Tail
 		var tailID string
 
 		BeforeEach(func() {
-			s = &Snitch{
+			s = &Streamdal{
 				tailsMtx: &sync.RWMutex{},
 				tails:    make(map[string]map[string]*Tail),
 				config: &Config{
@@ -88,14 +88,14 @@ var _ = Describe("Tail", func() {
 			outboundCh := make(chan *protos.TailResponse, 1)
 
 			tail := &Tail{
-				Request:      &protos.Command{},
-				CancelFunc:   cancel,
-				outboundCh:   outboundCh,
-				snitchServer: fakeServer,
-				metrics:      fakeMetrics,
-				cancelCtx:    ctx,
-				lastMsg:      time.Now(),
-				log:          &loggerfakes.FakeLogger{},
+				Request:         &protos.Command{},
+				CancelFunc:      cancel,
+				outboundCh:      outboundCh,
+				streamdalServer: fakeServer,
+				metrics:         fakeMetrics,
+				cancelCtx:       ctx,
+				lastMsg:         time.Now(),
+				log:             &loggerfakes.FakeLogger{},
 			}
 
 			tail.ShipResponse(&protos.TailResponse{})
@@ -113,14 +113,14 @@ var _ = Describe("Tail", func() {
 			outboundCh := make(chan *protos.TailResponse, 1)
 
 			tail := &Tail{
-				Request:      &protos.Command{},
-				CancelFunc:   cancel,
-				outboundCh:   outboundCh,
-				snitchServer: fakeServer,
-				metrics:      fakeMetrics,
-				cancelCtx:    ctx,
-				lastMsg:      time.Time{},
-				log:          &loggerfakes.FakeLogger{},
+				Request:         &protos.Command{},
+				CancelFunc:      cancel,
+				outboundCh:      outboundCh,
+				streamdalServer: fakeServer,
+				metrics:         fakeMetrics,
+				cancelCtx:       ctx,
+				lastMsg:         time.Time{},
+				log:             &loggerfakes.FakeLogger{},
 			}
 
 			time.Sleep(MinTailResponseIntervalMS * 2 * time.Millisecond)
@@ -162,18 +162,18 @@ var _ = Describe("Tail", func() {
 						},
 					},
 				},
-				CancelFunc:   cancel,
-				outboundCh:   outboundCh,
-				snitchServer: fakeServer,
-				metrics:      fakeMetrics,
-				cancelCtx:    ctx,
-				lastMsg:      time.Now(),
-				log:          &loggerfakes.FakeLogger{},
+				CancelFunc:      cancel,
+				outboundCh:      outboundCh,
+				streamdalServer: fakeServer,
+				metrics:         fakeMetrics,
+				cancelCtx:       ctx,
+				lastMsg:         time.Now(),
+				log:             &loggerfakes.FakeLogger{},
 			}
 
 			time.Sleep(time.Second)
 
-			s := &Snitch{
+			s := &Streamdal{
 				tailsMtx: &sync.RWMutex{},
 				tails:    make(map[string]map[string]*Tail),
 			}
@@ -208,7 +208,7 @@ var _ = Describe("Tail", func() {
 			serverClient, err := server.New("localhost:9990", "1234")
 			Expect(err).To(BeNil())
 
-			s := &Snitch{
+			s := &Streamdal{
 				tailsMtx:     &sync.RWMutex{},
 				tails:        make(map[string]map[string]*Tail),
 				audiences:    map[string]struct{}{},
@@ -270,12 +270,12 @@ var _ = Describe("Tail", func() {
 	})
 
 	Context("stopTailAudience", func() {
-		var s *Snitch
+		var s *Streamdal
 		var aud *protos.Audience
 		var cmd *protos.Command
 
 		BeforeEach(func() {
-			s = &Snitch{
+			s = &Streamdal{
 				tails:        map[string]map[string]*Tail{},
 				tailsMtx:     &sync.RWMutex{},
 				audiences:    map[string]struct{}{},

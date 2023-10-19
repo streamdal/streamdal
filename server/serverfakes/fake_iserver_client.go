@@ -5,9 +5,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/types"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/go-sdk/server"
+	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 type FakeIServerClient struct {

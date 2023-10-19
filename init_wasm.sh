@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Step 1: Curl the GitHub API to get the latest release
-latest_release=$(curl -s https://api.github.com/repos/streamdal/snitch-wasm/releases/latest)
+latest_release=$(curl -s https://api.github.com/repos/streamdal/wasm/releases/latest)
 
 # Step 2: Extract the "browser_download_url" from the JSON response
 download_url=$(echo "$latest_release" | grep -o 'https://.*\.zip')

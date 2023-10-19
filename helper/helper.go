@@ -1,6 +1,6 @@
 // Package helper contains WASM-related helper functions and methods.
-// This package is separate from `snitch-go-client` to avoid polluting
-// snitch-go-client's public API.
+// This package is separate from `go-sdk` to avoid polluting
+// go-sdk's public API.
 package helper
 
 import (

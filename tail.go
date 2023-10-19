@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -9,22 +9,22 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/metrics"
-	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/types"
-	"github.com/streamdal/snitch-go-client/validate"
+	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/go-sdk/metrics"
+	"github.com/streamdal/go-sdk/server"
+	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/go-sdk/validate"
 )
 
 const (
 	// NumTailWorkers is the number of tail workers to start for each tail request
 	// The workers are responsible for reading from the tail channel and streaming
-	// TailResponse messages to the snitch server
+	// TailResponse messages to the server
 	NumTailWorkers = 2
 
-	// MinTailResponseIntervalMS is how often we send a TailResponse to the snitch server
+	// MinTailResponseIntervalMS is how often we send a TailResponse to the server
 	// If this rate is exceeded, we will drop messages rather than flooding the server
 	// This is an int to avoid a .Milliseconds() call
 	MinTailResponseIntervalMS = 10
@@ -34,15 +34,15 @@ type Tail struct {
 	Request    *protos.Command
 	CancelFunc context.CancelFunc
 
-	outboundCh   chan *protos.TailResponse
-	snitchServer server.IServerClient
-	metrics      metrics.IMetrics
-	cancelCtx    context.Context
-	lastMsg      time.Time
-	log          logger.Logger
+	outboundCh      chan *protos.TailResponse
+	streamdalServer server.IServerClient
+	metrics         metrics.IMetrics
+	cancelCtx       context.Context
+	lastMsg         time.Time
+	log             logger.Logger
 }
 
-func (s *Snitch) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
+func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
 	tails := s.getTail(aud)
 	if len(tails) == 0 {
 		return
@@ -83,7 +83,7 @@ func (t *Tail) ShipResponse(tr *protos.TailResponse) {
 func (t *Tail) startWorkers() error {
 	for i := 0; i < NumTailWorkers; i++ {
 		// Start SDK -> Server streaming gRPC connection
-		stream, err := t.snitchServer.GetTailStream(t.cancelCtx)
+		stream, err := t.streamdalServer.GetTailStream(t.cancelCtx)
 		if err != nil {
 			return errors.Wrap(err, "error starting tail worker")
 		}
@@ -132,8 +132,8 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 					return nil
 				}
 				if strings.Contains(err.Error(), "connection refused") {
-					// Snitch server went away, log, sleep, and wait for reconnect
-					t.log.Warn("failed to send tail response, snitch server went away, waiting for reconnect")
+					// Streamdal server went away, log, sleep, and wait for reconnect
+					t.log.Warn("failed to send tail response, streamdal server went away, waiting for reconnect")
 					time.Sleep(ReconnectSleep)
 					return nil
 				}
@@ -144,7 +144,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 	})
 }
 
-func (s *Snitch) startTailAudience(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) startTailAudience(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
@@ -162,14 +162,14 @@ func (s *Snitch) startTailAudience(_ context.Context, cmd *protos.Command) error
 
 	// Start workers
 	t := &Tail{
-		Request:      cmd,
-		outboundCh:   make(chan *protos.TailResponse, 100),
-		cancelCtx:    ctx,
-		CancelFunc:   cancel,
-		snitchServer: s.serverClient,
-		metrics:      s.metrics,
-		log:          s.config.Logger,
-		lastMsg:      time.Now(),
+		Request:         cmd,
+		outboundCh:      make(chan *protos.TailResponse, 100),
+		cancelCtx:       ctx,
+		CancelFunc:      cancel,
+		streamdalServer: s.serverClient,
+		metrics:         s.metrics,
+		log:             s.config.Logger,
+		lastMsg:         time.Now(),
 	}
 
 	if err := t.startWorkers(); err != nil {
@@ -181,7 +181,7 @@ func (s *Snitch) startTailAudience(_ context.Context, cmd *protos.Command) error
 	return nil
 }
 
-func (s *Snitch) stopTailAudience(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) stopTailAudience(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStopCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail request stop command")
 	}
@@ -209,7 +209,7 @@ func (s *Snitch) stopTailAudience(_ context.Context, cmd *protos.Command) error 
 	return nil
 }
 
-func (s *Snitch) getTail(aud *protos.Audience) map[string]*Tail {
+func (s *Streamdal) getTail(aud *protos.Audience) map[string]*Tail {
 	s.tailsMtx.RLock()
 	tails, ok := s.tails[audToStr(aud)]
 	s.tailsMtx.RUnlock()
@@ -227,7 +227,7 @@ func (s *Snitch) getTail(aud *protos.Audience) map[string]*Tail {
 	return nil
 }
 
-func (s *Snitch) removeTail(aud *protos.Audience, tailID string) {
+func (s *Streamdal) removeTail(aud *protos.Audience, tailID string) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 
@@ -244,7 +244,7 @@ func (s *Snitch) removeTail(aud *protos.Audience, tailID string) {
 	}
 }
 
-func (s *Snitch) setTailing(tail *Tail) {
+func (s *Streamdal) setTailing(tail *Tail) {
 	s.tailsMtx.Lock()
 	defer s.tailsMtx.Unlock()
 

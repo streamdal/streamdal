@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-go-client/validate"
+	"github.com/streamdal/go-sdk/validate"
 )
 
 var (
@@ -22,10 +22,10 @@ var (
 	ErrPipelineNotActive = errors.New("pipeline not active or does not exist")
 )
 
-func (s *Snitch) genClientInfo() *protos.ClientInfo {
+func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
-		LibraryName:    "snitch-go-client",
+		LibraryName:    "go-sdk",
 		LibraryVersion: "0.0.55",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
@@ -33,7 +33,7 @@ func (s *Snitch) genClientInfo() *protos.ClientInfo {
 	}
 }
 
-func (s *Snitch) register(looper director.Looper) error {
+func (s *Streamdal) register(looper director.Looper) error {
 	req := &protos.RegisterRequest{
 		ServiceName: s.config.ServiceName,
 		SessionId:   s.sessionID,
@@ -62,7 +62,7 @@ func (s *Snitch) register(looper director.Looper) error {
 	// to perform a recv to verify.
 	srv, err := s.serverClient.Register(s.config.ShutdownCtx, req)
 	if err != nil {
-		return errors.Wrap(err, "unable to complete initial registration with snitch server")
+		return errors.Wrap(err, "unable to complete initial registration with streamdal server")
 	}
 
 	stream = srv
@@ -79,7 +79,7 @@ func (s *Snitch) register(looper director.Looper) error {
 			s.config.Logger.Debug("stream is nil, attempting to register")
 
 			if err := s.serverClient.Reconnect(); err != nil {
-				s.config.Logger.Errorf("Failed to reconnect with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				s.config.Logger.Errorf("Failed to reconnect with streamdal server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 				return nil
 			}
@@ -96,7 +96,7 @@ func (s *Snitch) register(looper director.Looper) error {
 					return nil
 				}
 
-				s.config.Logger.Errorf("Failed to re-register with snitch server: %s, retrying in '%s'", err, ReconnectSleep.String())
+				s.config.Logger.Errorf("Failed to re-register with streamdal server: %s, retrying in '%s'", err, ReconnectSleep.String())
 				time.Sleep(ReconnectSleep)
 
 				return nil
@@ -107,7 +107,7 @@ func (s *Snitch) register(looper director.Looper) error {
 			stream = newStream
 
 			// Re-announce audience (if we had any) - this is needed so that
-			// streamdal server repopulates live entry in snitch_live (which is used
+			// streamdal server repopulates live entry in live:* prefix (which is used
 			// for DetachPipeline())
 			s.addAudiences(s.config.ShutdownCtx)
 		}
@@ -138,9 +138,9 @@ func (s *Snitch) register(looper director.Looper) error {
 
 			// Nicer reconnect messages
 			if strings.Contains(err.Error(), "reading from server: EOF") {
-				s.config.Logger.Warnf("snitch server is unavailable, retrying in %s...", ReconnectSleep.String())
+				s.config.Logger.Warnf("streamdal server is unavailable, retrying in %s...", ReconnectSleep.String())
 			} else if strings.Contains(err.Error(), "server shutting down") {
-				s.config.Logger.Warnf("snitch server is shutting down, retrying in %s...", ReconnectSleep.String())
+				s.config.Logger.Warnf("streamdal server is shutting down, retrying in %s...", ReconnectSleep.String())
 			} else {
 				s.config.Logger.Warnf("error receiving message, retrying in %s: %s", ReconnectSleep.String(), err)
 			}
@@ -171,7 +171,7 @@ func (s *Snitch) register(looper director.Looper) error {
 	return nil
 }
 
-func (s *Snitch) handleCommand(cmd *protos.Command) error {
+func (s *Streamdal) handleCommand(cmd *protos.Command) error {
 	if cmd == nil {
 		s.config.Logger.Debug("Received nil command, ignoring")
 		return nil
@@ -238,7 +238,7 @@ func (s *Snitch) handleCommand(cmd *protos.Command) error {
 	return err
 }
 
-func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error {
+func (s *Streamdal) handleKVCommand(_ context.Context, kv *protos.KVCommand) error {
 	if err := validate.KVCommand(kv); err != nil {
 		return errors.Wrap(err, "failed to validate kv command")
 	}
@@ -268,7 +268,7 @@ func (s *Snitch) handleKVCommand(_ context.Context, kv *protos.KVCommand) error 
 	return nil
 }
 
-func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) attachPipeline(_ context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrEmptyCommand
 	}
@@ -287,7 +287,7 @@ func (s *Snitch) attachPipeline(_ context.Context, cmd *protos.Command) error {
 	return nil
 }
 
-func (s *Snitch) detachPipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) detachPipeline(_ context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrEmptyCommand
 	}
@@ -312,7 +312,7 @@ func (s *Snitch) detachPipeline(_ context.Context, cmd *protos.Command) error {
 	return nil
 }
 
-func (s *Snitch) pausePipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) pausePipeline(_ context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrEmptyCommand
 	}
@@ -348,7 +348,7 @@ func (s *Snitch) pausePipeline(_ context.Context, cmd *protos.Command) error {
 	return nil
 }
 
-func (s *Snitch) resumePipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) resumePipeline(_ context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrEmptyCommand
 	}

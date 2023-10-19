@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-go-client/types"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 var _ = Describe("Counter", func() {

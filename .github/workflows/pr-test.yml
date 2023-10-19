@@ -19,4 +19,4 @@ jobs:
           make test/coverage
       - name: Upload coverage information
         run: |
-          GIT_BRANCH="${GITHUB_HEAD_REF}" ./cc-test-reporter after-build -p github.com/streamdal/snitch-go-client -r ${{ secrets.CC_TEST_REPORTER_ID }}
+          GIT_BRANCH="${GITHUB_HEAD_REF}" ./cc-test-reporter after-build -p github.com/streamdal/go-sdk -r ${{ secrets.CC_TEST_REPORTER_ID }}

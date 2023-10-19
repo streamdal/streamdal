@@ -10,9 +10,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero/api"
 
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
-	"github.com/streamdal/snitch-go-client/helper"
+	"github.com/streamdal/go-sdk/helper"
 )
 
 // HTTPRequest is function that is exported to and called from a Rust WASM module

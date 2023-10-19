@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
 	"github.com/tetratelabs/wazero/api"
 
-	"github.com/streamdal/snitch-go-client/helper"
+	"github.com/streamdal/protos/build/go/protos/steps"
+
+	"github.com/streamdal/go-sdk/helper"
 )
 
 // KVExists is function that is exported to and called from a Rust WASM module

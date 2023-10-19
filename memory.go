@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import "fmt"
 

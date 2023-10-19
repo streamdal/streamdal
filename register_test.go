@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -8,22 +8,22 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
-	"github.com/streamdal/snitch-go-client/kv/kvfakes"
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/kv/kvfakes"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
 )
 
 var _ = Describe("Register", func() {
 	Context("handleKVCommand", func() {
-		var s *Snitch
+		var s *Streamdal
 		var fakeKV *kvfakes.FakeIKV
 
 		BeforeEach(func() {
 			fakeKV = &kvfakes.FakeIKV{}
 
-			s = &Snitch{
+			s = &Streamdal{
 				config: &Config{
 					Logger: &loggerfakes.FakeLogger{},
 				},
@@ -89,7 +89,7 @@ var _ = Describe("Register", func() {
 
 	Context("attachPipeline", func() {
 		It("should attach a pipeline", func() {
-			s := &Snitch{
+			s := &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
 				pipelines:    make(map[string]map[string]*protos.Command),
 				config: &Config{
@@ -130,7 +130,7 @@ var _ = Describe("Register", func() {
 		It("should detach a pipeline", func() {
 			pipelineID := uuid.New().String()
 
-			s := &Snitch{
+			s := &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
 				pipelines:    make(map[string]map[string]*protos.Command),
 				config: &Config{
@@ -171,7 +171,7 @@ var _ = Describe("Register", func() {
 		It("should pause a pipeline", func() {
 			pipelineID := uuid.New().String()
 
-			s := &Snitch{
+			s := &Streamdal{
 				pipelinesPausedMtx: &sync.RWMutex{},
 				pipelinesPaused:    make(map[string]map[string]*protos.Command),
 				pipelinesMtx:       &sync.RWMutex{},
@@ -232,7 +232,7 @@ var _ = Describe("Register", func() {
 		It("should resume a pipeline", func() {
 			pipelineID := uuid.New().String()
 
-			s := &Snitch{
+			s := &Streamdal{
 				pipelinesPausedMtx: &sync.RWMutex{},
 				pipelinesPaused:    make(map[string]map[string]*protos.Command),
 				pipelinesMtx:       &sync.RWMutex{},
