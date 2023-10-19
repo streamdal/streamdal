@@ -10,7 +10,7 @@ jobs:
       new_tag: ${{ steps.create_tag.outputs.new_tag }}
     environment:
       name: pypi
-      url: https://pypi.org/p/snitch-protos
+      url: https://pypi.org/p/streamdal-protos
     steps:
       - uses: actions/checkout@main
       - name: Generate new tag (dry run)

@@ -85,10 +85,10 @@ generate/rust:
 generate/python: description = Compile protobuf schema descriptor and generate types for python
 generate/python: clean/python
 generate/python:
-	mkdir -p build/python/snitch_protos
+	mkdir -p build/python/streamdal_protos
 	docker run --rm -v ${PWD}:/defs streamdal/betterproto:latest \
- 		--python_betterproto_out=/defs/build/python/snitch_protos \
- 		--pyi_out=/defs/build/python/snitch_protos \
+ 		--python_betterproto_out=/defs/build/python/streamdal_protos \
+ 		--pyi_out=/defs/build/python/streamdal_protos \
 		-I /defs/protos/ \
 		-I /defs/protos/steps/ \
 		-I /defs/protos/shared/ \
@@ -127,8 +127,8 @@ clean/rust:
 .PHONY: clean/python
 clean/python: description = Remove all Python build artifacts
 clean/python:
-	rm -rf ./build/python/snitch_protos
-	rm -rf ./build/python/snitch_protos.egg-info
+	rm -rf ./build/python/streamdal_protos
+	rm -rf ./build/python/streamdal_protos.egg-info
 
 .PHONY: clean/protoset
 clean/protoset: description = Remove protoset artifacts

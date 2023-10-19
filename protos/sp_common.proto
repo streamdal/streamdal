@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos;
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+option go_package = "github.com/streamdal/protos/build/go/protos";
 
 // Common response message for many gRPC methods
 message StandardResponse {
@@ -72,7 +72,7 @@ enum TailRequestType {
   TAIL_REQUEST_TYPE_STOP = 2;
 }
 
-// TailResponse originates in the SDK and then is sent to snitch servers where
+// TailResponse originates in the SDK and then is sent to streamdal servers where
 // it is forwarded to the correct frontend streaming gRPC connection
 message TailResponse {
   TailResponseType type = 1;

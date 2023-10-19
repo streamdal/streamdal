@@ -190,19 +190,19 @@ export interface GetAttachCommandsByServiceResponse {
  */
 export interface WasmModule {
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
+     * ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
      *
      * @generated from protobuf field: string id = 1;
      */
     id: string;
     /**
-     * WASM module bytes (set by snitch-server)
+     * WASM module bytes (set by server)
      *
      * @generated from protobuf field: bytes bytes = 2;
      */
     bytes: Uint8Array;
     /**
-     * WASM function name to execute (set by snitch-server)
+     * WASM function name to execute (set by server)
      *
      * @generated from protobuf field: string function = 3;
      */

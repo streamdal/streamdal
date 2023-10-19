@@ -108,7 +108,7 @@ export interface TailRequest {
     };
 }
 /**
- * TailResponse originates in the SDK and then is sent to snitch servers where
+ * TailResponse originates in the SDK and then is sent to streamdal servers where
  * it is forwarded to the correct frontend streaming gRPC connection
  *
  * @generated from protobuf message protos.TailResponse

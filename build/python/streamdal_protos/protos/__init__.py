@@ -188,8 +188,8 @@ class TailRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TailResponse(betterproto.Message):
     """
-    TailResponse originates in the SDK and then is sent to snitch servers where
-    it is forwarded to the correct frontend streaming gRPC connection
+    TailResponse originates in the SDK and then is sent to streamdal servers
+    where it is forwarded to the correct frontend streaming gRPC connection
     """
 
     type: "TailResponseType" = betterproto.enum_field(1)
@@ -288,17 +288,17 @@ class PipelineStep(betterproto.Message):
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
-    """ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server"""
+    """ID is a uuid(sha256(_wasm_bytes)) that is set by server"""
 
     wasm_bytes: Optional[bytes] = betterproto.bytes_field(
         10001, optional=True, group="X_wasm_bytes"
     )
-    """WASM module bytes (set by snitch-server)"""
+    """WASM module bytes (set by server)"""
 
     wasm_function: Optional[str] = betterproto.string_field(
         10002, optional=True, group="X_wasm_function"
     )
-    """WASM function name to execute (set by snitch-server)"""
+    """WASM function name to execute (set by server)"""
 
 
 @dataclass(eq=False, repr=False)
@@ -337,7 +337,7 @@ class ClientInfo(betterproto.Message):
     session_id: Optional[str] = betterproto.string_field(
         7, optional=True, group="X_session_id"
     )
-    """Filled out by snitch_server on GetAll()"""
+    """Filled out by server on GetAll()"""
 
     service_name: Optional[str] = betterproto.string_field(
         8, optional=True, group="X_service_name"
@@ -666,8 +666,7 @@ class TestResponse(betterproto.Message):
 class KvObject(betterproto.Message):
     """
     KVObject represents a single KV object used in protos.KVInstruction; this
-    is constructed by snitch-server and broadcasted out to other snitch-server
-    nodes.
+    is constructed by server and broadcast out to other server nodes.
     """
 
     key: str = betterproto.string_field(1)
@@ -686,9 +685,9 @@ class KvObject(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class KvInstruction(betterproto.Message):
     """
-    Container for one or more KVObject's; snitch-server broadcasts KVCommand
-    that contains one or more of these instructions when a "POST /api/v1/kv"
-    request is made.
+    Container for one or more KVObject's; server broadcasts KVCommand that
+    contains one or more of these instructions when a "POST /api/v1/kv" request
+    is made.
     """
 
     id: str = betterproto.string_field(1)
@@ -710,12 +709,11 @@ class KvInstruction(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class KvRequest(betterproto.Message):
     """
-    Used for broadcasting KV instructions to other snitch-server nodes. NOTE:
-    While this data structure is similar to KVCommand it makes sense to keep
-    them separate. It would cause more confusion if we tried to re-use
-    KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS
-    This request structure is used for including all updates -
-    create/update/delete.
+    Used for broadcasting KV instructions to other server nodes. NOTE: While
+    this data structure is similar to KVCommand it makes sense to keep them
+    separate. It would cause more confusion if we tried to re-use KVCommand for
+    the purpose of broadcasting AND for sending SDK commands. ~DS This request
+    structure is used for including all updates - create/update/delete.
     """
 
     instructions: List["KvInstruction"] = betterproto.message_field(1)
@@ -743,7 +741,7 @@ class KvUpdateHttpRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class Command(betterproto.Message):
-    """Command is used by snitch-server for sending commands to SDKs"""
+    """Command is used by streamdal server for sending commands to SDKs"""
 
     audience: "Audience" = betterproto.message_field(1)
     """
@@ -766,14 +764,14 @@ class Command(betterproto.Message):
     keep_alive: "KeepAliveCommand" = betterproto.message_field(104, group="command")
     kv: "KvCommand" = betterproto.message_field(105, group="command")
     """
-    snitch-server will emit this when a user makes changes to the KV store via
-    the KV HTTP API.
+    Server will emit this when a user makes changes to the KV store via the KV
+    HTTP API.
     """
 
     tail: "TailCommand" = betterproto.message_field(106, group="command")
     """
-    Emitted by snitch-server when a user makes a Tail() call Consumed by all
-    snitch-server instances and by SDKs
+    Emitted by server when a user makes a Tail() call Consumed by all server
+    instances and by SDKs
     """
 
 
@@ -804,7 +802,7 @@ class KeepAliveCommand(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class KvCommand(betterproto.Message):
-    """Sent by snitch-server on Register channel(s) to live SDKs"""
+    """Sent by server on Register channel(s) to live SDKs"""
 
     instructions: List["KvInstruction"] = betterproto.message_field(1)
     overwrite: bool = betterproto.bool_field(2)
@@ -937,13 +935,13 @@ class WasmModule(betterproto.Message):
     """
 
     id: str = betterproto.string_field(1)
-    """ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server"""
+    """ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server"""
 
     bytes: builtins.bytes = betterproto.bytes_field(2)
-    """WASM module bytes (set by snitch-server)"""
+    """WASM module bytes (set by server)"""
 
     function: str = betterproto.string_field(3)
-    """WASM function name to execute (set by snitch-server)"""
+    """WASM function name to execute (set by server)"""
 
 
 @dataclass(eq=False, repr=False)
@@ -954,9 +952,7 @@ class SendSchemaRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class BusEvent(betterproto.Message):
-    """
-    Type used by `snitch-server` for broadcasting events to other snitch nodes
-    """
+    """Type used by `server` for broadcasting events to other nodes"""
 
     source: str = betterproto.string_field(1)
     register_request: "RegisterRequest" = betterproto.message_field(100, group="event")
@@ -1000,12 +996,11 @@ class BusEvent(betterproto.Message):
     """
     All gRPC metadata is stored in ctx; when request goes outside of gRPC
     bounds, we will translate ctx metadata into this field. Example: 1. Request
-    comes into snitch-server via external gRPC to set new pipeline 2. snitch-
-    server has to send SetPipeline cmd to SDK via gRPC - it passes    on
-    original metadata in request. 3. snitch-server has to broadcast SetPipeline
-    cmd to other services via bus 4. Since this is not a gRPC call, snitch-
-    server translates ctx metadata to    this field and includes it in the bus
-    event.
+    comes into server via external gRPC to set new pipeline 2. server has to
+    send SetPipeline cmd to SDK via gRPC - it passes    on original metadata in
+    request. 3. server has to broadcast SetPipeline cmd to other services via
+    bus 4. Since this is not a gRPC call, server translates ctx metadata to
+    this field and includes it in the bus event.
     """
 
 

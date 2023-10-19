@@ -20,7 +20,7 @@ import { CreatePipelineRequest } from "./sp_external";
 import { DeregisterRequest } from "./sp_internal";
 import { RegisterRequest } from "./sp_internal";
 /**
- * Type used by `snitch-server` for broadcasting events to other snitch nodes
+ * Type used by `server` for broadcasting events to other nodes
  *
  * @generated from protobuf message protos.BusEvent
  */
@@ -130,11 +130,11 @@ export interface BusEvent {
      * bounds, we will translate ctx metadata into this field.
      *
      * Example:
-     * 1. Request comes into snitch-server via external gRPC to set new pipeline
-     * 2. snitch-server has to send SetPipeline cmd to SDK via gRPC - it passes
+     * 1. Request comes into server via external gRPC to set new pipeline
+     * 2. server has to send SetPipeline cmd to SDK via gRPC - it passes
      *    on original metadata in request.
-     * 3. snitch-server has to broadcast SetPipeline cmd to other services via bus
-     * 4. Since this is not a gRPC call, snitch-server translates ctx metadata to
+     * 3. server has to broadcast SetPipeline cmd to other services via bus
+     * 4. Since this is not a gRPC call, server translates ctx metadata to
      *    this field and includes it in the bus event.
      *
      * @generated from protobuf field: map<string, string> _metadata = 1000;

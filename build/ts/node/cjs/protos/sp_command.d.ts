@@ -9,7 +9,7 @@ import { KVInstruction } from "./sp_kv";
 import { Pipeline } from "./sp_pipeline";
 import { Audience } from "./sp_common";
 /**
- * Command is used by snitch-server for sending commands to SDKs
+ * Command is used by streamdal server for sending commands to SDKs
  *
  * @generated from protobuf message protos.Command
  */
@@ -57,7 +57,7 @@ export interface Command {
     } | {
         oneofKind: "kv";
         /**
-         * snitch-server will emit this when a user makes changes to the KV store
+         * Server will emit this when a user makes changes to the KV store
          * via the KV HTTP API.
          *
          * @generated from protobuf field: protos.KVCommand kv = 105;
@@ -66,8 +66,8 @@ export interface Command {
     } | {
         oneofKind: "tail";
         /**
-         * Emitted by snitch-server when a user makes a Tail() call
-         * Consumed by all snitch-server instances and by SDKs
+         * Emitted by server when a user makes a Tail() call
+         * Consumed by all server instances and by SDKs
          *
          * @generated from protobuf field: protos.TailCommand tail = 106;
          */
@@ -120,7 +120,7 @@ export interface ResumePipelineCommand {
 export interface KeepAliveCommand {
 }
 /**
- * Sent by snitch-server on Register channel(s) to live SDKs
+ * Sent by server on Register channel(s) to live SDKs
  *
  * @generated from protobuf message protos.KVCommand
  */

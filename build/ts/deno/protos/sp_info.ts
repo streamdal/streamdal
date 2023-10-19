@@ -82,7 +82,7 @@ export interface ClientInfo {
      */
     os: string;
     /**
-     * Filled out by snitch_server on GetAll()
+     * Filled out by server on GetAll()
      *
      * @generated from protobuf field: optional string _session_id = 7;
      */

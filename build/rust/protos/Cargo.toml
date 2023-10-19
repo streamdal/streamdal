@@ -1,12 +1,12 @@
 [package]
-name = "snitch-protos"
+name = "streamdal-protos"
 version = "0.0.114"
 edition = "2021"
 authors = ["Daniel Selans <daniel@streamdal.com>"]
 categories = ["development-tools"]
-description = "Generated protobuf for rust used with `snitch` components"
-documentation = "https://github.com/streamdal/snitch-protos"
-repository = "https://github.com/streamdal/snitch-protos"
+description = "Generated protobuf for rust used with `streamdal/server` components"
+documentation = "https://github.com/streamdal/protos"
+repository = "https://github.com/streamdal/protos"
 homepage = "https://streamdal.com"
 keywords = ["protobuf", "multi-language"]
 license = "MIT"
