@@ -1,12 +1,12 @@
 // Package hostfunc contains host function methods. They are separated from
-// snitch-go-client in order to keep the public API clean.
+// go-sdk in order to keep the public API clean.
 package hostfunc
 
 import (
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/snitch-go-client/kv"
-	"github.com/streamdal/snitch-go-client/logger"
+	"github.com/streamdal/go-sdk/kv"
+	"github.com/streamdal/go-sdk/logger"
 )
 
 type HostFunc struct {

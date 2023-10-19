@@ -1,4 +1,4 @@
-// Package metrics is responsible for tracking and publishing metrics to the Snitch server.
+// Package metrics is responsible for tracking and publishing metrics to the Streamdal server.
 package metrics
 
 import (
@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/types"
+	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/go-sdk/server"
+	"github.com/streamdal/go-sdk/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics
@@ -48,7 +48,7 @@ const (
 
 var (
 	ErrMissingConfig       = errors.New("config cannot be nil")
-	ErrMissingSnitchClient = errors.New("SnitchClient cannot be nil")
+	ErrMissingServerClient = errors.New("ServerClient cannot be nil")
 	ErrMissingEntry        = errors.New("CounterEntry cannot be nil")
 	ErrEmptyName           = errors.New("Name must be set")
 	ErrMissingShutdownCtx  = errors.New("ShutdownCtx cannot be nil")
@@ -118,7 +118,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.ServerClient == nil {
-		return ErrMissingSnitchClient
+		return ErrMissingServerClient
 	}
 
 	if cfg.ShutdownCtx == nil {
@@ -276,8 +276,8 @@ func (m *Metrics) runCounterWorkerPool(_ string, looper director.Looper) {
 			lastFlush = time.Now().UTC()
 
 			if err != nil && strings.Contains(err.Error(), "connection refused") {
-				// Snitch server went away, log, sleep, and wait for reconnect
-				m.Log.Warn("failed to send metrics, snitch server went away, waiting for reconnect")
+				// Server went away, log, sleep, and wait for reconnect
+				m.Log.Warn("failed to send metrics, streamdal server went away, waiting for reconnect")
 				time.Sleep(time.Second * 5)
 				return nil
 			}

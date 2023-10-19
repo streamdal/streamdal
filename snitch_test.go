@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -18,16 +18,16 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
-	"github.com/streamdal/snitch-protos/build/go/protos/steps"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
-	"github.com/streamdal/snitch-go-client/hostfunc"
-	"github.com/streamdal/snitch-go-client/kv"
-	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
-	"github.com/streamdal/snitch-go-client/metrics/metricsfakes"
-	"github.com/streamdal/snitch-go-client/server/serverfakes"
+	"github.com/streamdal/go-sdk/hostfunc"
+	"github.com/streamdal/go-sdk/kv"
+	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/metrics/metricsfakes"
+	"github.com/streamdal/go-sdk/server/serverfakes"
 )
 
 type InternalServer struct {
@@ -51,7 +51,7 @@ func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Intern
 	}
 }
 
-var _ = Describe("Snitch", func() {
+var _ = Describe("Streamdal", func() {
 	Context("validateConfig", func() {
 		var cfg *Config
 
@@ -59,8 +59,8 @@ var _ = Describe("Snitch", func() {
 			cfg = &Config{
 				ServiceName: "service",
 				ShutdownCtx: context.Background(),
-				SnitchURL:   "http://localhost:9090",
-				SnitchToken: "foo",
+				ServerURL:   "http://localhost:9090",
+				ServerToken: "foo",
 				DryRun:      false,
 				StepTimeout: 0,
 				Logger:      &logger.NoOpLogger{},
@@ -88,11 +88,11 @@ var _ = Describe("Snitch", func() {
 		})
 
 		It("should error on invalid step timeout duration", func() {
-			_ = os.Setenv("SNITCH_STEP_TIMEOUT", "foo")
+			_ = os.Setenv("STREAMDAL_STEP_TIMEOUT", "foo")
 			err := validateConfig(cfg)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("unable to parse StepTimeout"))
-			_ = os.Unsetenv("SNITCH_STEP_TIMEOUT")
+			_ = os.Unsetenv("STREAMDAL_STEP_TIMEOUT")
 		})
 	})
 
@@ -113,7 +113,7 @@ var _ = Describe("Snitch", func() {
 	})
 
 	Context("New", func() {
-		It("returns a new instance of Snitch", func() {
+		It("returns a new instance of Streamdal", func() {
 			lis, err := net.Listen("tcp", ":9090")
 			Expect(err).ToNot(HaveOccurred())
 
@@ -135,8 +135,8 @@ var _ = Describe("Snitch", func() {
 			cfg := &Config{
 				ServiceName: "mysvc1",
 				ShutdownCtx: ctx,
-				SnitchURL:   "localhost:9090",
-				SnitchToken: "foo",
+				ServerURL:   "localhost:9090",
+				ServerToken: "foo",
 				DryRun:      false,
 				Logger:      &loggerfakes.FakeLogger{},
 			}
@@ -151,7 +151,7 @@ var _ = Describe("Snitch", func() {
 
 		fakeClient := &serverfakes.FakeIServerClient{}
 
-		s := &Snitch{
+		s := &Streamdal{
 			pipelinesMtx: &sync.RWMutex{},
 			pipelines:    map[string]map[string]*protos.Command{},
 			serverClient: fakeClient,
@@ -187,7 +187,7 @@ var _ = Describe("Snitch", func() {
 
 	Context("handleConditions", func() {
 		var fakeClient *serverfakes.FakeIServerClient
-		var s *Snitch
+		var s *Streamdal
 		var pipeline *protos.Pipeline
 		var step *protos.PipelineStep
 		var aud *protos.Audience
@@ -196,7 +196,7 @@ var _ = Describe("Snitch", func() {
 		BeforeEach(func() {
 			fakeClient = &serverfakes.FakeIServerClient{}
 
-			s = &Snitch{
+			s = &Streamdal{
 				serverClient: fakeClient,
 				metrics:      &metricsfakes.FakeIMetrics{},
 				config: &Config{
@@ -229,7 +229,7 @@ var _ = Describe("Snitch", func() {
 
 	Context("Process", func() {
 		It("return error when process request is nil", func() {
-			s := &Snitch{}
+			s := &Streamdal{}
 			_, err := s.Process(context.Background(), nil)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(ErrEmptyProcessRequest.Error()))
@@ -269,7 +269,7 @@ var _ = Describe("Snitch", func() {
 				},
 			}
 
-			s := &Snitch{
+			s := &Streamdal{
 				serverClient: &serverfakes.FakeIServerClient{},
 				functionsMtx: &sync.RWMutex{},
 				functions:    map[string]*function{},
@@ -344,7 +344,7 @@ var _ = Describe("Snitch", func() {
 				},
 			}
 
-			s := &Snitch{
+			s := &Streamdal{
 				serverClient: &serverfakes.FakeIServerClient{},
 				functionsMtx: &sync.RWMutex{},
 				functions:    map[string]*function{},
@@ -387,7 +387,7 @@ var _ = Describe("Snitch", func() {
 	})
 })
 
-func createSnitchClient() (*Snitch, *kv.KV, error) {
+func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 	kvClient, err := kv.New(&kv.Config{})
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "unable to create kv client")
@@ -398,7 +398,7 @@ func createSnitchClient() (*Snitch, *kv.KV, error) {
 		return nil, nil, errors.Wrap(err, "unable to create hostfunc client")
 	}
 
-	return &Snitch{
+	return &Streamdal{
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines:    map[string]map[string]*protos.Command{},
 		audiencesMtx: &sync.RWMutex{},
@@ -441,13 +441,13 @@ func TestKVRequestStaticModeKeyDoesNotExist(t *testing.T) {
 		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
 	}
 
-	snitchClient, _, err := createSnitchClient()
+	sdClient, _, err := createStreamdalClient()
 	if err != nil {
-		t.Fatalf("unable to create snitch client for kv test: %s", err)
+		t.Fatalf("unable to create client for kv test: %s", err)
 	}
 
 	// Create WASM func from request
-	f, err := snitchClient.createFunction(req.Step)
+	f, err := sdClient.createFunction(req.Step)
 	if err != nil {
 		t.Fatalf("unable to create func: %s", err)
 	}
@@ -498,15 +498,15 @@ func TestKVRequestDynamicModeKeyExists(t *testing.T) {
 	// This should cause lookup to use "bar" for key
 	req.InputPayload = []byte(`{"object":{"foo":"bar"}}"`)
 
-	snitchClient, kvClient, err := createSnitchClient()
+	sdClient, kvClient, err := createStreamdalClient()
 	if err != nil {
-		t.Fatalf("unable to create snitch client for kv test: %s", err)
+		t.Fatalf("unable to create client for kv test: %s", err)
 	}
 
 	kvClient.Set("bar", "")
 
 	// Create WASM func from request
-	f, err := snitchClient.createFunction(req.Step)
+	f, err := sdClient.createFunction(req.Step)
 	if err != nil {
 		t.Fatalf("unable to create func: %s", err)
 	}
@@ -556,13 +556,13 @@ func TestKVRequestDynamicModeKeyDoesNotExist(t *testing.T) {
 
 	req.InputPayload = []byte(`{"object":{"foo":"bar"}}"`)
 
-	snitchClient, _, err := createSnitchClient()
+	sdClient, _, err := createStreamdalClient()
 	if err != nil {
-		t.Fatalf("unable to create snitch client for kv test: %s", err)
+		t.Fatalf("unable to create client for kv test: %s", err)
 	}
 
 	// Create WASM func from request
-	f, err := snitchClient.createFunction(req.Step)
+	f, err := sdClient.createFunction(req.Step)
 	if err != nil {
 		t.Fatalf("unable to create func: %s", err)
 	}
@@ -610,16 +610,16 @@ func TestKVRequestStaticModeKeyExists(t *testing.T) {
 		t.Fatalf("unable to create WASMRequest for kv test: %s", err)
 	}
 
-	snitchClient, kvClient, err := createSnitchClient()
+	sdClient, kvClient, err := createStreamdalClient()
 	if err != nil {
-		t.Fatalf("unable to create snitch client for kv test: %s", err)
+		t.Fatalf("unable to create client for kv test: %s", err)
 	}
 
 	// Add the key to the KV store
 	kvClient.Set(key, "")
 
 	// Create WASM func from request
-	f, err := snitchClient.createFunction(req.Step)
+	f, err := sdClient.createFunction(req.Step)
 	if err != nil {
 		t.Fatalf("unable to create func: %s", err)
 	}
@@ -683,7 +683,7 @@ func TestHttpRequest(t *testing.T) {
 		InputPayload: []byte(``),
 	}
 
-	s := &Snitch{
+	s := &Streamdal{
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines:    map[string]map[string]*protos.Command{},
 		audiencesMtx: &sync.RWMutex{},
@@ -758,7 +758,7 @@ func inferSchema(fileName string) (*protos.WASMResponse, error) {
 		InputPayload: payloadData,
 	}
 
-	s := &Snitch{
+	s := &Streamdal{
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines:    map[string]map[string]*protos.Command{},
 		audiencesMtx: &sync.RWMutex{},
@@ -849,7 +849,7 @@ func benchmarkInferSchema(fileName string, currentSchema []byte, b *testing.B) {
 		InputPayload: payloadData,
 	}
 
-	s := &Snitch{
+	s := &Streamdal{
 		pipelinesMtx: &sync.RWMutex{},
 		pipelines:    map[string]map[string]*protos.Command{},
 		audiencesMtx: &sync.RWMutex{},

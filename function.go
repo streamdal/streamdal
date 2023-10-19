@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"context"
@@ -6,10 +6,11 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 type function struct {
@@ -61,14 +62,14 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	return resBytes, nil
 }
 
-func (s *Snitch) setFunctionCache(wasmID string, f *function) {
+func (s *Streamdal) setFunctionCache(wasmID string, f *function) {
 	s.functionsMtx.Lock()
 	defer s.functionsMtx.Unlock()
 
 	s.functions[wasmID] = f
 }
 
-func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*function, error) {
+func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep) (*function, error) {
 	// check cache
 	fc, ok := s.getFunctionFromCache(step.GetXWasmId())
 	if ok {
@@ -86,7 +87,7 @@ func (s *Snitch) getFunction(_ context.Context, step *protos.PipelineStep) (*fun
 	return fi, nil
 }
 
-func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
+func (s *Streamdal) getFunctionFromCache(wasmID string) (*function, bool) {
 	s.functionsMtx.RLock()
 	defer s.functionsMtx.RUnlock()
 
@@ -94,7 +95,7 @@ func (s *Snitch) getFunctionFromCache(wasmID string) (*function, bool) {
 	return f, ok
 }
 
-func (s *Snitch) createFunction(step *protos.PipelineStep) (*function, error) {
+func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error) {
 	inst, err := s.createWASMInstance(step.GetXWasmBytes())
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create WASM instance")
@@ -127,7 +128,7 @@ func (s *Snitch) createFunction(step *protos.PipelineStep) (*function, error) {
 	}, nil
 }
 
-func (s *Snitch) createWASMInstance(wasmBytes []byte) (api.Module, error) {
+func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	if len(wasmBytes) == 0 {
 		return nil, errors.New("wasm data is empty")
 	}

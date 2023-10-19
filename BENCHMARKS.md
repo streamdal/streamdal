@@ -11,7 +11,7 @@ go test -bench=.
 
 goos: darwin
 goarch: arm64
-pkg: github.com/streamdal/snitch-go-client
+pkg: github.com/streamdal/go-sdk
 BenchmarkInferSchema_FreshSchema/small.json-8         	   16830	     72359 ns/op
 BenchmarkInferSchema_FreshSchema/medium.json-8        	    2074	    574853 ns/op
 BenchmarkInferSchema_FreshSchema/large.json-8         	     240	   5009645 ns/op

@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
 )
 
 var _ = Describe("KV", func() {

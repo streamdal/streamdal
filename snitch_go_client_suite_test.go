@@ -1,4 +1,4 @@
-package snitch
+package streamdal
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSnitchGoClient(t *testing.T) {
+func TestStreamdalGoClient(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "SnitchGoClient Suite")
+	RunSpecs(t, "StreamdalGoClient Suite")
 }

@@ -5,15 +5,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/snitch-go-client/logger/loggerfakes"
-	"github.com/streamdal/snitch-go-client/server/serverfakes"
-	"github.com/streamdal/snitch-go-client/types"
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/server/serverfakes"
+	"github.com/streamdal/go-sdk/types"
 )
 
 var _ = Describe("Metrics", func() {
@@ -55,7 +55,7 @@ var _ = Describe("Metrics", func() {
 				ServerClient: nil,
 				ShutdownCtx:  context.Background(),
 			})
-			Expect(err).To(Equal(ErrMissingSnitchClient))
+			Expect(err).To(Equal(ErrMissingServerClient))
 		})
 
 		It("should return nil on valid config", func() {

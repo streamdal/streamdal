@@ -1,12 +1,12 @@
-package snitch
+package streamdal
 
 import (
 	"context"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
-func (s *Snitch) getSchema(_ context.Context, aud *protos.Audience) []byte {
+func (s *Streamdal) getSchema(_ context.Context, aud *protos.Audience) []byte {
 	s.schemasMtx.RLock()
 	defer s.schemasMtx.RUnlock()
 
@@ -18,7 +18,7 @@ func (s *Snitch) getSchema(_ context.Context, aud *protos.Audience) []byte {
 	return schema.JsonSchema
 }
 
-func (s *Snitch) setSchema(_ context.Context, aud *protos.Audience, schema []byte) {
+func (s *Streamdal) setSchema(_ context.Context, aud *protos.Audience, schema []byte) {
 	s.schemasMtx.Lock()
 	defer s.schemasMtx.Unlock()
 
@@ -28,7 +28,7 @@ func (s *Snitch) setSchema(_ context.Context, aud *protos.Audience, schema []byt
 }
 
 // handleSchema will handle the schema step in the pipeline, if necessary
-func (s *Snitch) handleSchema(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, resp *protos.WASMResponse) bool {
+func (s *Streamdal) handleSchema(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, resp *protos.WASMResponse) bool {
 	inferSchema := step.GetInferSchema()
 
 	if inferSchema == nil {
@@ -46,7 +46,7 @@ func (s *Snitch) handleSchema(ctx context.Context, aud *protos.Audience, step *p
 		return false
 	}
 
-	// Schema is new or modified, update in memory and send to snitch server
+	// Schema is new or modified, update in memory and send to the server
 	s.setSchema(ctx, aud, resp.OutputStep)
 
 	go func() {

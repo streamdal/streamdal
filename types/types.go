@@ -1,6 +1,6 @@
 package types
 
-import "github.com/streamdal/snitch-protos/build/go/protos"
+import "github.com/streamdal/protos/build/go/protos"
 
 type CounterName string
 

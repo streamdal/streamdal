@@ -1,17 +1,17 @@
-// Package snitch is a library that allows running of Client data pipelines against data
+// Package streamdal is a library that allows running of Client data pipelines against data
 // This package is designed to be included in golang message bus libraries. The only public
 // method is Process() which is used to run pipelines against data.
 //
-// Use of this package requires a running instance of a snitch server.
-// The server can be downloaded at https://github.com/streamdal/snitch
+// Use of this package requires a running instance of a streamdal server©.
+// The server can be downloaded at https://github.com/streamdal/server
 //
 // The following environment variables must be set:
-// - SNITCH_URL: The address of the Client server
-// - SNITCH_TOKEN: The token to use when connecting to the Client server
+// - STREAMDAL_URL: The address of the Client server
+// - STREAMDAL_TOKEN: The token to use when connecting to the Client server
 //
 // Optional parameters:
-// - SNITCH_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
-package snitch
+// - STREAMDAL_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
+package streamdal
 
 import (
 	"context"
@@ -26,14 +26,14 @@ import (
 	"github.com/relistan/go-director"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-go-client/hostfunc"
-	"github.com/streamdal/snitch-go-client/kv"
-	"github.com/streamdal/snitch-go-client/logger"
-	"github.com/streamdal/snitch-go-client/metrics"
-	"github.com/streamdal/snitch-go-client/server"
-	"github.com/streamdal/snitch-go-client/types"
+	"github.com/streamdal/go-sdk/hostfunc"
+	"github.com/streamdal/go-sdk/kv"
+	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/go-sdk/metrics"
+	"github.com/streamdal/go-sdk/server"
+	"github.com/streamdal/go-sdk/types"
 )
 
 // OperationType is used to indicate if the operation is a consumer or a producer
@@ -52,7 +52,7 @@ const (
 	// RuleUpdateInterval is how often to check for rule updates
 	RuleUpdateInterval = time.Second * 30
 
-	// ReconnectSleep determines the length of time to wait between reconnect attempts to snitch server
+	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
 	ReconnectSleep = time.Second * 5
 
 	// MaxWASMPayloadSize is the maximum size of data that can be sent to the WASM module
@@ -80,11 +80,11 @@ var (
 	ErrEmptyProcessRequest  = errors.New("process request cannot be empty")
 )
 
-type ISnitch interface {
+type IStreamdal interface {
 	Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error)
 }
 
-type Snitch struct {
+type Streamdal struct {
 	config             *Config
 	functions          map[string]*function
 	pipelines          map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
@@ -106,14 +106,13 @@ type Snitch struct {
 }
 
 type Config struct {
-	// SnitchURL ... @MG - let's discuss the nil, nil return if left empty.
-	SnitchURL string
+	// ServerURL ... @MG - let's discuss the nil, nil return if left empty.
+	ServerURL string
 
-	// SnitchToken ... @MG - let's discuss the nil, nil return if left empty.
-	SnitchToken string
+	// ServerToken ... @MG - let's discuss the nil, nil return if left empty.
+	ServerToken string
 
-	// ServiceName is the name that this library will identify as in the snitch
-	// UI. Required
+	// ServiceName is the name that this library will identify as in the UI. Required
 	ServiceName string
 
 	// PipelineTimeout defines how long this library will allow a pipeline to
@@ -128,11 +127,11 @@ type Config struct {
 	// New(). If left as false, failure to complete startup (such as bad auth)
 	// will cause New() to return an error. If true, the library will block and
 	// continue trying to initialize. You may want to adjust this if you want
-	// your application to behave a certain way on startup when snitch-server
+	// your application to behave a certain way on startup when the server
 	// is unavailable. Optional; default: false
 	IgnoreStartupError bool
 
-	// If specified, library will connect to snitch-server but won't apply any
+	// If specified, library will connect to the server but won't apply any
 	// pipelines. Optional; default: false
 	DryRun bool
 
@@ -146,13 +145,13 @@ type Config struct {
 
 	// Audiences is a list of audiences you can specify at registration time.
 	// This is useful if you know your audiences in advance and want to populate
-	// service groups in the snitch UI _before_ your code executes any .Process()
+	// service groups in the Streamdal UI _before_ your code executes any .Process()
 	// calls. Optional; default: nil
 	Audiences []*Audience
 
 	// ClientType specifies whether this of the SDK is used in a shim library or
 	// as a standalone SDK. This information is used for both debug info and to
-	// help the library determine whether SnitchURL and SnitchToken should be
+	// help the library determine whether ServerURL and ServerToken should be
 	// optional or required. Optional; default: ClientTypeSDK
 	ClientType ClientType
 }
@@ -176,7 +175,7 @@ type ProcessResponse struct {
 	Message string
 }
 
-func New(cfg *Config) (*Snitch, error) {
+func New(cfg *Config) (*Streamdal, error) {
 	if err := validateConfig(cfg); err != nil {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
@@ -184,13 +183,13 @@ func New(cfg *Config) (*Snitch, error) {
 	// We instantiate this library based on whether or not we have a Client URL+token
 	// If these are not provided, the wrapper library will not perform rule checks and
 	// will act as normal
-	if cfg.SnitchURL == "" || cfg.SnitchToken == "" {
+	if cfg.ServerURL == "" || cfg.ServerToken == "" {
 		return nil, nil
 	}
 
-	serverClient, err := server.New(cfg.SnitchURL, cfg.SnitchToken)
+	serverClient, err := server.New(cfg.ServerURL, cfg.ServerToken)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to connect to snitch server '%s'", cfg.SnitchURL)
+		return nil, errors.Wrapf(err, "failed to connect to streamdal server© '%s'", cfg.ServerURL)
 	}
 
 	m, err := metrics.New(&metrics.Config{
@@ -214,7 +213,7 @@ func New(cfg *Config) (*Snitch, error) {
 		return nil, errors.Wrap(err, "failed to create hostfunc instance")
 	}
 
-	s := &Snitch{
+	s := &Streamdal{
 		functions:          make(map[string]*function),
 		functionsMtx:       &sync.RWMutex{},
 		serverClient:       serverClient,
@@ -276,30 +275,30 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.ServiceName == "" {
-		cfg.ServiceName = os.Getenv("SNITCH_SERVICE_NAME")
+		cfg.ServiceName = os.Getenv("STREAMDAL_SERVICE_NAME")
 		if cfg.ServiceName == "" {
 			return ErrEmptyServiceName
 		}
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if cfg.SnitchURL == "" {
-		cfg.SnitchURL = os.Getenv("SNITCH_URL")
+	if cfg.ServerURL == "" {
+		cfg.ServerURL = os.Getenv("STREAMDAL_URL")
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if cfg.SnitchToken == "" {
-		cfg.SnitchToken = os.Getenv("SNITCH_TOKEN")
+	if cfg.ServerToken == "" {
+		cfg.ServerToken = os.Getenv("STREAMDAL_TOKEN")
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
-	if os.Getenv("SNITCH_DRY_RUN") == "true" {
+	if os.Getenv("STREAMDAL_DRY_RUN") == "true" {
 		cfg.DryRun = true
 	}
 
 	// Can be specified in config for lib use, or via envar for shim use
 	if cfg.StepTimeout == 0 {
-		to := os.Getenv("SNITCH_STEP_TIMEOUT")
+		to := os.Getenv("STREAMDAL_STEP_TIMEOUT")
 		if to == "" {
 			to = DefaultStepTimeoutDurationStr
 		}
@@ -314,7 +313,7 @@ func validateConfig(cfg *Config) error {
 
 	// Can be specified in config for lib use, or via envar for shim use
 	if cfg.PipelineTimeout == 0 {
-		to := os.Getenv("SNITCH_PIPELINE_TIMEOUT")
+		to := os.Getenv("STREAMDAL_PIPELINE_TIMEOUT")
 		if to == "" {
 			to = DefaultPipelineTimeoutDurationStr
 		}
@@ -360,7 +359,7 @@ func validateProcessRequest(req *ProcessRequest) error {
 	return nil
 }
 
-func (s *Snitch) watchForShutdown() {
+func (s *Streamdal) watchForShutdown() {
 	<-s.config.ShutdownCtx.Done()
 
 	// Shut down all tails
@@ -374,7 +373,7 @@ func (s *Snitch) watchForShutdown() {
 	}
 }
 
-func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
+func (s *Streamdal) pullInitialPipelines(ctx context.Context) error {
 	cmds, err := s.serverClient.GetAttachCommandsByService(ctx, s.config.ServiceName)
 	if err != nil {
 		return errors.Wrap(err, "unable to pull initial pipelines")
@@ -410,7 +409,7 @@ func (s *Snitch) pullInitialPipelines(ctx context.Context) error {
 	return nil
 }
 
-func (s *Snitch) heartbeat(loop *director.TimedLooper) {
+func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 	var quit bool
 	loop.Loop(func() error {
 		if quit {
@@ -436,8 +435,8 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 
 		if err := s.serverClient.HeartBeat(s.config.ShutdownCtx, hb); err != nil {
 			if strings.Contains(err.Error(), "connection refused") {
-				// Snitch server went away, log, sleep, and wait for reconnect
-				s.config.Logger.Warn("failed to send heartbeat, snitch server went away, waiting for reconnect")
+				// Streamdal server went away, log, sleep, and wait for reconnect
+				s.config.Logger.Warn("failed to send heartbeat, streamdal server© went away, waiting for reconnect")
 				time.Sleep(ReconnectSleep)
 				return nil
 			}
@@ -448,7 +447,7 @@ func (s *Snitch) heartbeat(loop *director.TimedLooper) {
 	})
 }
 
-func (s *Snitch) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
+func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
@@ -491,7 +490,7 @@ func (s *Snitch) runStep(ctx context.Context, aud *protos.Audience, step *protos
 	return resp, nil
 }
 
-func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
+func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
 	s.pipelinesMtx.RLock()
 	defer s.pipelinesMtx.RUnlock()
 
@@ -505,7 +504,7 @@ func (s *Snitch) getPipelines(ctx context.Context, aud *protos.Audience) map[str
 	return pipelines
 }
 
-func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
+func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
 	if err := validateProcessRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid process request")
 	}
@@ -685,7 +684,7 @@ func (s *Snitch) Process(ctx context.Context, req *ProcessRequest) (*ProcessResp
 	}, nil
 }
 
-func (s *Snitch) handleConditions(
+func (s *Streamdal) handleConditions(
 	ctx context.Context,
 	conditions []protos.PipelineStepCondition,
 	pipeline *protos.Pipeline,
