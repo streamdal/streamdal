@@ -1,4 +1,4 @@
-use snitch_transform::transform::Request;
+use streamdal_transform::transform::Request;
 
 fn main() {
     println!("Overwrite example");
@@ -23,7 +23,7 @@ fn overwrite() {
         value: r#""baz""#.to_string(),
     };
 
-    let updated_json = snitch_transform::transform::overwrite(&req).unwrap();
+    let updated_json = streamdal_transform::transform::overwrite(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -40,7 +40,7 @@ fn mask_string() {
         value: "".to_string(),
     };
 
-    let updated_json = snitch_transform::transform::mask(&req).unwrap();
+    let updated_json = streamdal_transform::transform::mask(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -57,7 +57,7 @@ fn mask_number() {
         value: "".to_string(), // default
     };
 
-    let updated_json = snitch_transform::transform::mask(&req).unwrap();
+    let updated_json = streamdal_transform::transform::mask(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -74,7 +74,7 @@ fn obfuscate_string() {
         value: "".to_string(), // default
     };
 
-    let updated_json = snitch_transform::transform::obfuscate(&req).unwrap();
+    let updated_json = streamdal_transform::transform::obfuscate(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",

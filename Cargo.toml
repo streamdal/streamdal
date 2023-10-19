@@ -1,15 +1,16 @@
 [package]
-name = "snitch-transform"
+name = "streamdal-transform"
 version = "0.0.6"
 edition = "2021"
 license = "MIT"
 description = "JSON data transformation lib used by snitch components"
 categories = ["data structures", "encoding", "data manipulation"]
 keywords = ["json", "replace", "transform", "snitch", "obfuscate"]
-repository = "https://github.com/streamdal/snitch-transform"
+repository = "https://github.com/streamdal/wasm-transform"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 snitch-gjson = "0.8.1-with-set"
 sha256 = "1.1.4"
+streamdal-protos = "0.0.115"
