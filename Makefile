@@ -1,5 +1,5 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
-SERVICE = snitch-server
+SERVICE = server
 ARCH ?= $(shell uname -m)
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
@@ -38,18 +38,18 @@ setup/darwin:
 ### Dev
 
 .PHONY: run/dev
-run/dev: description = Download snitch-server img and run it + all its deps
+run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
 	docker-compose -f docker-compose.dev.yaml build && \
 	docker-compose -f docker-compose.dev.yaml up -d && \
-	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
+	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
 
 .PHONY: run/dev/build
-run/dev/build: description = Build snitch-server img and run it + all its deps
+run/dev/build: description = Build streamdal/server img and run it + all its deps
 run/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml build && \
 	docker-compose -f docker-compose.dev.build.yaml up -d && \
-	echo "Running snitch-server version `curl -s http://localhost:8080/version`"
+	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
 
 ### Build
 
@@ -91,11 +91,11 @@ clean:
 # commands even if they fail
 
 .PHONY: reset
-reset: description = Full reset that will remove all snitch-related docker containers, images, volumes, etc.
+reset: description = Full reset that will remove all streamdal server related docker containers, images, volumes, etc.
 reset:
 	echo "flushall" | nc localhost 6379 || true
-	docker ps | grep -i -e snitch -e redis | awk {'print $$1'} | xargs docker rm -f || true
-	docker images | grep -i -e snitch -e redis | awk {'print $$3'} | xargs docker rmi -f || true
+	docker ps | grep -i -e streamdal -e redis | awk {'print $$1'} | xargs docker rm -f || true
+	docker images | grep -i -e streamdal -e redis | awk {'print $$3'} | xargs docker rmi -f || true
 	docker volume rm -f redis-data || true
 	docker volume ls | grep -i redis | awk {'print $2'} | xargs docker volume rm -f || true
 

@@ -14,7 +14,8 @@ import (
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/snitch-go-client"
+
+	streamdal "github.com/streamdal/go-sdk"
 )
 
 type Register struct {
@@ -115,10 +116,10 @@ func (r *Register) runFileReader(workerID int, readCh chan []byte) error {
 	}
 }
 
-func (r *Register) newClient() (*snitch.Snitch, error) {
-	cfg := &snitch.Config{
-		SnitchURL:       r.config.SnitchAddress,
-		SnitchToken:     r.config.SnitchToken,
+func (r *Register) newClient() (*streamdal.Streamdal, error) {
+	cfg := &streamdal.Config{
+		ServerURL:       r.config.ServerAddress,
+		ServerToken:     r.config.ServerToken,
 		ServiceName:     r.config.ServiceName,
 		PipelineTimeout: 0,
 		StepTimeout:     0,
@@ -132,7 +133,7 @@ func (r *Register) newClient() (*snitch.Snitch, error) {
 		cfg.Logger = r.log
 	}
 
-	return snitch.New(cfg)
+	return streamdal.New(cfg)
 }
 
 func (r *Register) runClient(workerID int, readCh chan []byte) error {
@@ -140,7 +141,7 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 
 	sc, err := r.newClient()
 	if err != nil {
-		return errors.Wrap(err, "failed to create initial snitch client")
+		return errors.Wrap(err, "failed to create initial streamdal client")
 	}
 
 	var reconnectTime time.Time
@@ -151,7 +152,7 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 
 			sc, err = r.newClient()
 			if err != nil {
-				return errors.Wrapf(err, "failed to create snitch client for worker '%s'", workerID)
+				return errors.Wrapf(err, "failed to create client for worker '%d'", workerID)
 			}
 		}
 
@@ -183,9 +184,9 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
-		resp, err := sc.Process(context.Background(), &snitch.ProcessRequest{
+		resp, err := sc.Process(context.Background(), &streamdal.ProcessRequest{
 			ComponentName: r.config.Register.ComponentName,
-			OperationType: snitch.OperationType(r.config.Register.OperationType),
+			OperationType: streamdal.OperationType(r.config.Register.OperationType),
 			OperationName: operationName,
 			Data:          input,
 		})
@@ -194,7 +195,7 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 	}
 }
 
-func (r *Register) display(pre []byte, post *snitch.ProcessResponse, err error) {
+func (r *Register) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	tw := gopretty.NewWriter()
 	tw.Style().Box = gopretty.StyleBoxDouble
 	now := time.Now().Format(time.RFC1123)
@@ -208,7 +209,7 @@ func (r *Register) display(pre []byte, post *snitch.ProcessResponse, err error) 
 
 	if err != nil {
 		status = color.RedString("FAILURE")
-		message = color.RedString("Snitch error: " + err.Error())
+		message = color.RedString("Process error: " + err.Error())
 	}
 
 	if post.Error {
@@ -235,10 +236,10 @@ func (r *Register) display(pre []byte, post *snitch.ProcessResponse, err error) 
 	}
 
 	// Determine post-title
-	postTitle := "Post-Snitch (unchanged)"
+	postTitle := "Post-Process (unchanged)"
 
 	if err == nil && !post.Error && string(pre) != string(post.Data) {
-		postTitle = "Post-Snitch " + underline("(changed)")
+		postTitle = "Post-Process " + underline("(changed)")
 	}
 
 	tw.AppendRow(gopretty.Row{bold("Date"), now})
@@ -247,7 +248,7 @@ func (r *Register) display(pre []byte, post *snitch.ProcessResponse, err error) 
 
 	if !r.config.Quiet {
 		tw.AppendSeparator()
-		tw.AppendRow(gopretty.Row{bold("Pre-Snitch"), bold(postTitle)})
+		tw.AppendRow(gopretty.Row{bold("Pre-Process"), bold(postTitle)})
 		tw.AppendSeparator()
 		tw.AppendRow(gopretty.Row{string(preFormatted), string(postFormatted)})
 	}

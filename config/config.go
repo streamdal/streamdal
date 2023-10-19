@@ -10,7 +10,7 @@ import (
 
 const (
 	EnvFile         = ".env"
-	EnvConfigPrefix = "SNITCH_SERVER"
+	EnvConfigPrefix = "STREAMDAL_SERVER"
 )
 
 type Config struct {
@@ -20,7 +20,7 @@ type Config struct {
 	AuthToken            string           `help:"Authentication token" required:"true" short:"t"`
 	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8080"`
 	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":9090"`
-	RedisURL             string           `help:"Address for Redis cluster used by snitch-server" default:"localhost:6379"`
+	RedisURL             string           `help:"Address for Redis cluster used by Streamdal server" default:"localhost:6379"`
 	RedisDatabase        int              `help:"Redis database number to use" default:"0"`
 	RedisPassword        string           `help:"Redis password" default:""`
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
@@ -49,8 +49,8 @@ func New(version string) *Config {
 
 	cfg := &Config{}
 	cfg.KongContext = kong.Parse(cfg,
-		kong.Name("snitch-server"),
-		kong.Description("Server component in the snitch ecosystem"),
+		kong.Name("streamdal-server"),
+		kong.Description("Server component in the Streamdal ecosystem"),
 		kong.DefaultEnvars(EnvConfigPrefix),
 		kong.Vars{
 			"version": version,

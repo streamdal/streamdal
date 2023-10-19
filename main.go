@@ -13,10 +13,10 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	_ "gopkg.in/relistan/rubberneck.v1"
 
-	"github.com/streamdal/snitch-server/apis/grpcapi"
-	"github.com/streamdal/snitch-server/apis/httpapi"
-	"github.com/streamdal/snitch-server/config"
-	"github.com/streamdal/snitch-server/deps"
+	"github.com/streamdal/server/apis/grpcapi"
+	"github.com/streamdal/server/apis/httpapi"
+	"github.com/streamdal/server/config"
+	"github.com/streamdal/server/deps"
 )
 
 var (
@@ -58,7 +58,7 @@ func main() {
 	go func() {
 		sig := <-c
 		logrus.Debugf("Received system call: %+v", sig)
-		logrus.Info("Shutting down snitch...")
+		logrus.Info("Shutting down Streamdal server...")
 		d.ShutdownFunc()
 	}()
 

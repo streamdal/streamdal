@@ -9,10 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
-	"github.com/streamdal/snitch-protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/util"
 )
 
 func (b *Bus) BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error {
@@ -61,7 +61,7 @@ func (b *Bus) BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceR
 }
 
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
-// it to other snitch-server nodes.
+// it to other server nodes.
 func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {
 	kvRequest := util.GenerateKVRequest(shared.KVAction_KV_ACTION_CREATE, kvs, overwrite)
 
@@ -73,7 +73,7 @@ func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, ove
 }
 
 // BroadcastKVUpdate will transform the req into a generic KVRequest and broadcast
-// it to other snitch-server nodes.
+// it to other server nodes.
 func (b *Bus) BroadcastKVUpdate(ctx context.Context, kvs []*protos.KVObject) error {
 	kvRequest := util.GenerateKVRequest(shared.KVAction_KV_ACTION_UPDATE, kvs, false)
 

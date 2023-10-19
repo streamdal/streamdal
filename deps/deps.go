@@ -10,17 +10,17 @@ import (
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/streamdal/snitch-server/backends/cache"
-	"github.com/streamdal/snitch-server/config"
-	"github.com/streamdal/snitch-server/services/bus"
-	"github.com/streamdal/snitch-server/services/cmd"
-	"github.com/streamdal/snitch-server/services/encryption"
-	"github.com/streamdal/snitch-server/services/kv"
-	"github.com/streamdal/snitch-server/services/metrics"
-	"github.com/streamdal/snitch-server/services/notify"
-	"github.com/streamdal/snitch-server/services/pubsub"
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/wasm"
+	"github.com/streamdal/server/backends/cache"
+	"github.com/streamdal/server/config"
+	"github.com/streamdal/server/services/bus"
+	"github.com/streamdal/server/services/cmd"
+	"github.com/streamdal/server/services/encryption"
+	"github.com/streamdal/server/services/kv"
+	"github.com/streamdal/server/services/metrics"
+	"github.com/streamdal/server/services/notify"
+	"github.com/streamdal/server/services/pubsub"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/wasm"
 )
 
 const (

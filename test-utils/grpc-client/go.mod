@@ -1,9 +1,9 @@
-module github.com/streamdal/snitch-server/test-utils/grpc-client
+module github.com/streamdal/server/test-utils/grpc-client
 
 go 1.20
 
 require (
-	github.com/streamdal/snitch-protos v0.0.26
+	github.com/streamdal/protos v0.0.115
 	google.golang.org/grpc v1.56.2
 )
 

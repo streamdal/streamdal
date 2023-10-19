@@ -23,7 +23,7 @@ static_resources:
                     routes:
                       - match: { prefix: "/" }
                         route:
-                          cluster: snitch
+                          cluster: streamdal
                           timeout: 0s
                           max_stream_duration:
                             grpc_timeout_header_max: 0s
@@ -45,17 +45,17 @@ static_resources:
                   typed_config:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: snitch
+    - name: streamdal
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
       lb_policy: round_robin
       load_assignment:
-        cluster_name: snitch
+        cluster_name: streamdal
         endpoints:
           - lb_endpoints:
             - endpoint:
                 address:
                   socket_address:
-                    address: snitch-server
+                    address: streamdal-server
                     port_value: 9090

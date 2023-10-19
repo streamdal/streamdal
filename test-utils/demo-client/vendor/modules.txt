@@ -42,22 +42,22 @@ github.com/rivo/uniseg
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/snitch-go-client v0.0.55
+# github.com/streamdal/go-sdk v0.0.56
 ## explicit; go 1.17
-github.com/streamdal/snitch-go-client
-github.com/streamdal/snitch-go-client/helper
-github.com/streamdal/snitch-go-client/hostfunc
-github.com/streamdal/snitch-go-client/kv
-github.com/streamdal/snitch-go-client/logger
-github.com/streamdal/snitch-go-client/metrics
-github.com/streamdal/snitch-go-client/server
-github.com/streamdal/snitch-go-client/types
-github.com/streamdal/snitch-go-client/validate
-# github.com/streamdal/snitch-protos v0.0.110
+github.com/streamdal/go-sdk
+github.com/streamdal/go-sdk/helper
+github.com/streamdal/go-sdk/hostfunc
+github.com/streamdal/go-sdk/kv
+github.com/streamdal/go-sdk/logger
+github.com/streamdal/go-sdk/metrics
+github.com/streamdal/go-sdk/server
+github.com/streamdal/go-sdk/types
+github.com/streamdal/go-sdk/validate
+# github.com/streamdal/protos v0.0.115
 ## explicit; go 1.20
-github.com/streamdal/snitch-protos/build/go/protos
-github.com/streamdal/snitch-protos/build/go/protos/shared
-github.com/streamdal/snitch-protos/build/go/protos/steps
+github.com/streamdal/protos/build/go/protos
+github.com/streamdal/protos/build/go/protos/shared
+github.com/streamdal/protos/build/go/protos/steps
 # github.com/tetratelabs/wazero v1.2.0
 ## explicit; go 1.18
 github.com/tetratelabs/wazero

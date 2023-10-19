@@ -1,4 +1,4 @@
-module github.com/streamdal/snitch-server/test-utils/demo-client
+module github.com/streamdal/server/test-utils/demo-client
 
 go 1.20
 
@@ -9,7 +9,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.4.6
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/snitch-go-client v0.0.55
+	github.com/streamdal/go-sdk v0.0.56
 )
 
 require (
@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/streamdal/snitch-protos v0.0.110 // indirect
+	github.com/streamdal/protos v0.0.115 // indirect
 	github.com/tetratelabs/wazero v1.2.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect

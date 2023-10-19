@@ -5,7 +5,7 @@ import (
 
 	"github.com/onsi/gomega"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 type AudienceTestCase struct {

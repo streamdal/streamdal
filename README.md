@@ -1,6 +1,6 @@
-# snitch-server
+# streamdal-server
 
-The server component in the `snitch` ecosystem.
+The server component in the Streamdal ecosystem.
 
 The server exposes 3 APIs:
 
@@ -13,13 +13,13 @@ The server exposes 3 APIs:
 
 ## Development
 
-To develop _against_ the `snitch-server`, you must have Go installed as you 
+To develop _against_ the server, you must have Go installed as you 
 will need to compile the server. You can run `make setup` which will install
 it via `brew`. Otherwise, you will have to install Go manually.
 
-To run the `snitch-server` and its dependencies, run: `make run/dev`
+To run the server and its dependencies, run: `make run/dev`
 
-To develop the `snitch-server` itself, you'll want to only run the `redis` and
+To develop the server itself, you'll want to only run the `redis` and
 `envoy` dependencies and run `go run main.go` manually, on-demand.
 
 ## gRPC API Usage
@@ -69,7 +69,7 @@ We should settle on `ID` as described here: https://github.com/golang/go/wiki/Co
 
 # Encryption
 
-To run snitch server, you will have to generate an AES256 key and pass it via `--aes-key` flag or `SNITCH_SERVER_AES_KEY` 
+To run the server, you will have to generate an AES256 key and pass it via `--aes-key` flag or `STREAMDAL_SERVER_AES_KEY` 
 environment variable.
 
 To generate a key, you can use the following command:

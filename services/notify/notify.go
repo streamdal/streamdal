@@ -21,9 +21,9 @@ import (
 	"github.com/slack-go/slack"
 	gomail "gopkg.in/mail.v2"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/store"
+	"github.com/streamdal/server/services/store"
 )
 
 var (
@@ -32,7 +32,7 @@ var (
 )
 
 const (
-	EmailSubject = "Streamdal Snitch Alert"
+	EmailSubject = "Streamdal Alert"
 )
 
 //go:embed templates/*
@@ -239,7 +239,7 @@ func (n *Notify) handleEmailSES(ctx context.Context, event *Notification, emailC
 	}
 
 	// Required for logging
-	input.SetConfigurationSetName("snitch-log")
+	input.SetConfigurationSetName("streamdal-log")
 
 	if _, err := sesClient.SendEmail(input); err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
@@ -268,7 +268,7 @@ func (n *Notify) handleEmailSES(ctx context.Context, event *Notification, emailC
 func (n *Notify) handleSlack(ctx context.Context, event *Notification, cfg *protos.NotificationSlack) error {
 	api := slack.New(cfg.BotToken)
 
-	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Snitch Alert", false, false))
+	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Alert", false, false))
 
 	sectionBlock := slack.NewSectionBlock(nil, []*slack.TextBlockObject{
 		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline ID*: %s\n", event.Pipeline.Id), false, false),
@@ -304,7 +304,7 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *
 			ID:   cfg.ServiceId,
 			Type: "service_reference",
 		},
-		Title:       "Streamdal Snitch Alert",
+		Title:       "Streamdal Alert",
 		Urgency:     urgency,
 		IncidentKey: event.Pipeline.Id,
 		Body: &pagerduty.APIDetails{

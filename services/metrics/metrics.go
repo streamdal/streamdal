@@ -19,15 +19,12 @@ import (
 	"github.com/relistan/go-director"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 const (
 	// namespace is the prometheus namespace for all metrics
 	namespace = "streamdal"
-
-	// subsystem is the prometheus subsystem for all metrics
-	subsystem = "snitch"
 
 	// counterDumperInterval is how often we will dump metrics to RedisBackend
 	counterDumperInterval = time.Second * 10
@@ -121,7 +118,6 @@ func New(cfg *Config) (*Metrics, error) {
 	for _, counter := range defaultCounters {
 		c := promauto.NewCounterVec(prometheus.CounterOpts{
 			Namespace: namespace,
-			Subsystem: subsystem,
 			Name:      counter.Name,
 			Help:      counter.Description,
 		}, counter.Labels)
@@ -356,7 +352,7 @@ func parseMetricString(input string) (*protos.Metric, error) {
 	name := input[:strings.Index(input, "{")]
 
 	return &protos.Metric{
-		Name:   strings.Replace(name, "streamdal_snitch_", "", 1),
+		Name:   strings.Replace(name, "streamdal_", "", 1),
 		Labels: labels,
 		Value:  value,
 	}, nil

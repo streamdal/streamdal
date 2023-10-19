@@ -34,7 +34,7 @@ scrape_configs:
   static_configs:
     - targets: ['envoy:9901'] # Address of the Redis Exporter
 
-- job_name: "snitch-server"
+- job_name: "streamdal-server"
   scrape_interval: 60s
   static_configs:
-  - targets: [snitch-server:8080]
+  - targets: [streamdal-server:8080]

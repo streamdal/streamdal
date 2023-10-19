@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/util"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/util"
 )
 
 // These tests expect the gRPC server and redis to be running. The server is
@@ -234,7 +234,7 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveKeys).ToNot(BeEmpty())
 
-			// Verify that K/V is created in `snitch_live` bucket
+			// Verify that K/V is created in `streamdal_live` bucket
 			liveData, err := redisClient.Get(
 				context.Background(),
 				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
@@ -243,7 +243,7 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveData).ToNot(BeNil())
 
-			// Verify that entry is created in `snitch_audience` bucket
+			// Verify that entry is created in `streamdal_audience` bucket
 			audienceData, err := redisClient.Get(
 				context.Background(),
 				store.RedisAudienceKey(util.AudienceToStr(audience)),

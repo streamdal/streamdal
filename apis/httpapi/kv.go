@@ -12,9 +12,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/validate"
+	"github.com/streamdal/server/validate"
 )
 
 func (a *HTTPAPI) getUsageKVHandler(rw http.ResponseWriter, r *http.Request) {
@@ -116,7 +116,7 @@ func (a *HTTPAPI) createKVHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Broadcast KV changes to other snitch-server nodes (reminder: we do this
+	// Broadcast KV changes to other server nodes (reminder: we do this
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	// TODO: create broadcast handlers for emitting commands on KV updates
@@ -179,7 +179,7 @@ func (a *HTTPAPI) updateKVHandler(rw http.ResponseWriter, r *http.Request) {
 		updateList = append(updateList, updated)
 	}
 
-	// Broadcast KV changes to other snitch-server nodes (reminder: we do this
+	// Broadcast KV changes to other server nodes (reminder: we do this
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	if err := a.Options.BusService.BroadcastKVUpdate(r.Context(), updateList); err != nil {
@@ -220,7 +220,7 @@ func (a *HTTPAPI) deleteKVHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Broadcast KV changes to other snitch-server nodes (reminder: we do this
+	// Broadcast KV changes to other server nodes (reminder: we do this
 	// so that the nodes can inform their connected SDKs of the change and the
 	// SDKs can update their local KV state)
 	if err := a.Options.BusService.BroadcastKVDelete(r.Context(), key); err != nil {

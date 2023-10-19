@@ -13,12 +13,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 
-	"github.com/streamdal/snitch-server/services/store"
-	"github.com/streamdal/snitch-server/types"
-	"github.com/streamdal/snitch-server/util"
-	"github.com/streamdal/snitch-server/validate"
+	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/types"
+	"github.com/streamdal/server/util"
+	"github.com/streamdal/server/validate"
 )
 
 const (
@@ -198,7 +198,7 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 		}
 	}
 
-	// No register entries == no one connected to any instances of snitch server
+	// No register entries == no one connected to any instances of server
 	if len(liveData) == 0 {
 		return liveInfo, nil
 	}
@@ -270,7 +270,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 		return nil, errors.Wrap(err, "invalid get pipelines request")
 	}
 
-	// Read all keys in "snitch_pipelines"
+	// Read all keys in "streamdal_pipelines"
 	pipelines, err := s.Options.StoreService.GetPipelines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
@@ -367,7 +367,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Pipeline exists - broadcast it as there might be snitch-servers that have
+	// Pipeline exists - broadcast it as there might be servers that have
 	// a client that has an active registration using this pipeline (and it should
 	// get updated)
 	if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
@@ -904,11 +904,11 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	s.log.Debug("external.Tail(): after broadcast")
 
 	// When the connection to the endpoint is closed, emit a STOP event which will be broadcast
-	// to all snitch server instances and their connected clients so that they can stop tailing.
+	// to all server instances and their connected clients so that they can stop tailing.
 	//
 	// handlers.handleTailCommand() will close the intra-server golang channel preventing
 	// any more messages from being sent to the client. Any unread messages still in the redis
-	// pubsub topic "snitch_events:tail:{$tail_request_id}" will be discarded.
+	// pubsub topic "streamdal_events:tail:{$tail_request_id}" will be discarded.
 	defer func() {
 		req.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
 		if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {

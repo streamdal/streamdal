@@ -8,7 +8,7 @@ import (
 
 	"github.com/paulbellamy/ratecounter"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos"
 )
 
 // TODO: needed?

@@ -1,7 +1,7 @@
 # What is this directory?
 
 This directory contains specific versions of the WASM artifacts pulled from
-the [streamdal/snitch-wasm](https://github.com/streamdal/snitch-wasm) repo.
+the [streamdal/wasm](https://github.com/streamdal/wasm) repo.
 
 The files in this directory are _intentionally_ populated by hand to avoid
 accidentally introducing incorrect versions of the WASM artifacts.
@@ -9,10 +9,10 @@ accidentally introducing incorrect versions of the WASM artifacts.
 The file format follows the convention: `$NAME_$SEMVER.wasm`
 
 Where `$NAME` is the lowercase name of the protobuf pipeline step listed 
-[here](https://github.com/streamdal/snitch-protos/blob/main/protos/pipeline.proto#L49-L53). 
+[here](https://github.com/streamdal/protos/blob/main/protos/pipeline.proto#L49-L53). 
 
 `$SEMVER` is the semantic version of the WASM artifact which will be the same
-as the _release tag_ in the [streamdal/snitch-wasm](https://github.com/streamdal/snitch-wasm) repo.
+as the _release tag_ in the [streamdal/wasm](https://github.com/streamdal/wasm) repo.
 
 Example:
 
