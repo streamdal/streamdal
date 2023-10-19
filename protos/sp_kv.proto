@@ -4,10 +4,10 @@ package protos;
 
 import "shared/sp_shared.proto";
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+option go_package = "github.com/streamdal/protos/build/go/protos";
 
 // KVObject represents a single KV object used in protos.KVInstruction; this is
-// constructed by snitch-server and broadcasted out to other snitch-server nodes.
+// constructed by server and broadcast out to other server nodes.
 message KVObject {
   // Valid key regex: /^[a-zA-Z0-9_-:]+$/)
   string key = 1;
@@ -22,7 +22,7 @@ message KVObject {
   int64 updated_at_unix_ts_nano_utc = 4;
 }
 
-// Container for one or more KVObject's; snitch-server broadcasts KVCommand that
+// Container for one or more KVObject's; server broadcasts KVCommand that
 // contains one or more of these instructions when a "POST /api/v1/kv" request
 // is made.
 message KVInstruction {
@@ -39,7 +39,7 @@ message KVInstruction {
   int64 requested_at_unix_ts_nano_utc = 4;
 }
 
-// Used for broadcasting KV instructions to other snitch-server nodes.
+// Used for broadcasting KV instructions to other server nodes.
 // NOTE: While this data structure is similar to KVCommand it makes sense to
 // keep them separate. It would cause more confusion if we tried to re-use
 // KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS

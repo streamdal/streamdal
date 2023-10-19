@@ -119,19 +119,19 @@ export interface PipelineStep {
         oneofKind: undefined;
     };
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
+     * ID is a uuid(sha256(_wasm_bytes)) that is set by server
      *
      * @generated from protobuf field: optional string _wasm_id = 10000;
      */
     WasmId?: string;
     /**
-     * WASM module bytes (set by snitch-server)
+     * WASM module bytes (set by server)
      *
      * @generated from protobuf field: optional bytes _wasm_bytes = 10001;
      */
     WasmBytes?: Uint8Array;
     /**
-     * WASM function name to execute (set by snitch-server)
+     * WASM function name to execute (set by server)
      *
      * @generated from protobuf field: optional string _wasm_function = 10002;
      */

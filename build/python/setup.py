@@ -6,16 +6,16 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name='snitch-protos',
+    name='streamdal-protos',
     version='0.0.9',
-    description='Protobuf python package for Streamdal.com Snitch',
+    description='Protobuf python package for Streamdal.com server and SDKs',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/streamdal/snitch-protos',
+    url='https://github.com/streamdal/protos',
     author='Streamdal.com',
     author_email='engineering@streamdal.com',
     license='MIT',
-    packages=['snitch_protos', 'snitch_protos.protos', 'snitch_protos.protos.steps', 'snitch_protos.protos.shared'],
+    packages=['streamdal_protos', 'streamdal_protos.protos', 'streamdal_protos.protos.steps', 'streamdal_protos.protos.shared'],
     install_requires=[''],
     python_requires=">=3.7",
 

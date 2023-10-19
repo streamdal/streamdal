@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos.steps;
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos/steps";
+option go_package = "github.com/streamdal/protos/build/go/protos/steps";
 
 enum TransformType {
   TRANSFORM_TYPE_UNKNOWN = 0;

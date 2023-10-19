@@ -7,7 +7,7 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { KVAction } from "./shared/sp_shared.js";
 /**
  * KVObject represents a single KV object used in protos.KVInstruction; this is
- * constructed by snitch-server and broadcasted out to other snitch-server nodes.
+ * constructed by server and broadcast out to other server nodes.
  *
  * @generated from protobuf message protos.KVObject
  */
@@ -38,7 +38,7 @@ export interface KVObject {
     updatedAtUnixTsNanoUtc: string;
 }
 /**
- * Container for one or more KVObject's; snitch-server broadcasts KVCommand that
+ * Container for one or more KVObject's; server broadcasts KVCommand that
  * contains one or more of these instructions when a "POST /api/v1/kv" request
  * is made.
  *
@@ -71,7 +71,7 @@ export interface KVInstruction {
     requestedAtUnixTsNanoUtc: string;
 }
 /**
- * Used for broadcasting KV instructions to other snitch-server nodes.
+ * Used for broadcasting KV instructions to other server nodes.
  * NOTE: While this data structure is similar to KVCommand it makes sense to
  * keep them separate. It would cause more confusion if we tried to re-use
  * KVCommand for the purpose of broadcasting AND for sending SDK commands. ~DS

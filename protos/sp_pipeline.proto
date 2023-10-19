@@ -11,7 +11,7 @@ import "steps/sp_steps_inferschema.proto";
 import "steps/sp_steps_kv.proto";
 import "steps/sp_steps_transform.proto";
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+option go_package = "github.com/streamdal/protos/build/go/protos";
 
 // Pipeline is a structure that holds one or more pipeline steps. This structure
 // is intended to be immutable; clients are expected to generate WASMRequest's
@@ -59,12 +59,12 @@ message PipelineStep {
     steps.InferSchemaStep infer_schema = 1007;
   }
 
-  // ID is a uuid(sha256(_wasm_bytes)) that is set by snitch-server
+  // ID is a uuid(sha256(_wasm_bytes)) that is set by server
   optional string _wasm_id = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
-  // WASM module bytes (set by snitch-server)
+  // WASM module bytes (set by server)
   optional bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
-  // WASM function name to execute (set by snitch-server)
+  // WASM function name to execute (set by server)
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

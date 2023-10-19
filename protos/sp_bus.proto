@@ -7,13 +7,13 @@ import "sp_external.proto";
 import "sp_internal.proto";
 import "sp_kv.proto";
 
-option go_package = "github.com/streamdal/snitch-protos/build/go/protos";
+option go_package = "github.com/streamdal/protos/build/go/protos";
 
-// Type used by `snitch-server` for broadcasting events to other snitch nodes
+// Type used by `server` for broadcasting events to other nodes
 message BusEvent {
   string source = 1;
 
-  // This _should_ contain request messages - each snitch-server can determine
+  // This _should_ contain request messages - each server can determine
   // how to interpret and handle the message.
   //
   // NOTE: The bus _should not_ be used for transmitting commands to SDKs. The
@@ -41,11 +41,11 @@ message BusEvent {
   // bounds, we will translate ctx metadata into this field.
   //
   // Example:
-  // 1. Request comes into snitch-server via external gRPC to set new pipeline
-  // 2. snitch-server has to send SetPipeline cmd to SDK via gRPC - it passes
+  // 1. Request comes into server via external gRPC to set new pipeline
+  // 2. server has to send SetPipeline cmd to SDK via gRPC - it passes
   //    on original metadata in request.
-  // 3. snitch-server has to broadcast SetPipeline cmd to other services via bus
-  // 4. Since this is not a gRPC call, snitch-server translates ctx metadata to
+  // 3. server has to broadcast SetPipeline cmd to other services via bus
+  // 4. Since this is not a gRPC call, server translates ctx metadata to
   //    this field and includes it in the bus event.
   map <string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
