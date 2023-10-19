@@ -1,11 +1,11 @@
-<a href="https://crates.io/crates/snitch-transform/"><img src="https://img.shields.io/crates/v/snitch-transform.svg"></a>
-<a href="https://docs.rs/snitch-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
+<a href="https://crates.io/crates/streamdal-transform/"><img src="https://img.shields.io/crates/v/streamdal-transform.svg"></a>
+<a href="https://docs.rs/streamdal-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
 
 
-snitch-transform
+streamdal-transform
 ==================
 
-Library used by [snitch-wasm](https://github.com/streamdal/snitch-wasm) to 
+Library used by [streamdal/wasm](https://github.com/streamdal/wasm) to 
 perform transformations on JSON payloads.
 
 Currently only has support for `overwrite`, `mask` and `obfuscate`.
@@ -22,7 +22,7 @@ fn main() {
         value: r#""baz""#.to_string(),
     };
 
-    let updated_json = snitch_transform::transform::overwrite(&req).unwrap();
+    let updated_json = streamdal_transform::transform::overwrite(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
