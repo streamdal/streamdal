@@ -1,6 +1,6 @@
 use protos::sp_steps_detective::DetectiveType;
-use snitch_detective::detective;
-use snitch_detective::detective::Request;
+use streamdal_detective::detective;
+use streamdal_detective::detective::Request;
 
 fn main() {
     let det = detective::Detective::new();
