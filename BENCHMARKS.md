@@ -2,7 +2,7 @@
 
 ***Up to date as of 2023-09-20***
 
-All benchmarks include marshal/unmarshal of `WASMRequest` and `WASMResponse respectively`
+All benchmarks include marshal/unmarshal of `WASMRequest` and `WASMResponse` respectively
 
 *inferschema*
 
