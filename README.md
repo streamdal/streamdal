@@ -1,17 +1,17 @@
-streamdal-detective
+wasm-detective
 ================
-[![Release](https://github.com/streamdal/streamdal-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/streamdal-detective/actions/workflows/release.yaml)
-[![Test](https://github.com/streamdal/streamdal-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/streamdal-detective/actions/workflows/pr.yaml)
+[![Release](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml)
+[![Test](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml)
 
-Rust helper lib for performing value matching in `streamdal/wasm` WASM functions.
+Rust helper lib for performing value matching in `streamdal/wasm` Wasm functions.
 
 For available matchers, look at the enums listed in
-[streamdal-protos](https://github.com/streamdal/streamdal-protos/blob/main/protos/steps/detective.proto).
+[protos](https://github.com/streamdal/protos/blob/main/protos/steps/detective.proto).
 
 # Install
 ```
 cargo add streamdal-protos
-cargo add streamdal-detective
+cargo add streamdal-wasm-detective
 ```
 
 # Usage
