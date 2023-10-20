@@ -8,11 +8,14 @@ import { initAllServices } from "../lib/fetch.ts";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
   await initAllServices();
+  const success = ctx.data?.success;
 
   return (
     <>
       <NavBar />
-      <OpModal serviceMap={serviceSignal.value} />
+      {!req.url.includes("/email") && (
+        <OpModal serviceMap={serviceSignal.value} />
+      )}
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />
@@ -25,6 +28,7 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
               : []}
             blur={req.url.includes("pipelines") ||
               req.url.includes("notifications")}
+            success={success}
           />
         </ReactFlowProvider>
 

@@ -6,6 +6,8 @@ import {
 import { client, meta } from "./grpc.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import {
+  AppRegisterRejectRequest,
+  AppRegistrationRequest,
   AttachPipelineRequest,
   CreateNotificationRequest,
   DeleteAudienceRequest,
@@ -172,6 +174,36 @@ export const deleteService = async (serviceName: string) => {
     console.error("error deleting service", error);
     return {
       id: "deleteServiceRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const sendEmail = async (email: string) => {
+  try {
+    const request = AppRegistrationRequest.create({ email });
+    const { response } = await client.appRegister(request, meta);
+    return response;
+  } catch (error) {
+    console.error("error registering app", error);
+    return {
+      id: "appRegistrationRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const rejectEmailCollection = async () => {
+  try {
+    const request = AppRegisterRejectRequest.create();
+    const { response } = await client.appRegisterReject(request, meta);
+    return response;
+  } catch (error) {
+    console.error("error rejecting to register app", error);
+    return {
+      id: "appRegistrationRejectRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };

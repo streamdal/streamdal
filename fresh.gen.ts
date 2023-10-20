@@ -6,8 +6,8 @@ import * as $0 from "./routes/_500.tsx";
 import * as $1 from "./routes/_app.tsx";
 import * as $2 from "./routes/_layout.tsx";
 import * as $3 from "./routes/_middleware.ts";
-import * as $4 from "./routes/index.tsx";
-import * as $5 from "./routes/login.tsx";
+import * as $4 from "./routes/email.tsx";
+import * as $5 from "./routes/index.tsx";
 import * as $6 from "./routes/notifications/configure.tsx";
 import * as $7 from "./routes/notifications/index.tsx";
 import * as $8 from "./routes/pipelines/[id]/delete.tsx";
@@ -27,13 +27,14 @@ import * as $21 from "./routes/ws/server-error.tsx";
 import * as $22 from "./routes/ws/service-map.tsx";
 import * as $23 from "./routes/ws/tail.tsx";
 import * as $$0 from "./islands/customNodes.tsx";
-import * as $$1 from "./islands/notifications.tsx";
-import * as $$2 from "./islands/opModal.tsx";
-import * as $$3 from "./islands/operationOpModal.tsx";
-import * as $$4 from "./islands/pipeline.tsx";
-import * as $$5 from "./islands/pipelines.tsx";
-import * as $$6 from "./islands/serviceMap.tsx";
-import * as $$7 from "./islands/tail.tsx";
+import * as $$1 from "./islands/emailCollectionForm.tsx";
+import * as $$2 from "./islands/notifications.tsx";
+import * as $$3 from "./islands/opModal.tsx";
+import * as $$4 from "./islands/operationOpModal.tsx";
+import * as $$5 from "./islands/pipeline.tsx";
+import * as $$6 from "./islands/pipelines.tsx";
+import * as $$7 from "./islands/serviceMap.tsx";
+import * as $$8 from "./islands/tail.tsx";
 
 const manifest = {
   routes: {
@@ -41,8 +42,8 @@ const manifest = {
     "./routes/_app.tsx": $1,
     "./routes/_layout.tsx": $2,
     "./routes/_middleware.ts": $3,
-    "./routes/index.tsx": $4,
-    "./routes/login.tsx": $5,
+    "./routes/email.tsx": $4,
+    "./routes/index.tsx": $5,
     "./routes/notifications/configure.tsx": $6,
     "./routes/notifications/index.tsx": $7,
     "./routes/pipelines/[id]/delete.tsx": $8,
@@ -70,13 +71,14 @@ const manifest = {
   },
   islands: {
     "./islands/customNodes.tsx": $$0,
-    "./islands/notifications.tsx": $$1,
-    "./islands/opModal.tsx": $$2,
-    "./islands/operationOpModal.tsx": $$3,
-    "./islands/pipeline.tsx": $$4,
-    "./islands/pipelines.tsx": $$5,
-    "./islands/serviceMap.tsx": $$6,
-    "./islands/tail.tsx": $$7,
+    "./islands/emailCollectionForm.tsx": $$1,
+    "./islands/notifications.tsx": $$2,
+    "./islands/opModal.tsx": $$3,
+    "./islands/operationOpModal.tsx": $$4,
+    "./islands/pipeline.tsx": $$5,
+    "./islands/pipelines.tsx": $$6,
+    "./islands/serviceMap.tsx": $$7,
+    "./islands/tail.tsx": $$8,
   },
   baseUrl: import.meta.url,
 };

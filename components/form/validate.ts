@@ -12,7 +12,6 @@ export const validate = <T>(
     const validated = schema.parse(data);
     return { data: validated, errors: null };
   } catch (error: any) {
-    console.error("Parsing error:  ", error);
     const errors = error?.issues?.reduce(
       (o: any, e: ZodIssue) => ({ ...o, [e.path.join(".")]: e.message }),
       {},

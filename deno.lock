@@ -1,6 +1,7 @@
 {
   "version": "3",
   "redirects": {
+    "https://deno.land/x/zod/mod.ts": "https://deno.land/x/zod@v3.21.4/mod.ts",
     "https://esm.sh/v132/preact/compat": "https://esm.sh/v132/preact@10.18.1/compat"
   },
   "remote": {
@@ -605,6 +606,21 @@
     "https://deno.land/x/streamdal_protos@v0.0.113/protos/steps/sp_steps_inferschema.ts": "5243d27fa0f00a2acf59bcd88c1c101c60a6287701f4a524ba7b4b04a761e880",
     "https://deno.land/x/streamdal_protos@v0.0.113/protos/steps/sp_steps_kv.ts": "e096d14d5412dbaf78ce735e061035e6f38df5b2050ac201cfb3bacab75485b0",
     "https://deno.land/x/streamdal_protos@v0.0.113/protos/steps/sp_steps_transform.ts": "36c47e4cd336063f5c759d7dae302741b7f32ec18eadc15589a59a0ab111c060",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/shared/sp_shared.ts": "ab5247706faf9801158098f3ce4a8e066d64a17c1bfafd725672abb473c52197",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_common.ts": "9065181d95b9b1aa12616648751614676bc72bd3574aeb54d642dae348b6a483",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_external.client.ts": "2539112ae4bd949113ac967f5fd0f108991f1bbf7d3a505564337564f611a9df",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_external.ts": "872dc2502554c618f01147f399081ba6888d719aaeb98930ffb0d6901d6a3b90",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_info.ts": "0097d63fb4777bae83c9777e731576f94919a295c420740086e2d5e82dad85a6",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_notify.ts": "80f8af47d2b89c2f5f970140e241217fe1deda0a9a10b07e035e084b1e5d6d93",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/sp_pipeline.ts": "e0117bc5e04296e525b1320d30dff2f12fb4eae3f64ce5e4bce2329c91eef18c",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_custom.ts": "5e667f618363034079f475470adbd3a037611f827999590ab38302f1d51a0e40",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_decode.ts": "4a1747025d3d536ac2a00f85c29bf63f1de05b8a5d04a8d02ca93c005b7e8c56",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_detective.ts": "ce27cb412910d41c36d7d901d097280be08414400676006d0e0d7b4ad6697dfa",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_encode.ts": "1e779f8558ca81a0604175e116f81fd641211fc6b340312018dbf9902db83d9b",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_httprequest.ts": "87fda7fe571bbc977cdcecd11a10e0556525c2b447622bd91f2b01aea8c56642",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_inferschema.ts": "5243d27fa0f00a2acf59bcd88c1c101c60a6287701f4a524ba7b4b04a761e880",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_kv.ts": "e096d14d5412dbaf78ce735e061035e6f38df5b2050ac201cfb3bacab75485b0",
+    "https://deno.land/x/streamdal_protos@v0.0.114/protos/steps/sp_steps_transform.ts": "36c47e4cd336063f5c759d7dae302741b7f32ec18eadc15589a59a0ab111c060",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/adjustments-horizontal.tsx": "5970351d91df4222c11ec2e4b1e0288a6cf5e4834d442c2ba9332262fae4d694",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/bell.tsx": "1e0611da345cf34134590f24a0624278927fae1b20b259b065b0d6b589037382",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/check.tsx": "7a34654bec04502f8c411801621572232fa842a3a916fe6da0897aa0affb60ac",
@@ -653,6 +669,7 @@
     "https://deno.land/x/zod@v3.21.4/helpers/util.ts": "8baf19b19b2fca8424380367b90364b32503b6b71780269a6e3e67700bb02774",
     "https://deno.land/x/zod@v3.21.4/index.ts": "d27aabd973613985574bc31f39e45cb5d856aa122ef094a9f38a463b8ef1a268",
     "https://deno.land/x/zod@v3.21.4/locales/en.ts": "a7a25cd23563ccb5e0eed214d9b31846305ddbcdb9c5c8f508b108943366ab4c",
+    "https://deno.land/x/zod@v3.21.4/mod.ts": "64e55237cb4410e17d968cd08975566059f27638ebb0b86048031b987ba251c4",
     "https://deno.land/x/zod@v3.21.4/types.ts": "b5d061babea250de14fc63764df5b3afa24f2b088a1d797fc060ba49a0ddff28",
     "https://esm.sh/*@preact/signals-core@1.2.3": "0b8f6b239732967b35aafe142d96ba382a37ebec46a64cfd84b354bef143ee53",
     "https://esm.sh/*@preact/signals@1.1.3": "03fc5fbeace31246b8e8a9a1c9f1826b12f41d81bcfbe805e9510d4d0e2a18c0",

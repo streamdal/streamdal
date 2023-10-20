@@ -1,4 +1,5 @@
 import { Github, Google } from "../icons/social.tsx";
+import { z } from "https://deno.land/x/zod/mod.ts";
 import { useState } from "preact/hooks";
 import { LoginFormInput } from "./loginFormInput.tsx";
 
@@ -22,7 +23,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <div class="mx-[-32px] my-[-24px] w-screen h-screen flex flex-col justify-center align-top items-center bg-login bg-cover bg-center  bg-no-repeat">
+    <div class="w-screen h-screen flex flex-col justify-center align-top items-center bg-login bg-cover bg-center  bg-no-repeat">
       <form className={"rounded-xl px-6 py-10 items-center bg-white w-[400px]"}>
         <div className={"w-full items-center"}>
           <img

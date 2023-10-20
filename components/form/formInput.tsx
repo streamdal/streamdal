@@ -23,6 +23,7 @@ export const FormInput = ({
   isNumber,
 }: FormInputProps) => {
   const value = resolveValue(data, name);
+
   return (
     <div class={`flex flex-col my-2 ${wrapperClass}`}>
       {label && (

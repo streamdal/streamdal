@@ -1,12 +1,6 @@
 import { Handlers } from "$fresh/src/server/types.ts";
-import { serviceSignal } from "../../../components/serviceMap/serviceSignal.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { getAttachedPipeline } from "../../../lib/utils.ts";
-import {
-  deleteAudience,
-  deleteService,
-  detachPipeline,
-} from "../../../lib/mutation.ts";
+import { deleteService } from "../../../lib/mutation.ts";
 
 export const handler: Handlers<> = {
   async POST(req, ctx) {

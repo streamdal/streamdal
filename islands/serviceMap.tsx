@@ -35,6 +35,8 @@ import {
 } from "../components/serviceMap/opModalSignal.ts";
 import { ServerError } from "../components/error/server.tsx";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -103,10 +105,11 @@ export const updateEdges = (
 };
 
 export default function ServiceMapComponent(
-  { initNodes, initEdges, blur = false }: {
+  { initNodes, initEdges, blur = false, success }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
     blur?: boolean;
+    success?: SuccessType;
   },
 ) {
   const wrapper = useRef(null);
@@ -132,6 +135,14 @@ export default function ServiceMapComponent(
     y: 150,
     zoom: .85,
   };
+
+  if (success?.message && window?.location?.pathname === "/") {
+    toastSignal.value = {
+      id: "global",
+      type: success.status ? "success" : "error",
+      message: success.message,
+    };
+  }
 
   const fit = (nodes: FlowNode[], rfInstance) => {
     const { right } = wrapper?.current?.getBoundingClientRect();
@@ -183,6 +194,7 @@ export default function ServiceMapComponent(
       {serverErrorSignal.value
         ? <ServerError message={serverErrorSignal.value} />
         : null}
+      <Toast id={"global"} />
       <ReactFlow
         onInit={(reactFlowInstance: ReactFlowInstance) => {
           setRfInstance(reactFlowInstance, fit(nodes, reactFlowInstance));

@@ -1,4 +1,4 @@
-import { SuccessRoute, SuccessType } from "./_middleware.ts";
+import { SuccessRoute } from "./_middleware.ts";
 import { Handlers } from "$fresh/src/server/types.ts";
 
 export const handler: Handlers<SuccessRoute> = {
