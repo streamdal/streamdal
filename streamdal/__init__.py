@@ -334,10 +334,23 @@ class StreamdalClient:
             "pipeline_id": "",
         }
 
+        bytes_counter = metrics.COUNTER_CONSUME_BYTES
+        errors_counter = metrics.COUNTER_CONSUME_ERRORS
+        total_counter = metrics.COUNTER_CONSUME_PROCESSED
+        rate_bytes = metrics.COUNTER_CONSUME_BYTES_RATE
+        rate_processed = metrics.COUNTER_CONSUME_PROCESSED_RATE
+
+        if req.operation_type == MODE_PRODUCER:
+            bytes_counter = metrics.COUNTER_PRODUCE_BYTES
+            errors_counter = metrics.COUNTER_PRODUCE_ERRORS
+            total_counter = metrics.COUNTER_PRODUCE_PROCESSED
+            rate_bytes = metrics.COUNTER_PRODUCE_BYTES_RATE
+            rate_processed = metrics.COUNTER_PRODUCE_PROCESSED_RATE
+
         if payload_size > MAX_PAYLOAD_SIZE:
             self.metrics.incr(
                 CounterEntry(
-                    name=metrics.COUNTER_PRODUCE_ERRORS,
+                    name=errors_counter,
                     value=1.0,
                     labels=labels,
                     aud=aud,
@@ -356,19 +369,6 @@ class StreamdalClient:
                 req.data,
             )
             return ProcessResponse(data=req.data, error=False, message="")
-
-        bytes_counter = metrics.COUNTER_CONSUME_BYTES
-        errors_counter = metrics.COUNTER_CONSUME_ERRORS
-        total_counter = metrics.COUNTER_CONSUME_PROCESSED
-        rate_bytes = metrics.COUNTER_CONSUME_BYTES_RATE
-        rate_processed = metrics.COUNTER_CONSUME_PROCESSED_RATE
-
-        if req.operation_type == MODE_PRODUCER:
-            bytes_counter = metrics.COUNTER_PRODUCE_BYTES
-            errors_counter = metrics.COUNTER_PRODUCE_ERRORS
-            total_counter = metrics.COUNTER_PRODUCE_PROCESSED
-            rate_bytes = metrics.COUNTER_PRODUCE_BYTES_RATE
-            rate_processed = metrics.COUNTER_PRODUCE_PROCESSED_RATE
 
         self.metrics.incr(CounterEntry(name=rate_bytes, value=1.0, labels={}, aud=aud))
         self.metrics.incr(
@@ -420,25 +420,9 @@ class StreamdalClient:
                         )
                         continue
 
-                    should_continue = True
-                    for cond in step.on_success:
-                        if (
-                            cond
-                            == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY
-                        ):
-                            self._notify_condition(pipeline, step, cmd.audience)
-                            self.log.debug(f"Step '{step.name}' succeeded, notifying")
-                        elif (
-                            cond
-                            == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
-                        ):
-                            should_continue = False
-                            self.log.debug(f"Step '{step.name}' succeeded, aborting")
-                        else:
-                            # We still need to continue to remaining steps after other conditions have been processed
-                            self.log.debug(
-                                f"Step '{step.name}' succeeded, continuing to next step"
-                            )
+                    should_continue = self._handle_condition(
+                        step.on_failure, pipeline, step, cmd.audience
+                    )
 
                     # Not continuing, exit function early
                     if should_continue is False and self.cfg.dry_run is False:
@@ -454,27 +438,14 @@ class StreamdalClient:
 
                     continue
 
-                should_continue = True
-                for cond in step.on_failure:
-                    if (
-                        cond
-                        == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY
-                    ):
-                        self._notify_condition(pipeline, step, cmd.audience)
-                        self.log.debug(f"Step '{step.name}' failed, notifying")
-                    elif (
-                        cond
-                        == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
-                    ):
-                        should_continue = False
-                        self.log.debug(
-                            f"Step '{step.name}' failed, aborting further pipeline steps"
-                        )
-                    else:
-                        # We still need to continue to remaining steps after other conditions have been processed
-                        self.log.debug(
-                            f"Step '{step.name}' failed, continuing to next step"
-                        )
+                # Failure conditions
+                self.metrics.incr(
+                    CounterEntry(name=errors_counter, value=1.0, labels=labels, aud=aud)
+                )
+
+                should_continue = self._handle_condition(
+                    step.on_failure, pipeline, step, cmd.audience
+                )
 
                 # Not continuing, exit function early
                 if should_continue is False and self.cfg.dry_run is False:
@@ -533,6 +504,29 @@ class StreamdalClient:
 
         if not self.cfg.dry_run:
             loop.run_until_complete(call())
+
+    def _handle_condition(
+        self,
+        conditions: [],
+        pipeline: protos.Pipeline,
+        step: protos.PipelineStep,
+        aud: protos.Audience,
+    ) -> bool:
+        should_continue = True
+        for cond in conditions:
+            if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
+                self._notify_condition(pipeline, step, aud)
+                self.log.debug(f"Step '{step.name}' failed, notifying")
+            elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
+                should_continue = False
+                self.log.debug(
+                    f"Step '{step.name}' failed, aborting further pipeline steps"
+                )
+            else:
+                # We still need to continue to remaining steps after other conditions have been processed
+                self.log.debug(f"Step '{step.name}' failed, continuing to next step")
+
+        return should_continue
 
     def _get_pipelines(self, aud: protos.Audience) -> dict:
         """
@@ -986,22 +980,7 @@ class StreamdalClient:
 
         req = protos.steps.HttpRequest().parse(data)
 
-        if req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET:
-            response = requests.get(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST:
-            response = requests.post(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT:
-            response = requests.put(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
-            response = requests.delete(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PATCH:
-            response = requests.patch(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_HEAD:
-            response = requests.head(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
-            response = requests.options(req.url)
-        else:
-            raise ValueError("Invalid HTTP method provided")
+        response = self._http_request_perform(req)
 
         headers = {}
         for k, v in response.headers.items():
@@ -1026,6 +1005,26 @@ class StreamdalClient:
         memory.write(caller, resp, resp_ptr)
 
         return resp_ptr
+
+    def _http_request_perform(self, req: protos.steps.HttpRequest) -> requests.Response:
+        if req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET:
+            response = requests.get(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST:
+            response = requests.post(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT:
+            response = requests.put(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
+            response = requests.delete(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PATCH:
+            response = requests.patch(req.url, json=req.body)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_HEAD:
+            response = requests.head(req.url)
+        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
+            response = requests.options(req.url)
+        else:
+            raise ValueError("Invalid HTTP method provided")
+
+        return response
 
     # ------------------------------------------------------------------------------------
 
