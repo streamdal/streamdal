@@ -1,20 +1,20 @@
 import asyncio
 import threading
 import pytest
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 import uuid
 import unittest.mock as mock
-import snitchpy
-from snitchpy import SnitchClient, SnitchConfig
+import streamdal
+from streamdal import StreamdalClient, StreamdalConfig
 
 
-class TestSnitchClient:
-    client: SnitchClient
+class TestStreamdalClient:
+    client: StreamdalClient
 
     @pytest.fixture(autouse=True)
     def before_each(self):
-        client = object.__new__(SnitchClient)
-        client.cfg = SnitchConfig(service_name="testing")
+        client = object.__new__(StreamdalClient)
+        client.cfg = StreamdalConfig(service_name="testing")
         client.grpc_loop = asyncio.get_event_loop()
         client.log = mock.Mock()
         client.metrics = mock.Mock()
@@ -41,12 +41,12 @@ class TestSnitchClient:
     def test_process_max_size(self):
         fake_metrics = mock.Mock()
 
-        self.client.cfg = SnitchConfig(service_name="testing")
+        self.client.cfg = StreamdalConfig(service_name="testing")
         self.client.metrics = fake_metrics
-        payload = bytearray(snitchpy.MAX_PAYLOAD_SIZE + 1)
+        payload = bytearray(streamdal.MAX_PAYLOAD_SIZE + 1)
         payload_bytes = bytes(payload)
 
-        req = snitchpy.ProcessRequest(
+        req = streamdal.ProcessRequest(
             data=payload_bytes,
             operation_type=1,
             component_name="kafka",
@@ -86,15 +86,15 @@ class TestSnitchClient:
 
     def test_op_to_string(self):
         assert (
-            SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_PRODUCER)
+            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_PRODUCER)
             == "producer"
         )
         assert (
-            SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_CONSUMER)
+            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_CONSUMER)
             == "consumer"
         )
         assert (
-            SnitchClient.op_to_string(protos.OperationType.OPERATION_TYPE_UNSET)
+            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_UNSET)
             == "consumer"
         )
 
@@ -139,9 +139,9 @@ class TestSnitchClient:
         self.client._attach_pipeline(cmd)
 
         resp = self.client.process(
-            snitchpy.ProcessRequest(
+            streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=snitchpy.MODE_PRODUCER,
+                operation_type=streamdal.MODE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -198,9 +198,9 @@ class TestSnitchClient:
         client._attach_pipeline(cmd)
 
         resp = client.process(
-            snitchpy.ProcessRequest(
+            streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=snitchpy.MODE_PRODUCER,
+                operation_type=streamdal.MODE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -214,7 +214,7 @@ class TestSnitchClient:
 
     def test_process_failure_dry_run(self):
         client = self.client
-        client.cfg = SnitchConfig(dry_run=True)
+        client.cfg = StreamdalConfig(dry_run=True)
 
         wasm_resp = protos.WasmResponse(
             output_payload=b'{"object": {"type": "should be replaced by original data on dry run"}}',
@@ -254,9 +254,9 @@ class TestSnitchClient:
         client._attach_pipeline(cmd)
 
         resp = client.process(
-            snitchpy.ProcessRequest(
+            streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=snitchpy.MODE_PRODUCER,
+                operation_type=streamdal.MODE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )

@@ -3,8 +3,8 @@ import threading
 import time
 
 import pytest
-import snitch_protos.protos as protos
-from snitchpy.metrics import Metrics, CounterEntry, Counter, composite_id
+import streamdal_protos.protos as protos
+from streamdal.metrics import Metrics, CounterEntry, Counter, composite_id
 from threading import Event, Lock
 from queue import SimpleQueue
 from unittest.mock import AsyncMock, Mock

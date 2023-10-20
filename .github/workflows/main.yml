@@ -51,7 +51,7 @@ jobs:
         run: |
           make test/wasm
           pip install coverage
-          coverage run --source=snitchpy -m pytest && coverage xml
+          coverage run --source=streamdal -m pytest && coverage xml
       - name: Upload coverage information
         run: |
           ./cc-test-reporter format-coverage -t coverage.py
@@ -72,7 +72,7 @@ jobs:
           dry_run: true
       - name: Build python dist
         run: |
-          sed -i "s/version=\".*\"/version=\"${{ steps.get_new_version.outputs.new_version }}\"/" snitchpy/__init__.py
+          sed -i "s/version=\".*\"/version=\"${{ steps.get_new_version.outputs.new_version }}\"/" streamdal/__init__.py
           sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
           python3 setup.py sdist
       - name: Publish package distributions to PyPI

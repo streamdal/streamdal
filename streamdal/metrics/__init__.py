@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 from threading import Thread, Lock, Event
 from queue import SimpleQueue, Empty
 import asyncio
@@ -87,7 +87,7 @@ def composite_id(entry: CounterEntry) -> str:
 
 
 class Metrics:
-    """Class Metrics is used to manage counter metrics, and ship them to Snitch server asynchronously"""
+    """Class Metrics is used to manage counter metrics, and ship them to Streamdal server asynchronously"""
 
     loop: asyncio.AbstractEventLoop
     log: logging.Logger
@@ -99,7 +99,7 @@ class Metrics:
     incr_queue: SimpleQueue = SimpleQueue()
 
     def __init__(self, **kwargs):
-        log = kwargs.get("log", logging.getLogger("snitch-client"))
+        log = kwargs.get("log", logging.getLogger("streamdal-client"))
         log.setLevel(logging.DEBUG)
 
         self.stub = kwargs.get("stub")

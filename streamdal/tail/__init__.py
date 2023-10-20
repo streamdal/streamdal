@@ -1,8 +1,8 @@
 import logging
 import asyncio
-import snitch_protos.protos as protos
+import streamdal_protos.protos as protos
 import time
-from snitchpy.metrics import Metrics, CounterEntry, COUNTER_DROPPED_TAIL_MESSAGES
+from streamdal.metrics import Metrics, CounterEntry, COUNTER_DROPPED_TAIL_MESSAGES
 from grpclib.client import Channel
 from grpclib.exceptions import ProtocolError
 from queue import SimpleQueue, Empty
@@ -16,18 +16,18 @@ MIN_TAIL_RESPONSE_INTERVAL = 10_000_000  # 10ms
 class Tail:
     request: protos.TailRequest
     auth_token: str
-    snitch_url: str
+    streamdal_url: str
     metrics: Metrics
     lock: Lock = Lock()
     exit: Event = Event()
     queue: SimpleQueue = SimpleQueue()
     last_msg: int = 0
-    log: logging.Logger = logging.getLogger("snitch-client")
+    log: logging.Logger = logging.getLogger("streamdal-python-sdk")
 
     def __init__(
         self,
         request: protos.TailRequest,
-        snitch_url: str,
+        streamdal_url: str,
         exit: Event,
         auth_token: str,
         log: logging.Logger,
@@ -38,7 +38,7 @@ class Tail:
         self.exit = exit
         self.log = log
         self.auth_token = auth_token
-        self.snitch_url = snitch_url
+        self.streamdal_url = streamdal_url
         self.metrics = metrics
 
     def tail_iterator(self):
@@ -61,7 +61,7 @@ class Tail:
         self.log.debug(f"Starting tail worker {worker_id}")
 
         # Create gRPC channel and stub
-        (host, port) = self.snitch_url.split(":")
+        (host, port) = self.streamdal_url.split(":")
         loop = asyncio.new_event_loop()
         channel = Channel(host=host, port=port, loop=loop)
         stub = protos.InternalStub(channel=channel)

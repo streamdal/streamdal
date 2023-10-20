@@ -6,16 +6,21 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name="snitchpy",
+    name="streamdal",
     version="0.0.1",
-    description="Python client SDK for Streamdal's open source Snitch server",
+    description="Python client SDK for Streamdal's open source observability server",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/streamdal/snitch-python-client",
+    url="https://github.com/streamdal/python-sdk",
     author="Streamdal.com",
     author_email="engineering@streamdal.com",
     license="MIT",
-    packages=["snitchpy", "snitchpy.metrics", "snitchpy.validation", "snitchpy.tail"],
+    packages=[
+        "streamdal",
+        "streamdal.metrics",
+        "streamdal.validation",
+        "streamdal.tail",
+    ],
     install_requires=[""],
     python_requires=">=3.8",
     classifiers=[

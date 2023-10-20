@@ -1,10 +1,10 @@
 import pprint
 import logging
 
-from snitchpy import (
+from streamdal import (
     Audience,
-    SnitchClient,
-    SnitchConfig,
+    StreamdalClient,
+    StreamdalConfig,
     ProcessRequest,
     MODE_CONSUMER,
 )
@@ -12,15 +12,15 @@ from snitchpy import (
 
 def main():
     logging.basicConfig()
-    client = SnitchClient(
-        cfg=SnitchConfig(
-            service_name="snitchtest",
+    client = StreamdalClient(
+        cfg=StreamdalConfig(
+            service_name="streamdaltest",
             dry_run=True,
-            snitch_url="snitch-server.dev.svc.cluster.local:9090",
-            snitch_token="1234",
+            streamdal_url="streamdal-server.dev.svc.cluster.local:9090",
+            streamdal_token="1234",
             audiences=[
                 Audience(
-                    service_name="snitchtest",
+                    service_name="streamdaltest",
                     operation_name="opname",
                     component_name="comname",
                     operation_type=MODE_CONSUMER,
