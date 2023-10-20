@@ -1,6 +1,6 @@
-# snitch-wasm
+# Wasm
 
-This repository contains all of the WASM funcs used by `snitch` components.
+This repository contains all of the Wasm funcs used by `snitch` components.
 
 To build: `make build`
 
@@ -10,7 +10,7 @@ To test: `make test`
 
 Releases are automatically tagged on merge to `main`.
 
-## WASM Artifact Size
+## Wasm Artifact Size
 
 Close to 50% size reduction is achieved by using `lto = true` in `Cargo.toml`.
 
