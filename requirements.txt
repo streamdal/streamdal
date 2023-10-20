@@ -2,11 +2,11 @@ betterproto==2.0.0b6
 black==23.7.0
 bleach==6.0.0
 certifi==2023.7.22
-cffi @ file:///private/tmp/cffi-20231014-5567-1hyue8f/cffi-1.16.0
+cffi==1.15.1
 charset-normalizer==3.2.0
 click==8.1.5
 coverage==7.2.7
-docutils @ file:///private/tmp/docutils-20231015-5454-w1xze4/docutils-0.20.1
+docutils==0.20.1
 grpcio==1.56.0
 grpclib==0.4.5
 h2==4.1.0
@@ -31,7 +31,7 @@ pkginfo==1.9.6
 platformdirs==3.8.1
 pluggy==1.2.0
 protobuf==4.23.4
-pycparser @ file:///private/tmp/pycparser-20231013-5787-1anpge2/pycparser-2.21
+pycparser==2.21
 Pygments==2.15.1
 pytest==7.4.0
 pytest-cov==4.1.0
