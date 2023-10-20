@@ -1066,19 +1066,6 @@ class StreamdalClient:
 
         req = cmd.tail.request
 
-        pipelines = self._get_pipelines(req.audience)
-        if len(pipelines) == 0:
-            self.log.debug(
-                f"received tail command for non-existent pipeline: {req.pipeline_id}"
-            )
-            return
-
-        if req.pipeline_id not in pipelines.keys():
-            self.log.debug(
-                f"received tail command for non-existent pipeline: {req.pipeline_id}"
-            )
-            return
-
         aud_str = self._aud_to_str(req.audience)
 
         self.log.debug(f"Tailing audience: {aud_str}")
@@ -1147,7 +1134,10 @@ class StreamdalClient:
         if tail_id not in self.tails[key]:
             return
 
-        del self.tails[key][tail_id]
+        self.tails[key].pop(tail_id)
+
+        if len(self.tails[key]) == 0:
+            self.tails.pop(key)
 
     def _get_schema(self, aud: protos.Audience) -> bytes:
         schema = self.schemas.get(self._aud_to_str(aud))

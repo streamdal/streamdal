@@ -80,7 +80,7 @@ class Tail:
                     )
 
                     self.log.warning(
-                        f"Dropping tail response for {self.request.pipeline_id}, too fast"
+                        f"Dropping tail response for {self.request.id}, too fast"
                     )
 
                 await stub.send_tail(

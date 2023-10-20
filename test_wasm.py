@@ -2,6 +2,7 @@ import streamdal_protos.protos as protos
 import uuid
 from streamdal import StreamdalClient
 from wasmtime import Store, Memory, MemoryType, Limits
+from pytest_mock import mocker
 
 
 class TestStreamdalWasm:
@@ -65,6 +66,20 @@ class TestStreamdalWasm:
 
         assert res2 is not None
         assert res2.exit_code == 2
+
+    def test_call_wasm_failure(self, mocker):
+        mocker.patch(
+            "streamdal.StreamdalClient._exec_wasm",
+            side_effect=Exception("something happened"),
+        )
+        client = object.__new__(StreamdalClient)
+
+        step = protos.PipelineStep()
+
+        res = client._call_wasm(step=step, data=b"")
+
+        assert res is not None
+        assert res.exit_code == 3
 
     def test_http_request(self):
         """Test we can execute a wasm file"""
