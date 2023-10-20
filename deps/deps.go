@@ -2,7 +2,9 @@ package deps
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/InVisionApp/go-health/v2"
@@ -181,8 +183,9 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.CmdService = c
 
 	metricsService, err := metrics.New(&metrics.Config{
-		RedisBackend: d.RedisBackend,
-		ShutdownCtx:  d.ShutdownContext,
+		RedisBackend:  d.RedisBackend,
+		ShutdownCtx:   d.ShutdownContext,
+		PrometheusURL: parseHTTPListenAddress(cfg.HTTPAPIListenAddress),
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new metrics service")
@@ -252,4 +255,17 @@ func (c *customCheck) Status() (interface{}, error) {
 	// You can return additional information pertaining to the check as long
 	// as it can be JSON marshalled
 	return map[string]int{}, nil
+}
+
+func parseHTTPListenAddress(addr string) string {
+	parts := strings.Split(addr, ":")
+	if len(parts) != 2 {
+		return "http://localhost:8080"
+	}
+
+	if parts[0] == "" {
+		parts[0] = "localhost"
+	}
+
+	return fmt.Sprintf("http://%s:%s", parts[0], parts[1])
 }
