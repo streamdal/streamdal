@@ -78,7 +78,7 @@ func CtxRequestId(ctx context.Context) string {
 }
 
 func ParseConfigKey(key string) (*protos.Audience, string) {
-	key = strings.TrimPrefix(key, "config:")
+	key = strings.TrimPrefix(key, "streamdal_config:")
 	parts := strings.Split(key, ":")
 	if len(parts) < 5 {
 		return nil, ""
