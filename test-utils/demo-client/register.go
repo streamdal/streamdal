@@ -109,7 +109,7 @@ func (r *Register) runFileReader(workerID int, readCh chan []byte) error {
 
 		for scanner.Scan() {
 			readCh <- scanner.Bytes()
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * time.Duration(100+rand.Intn(500)))
 		}
 
 		llog.Debug("reached end of file; restarting")

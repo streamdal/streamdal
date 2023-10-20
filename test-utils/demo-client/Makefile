@@ -16,12 +16,12 @@ help:
 run: description = Run with defaults
 run:
 	go run *.go register -d \
-	--quiet \
-	--num-instances 4 \
-	--reconnect-interval 10 \
-	--reconnect-random \
+	--num-instances 1 \
 	--service-name "service" \
 	--component-name "kafka" \
 	--operation-name  "demo-operation" \
 	--consumer-input-type file \
 	--consumer-input-file ./test-data/sample.json
+	# this client also supports --quiet (for quiet output), various "reconnect"
+	# conditions and support for launching multiple clients. `--help` for more
+	# info.
