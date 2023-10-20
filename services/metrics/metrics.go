@@ -97,8 +97,9 @@ type Metrics struct {
 }
 
 type Config struct {
-	RedisBackend *redis.Client
-	ShutdownCtx  context.Context
+	RedisBackend  *redis.Client
+	ShutdownCtx   context.Context
+	PrometheusURL string
 }
 
 func New(cfg *Config) (*Metrics, error) {
@@ -180,6 +181,10 @@ func validateConfig(cfg *Config) error {
 
 	if cfg.ShutdownCtx == nil {
 		return errors.New("shutdown context is required")
+	}
+
+	if cfg.PrometheusURL == "" {
+		cfg.PrometheusURL = "http://localhost:8080"
 	}
 
 	return nil
@@ -272,7 +277,7 @@ func (m *Metrics) FetchCounters(ctx context.Context) ([]*protos.Metric, error) {
 	client := http.DefaultClient
 
 	// TODO: this needs to support HttpListenAddress from config instead of being hardcoded
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:8080/metrics", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, m.PrometheusURL+"/metrics", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create request")
 	}
