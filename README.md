@@ -1,5 +1,8 @@
 <a href="https://crates.io/crates/streamdal-wasm-transform/"><img src="https://img.shields.io/crates/v/streamdal-wasm-transform.svg"></a>
 <a href="https://docs.rs/streamdal-wasm-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
+[![Release](https://github.com/streamdal/wasm-transform/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-transform/actions/workflows/release.yaml)
+[![Test](https://github.com/streamdal/wasm-transform/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-transform/actions/workflows/pr.yaml)
+
 
 streamdal-transform
 ==================
