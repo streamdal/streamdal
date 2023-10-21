@@ -1,4 +1,4 @@
-use streamdal_transform::transform::Request;
+use streamdal_wasm_transform::transform;
 
 fn main() {
     println!("Overwrite example");
@@ -17,13 +17,13 @@ fn main() {
 fn overwrite() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let req = Request {
+    let req = transform::Request {
         data: sample_json.into(),
         path: "hello".to_string(),
         value: r#""baz""#.to_string(),
     };
 
-    let updated_json = streamdal_transform::transform::overwrite(&req).unwrap();
+    let updated_json = transform::overwrite(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -34,13 +34,13 @@ fn overwrite() {
 fn mask_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let req = Request {
+    let req = transform::Request {
         data: sample_json.into(),
         path: "hello".to_string(),
         value: "".to_string(),
     };
 
-    let updated_json = streamdal_transform::transform::mask(&req).unwrap();
+    let updated_json = transform::mask(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -51,13 +51,13 @@ fn mask_string() {
 fn mask_number() {
     let sample_json = r#"{"hello": 329328102938}"#;
 
-    let req = Request {
+    let req = transform::Request {
         path: "hello".to_string(),
         data: sample_json.into(),
         value: "".to_string(), // default
     };
 
-    let updated_json = streamdal_transform::transform::mask(&req).unwrap();
+    let updated_json = transform::mask(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
@@ -68,13 +68,13 @@ fn mask_number() {
 fn obfuscate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let req = Request {
+    let req = transform::Request {
         path: "hello".to_string(),
         data: sample_json.into(),
         value: "".to_string(), // default
     };
 
-    let updated_json = streamdal_transform::transform::obfuscate(&req).unwrap();
+    let updated_json = transform::obfuscate(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",

@@ -1,4 +1,4 @@
-use snitch_gjson as gjson;
+use streamdal_gjson as gjson;
 
 #[derive(Debug)]
 pub enum TransformError {
