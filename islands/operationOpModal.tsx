@@ -121,7 +121,7 @@ export const OperationOpModalInfo = (
           <div class="text-cobweb font-medium text-xs my-3">
             {clients
               ? "View your pipeline data in realtime"
-              : "You must attach a client first"}
+              : "No attached client(s)"}
           </div>
           {clients && (
             <div class="flex flex-col">
