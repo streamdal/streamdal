@@ -2,3 +2,4 @@
 .idea
 c.out
 backend-data
+assets/grafana-data/grafana.db
