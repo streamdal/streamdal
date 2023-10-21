@@ -12,5 +12,5 @@ repository = "https://github.com/streamdal/wasm-transform"
 
 [dependencies]
 streamdal-gjson = "0.8.1-with-set-rename"
-sha256 = "1.1.4"
-streamdal-protos = "0.0.115"
+sha256 = "= 1.1.4"
+streamdal-protos = "= 0.0.115"
