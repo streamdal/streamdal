@@ -1,7 +1,7 @@
 use protobuf::EnumOrUnknown;
 use protos::sp_steps_detective::DetectiveType;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
-use snitch_detective::detective::{Detective, Request};
+use streamdal_wasm_detective::detective::{Detective, Request};
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
