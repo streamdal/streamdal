@@ -1,12 +1,12 @@
 [package]
-name = "streamdal-detective"
+name = "streamdal-wasm-detective"
 version = "0.0.28"
 edition = "2021"
 license = "MIT"
 description = "Data matcher library used by Streamdal WASM functions"
 categories = ["parser-implementations", "wasm"]
 keywords = ["protobuf", "json", "match", "wasm"]
-repository = "https://github.com/streamdal/streamdal-detective"
+repository = "https://github.com/streamdal/wasm-detective"
 
 [dependencies]
 ajson = "0.3.1"
