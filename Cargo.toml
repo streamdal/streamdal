@@ -1,5 +1,5 @@
 [package]
-name = "streamdal-transform"
+name = "streamdal-wasm-transform"
 version = "0.0.7"
 edition = "2021"
 license = "MIT"
@@ -11,6 +11,6 @@ repository = "https://github.com/streamdal/wasm-transform"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-snitch-gjson = "0.8.1-with-set"
+streamdal-gjson = "0.8.1-with-set-rename"
 sha256 = "1.1.4"
 streamdal-protos = "0.0.115"

@@ -1,6 +1,5 @@
-<a href="https://crates.io/crates/streamdal-transform/"><img src="https://img.shields.io/crates/v/streamdal-transform.svg"></a>
-<a href="https://docs.rs/streamdal-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
-
+<a href="https://crates.io/crates/streamdal-wasm-transform/"><img src="https://img.shields.io/crates/v/streamdal-wasm-transform.svg"></a>
+<a href="https://docs.rs/streamdal-wasm-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
 
 streamdal-transform
 ==================
@@ -16,13 +15,13 @@ Currently only has support for `overwrite`, `mask` and `obfuscate`.
 fn main() {
     let sample_json = r#"{"hello": "world"}"#;
 
-    let req = Request {
+    let req = streamdal_wasm_transform::transform::Request {
         data: sample_json.into(),
         path: "hello".to_string(),
         value: r#""baz""#.to_string(),
     };
 
-    let updated_json = streamdal_transform::transform::overwrite(&req).unwrap();
+    let updated_json = streamdal_wasm_transform::transform::overwrite(&req).unwrap();
 
     println!(
         "Input JSON: {} || Result JSON: {}",
