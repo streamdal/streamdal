@@ -2,7 +2,7 @@ use protobuf::{EnumOrUnknown, Message};
 use protos::sp_shared::KVAction;
 use protos::sp_steps_kv::{KVMode, KVStatus, KVStepResponse};
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
-use snitch_detective::detective;
+use streamdal_wasm_detective::detective;
 
 extern "C" {
     fn kvExists(ptr: *mut u8, length: usize) -> *mut u8;

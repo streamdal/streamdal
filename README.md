@@ -1,6 +1,10 @@
-# Wasm
+Wasm
+====
+[![Release](https://github.com/streamdal/wasm/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm/actions/workflows/release.yaml)
+[![Test](https://github.com/streamdal/wasm/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm/actions/workflows/pr.yaml)
 
-This repository contains all of the Wasm funcs used by `snitch` components.
+This repository contains all of the Wasm funcs used by various 
+[Streamdal](https://github.com/streamdal/streamdal) components.
 
 To build: `make build`
 
@@ -22,7 +26,7 @@ We get another 15-20% reduction by using `wasm-opt` (with `Os` flag).
 Result is as follows:
 
 ```bash
-~/Code/streamdal/snitch-wasm/build main* ⇡                                                                          2h41m ✖ ⚑ ◒
+~/Code/streamdal/wasm/build main* ⇡                                                                          2h41m ✖ ⚑ ◒
 ❯ du -sh *
 1.9M	detective.lto+wasm-opt.wasm
 2.4M	detective.lto-only.wasm

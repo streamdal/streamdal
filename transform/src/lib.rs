@@ -1,6 +1,6 @@
 use protos::sp_steps_transform::TransformType;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
-use snitch_transform::transform;
+use streamdal_wasm_transform::transform;
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
@@ -15,10 +15,10 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
         panic!("invalid step: {}", err) // TODO: Should write response here
     }
 
-    // Generate snitch-transform request
+    // Generate transform request
     let transform_request = generate_transform_request(&wasm_request);
 
-    // Run request against snitch-transform
+    // Run request against transform
     let result = match wasm_request.step.transform().type_.unwrap() {
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE => transform::overwrite(&transform_request),
         TransformType::TRANSFORM_TYPE_MASK_VALUE => transform::mask(&transform_request),
