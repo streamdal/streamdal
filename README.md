@@ -1,10 +1,13 @@
-# streamdal-server
+streamdal-server
+================
+[![Build master](https://github.com/streamdal/server/actions/workflows/master-build.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/master-build.yml)
+[![Pull Request](https://github.com/streamdal/server/actions/workflows/pr-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/pr-test.yml)
 
 The server component in the Streamdal ecosystem.
 
 The server exposes 3 APIs:
 
-1. gRPC API on port `9090` (used by SDKs)
+1. gRPC API on port `9090`
    1. Used by SDKs
 2. gRPC-Web API on port `9091`
    1. Used by the UI component
