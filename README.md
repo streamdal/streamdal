@@ -1,12 +1,14 @@
 wasm-detective
 ================
+<a href="https://crates.io/crates/streamdal-wasm-detective/"><img src="https://img.shields.io/crates/v/streamdal-wasm-detective.svg"></a>
+<a href="https://docs.rs/streamdal-wasm-detective/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
 [![Release](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml)
 [![Test](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml)
 
 Rust helper lib for performing value matching in `streamdal/wasm` Wasm functions.
 
 For available matchers, look at the enums listed in
-[protos](https://github.com/streamdal/protos/blob/main/protos/steps/detective.proto).
+[streamdal/protos](https://github.com/streamdal/protos/blob/main/protos/steps/detective.proto).
 
 # Install
 ```
