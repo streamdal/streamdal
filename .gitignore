@@ -3,3 +3,4 @@
 streamdal-cli.log
 build/*
 .DS_Store
+c.out
