@@ -1,5 +1,7 @@
 CLI
 ===
+[![Pull Request](https://github.com/streamdal/cli/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/pr.yaml)
+[![Release](https://github.com/streamdal/cli/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/release.yaml)
 
 A CLI viewer app for the [Streamdal](https://streamdal.com) platform.
 
