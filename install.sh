@@ -8,7 +8,7 @@ if [[ $1 == "-f" ]]; then
   echo "Forcing install..."
 else
   if [ -f "/usr/local/bin/streamdal-cli" ]; then
-    echo "Streamdal CLI is already installed. To overwrite, pass -f flag or check https://docs.streamdal.com/cli/upgrade for manual upgrade instructions."
+    echo "Streamdal CLI is already installed. To overwrite, pass -f flag (via curl: | bash -s -- -f) or check https://docs.streamdal.com/cli/upgrade for manual upgrade instructions."
     exit 1
   fi
 fi
