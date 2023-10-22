@@ -3,46 +3,50 @@ CLI
 [![Pull Request](https://github.com/streamdal/cli/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/pr.yaml)
 [![Release](https://github.com/streamdal/cli/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/release.yaml)
 
-A CLI viewer app for the [Streamdal](https://streamdal.com) platform.
+CLI tool for [Streamdal](https://streamdal.com)!
 
-> It's like a `tail -f`, for your software!
+> It's like a `tail -f` for your data!
 
-This app looks best if you use it in a _modern_ terminal that has TrueColor 
+NOTE: This app looks best if you use it in a _modern_ terminal that has TrueColor
 support such as iTerm2, Alacrity, Konsole, PowerShell and many, many more.
 
 ## Demo
+**TODO: Add demo gif**
+
+_**OR**_
+
+You can try out the live demo at [demo.streamdal.com](https://demo.streamdal.com).
 
 ## Install
 Install via homebrew:
 ```
-brew install streamdal/cli && streamdal --version
+brew install streamdal/tap/cli
 ```
 
-OR
+_**OR**_
 
 Install manually:
 
-1. Download latest release [here](https://github.com/streamdal/cli/release)
-2. `chmod +x streamdal-*`
-3. `mv streamdal ./streamdal --version`
+1. Download latest release [here](https://github.com/streamdal/cli/releases)
+2. `chmod +x streamdal-darwin-arm64`
+3. `mv streamdal-darwin-arm64 /usr/local/bin/streamdal-cli`
+4. Verify that it works: `streamdal-cli --version`
 
-OR
+_**OR**_
 
 For the brave, install via curl/bash:
 
 `curl -s https://raw.githubusercontent.com/streamdal/cli/main/install.sh | bash`
 
-<sub>This will download the latest release of the CLI and place it in `/usr/local/bin/streamdal`.</sub>
+<sub>This will download the latest release of the CLI and place it in `/usr/local/bin/streamdal-cli`.</sub>
 
 ## Usage
 
-Launch the CLI utility by running:
+Launch the CLI tool by running:
 
 ```
-$ streamdal --server streamdal-server-address --auth 1234
+$ streamdal-cli --server streamdal-server-address --auth 1234
 ```
-
-You should see something like this:
 
 ## Environment Variables
 
@@ -62,6 +66,17 @@ You can expose several environment variables to the CLI to save on typing:
 You can expose these variables by using `export` and adding them to your `.rc`
 file. Alternatively, you can set them in a `.env` file in whichever directory 
 you launch the CLI from.
+
+## Release
+The process of releasing is semi-automated. You will have to push a new version
+tag which will kick off a release Github action and publish a new release on
+the [releases](https://github.com/streamdal/cli/releases) page.
+
+You will also need to perform a manual update to the 
+[homebrew formula](https://github.com/streamdal/homebrew-tap).
+For that, edit `cli.rb`, update `url` and `sha256` for each release and get the
+change merged. Verify that new version is available by running 
+`brew upgrade streamdal/tap/cli`.
 
 ## Community
 
