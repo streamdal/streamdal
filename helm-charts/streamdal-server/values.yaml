@@ -92,6 +92,22 @@ env:
   - name: STREAMDAL_SERVER_AUTH_TOKEN
     value: "1234"
 
+consoleService:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+  name: http
+  loadBalancer:
+    enabled: false
+    port: 443
+    targetPort: 3000
+    name: https
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: your-cert-arn
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+
 
 consoleIngress:
   enabled: false
