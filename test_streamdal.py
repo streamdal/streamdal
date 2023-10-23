@@ -1,4 +1,5 @@
 import asyncio
+import streamdal.common as common
 import threading
 import pytest
 import streamdal_protos.protos as protos
@@ -6,7 +7,6 @@ import uuid
 import unittest.mock as mock
 import streamdal
 from streamdal import StreamdalClient, StreamdalConfig
-from pytest_mock import mocker
 
 
 class TestStreamdalClient:
@@ -85,20 +85,6 @@ class TestStreamdalClient:
     #     hb.join()
     #     fake_stub.heartbeat.assert_called_once()
 
-    def test_op_to_string(self):
-        assert (
-            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_PRODUCER)
-            == "producer"
-        )
-        assert (
-            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_CONSUMER)
-            == "consumer"
-        )
-        assert (
-            StreamdalClient.op_to_string(protos.OperationType.OPERATION_TYPE_UNSET)
-            == "consumer"
-        )
-
     def test_process_success(self):
         wasm_resp = protos.WasmResponse(
             output_payload=b'{"object": {"type": "streamdal"}}',
@@ -142,7 +128,7 @@ class TestStreamdalClient:
         resp = self.client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -201,7 +187,7 @@ class TestStreamdalClient:
         resp = client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -257,7 +243,7 @@ class TestStreamdalClient:
         resp = client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -267,30 +253,6 @@ class TestStreamdalClient:
         assert resp.error is False
         assert resp.message == ""
         assert resp.data == b'{"object": {"type": "streamdal"}}'
-
-    def test_aud_to_str(self):
-        aud = protos.Audience(
-            component_name="kafka",
-            service_name="testing",
-            operation_name="test-topic",
-            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
-        )
-
-        assert self.client._aud_to_str(aud) == "testing.kafka.2.test-topic"
-
-    def test_str_to_aud(self):
-        aud = protos.Audience(
-            component_name="kafka",
-            service_name="testing",
-            operation_name="test-topic",
-            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
-        )
-
-        parsed = self.client._str_to_aud("testing.kafka.2.test-topic")
-        assert parsed.component_name == aud.component_name
-        assert parsed.service_name == aud.service_name
-        assert parsed.operation_name == aud.operation_name
-        assert parsed.operation_type == aud.operation_type
 
     def test_tail_request_start(self, mocker):
         m = mock.Mock()
@@ -423,7 +385,7 @@ class TestStreamdalClient:
             operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
         )
 
-        aud_str = self.client._aud_to_str(aud)
+        aud_str = common.aud_to_str(aud)
 
         self.client.tails = {aud_str: {tail_id: mock.Mock()}}
         self.client._remove_tail(aud, tail_id)

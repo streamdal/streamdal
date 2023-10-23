@@ -17,6 +17,7 @@ setup(
     license="MIT",
     packages=[
         "streamdal",
+        "streamdal.common",
         "streamdal.metrics",
         "streamdal.validation",
         "streamdal.tail",

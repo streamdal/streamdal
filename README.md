@@ -1,4 +1,4 @@
-# python-sdk
+# Streamdal Python SDK
 
 
 [![Master build status](https://github.com/streamdal/python-sdk/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/python-sdk/actions/workflows/main.yml)
@@ -25,7 +25,7 @@ python -m pip install streamdal
 
 ```python
 import pprint
-from streamdal import (MODE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
 
 
 def main():
@@ -40,7 +40,7 @@ def main():
 
     res = client.process(
         ProcessRequest(
-            operation_type=MODE_CONSUMER,
+            operation_type=OPERATION_TYPE_CONSUMER,
             operation_name="new-order-topic",
             component_name="kafka",
             data=b'{"object": {"field": true}}',
@@ -54,26 +54,21 @@ if __name__ == "__main__":
     main()
 ```
 
+### Metrics
+
+Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/metrics
+
+| Metric                                       | Description                                      | Labels                                                                        |
+|----------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------|
+| `streamdal_counter_consume_bytes`     | Number of bytes consumed by the client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_consume_errors`    | Number of errors encountered while consuming payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_consume_processed` | Number of payloads processed by the client | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_bytes`     | Number of bytes produced by the client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_errors`    | Number of errors encountered while producing payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_processed` | Number of payloads processed by the client | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_notify`            | Number of notifications sent to the server | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+
+
 ### License
 
-MIT License
-
-Copyright (c) 2023 Batch.sh Inc. D.B.A. Streamdal.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details

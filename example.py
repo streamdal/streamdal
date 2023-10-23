@@ -9,7 +9,7 @@ from streamdal import (
     StreamdalClient,
     StreamdalConfig,
     ProcessRequest,
-    MODE_CONSUMER,
+    OPERATION_TYPE_CONSUMER,
 )
 
 
@@ -25,14 +25,14 @@ def main():
                 Audience(
                     operation_name="demo-operation",
                     component_name="kafka",
-                    operation_type=MODE_CONSUMER,
+                    operation_type=OPERATION_TYPE_CONSUMER,
                 )
             ],
         )
     )
 
     # req = ProcessRequest(
-    #     operation_type=MODE_CONSUMER,
+    #     operation_type=OPERATION_TYPE_CONSUMER,
     #     operation_name="opname",
     #     component_name="comname",
     #     data=b'{"object": {"field": true}}',
@@ -45,7 +45,7 @@ def main():
     while not client.cfg.exit.is_set():
         time.sleep(5)
         req = ProcessRequest(
-            operation_type=MODE_CONSUMER,
+            operation_type=OPERATION_TYPE_CONSUMER,
             operation_name="demo-operation",
             component_name="kafka",
             data=b'{"object": {"field": true}}',
