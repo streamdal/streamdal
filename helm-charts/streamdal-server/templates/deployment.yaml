@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "snitch.fullname" . }}
+  name: {{ include "streamdal.fullname" . }}
   labels:
-    {{- include "snitch.labels" . | nindent 4 }}
+    {{- include "streamdal.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "snitch.selectorLabels" . | nindent 6 }}
+      {{- include "streamdal.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "snitch.selectorLabels" . | nindent 8 }}
+        {{- include "streamdal.selectorLabels" . | nindent 8 }}
     spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       volumes:
         - name: envoy-config
           configMap:
-            name: {{ include "snitch.fullname" . }}-envoy
+            name: {{ include "streamdal.fullname" . }}-envoy
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -32,26 +32,30 @@ spec:
               containerPort: 9090
               protocol: TCP
           env: 
-            - name: SNITCH_SERVER_REDIS_URL
+            - name: STREAMDAL_SERVER_REDIS_URL
               value: "{{ .Release.Name }}-redis-master:6379"
-            - name: SNITCH_SERVER_NODE_ID
+            - name: STREAMDAL_SERVER_NODE_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: SNITCH_SERVER_AES_KEY
+            - name: STREAMDAL_SERVER_AES_KEY
               valueFrom:
                 secretKeyRef:
-                  name: snitch-server-aes-key
-                  key: SNITCH_SERVER_AES_KEY
+                  name: streamdal-server-aes-key
+                  key: STREAMDAL_SERVER_AES_KEY
             {{- toYaml .Values.env | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         - name: envoy
-          image: envoyproxy/envoy:v1.19.0
+          image: envoyproxy/envoy:v1.22.0
           volumeMounts:
             - name: envoy-config
               mountPath: /etc/envoy
-          command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+          command: ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml"]
+          ports:
+            - name: envoy
+              containerPort: 9091
+              protocol: TCP
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

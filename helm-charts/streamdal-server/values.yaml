@@ -1,15 +1,15 @@
-# Default values for snitch.
+# Default values for streamdal.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 3
 
 image:
-  repository: streamdal/snitch-server
+  repository: streamdal/server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
-nameOverride: "snitch-server"
+  tag: "e074107"
+nameOverride: "server"
 fullnameOverride: ""
 
 serviceAccount:
@@ -89,10 +89,9 @@ tolerations: []
 affinity: {}
 
 env:
-  - name: SNITCH_SERVER_AUTH_TOKEN
+  - name: STREAMDAL_SERVER_AUTH_TOKEN
     value: "1234"
-  - name: SNITCH_SERVER_NODE_NAME
-    value: "node1"
+
 
 consoleIngress:
   enabled: false
