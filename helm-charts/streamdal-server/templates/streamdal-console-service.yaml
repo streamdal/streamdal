@@ -10,6 +10,11 @@ metadata:
   {{- end }}
 spec:
   type: {{ if .Values.consoleService.loadBalancer.enabled }}LoadBalancer{{ else }}ClusterIP{{ end }}
+  {{- if .Values.consoleService.loadBalancer.enabled }}
+  selector:
+    app.kubernetes.io/name: {{ include "streamdal.name" . }}-console
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- end }}
   ports:
   {{- if .Values.consoleService.loadBalancer.enabled }}
   - name: {{ .Values.consoleService.loadBalancer.name }}
