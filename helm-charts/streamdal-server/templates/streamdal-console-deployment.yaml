@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "streamdal.fullname" . }}-console
+  labels:
+    {{- include "streamdal.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "streamdal.name" . }}-console
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "streamdal.name" . }}-console
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: streamdal-console
+          image: "streamdal/console:v0.1.26" # Fixed the image and tag definition
+          ports:
+            - containerPort: 3000
+          env:
+            - name: STREAMDAL_API_URL
+              value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:9091"
+            - name: STREAMDAL_GRPC_WEB_URL
+              value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:9091"
+          volumeMounts:
+          - mountPath: /root/.cache
+            name: esbuild-cache
+      volumes:
+      - name: esbuild-cache
+        emptyDir: {}
