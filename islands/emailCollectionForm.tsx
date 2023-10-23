@@ -42,7 +42,7 @@ export const EmailCollectionForm = () => {
           <h2
             className={"text-center mb-3 text-2xl font-display tracking-wide"}
           >
-            Enter your email to be notified about Streamdal updates
+            We'd love to send you updates!
           </h2>
           <FormInput
             name="email"

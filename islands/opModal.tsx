@@ -17,6 +17,7 @@ import { useSignalEffect } from "@preact/signals";
 import { initFlowbite } from "flowbite";
 import { OperationOpModalInfo } from "./operationOpModal.tsx";
 import { DeleteServiceModal } from "../components/modals/deleteServiceModal.tsx";
+import { ServiceLanguage } from "../components/icons/serviceLanguages.tsx";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -24,6 +25,10 @@ export default function OpModal(
   { serviceMap }: { serviceMap: ServiceMapType },
 ) {
   const displayType = opModal.value?.displayType;
+  const liveServiceInfo = serviceMap.live.find((service) =>
+    service.client?.ServiceName === opModal.value?.audience.serviceName
+  );
+  const serviceLanguage = liveServiceInfo?.client?.language;
   const itemName = () => {
     switch (displayType) {
       case "operation":
@@ -37,20 +42,32 @@ export default function OpModal(
 
   const iconDisplay = () => {
     if (displayType === "operation") {
-      return opType === "CONSUMER"
-        ? <ConsumerIcon className={"mx-2"} />
-        : <ProducerIcon className={"mx-2"} />;
+      return opType === "CONSUMER" ? <ConsumerIcon /> : <ProducerIcon />;
     }
     if (displayType === "component") {
+      return <ComponentImage componentName={displayName} className={"w-6"} />;
+    }
+    if (displayType === "service") {
       return (
-        <ComponentImage componentName={displayName} className={"w-6 mx-2"} />
+        <div
+          className={"rounded-full w-[40px] h-[40px] bg-purple-200 flex justify-center items-center p-1"}
+        >
+          <div className={"w-[25px]"}>
+            <ServiceLanguage language={serviceLanguage} />
+          </div>
+        </div>
       );
     }
     return (
-      <img
-        src={"/images/placeholder-icon.png"}
-        className={"w-7 mx-2"}
-      />
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 48 48"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="48" height="48" rx="24" fill="#E6DDFE" />
+      </svg>
     );
   };
 
@@ -153,7 +170,7 @@ export default function OpModal(
                         <div class="z-[20] flex items-center justify-start px-4 w-full h-16 bg-web">
                           {iconDisplay()}
                           <div class="flex flex-col">
-                            <h3 class="text-lg text-cloud">
+                            <h3 class="text-lg text-cloud mx-2">
                               {displayName}
                             </h3>
                           </div>

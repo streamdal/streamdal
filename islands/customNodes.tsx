@@ -3,7 +3,6 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import "twind";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { ServiceNodeMenu } from "../components/serviceMap/nodeMenu.tsx";
 import { ProducerIcon } from "../components/icons/producer.tsx";
 import { ConsumerIcon } from "../components/icons/consumer.tsx";
 import {
@@ -19,11 +18,16 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { NodeData, Operation } from "../lib/nodeMapper.ts";
 import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { ServiceLanguage } from "../components/icons/serviceLanguages.tsx";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
 
 export const ServiceNode = ({ data }: { data: NodeData }) => {
+  const liveServiceInfo = data.serviceMap.live.find((service) =>
+    service.client?.ServiceName === data.audience.serviceName
+  );
+  const serviceLanguage = liveServiceInfo?.client?.language;
   const highlighted = data?.audience === opModal.value?.audience &&
     opModal.value?.displayType === "service";
   const trashActive = opModal.value?.deleteService;
@@ -65,11 +69,12 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
           }}
         >
           <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
-          <img
-            src={"/images/placeholder-icon.png"}
-            className={"h-[40px]"}
-          />
-          <div class="flex flex-col ml-2">
+          <div
+            className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
+          >
+            <ServiceLanguage language={serviceLanguage} />
+          </div>
+          <div class="flex flex-col ml-3">
             <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>
         </div>
