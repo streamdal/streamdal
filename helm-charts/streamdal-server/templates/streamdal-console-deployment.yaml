@@ -26,6 +26,8 @@ spec:
               value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:9091"
             - name: STREAMDAL_GRPC_WEB_URL
               value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:9091"
+            - name: STREAMDAL_GRPC_AUTH_TOKEN
+              value: {{ .Values.env[0].value | quote }}
           volumeMounts:
           - mountPath: /root/.cache
             name: esbuild-cache

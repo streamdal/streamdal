@@ -103,11 +103,11 @@ consoleService:
     targetPort: 3000
     name: https
     annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
       service.beta.kubernetes.io/aws-load-balancer-ssl-cert: your-cert-arn
-      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
 
 consoleIngress:
   enabled: false
