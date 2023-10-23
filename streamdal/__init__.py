@@ -5,6 +5,7 @@ import logging
 import os
 import platform
 import signal
+import streamdal.hostfunc as hostfunc
 import streamdal_protos.protos as protos
 import socket
 import time
@@ -47,18 +48,6 @@ OPERATION_TYPE_PRODUCER = 2
 
 CLIENT_TYPE_SDK = 1
 CLIENT_TYPE_SHIM = 2
-
-
-class StreamdalException(Exception):
-    """Raised for any exception caused by python-sdk"""
-
-    pass
-
-
-class StreamdalRegisterException(StreamdalException):
-    """Raised when a service fails to register with streamdal server"""
-
-    pass
 
 
 @dataclass(frozen=True)
@@ -133,7 +122,7 @@ class StreamdalClient:
     schemas: dict
 
     # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
-    # channels for register and tail requests. All other unary operations can use the same
+    # channels for register` and tail requests. All other unary operations can use the same
     # grpc_channel and grpc_loop
     grpc_channel: Channel
     grpc_stub: protos.InternalStub
@@ -589,8 +578,7 @@ class StreamdalClient:
             os=platform.system(),
         )
 
-    def _register(self) -> None:
-        """Register the service with the Streamdal Server and receive a stream of commands to execute"""
+    def _gen_register_request(self) -> protos.RegisterRequest:
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
             service_name=self.cfg.service_name,
@@ -614,34 +602,24 @@ class StreamdalClient:
             # Note in local map that we've seen this audience
             self.audiences[common.aud_to_str(aud)] = aud
 
+        return req
+
+    def _register(self) -> None:
+        """Register the service with the Streamdal Server and receive a stream of commands to execute"""
+
         async def call():
             self.log.debug("Registering with streamdal server")
 
             async for cmd in self.register_stub.register(
-                req, timeout=None, metadata=self._get_metadata()
+                register_request=self._gen_register_request(),
+                timeout=None,
+                metadata=self._get_metadata(),
             ):
                 if self.exit.is_set():
                     return
 
-                (command, _) = which_one_of(cmd, "command")
-
                 try:
-                    if command == "attach_pipeline":
-                        self._attach_pipeline(cmd)
-                    elif command == "detach_pipeline":
-                        self._detach_pipeline(cmd)
-                    elif command == "pause_pipeline":
-                        self._pause_pipeline(cmd)
-                    elif command == "resume_pipeline":
-                        self._resume_pipeline(cmd)
-                    elif command == "keep_alive":
-                        pass
-                    elif command == "tail":
-                        self._tail_request(cmd)
-                    elif command == "kv":
-                        self._handle_kv(cmd)
-                    else:
-                        self.log.error(f"Unknown response type: {cmd}")
+                    self._handle_command(cmd)
                 except ValueError as e:
                     self.log.error(f"Received invalid command: {e}")
 
@@ -653,7 +631,7 @@ class StreamdalClient:
                 self.register_loop.run_until_complete(call())
             except Exception as e:
                 self.log.debug(
-                    f"Register looper lost connection, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
+                    f"Register looper lost connection: {e}, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
                 )
                 try:
                     time.sleep(DEFAULT_GRPC_RECONNECT_INTERVAL)
@@ -677,6 +655,26 @@ class StreamdalClient:
         self.register_loop.stop()
 
         self.log.debug("Exited register looper")
+
+    def _handle_command(self, cmd: protos.Command):
+        (command, _) = which_one_of(cmd, "command")
+
+        if command == "attach_pipeline":
+            self._attach_pipeline(cmd)
+        elif command == "detach_pipeline":
+            self._detach_pipeline(cmd)
+        elif command == "pause_pipeline":
+            self._pause_pipeline(cmd)
+        elif command == "resume_pipeline":
+            self._resume_pipeline(cmd)
+        elif command == "keep_alive":
+            pass
+        elif command == "tail":
+            self._tail_request(cmd)
+        elif command == "kv":
+            self._handle_kv(cmd)
+        else:
+            self.log.error(f"Unknown response type: {cmd}")
 
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
@@ -857,7 +855,7 @@ class StreamdalClient:
             "env",
             "httpRequest",
             FuncType([ValType.i32(), ValType.i32()], [ValType.i32()]),
-            self.http_request,
+            hostfunc.http_request,
             True,
         )
 
@@ -870,7 +868,9 @@ class StreamdalClient:
         try:
             instance, store = self._get_function(req.step)
         except Exception as e:
-            raise StreamdalException("Failed to instantiate function: {}".format(e))
+            raise common.StreamdalException(
+                "Failed to instantiate function: {}".format(e)
+            )
 
         req = copy(req)
         req.step.wasm_bytes = None  # Don't need to write this
@@ -894,102 +894,7 @@ class StreamdalClient:
         result_ptr = f(store, start_ptr, len(data))
 
         # Read from result pointer
-        return self._read_memory(memory, store, result_ptr)
-
-    @staticmethod
-    def _read_memory(memory: Memory, store, result_ptr: int, length: int = -1) -> bytes:
-        mem_len = memory.data_len(store)
-
-        # Ensure we aren't reading out of bounds
-        if result_ptr > mem_len or result_ptr + length > mem_len:
-            raise StreamdalException("WASM memory pointer out of bounds")
-
-        # TODO: can we avoid reading the entire buffer somehow?
-        result_data = memory.read(store, result_ptr, mem_len)
-
-        res = bytearray()  # Used to build our result
-        nulls = 0  # How many null pointers we've encountered
-        count = (
-            0  # How many bytes we've read, used to check against length, if provided
-        )
-
-        for v in result_data:
-            if length == count and length != -1:
-                break
-
-            if nulls == 3:
-                break
-
-            if v == 166:
-                nulls += 1
-                res.append(v)
-                continue
-
-            count += 1
-            res.append(v)
-            nulls = (
-                0  # Reset nulls since we read another byte and thus aren't at the end
-            )
-
-        if count == len(result_data) and nulls != 3:
-            raise StreamdalException(
-                "unable to read response from wasm - no terminators found in response data"
-            )
-
-        return bytes(res).rstrip(b"\xa6")
-
-    def http_request(self, caller: Caller, ptr: int, length: int) -> int:
-        memory: Memory = caller.get("memory")
-
-        data = self._read_memory(memory, caller, ptr, length)
-
-        req = protos.steps.HttpRequest().parse(data)
-
-        response = self._http_request_perform(req)
-
-        headers = {}
-        for k, v in response.headers.items():
-            headers[k] = v
-
-        res = protos.steps.HttpResponse(
-            code=response.status_code,
-            body=response.text.encode("utf-8"),
-            headers=headers,
-        )
-
-        resp = res.SerializeToString()
-
-        # Append terminator sequence
-        resp += b"\xa6\xa6\xa6"
-
-        # Allocate memory for response
-        alloc = caller.get("alloc")
-        resp_ptr = alloc(caller, len(resp) + 64)
-
-        # Write response to memory
-        memory.write(caller, resp, resp_ptr)
-
-        return resp_ptr
-
-    def _http_request_perform(self, req: protos.steps.HttpRequest) -> requests.Response:
-        if req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET:
-            response = requests.get(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST:
-            response = requests.post(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT:
-            response = requests.put(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
-            response = requests.delete(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PATCH:
-            response = requests.patch(req.url, json=req.body)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_HEAD:
-            response = requests.head(req.url)
-        elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
-            response = requests.options(req.url)
-        else:
-            raise ValueError("Invalid HTTP method provided")
-
-        return response
+        return common.read_memory(memory, store, result_ptr)
 
     # ------------------------------------------------------------------------------------
 

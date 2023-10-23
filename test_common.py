@@ -1,5 +1,6 @@
 import streamdal_protos.protos as protos
 import streamdal.common as common
+from wasmtime import Store, Memory, MemoryType, Limits
 
 
 class TestCommon:
@@ -26,3 +27,25 @@ class TestCommon:
         assert parsed.service_name == aud.service_name
         assert parsed.operation_name == aud.operation_name
         assert parsed.operation_type == aud.operation_type
+
+    def test_read_memory_within_bounds(self):
+        """Test reading within bounds of memory"""
+        store = Store()
+        memory = Memory(store, MemoryType(Limits(1, 1024)))
+        data = b"Hello, World!\xa6\xa6\xa6"
+        memory.write(store, data, 0)
+
+        result = common.read_memory(memory, store, 0, len(data))
+        assert result == b"Hello, World!"
+
+    def test_read_memory_with_interspersed_pointers(self):
+        """Test reading with null pointers"""
+        store = Store()
+        memory = Memory(store, MemoryType(Limits(1, 1)))
+        data = b"Hel\xa6lo,\xa6 W\xa6orld!\xa6\xa6\xa6"
+        memory.write(store, data, 0)
+
+        result = common.read_memory(memory, store, 0)
+        assert (
+            result == b"Hel\xa6lo,\xa6 W\xa6orld!"
+        )  # Should NOT stop at the third terminator character
