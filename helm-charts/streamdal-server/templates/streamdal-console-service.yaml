@@ -4,13 +4,17 @@ metadata:
   name: streamdal-console
   labels:
     {{- include "streamdal.labels" . | nindent 4 }}
+  {{- if and (eq .Values.consoleService.type "LoadBalancer") .Values.consoleService.loadBalancer.enabled }}
+  annotations:
+    {{- toYaml .Values.consoleService.loadBalancer.annotations | nindent 4 }}
+  {{- end }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.consoleService.type }}
   ports:
-    - port: 3000
-      targetPort: 3000
-      protocol: TCP
-      name: http
+    - name: {{ if and (eq .Values.consoleService.type "LoadBalancer") .Values.consoleService.loadBalancer.enabled }}{{ .Values.consoleService.loadBalancer.name }}{{ else }}{{ .Values.consoleService.name }}{{ end }}
+      port: {{ if and (eq .Values.consoleService.type "LoadBalancer") .Values.consoleService.loadBalancer.enabled }}{{ .Values.consoleService.loadBalancer.port }}{{ else }}{{ .Values.consoleService.port }}{{ end }}
+      targetPort: {{ if and (eq .Values.consoleService.type "LoadBalancer") .Values.consoleService.loadBalancer.enabled }}{{ .Values.consoleService.loadBalancer.targetPort }}{{ else }}{{ .Values.consoleService.targetPort }}{{ end }}
   selector:
     app.kubernetes.io/name: {{ include "streamdal.name" . }}-console
     app.kubernetes.io/instance: {{ .Release.Name }}
+
