@@ -578,8 +578,7 @@ class StreamdalClient:
             os=platform.system(),
         )
 
-    def _register(self) -> None:
-        """Register the service with the Streamdal Server and receive a stream of commands to execute"""
+    def _gen_register_request(self) -> protos.RegisterRequest:
         req = protos.RegisterRequest(
             dry_run=self.cfg.dry_run,
             service_name=self.cfg.service_name,
@@ -603,34 +602,24 @@ class StreamdalClient:
             # Note in local map that we've seen this audience
             self.audiences[common.aud_to_str(aud)] = aud
 
+        return req
+
+    def _register(self) -> None:
+        """Register the service with the Streamdal Server and receive a stream of commands to execute"""
+
         async def call():
             self.log.debug("Registering with streamdal server")
 
             async for cmd in self.register_stub.register(
-                req, timeout=None, metadata=self._get_metadata()
+                register_request=self._gen_register_request(),
+                timeout=None,
+                metadata=self._get_metadata(),
             ):
                 if self.exit.is_set():
                     return
 
-                (command, _) = which_one_of(cmd, "command")
-
                 try:
-                    if command == "attach_pipeline":
-                        self._attach_pipeline(cmd)
-                    elif command == "detach_pipeline":
-                        self._detach_pipeline(cmd)
-                    elif command == "pause_pipeline":
-                        self._pause_pipeline(cmd)
-                    elif command == "resume_pipeline":
-                        self._resume_pipeline(cmd)
-                    elif command == "keep_alive":
-                        pass
-                    elif command == "tail":
-                        self._tail_request(cmd)
-                    elif command == "kv":
-                        self._handle_kv(cmd)
-                    else:
-                        self.log.error(f"Unknown response type: {cmd}")
+                    self._handle_command(cmd)
                 except ValueError as e:
                     self.log.error(f"Received invalid command: {e}")
 
@@ -642,7 +631,7 @@ class StreamdalClient:
                 self.register_loop.run_until_complete(call())
             except Exception as e:
                 self.log.debug(
-                    f"Register looper lost connection, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
+                    f"Register looper lost connection: {e}, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
                 )
                 try:
                     time.sleep(DEFAULT_GRPC_RECONNECT_INTERVAL)
@@ -666,6 +655,26 @@ class StreamdalClient:
         self.register_loop.stop()
 
         self.log.debug("Exited register looper")
+
+    def _handle_command(self, cmd: protos.Command):
+        (command, _) = which_one_of(cmd, "command")
+
+        if command == "attach_pipeline":
+            self._attach_pipeline(cmd)
+        elif command == "detach_pipeline":
+            self._detach_pipeline(cmd)
+        elif command == "pause_pipeline":
+            self._pause_pipeline(cmd)
+        elif command == "resume_pipeline":
+            self._resume_pipeline(cmd)
+        elif command == "keep_alive":
+            pass
+        elif command == "tail":
+            self._tail_request(cmd)
+        elif command == "kv":
+            self._handle_kv(cmd)
+        else:
+            self.log.error(f"Unknown response type: {cmd}")
 
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:

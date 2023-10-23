@@ -110,10 +110,6 @@ class TestStreamdalWasm:
 
         res = client._call_wasm(step=step, data=b'{"object": {"payload": "test"}}')
 
-        # Write output schema to file.txt
-        with open("./assets/test/file.txt", "wb") as file:
-            file.write(res.output_step)
-
         assert res is not None
         assert res.exit_code == 1
         assert res.exit_msg == "inferred fresh schema"
