@@ -25,7 +25,7 @@ python -m pip install streamdal
 
 ```python
 import pprint
-from streamdal import (MODE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
 
 
 def main():
@@ -40,7 +40,7 @@ def main():
 
     res = client.process(
         ProcessRequest(
-            operation_type=MODE_CONSUMER,
+            operation_type=OPERATION_TYPE_CONSUMER,
             operation_name="new-order-topic",
             component_name="kafka",
             data=b'{"object": {"field": true}}',
@@ -53,3 +53,22 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+### Metrics
+
+Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/metrics
+
+| Metric                                       | Description                                      | Labels                                                                        |
+|----------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------|
+| `streamdal_counter_consume_bytes`     | Number of bytes consumed by the client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_consume_errors`    | Number of errors encountered while consuming payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_consume_processed` | Number of payloads processed by the client | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_bytes`     | Number of bytes produced by the client     | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_errors`    | Number of errors encountered while producing payloads | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_produce_processed` | Number of payloads processed by the client | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+| `streamdal_counter_notify`            | Number of notifications sent to the server | `service`, `component_name`, `operation_name`, `pipeline_id`, `pipeline_name` |
+
+
+### License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details

@@ -42,8 +42,8 @@ DEFAULT_GRPC_TIMEOUT = 5  # 5 seconds
 DEFAULT_HEARTBEAT_INTERVAL = 1  # 1 second
 MAX_PAYLOAD_SIZE = 1024 * 1024  # 1 megabyte
 
-MODE_CONSUMER = 1
-MODE_PRODUCER = 2
+OPERATION_TYPE_CONSUMER = 1
+OPERATION_TYPE_PRODUCER = 2
 
 CLIENT_TYPE_SDK = 1
 CLIENT_TYPE_SHIM = 2
@@ -312,7 +312,7 @@ class StreamdalClient:
         rate_bytes = metrics.COUNTER_CONSUME_BYTES_RATE
         rate_processed = metrics.COUNTER_CONSUME_PROCESSED_RATE
 
-        if req.operation_type == MODE_PRODUCER:
+        if req.operation_type == OPERATION_TYPE_PRODUCER:
             bytes_counter = metrics.COUNTER_PRODUCE_BYTES
             errors_counter = metrics.COUNTER_PRODUCE_ERRORS
             total_counter = metrics.COUNTER_PRODUCE_PROCESSED

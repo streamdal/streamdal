@@ -128,7 +128,7 @@ class TestStreamdalClient:
         resp = self.client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -187,7 +187,7 @@ class TestStreamdalClient:
         resp = client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
@@ -243,7 +243,7 @@ class TestStreamdalClient:
         resp = client.process(
             streamdal.ProcessRequest(
                 data=b'{"object": {"type": "streamdal"}}',
-                operation_type=streamdal.MODE_PRODUCER,
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
                 component_name="kafka",
                 operation_name="test-topic",
             )
