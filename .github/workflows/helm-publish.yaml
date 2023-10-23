@@ -1,12 +1,3 @@
-name: Publish Helm Chart
-
-on:
-  push:
-    paths:
-      - 'helm-charts/**'
-    branches:
-      - main
-
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -32,11 +23,11 @@ jobs:
 
     - name: Package Helm Chart
       run: |
-        helm package helm-charts/snitch-server -d helm-charts-packages
+        helm package helm-charts/streamdal-server -d helm-charts-packages
 
     - name: Update Helm repo index
       run: |
-        helm repo index helm-charts-packages --url https://streamdal.github.io/snitch/helm-charts-packages
+        helm repo index helm-charts-packages --url https://streamdal.github.io/streamdal/helm-charts-packages
         git add helm-charts-packages/index.yaml
         git add helm-charts-packages/*.tgz
 
