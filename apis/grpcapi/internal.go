@@ -327,37 +327,63 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
-func (s *InternalServer) GetAttachCommandsByService(
+// GetActiveCommands is used by SDKs to get all active commands at SDK init -
+// this enables the SDKs to "resume" whatever operations that were active when
+// they were last connected to the Streamdal server.
+func (s *InternalServer) GetActiveCommands(
 	ctx context.Context,
-	req *protos.GetAttachCommandsByServiceRequest,
-) (*protos.GetAttachCommandsByServiceResponse, error) {
-	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
+	req *protos.GetActiveCommandsRequest,
+) (*protos.GetActiveCommandsResponse, error) {
+	if req.ServiceName == "" {
+		return nil, errors.New("service name is required")
+	}
+
+	active, paused, err := s.getActiveAttachPipelineCommands(ctx, req.ServiceName)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get attach commands by service")
 	}
 
+	tailCommands, err := s.Options.StoreService.GetActiveTailCommandsByService(ctx, req.ServiceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get active tails")
+	}
+
+	return &protos.GetActiveCommandsResponse{
+		Active:      append(active, tailCommands...), // Include start tail commands in active commands
+		Paused:      paused,
+		WasmModules: util.GenerateWasmMapping(append(active, paused...)...), // Include active and paused; tail does not have steps
+	}, nil
+}
+
+func (s *InternalServer) getActiveAttachPipelineCommands(
+	ctx context.Context,
+	serviceName string,
+) ([]*protos.Command, []*protos.Command, error) {
+	if serviceName == "" {
+		return nil, nil, errors.New("service name is required")
+	}
+
+	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, serviceName)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "unable to get attach commands by service")
+	}
+
 	pausedMap, err := s.Options.StoreService.GetPaused(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get paused pipelines")
+		return nil, nil, errors.Wrap(err, "unable to get paused pipelines")
 	}
 
 	active := make([]*protos.Command, 0)
 	paused := make([]*protos.Command, 0)
-	wasmModules := make(map[string]*protos.WasmModule)
 
 	for _, a := range attaches {
-		// Inject WASM data into it's own map and zero out the bytes in the steps
-		// This is to prevent the WASM data from being duplicated in the response
-		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
-			if _, ok := wasmModules[step.GetXWasmId()]; !ok {
-				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
-					Id:       step.GetXWasmId(),
-					Bytes:    step.GetXWasmBytes(),
-					Function: step.GetXWasmFunction(),
-				}
-			}
+		if err := validate.AttachPipelineCommand(a.GetAttachPipeline()); err != nil {
+			s.log.Warningf("invalid attach pipeline command: %s", err.Error())
+			continue
+		}
 
-			// Always wipe bytes. SDK Client will handle lookup
+		// Always wipe bytes. SDK Client will handle lookup.
+		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
 			step.XWasmBytes = nil
 		}
 
@@ -379,10 +405,28 @@ func (s *InternalServer) GetAttachCommandsByService(
 		active = append(active, a)
 	}
 
+	return active, paused, nil
+}
+
+// GetAttachCommandsByService is used by SDKs to get active attach commands at
+// SDK initialization time. It is 'ByService' because that is the only thing
+// an SDK knows 100% about itself at initialization time -- audiences may not
+// be announced until a later .Process() call.
+//
+// DEPRECATED - use GetActiveCommands() instead
+func (s *InternalServer) GetAttachCommandsByService(
+	ctx context.Context,
+	req *protos.GetAttachCommandsByServiceRequest,
+) (*protos.GetAttachCommandsByServiceResponse, error) {
+	active, paused, err := s.getActiveAttachPipelineCommands(ctx, req.ServiceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get attach commands by service")
+	}
+
 	return &protos.GetAttachCommandsByServiceResponse{
 		Active:      active,
 		Paused:      paused,
-		WasmModules: wasmModules,
+		WasmModules: util.GenerateWasmMapping(append(active, paused...)...),
 	}, nil
 }
 

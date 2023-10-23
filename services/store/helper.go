@@ -36,6 +36,9 @@ const (
 
 	RedisSchemaPrefix = "streamdal_schema"
 	RedisSchemaFormat = "streamdal_schema:%s" // K: $audience V: serialized protos.Schema
+
+	RedisActiveTailPrefix    = "streamdal_tail"
+	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s" // K: $service_name:$frontend_session_id V: serialized protos.Command
 )
 
 func RedisRegisterKey(session, node string) string {

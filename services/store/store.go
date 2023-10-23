@@ -6,9 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/redis/go-redis/v9"
-
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/streamdal/server/services/encryption"
 	"github.com/streamdal/server/services/store/types"
 	"github.com/streamdal/server/util"
+	"github.com/streamdal/server/validate"
 )
 
 /*
@@ -88,6 +88,7 @@ type IStore interface {
 	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
+	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 
 	// GetAudiencesBySessionID returns all audiences for a given session id
 	// This is needed to inject an inferschema pipeline for each announced audience
@@ -1183,4 +1184,48 @@ func (s *Store) setStreamdalID(ctx context.Context) (string, error) {
 
 	// Streamdal cluster ID already set
 	return id, nil
+}
+
+func (s *Store) GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
+	tailCommands := make([]*protos.Command, 0)
+
+	activeTailKeys, err := s.options.RedisBackend.Keys(ctx, RedisActiveTailPrefix+":"+serviceName).Result()
+	// No keys in redis
+	if errors.Is(err, redis.Nil) {
+		return tailCommands, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "error fetching active tail keys from store")
+	}
+
+	// Each key is an active tail - fetch each + decode
+	for _, key := range activeTailKeys {
+		encodedCmd, err := s.options.RedisBackend.Get(ctx, key).Result()
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching key '%s' from store", key)
+		}
+
+		// Attempt to decode
+		cmd := &protos.Command{}
+
+		if err := proto.Unmarshal([]byte(encodedCmd), cmd); err != nil {
+			return nil, errors.Wrap(err, "error unmarshaling command")
+		}
+
+		if err := validate.TailCommand(cmd.GetTail()); err != nil {
+			return nil, errors.Wrap(err, "error validating tail command")
+		}
+
+		// We shouldn't normally hit this - if we do, it's a bug - it means that
+		// we are storing a tail command that is not actually a start command.
+		if cmd.GetTail().GetRequest().Type != protos.TailRequestType_TAIL_REQUEST_TYPE_START {
+			s.log.Warningf("bug? active tail command for key '%s' should contain a start request type but contains '%s'",
+				serviceName, cmd.GetTail().GetRequest().Type.String())
+
+			continue
+		}
+
+		tailCommands = append(tailCommands, cmd)
+	}
+
+	return tailCommands, nil
 }
