@@ -1,4 +1,5 @@
 import pytest
+import streamdal.common as common
 import streamdal_protos.protos as protos
 import uuid
 import unittest.mock as mock
@@ -27,7 +28,7 @@ class TestStreamdalRegisterMethods:
         )
 
         pipeline_id = str(uuid.uuid4())
-        aud_str = StreamdalClient._aud_to_str(aud)
+        aud_str = common.aud_to_str(aud)
         self.client.paused_pipelines[aud_str] = {}
         self.client.paused_pipelines[aud_str][pipeline_id] = protos.Command
 
@@ -53,7 +54,7 @@ class TestStreamdalRegisterMethods:
 
         self.client._attach_pipeline(cmd)
 
-        aud_str = StreamdalClient._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
         assert self.client.pipelines[aud_str] is not None
         assert self.client.pipelines[aud_str][pipeline_id] is not None
 
@@ -116,7 +117,7 @@ class TestStreamdalRegisterMethods:
         res = self.client._pause_pipeline(pause_cmd)
         assert res is True
 
-        aud_str = StreamdalClient._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 1
         assert len(self.client.pipelines) == 0
         assert self.client.paused_pipelines[aud_str] is not None
@@ -139,7 +140,7 @@ class TestStreamdalRegisterMethods:
         res = self.client._resume_pipeline(resume_cmd)
         assert res is True
 
-        aud_str = StreamdalClient._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
         assert len(self.client.paused_pipelines) == 0
         assert len(self.client.pipelines) == 1
         assert self.client.pipelines[aud_str] is not None

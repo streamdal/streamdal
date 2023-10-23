@@ -1,4 +1,5 @@
 import asyncio
+import streamdal.common
 import datetime
 import logging
 import os
@@ -231,7 +232,7 @@ class StreamdalClient:
                     else:
                         self.log.error(f"BUG: missing wasm module {step.wasm_id}")
 
-                aud_str = self._aud_to_str(cmd.audience)
+                aud_str = common.aud_to_str(cmd.audience)
 
                 if self.paused_pipelines.get(aud_str) is None:
                     self.paused_pipelines[aud_str] = {}
@@ -257,27 +258,9 @@ class StreamdalClient:
         elif cfg.streamdal_token == "":
             raise ValueError("streamdal_token is required")
 
-    @staticmethod
-    def _aud_to_str(aud: protos.Audience) -> str:
-        """Convert an Audience to a string"""
-        return "{}.{}.{}.{}".format(
-            aud.service_name, aud.component_name, aud.operation_type, aud.operation_name
-        )
-
-    @staticmethod
-    def _str_to_aud(aud: str) -> protos.Audience:
-        """Convert a string to an Audience"""
-        parts = aud.split(".")
-        return protos.Audience(
-            service_name=parts[0],
-            operation_type=protos.OperationType(int(parts[2])),
-            operation_name=parts[3],
-            component_name=parts[1],
-        )
-
     def seen_audience(self, aud: protos.Audience) -> bool:
         """Have we seen this audience before?"""
-        return self.audiences.get(self._aud_to_str(aud)) is not None
+        return self.audiences.get(common.aud_to_str(aud)) is not None
 
     def _add_audience(self, aud: protos.Audience) -> None:
         """Add an audience to the local map and send to server"""
@@ -291,7 +274,7 @@ class StreamdalClient:
             )
 
         # We haven't seen it yet, add to local map and send to server
-        self.audiences[self._aud_to_str(aud)] = aud
+        self.audiences[common.aud_to_str(aud)] = aud
         self.grpc_loop.create_task(call())
 
     def _add_audiences(self) -> None:
@@ -534,7 +517,7 @@ class StreamdalClient:
 
         :return: dict of pipelines in format dict[str:protos.Command]
         """
-        aud_str = self._aud_to_str(aud)
+        aud_str = common.aud_to_str(aud)
 
         pipelines = self.pipelines.get(aud_str)
         if pipelines is None:
@@ -640,7 +623,7 @@ class StreamdalClient:
             req.audiences.append(aud)
 
             # Note in local map that we've seen this audience
-            self.audiences[self._aud_to_str(aud)] = aud
+            self.audiences[common.aud_to_str(aud)] = aud
 
         async def call():
             self.log.debug("Registering with streamdal server")
@@ -709,7 +692,7 @@ class StreamdalClient:
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
         """Set pipeline in internal map of pipelines"""
-        aud_str = StreamdalClient._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
 
         # Create audience key if it doesn't exist
         if pipes_map.get(aud_str) is None:
@@ -722,7 +705,7 @@ class StreamdalClient:
         pipes_map: dict, cmd: protos.Command, pipeline_id: str
     ) -> protos.Command:
         """Grab pipeline in internal map of pipelines and remove it"""
-        aud_str = StreamdalClient._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
 
         if pipes_map.get(aud_str) is None:
             return None
@@ -746,7 +729,7 @@ class StreamdalClient:
             self.log.debug("Service name does not match, ignoring")
             return False
 
-        aud_str = self._aud_to_str(cmd.audience)
+        aud_str = common.aud_to_str(cmd.audience)
 
         self.log.debug(
             f"Deleting pipeline {cmd.detach_pipeline.pipeline_id} for audience {aud_str}"
@@ -834,7 +817,7 @@ class StreamdalClient:
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
         """Check if a pipeline is paused"""
-        aud_str = self._aud_to_str(aud)
+        aud_str = common.aud_to_str(aud)
 
         if self.paused_pipelines.get(aud_str) is None:
             return False
@@ -966,13 +949,6 @@ class StreamdalClient:
 
         return bytes(res).rstrip(b"\xa6")
 
-    @staticmethod
-    def op_to_string(op: protos.OperationType) -> str:
-        if op == protos.OperationType.OPERATION_TYPE_PRODUCER:
-            return "producer"
-
-        return "consumer"
-
     def http_request(self, caller: Caller, ptr: int, length: int) -> int:
         memory: Memory = caller.get("memory")
 
@@ -1065,7 +1041,7 @@ class StreamdalClient:
 
         req = cmd.tail.request
 
-        aud_str = self._aud_to_str(req.audience)
+        aud_str = common.aud_to_str(req.audience)
 
         self.log.debug(f"Tailing audience: {aud_str}")
 
@@ -1083,7 +1059,7 @@ class StreamdalClient:
         self._set_tail(t)
 
     def _set_tail(self, t: Tail):
-        key = self._aud_to_str(t.request.audience)
+        key = common.aud_to_str(t.request.audience)
 
         if key not in self.tails:
             self.tails[key] = {}
@@ -1119,14 +1095,14 @@ class StreamdalClient:
         self,
         aud: protos.Audience,
     ) -> dict:
-        key = self._aud_to_str(aud)
+        key = common.aud_to_str(aud)
         if key in self.tails:
             return self.tails[key]
 
         return {}
 
     def _remove_tail(self, aud: protos.Audience, tail_id: str):
-        key = self._aud_to_str(aud)
+        key = common.aud_to_str(aud)
         if key not in self.tails:
             return
 
@@ -1139,14 +1115,14 @@ class StreamdalClient:
             self.tails.pop(key)
 
     def _get_schema(self, aud: protos.Audience) -> bytes:
-        schema = self.schemas.get(self._aud_to_str(aud))
+        schema = self.schemas.get(common.aud_to_str(aud))
         if schema is None:
             return b""
 
         return schema.json_schema
 
     def _set_schema(self, aud: protos.Audience, schema: bytes) -> None:
-        self.schemas[self._aud_to_str(aud)] = protos.Schema(json_schema=schema)
+        self.schemas[common.aud_to_str(aud)] = protos.Schema(json_schema=schema)
 
     def _handle_schema(
         self, aud: protos.Audience, step: protos.PipelineStep, resp: protos.WasmResponse
@@ -1174,7 +1150,7 @@ class StreamdalClient:
             await self.grpc_stub.send_schema(
                 send_schema_request=req, metadata=self._get_metadata()
             )
-            self.log.debug(f"Published schema for audience '{self._aud_to_str(aud)}'")
+            self.log.debug(f"Published schema for audience '{common.aud_to_str(aud)}'")
 
         self._set_schema(aud, resp.output_step)
         self.grpc_loop.create_task(call())
