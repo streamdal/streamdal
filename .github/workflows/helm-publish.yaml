@@ -1,3 +1,12 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    paths:
+      - 'helm-charts/**'
+    branches:
+      - main
+
 jobs:
   release:
     runs-on: ubuntu-latest
