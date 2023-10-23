@@ -905,12 +905,35 @@ class DeregisterRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetActiveCommandsRequest(betterproto.Message):
+    service_name: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetActiveCommandsResponse(betterproto.Message):
+    active: List["Command"] = betterproto.message_field(1)
+    """Commands in active state"""
+
+    paused: List["Command"] = betterproto.message_field(2)
+    """Commands in paused state"""
+
+    wasm_modules: Dict[str, "WasmModule"] = betterproto.map_field(
+        3, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+    """ID = wasm ID"""
+
+
+@dataclass(eq=False, repr=False)
 class GetAttachCommandsByServiceRequest(betterproto.Message):
+    """DEPRECATED as of 10.23.2023 -- use GetActiveCommandsRequest instead"""
+
     service_name: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class GetAttachCommandsByServiceResponse(betterproto.Message):
+    """DEPRECATED as of 10.23.2023 -- use GetActiveCommandsResponse instead"""
+
     active: List["Command"] = betterproto.message_field(1)
     """AttachCommands for all active pipelines"""
 
@@ -1642,6 +1665,23 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def get_active_commands(
+        self,
+        get_active_commands_request: "GetActiveCommandsRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetActiveCommandsResponse":
+        return await self._unary_unary(
+            "/protos.Internal/GetActiveCommands",
+            get_active_commands_request,
+            GetActiveCommandsResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def get_attach_commands_by_service(
         self,
         get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
@@ -2270,6 +2310,11 @@ class InternalBase(ServiceBase):
     async def metrics(self, metrics_request: "MetricsRequest") -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_active_commands(
+        self, get_active_commands_request: "GetActiveCommandsRequest"
+    ) -> "GetActiveCommandsResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def get_attach_commands_by_service(
         self,
         get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
@@ -2322,6 +2367,14 @@ class InternalBase(ServiceBase):
     ) -> None:
         request = await stream.recv_message()
         response = await self.metrics(request)
+        await stream.send_message(response)
+
+    async def __rpc_get_active_commands(
+        self,
+        stream: "grpclib.server.Stream[GetActiveCommandsRequest, GetActiveCommandsResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_active_commands(request)
         await stream.send_message(response)
 
     async def __rpc_get_attach_commands_by_service(
@@ -2377,6 +2430,12 @@ class InternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 MetricsRequest,
                 StandardResponse,
+            ),
+            "/protos.Internal/GetActiveCommands": grpclib.const.Handler(
+                self.__rpc_get_active_commands,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetActiveCommandsRequest,
+                GetActiveCommandsResponse,
             ),
             "/protos.Internal/GetAttachCommandsByService": grpclib.const.Handler(
                 self.__rpc_get_attach_commands_by_service,

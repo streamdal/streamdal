@@ -32,8 +32,16 @@ service Internal {
   // Send periodic metrics to the server
   rpc Metrics(MetricsRequest) returns (StandardResponse);
 
+  // Used by SDKs to fetch all active commands for the service during SDK startup.
+  // This is needed in order to be able to "resume" where the SDK was at before
+  // shutdown or restart. For example - resuming tail requests or resuming
+  // attached pipelines.
+  rpc GetActiveCommands(GetActiveCommandsRequest) returns (GetActiveCommandsResponse);
+
   // Used to pull all pipeline configs for the service name in the SDK's constructor
-  // This is needed because Register() is async
+  // This is needed because Register() is async.
+  //
+  // DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
   rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
 
   rpc SendTail(stream TailResponse) returns (StandardResponse);
@@ -107,10 +115,28 @@ message DeregisterRequest {
   string session_id = 2;
 }
 
+message GetActiveCommandsRequest {
+  string service_name = 1;
+}
+
+message GetActiveCommandsResponse {
+  // Commands in active state
+  repeated protos.Command active = 1;
+
+  // Commands in paused state
+  repeated protos.Command paused = 2;
+
+  // ID = wasm ID
+  map<string,WasmModule> wasm_modules = 3;
+}
+
+// DEPRECATED as of 10.23.2023 -- use GetActiveCommandsRequest instead
 message GetAttachCommandsByServiceRequest {
   string service_name = 1;
 }
 
+
+// DEPRECATED as of 10.23.2023 -- use GetActiveCommandsResponse instead
 message GetAttachCommandsByServiceResponse {
   // AttachCommands for all active pipelines
   repeated protos.Command active = 1;

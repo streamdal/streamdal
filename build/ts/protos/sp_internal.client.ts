@@ -9,6 +9,8 @@ import type { TailResponse } from "./sp_common.js";
 import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal.js";
 import type { GetAttachCommandsByServiceRequest } from "./sp_internal.js";
+import type { GetActiveCommandsResponse } from "./sp_internal.js";
+import type { GetActiveCommandsRequest } from "./sp_internal.js";
 import type { MetricsRequest } from "./sp_internal.js";
 import type { NotifyRequest } from "./sp_internal.js";
 import type { HeartbeatRequest } from "./sp_internal.js";
@@ -63,8 +65,19 @@ export interface IInternalClient {
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
     /**
+     * Used by SDKs to fetch all active commands for the service during SDK startup.
+     * This is needed in order to be able to "resume" where the SDK was at before
+     * shutdown or restart. For example - resuming tail requests or resuming
+     * attached pipelines.
+     *
+     * @generated from protobuf rpc: GetActiveCommands(protos.GetActiveCommandsRequest) returns (protos.GetActiveCommandsResponse);
+     */
+    getActiveCommands(input: GetActiveCommandsRequest, options?: RpcOptions): UnaryCall<GetActiveCommandsRequest, GetActiveCommandsResponse>;
+    /**
      * Used to pull all pipeline configs for the service name in the SDK's constructor
-     * This is needed because Register() is async
+     * This is needed because Register() is async.
+     *
+     * DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
      *
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
@@ -143,20 +156,34 @@ export class InternalClient implements IInternalClient, ServiceInfo {
         return stackIntercept<MetricsRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Used by SDKs to fetch all active commands for the service during SDK startup.
+     * This is needed in order to be able to "resume" where the SDK was at before
+     * shutdown or restart. For example - resuming tail requests or resuming
+     * attached pipelines.
+     *
+     * @generated from protobuf rpc: GetActiveCommands(protos.GetActiveCommandsRequest) returns (protos.GetActiveCommandsResponse);
+     */
+    getActiveCommands(input: GetActiveCommandsRequest, options?: RpcOptions): UnaryCall<GetActiveCommandsRequest, GetActiveCommandsResponse> {
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetActiveCommandsRequest, GetActiveCommandsResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Used to pull all pipeline configs for the service name in the SDK's constructor
-     * This is needed because Register() is async
+     * This is needed because Register() is async.
+     *
+     * DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
      *
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
     getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse> {
-        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
     sendTail(options?: RpcOptions): ClientStreamingCall<TailResponse, StandardResponse> {
-        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
         return stackIntercept<TailResponse, StandardResponse>("clientStreaming", this._transport, method, opt);
     }
     /**
@@ -165,7 +192,7 @@ export class InternalClient implements IInternalClient, ServiceInfo {
      * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
      */
     sendSchema(input: SendSchemaRequest, options?: RpcOptions): UnaryCall<SendSchemaRequest, StandardResponse> {
-        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        const method = this.methods[8], opt = this._transport.mergeOptions(options);
         return stackIntercept<SendSchemaRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
 }

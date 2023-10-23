@@ -64,20 +64,34 @@ export class InternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
+     * Used by SDKs to fetch all active commands for the service during SDK startup.
+     * This is needed in order to be able to "resume" where the SDK was at before
+     * shutdown or restart. For example - resuming tail requests or resuming
+     * attached pipelines.
+     *
+     * @generated from protobuf rpc: GetActiveCommands(protos.GetActiveCommandsRequest) returns (protos.GetActiveCommandsResponse);
+     */
+    getActiveCommands(input, options) {
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        return stackIntercept("unary", this._transport, method, opt, input);
+    }
+    /**
      * Used to pull all pipeline configs for the service name in the SDK's constructor
-     * This is needed because Register() is async
+     * This is needed because Register() is async.
+     *
+     * DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
      *
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
     getAttachCommandsByService(input, options) {
-        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
     sendTail(options) {
-        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
         return stackIntercept("clientStreaming", this._transport, method, opt);
     }
     /**
@@ -86,7 +100,7 @@ export class InternalClient {
      * @generated from protobuf rpc: SendSchema(protos.SendSchemaRequest) returns (protos.StandardResponse);
      */
     sendSchema(input, options) {
-        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        const method = this.methods[8], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
 }
