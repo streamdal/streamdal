@@ -247,17 +247,6 @@ class StreamdalClient:
 
         self.grpc_loop.run_until_complete(call())
 
-    @staticmethod
-    def _validate_config(cfg: StreamdalConfig) -> None:
-        if cfg is None:
-            raise ValueError("cfg is required")
-        elif cfg.service_name == "":
-            raise ValueError("service_name is required")
-        elif cfg.streamdal_url == "":
-            raise ValueError("streamdal_url is required")
-        elif cfg.streamdal_token == "":
-            raise ValueError("streamdal_token is required")
-
     def seen_audience(self, aud: protos.Audience) -> bool:
         """Have we seen this audience before?"""
         return self.audiences.get(common.aud_to_str(aud)) is not None
