@@ -4,7 +4,6 @@ from pathlib import Path
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
-
 setup(
     name="streamdal",
     version="0.0.1",
@@ -21,6 +20,7 @@ setup(
         "streamdal.metrics",
         "streamdal.validation",
         "streamdal.tail",
+        "streamdal.hostfunc",
     ],
     install_requires=[""],
     python_requires=">=3.8",
