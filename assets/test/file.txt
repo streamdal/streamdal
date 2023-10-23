@@ -1,0 +1,1 @@
+{"$schema":"http://json-schema.org/draft-07/schema#","properties":{"object":{"properties":{"payload":{"type":"string"}},"required":["payload"],"type":"object"}},"required":["object"],"type":"object"}

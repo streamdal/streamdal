@@ -26,6 +26,7 @@ setup:
 .PHONY: test
 test:
 	@echo "Running tests..."
+	make test/wasm
 	pytest --cov=streamdal
 
 .PHONY: test/wasm
