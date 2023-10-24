@@ -243,7 +243,7 @@ var _ = Describe("Streamdal", func() {
 				OperationName: "mytopic",
 			}
 
-			wasmData, err := os.ReadFile("src/detective.wasm")
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -318,7 +318,7 @@ var _ = Describe("Streamdal", func() {
 				OperationName: "mytopic",
 			}
 
-			wasmData, err := os.ReadFile("src/detective.wasm")
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -409,7 +409,7 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 }
 
 func createWASMRequestForKV(action shared.KVAction, key string, value []byte, mode steps.KVMode) (*protos.WASMRequest, error) {
-	wasmData, err := os.ReadFile("src/kv.wasm")
+	wasmData, err := os.ReadFile("test-assets/wasm/kv.wasm")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read wasm file")
 	}
@@ -660,7 +660,7 @@ func TestKVRequestStaticModeKeyExists(t *testing.T) {
 }
 
 func TestHttpRequest(t *testing.T) {
-	wasmData, err := os.ReadFile("src/httprequest.wasm")
+	wasmData, err := os.ReadFile("test-assets/wasm/httprequest.wasm")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -719,7 +719,7 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestInferSchema(t *testing.T) {
-	wasmResp, err := inferSchema("json-examples/small.json")
+	wasmResp, err := inferSchema("test-assets/json-examples/small.json")
 	if err != nil {
 		t.Error(err)
 	}
@@ -732,244 +732,3 @@ func TestInferSchema(t *testing.T) {
 		t.Errorf("expected ExitMsg to contain 'inferred fresh schema', got = %s", wasmResp.ExitMsg)
 	}
 }
-
-func inferSchema(fileName string) (*protos.WASMResponse, error) {
-	wasmData, err := os.ReadFile("src/inferschema.wasm")
-	if err != nil {
-		return nil, err
-	}
-
-	payloadData, err := os.ReadFile(fileName)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to load json file")
-	}
-
-	req := &protos.WASMRequest{
-		Step: &protos.PipelineStep{
-			Step: &protos.PipelineStep_InferSchema{
-				InferSchema: &steps.InferSchemaStep{
-					CurrentSchema: nil,
-				},
-			},
-			XWasmId:       stringPtr(uuid.New().String()),
-			XWasmFunction: stringPtr("f"),
-			XWasmBytes:    wasmData,
-		},
-		InputPayload: payloadData,
-	}
-
-	s := &Streamdal{
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string]map[string]*protos.Command{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-	}
-
-	f, err := s.createFunction(req.Step)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Step.XWasmBytes = nil
-
-	data, err := proto.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := f.Exec(context.Background(), data)
-	if err != nil {
-		return nil, err
-	}
-
-	wasmResp := &protos.WASMResponse{}
-
-	if err := proto.Unmarshal(res, wasmResp); err != nil {
-		return nil, fmt.Errorf("unable to unmarshal wasm response: %s", err)
-	}
-
-	return wasmResp, nil
-}
-
-func BenchmarkInferSchema_FreshSchema(b *testing.B) {
-	b.Run("small.json", func(b *testing.B) {
-		benchmarkInferSchema("json-examples/small.json", nil, b)
-	})
-
-	b.Run("medium.json", func(b *testing.B) {
-		benchmarkInferSchema("json-examples/medium.json", nil, b)
-	})
-
-	b.Run("large.json", func(b *testing.B) {
-		benchmarkInferSchema("json-examples/large.json", nil, b)
-	})
-}
-
-func BenchmarkInferSchema_MatchExisting(b *testing.B) {
-	// Each test will infer a schema first for the payload and then
-	// use that schema to match the payload again, simulating a never changing schema
-	b.Run("small.json", func(b *testing.B) {
-		wasmResp, _ := inferSchema("json-examples/small.json")
-		benchmarkInferSchema("json-examples/small.json", wasmResp.OutputStep, b)
-	})
-
-	b.Run("medium.json", func(b *testing.B) {
-		wasmResp, _ := inferSchema("json-examples/medium.json")
-		benchmarkInferSchema("json-examples/medium.json", wasmResp.OutputStep, b)
-	})
-
-	b.Run("large.json", func(b *testing.B) {
-		wasmResp, _ := inferSchema("json-examples/large.json")
-		benchmarkInferSchema("json-examples/large.json", wasmResp.OutputStep, b)
-	})
-}
-
-func benchmarkInferSchema(fileName string, currentSchema []byte, b *testing.B) {
-	wasmData, err := os.ReadFile("src/inferschema.wasm")
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	payloadData, err := os.ReadFile(fileName)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	req := &protos.WASMRequest{
-		Step: &protos.PipelineStep{
-			Step: &protos.PipelineStep_InferSchema{
-				InferSchema: &steps.InferSchemaStep{
-					CurrentSchema: currentSchema,
-				},
-			},
-			XWasmId:       stringPtr(uuid.New().String()),
-			XWasmFunction: stringPtr("f"),
-			XWasmBytes:    wasmData,
-		},
-		InputPayload: payloadData,
-	}
-
-	s := &Streamdal{
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string]map[string]*protos.Command{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-	}
-
-	f, err := s.createFunction(req.Step)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	req.Step.XWasmBytes = nil
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		data, err := proto.Marshal(req)
-		if err != nil {
-			b.Fatalf("Unable to marshal WASMRequest: %s", err)
-		}
-
-		res, err := f.Exec(context.Background(), data)
-		if err != nil {
-			b.Fatal(err)
-		}
-
-		wasmResp := &protos.WASMResponse{}
-
-		if err := proto.Unmarshal(res, wasmResp); err != nil {
-			b.Fatal("unable to unmarshal wasm response: " + err.Error())
-		}
-
-		if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
-			b.Errorf("expected ExitCode = 0, got = %d", wasmResp.ExitCode)
-		}
-	}
-}
-
-//func BenchmarkMatchSmallJSON(b *testing.B) {
-//	matchBench("json-examples/small.json", b)
-//}
-//
-//func BenchmarkMatchMediumJSON(b *testing.B) {
-//	matchBench("json-examples/medium.json", b)
-//}
-//
-//func BenchmarkMatchLargeJSON(b *testing.B) {
-//	matchBench("json-examples/large.json", b)
-//}
-//
-//func BenchmarkTransformSmallJSON(b *testing.B) {
-//	transformBench("json-examples/small.json", b)
-//}
-//
-//func BenchmarkTransformMediumJSON(b *testing.B) {
-//	transformBench("json-examples/medium.json", b)
-//}
-//
-//func BenchmarkTransformLargeJSON(b *testing.B) {
-//	transformBench("json-examples/large.json", b)
-//}
-
-//func matchBench(fileName string, b *testing.B) {
-//	jsonData, err := os.ReadFile(fileName)
-//	if err != nil {
-//		b.Error("unable to read json: " + err.Error())
-//	}
-//
-//	d, err := setup(Match)
-//	if err != nil {
-//		b.Error(err)
-//	}
-//
-//	b.ResetTimer()
-//
-//	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-//	defer cancel()
-//
-//	for i := 0; i < b.N; i++ {
-//		cfg := &protos.RuleConfigMatch{
-//			Path:     "firstname",
-//			Type:     "string_contains_any",
-//			Operator: protos.MatchOperator_MATCH_OPERATOR_ISMATCH,
-//			Args:     []string{"Rani"},
-//		}
-//		_, err := d.runMatch(ctx, jsonData, cfg)
-//		if err != nil {
-//			cancel()
-//			b.Fatal("error during runMatch: " + err.Error())
-//		}
-//		cancel()
-//	}
-//}
-//
-//func transformBench(fileName string, b *testing.B) {
-//	jsonData, err := os.ReadFile(fileName)
-//	if err != nil {
-//		b.Error("unable to read json: " + err.Error())
-//	}
-//
-//	d, err := setup(Transform)
-//	if err != nil {
-//		b.Error(err)
-//	}
-//
-//	b.ResetTimer()
-//
-//	fm := &protos.FailureModeTransform{
-//		Type:  protos.FailureModeTransform_TRANSFORM_TYPE_REPLACE,
-//		Path:  "firstname",
-//		Value: "Testing",
-//	}
-//
-//	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-//	defer cancel()
-//
-//	for i := 0; i < b.N; i++ {
-//		_, err := d.failTransform(ctx, jsonData, fm)
-//		if err != nil {
-//			b.Error("error during runTransform: " + err.Error())
-//		}
-//	}
-//}
