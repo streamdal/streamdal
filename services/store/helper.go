@@ -3,6 +3,7 @@ package store
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/streamdal/server/util"
 
@@ -38,7 +39,12 @@ const (
 	RedisSchemaFormat = "streamdal_schema:%s" // K: $audience V: serialized protos.Schema
 
 	RedisActiveTailPrefix    = "streamdal_tail"
-	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s" // K: $service_name:$frontend_session_id V: serialized protos.Command
+	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s" // K: $service_name:$tail_request_id V: serialized protos.TailRequest
+
+	// RedisActiveTailTTL is the TTL for the active tail key. While this key
+	// should be automatically cleaned up when the frontend stops a Tail() request,
+	// this TTL is a safety mechanism to ensure we do not leave orphaned tails.
+	RedisActiveTailTTL = 10 * time.Second
 )
 
 func RedisRegisterKey(session, node string) string {

@@ -89,6 +89,7 @@ type IStore interface {
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
+	AddActiveTailRequest(ctx context.Context, req *protos.TailRequest) (string, error) // Returns key that tail req is stored under
 
 	// GetAudiencesBySessionID returns all audiences for a given session id
 	// This is needed to inject an inferschema pipeline for each announced audience
@@ -1199,33 +1200,55 @@ func (s *Store) GetActiveTailCommandsByService(ctx context.Context, serviceName 
 
 	// Each key is an active tail - fetch each + decode
 	for _, key := range activeTailKeys {
-		encodedCmd, err := s.options.RedisBackend.Get(ctx, key).Result()
+		encodedTailReq, err := s.options.RedisBackend.Get(ctx, key).Result()
 		if err != nil {
 			return nil, errors.Wrapf(err, "error fetching key '%s' from store", key)
 		}
 
 		// Attempt to decode
-		cmd := &protos.Command{}
+		tailRequest := &protos.TailRequest{}
 
-		if err := proto.Unmarshal([]byte(encodedCmd), cmd); err != nil {
-			return nil, errors.Wrap(err, "error unmarshaling command")
+		if err := proto.Unmarshal([]byte(encodedTailReq), tailRequest); err != nil {
+			return nil, errors.Wrap(err, "error unmarshaling tail request")
 		}
 
-		if err := validate.TailCommand(cmd.GetTail()); err != nil {
-			return nil, errors.Wrap(err, "error validating tail command")
+		if err := validate.StartTailRequest(tailRequest); err != nil {
+			return nil, errors.Wrap(err, "error validating tail request")
 		}
 
 		// We shouldn't normally hit this - if we do, it's a bug - it means that
 		// we are storing a tail command that is not actually a start command.
-		if cmd.GetTail().GetRequest().Type != protos.TailRequestType_TAIL_REQUEST_TYPE_START {
+		if tailRequest.Type != protos.TailRequestType_TAIL_REQUEST_TYPE_START {
 			s.log.Warningf("bug? active tail command for key '%s' should contain a start request type but contains '%s'",
-				serviceName, cmd.GetTail().GetRequest().Type.String())
+				serviceName, tailRequest.Type.String())
 
 			continue
 		}
 
-		tailCommands = append(tailCommands, cmd)
+		tailCommands = append(tailCommands, &protos.Command{
+			Audience: tailRequest.Audience,
+			Command: &protos.Command_Tail{
+				Tail: &protos.TailCommand{
+					Request: tailRequest,
+				},
+			},
+		})
 	}
 
 	return tailCommands, nil
+}
+
+func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailRequest) (string, error) {
+	encodedReq, err := proto.Marshal(req)
+	if err != nil {
+		return "", errors.Wrap(err, "unable to marshal tail request")
+	}
+
+	tailKey := fmt.Sprintf(RedisActiveTailKeyFormat, req.Audience.ServiceName, req.GetXId())
+
+	if err := s.options.RedisBackend.Set(ctx, tailKey, encodedReq, RedisActiveTailTTL).Err(); err != nil {
+		return "", errors.Wrap(err, "unable to save tail request")
+	}
+
+	return tailKey, nil
 }

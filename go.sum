@@ -720,6 +720,8 @@ github.com/streamdal/protos v0.0.115 h1:wsLiKEA4oG2yAj2Tm2cl8yirE34oHur4iVjxRDk8
 github.com/streamdal/protos v0.0.115/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
 github.com/streamdal/protos v0.0.117 h1:a8cL1Zxo5UiwZdVdmpQHSS9PmRkUadokaKO+K9saflM=
 github.com/streamdal/protos v0.0.117/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
+github.com/streamdal/protos v0.0.118 h1:JJlnQ9kwn36sorXu1cZoteSdexu5FMRjG0kmaimwcHU=
+github.com/streamdal/protos v0.0.118/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=

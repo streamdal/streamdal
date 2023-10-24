@@ -728,18 +728,6 @@ func AttachPipelineCommand(cmd *protos.AttachPipelineCommand) error {
 	return nil
 }
 
-func TailCommand(cmd *protos.TailCommand) error {
-	if cmd == nil {
-		return ErrNilInput
-	}
-
-	if cmd.GetRequest() == nil {
-		return ErrNilField("Request")
-	}
-
-	return nil
-}
-
 func StartTailRequest(r *protos.TailRequest) error {
 	return validateTailRequest(r)
 }

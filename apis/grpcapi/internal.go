@@ -34,6 +34,48 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 	}
 }
 
+// sendActiveTails is executed during Register() and will send all active tails
+// to the client (so that SDK can "resume" any in-progress tails)
+func (s *InternalServer) sendActiveTails(ctx context.Context, cmdCh chan *protos.Command, req *protos.RegisterRequest) {
+	tailCommands, err := s.Options.StoreService.GetActiveTailCommandsByService(ctx, req.ServiceName)
+	if err != nil {
+		s.log.Errorf("unable to fetch active tail commands by service '%s': %s", req.ServiceName, err.Error())
+	}
+
+	for _, cmd := range tailCommands {
+		cmdCh <- cmd
+	}
+}
+
+func (s *InternalServer) sendKVs(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
+	llog := s.log.WithFields(logrus.Fields{
+		"method":     "sendKVs",
+		"session_id": sessionID,
+	})
+
+	llog.Debug("starting initial KV sync")
+
+	kvCommands, err := s.generateInitialKVCommands(ctx)
+	if err != nil {
+		llog.Errorf("unable to generate initial kv commands: %v", err)
+		return
+	}
+
+	llog.Debugf("generated '%d' kv commands", len(kvCommands))
+
+	for _, cmd := range kvCommands {
+		llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
+
+		cmdCh <- &protos.Command{
+			Command: &protos.Command_Kv{
+				Kv: cmd,
+			},
+		}
+	}
+
+	llog.Debug("finished initial KV sync")
+}
+
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
 	// Get all audiences for this session
 	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
@@ -94,33 +136,24 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "unable to broadcast register")
 	}
 
+	// NOTE: We cannot send AttachPipelines in here because Register() is an
+	// async operation in the SDKs - if we did it here, there is a chance that a
+	// .Process() call might process some messages WITHOUT any pipelines attached.
+	//
+	// Because of this, all of the SDKs ASK for attached pipelines in the
+	// *constructor* (rather than inside of Register()).
+
 	// Send all KVs to client
-	go func() {
-		llog.Debug("starting initial KV sync")
+	go s.sendKVs(server.Context(), ch, request.SessionId)
 
-		kvCommands, err := s.generateInitialKVCommands(server.Context())
-		if err != nil {
-			llog.Errorf("unable to generate initial kv commands: %v", err)
-			return
-		}
-
-		llog.Debugf("generated '%d' kv commands", len(kvCommands))
-
-		for _, cmd := range kvCommands {
-			llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
-
-			ch <- &protos.Command{
-				Command: &protos.Command_Kv{
-					Kv: cmd,
-				},
-			}
-		}
-
-		llog.Debug("finished initial KV sync")
-	}()
+	// Send all active tails. We are passing request here because we need access
+	// to the ServiceName (so we can get all active tails for that service)
+	go s.sendActiveTails(server.Context(), ch, request)
 
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
+
+	// TODO: Why not send active tails here? (This way, SDK does not have to ask for anything at registration time.)
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
@@ -327,34 +360,6 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
-// GetActiveCommands is used by SDKs to get all active commands at SDK init -
-// this enables the SDKs to "resume" whatever operations that were active when
-// they were last connected to the Streamdal server.
-func (s *InternalServer) GetActiveCommands(
-	ctx context.Context,
-	req *protos.GetActiveCommandsRequest,
-) (*protos.GetActiveCommandsResponse, error) {
-	if req.ServiceName == "" {
-		return nil, errors.New("service name is required")
-	}
-
-	active, paused, err := s.getActiveAttachPipelineCommands(ctx, req.ServiceName)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get attach commands by service")
-	}
-
-	tailCommands, err := s.Options.StoreService.GetActiveTailCommandsByService(ctx, req.ServiceName)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get active tails")
-	}
-
-	return &protos.GetActiveCommandsResponse{
-		Active:      append(active, tailCommands...), // Include start tail commands in active commands
-		Paused:      paused,
-		WasmModules: util.GenerateWasmMapping(append(active, paused...)...), // Include active and paused; tail does not have steps
-	}, nil
-}
-
 func (s *InternalServer) getActiveAttachPipelineCommands(
 	ctx context.Context,
 	serviceName string,
@@ -408,12 +413,6 @@ func (s *InternalServer) getActiveAttachPipelineCommands(
 	return active, paused, nil
 }
 
-// GetAttachCommandsByService is used by SDKs to get active attach commands at
-// SDK initialization time. It is 'ByService' because that is the only thing
-// an SDK knows 100% about itself at initialization time -- audiences may not
-// be announced until a later .Process() call.
-//
-// DEPRECATED - use GetActiveCommands() instead
 func (s *InternalServer) GetAttachCommandsByService(
 	ctx context.Context,
 	req *protos.GetAttachCommandsByServiceRequest,
@@ -436,7 +435,7 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 		"request_id": util.CtxRequestId(srv.Context()),
 	})
 
-	// This isn't necessary for go, but other langauge libraries, such as python
+	// This isn't necessary for go, but other language libraries, such as python
 	// require a response to eventually be sent and will throw an exception if
 	// one is not received
 	defer func() {
