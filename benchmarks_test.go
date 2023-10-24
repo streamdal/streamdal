@@ -107,7 +107,7 @@ func BenchmarkDetective(b *testing.B) {
 //			},
 //		},
 //	}
-//	benchmarkWASM("src/httprequest.wasm", "test-assets/json-examples/small.json", step, b)
+//	benchmarkWASM("test-assets/wasm/httprequest.wasm", "test-assets/json-examples/small.json", step, b)
 //}
 
 // ---------------------------- Helper Methods ----------------------------
@@ -178,7 +178,7 @@ func benchmarkWASM(wasmFile, testPayloadFile string, step *protos.PipelineStep, 
 // inferSchema is used to generate an existing schema for benchmarks
 // It is not used in the actual benchmark itself
 func inferSchema(fileName string) (*protos.WASMResponse, error) {
-	wasmData, err := os.ReadFile("src/inferschema.wasm")
+	wasmData, err := os.ReadFile("test-assets/wasm/inferschema.wasm")
 	if err != nil {
 		return nil, err
 	}

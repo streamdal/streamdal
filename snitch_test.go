@@ -243,7 +243,7 @@ var _ = Describe("Streamdal", func() {
 				OperationName: "mytopic",
 			}
 
-			wasmData, err := os.ReadFile("src/detective.wasm")
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -318,7 +318,7 @@ var _ = Describe("Streamdal", func() {
 				OperationName: "mytopic",
 			}
 
-			wasmData, err := os.ReadFile("src/detective.wasm")
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -660,7 +660,7 @@ func TestKVRequestStaticModeKeyExists(t *testing.T) {
 }
 
 func TestHttpRequest(t *testing.T) {
-	wasmData, err := os.ReadFile("src/httprequest.wasm")
+	wasmData, err := os.ReadFile("test-assets/wasm/httprequest.wasm")
 	if err != nil {
 		t.Fatal(err)
 	}
