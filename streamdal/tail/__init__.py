@@ -23,6 +23,7 @@ class Tail:
     queue: SimpleQueue = SimpleQueue()
     last_msg: int = 0
     log: logging.Logger = logging.getLogger("streamdal-python-sdk")
+    active: bool = False
 
     def __init__(
         self,
@@ -32,6 +33,7 @@ class Tail:
         auth_token: str,
         log: logging.Logger,
         metrics: Metrics,
+        active: bool,
     ):
         self.request = request
         self.queue = SimpleQueue()
@@ -40,6 +42,7 @@ class Tail:
         self.auth_token = auth_token
         self.streamdal_url = streamdal_url
         self.metrics = metrics
+        self.active = active
 
     def tail_iterator(self):
         while not self.exit.is_set():
@@ -56,6 +59,8 @@ class Tail:
                 target=self.start_tail_worker, args=(i + 1,), daemon=False
             )
             incr_worker.start()
+
+        self.active = True
 
     def start_tail_worker(self, worker_id: int):
         self.log.debug(f"Starting tail worker {worker_id}")
