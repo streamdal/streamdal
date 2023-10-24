@@ -14,7 +14,8 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 
 .. and [a bunch of other things](https://docs.streamdal.com/capabilities).
 
-\<INSERT IMG HERE>
+_This is what it looks like:_
+<img src="assets/img.png">
 
 ---
 
