@@ -186,15 +186,20 @@ MAIN:
 
 	llog.Debug("deleting registration from store")
 
-	if err := s.Options.StoreService.DeleteRegistration(server.Context(), deregisterRequest); err != nil {
-		return errors.Wrap(err, "unable to delete registration")
+	// By this point, the server context may be cancelled, so we must not rely on it
+	ctx := context.Background()
+
+	if err := s.Options.StoreService.DeleteRegistration(ctx, deregisterRequest); err != nil {
+		err = errors.Wrap(err, "unable to delete registration")
+		llog.Error(err)
+		return err
 	}
 
 	llog.Debug("announcing de-registration")
 
 	// Announce de-registration - the UI will still display the audience(s) but
 	// they no longer will be live (ie. attached clients will decrease)
-	if err := s.Options.BusService.BroadcastDeregister(server.Context(), deregisterRequest); err != nil {
+	if err := s.Options.BusService.BroadcastDeregister(ctx, deregisterRequest); err != nil {
 		llog.Errorf("unable to broadcast deregister event: %s", err)
 	}
 
