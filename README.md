@@ -17,8 +17,6 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 _This is what it looks like:_
 <img src="assets/img.png">
 
----
-
 <div align="center">
 
 [Overview](#streamdal) •
@@ -31,9 +29,7 @@ _This is what it looks like:_
 
 </div>
 
----
-
-## Demo
+# Demo
 
 You don't have to install the [server](https://github.com/streamdal/server), 
 the [console](https://github.com/streamdal/console)
@@ -46,9 +42,7 @@ Streamdal in action. We've got a live demo :)
 [Go SDK](https://github.com/streamdal/go-sdk), doing reads and writes to and 
 from various data sources like Kafka, PostgreSQL and HTTP APIs.</sub>
 
-## Getting Started
-
----
+# Getting Started
 
 The _easiest_ way to get Streamdal running is to bring up all of the components
 on your local machine using [Docker Compose](https://docs.docker.com/compose/).
@@ -72,7 +66,7 @@ ebc04b0e4eee   local-envoy                       "/usr/local/bin/envo…"   3 we
 
 Open `http://localhost:3000` in your browser and you should see the console.
 
-Ready for [Next Steps](#next-steps)?
+**Ready for [Next Steps](#next-steps)?**
 
 ### Deploying to Other Platforms
 
@@ -82,11 +76,7 @@ on-prem, IoT and so on. You can find deployment instructions in the
 
 And if something does not work or you get stuck, check out the official [docs](https://docs.streamdal.com).
 
-## How Does It Work?
-
-> [!NOTE]
-> For a more in-depth explanation of the architecture, the flow and the various
-> components, visit our [docs](https://docs.streamdal.com).
+# How Does It Work?
 
 Streamdal consists of **three** main components:
 
@@ -113,20 +103,21 @@ valid JSON", "message should contain a field called `foo`", "strip all email
 addresses" and so on).
 
 > [!NOTE]
-> [Learn more](https://docs.streamdal.com/arch) about the architecture, the flow and the various components.
+> For a more in-depth explanation of the architecture, the flow and the various
+> components, visit our [docs](https://docs.streamdal.com).
 
-## Community
+# Community
 
 Need help? Have questions? Want to chat? 
 
 Join our [Discord](https://discord.gg/123456789)!
 
-## Contributing
+# Contributing
 
 We :heart: contributions! But... before you craft an amazing PR, please read
 through our [contributing guidelines](https://docs.streamdal.com/contributing).
 
-## License
+# License
 
 This project is licensed under the `Apache-2.0` license. 
 
