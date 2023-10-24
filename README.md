@@ -14,7 +14,7 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 
 .. and [a bunch of other things](https://docs.streamdal.com/capabilities).
 
-_This is what it looks like:_
+<sub>_This is what it looks like:_</sub>
 <img src="assets/img.png">
 
 <div align="center">
@@ -29,6 +29,11 @@ _This is what it looks like:_
 
 </div>
 
+<<<<<<< Updated upstream
+=======
+---
+
+>>>>>>> Stashed changes
 # Demo
 
 You don't have to install the [server](https://github.com/streamdal/server), 
@@ -43,6 +48,11 @@ Streamdal in action. We've got a live demo :)
 from various data sources like Kafka, PostgreSQL and HTTP APIs.</sub>
 
 # Getting Started
+<<<<<<< Updated upstream
+=======
+
+---
+>>>>>>> Stashed changes
 
 The _easiest_ way to get Streamdal running is to bring up all of the components
 on your local machine using [Docker Compose](https://docs.docker.com/compose/).
@@ -76,36 +86,47 @@ on-prem, IoT and so on. You can find deployment instructions in the
 
 And if something does not work or you get stuck, check out the official [docs](https://docs.streamdal.com).
 
+<<<<<<< Updated upstream
 # How Does It Work?
+=======
+## How Does It Work?
+>>>>>>> Stashed changes
 
 Streamdal consists of **three** main components:
 
-1. [Server](https://github.com/streamdal/server)
-    - A distributed server that can be deployed anywhere (cloud, on-prem, IoT, 
-      etc.) and it is responsible for facilitating communication between the 
-      SDKs and the Console (UI).
-2. [Console](https://github.com/streamdal/console)
-    - A _beautiful_, figma-like UI that is the primary way you interface with
-      your SDKs, define rules, observe data and on.
-3. SDKs
-    1. [Go](https://github.com/streamdal/sdk-go)
-    2. [Node.js](https://github.com/streamdal/sdk-node) 
-    3. [Python](https://github.com/streamdal/python)
+- **[Server](https://github.com/streamdal/server)**
+- **[Console](https://github.com/streamdal/console)**
+- **[SDKs](https://docs.streamdal.com/sdks)**
 
-The basic flow is that you [install](#install) the server and console and wrap
-any reads or writes in your app with our SDK. Once that's done, you will be able
-to see the data your app is reading or writing in the 
-[console](https://github.com/streamdal/console) (or use our 
+The basic flow is that you [install](#getting-started) the server and console and
+wrap any reads or writes in your app with our SDK. Once that's done, you will be 
+able to see the data your app is reading or writing in the 
+[console](https://github.com/streamdal/console) (or use the  
 [CLI](https://github.com/streamdal/cli)).
 
 You will also be able to enforce rules on your data (such as "this should be 
 valid JSON", "message should contain a field called `foo`", "strip all email
 addresses" and so on).
 
+<<<<<<< Updated upstream
 > [!NOTE]
 > For a more in-depth explanation of the architecture, the flow and the various
 > components, visit our [docs](https://docs.streamdal.com).
 
+=======
+> [!IMPORTANT]
+> For a more in-depth explanation of the architecture, the flow and the various
+> components, visit our [docs](https://docs.streamdal.com).
+
+# Roadmap
+
+Our roadmap is public and available [here](https://github.com/streamdal/streamdal/projects/1)!
+
+> [!NOTE]
+> You have the power to shape and mold where this project goes - vote on issues,
+> add to the discussion and express your opinion!
+
+>>>>>>> Stashed changes
 # Community
 
 Need help? Have questions? Want to chat? 
