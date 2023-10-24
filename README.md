@@ -38,10 +38,6 @@ Streamdal in action. We've got a live demo :)
 
 **https://demo.streamdal.com**
 
-<sub>The demo has a bunch of sample apps instrumented with the 
-[Go SDK](https://github.com/streamdal/go-sdk), doing reads and writes to and 
-from various data sources like Kafka, PostgreSQL and HTTP APIs.</sub>
-
 # Getting Started
 
 The _easiest_ way to get Streamdal running is to bring up all of the components
