@@ -1,10 +1,4 @@
-import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
-import {
-  Audience,
-  OperationType,
-  StandardResponse,
-  TailResponse,
-} from "@streamdal/protos/protos/sp_common";
+import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { v4 as uuidv4 } from "uuid";
 
@@ -29,7 +23,6 @@ export interface StreamdalConfigs {
 
 export interface Configs {
   grpcClient: IInternalClient;
-  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   streamdalUrl: string;
   streamdalToken: string;
   serviceName: string;
@@ -82,9 +75,6 @@ export class Streamdal {
 
     this.configs = {
       grpcClient,
-      tailCall: grpcClient.sendTail({
-        meta: { "auth-token": token },
-      }),
       sessionId,
       streamdalUrl: url,
       streamdalToken: token,
@@ -102,7 +92,7 @@ export class Streamdal {
     }, HEARTBEAT_INTERVAL);
 
     setInterval(() => {
-      void sendMetrics(this.configs);
+      sendMetrics(this.configs);
     }, METRIC_INTERVAL);
 
     void addAudiences(this.configs);

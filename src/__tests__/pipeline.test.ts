@@ -1,9 +1,4 @@
-import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import { Command } from "@streamdal/protos/protos/sp_command";
-import {
-  StandardResponse,
-  TailResponse,
-} from "@streamdal/protos/protos/sp_common";
 import { InternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
 import sinon from "sinon";
@@ -21,10 +16,6 @@ const testConfigs = {
       paused: [],
     }),
   } as unknown as InternalClient,
-  tailCall: {} as unknown as ClientStreamingCall<
-    TailResponse,
-    StandardResponse
-  >,
   sessionId: uuidv4(),
   streamdalUrl: "localhost:9090",
   streamdalToken: "1234",

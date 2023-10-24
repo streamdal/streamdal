@@ -1,10 +1,4 @@
-import { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
-import {
-  Audience,
-  StandardResponse,
-  TailResponse,
-  TailResponseType,
-} from "@streamdal/protos/protos/sp_common";
+import { Audience } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import {
   PipelineStep,
@@ -17,6 +11,7 @@ import { addAudience } from "./audience.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { EnhancedStep, initPipelines, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
+import { sendTail } from "./tail.js";
 import { runWasm } from "./wasm.js";
 
 export interface StepStatus {
@@ -35,7 +30,6 @@ export interface PipelinesStatus {
 
 export interface PipelineConfigs {
   grpcClient: IInternalClient;
-  tailCall: ClientStreamingCall<TailResponse, StandardResponse>;
   streamdalToken: string;
   sessionId: string;
   dryRun: boolean;
@@ -62,47 +56,6 @@ const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
     pipelineId: pipeline.id,
     pipelineName: pipeline.name,
   })) as EnhancedStep[];
-
-export const sendTail = ({
-  configs,
-  tails,
-  audience,
-  originalData,
-  newData,
-}: TailRequest) => {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    tails?.forEach(async (tailStatus, tailRequestId) => {
-      if (tailStatus.tail) {
-        const tailResponse = TailResponse.create({
-          timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
-          type: TailResponseType.PAYLOAD,
-          tailRequestId: tailRequestId,
-          audience,
-          sessionId: configs.sessionId,
-          originalData,
-          newData,
-        });
-        console.debug("sending tail response", tailResponse);
-        await configs.tailCall.requests.send(tailResponse);
-
-        const headers = await configs.tailCall.headers;
-        console.debug("got tail response headers: ", headers);
-
-        const response = await configs.tailCall.response;
-        console.debug("got tail response message: ", response);
-
-        const status = await configs.tailCall.status;
-        console.debug("got tail status: ", status);
-
-        const trailers = await configs.tailCall.trailers;
-        console.debug("got tail trailers: ", trailers);
-      }
-    });
-  } catch (e) {
-    console.error("Error sending tail request", e);
-  }
-};
 
 export const retryProcessPipeline = async ({
   configs,
