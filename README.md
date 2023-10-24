@@ -29,11 +29,6 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 
 </div>
 
-<<<<<<< Updated upstream
-=======
----
-
->>>>>>> Stashed changes
 # Demo
 
 You don't have to install the [server](https://github.com/streamdal/server), 
@@ -48,11 +43,6 @@ Streamdal in action. We've got a live demo :)
 from various data sources like Kafka, PostgreSQL and HTTP APIs.</sub>
 
 # Getting Started
-<<<<<<< Updated upstream
-=======
-
----
->>>>>>> Stashed changes
 
 The _easiest_ way to get Streamdal running is to bring up all of the components
 on your local machine using [Docker Compose](https://docs.docker.com/compose/).
@@ -84,13 +74,9 @@ You can install Streamdal on other platforms like Kubernetes, AWS, GCP, Azure,
 on-prem, IoT and so on. You can find deployment instructions in the 
 [install](./install) dir.
 
-And if something does not work or you get stuck, check out the official [docs](https://docs.streamdal.com).
+And if something does not work or you get stuck, [seek help](#getting-help)!
 
-<<<<<<< Updated upstream
 # How Does It Work?
-=======
-## How Does It Work?
->>>>>>> Stashed changes
 
 Streamdal consists of **three** main components:
 
@@ -108,12 +94,6 @@ You will also be able to enforce rules on your data (such as "this should be
 valid JSON", "message should contain a field called `foo`", "strip all email
 addresses" and so on).
 
-<<<<<<< Updated upstream
-> [!NOTE]
-> For a more in-depth explanation of the architecture, the flow and the various
-> components, visit our [docs](https://docs.streamdal.com).
-
-=======
 > [!IMPORTANT]
 > For a more in-depth explanation of the architecture, the flow and the various
 > components, visit our [docs](https://docs.streamdal.com).
@@ -126,7 +106,6 @@ Our roadmap is public and available [here](https://github.com/streamdal/streamda
 > You have the power to shape and mold where this project goes - vote on issues,
 > add to the discussion and express your opinion!
 
->>>>>>> Stashed changes
 # Community
 
 Need help? Have questions? Want to chat? 
