@@ -7,7 +7,7 @@ import {
 
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
-import { grpcToken } from "./configs.ts";
+import { GRPC_TOKEN, grpcToken } from "./configs.ts";
 
 export const tailAbortSignal = signal<boolean>(false);
 
@@ -57,7 +57,7 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
     const tailCall: any = client.tail(
       tailRequest,
       {
-        meta: { "auth-token": await grpcToken() },
+        meta: { "auth-token": GRPC_TOKEN },
         abort: abortController.signal,
       },
     );

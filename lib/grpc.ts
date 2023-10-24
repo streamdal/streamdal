@@ -3,14 +3,14 @@ import {
   IExternalClient,
 } from "streamdal-protos/protos/sp_external.client.ts";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
-import { grpcToken, grpcUrl } from "./configs.ts";
+import { GRPC_TOKEN, GRPC_URL } from "./configs.ts";
 
 export const meta = {
-  meta: { "auth-token": await grpcToken() },
+  meta: { "auth-token": GRPC_TOKEN },
 };
 
 const transport = new GrpcWebFetchTransport({
-  baseUrl: await grpcUrl(),
+  baseUrl: GRPC_URL,
   format: "binary",
 });
 
