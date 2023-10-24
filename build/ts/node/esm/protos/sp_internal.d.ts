@@ -147,42 +147,6 @@ export interface DeregisterRequest {
     sessionId: string;
 }
 /**
- * @generated from protobuf message protos.GetActiveCommandsRequest
- */
-export interface GetActiveCommandsRequest {
-    /**
-     * @generated from protobuf field: string service_name = 1;
-     */
-    serviceName: string;
-}
-/**
- * @generated from protobuf message protos.GetActiveCommandsResponse
- */
-export interface GetActiveCommandsResponse {
-    /**
-     * Commands in active state
-     *
-     * @generated from protobuf field: repeated protos.Command active = 1;
-     */
-    active: Command[];
-    /**
-     * Commands in paused state
-     *
-     * @generated from protobuf field: repeated protos.Command paused = 2;
-     */
-    paused: Command[];
-    /**
-     * ID = wasm ID
-     *
-     * @generated from protobuf field: map<string, protos.WasmModule> wasm_modules = 3;
-     */
-    wasmModules: {
-        [key: string]: WasmModule;
-    };
-}
-/**
- * DEPRECATED as of 10.23.2023 -- use GetActiveCommandsRequest instead
- *
  * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
  */
 export interface GetAttachCommandsByServiceRequest {
@@ -192,8 +156,6 @@ export interface GetAttachCommandsByServiceRequest {
     serviceName: string;
 }
 /**
- * DEPRECATED as of 10.23.2023 -- use GetActiveCommandsResponse instead
- *
  * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export interface GetAttachCommandsByServiceResponse {
@@ -319,27 +281,6 @@ declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
  * @generated MessageType for protobuf message protos.DeregisterRequest
  */
 export declare const DeregisterRequest: DeregisterRequest$Type;
-declare class GetActiveCommandsRequest$Type extends MessageType<GetActiveCommandsRequest> {
-    constructor();
-    create(value?: PartialMessage<GetActiveCommandsRequest>): GetActiveCommandsRequest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetActiveCommandsRequest): GetActiveCommandsRequest;
-    internalBinaryWrite(message: GetActiveCommandsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.GetActiveCommandsRequest
- */
-export declare const GetActiveCommandsRequest: GetActiveCommandsRequest$Type;
-declare class GetActiveCommandsResponse$Type extends MessageType<GetActiveCommandsResponse> {
-    constructor();
-    create(value?: PartialMessage<GetActiveCommandsResponse>): GetActiveCommandsResponse;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetActiveCommandsResponse): GetActiveCommandsResponse;
-    private binaryReadMap3;
-    internalBinaryWrite(message: GetActiveCommandsResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.GetActiveCommandsResponse
- */
-export declare const GetActiveCommandsResponse: GetActiveCommandsResponse$Type;
 declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
     constructor();
     create(value?: PartialMessage<GetAttachCommandsByServiceRequest>): GetAttachCommandsByServiceRequest;

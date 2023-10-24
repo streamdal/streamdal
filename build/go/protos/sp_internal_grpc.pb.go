@@ -24,7 +24,6 @@ const (
 	Internal_Heartbeat_FullMethodName                  = "/protos.Internal/Heartbeat"
 	Internal_Notify_FullMethodName                     = "/protos.Internal/Notify"
 	Internal_Metrics_FullMethodName                    = "/protos.Internal/Metrics"
-	Internal_GetActiveCommands_FullMethodName          = "/protos.Internal/GetActiveCommands"
 	Internal_GetAttachCommandsByService_FullMethodName = "/protos.Internal/GetAttachCommandsByService"
 	Internal_SendTail_FullMethodName                   = "/protos.Internal/SendTail"
 	Internal_SendSchema_FullMethodName                 = "/protos.Internal/SendSchema"
@@ -52,15 +51,8 @@ type InternalClient interface {
 	Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Send periodic metrics to the server
 	Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*StandardResponse, error)
-	// Used by SDKs to fetch all active commands for the service during SDK startup.
-	// This is needed in order to be able to "resume" where the SDK was at before
-	// shutdown or restart. For example - resuming tail requests or resuming
-	// attached pipelines.
-	GetActiveCommands(ctx context.Context, in *GetActiveCommandsRequest, opts ...grpc.CallOption) (*GetActiveCommandsResponse, error)
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
-	// This is needed because Register() is async.
-	//
-	// DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
+	// This is needed because Register() is async
 	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(ctx context.Context, opts ...grpc.CallOption) (Internal_SendTailClient, error)
 	// Used by SDK to send a new schema to the server
@@ -143,15 +135,6 @@ func (c *internalClient) Metrics(ctx context.Context, in *MetricsRequest, opts .
 	return out, nil
 }
 
-func (c *internalClient) GetActiveCommands(ctx context.Context, in *GetActiveCommandsRequest, opts ...grpc.CallOption) (*GetActiveCommandsResponse, error) {
-	out := new(GetActiveCommandsResponse)
-	err := c.cc.Invoke(ctx, Internal_GetActiveCommands_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *internalClient) GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error) {
 	out := new(GetAttachCommandsByServiceResponse)
 	err := c.cc.Invoke(ctx, Internal_GetAttachCommandsByService_FullMethodName, in, out, opts...)
@@ -226,15 +209,8 @@ type InternalServer interface {
 	Notify(context.Context, *NotifyRequest) (*StandardResponse, error)
 	// Send periodic metrics to the server
 	Metrics(context.Context, *MetricsRequest) (*StandardResponse, error)
-	// Used by SDKs to fetch all active commands for the service during SDK startup.
-	// This is needed in order to be able to "resume" where the SDK was at before
-	// shutdown or restart. For example - resuming tail requests or resuming
-	// attached pipelines.
-	GetActiveCommands(context.Context, *GetActiveCommandsRequest) (*GetActiveCommandsResponse, error)
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
-	// This is needed because Register() is async.
-	//
-	// DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
+	// This is needed because Register() is async
 	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
 	SendTail(Internal_SendTailServer) error
 	// Used by SDK to send a new schema to the server
@@ -260,9 +236,6 @@ func (UnimplementedInternalServer) Notify(context.Context, *NotifyRequest) (*Sta
 }
 func (UnimplementedInternalServer) Metrics(context.Context, *MetricsRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Metrics not implemented")
-}
-func (UnimplementedInternalServer) GetActiveCommands(context.Context, *GetActiveCommandsRequest) (*GetActiveCommandsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetActiveCommands not implemented")
 }
 func (UnimplementedInternalServer) GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAttachCommandsByService not implemented")
@@ -379,24 +352,6 @@ func _Internal_Metrics_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Internal_GetActiveCommands_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetActiveCommandsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(InternalServer).GetActiveCommands(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Internal_GetActiveCommands_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InternalServer).GetActiveCommands(ctx, req.(*GetActiveCommandsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Internal_GetAttachCommandsByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAttachCommandsByServiceRequest)
 	if err := dec(in); err != nil {
@@ -481,10 +436,6 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Metrics",
 			Handler:    _Internal_Metrics_Handler,
-		},
-		{
-			MethodName: "GetActiveCommands",
-			Handler:    _Internal_GetActiveCommands_Handler,
 		},
 		{
 			MethodName: "GetAttachCommandsByService",
