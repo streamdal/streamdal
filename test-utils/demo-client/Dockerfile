@@ -1,0 +1,39 @@
+# Use the specified Alpine version for the build stage
+ARG ALPINE_VERSION=3.18
+
+# Use the Go Alpine image for the builder stage
+FROM golang:1.20-alpine$ALPINE_VERSION AS builder
+ARG TARGETARCH
+ARG TARGETOS
+
+# Install necessary build tools
+RUN apk --update add make bash curl git
+
+# Set the working directory
+WORKDIR /demo-client
+
+# Copy everything into the build container
+COPY . .
+
+# Build the application using Makefile (assuming it's set up for your project)
+CMD echo "make build/$TARGETOS-$TARGETARCH"
+RUN make build/$TARGETOS-$TARGETARCH
+
+# Now, in the 2nd build stage, use a lightweight Alpine image
+FROM alpine:$ALPINE_VERSION
+ARG TARGETARCH
+ARG TARGETOS
+
+# Install SSL certificates and some quality-of-life tools
+RUN apk --update add bash curl ca-certificates && update-ca-certificates
+
+# Copy the built binary and test data
+COPY --from=builder /demo-client/build/demo-client-$TARGETOS-$TARGETARCH /demo-client
+COPY --from=builder /demo-client/test-data/sample.json /test-data/sample.json
+
+# Make the binary executable
+RUN chmod +x /demo-client
+
+# Entrypoint and command to run the specified go command
+ENTRYPOINT ["/demo-client"]
+CMD ["register", "-d", "--num-instances", "1", "--service-name", "service", "--server-address", "streamdal-server.streamdal-server.svc.cluster.local:9090", "--component-name", "kafka", "--operation-name", "demo-operation", "--consumer-input-type", "file", "--consumer-input-file", "/test-data/sample.json"]
