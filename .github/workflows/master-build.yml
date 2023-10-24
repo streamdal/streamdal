@@ -18,7 +18,7 @@ jobs:
         uses: jakejarvis/wait-action@master
         with:
           time: '30s'
-      - name: Master buld tests
+      - name: Master build tests
         run: |
           sudo make test
 

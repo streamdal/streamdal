@@ -26,12 +26,12 @@ ARG TARGETOS
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy bin & WASM
-COPY --from=builder /build/server-$TARGETOS-$TARGETARCH /server
+COPY --from=builder /build/server-$TARGETOS-$TARGETARCH /streamdal-server
 COPY --from=builder /assets/wasm/* /assets/wasm/
 
-RUN chmod +x /server
+RUN chmod +x /streamdal-server
 
 EXPOSE 8080
 EXPOSE 9090
 
-CMD ["/server", "--debug"]
+CMD ["/streamdal-server", "--debug"]
