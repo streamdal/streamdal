@@ -3,25 +3,18 @@
 
 [![Master build status](https://github.com/streamdal/go-sdk/workflows/main/badge.svg)](https://github.com/streamdal/go-sdk/actions/workflows/main-test.yml)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/test_coverage)](https://codeclimate.com/github/streamdal/go-sdk/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/maintainability)](https://codeclimate.com/github/streamdal/go-sdk/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/018c12aaebba74deb05e/maintainability)](https://codeclimate.com/github/streamdal/go-sdk/maintainability)
+[![GitHub](https://img.shields.io/github/license/streamdal/go-sdk)](https://github.com/streamdal/go-sdk)
 
+### Documentation
 
-## Shim usage
+See https://docs.streamdal.com
 
-Streamdal maintains forks of popular messaging libraries with this SDK already integrated into them. These shims
-are designed to allow usage if this SDK with minimal changes to your existing codebase.
+### Installation
 
-To use these shims, you can specify the following environment variables, which will be read by the SDK at runtime
-
-| Envar                        | Required | Description                                                                                                                             | Default          |
-|------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| `STREAMDAL_URL`              | Yes      | URL to a running Streamdal server instance in your infrastructure                                                                       | `localhost:9090` |
-| `STREAMDAL_TOKEN`            | Yes      | Token to use when authenticating with the plumber server, configured via plumber server                                                 | `streamdal`      |
-| `STREAMDAL_DRY_RUN`          | No       | `true` or `false`. Dry run mode will simply log the rules that would have been applied to the message, but will not actually apply them | `false`          |
-| `STREAMDAL_STEP_TIMEOUT`     | No       | Timeout for wasm execution in milliseconds                                                                                              | `10`             |
-| `STREAMDAL_PIPELINE_TIMEOUT` | No       | Timeout for entire pipeline execution in milliseconds                                                                                   | `100`            |
-| `STREAMDAL_DATA_SOURCE`      | No       | Data source to use when applying rules. This is used to determine which rulesets to apply to the message.                               | `kafka`          |
-
+```bash
+go get github.com/streamdal/go-sdk
+```
 
 ### Example Usage
 
@@ -70,7 +63,7 @@ func main() {
 
 ### Metrics
 
-Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/v1/metrics
+Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/metrics
 
 | Metric                                       | Description                                      | Labels                                                                        |
 |----------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------|

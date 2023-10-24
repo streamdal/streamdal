@@ -284,4 +284,25 @@ var _ = Describe("Metrics", func() {
 
 		})
 	})
+
+	Context("New", func() {
+		It("Starts up and shuts down", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			m, err := New(&Config{
+				ServerClient:   &serverfakes.FakeIServerClient{},
+				ShutdownCtx:    ctx,
+				Log:            &loggerfakes.FakeLogger{},
+				IncrInterval:   time.Millisecond,
+				ReaperInterval: time.Millisecond,
+				ReaperTTL:      0,
+			})
+			Expect(err).To(BeNil())
+
+			Expect(m).ToNot(BeNil())
+			cancel()
+			m.wg.Wait()
+		})
+	})
 })
