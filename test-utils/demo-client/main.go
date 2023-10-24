@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	// Attempt to load .env
+	_ = godotenv.Load(".env")
+
 	cfg, err := ParseArgs()
 	if err != nil {
 		fmt.Println("ERROR: ", err)
@@ -16,23 +19,12 @@ func main() {
 	}
 
 	if cfg.Debug {
-		fmt.Println("Set debug level")
+		fmt.Println("We are setting debug mode")
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
-	switch cfg.Ctx.Command() {
-	case "register":
-		err = runRegister(cfg)
-	case "another":
-		err = runAnother(cfg)
-	}
-
-	if err != nil {
+	if err := Run(cfg); err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)
 	}
-}
-
-func runAnother(cfg *Config) error {
-	return errors.New("not implemented")
 }
