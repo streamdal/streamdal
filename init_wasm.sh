@@ -20,4 +20,4 @@ unzip -o release.zip -d test-assets/wasm/
 
 # Step 6: Clean up & info
 rm release.zip
-cat test-assets/version.txt
+cat test-assets/wasm/version.txt
