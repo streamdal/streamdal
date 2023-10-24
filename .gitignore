@@ -2,4 +2,5 @@
 src/*.wasm
 src/version.txt
 c.out
-test-assets/wasm/*
+test-assets/wasm/*.wasm
+test-assets/wasm/version.txt

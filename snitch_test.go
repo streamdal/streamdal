@@ -409,7 +409,7 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 }
 
 func createWASMRequestForKV(action shared.KVAction, key string, value []byte, mode steps.KVMode) (*protos.WASMRequest, error) {
-	wasmData, err := os.ReadFile("src/kv.wasm")
+	wasmData, err := os.ReadFile("test-assets/wasm/kv.wasm")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read wasm file")
 	}

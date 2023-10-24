@@ -32,7 +32,7 @@ func BenchmarkTransform_Replace(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("src/transform.wasm", jsonFile, step, b)
+			benchmarkWASM("test-assets/wasm/transform.wasm", jsonFile, step, b)
 		})
 	}
 }
@@ -49,7 +49,7 @@ func BenchmarkInferSchema_FreshSchema(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("src/inferschema.wasm", jsonFile, step, b)
+			benchmarkWASM("test-assets/wasm/inferschema.wasm", jsonFile, step, b)
 		})
 	}
 }
@@ -69,7 +69,7 @@ func BenchmarkInferSchema_MatchExisting(b *testing.B) {
 				},
 			}
 
-			benchmarkWASM("src/inferschema.wasm", jsonFile, step, b)
+			benchmarkWASM("test-assets/wasm/inferschema.wasm", jsonFile, step, b)
 		})
 	}
 }
@@ -89,7 +89,7 @@ func BenchmarkDetective(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("src/detective.wasm", jsonFile, step, b)
+			benchmarkWASM("test-assets/wasm/detective.wasm", jsonFile, step, b)
 		})
 	}
 }
