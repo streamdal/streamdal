@@ -5,8 +5,6 @@ import type { TailResponse } from "./sp_common";
 import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
 import type { GetAttachCommandsByServiceResponse } from "./sp_internal";
 import type { GetAttachCommandsByServiceRequest } from "./sp_internal";
-import type { GetActiveCommandsResponse } from "./sp_internal";
-import type { GetActiveCommandsRequest } from "./sp_internal";
 import type { MetricsRequest } from "./sp_internal";
 import type { NotifyRequest } from "./sp_internal";
 import type { HeartbeatRequest } from "./sp_internal";
@@ -60,19 +58,8 @@ export interface IInternalClient {
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
     /**
-     * Used by SDKs to fetch all active commands for the service during SDK startup.
-     * This is needed in order to be able to "resume" where the SDK was at before
-     * shutdown or restart. For example - resuming tail requests or resuming
-     * attached pipelines.
-     *
-     * @generated from protobuf rpc: GetActiveCommands(protos.GetActiveCommandsRequest) returns (protos.GetActiveCommandsResponse);
-     */
-    getActiveCommands(input: GetActiveCommandsRequest, options?: RpcOptions): UnaryCall<GetActiveCommandsRequest, GetActiveCommandsResponse>;
-    /**
      * Used to pull all pipeline configs for the service name in the SDK's constructor
-     * This is needed because Register() is async.
-     *
-     * DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
+     * This is needed because Register() is async
      *
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
@@ -138,19 +125,8 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      */
     metrics(input: MetricsRequest, options?: RpcOptions): UnaryCall<MetricsRequest, StandardResponse>;
     /**
-     * Used by SDKs to fetch all active commands for the service during SDK startup.
-     * This is needed in order to be able to "resume" where the SDK was at before
-     * shutdown or restart. For example - resuming tail requests or resuming
-     * attached pipelines.
-     *
-     * @generated from protobuf rpc: GetActiveCommands(protos.GetActiveCommandsRequest) returns (protos.GetActiveCommandsResponse);
-     */
-    getActiveCommands(input: GetActiveCommandsRequest, options?: RpcOptions): UnaryCall<GetActiveCommandsRequest, GetActiveCommandsResponse>;
-    /**
      * Used to pull all pipeline configs for the service name in the SDK's constructor
-     * This is needed because Register() is async.
-     *
-     * DEPRECATED as of 10.23.2023 -- use GetActiveCommands() instead
+     * This is needed because Register() is async
      *
      * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
      */
