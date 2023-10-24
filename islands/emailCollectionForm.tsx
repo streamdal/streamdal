@@ -51,6 +51,7 @@ export const EmailCollectionForm = () => {
             data={data}
             setData={setData}
           />
+          <input type="submit" class="hidden" />
           <div className={"flex flex-col items-center"}>
             <button
               type={"submit"}

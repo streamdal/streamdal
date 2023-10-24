@@ -5,8 +5,33 @@ import { ReactFlowProvider } from "reactflow";
 import OpModal from "../islands/opModal.tsx";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { initAllServices } from "../lib/fetch.ts";
+import { GRPC_TOKEN } from "../lib/configs.ts";
+import { InternalError } from "../components/error/internal.tsx";
+import { CustomError } from "../components/error/custom.tsx";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
+  if (!GRPC_TOKEN) {
+    return (
+      <>
+        <NavBar />
+        <CustomError
+          children={
+            <span>
+              You must supply STREAMDAL_GRPC_AUTH_TOKEN as an environment
+              variable or in a .env file. See{" "}
+              <a
+                class="text-underline "
+                href="https://github.com/streamdal/console/blob/master/example.env."
+              >
+                example
+              </a>.
+            </span>
+          }
+        />
+      </>
+    );
+  }
+
   await initAllServices();
   const success = ctx.data?.success;
 
