@@ -16,20 +16,84 @@ help: HELP_SCRIPT = \
 help:
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
 
+.PHONY: run/all
+run/all: description = Run all of the clients
+run/all:
+	make run1 & \
+	make run2 & \
+	make run3 & \
+	make run4 & \
+	make run5 & \
+	make run6
 
-.PHONY: run
-run: description = Run with defaults
-run:
-	go run *.go register -d \
-	--num-instances 1 \
-	--service-name "service" \
-	--component-name "kafka" \
-	--operation-name  "demo-operation" \
-	--consumer-input-type file \
-	--consumer-input-file ./test-data/sample.json
+.PHONY: run1
+run1: description = Run signup-service
+run1:
+	go run *.go -d \
+	--service-name "Signup-service" \
+	--operation-type 2 \
+	--operation-name  "Verifier" \
+	--component-name "PostgreSQL" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-signup-producer.json
 	# this client also supports --quiet (for quiet output), various "reconnect"
 	# conditions and support for launching multiple clients. `--help` for more
 	# info.
+
+.PHONY: run2
+run2: description = Run signup-service
+run2:
+	go run *.go -d \
+	--service-name "Signup-service" \
+	--operation-type 2 \
+	--operation-name  "Recorder" \
+	--component-name "kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-signup-producer.json
+
+.PHONY: run3
+run3: description = Run billing-service
+run3:
+	go run *.go -d \
+	--service-name "billing-service" \
+	--operation-type 1 \
+	--operation-name  "Processor" \
+	--component-name "Kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-billing-consumer.json
+
+.PHONY: run4
+run4: description = Run billing-service
+run4:
+	go run *.go -d \
+	--service-name "Billing-service" \
+	--operation-type 2 \
+	--operation-name  "Stripe-register" \
+	--component-name "Stripe" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-billing-producer.json
+
+.PHONY: run5
+run5: description = Run welcome-service
+run5:
+	go run *.go -d \
+	--service-name "Welcome-service" \
+	--operation-type 1 \
+	--operation-name  "Reader" \
+	--component-name "Kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-signup-producer.json
+
+.PHONY: run6
+run6: description = Run welcome-service
+run6:
+	go run *.go -d \
+	--service-name "Welcome-service" \
+	--operation-type 2 \
+	--operation-name  "Emailer" \
+	--component-name "AWS-SES" \
+	--data-source-type file \
+	--data-source-file ./assets/sample-welcome-producer.json
 
 ### Build
 

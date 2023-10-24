@@ -1,8 +1,9 @@
 ## Demo Client
 
-Simple go utility to demonstrate go sdk 
+Simple go utility to demonstrate [Go SDK](https://github.com/streamdal/go-sdk)
+usage. 
 
-## Build Push
+## Build & Push
 
 ```make docker/build```
 

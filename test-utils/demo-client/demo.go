@@ -18,31 +18,32 @@ import (
 	streamdal "github.com/streamdal/go-sdk"
 )
 
-type Register struct {
+type Demo struct {
 	config *Config
 	log    *logrus.Entry
 }
 
-func runRegister(cfg *Config) error {
-	r := &Register{
+// Run is the main entry point for running the demo
+func Run(cfg *Config) error {
+	r := &Demo{
 		config: cfg,
-		log:    logrus.WithField("cmd", "register"),
+		log:    logrus.WithField("cmd", "client"),
 	}
 
 	// Global err channel
 	errCh := make(chan error, 1)
 
-	for i := 0; i < cfg.Register.NumInstances; i++ {
+	for i := 0; i < cfg.NumInstances; i++ {
 		workerID := i
 
 		// Dedicated read channel for each worker
 		readCh := make(chan []byte, 1)
 
-		if cfg.Register.ConsumerInputType != "none" {
-			r.log.Debugf("launching reader '%d'", workerID)
+		if cfg.DataSourceType == "file" {
+			r.log.Debugf("launching file reader '%d'", workerID)
 
-			// Launch something that will read data from $consumer_input and write
-			// results to input ch.
+			// Launch a reader that will read data from somewhere and write it
+			// to the readCh
 			go func() {
 				if err := r.runReader(workerID, readCh); err != nil {
 					errCh <- errors.Wrap(err, "reader error")
@@ -74,17 +75,18 @@ func runRegister(cfg *Config) error {
 	return nil
 }
 
-func (r *Register) runReader(workerID int, readCh chan []byte) error {
+// Wrapper for the type of reader
+func (r *Demo) runReader(workerID int, readCh chan []byte) error {
 	llog := r.log.WithField("func", "runReader").WithField("worker_id", workerID)
 
 	var err error
 
-	switch r.config.Register.ConsumerInputType {
+	switch r.config.DataSourceType {
 	case "file":
 		llog.Info("reading from file")
 		err = r.runFileReader(workerID, readCh)
 	case "none":
-		llog.Info("no consumer input, exiting")
+		llog.Info("'none' data source type - nothing to do")
 		return nil
 	}
 
@@ -95,12 +97,12 @@ func (r *Register) runReader(workerID int, readCh chan []byte) error {
 	return nil
 }
 
-func (r *Register) runFileReader(workerID int, readCh chan []byte) error {
+func (r *Demo) runFileReader(workerID int, readCh chan []byte) error {
 	llog := r.log.WithField("func", "runFileReader").WithField("worker_id", workerID)
 
 	// Read the file continuously and write to inputCh
 	for {
-		f, err := os.Open(r.config.Register.ConsumerInputFile.Name())
+		f, err := os.Open(r.config.DataSourceFile.Name())
 		if err != nil {
 			return errors.Wrap(err, "failed to open file")
 		}
@@ -116,7 +118,7 @@ func (r *Register) runFileReader(workerID int, readCh chan []byte) error {
 	}
 }
 
-func (r *Register) newClient() (*streamdal.Streamdal, error) {
+func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 	cfg := &streamdal.Config{
 		ServerURL:       r.config.ServerAddress,
 		ServerToken:     r.config.ServerToken,
@@ -126,7 +128,7 @@ func (r *Register) newClient() (*streamdal.Streamdal, error) {
 		DryRun:          false,
 		ShutdownCtx:     context.Background(), // TODO: Why is this required?
 		ClientType:      0,                    // This is intended primarily for shims - shims will specify that they're a shim
-		Audiences:       nil,
+		Audiences:       nil,                  // We could specify an audience here if we know it ahead of time; otherwise specify in .Process()
 	}
 
 	if r.config.InjectLogger {
@@ -136,7 +138,7 @@ func (r *Register) newClient() (*streamdal.Streamdal, error) {
 	return streamdal.New(cfg)
 }
 
-func (r *Register) runClient(workerID int, readCh chan []byte) error {
+func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 	llog := r.log.WithField("func", "runClient").WithField("worker_id", workerID)
 
 	sc, err := r.newClient()
@@ -157,19 +159,19 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 		}
 
 		// If ReconnectInterval is set, we want to reconnect; will take effect next iteration
-		if r.config.Register.ReconnectInterval > 0 {
+		if r.config.ReconnectInterval > 0 {
 			// Do we want to reconnect randomly?
-			if r.config.Register.ReconnectRandom {
-				reconnectTime = time.Now().Add(time.Duration(rand.Intn(r.config.Register.ReconnectInterval)) * time.Second)
+			if r.config.ReconnectRandom {
+				reconnectTime = time.Now().Add(time.Duration(rand.Intn(r.config.ReconnectInterval)) * time.Second)
 			} else {
-				reconnectTime = time.Now().Add(time.Duration(r.config.Register.ReconnectInterval) * time.Second)
+				reconnectTime = time.Now().Add(time.Duration(r.config.ReconnectInterval) * time.Second)
 			}
 
 			r.log.Debugf("next reconnect: %s", reconnectTime)
 		}
 
-		if r.config.Register.ConsumerInputType == "none" {
-			llog.Debug("no input data, nothing to do - noop")
+		if r.config.DataSourceType == "none" {
+			llog.Debug("no data source, nothing to do - noop")
 			time.Sleep(time.Second * 1)
 			continue
 		}
@@ -177,16 +179,16 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 		// Consumer will have input - read input data
 		input := <-readCh
 
-		operationName := r.config.Register.OperationName
+		operationName := r.config.OperationName
 
 		// Give each instance a unique operation name
-		if r.config.Register.NumInstances > 1 {
+		if r.config.NumInstances > 1 {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
 		resp, err := sc.Process(context.Background(), &streamdal.ProcessRequest{
-			ComponentName: r.config.Register.ComponentName,
-			OperationType: streamdal.OperationType(r.config.Register.OperationType),
+			ComponentName: r.config.ComponentName,
+			OperationType: streamdal.OperationType(r.config.OperationType),
 			OperationName: operationName,
 			Data:          input,
 		})
@@ -195,7 +197,7 @@ func (r *Register) runClient(workerID int, readCh chan []byte) error {
 	}
 }
 
-func (r *Register) display(pre []byte, post *streamdal.ProcessResponse, err error) {
+func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	tw := gopretty.NewWriter()
 	tw.Style().Box = gopretty.StyleBoxDouble
 	now := time.Now().Format(time.RFC1123)
