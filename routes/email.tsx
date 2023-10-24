@@ -10,6 +10,10 @@ import { WithSession } from "fresh-session/mod.ts";
 
 export type SessionData = { session: Record<string, string>; message?: string };
 
+export const config: RouteConfig = {
+  skipInheritedLayouts: true,
+};
+
 export const handler: Handlers<> = {
   async POST(req: Request, ctx: HandlerContext<SessionData, WithSession>) {
     const { session } = ctx.state;

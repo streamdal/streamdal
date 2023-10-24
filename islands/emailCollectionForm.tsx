@@ -32,37 +32,44 @@ export const EmailCollectionForm = () => {
         <form
           method="post"
           onSubmit={onSubmit}
+          className={"flex flex-col items-center w-full"}
         >
-          <div className={"w-full items-center"}>
+          <div className={"w-full flex items-center justify-center"}>
             <img
-              src={"/images/logo.svg"}
-              className={"w-16 ml-[144px] mb-4 max-w-16"}
+              src={"/images/email-bird.svg"}
+              className={"w-54 mb-5"}
             />
           </div>
           <h2
-            className={"text-center mb-3 text-2xl font-display tracking-wide"}
+            className={"text-center text-3xl font-display tracking-wide"}
           >
-            We'd love to send you updates!
+            Stay in the crow-d!
           </h2>
+          <p className={"text-center font-normal text-sm w-64 my-6"}>
+            Enter your email to receive crow-tastic news and Streamdal updates.
+          </p>
           <FormInput
             name="email"
-            label="Email"
+            label="Your email"
             errors={errors}
             data={data}
             setData={setData}
+            wrapperClass={"w-[350px]"}
+            inputClass={"border-2 border-purple-100 rounded-md text-sm my-2"}
+            placeHolder={"name@company.com"}
           />
           <input type="submit" class="hidden" />
           <div className={"flex flex-col items-center"}>
             <button
               type={"submit"}
-              className={"bg-streamdalYellow btn-heimdal text-web mb-3 w-full font-bold"}
+              className={"bg-streamdalYellow w-[350px] btn-heimdal text-web mb-3 w-full font-bold"}
             >
               Submit
             </button>
           </div>
           <button
             type="submit"
-            class={"btn-secondary text-web w-full font-bold"}
+            class={"btn-secondary text-web w-[350px] font-bold"}
           >
             No thanks
           </button>
