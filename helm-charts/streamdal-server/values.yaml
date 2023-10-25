@@ -91,6 +91,8 @@ affinity: {}
 env:
   - name: STREAMDAL_SERVER_AUTH_TOKEN
     value: "1234"
+  - name: STREAMDAL_DEMO
+    value: false
 
 consoleService:
   type: ClusterIP
