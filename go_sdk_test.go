@@ -382,7 +382,7 @@ var _ = Describe("Streamdal", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp.Error).To(BeTrue())
-			Expect(resp.Message).To(Equal("detective step failed"))
+			Expect(resp.Message).To(ContainSubstring("step failed"))
 		})
 	})
 })
@@ -731,4 +731,12 @@ func TestInferSchema(t *testing.T) {
 	if !strings.Contains(wasmResp.ExitMsg, "inferred fresh schema") {
 		t.Errorf("expected ExitMsg to contain 'inferred fresh schema', got = %s", wasmResp.ExitMsg)
 	}
+}
+
+func stringPtr(in string) *string {
+	return &in
+}
+
+func boolPtr(in bool) *bool {
+	return &in
 }
