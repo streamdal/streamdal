@@ -1,6 +1,8 @@
 import { Handle, Position } from "reactflow";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
+import IconBrandStripe from "tabler-icons/tsx/brand-stripe.tsx";
+import IconBrandAws from "tabler-icons/tsx/brand-aws.tsx";
 import "twind";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { ProducerIcon } from "../components/icons/producer.tsx";
@@ -228,7 +230,8 @@ export const OperationNode = (
 export const ComponentImage = (
   { componentName, className }: { componentName: string; className: string },
 ) => {
-  if (componentName.toLowerCase().includes("kafka")) {
+  const formattedComponentName = componentName.toLowerCase();
+  if (formattedComponentName.includes("kafka")) {
     return (
       <img
         src={"/images/kafka-dark.svg"}
@@ -237,7 +240,7 @@ export const ComponentImage = (
     );
   }
 
-  if (componentName.toLowerCase().includes("postgres")) {
+  if (formattedComponentName.includes("postgres")) {
     return (
       <img
         src={"/images/postgresql.svg"}
@@ -246,7 +249,23 @@ export const ComponentImage = (
     );
   }
 
-  return <IconDatabase class="w-6 h-6" />;
+  if (
+    formattedComponentName.includes("database") ||
+    formattedComponentName.includes("db")
+  ) {
+    return <IconDatabase className={`text-white w-14 h-14`} />;
+  }
+
+  if (formattedComponentName.includes("stripe")) {
+    return <IconBrandStripe class="w-14 h-14 text-white" />;
+  }
+  if (
+    formattedComponentName.includes("ses") &&
+    formattedComponentName.includes("aws")
+  ) {
+    return <IconBrandAws class="w-14 h-14 text-white" />;
+  }
+  return <IconDatabase className={`text-white w-14 h-14`} />;
 };
 
 export const ComponentNode = ({ data }: { data: NodeData }) => {
@@ -300,7 +319,7 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
         <div class="flex justify-center flex-col items-center">
           <ComponentImage
             componentName={data.audience.componentName}
-            className={"w-[30px]"}
+            className={"w-[40px]"}
           />
           <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
         </div>
