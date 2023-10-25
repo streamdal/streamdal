@@ -77,7 +77,7 @@ export const offset = (
   key: string,
   item: Map<string, number>,
 ) => {
-  let offset = 0;
+  let offset = 25;
   for (const [k, v] of item) {
     if (k === key) {
       return offset +
@@ -85,7 +85,23 @@ export const offset = (
     }
     offset += v * GROUP_WIDTH + GROUP_MARGIN;
   }
-  return offset ? offset : 25;
+  return offset;
+};
+
+export const componentOffset = (
+  key: string,
+  item: Map<string, number>,
+) => {
+  let offset = 25;
+  const keys = Array.from(item.keys());
+  for (const [k, v] of item) {
+    if (k === key) {
+      return offset +
+        ((keys.indexOf(k) + 1) * (GROUP_WIDTH + GROUP_MARGIN) / 2);
+    }
+    offset += GROUP_WIDTH + GROUP_MARGIN;
+  }
+  return offset;
 };
 
 export const mapOperation = (
@@ -127,9 +143,8 @@ export const mapOperation = (
       type: `${op}Group`,
       dragHandle: "#dragHandle",
       position: {
-        x: nodesMap.operationGroups.size === 1
-          ? 25
-          : (nodesMap.operationGroups.size - 1) * (GROUP_WIDTH + GROUP_MARGIN),
+        x: 25 +
+          (nodesMap.operationGroups.size - 1) * (GROUP_WIDTH + GROUP_MARGIN),
         y: 300,
       },
       data: {
@@ -191,7 +206,7 @@ export const mapNodes = (
         type: "component",
         dragHandle: `#${cKey}-dragHandle`,
         position: {
-          x: offset(cKey, nodesMap.components),
+          x: componentOffset(cKey, nodesMap.components),
           y: 550 + (max - 1) * 76,
         },
         data: { audience: a, serviceMap },
