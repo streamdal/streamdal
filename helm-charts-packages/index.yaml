@@ -3,7 +3,21 @@ entries:
   streamdal-server:
   - apiVersion: v2
     appVersion: 1.16.1
-    created: "2023-10-25T14:02:05.489702073Z"
+    created: "2023-10-25T14:24:37.362386112Z"
+    dependencies:
+    - name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.0.4
+    description: A Helm chart for Kubernetes
+    digest: da296604168133cf2a00cd7760320f78bccc52fa4bde31dd72349af1945161f5
+    name: streamdal-server
+    type: application
+    urls:
+    - https://streamdal.github.io/streamdal/helm-charts-packages/streamdal-server-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: 1.16.1
+    created: "2023-10-25T14:24:37.353975423Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -17,7 +31,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: 1.16.1
-    created: "2023-10-25T14:02:05.482019019Z"
+    created: "2023-10-25T14:24:37.336904345Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -31,7 +45,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 1.16.1
-    created: "2023-10-25T14:02:05.472749253Z"
+    created: "2023-10-25T14:24:37.326811658Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -45,7 +59,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.16.1
-    created: "2023-10-25T14:02:05.464981998Z"
+    created: "2023-10-25T14:24:37.318202669Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -59,7 +73,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 1.16.1
-    created: "2023-10-25T14:02:05.455020328Z"
+    created: "2023-10-25T14:24:37.307958782Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -71,4 +85,4 @@ entries:
     urls:
     - https://streamdal.github.io/streamdal/helm-charts-packages/streamdal-server-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-25T14:02:05.444188352Z"
+generated: "2023-10-25T14:24:37.292666201Z"
