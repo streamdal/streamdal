@@ -48,7 +48,7 @@ streamdal-protos==0.0.118
 stringcase==1.2.0
 tf==1.0.0
 twine==4.0.2
-urllib3==2.0.3
+urllib3==2.0.7
 wasmer==1.1.0
 wasmer-compiler-cranelift==1.1.0
 wasmtime==10.0.0
