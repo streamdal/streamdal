@@ -23,7 +23,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.12.2
 	github.com/streamdal/protos v0.0.118
-	golang.org/x/crypto v0.12.0
+	golang.org/x/crypto v0.14.0
 	google.golang.org/grpc v1.56.2
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
@@ -62,10 +62,10 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tinylib/msgp v1.1.2 // indirect
-	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
