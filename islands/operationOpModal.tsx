@@ -1,9 +1,5 @@
 import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
-import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import IconLink from "tabler-icons/tsx/link.tsx";
 import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
 import { Toggle } from "../components/form/switch.tsx";
@@ -14,8 +10,6 @@ import {
   tailSamplingSignal,
 } from "./tail.tsx";
 import { isNumeric } from "../lib/utils.ts";
-import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
-import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
 import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
 import { useState } from "preact/hooks";
 import { Schema } from "../components/operation/schema.tsx";

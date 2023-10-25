@@ -52,15 +52,15 @@ export const Schema = (
             message={"Click to maximize schema"}
           />
         </div>
-        <pre>
+        <pre className={"h-[150px]"}>
           <code>
             <div
-              class={"font-sm"}
-              dangerouslySetInnerHTML={{
-                  __html: opModal.value.schemaInfo?.schema ?
-                    `${ hljs.highlight(`${opModal.value.schemaInfo?.schema }`, { language: 'json' }).value}` :
-                    ""
-              }}
+                class={"font-sm "}
+                dangerouslySetInnerHTML={{
+                    __html: opModal.value?.schemaInfo?.schema ?
+                        `${hljs.highlight(`${opModal.value?.schemaInfo?.schema}`, {language: 'json'}).value}` :
+                        ""
+                }}
             >
             </div>
           </code>

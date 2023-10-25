@@ -1,5 +1,3 @@
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
 import { OP_MODAL_WIDTH } from "../../islands/opModal.tsx";
 
@@ -55,10 +53,10 @@ export const SchemaModal = (
                 <div
                     class={"pb-2 px-4"}
                     dangerouslySetInnerHTML={{
-                      __html: `${
-                          hljs.highlight(`${schema}`, {language: 'json'})
-                              .value
-                      }`,
+                        __html: `${
+                            hljs.highlight(`${schema}`, {language: 'json'})
+                                .value
+                        }`,
                     }}
                 >
                 </div>
