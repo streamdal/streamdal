@@ -89,10 +89,8 @@ tolerations: []
 affinity: {}
 
 env:
-  - name: STREAMDAL_SERVER_AUTH_TOKEN
-    value: "1234"
-  - name: STREAMDAL_DEMO
-    value: false
+  STREAMDAL_SERVER_AUTH_TOKEN: "1234"
+  STREAMDAL_DEMO: "false"
 
 consoleService:
   type: ClusterIP
