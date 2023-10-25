@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -879,6 +880,9 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// Each tail request gets its own unique ID so that we can receive messages over
 	// a unique channel from RedisBackend
 	req.XId = util.StringPtr(util.GenerateUUID())
+	req.Audience.ServiceName = strings.ToLower(req.Audience.GetServiceName())
+	req.Audience.OperationName = strings.ToLower(req.Audience.GetOperationName())
+	req.Audience.ComponentName = strings.ToLower(req.Audience.GetComponentName())
 
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
