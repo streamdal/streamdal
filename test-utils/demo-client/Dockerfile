@@ -27,13 +27,12 @@ ARG TARGETOS
 # Install SSL certificates and some quality-of-life tools
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
-# Copy the built binary and test data
+# Copy the built binary, test data, and assets directory
 COPY --from=builder /demo-client/build/demo-client-$TARGETOS-$TARGETARCH /demo-client
-COPY --from=builder /demo-client/test-data/sample.json /test-data/sample.json
+COPY --from=builder /demo-client/assets /assets
 
 # Make the binary executable
 RUN chmod +x /demo-client
 
 # Entrypoint and command to run the specified go command
 ENTRYPOINT ["/demo-client"]
-CMD ["register", "-d", "--num-instances", "1", "--service-name", "service", "--server-address", "streamdal-server.streamdal-server.svc.cluster.local:9090", "--component-name", "kafka", "--operation-name", "demo-operation", "--consumer-input-type", "file", "--consumer-input-file", "/test-data/sample.json"]
