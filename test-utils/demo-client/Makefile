@@ -1,4 +1,4 @@
-VERSION ?= e074107
+VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = demo-client
 ARCH ?= $(shell uname -m)
 GOOS=linux GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-linux-arm64
@@ -131,7 +131,7 @@ build/darwin-arm64: clean
 docker/build: description = Build docker image
 docker/build:
 	docker buildx build --push --platform=linux/amd64,linux/arm64 \
-        -t streamdal/demo-client:e074107 \
+        -t streamdal/demo-client:$(VERSION) \
         -t streamdal/demo-client:latest \
         -f ./Dockerfile .
 
