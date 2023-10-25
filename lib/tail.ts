@@ -65,6 +65,10 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
     let lastDate = null;
 
     for await (const response of tailCall?.responses) {
+      if (response?.Keepalive) {
+        continue;
+      }
+
       const currentDate = parseDate(response.timestampNs);
 
       if (sampling === 0) {
