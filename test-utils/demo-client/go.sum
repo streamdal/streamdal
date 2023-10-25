@@ -94,6 +94,12 @@ github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/streamdal/go-sdk v0.0.56 h1:vGX4flTGbNhmmjy/b/qgHNIK+XQ1j8C4yThk3aOZkCM=
 github.com/streamdal/go-sdk v0.0.56/go.mod h1:NGD87blMB/9adCadne1no53nf9g7bH0YA31Z+u6qsb4=
+github.com/streamdal/go-sdk v0.0.58 h1:57WDObftBHaLYgB5/BD2IOPndJ88ANXj7acbcp7rAz0=
+github.com/streamdal/go-sdk v0.0.58/go.mod h1:NGD87blMB/9adCadne1no53nf9g7bH0YA31Z+u6qsb4=
+github.com/streamdal/go-sdk v0.0.59-0.20231024223547-bfb23e1def9f h1:J1wB/JxwLS0vxhGgItNH8+CY4xeFB+KB9vSz68J662U=
+github.com/streamdal/go-sdk v0.0.59-0.20231024223547-bfb23e1def9f/go.mod h1:NGD87blMB/9adCadne1no53nf9g7bH0YA31Z+u6qsb4=
+github.com/streamdal/go-sdk v0.0.60 h1:U28GCcDmvFFtH4DXt390WrMqUuvYXV82081a584qnAk=
+github.com/streamdal/go-sdk v0.0.60/go.mod h1:NGD87blMB/9adCadne1no53nf9g7bH0YA31Z+u6qsb4=
 github.com/streamdal/protos v0.0.115 h1:wsLiKEA4oG2yAj2Tm2cl8yirE34oHur4iVjxRDk8Y5o=
 github.com/streamdal/protos v0.0.115/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

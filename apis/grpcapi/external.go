@@ -889,6 +889,8 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
 
+	s.log.Info("external.Tail(): broadcasting tail request")
+
 	// Need to broadcast tail request because an SDK might be connected to a
 	// different server instance. The broadcast handler that receives this message
 	// is responsible for telling connected SDK to start tailing!
@@ -957,7 +959,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			}
 		case <-tailTicker.C:
 			// Keep the tail request key alive while this req is open
-			if err := s.Options.RedisBackend.Expire(server.Context(), activeTailKey, store.RedisActiveTailTTL); err != nil {
+			if _, err := s.Options.RedisBackend.Expire(server.Context(), activeTailKey, store.RedisActiveTailTTL).Result(); err != nil {
 				s.log.Errorf("unable to refresh active tail request for key '%s': %s", activeTailKey, err)
 			}
 		case <-keepaliveTicker.C:

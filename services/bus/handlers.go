@@ -590,11 +590,7 @@ func (b *Bus) handleTailResponse(_ context.Context, req *protos.TailResponse) er
 		return nil
 	}
 
-	llog.Debug("before publish to pubsub topic '%s'", req.TailRequestId)
-
 	b.options.PubSub.Publish(req.TailRequestId, req)
-
-	llog.Debug("after publish to pubsub topic '%s'", req.TailRequestId)
 
 	return nil
 }

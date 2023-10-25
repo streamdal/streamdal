@@ -30,10 +30,11 @@ run/all:
 run1: description = Run signup-service
 run1:
 	go run *.go -d \
-	--service-name "Signup-service" \
+    --quiet \
+	--service-name "signup-service" \
 	--operation-type 2 \
-	--operation-name  "Verifier" \
-	--component-name "PostgreSQL" \
+	--operation-name  "verifier" \
+	--component-name "postgresql" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-signup-producer.json
 	# this client also supports --quiet (for quiet output), various "reconnect"
@@ -44,9 +45,9 @@ run1:
 run2: description = Run signup-service
 run2:
 	go run *.go -d \
-	--service-name "Signup-service" \
+	--service-name "signup-service" \
 	--operation-type 2 \
-	--operation-name  "Recorder" \
+	--operation-name  "recorder" \
 	--component-name "kafka" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-signup-producer.json
@@ -57,8 +58,8 @@ run3:
 	go run *.go -d \
 	--service-name "billing-service" \
 	--operation-type 1 \
-	--operation-name  "Processor" \
-	--component-name "Kafka" \
+	--operation-name  "processor" \
+	--component-name "kafka" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-billing-consumer.json
 
@@ -66,10 +67,10 @@ run3:
 run4: description = Run billing-service
 run4:
 	go run *.go -d \
-	--service-name "Billing-service" \
+	--service-name "billing-service" \
 	--operation-type 2 \
-	--operation-name  "Stripe-register" \
-	--component-name "Stripe" \
+	--operation-name  "stripe-register" \
+	--component-name "stripe" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-billing-producer.json
 
@@ -77,10 +78,10 @@ run4:
 run5: description = Run welcome-service
 run5:
 	go run *.go -d \
-	--service-name "Welcome-service" \
+	--service-name "welcome-service" \
 	--operation-type 1 \
-	--operation-name  "Reader" \
-	--component-name "Kafka" \
+	--operation-name  "reader" \
+	--component-name "kafka" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-signup-producer.json
 
@@ -88,10 +89,10 @@ run5:
 run6: description = Run welcome-service
 run6:
 	go run *.go -d \
-	--service-name "Welcome-service" \
+	--service-name "welcome-service" \
 	--operation-type 2 \
-	--operation-name  "Emailer" \
-	--component-name "AWS-SES" \
+	--operation-name  "emailer" \
+	--component-name "aws-ses" \
 	--data-source-type file \
 	--data-source-file ./assets/sample-welcome-producer.json
 

@@ -20,7 +20,7 @@ setup/darwin:
 test: description = Run all tests
 test:
 	bash ./init_wasm.sh
-	go test ./...
+	go test ./... -v
 
 .PHONY: test/fakes
 test/fakes: description = Generate all fakes
@@ -33,3 +33,9 @@ test/coverage: description = Run all tests
 test/coverage:
 	bash ./init_wasm.sh
 	go test -coverprofile=c.out `go list ./... | grep -v fake`
+
+.PHONY: test/benchmark
+test/benchmark: description = Run all benchmarks
+test/benchmark:
+	bash ./init_wasm.sh
+	go test -bench=. -run=^#

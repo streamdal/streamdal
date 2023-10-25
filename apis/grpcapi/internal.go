@@ -42,6 +42,8 @@ func (s *InternalServer) sendActiveTails(ctx context.Context, cmdCh chan *protos
 		s.log.Errorf("unable to fetch active tail commands by service '%s': %s", req.ServiceName, err.Error())
 	}
 
+	s.log.Debugf("resume: sending '%d' active tails for register session id '%s'", len(tailCommands), req.SessionId)
+
 	for _, cmd := range tailCommands {
 		cmdCh <- cmd
 	}
@@ -265,8 +267,6 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 			Message: err.Error(),
 		}, nil
 	}
-
-	s.log.Debug("Saved heartbeat")
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),

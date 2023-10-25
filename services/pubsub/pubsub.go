@@ -64,8 +64,6 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 
 	ch := make(chan interface{}, 1)
 
-	ps.log.Debug("pubsub.Listen: before lock")
-
 	ps.mtx.Lock()
 	if _, ok := ps.topics[topic]; !ok {
 		ps.topics[topic] = make(map[string]chan interface{})
@@ -74,8 +72,6 @@ func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
 	ps.topics[topic][id] = ch
 
 	ps.mtx.Unlock()
-
-	ps.log.Debug("pubsub.Listen: after unlock")
 
 	return ch
 }

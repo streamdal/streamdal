@@ -429,13 +429,6 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 }
 
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
-	llog := s.log.WithField("method", "AddAudience")
-	llog.Debug("received request to add audience")
-
-	audStr := util.AudienceToStr(req.Audience)
-
-	s.log.Debugf("audience contents: %+v; audience as str: %s", req.Audience, audStr)
-
 	// Add it to the live bucket
 	if err := s.options.RedisBackend.Set(
 		ctx,
@@ -1190,13 +1183,17 @@ func (s *Store) setStreamdalID(ctx context.Context) (string, error) {
 func (s *Store) GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
 	tailCommands := make([]*protos.Command, 0)
 
-	activeTailKeys, err := s.options.RedisBackend.Keys(ctx, RedisActiveTailPrefix+":"+serviceName).Result()
+	activeTailKeys, err := s.options.RedisBackend.Keys(ctx, RedisActiveTailPrefix+":"+serviceName+":*").Result()
 	// No keys in redis
 	if errors.Is(err, redis.Nil) {
+		s.log.Debug("resume: no active tails found")
 		return tailCommands, nil
 	} else if err != nil {
+		s.log.Errorf("resume: error fetching active tail keys from store: %s", err)
 		return nil, errors.Wrap(err, "error fetching active tail keys from store")
 	}
+
+	s.log.Debugf("resume: found '%d' active tails", len(activeTailKeys))
 
 	// Each key is an active tail - fetch each + decode
 	for _, key := range activeTailKeys {

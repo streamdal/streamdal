@@ -148,7 +148,7 @@ func applyDefaults(cfg *Config) {
 	}
 
 	if cfg.Log == nil {
-		cfg.Log = &logger.NoOpLogger{}
+		cfg.Log = &logger.TinyLogger{}
 	}
 }
 
