@@ -58,6 +58,9 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 
 	// Read memory starting from result ptr
 	resBytes, err := f.ReadMemory(resultPtr, -1)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to read memory")
+	}
 
 	return resBytes, nil
 }
