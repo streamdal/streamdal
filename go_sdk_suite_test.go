@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestStreamdalGoClient(t *testing.T) {
+func TestStreamdalGoSDK(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "StreamdalGoClient Suite")
+	RunSpecs(t, "StreamdalGoSDK Suite")
 }

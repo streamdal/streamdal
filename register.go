@@ -10,9 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/protos/build/go/protos/shared"
-
 	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
 	"github.com/streamdal/go-sdk/validate"
 )
@@ -26,7 +25,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "0.0.58",
+		LibraryVersion: "0.0.60",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
@@ -235,10 +234,10 @@ func (s *Streamdal) handleTailCommand(_ context.Context, cmd *protos.Command) er
 	switch tail.GetRequest().Type {
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
 		s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
-		err = s.startTailAudience(context.Background(), cmd)
+		err = s.startTailHandler(context.Background(), cmd)
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 		s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
-		err = s.stopTailAudience(context.Background(), cmd)
+		err = s.stopTailHandler(context.Background(), cmd)
 	default:
 		return fmt.Errorf("unknown tail command type: %s", tail.GetRequest().Type)
 	}

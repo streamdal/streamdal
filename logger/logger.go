@@ -26,47 +26,43 @@ type Logger interface {
 	Errorf(format string, args ...interface{})
 }
 
-// NoOpLogger is a do-nothing logger; it is used internally
-// as the default Logger when none is provided in the Options.
-type NoOpLogger struct {
-}
+// TinyLogger is an _almost_ no-op logger - if the user of the SDK does not
+// inject their own logger, this logger will be used instead. This logger will
+// print Warning and Error messages to STDOUT and will ignore Debug & Info.
+type TinyLogger struct{}
 
-// Debug is no-op implementation of Logger's Debug.
-func (l *NoOpLogger) Debug(args ...interface{}) {
-	log.Println(args...)
-}
+// Debug won't print anything.
+func (l *TinyLogger) Debug(args ...interface{}) {}
 
 // Debugf is no-op implementation of Logger's Debugf.
-func (l *NoOpLogger) Debugf(format string, args ...interface{}) {
-	log.Printf(format, args...)
-}
+func (l *TinyLogger) Debugf(format string, args ...interface{}) {}
 
 // Info is no-op implementation of Logger's Info.
-func (l *NoOpLogger) Info(args ...interface{}) {
+func (l *TinyLogger) Info(args ...interface{}) {}
+
+// Infof is a no-op implementation of Logger's Infof.
+func (l *TinyLogger) Infof(format string, args ...interface{}) {}
+
+// Warn will print the warn message to STDOUT. This will only be used if the
+// user has NOT injected their own logger.
+func (l *TinyLogger) Warn(args ...interface{}) {
 	log.Println(args...)
 }
 
-// Infof is no-op implementation of Logger's Infof.
-func (l *NoOpLogger) Infof(format string, args ...interface{}) {
+// Warnf will print the warn message to STDOUT. This will only be used if the
+// user has NOT injected their own logger.
+func (l *TinyLogger) Warnf(format string, args ...interface{}) {
 	log.Printf(format, args...)
 }
 
-// Warn is no-op implementation of Logger's Warn.
-func (l *NoOpLogger) Warn(args ...interface{}) {
+// Error will print the error message to STDOUT. This will only be used if the
+// user has NOT injected their own logger.
+func (l *TinyLogger) Error(args ...interface{}) {
 	log.Println(args...)
 }
 
-// Warnf is no-op implementation of Logger's Warnf.
-func (l *NoOpLogger) Warnf(format string, args ...interface{}) {
-	log.Printf(format, args...)
-}
-
-// Error is no-op implementation of Logger's Error.
-func (l *NoOpLogger) Error(args ...interface{}) {
-	log.Println(args...)
-}
-
-// Errorf is no-op implementation of Logger's Errorf.
-func (l *NoOpLogger) Errorf(format string, args ...interface{}) {
+// Errorf will print the error message to STDOUT. This will only be used if the
+// user has NOT injected their own logger.
+func (l *TinyLogger) Errorf(format string, args ...interface{}) {
 	log.Printf(format, args...)
 }
