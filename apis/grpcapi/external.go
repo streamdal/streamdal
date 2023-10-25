@@ -880,28 +880,23 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// a unique channel from RedisBackend
 	req.XId = util.StringPtr(util.GenerateUUID())
 
-	s.log.Debug("external.Tail(): after str ptr")
-
 	if err := validate.StartTailRequest(req); err != nil {
 		return errors.Wrap(err, "invalid tail request")
 	}
-
-	s.log.Debug("external.Tail(): after validate")
 
 	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
 	// messages from RedisBackend
 	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
 
-	s.log.Debug("external.Tail(): after listen")
+	s.log.Info("external.Tail(): broadcasting tail request")
 
 	// Need to broadcast tail request because an SDK might be connected to a
-	// different server instance.
+	// different server instance. The broadcast handler that receives this message
+	// is responsible for telling connected SDK to start tailing!
 	if err := s.Options.BusService.BroadcastTailRequest(context.Background(), req); err != nil {
 		return errors.Wrap(err, "unable to broadcast tail request")
 	}
-
-	s.log.Debug("external.Tail(): after broadcast")
 
 	// When the connection to the endpoint is closed, emit a STOP event which will be broadcast
 	// to all server instances and their connected clients so that they can stop tailing.
@@ -916,8 +911,26 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		}
 	}()
 
+	tailTicker := time.NewTicker(time.Second)
+	defer tailTicker.Stop()
+
 	keepaliveTicker := time.NewTicker(streamKeepaliveInterval)
 	defer keepaliveTicker.Stop()
+
+	// Create a TTL'd entry for the request and keep it alive for the duration
+	// of this request.
+	activeTailKey, err := s.Options.StoreService.AddActiveTailRequest(server.Context(), req)
+	if err != nil {
+		return errors.Wrap(err, "unable to store tail request")
+	}
+
+	// Best effort: delete the active tail request key when client disconnects.
+	// If this does not work - the key will TTL out after RedisActiveTailTTL.
+	defer func() {
+		if _, err := s.Options.RedisBackend.Del(server.Context(), activeTailKey).Result(); err != nil {
+			s.log.Errorf("DEFER: unable to delete active tail request key '%s': %s", activeTailKey, err)
+		}
+	}()
 
 	for {
 		select {
@@ -943,6 +956,11 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			// Send tail response to client
 			if err := server.Send(tr); err != nil {
 				return errors.Wrap(err, "unable to send tail stream response")
+			}
+		case <-tailTicker.C:
+			// Keep the tail request key alive while this req is open
+			if _, err := s.Options.RedisBackend.Expire(server.Context(), activeTailKey, store.RedisActiveTailTTL).Result(); err != nil {
+				s.log.Errorf("unable to refresh active tail request for key '%s': %s", activeTailKey, err)
 			}
 		case <-keepaliveTicker.C:
 			if err := server.Send(&protos.TailResponse{

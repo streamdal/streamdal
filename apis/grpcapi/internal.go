@@ -34,6 +34,50 @@ func (g *GRPCAPI) newInternalServer() *InternalServer {
 	}
 }
 
+// sendActiveTails is executed during Register() and will send all active tails
+// to the client (so that SDK can "resume" any in-progress tails)
+func (s *InternalServer) sendActiveTails(ctx context.Context, cmdCh chan *protos.Command, req *protos.RegisterRequest) {
+	tailCommands, err := s.Options.StoreService.GetActiveTailCommandsByService(ctx, req.ServiceName)
+	if err != nil {
+		s.log.Errorf("unable to fetch active tail commands by service '%s': %s", req.ServiceName, err.Error())
+	}
+
+	s.log.Debugf("resume: sending '%d' active tails for register session id '%s'", len(tailCommands), req.SessionId)
+
+	for _, cmd := range tailCommands {
+		cmdCh <- cmd
+	}
+}
+
+func (s *InternalServer) sendKVs(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
+	llog := s.log.WithFields(logrus.Fields{
+		"method":     "sendKVs",
+		"session_id": sessionID,
+	})
+
+	llog.Debug("starting initial KV sync")
+
+	kvCommands, err := s.generateInitialKVCommands(ctx)
+	if err != nil {
+		llog.Errorf("unable to generate initial kv commands: %v", err)
+		return
+	}
+
+	llog.Debugf("generated '%d' kv commands", len(kvCommands))
+
+	for _, cmd := range kvCommands {
+		llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
+
+		cmdCh <- &protos.Command{
+			Command: &protos.Command_Kv{
+				Kv: cmd,
+			},
+		}
+	}
+
+	llog.Debug("finished initial KV sync")
+}
+
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
 	// Get all audiences for this session
 	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
@@ -94,33 +138,24 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		return errors.Wrap(err, "unable to broadcast register")
 	}
 
+	// NOTE: We cannot send AttachPipelines in here because Register() is an
+	// async operation in the SDKs - if we did it here, there is a chance that a
+	// .Process() call might process some messages WITHOUT any pipelines attached.
+	//
+	// Because of this, all of the SDKs ASK for attached pipelines in the
+	// *constructor* (rather than inside of Register()).
+
 	// Send all KVs to client
-	go func() {
-		llog.Debug("starting initial KV sync")
+	go s.sendKVs(server.Context(), ch, request.SessionId)
 
-		kvCommands, err := s.generateInitialKVCommands(server.Context())
-		if err != nil {
-			llog.Errorf("unable to generate initial kv commands: %v", err)
-			return
-		}
-
-		llog.Debugf("generated '%d' kv commands", len(kvCommands))
-
-		for _, cmd := range kvCommands {
-			llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
-
-			ch <- &protos.Command{
-				Command: &protos.Command_Kv{
-					Kv: cmd,
-				},
-			}
-		}
-
-		llog.Debug("finished initial KV sync")
-	}()
+	// Send all active tails. We are passing request here because we need access
+	// to the ServiceName (so we can get all active tails for that service)
+	go s.sendActiveTails(server.Context(), ch, request)
 
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
+
+	// TODO: Why not send active tails here? (This way, SDK does not have to ask for anything at registration time.)
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
@@ -233,8 +268,6 @@ func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatReq
 		}, nil
 	}
 
-	s.log.Debug("Saved heartbeat")
-
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
@@ -327,37 +360,35 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
-func (s *InternalServer) GetAttachCommandsByService(
+func (s *InternalServer) getActiveAttachPipelineCommands(
 	ctx context.Context,
-	req *protos.GetAttachCommandsByServiceRequest,
-) (*protos.GetAttachCommandsByServiceResponse, error) {
-	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, req.ServiceName)
+	serviceName string,
+) ([]*protos.Command, []*protos.Command, error) {
+	if serviceName == "" {
+		return nil, nil, errors.New("service name is required")
+	}
+
+	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, serviceName)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get attach commands by service")
+		return nil, nil, errors.Wrap(err, "unable to get attach commands by service")
 	}
 
 	pausedMap, err := s.Options.StoreService.GetPaused(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get paused pipelines")
+		return nil, nil, errors.Wrap(err, "unable to get paused pipelines")
 	}
 
 	active := make([]*protos.Command, 0)
 	paused := make([]*protos.Command, 0)
-	wasmModules := make(map[string]*protos.WasmModule)
 
 	for _, a := range attaches {
-		// Inject WASM data into it's own map and zero out the bytes in the steps
-		// This is to prevent the WASM data from being duplicated in the response
-		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
-			if _, ok := wasmModules[step.GetXWasmId()]; !ok {
-				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
-					Id:       step.GetXWasmId(),
-					Bytes:    step.GetXWasmBytes(),
-					Function: step.GetXWasmFunction(),
-				}
-			}
+		if err := validate.AttachPipelineCommand(a.GetAttachPipeline()); err != nil {
+			s.log.Warningf("invalid attach pipeline command: %s", err.Error())
+			continue
+		}
 
-			// Always wipe bytes. SDK Client will handle lookup
+		// Always wipe bytes. SDK Client will handle lookup.
+		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
 			step.XWasmBytes = nil
 		}
 
@@ -379,10 +410,22 @@ func (s *InternalServer) GetAttachCommandsByService(
 		active = append(active, a)
 	}
 
+	return active, paused, nil
+}
+
+func (s *InternalServer) GetAttachCommandsByService(
+	ctx context.Context,
+	req *protos.GetAttachCommandsByServiceRequest,
+) (*protos.GetAttachCommandsByServiceResponse, error) {
+	active, paused, err := s.getActiveAttachPipelineCommands(ctx, req.ServiceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get attach commands by service")
+	}
+
 	return &protos.GetAttachCommandsByServiceResponse{
 		Active:      active,
 		Paused:      paused,
-		WasmModules: wasmModules,
+		WasmModules: util.GenerateWasmMapping(append(active, paused...)...),
 	}, nil
 }
 
@@ -392,7 +435,7 @@ func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
 		"request_id": util.CtxRequestId(srv.Context()),
 	})
 
-	// This isn't necessary for go, but other langauge libraries, such as python
+	// This isn't necessary for go, but other language libraries, such as python
 	// require a response to eventually be sent and will throw an exception if
 	// one is not received
 	defer func() {

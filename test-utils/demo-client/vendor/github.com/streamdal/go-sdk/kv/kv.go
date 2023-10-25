@@ -152,7 +152,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.Logger == nil {
-		cfg.Logger = &logger.NoOpLogger{}
+		cfg.Logger = &logger.TinyLogger{}
 	}
 
 	return nil

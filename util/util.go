@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/streamdal/protos/build/go/protos/steps"
 
 	"github.com/gofrs/uuid"
@@ -173,6 +174,40 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 	}
 
 	return nil
+}
+
+// GenerateWasmMapping will generate a map of WASM modules from the given command(s).
+// NOTE: This is primarily useful for commands that have Steps which contain
+// Wasm fields (like AttachCommand). For commands that do not have Steps w/ Wasm,
+// this will do nothing.
+func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmModule {
+	wasmModules := make(map[string]*protos.WasmModule)
+
+	for _, cmd := range commands {
+		if cmd.GetAttachPipeline() == nil {
+			continue
+		}
+
+		if cmd.GetAttachPipeline().Pipeline == nil {
+			logrus.Warnf("bug? attach pipeline command has nil pipeline. Audience: %s CommandStr: %s",
+				AudienceToStr(cmd.Audience), cmd.String())
+			continue
+		}
+
+		// Inject WASM data into it's own map and zero out the bytes in the steps
+		// This is to prevent the WASM data from being duplicated in the response
+		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
+			if _, ok := wasmModules[step.GetXWasmId()]; !ok {
+				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+					Id:       step.GetXWasmId(),
+					Bytes:    step.GetXWasmBytes(),
+					Function: step.GetXWasmFunction(),
+				}
+			}
+		}
+	}
+
+	return wasmModules
 }
 
 func StripWASMFields(pipeline *protos.Pipeline) {

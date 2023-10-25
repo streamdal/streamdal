@@ -40,6 +40,7 @@ type Tail struct {
 	cancelCtx       context.Context
 	lastMsg         time.Time
 	log             logger.Logger
+	active          bool
 }
 
 func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
@@ -49,9 +50,23 @@ func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalDa
 	}
 
 	for _, tail := range tails {
+		tailID := tail.Request.GetTail().Request.GetXId()
+
+		if !tail.active {
+			tail.log.Debugf("tail id '%s' is not active - starting workers", tailID)
+
+			if err := tail.startWorkers(); err != nil {
+				tail.log.Errorf("error starting tail workers for request '%s': %s", err, tailID)
+				continue
+			}
+
+			// Save tail state
+			tail.active = true
+		}
+
 		tr := &protos.TailResponse{
 			Type:          protos.TailResponseType_TAIL_RESPONSE_TYPE_PAYLOAD,
-			TailRequestId: tail.Request.GetTail().Request.GetXId(),
+			TailRequestId: tailID,
 			Audience:      aud,
 			PipelineId:    pipelineID,
 			SessionId:     s.sessionID,
@@ -72,7 +87,7 @@ func (t *Tail) ShipResponse(tr *protos.TailResponse) {
 			Labels: map[string]string{},
 			Value:  1})
 
-		t.log.Warnf("Dropping tail response for %s, too fast", tr.PipelineId)
+		t.log.Warnf("sending tail responses too fast - dropping message for tail request id '%s'", tr.TailRequestId)
 		return
 	}
 
@@ -144,23 +159,31 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 	})
 }
 
-func (s *Streamdal) startTailAudience(_ context.Context, cmd *protos.Command) error {
+// startTailHandler will record the start tail request in the main tail map.
+// Starting of the tail workers is done in the sendTail() method which is called
+// during .Process() calls.
+func (s *Streamdal) startTailHandler(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStartCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail command")
 	}
 
 	// Check if we have this audience
 	audStr := audToStr(cmd.Audience)
-	if _, ok := s.audiences[audStr]; !ok {
-		s.config.Logger.Debugf("Received tail command for unknown audience: '%s'", audStr)
-		return nil
-	}
 
-	s.config.Logger.Debugf("Tailing audience '%s'", audStr)
+	// If this is a start that was given to us as part of an initial Register(),
+	// then we will probably not know about the audience(s) yet, so we should
+	// keep ALL StartTail requests in memory until we see the audience mentioned
+	// in a .Process().
+	//
+	// Optimization for the future: TTL the tail request for 24h and refresh the
+	// the TTL when we see the audience in a .Process() call. This would prevent
+	// the tail map from growing indefinitely. ~DS
+
+	s.config.Logger.Debugf("received tail command for audience '%s'; saving to tail map", audStr)
 
 	ctx, cancel := context.WithCancel(s.config.ShutdownCtx)
 
-	// Start workers
+	// Create entry in tail map
 	t := &Tail{
 		Request:         cmd,
 		outboundCh:      make(chan *protos.TailResponse, 100),
@@ -170,18 +193,16 @@ func (s *Streamdal) startTailAudience(_ context.Context, cmd *protos.Command) er
 		metrics:         s.metrics,
 		log:             s.config.Logger,
 		lastMsg:         time.Now(),
+		active:          false,
 	}
 
-	if err := t.startWorkers(); err != nil {
-		return errors.Wrap(err, "unable to tail pipeline")
-	}
-
+	// Save entry in tail map
 	s.setTailing(t)
 
 	return nil
 }
 
-func (s *Streamdal) stopTailAudience(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) stopTailHandler(_ context.Context, cmd *protos.Command) error {
 	if err := validate.TailRequestStopCommand(cmd); err != nil {
 		return errors.Wrap(err, "invalid tail request stop command")
 	}
@@ -200,7 +221,7 @@ func (s *Streamdal) stopTailAudience(_ context.Context, cmd *protos.Command) err
 		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
 		return nil
 	}
-
+	
 	// Cancel workers
 	tail.CancelFunc()
 
@@ -209,6 +230,7 @@ func (s *Streamdal) stopTailAudience(_ context.Context, cmd *protos.Command) err
 	return nil
 }
 
+// k: audience_as_str
 func (s *Streamdal) getTail(aud *protos.Audience) map[string]*Tail {
 	s.tailsMtx.RLock()
 	tails, ok := s.tails[audToStr(aud)]
