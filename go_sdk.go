@@ -637,7 +637,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 					return &ProcessResponse{
 						Data:    wasmResp.OutputPayload,
 						Error:   true,
-						Message: "step failed:" + wasmResp.ExitMsg,
+						Message: "step failed: " + wasmResp.ExitMsg,
 					}, nil
 				}
 			default:

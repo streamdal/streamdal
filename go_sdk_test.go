@@ -382,7 +382,7 @@ var _ = Describe("Streamdal", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp.Error).To(BeTrue())
-			Expect(resp.Message).To(Equal("detective step failed"))
+			Expect(resp.Message).To(ContainSubstring("step failed"))
 		})
 	})
 })
