@@ -2,8 +2,9 @@
 
 
 [![Master build status](https://github.com/streamdal/python-sdk/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/python-sdk/actions/workflows/main.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/056c5faddeefeed37fcb/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability)
+[![GitHub](https://img.shields.io/github/license/streamdal/python-sdk)](https://github.com/streamdal/python-sdk)
 
 python-sdk is the python client SDK for Streamdal's open source observability server https://github.com/streamdal/server
 

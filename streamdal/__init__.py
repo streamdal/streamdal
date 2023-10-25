@@ -10,7 +10,6 @@ import streamdal_protos.protos as protos
 import socket
 import time
 import uuid
-import requests
 import streamdal.validation
 from betterproto import which_one_of
 from copy import copy
@@ -18,7 +17,6 @@ from dataclasses import dataclass, field
 from grpclib.client import Channel
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
-
 from threading import Thread, Event
 from wasmtime import (
     Config,
@@ -26,12 +24,10 @@ from wasmtime import (
     Linker,
     Module,
     Store,
-    Memory,
     WasiConfig,
     Instance,
     FuncType,
     ValType,
-    Caller,
 )
 
 DEFAULT_SERVER_URL = "localhost:9090"
@@ -269,7 +265,8 @@ class StreamdalClient:
             except Exception as e:
                 self.log.debug(f"Failed to re-announce audience: {e}")
 
-        for aud in self.audiences.keys():
+        for aud_str in self.audiences.keys():
+            aud = common.str_to_aud(aud_str)
             self.grpc_loop.run_until_complete(call())
 
     def process(self, req: ProcessRequest) -> ProcessResponse:
@@ -336,7 +333,7 @@ class StreamdalClient:
             CounterEntry(name=rate_processed, value=1.0, labels={}, aud=aud)
         )
 
-        # Ensure no side-effects are propagated to outside the library
+        # Ensure no side effects are propagated to outside the library
         data = copy(req.data)
 
         # Needed for send_tail()
@@ -634,6 +631,9 @@ class StreamdalClient:
                     f"Register looper lost connection: {e}, retrying in {DEFAULT_GRPC_RECONNECT_INTERVAL}s..."
                 )
                 try:
+                    # Kill all in-progress tail requests since register() will send them downstream again
+                    self._stop_all_tails()
+
                     time.sleep(DEFAULT_GRPC_RECONNECT_INTERVAL)
                     self.register_channel = Channel(
                         host=self.host, port=self.port, loop=self.register_loop
@@ -659,22 +659,25 @@ class StreamdalClient:
     def _handle_command(self, cmd: protos.Command):
         (command, _) = which_one_of(cmd, "command")
 
-        if command == "attach_pipeline":
-            self._attach_pipeline(cmd)
-        elif command == "detach_pipeline":
-            self._detach_pipeline(cmd)
-        elif command == "pause_pipeline":
-            self._pause_pipeline(cmd)
-        elif command == "resume_pipeline":
-            self._resume_pipeline(cmd)
-        elif command == "keep_alive":
-            pass
-        elif command == "tail":
-            self._tail_request(cmd)
-        elif command == "kv":
-            self._handle_kv(cmd)
-        else:
-            self.log.error(f"Unknown response type: {cmd}")
+        try:
+            if command == "attach_pipeline":
+                self._attach_pipeline(cmd)
+            elif command == "detach_pipeline":
+                self._detach_pipeline(cmd)
+            elif command == "pause_pipeline":
+                self._pause_pipeline(cmd)
+            elif command == "resume_pipeline":
+                self._resume_pipeline(cmd)
+            elif command == "keep_alive":
+                pass
+            elif command == "tail":
+                self._tail_request(cmd)
+            elif command == "kv":
+                self._handle_kv(cmd)
+            else:
+                self.log.error(f"Unknown response type: {cmd}")
+        except Exception as e:
+            self.log.error(f"Failed to handle '{command}' command: {e}")
 
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
@@ -918,6 +921,12 @@ class StreamdalClient:
             return
 
         for tail_id, running_tail in tails.items():
+            # Tail might not be active yet, so start it if needed
+            # This can happen if the tail request came from internal.Register()
+            # and we did not have the audience yet.
+            if running_tail.active is False:
+                running_tail.start_tail_workers()
+
             tr = protos.TailResponse(
                 type=protos.TailResponseType.TAIL_RESPONSE_TYPE_PAYLOAD,
                 tail_request_id=running_tail.request.id,
@@ -937,6 +946,13 @@ class StreamdalClient:
 
         aud_str = common.aud_to_str(req.audience)
 
+        # Do we already have this tail?
+        if aud_str in self.tails:
+            tails = self.tails.get(aud_str)
+            if len(tails) > 0 and req.id in tails:
+                self.log.debug(f"Tail '{req.id}' already exists, skipping TailCommand")
+                return
+
         self.log.debug(f"Tailing audience: {aud_str}")
 
         t = Tail(
@@ -946,9 +962,13 @@ class StreamdalClient:
             streamdal_url=self.cfg.streamdal_url,
             auth_token=self.auth_token,
             metrics=self.metrics,
+            active=False,
         )
 
-        t.start_tail_workers()
+        # Check if we have this audience yet, if not, this TailCommand came from
+        # internal.Register() and should only be cached for now instead of started
+        if aud_str in self.audiences:
+            t.start_tail_workers()
 
         self._set_tail(t)
 
@@ -984,6 +1004,18 @@ class StreamdalClient:
         tails[tail_id].exit.set()
 
         self._remove_tail(aud, tail_id)
+
+    def _stop_all_tails(self):
+        """
+        Stop all tail requests
+        This is called when the register looper loses connection to the server
+        since we will receive all TailCommands again on re-register.
+        """
+        audiences = self.tails.values()
+        for audience in audiences:
+            for t in audience.values():
+                t.exit.set()
+                self._remove_tail(t.request.audience, t.request.id)
 
     def _get_tails(
         self,
