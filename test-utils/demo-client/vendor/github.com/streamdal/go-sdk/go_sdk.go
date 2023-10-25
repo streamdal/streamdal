@@ -624,22 +624,9 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 					}, nil
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
-				s.config.Logger.Errorf("Step '%s' returned exit code failure", step.Name)
-
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
-
-				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
-				if !shouldContinue {
-					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    wasmResp.OutputPayload,
-						Error:   true,
-						Message: "detective step failed", // TODO: WASM module should return the error message, not just "detective run completed"
-					}, nil
-				}
+				fallthrough
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
-				s.config.Logger.Errorf("Step '%s' returned exit code internal error", step.Name)
+				s.config.Logger.Errorf("Step '%s' returned exit code '%s'", step.Name, wasmResp.ExitCode.String())
 
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
 
@@ -650,7 +637,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 					return &ProcessResponse{
 						Data:    wasmResp.OutputPayload,
 						Error:   true,
-						Message: "detective step failed:" + wasmResp.ExitMsg,
+						Message: "step failed: " + wasmResp.ExitMsg,
 					}, nil
 				}
 			default:
@@ -730,12 +717,4 @@ func (a *Audience) ToProto(serviceName string) *protos.Audience {
 		OperationType: protos.OperationType(a.OperationType),
 		OperationName: a.OperationName,
 	}
-}
-
-func stringPtr(in string) *string {
-	return &in
-}
-
-func boolPtr(in bool) *bool {
-	return &in
 }

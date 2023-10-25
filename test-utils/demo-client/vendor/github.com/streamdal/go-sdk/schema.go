@@ -42,7 +42,7 @@ func (s *Streamdal) handleSchema(ctx context.Context, aud *protos.Audience, step
 	existingSchema := s.getSchema(ctx, aud)
 
 	if string(resp.OutputStep) == string(existingSchema) {
-		// Schema matches what we have in memory, noting to do
+		// Schema matches what we have in memory, nothing to do
 		return false
 	}
 

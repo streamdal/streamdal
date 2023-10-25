@@ -10,9 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/protos/build/go/protos/shared"
-
 	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/protos/build/go/protos/shared"
 
 	"github.com/streamdal/go-sdk/validate"
 )
@@ -26,7 +25,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "0.0.59",
+		LibraryVersion: "0.0.63",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
@@ -154,7 +153,7 @@ func (s *Streamdal) register(looper director.Looper) error {
 		// encounter any errors
 		initialRegister = false
 
-		if err := s.handleCommand(cmd); err != nil {
+		if err := s.handleCommand(stream.Context(), cmd); err != nil {
 			s.config.Logger.Errorf("Failed to handle command: %s", cmd.Command)
 			return nil
 		}
@@ -171,7 +170,7 @@ func (s *Streamdal) register(looper director.Looper) error {
 	return nil
 }
 
-func (s *Streamdal) handleCommand(cmd *protos.Command) error {
+func (s *Streamdal) handleCommand(ctx context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		s.config.Logger.Debug("Received nil command, ignoring")
 		return nil
@@ -192,47 +191,55 @@ func (s *Streamdal) handleCommand(cmd *protos.Command) error {
 	switch cmd.Command.(type) {
 	case *protos.Command_Kv:
 		s.config.Logger.Debug("Received kv command")
-		err = s.handleKVCommand(context.Background(), cmd.GetKv())
+		err = s.handleKVCommand(ctx, cmd.GetKv())
 	case *protos.Command_AttachPipeline:
 		s.config.Logger.Debug("Received attach pipeline command")
-		err = s.attachPipeline(context.Background(), cmd)
+		err = s.attachPipeline(ctx, cmd)
 	case *protos.Command_DetachPipeline:
 		s.config.Logger.Debug("Received detach pipeline command")
-		err = s.detachPipeline(context.Background(), cmd)
+		err = s.detachPipeline(ctx, cmd)
 	case *protos.Command_PausePipeline:
 		s.config.Logger.Debug("Received pause pipeline command")
-		err = s.pausePipeline(context.Background(), cmd)
+		err = s.pausePipeline(ctx, cmd)
 	case *protos.Command_ResumePipeline:
 		s.config.Logger.Debug("Received resume pipeline command")
-		err = s.resumePipeline(context.Background(), cmd)
+		err = s.resumePipeline(ctx, cmd)
 	case *protos.Command_Tail:
-		tail := cmd.GetTail()
-
-		if tail == nil {
-			s.config.Logger.Errorf("Received tail command with nil tail; full cmd: %+v", cmd)
-			return nil
-		}
-
-		if tail.GetRequest() == nil {
-			s.config.Logger.Errorf("Received tail command with nil Request; full cmd: %+v", cmd)
-			return nil
-		}
-
-		audStr := audToStr(tail.GetRequest().Audience)
-
-		switch cmd.GetTail().GetRequest().Type {
-		case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
-			s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
-			err = s.startTailHandler(context.Background(), cmd)
-		case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
-			s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
-			err = s.stopTailHandler(context.Background(), cmd)
-		default:
-			s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
-			return nil
-		}
+		s.config.Logger.Debug("Received tail command")
+		err = s.handleTailCommand(ctx, cmd)
 	default:
 		err = fmt.Errorf("unknown command type: %+v", cmd.Command)
+	}
+
+	return err
+}
+
+func (s *Streamdal) handleTailCommand(_ context.Context, cmd *protos.Command) error {
+	tail := cmd.GetTail()
+
+	if tail == nil {
+		s.config.Logger.Errorf("Received tail command with nil tail; full cmd: %+v", cmd)
+		return nil
+	}
+
+	if tail.GetRequest() == nil {
+		s.config.Logger.Errorf("Received tail command with nil Request; full cmd: %+v", cmd)
+		return nil
+	}
+
+	audStr := audToStr(tail.GetRequest().Audience)
+
+	var err error
+
+	switch tail.GetRequest().Type {
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
+		s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
+		err = s.startTailHandler(context.Background(), cmd)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
+		s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
+		err = s.stopTailHandler(context.Background(), cmd)
+	default:
+		return fmt.Errorf("unknown tail command type: %s", tail.GetRequest().Type)
 	}
 
 	return err
