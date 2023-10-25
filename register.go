@@ -223,10 +223,10 @@ func (s *Streamdal) handleCommand(cmd *protos.Command) error {
 		switch cmd.GetTail().GetRequest().Type {
 		case protos.TailRequestType_TAIL_REQUEST_TYPE_START:
 			s.config.Logger.Debugf("Received start tail command for audience '%s'", audStr)
-			err = s.startTailAudience(context.Background(), cmd)
+			err = s.startTailHandler(context.Background(), cmd)
 		case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 			s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
-			err = s.stopTailAudience(context.Background(), cmd)
+			err = s.stopTailHandler(context.Background(), cmd)
 		default:
 			s.config.Logger.Errorf("Unknown tail command type: %s", tail.GetRequest().Type)
 			return nil

@@ -20,7 +20,7 @@ setup/darwin:
 test: description = Run all tests
 test:
 	bash ./init_wasm.sh
-	go test ./...
+	go test ./... -v
 
 .PHONY: test/fakes
 test/fakes: description = Generate all fakes

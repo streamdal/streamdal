@@ -14,10 +14,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/streamdal/protos/build/go/protos"
+
 	"github.com/streamdal/go-sdk/logger/loggerfakes"
 	"github.com/streamdal/go-sdk/metrics/metricsfakes"
 	"github.com/streamdal/go-sdk/server/serverfakes"
-	"github.com/streamdal/protos/build/go/protos"
 )
 
 var _ = Describe("Tail", func() {
@@ -187,7 +188,7 @@ var _ = Describe("Tail", func() {
 		})
 	})
 
-	Context("startTailAudience", func() {
+	Context("startTailHandler", func() {
 		It("Starts and stops tail", func() {
 
 			lis, err := net.Listen("tcp", ":9990")
@@ -247,7 +248,7 @@ var _ = Describe("Tail", func() {
 				},
 			}
 
-			err = s.startTailAudience(context.Background(), cmd)
+			err = s.startTailHandler(context.Background(), cmd)
 			Expect(err).To(BeNil())
 
 			// Wait for goroutine workers to spin up
@@ -259,7 +260,7 @@ var _ = Describe("Tail", func() {
 
 			cmd.GetTail().GetRequest().Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
 
-			err = s.stopTailAudience(context.Background(), cmd)
+			err = s.stopTailHandler(context.Background(), cmd)
 			Expect(err).To(BeNil())
 
 			// Wait for loopers to quit
@@ -269,7 +270,7 @@ var _ = Describe("Tail", func() {
 		})
 	})
 
-	Context("stopTailAudience", func() {
+	Context("stopTailHandler", func() {
 		var s *Streamdal
 		var aud *protos.Audience
 		var cmd *protos.Command
@@ -308,14 +309,14 @@ var _ = Describe("Tail", func() {
 		})
 
 		It("ignores unknown audience", func() {
-			got := s.stopTailAudience(context.Background(), cmd)
+			got := s.stopTailHandler(context.Background(), cmd)
 			Expect(got).To(BeNil())
 		})
 
 		It("ignores unknown tail", func() {
 			s.audiences[audToStr(aud)] = struct{}{}
 
-			got := s.stopTailAudience(context.Background(), cmd)
+			got := s.stopTailHandler(context.Background(), cmd)
 			Expect(got).To(BeNil())
 		})
 	})
