@@ -328,7 +328,7 @@ func validateConfig(cfg *Config) error {
 
 	// Default to NOOP logger if none is provided
 	if cfg.Logger == nil {
-		cfg.Logger = &logger.NoOpLogger{}
+		cfg.Logger = &logger.TinyLogger{}
 	}
 
 	// Default to ClientTypeSDK

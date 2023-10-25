@@ -63,7 +63,7 @@ var _ = Describe("Streamdal", func() {
 				ServerToken: "foo",
 				DryRun:      false,
 				StepTimeout: 0,
-				Logger:      &logger.NoOpLogger{},
+				Logger:      &logger.TinyLogger{},
 			}
 		})
 
@@ -279,7 +279,7 @@ var _ = Describe("Streamdal", func() {
 				tailsMtx:     &sync.RWMutex{},
 				config: &Config{
 					ServiceName:     "mysvc1",
-					Logger:          &logger.NoOpLogger{},
+					Logger:          &logger.TinyLogger{},
 					StepTimeout:     time.Millisecond * 10,
 					PipelineTimeout: time.Millisecond * 100,
 				},
@@ -352,7 +352,7 @@ var _ = Describe("Streamdal", func() {
 				audiences:    map[string]struct{}{},
 				config: &Config{
 					ServiceName:     "mysvc1",
-					Logger:          &logger.NoOpLogger{},
+					Logger:          &logger.TinyLogger{},
 					StepTimeout:     time.Millisecond * 10,
 					PipelineTimeout: time.Millisecond * 100,
 				},
@@ -393,7 +393,7 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 		return nil, nil, errors.Wrap(err, "unable to create kv client")
 	}
 
-	hfClient, err := hostfunc.New(kvClient, &logger.NoOpLogger{})
+	hfClient, err := hostfunc.New(kvClient, &logger.TinyLogger{})
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "unable to create hostfunc client")
 	}
