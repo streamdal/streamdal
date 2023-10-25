@@ -286,4 +286,47 @@ var _ = Describe("Register", func() {
 			Expect(len(s.pipelinesPaused)).To(Equal(0))
 		})
 	})
+
+	Context("handleCommand", func() {
+		var s *Streamdal
+		var fakeLogger *loggerfakes.FakeLogger
+
+		BeforeEach(func() {
+			fakeLogger = &loggerfakes.FakeLogger{}
+			s = &Streamdal{
+				config: &Config{
+					ServiceName: "test-service",
+					Logger:      fakeLogger,
+				},
+			}
+		})
+
+		It("safely handles nil command", func() {
+			err := s.handleCommand(context.Background(), nil)
+			Expect(err).To(BeNil())
+			Expect(fakeLogger.DebugCallCount()).To(Equal(1))
+		})
+
+		It("safely handles keep-alives", func() {
+			err := s.handleCommand(context.Background(), &protos.Command{
+				Command: &protos.Command_KeepAlive{
+					KeepAlive: &protos.KeepAliveCommand{},
+				},
+			})
+
+			Expect(err).To(BeNil())
+			Expect(fakeLogger.DebugCallCount()).To(Equal(1))
+		})
+
+		It("ignores commands with invalid service name", func() {
+			err := s.handleCommand(context.Background(), &protos.Command{
+				Audience: &protos.Audience{
+					ServiceName: "invalid-service",
+				},
+			})
+
+			Expect(err).To(BeNil())
+			Expect(fakeLogger.DebugfCallCount()).To(Equal(1))
+		})
+	})
 })
