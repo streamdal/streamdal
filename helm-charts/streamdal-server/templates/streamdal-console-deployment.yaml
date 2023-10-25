@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: streamdal-console
-          image: "streamdal/console:v0.1.26" # Fixed the image and tag definition
+          image: "streamdal/console:v0.1.27" # Fixed the image and tag definition
           ports:
             - containerPort: 3000
           env:
@@ -28,6 +28,8 @@ spec:
               value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:9091"
             - name: STREAMDAL_GRPC_AUTH_TOKEN
               value: {{ .Values.env[0].value | quote }}
+            - name: STREAMDAL_DEMO
+              value: {{ .Values.env[1].value | quote }}
           volumeMounts:
           - mountPath: /root/.cache
             name: esbuild-cache
