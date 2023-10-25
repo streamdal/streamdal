@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: streamdal-console
-          image: "streamdal/console:v0.1.27" # Fixed the image and tag definition
+          image: "streamdal/console:v0.1.28" # Fixed the image and tag definition
           ports:
             - containerPort: 3000
           env:
