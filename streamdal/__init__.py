@@ -10,7 +10,6 @@ import streamdal_protos.protos as protos
 import socket
 import time
 import uuid
-import requests
 import streamdal.validation
 from betterproto import which_one_of
 from copy import copy
@@ -18,7 +17,6 @@ from dataclasses import dataclass, field
 from grpclib.client import Channel
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
-
 from threading import Thread, Event
 from wasmtime import (
     Config,
@@ -26,12 +24,10 @@ from wasmtime import (
     Linker,
     Module,
     Store,
-    Memory,
     WasiConfig,
     Instance,
     FuncType,
     ValType,
-    Caller,
 )
 
 DEFAULT_SERVER_URL = "localhost:9090"
@@ -269,7 +265,8 @@ class StreamdalClient:
             except Exception as e:
                 self.log.debug(f"Failed to re-announce audience: {e}")
 
-        for aud in self.audiences.keys():
+        for aud_str in self.audiences.keys():
+            aud = common.str_to_aud(aud_str)
             self.grpc_loop.run_until_complete(call())
 
     def process(self, req: ProcessRequest) -> ProcessResponse:
@@ -662,22 +659,25 @@ class StreamdalClient:
     def _handle_command(self, cmd: protos.Command):
         (command, _) = which_one_of(cmd, "command")
 
-        if command == "attach_pipeline":
-            self._attach_pipeline(cmd)
-        elif command == "detach_pipeline":
-            self._detach_pipeline(cmd)
-        elif command == "pause_pipeline":
-            self._pause_pipeline(cmd)
-        elif command == "resume_pipeline":
-            self._resume_pipeline(cmd)
-        elif command == "keep_alive":
-            pass
-        elif command == "tail":
-            self._tail_request(cmd)
-        elif command == "kv":
-            self._handle_kv(cmd)
-        else:
-            self.log.error(f"Unknown response type: {cmd}")
+        try:
+            if command == "attach_pipeline":
+                self._attach_pipeline(cmd)
+            elif command == "detach_pipeline":
+                self._detach_pipeline(cmd)
+            elif command == "pause_pipeline":
+                self._pause_pipeline(cmd)
+            elif command == "resume_pipeline":
+                self._resume_pipeline(cmd)
+            elif command == "keep_alive":
+                pass
+            elif command == "tail":
+                self._tail_request(cmd)
+            elif command == "kv":
+                self._handle_kv(cmd)
+            else:
+                self.log.error(f"Unknown response type: {cmd}")
+        except Exception as e:
+            self.log.error(f"Failed to handle '{command}' command: {e}")
 
     @staticmethod
     def _put_pipeline(pipes_map: dict, cmd: protos.Command, pipeline_id: str) -> None:
@@ -947,8 +947,9 @@ class StreamdalClient:
         aud_str = common.aud_to_str(req.audience)
 
         # Do we already have this tail?
-        if aud_str in self.audiences:
-            if req.id in self.tails[aud_str]:
+        if aud_str in self.tails:
+            tails = self.tails.get(aud_str)
+            if len(tails) > 0 and req.id in tails:
                 self.log.debug(f"Tail '{req.id}' already exists, skipping TailCommand")
                 return
 
