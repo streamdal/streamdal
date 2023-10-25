@@ -11,6 +11,7 @@ import { addAudience } from "./audience.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { EnhancedStep, initPipelines, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
+import { sendSchema } from "./schema.js";
 import { sendTail } from "./tail.js";
 import { runWasm } from "./wasm.js";
 
@@ -21,6 +22,7 @@ export interface StepStatus {
   error: boolean;
   message?: string;
   abort: boolean;
+  schema: any;
 }
 
 export interface PipelinesStatus {
@@ -175,12 +177,14 @@ export const processPipeline = async ({
       `running pipeline step ${step.pipelineName} - ${step.name}...`
     );
 
-    pipelineStatus = await runStep({
+    pipelineStatus = runStep({
       audience,
       configs,
       step,
       pipeline: pipelineStatus,
     });
+
+    void sendSchema({ configs, audience, pipelineStatus });
 
     console.debug(`pipeline step ${step.pipelineName} - ${step.name} complete`);
 
@@ -238,7 +242,7 @@ export const resultCondition = (
   }
 };
 
-export const runStep = async ({
+export const runStep = ({
   audience,
   configs,
   step,
@@ -248,26 +252,28 @@ export const runStep = async ({
   configs: PipelineConfigs;
   step: EnhancedStep;
   pipeline: PipelinesStatus;
-}): Promise<PipelinesStatus> => {
+}): PipelinesStatus => {
   const stepStatus: StepStatus = {
     stepName: step.name,
     pipelineId: step.pipelineId,
     pipelineName: step.pipelineName,
     error: false,
     abort: false,
+    schema: null,
   };
 
   let data = pipeline.data;
   const payloadSize = data.length;
 
   try {
-    const { outputPayload, exitCode, exitMsg } =
+    const { outputPayload, outputStep, exitCode, exitMsg } =
       payloadSize < MAX_PAYLOAD_SIZE
-        ? await runWasm({
+        ? runWasm({
             step,
             data,
           })
         : {
+            outputStep: null,
             outputPayload: new Uint8Array(),
             exitCode: WASMExitCode.WASM_EXIT_CODE_FAILURE,
             exitMsg: "Payload exceeds maximum size",
@@ -279,6 +285,7 @@ export const runStep = async ({
       exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS ? outputPayload : data;
     stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
     stepStatus.message = exitMsg;
+    stepStatus.schema = outputStep;
   } catch (error: any) {
     stepStatus.error = true;
     stepStatus.message = error.toString();

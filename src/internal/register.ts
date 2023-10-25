@@ -33,7 +33,8 @@ export const internal = {
     string,
     { audience: Audience; tails: Map<string, TailStatus> }
   >(),
-  wasmModules: new Map<string, WasmModule>(),
+  wasmModules: new Map<string, any>(),
+  schemas: new Map<string, any>(),
 };
 
 export const audienceKey = (audience: Audience) =>

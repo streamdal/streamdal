@@ -5,6 +5,7 @@ import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
 import { Configs } from "../streamdal.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
+import { instantiateWasm } from "./wasm.js";
 
 export type InternalPipeline = Pipeline & {
   paused?: boolean;
@@ -27,7 +28,7 @@ export const initPipelines = async (configs: Configs) => {
       );
 
     for (const [k, v] of Object.entries(response.wasmModules)) {
-      internal.wasmModules.set(k, v);
+      void instantiateWasm(k, v.bytes, v.function);
     }
 
     for (const command of response.active) {
@@ -82,20 +83,21 @@ export const processResponse = (response: Command) => {
 
 export const buildPipeline = (pipeline: Pipeline): Pipeline => ({
   ...pipeline,
-  steps: pipeline.steps.map((step: PipelineStep) => ({
-    ...step,
-    ...(step.WasmId
-      ? { WasmBytes: internal.wasmModules.get(step.WasmId)?.bytes }
-      : {}),
-  })),
+  steps: pipeline.steps.map((step: PipelineStep) => {
+    void instantiateWasm(step.WasmId, step.WasmBytes, step.WasmFunction);
+    return {
+      ...step,
+      WasmBytes: undefined,
+    };
+  }),
 });
 
-export const attachPipeline = (audience: Audience, pipeline: Pipeline) =>
-  pipeline.name !== "Schema Inference" &&
+export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
   internal.pipelines.set(audienceKey(audience), {
     ...buildPipeline(pipeline),
     paused: false,
   });
+};
 
 export const detachPipeline = (audience: Audience, pipelineId: string) => {
   const key = audienceKey(audience);
