@@ -732,3 +732,11 @@ func TestInferSchema(t *testing.T) {
 		t.Errorf("expected ExitMsg to contain 'inferred fresh schema', got = %s", wasmResp.ExitMsg)
 	}
 }
+
+func stringPtr(in string) *string {
+	return &in
+}
+
+func boolPtr(in bool) *bool {
+	return &in
+}
