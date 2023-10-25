@@ -45,7 +45,7 @@ func (s *InternalServer) sendActiveTails(ctx context.Context, cmdCh chan *protos
 	s.log.Debugf("resume: sending '%d' active tails for register session id '%s'", len(tailCommands), req.SessionId)
 
 	for _, cmd := range tailCommands {
-		cmdCh <- cmd
+		s.sendToClient(cmdCh, cmd)
 	}
 }
 
@@ -68,14 +68,20 @@ func (s *InternalServer) sendKVs(ctx context.Context, cmdCh chan *protos.Command
 	for _, cmd := range kvCommands {
 		llog.Debugf("sending '%d' KV instructions", len(cmd.Instructions))
 
-		cmdCh <- &protos.Command{
-			Command: &protos.Command_Kv{
-				Kv: cmd,
-			},
-		}
+		s.sendToClient(cmdCh, &protos.Command{Command: &protos.Command_Kv{Kv: cmd}})
 	}
 
 	llog.Debug("finished initial KV sync")
+}
+
+func (s *InternalServer) sendToClient(ch chan *protos.Command, cmd *protos.Command) {
+	defer func() {
+		if r := recover(); r != nil {
+			s.log.Debug("BUG: tried to write to closed Register() channel")
+		}
+	}()
+
+	ch <- cmd
 }
 
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
@@ -96,7 +102,7 @@ func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh cha
 			return
 		}
 
-		cmdCh <- attachCmd
+		s.sendToClient(cmdCh, attachCmd)
 	}
 }
 
