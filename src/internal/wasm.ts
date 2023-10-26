@@ -20,7 +20,7 @@ export const instantiateWasm = async (
   wasmBytes?: Uint8Array,
   wasmFunction?: string
 ) => {
-  if (!wasmId || !wasmBytes || !wasmFunction) {
+  if (!wasmId || !wasmFunction || !wasmBytes || wasmBytes.length === 0) {
     console.debug("Wasm info missing, skipping instantiation, .");
     return;
   }

@@ -28,11 +28,11 @@ export const sendSchema = async ({
     const key = audienceKey(audience);
     const existing = internal.schemas.get(key);
 
-    if (!existing || JSON.stringify(existing) !== JSON.stringify(step.schema)) {
+    if (!existing || existing.toString() !== step.schema.toString()) {
       internal.schemas.set(key, step.schema);
       const schemaRequest = SendSchemaRequest.create({
         audience,
-        schema: step.schema,
+        schema: { jsonSchema: step.schema },
       });
       console.debug("sending schema...");
       const call = configs.grpcClient.sendSchema(schemaRequest, {
