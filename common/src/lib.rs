@@ -2,10 +2,6 @@ use protobuf;
 use protos::sp_wsm::{WASMExitCode, WASMRequest, WASMResponse};
 use std::mem;
 
-// Maximum number of bytes to read from memory if we don't hit terminator characters
-// If this value is exceeded, WASM will panic
-const MAX_READ_SIZE: usize = 1024 * 1024; // 1 MB
-
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
 pub fn read_request(ptr: *mut u8, length: usize) -> Result<WASMRequest, String> {
     let request_bytes = read_memory_with_length(ptr, length);
@@ -29,7 +25,7 @@ pub fn write_response(
     output_step: Option<&[u8]>,
     exit_code: WASMExitCode,
     exit_msg: String,
-) -> *mut u8 {
+) -> u64 {
     let mut response = WASMResponse::new();
 
     response.output_payload = match output_payload {
@@ -52,16 +48,13 @@ pub fn write_response(
         }
     };
 
-    // Append 3 terminators (ascii code 166 = ¦)
-    bytes.extend_from_slice(&[166, 166, 166]);
-
-    let ptr = bytes.as_mut_ptr();
-
-    ptr
+    let ptr = ((bytes.as_mut_ptr() as u64) << 32) | bytes.len() as u64;
+    mem::forget(bytes);
+    return ptr
 }
 
 /// Small helper for write_response
-pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> *mut u8 {
+pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> u64 {
     write_response(None, None, wasm_exit_code, error)
 }
 
@@ -103,37 +96,4 @@ pub unsafe extern "C" fn dealloc(pointer: *mut u8, size: i32) {
 pub fn read_memory_with_length(ptr: *mut u8, length: usize) -> Vec<u8> {
     let array = unsafe { std::slice::from_raw_parts(ptr, length) };
     return array.to_vec();
-}
-
-/// Helper for reading data from memory without knowing length ahead of time
-pub fn read_memory_until_terminator(ptr: *mut u8) -> Vec<u8> {
-    let mut buf: Vec<u8> = Vec::new();
-    let mut null_hits = 0;
-
-    let mut offset = 0;
-    loop {
-        unsafe {
-            let current_ptr = ptr.offset(offset as isize);
-            let value = *current_ptr;
-
-            if offset >= MAX_READ_SIZE {
-                panic!("read_memory: exceeded max length of {}", MAX_READ_SIZE);
-            }
-
-            if null_hits == 3 {
-                // We're at the end
-                return buf;
-            }
-
-            if value == 166 {
-                null_hits += 1;
-                continue;
-            }
-
-            offset += 1;
-
-            buf.push(value);
-            null_hits = 0;
-        }
-    }
 }
