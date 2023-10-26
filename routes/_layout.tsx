@@ -6,7 +6,6 @@ import OpModal from "../islands/opModal.tsx";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { initAllServices } from "../lib/fetch.ts";
 import { GRPC_TOKEN } from "../lib/configs.ts";
-import { InternalError } from "../components/error/internal.tsx";
 import { CustomError } from "../components/error/custom.tsx";
 
 export default async function Layout(req: Request, ctx: LayoutContext) {
@@ -57,7 +56,10 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
           />
         </ReactFlowProvider>
 
-        <div class="absolute bottom-0 left-0 text-streamdalPurple ml-2 mb-1">
+        <div class="absolute bottom-0 left-0 text-web ml-2 mb-1 flex justify-center items-center text-xs">
+          <a className={"mr-2"} href={"https://github.com/streamdal/streamdal"}>
+            <img src={"/images/github-logo.svg"} />
+          </a>
           {await Deno.readTextFile("VERSION")}
         </div>
       </div>
