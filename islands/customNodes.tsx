@@ -33,6 +33,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   const highlighted = data?.audience === opModal.value?.audience &&
     opModal.value?.displayType === "service";
   const trashActive = opModal.value?.deleteService;
+  const key = data?.audience.serviceName;
 
   const setHover = () => {
     setServiceGroup(
@@ -73,9 +74,16 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
           <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
           <div
             className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
+            data-tooltip-target={`service-language-${key}`}
           >
             <ServiceLanguage language={serviceLanguage} />
           </div>
+          {!serviceLanguage && (
+            <Tooltip
+              targetId={`service-language-${key}`}
+              message={"Attach a client to see language"}
+            />
+          )}
           <div class="flex flex-col ml-3">
             <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>

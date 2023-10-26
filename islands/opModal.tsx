@@ -52,7 +52,7 @@ export default function OpModal(
         <div
           className={"rounded-full w-[40px] h-[40px] bg-purple-200 flex justify-center items-center p-1"}
         >
-          <div className={"w-[25px]"}>
+          <div className={"w-[25px] flex justify-center items-center"}>
             <ServiceLanguage language={serviceLanguage} />
           </div>
         </div>
