@@ -42,7 +42,7 @@ func ReadRequestFromMemory(module api.Module, msg proto.Message, ptr, length int
 // WriteResponseToMemory is a helper function that marshals provided message to
 // module memory, appends terminators and returns the pointer to the start of
 // the message.
-func WriteResponseToMemory(module api.Module, msg proto.Message) (int32, error) {
+func WriteResponseToMemory(module api.Module, msg proto.Message) (uint64, error) {
 	if module == nil {
 		return 0, errors.New("module cannot be nil")
 	}
@@ -55,9 +55,6 @@ func WriteResponseToMemory(module api.Module, msg proto.Message) (int32, error) 
 	if err != nil {
 		return 0, errors.Wrap(err, "unable to marshal response")
 	}
-
-	// Append terminator to end of response
-	data = append(data, 166, 166, 166)
 
 	alloc := module.ExportedFunction("alloc")
 	if alloc == nil {
@@ -80,5 +77,5 @@ func WriteResponseToMemory(module api.Module, msg proto.Message) (int32, error) 
 		return 0, errors.New("unable to write host function results to memory")
 	}
 
-	return int32(allocRes[0]), nil
+	return (allocRes[0] << uint64(32)) | uint64(len(data)), nil
 }

@@ -49,7 +49,8 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 		return nil, errors.Wrap(err, "error during func call")
 	}
 
-	resultPtr := uint32(result[0])
+	resultPtr := uint32(result[0] >> 32)
+	resultSize := uint32(result[0])
 
 	// Dealloc request memory
 	if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
@@ -57,7 +58,7 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	}
 
 	// Read memory starting from result ptr
-	resBytes, err := f.ReadMemory(resultPtr, -1)
+	resBytes, err := f.readMemory(resultPtr, resultSize)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read memory")
 	}
@@ -136,7 +137,7 @@ func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		return nil, errors.New("wasm data is empty")
 	}
 
-	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) int32{
+	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) uint64{
 		"kvExists":    s.hf.KVExists,
 		"httpRequest": s.hf.HTTPRequest,
 	}
@@ -174,4 +175,14 @@ func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 	}
 
 	return mod, nil
+}
+
+func (f *function) readMemory(ptr, length uint32) ([]byte, error) {
+	mem, ok := f.Inst.Memory().Read(ptr, length)
+	if !ok {
+		return nil, fmt.Errorf("unable to read memory at '%d' with length '%d'", ptr, length)
+	}
+
+	return mem, nil
+
 }
