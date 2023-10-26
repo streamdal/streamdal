@@ -46,8 +46,8 @@ github.com/rivo/uniseg
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/go-sdk v0.0.64
-## explicit; go 1.17
+# github.com/streamdal/go-sdk v0.0.68
+## explicit; go 1.19
 github.com/streamdal/go-sdk
 github.com/streamdal/go-sdk/helper
 github.com/streamdal/go-sdk/hostfunc
@@ -62,16 +62,18 @@ github.com/streamdal/go-sdk/validate
 github.com/streamdal/protos/build/go/protos
 github.com/streamdal/protos/build/go/protos/shared
 github.com/streamdal/protos/build/go/protos/steps
-# github.com/tetratelabs/wazero v1.2.0
-## explicit; go 1.18
+# github.com/tetratelabs/wazero v1.5.0
+## explicit; go 1.19
 github.com/tetratelabs/wazero
 github.com/tetratelabs/wazero/api
 github.com/tetratelabs/wazero/experimental
+github.com/tetratelabs/wazero/experimental/sys
 github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1
 github.com/tetratelabs/wazero/internal/asm
 github.com/tetratelabs/wazero/internal/asm/amd64
 github.com/tetratelabs/wazero/internal/asm/arm64
 github.com/tetratelabs/wazero/internal/bitpack
+github.com/tetratelabs/wazero/internal/close
 github.com/tetratelabs/wazero/internal/descriptor
 github.com/tetratelabs/wazero/internal/engine/compiler
 github.com/tetratelabs/wazero/internal/engine/interpreter
