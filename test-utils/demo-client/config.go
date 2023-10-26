@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -19,6 +19,7 @@ type Config struct {
 	NumInstances      int      `kong:"help='Number of instances of SDK to register',required,default='1'"`
 	ReconnectRandom   bool     `kong:"help='Randomly disconnects and reconnects to server (useful for testing concurrency in server)',default='false'"`
 	ReconnectInterval int      `kong:"help='Seconds between reconnects (rand(0..ReconnectInterval) if ReconnectRandom is true)',default='0'"`
+	MessageRate       []int    `kong:"help='Messages to send per second (can specify range as X,Y)',required,default='1'"`
 	DataSourceType    string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
 	DataSourceFile    *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
 
@@ -44,8 +45,33 @@ func ParseArgs() (*Config, error) {
 			Summary: true,
 		}))
 
-	fmt.Println("cfg.Debug: ", cfg.Debug)
-	fmt.Println("cfg.ServerToken: ", cfg.ServerToken)
+	if err := validateCLIArgs(cfg); err != nil {
+		return nil, errors.Wrap(err, "error validating args")
+	}
 
 	return cfg, nil
+}
+
+func validateCLIArgs(cfg *Config) error {
+	if cfg == nil {
+		return errors.New("config cannot be nil")
+	}
+
+	if cfg.OperationType != 1 && cfg.OperationType != 2 {
+		return errors.New("operation type must be 1 or 2")
+	}
+
+	// Rates must be larger than 0
+	for _, rate := range cfg.MessageRate {
+		if rate < 1 {
+			return errors.New("rate cannot be less than 1")
+		}
+	}
+
+	// If we were given a range, make sure it's in ascending order
+	if len(cfg.MessageRate) > 1 && cfg.MessageRate[0] > cfg.MessageRate[1] {
+		return errors.New("rate[0] cannot be larger than rate[1]")
+	}
+
+	return nil
 }
