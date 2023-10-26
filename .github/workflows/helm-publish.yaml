@@ -3,7 +3,7 @@ name: Publish Helm Chart
 on:
   push:
     paths:
-      - 'helm-charts/**'
+      - 'install/helm-charts/**'
     branches:
       - main
 
