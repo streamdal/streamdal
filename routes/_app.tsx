@@ -1,6 +1,6 @@
 import { AppContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
-import { streamServiceMap } from "../lib/stream.ts";
+import { DEMO } from "../lib/configs.ts";
 
 export default async function App(
   req: Request,
@@ -9,12 +9,40 @@ export default async function App(
   return (
     <html lang="en">
       <Head>
-        <title>{"Streamdal Console"}</title>
+        <title>
+          {DEMO === "true"
+            ? "Streamdal: Open Source Data Observability That Drives Action"
+            : "Streamdal Console"}
+        </title>
         <meta
           charSet="UTF-8"
-          content="Streamdal's Console"
+          content={DEMO === "true"
+            ? "Detect and resolve data incidents faster by peeking into data flowing through your systems" +
+              " and act on it in real-time with Streamdal"
+            : "Streamdal's Console"}
           name="description"
         />
+        {DEMO === "true" &&
+          (
+            <>
+              <meta
+                property="og:title"
+                content="Streamdal: Open Source Data Observability That Drives Action"
+              />
+              <meta
+                property="og:description"
+                content="Detect and resolve data incidents faster by peeking into data flowing through your systems and act on it in real-time with Streamdal"
+              />
+              <meta
+                property="og:image"
+                content="/images/data-graph.png"
+              />
+              <meta
+                property="og:url"
+                content="https://demo.streamdal.com/"
+              />
+            </>
+          )}
         <link rel="icon" type="image/png" href="/images/favicon.png" />
         <link
           rel="stylesheet"
