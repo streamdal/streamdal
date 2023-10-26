@@ -25,7 +25,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "0.0.67",
+		LibraryVersion: "0.0.68",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
