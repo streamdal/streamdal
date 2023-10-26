@@ -44,7 +44,7 @@ export const formatBytes = (sizeBytes: number | bigint): string => {
     ++u;
   }
 
-  return new Intl.NumberFormat([], {
+  return UNITS[u] === "byte" ? size.toString() : new Intl.NumberFormat([], {
     style: "unit",
     unit: UNITS[u],
     unitDisplay: "narrow",

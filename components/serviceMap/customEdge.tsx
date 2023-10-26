@@ -4,7 +4,7 @@ import {
   EdgeProps,
   getBezierPath,
 } from "reactflow";
-import { edgeKey } from "../../lib/utils.ts";
+import { edgeKey, formatBytes, formatNumber } from "../../lib/utils.ts";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { signal } from "@preact/signals";
 
@@ -25,15 +25,15 @@ const EdgeLabel = (
       style={{
         transform,
       }}
-      className="absolute flex flex-col bg-white p-2 font-medium text-sm rounded-md shadow-md nodrag nopan"
+      className="absolute w-[136px] flex flex-col bg-white p-2 font-medium text-sm rounded-md shadow-md nodrag nopan"
     >
       <div class="flex flex-row justify-start items-center">
         <div class="text-cobweb mr-[2px]">Bytes/s:</div>
-        <div class="text-web">{bytes}</div>
+        <div class="text-web">{formatBytes(bytes)}</div>
       </div>
       <div className="flex flex-row justify-start items-center">
         <div className="text-cobweb mr-[2px]">Processed/s:</div>
-        <div className="text-web">{processed}</div>
+        <div className="text-web">{formatNumber(processed)}</div>
       </div>
     </div>
   );
