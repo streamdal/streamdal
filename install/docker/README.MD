@@ -1,5 +1,7 @@
 # Snitch Server Docker Deployment
 
+# THIS IS OUTDATED!!!
+
 This repository contains the Docker Compose setup to deploy the Snitch Server, NATS, Envoy, and a Web Console for Snitch.
 
 ## Pre-requisites
@@ -11,13 +13,16 @@ This repository contains the Docker Compose setup to deploy the Snitch Server, N
 
 1. **Navigate to the Docker directory:**
    ```bash
-   cd docker/snitch-server/
+   cd docker
    ```
 
 2. **Start the services using Docker Compose:**
    ```bash
    docker-compose up -d
    ```
+
+3. **Open up `https://localhost:3000` in your browser.
+    - You should see a welcome screen
 
 ## Services
 
