@@ -30,7 +30,8 @@ run/all:
 run1: description = Run signup-service
 run1:
 	go run *.go -d \
-    --quiet \
+	--quiet \
+	--message-rate 100 \
 	--service-name "signup-service" \
 	--operation-type 2 \
 	--operation-name  "verifier" \

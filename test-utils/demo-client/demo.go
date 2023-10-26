@@ -100,6 +100,20 @@ func (r *Demo) runReader(workerID int, readCh chan []byte) error {
 func (r *Demo) runFileReader(workerID int, readCh chan []byte) error {
 	llog := r.log.WithField("func", "runFileReader").WithField("worker_id", workerID)
 
+	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Figure out the MIN and MAX number of execs per sec we'll do (in nanos)
+	rateMin := int64(1_000_000_000 / r.config.MessageRate[0])
+	rateMax := int64(1_000_000_000 / r.config.MessageRate[0])
+
+	// If a range is provided, use that as the max
+	if len(r.config.MessageRate) > 1 {
+		rateMax = int64(1_000_000_000 / r.config.MessageRate[1])
+	}
+
+	// Tick will occur every MIN
+	rateTicker := time.NewTicker(time.Nanosecond * time.Duration(rateMin))
+
 	// Read the file continuously and write to inputCh
 	for {
 		f, err := os.Open(r.config.DataSourceFile.Name())
@@ -108,11 +122,20 @@ func (r *Demo) runFileReader(workerID int, readCh chan []byte) error {
 		}
 
 		scanner := bufio.NewScanner(f)
+		scanner.Split(bufio.ScanLines)
 
 		for scanner.Scan() {
+			// Wait for a tick
+			<-rateTicker.C
+
+			// Sleep for a random amount of time between min and max rate
+			time.Sleep(time.Nanosecond * time.Duration(seed.Intn(int((rateMax-rateMin)+rateMin))))
+
+			// Write data to chan
 			readCh <- scanner.Bytes()
-			time.Sleep(time.Millisecond * time.Duration(100+rand.Intn(500)))
 		}
+
+		f.Close()
 
 		llog.Debug("reached end of file; restarting")
 	}
