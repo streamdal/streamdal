@@ -32,7 +32,8 @@ jobs:
 
     - name: Package Helm Chart
       run: |
-        helm package install/helm-charts/streamdal-server -d helm-charts-packages
+        helm package install/helm-charts/streamdal-server -d install/helm-charts-packages
+
 
     - name: Update Helm repo index
       run: |
