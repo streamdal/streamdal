@@ -85,13 +85,15 @@ func audToStr(aud *protos.Audience) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s:%s:%d:%s", aud.ServiceName, aud.ComponentName, aud.OperationType, aud.OperationName)
+	return strings.ToLower(fmt.Sprintf("%s:%s:%d:%s", aud.ServiceName, aud.ComponentName, aud.OperationType, aud.OperationName))
 }
 
 func strToAud(str string) *protos.Audience {
 	if str == "" {
 		return nil
 	}
+
+	str = strings.ToLower(str)
 
 	parts := strings.Split(str, ":")
 	if len(parts) != 4 {

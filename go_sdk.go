@@ -712,9 +712,9 @@ func (s *Streamdal) handleConditions(
 
 func (a *Audience) ToProto(serviceName string) *protos.Audience {
 	return &protos.Audience{
-		ServiceName:   serviceName,
-		ComponentName: a.ComponentName,
+		ServiceName:   strings.ToLower(serviceName),
+		ComponentName: strings.ToLower(a.ComponentName),
 		OperationType: protos.OperationType(a.OperationType),
-		OperationName: a.OperationName,
+		OperationName: strings.ToLower(a.OperationName),
 	}
 }
