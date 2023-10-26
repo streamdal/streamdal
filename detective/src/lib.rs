@@ -4,7 +4,7 @@ use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use streamdal_wasm_detective::detective::{Detective, Request};
 
 #[no_mangle]
-pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
+pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Read request
     let wasm_request = match common::read_request(ptr, length) {
         Ok(req) => req,

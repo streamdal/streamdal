@@ -4,11 +4,11 @@ use protos::sp_steps_httprequest::HttpResponse;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 
 extern "C" {
-    fn httpRequest(ptr: *mut u8, length: usize) -> *mut u8;
+    fn httpRequest(ptr: *mut u8, length: usize) -> u64;
 }
 
 #[no_mangle]
-pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
+pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Read request
     let wasm_request = match common::read_request(ptr, length) {
         Ok(req) => req,
@@ -47,20 +47,22 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> *mut u8 {
 
     let req_ptr = bytes.as_mut_ptr();
 
-    let res_ptr: *mut u8;
+    let host_res: u64;
     unsafe {
-        res_ptr = httpRequest(req_ptr, bytes.len());
+        host_res = httpRequest(req_ptr, bytes.len());
     }
 
     // Need to read memory at res_ptr and return a response
-    let data = common::read_memory_until_terminator(res_ptr);
+    let host_res_ptr = (host_res >> 32) as *mut u8;
+    let host_res_len = host_res as u32;
+    let http_resp_bytes = common::read_memory_with_length(host_res_ptr, host_res_len as usize);
 
     // // Deallocate request memory
     unsafe {
         dealloc(req_ptr, length as i32);
     }
 
-    let result = http_response(data);
+    let result = http_response(http_resp_bytes);
 
     return match result {
         Ok(res) => {
