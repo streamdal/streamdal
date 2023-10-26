@@ -36,7 +36,7 @@ jobs:
 
     - name: Update Helm repo index
       run: |
-        helm repo index helm-charts-packages --url https://streamdal.github.io/streamdal/helm-charts-packages
+        helm repo index helm-charts-packages --url https://streamdal.github.io/streamdal/install/helm-charts-packages
         git add helm-charts-packages/index.yaml
         git add helm-charts-packages/*.tgz
 
