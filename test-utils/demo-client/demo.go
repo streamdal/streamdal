@@ -98,8 +98,6 @@ func (r *Demo) runReader(workerID int, readCh chan []byte) error {
 }
 
 func (r *Demo) runFileReader(workerID int, readCh chan []byte) error {
-	llog := r.log.WithField("func", "runFileReader").WithField("worker_id", workerID)
-
 	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Figure out the MIN and MAX number of execs per sec we'll do (in nanos)
@@ -121,23 +119,29 @@ func (r *Demo) runFileReader(workerID int, readCh chan []byte) error {
 			return errors.Wrap(err, "failed to open file")
 		}
 
-		scanner := bufio.NewScanner(f)
-		scanner.Split(bufio.ScanLines)
+		reader := bufio.NewReader(f)
 
-		for scanner.Scan() {
+		for {
 			// Wait for a tick
 			<-rateTicker.C
 
 			// Sleep for a random amount of time between min and max rate
 			time.Sleep(time.Nanosecond * time.Duration(seed.Intn(int((rateMax-rateMin)+rateMin))))
 
-			// Write data to chan
-			readCh <- scanner.Bytes()
+			// Try to read line
+			line, err := reader.ReadBytes('\n')
+			if err != nil {
+				break // EOF or other err
+			}
+
+			readCh <- line
 		}
 
-		f.Close()
+		if err := f.Close(); err != nil {
+			return errors.Wrap(err, "failed to close file")
+		}
 
-		llog.Debug("reached end of file; restarting")
+		// reached end of file; restarting
 	}
 }
 

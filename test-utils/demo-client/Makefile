@@ -31,7 +31,7 @@ run1: description = Run signup-service
 run1:
 	go run *.go -d \
 	--quiet \
-	--message-rate 100 \
+	--message-rate 10,20 \
 	--service-name "signup-service" \
 	--operation-type 2 \
 	--operation-name  "verifier" \
@@ -46,6 +46,8 @@ run1:
 run2: description = Run signup-service
 run2:
 	go run *.go -d \
+	--quiet \
+	--message-rate 10,20 \
 	--service-name "signup-service" \
 	--operation-type 2 \
 	--operation-name  "recorder" \
@@ -57,6 +59,8 @@ run2:
 run3: description = Run billing-service
 run3:
 	go run *.go -d \
+	--quiet \
+	--message-rate 1,4 \
 	--service-name "billing-service" \
 	--operation-type 1 \
 	--operation-name  "processor" \
@@ -68,6 +72,8 @@ run3:
 run4: description = Run billing-service
 run4:
 	go run *.go -d \
+	--quiet \
+	--message-rate 3,5 \
 	--service-name "billing-service" \
 	--operation-type 2 \
 	--operation-name  "stripe-register" \
@@ -79,6 +85,8 @@ run4:
 run5: description = Run welcome-service
 run5:
 	go run *.go -d \
+	--quiet \
+	--message-rate 40,50 \
 	--service-name "welcome-service" \
 	--operation-type 1 \
 	--operation-name  "reader" \
@@ -90,6 +98,8 @@ run5:
 run6: description = Run welcome-service
 run6:
 	go run *.go -d \
+	--quiet \
+	--message-rate 1,3 \
 	--service-name "welcome-service" \
 	--operation-type 2 \
 	--operation-name  "emailer" \
