@@ -13,7 +13,7 @@ import (
 )
 
 // KVExists is function that is exported to and called from a Rust WASM module
-func (h *HostFunc) KVExists(_ context.Context, module api.Module, ptr, length int32) int32 {
+func (h *HostFunc) KVExists(_ context.Context, module api.Module, ptr, length int32) uint64 {
 	// Read request
 	request := &steps.KVStep{}
 
@@ -39,7 +39,7 @@ func (h *HostFunc) KVExists(_ context.Context, module api.Module, ptr, length in
 }
 
 // Generates a protobuf response, writes to mem, and returns ptr to mem
-func kvExistsResponse(module api.Module, msg string, isError, exists bool) int32 {
+func kvExistsResponse(module api.Module, msg string, isError, exists bool) uint64 {
 	var status steps.KVStatus
 
 	if exists {

@@ -16,7 +16,7 @@ import (
 )
 
 // HTTPRequest is function that is exported to and called from a Rust WASM module
-func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length int32) int32 {
+func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length int32) uint64 {
 	request := &steps.HttpRequest{}
 
 	if err := helper.ReadRequestFromMemory(module, request, ptr, length); err != nil {
@@ -55,7 +55,7 @@ func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length
 }
 
 // httpRequestResponse is a helper for HostFuncHTTPRequest()
-func httpRequestResponse(module api.Module, code int, body string, headers map[string]string) int32 {
+func httpRequestResponse(module api.Module, code int, body string, headers map[string]string) uint64 {
 	if headers == nil {
 		headers = make(map[string]string)
 	}

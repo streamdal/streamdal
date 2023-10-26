@@ -137,7 +137,7 @@ func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		return nil, errors.New("wasm data is empty")
 	}
 
-	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) int32{
+	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) uint64{
 		"kvExists":    s.hf.KVExists,
 		"httpRequest": s.hf.HTTPRequest,
 	}
