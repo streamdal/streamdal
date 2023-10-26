@@ -22,7 +22,7 @@ jobs:
 
     - name: Ensure helm-charts-packages directory exists
       run: |
-        mkdir -p helm-charts-packages
+        mkdir -p install/helm-charts-packages
 
     - name: Install Helm
       run: |
@@ -32,13 +32,13 @@ jobs:
 
     - name: Package Helm Chart
       run: |
-        helm package helm-charts/streamdal-server -d helm-charts-packages
+        helm package install/helm-charts/streamdal-server -d helm-charts-packages
 
     - name: Update Helm repo index
       run: |
         helm repo index helm-charts-packages --url https://streamdal.github.io/streamdal/install/helm-charts-packages
-        git add helm-charts-packages/index.yaml
-        git add helm-charts-packages/*.tgz
+        git add install/helm-charts-packages/index.yaml
+        git add install/helm-charts-packages/*.tgz
 
     - name: Push changes
       run: |
