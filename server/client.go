@@ -4,6 +4,7 @@ package server
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -175,6 +176,10 @@ func (c *Client) Register(ctx context.Context, req *protos.RegisterRequest) (pro
 
 func (c *Client) NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
+
+	aud.ServiceName = strings.ToLower(aud.ServiceName)
+	aud.ComponentName = strings.ToLower(aud.ComponentName)
+	aud.OperationName = strings.ToLower(aud.OperationName)
 
 	_, err := c.Server.NewAudience(ctx, &protos.NewAudienceRequest{
 		Audience:  aud,
