@@ -1,6 +1,6 @@
 module github.com/streamdal/go-sdk
 
-go 1.17
+go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
