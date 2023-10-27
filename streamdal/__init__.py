@@ -897,7 +897,7 @@ class StreamdalClient:
         result_ptr = f(store, start_ptr, len(data))
 
         # Read from result pointer
-        return common.read_memory(memory, store, result_ptr)
+        return common.read_memory(memory, store, result_ptr, -1)
 
     # ------------------------------------------------------------------------------------
 
