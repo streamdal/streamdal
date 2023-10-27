@@ -2,7 +2,6 @@ package grpcapi
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -173,7 +172,6 @@ var _ = Describe("Internal gRPC API", func() {
 			time.Sleep(7 * time.Second)
 
 			data, err = redisClient.Get(context.Background(), store.RedisRegisterKey(registerRequest.SessionId, TestNodeName)).Result()
-			fmt.Println("received data from redis: ", data)
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
 			Expect(data).To(BeEmpty())
