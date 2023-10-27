@@ -281,7 +281,7 @@ pre {
 .pkeyword {
   display: inline;
   box-sizing: border-box;
-  margin: 0;
+  margin-top: 6px !important;
   padding-left: 3px;
   padding-right: 3px;
   vertical-align: baseline;
@@ -292,10 +292,9 @@ pre {
   text-decoration: none;
   align-items: initial;
   gap: initial;
-
 }
 a.pkeyword:hover {
-  color: var(  --color-purple-600);
+  color: var(--color-purple-600);
   text-decoration: none;
   border-color: var(--color-purple-600);
 }

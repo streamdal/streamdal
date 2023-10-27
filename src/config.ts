@@ -71,14 +71,14 @@ export const SIDEBAR: Sidebar = {
         text: "Getting Started",
         children: [
           {
-            text: "What is Snitch?",
-            slug: "what-is-snitch",
-            link: "en/what-is-snitch",
+            text: "What is Streamdal?",
+            slug: "what-is-streamdal",
+            link: "en/what-is-streamdal",
           },
           {
-            text: "How Snitch Works",
-            slug: "how-snitch-works",
-            link: "en/getting-started/how-snitch-works",
+            text: "How Streamdal Works",
+            slug: "how-streamdal-works",
+            link: "en/getting-started/how-streamdal-works",
           },
           {
             text: "Quickstart",
@@ -226,9 +226,9 @@ export const SIDEBAR: Sidebar = {
                 link: "en/data-governance/compliance/hipaa",
               },
               {
-                text: "ISC/IEC",
-                slug: "isc-iec",
-                link: "en/data-governance/compliance/isc-iec",
+                text: "ISO/IEC",
+                slug: "iso-iec",
+                link: "en/data-governance/compliance/iso-iec",
               },
               {
                 text: "NY State S.H.I.E.L.D",
@@ -251,19 +251,14 @@ export const SIDEBAR: Sidebar = {
                 link: "en/data-governance/compliance/pipeda",
               },
               {
-                text: "SOCII",
-                slug: "socii",
-                link: "en/data-governance/compliance/socii",
-              },
-              {
                 text: "TDPSA",
                 slug: "tdpsa",
                 link: "en/data-governance/compliance/tdpsa",
               },
               {
                 text: "VCDPA",
-                slug: "cdpa",
-                link: "en/data-governance/compliance/cdpa",
+                slug: "vcdpa",
+                link: "en/data-governance/compliance/vcdpa",
               },
             ]
           },  
@@ -328,7 +323,7 @@ export const SIDEBAR: Sidebar = {
             link: "en/engineering/grpc",
           },
           {
-            text: "Metrics (Coming Soon!)",
+            text: "Metrics",
             slug: "metrics",
             link: "en/engineering/metrics",
           },
