@@ -1,7 +1,7 @@
 ---
-title: "CCPA/CPRA Compliance with Streamdal"
-metaTitle: "Ensure CCPA/CPRA Compliance Seamlessly with Streamdal"
-description: "Employ Streamdal to guarantee adherence to CCPA/CPRA data standards effortlessly."
+title: "CCPA Data Compliance with Streamdal"
+metaTitle: "Ensure CCPA Data Compliance Seamlessly with Streamdal"
+description: "Employ Streamdal to guarantee adherence to CCPA data standards effortlessly."
 layout:  ../../../../layouts/MainLayout.astro
 ---
 
@@ -11,57 +11,75 @@ import { Notification } from "accessible-astro-components";
 
 <Notification type="warning">
   <img src={warning} alt="Warning" width="30px" height="30px" />
-  <p style="font-weight: lighter;">The data compliance parts of Streamdal are 
-  not yet ready for release. We are beta-testing these features with a select 
-  group of contributors, companies, and design partners. If you would like to 
-  participate in the beta, please 
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
   [reach out to us](/en/resources-support/get-support/).</p>
 </Notification>
 
 
-The California Consumer Privacy Act (CCPA) and California Privacy Rights Act 
-(CPRA) demand strict data protection standards. Streamdal can help you navigate 
-these regulations efficiently.
+<a href="https://oag.ca.gov/privacy/ccpa" target="_blank">The California Consumer Privacy Act</a> 
+_(CCPA)_ demands strict data protection standards. Streamdal can help you 
+navigate the data requirements of this regulation efficiently.
 
 ## Streamdal's Approach
 
 With Streamdal's data compliance features, you can:
 
-- Establish robust rules to ensure data processing is in line with CCPA/CPRA 
-requirements.
-- Receive real-time alerts on potential data breaches or violations.
-- Store and analyze data operation logs for CCPA/CPRA audit readiness.
+📉 **<span class="ykeyword">Data Minimization</span>:** Establish robust <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to ensure data processing is in 
+line with CCPA requirements.
 
-> **Coming post-beta**: An illustrative guide on setting up the appropriate rules in 
-the Streamdal UI for CCPA/CPRA compliance.
+🚨 **<span class="ykeyword">Monitoring and Alerts on real-time data</span>:** Receive real-time alerts on 
+potential data breaches or violations.
+
+For example, you could set up alerts for a sudden change in data flow rate, 
+spikes in logging activity, or sudden influx of data validation errors.
+
+⏳ **<span class="ykeyword">Timely Response to Requests</span>:** The combination of the [open source](/en/resources-support/open-source/) and 
+[data governance](/en/data-governance/overview/) Streamdal [components](/en/core-components/overview/) will enable you to easily comply with 
+customer data requests within the timeframe mandated by CCPA.
+
+> **Coming Soon**: A visual guide on setting up CCPA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
 
 ## Regulatory Insights
 
-Understanding the "legalese" of various laws and regulations can be a daunting 
-task. Many times this is left to a legal department/entity to help 
-organizations understand regulatory compliance. While a one-size-fits-all tool 
-does not exist for a complete compliance solution, Streamdal will _greatly 
-reduce_ the time, effort, and headache around data and _revolutionize now you 
-can govern it!_
+Understanding various laws, regulations, and compliance guidelines can be 
+daunting. We always recommend developing your data policies with a legal 
+department, security/GRC consultant, or your friendly neighborhood DevOps 
+professional 😄.
 
-Below are a few sections taken from the CCPA/CPRA[^1] text with how Streamdal 
-helps with compliance.
+The purpose of this section is to make researching these regulations easier and 
+to give a better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, <u>the combination of</u> the always free and open 
+source aspects of Streamdal and the data governance capabilities will ensure 
+successful compliance. 
+
+While more sections should be applicable, below are a few taken from the 
+_CCPA[^1]_ text with how Streamdal can help with data compliance:
 
 | § Sections | How Streamdal helps comply |
 |-|-|
-| § 7002 (a)-(1)(2): Restrictions on the Collection and Use of Personal Information. | The Streamdal SDK can enforce rules on consumers and producers to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization. |
-| § 7021: Timelines for Responding to Requests to Delete, Requests to Correct, and Requests to Know | Streamdal can greatly assist with the timeliness of these requests in two ways: <br /><br /> <ol><li>The UI can visually indicate which producers and consumers are handling PII, and this information can be used to map their end systems, helping reduce discovery time.</li> <br /><li>The SDK rules can be set up to strip, restrict, obfuscate, mask data, as well as rules on time fields, helping enforce data policies around retention, transmission, and consumption of PI/PI. This can greatly reduce time spent servicing these requests.</li></ol> |
-| § 7027 (g): Requests to Limit Use and Disclosure of Sensitive Personal Information. | For the same reasons listed in the above two cells, Streamdal can help limit the use and disclosure of sensitive PI/PII. |
+| § 7002 (a)-(1)(2): Restrictions on the Collection and Use of Personal Information. | The Streamdal [SDK](/en/core-components/sdk/) can enforce [rules](/en/resources-support/glossary/#rule-or-step) on [consumers](/en/resources-support/glossary/#consumer) and [producers](/en/resources-support/glossary/#producer) to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization. |
+| § 7021: <br /> Timelines for Responding to Requests to Delete, Requests to Correct, and Requests to Know. | Streamdal can greatly assist with the timeliness of these requests in two ways: <br /><br /> <ol><li>The [Console UI](/en/core-components/console-ui/) can visually indicate which producers and consumers are handling PII, and this information can be used to map their end systems, helping reduce discovery time.</li> <br /><li>[Rules](/en/resources-support/glossary/#rule-or-step) can be set up to strip, restrict, obfuscate, and mask data, as well as [rules](/en/resources-support/glossary/#rule-or-step) on `time fields`, helping enforce data policies around retention, transmission, and consumption of PI/PI. This can greatly reduce the time spent servicing these requests.</li></ol> |
+| § 7027 (g): <br /> Requests to Limit Use and Disclosure of Sensitive Personal Information. | For the same reasons listed in the above two cells, Streamdal can help limit the use and disclosure of sensitive PI/PII. |
 
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>_Did you know: CCPA requirements for the timeliness for responding to 
+    <p>
+    _Did you know:_ 
+    
+    _CCPA requirements on the timeliness for responding to 
     requests to delete, requests to correct, and requests to know are <u>no later 
-    than 10 business days?</u>_</p>
+    than 10 business days.</u>_
+    </p>
   </div>
 </Notification>
 
-Safeguard consumer privacy and ensure you're CCPA/CPRA compliant with Streamdal.
+Safeguard consumer privacy and ensure you're CCPA compliant with Streamdal.
 
-[^1]: <a href="https://cppa.ca.gov/regulations/pdf/20230329_final_regs_text.pdf" target="_blank">CCPA/CPRA PDF link</a>
+---
+
+[^1]: California Privacy Protection Agency. (2023). _California Consumer Privacy Act regulations. In TITLE 11. LAW, DIVISION 6. CALIFORNIA PRIVACY PROTECTION AGENCY, CHAPTER 1 (§ 7002 (a)-(1)(2), § 7021, § 7027)_. https://cppa.ca.gov/regulations/pdf/cppa_regs.pdf <br /> <br /> _In November 2020, California voters passed Proposition 24, the California Privacy Rights Act ("CPRA"). The CPRA amends and extends the California Consumer Privacy Act of 2018 ("CCPA"). To implement the law, the CPRA established the California Privacy Protection Agency ("Agency") and vested it with the full administrative power, authority and jurisdiction to implement and enforce the California Consumer Privacy Act of 2018. The Agency’s responsibilities include updating existing regulations, and adopting new regulations._

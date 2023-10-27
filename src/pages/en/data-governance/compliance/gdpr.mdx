@@ -1,14 +1,82 @@
 ---
-title: GDPR
-description: How Snitch helps with GDPR
+title: GDPR Compliance with Streamdal
+description: How Streamdal helps with GDPR compliance
 layout: ../../../../layouts/MainLayout.astro
 ---
 
 import info from "@images/icons/info.png";
-
+import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
+
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+<a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank">The General Data Protection Regulation</a> 
+_(GDPR)_ is a European regulation designed to protect the personal data rights 
+of people and how their data is processed. It also regulates the movement of 
+data. Using Streamdal, and applying all of its [core components](/en/core-components/overview/) 
+to new or existing data pipelines, will greatly simplify compliance requirements 
+for GDPR.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+
+✅ **<span class="ykeyword">Data Minimization & Accuracy</span>:** <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">Rules</a> can be applied to data for content and format requirements. You can get alerted on or notified when data contains <u>more sensitive information than what is necessary</u>, or on attempts to pass through restricted compliance boundaries.
+
+📝 **<span class="ykeyword">Data Policy & Processing Enforcement</span>:** Regardless of how data needs to be handled, such as <u>obfuscating/pseudonymizing PII</u>, you can define <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to enforce your policies and processes. 
+
+For everything else, you write functions - _which compile down to WASM, so you can use a variety of languages to get the job done!_
+
+🤖 **<span class="ykeyword">Data Governance Automation</span>:** With Streamdal you can define <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a>, policies, and validation for data once, and apply them limitlessly as <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> across your systems. 
+
+Whenever data needs to move, or whenever new data <a href="/en/resources-support/glossary/#source" class="pkeyword">sources</a> and <a href="/en/resources-support/glossary/#destination" class="pkeyword">destinations</a> are introduced into production, existing <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> and <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> can be applied along with whatever new data governance rules you need to attach.
+
+> **Coming Soon**: A visual guide on setting up GDPR-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+Understanding various laws, regulations, and compliance guidelines can be 
+daunting. We always recommend developing your data policies with a legal 
+department, security/GRC consultant, or your friendly neighborhood DevOps 
+professional 😄.
+
+The purpose of this section is to make researching these regulations easier and 
+to give a better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, <u>the combination of</u> the always free and 
+[open source](/en/resources-support/open-source/) aspects of Streamdal and the 
+[data governance](/en/data-governance/overview/) capabilities will ensure 
+successful compliance. 
+
+While more articles could be applicable, below are four taken from the 
+_GDPR[^1]_ along with how Streamdal can help with data compliance:
+
+| Article | How Streamdal helps comply |
+|-|-|
+| Article 5: Principles relating to processing of personal data | Streamdal can enforce [rules](/en/resources-support/glossary/#rule-or-step) on data to reject, alert, or operate on data if it contains more personal information than what is necessary, ensuring data minimization. It can also enforce [rules](/en/resources-support/glossary/#rule-or-step) about the format and content of messages, ensuring [data quality](/en/data-governance/data-quality/) and accuracy.
+| Article 17: <br />Right to erasure (‘right to be forgotten’) | You can write [rules](/en/resources-support/glossary/#rule-or-step) to ensure that `time-bound` data, or data with specific retention periods, are not accidentally reintroduced into production or development environments after it was supposed to be deleted. |
+| Article 25: <br />Data protection by design and by default | Streamdal can help ensure privacy considerations are integral to your data handling processes. <br /> <br />You can enforce policies like pseudonymizing personal data and limiting data exposure (i.e., PII processed and used for a specific data analytics use-case is only used by that specific [service](/en/resources-support/glossary/#service) and not accidentally replicated into other systems or [services](/en/resources-support/glossary/#service)). |
+| Article 32: Security of Processing | Streamdal can contribute to the security of processing personal data by providing monitoring and alerting capabilities that could detect potential security incidents. You can write [rules](/en/resources-support/glossary/#rule-or-step) that govern compliance boundaries, which will ensure only specific [producers](/en/resources-support/glossary/#producer) and [consumers](/en/resources-support/glossary/#consumer) can interact with data therein. |
 
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_
+
+    _GDPR mandates using encryption or <u>pseudonymization</u> whenever feasible[^2]_.
+    </p>
+  </div>
 </Notification>
+___
+
+[^1]: European Parliament, & Council of the European Union. (2016). _Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation) (GDPR) [Articles 5, 17, 25, 30, 32]._ EUR-Lex. https://eur-lex.europa.eu/eli/reg/2016/679/oj 
+[^2]: GDPR.EU. (n.d.). _GDPR checklist for data controllers: Data Security._ https://gdpr.eu/checklist/

@@ -1,14 +1,88 @@
 ---
-title: PIPEDA
-description: How Snitch helps with PIPEDA
+title: PIPEDA Compliance with Streamdal
+description: How Streamdal helps with PIPEDA compliance
 layout: ../../../../layouts/MainLayout.astro
 ---
 
 import info from "@images/icons/info.png";
-
+import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
+
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+
+Canada's <a href="https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/" target="_blank">Personal Information Protection and Electronic Documents Act</a> 
+_(PIPEDA)_ regulates how private businesses handle personal information during 
+commercial activities. It aims to strike a balance between individual privacy 
+rights and the operational needs of businesses to utilize such data.
+
+Streamdal is a powerful tool to help keep your data compliant with PIPEDA 
+principals.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+🚷 **<span class="ykeyword">Limiting Data Collection</span>:** The Streamdal [SDK](/en/core-components/sdk/) can enforce <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> on <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> and <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> to reject data or alert you if it contains more personal data than what is necessary, ensuring data minimization.
+
+🎯 **<span class="ykeyword">Data Accuracy</span>:** Along with the <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> you can set up to limit the collection of data, the [SDK](/en/core-components/sdk/) can validate and filter for specific fields of data.
+
+**For example**: you could set up <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to validate fields such as `time`, `name`,  `social security number`, and much more to ensure information is present and accurate. 
+
+🚓 **<span class="ykeyword">Enforcing Data Policies and Safeguards</span>:** Because the [SDK](/en/core-components/sdk/) executes your <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> and <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> as data is being `produced` or `consumed`, you will be able to mask, obfuscate, and otherwise enforce PII handling policies before it moves through your system - and every step afterward as needed.   
+
+> **Coming Soon**: A visual guide on setting up PIPEDA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+Understanding various laws, regulations, and compliance guidelines can be 
+daunting. We always recommend developing your data policies with a legal 
+department, security/GRC consultant, or your friendly neighborhood DevOps 
+professional 😄.
+
+The purpose of this section is to make researching these regulations easier and 
+to give a better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, <u>the combination of</u> the always free and 
+[open source](/en/resources-support/open-source/) aspects of Streamdal and the 
+[data governance](/en/data-governance/overview/) capabilities will ensure 
+successful compliance. 
+
+While more principles could be applicable, below are a few taken from 
+The Office of the Privacy Commissioner of Canada's _"PIPEDA in brief"[^1]_ 
+along with how Streamdal can help with data compliance:
+
+| Principals | How Streamdal Helps Comply |
+|-|-|
+| (4) Limiting collection | The Streamdal [SDK](/en/core-components/sdk/) can enforce [rules](/en/resources-support/glossary/#rule-or-step) on [consumers](/en/resources-support/glossary/#consumer) and [producers](/en/resources-support/glossary/#producer) to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization.|
+| (6) Accuracy | [Rules](/en/resources-support/glossary/#rule-or-step) and [Pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) can be attached to [producers](/en/resources-support/glossary/#producer) and [consumers](/en/resources-support/glossary/#consumer) to ensure data is valid and accurate and alert for anomalies. <br /><br />For example, you could create [rules](/en/resources-support/glossary/#rule-or-step) to filter for `e-mail address`, `phone number`, `IP address`, and other sensitive fiends like those listed above in our [approach](/en/data-governance/compliance/pipeda#streamdals-approach), and much more to ensure data is valid. |
+| (7) Safeguards | You can physically apply your data safeguards to [producers](/en/resources-support/glossary/#producer) and [consumers](/en/resources-support/glossary/#consumer) handling sensitive data by creating [rules](/en/resources-support/glossary/#rule-or-step) and attaching them as [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset). <br /><br />From the [Console UI](/en/core-components/console-ui/) (or [Streamdal CLI](/en/guides/tail/#cli)), you can periodically audit real-time data with [Tail](/en/guides/tail/) to ensure data is flowing within the necessary safeguards. |
+
 
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Sorry, this page is not ready yet!</p>
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_ 
+    
+    _The Office of the Privacy Commissioner of Canada suggests the following 
+    checklist for ensuring data accuracy:_
+    
+    - _List the specific items of personal information you need to provide a service._
+    - _List where all related personal information can be found._
+    - _Record the date when the personal information was obtained or updated._
+    - _Record the steps taken to verify the accuracy, completeness, and timeliness of the information. This may require reviewing your records or communicating with your customer[^2]._ 
+    </p>
+  </div>
 </Notification>
+___
+
+[^1]: Office of the Privacy Commissioner of Canada. (2019). _PIPEDA in brief [Sections (4) Limiting Collection; (6) Accuracy; (7) Safeguards]._ https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/pipeda_brief/
+[^2]: Office of the Privacy Commissioner of Canada. (2021). _PIPEDA Fair Information Principle 6 – Accuracy: Tips._ https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/p_principle/principles/p_accuracy/

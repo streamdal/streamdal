@@ -1,0 +1,98 @@
+---
+title: GLBA Compliance with Streamdal
+description: How Streamdal helps with GLBA
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
+
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+<a href="https://www.ftc.gov/business-guidance/privacy-security/gramm-leach-bliley-act" target="_blank">The Gramm-Leach-Bliley Act</a> 
+_(GLBA)_ covers a wide range of financial institutions. A significant factor in 
+complying with the GLBA is safeguarding sensitive data, which 
+Streamdal can help with.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+📝 **<span class="ykeyword">Automation with _'Risk Assessments'_ for all your data</span>:** While many 
+developers might be satisfied with just the [CLI](/en/guides/tail#cli) for data <a href="/en/resources-support/glossary/#observability" class="pkeyword">observability</a>, 
+security professionals or other operational and non-technical parts of an 
+organization can access the [Console UI](/en/core-components/console-ui/) to get an always up-to-date 
+view of all the data that moves in their systems. 
+
+Streamdal adds significant automation for risk assessments on data, and equips 
+organizations with new powerful mechanisms to help surface 
+_'unknown unknowns'_ in their data security.
+
+🦺 **<span class="ykeyword">Safeguards for controlling identified risks</span>:** Using Streamdal to implement granular 
+governance <a href="/en/resources-support/glossary/#step-or-rule" class="pkeyword">rules</a> on data moving 
+across your systems will bolster your methods of risk 
+mitigation. This can _wildly limit_ the "unauthorized disclosure, misuse, 
+alteration, destruction, or other compromise" of sensitive information.
+
+📑 **<span class="ykeyword">Adjusting Data Policies</span>:** As your systems mature and require greater data 
+governance, Streamdal allows you to easily change how data is handled in real 
+time. For example, you could begin obfuscating or de-identifying parts of 
+sensitive data, or adjusting the boundaries where data can reside all in real 
+time, and without re-compiling or changes to CI/CD.
+
+> **Coming Soon**: A visual guide on setting up GLBA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+Understanding various laws, regulations, and compliance guidelines can be 
+daunting. We always recommend developing your data policies with a legal 
+department, security/GRC consultant, or your friendly neighborhood DevOps 
+professional 😄.
+
+The purpose of this section is to make researching these regulations easier and 
+to give a better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, <u>the combination of</u> the always free and 
+[open source](/en/resources-support/open-source/) aspects of Streamdal and the 
+[data governance](/en/data-governance/overview/) capabilities will ensure 
+successful compliance.
+
+While more sections could be applicable, below are a few taken from the 
+_GLBA[^1]_ as archived in the U.S. Code of Federal Regulations along with how 
+Streamdal can help with data compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 314.3 Standards for safeguarding customer information (a) | The Streamdal [SDK](/en/core-components/sdk/) can ensure that data in motion complies with your organization's data security policies by filtering, alerting, or rejecting data based on content [rules](/en/resources-support/glossary/#rule-or-step). <br /> <br />For example, you can implement [rules](/en/resources-support/glossary/#rule-or-step) to reject data that contain plaintext passwords or other sensitive information. |
+| § 314.4 Elements (c)(1)(2)(4)(6)  | Weaving the Streamdal [SDK](/en/core-components/sdk/) `process()` into all of your services means that regardless of scale, you will always have an up-to-date view in the [Console UI](/en/core-components/console-ui/) of the flow of data in your systems, making discovery and management simple and easy. <br /> <br />Based on the [rules](/en/resources-support/glossary/#rule-or-step) you can set up, the [SDK](/en/core-components/sdk/) can determine and restrict who can consume and access data, fortifying data security. These same [rules](/en/resources-support/glossary/#rule-or-step) can also restrict the movement of data once it has passed its retention period, effectively ensuring data that is scheduled for secure disposal is not re-introduced into other environments. |
+| § 314.4 Elements (g) | The [rules](/en/resources-support/glossary/#rule-or-step) you create in the [Console UI](/en/core-components/console-ui/) can be as flexible and dynamic as you need, along with the ability to make adjustments on the fly and in real-time. For instance, if it is discovered that there is a new vulnerability in storage at an on-prem server, you can easily attach [rules](/en/resources-support/glossary/#rule-or-step) to your [producers](/en/resources-support/glossary/#producer) and [consumers](/en/resources-support/glossary/#consumer) that prevent sensitive data from entering that server. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_
+    
+    _The Privacy Rule guards "nonpublic personal information" (NPI), which is 
+    private financial data collected by institutions unless it's public. NPI 
+    doesn't include info deemed lawfully public unless the person opts to 
+    keep it private, like an unlisted phone number[^2]._
+    </p>
+  </div>
+</Notification>
+
+Rely on Streamdal to help keep your sensitive data GLBA-compliant anywhere it 
+can move!
+
+---
+
+[^1]: Code of Federal Regulations (2021). _Title 16 Commercial Practices. In Chapter I Federal Trade Commission, Subchapter C Regulations Under Specific Acts of Congress, PART 314—STANDARDS FOR SAFEGUARDING CUSTOMER INFORMATION (§ 314.3 (a) Standards for safeguarding customer information; § 314.4 (c)(1)(2)(4)(6) Elements; § 314.4 (g) Elements)._ Electronic Code of Federal Regulations. https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314 <br /><br /> _This part, which implements sections 501 and 505(b)(2) of the Gramm-Leach-Bliley Act, sets forth standards for developing, implementing, and maintaining reasonable administrative, technical, and physical safeguards to protect the security, confidentiality, and integrity of customer information._
+[^2]: Federal Trade Commission. (2002). _How to comply with the privacy of consumer financial information rule of the Gramm-Leach-Bliley Act._ https://www.ftc.gov/business-guidance/resources/how-comply-privacy-consumer-financial-information-rule-gramm-leach-bliley-act
