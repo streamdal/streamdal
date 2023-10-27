@@ -1,22 +1,34 @@
 ---
-title: How Streamdal Works Together
+title: How Streamdal Works
 metaTitle: "Seamlessly Integrating Streamdal's Components"
 description: Unraveling the collaborative dance of Streamdal's core components.
 layout: ../../../layouts/MainLayout.astro
 ---
 
 import mermaidFlow from '@images/guides/mermaidflow.png'
-import sdkFlow from '@images/guides/mermaidSdktoServer.png'
+import sdkFlow from '@images/guides/MermaidSdktoServer.png'
+import deploymentArch from '@images/guides/HA-Deployment.png'
 
-Here's a simple workflow to understand how Streamdal's components interact:
+<br>
+</br>
 
-## <span class="number-badge">1</span> Deploy Server and Console UI
+## 🖥️ Deploy Server and Console UI
 
-## Start by [Setting up the Streamdal Server](../../guides/deployment) on Your Network
+The Streamdal server is the heart of your setup, responsible for a multitude of tasks:
+- Orchestrating data flow and communication.
+- Ensuring secure and efficient data management.
+- Integrating seamlessly with the SDK and Console UI. 
 
-The Streamdal server plays a pivotal role in your setup, handling various tasks:
+[Setting up the Streamdal Server](../../guides/deployment) on Your Network
 
-- [Streamdal Server Repository](https://github.com/streamdal/server-repo-link)
+Below is a visual representation of the deployment architecture:
+
+<figure>
+  <img src={deploymentArch} alt="Deployment Arch" />
+  <figcaption>Streamdal's High Availability Deployment Architecture</figcaption>
+</figure>
+
+📦 [Streamdal Server Repository](https://github.com/streamdal/server-repo-link)
 
 ##  <span class="number-badge">2</span> Load the SDK
 
@@ -35,8 +47,11 @@ With the server in place, integrate the Streamdal SDK into your application. Her
 
 ##  <span class="number-badge">3</span> Access the Console UI
 
+
 Now, dive into the Console UI. Here, you'll witness:
 
 
 
 ## 🧩 How It All Works Together
+
+<img src={mermaidFlow} alt="Mermaid flow" />
