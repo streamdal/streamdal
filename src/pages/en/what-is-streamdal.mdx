@@ -1,43 +1,75 @@
 ---
 title: What is Streamdal?
-metaTitle: "Understanding the Core of Streamdal"
-description: Dive deeper into what makes Streamdal unique.
+metaTitle: "Understanding Streamdal's Engine"
+description: An engineering dive into the core mechanics of Streamdal.
 layout: ../../layouts/MainLayout.astro
 ---
-<br />
-<br />
-Streamdal handles real-time data management and security. Its core functionality revolves around not only ensuring the integrity of data but also implementing transformations seamlessly within the data stream, optimizing costs and efficiency. Let's dive deeper into its core features.
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import cliTail from "@images/guides/CliTail.png";
+import consoleUi from "@images/core-components/console-dashboard.png";
 
-## Observability: The Dashboard View
+Streamdal is an open-source data observability and governance tool built on a collection of several [components](../en/core-components/overview) that integrate seamlessly into your code via an [SDK](../core-components/sdk/).  
 
-The Dashboard View remains the nerve center of the Console UI, offering
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  📌 Quick peek? Check the live [demo](https://demo.streamdal.com).
+</Notification>
 
-- **Visual Representations**: A graphic layout showcasing the relationship between consumers, producers, and topics in each pipeline.
-- **Real-time Stats**: Gain insights into performance, consumption, and production rates of each entity.
-- **Tail View**: Observe your pipeline data in real-time, ensuring immediate feedback on operations.
-- **Schema Discovery**: Explore and define schemas, generated based on events that flow across your schemas 
+## 🎁 Features
+- **Data Observability**: Think `tail -f` for your data!
+- **Data Governance & Enforcement**: Keeping your data compliant.
+- **Data Quality Monitoring**: Ensuring your data's accuracy.
+- **Data Transformation**: Tailoring your data.
+- **Data Obfuscation, Masking, and Stripping**: Securing your data.
 
-## PII Detection (Beta)
+## 🎥 Demo Video
+Explore Streamdal in action! Our demo video offers a comprehensive walkthrough of the platform's capabilities and how it can be integrated into your workflows.
 
-Protecting personal and sensitive data is paramount. Streamdal's **PII Detection** capabilities scan real-time data streams to identify and manage Personally Identifiable Information (PII). Be it a stray email address, a credit card number, or any sensitive piece of information; Streamdal is ever-vigilant.
+[Watch the Demo Video](https://demo.streamdal.com/video)
 
-## Transformations: In-Broker Data Adjustments
 
-Instead of redirecting data to third-party systems for adjustment, Streamdal innovatively allows developers to deploy their transformation logic directly to the data's source. This revolutionary approach is akin to fitting a water purifier directly within the water tank.
+<div class="callout-box">
+   💡 **Why Streamdal?**
+   
+   Streamdal is not just another data management tool. It's a philosophy. A way of thinking and working with data that prioritizes real-time insights, flexibility, and ease of use. 
+   
+   [Discover the Streamdal way and its advantages.](../why-streamdal)
+</div>
 
-Benefits:
-- **Cost Savings**: By eliminating the constant transfer of data between storage and computation, costs are significantly reduced.
-- **Reduced Latency**: Direct transformations mean less waiting time, resulting in real-time or near-real-time data adjustments.
-- **Minimized Overhead**: With fewer systems in the chain, there's less overhead to manage and maintain.
+## 🚀 Deployment 
+- **Quick Setup**: Follow our [quickstart guide](../getting-started/quickstart) to get Streamdal up in no time.
+- **Production Ready**: For more robust requirements, see our [deployment guide](../guides/deployment/).
 
-While the concept appears streamlined on paper, its true brilliance lies in its execution. Implementing this approach reliably, securely, and efficiently is what sets Streamdal apart.
+## 🖥️ Console UI
+- Dive into the Console UI to explore [metrics, schema views, and data graphs](../core-components/console-ui) of your services.
+<img src={consoleUi} alt="Streamdal Console Dashboard" />
 
-## Quarantine Actions (Beta)
+## 💻 CLI
+It's a must-have tool for developers seeking a streamlined experience. [Learn More](https://github.com/streamdal/cli)
+ <img src={cliTail} alt="Information" />
 
-Data anomalies or inadvertent transmission of sensitive information is a real concern in real-time data streams. Streamdal's **Quarantine** capability ensures this data doesn't make its way to unintended recipients. By quarantining suspicious or non-compliant data in real-time, Streamdal provides a vital protective layer.
+## 🛠️ SDK
+Connect your applications up to Streamdal via the SDK. Below are the SDKs we currently offer with more to come:
 
----
+- **Go SDK**: Enhance your Go applications with Streamdal. [View Go SDK Docs](/en/language-support/go)
+- **Node SDK**: Integrate Streamdal into your Node.js projects. [View Node SDK Docs](/en/language-support/node)
+- **Python SDK**: Implement Streamdal functionalities in your Python applications. [View Python SDK Docs](/en/language-support/python)
 
-Embarking on your journey with Streamdal means setting a gold standard for data integrity, privacy, and compliance in real-time streams. With a foundation built on innovation and efficiency, you're always a step ahead.
+Stay tuned for more SDKs in the pipeline!
+## 🛣️ Roadmap
+Our roadmap is public and open for all! Check out the plans and milestones for Streamdal's future. [View the Roadmap](https://github.com/streamdal/streamdal/projects/1)
 
-Continue exploring to see how Streamdal can redefine your real-time data processes.
+<div class="callout-note">
+   📢 **Note**
+   
+   You have the power to shape and mold where this project goes - vote on issues, add to the discussion, and express your opinion!
+</div>
+
+## 🤝 Community
+Need help? Have questions? Want to contribute or chat with like-minded developers?
+[Join our Discord!](https://discord.streamdal.com)
+
+## 🌟 Contributing
+We ❤️ contributions from our community! If you're looking to get involved, make sure to read our [contributing guidelines](https://github.com/streamdal/contributing) before you craft that amazing PR.
+The content is now integrated within the structure, with slight changes to fit the existing style and format.

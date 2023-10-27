@@ -1,31 +1,42 @@
 ---
-title: How Streamdal Works?
-metaTitle: "Peeling Back the Layers of Streamdal's Operations"
-description: A deep dive into the intricacies of Streamdal's operational mechanics.
+title: How Streamdal Works Together
+metaTitle: "Seamlessly Integrating Streamdal's Components"
+description: Unraveling the collaborative dance of Streamdal's core components.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-<br />
-<br />
-Understanding Streamdal is to understand the synergy between sophisticated rule generation and real-time SDK integration. Streamdal operates on a premise of dynamic rule creation, timely synchronization, and instantaneous data management.
+import mermaidFlow from '@images/guides/mermaidflow.png'
+import sdkFlow from '@images/guides/mermaidSdktoServer.png'
 
-## Streamdal Server: The Heart of Rule Creation
+Here's a simple workflow to understand how Streamdal's components interact:
 
-At the core of the ecosystem is the Streamdal server, which you deploy directly on your network. This isn't just any server; it's a powerhouse designed to allow end-users to sculpt rules tailored to specific needs.
+## <span class="number-badge">1</span> Deploy Server and Console UI
 
-The genius of Streamdal server lies in its ability to convert these crafted rules into **WebAssembly (WASM)**. This transformation into WASM ensures that rules are not only lightweight and portable but also executed at near-native speed, making real-time data transformations and operations a reality.
+## Start by [Setting up the Streamdal Server](../../guides/deployment) on Your Network
 
-## SDK: The Conduit of Compliance
+The Streamdal server plays a pivotal role in your setup, handling various tasks:
 
-The Streamdal SDK, adaptable and vigilant, is an active participant in the dance of data management. Rather than being a passive element, the SDK pulls the WASM-compiled rules from the Streamdal server at frequent intervals, ensuring it's always equipped with the most updated directives.
+- [Streamdal Server Repository](https://github.com/streamdal/server-repo-link)
 
-With the rules in tow, the SDK provides capabilities like:
+##  <span class="number-badge">2</span> Load the SDK
 
-- **On-the-fly Transformations (Beta)**: Modify and adjust data in real-time based on the latest rules without external dependencies.
-- **PII Detection (Beta)**: Swiftly identify and manage sensitive information, ensuring data privacy is never compromised.
-- **Data Reliability (Beta)**: By enforcing the latest rules, ensure the integrity and consistency of data throughout its lifecycle.
-- **Access Control (Coming Soon)**: Based on the rules, the SDK can determine and restrict who can consume and access the data, fortifying data security.
+With the server in place, integrate the Streamdal SDK into your application. Here's a breakdown of how the SDK communicates:
 
----
+1. **Registration**: Once integrated, the SDK will register itself with the Streamdal server, confirming its active status and readiness to send/receive data.
 
-The fusion of the Streamdal server's rule generation prowess with the SDK's execution capabilities births a system where data security, transformation, and compliance are not just buzzwords—they are tangible results. Dive deeper to understand each component in detail and unlock the full potential of Streamdal in your operations.
+2. **Communication via gRPC**: The SDK and Streamdal server communicate over gRPC, This ensures efficient, bi-directional streaming and ensures robust data delivery.
+
+3. **Metrics Reporting**: Post registration, the SDK begins sending metrics to the Streamdal server. These metrics provide valuable insights into the data flow, potential bottlenecks, and other crucial aspects.
+
+5. **Fetching Rules (Beta)**: The SDK fetches the latest WASM-compiled rules from the server. These rules determine how data is processed, ensuring that any changes in data processing logic are immediately reflected in the SDK.
+
+<img src={sdkFlow} alt="SDK flow" />
+
+
+##  <span class="number-badge">3</span> Access the Console UI
+
+Now, dive into the Console UI. Here, you'll witness:
+
+
+
+## 🧩 How It All Works Together
