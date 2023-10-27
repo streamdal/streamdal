@@ -1,30 +1,78 @@
 ---
-title: "FED RAMP Compliance with Snitch"
-metaTitle: "Achieve FED RAMP Compliance Efficiently with Snitch"
-description: "Guide to use Snitch for strict adherence to FED RAMP standards."
+title: "FedRAMP Compliance with Streamdal"
+metaTitle: "Achieve FedRAMP Compliance Efficiently with Streamdal"
+description: "Guide to use Streamdal for strict adherence to FedRAMP standards."
 layout: ../../../../layouts/MainLayout.astro
 ---
 
-# FED RAMP Compliance with Snitch
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
 
-Federal Risk and Authorization Management Program (FED RAMP) mandates cloud services to meet consistent security and quality standards. Achieving and maintaining this certification can be complex, but Snitch simplifies the process.
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
 
-## Snitch's Approach
+Federal Risk and Authorization Management Program (FedRAMP) mandates cloud 
+services to meet consistent security and quality standards. Achieving and 
+maintaining this certification can be complex, but Streamdal simplifies the 
+process.
 
-Leverage Snitch to:
+## Streamdal's Approach
 
-- **Continuous Monitoring**: Implement rules to consistently monitor cloud environments, detecting and alerting on any anomalous activities that might signify a potential security threat.
-  
-  ```Example: Snitch can be configured to detect unexpected spikes in data traffic, alerting your security team to potential breaches.```
+Leverage Streamdal for:
 
-- **Access Control**: Regularly validate that only authorized personnel can access specific data sets and ensure logs of all access activities.
+- **Data Protection**: You can implement rules on data to consistently govern 
+how federal information is processed. Prevent accidental transmission or access 
+by disallowing data from leaving its defined boundaries. Ensure development 
+environments are not processing, storing, or transmitting federal information.
 
-  ```Example: Using Snitch, snitch to controll access to consumers and producers.```
+- **Incident Response**: Streamline your response to security incidents by 
+setting up automated workflows that aid your team in rapidly addressing threats.
 
-- **Incident Response**: Streamline your response to security incidents by setting up automated workflows that aid your team in rapidly addressing threats.
+- **Continuous Monitoring**: Implement rules to consistently monitor cloud 
+environments, detecting and alerting on any unauthorized access or anomalous 
+activities that might signify a potential security threat.
 
-  ```Example: Notify of unauthorized consumers.```
+> **Coming Soon**: A visual guide on setting up FedRAMP-specific rules in the 
+Streamdal UI.
 
-> **Coming Soon**: A visual guide on setting up FED RAMP-specific rules in the Snitch UI.
+## Regulatory Insights
 
-Navigate cloud security effortlessly and remain FED RAMP compliant with Snitch.
+Understanding the "legalese" of various laws and regulations can be a daunting 
+task. Many times this is left to a legal department/entity to help 
+organizations understand regulatory compliance. While a one-size-fits-all tool 
+does not exist for a complete compliance solution, Streamdal will greatly 
+reduce_ the time, effort, and headache around handling data and _revolutionize 
+how you can govern it!_
+
+Below are a few key concepts taken from the _FedRAMP CSO's Impact 
+Levels[^1]_ along with how Streamdal can help with data compliance:
+
+| Key Concepts | How Streamdal helps comply |
+|-|-|
+| #1 (All Impact levels): Defining Your Authorization Boundary in the Cloud | Streamdal can play a key part in defining and protecting data boundaries for the authorizing officials operating in your systems. You can write rules for controlling access to data, and rules to protect the flow of all federal information and metadata from leaving its boundaries. |
+| #4 (FR-High): Interconnections in the Cloud | Streamdal will significantly uncomplicate the disclosing process to the AO (Agency of Authorizing Authority). Without necessarily defining rules, simply using the observability Streamdal offers will surface all of the data handling portions of your systems. |
+
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>_Did you know: An <u>API that calls data from an external source</u>, 
+    <u>IaaS that a PaaS or SaaS resides upon</u>, or external systems that 
+    provide <u>audit logging</u>, <u>vulnerability scanning</u>, or 
+    <u>ticketing systems</u> are all examples of external services that could 
+    impact the CIA (confidentiality, integrity, or availability) of federal 
+    information?_</p>
+  </div>
+</Notification>
+
+Navigate cloud security effortlessly and remain FedRAMP compliant with 
+Streamdal.
+
+[^1]: Federal Risk and Authorization Management Program (FedRAMP). (n.d.). Understanding Baselines and Impact Levels for FedRAMP® Authorizations. https://www.fedramp.gov/baselines/ <br /> <br /> _Federal Information Processing Standard (FIPS) 199 provides the standards for the security categorization of federal information and information systems. A system’s category is dependent on the potential impact on an agency’s assets and operations should their information and information systems be compromised through unauthorized access, use, disclosure, disruption, modification, or destruction. These are the standards Cloud Service Providers (CSPs) must employ to ensure their services meet the minimum security requirements for the data processed, stored, and transmitted._

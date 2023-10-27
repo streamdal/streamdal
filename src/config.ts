@@ -1,6 +1,6 @@
 export const SITE = {
-  title: "Snitch Documentation",
-  description: "Snitch.build documentation",
+  title: "Streamdal Documentation",
+  description: "Streamdal Open Source and Data Governance Documentation",
   defaultLanguage: "en_US",
 };
 
@@ -185,30 +185,25 @@ export const SIDEBAR: Sidebar = {
     ],
     api: [
       {
-        text: "Data Governance",
+        text: "Data Governance (Beta)",
         children: [
           {
-            text: "Overview (Coming Soon!)",
+            text: "Overview",
             slug: "overview",
             link: "en/data-governance/overview"
           },
           {
-            text: "Data Quality (Coming Soon!)",
+            text: "Data Quality",
             slug: "data-quality",
             link: "en/data-governance/data-quality"
           },
           {
-            text: "Governance for Compliance (Coming Soon!)",
+            text: "Governance for Compliance",
             children: [
               {
-                text: "CCPA/CPRA",
+                text: "CCPA",
                 slug: "ccpa-cpra",
                 link: "en/data-governance/compliance/ccpa-cpra",
-              },
-              {
-                text: "CDPA",
-                slug: "cdpa",
-                link: "en/data-governance/compliance/cdpa",
               },
               {
                 text: "FED RAMP",
@@ -216,9 +211,9 @@ export const SIDEBAR: Sidebar = {
                 link: "en/data-governance/compliance/fed-ramp",
               },
               {
-                text: "GBLA",
+                text: "GLBA",
                 slug: "gbla",
-                link: "en/data-governance/compliance/gbla",
+                link: "en/data-governance/compliance/glba",
               },
               {
                 text: "GDPR",
@@ -251,19 +246,24 @@ export const SIDEBAR: Sidebar = {
                 link: "en/data-governance/compliance/pci-dss",
               },
               {
-                text: "SOCII",
-                slug: "socii",
-                link: "en/data-governance/compliance/socii",
-              },
-              {
                 text: "PIPEDA",
                 slug: "pipeda",
                 link: "en/data-governance/compliance/pipeda",
               },
               {
+                text: "SOCII",
+                slug: "socii",
+                link: "en/data-governance/compliance/socii",
+              },
+              {
                 text: "TDPSA",
                 slug: "tdpsa",
                 link: "en/data-governance/compliance/tdpsa",
+              },
+              {
+                text: "VCDPA",
+                slug: "cdpa",
+                link: "en/data-governance/compliance/cdpa",
               },
             ]
           },  
@@ -303,9 +303,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/resources-support/glossary",
           },  
           {
-            text: "License & Use",
+            text: "Open Source",
             slug: "license",
-            link: "en/resources-support/license",
+            link: "en/resources-support/open-source",
           },
           {
             text: "Roadmap",

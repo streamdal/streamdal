@@ -172,4 +172,18 @@ culpa qui officia deserunt mollit anim id est laborum.
   </div>
 </div>
 
+## Keyword Highlighting
+
+Keyword highlighting is for core components or glossary terms. This is 
+accomplished through assigning classes:
+
+- <span class="pkeyword">Class: pkeyword without the hoverstate is achieved with a span</span>
+{/* */}
+- <a href="#" class="pkeyword">Keyword links have a special hoverstate</a>
+
+  ...but require `<a href>` and will not work with `[markdown](syntax)` for links.
+
+- <span class="ykeyword">Class: ykeyword. No hover state, just for extra 
+highlighting for statements or special titles</span>
+  - **<span class="ykeyword">Here is the same highlighting, but in bold</span>**
 

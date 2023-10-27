@@ -1,30 +1,92 @@
 ---
-title: "CDPA Compliance with Snitch"
-metaTitle: "Achieve CDPA Compliance Seamlessly with Snitch"
-description: "Utilize Snitch to ensure consistent adherence to CDPA standards."
+title: "Virginia CDPA Data Compliance with Streamdal"
+metaTitle: "Ensure VCDPA Data Compliance Seamlessly with Streamdal"
+description: "Utilize Streamdal to ensure consistent adherence to VCDPA data standards."
 layout: ../../../../layouts/MainLayout.astro
 ---
 
-# CDPA Compliance with Snitch
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
 
-The Consumer Data Protection Act (CDPA) necessitates rigorous data protection standards, prioritizing consumer rights to access, correct, and delete personal data. With Snitch, ensuring compliance is streamlined and transparent.
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
 
-## Snitch's Approach
+The Consumer Data Protection Act of Virginia (VCDPA) necessitates rigorous data 
+protection standards, prioritizing consumer rights to access, correct, and 
+delete personal data. With Streamdal, ensuring compliance is streamlined and 
+transparent.
 
-Using Snitch, you can:
+## Streamdal's Approach
 
-- **Right to Access**: Set up rules that ensure user requests for data access are processed correctly, logging each request to maintain a history of actions taken.
+With Streamdal's data compliance features, you can enable:
+
+- **Right to Access**: Set up rules that ensure user requests for data access 
+are processed correctly, logging each request to maintain a history of actions 
+taken.
   
-  ```Example: Create a rule where, upon receiving a data access request, Snitch verifies the authenticity of the request, logs it, and ensures the necessary data is retrieved.```
+  {/* ```
+  Example: Create a rule where, upon receiving a data access request, 
+  Streamdal verifies the authenticity of the request, logs it, and ensures the 
+  necessary data is retrieved.
+  ``` */}
 
-- **Right to Correct**: Allow for seamless correction of data by creating workflows that process these requests while maintaining an audit trail.
+- **Right to Correct**: Allow for seamless correction of data by creating 
+workflows that process these requests while maintaining an audit trail.
 
-  ```Example: If a user submits a request to correct their address, Snitch ensures the new address meets validation criteria, replaces the old data, and logs the change.```
+  {/* ```
+  Example: If a user submits a request to correct their address, Streamdal 
+  ensures the new address meets validation criteria, replaces the old data, 
+  and logs the change.
+  ``` */}
 
-- **Right to Delete**: Automate the process of data deletion on user request, ensuring data is permanently removed from all systems.
+- **Right to Delete**: Automate the process of data deletion on user request, 
+ensuring data is permanently removed from all systems.
 
-  ```Example: Upon a user's deletion request, Snitch can trigger a rule to remove the user's data, log the deletion, and send a confirmation to the user.```
+  {/* ```
+  Example: Upon a user's deletion request, Streamdal can trigger a rule to 
+  remove the user's data, log the deletion, and send a confirmation to the 
+  user.
+  ``` */}
 
-> **Coming Soon**: An illustrative guide on setting up the apt rules in the Snitch UI for CDPA compliance.
+> **Coming Soon**: An illustrative guide on setting up the appropriate rules in 
+the Streamdal UI for VCDPA data compliance.
 
-Ensure consumer data rights and maintain CDPA compliance effectively with Snitch.
+## Regulatory Insights
+
+Understanding the "legalese" of various laws and regulations can be a daunting 
+task. Many times this is left to a legal department/entity to help 
+organizations understand regulatory compliance. While a one-size-fits-all tool 
+does not exist for a complete compliance solution, Streamdal will _greatly 
+reduce_ the time, effort, and headache around handling data and _revolutionize 
+how you can govern it!_
+
+Below are a few sections taken from the _VCDPA[^1]_ text with how 
+Streamdal can help with data compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 59.1-578: <br /> Data controller responsibilities; transparency. | The Streamdal SDK can enforce rules on consumers and producers to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization. |
+| § 59.1-580: <br /> Data protection assessments. | From the UI Streamdal provides, you can make rules to ensure that wherever PII moves and is processed throughout your systems, it is documented for record-keeping and assessment requirements. Streamdal can effectively automate these kinds of requests, as well as consumer inquiries. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>_Did you know: VCDPA requirements on the timeliness for 
+    responding to requests to delete, requests to correct, and requests to know 
+    are <u>no later than 45 business days?</u>_</p>
+  </div>
+</Notification>
+
+Ensure consumer data rights and maintain VCDPA compliance effectively with 
+Streamdal.
+
+---
+
+[^1]: Virginia. (2023). Consumer Data Protection Act. In Title 59.1. Trade and Commerce, Chapter 53 (Va. Code Ann. § 59.1-578, § 59.1-580). https://law.lis.virginia.gov/vacodefull/title59.1/chapter53/ <br /> <br /> _The Virginia Consumer Data Protection Act (“VCDPA”) went into effect on January 1, 2023. This new law provides Virginia residents certain rights for personal data collected by businesses under conditions outlined in the law._
