@@ -103,7 +103,8 @@ func (t *Telemetry) startWorker(looper director.Looper) {
 			// NOOP
 		}
 
-		if len(batch) > serverFlushMaxBatchSize && time.Now().UTC().Sub(lastFlush) > serverFlushTimeout {
+		batchReady := len(batch) >= serverFlushMaxBatchSize || time.Now().UTC().Sub(lastFlush) > serverFlushTimeout
+		if batchReady {
 			if err := t.sendTelemetryBatch(t.ShutdownCtx, batch); err != nil {
 				t.log.WithError(err).Error("unable to send telemetry batch")
 			}
@@ -117,6 +118,10 @@ func (t *Telemetry) startWorker(looper director.Looper) {
 }
 
 func (t *Telemetry) sendTelemetryBatch(_ context.Context, data []map[string]string) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	u, err := url.Parse(types.UibffEndpoint + "/v1/app/telemetry")
 	if err != nil {
 		return errors.Wrap(err, "unable to parse url")
