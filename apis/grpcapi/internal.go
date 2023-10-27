@@ -393,11 +393,6 @@ func (s *InternalServer) getActiveAttachPipelineCommands(
 			continue
 		}
 
-		// Always wipe bytes. SDK Client will handle lookup.
-		for _, step := range a.GetAttachPipeline().Pipeline.Steps {
-			step.XWasmBytes = nil
-		}
-
 		pausedEntry, ok := pausedMap[a.GetAttachPipeline().Pipeline.Id]
 		if !ok {
 			// Pipeline ID is not present in map, it is not paused

@@ -6,15 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"github.com/streamdal/protos/build/go/protos/steps"
-
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/streamdal/protos/build/go/protos"
 	"github.com/streamdal/protos/build/go/protos/shared"
+	"github.com/streamdal/protos/build/go/protos/steps"
 
 	"github.com/streamdal/server/wasm"
 )
@@ -194,16 +193,20 @@ func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmMod
 			continue
 		}
 
-		// Inject WASM data into it's own map and zero out the bytes in the steps
+		// Inject WASM data into its own map and zero out the bytes in the steps
 		// This is to prevent the WASM data from being duplicated in the response
 		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
-			if _, ok := wasmModules[step.GetXWasmId()]; !ok {
-				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
-					Id:       step.GetXWasmId(),
-					Bytes:    step.GetXWasmBytes(),
-					Function: step.GetXWasmFunction(),
-				}
+			if _, ok := wasmModules[step.GetXWasmId()]; ok {
+				step.XWasmBytes = nil
+				continue
 			}
+
+			wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+				Id:       step.GetXWasmId(),
+				Bytes:    step.GetXWasmBytes(),
+				Function: step.GetXWasmFunction(),
+			}
+			step.XWasmBytes = nil
 		}
 	}
 
