@@ -32,15 +32,14 @@ def http_request(caller: Caller, ptr: int, length: int) -> int:
 
     resp = res.SerializeToString()
 
-    # Append terminator sequence
-    resp += b"\xa6\xa6\xa6"
-
     # Allocate memory for response
     alloc = caller.get("alloc")
     resp_ptr = alloc(caller, len(resp) + 64)
 
     # Write response to memory
     memory.write(caller, resp, resp_ptr)
+
+    resp_ptr = resp_ptr << 32 | len(resp)
 
     return resp_ptr
 
@@ -61,6 +60,6 @@ def __http_request_perform(req: protos.steps.HttpRequest) -> requests.Response:
     elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
         response = requests.options(req.url)
     else:
-        raise ValueError("Invalid HTTP method provided")
+        raise ValueError(f"Invalid HTTP method provided: '{req.method}'")
 
     return response

@@ -857,7 +857,7 @@ class StreamdalClient:
         linker.define_func(
             "env",
             "httpRequest",
-            FuncType([ValType.i32(), ValType.i32()], [ValType.i32()]),
+            FuncType([ValType.i32(), ValType.i32()], [ValType.i64()]),
             hostfunc.http_request,
             True,
         )
@@ -887,7 +887,7 @@ class StreamdalClient:
         # Get alloc() from module
         alloc = instance.exports(store)["alloc"]
         # Allocate enough memory for the length of the data and receive memory pointer
-        start_ptr = alloc(store, len(data) + 64)
+        start_ptr = alloc(store, len(data))
 
         # Write to memory starting at pointer returned bys alloc()
         memory.write(store, data, start_ptr)

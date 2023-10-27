@@ -45,7 +45,7 @@ def read_memory(memory: Memory, store, result_ptr: int, length: int = None) -> b
         len_true = mem_len
     elif length == -1:
         ptr_true = result_ptr >> 32
-        len_true = result_ptr
+        len_true = result_ptr & 0xFFFFFFFF
     else:
         ptr_true = result_ptr
         len_true = length
@@ -54,4 +54,4 @@ def read_memory(memory: Memory, store, result_ptr: int, length: int = None) -> b
     # if length is not None or length != -1 and ptr_true > len_true or ptr_true + len_true > mem_len:
     #     raise StreamdalException("WASM memory pointer out of bounds")
 
-    return memory.read(store, ptr_true, len_true)
+    return memory.read(store, ptr_true, ptr_true + len_true)
