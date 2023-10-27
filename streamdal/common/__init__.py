@@ -30,43 +30,28 @@ def str_to_aud(aud: str) -> protos.Audience:
     )
 
 
-def read_memory(memory: Memory, store, result_ptr: int, length: int = -1) -> bytes:
+def read_memory(memory: Memory, store, result_ptr: int, length: int = None) -> bytes:
     """
-    Read a response from a wasm memory buffer using the given length,
-    or until we encounter 3 null bytes in a row.
+    This function has three operation modes:
+
+    1. If you pass a $ptr and $length - it will try to read $length bytes from the $ptr
+    2. If you pass a ptr and pass length as -1 - it will try to unpack size from the $ptr
+    3. If you pass a ptr and do NOT pass length - it will read all memory starting at $ptr
     """
     mem_len = memory.data_len(store)
 
-    # Ensure we aren't reading out of bounds
-    if result_ptr > mem_len or result_ptr + length > mem_len:
-        raise StreamdalException("WASM memory pointer out of bounds")
+    if length is None:
+        ptr_true = result_ptr
+        len_true = mem_len
+    elif length == -1:
+        ptr_true = result_ptr >> 32
+        len_true = result_ptr & 0xFFFFFFFF
+    else:
+        ptr_true = result_ptr
+        len_true = length
 
-    # TODO: can we avoid reading the entire buffer somehow?
-    result_data = memory.read(store, result_ptr, mem_len)
+    # Ensure we aren't reading out of bounds (if we have a real length)
+    # if length is not None or length != -1 and ptr_true > len_true or ptr_true + len_true > mem_len:
+    #     raise StreamdalException("WASM memory pointer out of bounds")
 
-    res = bytearray()  # Used to build our result
-    nulls = 0  # How many null pointers we've encountered
-    count = 0  # How many bytes we've read, used to check against length, if provided
-
-    for v in result_data:
-        if length == count and length != -1:
-            break
-
-        if nulls == 3:
-            break
-
-        if v == 166:
-            nulls += 1
-            res.append(v)
-            continue
-
-        count += 1
-        res.append(v)
-        nulls = 0  # Reset nulls since we read another byte and thus aren't at the end
-
-    if count == len(result_data) and nulls != 3:
-        raise StreamdalException(
-            "unable to read response from wasm - no terminators found in response data"
-        )
-
-    return bytes(res).rstrip(b"\xa6")
+    return memory.read(store, ptr_true, ptr_true + len_true)
