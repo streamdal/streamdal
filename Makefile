@@ -42,14 +42,14 @@ setup/darwin:
 run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
 	docker-compose -f docker-compose.dev.yaml pull && \
-	docker-compose -f docker-compose.dev.yaml up -d && \
+	docker-compose -f docker-compose.dev.yaml up -d
 	@bash $(VERSION_SCRIPT)
 
 .PHONY: run/dev/build
 run/dev/build: description = Build streamdal/server img and run it + all its deps
 run/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml build && \
-	docker-compose -f docker-compose.dev.build.yaml up -d && \
+	docker-compose -f docker-compose.dev.build.yaml up -d
 	@bash $(VERSION_SCRIPT)
 
 .PHONY: get/version
