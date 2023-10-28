@@ -40,7 +40,7 @@ setup/darwin:
 .PHONY: run/dev
 run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
-	docker-compose -f docker-compose.dev.yaml build && \
+	docker-compose -f docker-compose.dev.yaml pull && \
 	docker-compose -f docker-compose.dev.yaml up -d && \
 	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
 
