@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
-import { WasmModule } from "@streamdal/protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
 import { Configs } from "../streamdal.js";
@@ -85,9 +84,10 @@ export const register = async (configs: Configs) => {
     internal.registered = true;
 
     for await (const response of call.responses) {
-      response.command.oneofKind !== "keepAlive" &&
-        console.debug("processing response command...", response);
-      processResponse(response);
+      if (response.command.oneofKind !== "keepAlive") {
+        console.debug("processing register command", response);
+        processResponse(response);
+      }
     }
   } catch (error) {
     internal.registered = false;

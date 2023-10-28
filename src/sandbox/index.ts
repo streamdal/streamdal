@@ -1,6 +1,7 @@
 import { Audience } from "@streamdal/protos/protos/sp_common";
 
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
+import { billingExample } from "./billing.js";
 
 const exampleData = {
   boolean_t: true,
@@ -97,9 +98,9 @@ const audienceCProducer: Audience = {
   operationName: "kafka-consumer",
 };
 
-const logTest = async (streamdal: any, audience: Audience, input: any) => {
+const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
   console.log("--------------------------------");
-  console.log(new Date());
+  console.log("pipeline request start", new Date());
   console.log(
     `sending pipeline request for ${audience.serviceName} - ${OperationType[
       audience.operationType
@@ -109,9 +110,14 @@ const logTest = async (streamdal: any, audience: Audience, input: any) => {
     audience: audience,
     data: new TextEncoder().encode(JSON.stringify(input)),
   });
-  console.log("error", error);
-  console.log("message", message);
-  console.log("data:");
+  //
+  // no active pipeline messages are technically errors
+  // but more informational
+  error &&
+    !message?.startsWith("no active pipeline") &&
+    console.log("result error", error);
+  console.log("result message", message);
+  console.log("result data:");
   try {
     data && data.length > 0
       ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
@@ -119,339 +125,260 @@ const logTest = async (streamdal: any, audience: Audience, input: any) => {
   } catch (e) {
     console.error("could not parse data", e);
   }
-  console.log("pipeline request done");
+  console.log("pipeline request done", new Date());
   console.log("--------------------------------");
   console.log("\n");
 };
 
-const randomInterval = async (
+export const runPipeline = (
+  streamdal: any,
+  audience: Audience,
+  input: any,
+  interval = 0
+) =>
+  interval
+    ? setInterval(() => {
+        void logPipeline(streamdal, audience, input);
+      }, 2000)
+    : void logPipeline(streamdal, audience, input);
+
+export const randomPipeline = (
   streamdal: any,
   audience: Audience,
   input: any
 ) => {
-  console.log("--------------------------------");
-  console.log(new Date());
-  console.log(
-    `sending pipeline request for ${audience.serviceName} - ${OperationType[
-      audience.operationType
-    ].toLowerCase()}`
-  );
-  const { error, message, data } = await streamdal.processPipeline({
-    audience: audience,
-    data: new TextEncoder().encode(JSON.stringify(input)),
-  });
-  console.log("error", error);
-  console.log("message", message);
-  console.log("data:");
-  try {
-    data && data.length > 0
-      ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
-      : console.log("no data returned");
-  } catch (e) {
-    console.error("could not parse data", e);
-  }
-  console.log("pipeline request done");
-  console.log("--------------------------------");
-  console.log("\n");
+  runPipeline(streamdal, audience, input);
   setTimeout(
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    () => randomInterval(streamdal, audience, input),
+    () => randomPipeline(streamdal, audience, input),
     Math.floor(Math.random() * (3000 - 250) + 3000)
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const exampleStaggered = async () => {
+export const exampleStaggered = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  setInterval(() => {
-    void randomInterval(streamdalA, audienceAConsumer, exampleData);
-  }, 2000);
-
-  setTimeout(() => {
-    void logTest(streamdalA, audienceAProducer, exampleData);
-  }, 4000);
-
-  setTimeout(() => {
-    void logTest(streamdalB, audienceBConsumer, exampleData);
-  }, 8000);
-
-  setTimeout(() => {
-    void logTest(streamdalB, audienceBProducer, exampleData);
-  }, 12000);
+  randomPipeline(streamdalA, audienceAConsumer, exampleData);
+  runPipeline(streamdalA, audienceAProducer, exampleData, 4000);
+  runPipeline(streamdalB, audienceBConsumer, exampleData, 8000);
+  runPipeline(streamdalB, audienceBProducer, exampleData, 12000);
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const tailFriendly = async () => {
+export const tailFriendly = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(streamdalA, audienceAConsumer, exampleData);
+  runPipeline(streamdalA, audienceAConsumer, exampleData);
 
-  void logTest(
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
 
-  void logTest(
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-three" },
     exampleData
   );
 
-  void logTest(
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
-  void logTest(streamdalA, audienceAProducer, exampleData);
+  runPipeline(streamdalA, audienceAProducer, exampleData);
+  runPipeline(streamdalB, audienceBConsumer, exampleData, 1);
+  runPipeline(streamdalB, audienceBProducer, exampleData);
 
-  setInterval(() => {
-    void logTest(streamdalB, audienceBConsumer, exampleData);
-  }, 1000);
-
-  void logTest(streamdalB, audienceBProducer, exampleData);
-
-  void logTest(
+  runPipeline(
     streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const highVolumeTail = async () => {
+export const highVolumeTail = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  setInterval(() => {
-    void logTest(streamdalA, audienceAConsumer, exampleData);
-  }, 500);
+  runPipeline(streamdalA, audienceAConsumer, exampleData, 500);
 
-  setInterval(() => {
-    void logTest(
-      streamdalA,
-      { ...audienceAConsumer, operationName: "kafka-consumer-two" },
-      exampleData
-    );
-  }, 500);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+    exampleData,
+    500
+  );
 
-  setInterval(() => {
-    void logTest(
-      streamdalA,
-      { ...audienceAConsumer, operationName: "kafka-consumer-three" },
-      exampleData
-    );
-  }, 1000);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+    exampleData,
+    1000
+  );
 
-  setInterval(() => {
-    void logTest(
-      streamdalA,
-      { ...audienceAConsumer, componentName: "another-kafka" },
-      exampleData
-    );
-  }, 500);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData,
+    500
+  );
 
-  void logTest(
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
-  setInterval(() => {
-    void logTest(streamdalA, audienceAProducer, exampleData);
-  }, 2000);
+  runPipeline(streamdalA, audienceAProducer, exampleData, 2000);
+  runPipeline(streamdalB, audienceBConsumer, exampleData, 250);
+  runPipeline(streamdalB, audienceBProducer, exampleData, 500);
 
-  setInterval(() => {
-    void logTest(streamdalB, audienceBConsumer, exampleData);
-  }, 250);
-
-  setInterval(() => {
-    void logTest(streamdalB, audienceBProducer, exampleData);
-  }, 500);
-
-  setInterval(() => {
-    void logTest(
-      streamdalB,
-      { ...audienceBProducer, componentName: "kafka" },
-      exampleData
-    );
-  }, 500);
+  runPipeline(
+    streamdalB,
+    { ...audienceBProducer, componentName: "kafka" },
+    exampleData,
+    500
+  );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const throughputFriendly = async () => {
+export const throughputFriendly = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  void randomInterval(streamdalA, audienceAConsumer, exampleData);
+  randomPipeline(streamdalA, audienceAConsumer, exampleData);
 
-  void randomInterval(
+  randomPipeline(
     streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
 
-  void randomInterval(
+  randomPipeline(
     streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-three" },
     exampleData
   );
 
-  void randomInterval(
+  randomPipeline(
     streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
 
-  void randomInterval(streamdalA, audienceAProducer, exampleData);
+  randomPipeline(streamdalA, audienceAProducer, exampleData);
+  randomPipeline(streamdalB, audienceBConsumer, exampleData);
+  randomPipeline(streamdalB, audienceBProducer, exampleData);
 
-  void randomInterval(streamdalB, audienceBConsumer, exampleData);
-
-  void randomInterval(streamdalB, audienceBProducer, exampleData);
-
-  void randomInterval(
+  randomPipeline(
     streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const tailFast = async () => {
+export const tailFast = () => {
   const streamdalB = new Streamdal(serviceBConfig);
-
-  setInterval(() => {
-    void logTest(streamdalB, audienceBConsumer, exampleData);
-  }, 100);
+  runPipeline(streamdalB, audienceBConsumer, exampleData, 100);
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const exampleConcurrent = async () => {
+export const exampleConcurrent = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
-  setInterval(() => {
-    void logTest(streamdalA, audienceAConsumer, exampleData);
-  }, 4000);
+  runPipeline(streamdalA, audienceAConsumer, exampleData, 4000);
 
-  void logTest(streamdalA, audienceAProducer, exampleData);
-  void logTest(streamdalB, audienceBConsumer, exampleData);
-  void logTest(streamdalB, audienceBProducer, exampleData);
+  runPipeline(streamdalA, audienceAProducer, exampleData);
+  runPipeline(streamdalB, audienceBConsumer, exampleData);
+  runPipeline(streamdalB, audienceBProducer, exampleData);
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const exampleMultipleGroup = async () => {
+export const exampleMultipleGroup = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(streamdalA, audienceAConsumer, exampleData);
-  void logTest(
+  runPipeline(streamdalA, audienceAConsumer, exampleData);
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, operationName: "kafka-consumer-two" },
     exampleData
   );
-  void logTest(streamdalA, audienceAProducer, exampleData);
-  void logTest(streamdalB, audienceBConsumer, exampleData);
-  void logTest(streamdalB, audienceBProducer, exampleData);
-  void logTest(
+  runPipeline(streamdalA, audienceAProducer, exampleData);
+  runPipeline(streamdalB, audienceBConsumer, exampleData);
+  runPipeline(streamdalB, audienceBProducer, exampleData);
+  runPipeline(
     streamdalB,
     { ...audienceBProducer, operationName: "kafka-producer-two" },
     exampleData
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const exampleMultipleComponentsPerService = async () => {
+export const exampleMultipleComponentsPerService = () => {
   const streamdalA = new Streamdal(serviceAConfig);
   const streamdalB = new Streamdal(serviceBConfig);
 
-  void logTest(streamdalA, audienceAConsumer, exampleData);
-  void logTest(
+  runPipeline(streamdalA, audienceAConsumer, exampleData);
+  runPipeline(
     streamdalA,
     { ...audienceAConsumer, componentName: "another-kafka" },
     exampleData
   );
-  void logTest(streamdalA, audienceAProducer, exampleData);
-  void logTest(streamdalB, audienceBConsumer, exampleData);
-  void logTest(streamdalB, audienceBProducer, exampleData);
-  void logTest(
+  runPipeline(streamdalA, audienceAProducer, exampleData);
+  runPipeline(streamdalB, audienceBConsumer, exampleData);
+  runPipeline(streamdalB, audienceBProducer, exampleData);
+  runPipeline(
     streamdalB,
     { ...audienceBProducer, componentName: "kafka" },
     exampleData
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
-export const exampleSimple = async () => {
+export const exampleSimple = () => {
   const streamdalA = new Streamdal(serviceAConfig);
-  void logTest(streamdalA, audienceAConsumer, exampleData);
+  runPipeline(streamdalA, audienceAConsumer, exampleData);
 };
 
-export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async () => {
-    const streamdalA = new Streamdal(serviceAConfig);
-    const streamdalB = new Streamdal(serviceBConfig);
-    const streamdalC = new Streamdal(serviceCConfig);
+export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup = () => {
+  const streamdalA = new Streamdal(serviceAConfig);
+  const streamdalB = new Streamdal(serviceBConfig);
+  const streamdalC = new Streamdal(serviceCConfig);
 
-    setInterval(() => {
-      void logTest(streamdalA, audienceAConsumer, exampleData);
-    }, 2000);
+  runPipeline(streamdalA, audienceAConsumer, exampleData, 2000);
 
-    setInterval(() => {
-      void logTest(
-        streamdalA,
-        { ...audienceAConsumer, operationName: "kafka-consumer-two" },
-        exampleData
-      );
-    }, 4000);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+    exampleData,
+    4000
+  );
 
-    setInterval(() => {
-      void logTest(
-        streamdalA,
-        { ...audienceAConsumer, operationName: "kafka-consumer-three" },
-        exampleData
-      );
-    }, 6000);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+    exampleData,
+    6000
+  );
 
-    setInterval(() => {
-      void logTest(
-        streamdalA,
-        { ...audienceAConsumer, componentName: "another-kafka" },
-        exampleData
-      );
-    }, 8000);
+  runPipeline(
+    streamdalA,
+    { ...audienceAConsumer, componentName: "another-kafka" },
+    exampleData,
+    8000
+  );
 
-    setInterval(() => {
-      void logTest(streamdalA, audienceAProducer, exampleData);
-    }, 10000);
+  runPipeline(streamdalA, audienceAProducer, exampleData, 10000);
+  runPipeline(streamdalB, audienceBConsumer, exampleData, 12000);
+  runPipeline(streamdalB, audienceBProducer, exampleData, 14000);
+  runPipeline(
+    streamdalB,
+    { ...audienceBProducer, componentName: "kafka" },
+    exampleData,
+    16000
+  );
 
-    setInterval(() => {
-      void logTest(streamdalB, audienceBConsumer, exampleData);
-    }, 12000);
+  runPipeline(streamdalC, audienceCConsumer, exampleData, 2000);
+  runPipeline(streamdalC, audienceCProducer, exampleData, 2000);
+};
 
-    setInterval(() => {
-      void logTest(streamdalB, audienceBProducer, exampleData);
-    }, 14000);
-
-    setInterval(() => {
-      void logTest(
-        streamdalB,
-        { ...audienceBProducer, componentName: "kafka" },
-        exampleData
-      );
-    }, 16000);
-
-    setInterval(() => {
-      void logTest(streamdalC, audienceCConsumer, exampleData);
-    }, 2000);
-
-    setInterval(() => {
-      void logTest(streamdalC, audienceCProducer, exampleData);
-    }, 2000);
-  };
-
-void throughputFriendly();
+billingExample();

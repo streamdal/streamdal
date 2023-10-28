@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 import { WASMRequest, WASMResponse } from "@streamdal/protos/protos/sp_wsm";
 // eslint-disable-next-line import/no-unresolved
@@ -17,10 +16,9 @@ const wasi = new WASI({
 
 export const instantiateWasm = async (
   wasmId?: string,
-  wasmBytes?: Uint8Array,
-  wasmFunction?: string
+  wasmBytes?: Uint8Array
 ) => {
-  if (!wasmId || !wasmFunction || !wasmBytes || wasmBytes.length === 0) {
+  if (!wasmId || !wasmBytes || wasmBytes.length === 0) {
     console.debug("Wasm info missing, skipping instantiation, .");
     return;
   }
@@ -32,10 +30,10 @@ export const instantiateWasm = async (
 
   const wasm = await WebAssembly.compile(wasmBytes);
   const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
-  const instance: any = await WebAssembly.instantiate(wasm, importObject);
-  const { exports } = instance;
-  const { memory, alloc, [wasmFunction]: f } = exports;
-  internal.wasmModules.set(wasmId, { memory, alloc, f });
+  internal.wasmModules.set(
+    wasmId,
+    await WebAssembly.instantiate(wasm, importObject)
+  );
 };
 
 export const readResponse = (pointer: number, buffer: Uint8Array) => {
@@ -80,8 +78,10 @@ export const runWasm = ({
     inputPayload: data,
   });
 
+  const { exports } = internal.wasmModules.get(step.WasmId!);
+  const { memory, alloc, [step.WasmFunction!]: f } = exports;
+
   const requestBytes = WASMRequest.toBinary(request);
-  const { memory, alloc, f } = internal.wasmModules.get(step.WasmId!);
 
   const ptr = alloc(requestBytes.length);
   const mem = new Uint8Array(memory.buffer, ptr, requestBytes.length);
@@ -91,6 +91,5 @@ export const runWasm = ({
 
   const completeBufferFromMemory = new Uint8Array(memory.buffer);
   const response = readResponse(returnPtr, completeBufferFromMemory);
-  const decodedResponse = WASMResponse.fromBinary(response);
-  return decodedResponse;
+  return WASMResponse.fromBinary(response);
 };

@@ -287,6 +287,7 @@ export const runStep = ({
     stepStatus.message = exitMsg;
     stepStatus.schema = outputStep;
   } catch (error: any) {
+    console.error(`error running pipeline step - ${step.name}`, error);
     stepStatus.error = true;
     stepStatus.message = error.toString();
     stepStatus.abort = true;

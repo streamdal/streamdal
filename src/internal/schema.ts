@@ -23,6 +23,7 @@ export const sendSchema = async ({
 
     if (!step.schema) {
       console.info("No schema found, skipping send schema");
+      return;
     }
 
     const key = audienceKey(audience);

@@ -28,7 +28,7 @@ export const initPipelines = async (configs: Configs) => {
       );
 
     for (const [k, v] of Object.entries(response.wasmModules)) {
-      void instantiateWasm(k, v.bytes, v.function);
+      void instantiateWasm(k, v.bytes);
     }
 
     for (const command of response.active) {
@@ -81,16 +81,18 @@ export const processResponse = (response: Command) => {
   }
 };
 
-export const buildPipeline = (pipeline: Pipeline): Pipeline => ({
-  ...pipeline,
-  steps: pipeline.steps.map((step: PipelineStep) => {
-    void instantiateWasm(step.WasmId, step.WasmBytes, step.WasmFunction);
-    return {
-      ...step,
-      WasmBytes: undefined,
-    };
-  }),
-});
+export const buildPipeline = (pipeline: Pipeline): Pipeline => {
+  return {
+    ...pipeline,
+    steps: pipeline.steps.map((step: PipelineStep) => {
+      void instantiateWasm(step.WasmId, step.WasmBytes);
+      return {
+        ...step,
+        WasmBytes: undefined,
+      };
+    }),
+  };
+};
 
 export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
   internal.pipelines.set(audienceKey(audience), {
