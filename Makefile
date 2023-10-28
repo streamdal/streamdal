@@ -1,6 +1,7 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = server
 ARCH ?= $(shell uname -m)
+VERSION_SCRIPT = ./assets/scripts/get-version.sh
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
@@ -41,8 +42,8 @@ setup/darwin:
 run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
 	docker-compose -f docker-compose.dev.yaml pull && \
-	docker-compose -f docker-compose.dev.yaml up -d && \
-	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
+	docker-compose -f docker-compose.dev.yaml up -d
+	@bash $(VERSION_SCRIPT)
 
 .PHONY: run/dev/build
 run/dev/build: description = Build streamdal/server img and run it + all its deps
@@ -50,6 +51,11 @@ run/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml build && \
 	docker-compose -f docker-compose.dev.build.yaml up -d && \
 	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
+
+.PHONY: get/version
+get/version: description = Get streamdal/server version + how far behind it is from remote
+get/version:
+	@bash $(VERSION_SCRIPT)
 
 ### Build
 
