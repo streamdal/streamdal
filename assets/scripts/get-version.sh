@@ -29,7 +29,7 @@ if [[ -z $SERVER_VERSION ]]; then
   fatal "Failed to get server version from ${SERVER_VERSION_URL}. Is the server running?"
 fi
 
-GIT_COMMITS=$(git rev-list $GIT_ORIGIN/master)
+GIT_COMMITS=$(git rev-list $GIT_ORIGIN/main)
 
 # Save old split settings
 export OLD_IFS=$IFS
