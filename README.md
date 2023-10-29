@@ -35,9 +35,22 @@ the [console](https://github.com/streamdal/console)
 or [instrument](https://docs.streamdal.com/instrument) any of your apps to see 
 Streamdal in action. We've got a live demo :)
 
-**https://demo.streamdal.com**
+**[DEMO.STREAMDAL.COM](https://demo.streamdal.com)**
+
+In the live demo, you can:
+
+1. Select any component and start a `Tail` to see the data it is consuming or
+producing in _real-time_
+2. Create pipelines that detect, transform, obfuscate, mask, strip or validate data
+3. Attach and detach pipelines to components
+4. Watch read/write throughput of components
+
+**Each one of these actions is occurring in _real-time_!**
+
+You can read more about how this is achieved [here](https://docs.streamdal.com/arch).
 
 # Getting Started
+
 Getting started consists of two steps:
 
 1. **Installing** the server, console and their dependencies
@@ -51,9 +64,9 @@ The _easiest_ way to get Streamdal running is via `curl | bash`:
 curl -s https://install.streamdal.com | bash
 ```
 
-> 🎉 Open `http://localhost:8080` in your browser and you should see the console! 🎉
+🎉 **Open `http://localhost:8080` in your browser and you should see the console!** 🎉
 
-[!INFO]
+[!NOTE]
 > For alternative installation methods, check the [install](./install) dir.
 
 ### [STEP 2] Instrument
@@ -88,7 +101,7 @@ one of our [SDKs](#sdks).
 // <TODO>
 ```
 
-[!WARNING]
+[!IMPORTANT]
 > These are _basic_, non-production ready examples.
 > 
 > For best results, you should read the [docs](https://docs.streamdal.com/sdks) 
