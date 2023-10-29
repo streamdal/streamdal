@@ -12,8 +12,8 @@ services:
       - STREAMDAL_SERVER_DEBUG=true
     container_name: streamdal-server
     ports:
-      - "8080:8080"
-      - "9090:9090"
+      - "8081:8081" # HTTP API
+      - "8082:8082" # gRPC API
     networks:
       - streamdal-network
 

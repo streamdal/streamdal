@@ -17,7 +17,7 @@ type Config struct {
 	Version           kong.VersionFlag `help:"Show version and exit" short:"v" env:"-"`
 	Debug             bool             `help:"Enable debug logging" short:"d" default:"false"`
 	Auth              string           `help:"Authentication token" required:"true" short:"a"`
-	Server            string           `help:"Streamdal server URL (gRPC)" default:"localhost:9090"`
+	Server            string           `help:"Streamdal server URL (gRPC)" default:"localhost:8082"`
 	ConnectTimeout    time.Duration    `help:"Initial gRPC connection timeout in seconds" default:"5s"`
 	DisableTLS        bool             `help:"Disable TLS" default:"false"`
 	EnableFileLogging bool             `help:"Enable file logging" default:"false"`
