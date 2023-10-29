@@ -1,71 +1,43 @@
-# Snitch Server Docker Deployment
+Docker Installation Instructions
+================================
 
-# THIS IS OUTDATED!!!
+Installing using this method is one of the easiest ways to get Streamdal running!
 
-This repository contains the Docker Compose setup to deploy the Snitch Server, NATS, Envoy, and a Web Console for Snitch.
-
-## Pre-requisites
-
-- Docker Engine v19.03.0+
-- Docker Compose v1.25.5+
-
-## Setup
-
-1. **Navigate to the Docker directory:**
-   ```bash
-   cd docker
-   ```
-
-2. **Start the services using Docker Compose:**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Open up `https://localhost:3000` in your browser.
-    - You should see a welcome screen
-
-## Services
-
-- **NATS**: A high performance NATS Server. Exposes ports:
-  - `4222`: NATS port
-  - `6222`
-  - `8222`: HTTP Monitor
-
-- **Snitch Servers**: Three instances of Snitch Server are deployed. Each server connects to NATS and serves on ports `8080` and `9090`.
-
-- **Envoy**: A service to proxy gRPC-web to gRPC. Serves on port `9091`.
-
-- **Web Console**: Web interface for Snitch. Connects to the Envoy service and serves on port `3000`.
-
-## Configuration
-
-### NATS:
-
-NATS is configured using the `nats-server.conf` file located in the `assets/nats/` directory.
-
-### Snitch Servers:
-
-Each Snitch Server instance has the following environment variables:
-
-- `SNITCH_SERVER_AUTH_TOKEN`: Authentication token.
-- `SNITCH_SERVER_NATSURL`: URL for connecting to NATS.
-
-### Web Console:
-
-The Web Console connects to the Envoy service for gRPC-web to gRPC translation. It has the environment variable `SNITCH_GRPC_WEB_URL` set to `http://envoy:9091`.
-
-## Volumes
-
-- **jetstream-data**: A named volume to store NATS JetStream data.
-
-## Networks
-
-- **snitch-network**: A custom Docker network for inter-service communication.
-
-## Stopping the Services
-
-To stop and remove all running containers defined in the compose file:
-
+1. Make sure you have [Docker](https://docker.com) installed and running
+2. Make sure you have [Docker Compose](https://docs.docker.com/compose/) installed
+3. Clone this repo
+4. `cd streamdal/install/docker`
+5. `docker-compose up -d --pull --always-recreate-deps --force-recreate`
+6. `docker ps` -- you should see something like:
 ```bash
-docker-compose down
+❯ docker ps
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                            NAMES
+ed6f02a60db1   streamdal/console:v0.1.26   "/tini -- docker-ent…"   1 day ago   Up 10 minutes   0.0.0.0:8080->8080/tcp                           streamdal-console
+75823378255d   docker-envoy                "/usr/local/bin/envo…"   1 day ago   Up 10 minutes   0.0.0.0:8083->8083/tcp, 10000/tcp                streamdal-envoy
+aa59c29d9221   streamdal/server:e074107    "/server --debug"        1 day ago   Up 10 minutes   0.0.0.0:8081->8081/tcp, 0.0.0.0:8082->8082/tcp   streamdal-server
+750468b0c1bc   redis:latest                "docker-entrypoint.s…"   1 day ago   Up 10 minutes   0.0.0.0:6379->6379/tcp                           streamdal-redis
 ```
+
+> 🎉 Open `http://localhost:8080` in your browser to see the console! 🎉
+
+[!WARNING]
+> This is NOT a recommended _production_ setup!
+>
+> At minimum, you will want to run at least **two** copies of the server, console
+> and envoy containers for redundancy.
+> 
+> For improving Redis reliability, you will want to follow a separate guide that
+> uses [Redis Sentinel](https://redis.io/docs/management/sentinel/).
+
+## Redundancy / High-Availability
+
+The [server](https://github.com/streamdal/server) is distributed by default which
+means that you can run any number of server instances.
+
+The only requirements are that you:
+
+* Set a unique `STREAMDAL_SERVER_NODE_NAME` environment variable for each node
+  * Ie. `node1`, `node2`, `node3`, etc.
+* Set the same `STREAMDAL_SERVER_TOKEN` environment variable for each node
+
+_To learn more about how the server works, check out the [components docs](https://docs.streamdal.com/components)._
