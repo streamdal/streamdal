@@ -30,7 +30,7 @@ from wasmtime import (
     ValType,
 )
 
-DEFAULT_SERVER_URL = "localhost:9090"
+DEFAULT_SERVER_URL = "localhost:8082"
 DEFAULT_SERVER_TOKEN = "1234"
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5  # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10  # 100 milliseconds

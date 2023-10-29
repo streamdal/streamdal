@@ -7,7 +7,7 @@ class TestStreamdalConfig:
         # A valid config should not raise any exception
         config = StreamdalConfig(
             service_name="MyService",
-            streamdal_url="localhost:9090",
+            streamdal_url="localhost:8082",
             streamdal_token="fake token",
         )
         assert config.validate() is None
@@ -17,7 +17,7 @@ class TestStreamdalConfig:
         with pytest.raises(ValueError, match="service_name is required"):
             cfg = StreamdalConfig(
                 service_name="",
-                streamdal_url="localhost:9090",
+                streamdal_url="localhost:8082",
                 streamdal_token="fake token",
             )
             cfg.validate()
@@ -35,7 +35,7 @@ class TestStreamdalConfig:
         with pytest.raises(ValueError, match="streamdal_token is required"):
             cfg = StreamdalConfig(
                 service_name="writer",
-                streamdal_url="localhost:9090",
+                streamdal_url="localhost:8082",
                 streamdal_token="",
             )
             cfg.validate()

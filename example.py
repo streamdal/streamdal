@@ -19,7 +19,7 @@ def main():
         cfg=StreamdalConfig(
             service_name="service",
             dry_run=True,
-            streamdal_url="localhost:9090",
+            streamdal_url="localhost:8082",
             streamdal_token="1234",
             audiences=[
                 Audience(

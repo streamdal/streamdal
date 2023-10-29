@@ -16,7 +16,7 @@ def main():
         cfg=StreamdalConfig(
             service_name="streamdaltest",
             dry_run=True,
-            streamdal_url="streamdal-server.dev.svc.cluster.local:9090",
+            streamdal_url="streamdal-server.dev.svc.cluster.local:8082",
             streamdal_token="1234",
             audiences=[
                 Audience(
