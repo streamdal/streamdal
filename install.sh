@@ -20,6 +20,7 @@
 INSTALL_DIR=~/streamdal
 INSTALL_DIR_DOCKER="$INSTALL_DIR/install/docker"
 STREAMDAL_REPO="git@github.com:streamdal/streamdal.git"
+DEFAULT_UI_URL="http://localhost:8080"
 
 fatal() {
   printf "\x1b[48;5;%sm» ⚠️  ${1}\e[0m\n" "196"
@@ -83,4 +84,4 @@ info "Starting streamdal components via docker-compose..."
 docker-compose up -d --pull --always-recreate-deps --force-recreate --quiet-pull || fatal "Failed to start streamdal"
 
 info "🎉 Streamdal has been successfully installed! 🎉"
-info "You can access the UI at http://localhost:8081"
+info "You can access the UI at ${DEFAULT_UI_URL}"

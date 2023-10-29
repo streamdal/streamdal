@@ -12,9 +12,9 @@ Installing using this method is one of the easiest ways to get Streamdal running
 ```bash
 ❯ docker ps
 CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                            NAMES
-ed6f02a60db1   streamdal/console:v0.1.26   "/tini -- docker-ent…"   1 day ago   Up 10 minutes   0.0.0.0:3000->3000/tcp                           streamdal-console
-75823378255d   docker-envoy                "/usr/local/bin/envo…"   1 day ago   Up 10 minutes   0.0.0.0:9091->9091/tcp, 10000/tcp                streamdal-envoy
-aa59c29d9221   streamdal/server:e074107    "/server --debug"        1 day ago   Up 10 minutes   0.0.0.0:9090->9090/tcp, 0.0.0.0:8080->8080/tcp   streamdal-server
+ed6f02a60db1   streamdal/console:v0.1.26   "/tini -- docker-ent…"   1 day ago   Up 10 minutes   0.0.0.0:8080->8080/tcp                           streamdal-console
+75823378255d   docker-envoy                "/usr/local/bin/envo…"   1 day ago   Up 10 minutes   0.0.0.0:8083->8083/tcp, 10000/tcp                streamdal-envoy
+aa59c29d9221   streamdal/server:e074107    "/server --debug"        1 day ago   Up 10 minutes   0.0.0.0:8081->8081/tcp, 0.0.0.0:8082->8082/tcp   streamdal-server
 750468b0c1bc   redis:latest                "docker-entrypoint.s…"   1 day ago   Up 10 minutes   0.0.0.0:6379->6379/tcp                           streamdal-redis
 ```
 
