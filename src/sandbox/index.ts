@@ -30,7 +30,7 @@ const exampleData = {
 };
 
 const serviceAConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "test-service",
   pipelineTimeout: "100",
@@ -39,7 +39,7 @@ const serviceAConfig: StreamdalConfigs = {
 };
 
 const serviceBConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "another-test-service",
   pipelineTimeout: "100",
@@ -48,7 +48,7 @@ const serviceBConfig: StreamdalConfigs = {
 };
 
 const serviceCConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "third-service",
   pipelineTimeout: "100",

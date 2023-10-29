@@ -17,7 +17,7 @@ const testConfigs = {
     }),
   } as unknown as InternalClient,
   sessionId: uuidv4(),
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "test-service",
   pipelineTimeout: "100",

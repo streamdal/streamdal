@@ -14,7 +14,7 @@ to process your data:
 ```typescript
 
 const config: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",
@@ -41,9 +41,9 @@ export const example = async () => {
 };
 
 ```
-*see ./examples for a runnable examples that can be used as a starters*
+*See [./examples](./examples) for runnable examples that can be used as a starters.*
 
-## WASM
+## Wasm
 In order to run pipelines with a minimal amount of overhead, the Streamdal node sdk ships 
 and executes pipeline rules as WASM. If you are using Node version < 20.* you'll need to enable 
 WASM functionality in your node app by supplying the flag, see:

@@ -33,7 +33,7 @@ const exampleData = {
 };
 
 const config: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",

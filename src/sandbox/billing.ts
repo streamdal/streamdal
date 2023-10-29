@@ -6,7 +6,7 @@ import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
 import { runPipeline } from "./index.js";
 
 const serviceBillingConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "billing-service",
   pipelineTimeout: "100",
@@ -15,7 +15,7 @@ const serviceBillingConfig: StreamdalConfigs = {
 };
 
 const serviceSignupConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "signup-service",
   pipelineTimeout: "100",
@@ -24,7 +24,7 @@ const serviceSignupConfig: StreamdalConfigs = {
 };
 
 const serviceWelcomeConfig: StreamdalConfigs = {
-  streamdalUrl: "localhost:9090",
+  streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
   serviceName: "welcome-service",
   pipelineTimeout: "100",
