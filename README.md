@@ -34,7 +34,7 @@ def main():
         cfg=StreamdalConfig(
             service_name="order-ingest",
             dry_run=True,
-            streamdal_url="streamdal-server.dev.svc.cluster.local:9090",
+            streamdal_url="streamdal-server.dev.svc.cluster.local:8082",
             streamdal_token="1234",
         )
     )
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
 ### Metrics
 
-Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/metrics
+Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8081/metrics
 
 | Metric                                       | Description                                      | Labels                                                                        |
 |----------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------|
