@@ -61,7 +61,7 @@ Getting started consists of two steps:
 The _easiest_ way to get Streamdal running is via `curl | bash`:
 
 ```
-curl -s https://install.streamdal.com | bash
+curl -s https://sh.streamdal.com | bash
 ```
 
 🎉 **Open `http://localhost:8080` in your browser and you should see the console!** 🎉
