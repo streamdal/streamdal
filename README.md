@@ -35,7 +35,7 @@ func main() {
 	defer cancel()
 
 	sc, err := streamdal.New(&streamdal.Config{
-		ServerURL:       "localhost:9090",
+		ServerURL:       "localhost:8082",
 		ServerToken:     "streamdal",
 		StepTimeout:     time.Millisecond * 10,
 		PipelineTimeout: time.Millisecond * 100,
@@ -64,7 +64,7 @@ func main() {
 
 ### Metrics
 
-Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8080/metrics
+Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8081/metrics
 
 | Metric                                       | Description                                      | Labels                                                                        |
 |----------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------|
