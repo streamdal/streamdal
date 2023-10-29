@@ -5,6 +5,8 @@ attach pipelines to consumers and producers and monitor their operations.
 
 ![Console](./console-screenshot.png)
 
+<sub>For more details, see the main [streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
 ### Development
 
 The Console is a Deno + Fresh project that uses Preact, ReactFlow and Twind:
@@ -14,7 +16,7 @@ Make sure to install Deno: https://deno.land/manual/getting_started/installation
 
 Optionally, copy `example.env` -> `.env` and set environment variables as
 needed. By default the console will access the GRPC WEB API running on
-`http://localhost:9091`
+`http://localhost:8083`
 
 Then start the project:
 
@@ -28,6 +30,8 @@ If you make any significant Deno lib and/or configuration changes and your IDE
 gets confused, you can force update the Deno lib cache with
 `deno cache --reload main.ts`
 
+**By default, the console will be viewable at: `http://localhost:8080`**
+
 ### Server
 
 This console needs a streamdal-server to run against. See
@@ -39,6 +43,14 @@ instructions on running it locally.
 If you just want to run the console and the server together for non-development
 purposes, you can bring them both up with docker, see:
 https://github.com/streamdal/streamdal/tree/main/docker/local
+
+### Dependencies
+
+The console depends on the following dependencies (direct and indirect):
+
+* [streamdal/server](https://github.com/streamdal/streamdal-server)
+* Envoy (used by Console for gRPC-Web)
+* Redis (used by `streamdal/server`)
 
 ### Releasing
 

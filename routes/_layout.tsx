@@ -16,8 +16,8 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
         <CustomError
           children={
             <span>
-              You must supply STREAMDAL_GRPC_AUTH_TOKEN as an environment
-              variable or in a .env file. See{" "}
+              You must supply STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN as an
+              environment variable or in a .env file. See{" "}
               <a
                 class="text-underline "
                 href="https://github.com/streamdal/console/blob/master/example.env."
