@@ -23,7 +23,7 @@ type Config struct {
 	DataSourceType    string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
 	DataSourceFile    *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
 
-	ServerAddress string `kong:"help='Streamdal server address',default='localhost:9090',required"`
+	ServerAddress string `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
 	ServerToken   string `kong:"help='Streamdal server token',default='1234',required"`
 	Debug         bool   `kong:"help='Enable debug output',short='d'"`
 	Quiet         bool   `kong:"help='Disable showing pre/post output',short='q'"`

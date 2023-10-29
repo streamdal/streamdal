@@ -6,7 +6,7 @@
 
 GIT_ORIGIN="sd_origin"
 GIT_REMOTE="git@github.com:streamdal/server.git"
-SERVER_VERSION_URL="http://localhost:8080/version"
+SERVER_VERSION_URL="http://localhost:8081/version"
 
 fatal() {
   echo "FATAL: $1"

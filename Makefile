@@ -41,16 +41,18 @@ setup/darwin:
 .PHONY: run/dev
 run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
-	docker-compose -f docker-compose.dev.yaml pull && \
-	docker-compose -f docker-compose.dev.yaml up -d
+	docker-compose -f docker-compose.dev.yaml up --pull --always-recreate-deps --force-recreate --quiet-pull -d
 	@bash $(VERSION_SCRIPT)
 
 .PHONY: run/dev/build
 run/dev/build: description = Build streamdal/server img and run it + all its deps
 run/dev/build:
+	docker rm -f "/streamdal-server" || true && \
+	docker rm -f "/streamdal-redis" || true && \
+	docker rm -f "/streamdal-envoy" || true && \
 	docker-compose -f docker-compose.dev.build.yaml build && \
 	docker-compose -f docker-compose.dev.build.yaml up -d && \
-	echo "Running streamdal/server version `curl -s http://localhost:8080/version`"
+	echo "Running streamdal/server version `curl -s http://localhost:8081/version`"
 
 .PHONY: get/version
 get/version: description = Get streamdal/server version + how far behind it is from remote
