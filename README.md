@@ -66,7 +66,7 @@ curl -s https://install.streamdal.com | bash
 
 🎉 **Open `http://localhost:8080` in your browser and you should see the console!** 🎉
 
-[!NOTE]
+> [!NOTE]
 > For alternative installation methods, check the [install](./install) dir.
 
 ### [STEP 2] Instrument
@@ -101,7 +101,7 @@ one of our [SDKs](#sdks).
 // <TODO>
 ```
 
-[!IMPORTANT]
+> [!IMPORTANT]
 > These are _basic_, non-production ready examples.
 > 
 > For best results, you should read the [docs](https://docs.streamdal.com/sdks) 
