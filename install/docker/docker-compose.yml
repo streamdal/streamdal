@@ -30,8 +30,8 @@ services:
       - STREAMDAL_SERVER_AUTH_TOKEN=1234
       - STREAMDAL_SERVER_REDIS_URL=redis:6379
     ports:
-      - "8081:8081" # HTTP API
-      - "8082:8082" # gRPC API
+      - "8080:8080"
+      - "9090:9090"
     networks:
       - streamdal-network
     restart: on-failure
@@ -44,7 +44,7 @@ services:
     depends_on:
       - streamdal-server
     ports:
-      - "8083:8083"
+      - "9091:9091"
     networks:
       - streamdal-network
     restart: on-failure
@@ -55,11 +55,11 @@ services:
     depends_on:
       - envoy
     environment:
-      - STREAMDAL_GRPC_WEB_URL=http://envoy:8083
+      - STREAMDAL_GRPC_WEB_URL=http://envoy:9091
       - STREAMDAL_GRPC_AUTH_TOKEN=1234
-      - STREAMDAL_API_URL=http://envoy:8083
+      - STREAMDAL_API_URL=http://envoy:9091
     ports:
-      - "8080:8080"
+      - "3000:3000"
     networks:
       - streamdal-network
 volumes:
