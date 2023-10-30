@@ -78,6 +78,10 @@ curl -s https://sh.streamdal.com | bash
 Once you've installed the server and console, you can instrument your code using
 one of our [SDKs](#sdks).
 
+> To see an example of a _complete_ instrumentation, take a look at the
+[Go demo client](https://github.com/streamdal/server/tree/main/test-utils/demo-client) 
+> that is bundled with the [server](https://github.com/streamdal/server).
+
 **Go**
 ```go
 // When consuming/reading
@@ -125,7 +129,7 @@ export const example = async () => {
 > [!IMPORTANT]
 > These are _basic_, non-production ready examples.
 > 
-> For best results, you should read the [docs](https://docs.streamdal.com/sdks) 
+> For best results, you should read the [SDK docs](https://docs.streamdal.com/en/core-components/sdk/) 
 > for the SDK you are using.
 
 ### SDKs
@@ -136,7 +140,7 @@ Several SDKs are available for instrumenting your code:
 * [Python](https://github.com/streamdal/python-sdk)
 * [Node.js](https://github.com/streamdal/node-sdk)
 
-For details on how to use them, refer to the [SDK docs](https://docs.streamdal.com/sdks).
+For details on how to use them, refer to the [SDK docs](https://docs.streamdal.com/en/core-components/sdk/).
 
 # How Does It Work?
 
@@ -157,8 +161,8 @@ valid JSON"_, _"message should contain a field called `foo`"_, _"strip all email
 addresses"_ and so on).
 
 > [!IMPORTANT]
-> For a more in-depth explanation of the architecture, the flow and the various
-> components, visit our [docs](https://docs.streamdal.com/arch).
+> For a more in-depth explanation of the flow and the various components, visit 
+> our [docs](https://docs.streamdal.com/en/getting-started/how-streamdal-works/).
 
 # Community
 
@@ -172,7 +176,7 @@ Join our [Discord](https://discord.gg/123456789)!
 
 Stuck? Something not working right? Have questions?
 
-* First and _easiest_ way to get help is to join our [Discord](https://discord.gg/123456789)
+* First and _easiest_ way to get help is to join our [Discord](https://discord.gg/streamdal)
 * If you're not in the mood to chat - there's [docs](https://docs.streamdal.com)
 * If all else fails, [open an issue](https://github.com/streamdal/streamdal/issues/new)!
 
@@ -191,7 +195,7 @@ on what's in the pipeline.
 ### Contributing
 
 We :heart: contributions! But... before you craft an amazing PR, please read
-through our [contributing guidelines](https://docs.streamdal.com/contributing).
+through our [contributing docs](https://docs.streamdal.com/en/resources-support/contributing/).
 
 ### License
 
