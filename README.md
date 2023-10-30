@@ -37,13 +37,17 @@ Streamdal in action. We've got a live demo :)
 
 **[DEMO.STREAMDAL.COM](https://demo.streamdal.com)**
 
-In the live demo, you can:
+_The demo showcases:_
 
-1. Select any component and start a `Tail` to see the data it is consuming or
-producing in _real-time_
-2. Create pipelines that detect, transform, obfuscate, mask, strip or validate data
-3. Attach and detach pipelines to components
-4. Watch read/write throughput of components
+1. **Tail**
+    * Select any Component and start `Tail` request to watch live output
+2. **Welcome Service/Emailer**
+    * View how attached `Mask dot com emails` pipeline obfuscates `recipient` field if field contains `.com`
+3. **Signup Service/Recorder**
+    * Observe attached `Scrub ICMP` pipeline changing `object.ipv4_address` if `object.protocol` equals "ICMP"
+4. **Observe Throughput**
+    * Watch the read/write-per-second throughput for any component
+
 
 **Each one of these actions is occurring in _real-time_!**
 
