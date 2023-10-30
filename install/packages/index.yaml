@@ -3,7 +3,21 @@ entries:
   streamdal-server:
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-10-30T15:46:58.270015501Z"
+    created: "2023-10-30T16:03:29.894160649Z"
+    dependencies:
+    - name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.0.4
+    description: A Helm chart for Kubernetes
+    digest: f39d213cdeecb62e7a472a36112aa1cdaf003d5b46c1077b88b8faeb6c63bded
+    name: streamdal-server
+    type: application
+    urls:
+    - https://streamdal.github.io/streamdal/install/packages/streamdal-server-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v2
+    appVersion: 1.1.19
+    created: "2023-10-30T16:03:29.887604033Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -17,7 +31,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-10-30T15:46:58.262199323Z"
+    created: "2023-10-30T16:03:29.878192165Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -29,4 +43,4 @@ entries:
     urls:
     - https://streamdal.github.io/streamdal/install/packages/streamdal-server-0.1.7.tgz
     version: 0.1.7
-generated: "2023-10-30T15:46:58.245561958Z"
+generated: "2023-10-30T16:03:29.869321008Z"
