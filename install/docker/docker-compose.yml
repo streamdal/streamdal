@@ -21,7 +21,7 @@ services:
 
   streamdal-server:
     container_name: streamdal-server
-    image: streamdal/server:e074107
+    image: streamdal/server:ef7093c
     depends_on:
       - streamdal-aes-gen
       - redis
@@ -37,20 +37,17 @@ services:
     restart: on-failure
 
   envoy:
-    build:
-      context: assets/envoy
-      dockerfile: Dockerfile
+    image: envoyproxy/envoy:tools-v1.28.0
     container_name: streamdal-envoy
-    depends_on:
-      - streamdal-server
     ports:
       - "8083:8083"
+    volumes:
+      - ${PWD}/assets/envoy/envoy.yaml:/etc/envoy/envoy.yaml
     networks:
       - streamdal-network
-    restart: on-failure
 
   streamdal-console:
-    image: streamdal/console:v0.1.26
+    image: streamdal/console:v0.1.30
     container_name: streamdal-console
     depends_on:
       - envoy
