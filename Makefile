@@ -1,11 +1,13 @@
-VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = server
 ARCH ?= $(shell uname -m)
 VERSION_SCRIPT = ./assets/scripts/get-version.sh
+VERSION ?= $(shell git rev-parse --short HEAD)
+SHORT_SHA ?= $(shell git rev-parse --short HEAD)
+GIT_TAG ?= $(shell git describe --tags --abbrev=0)
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
-GO_BUILD_FLAGS = -ldflags "-X main.version=${VERSION}"
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION}"
 
 # Utility functions
 check_defined = \
@@ -135,6 +137,7 @@ docker/build: description = Build docker image
 docker/build:
 	docker buildx build --push --platform=linux/amd64,linux/arm64 \
 	-t streamdal/$(SERVICE):$(VERSION) \
+	-t streamdal/$(SERVICE):$(GIT_TAG)-$(SHORT_SHA) \
 	-t streamdal/$(SERVICE):latest \
 	-f ./Dockerfile .
 
