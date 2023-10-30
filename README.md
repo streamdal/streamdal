@@ -94,11 +94,54 @@ one of our [SDKs](#sdks).
 
 **Node**
 ```typescript
+
+const streamdal = new Streamdal(config);
+
 // When consuming/reading
-// <TODO>
+const consumePipeline = (data: string) =>
+  streamdal.processPipeline({
+    consumerAudience,
+    data: new TextEncoder().encode(data),
+  });
+
+// Asssuming a RabbitMQ consumer 
+channel.consume(
+  queue,
+  async (msg) => {
+    const processed: StreamdalResponse = await consumePipeline(
+      JSON.stringify(msg)
+    );
+    if (!processed.error) {
+      channel.ack(msg);
+    } else {
+      console.error("Pipeline error", processed.message);
+      // Optionally explore more detailed step status information
+      console.dir(processed.stepStatuses);
+    }
+  },
+  { noAck: false }
+);
 
 // When producing/writing
-// <TODO>
+const producePipeline = (data: string) =>
+  streamdal.processPipeline({
+    producerAudience,
+    data: new TextEncoder().encode(data),
+  });
+
+const processed: StreamdalResponse = await producePipeline(
+  JSON.stringify(msg)
+);
+
+if (!processed.error) {
+  // Asssuming a RabbitMQ producer
+  channel.publish(exchange, routingKey, Buffer.from(processed.data));
+} else {
+  console.error("Pipeline error", processed.message);
+  // Optionally explore more detailed step status information
+  console.dir(processed.stepStatuses);
+}
+
 ```
 
 > [!IMPORTANT]
