@@ -5,12 +5,11 @@
 # This script will:
 #
 # - Check that you have `git`, `docker` and `docker-compose` installed
-# - Look for a previous install (if found, it will prompt you to force install)
+# - Look for previous install; if found, move it to a backup dir
 # - Clone the streamdal repo to $STREAMDAL_INSTALL_DIR (default: ~/streamdal)
 # - Start streamdal components via docker-compose
 #
-# To avoid interactive "force" prompt, set $STREAMDAL_FORCE_INSTALL=true
-# To change the install dir, you can set $STREAMDAL_INSTALL_DIR to a custom path
+# Set $STREAMDAL_INSTALL_DIR to change the install dir.
 #
 # github.com/streamdal/streamdal
 #
@@ -27,11 +26,6 @@ fatal() {
 
 info() {
   printf "\x1b[48;5;%sm» ${1}\e[0m\n" "99"
-}
-
-question() {
-  printf "\x1b[48;5;%sm» DEBUG10 ${1}\e[0m: " "99"
-  read -r FORCE_INSTALL_REPLY
 }
 
 warning() {
@@ -68,28 +62,13 @@ if [[ -n $STREAMDAL_INSTALL_DIR ]]; then
 fi
 
 if [[ -d $INSTALL_DIR ]]; then
-  warning "Streamdal is already installed in ${INSTALL_DIR}"
+  warning "Detected previous installation in ${INSTALL_DIR}"
 
-  if [[ -z "${STREAMDAL_INSTALL_FORCE}" ]]; then
-    question "Do you want to force install? [y/N]: "
-
-    # Normalize reply
-    FORCE_INSTALL_REPLY="${FORCE_INSTALL_REPLY// /}"
-    FORCE_INSTALL_REPLY=$(echo "${FORCE_INSTALL_REPLY}" | awk '{print tolower($0)}')
-
-    if [[ $FORCE_INSTALL_REPLY != "y" && $FORCE_INSTALL_REPLY != "yes" ]]; then
-      fatal "Aborting install"
-    fi
-  fi
-
-  info "Forcing install..."
-
-  # Force is set - rename dir to
   RENAME_DIR="${INSTALL_DIR}.backup.$(date +%s || fatal 'Failed to rename ${INSTALL_DIR}')"
 
   mv -f "$INSTALL_DIR" "$RENAME_DIR" || fatal "Unable to rename ${INSTALL_DIR} to ${RENAME_DIR}"
 
-  info "Successfully renamed ${INSTALL_DIR} to ${RENAME_DIR}"
+  warning "Successfully backed up ${INSTALL_DIR} to ${RENAME_DIR}"
 fi
 
 info "Cloning repo '${STREAMDAL_REPO}' to '${INSTALL_DIR}'..."
