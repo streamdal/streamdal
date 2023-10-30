@@ -42,12 +42,12 @@ services:
     build:
       context: ${PWD}/assets/envoy
       dockerfile: ${PWD}/assets/envoy/Dockerfile
-    image: grpcweb/envoy
     container_name: streamdal-envoy
     ports:
       - "8083:8083"
     networks:
       - streamdal-network
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus

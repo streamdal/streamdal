@@ -41,7 +41,11 @@ setup/darwin:
 .PHONY: run/dev
 run/dev: description = Download streamdal/server img and run it + all its deps
 run/dev:
-	docker-compose -f docker-compose.dev.yaml up --pull --always-recreate-deps --force-recreate --quiet-pull -d
+	docker rm -f "/streamdal-server" || true && \
+    docker rm -f "/streamdal-redis" || true && \
+    docker rm -f "/streamdal-envoy" || true && \
+	docker-compose -f docker-compose.dev.yaml pull --quiet && \
+	docker-compose -f docker-compose.dev.yaml up --always-recreate-deps --force-recreate -d
 	@bash $(VERSION_SCRIPT)
 
 .PHONY: run/dev/build
