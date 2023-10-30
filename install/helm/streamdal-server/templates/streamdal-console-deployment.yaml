@@ -24,7 +24,7 @@ spec:
           env:
             - name: STREAMDAL_CONSOLE_GRPC_WEB_URL
               value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:8083"
-            - name: STREAMDAL_GRPC_AUTH_TOKEN
+            - name: STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN
               value: {{ .Values.env.STREAMDAL_SERVER_AUTH_TOKEN | quote }}
             - name: STREAMDAL_DEMO
               value: {{ .Values.env.STREAMDAL_DEMO | quote }}
