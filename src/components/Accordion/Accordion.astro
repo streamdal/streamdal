@@ -17,12 +17,15 @@ const { title } = Astro.props;
     outline: none;
     margin-bottom: -20px;
     margin-left: 0px;
+
   }
+  
   .collapsible.active {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    border-bottom-color: #28203F;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom-color: #28203F !important;
   }
+  
   .wrapper {
     height: 0;
     overflow: hidden;
@@ -31,9 +34,11 @@ const { title } = Astro.props;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
   }
+
   .inner-content {
     padding: 18px;
   }
+
   .carr {
     flex-shrink: 0;
     flex-grow: 0;
@@ -41,16 +46,9 @@ const { title } = Astro.props;
     height: 15px;
     transition: transform 0.3s;
   }
+
   .collapsible.active .carr {
     transform: rotate(180deg);
-  }
-/* Span being used for linebreaks in <p> */
-  span {
-    display: inline;
-  }
-  span:before {
-    content: "\a ";
-    white-space: pre;
   }
 </style>
 
@@ -75,7 +73,7 @@ const { title } = Astro.props;
         content.style.height = null;
       } else {
         content.style.height = `${content.scrollHeight}px`;
-      }
+      } 
     });
   });
 </script>

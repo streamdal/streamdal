@@ -9,7 +9,7 @@ const PageNotFound = () => (
     <p class="text-center mx-auto w-5/6 font-sans leading-6 text-md">
       We don't have that page. Pray forgive us, and return from where thy came.
     </p>
-    <a href={"/en/what-is-snitch"} class="hover:no-underline">
+    <a href={"/en/what-is-streamdal"} class="hover:no-underline">
       <button class="mx-auto my-10 bg-yellow-accent rounded text-purple-darkText text-sm font-normal py-3.5 px-5 hover:bg-gradient-to-r from-purple-light to-yellow-accent font-sans">
         Home
       </button>
