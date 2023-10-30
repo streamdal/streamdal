@@ -21,7 +21,7 @@ services:
 
   streamdal-server:
     container_name: streamdal-server
-    image: streamdal/server:ef7093c
+    image: streamdal/server:v0.0.1-fb290f5 
     depends_on:
       - streamdal-aes-gen
       - redis
@@ -47,13 +47,14 @@ services:
       - streamdal-network
 
   streamdal-console:
-    image: streamdal/console:v0.1.30
+    image: streamdal/console:v0.1.31
     container_name: streamdal-console
     depends_on:
       - envoy
     environment:
       - STREAMDAL_CONSOLE_GRPC_WEB_URL=http://envoy:8083
       - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN=1234
+      - STREAMDAL_CONSOLE_PORT=8080
     ports:
       - "8080:8080"
     networks:
