@@ -72,7 +72,7 @@ ol {
     margin: 0;
 
     > li {
-      margin-top: -20px;
+      margin-top: -50px;
     }
   }
 }
@@ -239,10 +239,11 @@ strong {
 .inlineimg {
   display: inline;
 }
-
-.hidden {
+/* used in faq specifically */
+.hiddenh {
   visibility: hidden;
   display: inline;
+  font-size: 1px;
 }
 code {
   --border-radius: 3px;
