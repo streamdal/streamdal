@@ -31,7 +31,7 @@ info() {
 
 question() {
   printf "\x1b[48;5;%sm» ${1}\e[0m: " "99"
-  read -r FORCE_INSTALL_REPLY
+  read FORCE_INSTALL_REPLY
 }
 
 warning() {
