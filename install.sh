@@ -30,7 +30,7 @@ info() {
 }
 
 question() {
-  printf "\x1b[48;5;%sm» ${1}\e[0m: " "99"
+  printf "\x1b[48;5;%sm» DEBUG1 ${1}\e[0m: " "99"
   read FORCE_INSTALL_REPLY
 }
 
