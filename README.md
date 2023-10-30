@@ -1,5 +1,7 @@
 # Console
 
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+
 Streamdal's console allows you visualize interact with your services, build and
 attach pipelines to consumers and producers and monitor their operations.
 
