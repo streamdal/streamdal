@@ -28,7 +28,7 @@ services:
       - streamdal-network
 
   envoy:
-    image: envoyproxy/envoy:v1.22.0
+    image: envoyproxy/envoy:tools-v1.28.0 
     container_name: streamdal-envoy
     ports:
       - "8083:8083"

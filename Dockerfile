@@ -31,7 +31,7 @@ COPY --from=builder /assets/wasm/* /assets/wasm/
 
 RUN chmod +x /streamdal-server
 
-EXPOSE 8080
-EXPOSE 9090
+EXPOSE 8081
+EXPOSE 8082
 
 CMD ["/streamdal-server", "--debug"]
