@@ -11,7 +11,6 @@ import (
 	"github.com/streamdal/protos/build/go/protos"
 )
 
-// TODO: needed?
 const (
 	RateBytes     RateCounterType = "bytes"
 	RateProcessed RateCounterType = "processed"

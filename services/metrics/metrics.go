@@ -279,7 +279,6 @@ func (m *Metrics) runCounterDumper(looper director.Looper) {
 func (m *Metrics) FetchCounters(ctx context.Context) ([]*protos.Metric, error) {
 	client := http.DefaultClient
 
-	// TODO: this needs to support HttpListenAddress from config instead of being hardcoded
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, m.PrometheusURL+"/metrics", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create request")
