@@ -29,7 +29,7 @@ spec:
             - name: STREAMDAL_DEMO
               value: {{ .Values.env.STREAMDAL_DEMO | quote }}
             - name: STREAMDAL_CONSOLE_PORT
-              value: 8080
+              value: "8080"
           volumeMounts:
           - mountPath: /root/.cache
             name: esbuild-cache
