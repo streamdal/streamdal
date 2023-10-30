@@ -8,6 +8,9 @@ Deno.env.set(
   "APP_KEY",
   env["STREAMDAL_CONSOLE_SESSION_KEY"] ?? crypto.randomUUID(),
 );
+export const PORT = env["STREAMDAL_CONSOLE_PORT"] ??
+  Deno.env.get("STREAMDAL_CONSOLE_PORT") ?? 8080;
+
 export const GRPC_URL = env["STREAMDAL_CONSOLE_GRPC_WEB_URL"] ??
   Deno.env.get("STREAMDAL_CONSOLE_GRPC_WEB_URL") ?? "http://localhost:8083";
 export const GRPC_TOKEN = env["STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN"] ??
