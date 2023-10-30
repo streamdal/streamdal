@@ -11,7 +11,7 @@ import tailFlow from '../../../images/guides/TailFlow.png';
 
 ## Introducing Streamdal Tail
 
-Streamdal Tail is a practical tool integrated into the Streamdal console, designed to grant you immediate observability into the real-time flow of data through the SDK. This feature proves invaluable, especially when you're in the process of formulating new rules or validating expected outputs. By allowing you to monitor any actively connected consumer or producer, Streamdal Tail ensures you have a clear understanding of your message flows, enabling you to refine your configurations with confidence.
+Streamdal Tail, think **tail -f** for your data!, grants you immediate observability into the real-time flow of data through the SDK. This feature proves invaluable, especially when you're in the process of formulating new rules or validating expected outputs. By allowing you to monitor any actively connected consumer or producer, Streamdal Tail ensures you have a clear understanding of your message flows, enabling you to refine your configurations with confidence.
 
 ### How Does it Work?
 
@@ -36,13 +36,13 @@ Here's a step-by-step walkthrough of the user experience:
 3. **Ending the Session**:
     - You can end the tailing session whenever you wish. Once the session is closed, the real-time data monitoring will cease.
 
-### Under the Hood
+### Under the Hood: High-Level Request Flow Diagram
 
-For those curious about what powers this feature:
+While it's not crucial to grasp the underlying mechanics, here’s a glimpse into what transpires when a request is dispatched:
 
-- The front-end of the Streamdal console initiates a special request to the backend whenever you decide to start a tail session.
-- This request indicates the backend to start streaming data to the front-end.
-- The server then continuously feeds data to the front-end, ensuring you see real-time information. The data stream continues until you decide to close the session or the session ends due to other factors.
+- On initiating a tail session, the Streamdal console's front-end sends a distinctive request to the backend.
+- This directive prompts the backend to commence data streaming towards the front-end.
+- The server continually channels data to the front-end, providing a live feed until the session is either closed by you or terminated due to other conditions.
 
   <img src={tailFlow} alt="Streamdal Tail Arch" />
 

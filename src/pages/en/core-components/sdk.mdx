@@ -8,85 +8,30 @@ import sdkDiagram from '../../../images/core-components/StreamdalSdk.png';
 
 <br />
 <br />
-At the heart of Streamdal's real-time data operations is its SDK — a robust, flexible, and lightweight tool that translates your rules into actions. The beauty of Streamdal's approach lies in its seamless integration into popular messaging libraries, minimizing the friction often associated with adopting new technologies.
+Designed with efficiency in mind, the SDK handles metrics reporting, pipeline processing, and validations using WebAssembly (WASM). This approach guarantees sub-millisecond overhead, high scalability, and compatibility across various languages.
 
-## Forks of Popular Messaging Libraries: Easy Integration (Coming Soon)
+## Key Features
 
-Streamdal has gone the extra mile by maintaining forks of widely-used messaging libraries with its SDK already integrated. These adaptations, termed "shims", are engineered to allow you to leverage the capabilities of the SDK without making major alterations to your existing codebase.
+- **Lightweight Design**: The SDK is crafted to be lean, ensuring efficient runtime without adding bulk.
+- **Real-time Rule Processing**: Utilizing WebAssembly (WASM), the SDK boasts sub-millisecond overheads for rule application.
+- **Console UI-Defined Rules**: Rules are defined directly through the console UI, and pulled down via the SDK for processing .
+
+## Multi-Language Support
+
+The SDK is currently available in the following languages:
+
+- **[Go](https://github.com/streamdal/go-sdk)**
+- **[Node](https://github.com/streamdal/node-sdk)**
+- **[Python](https://github.com/streamdal/python-sdk)**
+
+## Instrumentation
+
+The SDK is designed to be integraterd into your application as a library. Please see our [intrumentation guide](../../guides/Instrumentation/).  
 
 ## SDK High Level Architecture
 
 <img src={sdkDiagram} alt="Streamdal SDK Arch" />
 
-## Environment Variables: Configuring the SDK
 
-While integrating, the SDK offers the flexibility to be configured via specific environment variables, fetched at runtime. This setup ensures a dynamic approach, allowing changes without frequent code modifications. Here's a breakdown:
-
-| Environment Variable      | Mandatory? | Purpose                                                                                                                              | Default Value    |
-|---------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| `STREAMDAL_URL`           | Yes        | Connects to your deployed Streamdal server instance                                                                                  | `localhost:9090` |
-| `STREAMDAL_TOKEN`         | Yes        | Authentication token for the Streamdal server                                                                                       | `streamdal`      |
-| `STREAMDAL_DRY_RUN`       | No         | Switch between actual execution and logging-only mode                                                                                | `false`          |
-| `STREAMDAL_STEP_TIMEOUT`  | No         | Set the maximum duration for wasm execution                                                                                          | `10`             |
-| `STREAMDAL_PIPELINE_TIMEOUT`| No       | Define the total allowable execution time for the entire pipeline                                                                     | `100`            |
-| `STREAMDAL_DATA_SOURCE`   | No         | Designate the data source when applying rules, determining the applicable rulesets                                                   | `kafka`          |
-
-## Golang SDK Example
-
-Using the SDK in your Golang applications is straightforward. Here's a simple example to get you started:
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"time"
-
-	"github.com/streamdal-go-client"
-)
-
-func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	sc, err := streamdal.New(&streamdal.Config{
-		StreamdalURL:     "localhost:9090",
-		StreamdalToken:   "streamdal",
-		StepTimeout:     time.Millisecond * 10,
-		PipelineTimeout: time.Millisecond * 100,
-		DryRun:          false,
-		ServiceName:     "billing-svc",
-		ShutdownCtx:     ctx,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	resp, err := sc.Process(ctx, &streamdal.Process
-
-	resp, err := sc.Process(ctx, &streamdal.ProcessRequest{
-		OperationType: streamdal.OperationTypeConsumer,
-		OperationName: "new-order-topic",
-		ComponentName: "kafka",
-		Data:          []byte(`{"object": {"field": true}}`),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%#v\n", resp)
-}
-```
-
-Explore other language-specific SDK documentations to fully harness Streamdal's prowess in your applications.
-
-## Available SDKs
-
-Streamdal offers SDKs for various languages to help developers integrate with their services effortlessly. Below are the official SDKs:
-
-- [Go SDK](https://github.com/streamdal/go-client)
-- [Node.js SDK](https://github.com/streamdal/node-sdk)
-- [Python SDK](https://github.com/streamdal/python-client)
 
 
