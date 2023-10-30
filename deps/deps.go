@@ -28,6 +28,7 @@ import (
 
 const (
 	DefaultHealthCheckIntervalSecs = 1
+	defaultHTTPListenAddress       = "http://localhost:8081"
 )
 
 type customCheck struct{}
@@ -274,7 +275,7 @@ func (c *customCheck) Status() (interface{}, error) {
 func parseHTTPListenAddress(addr string) string {
 	parts := strings.Split(addr, ":")
 	if len(parts) != 2 {
-		return "http://localhost:8080"
+		return defaultHTTPListenAddress
 	}
 
 	if parts[0] == "" {

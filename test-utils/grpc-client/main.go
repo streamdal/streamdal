@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// dial server
-	conn, err := grpc.Dial(":9090", grpc.WithInsecure())
+	conn, err := grpc.Dial(":8082", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("can not connect with server %v", err)
 	}
@@ -60,7 +60,7 @@ func main() {
 
 //func main() {
 //	// dial server
-//	conn, err := grpc.Dial(":9090", grpc.WithInsecure())
+//	conn, err := grpc.Dial(":8082", grpc.WithInsecure())
 //	if err != nil {
 //		log.Fatalf("can not connect with server %v", err)
 //	}

@@ -28,6 +28,9 @@ const (
 
 	// counterDumperInterval is how often we will dump metrics to RedisBackend
 	counterDumperInterval = time.Second * 10
+
+	// If no prometheus URL is provided, use this
+	defaultPrometheusURL = "http://localhost:8081"
 )
 
 // defaultCounter is used to define counters
@@ -184,7 +187,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.PrometheusURL == "" {
-		cfg.PrometheusURL = "http://localhost:8080"
+		cfg.PrometheusURL = defaultPrometheusURL
 	}
 
 	return nil

@@ -31,7 +31,7 @@ You can view the available methods by looking at [protos](https://github.com/str
 or doing it via `grpcurl`:
 
 ```bash
-$ grpcurl -H "auth-token: 1234" --plaintext localhost:9090 describe
+$ grpcurl -H "auth-token: 1234" --plaintext localhost:8082 describe
 grpc.reflection.v1alpha.ServerReflection is a service:
 service ServerReflection {
   rpc ServerReflectionInfo ( stream .grpc.reflection.v1alpha.ServerReflectionRequest ) returns ( stream .grpc.reflection.v1alpha.ServerReflectionResponse );
@@ -64,7 +64,7 @@ either in code or via `grpcurl`:
 
 ```
 $ grpcurl -d '{"input": "Hello world"}' -plaintext -H "auth-token: 1234" \
-localhost:9090 protos.External/Test
+localhost:8082 protos.External/Test
 ```
 
 TODO: There's a scattering of `Id` vs `ID` used throughout the project. 

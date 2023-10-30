@@ -18,8 +18,8 @@ type Config struct {
 	Debug                bool             `help:"Enable debug logging" short:"d" default:"false"`
 	NodeName             string           `help:"Name for this node" required:"true" help:"Node name (must be unique in cluster)" short:"n"`
 	AuthToken            string           `help:"Authentication token" required:"true" short:"t"`
-	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8080"`
-	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":9090"`
+	HTTPAPIListenAddress string           `help:"HTTP API listen address" default:":8081"`
+	GRPCAPIListenAddress string           `help:"gRPC API listen address" default:":8082"`
 	RedisURL             string           `help:"Address for Redis cluster used by Streamdal server" default:"localhost:6379"`
 	RedisDatabase        int              `help:"Redis database number to use" default:"0"`
 	RedisPassword        string           `help:"Redis password" default:""`

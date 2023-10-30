@@ -2,9 +2,6 @@ version: "3"
 services:
   streamdal-server:
     image: streamdal/server:latest
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
     depends_on:
       - redis
     environment:
@@ -14,8 +11,8 @@ services:
       - STREAMDAL_SERVER_DEBUG=true
     container_name: streamdal-server
     ports:
-      - "8080:8080"
-      - "9090:9090"
+      - "8081:8081"
+      - "8082:8082"
     networks:
       - streamdal-network
 
@@ -31,14 +28,12 @@ services:
       - streamdal-network
 
   envoy:
-    build:
-      context: ${PWD}/assets/envoy
-      dockerfile: ${PWD}/assets/envoy/Dockerfile
-    image: grpcweb/envoy
+    image: envoyproxy/envoy:tools-v1.28.0 
     container_name: streamdal-envoy
     ports:
-      - "9091:9091"
-      - "9901:9901"
+      - "8083:8083"
+    volumes:
+      - ${PWD}/assets/envoy/envoy.yaml:/etc/envoy/envoy.yaml
     networks:
       - streamdal-network
 
