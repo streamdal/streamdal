@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 #
-# This script is used to install Streamdal.
+# This script is used for installing Streamdal.
 #
-# This script is also used for installing Streamdal via curl:
+# This script will:
 #
-# curl -s https://install.streamdal.com | bash
+# - Check that you have `git`, `docker` and `docker-compose` installed
+# - Look for a previous install (if found, it will prompt you to force install)
+# - Clone the streamdal repo to $STREAMDAL_INSTALL_DIR (default: ~/streamdal)
+# - Start streamdal components via docker-compose
 #
-# This script requires that you have `git`, `docker` and `docker-compose` installed.
+# To avoid interactive "force" prompt, set $STREAMDAL_FORCE_INSTALL=true
+# To change the install dir, you can set $STREAMDAL_INSTALL_DIR to a custom path
 #
-# If the script detects a previous installation, it will error out. You can
-# override this behavior by setting `STREAMDAL_INSTALL_FORCE=true` env var and
-# re-running the install.
-#
-# By default, the script will `git clone` the streamdal repo to ~/streamdal.
-# You can change the directory streamdal will be installed in by setting the
-# `STREAMDAL_INSTALL_DIR` env var to another directory.
+# github.com/streamdal/streamdal
 #
 
 INSTALL_DIR=~/streamdal
@@ -29,6 +27,15 @@ fatal() {
 
 info() {
   printf "\x1b[48;5;%sm» ${1}\e[0m\n" "99"
+}
+
+question() {
+  printf "\x1b[48;5;%sm» ${1}\e[0m: " "99"
+  read -r FORCE_INSTALL_REPLY
+}
+
+warning() {
+  printf "\x1b[48;5;%sm»️ ${1}\e[0m\n" "214"
 }
 
 check_requirements() {
@@ -53,14 +60,25 @@ check_requirements
 # Check install dir
 if [[ -n $STREAMDAL_INSTALL_DIR ]]; then
   INSTALL_DIR=$STREAMDAL_INSTALL_DIR
+  INSTALL_DIR_DOCKER="$INSTALL_DIR/install/docker"
 fi
 
 if [[ -d $INSTALL_DIR ]]; then
-  if [[ ! -n $STREAMDAL_INSTALL_FORCE ]]; then
-    fatal "Streamdal is already installed in ${INSTALL_DIR}. Set STREAMDAL_INSTALL_FORCE=true to override."
+  warning "Streamdal is already installed in ${INSTALL_DIR}"
+
+  if [[ -z "${STREAMDAL_INSTALL_FORCE}" ]]; then
+    question "Do you want to force install? [y/N]: "
+
+    # Normalize reply
+    FORCE_INSTALL_REPLY="${FORCE_INSTALL_REPLY// /}"
+    FORCE_INSTALL_REPLY=$(echo "${FORCE_INSTALL_REPLY}" | awk '{print tolower($0)}')
+
+    if [[ $FORCE_INSTALL_REPLY != "y" && $FORCE_INSTALL_REPLY != "yes" ]]; then
+      fatal "Aborting install"
+    fi
   fi
 
-  info "Streamdal is already installed in ${INSTALL_DIR} - forcing install..."
+  info "Forcing install..."
 
   # Force is set - rename dir to
   RENAME_DIR="${INSTALL_DIR}.backup.$(date +%s || fatal 'Failed to rename ${INSTALL_DIR}')"
