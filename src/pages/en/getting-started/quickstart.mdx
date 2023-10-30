@@ -4,9 +4,12 @@ metaTitle: "Get Up and Running with Streamdal"
 description: Streamline your real-time data management and security with Streamdal.
 layout: ../../../layouts/MainLayout.astro
 ---
+
+import quickTail from '@images/guides/quickTail.png'
+
 <br />
 <br />
-Streamdal is your gateway to real-time data management and security. It ensures data integrity, enables seamless transformations within the data stream, and optimizes costs and efficiency. Here’s a quick guide to get you started with Streamdal:
+Streamdal is a two step process to get up and running. First, you'll need to install the Streamdal server and console. Then, you'll need to instrument your code using one of the Streamdal SDKs.
 
 ## [STEP 1] Install Streamdal Server and Console
 
@@ -15,9 +18,44 @@ The quickest way to deploy Streamdal is using the provided script via curl:
 ```bash
 curl -s https://sh.streamdal.com | bash
 ```
+The script installs our docker-compose you can read up more about it [here](../../guides/deployment).
 
-🎉 Open http://localhost:8080 in your browser to access the Streamdal console! 🎉
+Run the following command to view the status of the deployment:
+```bash
+❯ docker ps
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                            NAMES
+ed6f02a60db1   streamdal/console:v0.1.26   "/tini -- docker-ent…"   1 day ago   Up 10 minutes   0.0.0.0:8080->8080/tcp                           streamdal-console
+75823378255d   docker-envoy                "/usr/local/bin/envo…"   1 day ago   Up 10 minutes   0.0.0.0:8083->8083/tcp, 10000/tcp                streamdal-envoy
+aa59c29d9221   streamdal/server:e074107    "/server --debug"        1 day ago   Up 10 minutes   0.0.0.0:8081->8081/tcp, 0.0.0.0:8082->8082/tcp   streamdal-server
+750468b0c1bc   redis:latest                "docker-entrypoint.s…"   1 day ago   Up 10 minutes   0.0.0.0:6379->6379/tcp                           streamdal-redis
+```
+
+🎉 Once everything is up you should be able to access the console at http://localhost:8080 🎉
 
 
 ## [STEP 2] Instrument Your Code
-With the server and console up and running, it's time to [instrument your code](../guides/instrumentation) using one of the Streamdal SDKs. Check out the [SDK documentation](../guides/instrumentation)) to find the right SDK for your project and learn how to integrate it.
+With the server and console up and running, it's time to [instrument your code](../../guides/instrumentation) using one of the Streamdal SDKs. Check out the [SDK documentation](../../guides/instrumentation)) to find the right SDK for your project and learn how to integrate it.
+
+If just want to kick the tires, you can use our demo sdk: 
+
+```bash
+docker run \
+  --name billing-service-stripe-register \
+  --label app=billing-service-stripe-register \
+  streamdal/demo-client:2249e0f \
+  -d \
+  --message-rate=10,20 \
+  --service-name=billing-service \
+  --server-address=localhost:8082 \
+  --operation-type=2 \
+  --operation-name=stripe-register \
+  --component-name=stripe \
+  --data-source-type=file \
+  --data-source-file=/assets/sample-billing-producer.json
+```  
+
+## [STEP 3] Explore the Console
+
+Once an SDK is connected to your server you should be able to see the data flowing in the console. Checkout the [console documentation](../../guides/console) to learn more about the console and how to use it.
+
+<img src={quickTail} alt="quickTail" />
