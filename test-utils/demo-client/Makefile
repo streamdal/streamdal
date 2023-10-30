@@ -53,7 +53,7 @@ run2:
 	--operation-name  "recorder" \
 	--component-name "kafka" \
 	--data-source-type file \
-	--data-source-file ./assets/sample-signup-producer.json
+	--data-source-file ./assets/sample.json
 
 .PHONY: run3
 run3: description = Run billing-service
