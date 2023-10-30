@@ -172,7 +172,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	if d.Config.TelemetryEnabled {
+	if !d.Config.TelemetryDisabled {
 		telemetryService, err := telemetry.New(&telemetry.Config{
 			ShutdownCtx: d.ShutdownContext,
 		})

@@ -93,12 +93,6 @@ func (t *Telemetry) startWorker(looper director.Looper) {
 		case work := <-t.work:
 			batch = append(batch, work)
 			t.log.WithField("data", work).Info("received telemetry data")
-
-			if err := t.sendTelemetryBatch(t.ShutdownCtx, batch); err != nil {
-				t.log.WithError(err).Error("unable to send telemetry data")
-			}
-			batch = make([]map[string]string, 0)
-			lastFlush = time.Now().UTC()
 		default:
 			// NOOP
 		}
