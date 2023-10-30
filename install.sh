@@ -30,7 +30,7 @@ info() {
 }
 
 question() {
-  printf "\x1b[48;5;%sm» DEBUG2 ${1}\e[0m: " "99"
+  printf "\x1b[48;5;%sm» DEBUG4 ${1}\e[0m: " "99"
   read -r FORCE_INSTALL_REPLY
 }
 
@@ -56,6 +56,10 @@ info "Checking requirements..."
 
 # Check if requirements are met
 check_requirements
+
+# If the script was executed via a pipe, we will not have access to STDIN.
+# To fix, we will explicitly connect /dev/tty to the script.
+"$@" < /dev/tty
 
 # Check install dir
 if [[ -n $STREAMDAL_INSTALL_DIR ]]; then
