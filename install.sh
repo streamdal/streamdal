@@ -51,10 +51,6 @@ info "Checking requirements..."
 # Check if requirements are met
 check_requirements
 
-# If the script was executed via a pipe, we will not have access to STDIN.
-# To fix, we will explicitly connect /dev/tty to the script.
-exec < /dev/tty
-
 # Check install dir
 if [[ -n $STREAMDAL_INSTALL_DIR ]]; then
   INSTALL_DIR=$STREAMDAL_INSTALL_DIR
