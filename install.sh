@@ -30,8 +30,8 @@ info() {
 }
 
 question() {
-  printf "\x1b[48;5;%sm» DEBUG1 ${1}\e[0m: " "99"
-  read FORCE_INSTALL_REPLY
+  printf "\x1b[48;5;%sm» DEBUG2 ${1}\e[0m: " "99"
+  read -r FORCE_INSTALL_REPLY
 }
 
 warning() {
