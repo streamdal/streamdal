@@ -94,11 +94,28 @@ one of our [SDKs](#sdks).
 
 **Node**
 ```typescript
-// When consuming/reading
-// <TODO>
+import { OperationType, Streamdal } from "@streamdal/node-sdk/streamdal";
 
-// When producing/writing
-// <TODO>
+export const example = async () => {
+  const streamdal = new Streamdal({
+    streamdalUrl: "localhost:8082",
+    streamdalToken: "1234",
+    serviceName: "test-service-name",
+    pipelineTimeout: "100",
+    stepTimeout: "10",
+  });
+
+  const result = await streamdal.processPipeline({
+    audience: {
+      serviceName: "test-service",
+      componentName: "kafka",
+      operationType: OperationType.PRODUCER,
+      operationName: "kafka-producer",
+    },
+    data: new TextEncoder().encode(JSON.stringify({ key: "value" })),
+  });
+};
+
 ```
 
 > [!IMPORTANT]
