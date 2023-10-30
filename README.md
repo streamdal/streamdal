@@ -1,7 +1,7 @@
 Streamdal
 =========
 [![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
-[![Discord](https://img.shields.io/discord/123456789?color=blue&label=discord)](https://discord.gg/123456789)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 This is the _main_ repo for the [Streamdal](https://streamdal.com) project.
 
