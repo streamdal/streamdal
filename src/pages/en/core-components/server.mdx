@@ -5,25 +5,26 @@ description: A deep dive into the Streamdal Server and how it bridges the gap be
 layout: ../../../layouts/MainLayout.astro
 ---
 
+
 <br />
 <br />
 The Streamdal Server stands as the vital intermediary in Streamdal's architecture, ensuring that the rules crafted in the Console UI seamlessly manifest into real-time operations. Engineered for high availability, this server doesn't just store rules; it translates them into **WebAssembly (WASM)**, the very format that the SDK understands and executes.
+
+## Overview 
+The Servers job is to manage the primary functionalities, communicate with other components, and provide an interface for SDKs. 
+The SDK is responsible for registering itself with the server, communicating via gRPC, reporting metrics, and fetching rules. 
+The Console UI is a web-based user interface communicating with the server through gRPC via Envoy, providing a user-friendly interface to manage and monitor the system.
 
 ## Real-time WASM Translation: From Rules to Actions
 
 The server's primary role revolves around its capability to take in rules formulated via the Streamdal UI. Once received, it embarks on the task of converting these intricate rules into WASM code, optimizing for both efficiency and speed. With the translated rules now in WASM format, the SDK can fetch and execute them in real-time, ensuring data operations reflect the most recent directives.
 
-## Multi-faceted API Endpoints
 
-To cater to varied components and usage scenarios, the Streamdal Server hosts multiple APIs:
 
-- **gRPC API on port 9090**: 
+- **gRPC API on port 8082**: 
   - Designed explicitly for SDKs, it's the primary channel through which WASM-translated rules are transmitted to the SDK for execution.
 
-- **gRPC-Web API on port 9091**: 
-  - Tailored for the UI component, it ensures the Console UI remains in sync with the server, reflecting real-time rule status and updates.
-
-- **REST API on port 8080**: 
+- **REST API on port 8081**: 
   - Beyond rule management, this API serves critical utility purposes. It exposes metrics, integrates with Prometheus for monitoring, and provides health-check endpoints to ensure the system's optimal operation.
 
 ---

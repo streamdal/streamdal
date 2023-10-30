@@ -1,74 +1,122 @@
 ---
-title: Stremdal Deployment Guide
+title: Streamdal Deployment Guide
 metaTitle: "Step-by-step Guide for Streamdal"
-description: A detailed guide to deploying Streamdal Server on Kubernetes, Docker, and AWS.
+description: A detailed guide to deploying Streamdal on Docker, Kubernetes (Helm), and AWS (Cloud Formation).
 layout: ../../../layouts/MainLayout.astro
 ---
+
 <br />
 <br />
 
-## Helm Deployment for Streamdal Server
+## Deployment Overview
 
-Deploying Streamdal Server on Kubernetes using Helm has never been easier. Follow the steps below to get your Streamdal Server up and running.
+Below are the key components deployed across different deployment methods (Docker, Helm, AWS CloudFormation) and their respective purposes:
 
-### **Pre-requisites**
-
-- Helm (version 3 or above)
-- An active Kubernetes cluster (version 1.16 or above)
-
-### **1. Add the Streamdal Helm Repository**
-
-Start by adding the Streamdal Helm repository:
-
-```bash
-helm repo add streamdal https://streamdal.github.io/streamdal/helm-charts/streamdal-server
-```
-
-### **2. Update the Repositories**
-After adding, ensure you update the Helm repositories:
-
-```bash
-helm repo update
-```
-### **3. Install Streamdal Server**
-With the repo added and updated, you can now install the Streamdal Server:
-
-```bash
-helm install streamdal streamdal/streamdal-server
-```
-
-### **4. Access the Streamdal Console**
-
-Once installed, you might want to access the Streamdal console. Forward the console port to do so:
-
-```bash
-kubectl port-forward svc/streamdal-streamdal-server-console 3000:3000 
-```
-
-Then open your browser and navigate to http://127.0.0.1:3000.
-
-### **5. Customizing Your Deployment with values.yaml**
-
-Streamdal Helm chart comes with a set of default configurations. However, you might want to tailor the installation to your needs. This is where values.yaml comes into play.
-
-For instance, you might want to change the default authentication token or configure NATS storage.
-
-Here's a brief overview of what you can configure:
-
-* Image Settings: Like the repository, pull policy, and tag.
-* Service Ports: Define ports for the Server, gRPC, and Envoy.
-* Ingress Settings: Customize ingress for the main server and the console.
-* Environment Variables: Set specific environment variables such as authentication tokens.
-* NATS Configuration: Configure JetStream and Memory/File storage settings for NATS.
+| Service             | Feature Description                                                       |
+|---------------------|--------------------------------------------------------------------------|
+| Streamdal Servers   | Core servers for managing and processing tasks.                         |
+| Redis               | Maintains state and coordinates tasks between Streamdal servers.        |
+| Envoy               | Manages gRPC-web traffic between the Streamdal console and the server.  |
+| Streamdal Console UI| Administrative interface for managing and monitoring Streamdal servers.|
+| Persistent Storage  | Redis provides a persistent store to maintain state across deploys and server restarts. |
 
 
-To customize, create a values.yaml file, define your settings, and then deploy using:
 
-```bash
-helm install [RELEASE_NAME] streamdal/streamdal-server -f values.yaml
-```
 
-For a detailed list of all configuration options, refer to the default values.yaml file provided in the Helm chart.
+## Docker Deployment
+- Ideal for development and testing.
+- Simple setup suitable for local testing.
 
-## Final Thoughts
-Deploying Streamdal Server with Helm allows for a streamlined Kubernetes deployment, and with the flexibility of the values.yaml file, you can adjust the installation to perfectly fit your environment and requirements.
+## Helm Deployment
+- Geared towards production on Kubernetes.
+- Three Streamdal Servers in HA, Envoy Sidecar, and Redis in failover mode.
+
+## AWS CloudFormation Deployment (ECS)
+- Deploys on AWS Elastic Container Service (ECS) for scalable infrastructure.
+- Configures ECS Cluster, Task Definitions, Services, networking, and EFS filesystem.
+- Three Streamdal server instances in FARGATE launch type.
+
+## Deployments
+
+Deploy Streamdal using one of the following methods. Each tab provides a brief description of the deployment method and steps to deploy. For detailed instructions and configurations, refer to the README in the respective repositories.
+
+<div class="pc-tabx w-full max-w-2xl m-0">
+  <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
+  <label
+    for="tab1"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab1:border-b-4 peer-checked/tab1:border-purple-bright peer-checked/tab1:font-bold"
+  >
+    Docker
+  </label>
+  <input id="tab2" type="radio" name="pct" class="hidden peer/tab2" />
+  <label
+    for="tab2"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab2:border-b-4 peer-checked/tab2:border-purple-bright peer-checked/tab2:font-bold"
+  >
+    Helm
+  </label>
+  <input id="tab3" type="radio" name="pct" class="hidden peer/tab3" />
+  <label
+    for="tab3"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab3:border-b-4 peer-checked/tab3:border-purple-bright peer-checked/tab3:font-bold"
+  >
+    Cloud (AWS CloudFormation)
+  </label>
+  <div class="hidden peer-checked/tab1:block clear-both p-5 w-full">
+    <p>
+      Deploy Streamdal using Docker Compose. This method encapsulates Streamdal within Docker containers, ensuring an isolated environment for the application.
+      <br/>
+      1. Clone the repository: 
+         ```bash
+         git clone https://github.com/streamdal/streamdal
+         ```
+      2. Navigate to the docker directory:
+         ```bash
+         cd streamdal/install/docker
+         ```
+      3. Run Docker Compose:
+         ```bash
+         docker-compose up -d
+         ```
+      [Detailed Docker Deployment Guide](https://github.com/streamdal/streamdal/tree/main/install/docker)
+    </p>
+  </div>
+  <div class="hidden peer-checked/tab2:block clear-both p-5 w-full">
+    <p>
+      Deploy Streamdal on Kubernetes using Helm. Helm facilitates the management and deployment of Streamdal on a Kubernetes cluster, providing an organized way to configure and manage instances.
+      <br/>
+      1. Add the Streamdal Helm repository:
+         ```bash
+         helm repo add streamdal https://streamdal.github.io/streamdal/helm-charts/streamdal-server
+         ```
+      2. Update the repositories:
+         ```bash
+         helm repo update
+         ```
+      3. Install Streamdal Server:
+         ```bash
+         helm install streamdal streamdal/streamdal-server
+         ```
+      [Detailed Helm Deployment Guide](https://github.com/streamdal/streamdal/tree/main/install/helm-charts)
+    </p>
+  </div>
+  <div class="hidden peer-checked/tab3:block clear-both p-5 w-full">
+    <p>
+      Deploy Streamdal using AWS CloudFormation. This method allows for the provisioning and management of AWS resources to host Streamdal, enabling a cloud-native deployment.
+      <br/>
+      1. Clone the repository: 
+         ```bash
+         git clone https://github.com/streamdal/streamdal
+         ```
+      2. Navigate to the ECS directory:
+         ```bash
+         cd streamdal/install/ecs
+         ```
+      3. Launch your ECS stack
+         ```bash
+         aws cloudformation create-stack --stack-name snitch-stack --template-body file://ecs.yml --capabilities CAPABILITY_NAMED_IAM
+         ```
+      [Detailed Cloud Deployment Guide](https://github.com/streamdal/streamdal/tree/main/install/ecs)
+    </p>
+  </div>
+</div>
