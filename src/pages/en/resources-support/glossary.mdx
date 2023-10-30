@@ -6,6 +6,8 @@ layout: ../../../layouts/MainLayout.astro
 
 import producer from "@images/core-components/producer.png";
 import consumer from "@images/core-components/consumer.png";
+import producer_icon from "@images/icons/producer_icon.png";
+import consumer_icon from "@images/icons/consumer_icon.png";
 
 Streamdal uses a variety of terms that can have various meanings across 
 industries and use cases. This section exists to help clear up any ambiguity 
@@ -36,15 +38,16 @@ execution. The condition might be configured to **ABORT** the `pipeline` if a
 
 ### <span class="pkeyword">Consumer</span>
 
-A `consumer` generally refers to any function, method, or component that takes 
-input (or data) and does something with it. A `consumer` consumes data, but may 
-not necessarily produce output. 
+A consumer <img src={consumer_icon} class="inlineimg" /> generally refers to 
+any function, method, or component that takes input (or data) and does 
+something with it. A consumer `consumes` data, but may not necessarily 
+produce output. 
 
 For example, a function that logs data to the console, writes data to a file, 
-or updates a UI element can be considered a `consumer` because it acts on the 
+or updates a UI element can be considered a consumer because it acts on the 
 data but doesn't give you something to work with afterward.
 
-Sometimes a `consumer` will take in data, process it, and produce new or 
+Sometimes a consumer will take in data, process it, and produce new or 
 transformed data - this hybrid of "consumer/producer" functionality is 
 sometimes referred to as a "transformer."
 
@@ -72,7 +75,7 @@ data ends up (output). Some examples of destinations would be:
 
 Streamdal does not configure/reconfigure or affect your network firewall 
 settings. When we say "firewall for data," it is a figure of speech to convey 
-the power that creating rules and attaching pipelines to the flow of your 
+the power that creating <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">rules</a> and attaching pipelines to the flow of your 
 data establishes. 
 
 Our [data governance](/en/data-governance/overview/) sections somewhat cover 
@@ -114,13 +117,13 @@ A `pipeline` is a set of `steps` and conditions. A user would configure one or
 more steps for a specific producer or consumer - the result would be a pipeline 
 (that is sent to the [SDK](/en/core-components/sdk/) client via [gRPC](/en/engineering/grpc/)).
 
-### <span class="pkeyword">Producer</span>
 
-A `producer` typically refers to a function, method, or component that generates 
-or produces data. It can be thought of as a source of data in a data flow 
-pipeline.
+### <span class="pkeyword">Producer</span> 
+A producer <img src={producer_icon} class="inlineimg" />  typically refers to a 
+function, method, or component that generates or `produces` data. It can be 
+thought of as a source of data in a data flow pipeline.
 
-Sometimes a `producer` will take in data, process it, and produce new or 
+Sometimes a producer will take in data, process it, and produce new or 
 transformed data - this hybrid of "producer/consumer" functionality is 
 sometimes referred to as a "transformer."
 
@@ -130,7 +133,7 @@ sometimes referred to as a "transformer."
 
 A service can have various meanings depending on the context, but it generally 
 refers to a distinct functional unit that provides specific functionalities or 
-operations which are well-defined and independent.
+operations that are well-defined and independent.
 
 Here is some common contexts in which the term "service" might be used:
 
@@ -146,7 +149,7 @@ defined, which gives your "service" a name on the
 [Golang example](/en/core-components/sdk/#golang-sdk-example) shows how this 
 works.
 
-### <span class="pkeyword">Shims</span>
+### <span class="pkeyword">Shim</span>
 
 A [wrapper library](/en/core-components/libraries-shims/) for popular libraries 
 that incorporate the usage of our [SDK](/en/core-components/sdk/) to simplify 
@@ -178,7 +181,7 @@ both static or dynamic. Some examples of a data source would be:
 
 ### <span class="pkeyword">Rule</span> or <span class="pkeyword">Step</span>
 
-A `step` (or a `rule`) is a single unit of “work” that the 
+A `rule` (or a `step`) is a single unit of “work” that the 
 [SDK](/en/core-components/sdk/) will run against a payload.
 - **Example**: The user might create a step that ensures that the payload always 
 contains a field called `id` which MUST be of the `uuid` format.
@@ -186,7 +189,10 @@ contains a field called `id` which MUST be of the `uuid` format.
 ### <span class="pkeyword">WASM</span>
 
 `WASM` is <a href="https://webassembly.org/" target="_blank">WebAssembly</a>. 
-We use this technology in `steps`. A step consists of a configuration 
-(ie. what is the name of this step, what WASM function should it run with what 
-parameters, etc.) - AND the actual WASM bytes that will be executed by the 
-[SDK](/en/core-components/sdk/).
+We use this technology in `steps`, and it's a 
+[principal element of Streamdal functionality](/en/resources-support/faq/#16-what-role-does-wasm-play-in-streamdal). 
+
+A step consists of a configuration 
+(ie. what is the name of this step, what <span class="pkeyword">WASM</span> 
+function should it run with what parameters, etc.) - AND the actual WASM bytes 
+that will be executed by the [SDK](/en/core-components/sdk/).
