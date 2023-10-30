@@ -1,4 +1,4 @@
-name: Release
+name: Main Test
 on:
   push:
     branches:
@@ -58,30 +58,3 @@ jobs:
           GIT_BRANCH=main ./cc-test-reporter after-build \
             -r ${{ secrets.CC_TEST_REPORTER_ID }} \
             -t coverage.py
-  build:
-    outputs:
-      new_tag: ${{ steps.create_tag.outputs.new_tag }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Generate new tag (dry run)
-        uses: mathieudutour/github-tag-action@v6.1
-        id: get_new_version
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: true
-      - name: Build python dist
-        run: |
-          sed -i "s/version=\".*\"/version=\"${{ steps.get_new_version.outputs.new_version }}\"/" streamdal/__init__.py
-          sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
-          python3 setup.py sdist
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist
-          password: ${{ secrets.PYPI_API_TOKEN }}
-      - name: Create tag
-        uses: mathieudutour/github-tag-action@v6.1
-        id: create_tag
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}

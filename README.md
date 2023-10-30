@@ -28,31 +28,24 @@ python -m pip install streamdal
 import pprint
 from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
 
-
-def main():
-    client = StreamdalClient(
-        cfg=StreamdalConfig(
-            service_name="order-ingest",
-            dry_run=True,
-            streamdal_url="streamdal-server.dev.svc.cluster.local:8082",
-            streamdal_token="1234",
-        )
+client = StreamdalClient(
+    cfg=StreamdalConfig(
+        service_name="order-ingest",
+        streamdal_url="streamdal-server.svc.cluster.local:8082",
+        streamdal_token="1234",
     )
+)
 
-    res = client.process(
-        ProcessRequest(
-            operation_type=OPERATION_TYPE_CONSUMER,
-            operation_name="new-order-topic",
-            component_name="kafka",
-            data=b'{"object": {"field": true}}',
-        )
+res = client.process(
+    ProcessRequest(
+        operation_type=OPERATION_TYPE_CONSUMER,
+        operation_name="new-order-topic",
+        component_name="kafka",
+        data=b'{"object": {"field": true}}',
     )
+)
 
-    pprint.pprint(res)
-
-
-if __name__ == "__main__":
-    main()
+pprint.pprint(res)
 ```
 
 ### Metrics
