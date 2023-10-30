@@ -1,43 +1,41 @@
 ---
-title: "Node Client Support for Snitch"
-metaTitle: "Boost Your Node.js Projects with Snitch Integration"
-description: "Easily incorporate Snitch into your Node applications to enhance your data processing."
+title: "Node Client Support for Streamdal"
+metaTitle: "Boost Your Node.js Projects with Streamdal Integration"
+description: "Easily incorporate Streamdal into your Node applications to enhance your data processing."
 layout: ../../../layouts/MainLayout.astro
 ---
+import { Notification } from "accessible-astro-components";
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
 
 <br />
 <br />
 
-Welcome to the Node Client Guide for Snitch! If you're harnessing the power of Node.js and aim to supercharge your data operations, you're on the right track. Integrating Snitch into your Node applications is both efficient and straightforward with our Node SDK.
+Welcome to the Node Client Guide for Streamdal! If you're harnessing the power of Node.js and aim to supercharge your data operations, you're on the right track. Integrating Streamdal into your Node applications is both efficient and straightforward with our Node SDK.
 
-## Kickstart Your Integration
-
-Before diving into the code, ensure you've set the necessary environment variables:
-
-| Variable                 | Description                                                                                              | Default         |
-|--------------------------|----------------------------------------------------------------------------------------------------------|-----------------|
-| `SNITCH_URL`             | URL pointing to an operational Snitch server within your setup.                                          | `localhost:9091`|
-| `SNITCH_TOKEN`           | Authentication token for your Snitch instance.                                                           | `1234`          |
-| `SNITCH_SERVICE_NAME`    | The name of your service in your infrastructure.                                                         | `localhost`     |
-| `SNITCH_PIPELINE_TIMEOUT`| Total time (in milliseconds) allowed for the execution of the entire pipeline.                           | `100`           |
-| `SNITCH_STEP_TIMEOUT`    | Max duration (in milliseconds) allocated for a single step execution within the pipeline.                | `10`            |
-| `SNITCH_DRY_RUN`         | A boolean (`true` or `false`) indicating if the SDK should execute in a dry run mode.                    | `false`         |
+<Notification type="warn">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>For detailed information on the SDK and its functionalities, refer to the [SDK README](https://github.com/streamdal/go-sdk).</p>
+  </div>
+</Notification>
 
 With the environment set up, it's time to integrate the SDK:
 
 1. Install the SDK package:
 ```bash
-npm install @streamdal/node-sdk-client
+npm install @streamdal/node-sdk
 ```
 
-## 1. Here's a basic example to help you get started:
+Dive Into an Example
+Here's a basic example to help you get started with Streamdal Node SDK:
 
 ```bash
-import { Snitch, SnitchConfigs, Audience, OperationType } from "@streamdal/snitch-node-client/snitch.js";
+import { Streamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk/streamdal.js";
 
-const config: SnitchConfigs = {
-  snitchUrl: "localhost:9091",
-  snitchToken: "1234",
+const config: StreamdalConfigs = {
+  streamdalUrl: "localhost:8082",
+  streamdalToken: "1234",
   serviceName: "test-service-name",
   pipelineTimeout: "100",
   stepTimeout: "10",
@@ -52,14 +50,32 @@ const audience: Audience = {
 };
 
 export const example = async () => {
-  const snitch = new Snitch(config);
-  const result = await snitch.processPipeline({
+  const streamdal = new Streamdal(config);
+  const result = await streamdal.processPipeline({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });
 
-  console.log("Snitch Response:");
+  console.log("Streamdal Response:");
   console.dir(result, {depth: 20});
 };
+``` 
+This example demonstrates how to initialize a new instance of the Streamdal SDK, and how to process data through a pipeline. You simply need to create a configuration object, an audience object, and then call the processPipeline method on a new Streamdal instance. The result will be logged to the console.
+
+## Wasm Execution
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    To run pipelines with minimal overhead, the Streamdal Node SDK ships and executes pipeline rules as 
+    <span class="yhighlight">WASM</span>. If you are using a Node version lower than 
+    <span class="yhighlight">20.*</span>, you'll need to enable WASM functionality in your Node app by 
+    supplying the flag as shown below:
+    </p>
+  </div>
+</Notification>
+
+```bash
+node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js
 ```
-With Snitch's Node client, you're now empowered to redefine your data operations, ensuring efficiency, compliance, and superior performance. Happy coding with Node.js and Snitch!

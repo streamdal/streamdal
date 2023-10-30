@@ -63,4 +63,16 @@ func main() {
 	fmt.Printf("%#v\n", resp)
 }
 ```
+## Example Code Breakdown
 
+**Imports:** The necessary Go packages, including the Streamdal SDK, are imported.
+
+**Context Creation:** A context, allowing for timeouts and graceful shutdowns, is established.
+
+**Streamdal Client Setup:** The SDK client is instantiated with configurations such as the server URL, service name, and timeouts.
+
+**Error Checks:** If there's an initialization error, the program halts and displays the error.
+
+**Data Processing:** The Process() method is called on the Streamdal client to process data, specifying details like operation type and the actual data.
+
+**Display Output:** The processed data's response is printed to the console.
