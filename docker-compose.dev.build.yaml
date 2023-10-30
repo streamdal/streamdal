@@ -39,12 +39,12 @@ services:
       - '--redis.addr=redis:6379' # Address of the Redis server
 
   envoy:
-    build:
-      context: ${PWD}/assets/envoy
-      dockerfile: ${PWD}/assets/envoy/Dockerfile
+    image: envoyproxy/envoy:v1.22.0
     container_name: streamdal-envoy
     ports:
       - "8083:8083"
+    volumes:
+      - ${PWD}/assets/envoy/envoy.yaml:/etc/envoy/envoy.yaml
     networks:
       - streamdal-network
 

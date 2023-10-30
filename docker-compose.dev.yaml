@@ -2,9 +2,6 @@ version: "3"
 services:
   streamdal-server:
     image: streamdal/server:latest
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
     depends_on:
       - redis
     environment:
@@ -31,9 +28,6 @@ services:
       - streamdal-network
 
   envoy:
-    #build:
-    #  context: ${PWD}/assets/envoy
-    #  dockerfile: ${PWD}/assets/envoy/Dockerfile
     image: envoyproxy/envoy:v1.22.0
     container_name: streamdal-envoy
     ports:
