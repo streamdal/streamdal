@@ -5,16 +5,20 @@ description: An engineering dive into the core mechanics of Streamdal.
 layout: ../../layouts/MainLayout.astro
 ---
 import info from "@images/icons/info.png";
+import note from "@images/icons/note.png";
 import { Notification } from "accessible-astro-components";
 import cliTail from "@images/guides/CliTail.png";
 import consoleUi from "@images/core-components/console-dashboard.png";
 
-Streamdal is an open-source data observability and governance tool built on a collection of several [components](../en/core-components/overview) that integrate seamlessly into your code via an [SDK](../core-components/sdk/).  
-
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
   📌 Quick peek? Check the live [demo](https://demo.streamdal.com).
+  </div>
 </Notification>
+
+**Streamdal** is an _open-source data observability and governance tool_ built on a collection of several **Opensource** [components](../core-components/overview), [server](../core-components/server), [sdk](../core-components/sdk), and [console ui](../core-components/ui) that integrate seamlessly into your code.
+
 
 ## 🎁 Features
 - **Data Observability**: Think `tail -f` for your data!
@@ -58,17 +62,20 @@ Connect your applications up to Streamdal via the SDK. Below are the SDKs we cur
 
 Stay tuned for more SDKs in the pipeline!
 ## 🛣️ Roadmap
-Our roadmap is public and open for all! Check out the plans and milestones for Streamdal's future. [View the Roadmap](https://github.com/streamdal/streamdal/projects/1)
+Our roadmap is public and open for all! Check out the plans and milestones for Streamdal's future. [View the Roadmap](https://github.com/orgs/streamdal/projects/1)
 
-<div class="callout-note">
-   📢 **Note**
+<Notification type="note">
+  <img src={note} alt="Note" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    📢 **Note**
    
    You have the power to shape and mold where this project goes - vote on issues, add to the discussion, and express your opinion!
-</div>
+  </div>
+</Notification>
 
 ## 🤝 Community
 Need help? Have questions? Want to contribute or chat with like-minded developers?
-[Join our Discord!](https://discord.streamdal.com)
+[Join our Discord!](https://discord.gg/ssYc5FvWgH)
 
 ## 🌟 Contributing
 We ❤️ contributions from our community! If you're looking to get involved, make sure to read our [contributing guidelines](https://github.com/streamdal/contributing) before you craft that amazing PR.
