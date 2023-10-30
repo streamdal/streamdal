@@ -2,6 +2,7 @@ streamdal-server
 ================
 [![Build master](https://github.com/streamdal/server/actions/workflows/master-build.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/master-build.yml)
 [![Pull Request](https://github.com/streamdal/server/actions/workflows/pr-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/pr-test.yml)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 The server component in the Streamdal ecosystem.
 
