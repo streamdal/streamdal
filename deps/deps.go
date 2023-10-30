@@ -22,6 +22,7 @@ import (
 	"github.com/streamdal/server/services/notify"
 	"github.com/streamdal/server/services/pubsub"
 	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/services/telemetry"
 	"github.com/streamdal/server/wasm"
 )
 
@@ -51,6 +52,7 @@ type Dependencies struct {
 	Health            health.IHealth
 	ShutdownContext   context.Context
 	ShutdownFunc      context.CancelFunc
+	Telemetry         telemetry.ITelemetry
 }
 
 func New(cfg *config.Config) (*Dependencies, error) {
@@ -170,6 +172,18 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
+	if !d.Config.TelemetryDisabled {
+		telemetryService, err := telemetry.New(&telemetry.Config{
+			ShutdownCtx: d.ShutdownContext,
+		})
+		if err != nil {
+			return errors.Wrap(err, "unable to create new telemetry service")
+		}
+		d.Telemetry = telemetryService
+	} else {
+		d.Telemetry = &telemetry.DummyTelemetry{}
+	}
+
 	encryptionService, err := encryption.New(cfg.AesKey)
 	if err != nil {
 		return errors.Wrap(err, "unable to create new encryption service")

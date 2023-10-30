@@ -83,6 +83,7 @@ func run(d *deps.Dependencies) error {
 			PubSubService:   d.PubSubService,
 			MetricsService:  d.MetricsService,
 			KVService:       d.KVService,
+			DemoMode:        d.Config.DemoMode,
 		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API setup")
@@ -90,8 +91,6 @@ func run(d *deps.Dependencies) error {
 		}
 
 		if err := api.Run(); err != nil {
-			fmt.Println("grpc server error - what now!!!")
-
 			errChan <- errors.Wrap(err, "error during gRPC API run")
 			return
 		}

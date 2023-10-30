@@ -67,9 +67,6 @@ $ grpcurl -d '{"input": "Hello world"}' -plaintext -H "auth-token: 1234" \
 localhost:8082 protos.External/Test
 ```
 
-TODO: There's a scattering of `Id` vs `ID` used throughout the project. 
-We should settle on `ID` as described here: https://github.com/golang/go/wiki/CodeReviewComments#initialisms
-
 # Encryption
 
 To run the server, you will have to generate an AES256 key and pass it via `--aes-key` flag or `STREAMDAL_SERVER_AES_KEY` 

@@ -28,8 +28,6 @@ const (
 
 	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
 	streamKeepaliveInterval = 10 * time.Second
-
-	uibffEndpoint = "https://api.dev.streamdal.com"
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -1074,7 +1072,7 @@ func (s *ExternalServer) GetSchema(ctx context.Context, req *protos.GetSchemaReq
 }
 
 func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.AppRegistrationStatusRequest) (*protos.AppRegistrationStatusResponse, error) {
-	u, err := url.Parse(uibffEndpoint + "/v1/registration")
+	u, err := url.Parse(types.UibffEndpoint + "/v1/registration")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to parse url")
 	}
@@ -1082,8 +1080,6 @@ func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.Ap
 	params := url.Values{}
 	params.Add("email", req.Email)
 	u.RawQuery = params.Encode()
-
-	println(u.String())
 
 	resp, err := http.DefaultClient.Get(u.String())
 	if err != nil {
@@ -1129,9 +1125,9 @@ func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppR
 }
 
 func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {
-	u, err := url.Parse(uibffEndpoint + endpoint)
+	u, err := url.Parse(types.UibffEndpoint + endpoint)
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to parse url '%s'", uibffEndpoint+endpoint)
+		return nil, errors.Wrapf(err, "unable to parse url '%s'", types.UibffEndpoint+endpoint)
 	}
 
 	marshaler := jsonpb.Marshaler{}

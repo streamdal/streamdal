@@ -153,9 +153,9 @@ func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 		PipelineTimeout: 0,
 		StepTimeout:     0,
 		DryRun:          false,
-		ShutdownCtx:     context.Background(), // TODO: Why is this required?
-		ClientType:      0,                    // This is intended primarily for shims - shims will specify that they're a shim
-		Audiences:       nil,                  // We could specify an audience here if we know it ahead of time; otherwise specify in .Process()
+		ShutdownCtx:     context.Background(),
+		ClientType:      0,   // This is intended primarily for shims - shims will specify that they're a shim
+		Audiences:       nil, // We could specify an audience here if we know it ahead of time; otherwise specify in .Process()
 	}
 
 	if r.config.InjectLogger {

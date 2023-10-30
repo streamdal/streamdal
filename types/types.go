@@ -4,4 +4,5 @@ package types
 
 const (
 	PubSubChangesTopic = "changes"
+	UibffEndpoint      = "https://api.streamdal.com"
 )
