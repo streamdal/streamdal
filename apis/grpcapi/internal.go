@@ -161,8 +161,6 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
 
-	// TODO: Why not send active tails here? (This way, SDK does not have to ask for anything at registration time.)
-
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:
 	for {
