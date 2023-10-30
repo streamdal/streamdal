@@ -68,6 +68,13 @@ ul > li ol > li > ul > li {
 ol {
   list-style: auto;
   margin-left: 1rem;
+  &.accordion-list {
+    margin: 0;
+
+    > li {
+      margin-top: -20px;
+    }
+  }
 }
 
 ul:not(details > ul, .nav-groups) {
@@ -128,10 +135,6 @@ h4 {
 h5 {
   font-size: 1rem;
 }
-
-/* p {
-  /* line-height: 1.65em;
-} */
 
 .content ul {
   line-height: 1.1em;
@@ -233,6 +236,14 @@ strong {
 
 /* Supporting Content */
 
+.inlineimg {
+  display: inline;
+}
+
+.hidden {
+  visibility: hidden;
+  display: inline;
+}
 code {
   --border-radius: 3px;
   margin-top: 2px;
@@ -276,7 +287,7 @@ pre {
   overflow-x: auto;
 }
 
-/* Additional Keyword Highlighting */
+/* Additional keyword highlighting */
 
 .pkeyword {
   display: inline;
@@ -301,6 +312,19 @@ a.pkeyword:hover {
 
 .ykeyword {
   color: var(--color-yellow-500);
+}
+
+.yhighlight {
+  background-color: var(--color-yellow-500);
+  color: var(--color-purple-900);
+  padding-left: 3px;
+  padding-right: 3px;
+  font-weight: bold;
+}
+.phighlight {
+  background-color: var(--color-purple-600);
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 /* Additional table design */
