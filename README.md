@@ -1,5 +1,7 @@
 # Console
 
+[![Pull Request](https://github.com/streamdal/console/actions/workflows/pr.yml/badge.svg)](https://github.com/streamdal/console/actions/workflows/pr.yml)
+[![Publish Docker](https://github.com/streamdal/console/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/console/actions/workflows/release.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 Streamdal's console allows you visualize interact with your services, build and
