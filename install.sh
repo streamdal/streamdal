@@ -1,21 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This install script will attempt to download the latest Streamdal CLI binary
 # and install it as /usr/local/bin/streamdal-cli.
 #
+# github.com/streamdal/cli
+#
 
-if [[ $1 == "-f" ]]; then
-  echo "Forcing install..."
-else
-  if [ -f "/usr/local/bin/streamdal-cli" ]; then
-    echo "Streamdal CLI is already installed. To overwrite, pass -f flag (via curl: | bash -s -- -f) or check https://docs.streamdal.com/cli/upgrade for manual upgrade instructions."
-    exit 1
-  fi
-fi
-
+STREAMDAL_CLI_BIN="streamdal-cli"
+STREAMDAL_CLI_BIN_FULL="/usr/local/bin/${STREAMDAL_CLI_BIN}"
 GITHUB_LATEST_API_URL="https://api.github.com/repos/streamdal/cli/releases/latest"
 GITHUB_DOWNLOAD_URL="https://github.com/streamdal/cli/releases/download"
 CANNOT_INSTALL_ERR="Cannot install via install script - check https://docs.streamdal.com/cli/install for manual installation instructions"
+
+fatal() {
+  printf "\x1b[48;5;%sm» ⚠️  ${1}\e[0m\n" "196"
+  exit 1
+}
+
+info() {
+  printf "\x1b[48;5;%sm» ${1}\e[0m\n" "99"
+}
+
+warning() {
+  printf "\x1b[48;5;%sm»️ ${1}\e[0m\n" "214"
+}
+
+if [ -f "${STREAMDAL_CLI_BIN_FULL}" ]; then
+  warning "Detected previous installation of ${STREAMDAL_CLI_BIN_FULL}"
+
+  if [[ $1 != "force" ]]; then
+    fatal "Streamdal CLI is already installed. To overwrite, pass 'force' arg: curl -sSL https://sh.streamdal.com/cli | sh -s force"
+  fi
+
+  warning "Overwriting previous installation at ${STREAMDAL_CLI_BIN_FULL}"
+fi
 
 OS=$(uname -s)
 ARCH=$(uname -m)
@@ -25,8 +43,7 @@ if [ "$OS" == "Linux" ]; then
   if [ "$ARCH" == "x86_64" ]; then
     FULL_URL="${GITHUB_DOWNLOAD_URL}/${LATEST_VERSION}/streamdal-linux"
   else
-    echo $CANNOT_INSTALL_ERR
-    exit 1
+    fatal "${CANNOT_INSTALL_ERR}"
   fi
 elif [ "$OS" == "Darwin" ]; then
   if [ "${ARCH}" == "x86_64" ]; then
@@ -34,24 +51,19 @@ elif [ "$OS" == "Darwin" ]; then
   elif [ "${ARCH}" == "arm64" ]; then
     FULL_URL="${GITHUB_DOWNLOAD_URL}/${LATEST_VERSION}/streamdal-darwin-arm64"
   else
-    echo $CANNOT_INSTALL_ERR
-    exit 1
+    fatal "${CANNOT_INSTALL_ERR}"
   fi
 else
-  echo $CANNOT_INSTALL_ERR
-  exit 1
+  fatal "${CANNOT_INSTALL_ERR}"
 fi
 
-INSTALL_DIR="/usr/local/bin"
-BIN_NAME="streamdal-cli"
-
 # Download and install the Go binary
-curl -L -o "${INSTALL_DIR}/${BIN_NAME}" "${FULL_URL}"
-chmod +x "${INSTALL_DIR}/${BIN_NAME}"
+curl -sSL -o "${STREAMDAL_CLI_BIN_FULL}" "${FULL_URL}"
+chmod +x "${STREAMDAL_CLI_BIN_FULL}"
 
 # Check if the installation was successful
 if [ $? -eq 0 ]; then
-  echo "Streamdal CLI ${LATEST_VERSION} (${OS}/${ARCH}) installed successfully to ${INSTALL_DIR}/${BIN_NAME}"
+  info "🎉Streamdal CLI ${LATEST_VERSION} (${OS}/${ARCH}) installed successfully to ${STREAMDAL_CLI_BIN_FULL} 🎉"
 else
-  echo "Installation failed. Submit an issue at https://github.com/streamdal/cli/issues/new"
+  fatal "Installation failed. Submit an issue at https://github.com/streamdal/cli/issues/new"
 fi
