@@ -94,53 +94,27 @@ one of our [SDKs](#sdks).
 
 **Node**
 ```typescript
+import { OperationType, Streamdal } from "@streamdal/node-sdk/streamdal";
 
-const streamdal = new Streamdal(config);
-
-// When consuming/reading
-const consumePipeline = (data: string) =>
-  streamdal.processPipeline({
-    consumerAudience,
-    data: new TextEncoder().encode(data),
+export const example = async () => {
+  const streamdal = new Streamdal({
+    streamdalUrl: "localhost:8082",
+    streamdalToken: "1234",
+    serviceName: "test-service-name",
+    pipelineTimeout: "100",
+    stepTimeout: "10",
   });
 
-// Asssuming a RabbitMQ consumer 
-channel.consume(
-  queue,
-  async (msg) => {
-    const processed: StreamdalResponse = await consumePipeline(
-      JSON.stringify(msg)
-    );
-    if (!processed.error) {
-      channel.ack(msg);
-    } else {
-      console.error("Pipeline error", processed.message);
-      // Optionally explore more detailed step status information
-      console.dir(processed.stepStatuses);
-    }
-  },
-  { noAck: false }
-);
-
-// When producing/writing
-const producePipeline = (data: string) =>
-  streamdal.processPipeline({
-    producerAudience,
-    data: new TextEncoder().encode(data),
+  const result = await streamdal.processPipeline({
+    audience: {
+      serviceName: "test-service",
+      componentName: "kafka",
+      operationType: OperationType.PRODUCER,
+      operationName: "kafka-producer",
+    },
+    data: new TextEncoder().encode(JSON.stringify({ key: "value" })),
   });
-
-const processed: StreamdalResponse = await producePipeline(
-  JSON.stringify(msg)
-);
-
-if (!processed.error) {
-  // Asssuming a RabbitMQ producer
-  channel.publish(exchange, routingKey, Buffer.from(processed.data));
-} else {
-  console.error("Pipeline error", processed.message);
-  // Optionally explore more detailed step status information
-  console.dir(processed.stepStatuses);
-}
+};
 
 ```
 
