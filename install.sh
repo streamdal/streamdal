@@ -64,7 +64,7 @@ if [[ -d $INSTALL_DIR ]]; then
 
   mv -f "$INSTALL_DIR" "$RENAME_DIR" || fatal "Unable to rename ${INSTALL_DIR} to ${RENAME_DIR}"
 
-  warning "Successfully backed up ${INSTALL_DIR} to ${RENAME_DIR}"
+  warning "Successfully backed up ${INSTALL_DIR} to ${RENAME_DIR}" 
 fi
 
 info "Cloning repo '${STREAMDAL_REPO}' to '${INSTALL_DIR}'..."
