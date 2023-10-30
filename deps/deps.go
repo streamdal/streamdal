@@ -184,11 +184,11 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		d.Telemetry = &telemetry.DummyTelemetry{}
 	}
 
-	encryptionService, err := encryption.New(cfg.AesKey)
-	if err != nil {
-		return errors.Wrap(err, "unable to create new encryption service")
-	}
-	d.EncryptionService = encryptionService
+	//encryptionService, err := encryption.New(cfg.AesKey)
+	//if err != nil {
+	//	return errors.Wrap(err, "unable to create new encryption service")
+	//}
+	//d.EncryptionService = encryptionService
 
 	c, err := cmd.New()
 	if err != nil {
