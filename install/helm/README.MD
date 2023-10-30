@@ -31,10 +31,10 @@ helm install streamdal streamdal/streamdal-server -f values.yaml
 
 ### View console
 
-Forward the console port and view http://127.0.0.1:3000 in browser 
+Forward the console port and view http://127.0.0.1:8080 in browser 
 
 ```bash 
-kubectl port-forward svc/streamdal-console 3000:3000 
+kubectl port-forward svc/streamdal-console 8080:8080
 ```
 
 
@@ -49,9 +49,9 @@ Here are the configurable parameters of the Streamdal Server Helm chart and thei
 
 ### Service:
 Multiple ports configurations are available:
-- **Server**: Port `8080`
-- **gRPC**: Port `9090`
-- **Envoy**: Port `9091`
+- **Console HTTP**: Port `8080`
+- **Server gRPC**: Port `8082`
+- **Server HTTP API**: Port `8081`
 
 ### Ingress:
 

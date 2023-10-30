@@ -8,7 +8,7 @@ image:
   repository: streamdal/server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "8054f22"
+  tag: "ef7093c"
 nameOverride: "server"
 fullnameOverride: ""
 
@@ -38,14 +38,14 @@ service:
   type: ClusterIP
   ports:
     - name: server
-      port: 8080
-      targetPort: 8080
+      port: 8081
+      targetPort: 8081
     - name: grpc
-      port: 9090
-      targetPort: 9090
+      port: 8082
+      targetPort: 8082
     - name: envoy
-      port: 9091
-      targetPort: 9091
+      port: 8083
+      targetPort: 8083
 
 ingress:
   enabled: false
@@ -90,17 +90,17 @@ affinity: {}
 
 env:
   STREAMDAL_SERVER_AUTH_TOKEN: "1234"
-  STREAMDAL_DEMO: "false"
+  STREAMDAL_DEMO: "true"
 
 consoleService:
   type: ClusterIP
-  port: 3000
-  targetPort: 3000
+  port: 8080
+  targetPort: 8080
   name: http
   loadBalancer:
     enabled: false
     port: 443
-    targetPort: 3000
+    targetPort: 8080
     name: https
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: "nlb"

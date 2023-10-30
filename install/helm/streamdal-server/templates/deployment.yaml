@@ -26,10 +26,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 8081
               protocol: TCP
             - name: grpc
-              containerPort: 9090
+              containerPort: 8082
               protocol: TCP
           env: 
             - name: STREAMDAL_SERVER_REDIS_URL
@@ -57,7 +57,7 @@ spec:
           command: ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml"]
           ports:
             - name: envoy
-              containerPort: 9091
+              containerPort: 8083
               protocol: TCP
       {{- with .Values.nodeSelector }}
       nodeSelector:

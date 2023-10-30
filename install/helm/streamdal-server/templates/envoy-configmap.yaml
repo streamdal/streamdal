@@ -7,13 +7,13 @@ data:
     admin:
       access_log_path: /tmp/admin_access.log
       address:
-        socket_address: { address: 0.0.0.0, port_value: 9901 }
+        socket_address: { address: 0.0.0.0, port_value: 8084 }
     
     static_resources:
       listeners:
         - name: listener_0
           address:
-            socket_address: { address: 0.0.0.0, port_value: 9091 }
+            socket_address: { address: 0.0.0.0, port_value: 8083 }
           filter_chains:
             - filters:
               - name: envoy.filters.network.http_connection_manager
@@ -64,4 +64,4 @@ data:
                   address:
                     socket_address:
                       address: 127.0.0.1
-                      port_value: 9090                      
+                      port_value: 8082                      
