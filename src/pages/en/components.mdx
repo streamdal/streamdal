@@ -131,6 +131,19 @@ culpa qui officia deserunt mollit anim id est laborum.
 </p>
 </Accordion>
 
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    Note:
+    
+    There is an `AccordionGroup` component, but this is only used for special 
+    formatting on the FAQ page. Using this will affect the margins around 
+    `Accordion`. It is not needed to use an `Accordion`.
+    </p>
+  </div>
+</Notification>
+
 ## Horizontal line
 
 ```
@@ -177,6 +190,13 @@ culpa qui officia deserunt mollit anim id est laborum.
 Keyword highlighting is for glossary terms. This is accomplished through 
 assigning classes:
 
+```json
+pkeyword
+ykeyword
+yhighlight
+phighlight
+```
+
 - <span class="pkeyword">Class: pkeyword without the hoverstate is achieved with a span</span>
 {/* */}
 - <a href="#" class="pkeyword">Keyword links have a special hoverstate</a>
@@ -186,4 +206,24 @@ assigning classes:
 - <span class="ykeyword">Class: ykeyword. No hover state, just for extra 
 highlighting for statements or special titles</span>
   - **<span class="ykeyword">Here is the same highlighting, but in bold</span>**
+
+- **<span class="yhighlight">Text box highlighting yellow</span>**
+- bullet text between
+- **<span class="phighlight">Text box highlighting purple</span>**
+- No bold text 👇
+- <span class="yhighlight">Text box highlighting yellow</span>
+- bullet text between
+- <span class="phighlight">Text box highlighting purple</span>
+- Italics 👇
+- _<span class="yhighlight">Text box highlighting yellow</span>_
+- bullet text between
+- _<span class="phighlight">Text box highlighting purple</span>_
+
+**<span class="yhighlight">Text box highlighting yellow</span>**
+👈 bold text 👉
+**<span class="phighlight">Text box highlighting purple</span>**
+regular text 👉
+<span class="yhighlight">Text box highlighting yellow</span>
+👉
+<span class="phighlight">Text box highlighting purple</span>
 

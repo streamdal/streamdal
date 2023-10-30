@@ -1,1 +1,0 @@
-export declare const getGlobals: <T extends Record<string, unknown> | string[], G extends Record<string, boolean>, R extends G = G & Record<T extends (infer R_1)[] ? R_1 : keyof T, false>>(sources: T, initialGlobals?: G) => R;
