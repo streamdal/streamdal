@@ -25,37 +25,24 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/streamdal/go-sdk"
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	sc, err := streamdal.New(&streamdal.Config{
-		ServerURL:       "localhost:8082",
-		ServerToken:     "streamdal",
-		StepTimeout:     time.Millisecond * 10,
-		PipelineTimeout: time.Millisecond * 100,
-		DryRun:          false,
+	sc, _ := streamdal.New(&streamdal.Config{
+		ServerURL:       "streamdal-server.svc.cluster.local:8082",
+		ServerToken:     "1234",
 		ServiceName:     "billing-svc",
-		ShutdownCtx:     ctx,
+		ShutdownCtx:     context.Background(),
 	})
-	if err != nil {
-		panic(err)
-	}
-
-	resp, err := sc.Process(ctx, &streamdal.ProcessRequest{
+	
+	resp, _ := sc.Process(context.Background(), &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
 		Data:          []byte(`{"object": {"field": true}}`),
 	})
-	if err != nil {
-		panic(err)
-	}
 
 	fmt.Printf("%#v\n", resp)
 }

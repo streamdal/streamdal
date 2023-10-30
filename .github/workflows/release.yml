@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  test:
+    name: Tag and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag name
+        run: echo "TAG_NAME=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Delete tag
+        uses: prompt/actions-delete-tag@v1
+      - name: Delete tag local
+        run: git tag -d ${{ env.TAG_NAME }}
+      - name: Inject version into register.go
+        run: |
+          sed -i 's/LibraryVersion:.*/LibraryVersion: "${{ env.TAG_NAME }}",/' register.go
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bumped version in register.go to ${{ env.TAG_NAME }}
+          branch: main
+          tagging_message: ${{ env.TAG_NAME }}
+          push_options: '--force'
