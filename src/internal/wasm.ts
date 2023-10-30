@@ -36,29 +36,15 @@ export const instantiateWasm = async (
   );
 };
 
-export const readResponse = (pointer: number, buffer: Uint8Array) => {
-  let nullHits = 0;
-  const data = [];
+export const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
+  //
+  // Shift right by 32 bits to get the start value
+  const start = Number(pointer >> BigInt(32));
 
-  for (let i = pointer; i < buffer.length; i++) {
-    //
-    // Have three nulls in a row, can quit
-    if (nullHits === 3) {
-      break;
-    }
-
-    // Don't have a length, have to see if we hit three sequential terminators
-    if (buffer[i] === 166) {
-      nullHits++;
-      continue;
-    }
-
-    // Not a terminator, reset null hits
-    nullHits = 0;
-    data.push(buffer[i]);
-  }
-
-  return new Uint8Array(data);
+  //
+  // Bitwise AND operation with 0xFFFFFFFF to get the length
+  const length = Number(pointer & BigInt(0xffffffff));
+  return buffer.slice(start, start + length);
 };
 
 export const runWasm = ({
@@ -87,9 +73,7 @@ export const runWasm = ({
   const mem = new Uint8Array(memory.buffer, ptr, requestBytes.length);
   mem.set(requestBytes);
 
-  const returnPtr = f(ptr, requestBytes.length);
-
-  const completeBufferFromMemory = new Uint8Array(memory.buffer);
-  const response = readResponse(returnPtr, completeBufferFromMemory);
+  const returnPtr = BigInt(f(ptr, requestBytes.length));
+  const response = readResponse(returnPtr, new Uint8Array(memory.buffer));
   return WASMResponse.fromBinary(response);
 };
