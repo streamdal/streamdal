@@ -139,8 +139,9 @@ build/darwin-arm64: clean
 	GOOS=darwin GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-darwin-arm64
 
 .PHONY: docker/build
-docker/build: description = Build docker image
+docker/build: description = Build and push docker image
 docker/build:
+	docker buildx create --use
 	docker buildx build --push --platform=linux/amd64,linux/arm64 \
         -t streamdal/demo-client:$(VERSION) \
         -t streamdal/demo-client:latest \
