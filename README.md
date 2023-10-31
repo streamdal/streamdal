@@ -2,10 +2,10 @@
    
 <img src="./assets/streamdal-logo-dark.png#gh-dark-mode-only"><img src="./assets/streamdal-logo-light.png#gh-light-mode-only">  
 
-</div>  
-
 [![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+
+</div>  
 
 **This is the _main_ repo for the [Streamdal](https://streamdal.com) project.**
 
