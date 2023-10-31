@@ -15,7 +15,7 @@ export const GRPC_URL = env["STREAMDAL_CONSOLE_GRPC_WEB_URL"] ??
   Deno.env.get("STREAMDAL_CONSOLE_GRPC_WEB_URL") ?? "http://localhost:8083";
 export const GRPC_TOKEN = env["STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN"] ??
   Deno.env.get("STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN");
-export const PRODUCTION = env["STREAMDAL_CONSOLE_PRODUCTION"] ??
-  Deno.env.get("STREAMDAL_CONSOLE_PRODUCTION");
-export const DEMO = env["STREAMDAL_CONSOLE_DEMO"] ??
-  Deno.env.get("STREAMDAL_CONSOLE_DEMO");
+export const PRODUCTION = env["STREAMDAL_CONSOLE_PRODUCTION"] === "true" ||
+  Deno.env.get("STREAMDAL_CONSOLE_PRODUCTION") === "true";
+export const DEMO = env["STREAMDAL_CONSOLE_DEMO"] === "true" ||
+  Deno.env.get("STREAMDAL_CONSOLE_DEMO") === "true";

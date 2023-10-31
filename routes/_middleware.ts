@@ -49,10 +49,9 @@ const emailPromptHandler = async (
   const emailPrompted = session?.get("emailPrompted");
 
   if (
+    !PRODUCTION || DEMO ||
     emailPrompted || ctx.destination !== "route" ||
-    emailExcludes.some((route) => pathname.startsWith(route)) ||
-    PRODUCTION !== "true" ||
-    DEMO === "true"
+    emailExcludes.some((route) => pathname.startsWith(route))
   ) {
     return ctx.next();
   }
