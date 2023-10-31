@@ -11,12 +11,18 @@ import warning from "@images/icons/warning.png";
 <br />
 If you're developing with Go and aim to elevate your data operations, you're in the right place. With Streamdal's Go SDK, integrating the power of Streamdal into your Go applications has never been simpler.
 
+
 <Notification type="warn">
   <img src={warning} alt="Warning" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
     <p>For detailed information on the SDK and its functionalities, refer to the [SDK README](https://github.com/streamdal/go-sdk).</p>
   </div>
 </Notification>
+
+## Insturmentation
+
+Start with the [instrumentation doc](../../guides/instrumentation) if you haven't already. It will walk you through the process of setting up Streamdal and its components. 
+
 
 ## Dive Into an Example
 
@@ -65,14 +71,20 @@ func main() {
 ```
 ## Example Code Breakdown
 
-**Imports:** The necessary Go packages, including the Streamdal SDK, are imported.
+- **Imports:** 
+   - Essential Go packages are imported to support the application's functionality.
+   
+- **Context Creation:** 
+   - A new context is established, ensuring timeouts and graceful shutdowns.
 
-**Context Creation:** A context, allowing for timeouts and graceful shutdowns, is established.
+- **Streamdal Client Setup:** 
+   - Here, the SDK client is initialized with various configurations, including the server URL, service name, and specific timeout intervals.
 
-**Streamdal Client Setup:** The SDK client is instantiated with configurations such as the server URL, service name, and timeouts.
+- **Error Handling:** 
+   - Any initialization errors are caught. Should one occur, the program will immediately halt and display the error message.
 
-**Error Checks:** If there's an initialization error, the program halts and displays the error.
+- **Data Processing:** 
+   - The `Process()` method of the Streamdal client is invoked. This processes the data while specifying details such as the operation type and the actual data to be processed.
 
-**Data Processing:** The Process() method is called on the Streamdal client to process data, specifying details like operation type and the actual data.
-
-**Display Output:** The processed data's response is printed to the console.
+- **Output:** 
+   - The response from the processed data is then printed to the console, providing insight into the operation's result.
