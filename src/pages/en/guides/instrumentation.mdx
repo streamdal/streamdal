@@ -18,12 +18,10 @@ most recent.
 </div>
 </div>
 
-
-<br />
-<br />
-## Overview of SDK Instrumentation
-
-The SDK should initiliazed in your application where data consumption or production takes place. The SDK is responsible for sending data to the Streamdal server, which then processes it and returns a response.
+The [SDK](/en/core-components/sdk/) should initiliazed in your application 
+where data consumption or production takes place. The SDK is responsible for 
+sending data to the Streamdal [server](/en/core-components/server/), which then 
+processes it and returns a response.
 
 ## SDK flow
 1. **Initializing Streamdal Client:** The SDK's streamdal.New() method is invoked with a configuration object, initializing a new Streamdal client.
@@ -57,14 +55,15 @@ Let's delve into the specifics of the `Process()` method:
 | **Data** | The actual data payload that's being consumed or produced. | Byte array | ✅ Yes |
 
 
-## How the SDK parameters defines the Data Graph
+### How the SDK parameters defines the <a href="/en/resources-support/glossary#data-graph" class="pkeyword">Data Graph</a>
 
-<img src={dataGraph} alt="Audiance" />
+<center><img src={dataGraph} alt="Audiance" style="border-radius: 5px;" /></center>
 
 
 ## Golang SDK Example
 
-Using the SDK in your Golang applications is straightforward. Here's a simple example to get you started:
+Using the [SDK](/en/core-components/sdk/) in your Golang applications is 
+straightforward. Here's a simple example to get you started:
 
 ```go
 package main
@@ -109,6 +108,7 @@ func main() {
 	fmt.Printf("%#v\n", resp)
 }
 ```
+
 ## Available SDKs
 
 The SDK is currently available in the following languages:
@@ -117,10 +117,9 @@ The SDK is currently available in the following languages:
 - **[Node](https://github.com/streamdal/node-sdk)**
 - **[Python](https://github.com/streamdal/python-sdk)**
 
-
-
-
-
 ---
 
-With this guide at your side, integrating Streamdal into your operations becomes a piece of cake. Remember, the true magic unfolds when Streamdal's capabilities meld seamlessly with your application's data flows. So, jump in, integrate, and watch your data operations transform!
+With this guide at your side, integrating Streamdal into your operations 
+becomes a piece of cake. Remember, the true magic unfolds when Streamdal's 
+capabilities meld seamlessly with your application's data flows. So, jump in, 
+integrate, and watch your data operations transform!

@@ -1,5 +1,6 @@
 ---
 title: Contributing to Streamdal
+metaTitle: "Streamdal | Contributing"
 description: How to contribute to Streamdal
 layout: ../../../layouts/MainLayout.astro
 ---
@@ -39,6 +40,11 @@ library _eventually._ The current technology stack includes:
 - Deno (console-ui)
 - NATS (Streamdal server; will be replaced with Redis eventually)
 - Envoy (load balancing+proxy)
+- _and many more open source libraries and tools!_
+
+We LOVE open source! Read more on what 
+[open source technology](/en/resources-support/open-source/) is used at 
+Streamdal, and the [reasons behind that design choice](https://streamdal.com/manifesto).
 
 ## Adding an Issue
 
@@ -59,8 +65,7 @@ through the [Streamdal public repositories](https://github.com/streamdal/)._
 <Notification type="checked">
   <img src={checked} alt="checked" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    If you find that the issue currently exists, make relevant comments and 
-    add a reaction! 👍 to up-vote, 👎 to down-vote
+    We primarily provide support through the [main repo](https://github.com/streamdal/Streamdal/issues).
   </div>
 </Notification>
 
@@ -78,7 +83,7 @@ issue:
   visibility to your issue or faster collaboration.
 	- <u>Issue/Proposal:</u> Used for items that propose a new idea, 
   functionality or feature. This allows feedback from others before writing 
-  code.
+  code. _(This is sometimes marked just_ `feat` _or_ `chore`_)_
 	- <u>Issue/Question:</u> Use this issue type if you need help or have a 
   question.
   <br />
@@ -102,6 +107,9 @@ issue:
   - Streamdal console-ui. `cat` the `version.ts` file located in 
   the root directory where the console-ui is running.
 </ul>
+
+3. Include a thorough description of what your code does inside the PR. 
+Preferably, include a screenshot if it applies.
 
 ## Contributing - Pull Requests
 

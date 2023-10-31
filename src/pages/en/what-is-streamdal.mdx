@@ -4,12 +4,13 @@ metaTitle: "Understanding Streamdal's Engine"
 description: An engineering dive into the core mechanics of Streamdal.
 layout: ../../layouts/MainLayout.astro
 ---
-import info from "@images/icons/info.png";
+
 import note from "@images/icons/note.png";
 import { Notification } from "accessible-astro-components";
 import cliTail from "@images/guides/CliTail.png";
 import consoleUi from "@images/core-components/console-dashboard.png";
 import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -21,22 +22,31 @@ most recent.
 </div>
 </div>
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-  📌 Quick peek? Check the live [demo](https://demo.streamdal.com).
-  </div>
-</Notification>
+<br />
+<br />
 
-**Streamdal** is an _open-source data observability and governance tool_ built on a collection of several **Opensource** [components](core-components/overview), [server](core-components/server), [sdk](core-components/sdk), and [console ui](core-components/console-ui) that integrate seamlessly into your code.
+<div style="justify-content: center; display: flex;">
+  <div style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px; @media ">
+    <div style="background-color: var(--color-purple-1000); display: inline-flex; padding-left: 20px; padding-right: 20px; border-radius: 15px;">
+      📌 Want a quick peek at what it looks like? Check the live [demo](https://demo.streamdal.com)
+    </div>
+  </div>
+</div>
+
+
+📌 Quick peek? Check the live [demo](https://demo.streamdal.com)
+
+**Streamdal** is an _open-source data_ observability _and governance tool_ built on a collection of several **Opensource** [components](core-components/overview), [server](core-components/server), [sdk](core-components/sdk), and [console ui](core-components/console-ui) that integrate seamlessly into your code.
 
 
 ## 🎁 Features
-- **Data Observability**: Think `tail -f` for your data!
-- **Data Quality Monitoring**: Ensuring your data's accuracy.
-- **Data Governance & Enforcement (BETA)**: Keeping your data compliant.
-- **Data Transformation (BETA)**: Tailoring your data.
-- **Data Obfuscation, Masking, and Stripping (BETA)**: Securing your data.
+<ul>
+<li style="padding: 5px 0px 5px 0px;">**Data <a href="/en/resources-support/glossary#observability" class="pkeyword">Observability</a>**: Think `tail -f` for your data!</li>
+<li style="padding: 5px 0px 5px 0px;">**Data [Quality Monitoring](/en/data-governance/overview/)**: Ensuring your data's accuracy.</li>
+<li style="padding: 5px 0px 5px 0px;"><img src={beta} alt="Beta" style="display: inline" /> **Data Governance & Enforcement**: Keeping your data compliant.</li>
+<li style="padding: 5px 0px 5px 0px;"><img src={beta} alt="Beta" style="display: inline" /> **Data Transformation**: Tailoring your data.</li>
+<li style="padding: 5px 0px 5px 0px;"><img src={beta} alt="Beta" style="display: inline" /> **Data Obfuscation, Masking, and Stripping**: Securing your data.</li>
+</ul>
 
 ## 🎥 Demo Video
 Explore Streamdal in action! Our demo video offers a comprehensive walkthrough of the platform's capabilities and how it can be integrated into your workflows.
@@ -65,7 +75,7 @@ It's a must-have tool for developers seeking a streamlined experience. [Learn Mo
  <img src={cliTail} alt="Information" />
 
 ## 🛠️ SDK
-Connect your applications up to Streamdal via the SDK. Below is insturmentation guide and language sepcific SDKs we currently offer with more to come:
+Connect your applications up to Streamdal via the SDK. Below is instrumentation guide and language sepcific SDKs we currently offer with more to come:
 
 - **Instrumentation Guide**: Start here [View Instrumentation Guide](../guides/instrumentation)
 - **Go SDK**: Enhance your Go applications with Streamdal. [View Go SDK Docs](../language-support/go)
@@ -79,16 +89,21 @@ Our roadmap is public and open for all! Check out the plans and milestones for S
 <Notification type="note">
   <img src={note} alt="Note" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    📢 **Note**
-   
-   You have the power to shape and mold where this project goes - vote on issues, add to the discussion, and express your opinion!
+    📢 **Note**: You have the power to shape and mold where this project goes!
+    
+    Vote on issues, add to the discussion, and express your opinion!
   </div>
 </Notification>
 
 ## 🤝 Community
 Need help? Have questions? Want to contribute or chat with like-minded developers?
-[Join our Discord!](https://discord.gg/ssYc5FvWgH)
+
+[Join our Community!](/en/resources-support/community/)
 
 ## 🌟 Contributing
-We ❤️ contributions from our community! If you're looking to get involved, make sure to read our [contributing guidelines](resources-support/contributing) before you craft that amazing PR.
-The content is now integrated within the structure, with slight changes to fit the existing style and format.
+We ❤️ contributions from our community! If you're looking to get involved, make 
+sure to read our [contributing guidelines](/en/resources-support/contributing) 
+before you craft that amazing PR.
+
+The content is now integrated within the structure, with some slight changes to 
+fit the existing style and format.

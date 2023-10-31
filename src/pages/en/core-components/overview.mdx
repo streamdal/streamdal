@@ -6,6 +6,7 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -23,9 +24,11 @@ The SDK, designed for efficiency, tackles metrics reporting, pipeline processing
 
 ### Key Features:
 
-- **Lightweight Design**: Tailored for efficiency, avoiding unnecessary bulk.
-- **Real-time Rule Processing**: Employs WASM, achieving [remarkable overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md).
-- **Console UI-Defined Rules**: Rules are directly defined via the console UI and fetched by the SDK for processing.
+<ul>
+<li style="padding: 5px 0px 5px 0px;">**Lightweight Design**: Tailored for efficiency, avoiding unnecessary bulk.</li>
+<li style="padding: 5px 0px 5px 0px;">**Real-time Rule Processing**: Employs <a href="/en/resources-support/glossary#wasm" class="pkeyword">WASM</a>, achieving [remarkable overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md).</li>
+<li style="padding: 5px 0px 5px 0px;">**Console UI-Defined Rules**: <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">Rules</a> are directly defined via the [Console UI](/en/core-components/console-ui/) and fetched by the [SDK](/en/core-components/sdk/) for processing.</li>
+</ul>
 
 For detailed insights, explore the [Streamdal SDK documentation](../sdk).
 
@@ -45,21 +48,25 @@ For a deep dive, refer to the [Streamdal Server documentation](../server).
 
 The Console UI stands as the orchestrator, steering the intricate nuances of data operations. Rooted in a robust GRPC framework, it offers a communicative bridge with the Console Server, granting users an interactive platform for data rule and pipeline management.
 
-### Dashboard View:
+### Dashboard View
 
-- **Data Graph**: Visual representation of consumers, producers, and topics relationships.
-- **Real-time Stats**: Insights into performance metrics and data flow rates.
-- **Tail View**: Live observation of pipeline data, granting immediate operational feedback.
-- **Schema Discovery**: Explore, define, and manage schemas generated from your data events.
+<ul>
+<li style="padding: 5px 0px 5px 0px;">**<a href="/en/resources-support/glossary#data-graph" class="pkeyword">Data Graph</a>**: Visual representation of consumers, producers, and topics relationships.</li>
+<li style="padding: 5px 0px 5px 0px;">**Real-time Stats**: Insights into performance [metrics](/en/engineering/metrics/) and data flow rates.</li>
+<li style="padding: 5px 0px 5px 0px;">**[Tail](/en/guides/tail/) View**: Live observation of pipeline data, granting immediate operational feedback.</li>
+<li style="padding: 5px 0px 5px 0px;">**Schema Discovery**: Explore, define, and manage schemas generated from your data events.</li>
+</ul>
 
-### Pipeline View (BETA):
+### <img src={beta} alt="Beta" style="display: inline" /> Pipeline View
 
-- **Detective (PII) Rules**: Define guidelines for handling Personal Identifiable Information (PII).
-- **Encode & Decode Rules**: Manage data encoding and decoding (Coming Soon).
+- **Detective (PII) <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">Rules</a>**: Define guidelines for handling Personal Identifiable Information (PII).
+- **Encode & Decode Rules**: Manage data encoding and decoding.
 - **Transformation Rules**: Set dynamic data transformation parameters.
 
 For an in-depth tour, navigate to the [Streamdal Console UI documentation](../console-ui).
 
 ---
 
-Streamdal's triad of SDK, Server, and Console UI forms the essence of its observability paradigm. Each component plays a distinct role, yet their synergy is what makes Streamdal a holistic solution for data operations. Dive into each, mastering their capabilities, and redefine your data's journey.
+Combining the three components Streamdal's [SDK](/en/core-components/sdk/), [Server](/en/core-components/server/), and [Console UI](/en/core-components/console-ui/) forms the essence of its <a href="/en/resources-support/glossary#observability" class="pkeyword">observability</a> paradigm. 
+
+Each component plays a distinct role, yet their synergy is what makes Streamdal a holistic solution for data operations. Dive into each, mastering their capabilities, and redefine your data's journey.
