@@ -59,7 +59,7 @@ _The demo will showcase:_
 
 **Each one of these actions is occurring in _real-time_!**
 
-You can read more about how this is achieved [here](https://docs.streamdal.com/arch).
+<sub>_You can read more about how this is achieved in the ["how does it work?"](https://docs.streamdal.com/en/getting-started/how-streamdal-works/) docs._</sub>
 
 # Getting Started
 
