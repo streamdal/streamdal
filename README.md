@@ -73,10 +73,12 @@ Getting started consists of two steps:
 The _easiest_ way to get Streamdal running is via `curl | bash`:
 
 ```
-curl -s https://sh.streamdal.com | bash
+curl -sSL https://sh.streamdal.com | bash
 ```
 
-🎉 **Open `http://localhost:8080` in your browser and you should see the console!** 🎉
+🎉 **Open `http://localhost:8080` in your browser and you should see an empty console!** 🎉
+
+Now, it's time to instrument some code that will (automatically) cause the view to be populated.
 
 > [!NOTE]
 > For alternative installation methods, check the [install](./install) dir.
@@ -90,25 +92,17 @@ one of our [SDKs](#sdks).
 [Go demo client](https://github.com/streamdal/server/tree/main/test-utils/demo-client) 
 > that is bundled with the [server](https://github.com/streamdal/server).
 
-**Go**
+**[Go](https://github.com/streamdal/go-sdk)**
 ```go
-// When consuming/reading
-// <TODO>
-
-// When producing/writing
-// <TODO>
+// TODO - show minimal code example _without_ checking resp
 ```
 
-**Python**
+**[Python](https://github.com/streamdal/python-sdk)**
 ```python
-# When consuming/reading
-# <TODO>
-
-# When producing/writing
-# <TODO>
+# TODO - show minimal code example _without_ checking resp
 ```
 
-**Node**
+**[Node.js](https://github.com/streamdal/node-sdk)**
 ```typescript
 import { OperationType, Streamdal } from "@streamdal/node-sdk/streamdal";
 
@@ -135,20 +129,9 @@ export const example = async () => {
 ```
 
 > [!IMPORTANT]
-> These are _basic_, non-production ready examples.
+> **These are _basic, minimal_ examples and should not be used in production code.**
 > 
-> For best results, you should read the [SDK docs](https://docs.streamdal.com/en/core-components/sdk/) 
-> for the SDK you are using.
-
-### SDKs
-
-Several SDKs are available for instrumenting your code:
-
-* [Go](https://github.com/streamdal/go-sdk)
-* [Python](https://github.com/streamdal/python-sdk)
-* [Node.js](https://github.com/streamdal/node-sdk)
-
-For details on how to use them, refer to the [SDK docs](https://docs.streamdal.com/en/core-components/sdk/).
+> Refer to the [instrumentation docs]([https://docs.streamdal.com/en/core-components/sdk/](https://docs.streamdal.com/en/guides/instrumentation/)) for more thorough directions.
 
 # How Does It Work?
 
@@ -156,7 +139,7 @@ Streamdal consists of **three** main components:
 
 - **[Server](https://github.com/streamdal/server)**
 - **[Console](https://github.com/streamdal/console)**
-- **[SDKs](https://docs.streamdal.com/sdks)**
+- **[SDKs](https://docs.streamdal.com/en/core-components/sdk/)**
 
 The basic flow is that you [install](#getting-started) the server and console and
 wrap any reads or writes in your app with our SDK. Once that's done, you will be 
@@ -176,7 +159,7 @@ addresses"_ and so on).
 
 We're building Streamdal in the open and we'd love for you to join us!
 
-Join our [Discord](https://discord.gg/123456789)!
+Join our [Discord](https://discord.gg/streamdal)!
 
 # Resources
 
