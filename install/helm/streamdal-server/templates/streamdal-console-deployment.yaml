@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: streamdal-console
-          image: "streamdal/console:v0.1.31" # Fixed the image and tag definition
+          image: "streamdal/console:v0.1.34" # Fixed the image and tag definition
           ports:
             - containerPort: 8080
           env:
@@ -30,6 +30,8 @@ spec:
               value: {{ .Values.env.STREAMDAL_DEMO | quote }}
             - name: STREAMDAL_CONSOLE_PORT
               value: "8080"
+            - name: STREAMDAL_CONSOLE_PRODUCTION
+              value: "true"
           volumeMounts:
           - mountPath: /root/.cache
             name: esbuild-cache

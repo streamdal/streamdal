@@ -4,8 +4,6 @@
 NOTE: It may take a few minutes for the Ingress to be available.
 You can watch the status by running 'kubectl get ingress --namespace {{ .Release.Namespace }} -w {{ include "streamdal-server.fullname" . }}-console'
 {{- else }}
-export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "streamdal-server.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-echo "Forwarding port to access Streamdal Console on http://127.0.0.1:3000/"
-kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000:3000
+echo "Forwarding port to access Streamdal Console on http://127.0.0.1:8080/"
+kubectl --namespace {{ .Release.Namespace }} port-forward svc/streamdal-console 8080:8080
 {{- end }}
-
