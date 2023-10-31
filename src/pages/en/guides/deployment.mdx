@@ -21,7 +21,8 @@ most recent.
 
 ## Deployment Overview
 
-Below are the key components deployed across different deployment methods (Docker, Helm, AWS CloudFormation) and their respective purposes:
+Below are the key components utlized across different deployment methods 
+(Docker, Helm, AWS CloudFormation) and their respective purposes:
 
 | Service             | Feature Description                                                       |
 |---------------------|--------------------------------------------------------------------------|
@@ -30,8 +31,6 @@ Below are the key components deployed across different deployment methods (Docke
 | Envoy               | Manages gRPC-web traffic between the Streamdal console and the server.  |
 | Streamdal Console UI| Administrative interface for managing and monitoring Streamdal servers.|
 | Persistent Storage  | Redis provides a persistent store to maintain state across deploys and server restarts. |
-
-
 
 
 ## Docker Deployment
@@ -44,12 +43,16 @@ Below are the key components deployed across different deployment methods (Docke
 
 ## AWS CloudFormation Deployment (ECS)
 - Deploys on AWS Elastic Container Service (ECS) for scalable infrastructure.
-- Configures ECS Cluster, Task Definitions, Services, networking, and EFS filesystem.
+- Configures ECS Cluster, Task Definitions, Services, networking, and EFS 
+filesystem.
 - Three Streamdal server instances in FARGATE launch type.
 
 ## Deployments
 
-Deploy Streamdal using one of the following methods. Each tab provides a brief description of the deployment method and steps to deploy. For detailed instructions and configurations, refer to the README in the respective repositories.
+Deploy Streamdal using one of the following methods. Each tab provides a brief 
+description of the deployment method and steps to deploy. For detailed 
+instructions and configurations, refer to the README in the respective 
+repositories.
 
 <div class="pc-tabx w-full max-w-2xl m-0">
   <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />

@@ -1,12 +1,14 @@
 ---
 title: Quarantine
+metaTitle: "Streamdal Data Quarantine Capabilities"
 description: Streamdal Quarantine
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -18,15 +20,17 @@ most recent.
 </div>
 </div>
 
-<Notification type="information">
-  <img src={info} alt="Information" width="30px" height="30px" />
-  <p style="font-weight: lighter;">Quarantine is not yet ready for 1.0 
-  release.</p>
+<Notification type="warning">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <p style="font-weight: lighter;">Quarantine is currently in beta, and being 
+  tested with a select group of contributors, companies, and design partners. 
+  If you would like to participate in the beta, please 
+  [reach out to us](/en/resources-support/get-support/).</p>
 </Notification>
 
 It will be a feature 
 that allows data to be _quarantined_ when a 
-[pipeline](/en/resources-support/glossary#pipeline) succeeds or fails. It will 
+<a href="/en/resources-support/glossary#pipeline" class="pkeyword">pipeline</a> succeeds or fails. It will 
 store the data in S3, so that it can be reviewed (and fixed/repaired/etc.) by 
 authorized users. 
 
@@ -37,5 +41,5 @@ in the meantime check out our
 [roadmap](https://github.com/orgs/streamdal/projects/1) periodically to keep 
 tabs on progress.
 
-Also, join our [Discord](https://discord.gg/streamdal) to participate in a 
-greater range of feature discussions!
+Also, join our [Community](/en/resources-support/community/) to participate 
+in the discussions!

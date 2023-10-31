@@ -1,10 +1,15 @@
 ---
 title: Getting Support
+metaTitle: "Streamdal | Support"
 description: Getting support for Streamdal
 layout: ../../../layouts/MainLayout.astro
 ---
 
+import github from "@images/github.png";
 import information from "@images/icons/information.png";
+import discordlogo from "@images/discord-logo.png";
+import note from "@images/icons/note.png";
+import { Notification } from "accessible-astro-components";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -16,25 +21,38 @@ most recent.
 </div>
 </div>
 
-There are many ways to get support with Streamdal. 
+There are many ways to get support with Streamdal. While Streamdal is a free 
+and open source project, if you need help deploying on-prem or in a large 
+enterprise environment, we are available to assist!
 
 ### Community
 
 Join our [community](/en/resources-support/community). This is the fastest way 
 to get to get support and understand how the other users are operating with 
 Streamdal.
+<br />
+We utlize 👉 <a href="https://discord.gg" alt="Streamdal Community Discord"><img src={discordlogo} width="35%" height="35%" style="display: inline" /></a>
 
 ### Github
 
-[Open up a new issue](https://github.com/streamdal/Streamdal/issues) on Github. 
+[Open up a new issue](https://github.com/streamdal/Streamdal/issues) 👉 <a href="https://github.com/streamdal/Streamdal/issues"><img src={github} width="15%" height="15%" style="display: inline;" /></a>
+
 This is the best way to get support and ensure your issue is seen and ticketed 
 by our developers and active contributors. Be sure to read over the 
 [contributing](/en/resources-support/contributing/) page for more details.
 
-### Website & E-mail
 
-[Contact us](https://streamdal.com/contact) via our website or 
-[email us](mailto:support@streamdal.com) and we will get back with you as soon 
-as possible. While Streamdal is a free and open source project, if you need 
-help deploying on-prem or in a large enterprise environment, we are available 
-to assist!
+<Notification type="information">
+  <img src={note} alt="Note" width="30px" height="30px" />
+  <p style="font-weight: lighter;">
+  There are many different repos for Streamdal. We will provide support in the 
+  [primary repo](https://github.com/streamdal/Streamdal/issues).
+  
+  </p>
+</Notification>
+
+### E-mail the Founders
+
+If the previous two options aren't going to work for you, send an e-mail to 
+[Dan](mailto:daniel@streamdal.com) or [Ustin](mailto:ustin@streamdal.com). 
+Again, if you need enterprise support, don't hesitate to reach out!

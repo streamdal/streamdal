@@ -157,10 +157,6 @@ a {
   gap: 0.5rem;
 }
 
-/* article > section :is(ul, ol) > * + * {
-  line-height: 200%;
-} */
-
 article > section nav :is(ul, ol) > * + * {
   margin-top: inherit;
 }
@@ -238,7 +234,6 @@ strong {
 .addl {
   background-color: var(--color-purple-1000);
   border-radius: 15px;
-  // text-align: center;
   font-style: italic;
   padding: 20px;
   display: inline-flex;
@@ -253,7 +248,7 @@ strong {
 }
 
 .addl-wrapper {
-  background: linear-gradient(90deg, #956CFF, #FFD260);
+  background: linear-gradient(250deg, #956CFF, #FFD260);
   border-radius: 17px;  
   padding: 2px;  
   display: inline-flex;
@@ -265,9 +260,63 @@ strong {
   height: auto;
   margin: 0px 20px 0px 20px;
 
-  // Media query for screens with a max-width of 400px (around the width of an iPhone 12)
   @media (max-width: 700px) {
     margin: auto;
+  }
+}
+
+.discord-link {
+  display: flex;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-purple-900) !important;
+  font-weight: bold;
+
+  &:hover {
+    font-weight: bold;
+    text-decoration: none;
+    transition: ease-in-out;
+    transition-duration: 0.5s;
+  }
+
+  .discord-wrapper {
+    display: flex;
+    margin-top: -200px;
+
+    @media (max-width: 1200px) {
+      margin-top: -150px;
+    }
+
+    @media (max-width: 700px) {
+      margin-top: -100px;
+    }
+
+    .discord-gradient-wrapper {
+      border: solid 1px transparent;
+      border-radius: 6px;
+      padding: 1px;
+      display: inline-flex;
+
+      &:hover {
+        background-color: #BDA1FD;
+        transition: ease-in-out;
+        background-image: none;
+        transition-duration: .5s;
+      }
+
+      .discord-content-wrapper {
+        background-color: #FFD260;
+        border-radius: 5px;
+        display: flex;
+        margin: auto;
+        padding: 6px 20px;
+
+        .discord-icon {
+          display: inline-flex;
+          padding-bottom: 4px;
+        }
+      }
+    }
   }
 }
 
@@ -356,6 +405,7 @@ a.pkeyword:hover {
   padding-left: 3px;
   padding-right: 3px;
   font-weight: bold;
+  border-radius: 5px;
 }
 .phighlight {
   background-color: var(--color-purple-600);
