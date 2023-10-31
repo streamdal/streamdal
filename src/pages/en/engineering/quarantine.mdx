@@ -5,8 +5,18 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import info from "@images/icons/info.png";
-
 import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
 
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
@@ -27,5 +37,5 @@ in the meantime check out our
 [roadmap](https://github.com/orgs/streamdal/projects/1) periodically to keep 
 tabs on progress.
 
-Also, join our [Discord](https://discord.gg/KU2k3zMB) to participate in a 
+Also, join our [Discord](https://discord.gg/streamdal) to participate in a 
 greater range of feature discussions!

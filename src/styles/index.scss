@@ -54,7 +54,6 @@ nav ul {
 }
 
 ul > li > ul > li {
-  line-height: 200%;
   margin-top: 5px;
   color: var(--theme-text-lighter);
 }
@@ -235,6 +234,42 @@ strong {
 }
 
 /* Supporting Content */
+
+.addl {
+  background-color: var(--color-purple-1000);
+  border-radius: 15px;
+  // text-align: center;
+  font-style: italic;
+  padding: 20px;
+  display: inline-flex;
+}
+
+.addlcontent {
+  margin: auto;
+  padding: auto;
+  @media (max-width: 700px) {
+    margin-left: 25px;
+  }
+}
+
+.addl-wrapper {
+  background: linear-gradient(90deg, #956CFF, #FFD260);
+  border-radius: 17px;  
+  padding: 2px;  
+  display: inline-flex;
+}
+
+.uimage {
+  display: block;
+  width: 47.18px;
+  height: auto;
+  margin: 0px 20px 0px 20px;
+
+  // Media query for screens with a max-width of 400px (around the width of an iPhone 12)
+  @media (max-width: 700px) {
+    margin: auto;
+  }
+}
 
 .inlineimg {
   display: inline;

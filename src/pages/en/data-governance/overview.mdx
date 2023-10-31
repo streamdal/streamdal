@@ -6,6 +6,17 @@ layout: ../../../layouts/MainLayout.astro
 
 import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
 
 <Notification type="warning">
   <img src={warning} alt="Warning" width="30px" height="30px" />
@@ -112,5 +123,5 @@ Be sure to periodically check out our
 [roadmap](/en/resources-support/roadmap) for updates on 
 development.
 
-In the meantime, join our [Discord](https://discord.gg/dDuzmS58sb) to read and 
+In the meantime, join our [Discord](https://discord.gg/streamdal) to read and 
 participate in all the discussions about the data governance features!

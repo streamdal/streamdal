@@ -6,10 +6,23 @@ layout: ../../../layouts/MainLayout.astro
 ---
 import { Notification } from "accessible-astro-components";
 import warning from "@images/icons/warning.png";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
 
 <br />
 <br />
-If you're developing with Go and aim to elevate your data operations, you're in the right place. With Streamdal's Go SDK, integrating the power of Streamdal into your Go applications has never been simpler.
+If you're developing with Go and aim to elevate your data operations, you're in 
+the right place. With Streamdal's Go SDK, integrating the power of Streamdal 
+into your Go applications has never been simpler.
 
 
 <Notification type="warn">
@@ -21,7 +34,9 @@ If you're developing with Go and aim to elevate your data operations, you're in 
 
 ## Insturmentation
 
-Start with the [instrumentation doc](../../guides/instrumentation) if you haven't already. It will walk you through the process of setting up Streamdal and its components. 
+Start with the [instrumentation guide](../../guides/instrumentation) if you 
+haven't already. It will walk you through the process of setting up Streamdal 
+and its components. 
 
 
 ## Dive Into an Example
