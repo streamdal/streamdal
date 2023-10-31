@@ -16,7 +16,7 @@
 
 INSTALL_DIR=~/streamdal
 INSTALL_DIR_DOCKER="$INSTALL_DIR/install/docker"
-STREAMDAL_REPO="git@github.com:streamdal/streamdal.git"
+STREAMDAL_REPO="https://github.com/streamdal/streamdal.git"
 DEFAULT_UI_URL="http://localhost:8080"
 
 fatal() {
