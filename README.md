@@ -7,14 +7,14 @@
 [![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-This is the _main_ repo for the [Streamdal](https://streamdal.com) project.
+**This is the _main_ repo for the [Streamdal](https://streamdal.com) project.**
 
 Streamdal is a combination of open source services and SDKs that enable _real-time_:
 
-* Data observability (think `tail -f` for your data!)
-* Data governance & enforcement
-* Data quality monitoring
-* Data transformation + obfuscation + masking + stripping
+* _Data observability (think `tail -f` for your data!)_
+* _Data governance & enforcement_
+* _Data quality monitoring_
+* _Data transformation + obfuscation + masking + stripping_
 
 .. and [a bunch of other things](https://docs.streamdal.com/capabilities).
 
@@ -32,16 +32,16 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 
 </div>
 
-# Demo
+# Live Demo
 
 You don't have to install the [server](https://github.com/streamdal/server), 
 the [console](https://github.com/streamdal/console)
 or [instrument](https://docs.streamdal.com/instrument) any of your apps to see 
 Streamdal in action. We've got a live demo :)
 
-**[DEMO.STREAMDAL.COM](https://demo.streamdal.com)**
+### [DEMO.STREAMDAL.COM](https://demo.streamdal.com)
 
-_The demo showcases:_
+_The demo will showcase:_
 
 1. **Tail**
     * Select any Component and start `Tail` request to watch live output
