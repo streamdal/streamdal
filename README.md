@@ -47,7 +47,11 @@ _The demo showcases:_
     * Observe attached `Scrub ICMP` pipeline changing `object.ipv4_address` if `object.protocol` equals "ICMP"
 4. **Observe Throughput**
     * Watch the read/write-per-second throughput for any component
-
+5. **Data Graph**
+    * Use the service map to see all services, operations and components and how they relate to each other
+    * The [data graph](https://docs.streamdal.com/en/resources-support/glossary/#data-graph) is the "node map" of all services and components
+6. **Schema Inference**
+    * View the inferred JSON Schema for all consumers and producers 
 
 **Each one of these actions is occurring in _real-time_!**
 
