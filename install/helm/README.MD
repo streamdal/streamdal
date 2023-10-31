@@ -109,7 +109,7 @@ Refer to the default `values.yaml` for possible configuration options.
 
 Below is a visual representation of the deployment architecture:
 
-- Three **Streamdal Servers** in HA, each equipped with an **Envoy Sidecar** port 9091 to handle gRPC web traffic.
+- Three **Streamdal Servers** in HA, each equipped with an **Envoy Sidecar** port 8082 to handle gRPC web traffic.
 - **Redis** operates in a failover mode, comprising one master and three replicas. Streamdal servers communicate with the Redis master for task distribution.
 - The **Streamdal Console** illustrates how the Streamdal servers connect and serve gRPC web traffic.
 - The **Client App with SDK** is an external entity, representing a typical client application that integrates with the Streamdal servers via API/SDK calls. It's important to note that this Client App is not deployed by the Helm chart but is illustrated to demonstrate potential end-user application integration.
@@ -120,9 +120,9 @@ graph TB
 
     subgraph Streamdal Cluster [streamdal Namespace]
         subgraph Streamdal Servers [HA Streamdal Servers]
-            server1[Streamdal Server 1<br>with Envoy Sidecar on port 9091]
-            server2[Streamdal Server 2<br>with Envoy Sidecar on port 9091]
-            server3[Streamdal Server 3<br>with Envoy Sidecar on port 9091]
+            server1[Streamdal Server 1<br>with Envoy Sidecar on port 8083]
+            server2[Streamdal Server 2<br>with Envoy Sidecar on port 8083]
+            server3[Streamdal Server 3<br>with Envoy Sidecar on port 8083]
         end
         
         subgraph Redis Cluster [Redis in Failover Mode]

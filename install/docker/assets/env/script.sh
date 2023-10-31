@@ -9,7 +9,7 @@ if [ -f $ENV_PATH ]; then
 fi
 
 # Check if the secret is already set
-if [ -z "${SNITCH_SERVER_AES_KEY}" ]; then
+if [ -z "${STREAMDAL_SERVER_AES_KEY}" ]; then
   # Generate a secret and write it to the .env file
   echo "SNITCH_SERVER_AES_KEY=$(head /dev/urandom | head -c 65 | sha256sum | awk '{print $1}' )" >> $ENV_PATH
 fi
