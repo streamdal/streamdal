@@ -12,7 +12,7 @@ NOTE: This app looks best if you use it in a _modern_ terminal that has TrueColo
 support such as iTerm2, Alacrity, Konsole, PowerShell and many, many more.
 
 ## Demo
-**TODO: Add demo gif**
+<img src="./assets/demo.gif">
 
 _**OR**_
 
@@ -37,7 +37,7 @@ _**OR**_
 
 For the brave, install via curl/bash:
 
-`curl -s https://raw.githubusercontent.com/streamdal/cli/main/install.sh | bash`
+`curl -sSL https://sh.streamdal.com/cli | sh`
 
 <sub>This will download the latest release of the CLI and place it in `/usr/local/bin/streamdal-cli`.</sub>
 
