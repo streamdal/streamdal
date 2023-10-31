@@ -114,7 +114,7 @@ var _ = Describe("Streamdal", func() {
 
 	Context("New", func() {
 		It("returns a new instance of Streamdal", func() {
-			lis, err := net.Listen("tcp", ":8082")
+			lis, err := net.Listen("tcp", ":18082")
 			Expect(err).ToNot(HaveOccurred())
 
 			srv := grpc.NewServer()
@@ -135,7 +135,7 @@ var _ = Describe("Streamdal", func() {
 			cfg := &Config{
 				ServiceName: "mysvc1",
 				ShutdownCtx: ctx,
-				ServerURL:   "localhost:8082",
+				ServerURL:   "localhost:18082",
 				ServerToken: "foo",
 				DryRun:      false,
 				Logger:      &loggerfakes.FakeLogger{},
