@@ -8,22 +8,6 @@ export const OperationActionMenu = () => {
   return (
     <div class="py-1 flex flex-row items-center">
       <button
-        data-tooltip-target="pipeline-pause"
-        type="button"
-        onClick={() =>
-          opModal.value = {
-            ...opModal.value,
-            pause: true,
-          }}
-        className="mr-2"
-      >
-        <IconPlayerPause class="w-4 h-4 text-gray-400" />
-      </button>
-      <Tooltip
-        targetId="pipeline-pause"
-        message={"Click to pause pipelines"}
-      />
-      <button
         data-tooltip-target="pipeline-unlink"
         type="button"
         className="mr-2"
