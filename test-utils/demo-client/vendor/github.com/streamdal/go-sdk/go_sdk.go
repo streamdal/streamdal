@@ -504,6 +504,23 @@ func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[
 	return pipelines
 }
 
+func (s *Streamdal) getCounterLabels(req *ProcessRequest, pipeline *protos.Pipeline) map[string]string {
+	l := map[string]string{
+		"service":       s.config.ServiceName,
+		"component":     req.ComponentName,
+		"operation":     req.OperationName,
+		"pipeline_name": "",
+		"pipeline_id":   "",
+	}
+
+	if pipeline != nil {
+		l["pipeline_name"] = pipeline.Name
+		l["pipeline_id"] = pipeline.Id
+	}
+
+	return l
+}
+
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error) {
 	if err := validateProcessRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid process request")
@@ -517,14 +534,6 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 		ComponentName: req.ComponentName,
 		OperationType: protos.OperationType(req.OperationType),
 		OperationName: req.OperationName,
-	}
-
-	labels := map[string]string{
-		"service":       s.config.ServiceName,
-		"component":     req.ComponentName,
-		"operation":     req.OperationName,
-		"pipeline_name": "",
-		"pipeline_id":   "",
 	}
 
 	counterError := types.ConsumeErrorCount
@@ -556,7 +565,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 
 	if payloadSize > MaxWASMPayloadSize {
 
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, nil), Value: 1, Audience: aud})
 
 		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
 		s.config.Logger.Warn(msg)
@@ -567,11 +576,9 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 
 	for _, p := range pipelines {
 		pipeline := p.GetAttachPipeline().GetPipeline()
-		labels["pipeline_name"] = pipeline.Name
-		labels["pipeline_id"] = pipeline.Id
 
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: labels, Value: 1, Audience: aud})
-		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: labels, Value: payloadSize, Audience: aud})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: s.getCounterLabels(req, pipeline), Value: payloadSize, Audience: aud})
 
 		// If a step
 		timeoutCtx, timeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
@@ -628,7 +635,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
 				s.config.Logger.Errorf("Step '%s' returned exit code '%s'", step.Name, wasmResp.ExitCode.String())
 
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
@@ -641,7 +648,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 					}, nil
 				}
 			default:
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: labels, Value: 1, Audience: aud})
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
 			}
 
