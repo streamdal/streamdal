@@ -16,7 +16,7 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 * _Data quality monitoring_
 * _Data transformation + obfuscation + masking + stripping_
 
-.. and [a bunch of other things](https://docs.streamdal.com/capabilities).
+.. and [a bunch of other things](https://docs.streamdal.com).
 
 <sub>_This is what it looks like:_</sub>
 <img src="assets/img.png">
