@@ -5,37 +5,49 @@ description: A comprehensive exploration of Streamdal's main components and thei
 layout: ../../../layouts/MainLayout.astro
 ---
 
-<br />
-<br />
-Streamdal's strength lies in its comprehensive observability capabilities. The Streamdal Server, Console UI, and SDK offers an intuitive and detailed view of your service, consumers, and producers in real-time.
+## 1. Streamdal SDK
 
-## Streamdal Server: Your Live Observability Hub
+The SDK, designed for efficiency, tackles metrics reporting, pipeline processing, and validations using **WebAssembly (WASM)**. This approach assures sub-millisecond overhead, immense scalability, and cross-language compatibility.
 
-Streamdal Server is more than just a connector; it's your observability powerhouse. It provides a live map of your service, highlighting the intricacies of consumers and producers. This live view is complemented with detailed metrics on messages published, consumed per second, and bytes per second.
+### Key Features:
 
-With robust API offerings:
-- The **gRPC API on port 9090** aids the SDK, ensuring seamless communication.
-- The **gRPC-Web API on port 9091** links with the Console UI, ensuring all updates are reflected in real-time.
-- The **REST API on port 8080** provides utility functions, including metrics, health checks, and the novel "tail" feature to view message flow in a JSON format.
+- **Lightweight Design**: Tailored for efficiency, avoiding unnecessary bulk.
+- **Real-time Rule Processing**: Employs WASM, achieving [remarkable overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md).
+- **Console UI-Defined Rules**: Rules are directly defined via the console UI and fetched by the SDK for processing.
 
-## Console UI: The Observability Command Center
+For detailed insights, explore the [Streamdal SDK documentation](../sdk).
 
-The Console UI is an all-in-one platform that showcases the live map, metrics, and schema views. This is where you can visually trace the flow of messages, view them, and understand the schema based on recent events.
+## 2. Streamdal Server
 
-- **Dashboard View** offering graphical insights into data flow and statistics.
-Coming soon:
-- **Pipeline View** allowing users to set and manage rules around data (PII) detection, encoding, decoding, and more.
+Acting as the pivotal hub in Streamdal's framework, the Server ensures fluent transformation of Console UI-defined rules into live operations. It integrates rules into the **WebAssembly (WASM)** format, which the SDK impeccably deciphers and executes.
 
-## SDK: Bridging Real-time Data Flow
+### Core Features:
 
-Streamdal's SDK ensures quick and effortless integration by maintaining forks of renowned messaging libraries. This facilitates the adaptation of Streamdal's features without requiring a complete code rewrite.
+- **WASM Integration**: Translates rules for swift, real-time operations.
+- **High Availability**: Crafted for uninterrupted and consistent data operations.
+- **Multi-Component Communication**: Vital in interfacing between different components for smooth data operations.
 
-Users can tweak the SDK with environment variables to:
-- Set up connectivity with variables like `STREAMDAL_URL` and `STREAMDAL_TOKEN`.
-- Specify execution settings and data source with variables like `STREAMDAL_DATA_SOURCE`.
+For a deep dive, refer to the [Streamdal Server documentation](../server).
 
-Additionally, the Golang version of the SDK showcases its simplicity and efficiency, streamlining data operations.
+## 3. Streamdal Console UI 
+
+The Console UI stands as the orchestrator, steering the intricate nuances of data operations. Rooted in a robust GRPC framework, it offers a communicative bridge with the Console Server, granting users an interactive platform for data rule and pipeline management.
+
+### Dashboard View:
+
+- **Data Graph**: Visual representation of consumers, producers, and topics relationships.
+- **Real-time Stats**: Insights into performance metrics and data flow rates.
+- **Tail View**: Live observation of pipeline data, granting immediate operational feedback.
+- **Schema Discovery**: Explore, define, and manage schemas generated from your data events.
+
+### Pipeline View (BETA):
+
+- **Detective (PII) Rules**: Define guidelines for handling Personal Identifiable Information (PII).
+- **Encode & Decode Rules**: Manage data encoding and decoding (Coming Soon).
+- **Transformation Rules**: Set dynamic data transformation parameters.
+
+For an in-depth tour, navigate to the [Streamdal Console UI documentation](../console-ui).
 
 ---
 
-In essence, Streamdal brings together the observability features of its Server, the visualization capabilities of the Console UI, and the real-time data flow of the SDK. Together, they form an ecosystem where monitoring, tracing, and data analysis reach new heights. Immerse yourself in each component to unlock the full potential of Streamdal for your operations.
+Streamdal's triad of SDK, Server, and Console UI forms the essence of its observability paradigm. Each component plays a distinct role, yet their synergy is what makes Streamdal a holistic solution for data operations. Dive into each, mastering their capabilities, and redefine your data's journey.
