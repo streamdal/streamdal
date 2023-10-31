@@ -1,5 +1,9 @@
-Streamdal
-=========
+<div align="center">
+
+![Streamdal](./assets/streamdal-logo-light.png#gh-dark-mode-only)![Streamdal](./assets/streamdal-logo-dark.png#gh-light-mode-only)
+
+</div>
+
 [![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
