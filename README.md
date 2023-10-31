@@ -100,12 +100,51 @@ one of our [SDKs](#sdks).
 
 **[Go](https://github.com/streamdal/go-sdk)**
 ```go
-// TODO - show minimal code example _without_ checking resp
+package main
+
+import (
+   "context"
+
+   "github.com/streamdal/go-sdk"
+)
+
+func main() {
+   sc, _ := streamdal.New(&streamdal.Config{
+      ServerURL:       "streamdal-server.svc.cluster.local:8082",
+      ServerToken:     "1234",
+      ServiceName:     "billing-svc",
+      ShutdownCtx:     context.Background(),
+   })
+
+   resp, _ := sc.Process(context.Background(), &streamdal.ProcessRequest{
+      OperationType: streamdal.OperationTypeConsumer,
+      OperationName: "new-order-topic",
+      ComponentName: "kafka",
+      Data:          []byte(`{"object": {"field": true}}`),
+   })
+}
 ```
 
 **[Python](https://github.com/streamdal/python-sdk)**
 ```python
-# TODO - show minimal code example _without_ checking resp
+from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+
+client = StreamdalClient(
+   cfg=StreamdalConfig(
+      service_name="order-ingest",
+      streamdal_url="streamdal-server.svc.cluster.local:8082",
+      streamdal_token="1234",
+   )
+)
+
+res = client.process(
+   ProcessRequest(
+      operation_type=OPERATION_TYPE_CONSUMER,
+      operation_name="new-order-topic",
+      component_name="kafka",
+      data=b'{"object": {"field": true}}',
+   )
+)
 ```
 
 **[Node.js](https://github.com/streamdal/node-sdk)**
