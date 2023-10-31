@@ -68,7 +68,7 @@ Getting started consists of two steps:
 1. **Installing** the server, console and their dependencies
 2. **Instrumenting** your code with one of our [SDKs](https://docs.streamdal.com/sdks)
 
-### [STEP 1] Install
+### Install
 
 The _easiest_ way to get Streamdal running is via `curl | bash`:
 
@@ -76,14 +76,20 @@ The _easiest_ way to get Streamdal running is via `curl | bash`:
 curl -sSL https://sh.streamdal.com | bash
 ```
 
-🎉 **Open `http://localhost:8080` in your browser and you should see an empty console!** 🎉
+1. The install script will verify that you have `git`, `docker` and `docker-compose` installed
+2. The install script will clone this repo to `~/streamdal`
+3. The install script will bring up all components via `docker-compose`
 
-Now, it's time to instrument some code that will (automatically) cause the view to be populated.
+Once done:
 
-> [!NOTE]
-> For alternative installation methods, check the [install](./install) dir.
+🎉 **Open`http://localhost:8080` in your browser!** 🎉
 
-### [STEP 2] Instrument
+You should be presented with a _beautiful_ (but empty) UI! To populate it,
+we will need to instrument some code. _Onto the next section!_
+
+<sub>_For alternative installation methods, check the [install](./install) dir._</sub>
+
+### Instrument
 
 Once you've installed the server and console, you can instrument your code using
 one of our [SDKs](#sdks).
