@@ -126,10 +126,11 @@ export const example = async () => {
   });
 };
 
-```
+```  
 
+  
 > [!IMPORTANT]
-> **These are _basic, minimal_ examples and should not be used in production code.**
+> **These are _basic, minimal_ examples and should NOT be used in production code.**
 > 
 > Refer to the [instrumentation docs]([https://docs.streamdal.com/en/core-components/sdk/](https://docs.streamdal.com/en/guides/instrumentation/)) for more thorough directions.
 
