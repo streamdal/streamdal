@@ -5,6 +5,18 @@ description: A comprehensive exploration of Streamdal's main components and thei
 layout: ../../../layouts/MainLayout.astro
 ---
 
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
 ## 1. Streamdal SDK
 
 The SDK, designed for efficiency, tackles metrics reporting, pipeline processing, and validations using **WebAssembly (WASM)**. This approach assures sub-millisecond overhead, immense scalability, and cross-language compatibility.

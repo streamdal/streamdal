@@ -4,25 +4,42 @@ metaTitle: "Boost Your Node.js Projects with Streamdal Integration"
 description: "Easily incorporate Streamdal into your Node applications to enhance your data processing."
 layout: ../../../layouts/MainLayout.astro
 ---
-import { Notification } from "accessible-astro-components";
 import info from "@images/icons/info.png";
 import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
 
 <br />
 <br />
 
-Welcome to the Node Client Guide for Streamdal! If you're harnessing the power of Node.js and aim to supercharge your data operations, you're on the right track. Integrating Streamdal into your Node applications is both efficient and straightforward with our Node SDK.
+Welcome to the Node Client Guide for Streamdal! If you're harnessing the power 
+of Node.js and aim to supercharge your data operations, you're on the right 
+track. Integrating Streamdal into your Node applications is both efficient and 
+straightforward with our Node SDK.
 
 <Notification type="warn">
   <img src={warning} alt="Warning" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>For detailed information on the SDK and its functionalities, refer to the [SDK README](https://github.com/streamdal/go-sdk).</p>
+    <p>For detailed information on the SDK and its functionalities, refer to 
+    the [SDK README](https://github.com/streamdal/go-sdk).</p>
   </div>
 </Notification>
 
-## Insturmentation
+## Instrumentation
 
-Start with the [instrumentation doc](../../guides/instrumentation) if you haven't already. It will walk you through the process of setting up Streamdal and its components. 
+Start with the [instrumentation guide](../../guides/instrumentation) if you 
+haven't already. It will walk you through the process of setting up Streamdal 
+and its components. 
 
 ## Integrate the SDK:
 
@@ -84,7 +101,7 @@ This example demonstrates how to initialize a new instance of the Streamdal SDK,
 node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js
 ```
 
-## For more indepth Examples
+## More In-depth Examples
 
 Examples with docker-compose files are available for the following:
 

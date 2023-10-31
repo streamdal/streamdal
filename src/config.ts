@@ -131,54 +131,54 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/console-ui",
           },
           {
-            text: "Libraries/Shims (Coming Soon!)",
+            text: "Libraries/Shims (TBA)",
             slug: "libraries-shiums",
             link: "en/core-components/libraries-shims",
           },
         ],
       },
       {
-        text: "Language Support",
+        text: "SDKs",
         children: [
           {
             text: "Go",
             slug: "go",
-            link: "en/language-support/go"
+            link: "en/sdks/go"
           },
           {
             text: "Node",
             slug: "node",
-            link: "en/language-support/node"
+            link: "en/sdks/node"
           },
           {
             text: "Python",
             slug: "python",
-            link: "en/language-support/python",
+            link: "en/sdks/python",
           },
           {
-            text: "Java (Coming Soon!)",
+            text: "Java (TBA)",
             slug: "java",
-            link: "en/language-support/java"
+            link: "en/sdks/java"
           },
           {
-            text: "Scala (Coming Soon!)",
+            text: "Scala (TBA)",
             slug: "scala",
-            link: "en/language-support/scala"
+            link: "en/sdks/scala"
           },
           {
-            text: "Rust (Coming Soon!)",
+            text: "Rust (TBA)",
             slug: "rust",
-            link: "en/language-support/rust"
+            link: "en/sdks/rust"
           },
           {
-            text: "Ruby (Coming Soon!)",
+            text: "Ruby (TBA)",
             slug: "ruby",
-            link: "en/language-support/ruby"
+            link: "en/sdks/ruby"
           },
           {
-            text: ".NET (Coming Soon!)",
+            text: ".NET (TBA)",
             slug: "dotnet",
-            link: "en/language-support/dotnet"
+            link: "en/sdks/dotnet"
           },
         ],
       },

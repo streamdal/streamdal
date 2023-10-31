@@ -1,13 +1,24 @@
 ---
-title: Scala Client Support (Coming Soon!)
-description: Streamdal Scala support (Coming Soon!)
+title: Rust Client Support (TBA)
+description: Streamdal Rust Support
 layout: ../../../layouts/MainLayout.astro
 ---
 
 import tip from "@images/icons/tip.png";
 import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
 
-Support for Scala is currently not available, but we're planning to add it.
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+Support for Rust is currently not available, but we're planning to add it.
 
 *However, we could use your input!* 👇
 
@@ -22,10 +33,12 @@ partners and current users:
 
 |  <u>Messaging Systems</u> |  <u>Database</u> |
 |---|---|
-|alpakka-kafka|doobie|
-|rabbitmq-java|mongo-scala|
-|akka-http|slick|
-|scala_nats/nats.java|anorm|
+|rust-rdkafka|sqlx|
+|lapin|mongo-rust|
+|hyper|actix|
+|juniper|rust-postgres|
+|reqwest|redis-rs|
+|nats.rs|diesel|
 
 <Notification type="tip">
   <img src={tip} alt="tip" width="30px" height="30px" />
@@ -34,9 +47,9 @@ partners and current users:
   </div>
 </Notification>
 
-Join our [discord](https://discord.gg/KU2k3zMB) and participate in the polls! 
+Join our [discord](https://discord.gg/streamdal) and participate in the polls! 
 The discussions and feedback our users and the open source community brings 
 will be incredibly value to feature development.
 
-For more information on the progress for Scala support, check out our 
+For more information on the progress for Rust support, check out our 
 [roadmap](/en/resources-support/roadmap)

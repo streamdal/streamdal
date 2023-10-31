@@ -8,12 +8,21 @@ import Accordion from "@components/Accordion/Accordion.astro";
 import edge from "@images/core-components/edge.png";
 import producer_icon from "@images/icons/producer_icon.png";
 import consumer_icon from "@images/icons/consumer_icon.png";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
 
 Get clarification or answers for the most common questions we receive about 
 Streamdal. Can't find what you're looking for, or need more details? Get in 
 touch with us.
-
----
 
 <br />
 <br />
@@ -202,7 +211,7 @@ to get test access or become a design partner,
 
 ### <span class="hiddenh">8. What is open source, what is free, and what is paid? Will this change in the future?</span>
 
-{/* TODO: Add launch manifesto link here once available */}
+
 <li>
 <Accordion 
 title="What is open source, what is free, and what is paid? Will this change in 
@@ -227,7 +236,7 @@ we put out as open source.
 <br />
 
 Check out our 
-[launch manifesto](#link-to-launch-manifesto) for details on this design 
+[launch manifesto](https://streamdal.com/manifesto/) for details on this design 
 decision.
 </p>
 </Accordion>
@@ -348,7 +357,7 @@ could be added.
 </li>
 
 ### <span class="hiddenh">14. What is Observability?</span>
-{/* TODO: Add launch manifesto link here once available */}
+
 <li>
 <Accordion 
 title="What is Observability?">
@@ -391,7 +400,7 @@ features we consider as "observability" features:
 <br />
 
 👆That list is subject to additions over time, _and not subtractions_. Check 
-out our [manifesto](#) for more information on this design choice.
+out our [manifesto](https://streamdal.com/manifesto/) for more information on this design choice.
 </p>
 </Accordion>
 </li>
@@ -423,8 +432,14 @@ business logic is going to be executed by WASM in the SDK.
 <br />
 
 The reason we're able to have such a low impact on any given client's resources, 
-usually less than 0.1ms, is because it's being executed via WASM. Check out 
-more information on this in our [WASM repo](https://github.com/streamdal/wasm).
+usually less than 0.1ms, is because it's being executed via WASM. It's 
+[open source](/en/resources-support/open-source/#wasm). 
+
+<br />
+
+Get more information on 
+how we use it in our [WASM repo](https://github.com/streamdal/wasm), and read 
+about this design choice in our [manifesto](https://streamdal.com/manifesto/).
 </p>
 </Accordion>
 </li>
