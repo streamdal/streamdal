@@ -36,7 +36,7 @@ Streamdal is a combination of open source services and SDKs that enable _real-ti
 
 You don't have to install the [server](https://github.com/streamdal/server), 
 the [console](https://github.com/streamdal/console)
-or [instrument](https://docs.streamdal.com/instrument) any of your apps to see 
+or [instrument](https://docs.streamdal.com/en/guides/instrumentation/) any of your apps to see 
 Streamdal in action. We've got a live demo :)
 
 ### [DEMO.STREAMDAL.COM](https://demo.streamdal.com)
