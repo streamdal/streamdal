@@ -82,7 +82,7 @@ some of the stuff we use in our projects:
 - [Kong](https://github.com/alecthomas/kong): A really awesome CLI `arg` and `flag` library that uses `struct` tags for declaration.  
 _(More trivia: [alecthomas](https://github.com/alecthomas) also wrote the excellent [kingpin](https://github.com/alecthomas/kingpin) library)_
 - [Ginkgo](https://github.com/onsi/ginkgo) & [Gomega](https://github.com/onsi/gomega): Our choice of BDD test framework + matcher. The server is complex, highly concurrent, and has _many_ moving parts. These libs have helped us write more thorough tests that are still easy to grok  _(even if you haven’t looked at them in a while)._
-- [Logsrus](https://github.com/sirupsen/logrus):  A popular, structured logging library.
+- [Logrus](https://github.com/sirupsen/logrus):  A popular, structured logging library.
 - [Httprouter](https://github.com/julienschmidt/httprouter): A fast, lightweight muxer we use for our REST API. While most internal communication in Streamdal happens with gRPC, the pieces that are not are powered by this library.
 - [Ratecounter](https://github.com/paulbellamy/ratecounter): We use this library to calculate rates (such as throughput over time).
 - [Go-director](https://github.com/relistan/go-director): This library enables us to declare for loops as injectable dependencies, which greatly simplifies testing.
