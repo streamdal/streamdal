@@ -66,7 +66,7 @@ _The demo will showcase:_
 Getting started consists of two steps:
 
 1. **Installing** the server, console and their dependencies
-2. **Instrumenting** your code with one of our [SDKs](https://docs.streamdal.com/sdks)
+2. **Instrumenting** your code with one of our [SDKs](https://docs.streamdal.com/en/core-components/sdk/)
 
 ### Install
 
