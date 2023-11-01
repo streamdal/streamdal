@@ -190,8 +190,7 @@ Streamdal consists of **three** main components:
 The basic flow is that you [install](#getting-started) the server and console and
 wrap any reads or writes in your app with our SDK. Once that's done, you will be 
 able to see the data your app is reading or writing in the 
-[console](https://github.com/streamdal/console) (or use the  
-[CLI](https://github.com/streamdal/cli)).
+[console](https://github.com/streamdal/console) (or use the [CLI](https://github.com/streamdal/cli)).
 
 You will also be able to enforce rules on your data (such as _"this should be 
 valid JSON"_, _"message should contain a field called `foo`"_, _"strip all email
