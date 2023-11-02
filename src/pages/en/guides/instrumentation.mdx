@@ -83,17 +83,12 @@ func main() {
 	sc, err := streamdal.New(&streamdal.Config{
 		StreamdalURL:     "localhost:8082",
 		StreamdalToken:   "streamdal",
-		StepTimeout:     time.Millisecond * 10,
-		PipelineTimeout: time.Millisecond * 100,
-		DryRun:          false,
 		ServiceName:     "billing-svc",
 		ShutdownCtx:     ctx,
 	})
 	if err != nil {
 		panic(err)
 	}
-
-	resp, err := sc.Process(ctx, &streamdal.Process
 
 	resp, err := sc.Process(ctx, &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
