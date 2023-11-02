@@ -96,7 +96,7 @@ var _ = Describe("Streamdal", func() {
 		})
 	})
 
-	Context("ToProto", func() {
+	Context("toProto", func() {
 		It("should convert public Audience struct to protobuf version", func() {
 			audPublic := Audience{
 				ComponentName: "test-component",
@@ -104,7 +104,7 @@ var _ = Describe("Streamdal", func() {
 				OperationName: "test-operation",
 			}
 
-			audProto := audPublic.ToProto("service")
+			audProto := audPublic.toProto("service")
 			Expect(audProto.ServiceName).To(Equal("service"))
 			Expect(audProto.ComponentName).To(Equal(audPublic.ComponentName))
 			Expect(audProto.OperationType).To(Equal(protos.OperationType_OPERATION_TYPE_PRODUCER))
@@ -299,15 +299,13 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			resp, err := s.Process(context.Background(), &ProcessRequest{
+			_, err = s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
 				OperationType: OperationType(aud.OperationType),
 				OperationName: aud.OperationName,
 				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
 			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(resp.Error).To(BeFalse())
-			Expect(resp.Message).ToNot(Equal("No pipelines, message ignored"))
 		})
 
 		It("fails on a detective match and aborts", func() {
@@ -374,15 +372,14 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			resp, err := s.Process(context.Background(), &ProcessRequest{
+			_, err = s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
 				OperationType: OperationType(aud.OperationType),
 				OperationName: aud.OperationName,
 				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
 			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(resp.Error).To(BeTrue())
-			Expect(resp.Message).To(ContainSubstring("step failed"))
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("step failed"))
 		})
 	})
 })

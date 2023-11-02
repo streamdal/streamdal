@@ -8,6 +8,7 @@
 // The following environment variables must be set:
 // - STREAMDAL_URL: The address of the Client server
 // - STREAMDAL_TOKEN: The token to use when connecting to the Client server
+// - STREAMDAL_SERVICE_NAME: The name of the service to identify it in the streamdal console
 //
 // Optional parameters:
 // - STREAMDAL_DRY_RUN: If true, rule hits will only be logged, no failure modes will be ran
@@ -49,9 +50,6 @@ const (
 	// DefaultStepTimeoutDurationStr is the default timeout for a single step.
 	DefaultStepTimeoutDurationStr = "10ms"
 
-	// RuleUpdateInterval is how often to check for rule updates
-	RuleUpdateInterval = time.Second * 30
-
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
 	ReconnectSleep = time.Second * 5
 
@@ -78,12 +76,20 @@ var (
 	ErrMissingShutdownCtx   = errors.New("shutdown context cannot be nil")
 	ErrEmptyCommand         = errors.New("command cannot be empty")
 	ErrEmptyProcessRequest  = errors.New("process request cannot be empty")
+
+	// ErrMaxPayloadSizeExceeded is returned when the payload is bigger than MaxWASMPayloadSize
+	ErrMaxPayloadSizeExceeded = fmt.Errorf("payload size exceeds maximum of '%d' bytes", MaxWASMPayloadSize)
+
+	// ErrPipelineTimeout is returned when a pipeline exceeds the configured timeout
+	ErrPipelineTimeout = errors.New("pipeline timeout exceeded")
 )
 
 type IStreamdal interface {
+	// Process is used to run data pipelines against data
 	Process(ctx context.Context, req *ProcessRequest) (*ProcessResponse, error)
 }
 
+// Streamdal is the main struct for this library
 type Streamdal struct {
 	config             *Config
 	functions          map[string]*function
@@ -106,10 +112,14 @@ type Streamdal struct {
 }
 
 type Config struct {
-	// ServerURL ... @MG - let's discuss the nil, nil return if left empty.
+	// ServerURL the hostname and port for the gRPC API of Streamdal Server
+	// If this value is left empty, the library will not attempt to connect to the server
+	// and New() will return nil
 	ServerURL string
 
-	// ServerToken ... @MG - let's discuss the nil, nil return if left empty.
+	// ServerToken is the authentication token for the gRPC API of the Streamdal server
+	// If this value is left empty, the library will not attempt to connect to the server
+	// and New() will return nil
 	ServerToken string
 
 	// ServiceName is the name that this library will identify as in the UI. Required
@@ -156,12 +166,15 @@ type Config struct {
 	ClientType ClientType
 }
 
+// Audience is used to announce an audience to the Streamdal server on library initialization
+// We use this to avoid end users having to import our protos
 type Audience struct {
 	ComponentName string
 	OperationType OperationType
 	OperationName string
 }
 
+// ProcessRequest is used to maintain a consistent API for the Process() call
 type ProcessRequest struct {
 	ComponentName string
 	OperationType OperationType
@@ -169,10 +182,10 @@ type ProcessRequest struct {
 	Data          []byte
 }
 
+// ProcessResponse is used to maintain a consistent API for the return of a Process() call
+// We will introduce additional fields in this struct in the future
 type ProcessResponse struct {
-	Data    []byte
-	Error   bool
-	Message string
+	Data []byte
 }
 
 func New(cfg *Config) (*Streamdal, error) {
@@ -560,16 +573,14 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 		s.sendTail(aud, "", data, data)
 
 		// No pipelines for this mode, nothing to do
-		return &ProcessResponse{Data: data, Message: "No pipelines, message ignored"}, nil
+		return &ProcessResponse{Data: data}, nil
 	}
 
 	if payloadSize > MaxWASMPayloadSize {
-
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, nil), Value: 1, Audience: aud})
 
-		msg := fmt.Sprintf("data size exceeds maximum, skipping pipelines on audience %s", audToStr(aud))
-		s.config.Logger.Warn(msg)
-		return &ProcessResponse{Data: data, Error: true, Message: msg}, nil
+		s.config.Logger.Warn(ErrMaxPayloadSizeExceeded)
+		return nil, ErrMaxPayloadSizeExceeded
 	}
 
 	originalData := data // Used for tail request
@@ -588,27 +599,20 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 			select {
 			case <-timeoutCtx.Done():
 				timeoutCxl()
-				return &ProcessResponse{
-					Data:    req.Data,
-					Error:   true,
-					Message: "pipeline timeout exceeded",
-				}, nil
+				return nil, ErrPipelineTimeout
 			default:
 				// NOOP
 			}
 
 			wasmResp, err := s.runStep(timeoutCtx, aud, step, data)
 			if err != nil {
-				s.config.Logger.Errorf("failed to run step '%s': %s", step.Name, err)
+				err = fmt.Errorf("failed to run step '%s': %s", step.Name, err)
+				s.config.Logger.Error(err)
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
 					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    req.Data,
-						Error:   true,
-						Message: err.Error(),
-					}, nil
+					return nil, err
 				}
 
 				// wasmResp will be nil, so don't allow code below to execute
@@ -625,9 +629,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 					timeoutCxl()
 					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
 					return &ProcessResponse{
-						Data:    wasmResp.OutputPayload,
-						Error:   false,
-						Message: "",
+						Data: wasmResp.OutputPayload,
 					}, nil
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
@@ -641,11 +643,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				if !shouldContinue {
 					timeoutCxl()
 					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    wasmResp.OutputPayload,
-						Error:   true,
-						Message: "step failed: " + wasmResp.ExitMsg,
-					}, nil
+					return nil, fmt.Errorf("step failed: %s", wasmResp.ExitMsg)
 				}
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
@@ -672,9 +670,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 	}
 
 	return &ProcessResponse{
-		Data:    data,
-		Error:   false,
-		Message: "",
+		Data: data,
 	}, nil
 }
 
@@ -717,7 +713,7 @@ func (s *Streamdal) handleConditions(
 	return shouldContinue
 }
 
-func (a *Audience) ToProto(serviceName string) *protos.Audience {
+func (a *Audience) toProto(serviceName string) *protos.Audience {
 	return &protos.Audience{
 		ServiceName:   strings.ToLower(serviceName),
 		ComponentName: strings.ToLower(a.ComponentName),
