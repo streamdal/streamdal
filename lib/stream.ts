@@ -1,4 +1,7 @@
-import { setServiceSignal } from "../components/serviceMap/serviceSignal.ts";
+import {
+  serviceSignal,
+  setServiceSignal,
+} from "../components/serviceMap/serviceSignal.ts";
 import { client, meta } from "./grpc.ts";
 import { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
@@ -34,15 +37,14 @@ export const streamServiceMap = async () => {
     const { status } = await call;
     status && console.info("received grpc getAllStream status", status);
   } catch (e) {
-    console.error("received grpc getAllStream error", e);
-
+    serviceSignal.value = null;
     //
-    // User generated abort signals present as cancelled exceptions,
-    // don't reconnect
+    // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {
       return;
     }
 
+    console.error("received grpc getAllStream error", e);
     serverErrorSignal.value = SERVER_ERROR;
 
     setTimeout(() => {

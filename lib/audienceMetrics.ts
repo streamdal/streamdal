@@ -38,14 +38,13 @@ export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
     const { status } = await audienceMetricsCall;
     status && console.info("received grpc getAudienceRates status", status);
   } catch (e) {
-    console.error("received grpc getAudienceRates error", e);
-
     //
-    // User generated abort signals present as cancelled exce ptions,
-    // don't reconnect
+    // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {
       return;
     }
+
+    console.error("received grpc getAudienceRates error", e);
 
     serverErrorSignal.value = SERVER_ERROR;
 
@@ -64,6 +63,6 @@ const sendMetrics = (metric: any, socket: WebSocket) => {
   try {
     socket.send(JSON.stringify(metric));
   } catch (e) {
-    console.error("failed to send audience metrics over socket", e);
+    console.debug("failed to send audience metrics over socket", e);
   }
 };

@@ -19,7 +19,7 @@ export const handler: Handlers<{ message: string | null }> = {
       try {
         socket.send(serverErrorSignal.value);
       } catch (e) {
-        console.error("failed to send server error over socket", e);
+        console.debug("failed to send server error over socket", e);
       }
     });
 
