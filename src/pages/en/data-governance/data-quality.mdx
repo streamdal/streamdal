@@ -1,5 +1,5 @@
 ---
-title: Data Quality (Beta)
+title: (Beta) Data Quality
 metaTitle: Enforcing Data Quality with Streamdal
 description: Data Quality with Streamdal
 layout: ../../../layouts/MainLayout.astro
@@ -8,6 +8,7 @@ layout: ../../../layouts/MainLayout.astro
 import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -19,8 +20,8 @@ most recent.
 </div>
 </div>
 
-<Notification type="warning">
-  <img src={warning} alt="Warning" width="30px" height="30px" />
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
   <p style="font-weight: lighter;">The data quality features of Streamdal 
   are currently in beta, and being tested with a select group of contributors, 
   companies, and design partners. If you would like to participate in the beta, 
@@ -28,9 +29,12 @@ most recent.
   [reach out to us](/en/resources-support/get-support/).</p>
 </Notification>
 
-As briefly mentioned in the [overview](/en/data-governance/overview), Streamdal 
-can also be used to ensure data quality for teams or across organizations _with 
-breathtaking swiftness_. 
+As briefly mentioned in the [Data Governance](/en/data-governance/overview) 
+overview, Streamdal can also be used to ensure data quality projects, teams or 
+across any organization _with breathtaking swiftness_. 
+
+> **Coming Soon**: A visual guide on setting up Data Quality-specific rules in 
+the [Console UI](/en/core-components/console-ui/).
 
 Once we are out of beta, this section will detail how 
 you can use [rules](/en/resources-support/glossary/#step--rule), 

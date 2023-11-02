@@ -6,7 +6,6 @@ layout: ../../../../layouts/MainLayout.astro
 ---
 
 import info from "@images/icons/info.png";
-import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 import information from "@images/icons/information.png";
 import beta from "@images/beta.png";
@@ -21,8 +20,8 @@ most recent.
 </div>
 </div>
 
-<Notification type="warning">
-  <img src={warning} alt="Warning" width="30px" height="30px" />
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
   <p style="font-weight: lighter;">The data compliance features of Streamdal 
   are currently in beta, and being tested with a select group of contributors, 
   companies, and design partners. If you would like to participate in the beta, 
@@ -35,7 +34,7 @@ _(VCDPA)_ necessitates rigorous data protection standards, prioritizing
 consumer rights to access, correct, and delete personal data. With Streamdal, 
 ensuring compliance is streamlined and transparent.
 
-## <img src={beta} alt="Beta" style="display: inline" /> Streamdal's Approach
+## Streamdal's Approach
 
 With Streamdal's data compliance features, you can enable:
 
