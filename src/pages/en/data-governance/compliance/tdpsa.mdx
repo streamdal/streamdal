@@ -6,7 +6,6 @@ layout: ../../../../layouts/MainLayout.astro
 ---
 
 import info from "@images/icons/info.png";
-import warning from "@images/icons/warning.png";
 import { Notification } from "accessible-astro-components";
 import information from "@images/icons/information.png";
 import beta from "@images/beta.png";
@@ -21,8 +20,8 @@ most recent.
 </div>
 </div>
 
-<Notification type="warning">
-  <img src={warning} alt="Warning" width="30px" height="30px" />
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
   <p style="font-weight: lighter;">The data compliance features of Streamdal 
   are currently in beta, and being tested with a select group of contributors, 
   companies, and design partners. If you would like to participate in the beta, 
@@ -36,7 +35,7 @@ the collection, processing, and use of sensitive data.
 
 Streamdal can help keep your data in compliance with this regulation.
 
-## <img src={beta} alt="Beta" style="display: inline" /> Streamdal's Approach
+## Streamdal's Approach
 
 You can leverage Streamdal for:
 
