@@ -32,7 +32,7 @@ principles, and really, our state of mind - check out our
 [Developer Docs](#developer-docs) •
 [Resources](#resources) •
 [Contributing](#contributing) •
-[Community](#community) •
+[Community](#community)
 </div>
 
 If you experience any issues with the documentation, whether it be poor 
