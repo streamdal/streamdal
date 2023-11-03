@@ -43,17 +43,19 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
       <div className="flex flex-col w-screen text-web">
         <ReactFlowProvider>
           <ctx.Component />
-          <ServiceMapComponent
-            initNodes={serviceSignal.value
-              ? Array.from(serviceSignal.value.nodesMap.values())
-              : []}
-            initEdges={serviceSignal.value
-              ? Array.from(serviceSignal.value.edgesMap.values())
-              : []}
-            blur={req.url.includes("pipelines") ||
-              req.url.includes("notifications")}
-            success={success}
-          />
+          {!req.url.includes("/pipeline") && (
+            <ServiceMapComponent
+              initNodes={serviceSignal.value
+                ? Array.from(serviceSignal.value.nodesMap.values())
+                : []}
+              initEdges={serviceSignal.value
+                ? Array.from(serviceSignal.value.edgesMap.values())
+                : []}
+              blur={req.url.includes("pipelines") ||
+                req.url.includes("notifications")}
+              success={success}
+            />
+          )}
         </ReactFlowProvider>
 
         <div class="absolute bottom-0 left-0 text-web ml-2 mb-1 flex justify-center items-center text-xs">
