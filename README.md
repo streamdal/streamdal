@@ -134,6 +134,8 @@ We're building Streamdal in the open and we'd would love to have you join!
 
 Let's build together 💪
 
+https://discord.gg/streamdal
+
 <div align="right">
 [<a href="#to-top">Back to top</a>]
 </div>
