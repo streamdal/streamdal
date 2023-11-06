@@ -19,28 +19,39 @@ most recent.
 </div>
 </div>
 
-Thank you for participating in open source! We're open to contributions for 
-Streamdal, and for feature proposals. Be sure to check out the
-[code of conduct](#code-of-conduct),  [roadmap](/en/resources-support/roadmap/)
-, and [known-issues](/en/resources-support/known-issues/) to gauge our current 
-progress. Alternatively, if you are new to open source, you might find some 
-[good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+Thank you for participating in open source! 
+
+We're always open to feature proposals and general contributions to Streamdal. 
+Be sure to check out the [code of conduct](#code-of-conduct) before opening up 
+a new issue or PR, and take a look at the 
+[roadmap](/en/resources-support/roadmap/) to gauge our current projects. 
+
+New to open source? Be sure to check back for some [good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) 
+from time to time.
 
 ## Technology Stack
 The Streamdal SDK is meant to be implemented in every language and relevant 
-library _eventually._ The current technology stack includes:
+library _eventually. 
 
-- WASM (functions and governance rules)
+We currently have an SDK for :
+- [Go](/en/sdks/go/)
+- [Node](/en/sdks/node/)
+- [Python](/en/sdks/python/)
+
+
+The current technology stack includes:
+
+- WASM
 - Protobuf
 - gRPC + gRPC-web
 - Rust
 - Go
 - React
 - Flowbite
-- Deno (console-ui)
-- NATS (Streamdal server; will be replaced with Redis eventually)
-- Envoy (load balancing+proxy)
-- _and many more open source libraries and tools!_
+- Deno
+- Redis
+- Envoy
+- _and many more open source libraries and tools!_ 👇
 
 We LOVE open source! Read more on what 
 [open source technology](/en/resources-support/open-source/) is used at 
@@ -98,14 +109,14 @@ issue:
   ```
   <br />
   - Streamdal SDK. This is language specific. You can find this in /releases of 
-  the url (Replace `%lang` with the language you are using.):
+  the url (Replace `$lang` with the language you are using):
   <br />
   ```
   https://github.com/streamdal/$lang-client/releases
   ```
   <br />
-  - Streamdal console-ui. `cat` the `version.ts` file located in 
-  the root directory where the console-ui is running.
+  - Streamdal Console UI. `cat` the `version.ts` file located in 
+  the root directory where the Console UI is running.
 </ul>
 
 3. Include a thorough description of what your code does inside the PR. 
@@ -122,7 +133,8 @@ expectations for the contribution you are about to make
 3. Create your change
 -- Code changes require tests, and make sure to run the linters to check and 
 format the code
-4. Update relevant documentation for the change
+4. Update relevant documentation for the change - Please check the [README.MD](https://github.com/streamdal/docs#adding-to-docs) 
+for helpful information on contributing to the documentation
 5. Commit with [DCO](#developer-certificate-of-origin-signing-your-work) 
 sign-off and open a PR
 6. Wait for the CI process to finish and make sure all checks are green. A 
