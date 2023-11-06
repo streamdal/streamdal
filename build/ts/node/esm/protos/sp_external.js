@@ -79,7 +79,7 @@ class GetAllResponse$Type extends MessageType {
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
-            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => GetAllResponseAudiences } },
             { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
             { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
@@ -105,7 +105,7 @@ class GetAllResponse$Type extends MessageType {
                 case /* map<string, protos.PipelineInfo> pipelines */ 3:
                     this.binaryReadMap3(message.pipelines, reader, options);
                     break;
-                case /* map<string, string> config */ 4:
+                case /* map<string, protos.GetAllResponseAudiences> config */ 4:
                     this.binaryReadMap4(message.config, reader, options);
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
@@ -150,12 +150,12 @@ class GetAllResponse$Type extends MessageType {
                     key = reader.string();
                     break;
                 case 2:
-                    val = reader.string();
+                    val = GetAllResponseAudiences.internalBinaryRead(reader, reader.uint32(), options);
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.config");
             }
         }
-        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : "";
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : GetAllResponseAudiences.create();
     }
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.LiveInfo live = 1; */
@@ -171,9 +171,13 @@ class GetAllResponse$Type extends MessageType {
             PipelineInfo.internalBinaryWrite(message.pipelines[k], writer, options);
             writer.join().join();
         }
-        /* map<string, string> config = 4; */
-        for (let k of Object.keys(message.config))
-            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.config[k]).join();
+        /* map<string, protos.GetAllResponseAudiences> config = 4; */
+        for (let k of Object.keys(message.config)) {
+            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            GetAllResponseAudiences.internalBinaryWrite(message.config[k], writer, options);
+            writer.join().join();
+        }
         /* int64 generated_at_unix_ts_ns_utc = 100; */
         if (message.generatedAtUnixTsNsUtc !== "0")
             writer.tag(100, WireType.Varint).int64(message.generatedAtUnixTsNsUtc);
@@ -190,6 +194,53 @@ class GetAllResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.GetAllResponse
  */
 export const GetAllResponse = new GetAllResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAllResponseAudiences$Type extends MessageType {
+    constructor() {
+        super("protos.GetAllResponseAudiences", [
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+        ]);
+    }
+    create(value) {
+        const message = { audiences: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Audience audiences */ 1:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.Audience audiences = 1; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllResponseAudiences
+ */
+export const GetAllResponseAudiences = new GetAllResponseAudiences$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetPipelinesRequest$Type extends MessageType {
     constructor() {

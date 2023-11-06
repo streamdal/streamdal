@@ -109,7 +109,7 @@ message GetAllResponse {
 
   // Audience to pipeline ID config/mapping.
   // key == $audience_as_string, value = $pipeline_id
-  map <string, string> config = 4;
+  map <string, GetAllResponseAudiences> config = 4;
 
   // When was this response generated. This is useful for determining what is
   // the latest update when using GetAllStream().
@@ -117,6 +117,10 @@ message GetAllResponse {
 
   // Set by server to indicate that the response is a keepalive message
   optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message GetAllResponseAudiences {
+  repeated protos.Audience audiences = 1;
 }
 
 message GetPipelinesRequest {

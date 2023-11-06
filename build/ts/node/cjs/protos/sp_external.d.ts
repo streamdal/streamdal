@@ -50,10 +50,10 @@ export interface GetAllResponse {
      * Audience to pipeline ID config/mapping.
      * key == $audience_as_string, value = $pipeline_id
      *
-     * @generated from protobuf field: map<string, string> config = 4;
+     * @generated from protobuf field: map<string, protos.GetAllResponseAudiences> config = 4;
      */
     config: {
-        [key: string]: string;
+        [key: string]: GetAllResponseAudiences;
     };
     /**
      * When was this response generated. This is useful for determining what is
@@ -68,6 +68,15 @@ export interface GetAllResponse {
      * @generated from protobuf field: optional bool _keepalive = 1000;
      */
     Keepalive?: boolean;
+}
+/**
+ * @generated from protobuf message protos.GetAllResponseAudiences
+ */
+export interface GetAllResponseAudiences {
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     */
+    audiences: Audience[];
 }
 /**
  * Don't think we need anything here
@@ -515,6 +524,16 @@ declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
  * @generated MessageType for protobuf message protos.GetAllResponse
  */
 export declare const GetAllResponse: GetAllResponse$Type;
+declare class GetAllResponseAudiences$Type extends MessageType<GetAllResponseAudiences> {
+    constructor();
+    create(value?: PartialMessage<GetAllResponseAudiences>): GetAllResponseAudiences;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponseAudiences): GetAllResponseAudiences;
+    internalBinaryWrite(message: GetAllResponseAudiences, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllResponseAudiences
+ */
+export declare const GetAllResponseAudiences: GetAllResponseAudiences$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
     create(value?: PartialMessage<GetPipelinesRequest>): GetPipelinesRequest;
