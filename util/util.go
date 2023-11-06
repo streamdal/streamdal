@@ -232,17 +232,20 @@ func BoolPtr(in bool) *bool {
 	return &in
 }
 
-func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]string {
+func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*protos.GetAllResponsePipelines {
 	if config == nil {
 		return nil
 	}
 
-	m := map[string]string{}
+	m := map[string]*protos.GetAllResponsePipelines{}
 
-	for k, v := range config {
-		// TODO: update to support multiple pipelines per audience
-		// TODO: this will require changes to frontend since the response will change
-		m[AudienceToStr(k)] = v[0]
+	for k, pipelines := range config {
+		m[AudienceToStr(k)] = &protos.GetAllResponsePipelines{
+			PipelineIds: make([]string, 0),
+		}
+		for _, pipelineID := range pipelines {
+			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, pipelineID)
+		}
 	}
 
 	return m

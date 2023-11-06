@@ -376,8 +376,8 @@ var _ = Describe("External gRPC API", func() {
 			// there should be at least len(config)
 			Expect(len(getAllResp.Config)).To(BeNumerically(">=", len(config)))
 
-			for aud, pipelineID := range getAllResp.Config {
-				Expect(config).To(HaveKeyWithValue(aud, pipelineID))
+			for aud, pipelines := range getAllResp.Config {
+				Expect(config[aud]).To(Equal(pipelines.GetPipelineIds()[0]))
 			}
 		})
 	})
@@ -610,9 +610,6 @@ var _ = Describe("External gRPC API", func() {
 			Expect(detachResp).ToNot(BeNil())
 			Expect(detachResp.Message).To(ContainSubstring("detached"))
 			Expect(detachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
-
-			// There is a 5s sleep before redis key is deleted
-			time.Sleep(time.Second * 7)
 
 			// Key should be gone from streamdal_config
 			shouldBeEmpty, err := redisClient.Get(context.Background(), store.RedisConfigKey(audience, createdResp.PipelineId)).Result()
