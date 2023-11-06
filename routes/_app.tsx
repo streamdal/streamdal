@@ -70,7 +70,7 @@ export default async function App(
             </>
           )}
       </Head>
-      <body className="h-screen bg-purple-50 m-0 overflow-hidden">
+      <body className="h-screen bg-purple-50 m-0 overflow-hidden" f-client-nav>
         <ctx.Component />
       </body>
     </html>
