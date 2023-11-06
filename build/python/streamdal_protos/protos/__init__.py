@@ -424,7 +424,7 @@ class GetAllResponse(betterproto.Message):
     attached to any audience.
     """
 
-    config: Dict[str, "GetAllResponseAudiences"] = betterproto.map_field(
+    config: Dict[str, "GetAllResponsePipelines"] = betterproto.map_field(
         4, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
     """
@@ -445,8 +445,9 @@ class GetAllResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class GetAllResponseAudiences(betterproto.Message):
-    audiences: List["Audience"] = betterproto.message_field(1)
+class GetAllResponsePipelines(betterproto.Message):
+    pipeline_ids: List[str] = betterproto.string_field(1)
+    """List of pipeline IDs that are attached to this audience"""
 
 
 @dataclass(eq=False, repr=False)

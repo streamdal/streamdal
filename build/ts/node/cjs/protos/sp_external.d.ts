@@ -50,10 +50,10 @@ export interface GetAllResponse {
      * Audience to pipeline ID config/mapping.
      * key == $audience_as_string, value = $pipeline_id
      *
-     * @generated from protobuf field: map<string, protos.GetAllResponseAudiences> config = 4;
+     * @generated from protobuf field: map<string, protos.GetAllResponsePipelines> config = 4;
      */
     config: {
-        [key: string]: GetAllResponseAudiences;
+        [key: string]: GetAllResponsePipelines;
     };
     /**
      * When was this response generated. This is useful for determining what is
@@ -70,13 +70,15 @@ export interface GetAllResponse {
     Keepalive?: boolean;
 }
 /**
- * @generated from protobuf message protos.GetAllResponseAudiences
+ * @generated from protobuf message protos.GetAllResponsePipelines
  */
-export interface GetAllResponseAudiences {
+export interface GetAllResponsePipelines {
     /**
-     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     * List of pipeline IDs that are attached to this audience
+     *
+     * @generated from protobuf field: repeated string pipeline_ids = 1;
      */
-    audiences: Audience[];
+    pipelineIds: string[];
 }
 /**
  * Don't think we need anything here
@@ -524,16 +526,16 @@ declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
  * @generated MessageType for protobuf message protos.GetAllResponse
  */
 export declare const GetAllResponse: GetAllResponse$Type;
-declare class GetAllResponseAudiences$Type extends MessageType<GetAllResponseAudiences> {
+declare class GetAllResponsePipelines$Type extends MessageType<GetAllResponsePipelines> {
     constructor();
-    create(value?: PartialMessage<GetAllResponseAudiences>): GetAllResponseAudiences;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponseAudiences): GetAllResponseAudiences;
-    internalBinaryWrite(message: GetAllResponseAudiences, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<GetAllResponsePipelines>): GetAllResponsePipelines;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponsePipelines): GetAllResponsePipelines;
+    internalBinaryWrite(message: GetAllResponsePipelines, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.GetAllResponseAudiences
+ * @generated MessageType for protobuf message protos.GetAllResponsePipelines
  */
-export declare const GetAllResponseAudiences: GetAllResponseAudiences$Type;
+export declare const GetAllResponsePipelines: GetAllResponsePipelines$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
     create(value?: PartialMessage<GetPipelinesRequest>): GetPipelinesRequest;

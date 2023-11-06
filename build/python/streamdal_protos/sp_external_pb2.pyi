@@ -145,8 +145,8 @@ class GetAllResponse(_message.Message):
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: GetAllResponseAudiences
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[GetAllResponseAudiences, _Mapping]] = ...) -> None: ...
+        value: GetAllResponsePipelines
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[GetAllResponsePipelines, _Mapping]] = ...) -> None: ...
     class PipelinesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -162,17 +162,17 @@ class GetAllResponse(_message.Message):
     _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
     _keepalive: bool
     audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
-    config: _containers.MessageMap[str, GetAllResponseAudiences]
+    config: _containers.MessageMap[str, GetAllResponsePipelines]
     generated_at_unix_ts_ns_utc: int
     live: _containers.RepeatedCompositeFieldContainer[_sp_info_pb2.LiveInfo]
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
-    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, GetAllResponseAudiences]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
+    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, GetAllResponsePipelines]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
-class GetAllResponseAudiences(_message.Message):
-    __slots__ = ["audiences"]
-    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
-    audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
-    def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
+class GetAllResponsePipelines(_message.Message):
+    __slots__ = ["pipeline_ids"]
+    PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
+    pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []

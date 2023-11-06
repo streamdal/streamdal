@@ -60,10 +60,10 @@ export interface GetAllResponse {
      * Audience to pipeline ID config/mapping.
      * key == $audience_as_string, value = $pipeline_id
      *
-     * @generated from protobuf field: map<string, protos.GetAllResponseAudiences> config = 4;
+     * @generated from protobuf field: map<string, protos.GetAllResponsePipelines> config = 4;
      */
     config: {
-        [key: string]: GetAllResponseAudiences;
+        [key: string]: GetAllResponsePipelines;
     };
     /**
      * When was this response generated. This is useful for determining what is
@@ -80,13 +80,15 @@ export interface GetAllResponse {
     Keepalive?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
- * @generated from protobuf message protos.GetAllResponseAudiences
+ * @generated from protobuf message protos.GetAllResponsePipelines
  */
-export interface GetAllResponseAudiences {
+export interface GetAllResponsePipelines {
     /**
-     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     * List of pipeline IDs that are attached to this audience
+     *
+     * @generated from protobuf field: repeated string pipeline_ids = 1;
      */
-    audiences: Audience[];
+    pipelineIds: string[];
 }
 /**
  * Don't think we need anything here
@@ -545,7 +547,7 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
-            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => GetAllResponseAudiences } },
+            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => GetAllResponsePipelines } },
             { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
             { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
@@ -571,7 +573,7 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
                 case /* map<string, protos.PipelineInfo> pipelines */ 3:
                     this.binaryReadMap3(message.pipelines, reader, options);
                     break;
-                case /* map<string, protos.GetAllResponseAudiences> config */ 4:
+                case /* map<string, protos.GetAllResponsePipelines> config */ 4:
                     this.binaryReadMap4(message.config, reader, options);
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
@@ -616,12 +618,12 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = GetAllResponseAudiences.internalBinaryRead(reader, reader.uint32(), options);
+                    val = GetAllResponsePipelines.internalBinaryRead(reader, reader.uint32(), options);
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.config");
             }
         }
-        map[key ?? ""] = val ?? GetAllResponseAudiences.create();
+        map[key ?? ""] = val ?? GetAllResponsePipelines.create();
     }
     internalBinaryWrite(message: GetAllResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* repeated protos.LiveInfo live = 1; */
@@ -637,11 +639,11 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
             PipelineInfo.internalBinaryWrite(message.pipelines[k], writer, options);
             writer.join().join();
         }
-        /* map<string, protos.GetAllResponseAudiences> config = 4; */
+        /* map<string, protos.GetAllResponsePipelines> config = 4; */
         for (let k of Object.keys(message.config)) {
             writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
-            GetAllResponseAudiences.internalBinaryWrite(message.config[k], writer, options);
+            GetAllResponsePipelines.internalBinaryWrite(message.config[k], writer, options);
             writer.join().join();
         }
         /* int64 generated_at_unix_ts_ns_utc = 100; */
@@ -661,26 +663,26 @@ class GetAllResponse$Type extends MessageType<GetAllResponse> {
  */
 export const GetAllResponse = new GetAllResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetAllResponseAudiences$Type extends MessageType<GetAllResponseAudiences> {
+class GetAllResponsePipelines$Type extends MessageType<GetAllResponsePipelines> {
     constructor() {
-        super("protos.GetAllResponseAudiences", [
-            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+        super("protos.GetAllResponsePipelines", [
+            { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
-    create(value?: PartialMessage<GetAllResponseAudiences>): GetAllResponseAudiences {
-        const message = { audiences: [] };
+    create(value?: PartialMessage<GetAllResponsePipelines>): GetAllResponsePipelines {
+        const message = { pipelineIds: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<GetAllResponseAudiences>(this, message, value);
+            reflectionMergePartial<GetAllResponsePipelines>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponseAudiences): GetAllResponseAudiences {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponsePipelines): GetAllResponsePipelines {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.Audience audiences */ 1:
-                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated string pipeline_ids */ 1:
+                    message.pipelineIds.push(reader.string());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -693,10 +695,10 @@ class GetAllResponseAudiences$Type extends MessageType<GetAllResponseAudiences> 
         }
         return message;
     }
-    internalBinaryWrite(message: GetAllResponseAudiences, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated protos.Audience audiences = 1; */
-        for (let i = 0; i < message.audiences.length; i++)
-            Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+    internalBinaryWrite(message: GetAllResponsePipelines, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated string pipeline_ids = 1; */
+        for (let i = 0; i < message.pipelineIds.length; i++)
+            writer.tag(1, WireType.LengthDelimited).string(message.pipelineIds[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -704,9 +706,9 @@ class GetAllResponseAudiences$Type extends MessageType<GetAllResponseAudiences> 
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAllResponseAudiences
+ * @generated MessageType for protobuf message protos.GetAllResponsePipelines
  */
-export const GetAllResponseAudiences = new GetAllResponseAudiences$Type();
+export const GetAllResponsePipelines = new GetAllResponsePipelines$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor() {
