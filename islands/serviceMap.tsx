@@ -37,7 +37,6 @@ import { ServerError } from "../components/error/server.tsx";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { showNav } from "./nav.tsx";
 
 const LAYOUT_KEY = "service-map-layout";
 
@@ -106,9 +105,10 @@ export const updateEdges = (
 };
 
 export default function ServiceMapComponent(
-  { initNodes, initEdges, success }: {
+  { initNodes, initEdges, blur = false, success }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
+    blur?: boolean;
     success?: SuccessType;
   },
 ) {
@@ -186,9 +186,10 @@ export default function ServiceMapComponent(
 
   return (
     <div
-      class={`w-full h-screen m-0 w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+      class={`w-full h-screen m-0 ${
+        blur ? "filter blur-sm" : ""
+      } w-[calc(100vw-${OP_MODAL_WIDTH})]`}
       ref={wrapper}
-      onClick={() => showNav.value = false}
     >
       {serverErrorSignal.value
         ? <ServerError message={serverErrorSignal.value} />
