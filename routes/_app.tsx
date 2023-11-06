@@ -6,7 +6,6 @@ export default async function App(
   req: Request,
   ctx: AppContext,
 ) {
-  console.log("shit", SENTRY_KEY);
   return (
     <html lang="en">
       <Head>
@@ -47,16 +46,16 @@ export default async function App(
         <link rel="icon" type="image/png" href="/images/favicon.png" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;500&display=swap"
+          href="/fonts/fonts.css?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;500&display=swap"
         />
         <link
           rel="stylesheet"
-          href="https://esm.sh/v132/reactflow@11.8.2/dist/base.css"
+          href="/vendor/reactflow@11.8.2.base.css"
         />
         <link rel="stylesheet" type="text/css" href="/style.css" />
         <link
           rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/base16/dark-violet.min.css"
+          href="/vendor/highlight.js@11.8.0.dark-violet.min.css"
         />
         {DEMO && SENTRY_KEY &&
           (

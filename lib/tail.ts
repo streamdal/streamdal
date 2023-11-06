@@ -4,10 +4,11 @@ import {
   TailRequestType,
   TailResponse,
 } from "streamdal-protos/protos/sp_common.ts";
+import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
 
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
-import { GRPC_TOKEN, grpcToken } from "./configs.ts";
+import { GRPC_TOKEN } from "./configs.ts";
 import { tailSignal } from "../islands/tail.tsx";
 
 export const tailAbortSignal = signal<boolean>(false);
@@ -20,6 +21,21 @@ export const parseDate = (timestampNs: string) => {
   }
   return null;
 };
+
+export const parseData = (data: string) => {
+  try {
+    const parsed = JSON.parse(data);
+    return JSON.stringify(parsed, null, 2);
+  } catch (e) {
+    console.debug("Error parsing tail data, returning raw data instead");
+  }
+  return data;
+};
+
+export const highlightData = (data: string) =>
+  hljs.highlightAuto(parseData(data)).value;
+
+export const formatData = (data: string) => highlightData(parseData(data));
 
 //
 // sampling is a value in seconds
@@ -35,7 +51,7 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
     socket.send(
       JSON.stringify({
         timestamp: parseDate(response.timestampNs),
-        data: new TextDecoder().decode(data),
+        data: formatData(new TextDecoder().decode(data)),
       }),
     );
   };
