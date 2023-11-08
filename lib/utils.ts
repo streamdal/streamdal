@@ -1,5 +1,7 @@
 import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { ConfigType, PipelinesType } from "./fetch.ts";
+import { PipelinesType } from "./fetch.ts";
+import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 
 export type AudienceParams = {
   service: string;
@@ -63,8 +65,6 @@ export const formatNumber = (number?: number | bigint) =>
 export const isNumeric = (num: any) =>
   (typeof num === "number" || (typeof num === "string" && num.trim() !== "")) &&
   !isNaN(num as number);
-
-export const removeWhitespace = (s: string) => s.replace(/ /g, "");
 
 export const logFormData = (data: FormData) => {
   for (const pair of data) {
@@ -193,24 +193,17 @@ export const setServiceGroup = (
   audiences.filter((a) => a.serviceName === serviceName)
     .map((x) => setHighlightedEdges(x, highlight));
 
-export const getAttachedPipeline = (
+export const getAttachedPipelines = (
   audience: Audience,
   pipelines: PipelinesType,
-  config: ConfigType,
-) => {
-  return pipelines[config[audienceKey(audience)]]?.pipeline;
-};
+): Pipeline[] =>
+  Object.values(pipelines)?.filter((p: PipelineInfo) =>
+    p.pipeline &&
+    p.audiences.some((a: Audience) => audienceKey(a) === audienceKey(audience))
+  ).map((p: PipelineInfo) => p.pipeline!);
 
 export const bigIntStringify = (obj: any) =>
   JSON.stringify(obj, (_, v) => typeof v === "bigint" ? v.toString() : v);
-
-export const addClass = (id: string, item: string) => {
-  return document.getElementById(id)?.classList.add(item);
-};
-
-export const removeClass = (id: string, item: string) => {
-  return document.getElementById(id)?.classList.remove(item);
-};
 
 export const longDateFormat = {
   year: "numeric" as const,

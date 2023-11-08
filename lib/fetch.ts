@@ -36,18 +36,6 @@ export const getPipeline = async (pipelineId: string) => {
   return response?.pipeline;
 };
 
-export const getAttachedPipeline = async (name: string) => {
-  const { response } = await client.getAll({}, meta);
-  const attachedPipelineName = Object.keys(response.pipelines).find((
-    pipeline,
-  ) =>
-    response.pipelines[pipeline].audiences.find((audience: Audience) =>
-      audience.operationName === name
-    )
-  );
-  return attachedPipelineName;
-};
-
 export const getNotifications = async () => {
   const { response } = await client.getNotifications({}, meta);
 

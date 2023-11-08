@@ -1,32 +1,12 @@
 import { Handlers } from "$fresh/src/server/types.ts";
-import {
-  getAttachedPipeline,
-  getAudienceFromParams,
-} from "../../../../../../../../lib/utils.ts";
-import {
-  deleteAudience,
-  detachPipeline,
-} from "../../../../../../../../lib/mutation.ts";
+import { getAudienceFromParams } from "root/lib/utils.ts";
+import { deleteAudience } from "root/lib/mutation.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { serviceSignal } from "../../../../../../../../components/serviceMap/serviceSignal.ts";
 
 export const handler: Handlers<> = {
   async POST(req, ctx) {
     const audience = getAudienceFromParams(ctx.params);
-    const pipelines = serviceSignal.value.pipelines;
-    const config = serviceSignal.value.config;
-    const attachedPipeline = await getAttachedPipeline(
-      audience,
-      pipelines,
-      config,
-    );
-    let response;
-    if (attachedPipeline) {
-      response = await detachPipeline(attachedPipeline.id, audience);
-    }
-    if (!attachedPipeline || response?.code === ResponseCode.OK) {
-      response = await deleteAudience(audience, true);
-    }
+    const response = await deleteAudience(audience, true);
 
     return new Response(
       JSON.stringify({

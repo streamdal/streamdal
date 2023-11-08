@@ -7,6 +7,7 @@ import PipelineDetail, { newPipeline } from "./pipeline.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { Sockets } from "./sockets.tsx";
 
 const Pipelines = (
   { id, pipelines, success, add = false }: {

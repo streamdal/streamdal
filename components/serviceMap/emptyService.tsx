@@ -6,7 +6,7 @@ export const EmptyService = () => (
     <a
       target="_new"
       class="ml-1 text-underline unerline-offset-2 cursor-pointer"
-      href="https://github.com/streamdal/streamdal"
+      href="https://github.com/streamdal/streamdal#instrument"
     >
       here
     </a>.

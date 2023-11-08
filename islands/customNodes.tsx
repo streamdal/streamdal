@@ -189,7 +189,6 @@ export const OperationNode = (
           opModal.value = {
             audience: operation.audience,
             displayType: "operation",
-            attachedPipeline: operation.attachedPipeline,
             clients: operation.clients,
           }}
       >
@@ -218,7 +217,6 @@ export const OperationNode = (
           opModal.value = {
             audience: operation.audience,
             displayType: "operation",
-            attachedPipeline: operation.attachedPipeline,
             clients: operation.clients,
             delete: true,
           };

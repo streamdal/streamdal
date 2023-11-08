@@ -5,12 +5,11 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 export type OpModalType = {
   audience: Audience;
   displayType: string;
-  attachedPipeline?: Pipeline & { paused?: boolean };
   clients: number;
-  pause?: boolean;
-  resume?: boolean;
-  detach?: boolean;
-  delete?: boolean;
+  pausePipeline?: Pipeline | null;
+  resumePipeline?: Pipeline | null;
+  detachPipeline?: Pipeline | null;
+  deletePipeline?: Pipeline | null;
   schemaModal?: boolean;
   deleteService?: boolean;
 };
@@ -20,8 +19,7 @@ export const OP_MODAL_KEY = "OP_MODAL_VALUE";
 export const deserializeOp = () => {
   try {
     const savedOperation = localStorage.getItem(OP_MODAL_KEY);
-    const parsedOperation = JSON.parse(savedOperation!);
-    return parsedOperation;
+    return JSON.parse(savedOperation!);
   } catch (e) {
     console.error("failed to deserialize and parse saved audience", e);
   }

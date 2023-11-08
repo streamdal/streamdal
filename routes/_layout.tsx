@@ -9,6 +9,7 @@ import { GRPC_TOKEN } from "../lib/configs.ts";
 import { CustomError } from "../components/error/custom.tsx";
 import { Partial } from "$fresh/runtime.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
+import { Sockets } from "../islands/sockets.tsx";
 
 const tokenError = () => (
   <CustomError
@@ -42,6 +43,7 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
 
   return (
     <>
+      <Sockets />
       <NavBar />
       {!req.url.includes("/email") && (
         <InfoDrawer serviceMap={serviceSignal.value} />

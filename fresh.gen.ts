@@ -41,6 +41,7 @@ import * as $$9 from "./islands/notifications.tsx";
 import * as $$10 from "./islands/pipeline.tsx";
 import * as $$11 from "./islands/pipelines.tsx";
 import * as $$12 from "./islands/serviceMap.tsx";
+import * as $$13 from "./islands/sockets.tsx";
 
 const manifest = {
   routes: {
@@ -91,6 +92,7 @@ const manifest = {
     "./islands/pipeline.tsx": $$10,
     "./islands/pipelines.tsx": $$11,
     "./islands/serviceMap.tsx": $$12,
+    "./islands/sockets.tsx": $$13,
   },
   baseUrl: import.meta.url,
 };

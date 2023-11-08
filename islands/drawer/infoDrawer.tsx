@@ -11,9 +11,8 @@ import { DeleteOperationModal } from "../../components/modals/deleteOperationMod
 import { SchemaModal } from "../../components/modals/schemaModal.tsx";
 import { DeleteServiceModal } from "../../components/modals/deleteServiceModal.tsx";
 import { Tail, tailEnabledSignal } from "./tail.tsx";
-import { useEffect } from "preact/hooks";
-import { initFlowbite } from "flowbite";
 import { ResumePipelineModal } from "../../components/modals/resumePipelineModal.tsx";
+import { AttachPipelineModal } from "../../components/modals/attachPipelineModal.tsx";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -49,41 +48,23 @@ export const DrawerContents = (
 
 export const InfoDrawer = ({ serviceMap }: { serviceMap: ServiceSignal }) => {
   const audience = opModal.value?.audience;
-  const attachedPipeline = opModal.value?.attachedPipeline;
-
-  useEffect(() => {
-    //
-    // Flowbite breaks on audience change for some reason
-    initFlowbite();
-  }, [audience]);
 
   return (
     <>
       <Toast id="pipelineCrud" />
-      {opModal.value?.pause && (
-        <PausePipelineModal
-          audience={audience}
-          pipeline={attachedPipeline}
-        />
+      {opModal.value?.pausePipeline && (
+        <PausePipelineModal audience={audience} />
       )}
-      {opModal.value?.resume && (
-        <ResumePipelineModal
-          audience={audience}
-          pipeline={attachedPipeline}
-        />
+      {opModal.value?.resumePipeline && (
+        <ResumePipelineModal audience={audience} />
       )}
-      {opModal.value?.detach && (
-        <DetachPipelineModal
-          audience={audience}
-          pipeline={attachedPipeline}
-        />
+      {opModal.value?.detachPipeline && (
+        <DetachPipelineModal audience={audience} />
       )}
-      {opModal.value?.delete && (
-        <DeleteOperationModal
-          audience={audience}
-          pipeline={attachedPipeline || null}
-        />
+      {opModal.value?.attachPipeline && (
+        <AttachPipelineModal audience={audience} />
       )}
+      {opModal.value?.delete && <DeleteOperationModal audience={audience} />}
       {opModal.value?.schemaModal && <SchemaModal />}
       {opModal.value?.deleteService && (
         <DeleteServiceModal audience={audience} />

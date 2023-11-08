@@ -23,13 +23,9 @@ export const pausePipeline = (audience: Audience, pipeline: Pipeline) => {
   };
 };
 
-export const PausePipelineModal = (
-  { audience, pipeline }: {
-    audience: Audience;
-    pipeline: Pipeline;
-  },
-) => {
-  const close = () => opModal.value = { ...opModal.value, pause: false };
+export const PausePipelineModal = ({ audience }: { audience: Audience }) => {
+  const pipeline = opModal.value.pausePipeline;
+  const close = () => opModal.value = { ...opModal.value, pausePipeline: null };
 
   const pause = async () => {
     const response = await fetch(
@@ -49,7 +45,8 @@ export const PausePipelineModal = (
         message: success.message,
       };
     }
-    opModal.value = { ...opModal.value, pause: false };
+
+    close();
   };
 
   return (

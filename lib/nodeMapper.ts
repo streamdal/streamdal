@@ -1,22 +1,12 @@
 import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
-import {
-  audienceKey,
-  componentKey,
-  getAttachedPipeline,
-  groupKey,
-  operationKey,
-  serviceKey,
-} from "./utils.ts";
-import { OpUpdate } from "../islands/serviceMap.tsx";
+import { audienceKey, componentKey, groupKey, serviceKey } from "./utils.ts";
 import { ServiceMapper } from "./serviceMapper.ts";
 import { GROUP_MARGIN, GROUP_WIDTH } from "../islands/customNodes.tsx";
 import { MarkerType } from "reactflow";
 
 export type Operation = {
   audience: Audience;
-  attachedPipeline?: Pipeline;
   clients?: ClientInfo[];
 };
 
@@ -125,11 +115,6 @@ export const mapOperation = (
         ops: [...node.data.ops!, {
           audience: a,
           clients: serviceMap.liveAudiences.get(audienceKey(a)),
-          attachedPipeline: getAttachedPipeline(
-            a,
-            serviceMap.pipelines,
-            serviceMap.config,
-          ),
         }] as Operation[],
       },
     });
@@ -152,11 +137,6 @@ export const mapOperation = (
         ops: [{
           audience: a,
           clients: serviceMap.liveAudiences.get(audienceKey(a)),
-          attachedPipeline: getAttachedPipeline(
-            a,
-            serviceMap.pipelines,
-            serviceMap.config,
-          ),
         }],
         serviceMap,
       },
@@ -287,27 +267,4 @@ export const mapEdges = (audiences: Audience[]): Map<string, FlowEdge> => {
   const edgesMap = new Map<string, FlowEdge>();
   audiences.forEach((a: Audience) => mapEdgePair(edgesMap, a, audiences));
   return edgesMap;
-};
-
-//
-// Because reactflow doesn't work with ssr, some updates are made in
-// unrouted modals client-side and those changes need to be reflected
-// in the already rendered nodes
-export const updateNode = (nodes: FlowNode[], update: OpUpdate) => {
-  return nodes.map((n: FlowNode) =>
-    n.id ===
-        groupKey(update.audience)
-      ? {
-        ...n,
-        data: {
-          ...n.data,
-          ops: n.data?.ops?.map((o) =>
-            operationKey(o.audience) === operationKey(update.audience)
-              ? { ...o, attachedPipeline: update.attachedPipeline }
-              : o
-          ),
-        },
-      }
-      : n
-  );
 };

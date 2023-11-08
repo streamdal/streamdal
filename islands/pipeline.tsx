@@ -32,6 +32,7 @@ import {
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
+import { useEffect } from "preact/hooks";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -209,14 +210,19 @@ const PipelineDetail = (
   // properly type this since it doesn't support useState<type>
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState({
-    ...pipeline,
-    steps: pipeline.steps.map((s: PipelineStep, i) => ({
-      ...s,
-      dragId: crypto.randomUUID(),
-      dragOrder: i,
-    })),
-  });
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    initFlowbite();
+    setData({
+      ...pipeline,
+      steps: pipeline.steps.map((s: PipelineStep, i) => ({
+        ...s,
+        dragId: crypto.randomUUID(),
+        dragOrder: i,
+      })),
+    });
+  }, [pipeline]);
 
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);

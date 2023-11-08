@@ -14,26 +14,22 @@ import { useSignalEffect } from "@preact/signals";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { OperationActionMenu } from "../../components/operation/operationActionMenu.tsx";
-import IconLink from "tabler-icons/tsx/link.tsx";
-import { OddAttachModal } from "../../components/modals/oddAttachModal.tsx";
+import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Toggle } from "../../components/form/switch.tsx";
 import { Schema } from "./schema.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
+import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
 ) {
-  const [attachSelectionOpen, setAttachSelectionOpen] = useState(false);
+  const [managePipelines, setManagePipelines] = useState(false);
   const [tailNavOpen, setTailNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(true);
-
-  const handleAttachOpen = () => {
-    setAttachSelectionOpen(!attachSelectionOpen);
-  };
+  const pipelines = Object.values(serviceMap?.pipelines);
 
   const audience = opModal.value?.audience;
-  const attachedPipeline = opModal.value?.attachedPipeline;
   const clients = opModal.value?.clients;
 
   useSignalEffect(() => {
@@ -63,7 +59,7 @@ export default function Operation(
           </h3>
           <BetaTag class={"ml-2"} />
         </div>
-        {!Object.values(serviceMap?.pipelines)?.length
+        {!pipelines?.length
           ? (
             <a href={"/pipelines"}>
               <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">
@@ -72,40 +68,34 @@ export default function Operation(
               </button>
             </a>
           )
-          : attachedPipeline
-          ? (
-            <div
-              className={`flex justify-between items-center text-web bg-purple-50 border border-purple-600 font-medium rounded-md w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600`}
-            >
-              {attachedPipeline?.name}
-              <OperationActionMenu
-                audience={audience}
-                attachedPipeline={attachedPipeline}
-              />
-            </div>
-          )
           : (
             <button
               id="attach-pipeline"
               className="text-web font-semibold bg-purple-50 border border-purple-600 hover:border-[#8E84AD] font-medium rounded-md w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
               type="button"
-              onClick={() => handleAttachOpen()}
+              onClick={() => setManagePipelines(!managePipelines)}
             >
-              Attach a pipeline
-              <IconLink class="w-4" data-tooltip-target="pipeline-attach" />
+              Attach/Detach Pipelines
+              {managePipelines
+                ? (
+                  <IconChevronUp
+                    class="w-4"
+                    data-tooltip-target="pipeline-manage"
+                  />
+                )
+                : (
+                  <IconChevronDown
+                    class="w-4"
+                    data-tooltip-target="pipeline-manage"
+                  />
+                )}
               <Tooltip
-                targetId="pipeline-attach"
-                message={"Attach pipeline"}
+                targetId="pipeline-manage"
+                message={"Attach/detach and pause/unpause pipelines"}
               />
             </button>
           )}
-        {attachSelectionOpen && (
-          <OddAttachModal
-            serviceMap={serviceMap}
-            setAttachSelectionOpen={setAttachSelectionOpen}
-            attachSelectionOpen={attachSelectionOpen}
-          />
-        )}
+        {managePipelines && <ManageOpPipelines pipelines={pipelines} />}
       </div>
       <div
         id="pipeline-attach-detach"

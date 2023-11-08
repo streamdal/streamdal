@@ -1,38 +1,38 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
+import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { serviceSignal } from "../serviceMap/serviceSignal.ts";
 
-export const detachPipeline = (audience: Audience, pipeline: Pipeline) => {
+export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
   serviceSignal.value = {
     ...serviceSignal.value,
     pipelines: {
       ...serviceSignal.value.pipelines,
       [pipeline.id]: {
         ...serviceSignal.value.pipelines[pipeline.id],
-        audiences: serviceSignal.value.pipelines[pipeline.id]?.audiences
-          ?.filter((
-            a: Audience,
-          ) => audienceKey(a) !== audienceKey(audience)),
+        audiences: [
+          ...serviceSignal.value.pipelines[pipeline.id].audiences,
+          ...[audience],
+        ],
       },
     },
   };
 };
 
-export const DetachPipelineModal = (
+export const AttachPipelineModal = (
   { audience }: { audience: Audience },
 ) => {
-  const pipeline = opModal.value.detachPipeline;
+  const pipeline = opModal.value.attachPipeline;
   const close = () =>
-    opModal.value = { ...opModal.value, detachPipeline: null };
+    opModal.value = { ...opModal.value, attachPipeline: null };
 
-  const detach = async () => {
+  const attach = async () => {
     const response = await fetch(
-      `${getAudienceOpRoute(audience)}/pipeline/${pipeline.id}/detach`,
+      `${getAudienceOpRoute(audience)}/pipeline/${pipeline.id}/attach`,
       {
         method: "POST",
       },
@@ -41,7 +41,7 @@ export const DetachPipelineModal = (
     const { success } = await response.json();
 
     if (success.message) {
-      detachPipeline(audience, pipeline);
+      attachPipeline(audience, pipeline);
       toastSignal.value = {
         id: "pipelineCrud",
         type: success.status ? "success" : "error",
@@ -66,7 +66,7 @@ export const DetachPipelineModal = (
           <div class="p-6 text-center">
             <IconUnlink class="w-10 h-10 mt-3 mx-auto text-burnt" />
             <div class="my-4">
-              Detach pipeline{" "}
+              Attach pipeline{" "}
               <span class="my-5 text-medium font-bold ">
                 {pipeline.name}
               </span>{" "}
@@ -85,9 +85,9 @@ export const DetachPipelineModal = (
             <button
               class="btn-heimdal"
               type="submit"
-              onClick={detach}
+              onClick={attach}
             >
-              Detach
+              Attach
             </button>
           </div>
         </div>

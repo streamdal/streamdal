@@ -12,12 +12,12 @@ import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.ts
 
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
-  url.protocol = url.protocol.replace("http", "ws");
-  return new WebSocket(url);
+  return new WebSocket(`ws://${url.host}${path}`);
 };
 
 export const serviceMapSocket = (path: string) => {
   const webSocket = getSocket(path);
+
   webSocket.addEventListener("open", () => {
     webSocket.send("ping");
   });

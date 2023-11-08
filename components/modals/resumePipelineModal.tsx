@@ -22,13 +22,10 @@ export const resumePipeline = (audience: Audience, pipeline: Pipeline) => {
   };
 };
 
-export const ResumePipelineModal = (
-  { audience, pipeline }: {
-    audience: Audience;
-    pipeline: Pipeline;
-  },
-) => {
-  const close = () => opModal.value = { ...opModal.value, resume: false };
+export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
+  const pipeline = opModal.value.resumePipeline;
+  const close = () =>
+    opModal.value = { ...opModal.value, resumePipeline: null };
 
   const resume = async () => {
     const response = await fetch(
@@ -48,7 +45,8 @@ export const ResumePipelineModal = (
         message: success.message,
       };
     }
-    opModal.value = { ...opModal.value, resume: false };
+
+    close();
   };
 
   return (
