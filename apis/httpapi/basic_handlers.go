@@ -20,8 +20,10 @@ func (a *HTTPAPI) healthCheckHandler(wr http.ResponseWriter, r *http.Request) {
 }
 
 func (a *HTTPAPI) versionHandler(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	rw.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 	rw.WriteHeader(http.StatusOK)
 
-	Write(rw, http.StatusOK, "streamdal/server "+a.Options.Version)
+	if _, err := rw.Write([]byte(a.Options.Version)); err != nil {
+		a.log.Errorf("unable to write response in versionHandler: %s", err)
+	}
 }
