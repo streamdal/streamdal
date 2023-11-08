@@ -48,7 +48,7 @@ run/dev:
     docker rm -f "/streamdal-envoy" || true && \
 	docker-compose -f docker-compose.dev.yaml pull --quiet && \
 	docker-compose -f docker-compose.dev.yaml up --always-recreate-deps --force-recreate -d
-	@bash $(VERSION_SCRIPT)
+#	@bash $(VERSION_SCRIPT)
 
 .PHONY: run/dev/build
 run/dev/build: description = Build streamdal/server img and run it + all its deps
