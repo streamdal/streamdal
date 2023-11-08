@@ -906,7 +906,7 @@ func (s *Store) GetAudiencesByService(ctx context.Context, serviceName string) (
 }
 
 func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error) {
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisPausedPrefix).Result()
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisPausedPrefix+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching paused keys from store")
 	}
@@ -920,7 +920,7 @@ func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, e
 			PipelineID: "",
 		}
 
-		parts := strings.SplitN(strings.Trim(RedisPausedPrefix+":", key), ":", 2)
+		parts := strings.SplitN(strings.TrimPrefix(key, RedisPausedPrefix+":"), ":", 2)
 		if len(parts) != 2 {
 			return nil, errors.Errorf("invalid paused key '%s' (incorrect number of parts '%d')", key, len(parts))
 		}
