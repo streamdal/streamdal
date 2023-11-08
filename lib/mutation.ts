@@ -14,6 +14,7 @@ import {
   DeleteServiceRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
+  ResumePipelineRequest,
 } from "streamdal-protos/protos/sp_external.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
@@ -140,6 +141,29 @@ export const pausePipeline = async (
     console.error("error pausing pipeline", error);
     return {
       id: "pausePipelineRequest",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const resumePipeline = async (
+  pipelineId: string,
+  audience: Audience,
+) => {
+  try {
+    const request = ResumePipelineRequest.create({ audience, pipelineId });
+
+    const { response } = await client.resumePipeline(
+      request,
+      meta,
+    );
+
+    return response;
+  } catch (error) {
+    console.error("error resuming pipeline", error);
+    return {
+      id: "resumePipelineRequest",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };

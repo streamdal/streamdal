@@ -21,12 +21,13 @@ import * as $15 from "./routes/service/[service]/component/[component]/[operatio
 import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
 import * as $17 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
 import * as $18 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $19 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
-import * as $20 from "./routes/service/[service]/delete.tsx";
-import * as $21 from "./routes/ws/audience-metrics.tsx";
-import * as $22 from "./routes/ws/server-error.tsx";
-import * as $23 from "./routes/ws/service-map.tsx";
-import * as $24 from "./routes/ws/tail.tsx";
+import * as $19 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx";
+import * as $20 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
+import * as $21 from "./routes/service/[service]/delete.tsx";
+import * as $22 from "./routes/ws/audience-metrics.tsx";
+import * as $23 from "./routes/ws/server-error.tsx";
+import * as $24 from "./routes/ws/service-map.tsx";
+import * as $25 from "./routes/ws/tail.tsx";
 import * as $$0 from "./islands/customNodes.tsx";
 import * as $$1 from "./islands/drawer/component.tsx";
 import * as $$2 from "./islands/drawer/infoDrawer.tsx";
@@ -66,13 +67,15 @@ const manifest = {
       $17,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
       $18,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx":
       $19,
-    "./routes/service/[service]/delete.tsx": $20,
-    "./routes/ws/audience-metrics.tsx": $21,
-    "./routes/ws/server-error.tsx": $22,
-    "./routes/ws/service-map.tsx": $23,
-    "./routes/ws/tail.tsx": $24,
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
+      $20,
+    "./routes/service/[service]/delete.tsx": $21,
+    "./routes/ws/audience-metrics.tsx": $22,
+    "./routes/ws/server-error.tsx": $23,
+    "./routes/ws/service-map.tsx": $24,
+    "./routes/ws/tail.tsx": $25,
   },
   islands: {
     "./islands/customNodes.tsx": $$0,

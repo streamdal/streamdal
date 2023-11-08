@@ -78,7 +78,10 @@ export default function Operation(
               className={`flex justify-between items-center text-web bg-purple-50 border border-purple-600 font-medium rounded-md w-full text-sm px-2 text-xs py-1 focus:ring-1 focus:outline-none focus:ring-purple-600`}
             >
               {attachedPipeline?.name}
-              <OperationActionMenu />
+              <OperationActionMenu
+                audience={audience}
+                attachedPipeline={attachedPipeline}
+              />
             </div>
           )
           : (

@@ -13,6 +13,7 @@ import { DeleteServiceModal } from "../../components/modals/deleteServiceModal.t
 import { Tail, tailEnabledSignal } from "./tail.tsx";
 import { useEffect } from "preact/hooks";
 import { initFlowbite } from "flowbite";
+import { ResumePipelineModal } from "../../components/modals/resumePipelineModal.tsx";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -61,6 +62,12 @@ export const InfoDrawer = ({ serviceMap }: { serviceMap: ServiceSignal }) => {
       <Toast id="pipelineCrud" />
       {opModal.value?.pause && (
         <PausePipelineModal
+          audience={audience}
+          pipeline={attachedPipeline}
+        />
+      )}
+      {opModal.value?.resume && (
+        <ResumePipelineModal
           audience={audience}
           pipeline={attachedPipeline}
         />

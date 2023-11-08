@@ -8,6 +8,7 @@ export type OpModalType = {
   attachedPipeline?: Pipeline & { paused?: boolean };
   clients: number;
   pause?: boolean;
+  resume?: boolean;
   detach?: boolean;
   delete?: boolean;
   schemaModal?: boolean;

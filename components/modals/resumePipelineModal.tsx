@@ -1,39 +1,38 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { getAudienceOpRoute } from "../../lib/utils.ts";
+import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { serviceSignal } from "../serviceMap/serviceSignal.ts";
 
-export const pausePipeline = (audience: Audience, pipeline: Pipeline) => {
+export const resumePipeline = (audience: Audience, pipeline: Pipeline) => {
   serviceSignal.value = {
     ...serviceSignal.value,
     pipelines: {
       ...serviceSignal.value.pipelines,
       [pipeline.id]: {
         ...serviceSignal.value.pipelines[pipeline.id],
-        paused: [
-          ...serviceSignal.value.pipelines[pipeline.id].paused,
-          ...[audience],
-        ],
+        paused: serviceSignal.value.pipelines[pipeline.id]?.paused?.filter((
+          a: Audience,
+        ) => audienceKey(a) !== audienceKey(audience)),
       },
     },
   };
 };
 
-export const PausePipelineModal = (
+export const ResumePipelineModal = (
   { audience, pipeline }: {
     audience: Audience;
     pipeline: Pipeline;
   },
 ) => {
-  const close = () => opModal.value = { ...opModal.value, pause: false };
+  const close = () => opModal.value = { ...opModal.value, resume: false };
 
-  const pause = async () => {
+  const resume = async () => {
     const response = await fetch(
-      `${getAudienceOpRoute(audience)}/pipeline/${pipeline.id}/pause`,
+      `${getAudienceOpRoute(audience)}/pipeline/${pipeline.id}/resume`,
       {
         method: "POST",
       },
@@ -42,14 +41,14 @@ export const PausePipelineModal = (
     const { success } = await response.json();
 
     if (success.message) {
-      pausePipeline(audience, pipeline);
+      resumePipeline(audience, pipeline);
       toastSignal.value = {
         id: "pipelineCrud",
         type: success.status ? "success" : "error",
         message: success.message,
       };
     }
-    opModal.value = { ...opModal.value, pause: false };
+    opModal.value = { ...opModal.value, resume: false };
   };
 
   return (
@@ -66,7 +65,7 @@ export const PausePipelineModal = (
           <div class="p-6 text-center">
             <IconPlayerPause class="w-10 h-10 mt-3 mx-auto text-burnt" />
             <div class="my-4">
-              Pause pipeline{" "}
+              Resume pipeline{" "}
               <span class="my-5 text-medium font-bold ">
                 {pipeline.name}
               </span>{" "}
@@ -85,9 +84,9 @@ export const PausePipelineModal = (
             <button
               class="btn-heimdal"
               type="submit"
-              onClick={pause}
+              onClick={resume}
             >
-              Pause
+              Resume
             </button>
           </div>
         </div>
