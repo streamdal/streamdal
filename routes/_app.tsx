@@ -43,7 +43,8 @@ export default async function App(
               />
             </>
           )}
-        <link rel="icon" type="image/png" href="/images/favicon.png" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/images/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/images/favicon-light.svg" media="(prefers-color-scheme: light)" />
         <link
           rel="stylesheet"
           href="/fonts/fonts.css?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;500&display=swap"
