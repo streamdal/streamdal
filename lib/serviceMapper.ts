@@ -1,14 +1,9 @@
 import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
 import { FlowEdge, FlowNode, mapEdges, mapNodes } from "./nodeMapper.ts";
-import {
-  ClientInfo,
-  LiveInfo,
-  PipelineInfo,
-} from "streamdal-protos/protos/sp_info.ts";
+import { ClientInfo, LiveInfo } from "streamdal-protos/protos/sp_info.ts";
 import { audienceKey } from "./utils.ts";
 
 export type ServiceMapper = GetAllResponse & {
-  pipes: PipelineInfo[];
   liveAudiences: Map<string, ClientInfo[]>;
 };
 
@@ -38,7 +33,6 @@ export const mapServiceResponse = (
   response: GetAllResponse,
 ): ServiceMapper => ({
   ...response,
-  pipes: Object.values(response?.pipelines),
   liveAudiences: mapLiveAudiences(response.live),
 });
 

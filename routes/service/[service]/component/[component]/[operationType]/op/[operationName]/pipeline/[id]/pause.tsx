@@ -1,11 +1,11 @@
 import { Handlers } from "$fresh/src/server/types.ts";
-import { SuccessType } from "../../../../../../../../../_middleware.ts";
+import { SuccessType } from "root/routes/_middleware.ts";
 import {
   OperationType,
   ResponseCode,
 } from "streamdal-protos/protos/sp_common.ts";
 import { HandlerContext } from "$fresh/server.ts";
-import { pausePipeline } from "../../../../../../../../../../lib/fetch.ts";
+import { pausePipeline } from "root/lib/mutation.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, { params }: HandlerContext) {

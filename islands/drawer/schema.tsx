@@ -1,11 +1,32 @@
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
-import { Tooltip } from "../tooltip/tooltip.tsx";
-import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
-import { opModal } from "../serviceMap/opModalSignal.ts";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import { getAudienceOpRoute } from "../../lib/utils.ts";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
+import { useEffect } from "preact/hooks";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 
 export const Schema = (
-  { setSchemaModalOpen }: { setSchemaModalOpen: () => void },
+  { audience }: { audience: Audience },
 ) => {
+  const getSchema = async () => {
+    const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
+      method: "GET",
+    });
+    return response.json();
+  };
+
+  useEffect(async () => {
+    try {
+      const schemaInfo = await getSchema();
+      opModal.value = {
+        ...opModal.value,
+        schemaInfo,
+      };
+    } catch (e) {
+      console.error("Error fetching schema", e);
+    }
+  }, [audience]);
+
   return (
     <>
       <div
@@ -42,7 +63,11 @@ export const Schema = (
         <div class={"w-full flex justify-end"}>
           <button
             className={"cursor-pointer"}
-            onClick={() => setSchemaModalOpen(true)}
+            onClick={() =>
+              opModal.value = {
+                ...opModal.value,
+                schemaModal: !opModal.value?.schemaModal,
+              }}
             data-tooltip-target="maximize"
           >
             <IconWindowMaximize class="w-5 h-5 text-white mx-1 my-1" />
@@ -57,8 +82,7 @@ export const Schema = (
             <div
                 class={"font-sm "}
                 dangerouslySetInnerHTML={{
-                    __html: opModal.value?.schemaInfo?.schema ?
-                        `${hljs.highlight(`${opModal.value?.schemaInfo?.schema}`, {language: 'json'}).value}` :
+                    __html: opModal.value?.schemaInfo?.schema ? opModal.value.schemaInfo?.schema:
                         ""
                 }}
             >

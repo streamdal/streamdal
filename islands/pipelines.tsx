@@ -6,7 +6,7 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import PipelineDetail, { newPipeline } from "./pipeline.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { OP_MODAL_WIDTH } from "./opModal.tsx";
+import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
 
 const Pipelines = (
   { id, pipelines, success, add = false }: {

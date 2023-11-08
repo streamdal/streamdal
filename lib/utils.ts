@@ -85,7 +85,7 @@ export const getAudienceFromParams = (params: AudienceParams) => {
   return {
     serviceName: params.service,
     componentName: params.component,
-    operationType: OperationType[params.operationType],
+    operationType: OperationType[params.operationType as any],
     operationName: params.operationName,
   };
 };
@@ -156,19 +156,21 @@ export const setOperationHoverGroup = (
 };
 
 export const setHighlightedEdges = (a: Audience, highlight: boolean) => {
-  const serviceEdge = document.querySelector(
+  const serviceEdge: any = document.querySelector(
     `[data-testid=rf__edge-${serviceKey(a)}-${groupKey(a)}-edge]`,
   );
-  const componentEdge = document.querySelector(
-    `[data-testid=rf__edge-${componentKey(a)}-${groupKey(a)}-edge]`,
-  );
 
-  if (componentEdge) {
+  const componentEdge: any = document
+    .querySelector(
+      `[data-testid=rf__edge-${componentKey(a)}-${groupKey(a)}-edge]`,
+    );
+
+  if (componentEdge?.children.length > 0) {
     componentEdge.children[0].style.stroke = `${
       highlight ? "#956CFF" : "#d2c1ff"
     }`;
   }
-  if (serviceEdge) {
+  if (serviceEdge?.children.length > 0) {
     serviceEdge.children[0].style.stroke = `${
       highlight ? "#956CFF" : "#d2c1ff"
     }`;
@@ -218,4 +220,13 @@ export const longDateFormat = {
   hour12: true,
   minute: "numeric" as const,
   fractionalSecondDigits: 3,
-} as DateTimeFormatOptions;
+};
+
+export const humanDateFormat = {
+  year: "numeric" as const,
+  month: "numeric" as const,
+  day: "numeric" as const,
+  hour: "numeric" as const,
+  hour12: true,
+  minute: "numeric" as const,
+};

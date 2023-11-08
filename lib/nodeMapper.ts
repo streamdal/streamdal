@@ -94,7 +94,7 @@ export const componentOffset = (
 ) => {
   let offset = 25;
   const keys = Array.from(item.keys());
-  for (const [k, v] of item) {
+  for (const [k] of item) {
     if (k === key) {
       return offset +
         ((keys.indexOf(k) + 1) * (GROUP_WIDTH + GROUP_MARGIN) / 2);

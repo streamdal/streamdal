@@ -4,10 +4,11 @@ import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { opUpdateSignal } from "../../islands/serviceMap.tsx";
+import { ServiceSignal } from "../serviceMap/serviceSignal.ts";
 
 export const OddAttachModal = (
   { serviceMap, setAttachSelectionOpen, attachSelectionOpen }: {
-    serviceMap: ServiceMap;
+    serviceMap: ServiceSignal;
     setAttachSelectOpen: () => void;
     attachSelectOpen: boolean;
   },
@@ -18,16 +19,14 @@ export const OddAttachModal = (
   const sortPipelines = (pipes: PipelineInfo[]) =>
     pipes?.sort((a, b) => a.pipeline.name.localeCompare(b.pipeline.name));
 
-  const sorted = attachedPipeline?.id
-    ? [
-      ...[serviceMap.pipes.find((p: PipelineInfo) =>
-        p.pipeline.id === attachedPipeline.id
-      )],
-      ...sortPipelines(serviceMap.pipes.filter((p: PipelineInfo) =>
+  const sorted = [
+    ...attachedPipeline?.id ? serviceMap.pipelines[attachedPipeline.id] : [],
+    ...sortPipelines(
+      Object.values(serviceMap?.pipelines)?.filter((p: PipelineInfo) =>
         p.pipeline.id !== attachedPipeline?.id
-      )),
-    ]
-    : sortPipelines(serviceMap.pipes);
+      ),
+    ),
+  ];
 
   const attachPipeline = async (e: any) => {
     const response = await fetch(

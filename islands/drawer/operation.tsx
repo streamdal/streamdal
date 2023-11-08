@@ -1,46 +1,61 @@
-import { BetaTag, ComingSoonTag } from "../components/icons/featureTags.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
-import IconLink from "tabler-icons/tsx/link.tsx";
-import { OddAttachModal } from "../components/modals/oddAttachModal.tsx";
-import { Toggle } from "../components/form/switch.tsx";
-import { OperationActionMenu } from "../components/operation/operationActionMenu.tsx";
+import { ConsumerIcon } from "../../components/icons/consumer.tsx";
+import { ProducerIcon } from "../../components/icons/producer.tsx";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { useState } from "preact/hooks";
 import {
   tailEnabledSignal,
   tailSamplingRateSignal,
   tailSamplingSignal,
+  tailSignal,
 } from "./tail.tsx";
-import { isNumeric } from "../lib/utils.ts";
-import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
-import { useState } from "preact/hooks";
-import { Schema } from "../components/operation/schema.tsx";
+import { isNumeric } from "../../lib/utils.ts";
+import { useSignalEffect } from "@preact/signals";
+import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
+import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
+import { OperationActionMenu } from "../../components/operation/operationActionMenu.tsx";
+import IconLink from "tabler-icons/tsx/link.tsx";
+import { OddAttachModal } from "../../components/modals/oddAttachModal.tsx";
+import { Toggle } from "../../components/form/switch.tsx";
+import { Schema } from "./schema.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 
-export const OperationOpModalInfo = (
-  {
-    serviceMap,
-    attachedPipeline,
-    setTailNavOpen,
-    tailNavOpen,
-    schemaModalOpen,
-    setSchemaModalOpen,
-    clients,
-  }: {
-    serviceMap: ServiceMapType;
-    attachedPipeline: Pipeline;
-    setTailNavOpen: () => void;
-    tailNavOpen: boolean;
-    schemaModalOpen: boolean;
-    setSchemaModalOpen: () => void;
-    clients: ClientInfo[];
-  },
-) => {
+export default function Operation(
+  { serviceMap }: { serviceMap: ServiceSignal },
+) {
   const [attachSelectionOpen, setAttachSelectionOpen] = useState(false);
+  const [tailNavOpen, setTailNavOpen] = useState(false);
+  const [schemaNavOpen, setSchemaNavOpen] = useState(true);
 
   const handleAttachOpen = () => {
     setAttachSelectionOpen(!attachSelectionOpen);
   };
 
+  const audience = opModal.value?.audience;
+  const attachedPipeline = opModal.value?.attachedPipeline;
+  const clients = opModal.value?.clients;
+
+  useSignalEffect(() => {
+    if (tailEnabledSignal.value === false) {
+      tailSignal.value = {};
+    }
+  });
+
   return (
     <>
+      <div class="rounded-t flex justify-between">
+        <div class="z-[20] flex items-center justify-start px-4 w-full h-16 bg-web">
+          {OperationType[audience?.operationType] === OperationType.CONSUMER
+            ? <ConsumerIcon />
+            : <ProducerIcon />}
+          <div class="flex flex-col">
+            <h3 class="text-lg text-cloud mx-2">
+              {opModal.value.audience.operationName}
+            </h3>
+          </div>
+        </div>
+      </div>
       <div class="px-4 py-4 rounded-md mx-2">
         <div class="mb-2 flex items-center pr-2">
           <h3 class="text-web font-bold text-sm">
@@ -48,7 +63,7 @@ export const OperationOpModalInfo = (
           </h3>
           <BetaTag class={"ml-2"} />
         </div>
-        {!serviceMap?.pipes.length
+        {!Object.values(serviceMap?.pipelines)?.length
           ? (
             <a href={"/pipelines"}>
               <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">
@@ -74,7 +89,11 @@ export const OperationOpModalInfo = (
               onClick={() => handleAttachOpen()}
             >
               Attach a pipeline
-              <IconLink class="w-4" />
+              <IconLink class="w-4" data-tooltip-target="pipeline-attach" />
+              <Tooltip
+                targetId="pipeline-attach"
+                message={"Attach pipeline"}
+              />
             </button>
           )}
         {attachSelectionOpen && (
@@ -115,7 +134,7 @@ export const OperationOpModalInfo = (
           <div class="text-cobweb font-medium text-xs my-3">
             {clients
               ? "View your pipeline data in realtime"
-              : "No attached client(s)"}
+              : "No attached clients"}
           </div>
           {clients && (
             <div class="flex flex-col">
@@ -166,7 +185,6 @@ export const OperationOpModalInfo = (
         </div>
         <h3 id="collapse-heading-3">
           <button
-            type="button"
             className="flex items-center border-b border-purple-100 w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
             data-accordion-target="#collapse-body-3"
             aria-expanded="false"
@@ -191,7 +209,6 @@ export const OperationOpModalInfo = (
         </div>
         <h3 id="collapse-heading-4">
           <button
-            type="button"
             className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
             data-accordion-target="#collapse-body-4"
             aria-expanded="false"
@@ -214,11 +231,8 @@ export const OperationOpModalInfo = (
         </div>
         <h3 id="collapse-heading-5">
           <button
-            type="button"
             className={`flex items-center w-full px-5 border-purple-100 py-3 font-medium text-left text-web`}
-            data-accordion-target="#collapse-body-5"
-            aria-expanded="true"
-            aria-controls="collapse-body-5"
+            onClick={() => setSchemaNavOpen(!schemaNavOpen)}
           >
             <h3
               className={"text-web text-sm font-semibold ml-3"}
@@ -228,14 +242,16 @@ export const OperationOpModalInfo = (
             <BetaTag class={"ml-2"} />
           </button>
         </h3>
-        <div
-          id="collapse-body-5"
-          aria-labelledby="collapse-heading-5"
-          class={"flex flex-col items-center justify-center p-4"}
-        >
-          <Schema setSchemaModalOpen={setSchemaModalOpen} />
-        </div>
+        {schemaNavOpen && (
+          <div
+            id="collapse-body-5"
+            aria-labelledby="collapse-heading-5"
+            class={"flex flex-col items-center justify-center p-4"}
+          >
+            <Schema audience={audience} />
+          </div>
+        )}
       </div>
     </>
   );
-};
+}

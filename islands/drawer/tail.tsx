@@ -1,5 +1,5 @@
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { OP_MODAL_WIDTH } from "./opModal.tsx";
+import { OP_MODAL_WIDTH } from "./infoDrawer.tsx";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
@@ -8,8 +8,8 @@ import IconX from "tabler-icons/tsx/x.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
 import { signal } from "@preact/signals";
-import { audienceKey, longDateFormat } from "../lib/utils.ts";
-import { tailSocket } from "../lib/sockets.ts";
+import { audienceKey, longDateFormat } from "../../lib/utils.ts";
+import { tailSocket } from "../../lib/sockets.ts";
 
 export const MAX_TAIL_SIZE = 100;
 

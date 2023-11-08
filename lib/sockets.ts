@@ -5,7 +5,7 @@ import {
   tailSamplingRateSignal,
   tailSamplingSignal,
   tailSignal,
-} from "../islands/tail.tsx";
+} from "../islands/drawer/tail.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "./utils.ts";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";

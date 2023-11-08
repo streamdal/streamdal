@@ -18,26 +18,28 @@ import * as $12 from "./routes/pipelines/add.tsx";
 import * as $13 from "./routes/pipelines/index.tsx";
 import * as $14 from "./routes/pipelines/save.tsx";
 import * as $15 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
-import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx";
-import * as $17 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
-import * as $18 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
-import * as $19 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $20 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
-import * as $21 from "./routes/service/[service]/delete.tsx";
-import * as $22 from "./routes/ws/audience-metrics.tsx";
-import * as $23 from "./routes/ws/server-error.tsx";
-import * as $24 from "./routes/ws/service-map.tsx";
-import * as $25 from "./routes/ws/tail.tsx";
+import * as $16 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
+import * as $17 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
+import * as $18 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
+import * as $19 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
+import * as $20 from "./routes/service/[service]/delete.tsx";
+import * as $21 from "./routes/ws/audience-metrics.tsx";
+import * as $22 from "./routes/ws/server-error.tsx";
+import * as $23 from "./routes/ws/service-map.tsx";
+import * as $24 from "./routes/ws/tail.tsx";
 import * as $$0 from "./islands/customNodes.tsx";
-import * as $$1 from "./islands/emailCollectionForm.tsx";
-import * as $$2 from "./islands/nav.tsx";
-import * as $$3 from "./islands/notifications.tsx";
-import * as $$4 from "./islands/opModal.tsx";
-import * as $$5 from "./islands/operationOpModal.tsx";
-import * as $$6 from "./islands/pipeline.tsx";
-import * as $$7 from "./islands/pipelines.tsx";
-import * as $$8 from "./islands/serviceMap.tsx";
-import * as $$9 from "./islands/tail.tsx";
+import * as $$1 from "./islands/drawer/component.tsx";
+import * as $$2 from "./islands/drawer/infoDrawer.tsx";
+import * as $$3 from "./islands/drawer/operation.tsx";
+import * as $$4 from "./islands/drawer/schema.tsx";
+import * as $$5 from "./islands/drawer/service.tsx";
+import * as $$6 from "./islands/drawer/tail.tsx";
+import * as $$7 from "./islands/emailCollectionForm.tsx";
+import * as $$8 from "./islands/nav.tsx";
+import * as $$9 from "./islands/notifications.tsx";
+import * as $$10 from "./islands/pipeline.tsx";
+import * as $$11 from "./islands/pipelines.tsx";
+import * as $$12 from "./islands/serviceMap.tsx";
 
 const manifest = {
   routes: {
@@ -58,33 +60,34 @@ const manifest = {
     "./routes/pipelines/save.tsx": $14,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx":
       $15,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/index.tsx":
-      $16,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
-      $17,
+      $16,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
-      $18,
+      $17,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
-      $19,
+      $18,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
-      $20,
-    "./routes/service/[service]/delete.tsx": $21,
-    "./routes/ws/audience-metrics.tsx": $22,
-    "./routes/ws/server-error.tsx": $23,
-    "./routes/ws/service-map.tsx": $24,
-    "./routes/ws/tail.tsx": $25,
+      $19,
+    "./routes/service/[service]/delete.tsx": $20,
+    "./routes/ws/audience-metrics.tsx": $21,
+    "./routes/ws/server-error.tsx": $22,
+    "./routes/ws/service-map.tsx": $23,
+    "./routes/ws/tail.tsx": $24,
   },
   islands: {
     "./islands/customNodes.tsx": $$0,
-    "./islands/emailCollectionForm.tsx": $$1,
-    "./islands/nav.tsx": $$2,
-    "./islands/notifications.tsx": $$3,
-    "./islands/opModal.tsx": $$4,
-    "./islands/operationOpModal.tsx": $$5,
-    "./islands/pipeline.tsx": $$6,
-    "./islands/pipelines.tsx": $$7,
-    "./islands/serviceMap.tsx": $$8,
-    "./islands/tail.tsx": $$9,
+    "./islands/drawer/component.tsx": $$1,
+    "./islands/drawer/infoDrawer.tsx": $$2,
+    "./islands/drawer/operation.tsx": $$3,
+    "./islands/drawer/schema.tsx": $$4,
+    "./islands/drawer/service.tsx": $$5,
+    "./islands/drawer/tail.tsx": $$6,
+    "./islands/emailCollectionForm.tsx": $$7,
+    "./islands/nav.tsx": $$8,
+    "./islands/notifications.tsx": $$9,
+    "./islands/pipeline.tsx": $$10,
+    "./islands/pipelines.tsx": $$11,
+    "./islands/serviceMap.tsx": $$12,
   },
   baseUrl: import.meta.url,
 };

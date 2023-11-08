@@ -36,14 +36,6 @@ export const getPipeline = async (pipelineId: string) => {
   return response?.pipeline;
 };
 
-export const pausePipeline = async (pipeline: any, audience: Audience) => {
-  const { response } = await client.pausePipeline(
-    { pipelineId: pipeline, audience: audience },
-    meta,
-  );
-  return response;
-};
-
 export const getAttachedPipeline = async (name: string) => {
   const { response } = await client.getAll({}, meta);
   const attachedPipelineName = Object.keys(response.pipelines).find((

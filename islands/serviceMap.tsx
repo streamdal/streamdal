@@ -18,7 +18,7 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode, updateNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "./opModal.tsx";
+import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import {
   ComponentEdge,

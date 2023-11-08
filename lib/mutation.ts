@@ -128,11 +128,13 @@ export const pausePipeline = async (
   audience: Audience,
 ) => {
   try {
-    const request: PausePipelineRequest = { audience, pipelineId };
+    const request = PausePipelineRequest.create({ audience, pipelineId });
+
     const { response } = await client.pausePipeline(
       request,
       meta,
     );
+
     return response;
   } catch (error) {
     console.error("error pausing pipeline", error);

@@ -92,11 +92,11 @@ export const DeleteOperationModal = (
                   Cancel
                 </button>
                 <button
-                  class="btn-heimdal"
+                  class="btn-heimdal px-2"
                   type="submit"
                   onClick={deleteOp}
                 >
-                  {`${pipeline ? "Detach and Delete" : "Delete"}`}
+                  Delete
                 </button>
               </div>
             </div>

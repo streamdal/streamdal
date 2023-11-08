@@ -5,12 +5,12 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 export type OpModalType = {
   audience: Audience;
   displayType: string;
-  attachedPipeline?: Pipeline;
+  attachedPipeline?: Pipeline & { paused?: boolean };
   clients: number;
-  schema?: any;
   pause?: boolean;
   detach?: boolean;
   delete?: boolean;
+  schemaModal?: boolean;
   deleteService?: boolean;
 };
 

@@ -4,12 +4,12 @@ import {
   TailRequestType,
   TailResponse,
 } from "streamdal-protos/protos/sp_common.ts";
-import hljs from "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/es/highlight.min.js";
+import hljs from "../static/vendor/highlight@11.8.0.min.js";
 
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
 import { GRPC_TOKEN } from "./configs.ts";
-import { tailSignal } from "../islands/tail.tsx";
+import { tailSignal } from "../islands/drawer/tail.tsx";
 
 export const tailAbortSignal = signal<boolean>(false);
 
@@ -27,7 +27,7 @@ export const parseData = (data: string) => {
     const parsed = JSON.parse(data);
     return JSON.stringify(parsed, null, 2);
   } catch (e) {
-    console.debug("Error parsing tail data, returning raw data instead");
+    console.debug("Error parsing tail data, returning raw data instead", e);
   }
   return data;
 };
