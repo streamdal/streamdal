@@ -46,7 +46,7 @@ github.com/rivo/uniseg
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/go-sdk v0.0.72
+# github.com/streamdal/go-sdk v0.0.73
 ## explicit; go 1.19
 github.com/streamdal/go-sdk
 github.com/streamdal/go-sdk/helper
