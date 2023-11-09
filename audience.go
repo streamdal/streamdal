@@ -39,7 +39,7 @@ func (s *Streamdal) addAudiences(ctx context.Context) {
 	s.audiencesMtx.RLock()
 	defer s.audiencesMtx.RUnlock()
 
-	for audStr, _ := range s.audiences {
+	for audStr := range s.audiences {
 		aud := strToAud(audStr)
 
 		if aud == nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero"
@@ -19,9 +20,13 @@ type function struct {
 	entry   api.Function
 	alloc   api.Function
 	dealloc api.Function
+	mtx     *sync.Mutex
 }
 
 func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+
 	ptrLen := uint64(len(req))
 
 	inputPtr, err := f.alloc.Call(ctx, ptrLen)
@@ -129,6 +134,7 @@ func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error)
 		entry:   f,
 		alloc:   alloc,
 		dealloc: dealloc,
+		mtx:     &sync.Mutex{},
 	}, nil
 }
 

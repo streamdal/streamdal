@@ -131,7 +131,7 @@ func (k *KV) Keys() []string {
 
 	i := 0
 
-	for key, _ := range k.kvs {
+	for key := range k.kvs {
 		keys[i] = key
 		i++
 	}
