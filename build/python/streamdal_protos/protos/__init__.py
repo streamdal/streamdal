@@ -424,8 +424,8 @@ class GetAllResponse(betterproto.Message):
     attached to any audience.
     """
 
-    config: Dict[str, str] = betterproto.map_field(
-        4, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    config: Dict[str, "GetAllResponsePipelines"] = betterproto.map_field(
+        4, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
     """
     Audience to pipeline ID config/mapping. key == $audience_as_string, value =
@@ -442,6 +442,12 @@ class GetAllResponse(betterproto.Message):
         1000, optional=True, group="X_keepalive"
     )
     """Set by server to indicate that the response is a keepalive message"""
+
+
+@dataclass(eq=False, repr=False)
+class GetAllResponsePipelines(betterproto.Message):
+    pipeline_ids: List[str] = betterproto.string_field(1)
+    """List of pipeline IDs that are attached to this audience"""
 
 
 @dataclass(eq=False, repr=False)
