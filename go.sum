@@ -718,6 +718,8 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/streamdal/protos v0.0.119-0.20231106194639-ce7a212bae46 h1:Icq64GE8oa3HqA25Bumk1gfDAjW2CP0VFJrdYHasoZw=
 github.com/streamdal/protos v0.0.119-0.20231106194639-ce7a212bae46/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
+github.com/streamdal/protos v0.0.119 h1:mgnRZa9KxEolIfMJtDQjo3YgTOdFo1fwrI9aQQBT2aU=
+github.com/streamdal/protos v0.0.119/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
