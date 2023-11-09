@@ -589,11 +589,8 @@ PIPELINE:
 			select {
 			case <-timeoutCtx.Done():
 				timeoutCxl()
-				return &ProcessResponse{
-					Data:    req.Data,
-					Error:   true,
-					Message: "pipeline timeout exceeded",
-				}, nil
+				s.config.Logger.Errorf("pipeline '%s' timeout exceeded", pipeline.Name)
+				continue PIPELINE
 			default:
 				// NOOP
 			}
@@ -619,6 +616,8 @@ PIPELINE:
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
+						"condition failed, aborting pipeline", step.Name)
 					continue PIPELINE
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
@@ -631,6 +630,7 @@ PIPELINE:
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
+					s.config.Logger.Debugf("Step '%s' returned exit code failure, aborting pipeline", step.Name)
 					continue PIPELINE
 				}
 			default:
