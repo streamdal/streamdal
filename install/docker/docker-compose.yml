@@ -48,7 +48,7 @@ services:
       - streamdal-network
 
   streamdal-console:
-    image: streamdal/console:v0.1.39
+    image: streamdal/console:v0.1.40
     container_name: streamdal-console
     depends_on:
       - envoy
@@ -57,6 +57,7 @@ services:
       - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN=1234
       - STREAMDAL_CONSOLE_PORT=8080
       - STREAMDAL_CONSOLE_PRODUCTION=true
+      - STREAMDAL_CONSOLE_GOOGLE_ANALYTICS_KEY=GTM-PX732JX
     ports:
       - "8080:8080"
     networks:
