@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
 
@@ -97,7 +98,7 @@ func dialServer(serverAddr string) (*grpc.ClientConn, error) {
 			Timeout: 30 * time.Second,
 		}),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxGRPCMessageRecvSize)),
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 
 	conn, err := grpc.DialContext(dialCtx, serverAddr, opts...)

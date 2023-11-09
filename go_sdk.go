@@ -242,7 +242,7 @@ func New(cfg *Config) (*Streamdal, error) {
 		return nil, err
 	}
 
-	errCh := make(chan error, 0)
+	errCh := make(chan error)
 
 	// Start register
 	go func() {
