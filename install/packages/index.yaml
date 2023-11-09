@@ -3,13 +3,13 @@ entries:
   streamdal-server:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.784840825Z"
+    created: "2023-11-09T17:47:25.849298625Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
       version: 18.0.4
     description: A Helm chart for Kubernetes
-    digest: d18cf7a0d91b360804e6c135a4e743d7cfaf1ae1575b7007475a71f536908a1c
+    digest: 6b83895326c178b08f58558aeed8f9e4dc697e98ca4ab774d95c20fa788814c6
     name: streamdal-server
     type: application
     urls:
@@ -17,7 +17,7 @@ entries:
     version: 0.1.21
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.778671394Z"
+    created: "2023-11-09T17:47:25.843141549Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -31,7 +31,7 @@ entries:
     version: 0.1.19
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.772790617Z"
+    created: "2023-11-09T17:47:25.83815467Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -45,7 +45,7 @@ entries:
     version: 0.1.18
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.768085463Z"
+    created: "2023-11-09T17:47:25.832295831Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -59,7 +59,7 @@ entries:
     version: 0.1.17
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.762444756Z"
+    created: "2023-11-09T17:47:25.827453535Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -73,7 +73,7 @@ entries:
     version: 0.1.16
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.757747677Z"
+    created: "2023-11-09T17:47:25.819012244Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -87,7 +87,7 @@ entries:
     version: 0.1.15
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-11-09T17:37:38.752240438Z"
+    created: "2023-11-09T17:47:25.813299737Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -101,7 +101,7 @@ entries:
     version: 0.1.13
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.747497374Z"
+    created: "2023-11-09T17:47:25.808388251Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -115,7 +115,7 @@ entries:
     version: 0.1.12
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.741646447Z"
+    created: "2023-11-09T17:47:25.802795951Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -129,7 +129,7 @@ entries:
     version: 0.1.11
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.736255755Z"
+    created: "2023-11-09T17:47:25.796578488Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -143,7 +143,7 @@ entries:
     version: 0.1.10
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.800733253Z"
+    created: "2023-11-09T17:47:25.872254426Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -157,7 +157,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.795871708Z"
+    created: "2023-11-09T17:47:25.863100643Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -171,7 +171,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2023-11-09T17:37:38.789618124Z"
+    created: "2023-11-09T17:47:25.854136272Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -183,4 +183,4 @@ entries:
     urls:
     - https://streamdal.github.io/streamdal/install/packages/streamdal-server-0.1.7.tgz
     version: 0.1.7
-generated: "2023-11-09T17:37:38.731247246Z"
+generated: "2023-11-09T17:47:25.791367327Z"
