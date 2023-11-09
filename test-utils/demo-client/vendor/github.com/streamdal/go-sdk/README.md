@@ -49,6 +49,23 @@ func main() {
 
 ```
 
+### Configuration
+
+All configuration can be passed via `streamdal.Config{}`. Some values can be set via environment variables in 
+order to support 12-Factor and usage of this SDK inside shims where `streamdal.Config{}` cannot be set.
+
+| Config Parameter | Environment Variable       | Description                                                                      | Default       |
+|------------------|----------------------------|----------------------------------------------------------------------------------|---------------|
+| ServerURL        | STREAMDAL_URL              | URL pointing to your instance of streamdal server's gRPC API. Ex: localhost:8082 | *empty*       |
+| ServerToken      | STREAMDAL_TOKEN            | API token set in streamdal server                                                | *empty*       |
+| ServiceName      | STREAMDAL_SERVICE_NAME     | Identifies this service in the streamdal console                                 | *empty*       |
+| PipelineTimeout  | STREAMDAL_PIPELINE_TIMEOUT | Maximum time a pipeline can run before giving up                                 | 100ms         |
+| StepTimeout      | STREAMDAL_STEP_TIMEOUT     | Maximum time a pipeline step can run before giving up                            | 10ms          |
+| DryRun           | STREAMDAL_DRY_RUN          | If true, no data will be modified                                                | *false*       |
+| Logger           |                            | An optional custom logger                                                        |               |
+| ClientType       |                            | 1 = ClientTypeSDK, 2 = ClientTypeShim                                            | ClientTypeSDK |
+| ShutdownCtx      | -                          | Your application's main context which will receive shutdown signals              |               |
+
 ### Metrics
 
 Metrics are published to Streamdal server and are available in Prometheus format at http://streamdal_server_url:8081/metrics
