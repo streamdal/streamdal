@@ -574,6 +574,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 
 	originalData := data // Used for tail request
 
+PIPELINE:
 	for _, p := range pipelines {
 		pipeline := p.GetAttachPipeline().GetPipeline()
 
@@ -603,12 +604,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    req.Data,
-						Error:   true,
-						Message: err.Error(),
-					}, nil
+					continue PIPELINE
 				}
 
 				// wasmResp will be nil, so don't allow code below to execute
@@ -623,12 +619,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    wasmResp.OutputPayload,
-						Error:   false,
-						Message: "",
-					}, nil
+					continue PIPELINE
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				fallthrough
@@ -640,12 +631,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data:    wasmResp.OutputPayload,
-						Error:   true,
-						Message: "step failed: " + wasmResp.ExitMsg,
-					}, nil
+					continue PIPELINE
 				}
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
