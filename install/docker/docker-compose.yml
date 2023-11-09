@@ -22,7 +22,7 @@ services:
 
   streamdal-server:
     container_name: streamdal-server
-    image: streamdal/server:v0.0.1-fb290f5
+    image: streamdal/server:v0.0.4-f7f03d9
     depends_on:
       - streamdal-aes-gen
       - redis
@@ -48,7 +48,7 @@ services:
       - streamdal-network
 
   streamdal-console:
-    image: streamdal/console:v0.1.34
+    image: streamdal/console:v0.1.39
     container_name: streamdal-console
     depends_on:
       - envoy
