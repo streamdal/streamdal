@@ -59,7 +59,7 @@ some of the stuff we use in our projects:
     It's used for:
     - Defining internal and external APIs
     - Establishing a stable API spec used by SDKs
-    - Facilitating <a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a> functionality
+    - Facilitating <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> functionality
     - _And a many other uses_
 - [UUID](https://github.com/google/uuid): This library generates and inspects UUIDs based on RFC 4122 and DCE 1.1: Authentication and Security Services.
 - [Redis](https://redis.io): Used for internal communications between cluster nodes and as the primary storage mechanism. _We specifically use redis for Pubsub and its traditional key/value functionality._
@@ -122,7 +122,7 @@ SDKs in the future. Check the
   <div class="hidden peer-checked/tab1:block clear-both p-5 w-full">
     <p>
         <ul>
-            <li>[Wazero](http://github.com/tetratelabs/wazero): The <a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a> runtime the [Go SDK](/en/language-support/go/) uses for running <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules.</a></li>
+            <li>[Wazero](http://github.com/tetratelabs/wazero): The <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> runtime the [Go SDK](/en/language-support/go/) uses for running <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules.</a></li>
             <li>[UUID](http://github.com/google/uuid): Our go-to UUID library.</li>
             <li>[Ginkgo](http://github.com/onsi/ginkgo): This library really simplifies testing</li>
             <li>[Gomega](http://github.com/onsi/gomega): Combined with Ginkgo, this greatly simplifies BDD testing</li>
@@ -147,7 +147,7 @@ SDKs in the future. Check the
     <p>
         <ul>
             <li>[gRPClib](https://grpclib.readthedocs.io/en/latest/): Used for communicating with the [server](/en/core-components/server/).</li>
-            <li>[Wasmtime](https://wasmtime.dev/): WASM runtime we use to execute our <a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a> modules.</li>
+            <li>[Wasmtime](https://wasmtime.dev/): Wasm runtime we use to execute our <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> modules.</li>
             <li>[Betterproto](https://pypi.org/project/betterproto/): For _better_  😉 protobuf and gRPC support.</li>
         </ul>
     </p>
@@ -160,13 +160,13 @@ SDKs in the future. Check the
 The 
 <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rule</a> 
 functionality of Streamdal uses 
-<a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a> 
-extensively under the hood. Most of our WASM modules are 
+<a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> 
+extensively under the hood. Most of our Wasm modules are 
 [open source](https://github.com/streamdal/wasm).
 
 - [Rust](https://www.rust-lang.org/) — The language most of the modules are written in.
 - [Serde](https://serde.rs/) — For working with JSON.
-- [Protobuf](https://protobuf.dev/) - Used for facilitating communication between the executor ([SDKs](/en/core-components/sdk/)) and the WASM modules themselves. In other words, we encode requests in Protobuf, pass them to WASM, and the modules return Protobuf-encoded responses.
+- [Protobuf](https://protobuf.dev/) - Used for facilitating communication between the executor ([SDKs](/en/core-components/sdk/)) and the Wasm modules themselves. In other words, we encode requests in Protobuf, pass them to Wasm, and the modules return Protobuf-encoded responses.
 
 ## Website
 - [Astro](https://astro.build/) - Used for the documentation.

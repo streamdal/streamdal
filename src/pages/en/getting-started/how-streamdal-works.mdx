@@ -45,7 +45,7 @@ interplay between our server and SDK can be _very_ helpful:
 1. **Registration**: Post integration, the [SDK](/en/core-components/sdk/) registers with the Streamdal [server](/en/core-components/server/), affirming its status and its readiness to exchange data.
 2. **Communication via gRPC**: The SDK and server converse over gRPC, ensuring efficient bidirectional streaming and reliable data transmission.
 3. **Metrics Reporting**: After registration, the SDK sends [metrics](/en/engineering/metrics/) to the server. These insights reveal data flow patterns, potential bottlenecks, and other key metrics.
-4. <img src={beta} alt="Beta" style="display: inline" /> **Fetching Rules**: The SDK retrieves the latest <a href="/en/resources-support/glossary#wasm" class="pkeyword">WASM</a>-compiled rules from the server. These <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">rules</a>, vital for data processing, ensure immediate reflection of any changes in data logic within the SDK.
+4. <img src={beta} alt="Beta" style="display: inline" /> **Fetching Rules**: The SDK retrieves the latest <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>-compiled rules from the server. These <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">rules</a>, vital for data processing, ensure immediate reflection of any changes in data logic within the SDK.
 
 <img src={sdkFlow} alt="SDK flow" />
 

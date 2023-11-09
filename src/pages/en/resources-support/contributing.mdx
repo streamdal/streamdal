@@ -6,8 +6,11 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import checked from "@images/icons/checked.png";
-import { Notification } from "accessible-astro-components";
+import tip from "@images/icons/tip.png";
 import information from "@images/icons/information.png";
+import console_version from "@images/arch/console_version_example.png";
+import { Notification } from "accessible-astro-components";
+import Accordion from "@components/Accordion/Accordion.astro";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -19,110 +22,141 @@ most recent.
 </div>
 </div>
 
-Thank you for participating in open source! 
+Streamdal is an open-source project using the 
+[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-We're always open to feature proposals and general contributions to Streamdal. 
-Be sure to check out the [code of conduct](#code-of-conduct) before opening up 
-a new issue or PR, and take a look at the 
-[roadmap](/en/resources-support/roadmap/) to gauge our current projects. 
+## General Guidelines
 
-New to open source? Be sure to check back for some [good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) 
-from time to time.
+Feature proposals and general contributions are cherished and highly 
+encouraged! 
 
-## Technology Stack
-The Streamdal SDK is meant to be implemented in every language and relevant 
-library _eventually. 
+<Notification type="tip">
+  <img src={tip} alt="tip" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    New to open source? 
+    
+    <span style="font-weight: normal;">There should be some [good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) 
+    added periodically. Check out the Streamdal main 
+    [README](https://github.com/streamdal/streamdal/blob/main/README.md) for a 
+    list of component repositories, or search through our 
+    [public](http://github.com/streamdal) ones to find more of these.</span>
+    </p>
+  </div>
+</Notification>
 
-We currently have an SDK for :
-- [Go](/en/sdks/go/)
-- [Node](/en/sdks/node/)
-- [Python](/en/sdks/python/)
+Here are some simple guidelines to help determine where your efforts could 
+provide the most benefit, and ensure contributions go smoothly:
 
+1. Review our [code of conduct](#code-of-conduct)
+2. Take a look at our technology stack:
 
-The current technology stack includes:
+    - Wasm
+    - Protobuf
+    - gRPC + gRPC-web
+    - Rust
+    - Go
+    - React
+    - Flowbite
+    - Deno
+    - Redis
+    - Envoy
+    - _...and many more open source libraries and tools_ 👇
 
-- WASM
-- Protobuf
-- gRPC + gRPC-web
-- Rust
-- Go
-- React
-- Flowbite
-- Deno
-- Redis
-- Envoy
-- _and many more open source libraries and tools!_ 👇
+      Check out our [open source](/en/resources-support/open-source/) 
+      page to learn more about what other technologies are used with Streamdal.
 
-We LOVE open source! Read more on what 
-[open source technology](/en/resources-support/open-source/) is used at 
-Streamdal, and the [reasons behind that design choice](https://streamdal.com/manifesto).
+3. Take a quick glance at our [manifesto](https://streamdal.com/manifesto) - 
+this should help you gauge where our mindset is focused when it comes to future 
+development
+4. Reference the public [roadmap](https://github.com/orgs/streamdal/projects/1) 
+on GitHub
 
 ## Adding an Issue
-
-Before adding an issue, thoroughly read through the documentation 
-of each section in [core components](/en/core-components/overview/). You should 
-also search for existing issues in their respective repositories:
-<ul>
-- [Streamdal main repo](https://github.com/streamdal/Streamdal/issues)
-- [Streamdal-Console-UI](https://github.com/streamdal/console/issues)
-- [Streamdal-Server](https://github.com/streamdal/server/issues)
-<br />
-_For everything else, including language specific shims or client SDKs, 
-you can find those repositories listed on the 
-[main repo](https://github.com/streamdal/Streamdal/) readme or by searching 
-through the [Streamdal public repositories](https://github.com/streamdal/)._
-</ul>
 
 <Notification type="checked">
   <img src={checked} alt="checked" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    We primarily provide support through the [main repo](https://github.com/streamdal/Streamdal/issues).
+  <p>
+    Getting support: <span style="font-weight: normal;">We primarily provide 
+    support for issues through the [main repo](https://github.com/streamdal/Streamdal/issues).</span>
+  </p>
   </div>
 </Notification>
 
-Once you have read the documentation and searched through the current issues, 
-please include the following formatting and information before opening a new 
-issue:
+For adding issues you should:
+
+1. Be familiar with the [core components](/en/core-components/overview/)
+2. Search for existing `issues` in their respective repositories before opening up 
+a new one:
+
+    - [Streamdal/Streamdal](https://github.com/streamdal/Streamdal/issues)
+    - [Streamdal/Console](https://github.com/streamdal/console/issues)
+    - [Streamdal/Server](https://github.com/streamdal/server/issues)
+
+_Everything else, including language-specific shims or client SDKs, should be 
+listed on the main repo [README](https://github.com/streamdal/streamdal/blob/main/README.md) 
+or can be found by searching through the 
+[Streamdal public repositories](https://github.com/streamdal/)._
+
+### Formatting
 
 1. Format your issue name with one of the four types:
 	- <u>Issue/Bug:</u> You've found a bug with the code, and want to report it, 
   or create an issue to track the bug.
 	- <u>Issue/Discussion:</u> You have something on your mind, which requires 
-  input from others in a discussion. This could pertain to niche deployments to 
-  edge use cases not well documented, or anything you think relevant. Feel free 
-  to join the [community](/en/resources-support/community/) to bring greater 
-  visibility to your issue or faster collaboration.
+  input from others in a discussion. This could pertain to niche deployments, 
+  edge use cases not well documented, or anything else that might be relevant. 
 	- <u>Issue/Proposal:</u> Used for items that propose a new idea, 
   functionality or feature. This allows feedback from others before writing 
-  code. _(This is sometimes marked just_ `feat` _or_ `chore`_)_
+  code. _(This is sometimes marked as_ `feat` _or_ `chore`_)_
 	- <u>Issue/Question:</u> Use this issue type if you need help or have a 
   question.
   <br />
 
-2. List the version of everything you are using:
+2. List the version of everything you are using.
+
+    Outside of referencing the versions pulled in your `docker-compose.yml`, 
+    you can do the following for each component:
 <ul>
-  - Streamdal server. The version can be curl'd from the server REST API 
-  endpoint by adding /version:
+  - <span class="yhighlight">Server:</span> 
+  
+    You can `curl` the version from the server REST API endpoint by adding 
+    /version:
   <br />
   ```
-  curl https://streamdal.server:8080/version
+  curl https://streamdal.server:8081/version
   ```
   <br />
-  - Streamdal SDK. This is language specific. You can find this in /releases of 
-  the url (Replace `$lang` with the language you are using):
+  - <span class="yhighlight">SDK:</span> 
+  
+    This is language specific. You can find this in /releases of 
+    the URL (Replace `$lang` with the language you are using):
   <br />
   ```
-  https://github.com/streamdal/$lang-client/releases
+  https://github.com/streamdal/$lang-sdk/releases
   ```
   <br />
-  - Streamdal Console UI. `cat` the `version.ts` file located in 
-  the root directory where the Console UI is running.
+  - <span class="yhighlight">Console UI:</span> 
+  
+    `cat` the `version.ts` file located in 
+    the root directory where the Console UI is running. It is also visually 
+    indicated at the bottom left corner of the UI:
+
+  <br />
+
+<img src={console_version} style="border-radius: 5px;" alt="Example of Streamdal console version" />
+
 </ul>
 
 3. Include a thorough description of what your code does inside the PR. 
 Preferably, include a screenshot if it applies.
 
-## Contributing - Pull Requests
+If you feel it necessary, or for some reason an important issue is going 
+unnoticed, you are also permitted to cross-post issues to the 
+[community](/en/resources-support/community/) for greater visibility.
+
+## Pull Requests
 
 All contributions come through pull requests. Follow these guidelines when 
 contributing code or docs to Streamdal:
@@ -131,10 +165,11 @@ contributing code or docs to Streamdal:
 expectations for the contribution you are about to make
 2. Clone relevant repo and create a new branch
 3. Create your change
--- Code changes require tests, and make sure to run the linters to check and 
-format the code
-4. Update relevant documentation for the change - Please check the [README.MD](https://github.com/streamdal/docs#adding-to-docs) 
-for helpful information on contributing to the documentation
+-- Code changes require tests, and make sure to run linters to check and format 
+the code
+4. Update relevant documentation for the change - Please check the 
+doc's [README](https://github.com/streamdal/docs#adding-to-docs) 
+for helpful information on contributing to docs
 5. Commit with [DCO](#developer-certificate-of-origin-signing-your-work) 
 sign-off and open a PR
 6. Wait for the CI process to finish and make sure all checks are green. A 
@@ -151,7 +186,7 @@ Contribution intentionally submitted for inclusion in the Work by You to the
 Licensor shall be under the terms and conditions of this License, without any 
 additional terms or conditions. Notwithstanding the above, nothing herein shall 
 supersede or modify the terms of any separate license agreement you may have 
-executed with Licensor regarding such Contributions.
+executed with the Licensor regarding such Contributions.
 ```
 
 ### Work-in-progress
@@ -198,21 +233,20 @@ Contributors sign-off that they adhere to these requirements by adding a
 `Signed-off-by` line to commit messages.
 
 ```
-This is my commit message
+<This is my commit message>
 
 Signed-off-by: Random Dev <random@dev.example.org>
-## Code of Conduct
 ```
 
-Git even has a -s command line option to append this automatically to your 
+Git even has a `-s` cli flag to append this automatically to your 
 commit message:
 
 ```
 git commit -s -m 'This is my commit message'
 ```
 
-Each Pull Request is checked whether or not commits in a Pull Request do 
-contain a valid Signed-off-by line.
+Each PR is checked whether or not the commits contain a valid Signed-off-by 
+line.
 
 ### Unsigned commits
 
@@ -225,10 +259,13 @@ git commit --amend --no-edit --signoff
 git push --force-with-lease <remote-name> <branch-name>
 ```
 
-## Code of Conduct
-<details>
-{/* Need to find a way to fix so we can remove 'click to expand' */}
-<summary>Contributor Covenant Code of Conduct (click to expand)</summary>
+## <span class="hiddenh">Code of Conduct</span>
+
+
+
+<Accordion 
+title="Code of Conduct">
+<p>
 
 #### Our Pledge
 
@@ -238,44 +275,45 @@ size, visible or invisible disability, ethnicity, sex characteristics, gender
 identity and expression, level of experience, education, socio-economic status,
 nationality, personal appearance, race, caste, color, religion, or sexual
 identity and orientation.
-
+<br />
 We pledge to act and interact in ways that contribute to an open, welcoming,
 diverse, inclusive, and healthy community.
-
+<br />
 ---
 
 #### Our Standards
 
 Examples of behavior that contributes to a positive environment for our
 community include:
-<ul>
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes,
+
+- Demonstrating empathy and kindness toward other people
+- Being respectful of differing opinions, viewpoints, and experiences
+- Giving and gracefully accepting constructive feedback
+- Accepting responsibility and apologizing to those affected by our mistakes,
   and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall
+- Focusing on what is best not just for us as individuals, but for the overall
   community
-</ul>
+
+<br />
 
 Examples of unacceptable behavior include:
-<ul>
-* The use of sexualized language or imagery, and sexual attention or advances of
+
+- The use of sexualized language or imagery, and sexual attention or advances of
   any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address,
+- Trolling, insulting or derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information, such as a physical or email address,
   without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
+- Other conduct that could reasonably be considered inappropriate in a
   professional setting
-</ul>
+
 #### Enforcement Responsibilities
 
 Community leaders are responsible for clarifying and enforcing our standards of
 acceptable behavior and will take appropriate and fair corrective action in
 response to any behavior that they deem inappropriate, threatening, offensive,
 or harmful.
-
+<br />
 Community leaders have the right and responsibility to remove, edit, or reject
 comments, commits, code, wiki edits, issues, and other contributions that are
 not aligned to this Code of Conduct, and will communicate reasons for moderation
@@ -283,7 +321,7 @@ decisions when appropriate.
 
 #### Scope
 
-This Code of Conduct applies within all community spaces, and also applies when
+This Code of Conduct applies within all community spaces and also applies when
 an individual is officially representing the community in public spaces.
 Examples of representing our community include using an official email address,
 posting via an official social media account, or acting as an appointed
@@ -292,31 +330,54 @@ representative at an online or offline event.
 #### Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-[Streamdal.com/contact](https://www.Streamdal.com/contact).
+reported to the community leaders responsible for enforcement:
+
+<br />
+
+- [Alina](malto:alina@streamdal.com) -> @alinak6598 on Discord
+- [Jon](mailto:jon@streamdal.com) -> @dosplatos on Discord
+- @founders, @mods, or anyone with the @staff role on Discord
+
+<br />
+
 All complaints will be reviewed and investigated promptly and fairly.
 
+<br />
+
 All community leaders are obligated to respect the privacy and security of the
-reporter of any incident.
+reporter of any incident. If you feel that judgments were inappropriately 
+applied to you or others in the community, feel free to reach out to the 
+[founders](mailto:founders@streamdal.com) directly.
+
 
 #### Enforcement Guidelines
 
 Community leaders will follow these Community Impact Guidelines in determining
 the consequences for any action they deem in violation of this Code of Conduct:
 
+<br />
+
 <ol>
-<li>Correction</li>
+<li><span class="yhighlight">Correction</span></li>
 **Community Impact**: Use of inappropriate language or other behavior deemed
 unprofessional or unwelcome in the community.
+
+<br />
 
 **Consequence**: A private, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the
 behavior was inappropriate. A public apology may be requested.
+
 <br />
-<li>Warning</li>
+
+<li><span class="yhighlight">Warning</span></li>
+
+<br />
 
 **Community Impact**: A violation through a single incident or series of
 actions.
+
+<br />
 
 **Consequence**: A warning with consequences for continued behavior. No
 interaction with the people involved, including unsolicited interaction with
@@ -324,23 +385,35 @@ those enforcing the Code of Conduct, for a specified period of time. This
 includes avoiding interactions in community spaces as well as external channels
 like social media. Violating these terms may lead to a temporary or permanent
 ban.
+
 <br />
-<li>Temporary Ban</li>
+
+<li><span class="yhighlight">Temporary Ban</span></li>
+
+<br />
 
 **Community Impact**: A serious violation of community standards, including
 sustained inappropriate behavior.
+
+<br />
 
 **Consequence**: A temporary ban from any sort of interaction or public
 communication with the community for a specified period of time. No public or
 private interaction with the people involved, including unsolicited interaction
 with those enforcing the Code of Conduct, is allowed during this period.
 Violating these terms may lead to a permanent ban.
+
 <br />
-<li>Permanent Ban</li>
+
+<li><span class="yhighlight">Permanent Ban</span></li>
+
+<br />
 
 **Community Impact**: Demonstrating a pattern of violation of community
 standards, including sustained inappropriate behavior, harassment of an
 individual, or aggression toward or disparagement of classes of individuals.
+
+<br />
 
 **Consequence**: A permanent ban from any sort of public interaction within the
 community.
@@ -352,12 +425,22 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage],
 version 2.1, available at
 [https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
 
+<br />
+
 Community Impact Guidelines were inspired by
 [Mozilla's code of conduct enforcement ladder][Mozilla CoC].
 
+<br />
+
 For answers to common questions about this code of conduct, see the FAQ at
-[https://www.contributor-covenant.org/faq][FAQ]. Translations are available at
+[https://www.contributor-covenant.org/faq][FAQ]. 
+
+<br />
+
+Translations are available at
 [https://www.contributor-covenant.org/translations][translations].
+
+<br />
 
 [homepage]: https://www.contributor-covenant.org
 [v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
@@ -365,8 +448,6 @@ For answers to common questions about this code of conduct, see the FAQ at
 [FAQ]: https://www.contributor-covenant.org/faq
 [translations]: https://www.contributor-covenant.org/translations
 
-{/* Need to find a better way to do this - anchor links not working correctly. 
-My idea was to have these details collapse/go back to the top. Also, details 
-<summary> removes the visual indicator of collapsed/expanded state*/}
-<p align="right">[Back to top](/en/resources-support/contributing/)</p>
-</details>
+
+</p>
+</Accordion>

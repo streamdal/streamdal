@@ -36,7 +36,7 @@ When initializing the Streamdal client with `streamdal.New()`, you pass a config
 |-----------|-------------|------|---------|
 | **StreamdalURL** | The URL of the Streamdal server instance. | String | `"localhost:8082"` |
 | **StreamdalToken** | The authentication token for the Streamdal server. | String | `"streamdal"` |
-| **StepTimeout** | Sets the maximum duration for wasm execution in each step. | Duration | `time.Millisecond * 10` |
+| **StepTimeout** | Sets the maximum duration for Wasm execution in each step. | Duration | `time.Millisecond * 10` |
 | **PipelineTimeout** | Defines the total allowable execution time for the entire pipeline. | Duration | `time.Millisecond * 100` |
 | **DryRun** | A switch to toggle between actual execution and a logging-only mode. If set to true, it won't actually execute but will only log. | Boolean | `false` |
 | **ServiceName** | A name that represents the specific service in your infrastructure using this client. | String | `"billing-svc"` |
