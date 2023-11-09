@@ -20,3 +20,5 @@ export const PRODUCTION = env["STREAMDAL_CONSOLE_PRODUCTION"] === "true" ||
 export const DEMO = env["STREAMDAL_CONSOLE_DEMO"] === "true" ||
   Deno.env.get("STREAMDAL_CONSOLE_DEMO") === "true";
 export const SENTRY_KEY = env["STREAMDAL_CONSOLE_SENTRY_KEY"];
+export const GOOGLE_ANALYTICS_KEY =
+  env["STREAMDAL_CONSOLE_GOOGLE_ANALYTICS_KEY"];

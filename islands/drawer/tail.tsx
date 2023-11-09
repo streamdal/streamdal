@@ -68,7 +68,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
-    const socket = tailSocket("./ws/tail", audience);
+    const socket = tailSocket("/ws/tail", audience);
 
     return () => {
       socket?.close();

@@ -1,6 +1,13 @@
 import { AppContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
-import { DEMO, SENTRY_KEY } from "../lib/configs.ts";
+import { DEMO, GOOGLE_ANALYTICS_KEY, SENTRY_KEY } from "../lib/configs.ts";
+
+export const GTM_SCRIPT =
+  `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${GOOGLE_ANALYTICS_KEY}');`;
 
 export default async function App(
   req: Request,
@@ -70,6 +77,16 @@ export default async function App(
           rel="stylesheet"
           href="/vendor/highlight.js@11.8.0.dark-violet.min.css"
         />
+        {DEMO && GOOGLE_ANALYTICS_KEY &&
+          (
+            <script
+              async
+              id="gtag-init"
+              dangerouslySetInnerHTML={{
+                __html: GTM_SCRIPT,
+              }}
+            />
+          )}
         {DEMO && SENTRY_KEY &&
           (
             <>
@@ -84,6 +101,18 @@ export default async function App(
           )}
       </Head>
       <body className="h-screen bg-purple-50 m-0 overflow-hidden" f-client-nav>
+        {DEMO && GOOGLE_ANALYTICS_KEY &&
+          (
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${GOOGLE_ANALYTICS_KEY}`}
+                height="0"
+                width="0"
+                style="display:none;visibility:hidden"
+              >
+              </iframe>
+            </noscript>
+          )}
         <ctx.Component />
       </body>
     </html>
