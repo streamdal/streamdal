@@ -18,9 +18,11 @@ spec:
     spec:
       containers:
         - name: streamdal-console
-          image: "streamdal/console:v0.1.39" # Fixed the image and tag definition
+          image: "streamdal/console:v0.1.40" # Fixed the image and tag definition
           ports:
             - containerPort: 8080
+          nodeSelector:
+            kubernetes.io/hostname: ip-10-0-22-194.us-west-2.compute.internal
           env:
             - name: STREAMDAL_CONSOLE_GRPC_WEB_URL
               value: "http://streamdal-server.{{ .Release.Namespace }}.svc.cluster.local:8083"
