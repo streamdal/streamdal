@@ -5,75 +5,97 @@ import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
+import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
 import { signal } from "@preact/signals";
-import { audienceKey, longDateFormat } from "../../lib/utils.ts";
+import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 
 export const MAX_TAIL_SIZE = 100;
+export const TAIL_BUFFER_INTERVAL = 333;
 
-export const tailSignal = signal<{ [key in string]: TailData[] }>(
-  {},
+export const tailSignal = signal<TailData[] | null>(
+  null,
+);
+
+export const tailBufferSignal = signal<TailData[] | null>(
+  null,
 );
 
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
 export const tailSamplingSignal = signal<boolean>(false);
 export const tailSamplingRateSignal = signal<number>(1);
+export const tailDroppingSignal = signal<boolean>(false);
 
 export type TailData = { timestamp: Date; data: string };
 
 export const TailRow = (
-  { row }: { row: TailData; index: number },
-) => {
-  const lastRef = useRef();
-
-  useEffect(() => {
-    tailPausedSignal.value === false && lastRef.current &&
-      lastRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "start",
-      });
-  }, [lastRef.current]);
-
-  return (
-    <div className="flex flex-row w-full">
-      <div
-        ref={lastRef}
-        className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start"
-      >
-        <div className="text-stream">
-          {row.timestamp?.toLocaleDateString(
-            "en-us",
-            longDateFormat,
-          )}
-        </div>
-        <pre>
+  { row }: { row: TailData },
+) => (
+  <div className="flex flex-row w-full">
+    <div className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start">
+      <div className="text-stream">
+        {row.timestamp?.toLocaleDateString(
+          "en-us",
+          longDateFormat,
+        )}
+      </div>
+      <pre>
           <code>
             <div dangerouslySetInnerHTML={{
-                __html: row.data,
-              }}
+              __html: row.data,
+            }}
             >
             </div>
           </code>
-        </pre>
-      </div>
+      </pre>
     </div>
-  );
-};
+  </div>
+);
 
 export const Tail = ({ audience }: { audience: Audience }) => {
+  const scrollBottom = useRef();
   const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
     const socket = tailSocket("/ws/tail", audience);
+    const bufferInterval = setInterval(() => {
+      if (!tailPausedSignal.value && tailBufferSignal.value.length) {
+        tailSignal.value = [
+          ...(tailSignal.value || []).slice(
+            -(MAX_TAIL_SIZE - tailBufferSignal.value.length),
+          ),
+          ...tailBufferSignal.value.splice(0),
+        ];
+      }
+    }, TAIL_BUFFER_INTERVAL);
 
     return () => {
       socket?.close();
+      clearInterval(bufferInterval);
     };
-  }, [tailSamplingSignal.value, tailSamplingRateSignal.value]);
+  }, []);
+
+  useEffect(() => {
+    tailPausedSignal.value == false && scrollBottom.current &&
+      scrollBottom.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+  }, [tailSignal.value, tailPausedSignal.value]);
+
+  useEffect(() => {
+    const togglePause = () => {
+      tailPausedSignal.value = document.visibilityState !== "visible";
+    };
+    document.addEventListener("visibilitychange", togglePause);
+    return () => {
+      document.removeEventListener("visibilitychange", togglePause);
+    };
+  }, []);
 
   return (
     <div
@@ -94,14 +116,26 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             fullScreen ? "100" : "90"
           }%]`}
         >
-          <div>
-            Tail{" "}
+          <div class="flex flex-row justify-start items-center">
+            <span class="mr-1">Tail</span>
             <span class="text-streamdalPurple">{audience.operationName}</span>
+            {tailDroppingSignal.value &&
+              (
+                <div class="mt-1 flex flex-row items-center">
+                  <IconInfoCircle class="ml-2 text-stream w-4 h-4" />
+                  <span class="ml-1 text-stream text-base">
+                    High rate, showing limited messages
+                  </span>
+                </div>
+              )}
           </div>
+
           <div class="flex flex-row justify-end items-center">
             <div
               class="flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
-              onClick={() => tailPausedSignal.value = !tailPausedSignal.value}
+              onClick={() => {
+                tailPausedSignal.value = !tailPausedSignal.value;
+              }}
             >
               {tailPausedSignal.value
                 ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
@@ -130,9 +164,8 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             fullScreen ? "200" : "260"
           }px)] overflow-y-scroll rounded-md bg-black text-white`}
         >
-          {tailSignal.value[audienceKey(audience)]?.map((
-            tail: TailData,
-          ) => <TailRow row={tail} />)}
+          {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
+          <div ref={scrollBottom} />
         </div>
       </div>
     </div>

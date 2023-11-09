@@ -34,7 +34,7 @@ export default function Operation(
 
   useSignalEffect(() => {
     if (tailEnabledSignal.value === false) {
-      tailSignal.value = {};
+      tailSignal.value = [];
     }
   });
 

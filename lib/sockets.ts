@@ -2,12 +2,13 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { audienceMetricsSignal } from "../components/serviceMap/customEdge.tsx";
 import {
   MAX_TAIL_SIZE,
+  tailBufferSignal,
+  tailDroppingSignal,
   tailSamplingRateSignal,
   tailSamplingSignal,
-  tailSignal,
 } from "../islands/drawer/tail.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { audienceKey } from "./utils.ts";
+
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 
 export const getSocket = (path: string) => {
@@ -93,19 +94,17 @@ export const tailSocket = (path: string, audience: Audience) => {
 
     try {
       const parsedTail = JSON.parse(event.data);
-      const key = audienceKey(audience);
-      tailSignal.value = {
-        ...tailSignal.value,
-        [key]: [
-          ...(tailSignal.value[key] || []).slice(
-            -MAX_TAIL_SIZE,
-          ),
-          {
-            timestamp: new Date(parsedTail.timestamp),
-            data: parsedTail.data,
-          },
-        ],
-      };
+
+      tailDroppingSignal.value = !!(tailBufferSignal.value &&
+        tailBufferSignal.value.length > MAX_TAIL_SIZE);
+
+      tailBufferSignal.value = [
+        ...(tailBufferSignal.value || []).slice(-MAX_TAIL_SIZE),
+        {
+          timestamp: new Date(parsedTail.timestamp),
+          data: parsedTail.data,
+        },
+      ];
     } catch (e) {
       console.error("error parsing tail data", e);
     }

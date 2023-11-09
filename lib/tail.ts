@@ -107,7 +107,7 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
     const { status } = await tailCall;
     status && console.info("grpc tail status", status);
   } catch (e) {
-    tailSignal.value = {};
+    tailSignal.value = [];
     //
     // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {
