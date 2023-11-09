@@ -12,7 +12,9 @@ import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.ts
 
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
-  return new WebSocket(`ws://${url.host}${path}`);
+  url.protocol = url.protocol.replace("http", "ws");
+  url.pathname = path;
+  return new WebSocket(url);
 };
 
 export const serviceMapSocket = (path: string) => {
