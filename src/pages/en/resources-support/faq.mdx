@@ -37,7 +37,7 @@ title="What is Streamdal?">
 Streamdal is an open source <a href="/en/resources-support/glossary/#observability" class="pkeyword">observability</a> tool. 
 <br />
 It's comprised of a 
-[server](/en/core-components/server/), a UI, and a bunch of <a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a>-powered 
+[server](/en/core-components/server/), a UI, and a bunch of <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a>-powered 
 [SDKs](/en/core-components/sdk/). By using our SDK and deploying it’s server, 
 you’ll get a dynamic [graph](/en/core-components/console-ui#data-graph) of your 
 <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> 
@@ -142,7 +142,7 @@ the client by shipping down <a href="/en/resources-support/glossary/#rule-or-ste
 
 This happens with only a negligible resource hit to the client (usally \<0.1ms, 
 thanks to 
-<a href="/en/resources-support/glossary/#wasm" class="pkeyword">WASM</a>). 
+<a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a>). 
 There is no sending data, or shipping logs, metrics, or traces anywhere.
 
 <br />
@@ -406,40 +406,40 @@ out our [manifesto](https://streamdal.com/manifesto/) for more information on th
 </Accordion>
 </li>
 
-### <span class="hiddenh">15. What is WASM?</span>
+### <span class="hiddenh">15. What is Wasm?</span>
 
 <li>
 <Accordion 
-title="What is WASM?">
+title="What is Wasm?">
 <p>
-<a href="/en/resources-support/glossary#wasm" class="pkeyword">WASM</a> is [WebAssembly](https://webassembly.org/).
+<a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a> is [WebAssembly](https://webassembly.org/).
 </p>
 </Accordion>
 </li>
 
-### <span class="hiddenh">16. What role does WASM play in Streamdal?</span>
+### <span class="hiddenh">16. What role does Wasm play in Streamdal?</span>
 
 <li>
 <Accordion 
-title="What role does WASM play in Streamdal?">
+title="What role does Wasm play in Streamdal?">
 <p>
-We make significant use of <a href="/en/resources-support/glossary#wasm" class="pkeyword">WASM</a>.
+We make significant use of <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>.
 
 <br />
 
-Rules are supported by WASM 100%. Schema inference, rules, and any sort of 
-business logic is going to be executed by WASM in the SDK.
+Rules are supported by Wasm 100%. Schema inference, rules, and any sort of 
+business logic is going to be executed by Wasm in the SDK.
 
 <br />
 
 The reason we're able to have such a low impact on any given client's resources, 
-usually less than 0.1ms, is because it's being executed via WASM. It's 
+usually less than 0.1ms, is because it's being executed via Wasm. It's 
 [open source](/en/resources-support/open-source/#wasm). 
 
 <br />
 
 Get more information on 
-how we use it in our [WASM repo](https://github.com/streamdal/wasm), and read 
+how we use it in our [Wasm repo](https://github.com/streamdal/wasm), and read 
 about this design choice in our [manifesto](https://streamdal.com/manifesto/).
 </p>
 </Accordion>

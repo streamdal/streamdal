@@ -16,7 +16,7 @@ real-time:
 
 - Data observability _(think_ `tail -f`_, but for your app’s runtime data)_
 - Data quality monitoring
-- (Beta) Ultra-low overhead pipelines using [WASM](https://webassembly.org/)
+- (Beta) Ultra-low overhead pipelines using [Wasm](https://webassembly.org/)
 - (Beta) Data transformation + obfuscation + masking + stripping
 
 
