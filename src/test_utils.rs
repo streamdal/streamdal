@@ -20,6 +20,12 @@ pub const SAMPLE_JSON: &str = r#"{
         "semver": "1.2.3",
         "valid_hostname": "example.com",
         "invalid_hostname": "-example.com."
+        "email_plain_valid": "test@example.com",
+        "email_plain_invalid": "test@example",
+        "email_unicode_domain_valid": "test@日本.com",
+        "email_unicode_domain_invalid": "test@日本",
+        "email_unicode_local_valid": "日本@example.com",
+        "email_unicode_local_invalid": "日本@example",
     },
     "array": [
         "value1",

@@ -119,3 +119,31 @@ fn bench_hostname(b: &mut Bencher) {
         let _ = crate::matcher_core::hostname(&request);
     });
 }
+
+
+#[bench]
+fn bench_email(b: &mut Bencher) {
+    let request = generate_request_for_bench(
+        DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
+        "object.email_plain_valid",
+        vec![],
+    );
+
+    b.iter(|| {
+        let _ = crate::matcher_pii::email(&request);
+    });
+}
+
+#[bench]
+fn bench_email_utf8(b: &mut Bencher) {
+    let request = generate_request_for_bench(
+        DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
+        "object.email_unicode_domain_valid",
+        vec![],
+    );
+
+    b.iter(|| {
+        let _ = crate::matcher_pii::email(&request);
+    });
+}
+
