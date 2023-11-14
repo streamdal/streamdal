@@ -78,18 +78,22 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
 pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
     let field: String = detective::parse_field(request.data, &request.path)?;
 
+
+
     // Check if the string has the correct length
     if field.len() != 17 {
         return Ok(false);
     }
 
+    let s = str::replace(&field, "-", ":");
+
     // Iterate through each character and check if it's a valid MAC address character
-    for (i, c) in field.chars().enumerate() {
+    for (i, c) in s.chars().enumerate() {
         if i % 3 == 2 {
             if c != ':' {
                 return Ok(false);
             }
-        } else if !c.is_digit(16) {
+        } else if !c.is_ascii_hexdigit() {
             return Ok(false);
         }
     }

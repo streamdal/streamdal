@@ -75,7 +75,7 @@ test test_bench::bench_has_field           ... bench:         169 ns/iter (+/- 2
 test test_bench::bench_hostname            ... bench:         419 ns/iter (+/- 25)
 test test_bench::bench_ipv4_address        ... bench:         219 ns/iter (+/- 46)
 test test_bench::bench_ipv6_address        ... bench:         328 ns/iter (+/- 3)
-test test_bench::bench_mac_address         ... bench:         243 ns/iter (+/- 3)
+test test_bench::bench_mac_address         ... bench:         388 ns/iter (+/- 6)
 test test_bench::bench_semver              ... bench:         385 ns/iter (+/- 4)
 test test_bench::bench_string_contains_all ... bench:         219 ns/iter (+/- 11)
 test test_bench::bench_string_contains_any ... bench:         220 ns/iter (+/- 9)
