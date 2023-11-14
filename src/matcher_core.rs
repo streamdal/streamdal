@@ -78,9 +78,27 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
 pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
     let field: String = detective::parse_field(request.data, &request.path)?;
 
-    let re = Regex::new(r"^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$")?;
 
-    Ok(re.is_match(field.as_str()))
+
+    // Check if the string has the correct length
+    if field.len() != 17 {
+        return Ok(false);
+    }
+
+    let s = str::replace(&field, "-", ":");
+
+    // Iterate through each character and check if it's a valid MAC address character
+    for (i, c) in s.chars().enumerate() {
+        if i % 3 == 2 {
+            if c != ':' {
+                return Ok(false);
+            }
+        } else if !c.is_ascii_hexdigit() {
+            return Ok(false);
+        }
+    }
+
+    Ok(true)
 }
 
 pub fn uuid(request: &Request) -> Result<bool, CustomError> {
