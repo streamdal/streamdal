@@ -43,7 +43,7 @@ pub fn email(request: &Request) -> Result<bool, CustomError> {
     // Check for valid characters in local part
     for c in local_part.chars() {
         if !(c.is_ascii_alphanumeric() || c == '.' || c == '_' || c == '-') {
-            if let Some(_) = char::from_u32(c as u32) {
+            if char::from_u32(c as u32).is_some() {
                 continue;
             } else {
                 return Ok(false);
