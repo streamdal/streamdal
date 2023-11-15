@@ -65,18 +65,18 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-version = "0.0.115"
+version = "0.0.120"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6ce9e3939000b052909572ffefbc30376998ed0222ce532edd76581aad8504b"
+checksum = "9a371f4a886341cd605042d3989cbab4d4c19b3e61907efe0ee5ef142b1b72d0"
 dependencies = [
  "protobuf",
 ]
 
 [[package]]
 name = "syn"
-version = "2.0.38"
+version = "2.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e96b79aaa137db8f61e26363a0c9b47d8b4ec75da28b7d1d614c2303e232408b"
+checksum = "23e78b90f2fcf45d3e842032ce32e3f2d1545ba6636271dcbf24fa306d87be7a"
 dependencies = [
  "proc-macro2",
  "quote",

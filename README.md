@@ -36,6 +36,11 @@ Without any of the size optimizations, the initial binary size is ~4.2MB.
 
 Compile + optimization time is ~45s on an M2.
 
+## Developing
+
+To update protobuf definitions across all modules, run `bash update_protos.sh 1.2.3`. This will replace the 
+version of `streamdal-protos` across all `Cargo.toml` files and run a `cargo update` to pull in the new version.
+
 ## Release
 
 Releasing is semi-automatic - you have to manually create and push a new `v0.0.0`

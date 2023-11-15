@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 protobuf = "3.2.0"
-streamdal-wasm-detective = "0.0.30"
-streamdal-protos = "0.0.115"
+streamdal-wasm-detective = "0.0.33"
+streamdal-protos = "0.0.120"
 common = { path = "../common" }
 
 [profile.release]

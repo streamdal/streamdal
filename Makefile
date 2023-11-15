@@ -25,7 +25,7 @@ setup/darwin:
 
 .PHONY: build
 build: description = Build all targets
-build: clean build/detective build/transform build/httprequest build/kv build/inferschema
+build: clean build/detective build/transform build/httprequest build/kv build/inferschema  build/validjson
 
 .PHONY: build/detective
 build/detective: description = Build WASM target for detective
@@ -87,9 +87,21 @@ clean/inferschema: description = Remove inferschema WASM artifacts
 clean/inferschema:
 	rm -rf inferschema/target build/inferschema.wasm
 
+.PHONY: build/validjson
+build/validjson: description = Build WASM target for validjson
+build/validjson: clean/validjson
+	cd validjson && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/validjson.wasm target/wasm32-wasi/release/validjson.wasm
+
+.PHONY: clean/validjson
+clean/validjson: description = Remove validjson WASM artifacts
+clean/validjson:
+	rm -rf validjson/target build/validjson.wasm
+
 .PHONY: clean
 clean: description = Remove all build artifacts
-clean: clean/detective clean/transform clean/httprequest clean/kv clean/inferschema
+clean: clean/detective clean/transform clean/httprequest clean/kv clean/inferschema clean/validjson
 
 .PHONY: test
 test: description = Run tests
