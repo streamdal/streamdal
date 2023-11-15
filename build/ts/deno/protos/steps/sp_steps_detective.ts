@@ -127,9 +127,9 @@ export enum DetectiveType {
      */
     STRING_LENGTH_RANGE = 1020,
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_SEMVER = 2021;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_SEMVER = 1021;
      */
-    SEMVER = 2021,
+    SEMVER = 1021,
     /**
      * / Payloads containing values with any PII - runs all PII matchers
      *

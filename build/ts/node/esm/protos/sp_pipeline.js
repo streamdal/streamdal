@@ -3,6 +3,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { ValidJSONStep } from "./steps/sp_steps_valid_json.js";
 import { InferSchemaStep } from "./steps/sp_steps_inferschema.js";
 import { KVStep } from "./steps/sp_steps_kv.js";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
@@ -109,6 +110,7 @@ class PipelineStep$Type extends MessageType {
             { no: 1005, name: "http_request", kind: "message", oneof: "step", T: () => HttpRequestStep },
             { no: 1006, name: "kv", kind: "message", oneof: "step", T: () => KVStep },
             { no: 1007, name: "infer_schema", kind: "message", oneof: "step", T: () => InferSchemaStep },
+            { no: 1008, name: "valid_json", kind: "message", oneof: "step", T: () => ValidJSONStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
@@ -191,6 +193,12 @@ class PipelineStep$Type extends MessageType {
                         inferSchema: InferSchemaStep.internalBinaryRead(reader, reader.uint32(), options, message.step.inferSchema)
                     };
                     break;
+                case /* protos.steps.ValidJSONStep valid_json */ 1008:
+                    message.step = {
+                        oneofKind: "validJson",
+                        validJson: ValidJSONStep.internalBinaryRead(reader, reader.uint32(), options, message.step.validJson)
+                    };
+                    break;
                 case /* optional string _wasm_id */ 10000:
                     message.WasmId = reader.string();
                     break;
@@ -253,6 +261,9 @@ class PipelineStep$Type extends MessageType {
         /* protos.steps.InferSchemaStep infer_schema = 1007; */
         if (message.step.oneofKind === "inferSchema")
             InferSchemaStep.internalBinaryWrite(message.step.inferSchema, writer.tag(1007, WireType.LengthDelimited).fork(), options).join();
+        /* protos.steps.ValidJSONStep valid_json = 1008; */
+        if (message.step.oneofKind === "validJson")
+            ValidJSONStep.internalBinaryWrite(message.step.validJson, writer.tag(1008, WireType.LengthDelimited).fork(), options).join();
         /* optional string _wasm_id = 10000; */
         if (message.WasmId !== undefined)
             writer.tag(10000, WireType.LengthDelimited).string(message.WasmId);

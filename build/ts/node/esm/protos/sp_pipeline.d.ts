@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { ValidJSONStep } from "./steps/sp_steps_valid_json.js";
 import { InferSchemaStep } from "./steps/sp_steps_inferschema.js";
 import { KVStep } from "./steps/sp_steps_kv.js";
 import { HttpRequestStep } from "./steps/sp_steps_httprequest.js";
@@ -115,6 +116,12 @@ export interface PipelineStep {
          * @generated from protobuf field: protos.steps.InferSchemaStep infer_schema = 1007;
          */
         inferSchema: InferSchemaStep;
+    } | {
+        oneofKind: "validJson";
+        /**
+         * @generated from protobuf field: protos.steps.ValidJSONStep valid_json = 1008;
+         */
+        validJson: ValidJSONStep;
     } | {
         oneofKind: undefined;
     };

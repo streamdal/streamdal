@@ -99,9 +99,9 @@ export var DetectiveType;
      */
     DetectiveType[DetectiveType["STRING_LENGTH_RANGE"] = 1020] = "STRING_LENGTH_RANGE";
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_SEMVER = 2021;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_SEMVER = 1021;
      */
-    DetectiveType[DetectiveType["SEMVER"] = 2021] = "SEMVER";
+    DetectiveType[DetectiveType["SEMVER"] = 1021] = "SEMVER";
     /**
      * / Payloads containing values with any PII - runs all PII matchers
      *
