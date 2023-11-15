@@ -451,14 +451,28 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			_, err = s.Process(context.Background(), &ProcessRequest{
-				ComponentName: aud.ComponentName,
-				OperationType: OperationType(aud.OperationType),
-				OperationName: aud.OperationName,
-				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
-			})
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("step failed"))
+			payload := []byte(`{"object":{"payload":"streamdal@gmail.com"}`)
+
+			// Run 1000 requests in parallel
+			wg := &sync.WaitGroup{}
+			for i := 0; i < 100; i++ {
+				wg.Add(1)
+				go func() {
+					defer GinkgoRecover()
+					defer wg.Done()
+					resp, err := s.Process(context.Background(), &ProcessRequest{
+						ComponentName: aud.ComponentName,
+						OperationType: OperationType(aud.OperationType),
+						OperationName: aud.OperationName,
+						Data:          payload,
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{}))
+					Expect(string(resp.Data)).To(Equal(string(payload)))
+				}()
+			}
+
+			wg.Wait()
 
 		})
 	})
