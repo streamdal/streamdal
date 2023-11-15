@@ -473,7 +473,6 @@ var _ = Describe("Streamdal", func() {
 			}
 
 			wg.Wait()
-
 		})
 	})
 })
