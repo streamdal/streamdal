@@ -43,7 +43,7 @@ func (s *Streamdal) register(looper director.Looper) error {
 
 	s.audiencesMtx.Lock()
 	for _, aud := range s.config.Audiences {
-		pAud := aud.ToProto(s.config.ServiceName)
+		pAud := aud.toProto(s.config.ServiceName)
 		req.Audiences = append(req.Audiences, pAud)
 		s.audiences[audToStr(pAud)] = struct{}{}
 	}

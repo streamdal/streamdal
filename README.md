@@ -44,7 +44,7 @@ func main() {
 		Data:          []byte(`{"object": {"field": true}}`),
 	})
 
-	fmt.Printf("%#v\n", resp)
+	println(string(resp.Data))
 }
 
 ```
