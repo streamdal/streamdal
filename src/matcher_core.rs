@@ -78,8 +78,6 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
 pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
     let field: String = detective::parse_field(request.data, &request.path)?;
 
-
-
     // Check if the string has the correct length
     if field.len() != 17 {
         return Ok(false);
