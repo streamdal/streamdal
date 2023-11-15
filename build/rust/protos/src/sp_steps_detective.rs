@@ -249,7 +249,7 @@ pub enum DetectiveType {
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_LENGTH_RANGE)
     DETECTIVE_TYPE_STRING_LENGTH_RANGE = 1020,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_SEMVER)
-    DETECTIVE_TYPE_SEMVER = 2021,
+    DETECTIVE_TYPE_SEMVER = 1021,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_ANY)
     DETECTIVE_TYPE_PII_ANY = 2000,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_CREDIT_CARD)
@@ -333,7 +333,7 @@ impl ::protobuf::Enum for DetectiveType {
             1018 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN),
             1019 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX),
             1020 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE),
-            2021 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_SEMVER),
+            1021 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_SEMVER),
             2000 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_ANY),
             2001 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD),
             2002 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_SSN),
@@ -564,7 +564,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     TIVE_TYPE_URL\x10\xf8\x07\x12\x1c\n\x17DETECTIVE_TYPE_HOSTNAME\x10\xf9\
     \x07\x12%\n\x20DETECTIVE_TYPE_STRING_LENGTH_MIN\x10\xfa\x07\x12%\n\x20DE\
     TECTIVE_TYPE_STRING_LENGTH_MAX\x10\xfb\x07\x12'\n\"DETECTIVE_TYPE_STRING\
-    _LENGTH_RANGE\x10\xfc\x07\x12\x1a\n\x15DETECTIVE_TYPE_SEMVER\x10\xe5\x0f\
+    _LENGTH_RANGE\x10\xfc\x07\x12\x1a\n\x15DETECTIVE_TYPE_SEMVER\x10\xfd\x07\
     \x12\x1b\n\x16DETECTIVE_TYPE_PII_ANY\x10\xd0\x0f\x12#\n\x1eDETECTIVE_TYP\
     E_PII_CREDIT_CARD\x10\xd1\x0f\x12\x1b\n\x16DETECTIVE_TYPE_PII_SSN\x10\
     \xd2\x0f\x12\x1d\n\x18DETECTIVE_TYPE_PII_EMAIL\x10\xd3\x0f\x12\x1d\n\x18\

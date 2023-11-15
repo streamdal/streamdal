@@ -285,6 +285,7 @@ class PipelineStep(betterproto.Message):
     infer_schema: "steps.InferSchemaStep" = betterproto.message_field(
         1007, group="step"
     )
+    valid_json: "steps.ValidJsonStep" = betterproto.message_field(1008, group="step")
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
