@@ -1,6 +1,6 @@
 [package]
-name = "kv"
-version = "0.1.0"
+name = "validjson"
+version = "0.0.120"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,4 +12,8 @@ crate-type = ["cdylib"]
 protobuf = "3.2.0"
 streamdal-protos = "0.0.120"
 common = { path = "../common" }
-streamdal-wasm-detective = "0.0.30"
+serde_json = "1.0.108"
+
+[profile.release]
+lto = true
+
