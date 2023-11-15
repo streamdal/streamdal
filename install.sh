@@ -78,7 +78,7 @@ cd "$INSTALL_DIR_DOCKER" || fatal "Failed to change to install dir ${INSTALL_DIR
 info "Starting streamdal components via docker-compose..."
 
 # Attempt to start streamdal components
-docker-compose up -d --pull --always-recreate-deps --force-recreate --quiet-pull || fatal "Failed to start streamdal"
+docker-compose up -d --pull always --force-recreate --quiet-pull || fatal "Failed to start streamdal"
 
 info "🎉 Streamdal has been successfully installed! 🎉"
 info "You can access the UI at ${DEFAULT_UI_URL}"

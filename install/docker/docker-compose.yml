@@ -48,7 +48,7 @@ services:
       - streamdal-network
 
   streamdal-console:
-    image: streamdal/console:v0.1.40
+    image: streamdal/console:v0.1.41
     container_name: streamdal-console
     depends_on:
       - envoy
