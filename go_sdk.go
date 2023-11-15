@@ -255,7 +255,7 @@ func New(cfg *Config) (*Streamdal, error) {
 		return nil, err
 	}
 
-	errCh := make(chan error, 0)
+	errCh := make(chan error)
 
 	// Start register
 	go func() {
@@ -585,6 +585,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 
 	originalData := data // Used for tail request
 
+PIPELINE:
 	for _, p := range pipelines {
 		pipeline := p.GetAttachPipeline().GetPipeline()
 
@@ -599,7 +600,8 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 			select {
 			case <-timeoutCtx.Done():
 				timeoutCxl()
-				return nil, ErrPipelineTimeout
+				s.config.Logger.Errorf("pipeline '%s' timeout exceeded", pipeline.Name)
+				continue PIPELINE
 			default:
 				// NOOP
 			}
@@ -611,8 +613,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return nil, err
+					continue PIPELINE
 				}
 
 				// wasmResp will be nil, so don't allow code below to execute
@@ -627,10 +628,9 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return &ProcessResponse{
-						Data: wasmResp.OutputPayload,
-					}, nil
+					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
+						"condition failed, aborting pipeline", step.Name)
+					continue PIPELINE
 				}
 			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
 				fallthrough
@@ -642,8 +642,8 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) (*ProcessR
 				shouldContinue := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
 				if !shouldContinue {
 					timeoutCxl()
-					s.sendTail(aud, pipeline.Id, originalData, wasmResp.OutputPayload)
-					return nil, fmt.Errorf("step failed: %s", wasmResp.ExitMsg)
+					s.config.Logger.Debugf("Step '%s' returned exit code failure, aborting pipeline", step.Name)
+					continue PIPELINE
 				}
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})

@@ -38,7 +38,7 @@ var _ = Describe("Schema", func() {
 
 	Context("getSchema", func() {
 		It("returns empty when no schema found", func() {
-			schema := s.getSchema(nil, nil)
+			schema := s.getSchema(context.Background(), nil)
 			Expect(schema).To(Equal([]byte(``)))
 		})
 
