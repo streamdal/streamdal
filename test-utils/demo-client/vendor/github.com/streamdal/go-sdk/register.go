@@ -25,7 +25,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "v0.0.73",
+		LibraryVersion: "v0.0.75",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
@@ -43,7 +43,7 @@ func (s *Streamdal) register(looper director.Looper) error {
 
 	s.audiencesMtx.Lock()
 	for _, aud := range s.config.Audiences {
-		pAud := aud.ToProto(s.config.ServiceName)
+		pAud := aud.toProto(s.config.ServiceName)
 		req.Audiences = append(req.Audiences, pAud)
 		s.audiences[audToStr(pAud)] = struct{}{}
 	}
