@@ -234,16 +234,11 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 
 	// Set status and msg
 	status := color.GreenString("SUCCESS")
-	message := color.GreenString(post.Message)
+	message := ""
 
 	if err != nil {
 		status = color.RedString("FAILURE")
 		message = color.RedString("Process error: " + err.Error())
-	}
-
-	if post.Error {
-		status = color.RedString("FAILURE")
-		message = color.RedString(post.Message)
 	}
 
 	// Format pre data
@@ -267,7 +262,7 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	// Determine post-title
 	postTitle := "Post-Process (unchanged)"
 
-	if err == nil && !post.Error && string(pre) != string(post.Data) {
+	if err == nil && string(pre) != string(post.Data) {
 		postTitle = "Post-Process " + underline("(changed)")
 	}
 
