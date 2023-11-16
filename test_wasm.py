@@ -150,3 +150,34 @@ class TestStreamdalWasm:
         assert res.exit_code == 1
         assert res.exit_msg == "Successfully transformed payload"
         assert res.output_payload == b'{"object": {"payload": "new val"}}'
+
+    def test_validjson_wasm(self):
+        client = object.__new__(StreamdalClient)
+        client.functions = {}
+
+        with open("./assets/test/validjson.wasm", "rb") as file:
+            wasm_bytes = file.read()
+
+        step = protos.PipelineStep(
+            name="valid json test",
+            on_success=[],
+            on_failure=[],
+            wasm_bytes=wasm_bytes,
+            wasm_id=uuid.uuid4().__str__(),
+            wasm_function="f",
+            valid_json=protos.steps.ValidJsonStep(),
+        )
+
+        # valid json
+        res = client._call_wasm(step=step, data=b'{"object": {"payload": "old val"}}')
+
+        assert res is not None
+        assert res.exit_code == 1
+        assert res.output_payload == b'{"object": {"payload": "old val"}}'
+
+        # invalid json
+        res = client._call_wasm(step=step, data=b'{"object": {"payload": "old val}}')
+
+        assert res is not None
+        assert res.exit_code == 2
+        assert res.output_payload == b'{"object": {"payload": "old val}}'

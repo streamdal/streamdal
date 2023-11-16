@@ -382,17 +382,9 @@ class StreamdalClient:
                         step.on_failure, pipeline, step, cmd.audience
                     )
 
-                    # Not continuing, exit function early
-                    if should_continue is False and self.cfg.dry_run is False:
-                        self._send_tail(
-                            cmd.audience,
-                            pipeline.id,
-                            original_data,
-                            wasm_resp.output_payload,
-                        )
-                        return ProcessResponse(
-                            data=data, error=True, message=wasm_resp.exit_msg
-                        )
+                    if should_continue is False:
+                        # Continue outer pipeline loop if there are additional pipelines
+                        break
 
                     continue
 
@@ -406,16 +398,9 @@ class StreamdalClient:
                 )
 
                 # Not continuing, exit function early
-                if should_continue is False and self.cfg.dry_run is False:
-                    self._send_tail(
-                        cmd.audience,
-                        pipeline.id,
-                        original_data,
-                        wasm_resp.output_payload,
-                    )
-                    return ProcessResponse(
-                        data=data, error=True, message=wasm_resp.exit_msg
-                    )
+                if should_continue is False:
+                    # Continue outer pipeline loop if there are additional pipelines
+                    break
 
         self._send_tail(aud, "", original_data, data)
 
