@@ -16,11 +16,16 @@ import (
 
 var _ = Describe("WASM Modules", func() {
 	Context("ValidJSON", func() {
-		It("returns success on valid json", func() {
+
+		var req *protos.WASMRequest
+		var s *Streamdal
+		var f *function
+
+		BeforeEach(func() {
 			wasmData, err := os.ReadFile("test-assets/wasm/validjson.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
-			req := &protos.WASMRequest{
+			req = &protos.WASMRequest{
 				Step: &protos.PipelineStep{
 					Step: &protos.PipelineStep_ValidJson{
 						ValidJson: &steps.ValidJSONStep{},
@@ -32,18 +37,20 @@ var _ = Describe("WASM Modules", func() {
 				InputPayload: []byte(`{"foo":"bar"}`),
 			}
 
-			s := &Streamdal{
+			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
 				pipelines:    map[string]map[string]*protos.Command{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
 
-			f, err := s.createFunction(req.Step)
+			f, err = s.createFunction(req.Step)
 			Expect(err).ToNot(HaveOccurred())
 
 			req.Step.XWasmBytes = nil
+		})
 
+		It("returns success on valid json", func() {
 			data, err := proto.Marshal(req)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -56,6 +63,23 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+		})
+
+		It("returns failure on invalid json", func() {
+			req.InputPayload = []byte(`{"foo":"bar"`)
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
 		})
 	})
 
