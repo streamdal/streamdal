@@ -1,5 +1,5 @@
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
-use serde_json;
+use streamdal_gjson;
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
@@ -26,25 +26,36 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         );
     }
 
-    // Validate JSON
-    return match serde_json::from_slice(&wasm_request.input_payload) {
-        Ok(json) => {
-            common::write_response(
-                Some(json),
-                None,
-                WASMExitCode::WASM_EXIT_CODE_SUCCESS,
-                "".to_string(),
-            )
-        },
+    let orig_payload = wasm_request.input_payload.as_slice();
+
+
+    let str_json = match String::from_utf8(orig_payload.clone().to_vec()) {
+        Ok(v) => v,
         Err(e) => {
-            common::write_response(
+            return common::write_response(
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("invalid JSON: {}", e),
-            )
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to convert input_payload to string: {}", e),
+            );
         }
     };
+
+    if streamdal_gjson::valid(str_json.as_str()) {
+        common::write_response(
+            Some(orig_payload),
+            None,
+            WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+            "".to_string(),
+        )
+    } else {
+        common::write_response(
+            Some(orig_payload),
+            None,
+            WASMExitCode::WASM_EXIT_CODE_FAILURE,
+            "invalid JSON".to_string(),
+        )
+    }
 }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
@@ -57,4 +68,19 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
     }
 
     Ok(())
+}
+/// # Safety
+///
+/// This is unsafe because it operates on raw memory; see `common/src/lib.rs`.
+#[no_mangle]
+pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
+    common::alloc(size)
+}
+
+/// # Safety
+///
+/// This is unsafe because it operates on raw memory; see `common/src/lib.rs`.
+#[no_mangle]
+pub unsafe extern "C" fn dealloc(pointer: *mut u8, size: i32) {
+    common::dealloc(pointer, size)
 }
