@@ -28,11 +28,11 @@ pub const SAMPLE_JSON: &str = r#"{
         "email_unicode_local_invalid": "日本@example",
         "credit_card": {
             "visa": {
-                "valid": "4111111111111111",
+                "valid": "4111-1111-1111-1111",
                 "invalid": "4111111111111112",
             },
             "mastercard": {
-                "valid": "5555555555554444",
+                "valid": "5555 5555 5555 4444",
                 "invalid": "5555555555554445",
             },
             "amex": {

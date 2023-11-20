@@ -10,7 +10,7 @@ pub fn any(_request: &Request) -> Result<bool, CustomError> {
 
 pub fn credit_card(request: &Request) -> Result<bool, CustomError> {
     let mut  num: String = detective::parse_field(request.data, &request.path)?;
-    num = num.as_str().trim().replace("-", "").replace(" ", "");
+    num = num.as_str().trim().replace(['-', ' '], "");
 
     // Convert the card number string to a vector of digits
     let digits: Vec<u32> = num
