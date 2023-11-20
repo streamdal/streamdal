@@ -262,6 +262,8 @@ func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	llog := s.log.WithField("method", "CreatePipeline")
 	llog.Debug("received request to create pipeline")
 
+	applyPipelineDefaults(pipeline)
+
 	// Save to K/V
 	pipelineData, err := proto.Marshal(pipeline)
 	if err != nil {
@@ -1248,4 +1250,16 @@ func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailReques
 	}
 
 	return tailKey, nil
+}
+
+func applyPipelineDefaults(pipeline *protos.Pipeline) {
+	// Loop over steps and ensure negate is set for detective steps if it's nil
+	// Rust will panic if it's not set
+	for _, step := range pipeline.Steps {
+		if d := step.GetDetective(); d != nil {
+			if d.Negate == nil {
+				d.Negate = proto.Bool(false)
+			}
+		}
+	}
 }
