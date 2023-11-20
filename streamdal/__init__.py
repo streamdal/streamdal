@@ -882,7 +882,13 @@ class StreamdalClient:
         result_ptr = f(store, start_ptr, len(data))
 
         # Read from result pointer
-        return common.read_memory(memory, store, result_ptr, -1)
+        res = common.read_memory(memory, store, result_ptr, -1)
+
+        # Dealloc result pointer
+        dealloc = instance.exports(store)["dealloc"]
+        dealloc(store, result_ptr, len(res))
+
+        return res
 
     # ------------------------------------------------------------------------------------
 
