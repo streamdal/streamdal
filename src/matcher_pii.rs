@@ -8,8 +8,43 @@ pub fn any(_request: &Request) -> Result<bool, CustomError> {
     Err(CustomError::Error("not implemented".to_string()))
 }
 
-pub fn credit_card(_request: &Request) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+pub fn credit_card(request: &Request) -> Result<bool, CustomError> {
+    let mut  num: String = detective::parse_field(request.data, &request.path)?;
+    num = num.as_str().trim().replace(['-', ' '], "");
+
+    // Convert the card number string to a vector of digits
+    let digits: Vec<u32> = num
+        .chars()
+        .filter_map(|c| c.to_digit(10))
+        .collect();
+
+    // Check if the number of digits is valid for a credit card
+    if digits.len() < 13 || digits.len() > 19 {
+        return Ok(false);
+    }
+
+    // Implement the Luhn algorithm
+    let mut sum = 0;
+    let mut double = false;
+
+    for &digit in digits.iter().rev() {
+        let mut value = digit;
+
+        if double {
+            value *= 2;
+
+            if value > 9 {
+                value -= 9;
+            }
+        }
+
+        sum += value;
+        double = !double;
+    }
+
+    let res = sum % 10 == 0;
+
+    Ok(res)
 }
 
 pub fn ssn(_request: &Request) -> Result<bool, CustomError> {
@@ -21,7 +56,7 @@ pub fn email(request: &Request) -> Result<bool, CustomError> {
 
 
     // Split the email address into local part and domain part
-    let parts: Vec<&str> = email.split('@').collect();
+    let parts: Vec<&str> = email.trim().split('@').collect();
 
     // Ensure there are exactly two parts (local and domain)
     if parts.len() != 2 {

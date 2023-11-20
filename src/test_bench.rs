@@ -147,3 +147,16 @@ fn bench_email_utf8(b: &mut Bencher) {
     });
 }
 
+
+#[bench]
+fn bench_credit_card(b: &mut Bencher) {
+    let request = generate_request_for_bench(
+        DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
+        "object.credit_card.visa.valid",
+        vec![],
+    );
+
+    b.iter(|| {
+        let _ = crate::matcher_pii::credit_card(&request);
+    });
+}

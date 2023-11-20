@@ -26,6 +26,36 @@ pub const SAMPLE_JSON: &str = r#"{
         "email_unicode_domain_invalid": "test@日本",
         "email_unicode_local_valid": "日本@example.com",
         "email_unicode_local_invalid": "日本@example",
+        "credit_card": {
+            "visa": {
+                "valid": "4111-1111-1111-1111",
+                "invalid": "4111111111111112",
+            },
+            "mastercard": {
+                "valid": "5555 5555 5555 4444",
+                "invalid": "5555555555554445",
+            },
+            "amex": {
+                "valid": "378282246310005",
+                "invalid": "378282246310006",
+            },
+            "discover": {
+                "valid": "6011111111111117",
+                "invalid": "6011111111111118",
+            },
+            "diners_club": {
+                "valid": "30569309025904",
+                "invalid": "30569309025905",
+            },
+            "jcb": {
+                "valid": "3530111333300000",
+                "invalid": "3530111333300001",
+            },
+            "unionpay": {
+                "valid": "6200000000000005",
+                "invalid": "6200000000000006",
+            }
+        }
     },
     "array": [
         "value1",
