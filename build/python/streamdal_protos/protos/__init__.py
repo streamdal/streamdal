@@ -60,6 +60,8 @@ class TailRequestType(betterproto.Enum):
     TAIL_REQUEST_TYPE_UNSET = 0
     TAIL_REQUEST_TYPE_START = 1
     TAIL_REQUEST_TYPE_STOP = 2
+    TAIL_REQUEST_TYPE_PAUSE = 3
+    TAIL_REQUEST_TYPE_RESUME = 4
 
 
 class PipelineStepCondition(betterproto.Enum):
@@ -657,6 +659,16 @@ class AppVerifyRegistrationRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class AppRegisterRejectRequest(betterproto.Message):
     cluster_id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class PauseTailRequest(betterproto.Message):
+    tail_id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class ResumeTailRequest(betterproto.Message):
+    tail_id: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1441,6 +1453,40 @@ class ExternalStub(betterproto.ServiceStub):
         ):
             yield response
 
+    async def pause_tail(
+        self,
+        pause_tail_request: "PauseTailRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/PauseTail",
+            pause_tail_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def resume_tail(
+        self,
+        resume_tail_request: "ResumeTailRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/ResumeTail",
+            resume_tail_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def get_audience_rates(
         self,
         get_audience_rates_request: "GetAudienceRatesRequest",
@@ -1814,6 +1860,16 @@ class ExternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield TailResponse()
 
+    async def pause_tail(
+        self, pause_tail_request: "PauseTailRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def resume_tail(
+        self, resume_tail_request: "ResumeTailRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def get_audience_rates(
         self, get_audience_rates_request: "GetAudienceRatesRequest"
     ) -> AsyncIterator["GetAudienceRatesResponse"]:
@@ -2019,6 +2075,20 @@ class ExternalBase(ServiceBase):
             request,
         )
 
+    async def __rpc_pause_tail(
+        self, stream: "grpclib.server.Stream[PauseTailRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.pause_tail(request)
+        await stream.send_message(response)
+
+    async def __rpc_resume_tail(
+        self, stream: "grpclib.server.Stream[ResumeTailRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.resume_tail(request)
+        await stream.send_message(response)
+
     async def __rpc_get_audience_rates(
         self,
         stream: "grpclib.server.Stream[GetAudienceRatesRequest, GetAudienceRatesResponse]",
@@ -2208,6 +2278,18 @@ class ExternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_STREAM,
                 TailRequest,
                 TailResponse,
+            ),
+            "/protos.External/PauseTail": grpclib.const.Handler(
+                self.__rpc_pause_tail,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                PauseTailRequest,
+                StandardResponse,
+            ),
+            "/protos.External/ResumeTail": grpclib.const.Handler(
+                self.__rpc_resume_tail,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                ResumeTailRequest,
+                StandardResponse,
             ),
             "/protos.External/GetAudienceRates": grpclib.const.Handler(
                 self.__rpc_get_audience_rates,

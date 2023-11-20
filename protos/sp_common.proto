@@ -70,6 +70,8 @@ enum TailRequestType {
   TAIL_REQUEST_TYPE_UNSET = 0;
   TAIL_REQUEST_TYPE_START = 1;
   TAIL_REQUEST_TYPE_STOP = 2;
+  TAIL_REQUEST_TYPE_PAUSE = 3;
+  TAIL_REQUEST_TYPE_RESUME = 4;
 }
 
 // TailResponse originates in the SDK and then is sent to streamdal servers where

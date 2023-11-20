@@ -15,6 +15,8 @@ import type { GetSchemaResponse } from "./sp_external.ts";
 import type { GetSchemaRequest } from "./sp_external.ts";
 import type { GetAudienceRatesResponse } from "./sp_external.ts";
 import type { GetAudienceRatesRequest } from "./sp_external.ts";
+import type { ResumeTailRequest } from "./sp_external.ts";
+import type { PauseTailRequest } from "./sp_external.ts";
 import type { TailResponse } from "./sp_common.ts";
 import type { TailRequest } from "./sp_common.ts";
 import type { GetMetricsResponse } from "./sp_external.ts";
@@ -183,6 +185,14 @@ export interface IExternalClient {
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
+    /**
+     * @generated from protobuf rpc: PauseTail(protos.PauseTailRequest) returns (protos.StandardResponse);
+     */
+    pauseTail(input: PauseTailRequest, options?: RpcOptions): UnaryCall<PauseTailRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: ResumeTail(protos.ResumeTailRequest) returns (protos.StandardResponse);
+     */
+    resumeTail(input: ResumeTailRequest, options?: RpcOptions): UnaryCall<ResumeTailRequest, StandardResponse>;
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
@@ -420,45 +430,59 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: PauseTail(protos.PauseTailRequest) returns (protos.StandardResponse);
+     */
+    pauseTail(input: PauseTailRequest, options?: RpcOptions): UnaryCall<PauseTailRequest, StandardResponse> {
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        return stackIntercept<PauseTailRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: ResumeTail(protos.ResumeTailRequest) returns (protos.StandardResponse);
+     */
+    resumeTail(input: ResumeTailRequest, options?: RpcOptions): UnaryCall<ResumeTailRequest, StandardResponse> {
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        return stackIntercept<ResumeTailRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse> {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAudienceRatesRequest, GetAudienceRatesResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse> {
-        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        const method = this.methods[25], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetSchemaRequest, GetSchemaResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
      */
     appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse> {
-        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        const method = this.methods[26], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegistrationStatusRequest, AppRegistrationStatusResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
      */
     appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse> {
-        const method = this.methods[25], opt = this._transport.mergeOptions(options);
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
      */
     appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse> {
-        const method = this.methods[26], opt = this._transport.mergeOptions(options);
+        const method = this.methods[28], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppVerifyRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse> {
-        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        const method = this.methods[29], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegisterRejectRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -467,7 +491,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[28], opt = this._transport.mergeOptions(options);
+        const method = this.methods[30], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }
