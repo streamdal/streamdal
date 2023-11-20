@@ -111,6 +111,15 @@ type IStore interface {
 	// GetStreamdalID returns the unique ID for this cluster.
 	// If an ID has not been set yet, a new one is generated and returned
 	GetStreamdalID(ctx context.Context) (string, error)
+
+	// PauseTailRequest pauses a tail request by its ID
+	PauseTailRequest(ctx context.Context, req *protos.PauseTailRequest) (*protos.TailRequest, error)
+
+	// ResumeTailRequest resumes a tail request by its ID
+	ResumeTailRequest(ctx context.Context, req *protos.ResumeTailRequest) (*protos.TailRequest, error)
+
+	// GetTailRequestById returns a TailRequest by its ID
+	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
 }
 
 type Options struct {
@@ -1250,6 +1259,105 @@ func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailReques
 	}
 
 	return tailKey, nil
+}
+
+func (s *Store) GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisActiveTailPrefix+":*:"+tailID).Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching active tail keys from store")
+	}
+
+	if len(keys) == 0 {
+		return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+	} else if len(keys) > 1 {
+		return nil, errors.Errorf("BUG: found '%d' keys for tail ID '%s' - expected 1", len(keys), tailID)
+	}
+
+	encodedReq, err := s.options.RedisBackend.Get(ctx, keys[0]).Result()
+	if err != nil {
+		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
+	}
+
+	// Attempt to decode
+	tailRequest := &protos.TailRequest{}
+
+	if err := proto.Unmarshal([]byte(encodedReq), tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) GetPausedTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisPausedTailKeyFormat+":"+tailID).Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching active tail keys from store")
+	}
+
+	if len(keys) == 0 {
+		return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+	} else if len(keys) > 1 {
+		return nil, errors.Errorf("BUG: found '%d' keys for tail ID '%s' - expected 1", len(keys), tailID)
+	}
+
+	encodedReq, err := s.options.RedisBackend.Get(ctx, keys[0]).Result()
+	if err != nil {
+		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
+	}
+
+	// Attempt to decode
+	tailRequest := &protos.TailRequest{}
+
+	if err := proto.Unmarshal([]byte(encodedReq), tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) PauseTailRequest(ctx context.Context, req *protos.PauseTailRequest) (*protos.TailRequest, error) {
+	// Fetch tail request
+	tailRequest, err := s.GetTailRequestById(ctx, req.TailId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching tail request")
+	}
+
+	// Delete tail request from active
+	if err := s.options.RedisBackend.Del(ctx, fmt.Sprintf(RedisActiveTailKeyFormat, tailRequest.Audience.ServiceName, tailRequest.GetXId())).Err(); err != nil {
+		return nil, errors.Wrap(err, "error deleting tail request")
+	}
+
+	data, err := proto.Marshal(tailRequest)
+	if err != nil {
+		return nil, errors.Wrap(err, "error marshaling tail request")
+	}
+
+	// Save to paused
+	if err := s.options.RedisBackend.Set(ctx, fmt.Sprintf(RedisPausedTailKeyFormat, tailRequest.GetXId()), data, 0).Err(); err != nil {
+		return nil, errors.Wrap(err, "error saving paused tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) ResumeTailRequest(ctx context.Context, req *protos.ResumeTailRequest) (*protos.TailRequest, error) {
+	// Fetch tail request
+	tailRequest, err := s.GetPausedTailRequestById(ctx, req.TailId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching tail request")
+	}
+
+	// Delete tail request from paused
+	if err := s.options.RedisBackend.Del(ctx, fmt.Sprintf(RedisPausedTailKeyFormat, tailRequest.GetXId())).Err(); err != nil {
+		return nil, errors.Wrap(err, "error deleting tail request")
+	}
+
+	// Save to active
+	if _, err := s.AddActiveTailRequest(ctx, tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error saving active tail request")
+	}
+
+	return tailRequest, nil
 }
 
 func applyPipelineDefaults(pipeline *protos.Pipeline) {

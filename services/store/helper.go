@@ -39,7 +39,8 @@ const (
 	RedisSchemaFormat = "streamdal_schema:%s" // K: $audience V: serialized protos.Schema
 
 	RedisActiveTailPrefix    = "streamdal_tail"
-	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s" // K: $service_name:$tail_request_id V: serialized protos.TailRequest
+	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s"     // K: $service_name:$tail_request_id V: serialized protos.TailRequest
+	RedisPausedTailKeyFormat = "streamdal_tail_paused:%s" // K: $service_name:$tail_request_id:paused V: serialized protos.TailRequest
 
 	// RedisActiveTailTTL is the TTL for the active tail key. While this key
 	// should be automatically cleaned up when the frontend stops a Tail() request,

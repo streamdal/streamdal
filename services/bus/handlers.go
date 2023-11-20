@@ -474,6 +474,10 @@ func (b *Bus) handleTailCommand(ctx context.Context, req *protos.TailRequest) er
 		return b.handleTailRequestStart(ctx, req)
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 		return b.handleTailRequestStop(ctx, req)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_PAUSE:
+		return b.handleTailRequestPause(ctx, req)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_RESUME:
+		return b.handleTailRequestResume(ctx, req)
 	default:
 		b.log.Debugf("unknown tail command type: %v", req.Type)
 	}
@@ -501,6 +505,24 @@ func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest
 		b.log.Debugf("closed pubsub topic '%s'", req.GetXId())
 	} else {
 		b.log.Debugf("no pubsub topic '%s' found to close", req.GetXId())
+	}
+
+	return b.sendTailCommand(ctx, req)
+}
+
+func (b *Bus) handleTailRequestPause(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail pause command")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
+	}
+
+	return b.sendTailCommand(ctx, req)
+}
+
+func (b *Bus) handleTailRequestResume(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail resume command")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
 	}
 
 	return b.sendTailCommand(ctx, req)

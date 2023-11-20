@@ -975,6 +975,48 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	}
 }
 
+func (s *ExternalServer) PauseTail(ctx context.Context, req *protos.PauseTailRequest) (*protos.StandardResponse, error) {
+	if err := validate.PauseTailRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+	
+	tailReq, err := s.Options.StoreService.PauseTailRequest(ctx, req)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	tailReq.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_PAUSE
+
+	if err := s.Options.BusService.BroadcastTailRequest(ctx, tailReq); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK, "tail paused"), nil
+}
+
+func (s *ExternalServer) ResumeTail(ctx context.Context, req *protos.ResumeTailRequest) (*protos.StandardResponse, error) {
+	if err := validate.ResumeTailRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	}
+
+	// Get original tail request
+	tailReq, err := s.Options.StoreService.ResumeTailRequest(ctx, req)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	tailReq.Type = protos.TailRequestType_TAIL_REQUEST_TYPE_RESUME
+
+	if err := s.Options.BusService.BroadcastTailRequest(ctx, tailReq); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// TODO: we need to store the idea of a paused tail request in redis so that SendActiveTails will not
+	// TODO: start the tail again when a client reconnects
+
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK, "tail resumed"), nil
+}
+
 func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.External_GetMetricsServer) error {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()

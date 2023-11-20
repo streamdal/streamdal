@@ -756,6 +756,22 @@ func validateTailRequest(r *protos.TailRequest) error {
 	return nil
 }
 
+func PauseTailRequest(r *protos.PauseTailRequest) error {
+	if r.TailId == "" {
+		return ErrEmptyField("TailId")
+	}
+
+	return nil
+}
+
+func ResumeTailRequest(r *protos.ResumeTailRequest) error {
+	if r.TailId == "" {
+		return ErrEmptyField("TailId")
+	}
+
+	return nil
+}
+
 func TailResponse(r *protos.TailResponse) error {
 	if r == nil {
 		return ErrNilInput
