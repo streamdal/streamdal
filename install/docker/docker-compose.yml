@@ -22,7 +22,7 @@ services:
 
   streamdal-server:
     container_name: streamdal-server
-    image: streamdal/server:v0.0.6-24f7e13
+    image: streamdal/server:v0.0.8-f31fd03
     depends_on:
       - streamdal-aes-gen
       - redis
