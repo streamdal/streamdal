@@ -449,6 +449,17 @@ table {
   }
 }
 
+.ltable {
+  table {
+    th, td {
+      background-color: var(--color-purple-300);
+    }
+    tr {
+      color: var(--color-purple-1000);
+    }
+  }
+}
+
 table thead tr:first-child th {
   border-bottom: 0.0625em solid var(--color-purple-900);
 }
