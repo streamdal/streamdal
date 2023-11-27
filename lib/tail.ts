@@ -33,7 +33,7 @@ export const parseData = (data: string) => {
 };
 
 export const highlightData = (data: string) =>
-  hljs.highlightAuto(parseData(data)).value;
+  hljs.highlight(parseData(data), { language: "json" }).value;
 
 export const formatData = (data: string) => highlightData(parseData(data));
 

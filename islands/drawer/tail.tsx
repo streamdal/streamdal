@@ -8,7 +8,7 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { signal } from "@preact/signals";
+import { signal, useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 
@@ -36,7 +36,7 @@ export const TailRow = (
 ) => (
   <div className="flex flex-row w-full">
     <div className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start">
-      <div className="text-stream">
+      <div className="text-stormCloud">
         {row.timestamp?.toLocaleDateString(
           "en-us",
           longDateFormat,
@@ -58,11 +58,18 @@ export const TailRow = (
 export const Tail = ({ audience }: { audience: Audience }) => {
   const scrollBottom = useRef();
   const [fullScreen, setFullScreen] = useState(false);
+  const [socket, setSocket] = useState(null);
+
+  const start = () => setSocket(tailSocket("/ws/tail", audience));
+  const stop = () => {
+    socket?.close();
+    setSocket(null);
+  };
 
   useEffect(() => {
-    const socket = tailSocket("/ws/tail", audience);
+    start();
     const bufferInterval = setInterval(() => {
-      if (!tailPausedSignal.value && tailBufferSignal.value.length) {
+      if (!tailPausedSignal.value && tailBufferSignal.value?.length) {
         tailSignal.value = [
           ...(tailSignal.value || []).slice(
             -(MAX_TAIL_SIZE - tailBufferSignal.value.length),
@@ -72,11 +79,25 @@ export const Tail = ({ audience }: { audience: Audience }) => {
       }
     }, TAIL_BUFFER_INTERVAL);
 
+    const togglePause = () => {
+      tailPausedSignal.value = document.visibilityState !== "visible";
+    };
+    document.addEventListener("visibilitychange", togglePause);
+
     return () => {
-      socket?.close();
+      stop();
       clearInterval(bufferInterval);
+      document.removeEventListener("visibilitychange", togglePause);
     };
   }, []);
+
+  useSignalEffect(() => {
+    if (tailPausedSignal.value) {
+      socket?.readyState === WebSocket.OPEN && stop();
+    } else {
+      socket?.readyState !== WebSocket.OPEN && start();
+    }
+  });
 
   useEffect(() => {
     tailPausedSignal.value == false && scrollBottom.current &&
@@ -86,16 +107,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
         inline: "start",
       });
   }, [tailSignal.value, tailPausedSignal.value]);
-
-  useEffect(() => {
-    const togglePause = () => {
-      tailPausedSignal.value = document.visibilityState !== "visible";
-    };
-    document.addEventListener("visibilitychange", togglePause);
-    return () => {
-      document.removeEventListener("visibilitychange", togglePause);
-    };
-  }, []);
 
   return (
     <div
