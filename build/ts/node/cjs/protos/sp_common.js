@@ -93,6 +93,14 @@ var TailRequestType;
      * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
      */
     TailRequestType[TailRequestType["STOP"] = 2] = "STOP";
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_PAUSE = 3;
+     */
+    TailRequestType[TailRequestType["PAUSE"] = 3] = "PAUSE";
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_RESUME = 4;
+     */
+    TailRequestType[TailRequestType["RESUME"] = 4] = "RESUME";
 })(TailRequestType || (exports.TailRequestType = TailRequestType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends runtime_5.MessageType {

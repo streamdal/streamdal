@@ -287,7 +287,15 @@ export enum TailRequestType {
     /**
      * @generated from protobuf enum value: TAIL_REQUEST_TYPE_STOP = 2;
      */
-    STOP = 2
+    STOP = 2,
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_PAUSE = 3;
+     */
+    PAUSE = 3,
+    /**
+     * @generated from protobuf enum value: TAIL_REQUEST_TYPE_RESUME = 4;
+     */
+    RESUME = 4
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class StandardResponse$Type extends MessageType<StandardResponse> {

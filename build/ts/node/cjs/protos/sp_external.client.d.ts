@@ -11,6 +11,8 @@ import type { GetSchemaResponse } from "./sp_external";
 import type { GetSchemaRequest } from "./sp_external";
 import type { GetAudienceRatesResponse } from "./sp_external";
 import type { GetAudienceRatesRequest } from "./sp_external";
+import type { ResumeTailRequest } from "./sp_external";
+import type { PauseTailRequest } from "./sp_external";
 import type { TailResponse } from "./sp_common";
 import type { TailRequest } from "./sp_common";
 import type { GetMetricsResponse } from "./sp_external";
@@ -178,6 +180,14 @@ export interface IExternalClient {
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
+    /**
+     * @generated from protobuf rpc: PauseTail(protos.PauseTailRequest) returns (protos.StandardResponse);
+     */
+    pauseTail(input: PauseTailRequest, options?: RpcOptions): UnaryCall<PauseTailRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: ResumeTail(protos.ResumeTailRequest) returns (protos.StandardResponse);
+     */
+    resumeTail(input: ResumeTailRequest, options?: RpcOptions): UnaryCall<ResumeTailRequest, StandardResponse>;
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
@@ -350,6 +360,14 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse>;
+    /**
+     * @generated from protobuf rpc: PauseTail(protos.PauseTailRequest) returns (protos.StandardResponse);
+     */
+    pauseTail(input: PauseTailRequest, options?: RpcOptions): UnaryCall<PauseTailRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: ResumeTail(protos.ResumeTailRequest) returns (protos.StandardResponse);
+     */
+    resumeTail(input: ResumeTailRequest, options?: RpcOptions): UnaryCall<ResumeTailRequest, StandardResponse>;
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */

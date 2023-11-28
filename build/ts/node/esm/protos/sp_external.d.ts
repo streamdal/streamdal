@@ -487,6 +487,24 @@ export interface AppRegisterRejectRequest {
     clusterId: string;
 }
 /**
+ * @generated from protobuf message protos.PauseTailRequest
+ */
+export interface PauseTailRequest {
+    /**
+     * @generated from protobuf field: string tail_id = 1;
+     */
+    tailId: string;
+}
+/**
+ * @generated from protobuf message protos.ResumeTailRequest
+ */
+export interface ResumeTailRequest {
+    /**
+     * @generated from protobuf field: string tail_id = 1;
+     */
+    tailId: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -879,6 +897,26 @@ declare class AppRegisterRejectRequest$Type extends MessageType<AppRegisterRejec
  * @generated MessageType for protobuf message protos.AppRegisterRejectRequest
  */
 export declare const AppRegisterRejectRequest: AppRegisterRejectRequest$Type;
+declare class PauseTailRequest$Type extends MessageType<PauseTailRequest> {
+    constructor();
+    create(value?: PartialMessage<PauseTailRequest>): PauseTailRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PauseTailRequest): PauseTailRequest;
+    internalBinaryWrite(message: PauseTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PauseTailRequest
+ */
+export declare const PauseTailRequest: PauseTailRequest$Type;
+declare class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
+    constructor();
+    create(value?: PartialMessage<ResumeTailRequest>): ResumeTailRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResumeTailRequest): ResumeTailRequest;
+    internalBinaryWrite(message: ResumeTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.ResumeTailRequest
+ */
+export declare const ResumeTailRequest: ResumeTailRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
     create(value?: PartialMessage<TestRequest>): TestRequest;

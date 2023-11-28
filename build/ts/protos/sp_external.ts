@@ -497,6 +497,24 @@ export interface AppRegisterRejectRequest {
     clusterId: string;
 }
 /**
+ * @generated from protobuf message protos.PauseTailRequest
+ */
+export interface PauseTailRequest {
+    /**
+     * @generated from protobuf field: string tail_id = 1;
+     */
+    tailId: string;
+}
+/**
+ * @generated from protobuf message protos.ResumeTailRequest
+ */
+export interface ResumeTailRequest {
+    /**
+     * @generated from protobuf field: string tail_id = 1;
+     */
+    tailId: string;
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -2389,6 +2407,100 @@ class AppRegisterRejectRequest$Type extends MessageType<AppRegisterRejectRequest
  */
 export const AppRegisterRejectRequest = new AppRegisterRejectRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class PauseTailRequest$Type extends MessageType<PauseTailRequest> {
+    constructor() {
+        super("protos.PauseTailRequest", [
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<PauseTailRequest>): PauseTailRequest {
+        const message = { tailId: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<PauseTailRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PauseTailRequest): PauseTailRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: PauseTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.PauseTailRequest
+ */
+export const PauseTailRequest = new PauseTailRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
+    constructor() {
+        super("protos.ResumeTailRequest", [
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ResumeTailRequest>): ResumeTailRequest {
+        const message = { tailId: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<ResumeTailRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResumeTailRequest): ResumeTailRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ResumeTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.ResumeTailRequest
+ */
+export const ResumeTailRequest = new ResumeTailRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -2508,6 +2620,8 @@ export const External = new ServiceType("protos.External", [
     { name: "DeleteService", options: {}, I: DeleteServiceRequest, O: StandardResponse },
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },
     { name: "Tail", serverStreaming: true, options: {}, I: TailRequest, O: TailResponse },
+    { name: "PauseTail", options: {}, I: PauseTailRequest, O: StandardResponse },
+    { name: "ResumeTail", options: {}, I: ResumeTailRequest, O: StandardResponse },
     { name: "GetAudienceRates", serverStreaming: true, options: {}, I: GetAudienceRatesRequest, O: GetAudienceRatesResponse },
     { name: "GetSchema", options: {}, I: GetSchemaRequest, O: GetSchemaResponse },
     { name: "AppRegistrationStatus", options: {}, I: AppRegistrationStatusRequest, O: AppRegistrationStatusResponse },

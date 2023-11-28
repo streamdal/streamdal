@@ -75,6 +75,10 @@ service External {
 
   rpc Tail(TailRequest) returns (stream TailResponse);
 
+  rpc PauseTail(PauseTailRequest) returns (protos.StandardResponse);
+
+  rpc ResumeTail(ResumeTailRequest) returns (protos.StandardResponse);
+
   rpc GetAudienceRates(GetAudienceRatesRequest) returns (stream GetAudienceRatesResponse);
 
   rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
@@ -302,6 +306,14 @@ message AppVerifyRegistrationRequest {
 
 message AppRegisterRejectRequest {
   string cluster_id = 1;
+}
+
+message PauseTailRequest {
+  string tail_id = 1;
+}
+
+message ResumeTailRequest {
+  string tail_id = 1;
 }
 
 message TestRequest {
