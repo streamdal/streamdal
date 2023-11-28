@@ -1,7 +1,7 @@
 import { MiddlewareHandlerContext } from "$fresh/server.ts";
 import { cookieSession, WithSession } from "fresh-session/mod.ts";
 import { ErrorType } from "../components/form/validate.ts";
-import { DEMO, PRODUCTION } from "../lib/configs.ts";
+import { PRODUCTION } from "../lib/configs.ts";
 
 export type SuccessType = {
   status: boolean;
@@ -49,8 +49,7 @@ const emailPromptHandler = async (
   const emailPrompted = session?.get("emailPrompted");
 
   if (
-    !PRODUCTION || DEMO ||
-    emailPrompted || ctx.destination !== "route" ||
+    !PRODUCTION || emailPrompted || ctx.destination !== "route" ||
     emailExcludes.some((route) => pathname.startsWith(route))
   ) {
     return ctx.next();
