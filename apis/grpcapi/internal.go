@@ -7,6 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
+
+	"github.com/streamdal/server/types"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -148,7 +152,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// async operation in the SDKs - if we did it here, there is a chance that a
 	// .Process() call might process some messages WITHOUT any pipelines attached.
 	//
-	// Because of this, all of the SDKs ASK for attached pipelines in the
+	// Because of this, all the SDKs ASK for attached pipelines in the
 	// *constructor* (rather than inside of Register()).
 
 	// Send all KVs to client
@@ -160,6 +164,21 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
+
+	// TODO: need to figure out GaugeUsageRegistrationsTotal
+	// TODO: we need to hash the tags and store in redis/memory
+
+	// Send analytics
+	analyticsTags := []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"os", request.ClientInfo.Os},
+		{"sdk", request.ClientInfo.LibraryName},
+		{"arch", request.ClientInfo.Arch},
+		{"version", request.ClientInfo.LibraryVersion},
+	}
+
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, 1, 1.0, analyticsTags...)
+	defer s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, -1, 1.0, analyticsTags...)
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:

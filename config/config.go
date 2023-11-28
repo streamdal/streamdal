@@ -11,6 +11,13 @@ import (
 const (
 	EnvFile         = ".env"
 	EnvConfigPrefix = "STREAMDAL_SERVER"
+
+	// TODO: needed?
+	//// ConfigDir is the directory where we store persistent file configs
+	//ConfigDir = ".streamdal"
+	//
+	//// ConfigFileName is the persistent config's file name under ConfigDir
+	//ConfigFileName = "server.json"
 )
 
 type Config struct {
@@ -26,11 +33,15 @@ type Config struct {
 	HealthFreqSec        int              `help:"How often to perform health checks on dependencies" default:"60"`
 	SessionTTL           time.Duration    `help:"TTL for session keys in RedisBackend live K/V bucket" default:"5s"`
 	WASMDir              string           `help:"Directory where WASM files are stored" default:"./assets/wasm"`
-	SeedDummyData        bool             `help:"Seed RedisBackend with dummy data for testing" default:"false"`
 	NumTailWorkers       int              `help:"Number of tail workers to run" default:"4"`
 	NumBroadcastWorkers  int              `help:"Number of broadcast workers to run" default:"4"`
 	DemoMode             bool             `help:"Run server in demo mode. This disables modifications" default:"false"`
-	TelemetryDisabled    bool             `help:"Disable sending usage telemetry to Streamdal" default:"false"`
+	DisableAnalytics     bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
+	AnalyticsAddress     string           `help:"Address to send analytics to" default:"telemetry.streamdal.com:8125" hidden:"true"`
+	AnalyticsPrefix      string           `help:"Prefix to use for analytics" default:"server" hidden:"true"`
+
+	NodeID    string `kong:"-"`
+	InstallID string `kong:"-"`
 
 	AesKey string `help:"AES256 encryption key to encrypt notification configs at rest"`
 

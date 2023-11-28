@@ -71,6 +71,9 @@ github.com/aws/aws-sdk-go/service/sts/stsiface
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
+# github.com/cactus/go-statsd-client/v5 v5.1.0
+## explicit; go 1.11
+github.com/cactus/go-statsd-client/v5/statsd
 # github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2

@@ -29,6 +29,7 @@ require (
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/relistan/rubberneck.v1 v1.1.0
+	github.com/cactus/go-statsd-client/v5 v5.1.0
 )
 
 require (

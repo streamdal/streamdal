@@ -4,9 +4,9 @@ import (
 	"context"
 	"net"
 
-	"github.com/redis/go-redis/v9"
-
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -54,7 +54,10 @@ type Options struct {
 	RedisBackend    *redis.Client
 	PubSubService   pubsub.IPubSub
 	KVService       kv.IKV
+	Telemetry       statsd.Statter
 	DemoMode        bool
+	InstallID       string
+	NodeID          string
 }
 
 func New(o *Options) (*GRPCAPI, error) {
@@ -78,10 +81,12 @@ func (g *GRPCAPI) Run() error {
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			g.TelemetryUnaryInterceptor,
 			g.AuthServerUnaryInterceptor,
 			g.RequestIDServerUnaryInterceptor,
 		),
 		grpc.ChainStreamInterceptor(
+			g.TelemetryStreamInterceptor,
 			g.AuthServerStreamInterceptor,
 			g.RequestIDServerStreamInterceptor,
 		),
@@ -121,6 +126,40 @@ func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.Serve
 	}
 
 	return handler(srv, stream)
+}
+
+func (g *GRPCAPI) TelemetryStreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	tags := []statsd.Tag{
+		{"install_id", g.Options.InstallID},
+		{"source", "server"}, // TODO: what should this be?
+		{"node_id", g.Options.NodeID},
+	}
+
+	methodName := util.GrpcMethodCounterName(info.FullMethod)
+	if methodName != "" {
+		if err := g.Options.Telemetry.Inc(methodName, 1, 1.0, tags...); err != nil {
+			g.log.WithError(err).Debugf("unable to increment telemetry counter")
+		}
+	}
+
+	return handler(srv, stream)
+}
+
+func (g *GRPCAPI) TelemetryUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	tags := []statsd.Tag{
+		{"install_id", g.Options.InstallID},
+		{"source", "server"}, // TODO: what should this be?
+		{"node_id", g.Options.NodeID},
+	}
+
+	methodName := util.GrpcMethodCounterName(info.FullMethod)
+	if methodName != "" {
+		if err := g.Options.Telemetry.Inc(methodName, 1, 1.0, tags...); err != nil {
+			g.log.WithError(err).Debugf("unable to increment telemetry counter")
+		}
+	}
+
+	return handler(ctx, req)
 }
 
 // Have to do this so we can modify context
