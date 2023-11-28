@@ -139,7 +139,7 @@ export const runPipeline = (
   interval
     ? setInterval(() => {
         void logPipeline(streamdal, audience, input);
-      }, 2000)
+      }, interval)
     : void logPipeline(streamdal, audience, input);
 
 export const randomPipeline = (
