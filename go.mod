@@ -8,6 +8,7 @@ require (
 	github.com/PagerDuty/go-pagerduty v1.7.0
 	github.com/alecthomas/kong v0.8.0
 	github.com/aws/aws-sdk-go v1.34.28
+	github.com/cactus/go-statsd-client/v5 v5.1.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/protobuf v1.5.3
 	github.com/joho/godotenv v1.3.0
@@ -24,12 +25,11 @@ require (
 	github.com/slack-go/slack v0.12.2
 	github.com/streamdal/protos v0.0.120
 	golang.org/x/crypto v0.14.0
-	google.golang.org/grpc v1.56.3
+	google.golang.org/grpc v1.58.3
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/relistan/rubberneck.v1 v1.1.0
-	github.com/cactus/go-statsd-client/v5 v5.1.0
 )
 
 require (
