@@ -2,6 +2,7 @@ package grpcapi
 
 import (
 	"context"
+	"fmt"
 	"net"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
@@ -23,6 +24,7 @@ import (
 	"github.com/streamdal/server/services/notify"
 	"github.com/streamdal/server/services/pubsub"
 	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/server/types"
 	"github.com/streamdal/server/util"
 )
 
@@ -41,6 +43,10 @@ var (
 type GRPCAPI struct {
 	Options *Options
 	log     *logrus.Entry
+}
+
+type stackTracer interface {
+	StackTrace() errors.StackTrace
 }
 
 type Options struct {
@@ -120,7 +126,7 @@ func (g *GRPCAPI) AuthServerUnaryInterceptor(ctx context.Context, req interface{
 	return handler(ctx, req)
 }
 
-func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	if err := g.validateAuth(stream.Context()); err != nil {
 		return err
 	}
@@ -131,35 +137,65 @@ func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.Serve
 func (g *GRPCAPI) TelemetryStreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	tags := []statsd.Tag{
 		{"install_id", g.Options.InstallID},
-		{"source", "server"}, // TODO: what should this be?
 		{"node_id", g.Options.NodeID},
+		{"source", "server"},
 	}
 
 	methodName := util.GrpcMethodCounterName(info.FullMethod)
 	if methodName != "" {
+		tags = append(tags, statsd.Tag{"method", methodName})
 		if err := g.Options.Telemetry.Inc(methodName, 1, 1.0, tags...); err != nil {
 			g.log.WithError(err).Debugf("unable to increment telemetry counter")
 		}
 	}
 
-	return handler(srv, stream)
+	if err := handler(srv, stream); err != nil {
+		tags = append(tags, statsd.Tag{"error", err.Error()})
+
+		// Include code location if it's available
+		if err, ok := err.(stackTracer); ok {
+			stack := err.StackTrace()
+			loc := fmt.Sprintf("%s:%d", stack[0], stack[0])
+			tags = append(tags, statsd.Tag{"location", loc})
+		}
+
+		_ = g.Options.Telemetry.Inc(types.CounterErrorsTotal, 1, 1.0, tags...)
+		return err
+	}
+
+	return nil
 }
 
 func (g *GRPCAPI) TelemetryUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	tags := []statsd.Tag{
 		{"install_id", g.Options.InstallID},
-		{"source", "server"}, // TODO: what should this be?
 		{"node_id", g.Options.NodeID},
+		{"source", "server"},
 	}
 
 	methodName := util.GrpcMethodCounterName(info.FullMethod)
 	if methodName != "" {
+		tags = append(tags, statsd.Tag{"method", methodName})
 		if err := g.Options.Telemetry.Inc(methodName, 1, 1.0, tags...); err != nil {
 			g.log.WithError(err).Debugf("unable to increment telemetry counter")
 		}
 	}
 
-	return handler(ctx, req)
+	resp, err := handler(ctx, req)
+	if err != nil {
+		tags = append(tags, statsd.Tag{"error", err.Error()})
+
+		// Include code location if it's available
+		if err, ok := err.(stackTracer); ok {
+			stack := err.StackTrace()
+			loc := fmt.Sprintf("%s:%d", stack[0], stack[0])
+			tags = append(tags, statsd.Tag{"location", loc})
+		}
+
+		_ = g.Options.Telemetry.Inc(types.CounterErrorsTotal, 1, 1.0, tags...)
+	}
+
+	return resp, err
 }
 
 // Have to do this so we can modify context
@@ -172,7 +208,7 @@ func (s *serverStream) Context() context.Context {
 	return s.ctx
 }
 
-func (g *GRPCAPI) RequestIDServerStreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func (g *GRPCAPI) RequestIDServerStreamInterceptor(srv interface{}, stream grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	outgoingCtx, err := g.setRequestID(stream.Context())
 	if err != nil {
 		return err

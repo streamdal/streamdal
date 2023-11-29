@@ -304,6 +304,7 @@ func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
 }
 
 // GrpcMethodCounterName turns a gRPC method name into a counter name for statsd
+// This turns a string such as "/protos.External/GetSchema" into "grpc_method_external_get_schema_total"
 func GrpcMethodCounterName(method string) string {
 	parts := strings.Split(method, "/")
 	if len(parts) != 3 {
@@ -315,10 +316,9 @@ func GrpcMethodCounterName(method string) string {
 		which = "internal"
 	}
 
-	var op string
-
 	// Loop over each character in the method name and replace upper case characters with an underscore
 	// and the lowercase version
+	var op string
 	for _, c := range parts[2] {
 		if c >= 'A' && c <= 'Z' {
 			op += fmt.Sprintf("_%c", c+32)
@@ -330,10 +330,12 @@ func GrpcMethodCounterName(method string) string {
 	// Trim leading underscore since all gRPC methods start with a capital letter
 	op = strings.TrimPrefix(op, "_")
 
-	return fmt.Sprintf("grpc_method_%s_%s", which, op)
+	return fmt.Sprintf("grpc_method_%s_%s_total", which, op)
 }
 
-// TODO: add test
+// GenerateNodeID will generate a uuid node ID from the given install ID and node name
+// This ensures that the node ID is deterministic and consistent across restarts since
+// we have no local storage.
 func GenerateNodeID(installID, nodeName string) string {
 	hash := sha256.Sum256([]byte(installID + nodeName))
 
@@ -345,6 +347,7 @@ func GenerateNodeID(installID, nodeName string) string {
 	return id.String()
 }
 
+// GetStepType transforms a protobuf enum of a step type into a string for use with telemetry
 func GetStepType(step *protos.PipelineStep) string {
 	switch {
 	case step.GetDetective() != nil:
@@ -366,6 +369,8 @@ func GetStepType(step *protos.PipelineStep) string {
 	}
 }
 
+// GetStepSubType transforms a protobuf enum into a string for use with telemetry
+// This is used for detective, transform, and KV steps.
 func GetStepSubType(step *protos.PipelineStep) string {
 	var st string
 	switch {

@@ -36,9 +36,9 @@ const (
 	// Labels = install_id, status=active|inactive
 	GaugeUsageNumProducers = "usage_num_producers"
 
-	// GaugeUsageNumbDataSources tracks the number of unique data sources.
+	// GaugeUsageNumDataSources tracks the number of unique data sources.
 	// Labels = install_id
-	GaugeUsageNumbDataSources = "usage_num_data_sources"
+	GaugeUsageNumDataSources = "usage_num_data_sources"
 
 	// GaugeUsageRegistrationsTotal tracks the number of total registrations. Registrations should occur only on redeploy
 	// If we are seeing constant re-registrations, it might mean that client is misconfigured/not instrumented correctly.

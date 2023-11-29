@@ -335,12 +335,12 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
-	// Send Analytics
-	analyticsTags := []statsd.Tag{
+	// Send telemetry
+	telTags := []statsd.Tag{
 		{"install_id", s.Options.InstallID},
 		{"status", "detached"},
 	}
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, analyticsTags...)
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
 	for _, step := range req.Pipeline.Steps {
 		stepTags := []statsd.Tag{
@@ -387,7 +387,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Send Analytics
+	// Send telemetry
 	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
 
 	// Pipeline exists - broadcast it as there might be servers that have
@@ -477,7 +477,7 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Send Analytics
+	// Send telemetry
 	status := "detached"
 	if s.Options.StoreService.IsPipelineAttachedAny(ctx, req.PipelineId) {
 		status = "attached"
@@ -528,7 +528,7 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// Send Analytics
+	// Send telemetry
 	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
 		{"install_id", s.Options.InstallID},
 		{"status", "attached"},
@@ -616,12 +616,12 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
 	}
 
-	// Send Analytics
-	analyticsTags := []statsd.Tag{
+	// Send telemetry
+	telTags := []statsd.Tag{
 		{"install_id", s.Options.InstallID},
 		{"status", "attached"},
 	}
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, analyticsTags...)
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),

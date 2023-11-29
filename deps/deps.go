@@ -187,10 +187,10 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	if !d.Config.DisableAnalytics {
+	if !d.Config.TelemetryDisable {
 		telemetry, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
-			Address:       cfg.AnalyticsAddress,
-			Prefix:        cfg.AnalyticsPrefix,
+			Address:       cfg.TelemetryAddress,
+			Prefix:        cfg.TelemetryPrefix,
 			UseBuffered:   true,
 			FlushInterval: 500 * time.Millisecond,
 			TagFormat:     statsd.SuffixOctothorpe,

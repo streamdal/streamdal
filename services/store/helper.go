@@ -1,6 +1,7 @@
 package store
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"strings"
 	"time"
@@ -45,6 +46,12 @@ const (
 	// should be automatically cleaned up when the frontend stops a Tail() request,
 	// this TTL is a safety mechanism to ensure we do not leave orphaned tails.
 	RedisActiveTailTTL = 10 * time.Second
+
+	RedisTelemetryRegistrationPrefix = "streamdal_telemetry:registrations"
+	RedisTelemetryRegistrationFormat = "streamdal_telemetry:registrations:%x"
+
+	RedisTelemetryAudiencePrefix = "streamdal_telemetry:audience"
+	RedisTelemetryAudienceFormat = "streamdal_telemetry:audience:%x"
 )
 
 func RedisRegisterKey(session, node string) string {
@@ -57,6 +64,15 @@ func RedisAudienceKey(audience string) string {
 
 func RedisLiveKey(session, node, audience string) string {
 	return strings.ToLower(fmt.Sprintf(RedisLiveFormat, session, node, audience))
+}
+
+func RedisTelemetryRegistrationKey(serviceName, os, sdk, arch string) string {
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%s-%s-%s-%s", serviceName, os, sdk, arch)))
+	return strings.ToLower(fmt.Sprintf(RedisTelemetryRegistrationFormat, hash))
+}
+
+func RedisTelemetryAudience(aud *protos.Audience) string {
+	return strings.ToLower(fmt.Sprintf("%s:%x", RedisTelemetryAudienceFormat, util.AudienceToStr(aud)))
 }
 
 func RedisPipelineKey(pipelineID string) string {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	types2 "github.com/streamdal/server/types"
+	telTypes "github.com/streamdal/server/types"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
 
@@ -66,6 +66,8 @@ const (
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
+	RecordRegistration(ctx context.Context, req *protos.RegisterRequest) error
+	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
@@ -195,6 +197,37 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 				return errors.Wrap(err, "error adding audience")
 			}
 		}
+	}
+
+	return nil
+}
+
+func (s *Store) SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool {
+	registrationKey := RedisLiveKey(req.SessionId, s.options.NodeName, "register")
+
+	return s.options.RedisBackend.Exists(ctx, registrationKey).Val() == 1
+}
+
+func (s *Store) RecordRegistration(ctx context.Context, req *protos.RegisterRequest) error {
+	registrationKey := RedisTelemetryRegistrationKey(
+		req.ServiceName,
+		req.ClientInfo.Os,
+		req.ClientInfo.LibraryName,
+		req.ClientInfo.Arch,
+	)
+
+	req.ClientInfo.XSessionId = &req.SessionId
+	req.ClientInfo.XServiceName = &req.ServiceName
+	req.ClientInfo.XNodeName = &s.options.NodeName
+
+	clientInfoBytes, err := proto.Marshal(req.ClientInfo)
+	if err != nil {
+		return errors.Wrap(err, "error marshalling client info")
+	}
+
+	status := s.options.RedisBackend.Set(ctx, registrationKey, clientInfoBytes, s.options.SessionTTL)
+	if err := status.Err(); err != nil {
+		return errors.Wrap(err, "error record permanent registration to K/V")
 	}
 
 	return nil
@@ -449,14 +482,45 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	return nil
 }
 
-func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
-	// Check if we've seen the service before
+func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64, status string) {
+	if aud == nil {
+		return
+	}
 
-	keys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+req.Audience.ServiceName+":*").Val()
-	if len(keys) == 0 {
-		// Completely new audience
-		// Send analytics
-		_ = s.options.Telemetry.GaugeDelta(types2.GaugeUsageNumServices, 1, 1.0, statsd.Tag{"install_id", s.InstallID})
+	// Unique services
+	serviceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+aud.ServiceName+":*").Val()
+	if len(serviceKeys) == 0 {
+		// Completely new audience, send telemetry
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, []statsd.Tag{
+			{"install_id", s.InstallID},
+		}...)
+	}
+
+	// Unique data sources
+	dataSourceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+"*:*:*:"+aud.ComponentName+":*").Val()
+	if len(dataSourceKeys) == 0 {
+		// Completely new data source, send telemetry
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, []statsd.Tag{
+			{"install_id", s.InstallID},
+		}...)
+	}
+
+	if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, []statsd.Tag{
+			{"install_id", s.InstallID},
+			{"status", status},
+		}...)
+	} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, []statsd.Tag{
+			{"install_id", s.InstallID},
+			{"status", status},
+		}...)
+	}
+}
+
+func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
+	if req == nil {
+		return errors.New("request cannot be nil")
 	}
 
 	// Add it to the live bucket
@@ -479,6 +543,8 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
+	s.sendAudienceTelemetry(ctx, req.Audience, 1, "inactive")
+
 	return nil
 }
 
@@ -493,18 +559,19 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	}
 
 	if len(attached) > 0 {
-		return fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
+		err = fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
+
+		return err
 	}
 
-	return s.deleteAudienceKey(ctx, req.Audience)
-}
-
-func (s *Store) deleteAudienceKey(ctx context.Context, aud *protos.Audience) error {
 	// Delete audience from bucket
-	audStr := util.AudienceToStr(aud)
+	audStr := util.AudienceToStr(req.Audience)
 	if err := s.options.RedisBackend.Del(ctx, RedisAudienceKey(audStr)).Err(); err != nil {
 		return errors.Wrap(err, "error deleting audience from store")
 	}
+
+	// Send Analytics
+	s.sendAudienceTelemetry(ctx, req.Audience, -1, "inactive")
 
 	return nil
 }

@@ -121,9 +121,29 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		"session_id":   request.SessionId,
 	})
 
+	// Send telemetry
+	telTags := []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"os", request.ClientInfo.Os},
+		{"sdk", request.ClientInfo.LibraryName},
+		{"arch", request.ClientInfo.Arch},
+		{"version", request.ClientInfo.LibraryVersion},
+	}
+
 	// Store registration
 	if err := s.Options.StoreService.AddRegistration(server.Context(), request); err != nil {
 		return errors.Wrap(err, "unable to save registration")
+	}
+
+	// Store permanent registration for analytics
+	if ok := s.Options.StoreService.SeenRegistration(server.Context(), request); !ok {
+		// Save in redis so we send only once
+		if err := s.Options.StoreService.RecordRegistration(server.Context(), request); err != nil {
+			llog.Errorf("unable to record registration: %s", err.Error())
+		}
+
+		// Send telemetry
+		_ = s.Options.Telemetry.Inc(types.GaugeUsageRegistrationsTotal, 1, 1.0, telTags...)
 	}
 
 	// Create a new command channel
@@ -135,9 +155,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		llog.Debugf("channel already exists for session id '%s'", request.SessionId)
 	}
 
-	var (
-		shutdown bool
-	)
+	var shutdown bool
 
 	// Send a keepalive every tick
 	ticker := time.NewTicker(1 * time.Second)
@@ -168,17 +186,8 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// TODO: need to figure out GaugeUsageRegistrationsTotal
 	// TODO: we need to hash the tags and store in redis/memory
 
-	// Send analytics
-	analyticsTags := []statsd.Tag{
-		{"install_id", s.Options.InstallID},
-		{"os", request.ClientInfo.Os},
-		{"sdk", request.ClientInfo.LibraryName},
-		{"arch", request.ClientInfo.Arch},
-		{"version", request.ClientInfo.LibraryVersion},
-	}
-
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, 1, 1.0, analyticsTags...)
-	defer s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, -1, 1.0, analyticsTags...)
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, 1, 1.0, telTags...)
+	defer s.Options.Telemetry.GaugeDelta(types.GaugeUsageRegistrationsActive, -1, 1.0, telTags...)
 
 	// Listen for cmds from external API; forward them to connected clients
 MAIN:

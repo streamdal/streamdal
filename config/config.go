@@ -36,9 +36,9 @@ type Config struct {
 	NumTailWorkers       int              `help:"Number of tail workers to run" default:"4"`
 	NumBroadcastWorkers  int              `help:"Number of broadcast workers to run" default:"4"`
 	DemoMode             bool             `help:"Run server in demo mode. This disables modifications" default:"false"`
-	DisableAnalytics     bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
-	AnalyticsAddress     string           `help:"Address to send analytics to" default:"telemetry.streamdal.com:8125" hidden:"true"`
-	AnalyticsPrefix      string           `help:"Prefix to use for analytics" default:"server" hidden:"true"`
+	TelemetryDisable     bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
+	TelemetryAddress     string           `help:"Address to send telemetry to" default:"telemetry.streamdal.com:8125" hidden:"true"`
+	TelemetryPrefix      string           `help:"Prefix to use for telemetry" default:"server" hidden:"true"`
 
 	NodeID    string `kong:"-"`
 	InstallID string `kong:"-"`
