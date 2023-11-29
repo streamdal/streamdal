@@ -11,11 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/redis/go-redis/v9"
-
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/redis/go-redis/v9"
 	"github.com/relistan/go-director"
 	"github.com/sirupsen/logrus"
 
@@ -39,8 +39,6 @@ type defaultCounter struct {
 	Description string
 	Labels      []string
 }
-
-// storeCounter is used to cache counters in RedisBackend
 
 var defaultCounters = []*defaultCounter{
 	{
@@ -86,8 +84,6 @@ type IMetrics interface {
 	GetAllRateCounters(_ context.Context) map[string]*RateCounter
 
 	HandleMetricsRequest(ctx context.Context, req *protos.MetricsRequest) error
-
-	IncreaseRate(ctx context.Context, t RateCounterType, aud *protos.Audience, value int64)
 }
 
 type Metrics struct {
@@ -101,6 +97,7 @@ type Metrics struct {
 
 type Config struct {
 	RedisBackend  *redis.Client
+	Telemetry     statsd.Statter
 	ShutdownCtx   context.Context
 	PrometheusURL string
 }
@@ -182,6 +179,10 @@ func validateConfig(cfg *Config) error {
 		return errors.New("redis backend is required")
 	}
 
+	if cfg.Telemetry == nil {
+		return errors.New("telemetry is required")
+	}
+
 	if cfg.ShutdownCtx == nil {
 		return errors.New("shutdown context is required")
 	}
@@ -220,7 +221,6 @@ func (m *Metrics) HandleMetricsRequest(ctx context.Context, req *protos.MetricsR
 
 func (m *Metrics) increaseRate(ctx context.Context, metric *protos.Metric) {
 	// Get counter based on audience. We need to build audience from labels
-
 	counter := m.GetRateCounter(ctx, metric.Audience)
 
 	switch metric.Name {
