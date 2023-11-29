@@ -220,6 +220,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		RedisBackend:  d.RedisBackend,
 		ShutdownCtx:   d.ShutdownContext,
 		PrometheusURL: parseHTTPListenAddress(cfg.HTTPAPIListenAddress),
+		Telemetry:     d.Telemetry,
+		InstallID:     cfg.InstallID,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new metrics service")

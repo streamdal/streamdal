@@ -20,6 +20,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/protos/build/go/protos"
+
+	"github.com/streamdal/server/types"
 )
 
 const (
@@ -28,6 +30,8 @@ const (
 
 	// counterDumperInterval is how often we will dump metrics to RedisBackend
 	counterDumperInterval = time.Second * 10
+
+	telegramDumperInterval = time.Second * 10
 
 	// If no prometheus URL is provided, use this
 	defaultPrometheusURL = "http://localhost:8081"
@@ -100,6 +104,7 @@ type Config struct {
 	Telemetry     statsd.Statter
 	ShutdownCtx   context.Context
 	PrometheusURL string
+	InstallID     string
 }
 
 func New(cfg *Config) (*Metrics, error) {
@@ -129,7 +134,8 @@ func New(cfg *Config) (*Metrics, error) {
 		m.log.Error(err)
 	}
 
-	go m.runCounterDumper(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
+	go m.runCounterDumper(director.NewTimedLooper(director.FOREVER, counterDumperInterval, make(chan error, 1)))
+	go m.runTelemetryDumper(director.NewTimedLooper(director.FOREVER, telegramDumperInterval, make(chan error, 1)))
 
 	return m, nil
 }
@@ -253,7 +259,6 @@ func (m *Metrics) getVecCounter(_ context.Context, name string) *prometheus.Coun
 func (m *Metrics) runCounterDumper(looper director.Looper) {
 	var quit bool
 	looper.Loop(func() error {
-		time.Sleep(counterDumperInterval)
 		if quit {
 			time.Sleep(time.Millisecond * 50)
 			return nil
@@ -330,9 +335,78 @@ func (m *Metrics) dumpCounters() error {
 	return nil
 }
 
+func (m *Metrics) runTelemetryDumper(looper director.Looper) {
+	llog := m.log.WithField("method", "runTelemetryDumper")
+	llog.Debug("starting telemetry dumper")
+
+	var quit bool
+
+	looper.Loop(func() error {
+		if quit {
+			// Give looper time to exit
+			time.Sleep(time.Millisecond * 50)
+			return nil
+		}
+
+		select {
+		case <-m.ShutdownCtx.Done():
+			llog.Debugf("shutting down telemetry dumper")
+			quit = true
+			looper.Quit()
+			return nil
+		default:
+			// NOOP
+		}
+
+		rate := m.GetAllRateCounters(m.ShutdownCtx)
+
+		// There are multiple rate counters per audience, so we need to sum them all up
+		var producerEventsTotal, producerBytesTotal int64
+		var consumerEventsTotal, consumerBytesTotal int64
+		for audStr, counter := range rate {
+			parts := strings.Split(audStr, "/")
+			if len(parts) != 3 {
+				llog.Errorf("invalid audience string: %s", audStr)
+				continue
+			}
+
+			if parts[1] == "operation_type_producer" {
+				producerEventsTotal += counter.Processed.Rate() / 10
+				producerBytesTotal += counter.Bytes.Rate() / 10
+			} else {
+				consumerEventsTotal += counter.Processed.Rate() / 10
+				consumerBytesTotal += counter.Bytes.Rate() / 10
+			}
+		}
+
+		// Send Telemetry
+		_ = m.Telemetry.Gauge(types.GaugeUsageThroughputEventsPerSecond, producerEventsTotal, 1.0, []statsd.Tag{
+			{"install_id", m.Config.InstallID},
+			{"op", "producer"},
+		}...)
+		_ = m.Telemetry.Gauge(types.GaugeUsageThroughputEventsPerSecond, consumerEventsTotal, 1.0, []statsd.Tag{
+			{"install_id", m.Config.InstallID},
+			{"op", "consumer"},
+		}...)
+		_ = m.Telemetry.Gauge(types.GaugeUsageThroughputBytesPerSecond, producerBytesTotal, 1.0, []statsd.Tag{
+			{"install_id", m.Config.InstallID},
+			{"op", "producer"},
+		}...)
+		_ = m.Telemetry.Gauge(types.GaugeUsageThroughputBytesPerSecond, consumerBytesTotal, 1.0, []statsd.Tag{
+			{"install_id", m.Config.InstallID},
+			{"op", "consumer"},
+		}...)
+
+		return nil
+	})
+
+	llog.Debug("telemetry dumper exited")
+}
+
 // parseMetricString parses a prometheus metric string into a protos.Metric struct for caching in RedisBackend
 func parseMetricString(input string) (*protos.Metric, error) {
 	// Get key-value pairs
+	// TODO: can we eliminate this regex?
 	r := regexp.MustCompile(`(\w+)="([^"]+)"`)
 	matches := r.FindAllStringSubmatch(input, -1)
 

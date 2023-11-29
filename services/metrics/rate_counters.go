@@ -43,7 +43,12 @@ func (m *Metrics) GetAllRateCounters(_ context.Context) map[string]*RateCounter 
 	m.rateCountersMtx.RLock()
 	defer m.rateCountersMtx.RUnlock()
 
-	return m.rateCounters
+	ret := make(map[string]*RateCounter)
+	for k, v := range m.rateCounters {
+		ret[k] = v
+	}
+
+	return ret
 }
 
 // groupAudienceToStr returns a string representation of an audience, but without the audience's operation name
