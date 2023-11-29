@@ -505,17 +505,17 @@ func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience,
 		}...)
 	}
 
-	if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, []statsd.Tag{
-			{"install_id", s.InstallID},
-			{"status", status},
-		}...)
-	} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, []statsd.Tag{
-			{"install_id", s.InstallID},
-			{"status", status},
-		}...)
-	}
+	//if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
+	//	_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, []statsd.Tag{
+	//		{"install_id", s.InstallID},
+	//		{"status", status},
+	//	}...)
+	//} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
+	//	_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, []statsd.Tag{
+	//		{"install_id", s.InstallID},
+	//		{"status", status},
+	//	}...)
+	//}
 }
 
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {

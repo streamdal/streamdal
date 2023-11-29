@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
-
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"

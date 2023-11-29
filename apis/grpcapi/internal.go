@@ -8,15 +8,13 @@ import (
 	"time"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
-
-	"github.com/streamdal/server/types"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/protos/build/go/protos"
 	"github.com/streamdal/protos/build/go/protos/shared"
 
+	"github.com/streamdal/server/types"
 	"github.com/streamdal/server/util"
 	"github.com/streamdal/server/validate"
 )
