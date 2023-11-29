@@ -1,0 +1,13 @@
+# graphite.yaml
+apiVersion: 1
+
+datasources:
+  - name: Graphite
+    type: graphite
+    access: proxy
+    url: http://graphite:8080
+    isDefault: true
+    jsonData:
+      graphiteVersion: "1.1"
+      tlsAuth: false
+      tlsAuthWithCACert: false
