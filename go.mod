@@ -4,14 +4,16 @@ go 1.20
 
 require (
 	github.com/alecthomas/kong v0.8.0
+	github.com/cactus/go-statsd-client/v5 v5.1.0
 	github.com/charmbracelet/log v0.2.4
 	github.com/dselans/go-prettyjson-tview v0.0.0-20231014145821-c9dc5384407d
 	github.com/gdamore/tcell/v2 v2.6.0
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/tview v0.0.0-20230909130259-ba6a2a345459
 	github.com/streamdal/snitch-protos v0.0.99
-	google.golang.org/grpc v1.58.2
+	google.golang.org/grpc v1.58.3
 )
 
 require (
