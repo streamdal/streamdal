@@ -35,7 +35,7 @@ export const TailRow = (
   { row }: { row: TailData },
 ) => (
   <div className="flex flex-row w-full">
-    <div className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start">
+    <div className="bg-black text-white py-2 px-4 text-sm overflow-x-scroll flex flex-col justify-start dark-scrollbar">
       <div className="text-stormCloud">
         {row.timestamp?.toLocaleDateString(
           "en-us",
@@ -173,7 +173,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             fullScreen ? "100" : "90"
           }%] h-[calc(100vh-${
             fullScreen ? "200" : "260"
-          }px)] overflow-y-scroll rounded-md bg-black text-white`}
+          }px)] overflow-y-scroll rounded-md bg-black text-white dark-scrollbar`}
         >
           {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
           <div ref={scrollBottom} />

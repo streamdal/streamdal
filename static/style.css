@@ -25,3 +25,16 @@ select {
   font-size: 12px;
 }
 
+/*
+  Make scrollbars less intrusive for those
+  who have scrollbars set to always show in OSX
+*/
+.dark-scrollbar::-webkit-scrollbar {
+  background-color: #000;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 0.375rem;
+}
+
