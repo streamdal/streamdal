@@ -2,12 +2,17 @@ package main
 
 import (
 	"os"
+	"time"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/charmbracelet/log"
+	"github.com/pkg/errors"
 
 	"github.com/streamdal/cli/cmd"
 	"github.com/streamdal/cli/config"
 	"github.com/streamdal/cli/console"
+	"github.com/streamdal/cli/telemetry"
+	"github.com/streamdal/cli/types"
 	"github.com/streamdal/cli/util"
 )
 
@@ -37,7 +42,31 @@ func main() {
 
 	if cfg.Debug {
 		logger.SetLevel(log.DebugLevel)
+		logger.SetReportCaller(true)
 	}
+
+	var t statsd.Statter
+	if !cfg.TelemetryDisable {
+		statsdClient, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
+			Address:       cfg.TelemetryAddress,
+			Prefix:        cfg.TelemetryPrefix,
+			UseBuffered:   true,
+			FlushInterval: 500 * time.Millisecond,
+			TagFormat:     statsd.SuffixOctothorpe,
+		})
+		if err != nil {
+			log.Errorf("unable to create new statsd client: %s", err)
+			t = &telemetry.DummyTelemetry{}
+		} else {
+			t = statsdClient
+		}
+	} else {
+		t = &telemetry.DummyTelemetry{}
+	}
+
+	// Send telemetry
+	_ = t.Gauge(types.GaugeArgsNum, int64(len(cfg.KongContext.Args)), 1.0, cfg.GetStatsdTags()...)
+	_ = t.Inc(types.CounterExecTotal, 1, 1.0, cfg.GetStatsdTags()...)
 
 	// Initialize console components
 	ui, err := console.New(&console.Options{
@@ -45,21 +74,22 @@ func main() {
 		Logger: logger,
 	})
 	if err != nil {
-		log.Fatalf("unable to initialize console: %s", err)
+		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "unable to initialize console"))
 	}
 
 	// Initialize cmd which houses business logic
 	c, err := cmd.New(&cmd.Options{
-		Config:  cfg,
-		Console: ui,
-		Logger:  logger,
+		Config:    cfg,
+		Console:   ui,
+		Logger:    logger,
+		Telemetry: t,
 	})
 	if err != nil {
-		log.Fatalf("unable to initialize cmd: %s", err)
+		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "unable to initialize cmd"))
 	}
 
 	// Do the dance
 	if err := c.Run(); err != nil {
-		log.Fatalf("error during cmd run: %s", err)
+		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "error during cmd run"))
 	}
 }

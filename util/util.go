@@ -4,10 +4,19 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
+	"github.com/charmbracelet/log"
+	"github.com/pkg/errors"
+
 	"github.com/streamdal/snitch-protos/build/go/protos"
 
+	"github.com/streamdal/cli/config"
 	"github.com/streamdal/cli/types"
 )
+
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
 
 func AudienceEquals(a, b *protos.Audience) bool {
 	if a == nil || b == nil {
@@ -94,4 +103,20 @@ func ProtosOperationTypeToStr(operationType protos.OperationType) string {
 	default:
 		return ""
 	}
+}
+
+func ReportErrorAndExit(t statsd.Statter, cfg *config.Config, err error) {
+	tags := cfg.GetStatsdTags()
+
+	if err, ok := err.(stackTracer); ok {
+		stack := err.StackTrace()
+		loc := fmt.Sprintf("%s:%d", stack[0], stack[0])
+		tags = append(tags, statsd.Tag{"location", loc})
+	}
+
+	_ = t.Gauge(types.GaugeUptimeSeconds, 0, 1.0, tags...)
+	_ = t.Inc(types.CounterErrorsTotal, 1, 1.0, tags...)
+	_ = t.Close()
+	log.Fatal(err)
+
 }
