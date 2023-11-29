@@ -482,7 +482,7 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	return nil
 }
 
-func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64, status string) {
+func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64) {
 	if aud == nil {
 		return
 	}
@@ -491,31 +491,24 @@ func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience,
 	serviceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+aud.ServiceName+":*").Val()
 	if len(serviceKeys) == 0 {
 		// Completely new audience, send telemetry
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, []statsd.Tag{
-			{"install_id", s.InstallID},
-		}...)
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, statsd.Tag{"install_id", s.InstallID})
 	}
 
-	// Unique data sources
 	dataSourceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+"*:*:*:"+aud.ComponentName+":*").Val()
 	if len(dataSourceKeys) == 0 {
 		// Completely new data source, send telemetry
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, []statsd.Tag{
-			{"install_id", s.InstallID},
-		}...)
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, statsd.Tag{"install_id", s.InstallID})
 	}
 
-	//if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
-	//	_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, []statsd.Tag{
-	//		{"install_id", s.InstallID},
-	//		{"status", status},
-	//	}...)
-	//} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
-	//	_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, []statsd.Tag{
-	//		{"install_id", s.InstallID},
-	//		{"status", status},
-	//	}...)
-	//}
+	audExists := s.options.RedisBackend.Exists(ctx, RedisTelemetryAudience(aud)).Val() == 1
+
+	if audExists && val < 0 || !audExists && val > 0 {
+		if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		}
+	}
 }
 
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
@@ -543,7 +536,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
-	s.sendAudienceTelemetry(ctx, req.Audience, 1, "inactive")
+	s.sendAudienceTelemetry(ctx, req.Audience, 1)
 
 	return nil
 }
@@ -571,7 +564,7 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	}
 
 	// Send Analytics
-	s.sendAudienceTelemetry(ctx, req.Audience, -1, "inactive")
+	s.sendAudienceTelemetry(ctx, req.Audience, -1)
 
 	return nil
 }
