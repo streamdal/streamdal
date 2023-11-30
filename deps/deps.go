@@ -188,7 +188,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
 	if !d.Config.TelemetryDisable {
-		telemetry, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
+		t, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
 			Address:       cfg.TelemetryAddress,
 			Prefix:        "streamdal",
 			UseBuffered:   true,
@@ -198,7 +198,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		if err != nil {
 			return errors.Wrap(err, "unable to create new statsd client")
 		}
-		d.Telemetry = telemetry
+		d.Telemetry = t
 		fmt.Printf("\n\nConnected to telemetry: %s\n\n", cfg.TelemetryAddress)
 	} else {
 		d.Telemetry = &telemetry.DummyTelemetry{}
