@@ -309,11 +309,11 @@ message AppRegisterRejectRequest {
 }
 
 message PauseTailRequest {
-  Audience audience = 1;
+  string tail_id = 1;
 }
 
 message ResumeTailRequest {
-  Audience audience = 1;
+  string tail_id = 1;
 }
 
 message TestRequest {
