@@ -210,10 +210,12 @@ var _ = Describe("Tail", func() {
 			Expect(err).To(BeNil())
 
 			s := &Streamdal{
-				tailsMtx:     &sync.RWMutex{},
-				tails:        make(map[string]map[string]*Tail),
-				audiences:    map[string]struct{}{},
-				audiencesMtx: &sync.RWMutex{},
+				tailsMtx:       &sync.RWMutex{},
+				tails:          make(map[string]map[string]*Tail),
+				pausedTailsMtx: &sync.RWMutex{},
+				pausedTails:    make(map[string]map[string]*Tail),
+				audiences:      map[string]struct{}{},
+				audiencesMtx:   &sync.RWMutex{},
 				config: &Config{
 					Logger:      &loggerfakes.FakeLogger{},
 					ShutdownCtx: context.Background(),
