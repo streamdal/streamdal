@@ -501,18 +501,18 @@ export interface AppRegisterRejectRequest {
  */
 export interface PauseTailRequest {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: string tail_id = 1;
      */
-    audience?: Audience;
+    tailId: string;
 }
 /**
  * @generated from protobuf message protos.ResumeTailRequest
  */
 export interface ResumeTailRequest {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: string tail_id = 1;
      */
-    audience?: Audience;
+    tailId: string;
 }
 /**
  * @generated from protobuf message protos.TestRequest
@@ -2410,11 +2410,11 @@ export const AppRegisterRejectRequest = new AppRegisterRejectRequest$Type();
 class PauseTailRequest$Type extends MessageType<PauseTailRequest> {
     constructor() {
         super("protos.PauseTailRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<PauseTailRequest>): PauseTailRequest {
-        const message = {};
+        const message = { tailId: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<PauseTailRequest>(this, message, value);
@@ -2425,8 +2425,8 @@ class PauseTailRequest$Type extends MessageType<PauseTailRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2440,9 +2440,9 @@ class PauseTailRequest$Type extends MessageType<PauseTailRequest> {
         return message;
     }
     internalBinaryWrite(message: PauseTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2457,11 +2457,11 @@ export const PauseTailRequest = new PauseTailRequest$Type();
 class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
     constructor() {
         super("protos.ResumeTailRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<ResumeTailRequest>): ResumeTailRequest {
-        const message = {};
+        const message = { tailId: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<ResumeTailRequest>(this, message, value);
@@ -2472,8 +2472,8 @@ class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2487,9 +2487,9 @@ class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
         return message;
     }
     internalBinaryWrite(message: ResumeTailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

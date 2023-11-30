@@ -1924,11 +1924,11 @@ export const AppRegisterRejectRequest = new AppRegisterRejectRequest$Type();
 class PauseTailRequest$Type extends MessageType {
     constructor() {
         super("protos.PauseTailRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = {};
+        const message = { tailId: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1939,8 +1939,8 @@ class PauseTailRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1954,9 +1954,9 @@ class PauseTailRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1971,11 +1971,11 @@ export const PauseTailRequest = new PauseTailRequest$Type();
 class ResumeTailRequest$Type extends MessageType {
     constructor() {
         super("protos.ResumeTailRequest", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = {};
+        const message = { tailId: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1986,8 +1986,8 @@ class ResumeTailRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                case /* string tail_id */ 1:
+                    message.tailId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2001,9 +2001,9 @@ class ResumeTailRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* string tail_id = 1; */
+        if (message.tailId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.tailId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

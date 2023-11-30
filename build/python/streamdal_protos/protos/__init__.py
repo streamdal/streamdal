@@ -177,7 +177,7 @@ class Metric(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TailRequest(betterproto.Message):
     type: "TailRequestType" = betterproto.enum_field(1)
-    id: Optional[str] = betterproto.string_field(2, optional=True, group="X_id")
+    id: str = betterproto.string_field(2)
     audience: "Audience" = betterproto.message_field(3)
     pipeline_id: Optional[str] = betterproto.string_field(
         4, optional=True, group="_pipeline_id"
@@ -663,12 +663,12 @@ class AppRegisterRejectRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class PauseTailRequest(betterproto.Message):
-    audience: "Audience" = betterproto.message_field(1)
+    tail_id: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class ResumeTailRequest(betterproto.Message):
-    audience: "Audience" = betterproto.message_field(1)
+    tail_id: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
