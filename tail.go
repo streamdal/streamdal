@@ -44,7 +44,7 @@ type Tail struct {
 }
 
 func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
-	tails := s.getTailForAudience(aud)
+	tails := s.getTailsForAudience(aud)
 	if len(tails) == 0 {
 		return
 	}
@@ -118,7 +118,7 @@ func (t *Tail) startWorker(looper director.Looper, stream protos.Internal_SendTa
 	}
 
 	// Always cancel the context regardless of how we exit so
-	// that getTailForAudience() can remove the tail from the map
+	// that getTailsForAudience() can remove the tail from the map
 	defer t.CancelFunc()
 
 	var quit bool
@@ -210,20 +210,22 @@ func (s *Streamdal) stopTailHandler(_ context.Context, cmd *protos.Command) erro
 	aud := cmd.GetTail().Request.Audience
 	tailID := cmd.GetTail().Request.Id
 
-	tails := s.getTailForAudience(aud)
+	tails := s.getTailsForAudience(aud)
 	if len(tails) == 0 {
 		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
 		return nil
 	}
 
-	tail, ok := tails[tailID]
-	if !ok {
-		s.config.Logger.Debugf("Received stop tail command for unknown tail: %s", tailID)
-		return nil
+	if activeTail, ok := tails[tailID]; ok {
+		// Cancel workers
+		activeTail.CancelFunc()
 	}
 
-	// Cancel workers
-	tail.CancelFunc()
+	pausedTails := s.getPausedTailsForAudience(aud)
+	if pausedTail, ok := pausedTails[tailID]; ok {
+		// Cancel workers
+		pausedTail.CancelFunc()
+	}
 
 	s.removeActiveTail(aud, tailID)
 	s.removePausedTail(aud, tailID)
@@ -232,7 +234,7 @@ func (s *Streamdal) stopTailHandler(_ context.Context, cmd *protos.Command) erro
 }
 
 // k: audience_as_str
-func (s *Streamdal) getTailForAudience(aud *protos.Audience) map[string]*Tail {
+func (s *Streamdal) getTailsForAudience(aud *protos.Audience) map[string]*Tail {
 	s.tailsMtx.RLock()
 	tails, ok := s.tails[audToStr(aud)]
 	s.tailsMtx.RUnlock()
@@ -244,18 +246,12 @@ func (s *Streamdal) getTailForAudience(aud *protos.Audience) map[string]*Tail {
 	return nil
 }
 
-func (s *Streamdal) getPausedTail(aud *protos.Audience) map[string]*Tail {
+func (s *Streamdal) getPausedTailsForAudience(aud *protos.Audience) map[string]*Tail {
 	s.pausedTailsMtx.RLock()
 	tails, ok := s.pausedTails[audToStr(aud)]
 	s.pausedTailsMtx.RUnlock()
 
 	if ok {
-		// We don't know when a tail is cancelled so we need to check the context
-		//if tail.cancelCtx.Err() == context.Canceled {
-		//	s.removeActiveTail(id)
-		//	return nil
-		//}
-
 		return tails
 	}
 
@@ -334,7 +330,7 @@ func (s *Streamdal) pauseTailHandler(_ context.Context, cmd *protos.Command) err
 	aud := cmd.GetTail().Request.Audience
 	tailID := cmd.GetTail().Request.Id
 
-	tails := s.getTailForAudience(aud)
+	tails := s.getTailsForAudience(aud)
 	if len(tails) == 0 {
 		s.config.Logger.Debugf("Received pause tail command for unknown tail: %s", tailID)
 		return nil
@@ -365,7 +361,7 @@ func (s *Streamdal) resumeTailHandler(_ context.Context, cmd *protos.Command) er
 	aud := cmd.GetTail().Request.Audience
 	tailID := cmd.GetTail().Request.Id
 
-	tails := s.getPausedTail(aud)
+	tails := s.getPausedTailsForAudience(aud)
 	if len(tails) == 0 {
 		s.config.Logger.Debugf("Received resume tail command for unknown tail: %s", tailID)
 		return nil

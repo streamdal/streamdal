@@ -67,7 +67,7 @@ var _ = Describe("Tail", func() {
 
 		It("should get tail", func() {
 			s.setActiveTail(tail)
-			got := s.getTailForAudience(aud)
+			got := s.getTailsForAudience(aud)
 			Expect(len(got)).To(Equal(1))
 			Expect(got).To(HaveKey(tailID))
 		})
@@ -254,7 +254,7 @@ var _ = Describe("Tail", func() {
 			// Wait for goroutine workers to spin up
 			time.Sleep(time.Second)
 
-			tail := s.getTailForAudience(aud)
+			tail := s.getTailsForAudience(aud)
 			Expect(len(tail)).To(Equal(1))
 			tail[cmd.GetTail().Request.Id].outboundCh <- &protos.TailResponse{}
 
