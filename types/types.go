@@ -39,7 +39,7 @@ const (
 	// CounterFeatureSampleTotal is the number of times sample feature was used
 	CounterFeatureSampleTotal = "cli_feature_sample_total"
 
-	// CounterFeatureSelectTotal
+	// CounterFeatureSelectTotal is the number of times an audience was selected
 	CounterFeatureSelectTotal = "cli_feature_select_total"
 
 	GaugeArgsNum = "cli_args_num"
