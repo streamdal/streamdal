@@ -61,20 +61,20 @@ var _ = Describe("Tail", func() {
 		})
 
 		It("should set tailing", func() {
-			s.setTailing(tail)
+			s.setActiveTail(tail)
 			Expect(len(s.tails)).To(Equal(1))
 		})
 
 		It("should get tail", func() {
-			s.setTailing(tail)
-			got := s.getTail(aud)
+			s.setActiveTail(tail)
+			got := s.getTailForAudience(aud)
 			Expect(len(got)).To(Equal(1))
 			Expect(got).To(HaveKey(tailID))
 		})
 
 		It("should remove tail", func() {
-			s.setTailing(tail)
-			s.removeTail(aud, tailID)
+			s.setActiveTail(tail)
+			s.removeActiveTail(aud, tailID)
 			Expect(len(s.tails)).To(Equal(0))
 		})
 	})
@@ -179,7 +179,7 @@ var _ = Describe("Tail", func() {
 				tails:    make(map[string]map[string]*Tail),
 			}
 
-			s.setTailing(tail)
+			s.setActiveTail(tail)
 
 			Expect(len(s.tails)).To(Equal(1))
 
@@ -254,7 +254,7 @@ var _ = Describe("Tail", func() {
 			// Wait for goroutine workers to spin up
 			time.Sleep(time.Second)
 
-			tail := s.getTail(aud)
+			tail := s.getTailForAudience(aud)
 			Expect(len(tail)).To(Equal(1))
 			tail[cmd.GetTail().Request.Id].outboundCh <- &protos.TailResponse{}
 
