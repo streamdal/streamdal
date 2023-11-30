@@ -191,9 +191,9 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		telemetry, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
 			Address:       cfg.TelemetryAddress,
 			Prefix:        "streamdal",
-			UseBuffered:   false,
-			FlushInterval: 500 * time.Millisecond,
-			TagFormat:     statsd.SuffixOctothorpe,
+			UseBuffered:   true,
+			FlushInterval: time.Second,
+			TagFormat:     statsd.InfixSemicolon,
 		})
 		if err != nil {
 			return errors.Wrap(err, "unable to create new statsd client")
@@ -317,14 +317,16 @@ func (d *Dependencies) sendCreatedTelemetry() {
 
 // RunUptimeTelemetry sends a gauge metric to the telemetry backend every minute
 func (d *Dependencies) RunUptimeTelemetry() {
+	// Init telemetry
 	d.sendCreatedTelemetry()
 
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
 	tags := []statsd.Tag{
-		{"install_id", d.Config.InstallID},
-		{"node_id", d.Config.NodeID},
+		//{"install_id", d.Config.InstallID},
+		//{"node_id", d.Config.NodeID},
+		{"sample_tag", "mark"},
 	}
 
 	// Send started telemetry
