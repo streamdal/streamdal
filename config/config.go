@@ -27,7 +27,6 @@ type Config struct {
 	MaxOutputLines    int              `help:"Maximum number of output lines" default:"5000"`
 	TelemetryDisable  bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
 	TelemetryAddress  string           `help:"Address to send telemetry to" default:"telemetry.streamdal.com:8125" hidden:"true"`
-	TelemetryPrefix   string           `help:"Prefix to use for telemetry" default:"server" hidden:"true"`
 
 	InstallID   string        `kong:"-"`
 	KongContext *kong.Context `kong:"-"`

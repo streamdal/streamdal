@@ -49,10 +49,10 @@ func main() {
 	if !cfg.TelemetryDisable {
 		statsdClient, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
 			Address:       cfg.TelemetryAddress,
-			Prefix:        cfg.TelemetryPrefix,
+			Prefix:        "streamdal",
 			UseBuffered:   true,
-			FlushInterval: 500 * time.Millisecond,
-			TagFormat:     statsd.SuffixOctothorpe,
+			FlushInterval: time.Second,
+			TagFormat:     statsd.InfixSemicolon,
 		})
 		if err != nil {
 			log.Errorf("unable to create new statsd client: %s", err)
