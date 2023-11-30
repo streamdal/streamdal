@@ -501,10 +501,10 @@ func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest
 	}
 
 	// Close any pubsub channel
-	if ok := b.options.PubSub.CloseTopic(req.GetXId()); ok {
-		b.log.Debugf("closed pubsub topic '%s'", req.GetXId())
+	if ok := b.options.PubSub.CloseTopic(req.Id); ok {
+		b.log.Debugf("closed pubsub topic '%s'", req.Id)
 	} else {
-		b.log.Debugf("no pubsub topic '%s' found to close", req.GetXId())
+		b.log.Debugf("no pubsub topic '%s' found to close", req.Id)
 	}
 
 	return b.sendTailCommand(ctx, req)
@@ -536,7 +536,7 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 	// thus we won't be able to read from redis in order to send out stop commands
 	llog := b.log.WithFields(logrus.Fields{
 		"method":          "sendTailCommand",
-		"tail_request_id": req.GetXId(),
+		"tail_request_id": req.Id,
 		"audience":        req.Audience,
 		"audience_str":    util.AudienceToStr(req.Audience),
 	})

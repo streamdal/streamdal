@@ -877,7 +877,6 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 
 	// Each tail request gets its own unique ID so that we can receive messages over
 	// a unique channel from RedisBackend
-	req.XId = util.StringPtr(util.GenerateUUID())
 	req.Audience.ServiceName = strings.ToLower(req.Audience.GetServiceName())
 	req.Audience.OperationName = strings.ToLower(req.Audience.GetOperationName())
 	req.Audience.ComponentName = strings.ToLower(req.Audience.GetComponentName())
@@ -889,7 +888,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// Get channel for receiving TailResponse messages that get shipped over RedisBackend.
 	// This should exist before TailRequest command is sent to the SDKs so that we are ready to receive
 	// messages from RedisBackend
-	sdkReceiveChan := s.Options.PubSubService.Listen(req.GetXId(), util.CtxRequestId(server.Context()))
+	sdkReceiveChan := s.Options.PubSubService.Listen(req.Id, util.CtxRequestId(server.Context()))
 
 	s.log.Info("external.Tail(): broadcasting tail request")
 
@@ -945,7 +944,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 		case msg, isOpen := <-sdkReceiveChan:
 			// Just in case there is a race between stop emitted from another server and the channel read
 			if !isOpen {
-				s.log.Errorf("BUG: tried to read from closed channel '%s', tail is already closed", req.GetXId())
+				s.log.Errorf("BUG: tried to read from closed channel '%s', tail is already closed", req.Id)
 				return nil
 			}
 
@@ -979,7 +978,7 @@ func (s *ExternalServer) PauseTail(ctx context.Context, req *protos.PauseTailReq
 	if err := validate.PauseTailRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
-	
+
 	tailReq, err := s.Options.StoreService.PauseTailRequest(ctx, req)
 	if err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil

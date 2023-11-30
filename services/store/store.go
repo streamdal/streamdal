@@ -1252,7 +1252,7 @@ func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailReques
 		return "", errors.Wrap(err, "unable to marshal tail request")
 	}
 
-	tailKey := fmt.Sprintf(RedisActiveTailKeyFormat, req.Audience.ServiceName, req.GetXId())
+	tailKey := RedisActiveTailKey(req.Id)
 
 	if err := s.options.RedisBackend.Set(ctx, tailKey, encodedReq, RedisActiveTailTTL).Err(); err != nil {
 		return "", errors.Wrap(err, "unable to save tail request")
@@ -1323,7 +1323,7 @@ func (s *Store) PauseTailRequest(ctx context.Context, req *protos.PauseTailReque
 	}
 
 	// Delete tail request from active
-	if err := s.options.RedisBackend.Del(ctx, fmt.Sprintf(RedisActiveTailKeyFormat, tailRequest.Audience.ServiceName, tailRequest.GetXId())).Err(); err != nil {
+	if err := s.options.RedisBackend.Del(ctx, RedisActiveTailKey(tailRequest.Id)).Err(); err != nil {
 		return nil, errors.Wrap(err, "error deleting tail request")
 	}
 
@@ -1333,7 +1333,7 @@ func (s *Store) PauseTailRequest(ctx context.Context, req *protos.PauseTailReque
 	}
 
 	// Save to paused
-	if err := s.options.RedisBackend.Set(ctx, fmt.Sprintf(RedisPausedTailKeyFormat, tailRequest.GetXId()), data, 0).Err(); err != nil {
+	if err := s.options.RedisBackend.Set(ctx, RedisPausedTailKey(tailRequest.Id), data, 0).Err(); err != nil {
 		return nil, errors.Wrap(err, "error saving paused tail request")
 	}
 
@@ -1348,7 +1348,7 @@ func (s *Store) ResumeTailRequest(ctx context.Context, req *protos.ResumeTailReq
 	}
 
 	// Delete tail request from paused
-	if err := s.options.RedisBackend.Del(ctx, fmt.Sprintf(RedisPausedTailKeyFormat, tailRequest.GetXId())).Err(); err != nil {
+	if err := s.options.RedisBackend.Del(ctx, RedisPausedTailKey(tailRequest.Id)).Err(); err != nil {
 		return nil, errors.Wrap(err, "error deleting tail request")
 	}
 

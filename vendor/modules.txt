@@ -242,7 +242,7 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/protos v0.0.121-0.20231120161845-18009004564c
+# github.com/streamdal/protos v0.0.123
 ## explicit; go 1.20
 github.com/streamdal/protos/build/go/protos
 github.com/streamdal/protos/build/go/protos/shared
