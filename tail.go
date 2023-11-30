@@ -226,6 +226,7 @@ func (s *Streamdal) stopTailHandler(_ context.Context, cmd *protos.Command) erro
 	tail.CancelFunc()
 
 	s.removeActiveTail(aud, tailID)
+	s.removePausedTail(aud, tailID)
 
 	return nil
 }
