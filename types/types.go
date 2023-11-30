@@ -42,6 +42,8 @@ const (
 	// CounterFeatureSelectTotal is the number of times an audience was selected
 	CounterFeatureSelectTotal = "cli_feature_select_total"
 
+	// GaugeArgsNum is the number of CLI args passed to the CLI each time it is ran
+	// This is only a count and does not contain the actual args or values
 	GaugeArgsNum = "cli_args_num"
 )
 
