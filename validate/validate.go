@@ -82,7 +82,7 @@ func TailRequestStartCommand(cmd *protos.Command) error {
 		return ErrEmptyField("XId")
 	}
 
-	if err := Audience(cmd.Audience); err != nil {
+	if err := Audience(req.Audience); err != nil {
 		return errors.Wrap(err, "invalid audience")
 	}
 
@@ -106,6 +106,62 @@ func TailRequestStopCommand(cmd *protos.Command) error {
 
 	if req.GetXId() == "" {
 		return ErrEmptyField("XId")
+	}
+
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
+	}
+
+	return nil
+}
+
+func TailRequestPauseCommand(cmd *protos.Command) error {
+	if cmd == nil {
+		return ErrNilInput
+	}
+
+	tail := cmd.GetTail()
+	if tail == nil {
+		return ErrNilField("Tail")
+	}
+
+	req := tail.GetRequest()
+	if req == nil {
+		return ErrNilField("Request")
+	}
+
+	if req.GetXId() == "" {
+		return ErrEmptyField("XId")
+	}
+
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
+	}
+
+	return nil
+}
+
+func TailRequestResumeCommand(cmd *protos.Command) error {
+	if cmd == nil {
+		return ErrNilInput
+	}
+
+	tail := cmd.GetTail()
+	if tail == nil {
+		return ErrNilField("Tail")
+	}
+
+	req := tail.GetRequest()
+	if req == nil {
+		return ErrNilField("Request")
+	}
+
+	if req.GetXId() == "" {
+		return ErrEmptyField("XId")
+	}
+
+	if err := Audience(req.Audience); err != nil {
+		return errors.Wrap(err, "invalid audience")
 	}
 
 	return nil
