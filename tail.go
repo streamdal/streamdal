@@ -350,6 +350,9 @@ func (s *Streamdal) pauseTailHandler(_ context.Context, cmd *protos.Command) err
 
 	// Mode to paused tails
 	s.setPausedTailing(tail)
+
+	s.config.Logger.Infof("Paused tail: %s", tailID)
+
 	return nil
 }
 
@@ -378,6 +381,8 @@ func (s *Streamdal) resumeTailHandler(_ context.Context, cmd *protos.Command) er
 
 	// Add to active tails
 	s.setTailing(tail)
+
+	s.config.Logger.Infof("Resumed tail: %s", tailID)
 
 	return nil
 }
