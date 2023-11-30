@@ -190,8 +190,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	if !d.Config.TelemetryDisable {
 		telemetry, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
 			Address:       cfg.TelemetryAddress,
-			Prefix:        cfg.TelemetryPrefix,
-			UseBuffered:   true,
+			Prefix:        "streamdal",
+			UseBuffered:   false,
 			FlushInterval: 500 * time.Millisecond,
 			TagFormat:     statsd.SuffixOctothorpe,
 		})
@@ -199,6 +199,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 			return errors.Wrap(err, "unable to create new statsd client")
 		}
 		d.Telemetry = telemetry
+		fmt.Printf("\n\nConnected to telemetry: %s\n\n", cfg.TelemetryAddress)
 	} else {
 		d.Telemetry = &telemetry.DummyTelemetry{}
 	}
@@ -318,8 +319,6 @@ func (d *Dependencies) sendCreatedTelemetry() {
 func (d *Dependencies) RunUptimeTelemetry() {
 	d.sendCreatedTelemetry()
 
-	var uptime int64
-
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
@@ -335,7 +334,7 @@ func (d *Dependencies) RunUptimeTelemetry() {
 
 	// Reset uptime counter
 	// TODO: does this actually work?
-	if err := d.Telemetry.SetInt(types.GaugeServerUptime, 0, 1.0); err != nil {
+	if err := d.Telemetry.SetInt(types.GaugeServerUptime, 0, 1.0, tags...); err != nil {
 		logrus.Errorf("unable to reset uptime gauge: %s", err)
 	}
 
@@ -343,10 +342,9 @@ func (d *Dependencies) RunUptimeTelemetry() {
 		select {
 		case <-ticker.C:
 			// No error checking here since we don't want to spam logs every minute if telemetry is unreachable
-			uptime += 60
 
 			// Use delta since we only need to send the difference
-			_ = d.Telemetry.GaugeDelta(types.GaugeServerUptime, uptime, 1.0, tags...)
+			_ = d.Telemetry.GaugeDelta(types.GaugeServerUptime, 60, 1.0, tags...)
 
 			// Timestamp of last ping
 			_ = d.Telemetry.Gauge(types.GaugeTimestampPing, time.Now().Unix(), 1.0, tags...)
