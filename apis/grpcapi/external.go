@@ -928,7 +928,8 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 	// Best effort: delete the active tail request key when client disconnects.
 	// If this does not work - the key will TTL out after RedisActiveTailTTL.
 	defer func() {
-		if _, err := s.Options.RedisBackend.Del(server.Context(), activeTailKey).Result(); err != nil {
+		// Background context here since server context will be cancelled on exit
+		if _, err := s.Options.RedisBackend.Del(context.Background(), activeTailKey).Result(); err != nil {
 			s.log.Errorf("DEFER: unable to delete active tail request key '%s': %s", activeTailKey, err)
 		}
 	}()

@@ -1262,19 +1262,11 @@ func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailReques
 }
 
 func (s *Store) GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisActiveTailPrefix+":*:"+tailID).Result()
+	encodedReq, err := s.options.RedisBackend.Get(ctx, RedisActiveTailKey(tailID)).Result()
 	if err != nil {
-		return nil, errors.Wrap(err, "error fetching active tail keys from store")
-	}
-
-	if len(keys) == 0 {
-		return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
-	} else if len(keys) > 1 {
-		return nil, errors.Errorf("BUG: found '%d' keys for tail ID '%s' - expected 1", len(keys), tailID)
-	}
-
-	encodedReq, err := s.options.RedisBackend.Get(ctx, keys[0]).Result()
-	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+		}
 		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
 	}
 
@@ -1289,19 +1281,11 @@ func (s *Store) GetTailRequestById(ctx context.Context, tailID string) (*protos.
 }
 
 func (s *Store) GetPausedTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisPausedTailKeyFormat+":"+tailID).Result()
+	encodedReq, err := s.options.RedisBackend.Get(ctx, RedisPausedTailKey(tailID)).Result()
 	if err != nil {
-		return nil, errors.Wrap(err, "error fetching active tail keys from store")
-	}
-
-	if len(keys) == 0 {
-		return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
-	} else if len(keys) > 1 {
-		return nil, errors.Errorf("BUG: found '%d' keys for tail ID '%s' - expected 1", len(keys), tailID)
-	}
-
-	encodedReq, err := s.options.RedisBackend.Get(ctx, keys[0]).Result()
-	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+		}
 		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
 	}
 
