@@ -491,18 +491,18 @@ export interface AppRegisterRejectRequest {
  */
 export interface PauseTailRequest {
     /**
-     * @generated from protobuf field: string tail_id = 1;
+     * @generated from protobuf field: protos.Audience audience = 1;
      */
-    tailId: string;
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.ResumeTailRequest
  */
 export interface ResumeTailRequest {
     /**
-     * @generated from protobuf field: string tail_id = 1;
+     * @generated from protobuf field: protos.Audience audience = 1;
      */
-    tailId: string;
+    audience?: Audience;
 }
 /**
  * @generated from protobuf message protos.TestRequest

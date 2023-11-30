@@ -1927,11 +1927,11 @@ exports.AppRegisterRejectRequest = new AppRegisterRejectRequest$Type();
 class PauseTailRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.PauseTailRequest", [
-            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "audience", kind: "message", T: () => sp_common_7.Audience }
         ]);
     }
     create(value) {
-        const message = { tailId: "" };
+        const message = {};
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -1942,8 +1942,8 @@ class PauseTailRequest$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string tail_id */ 1:
-                    message.tailId = reader.string();
+                case /* protos.Audience audience */ 1:
+                    message.audience = sp_common_7.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1957,9 +1957,9 @@ class PauseTailRequest$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string tail_id = 1; */
-        if (message.tailId !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.tailId);
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            sp_common_7.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1974,11 +1974,11 @@ exports.PauseTailRequest = new PauseTailRequest$Type();
 class ResumeTailRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.ResumeTailRequest", [
-            { no: 1, name: "tail_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "audience", kind: "message", T: () => sp_common_7.Audience }
         ]);
     }
     create(value) {
-        const message = { tailId: "" };
+        const message = {};
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -1989,8 +1989,8 @@ class ResumeTailRequest$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string tail_id */ 1:
-                    message.tailId = reader.string();
+                case /* protos.Audience audience */ 1:
+                    message.audience = sp_common_7.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2004,9 +2004,9 @@ class ResumeTailRequest$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string tail_id = 1; */
-        if (message.tailId !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.tailId);
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            sp_common_7.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

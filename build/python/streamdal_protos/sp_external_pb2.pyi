@@ -284,10 +284,10 @@ class PausePipelineRequest(_message.Message):
     def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class PauseTailRequest(_message.Message):
-    __slots__ = ["tail_id"]
-    TAIL_ID_FIELD_NUMBER: _ClassVar[int]
-    tail_id: str
-    def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
+    __slots__ = ["audience"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class ResumePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
@@ -298,10 +298,10 @@ class ResumePipelineRequest(_message.Message):
     def __init__(self, pipeline_id: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class ResumeTailRequest(_message.Message):
-    __slots__ = ["tail_id"]
-    TAIL_ID_FIELD_NUMBER: _ClassVar[int]
-    tail_id: str
-    def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
+    __slots__ = ["audience"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class TestRequest(_message.Message):
     __slots__ = ["input"]

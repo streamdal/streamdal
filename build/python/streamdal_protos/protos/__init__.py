@@ -663,12 +663,12 @@ class AppRegisterRejectRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class PauseTailRequest(betterproto.Message):
-    tail_id: str = betterproto.string_field(1)
+    audience: "Audience" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class ResumeTailRequest(betterproto.Message):
-    tail_id: str = betterproto.string_field(1)
+    audience: "Audience" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
