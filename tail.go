@@ -50,7 +50,7 @@ func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalDa
 	}
 
 	for _, tail := range tails {
-		tailID := tail.Request.GetTail().Request.GetXId()
+		tailID := tail.Request.GetTail().Request.Id
 
 		if !tail.active {
 			tail.log.Debugf("tail id '%s' is not active - starting workers", tailID)
@@ -208,7 +208,7 @@ func (s *Streamdal) stopTailHandler(_ context.Context, cmd *protos.Command) erro
 	}
 
 	aud := cmd.GetTail().Request.Audience
-	tailID := cmd.GetTail().Request.GetXId()
+	tailID := cmd.GetTail().Request.Id
 
 	tails := s.getTail(aud)
 	if len(tails) == 0 {
@@ -307,7 +307,7 @@ func (s *Streamdal) setTailing(tail *Tail) {
 		s.tails[audStr] = make(map[string]*Tail)
 	}
 
-	s.tails[audStr][tr.GetXId()] = tail
+	s.tails[audStr][tr.Id] = tail
 }
 
 func (s *Streamdal) setPausedTailing(tail *Tail) {
@@ -322,7 +322,7 @@ func (s *Streamdal) setPausedTailing(tail *Tail) {
 		s.tails[audStr] = make(map[string]*Tail)
 	}
 
-	s.tails[audStr][tr.GetXId()] = tail
+	s.tails[audStr][tr.Id] = tail
 }
 
 func (s *Streamdal) pauseTailHandler(_ context.Context, cmd *protos.Command) error {
@@ -331,7 +331,7 @@ func (s *Streamdal) pauseTailHandler(_ context.Context, cmd *protos.Command) err
 	}
 
 	aud := cmd.GetTail().Request.Audience
-	tailID := cmd.GetTail().Request.GetXId()
+	tailID := cmd.GetTail().Request.Id
 
 	tails := s.getTail(aud)
 	if len(tails) == 0 {
@@ -359,7 +359,7 @@ func (s *Streamdal) resumeTailHandler(_ context.Context, cmd *protos.Command) er
 	}
 
 	aud := cmd.GetTail().Request.Audience
-	tailID := cmd.GetTail().Request.GetXId()
+	tailID := cmd.GetTail().Request.Id
 
 	tails := s.getPausedTail(aud)
 	if len(tails) == 0 {

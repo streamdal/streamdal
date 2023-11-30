@@ -51,7 +51,7 @@ var _ = Describe("Tail", func() {
 					Command: &protos.Command_Tail{
 						Tail: &protos.TailCommand{
 							Request: &protos.TailRequest{
-								XId:      &tailID,
+								Id:       tailID,
 								Audience: aud,
 							},
 						},
@@ -156,7 +156,7 @@ var _ = Describe("Tail", func() {
 					Command: &protos.Command_Tail{
 						Tail: &protos.TailCommand{
 							Request: &protos.TailRequest{
-								XId:        stringPtr(uuid.New().String()),
+								Id:         uuid.New().String(),
 								PipelineId: &pipelineID,
 								Audience:   aud,
 							},
@@ -240,7 +240,7 @@ var _ = Describe("Tail", func() {
 					Tail: &protos.TailCommand{
 						Request: &protos.TailRequest{
 							Type:       protos.TailRequestType_TAIL_REQUEST_TYPE_START,
-							XId:        stringPtr(uuid.New().String()),
+							Id:         uuid.New().String(),
 							PipelineId: &pipelineID,
 							Audience:   aud,
 						},
@@ -256,7 +256,7 @@ var _ = Describe("Tail", func() {
 
 			tail := s.getTail(aud)
 			Expect(len(tail)).To(Equal(1))
-			tail[cmd.GetTail().Request.GetXId()].outboundCh <- &protos.TailResponse{}
+			tail[cmd.GetTail().Request.Id].outboundCh <- &protos.TailResponse{}
 
 			cmd.GetTail().GetRequest().Type = protos.TailRequestType_TAIL_REQUEST_TYPE_STOP
 
@@ -299,7 +299,7 @@ var _ = Describe("Tail", func() {
 					Tail: &protos.TailCommand{
 						Request: &protos.TailRequest{
 							Type:       protos.TailRequestType_TAIL_REQUEST_TYPE_START,
-							XId:        stringPtr(uuid.New().String()),
+							Id:         uuid.New().String(),
 							PipelineId: stringPtr(uuid.New().String()),
 							Audience:   aud,
 						},

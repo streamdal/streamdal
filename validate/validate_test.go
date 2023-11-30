@@ -120,7 +120,7 @@ var _ = Describe("Validate", func() {
 			Expect(err.Error()).To(Equal(ErrNilField("Request").Error()))
 		})
 
-		It("cannot have empty XId", func() {
+		It("cannot have empty Id", func() {
 			err := TailRequestStartCommand(&protos.Command{
 				Command: &protos.Command_Tail{
 					Tail: &protos.TailCommand{
@@ -128,24 +128,23 @@ var _ = Describe("Validate", func() {
 					},
 				},
 			})
-			Expect(err.Error()).To(Equal(ErrEmptyField("XId").Error()))
+			Expect(err.Error()).To(Equal(ErrEmptyField("Id").Error()))
 		})
 
 		It("returns nil", func() {
-			xid := "test"
 			err := TailRequestStartCommand(&protos.Command{
 				Command: &protos.Command_Tail{
 					Tail: &protos.TailCommand{
 						Request: &protos.TailRequest{
-							XId: &xid,
+							Id: "test",
+							Audience: &protos.Audience{
+								ServiceName:   "test-service",
+								ComponentName: "test-component",
+								OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+								OperationName: "test-operation",
+							},
 						},
 					},
-				},
-				Audience: &protos.Audience{
-					ServiceName:   "test-service",
-					ComponentName: "test-component",
-					OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-					OperationName: "test-operation",
 				},
 			})
 			Expect(err).To(BeNil())
@@ -176,24 +175,38 @@ var _ = Describe("Validate", func() {
 			Expect(err.Error()).To(Equal(ErrNilField("Request").Error()))
 		})
 
-		It("cannot have empty XId", func() {
-			err := TailRequestStopCommand(&protos.Command{
-				Command: &protos.Command_Tail{
-					Tail: &protos.TailCommand{
-						Request: &protos.TailRequest{},
-					},
-				},
-			})
-			Expect(err.Error()).To(Equal(ErrEmptyField("XId").Error()))
-		})
-
-		It("returns nil", func() {
-			xid := "test"
+		It("cannot have empty Id", func() {
 			err := TailRequestStopCommand(&protos.Command{
 				Command: &protos.Command_Tail{
 					Tail: &protos.TailCommand{
 						Request: &protos.TailRequest{
-							XId: &xid,
+							Audience: &protos.Audience{
+								ServiceName:   "test-service",
+								ComponentName: "test-component",
+								OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+								OperationName: "test-operation",
+							},
+						},
+					},
+				},
+			})
+			Expect(err.Error()).To(Equal(ErrEmptyField("Id").Error()))
+		})
+
+		It("returns nil", func() {
+			aud := &protos.Audience{
+				ServiceName:   "test-service",
+				ComponentName: "test-component",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "test-operation",
+			}
+
+			err := TailRequestStopCommand(&protos.Command{
+				Command: &protos.Command_Tail{
+					Tail: &protos.TailCommand{
+						Request: &protos.TailRequest{
+							Id:       "test",
+							Audience: aud,
 						},
 					},
 				},

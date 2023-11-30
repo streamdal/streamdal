@@ -78,8 +78,8 @@ func TailRequestStartCommand(cmd *protos.Command) error {
 		return ErrNilField("Request")
 	}
 
-	if req.GetXId() == "" {
-		return ErrEmptyField("XId")
+	if req.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if err := Audience(req.Audience); err != nil {
@@ -104,8 +104,8 @@ func TailRequestStopCommand(cmd *protos.Command) error {
 		return ErrNilField("Request")
 	}
 
-	if req.GetXId() == "" {
-		return ErrEmptyField("XId")
+	if req.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if err := Audience(req.Audience); err != nil {
@@ -130,8 +130,8 @@ func TailRequestPauseCommand(cmd *protos.Command) error {
 		return ErrNilField("Request")
 	}
 
-	if req.GetXId() == "" {
-		return ErrEmptyField("XId")
+	if req.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if err := Audience(req.Audience); err != nil {
@@ -156,8 +156,8 @@ func TailRequestResumeCommand(cmd *protos.Command) error {
 		return ErrNilField("Request")
 	}
 
-	if req.GetXId() == "" {
-		return ErrEmptyField("XId")
+	if req.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if err := Audience(req.Audience); err != nil {
