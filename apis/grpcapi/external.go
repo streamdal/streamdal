@@ -1011,9 +1011,6 @@ func (s *ExternalServer) ResumeTail(ctx context.Context, req *protos.ResumeTailR
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// TODO: we need to store the idea of a paused tail request in redis so that SendActiveTails will not
-	// TODO: start the tail again when a client reconnects
-
 	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK, "tail resumed"), nil
 }
 
