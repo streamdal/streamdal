@@ -38,3 +38,8 @@ select {
   border-radius: 0.375rem;
 }
 
+input[type='checkbox'].checkmark-streamdal:checked:after {
+  content: '\2713';
+  color:white;
+}
+

@@ -24,7 +24,7 @@ import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
 ) {
-  const [managePipelines, setManagePipelines] = useState(false);
+  const [managePipelines, setManagePipelines] = useState(true);
   const [tailNavOpen, setTailNavOpen] = useState(false);
   const [schemaNavOpen, setSchemaNavOpen] = useState(true);
   const pipelines = Object.values(serviceMap?.pipelines);
@@ -75,7 +75,7 @@ export default function Operation(
               type="button"
               onClick={() => setManagePipelines(!managePipelines)}
             >
-              Attach/Detach Pipelines
+              Pipelines
               {managePipelines
                 ? (
                   <IconChevronUp
