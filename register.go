@@ -238,6 +238,12 @@ func (s *Streamdal) handleTailCommand(_ context.Context, cmd *protos.Command) er
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 		s.config.Logger.Debugf("Received stop tail command for audience '%s'", audStr)
 		err = s.stopTailHandler(context.Background(), cmd)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_PAUSE:
+		s.config.Logger.Debugf("Received pause tail command for audience '%s'", audStr)
+		err = s.pauseTailHandler(context.Background(), cmd)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_RESUME:
+		s.config.Logger.Debugf("Received resume tail command for audience '%s'", audStr)
+		err = s.resumeTailHandler(context.Background(), cmd)
 	default:
 		return fmt.Errorf("unknown tail command type: %s", tail.GetRequest().Type)
 	}

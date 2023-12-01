@@ -107,6 +107,8 @@ type Streamdal struct {
 	hf                 *hostfunc.HostFunc
 	tailsMtx           *sync.RWMutex
 	tails              map[string]map[string]*Tail // k1: audienceStr k2: tailID
+	pausedTailsMtx     *sync.RWMutex
+	pausedTails        map[string]map[string]*Tail // k1: audienceStr k2: tailID
 	schemas            map[string]*protos.Schema   // k: audienceStr
 	schemasMtx         *sync.RWMutex
 }
@@ -243,6 +245,8 @@ func New(cfg *Config) (*Streamdal, error) {
 		hf:                 hf,
 		tailsMtx:           &sync.RWMutex{},
 		tails:              make(map[string]map[string]*Tail),
+		pausedTailsMtx:     &sync.RWMutex{},
+		pausedTails:        make(map[string]map[string]*Tail),
 		schemasMtx:         &sync.RWMutex{},
 		schemas:            make(map[string]*protos.Schema),
 	}
