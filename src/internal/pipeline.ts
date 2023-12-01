@@ -138,20 +138,20 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         });
       }
       // Add entry (@JH, OK if overwritten?)
-      request.Id &&
-        internal.audiences.get(audienceKey(audience))?.tails.set(request.Id, {
+      request.id &&
+        internal.audiences.get(audienceKey(audience))?.tails.set(request.id, {
           tail: request.type === TailRequestType.START,
-          tailRequestId: request.Id,
+          tailRequestId: request.id,
         });
       break;
     }
     case TailRequestType.STOP: {
       console.debug(
         "received a STOP tail: removing entry from audiences for tail id",
-        request.Id
+        request.id
       );
-      request.Id &&
-        internal.audiences.get(audienceKey(audience))?.tails.delete(request.Id);
+      request.id &&
+        internal.audiences.get(audienceKey(audience))?.tails.delete(request.id);
       break;
     }
     default:
