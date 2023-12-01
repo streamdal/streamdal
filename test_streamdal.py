@@ -7,6 +7,7 @@ import uuid
 import unittest.mock as mock
 import streamdal
 from streamdal import StreamdalClient, StreamdalConfig
+from streamdal.tail import Tail
 
 
 class TestStreamdalClient:
@@ -31,6 +32,7 @@ class TestStreamdalClient:
         client.paused_pipelines = {}
         client.audiences = {}
         client.tails = {}
+        client.paused_tails = {}
         client.schemas = {}
 
         self.client = client
@@ -290,6 +292,74 @@ class TestStreamdalClient:
         self.client._tail_request(cmd)
         m.assert_called_once()
 
+    def test_tail_request_pause(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        t = Tail.__new__(Tail)
+        t.request = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+            type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+        )
+
+        self.client.tails[common.aud_to_str(aud)] = {}
+        self.client.tails[common.aud_to_str(aud)][tail_id] = t
+
+        pause_cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=aud,
+                    id=tail_id,
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_PAUSE,
+                )
+            ),
+        )
+
+        self.client._tail_request(pause_cmd)
+        assert len(self.client.paused_tails) == 1
+        assert len(self.client.tails) == 0
+
+    def test_tail_request_resume(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        t = Tail.__new__(Tail)
+        t.request = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+            type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+        )
+
+        self.client.paused_tails[common.aud_to_str(aud)] = {}
+        self.client.paused_tails[common.aud_to_str(aud)][tail_id] = t
+
+        resume_cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=aud,
+                    id=tail_id,
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_RESUME,
+                )
+            ),
+        )
+
+        self.client._tail_request(resume_cmd)
+        assert len(self.client.paused_tails) == 0
+        assert len(self.client.tails) == 1
+
     def test_set_tail(self):
         tail_id = uuid.uuid4().__str__()
 
@@ -308,7 +378,7 @@ class TestStreamdalClient:
 
         assert len(self.client.tails) == 0
 
-        self.client._set_tail(tail)
+        self.client._set_active_tail(tail)
 
         assert len(self.client.tails) == 1
 
@@ -370,7 +440,7 @@ class TestStreamdalClient:
             tail=protos.TailCommand(request=req),
         )
 
-        self.client._set_tail(tail)
+        self.client._set_active_tail(tail)
         assert len(self.client.tails) == 1
 
         cmd.tail.request.type = (protos.TailRequestType.TAIL_REQUEST_TYPE_STOP,)
@@ -390,7 +460,7 @@ class TestStreamdalClient:
         aud_str = common.aud_to_str(aud)
 
         self.client.tails = {aud_str: {tail_id: mock.Mock()}}
-        self.client._remove_tail(aud, tail_id)
+        self.client._remove_active_tail(aud, tail_id)
         assert len(self.client.tails) == 0
 
     def test_set_schema(self):
