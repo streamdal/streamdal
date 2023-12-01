@@ -162,7 +162,10 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             </div>
             <div
               className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
-              onClick={() => tailEnabledSignal.value = false}
+              onClick={() => {
+                tailPausedSignal.value = false;
+                tailEnabledSignal.value = false;
+              }}
             >
               <IconX class="w-6 h-6 text-white" />
             </div>

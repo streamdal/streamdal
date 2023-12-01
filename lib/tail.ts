@@ -66,7 +66,7 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
 
   try {
     const tailRequest = TailRequest.create({
-      Id: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       audience: audience,
       type: TailRequestType.START,
     });
