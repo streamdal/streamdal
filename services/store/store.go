@@ -130,6 +130,15 @@ type IStore interface {
 
 	// IsPipelineAttachedAny returns if pipeline is attached to any audience. Used for telemetry tags
 	IsPipelineAttachedAny(ctx context.Context, pipelineID string) bool
+
+	// PauseTailRequest pauses a tail request by its ID
+	PauseTailRequest(ctx context.Context, req *protos.PauseTailRequest) (*protos.TailRequest, error)
+
+	// ResumeTailRequest resumes a tail request by its ID
+	ResumeTailRequest(ctx context.Context, req *protos.ResumeTailRequest) (*protos.TailRequest, error)
+
+	// GetTailRequestById returns a TailRequest by its ID
+	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
 }
 
 type Options struct {
@@ -1345,13 +1354,96 @@ func (s *Store) AddActiveTailRequest(ctx context.Context, req *protos.TailReques
 		return "", errors.Wrap(err, "unable to marshal tail request")
 	}
 
-	tailKey := fmt.Sprintf(RedisActiveTailKeyFormat, req.Audience.ServiceName, req.GetXId())
+	tailKey := RedisActiveTailKey(req.Id)
 
 	if err := s.options.RedisBackend.Set(ctx, tailKey, encodedReq, RedisActiveTailTTL).Err(); err != nil {
 		return "", errors.Wrap(err, "unable to save tail request")
 	}
 
 	return tailKey, nil
+}
+
+func (s *Store) GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
+	encodedReq, err := s.options.RedisBackend.Get(ctx, RedisActiveTailKey(tailID)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+		}
+		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
+	}
+
+	// Attempt to decode
+	tailRequest := &protos.TailRequest{}
+
+	if err := proto.Unmarshal([]byte(encodedReq), tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) GetPausedTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error) {
+	encodedReq, err := s.options.RedisBackend.Get(ctx, RedisPausedTailKey(tailID)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, errors.Errorf("no tail request found for tail ID '%s'", tailID)
+		}
+		return nil, errors.Wrapf(err, "error fetching tail request '%s' from store", tailID)
+	}
+
+	// Attempt to decode
+	tailRequest := &protos.TailRequest{}
+
+	if err := proto.Unmarshal([]byte(encodedReq), tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error unmarshaling tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) PauseTailRequest(ctx context.Context, req *protos.PauseTailRequest) (*protos.TailRequest, error) {
+	// Fetch tail request
+	tailRequest, err := s.GetTailRequestById(ctx, req.TailId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching tail request")
+	}
+
+	// Delete tail request from active
+	if err := s.options.RedisBackend.Del(ctx, RedisActiveTailKey(tailRequest.Id)).Err(); err != nil {
+		return nil, errors.Wrap(err, "error deleting tail request")
+	}
+
+	data, err := proto.Marshal(tailRequest)
+	if err != nil {
+		return nil, errors.Wrap(err, "error marshaling tail request")
+	}
+
+	// Save to paused
+	if err := s.options.RedisBackend.Set(ctx, RedisPausedTailKey(tailRequest.Id), data, 0).Err(); err != nil {
+		return nil, errors.Wrap(err, "error saving paused tail request")
+	}
+
+	return tailRequest, nil
+}
+
+func (s *Store) ResumeTailRequest(ctx context.Context, req *protos.ResumeTailRequest) (*protos.TailRequest, error) {
+	// Fetch tail request
+	tailRequest, err := s.GetPausedTailRequestById(ctx, req.TailId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching tail request")
+	}
+
+	// Delete tail request from paused
+	if err := s.options.RedisBackend.Del(ctx, RedisPausedTailKey(tailRequest.Id)).Err(); err != nil {
+		return nil, errors.Wrap(err, "error deleting tail request")
+	}
+
+	// Save to active
+	if _, err := s.AddActiveTailRequest(ctx, tailRequest); err != nil {
+		return nil, errors.Wrap(err, "error saving active tail request")
+	}
+
+	return tailRequest, nil
 }
 
 func applyPipelineDefaults(pipeline *protos.Pipeline) {

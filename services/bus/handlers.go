@@ -474,6 +474,10 @@ func (b *Bus) handleTailCommand(ctx context.Context, req *protos.TailRequest) er
 		return b.handleTailRequestStart(ctx, req)
 	case protos.TailRequestType_TAIL_REQUEST_TYPE_STOP:
 		return b.handleTailRequestStop(ctx, req)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_PAUSE:
+		return b.handleTailRequestPause(ctx, req)
+	case protos.TailRequestType_TAIL_REQUEST_TYPE_RESUME:
+		return b.handleTailRequestResume(ctx, req)
 	default:
 		b.log.Debugf("unknown tail command type: %v", req.Type)
 	}
@@ -497,10 +501,28 @@ func (b *Bus) handleTailRequestStop(ctx context.Context, req *protos.TailRequest
 	}
 
 	// Close any pubsub channel
-	if ok := b.options.PubSub.CloseTopic(req.GetXId()); ok {
-		b.log.Debugf("closed pubsub topic '%s'", req.GetXId())
+	if ok := b.options.PubSub.CloseTopic(req.Id); ok {
+		b.log.Debugf("closed pubsub topic '%s'", req.Id)
 	} else {
-		b.log.Debugf("no pubsub topic '%s' found to close", req.GetXId())
+		b.log.Debugf("no pubsub topic '%s' found to close", req.Id)
+	}
+
+	return b.sendTailCommand(ctx, req)
+}
+
+func (b *Bus) handleTailRequestPause(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail pause command")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
+	}
+
+	return b.sendTailCommand(ctx, req)
+}
+
+func (b *Bus) handleTailRequestResume(ctx context.Context, req *protos.TailRequest) error {
+	b.log.Debugf("handling tail resume command")
+	if err := validate.StartTailRequest(req); err != nil {
+		return errors.Wrap(err, "invalid tail request")
 	}
 
 	return b.sendTailCommand(ctx, req)
@@ -514,7 +536,7 @@ func (b *Bus) sendTailCommand(_ context.Context, req *protos.TailRequest) error 
 	// thus we won't be able to read from redis in order to send out stop commands
 	llog := b.log.WithFields(logrus.Fields{
 		"method":          "sendTailCommand",
-		"tail_request_id": req.GetXId(),
+		"tail_request_id": req.Id,
 		"audience":        req.Audience,
 		"audience_str":    util.AudienceToStr(req.Audience),
 	})

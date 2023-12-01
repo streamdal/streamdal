@@ -40,7 +40,8 @@ const (
 	RedisSchemaFormat = "streamdal_schema:%s" // K: $audience V: serialized protos.Schema
 
 	RedisActiveTailPrefix    = "streamdal_tail"
-	RedisActiveTailKeyFormat = "streamdal_tail:%s:%s" // K: $service_name:$tail_request_id V: serialized protos.TailRequest
+	RedisActiveTailKeyFormat = "streamdal_tail:%s"        // K: $service_name:$tail_request_id V: serialized protos.TailRequest
+	RedisPausedTailKeyFormat = "streamdal_tail_paused:%s" // K: $service_name:$tail_request_id:paused V: serialized protos.TailRequest
 
 	// RedisActiveTailTTL is the TTL for the active tail key. While this key
 	// should be automatically cleaned up when the frontend stops a Tail() request,
@@ -98,4 +99,12 @@ func RedisNotificationAssocKey(pipelineID, configID string) string {
 
 func RedisSchemaKey(audience string) string {
 	return strings.ToLower(fmt.Sprintf(RedisSchemaFormat, audience))
+}
+
+func RedisActiveTailKey(tailID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisActiveTailKeyFormat, tailID))
+}
+
+func RedisPausedTailKey(tailID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisPausedTailKeyFormat, tailID))
 }
