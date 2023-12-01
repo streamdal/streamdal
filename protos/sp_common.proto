@@ -50,6 +50,7 @@ message Metric {
   map<string, string> labels = 2;
   double value = 3;
   Audience audience = 4;
+  SampleOptions sample_options = 5;
 }
 
 message TailRequest {
@@ -114,4 +115,10 @@ message Schema {
   int32 _version = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message SampleOptions {
+  uint32 sample_rate = 1;
+
+  uint32 sample_interval_seconds = 2;
 }

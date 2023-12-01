@@ -79,6 +79,10 @@ export interface Metric {
      * @generated from protobuf field: protos.Audience audience = 4;
      */
     audience?: Audience;
+    /**
+     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
+     */
+    sampleOptions?: SampleOptions;
 }
 /**
  * @generated from protobuf message protos.TailRequest
@@ -197,6 +201,19 @@ export interface Schema {
     Metadata: {
         [key: string]: string;
     };
+}
+/**
+ * @generated from protobuf message protos.SampleOptions
+ */
+export interface SampleOptions {
+    /**
+     * @generated from protobuf field: uint32 sample_rate = 1;
+     */
+    sampleRate: number;
+    /**
+     * @generated from protobuf field: uint32 sample_interval_seconds = 2;
+     */
+    sampleIntervalSeconds: number;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -364,4 +381,14 @@ declare class Schema$Type extends MessageType<Schema> {
  * @generated MessageType for protobuf message protos.Schema
  */
 export declare const Schema: Schema$Type;
+declare class SampleOptions$Type extends MessageType<SampleOptions> {
+    constructor();
+    create(value?: PartialMessage<SampleOptions>): SampleOptions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SampleOptions): SampleOptions;
+    internalBinaryWrite(message: SampleOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SampleOptions
+ */
+export declare const SampleOptions: SampleOptions$Type;
 export {};

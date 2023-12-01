@@ -172,6 +172,7 @@ class Metric(betterproto.Message):
     )
     value: float = betterproto.double_field(3)
     audience: "Audience" = betterproto.message_field(4)
+    sample_options: "SampleOptions" = betterproto.message_field(5)
 
 
 @dataclass(eq=False, repr=False)
@@ -233,6 +234,12 @@ class Schema(betterproto.Message):
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
+
+
+@dataclass(eq=False, repr=False)
+class SampleOptions(betterproto.Message):
+    sample_rate: int = betterproto.uint32_field(1)
+    sample_interval_seconds: int = betterproto.uint32_field(2)
 
 
 @dataclass(eq=False, repr=False)

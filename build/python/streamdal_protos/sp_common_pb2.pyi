@@ -44,7 +44,7 @@ class AudienceRate(_message.Message):
     def __init__(self, bytes: _Optional[float] = ..., processed: _Optional[float] = ...) -> None: ...
 
 class Metric(_message.Message):
-    __slots__ = ["audience", "labels", "name", "value"]
+    __slots__ = ["audience", "labels", "name", "sample_options", "value"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -55,12 +55,22 @@ class Metric(_message.Message):
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    SAMPLE_OPTIONS_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     audience: Audience
     labels: _containers.ScalarMap[str, str]
     name: str
+    sample_options: SampleOptions
     value: float
-    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., sample_options: _Optional[_Union[SampleOptions, _Mapping]] = ...) -> None: ...
+
+class SampleOptions(_message.Message):
+    __slots__ = ["sample_interval_seconds", "sample_rate"]
+    SAMPLE_INTERVAL_SECONDS_FIELD_NUMBER: _ClassVar[int]
+    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
+    sample_interval_seconds: int
+    sample_rate: int
+    def __init__(self, sample_rate: _Optional[int] = ..., sample_interval_seconds: _Optional[int] = ...) -> None: ...
 
 class Schema(_message.Message):
     __slots__ = ["_metadata", "_version", "json_schema"]
