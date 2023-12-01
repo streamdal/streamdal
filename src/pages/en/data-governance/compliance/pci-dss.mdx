@@ -40,32 +40,25 @@ Streamdal can help keep your PCI data in compliance.
 
 You can leverage Streamdal for:
 
-🌌 **<span class="ykeyword">Data Flow Diagram</span>:** An integral part of the [Console UI](/en/core-components/console-ui/) is the [Data Graph](/en/core-components/console-ui#data-graph). It will show the flow of data throughout your entire system in a single view, and give you instant compliance with this requirement of PCI DSS.
+**Data Flow Diagram:** An integral part of the [Console UI](/en/core-components/console-ui/) is the [Data Graph](/en/core-components/console-ui#data-graph). It will show the flow of data throughout your entire system in a single view, and give you instant compliance with this requirement of PCI DSS.
 
-<u>No maintenance on the Data Graph is required</u> because of how the Streamdal [SDK](/en/core-components/sdk/) works. The view it provides in the [Console UI](/en/core-components/console-ui/) is dynamic, and so long as new and existing services are instrumented with the [SDK](/en/core-components/sdk/), the [Data Graph](/en/core-components/console-ui#data-graph) will always give an up-to-date representation of data flow. 
+<u>No maintenance on the Data Graph is required</u> because of how the Streamdal SDK works. The view it provides in the Console UI) is dynamic, and so long as new and existing services are instrumented with the SDK, the Data Graph will always give an up-to-date representation of data flow. 
 
-🚓 **<span class="ykeyword">Enforcing Data Policies</span>:** You can physically apply your requirements to <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> of cardholder data by creating <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> in the [Console UI](/en/core-components/console-ui/). From there (or the Streamdal [CLI](/en/guides/tail#cli)), you can periodically audit real-time data with [Tail](/en/guides/tail/) to ensure data is flowing within the necessary compliance parameters.
+**Enforcing Data Policies:** You can physically apply your requirements to <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> of cardholder data by creating <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> in the Console UI. From there (or the Streamdal [CLI](/en/guides/tail#cli)), you can periodically audit real-time data with [Tail](/en/guides/tail/) to ensure data is flowing within the necessary compliance parameters.
 
-🎭 **<span class="ykeyword">Data Minimization & PII Protection</span>:** <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">Rules</a> can be created into a matrix of <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> that data must validate through in order to continue flowing through your systems. 
+**Data Minimization & PII Protection:** Rules can be created into a matrix of <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> that data must validate through in order to continue flowing through your systems. 
 
-**For example**: you could set up <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to obfuscate or block cardholder data, and restrict access by `IP address` or `time` fields to ensure data minimization and more scrutiny over hours of use
+**For example**: you could set up rules to obfuscate or block cardholder data, and restrict access by `IP address` or `time` fields to ensure data minimization and more scrutiny over hours of use
 
 > **Coming Soon**: A visual guide on setting up PCI DSS-specific rules in the 
 [Console UI](/en/core-components/console-ui/).
 
 ## Regulatory Insights
 
-Understanding various laws, regulations, and compliance guidelines can be 
-daunting. We always recommend developing your data policies with a legal 
-department, security/GRC consultant, or your friendly neighborhood DevOps 
-professional 😄.
-
-The purpose of this section is to make researching these regulations easier and 
-to give a better idea of where Streamdal could be the most impactful for your 
-organization. In most cases, <u>the combination of</u> the always free and 
-[open source](/en/resources-support/open-source/) aspects of Streamdal and the 
-[data governance](/en/data-governance/overview/) capabilities will ensure 
-successful compliance. 
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
 
 While more PCI requirements could be applicable, below are some _(abbreviated)_ 
 sections taken from various requirements established in the 

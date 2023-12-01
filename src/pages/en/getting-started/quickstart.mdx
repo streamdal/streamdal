@@ -22,17 +22,18 @@ most recent.
 <br />
 Streamdal is a two step process to get up and running. First, you'll need to install the Streamdal [server](/en/core-components/server/) and [console](/en/core-components/console-ui/). Then, you'll need to instrument your code using one of the Streamdal [SDKs](/en/core-components/sdk/).
 
-## <span class="yhighlight">\[STEP 1\]</span> Install Streamdal Server and Console
+## Step 1: Install Streamdal Server and Console
 
 The quickest way to deploy Streamdal is using the provided script via curl:
 
 ```bash
 curl -s https://sh.streamdal.com | bash
 ```
-👆 The script [installs our docker-compose](/en/guides/deployment#deployments).
 
+This script [installs our docker-compose](/en/guides/deployment#deployments). 
 Run the `docker ps` command to view the status of the deployment. A successful 
 deploy should give a reading similar to this:
+
 ```bash
 CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                            NAMES
 ed6f02a60db1   streamdal/console:v0.1.26   "/tini -- docker-ent…"   1 day ago   Up 10 minutes   0.0.0.0:8080->8080/tcp                           streamdal-console
@@ -41,11 +42,15 @@ aa59c29d9221   streamdal/server:e074107    "/server --debug"        1 day ago   
 750468b0c1bc   redis:latest                "docker-entrypoint.s…"   1 day ago   Up 10 minutes   0.0.0.0:6379->6379/tcp                           streamdal-redis
 ```
 
-🎉 Once everything is up you should be able to access the console at http://localhost:8080 🎉
+Once everything is up you should be able to access the console at 
+http://localhost:8080
 
 
-## <span class="yhighlight">\[STEP 2\]</span> Instrument Your Code
-With the server and console up and running, it's time to [instrument your code](../../guides/instrumentation) using one of the Streamdal SDKs. Check out the [SDK documentation](../../guides/instrumentation)) to find the right SDK for your project and learn how to integrate it.
+## Step 2: Instrument Your Code
+With the server and console up and running, it's time to 
+[instrument your code](../../guides/instrumentation) using one of the Streamdal 
+SDKs. Check out the [SDK documentation](../../guides/instrumentation)) to find 
+the right SDK for your project and learn how to integrate it.
 
 If just want to kick the tires, you can use our demo sdk: 
 
@@ -65,7 +70,7 @@ docker run \
   --data-source-file=/assets/sample-billing-producer.json
 ```  
 
-## <span class="yhighlight">\[STEP 3\]</span> Explore the Console
+## Step 3: Explore the Console
 
 Once an SDK is connected to your server you should be able to see the data 
 flowing in the Console UI.
