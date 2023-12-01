@@ -3,7 +3,7 @@
   "workspaces": [
     "examples"
   ],
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Streamdal's Node SDK",
   "keywords": [
     "streamdal",
