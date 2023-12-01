@@ -211,14 +211,14 @@ export const SIDEBAR: Sidebar = {
                 link: "en/data-governance/compliance/fed-ramp",
               },
               {
-                text: "GLBA",
-                slug: "gbla",
-                link: "en/data-governance/compliance/glba",
-              },
-              {
                 text: "GDPR",
                 slug: "gdpr",
                 link: "en/data-governance/compliance/gdpr",
+              },
+              {
+                text: "GLBA",
+                slug: "gbla",
+                link: "en/data-governance/compliance/glba",
               },
               {
                 text: "HIPAA",
