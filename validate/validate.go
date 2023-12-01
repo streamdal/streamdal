@@ -745,12 +745,36 @@ func validateTailRequest(r *protos.TailRequest) error {
 		return ErrUnsetEnum("Type")
 	}
 
-	if r.GetXId() == "" {
-		return ErrEmptyField("XId")
+	if r.Id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	if r.Audience == nil {
 		return ErrNilField("Audience")
+	}
+
+	return nil
+}
+
+func PauseTailRequest(r *protos.PauseTailRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.TailId == "" {
+		return ErrEmptyField("TailId")
+	}
+
+	return nil
+}
+
+func ResumeTailRequest(r *protos.ResumeTailRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.TailId == "" {
+		return ErrEmptyField("TailId")
 	}
 
 	return nil
