@@ -25,4 +25,4 @@ jobs:
         uses: dylibso/modsurfer-validate-action@main
         with:
             path: build/${{ matrix.funcs }}.wasm
-            check: validation/${{ matrix.funcs }}/mod.yaml
+            check: validation/${{ matrix.funcs }}.wasm.mod.yaml
