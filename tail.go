@@ -3,12 +3,12 @@ package streamdal
 import (
 	"context"
 	"io"
-	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"golang.org/x/time/rate"
 
 	"github.com/streamdal/protos/build/go/protos"
 
@@ -42,25 +42,16 @@ type Tail struct {
 	lastMsg         time.Time
 	log             logger.Logger
 	active          bool
-	lastSample      time.Time
-	sampleInterval  time.Duration
+	limiter         *rate.Limiter
 }
 
 func (t *Tail) ShouldSend() bool {
-	opts := t.Request.GetTail().Request.GetSampleOptions()
-	if opts == nil {
-		// No sampling, send everything
+	// If no rate limit, allow all messages
+	if t.limiter == nil {
 		return true
 	}
 
-	elapsed := time.Since(t.lastSample)
-
-	if elapsed >= t.sampleInterval && rand.Float64() < float64(opts.SampleRate/100) {
-		t.lastSample = time.Now()
-		return true
-	}
-
-	return false
+	return t.limiter.Allow()
 }
 
 func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
@@ -223,7 +214,8 @@ func (s *Streamdal) startTailHandler(_ context.Context, cmd *protos.Command) err
 	// Convert sample interval from seconds to time.Duration
 	if sampleOpts := cmd.GetTail().Request.GetSampleOptions(); sampleOpts != nil {
 		// Convert seconds to nanoseconds
-		t.sampleInterval = time.Duration(sampleOpts.SampleIntervalSeconds / 1_000_000)
+		interval := time.Duration(sampleOpts.SampleIntervalSeconds) * time.Second
+		t.limiter = rate.NewLimiter(rate.Every(interval), int(sampleOpts.SampleRate))
 	}
 
 	// Save entry in tail map
