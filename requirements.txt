@@ -8,7 +8,7 @@ click==8.1.5
 coverage==7.2.7
 docutils==0.20.1
 grpcio==1.56.0
-grpclib==0.4.5
+grpclib~=0.4.6
 h2==4.1.0
 hpack==4.0.0
 hyperframe==6.0.1
@@ -33,7 +33,7 @@ pluggy==1.2.0
 protobuf==4.23.4
 pycparser==2.21
 Pygments==2.15.1
-pytest==7.4.0
+pytest~=7.4.3
 pytest-asyncio==0.21.1
 pytest-cov==4.1.0
 pytest-mock==3.12.0
@@ -44,13 +44,15 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.4.2
 six==1.16.0
-streamdal-protos==0.0.120
+streamdal-protos==0.0.124
 stringcase==1.2.0
 tf==1.0.0
 twine==4.0.2
 urllib3==2.0.7
 wasmer==1.1.0
 wasmer-compiler-cranelift==1.1.0
-wasmtime==10.0.0
+wasmtime~=15.0.0
 webencodings==0.5.1
 zipp==3.16.2
+
+setuptools~=69.0.2

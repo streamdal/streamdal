@@ -912,6 +912,9 @@ class StreamdalClient:
             return
 
         for tail_id, running_tail in tails.items():
+            if not running_tail.should_send():
+                continue
+
             # Tail might not be active yet, so start it if needed
             # This can happen if the tail request came from internal.Register()
             # and we did not have the audience yet.
