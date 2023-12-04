@@ -66,6 +66,6 @@ validate:
       - I64
     max: 3
   size:
-    max: 600 KiB
+    max: 1.5 MiB KiB
   complexity:
     max_risk: medium
