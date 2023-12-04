@@ -3,6 +3,7 @@ package streamdal
 import (
 	"context"
 	"io"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -41,6 +42,25 @@ type Tail struct {
 	lastMsg         time.Time
 	log             logger.Logger
 	active          bool
+	lastSample      time.Time
+	sampleInterval  time.Duration
+}
+
+func (t *Tail) ShouldSend() bool {
+	opts := t.Request.GetTail().Request.GetSampleOptions()
+	if opts == nil {
+		// No sampling, send everything
+		return true
+	}
+
+	elapsed := time.Since(t.lastSample)
+
+	if elapsed >= t.sampleInterval && rand.Float64() < float64(opts.SampleRate/100) {
+		t.lastSample = time.Now()
+		return true
+	}
+
+	return false
 }
 
 func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
@@ -62,6 +82,10 @@ func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalDa
 
 			// Save tail state
 			tail.active = true
+		}
+
+		if !tail.ShouldSend() {
+			continue
 		}
 
 		tr := &protos.TailResponse{
@@ -194,6 +218,12 @@ func (s *Streamdal) startTailHandler(_ context.Context, cmd *protos.Command) err
 		log:             s.config.Logger,
 		lastMsg:         time.Now(),
 		active:          false,
+	}
+
+	// Convert sample interval from seconds to time.Duration
+	if sampleOpts := cmd.GetTail().Request.GetSampleOptions(); sampleOpts != nil {
+		// Convert seconds to nanoseconds
+		t.sampleInterval = time.Duration(sampleOpts.SampleIntervalSeconds / 1_000_000)
 	}
 
 	// Save entry in tail map
