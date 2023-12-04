@@ -4,6 +4,9 @@ jobs:
   test:
     name: Test build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        funcs: ["detective", "httprequest", "inferschema", "kv", "transform", "validjson"]
     steps:
       - uses: actions/checkout@v2
       - name: Install latest nightly
@@ -17,3 +20,9 @@ jobs:
           rustup target add wasm32-wasi
           cargo install wasm-opt
           make build
+
+      - name: modsurfer validate
+        uses: dylibso/modsurfer-validate-action@main
+        with:
+            path: build/${{ matrix.funcs }}.wasm
+            check: validation/${{ matrix.funcs }}/mod.yaml
