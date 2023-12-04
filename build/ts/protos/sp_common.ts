@@ -86,10 +86,6 @@ export interface Metric {
      * @generated from protobuf field: protos.Audience audience = 4;
      */
     audience?: Audience;
-    /**
-     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
-     */
-    sampleOptions?: SampleOptions;
 }
 /**
  * @generated from protobuf message protos.TailRequest
@@ -108,9 +104,14 @@ export interface TailRequest {
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: optional string pipeline_id = 4;
+     * @deprecated
+     * @generated from protobuf field: optional string pipeline_id = 4 [deprecated = true];
      */
     pipelineId?: string;
+    /**
+     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
+     */
+    sampleOptions?: SampleOptions;
     /**
      * @generated from protobuf field: map<string, string> _metadata = 1000;
      */
@@ -450,8 +451,7 @@ class Metric$Type extends MessageType<Metric> {
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
             { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "audience", kind: "message", T: () => Audience },
-            { no: 5, name: "sample_options", kind: "message", T: () => SampleOptions }
+            { no: 4, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
     create(value?: PartialMessage<Metric>): Metric {
@@ -477,9 +477,6 @@ class Metric$Type extends MessageType<Metric> {
                     break;
                 case /* protos.Audience audience */ 4:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                case /* protos.SampleOptions sample_options */ 5:
-                    message.sampleOptions = SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -521,9 +518,6 @@ class Metric$Type extends MessageType<Metric> {
         /* protos.Audience audience = 4; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* protos.SampleOptions sample_options = 5; */
-        if (message.sampleOptions)
-            SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -542,6 +536,7 @@ class TailRequest$Type extends MessageType<TailRequest> {
             { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
             { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "sample_options", kind: "message", T: () => SampleOptions },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -566,8 +561,11 @@ class TailRequest$Type extends MessageType<TailRequest> {
                 case /* protos.Audience audience */ 3:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* optional string pipeline_id */ 4:
+                case /* optional string pipeline_id = 4 [deprecated = true];*/ 4:
                     message.pipelineId = reader.string();
+                    break;
+                case /* protos.SampleOptions sample_options */ 5:
+                    message.sampleOptions = SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 case /* map<string, string> _metadata */ 1000:
                     this.binaryReadMap1000(message.Metadata, reader, options);
@@ -609,9 +607,12 @@ class TailRequest$Type extends MessageType<TailRequest> {
         /* protos.Audience audience = 3; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* optional string pipeline_id = 4; */
+        /* optional string pipeline_id = 4 [deprecated = true]; */
         if (message.pipelineId !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.pipelineId);
+        /* protos.SampleOptions sample_options = 5; */
+        if (message.sampleOptions)
+            SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();

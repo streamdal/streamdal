@@ -79,10 +79,6 @@ export interface Metric {
      * @generated from protobuf field: protos.Audience audience = 4;
      */
     audience?: Audience;
-    /**
-     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
-     */
-    sampleOptions?: SampleOptions;
 }
 /**
  * @generated from protobuf message protos.TailRequest
@@ -101,9 +97,14 @@ export interface TailRequest {
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: optional string pipeline_id = 4;
+     * @deprecated
+     * @generated from protobuf field: optional string pipeline_id = 4 [deprecated = true];
      */
     pipelineId?: string;
+    /**
+     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
+     */
+    sampleOptions?: SampleOptions;
     /**
      * @generated from protobuf field: map<string, string> _metadata = 1000;
      */

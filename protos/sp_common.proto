@@ -50,14 +50,14 @@ message Metric {
   map<string, string> labels = 2;
   double value = 3;
   Audience audience = 4;
-  SampleOptions sample_options = 5;
 }
 
 message TailRequest {
   TailRequestType type = 1;
   string id = 2;
   Audience audience = 3;
-  optional string pipeline_id = 4;
+  optional string pipeline_id = 4 [deprecated = true];
+  SampleOptions sample_options = 5;
   map<string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 

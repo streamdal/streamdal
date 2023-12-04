@@ -238,8 +238,7 @@ class Metric$Type extends runtime_5.MessageType {
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "labels", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
             { no: 3, name: "value", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "audience", kind: "message", T: () => exports.Audience },
-            { no: 5, name: "sample_options", kind: "message", T: () => exports.SampleOptions }
+            { no: 4, name: "audience", kind: "message", T: () => exports.Audience }
         ]);
     }
     create(value) {
@@ -265,9 +264,6 @@ class Metric$Type extends runtime_5.MessageType {
                     break;
                 case /* protos.Audience audience */ 4:
                     message.audience = exports.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                case /* protos.SampleOptions sample_options */ 5:
-                    message.sampleOptions = exports.SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -309,9 +305,6 @@ class Metric$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 4; */
         if (message.audience)
             exports.Audience.internalBinaryWrite(message.audience, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.SampleOptions sample_options = 5; */
-        if (message.sampleOptions)
-            exports.SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -330,6 +323,7 @@ class TailRequest$Type extends runtime_5.MessageType {
             { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => exports.Audience },
             { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "sample_options", kind: "message", T: () => exports.SampleOptions },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -354,8 +348,11 @@ class TailRequest$Type extends runtime_5.MessageType {
                 case /* protos.Audience audience */ 3:
                     message.audience = exports.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* optional string pipeline_id */ 4:
+                case /* optional string pipeline_id = 4 [deprecated = true];*/ 4:
                     message.pipelineId = reader.string();
+                    break;
+                case /* protos.SampleOptions sample_options */ 5:
+                    message.sampleOptions = exports.SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 case /* map<string, string> _metadata */ 1000:
                     this.binaryReadMap1000(message.Metadata, reader, options);
@@ -397,9 +394,12 @@ class TailRequest$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 3; */
         if (message.audience)
             exports.Audience.internalBinaryWrite(message.audience, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* optional string pipeline_id = 4; */
+        /* optional string pipeline_id = 4 [deprecated = true]; */
         if (message.pipelineId !== undefined)
             writer.tag(4, runtime_1.WireType.LengthDelimited).string(message.pipelineId);
+        /* protos.SampleOptions sample_options = 5; */
+        if (message.sampleOptions)
+            exports.SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k).tag(2, runtime_1.WireType.LengthDelimited).string(message.Metadata[k]).join();
