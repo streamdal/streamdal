@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
@@ -135,6 +136,11 @@ func (g *GRPCAPI) AuthServerStreamInterceptor(srv interface{}, stream grpc.Serve
 }
 
 func (g *GRPCAPI) TelemetryStreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	// Only want telemetry on external API calls
+	if strings.Contains(info.FullMethod, "protos.Internal") {
+		return handler(srv, stream)
+	}
+
 	tags := []statsd.Tag{
 		{"install_id", g.Options.InstallID},
 		{"node_id", g.Options.NodeID},
@@ -167,6 +173,11 @@ func (g *GRPCAPI) TelemetryStreamInterceptor(srv interface{}, stream grpc.Server
 }
 
 func (g *GRPCAPI) TelemetryUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	// Only want telemetry on external API calls
+	if strings.Contains(info.FullMethod, "protos.Internal") {
+		return handler(ctx, req)
+	}
+
 	tags := []statsd.Tag{
 		{"install_id", g.Options.InstallID},
 		{"node_id", g.Options.NodeID},
