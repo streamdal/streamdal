@@ -104,9 +104,14 @@ export interface TailRequest {
      */
     audience?: Audience;
     /**
-     * @generated from protobuf field: optional string pipeline_id = 4;
+     * @deprecated
+     * @generated from protobuf field: optional string pipeline_id = 4 [deprecated = true];
      */
     pipelineId?: string;
+    /**
+     * @generated from protobuf field: protos.SampleOptions sample_options = 5;
+     */
+    sampleOptions?: SampleOptions;
     /**
      * @generated from protobuf field: map<string, string> _metadata = 1000;
      */
@@ -204,6 +209,19 @@ export interface Schema {
     Metadata: {
         [key: string]: string;
     }; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+/**
+ * @generated from protobuf message protos.SampleOptions
+ */
+export interface SampleOptions {
+    /**
+     * @generated from protobuf field: uint32 sample_rate = 1;
+     */
+    sampleRate: number;
+    /**
+     * @generated from protobuf field: uint32 sample_interval_seconds = 2;
+     */
+    sampleIntervalSeconds: number;
 }
 /**
  * Common status codes used in gRPC method responses
@@ -518,6 +536,7 @@ class TailRequest$Type extends MessageType<TailRequest> {
             { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
             { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "sample_options", kind: "message", T: () => SampleOptions },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -542,8 +561,11 @@ class TailRequest$Type extends MessageType<TailRequest> {
                 case /* protos.Audience audience */ 3:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* optional string pipeline_id */ 4:
+                case /* optional string pipeline_id = 4 [deprecated = true];*/ 4:
                     message.pipelineId = reader.string();
+                    break;
+                case /* protos.SampleOptions sample_options */ 5:
+                    message.sampleOptions = SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 case /* map<string, string> _metadata */ 1000:
                     this.binaryReadMap1000(message.Metadata, reader, options);
@@ -585,9 +607,12 @@ class TailRequest$Type extends MessageType<TailRequest> {
         /* protos.Audience audience = 3; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* optional string pipeline_id = 4; */
+        /* optional string pipeline_id = 4 [deprecated = true]; */
         if (message.pipelineId !== undefined)
             writer.tag(4, WireType.LengthDelimited).string(message.pipelineId);
+        /* protos.SampleOptions sample_options = 5; */
+        if (message.sampleOptions)
+            SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();
@@ -858,3 +883,57 @@ class Schema$Type extends MessageType<Schema> {
  * @generated MessageType for protobuf message protos.Schema
  */
 export const Schema = new Schema$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SampleOptions$Type extends MessageType<SampleOptions> {
+    constructor() {
+        super("protos.SampleOptions", [
+            { no: 1, name: "sample_rate", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 2, name: "sample_interval_seconds", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SampleOptions>): SampleOptions {
+        const message = { sampleRate: 0, sampleIntervalSeconds: 0 };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SampleOptions>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SampleOptions): SampleOptions {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* uint32 sample_rate */ 1:
+                    message.sampleRate = reader.uint32();
+                    break;
+                case /* uint32 sample_interval_seconds */ 2:
+                    message.sampleIntervalSeconds = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SampleOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* uint32 sample_rate = 1; */
+        if (message.sampleRate !== 0)
+            writer.tag(1, WireType.Varint).uint32(message.sampleRate);
+        /* uint32 sample_interval_seconds = 2; */
+        if (message.sampleIntervalSeconds !== 0)
+            writer.tag(2, WireType.Varint).uint32(message.sampleIntervalSeconds);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SampleOptions
+ */
+export const SampleOptions = new SampleOptions$Type();

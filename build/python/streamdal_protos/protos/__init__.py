@@ -3,6 +3,7 @@
 # plugin: python-betterproto
 # This file has been @generated
 import builtins
+import warnings
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -182,9 +183,15 @@ class TailRequest(betterproto.Message):
     pipeline_id: Optional[str] = betterproto.string_field(
         4, optional=True, group="_pipeline_id"
     )
+    sample_options: "SampleOptions" = betterproto.message_field(5)
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("pipeline_id"):
+            warnings.warn("TailRequest.pipeline_id is deprecated", DeprecationWarning)
 
 
 @dataclass(eq=False, repr=False)
@@ -233,6 +240,12 @@ class Schema(betterproto.Message):
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
+
+
+@dataclass(eq=False, repr=False)
+class SampleOptions(betterproto.Message):
+    sample_rate: int = betterproto.uint32_field(1)
+    sample_interval_seconds: int = betterproto.uint32_field(2)
 
 
 @dataclass(eq=False, repr=False)

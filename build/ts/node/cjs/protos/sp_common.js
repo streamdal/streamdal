@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Schema = exports.AudienceRate = exports.TailResponse = exports.TailRequest = exports.Metric = exports.Audience = exports.StandardResponse = exports.TailRequestType = exports.TailResponseType = exports.OperationType = exports.ResponseCode = void 0;
+exports.SampleOptions = exports.Schema = exports.AudienceRate = exports.TailResponse = exports.TailRequest = exports.Metric = exports.Audience = exports.StandardResponse = exports.TailRequestType = exports.TailResponseType = exports.OperationType = exports.ResponseCode = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -323,6 +323,7 @@ class TailRequest$Type extends runtime_5.MessageType {
             { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => exports.Audience },
             { no: 4, name: "pipeline_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "sample_options", kind: "message", T: () => exports.SampleOptions },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -347,8 +348,11 @@ class TailRequest$Type extends runtime_5.MessageType {
                 case /* protos.Audience audience */ 3:
                     message.audience = exports.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* optional string pipeline_id */ 4:
+                case /* optional string pipeline_id = 4 [deprecated = true];*/ 4:
                     message.pipelineId = reader.string();
+                    break;
+                case /* protos.SampleOptions sample_options */ 5:
+                    message.sampleOptions = exports.SampleOptions.internalBinaryRead(reader, reader.uint32(), options, message.sampleOptions);
                     break;
                 case /* map<string, string> _metadata */ 1000:
                     this.binaryReadMap1000(message.Metadata, reader, options);
@@ -390,9 +394,12 @@ class TailRequest$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 3; */
         if (message.audience)
             exports.Audience.internalBinaryWrite(message.audience, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* optional string pipeline_id = 4; */
+        /* optional string pipeline_id = 4 [deprecated = true]; */
         if (message.pipelineId !== undefined)
             writer.tag(4, runtime_1.WireType.LengthDelimited).string(message.pipelineId);
+        /* protos.SampleOptions sample_options = 5; */
+        if (message.sampleOptions)
+            exports.SampleOptions.internalBinaryWrite(message.sampleOptions, writer.tag(5, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k).tag(2, runtime_1.WireType.LengthDelimited).string(message.Metadata[k]).join();
@@ -663,3 +670,57 @@ class Schema$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.Schema
  */
 exports.Schema = new Schema$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SampleOptions$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.SampleOptions", [
+            { no: 1, name: "sample_rate", kind: "scalar", T: 13 /*ScalarType.UINT32*/ },
+            { no: 2, name: "sample_interval_seconds", kind: "scalar", T: 13 /*ScalarType.UINT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { sampleRate: 0, sampleIntervalSeconds: 0 };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* uint32 sample_rate */ 1:
+                    message.sampleRate = reader.uint32();
+                    break;
+                case /* uint32 sample_interval_seconds */ 2:
+                    message.sampleIntervalSeconds = reader.uint32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* uint32 sample_rate = 1; */
+        if (message.sampleRate !== 0)
+            writer.tag(1, runtime_1.WireType.Varint).uint32(message.sampleRate);
+        /* uint32 sample_interval_seconds = 2; */
+        if (message.sampleIntervalSeconds !== 0)
+            writer.tag(2, runtime_1.WireType.Varint).uint32(message.sampleIntervalSeconds);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SampleOptions
+ */
+exports.SampleOptions = new SampleOptions$Type();

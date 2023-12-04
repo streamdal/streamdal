@@ -62,6 +62,14 @@ class Metric(_message.Message):
     value: float
     def __init__(self, name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., value: _Optional[float] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ...) -> None: ...
 
+class SampleOptions(_message.Message):
+    __slots__ = ["sample_interval_seconds", "sample_rate"]
+    SAMPLE_INTERVAL_SECONDS_FIELD_NUMBER: _ClassVar[int]
+    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
+    sample_interval_seconds: int
+    sample_rate: int
+    def __init__(self, sample_rate: _Optional[int] = ..., sample_interval_seconds: _Optional[int] = ...) -> None: ...
+
 class Schema(_message.Message):
     __slots__ = ["_metadata", "_version", "json_schema"]
     class MetadataEntry(_message.Message):
@@ -90,7 +98,7 @@ class StandardResponse(_message.Message):
     def __init__(self, id: _Optional[str] = ..., code: _Optional[_Union[ResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
 class TailRequest(_message.Message):
-    __slots__ = ["_metadata", "audience", "id", "pipeline_id", "type"]
+    __slots__ = ["_metadata", "audience", "id", "pipeline_id", "sample_options", "type"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -101,14 +109,16 @@ class TailRequest(_message.Message):
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    SAMPLE_OPTIONS_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     _METADATA_FIELD_NUMBER: _ClassVar[int]
     _metadata: _containers.ScalarMap[str, str]
     audience: Audience
     id: str
     pipeline_id: str
+    sample_options: SampleOptions
     type: TailRequestType
-    def __init__(self, type: _Optional[_Union[TailRequestType, str]] = ..., id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[TailRequestType, str]] = ..., id: _Optional[str] = ..., audience: _Optional[_Union[Audience, _Mapping]] = ..., pipeline_id: _Optional[str] = ..., sample_options: _Optional[_Union[SampleOptions, _Mapping]] = ..., _metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TailResponse(_message.Message):
     __slots__ = ["_keepalive", "_metadata", "audience", "new_data", "original_data", "pipeline_id", "session_id", "tail_request_id", "timestamp_ns", "type"]
