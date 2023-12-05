@@ -7,7 +7,7 @@ use protos::sp_steps_detective::DetectiveType;
 use std::str;
 
 // TODO: can we get this working
-//type MatcherFunc = fn (&Request, gjson::Value) -> Result<bool, CustomError>;
+type MatcherFunc = fn (&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
 
@@ -76,8 +76,8 @@ impl Detective {
         return f(request, field);
     }
 
-    fn get_matcher_func(request: &Request) -> Result<fn (&Request, gjson::Value) -> Result<bool, CustomError>, CustomError> {
-        let f = match request.match_type {
+    fn get_matcher_func(request: &Request) -> Result<MatcherFunc, CustomError> {
+        let f: MatcherFunc = match request.match_type {
             DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN
@@ -184,7 +184,7 @@ fn validate_request(request: &Request) -> Result<(), CustomError> {
 
     Ok(())
 }
-fn recurse_field(request: &Request, val: gjson::Value, field_name: &str, target_value: &str, f: fn (&Request, gjson::Value) -> Result<bool, CustomError>) -> bool {
+fn recurse_field(request: &Request, val: gjson::Value, field_name: &str, target_value: &str, f: MatcherFunc) -> bool {
     match val.kind() {
         gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
             if let Ok(res) = f(&request, val) {
