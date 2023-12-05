@@ -34,7 +34,7 @@ impl Detective {
     pub fn matches(&self, request: &Request) -> Result<bool, CustomError> {
         validate_request(request)?;
 
-        return if !request.path.is_empty() && request.path != "" {
+        if !request.path.is_empty() {
             // Matching on path value
             self.matches_path(request)
         } else {
@@ -54,7 +54,7 @@ impl Detective {
         let f = Detective::get_matcher_func(request)?;
 
         obj.each(|_, value| {
-            let res = recurse_field(&request, value, &request.path, &request.args, f);
+            let res = recurse_field(request, value, f);
             if res {
                 found = true;
             }
@@ -62,25 +62,32 @@ impl Detective {
         });
 
         if found {
-            return Ok(true);
+            Ok(true)
         } else {
-            return Ok(false);
+            Ok(false)
         }
     }
 
     pub fn matches_path(&self, request: &Request) -> Result<bool, CustomError> {
         // parse_field() will return an error if the path is not found
         // but for this single check, we don't want to error out
-        let field: gjson::Value;
-        if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
-            field = gjson::Value::default();
+        // let field: gjson::Value;
+        // if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
+        //     field = gjson::Value::default();
+        // } else {
+        //     field = parse_field(request.data, &request.path)?;
+        // };
+
+
+        let field: gjson::Value = if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
+            gjson::Value::default()
         } else {
-            field = parse_field(request.data, &request.path)?;
-        }
+            parse_field(request.data, &request.path)?
+        };
 
         let f = Detective::get_matcher_func(request)?;
 
-        return f(request, field);
+        f(request, field)
     }
 
     fn get_matcher_func(request: &Request) -> Result<MatcherFunc, CustomError> {
@@ -144,7 +151,7 @@ impl Detective {
             },
         };
 
-        return Ok(f);
+        Ok(f)
     }
 }
 
@@ -191,10 +198,10 @@ fn validate_request(request: &Request) -> Result<(), CustomError> {
 
     Ok(())
 }
-fn recurse_field(request: &Request, val: gjson::Value, field_name: &str, target_value: &Vec<String>, f: MatcherFunc) -> bool {
+fn recurse_field(request: &Request, val: gjson::Value, f: MatcherFunc) -> bool {
     match val.kind() {
         gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
-            if let Ok(res) = f(&request, val) {
+            if let Ok(res) = f(request, val) {
                 // TODO: fix this
                 return res;
             }
@@ -203,7 +210,7 @@ fn recurse_field(request: &Request, val: gjson::Value, field_name: &str, target_
         gjson::Kind::Object => {
             let mut found: bool = false;
             val.each(|_, value| {
-                if recurse_field(request, value, field_name, target_value, f) {
+                if recurse_field(request, value, f) {
                     found = true;
                 }
                 true
@@ -216,10 +223,10 @@ fn recurse_field(request: &Request, val: gjson::Value, field_name: &str, target_
         gjson::Kind::Array => {
             let mut found: bool = false;
             val.each(|_, value| {
-                if recurse_field(request,value, field_name, target_value, f) {
+                if recurse_field(request,value, f) {
                     found = true;
                 }
-                return true;
+                true
             });
 
             if found {

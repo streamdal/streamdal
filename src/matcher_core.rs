@@ -72,7 +72,7 @@ pub fn mac_address(_request: &Request, f: Value) -> Result<bool, CustomError> {
         return Ok(false);
     }
 
-    let s = str::replace(&field, "-", ":");
+    let s = str::replace(field, "-", ":");
 
     // Iterate through each character and check if it's a valid MAC address character
     for (i, c) in s.chars().enumerate() {
@@ -129,7 +129,7 @@ pub fn boolean_true(_request: &Request, field: Value) -> Result<bool, CustomErro
         return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
     }
 
-    Ok(field.bool() == true)
+    Ok(field.bool())
 }
 
 pub fn boolean_false(_request: &Request, field: Value) -> Result<bool, CustomError> {
@@ -137,7 +137,7 @@ pub fn boolean_false(_request: &Request, field: Value) -> Result<bool, CustomErr
         return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
     }
 
-    Ok(field.bool() == false)
+    Ok(!field.bool())
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,
