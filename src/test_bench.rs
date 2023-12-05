@@ -159,6 +159,18 @@ fn bench_email_utf8(b: &mut Bencher) {
     });
 }
 
+#[bench]
+fn bench_email_payload(b: &mut Bencher) {
+    let request = generate_request_for_bench(
+        DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
+        "",
+        vec![],
+    );
+
+    b.iter(|| {
+        let _ = crate::detective::Detective::new().matches(&request);
+    });
+}
 
 #[bench]
 fn bench_credit_card(b: &mut Bencher) {
@@ -173,3 +185,17 @@ fn bench_credit_card(b: &mut Bencher) {
         let _ = crate::matcher_pii::credit_card(&request, field);
     });
 }
+
+#[bench]
+fn bench_credit_card_payload(b: &mut Bencher) {
+    let request = generate_request_for_bench(
+        DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
+        "",
+        vec![],
+    );
+
+    b.iter(|| {
+        let _ = crate::detective::Detective::new().matches(&request);
+    });
+}
+
