@@ -1,7 +1,5 @@
-use crate::detective;
 use crate::error::CustomError;
 use chrono::TimeZone;
-
 use crate::detective::{parse_number, Request};
 use gjson::Value;
 use protos::sp_steps_detective::DetectiveType;
@@ -11,29 +9,25 @@ use std::str;
 use std::str::FromStr;
 use url::Url;
 
-pub fn string_equal_to(request: &Request) -> Result<bool, CustomError> {
+pub fn string_equal_to(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
         return Err(CustomError::Error(
             "string_equal_to requires exactly 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
-    Ok(field == request.args[0])
+    Ok(field.str() == request.args[0])
 }
 
-pub fn string_contains_any(request: &Request) -> Result<bool, CustomError> {
+pub fn string_contains_any(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.is_empty() {
         return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
     for arg in &request.args {
-        if field.contains(arg) {
+        if field.str().contains(arg) {
             return Ok(true);
         }
     }
@@ -41,17 +35,15 @@ pub fn string_contains_any(request: &Request) -> Result<bool, CustomError> {
     Ok(false)
 }
 
-pub fn string_contains_all(request: &Request) -> Result<bool, CustomError> {
+pub fn string_contains_all(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.is_empty() {
         return Err(CustomError::Error(
             "string_contains_any requires at least 1 argument".to_string(),
         ));
     }
 
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
     for arg in &request.args {
-        if !field.contains(arg) {
+        if !field.str().contains(arg) {
             return Ok(false);
         }
     }
@@ -59,15 +51,13 @@ pub fn string_contains_all(request: &Request) -> Result<bool, CustomError> {
     Ok(true)
 }
 
-pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
+pub fn ip_address(request: &Request, field: Value) -> Result<bool, CustomError> {
     match request.match_type {
         DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS => {
-            IpAddr::from_str(field.as_str()).map_or(Ok(false), |i| Ok(i.is_ipv4()))
+            IpAddr::from_str(field.str()).map_or(Ok(false), |i| Ok(i.is_ipv4()))
         }
         DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => {
-            IpAddr::from_str(field.as_str()).map_or(Ok(false), |i| Ok(i.is_ipv6()))
+            IpAddr::from_str(field.str()).map_or(Ok(false), |i| Ok(i.is_ipv6()))
         }
         _ => Err(CustomError::MatchError(
             "unknown ip address match type".to_string(),
@@ -75,9 +65,8 @@ pub fn ip_address(request: &Request) -> Result<bool, CustomError> {
     }
 }
 
-pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
+pub fn mac_address(_request: &Request, f: Value) -> Result<bool, CustomError> {
+    let field = f.str();
     // Check if the string has the correct length
     if field.len() != 17 {
         return Ok(false);
@@ -99,65 +88,61 @@ pub fn mac_address(request: &Request) -> Result<bool, CustomError> {
     Ok(true)
 }
 
-pub fn uuid(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
+pub fn uuid(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let re = Regex::new(
         r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
     )?;
 
-    Ok(re.is_match(field.as_str()))
+    Ok(re.is_match(field.str()))
 }
 
-pub fn timestamp_rfc3339(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
-    Ok(chrono::DateTime::parse_from_rfc3339(field.as_str()).is_ok())
+pub fn timestamp_rfc3339(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    Ok(chrono::DateTime::parse_from_rfc3339(field.str()).is_ok())
 }
 
-pub fn timestamp_unix_nano(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
-    if let Ok(ts) = field.parse::<i64>() {
-        if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts / 1_000_000_000, 0) {
-            return Ok(true);
-        }
+pub fn timestamp_unix_nano(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    if field.str().chars().any(|c| !c.is_ascii_digit()) {
+        return Ok(false);
     }
 
-    Ok(false)
-}
-
-pub fn timestamp_unix(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-
-    let ts: i64 = match field.parse() {
-        Ok(v) => {
-            println!("Parsed timestamp: {}", v);
-            v
-        }
-        Err(_) => {
-            println!("Failed to parse timestamp: {}", field);
-            return Ok(false);
-        }
-    };
-
-    if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(ts, 0) {
+    if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(field.i64() / 1_000_000_000, 0) {
         return Ok(true);
     }
 
     Ok(false)
 }
 
-pub fn boolean(request: &Request, expected: bool) -> Result<bool, CustomError> {
-    let field: bool = detective::parse_field(request.data, &request.path)?;
+pub fn timestamp_unix(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    if field.str().chars().any(|c| !c.is_ascii_digit()) {
+        return Ok(false);
+    }
 
-    Ok(field == expected)
+    if let chrono::LocalResult::Single(_) = chrono::Utc.timestamp_opt(field.i64(), 0) {
+        return Ok(true);
+    }
+
+    Ok(false)
+}
+
+pub fn boolean_true(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    if field.kind() != gjson::Kind::True && field.kind() != gjson::Kind::False {
+        return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
+    }
+
+    Ok(field.bool() == true)
+}
+
+pub fn boolean_false(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    if field.kind() != gjson::Kind::False && field.kind() != gjson::Kind::True{
+        return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
+    }
+
+    Ok(field.bool() == false)
 }
 
 // This is an all inclusive check - it'll return true if field is an empty string,
 // empty array or is null.
-pub fn is_empty(request: &Request) -> Result<bool, CustomError> {
-    let field: Value = detective::parse_field(request.data, &request.path)?;
-
+pub fn is_empty(_request: &Request, field: Value) -> Result<bool, CustomError> {
     match field.kind() {
         // Null field
         gjson::Kind::Null => Ok(true),
@@ -169,21 +154,19 @@ pub fn is_empty(request: &Request) -> Result<bool, CustomError> {
     }
 }
 
-pub fn has_field(request: &Request) -> Result<bool, CustomError> {
+pub fn has_field(request: &Request, _field: Value) -> Result<bool, CustomError> {
     let data_as_str = str::from_utf8(request.data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
     Ok(gjson::get(data_as_str, request.path.as_str()).exists())
 }
 
-pub fn is_type(request: &Request) -> Result<bool, CustomError> {
+pub fn is_type(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
         return Err(CustomError::Error(
             "is_type requires exactly 1 argument".to_string(),
         ));
     }
-
-    let field: Value = detective::parse_field(request.data, &request.path)?;
 
     match request.args[0].as_str() {
         "string" => Ok(field.kind() == gjson::Kind::String),
@@ -200,7 +183,7 @@ pub fn is_type(request: &Request) -> Result<bool, CustomError> {
     }
 }
 
-pub fn regex(request: &Request) -> Result<bool, CustomError> {
+pub fn regex(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
         return Err(CustomError::Error(
             "regex requires exactly 1 argument".to_string(),
@@ -208,18 +191,16 @@ pub fn regex(request: &Request) -> Result<bool, CustomError> {
     }
 
     let re_pattern = request.args[0].as_str();
-    let field: String = detective::parse_field(request.data, &request.path)?;
     let re = Regex::new(re_pattern)?;
 
-    Ok(re.is_match(field.as_str()))
+    Ok(re.is_match(field.str()))
 }
 
-pub fn url(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-    Url::parse(field.as_str()).map_or(Ok(false), |_| Ok(true))
+pub fn url(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    Url::parse(field.str()).map_or(Ok(false), |_| Ok(true))
 }
 
-pub fn string_length(request: &Request) -> Result<bool, CustomError> {
+pub fn string_length(request: &Request, f: Value) -> Result<bool, CustomError> {
     let mut required_args = 1;
 
     if request.match_type == DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE {
@@ -233,7 +214,7 @@ pub fn string_length(request: &Request) -> Result<bool, CustomError> {
         )));
     }
 
-    let field: String = detective::parse_field(request.data, &request.path)?;
+    let field = f.str();
     let arg1: f64 = parse_number(&request.args[0])?;
 
     match request.match_type {
@@ -250,7 +231,7 @@ pub fn string_length(request: &Request) -> Result<bool, CustomError> {
     }
 }
 
-pub fn hostname(request: &Request) -> Result<bool, CustomError> {
+pub fn hostname(_request: &Request, field: Value) -> Result<bool, CustomError> {
     fn is_valid_char(byte: u8) -> bool {
         byte.is_ascii_lowercase()
             || byte.is_ascii_uppercase()
@@ -259,8 +240,7 @@ pub fn hostname(request: &Request) -> Result<bool, CustomError> {
             || byte == b'.'
     }
 
-    let field: String = detective::parse_field(request.data, &request.path)?;
-    let hostname = field.as_str();
+    let hostname = field.str();
 
     // From: https://github.com/pop-os/hostname-validator/blob/master/src/lib.rs
     Ok(!(hostname.bytes().any(|byte| !is_valid_char(byte))
@@ -271,7 +251,6 @@ pub fn hostname(request: &Request) -> Result<bool, CustomError> {
         || hostname.len() > 253))
 }
 
-pub fn semver(request: &Request) -> Result<bool, CustomError> {
-    let field: String = detective::parse_field(request.data, &request.path)?;
-    semver::Version::parse(field.as_str()).map_or(Ok(false), |_| Ok(true))
+pub fn semver(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    semver::Version::parse(field.str()).map_or(Ok(false), |_| Ok(true))
 }

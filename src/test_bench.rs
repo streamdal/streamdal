@@ -2,6 +2,7 @@ extern crate test;
 use crate::test_utils::generate_request_for_bench;
 use protos::sp_steps_detective::DetectiveType;
 use test::Bencher;
+use crate::detective::parse_field;
 
 #[bench]
 fn bench_ipv4_address(b: &mut Bencher) {
@@ -12,7 +13,8 @@ fn bench_ipv4_address(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::ip_address(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::ip_address(&request, field);
     });
 }
 
@@ -25,7 +27,8 @@ fn bench_ipv6_address(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::ip_address(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::ip_address(&request, field);
     });
 }
 
@@ -38,7 +41,8 @@ fn bench_has_field(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::has_field(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::has_field(&request, field);
     });
 }
 
@@ -51,7 +55,8 @@ fn bench_string_contains_all(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::string_contains_all(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::string_contains_all(&request, field);
     });
 }
 
@@ -64,7 +69,8 @@ fn bench_string_contains_any(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::string_contains_any(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::string_contains_any(&request, field);
     });
 }
 
@@ -77,7 +83,8 @@ fn bench_uuid(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::uuid(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::uuid(&request, field);
     });
 }
 
@@ -90,7 +97,8 @@ fn bench_mac_address(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::mac_address(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::mac_address(&request, field);
     });
 }
 
@@ -103,7 +111,8 @@ fn bench_semver(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::semver(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::semver(&request, field);
     });
 }
 
@@ -116,7 +125,8 @@ fn bench_hostname(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_core::hostname(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_core::hostname(&request, field);
     });
 }
 
@@ -130,7 +140,8 @@ fn bench_email(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_pii::email(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_pii::email(&request, field);
     });
 }
 
@@ -143,7 +154,8 @@ fn bench_email_utf8(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_pii::email(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_pii::email(&request, field);
     });
 }
 
@@ -157,6 +169,7 @@ fn bench_credit_card(b: &mut Bencher) {
     );
 
     b.iter(|| {
-        let _ = crate::matcher_pii::credit_card(&request);
+        let field = parse_field(request.data, &request.path).unwrap();
+        let _ = crate::matcher_pii::credit_card(&request, field);
     });
 }

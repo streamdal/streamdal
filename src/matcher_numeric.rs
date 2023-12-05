@@ -3,7 +3,7 @@ use crate::detective::Request;
 use crate::error::CustomError;
 use protos::sp_steps_detective::DetectiveType;
 
-pub fn common(request: &Request) -> Result<bool, CustomError> {
+pub fn common(request: &Request, value: gjson::Value) -> Result<bool, CustomError> {
     let mut required_len = 1;
 
     if request.match_type == DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE {
@@ -17,8 +17,8 @@ pub fn common(request: &Request) -> Result<bool, CustomError> {
         )));
     }
 
-    let field: f64 = crate::detective::parse_field(request.data, &request.path)?;
     let arg1 = parse_number(&request.args[0])?;
+    let field = value.f64();
 
     let result = match request.match_type {
         DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO => field == arg1,
