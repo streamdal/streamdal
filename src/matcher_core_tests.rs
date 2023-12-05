@@ -211,7 +211,7 @@ fn has_field() {
             },
             expected: false,
             text: "field does not exist - should return false".to_string(),
-            should_error: true, // TODO: this should be false somehow
+            should_error: false,
         },
     ];
 
