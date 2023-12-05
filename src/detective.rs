@@ -71,14 +71,6 @@ impl Detective {
     pub fn matches_path(&self, request: &Request) -> Result<bool, CustomError> {
         // parse_field() will return an error if the path is not found
         // but for this single check, we don't want to error out
-        // let field: gjson::Value;
-        // if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
-        //     field = gjson::Value::default();
-        // } else {
-        //     field = parse_field(request.data, &request.path)?;
-        // };
-
-
         let field: gjson::Value = if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
             gjson::Value::default()
         } else {
