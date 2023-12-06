@@ -113,6 +113,7 @@ class StreamdalClient:
     workers: list
     audiences: dict
     tails: dict
+    paused_tails: dict
     host: str
     port: int
     schemas: dict
@@ -160,6 +161,7 @@ class StreamdalClient:
         self.paused_pipelines = {}
         self.audiences = {}
         self.tails = {}
+        self.paused_tails = {}
         self.schemas = {}
         self.log = log
         self.exit = cfg.exit
@@ -899,6 +901,10 @@ class StreamdalClient:
             self._start_tail(cmd)
         elif cmd.tail.request.type == protos.TailRequestType.TAIL_REQUEST_TYPE_STOP:
             self._stop_tail(cmd)
+        elif cmd.tail.request.type == protos.TailRequestType.TAIL_REQUEST_TYPE_PAUSE:
+            self._pause_tail(cmd)
+        elif cmd.tail.request.type == protos.TailRequestType.TAIL_REQUEST_TYPE_RESUME:
+            self._resume_tail(cmd)
 
     def _send_tail(
         self,
@@ -907,7 +913,7 @@ class StreamdalClient:
         original_data: bytes,
         new_data: bytes,
     ):
-        tails = self._get_tails(aud)
+        tails = self._get_active_tails_for_audience(aud)
         if len(tails) == 0:
             return
 
@@ -964,9 +970,9 @@ class StreamdalClient:
         if aud_str in self.audiences:
             t.start_tail_workers()
 
-        self._set_tail(t)
+        self._set_active_tail(t)
 
-    def _set_tail(self, t: Tail):
+    def _set_active_tail(self, t: Tail):
         key = common.aud_to_str(t.request.audience)
 
         if key not in self.tails:
@@ -974,30 +980,31 @@ class StreamdalClient:
 
         self.tails[key][t.request.id] = t
 
+    def _set_paused_tail(self, t: Tail):
+        key = common.aud_to_str(t.request.audience)
+
+        if key not in self.paused_tails:
+            self.paused_tails[key] = {}
+
+        self.paused_tails[key][t.request.id] = t
+
     def _stop_tail(self, cmd: protos.Command):
         validation.tail_request(cmd)
 
         aud = cmd.tail.request.audience
         tail_id = cmd.tail.request.id
 
-        tails = self._get_tails(aud)
-        if len(tails) == 0:
-            self.log.debug(
-                f"received stop tail command for non-existent tail: {tail_id}"
-            )
-            return
+        tails = self._get_active_tails_for_audience(aud)
+        if tail_id in tails.keys():
+            self.log.debug(f"Stopping active tail: {tail_id}")
+            tails[tail_id].exit.set()
+            self._remove_active_tail(aud, tail_id)
 
-        if tail_id not in tails.keys():
-            self.log.debug(
-                f"received stop tail command for non-existent tail: {tail_id}"
-            )
-            return
-
-        self.log.debug(f"Stopping tail: {tail_id}")
-
-        tails[tail_id].exit.set()
-
-        self._remove_tail(aud, tail_id)
+        paused_tails = self._get_paused_tails_for_audience(aud)
+        if tail_id in paused_tails.keys():
+            self.log.debug(f"Stopping paused tail: {tail_id}")
+            paused_tails[tail_id].exit.set()
+            self._remove_paused_tail(aud, tail_id)
 
     def _stop_all_tails(self):
         """
@@ -1009,9 +1016,43 @@ class StreamdalClient:
         for audience in audiences:
             for t in audience.values():
                 t.exit.set()
-                self._remove_tail(t.request.audience, t.request.id)
+                self._remove_active_tail(t.request.audience, t.request.id)
 
-    def _get_tails(
+        audiences = self.paused_tails.values()
+        for audience in audiences:
+            for t in audience.values():
+                t.exit.set()
+                self._remove_paused_tail(t.request.audience, t.request.id)
+
+    def _pause_tail(self, cmd: protos.Command):
+        # Remove from active tails
+        t = self._remove_active_tail(cmd.tail.request.audience, cmd.tail.request.id)
+        if t is None:
+            self.log.debug(
+                f"Received paused tail for unknown tail request {cmd.tail.request.id}"
+            )
+            return
+
+        # Add to paused tails
+        self._set_paused_tail(t)
+
+        self.log.debug(f"Pausing tail: {cmd.tail.request.id}")
+
+    def _resume_tail(self, cmd: protos.Command):
+        # Remove from paused tails
+        t = self._remove_paused_tail(cmd.tail.request.audience, cmd.tail.request.id)
+        if t is None:
+            self.log.debug(
+                f"Received resumed tail for unknown tail request {cmd.tail.request.id}"
+            )
+            return
+
+        # Add to active tails
+        self._set_active_tail(t)
+
+        self.log.debug(f"Resuming tail: {cmd.tail.request.id}")
+
+    def _get_active_tails_for_audience(
         self,
         aud: protos.Audience,
     ) -> dict:
@@ -1021,18 +1062,45 @@ class StreamdalClient:
 
         return {}
 
-    def _remove_tail(self, aud: protos.Audience, tail_id: str):
+    def _get_paused_tails_for_audience(
+        self,
+        aud: protos.Audience,
+    ) -> dict:
+        key = common.aud_to_str(aud)
+        if key in self.paused_tails:
+            return self.paused_tails[key]
+
+        return {}
+
+    def _remove_active_tail(self, aud: protos.Audience, tail_id: str) -> Tail:
         key = common.aud_to_str(aud)
         if key not in self.tails:
-            return
+            return None
 
         if tail_id not in self.tails[key]:
-            return
+            return None
 
-        self.tails[key].pop(tail_id)
+        t = self.tails[key].pop(tail_id)
 
         if len(self.tails[key]) == 0:
             self.tails.pop(key)
+
+        return t
+
+    def _remove_paused_tail(self, aud: protos.Audience, tail_id: str) -> Tail:
+        key = common.aud_to_str(aud)
+        if key not in self.paused_tails:
+            return None
+
+        if tail_id not in self.paused_tails[key]:
+            return None
+
+        t = self.paused_tails[key].pop(tail_id)
+
+        if len(self.paused_tails[key]) == 0:
+            self.paused_tails.pop(key)
+
+        return t
 
     def _get_schema(self, aud: protos.Audience) -> bytes:
         schema = self.schemas.get(common.aud_to_str(aud))
