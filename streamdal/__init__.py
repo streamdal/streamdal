@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from grpclib.client import Channel
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
+from streamdal.kv import KV
 from threading import Thread, Event
 from wasmtime import (
     Config,
@@ -105,6 +106,7 @@ class StreamdalClient:
     paused_pipelines: dict
     log: logging.Logger
     metrics: Metrics
+    kv: KV
     functions: dict
     exit: Event
     session_id: str
@@ -117,6 +119,7 @@ class StreamdalClient:
     host: str
     port: int
     schemas: dict
+    host_func: hostfunc.HostFunc
 
     # Due to the blocking nature of streaming calls, we need separate event loops and gRPC
     # channels for register` and tail requests. All other unary operations can use the same
@@ -175,6 +178,8 @@ class StreamdalClient:
         self.functions = {}
         self.session_id = str(uuid.uuid4())
         self.workers = []
+        self.kv = KV()
+        self.host_func = hostfunc.HostFunc(kv=self.kv)
 
         events = [signal.SIGINT, signal.SIGTERM, signal.SIGQUIT, signal.SIGHUP]
         for e in events:
@@ -789,7 +794,21 @@ class StreamdalClient:
         return True
 
     def _handle_kv(self, cmd: protos.Command) -> bool:
-        # Not implemented yet
+        validation.kv_command(cmd)
+
+        for i in cmd.kv.instructions:
+            validation.kv_instruction(i)
+
+            # TODO: validate instruction
+            if i.action == protos.shared.KvAction.KV_ACTION_CREATE:
+                self.kv.set(i.object.key, cmd.kv.request.value)
+            elif i.action == protos.shared.KvAction.KV_ACTION_UPDATE:
+                self.kv.set(i.object.key, cmd.kv.request.value)
+            elif i.action == protos.shared.KvAction.KV_ACTION_DELETE:
+                self.kv.delete(i.object.key)
+            elif i.action == protos.shared.KvAction.KV_ACTION_DELETE_ALL:
+                self.kv.purge()
+
         return True
 
     def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
@@ -841,13 +860,19 @@ class StreamdalClient:
         store = Store(linker.engine)
         store.set_wasi(wasi)
 
-        linker.define_func(
-            "env",
-            "httpRequest",
-            FuncType([ValType.i32(), ValType.i32()], [ValType.i64()]),
-            hostfunc.http_request,
-            True,
-        )
+        funcs = {
+            "httpRequest": self.host_func.http_request,
+            "kvExists": self.host_func.kv_exists,
+        }
+
+        for name, func in funcs.items():
+            linker.define_func(
+                "env",
+                name,
+                FuncType([ValType.i32(), ValType.i32()], [ValType.i64()]),
+                func,
+                True,
+            )
 
         instance = linker.instantiate(store, module)
 

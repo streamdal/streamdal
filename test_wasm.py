@@ -1,11 +1,20 @@
-import streamdal.common as common
+import pytest
 import streamdal_protos.protos as protos
 import uuid
-from streamdal import StreamdalClient
-from wasmtime import Store, Memory, MemoryType, Limits
+from streamdal import StreamdalClient, hostfunc, kv
 
 
 class TestStreamdalWasm:
+    client: StreamdalClient
+
+    @pytest.fixture(autouse=True)
+    def before_each(self):
+        client = object.__new__(StreamdalClient)
+        client.functions = {}
+        client.kv = kv.KV()
+        client.host_func = hostfunc.HostFunc(kv=client.kv)
+        self.client = client
+
     def test_call_wasm_failure(self, mocker):
         mocker.patch(
             "streamdal.StreamdalClient._exec_wasm",
@@ -22,9 +31,6 @@ class TestStreamdalWasm:
 
     def test_detective_wasm(self):
         """Test we can execute the detective wasm file"""
-
-        client = object.__new__(StreamdalClient)
-        client.functions = {}
 
         with open("./assets/test/detective.wasm", "rb") as file:
             wasm_bytes = file.read()
@@ -44,7 +50,7 @@ class TestStreamdalWasm:
             ),
         )
 
-        res = client._call_wasm(
+        res = self.client._call_wasm(
             step=step, data=b'{"object":  {"field": "streamdal@gmail.com"}}'
         )
 
@@ -52,7 +58,7 @@ class TestStreamdalWasm:
         assert res.exit_code == 1
         assert res.output_payload == b'{"object":  {"field": "streamdal@gmail.com"}}'
 
-        res2 = client._call_wasm(
+        res2 = self.client._call_wasm(
             step=step, data=b'{"object":  {"field": "mark@gmail.com"}}'
         )
 
@@ -60,10 +66,7 @@ class TestStreamdalWasm:
         assert res2.exit_code == 2
 
     def test_http_request_wasm(self):
-        """Test we can execute a wasm file"""
-
-        client = object.__new__(StreamdalClient)
-        client.functions = {}
+        """Test we can execute http_request wasm file"""
 
         with open("./assets/test/httprequest.wasm", "rb") as file:
             wasm_bytes = file.read()
@@ -83,7 +86,7 @@ class TestStreamdalWasm:
             ),
         )
 
-        res = client._call_wasm(step=step, data=b"")
+        res = self.client._call_wasm(step=step, data=b"")
 
         assert res is not None
         assert res.exit_code == 2
@@ -91,9 +94,6 @@ class TestStreamdalWasm:
 
     def test_infer_schema(self):
         """Test we can infer schema from json using the wasm module"""
-
-        client = object.__new__(StreamdalClient)
-        client.functions = {}
 
         with open("./assets/test/inferschema.wasm", "rb") as file:
             wasm_bytes = file.read()
@@ -108,7 +108,7 @@ class TestStreamdalWasm:
             infer_schema=protos.steps.InferSchemaStep(current_schema=b""),
         )
 
-        res = client._call_wasm(step=step, data=b'{"object": {"payload": "test"}}')
+        res = self.client._call_wasm(step=step, data=b'{"object": {"payload": "test"}}')
 
         assert res is not None
         assert res.exit_code == 1
@@ -123,9 +123,6 @@ class TestStreamdalWasm:
 
     def test_transform_wasm(self):
         """Test we can execute the transform wasm module"""
-
-        client = object.__new__(StreamdalClient)
-        client.functions = {}
 
         with open("./assets/test/transform.wasm", "rb") as file:
             wasm_bytes = file.read()
@@ -144,7 +141,9 @@ class TestStreamdalWasm:
             ),
         )
 
-        res = client._call_wasm(step=step, data=b'{"object": {"payload": "old val"}}')
+        res = self.client._call_wasm(
+            step=step, data=b'{"object": {"payload": "old val"}}'
+        )
 
         assert res is not None
         assert res.exit_code == 1
@@ -152,9 +151,6 @@ class TestStreamdalWasm:
         assert res.output_payload == b'{"object": {"payload": "new val"}}'
 
     def test_validjson_wasm(self):
-        client = object.__new__(StreamdalClient)
-        client.functions = {}
-
         with open("./assets/test/validjson.wasm", "rb") as file:
             wasm_bytes = file.read()
 
@@ -169,15 +165,47 @@ class TestStreamdalWasm:
         )
 
         # valid json
-        res = client._call_wasm(step=step, data=b'{"object": {"payload": "old val"}}')
+        res = self.client._call_wasm(
+            step=step, data=b'{"object": {"payload": "old val"}}'
+        )
 
         assert res is not None
         assert res.exit_code == 1
         assert res.output_payload == b'{"object": {"payload": "old val"}}'
 
         # invalid json
-        res = client._call_wasm(step=step, data=b'{"object": {"payload": "old val}}')
+        res = self.client._call_wasm(
+            step=step, data=b'{"object": {"payload": "old val}}'
+        )
 
         assert res is not None
         assert res.exit_code == 2
         assert res.output_payload == b'{"object": {"payload": "old val}}'
+
+    def test_kv_wasm(self):
+        """Test we can execute a wasm file"""
+
+        self.client.kv.set("test", "test")
+
+        with open("./assets/test/kv.wasm", "rb") as file:
+            wasm_bytes = file.read()
+
+        step = protos.PipelineStep(
+            name="KV exists test",
+            on_success=[],
+            on_failure=[],
+            wasm_bytes=wasm_bytes,
+            wasm_id=uuid.uuid4().__str__(),
+            wasm_function="f",
+            kv=protos.steps.KvStep(
+                action=protos.shared.KvAction.KV_ACTION_EXISTS,
+                key="test",
+                mode=protos.steps.KvMode.KV_MODE_STATIC,
+            ),
+        )
+
+        res = self.client._call_wasm(step=step, data=b"")
+
+        assert res is not None
+        assert res.exit_code == 1
+        assert res.exit_msg == "kv step response: \"Key 'test' exists\""
