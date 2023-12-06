@@ -244,3 +244,48 @@ fn test_credit_card() {
 
     crate::test_utils::run_tests(&test_cases);
 }
+
+#[test]
+fn test_payload_search() {
+    let json_with_field = r#"{
+        "object": {
+            "ccnum": "378282246310005"
+        }
+    }"#.as_bytes().to_vec();
+
+    let json_without_field = r#"{
+        "object": {
+            "ccnum": "foo"
+        }
+    }"#.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
+                data: &json_with_field,
+                path: "".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "e".to_string(),
+            should_error: false,
+        },
+
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
+                data: &json_without_field,
+                path: "".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: false,
+            text: "".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}

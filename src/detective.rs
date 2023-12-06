@@ -1,10 +1,12 @@
 use crate::error::CustomError;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
-use crate::{matcher_core as core, FromValue};
+use crate::{matcher_core as core};
 
 use protos::sp_steps_detective::DetectiveType;
 use std::str;
+
+type MatcherFunc = fn (&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
 
@@ -28,11 +30,59 @@ impl Detective {
         // env_logger::init();
         Detective {}
     }
-
     pub fn matches(&self, request: &Request) -> Result<bool, CustomError> {
         validate_request(request)?;
 
-        match request.match_type {
+        if !request.path.is_empty() {
+            // Matching on path value
+            self.matches_path(request)
+        } else {
+            // Matching on any field in the payload
+            self.matches_payload(request)
+        }
+    }
+
+    pub fn matches_payload(&self, request: &Request) -> Result<bool, CustomError> {
+        let data_as_str = str::from_utf8(request.data)
+            .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+        let obj = gjson::parse(data_as_str);
+
+        let mut found: bool = false;
+
+        let f = Detective::get_matcher_func(request)?;
+
+        obj.each(|_, value| {
+            let res = recurse_field(request, value, f);
+            if res {
+                found = true;
+            }
+            true
+        });
+
+        if found {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    pub fn matches_path(&self, request: &Request) -> Result<bool, CustomError> {
+        // parse_field() will return an error if the path is not found
+        // but for this single check, we don't want to error out
+        let field: gjson::Value = if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
+            gjson::Value::default()
+        } else {
+            parse_field(request.data, &request.path)?
+        };
+
+        let f = Detective::get_matcher_func(request)?;
+
+        f(request, field)
+    }
+
+    fn get_matcher_func(request: &Request) -> Result<MatcherFunc, CustomError> {
+        let f: MatcherFunc = match request.match_type {
             DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN
@@ -40,62 +90,66 @@ impl Detective {
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_MIN
             | DetectiveType::DETECTIVE_TYPE_NUMERIC_MAX
-            | DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE => numeric::common(request),
+            | DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE => numeric::common,
 
             // Core matchers
-            DetectiveType::DETECTIVE_TYPE_STRING_EQUAL => core::string_equal_to(request),
-            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY => core::string_contains_any(request),
-            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL => core::string_contains_all(request),
+            DetectiveType::DETECTIVE_TYPE_STRING_EQUAL => core::string_equal_to,
+            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ANY => core::string_contains_any,
+            DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL => core::string_contains_all,
             DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MIN
             | DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_MAX
-            | DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE => core::string_length(request),
+            | DetectiveType::DETECTIVE_TYPE_STRING_LENGTH_RANGE => core::string_length,
             DetectiveType::DETECTIVE_TYPE_IPV4_ADDRESS
-            | DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => core::ip_address(request),
-            DetectiveType::DETECTIVE_TYPE_REGEX => core::regex(request),
-            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339 => core::timestamp_rfc3339(request),
-            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO => core::timestamp_unix_nano(request),
-            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX => core::timestamp_unix(request),
-            DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE => core::boolean(request, false),
-            DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE => core::boolean(request, true),
-            DetectiveType::DETECTIVE_TYPE_IS_EMPTY => core::is_empty(request),
-            DetectiveType::DETECTIVE_TYPE_HAS_FIELD => core::has_field(request),
-            DetectiveType::DETECTIVE_TYPE_IS_TYPE => core::is_type(request),
-            DetectiveType::DETECTIVE_TYPE_UUID => core::uuid(request),
-            DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS => core::mac_address(request),
-            DetectiveType::DETECTIVE_TYPE_URL => core::url(request),
-            DetectiveType::DETECTIVE_TYPE_HOSTNAME => core::hostname(request),
-            DetectiveType::DETECTIVE_TYPE_SEMVER => core::semver(request),
+            | DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => core::ip_address,
+            DetectiveType::DETECTIVE_TYPE_REGEX => core::regex,
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_RFC3339 => core::timestamp_rfc3339,
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX_NANO => core::timestamp_unix_nano,
+            DetectiveType::DETECTIVE_TYPE_TIMESTAMP_UNIX => core::timestamp_unix,
+            DetectiveType::DETECTIVE_TYPE_BOOLEAN_FALSE => core::boolean_false,
+            DetectiveType::DETECTIVE_TYPE_BOOLEAN_TRUE => core::boolean_true,
+            DetectiveType::DETECTIVE_TYPE_IS_EMPTY => core::is_empty,
+            DetectiveType::DETECTIVE_TYPE_HAS_FIELD => core::has_field,
+            DetectiveType::DETECTIVE_TYPE_IS_TYPE => core::is_type,
+            DetectiveType::DETECTIVE_TYPE_UUID => core::uuid,
+            DetectiveType::DETECTIVE_TYPE_MAC_ADDRESS => core::mac_address,
+            DetectiveType::DETECTIVE_TYPE_URL => core::url,
+            DetectiveType::DETECTIVE_TYPE_HOSTNAME => core::hostname,
+            DetectiveType::DETECTIVE_TYPE_SEMVER => core::semver,
 
             // PII matchers
-            DetectiveType::DETECTIVE_TYPE_PII_ANY => pii::any(request),
-            DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii::credit_card(request),
-            DetectiveType::DETECTIVE_TYPE_PII_SSN => pii::ssn(request),
-            DetectiveType::DETECTIVE_TYPE_PII_EMAIL => pii::email(request),
-            DetectiveType::DETECTIVE_TYPE_PII_PHONE => pii::phone(request),
-            DetectiveType::DETECTIVE_TYPE_PII_DRIVER_LICENSE => pii::drivers_license(request),
-            DetectiveType::DETECTIVE_TYPE_PII_PASSPORT_ID => pii::passport_id(request),
-            DetectiveType::DETECTIVE_TYPE_PII_VIN_NUMBER => pii::vin_number(request),
-            DetectiveType::DETECTIVE_TYPE_PII_SERIAL_NUMBER => pii::serial_number(request),
-            DetectiveType::DETECTIVE_TYPE_PII_LOGIN => pii::login(request),
-            DetectiveType::DETECTIVE_TYPE_PII_TAXPAYER_ID => pii::taxpayer_id(request),
-            DetectiveType::DETECTIVE_TYPE_PII_ADDRESS => pii::address(request),
-            DetectiveType::DETECTIVE_TYPE_PII_SIGNATURE => pii::signature(request),
-            DetectiveType::DETECTIVE_TYPE_PII_GEOLOCATION => pii::geolocation(request),
-            DetectiveType::DETECTIVE_TYPE_PII_EDUCATION => pii::education(request),
-            DetectiveType::DETECTIVE_TYPE_PII_FINANCIAL => pii::financial(request),
-            DetectiveType::DETECTIVE_TYPE_PII_HEALTH => pii::health(request),
+            DetectiveType::DETECTIVE_TYPE_PII_ANY => pii::any,
+            DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii::credit_card,
+            DetectiveType::DETECTIVE_TYPE_PII_SSN => pii::ssn,
+            DetectiveType::DETECTIVE_TYPE_PII_EMAIL => pii::email,
+            DetectiveType::DETECTIVE_TYPE_PII_PHONE => pii::phone,
+            DetectiveType::DETECTIVE_TYPE_PII_DRIVER_LICENSE => pii::drivers_license,
+            DetectiveType::DETECTIVE_TYPE_PII_PASSPORT_ID => pii::passport_id,
+            DetectiveType::DETECTIVE_TYPE_PII_VIN_NUMBER => pii::vin_number,
+            DetectiveType::DETECTIVE_TYPE_PII_SERIAL_NUMBER => pii::serial_number,
+            DetectiveType::DETECTIVE_TYPE_PII_LOGIN => pii::login,
+            DetectiveType::DETECTIVE_TYPE_PII_TAXPAYER_ID => pii::taxpayer_id,
+            DetectiveType::DETECTIVE_TYPE_PII_ADDRESS => pii::address,
+            DetectiveType::DETECTIVE_TYPE_PII_SIGNATURE => pii::signature,
+            DetectiveType::DETECTIVE_TYPE_PII_GEOLOCATION => pii::geolocation,
+            DetectiveType::DETECTIVE_TYPE_PII_EDUCATION => pii::education,
+            DetectiveType::DETECTIVE_TYPE_PII_FINANCIAL => pii::financial,
+            DetectiveType::DETECTIVE_TYPE_PII_HEALTH => pii::health,
 
-            DetectiveType::DETECTIVE_TYPE_UNKNOWN => Err(CustomError::Error(
-                "match type cannot be unknown".to_string(),
-            )),
-        }
+            DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
+                return Err(CustomError::Error(
+                    "match type cannot be unknown".to_string(),
+                ))
+            },
+        };
+
+        Ok(f)
     }
 }
 
-pub fn parse_field<'a, T: FromValue<'a>>(
+pub fn parse_field<'a>(
     data: &'a [u8],
     path: &'a String,
-) -> Result<T, CustomError> {
+) -> Result<gjson::Value<'a>, CustomError> {
     let data_as_str = str::from_utf8(data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
@@ -108,7 +162,7 @@ pub fn parse_field<'a, T: FromValue<'a>>(
         )));
     }
 
-    T::from_value(v)
+    Ok(v)
 }
 
 pub fn parse_number(input: &str) -> Result<f64, CustomError> {
@@ -133,9 +187,44 @@ fn validate_request(request: &Request) -> Result<(), CustomError> {
         return Err(CustomError::Error("data cannot be empty".to_string()));
     }
 
-    if request.path.is_empty() {
-        return Err(CustomError::Error("path cannot be empty".to_string()));
+    Ok(())
+}
+fn recurse_field(request: &Request, val: gjson::Value, f: MatcherFunc) -> bool {
+    match val.kind() {
+        gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
+            if let Ok(res) = f(request, val) {
+                return res;
+            }
+        }
+
+        gjson::Kind::Object => {
+            let mut found: bool = false;
+            val.each(|_, value| {
+                if recurse_field(request, value, f) {
+                    found = true;
+                }
+                true
+            });
+
+            if found {
+                return true;
+            }
+        }
+        gjson::Kind::Array => {
+            let mut found: bool = false;
+            val.each(|_, value| {
+                if recurse_field(request,value, f) {
+                    found = true;
+                }
+                true
+            });
+
+            if found {
+                return true;
+            }
+        }
+        _ => {} // Don't care about nulls
     }
 
-    Ok(())
+    false
 }
