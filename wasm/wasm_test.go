@@ -43,7 +43,7 @@ func TestLoad(t *testing.T) {
 }
 
 func TestDeterminativeUUID(t *testing.T) {
-	fileData, err := os.ReadFile("../assets/wasm/detective_0_0_12.wasm")
+	fileData, err := os.ReadFile("../assets/wasm/detective_0_0_13.wasm")
 	if err != nil {
 		t.Errorf("unable to read file: %s", err)
 	}
