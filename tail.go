@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"golang.org/x/time/rate"
 
 	"github.com/streamdal/protos/build/go/protos"
 
@@ -41,6 +42,16 @@ type Tail struct {
 	lastMsg         time.Time
 	log             logger.Logger
 	active          bool
+	limiter         *rate.Limiter
+}
+
+func (t *Tail) ShouldSend() bool {
+	// If no rate limit, allow all messages
+	if t.limiter == nil {
+		return true
+	}
+
+	return t.limiter.Allow()
 }
 
 func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalData []byte, postPipelineData []byte) {
@@ -62,6 +73,10 @@ func (s *Streamdal) sendTail(aud *protos.Audience, pipelineID string, originalDa
 
 			// Save tail state
 			tail.active = true
+		}
+
+		if !tail.ShouldSend() {
+			continue
 		}
 
 		tr := &protos.TailResponse{
@@ -194,6 +209,13 @@ func (s *Streamdal) startTailHandler(_ context.Context, cmd *protos.Command) err
 		log:             s.config.Logger,
 		lastMsg:         time.Now(),
 		active:          false,
+	}
+
+	// Convert sample interval from seconds to time.Duration
+	if sampleOpts := cmd.GetTail().Request.GetSampleOptions(); sampleOpts != nil {
+		// Convert seconds to nanoseconds
+		interval := time.Duration(sampleOpts.SampleIntervalSeconds) * time.Second
+		t.limiter = rate.NewLimiter(rate.Every(interval), int(sampleOpts.SampleRate))
 	}
 
 	// Save entry in tail map
