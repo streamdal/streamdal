@@ -57,10 +57,16 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 }
 
 fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
+    let path = match wasm_request.step.detective().path.clone() {
+        Some(p) => p,
+        None => "".to_string(),
+    };
+
+
     Request {
         match_type: wasm_request.step.detective().type_.clone().unwrap(),
         data: &wasm_request.input_payload,
-        path: wasm_request.step.detective().path.clone().unwrap(),
+        path: path,
         args: wasm_request.step.detective().args.clone(),
         negate: wasm_request.step.detective().negate.clone().unwrap(),
     }
@@ -77,15 +83,6 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
 
     if req.step.detective().type_ == EnumOrUnknown::from(DetectiveType::DETECTIVE_TYPE_UNKNOWN) {
         return Err("detective type cannot be unknown".to_string());
-    }
-
-    let path = match req.step.detective().path.clone() {
-        Some(v) => v,
-        None => return Err("detective path must be set".to_string()),
-    };
-
-    if path == "" {
-        return Err("detective path cannot be empty".to_string());
     }
 
     Ok(())
