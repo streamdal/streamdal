@@ -79,3 +79,21 @@ def resume_pipeline(cmd: protos.Command):
 
     if cmd.resume_pipeline.pipeline_id == "":
         raise ValueError("cmd.resume_pipeline.pipeline.id must be non-empty")
+
+
+def kv_command(cmd: protos.Command):
+    if not isinstance(cmd, protos.Command):
+        raise ValueError("cmd must be a protos.Command")
+
+
+def kv_instruction(i: protos.KvInstruction):
+    if not isinstance(i, protos.KvInstruction):
+        raise ValueError("instruction must be a protos.KvInstruction")
+
+    if i.action == protos.shared.KvAction.KV_ACTION_UNSET:
+        raise ValueError("instruction.action cannot be unset")
+
+    if i.action != protos.shared.KvAction.KV_ACTION_DELETE_ALL and not isinstance(
+        i.object, protos.KvObject
+    ):
+        raise ValueError("instruction.object cannot be unset")
