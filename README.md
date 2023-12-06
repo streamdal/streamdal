@@ -82,5 +82,5 @@ test test_bench::bench_mac_address         ... bench:         343 ns/iter (+/- 7
 test test_bench::bench_semver              ... bench:         378 ns/iter (+/- 6)
 test test_bench::bench_string_contains_all ... bench:         218 ns/iter (+/- 4)
 test test_bench::bench_string_contains_any ... bench:         221 ns/iter (+/- 1)
-test test_bench::bench_uuid                ... bench:      29,468 ns/iter (+/- 326)
+test test_bench::bench_uuid                ... bench:         402 ns/iter (+/- 6)
 ```

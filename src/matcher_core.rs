@@ -8,6 +8,7 @@ use std::net::IpAddr;
 use std::str;
 use std::str::FromStr;
 use url::Url;
+use uuid::Uuid;
 
 pub fn string_equal_to(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
@@ -89,11 +90,8 @@ pub fn mac_address(_request: &Request, f: Value) -> Result<bool, CustomError> {
 }
 
 pub fn uuid(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let re = Regex::new(
-        r"^[a-fA-F0-9]{8}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{4}[:\-]?[a-fA-F0-9]{12}$",
-    )?;
-
-    Ok(re.is_match(field.str()))
+    let val = field.str().replace(':', "-");
+    Ok(Uuid::parse_str(val.as_str()).is_ok())
 }
 
 pub fn timestamp_rfc3339(_request: &Request, field: Value) -> Result<bool, CustomError> {
