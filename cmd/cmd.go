@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/charmbracelet/log"
 	pretty "github.com/dselans/go-prettyjson-tview"
 	"github.com/gdamore/tcell/v2"
@@ -31,12 +32,15 @@ type Cmd struct {
 	announceFilter bool
 	options        *Options
 	log            *log.Logger
+	shutdownCtx    context.Context
+	shutdownFunc   context.CancelFunc
 }
 
 type Options struct {
-	Config  *config.Config
-	Console *console.Console
-	Logger  *log.Logger
+	Config    *config.Config
+	Console   *console.Console
+	Logger    *log.Logger
+	Telemetry statsd.Statter
 }
 
 func New(opts *Options) (*Cmd, error) {
@@ -44,12 +48,20 @@ func New(opts *Options) (*Cmd, error) {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
 
-	return &Cmd{
+	ctx, cxl := context.WithCancel(context.Background())
+
+	c := &Cmd{
 		// TODO: Create an interface for API
 		//api:     api.NewUninitialized(),
-		options: opts,
-		log:     opts.Logger.WithPrefix("cmd"),
-	}, nil
+		options:      opts,
+		log:          opts.Logger.WithPrefix("cmd"),
+		shutdownCtx:  ctx,
+		shutdownFunc: cxl,
+	}
+
+	go c.runUptime()
+
+	return c, nil
 }
 
 // Run is the main entrypoint for starting the CLI app
@@ -92,7 +104,11 @@ func (c *Cmd) run(action *types.Action) error {
 	case types.StepViewOptions:
 		resp, err = c.actionViewOptions(action)
 	case types.StepQuit:
+		_ = c.options.Telemetry.Gauge(types.GaugeUptimeSeconds, 0, 1.0, c.options.Config.GetStatsdTags()...)
+		_ = c.options.Telemetry.Close()
+
 		c.options.Console.Stop()
+		c.shutdownFunc()
 		os.Exit(0)
 	case types.StepPause:
 		// Pause is only possible from tail() so that's where we want to go back
@@ -111,6 +127,9 @@ func (c *Cmd) run(action *types.Action) error {
 // Filter view can only be triggered if we came from tail so it makes sense
 // for us to go back to tail() after the filter view is closed.
 func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
+	// Send telemetry
+	_ = c.options.Telemetry.Inc(types.CounterFeatureFilterTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 	// Disable input capture while in Filter
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
@@ -148,6 +167,9 @@ func (c *Cmd) actionFilter(action *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
+	// Send telemetry
+	_ = c.options.Telemetry.Inc(types.CounterFeatureSearchTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 	// Disable input capture while in Search
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
@@ -183,6 +205,9 @@ func (c *Cmd) actionSearch(action *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
+	// Send telemetry
+	_ = c.options.Telemetry.Inc(types.CounterFeatureSampleTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 	// Disable input capture while in Rate
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
@@ -217,6 +242,9 @@ func (c *Cmd) actionRate(action *types.Action) (*types.Action, error) {
 }
 
 func (c *Cmd) actionViewOptions(action *types.Action) (*types.Action, error) {
+	// Send telemetry
+	_ = c.options.Telemetry.Inc(types.CounterFeatureViewTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 	// Disable input capture while in view options
 	origCapture := c.options.Console.GetInputCapture()
 	c.options.Console.SetInputCapture(nil)
@@ -322,6 +350,9 @@ func (c *Cmd) actionRetry(msg string, retryStep types.Step, pageToSwitchTo strin
 }
 
 func (c *Cmd) actionSelect(action *types.Action) (*types.Action, error) {
+	// Send telemetry
+	_ = c.options.Telemetry.Inc(types.CounterFeatureSelectTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 	// Only highlight 'q'
 	c.options.Console.ToggleAllMenuHighlights()
 	c.options.Console.ToggleMenuHighlight("Q")
@@ -631,6 +662,9 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 
 				// Update the menu pause button visual
 				if c.paused {
+					// Send telemetry
+					_ = c.options.Telemetry.Inc(types.CounterFeaturePauseTotal, 1, 1.0, c.options.Config.GetStatsdTags()...)
+
 					c.options.Console.SetMenuEntryOn("Pause")
 				} else {
 					c.options.Console.SetMenuEntryOff("Pause")
@@ -744,6 +778,26 @@ func (c *Cmd) tail(action *types.Action, textView *tview.TextView, actionCh <-ch
 	}
 }
 
+func (c *Cmd) runUptime() {
+	tags := c.options.Config.GetStatsdTags()
+
+	// Reset gauge to zero
+	_ = c.options.Telemetry.Gauge(types.GaugeUptimeSeconds, 0, 1.0, tags...)
+
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			// Use delta since we only need to send the difference
+			_ = c.options.Telemetry.GaugeDelta(types.GaugeUptimeSeconds, 60, 1.0, tags...)
+		case <-c.shutdownCtx.Done():
+			return
+		}
+	}
+}
+
 func validateOptions(opts *Options) error {
 	if opts == nil {
 		return errors.New("options cannot be nil")
@@ -759,6 +813,10 @@ func validateOptions(opts *Options) error {
 
 	if opts.Logger == nil {
 		return errors.New(".Logger cannot be nil")
+	}
+
+	if opts.Telemetry == nil {
+		return errors.New(".Telemetry cannot be nil")
 	}
 
 	return nil
