@@ -41,8 +41,10 @@ export const audienceKey = (audience: Audience) =>
 
 export const version = (): string => {
   try {
-    const pkg = JSON.parse(readFileSync("./package.json").toString());
-    return pkg?.version as string;
+    const pkg = JSON.parse(
+      readFileSync("./node_modules/@streamdal/node-sdk/package.json").toString()
+    );
+    return (pkg?.version ? pkg.version : "unknown") as string;
   } catch (e) {
     console.error("Error getting package version");
   }
