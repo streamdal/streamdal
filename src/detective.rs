@@ -6,7 +6,6 @@ use crate::{matcher_core as core};
 use protos::sp_steps_detective::DetectiveType;
 use std::str;
 
-// TODO: can we get this working
 type MatcherFunc = fn (&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
@@ -194,7 +193,6 @@ fn recurse_field(request: &Request, val: gjson::Value, f: MatcherFunc) -> bool {
     match val.kind() {
         gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
             if let Ok(res) = f(request, val) {
-                // TODO: fix this
                 return res;
             }
         }
