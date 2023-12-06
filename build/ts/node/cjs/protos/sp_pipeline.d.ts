@@ -157,13 +157,23 @@ export declare enum PipelineStepCondition {
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT = 1;
+     * Abort executing the current pipeline AND continue executing any other pipelines
+     *
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
      */
-    ABORT = 1,
+    ABORT_CURRENT = 1,
     /**
+     * Notify the server about the step condition
+     *
      * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_NOTIFY = 2;
      */
-    NOTIFY = 2
+    NOTIFY = 2,
+    /**
+     * Abort executing ALL pipelines
+     *
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
+     */
+    ABORT_ALL = 3
 }
 declare class Pipeline$Type extends MessageType<Pipeline> {
     constructor();

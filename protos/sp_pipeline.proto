@@ -34,8 +34,15 @@ message Pipeline {
 // Each step can have multiple conditions.
 enum PipelineStepCondition {
   PIPELINE_STEP_CONDITION_UNSET = 0;
-  PIPELINE_STEP_CONDITION_ABORT = 1;
+
+  // Abort executing the current pipeline AND continue executing any other pipelines
+  PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
+
+  // Notify the server about the step condition
   PIPELINE_STEP_CONDITION_NOTIFY = 2;
+
+  // Abort executing ALL pipelines
+  PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
 }
 
 // A pipeline step is a single step in a pipeline.

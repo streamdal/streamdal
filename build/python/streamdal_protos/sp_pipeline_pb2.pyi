@@ -14,7 +14,8 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
-PIPELINE_STEP_CONDITION_ABORT: PipelineStepCondition
+PIPELINE_STEP_CONDITION_ABORT_ALL: PipelineStepCondition
+PIPELINE_STEP_CONDITION_ABORT_CURRENT: PipelineStepCondition
 PIPELINE_STEP_CONDITION_NOTIFY: PipelineStepCondition
 PIPELINE_STEP_CONDITION_UNSET: PipelineStepCondition
 
