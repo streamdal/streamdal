@@ -2,6 +2,7 @@ import logging
 import asyncio
 import streamdal_protos.protos as protos
 import time
+import token_bucket
 from streamdal.metrics import Metrics, CounterEntry, COUNTER_DROPPED_TAIL_MESSAGES
 from grpclib.client import Channel
 from grpclib.exceptions import ProtocolError
@@ -24,6 +25,7 @@ class Tail:
     last_msg: int = 0
     log: logging.Logger = logging.getLogger("streamdal-python-sdk")
     active: bool = False
+    limiter: token_bucket.Limiter
 
     def __init__(
         self,
@@ -43,6 +45,14 @@ class Tail:
         self.streamdal_url = streamdal_url
         self.metrics = metrics
         self.active = active
+
+        self.limiter = token_bucket.Limiter(
+            float(request.sample_options.sample_interval_seconds),
+            request.sample_options.sample_rate,
+            token_bucket.MemoryStorage(),
+        )
+        if request.sample_options is not None:
+            pass
 
     def tail_iterator(self):
         while not self.exit.is_set():
@@ -105,3 +115,14 @@ class Tail:
         channel.close()
 
         self.log.debug(f"Tail worker {worker_id} exiting")
+
+    def should_send(self) -> bool:
+        """
+        Determines if we should send a tail message to the server
+        Limiter will be defined if the tail has sample options specified, so if it's none, just allow the message,
+        otherwise run through the limiter logic to determine if we should send.
+        """
+        if self.limiter is None:
+            return True
+
+        return self.limiter.consume(bytes(self.request.id, "utf-8"), 1)
