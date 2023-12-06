@@ -7,10 +7,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/streamdal/server/util"
+
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/streamdal/server/types"
 
 	"github.com/streamdal/server/backends/cache"
 	"github.com/streamdal/server/config"
@@ -52,7 +59,7 @@ type Dependencies struct {
 	Health            health.IHealth
 	ShutdownContext   context.Context
 	ShutdownFunc      context.CancelFunc
-	Telemetry         telemetry.ITelemetry
+	Telemetry         statsd.Statter
 }
 
 func New(cfg *config.Config) (*Dependencies, error) {
@@ -91,6 +98,14 @@ func New(cfg *config.Config) (*Dependencies, error) {
 	if err := d.setupServices(cfg); err != nil {
 		return nil, errors.Wrap(err, "unable to setup services")
 	}
+
+	// StoreService now available, get/generate install ID
+	installID, err := d.StoreService.GetInstallID(d.ShutdownContext)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get install ID")
+	}
+	d.Config.InstallID = installID
+	d.Config.NodeID = util.GenerateNodeID(installID, d.Config.NodeName)
 
 	return d, nil
 }
@@ -172,14 +187,19 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 }
 
 func (d *Dependencies) setupServices(cfg *config.Config) error {
-	if !d.Config.TelemetryDisabled {
-		telemetryService, err := telemetry.New(&telemetry.Config{
-			ShutdownCtx: d.ShutdownContext,
+	if !d.Config.TelemetryDisable {
+		t, err := statsd.NewClientWithConfig(&statsd.ClientConfig{
+			Address:       cfg.TelemetryAddress,
+			Prefix:        "streamdal",
+			UseBuffered:   true,
+			FlushInterval: time.Second,
+			TagFormat:     statsd.InfixSemicolon,
 		})
 		if err != nil {
-			return errors.Wrap(err, "unable to create new telemetry service")
+			return errors.Wrap(err, "unable to create new statsd client")
 		}
-		d.Telemetry = telemetryService
+		d.Telemetry = t
+		fmt.Printf("\n\nConnected to telemetry: %s\n\n", cfg.TelemetryAddress)
 	} else {
 		d.Telemetry = &telemetry.DummyTelemetry{}
 	}
@@ -201,6 +221,8 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		RedisBackend:  d.RedisBackend,
 		ShutdownCtx:   d.ShutdownContext,
 		PrometheusURL: parseHTTPListenAddress(cfg.HTTPAPIListenAddress),
+		Telemetry:     d.Telemetry,
+		InstallID:     cfg.InstallID,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new metrics service")
@@ -212,6 +234,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		ShutdownCtx:  d.ShutdownContext,
 		NodeName:     cfg.NodeName,
 		SessionTTL:   cfg.SessionTTL,
+		Telemetry:    d.Telemetry,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
@@ -259,6 +282,79 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	d.KVService = kvService
 
 	return nil
+}
+
+// sendCreatedTelemetry sends a gauge indicating when the cluster was first started
+// This will only be sent once and
+func (d *Dependencies) sendCreatedTelemetry() {
+	createdTS, err := d.StoreService.GetCreationDate(d.ShutdownContext)
+	if err != nil {
+		logrus.Errorf("unable to get creation date: %s", err)
+		return
+	}
+
+	if createdTS > 0 {
+		// Value is already set and sent to telemetry
+		return
+	}
+
+	createdTS = time.Now().UTC().Unix()
+
+	tags := []statsd.Tag{
+		{"install_id", d.Config.InstallID},
+		{"node_id", d.Config.NodeID},
+	}
+
+	// Set in redis
+	if err := d.StoreService.SetCreationDate(d.ShutdownContext, createdTS); err != nil {
+		logrus.Errorf("unable to set creation date: %s", err)
+	}
+
+	if err := d.Telemetry.Gauge(types.GaugeServerCreated, createdTS, 1.0, tags...); err != nil {
+		logrus.Errorf("unable to send created gauge: %s", err)
+	}
+}
+
+// RunUptimeTelemetry sends a gauge metric to the telemetry backend every minute
+func (d *Dependencies) RunUptimeTelemetry() {
+	// Init telemetry
+	d.sendCreatedTelemetry()
+
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	tags := []statsd.Tag{
+		//{"install_id", d.Config.InstallID},
+		//{"node_id", d.Config.NodeID},
+		{"sample_tag", "mark"},
+	}
+
+	// Send started telemetry
+	if err := d.Telemetry.Gauge(types.GaugeServerStart, time.Now().Unix(), 1.0, tags...); err != nil {
+		logrus.Errorf("unable to send started gauge: %s", err)
+	}
+
+	// Reset uptime counter
+	// TODO: does this actually work?
+	if err := d.Telemetry.SetInt(types.GaugeServerUptime, 0, 1.0, tags...); err != nil {
+		logrus.Errorf("unable to reset uptime gauge: %s", err)
+	}
+
+	for {
+		select {
+		case <-ticker.C:
+			// No error checking here since we don't want to spam logs every minute if telemetry is unreachable
+
+			// Use delta since we only need to send the difference
+			_ = d.Telemetry.GaugeDelta(types.GaugeServerUptime, 60, 1.0, tags...)
+
+			// Timestamp of last ping
+			_ = d.Telemetry.Gauge(types.GaugeTimestampPing, time.Now().Unix(), 1.0, tags...)
+
+		case <-d.ShutdownContext.Done():
+			return
+		}
+	}
 }
 
 // Status satisfies the go-health.ICheckable interface

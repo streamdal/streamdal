@@ -43,13 +43,13 @@ func TestLoad(t *testing.T) {
 }
 
 func TestDeterminativeUUID(t *testing.T) {
-	fileData, err := os.ReadFile("../assets/wasm/detective_0_0_1.wasm")
+	fileData, err := os.ReadFile("../assets/wasm/detective_0_0_12.wasm")
 	if err != nil {
 		t.Errorf("unable to read file: %s", err)
 	}
 
 	uuid := determinativeUUID(fileData)
-	if uuid != "936ab63d-df15-c06e-c1de-db56c0b97e57" {
+	if uuid != "e64869d6-b909-2a7e-fe4f-d6c0d3191bbd" {
 		t.Errorf("incorrect UUID: %s", uuid)
 	}
 }

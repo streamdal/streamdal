@@ -3,8 +3,13 @@ package store
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
+
+	telTypes "github.com/streamdal/server/types"
+
+	"github.com/cactus/go-statsd-client/v5/statsd"
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
@@ -50,15 +55,19 @@ const (
 	// See https://redis.io/docs/manual/keyspace-notifications/
 	RedisKeyWatchPrefix = "__keyspace@0__:"
 
-	// StreamdalIDKey is a unique ID for this streamdal server cluster
+	// InstallIDKey is a unique ID for this streamdal server cluster
 	// Each cluster will get a unique UUID. This is used to track the number of
 	// installs for telemetry and is completely random for anonymization purposes.
-	StreamdalIDKey = "streamdal_id"
+	InstallIDKey = "install_id"
+
+	RedisCreationDateKey = "streamdal_settings:creation_date"
 )
 
 type IStore interface {
 	AddRegistration(ctx context.Context, req *protos.RegisterRequest) error
 	DeleteRegistration(ctx context.Context, req *protos.DeregisterRequest) error
+	RecordRegistration(ctx context.Context, req *protos.RegisterRequest) error
+	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
 	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
@@ -108,9 +117,19 @@ type IStore interface {
 
 	GetSchema(ctx context.Context, aud *protos.Audience) (*protos.Schema, error)
 
-	// GetStreamdalID returns the unique ID for this cluster.
+	// GetInstallID returns the unique ID for this server cluster.
 	// If an ID has not been set yet, a new one is generated and returned
-	GetStreamdalID(ctx context.Context) (string, error)
+	GetInstallID(ctx context.Context) (string, error)
+
+	// GetCreationDate returns the creation date of this server cluster. This is used
+	// for sending server_timestamp_created_seconds metric to telemetry
+	GetCreationDate(ctx context.Context) (int64, error)
+
+	// SetCreationDate sets the creation date of this server cluster
+	SetCreationDate(ctx context.Context, ts int64) error
+
+	// IsPipelineAttachedAny returns if pipeline is attached to any audience. Used for telemetry tags
+	IsPipelineAttachedAny(ctx context.Context, pipelineID string) bool
 
 	// PauseTailRequest pauses a tail request by its ID
 	PauseTailRequest(ctx context.Context, req *protos.PauseTailRequest) (*protos.TailRequest, error)
@@ -128,11 +147,13 @@ type Options struct {
 	ShutdownCtx  context.Context
 	NodeName     string
 	SessionTTL   time.Duration
+	Telemetry    statsd.Statter
 }
 
 type Store struct {
-	options *Options
-	log     *logrus.Entry
+	options   *Options
+	log       *logrus.Entry
+	InstallID string
 }
 
 func New(opts *Options) (*Store, error) {
@@ -185,6 +206,37 @@ func (s *Store) AddRegistration(ctx context.Context, req *protos.RegisterRequest
 				return errors.Wrap(err, "error adding audience")
 			}
 		}
+	}
+
+	return nil
+}
+
+func (s *Store) SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool {
+	registrationKey := RedisLiveKey(req.SessionId, s.options.NodeName, "register")
+
+	return s.options.RedisBackend.Exists(ctx, registrationKey).Val() == 1
+}
+
+func (s *Store) RecordRegistration(ctx context.Context, req *protos.RegisterRequest) error {
+	registrationKey := RedisTelemetryRegistrationKey(
+		req.ServiceName,
+		req.ClientInfo.Os,
+		req.ClientInfo.LibraryName,
+		req.ClientInfo.Arch,
+	)
+
+	req.ClientInfo.XSessionId = &req.SessionId
+	req.ClientInfo.XServiceName = &req.ServiceName
+	req.ClientInfo.XNodeName = &s.options.NodeName
+
+	clientInfoBytes, err := proto.Marshal(req.ClientInfo)
+	if err != nil {
+		return errors.Wrap(err, "error marshalling client info")
+	}
+
+	status := s.options.RedisBackend.Set(ctx, registrationKey, clientInfoBytes, s.options.SessionTTL)
+	if err := status.Err(); err != nil {
+		return errors.Wrap(err, "error record permanent registration to K/V")
 	}
 
 	return nil
@@ -439,7 +491,40 @@ func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRe
 	return nil
 }
 
+func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64) {
+	if aud == nil {
+		return
+	}
+
+	// Unique services
+	serviceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+aud.ServiceName+":*").Val()
+	if len(serviceKeys) == 0 {
+		// Completely new audience, send telemetry
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+	}
+
+	dataSourceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+"*:*:*:"+aud.ComponentName+":*").Val()
+	if len(dataSourceKeys) == 0 {
+		// Completely new data source, send telemetry
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+	}
+
+	audExists := s.options.RedisBackend.Exists(ctx, RedisTelemetryAudience(aud)).Val() == 1
+
+	if audExists && val < 0 || !audExists && val > 0 {
+		if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		}
+	}
+}
+
 func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
+	if req == nil {
+		return errors.New("request cannot be nil")
+	}
+
 	// Add it to the live bucket
 	if err := s.options.RedisBackend.Set(
 		ctx,
@@ -460,6 +545,8 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
+	s.sendAudienceTelemetry(ctx, req.Audience, 1)
+
 	return nil
 }
 
@@ -474,18 +561,19 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	}
 
 	if len(attached) > 0 {
-		return fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
+		err = fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
+
+		return err
 	}
 
-	return s.deleteAudienceKey(ctx, req.Audience)
-}
-
-func (s *Store) deleteAudienceKey(ctx context.Context, aud *protos.Audience) error {
 	// Delete audience from bucket
-	audStr := util.AudienceToStr(aud)
+	audStr := util.AudienceToStr(req.Audience)
 	if err := s.options.RedisBackend.Del(ctx, RedisAudienceKey(audStr)).Err(); err != nil {
 		return errors.Wrap(err, "error deleting audience from store")
 	}
+
+	// Send Analytics
+	s.sendAudienceTelemetry(ctx, req.Audience, -1)
 
 	return nil
 }
@@ -967,6 +1055,12 @@ func (s *Store) IsPipelineAttached(ctx context.Context, audience *protos.Audienc
 	return true, nil
 }
 
+func (s *Store) IsPipelineAttachedAny(ctx context.Context, pipelineID string) bool {
+	search := fmt.Sprintf(RedisConfigKeyFormat, "*", pipelineID)
+	keys := s.options.RedisBackend.Keys(ctx, search).Val()
+	return len(keys) > 0
+}
+
 type PipelineUsage struct {
 	PipelineId string
 	Active     bool
@@ -1156,8 +1250,13 @@ func (s *Store) GetAudiencesBySessionID(ctx context.Context, sessionID string) (
 	return live, nil
 }
 
-func (s *Store) GetStreamdalID(ctx context.Context) (string, error) {
-	v, err := s.options.RedisBackend.Get(ctx, StreamdalIDKey).Result()
+func (s *Store) GetInstallID(ctx context.Context) (string, error) {
+	// Check cache first
+	if s.InstallID != "" {
+		return s.InstallID, nil
+	}
+
+	v, err := s.options.RedisBackend.Get(ctx, InstallIDKey).Result()
 	if errors.Is(err, redis.Nil) {
 		id, setErr := s.setStreamdalID(ctx)
 		if setErr != nil {
@@ -1172,11 +1271,14 @@ func (s *Store) GetStreamdalID(ctx context.Context) (string, error) {
 }
 
 func (s *Store) setStreamdalID(ctx context.Context) (string, error) {
-	id, err := s.options.RedisBackend.Get(ctx, StreamdalIDKey).Result()
+	id, err := s.options.RedisBackend.Get(ctx, InstallIDKey).Result()
 	if errors.Is(err, redis.Nil) {
 		// Create new ID
 		id := util.GenerateUUID()
-		err := s.options.RedisBackend.Set(ctx, StreamdalIDKey, id, 0).Err()
+
+		s.InstallID = id
+
+		err := s.options.RedisBackend.Set(ctx, InstallIDKey, id, 0).Err()
 		if err != nil {
 			return "", errors.Wrap(err, "unable to set cluster ID")
 		}
@@ -1354,4 +1456,26 @@ func applyPipelineDefaults(pipeline *protos.Pipeline) {
 			}
 		}
 	}
+}
+
+func (s *Store) GetCreationDate(ctx context.Context) (int64, error) {
+	created := s.options.RedisBackend.Get(ctx, RedisCreationDateKey).Val()
+	if created == "" {
+		return 0, nil
+	}
+
+	createdTS, err := strconv.ParseInt(created, 10, 64)
+	if err != nil {
+		return 0, errors.Wrap(err, "unable to convert creation date to int")
+	}
+
+	return createdTS, nil
+}
+
+func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
+	if err := s.options.RedisBackend.Set(ctx, RedisCreationDateKey, ts, 0).Err(); err != nil {
+		return errors.Wrap(err, "unable to set creation date in store")
+	}
+
+	return nil
 }

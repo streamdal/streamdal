@@ -1,6 +1,7 @@
 streamdal-server
 ================
 [![Test](https://github.com/streamdal/server/actions/workflows/main-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/main-test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server)
 [![Pull Request](https://github.com/streamdal/server/actions/workflows/pr-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/pr-test.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 

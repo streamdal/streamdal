@@ -803,6 +803,7 @@ func runServer() {
 		SessionTTL:           time.Second * 5,
 		WASMDir:              "./assets/wasm",
 		AesKey:               genAESKey(),
+		TelemetryDisable:     true,
 	})
 
 	if err != nil {
@@ -820,6 +821,7 @@ func runServer() {
 		PubSubService:   d.PubSubService,
 		MetricsService:  d.MetricsService,
 		KVService:       d.KVService,
+		Telemetry:       d.Telemetry,
 	})
 
 	if err != nil {

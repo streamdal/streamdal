@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"strings"
 	"time"
@@ -65,12 +66,8 @@ func CtxStringValue(ctx context.Context, key string) string {
 	return values[0]
 }
 
-func PtrStr(s *string) string {
-	if s == nil {
-		return ""
-	}
-
-	return *s
+func Pointer[T any](val T) *T {
+	return &val
 }
 
 func CtxRequestId(ctx context.Context) string {
@@ -224,14 +221,6 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 }
 
-func StringPtr(in string) *string {
-	return &in
-}
-
-func BoolPtr(in bool) *bool {
-	return &in
-}
-
 func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*protos.GetAllResponsePipelines {
 	if config == nil {
 		return nil
@@ -312,4 +301,88 @@ func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
 			},
 		},
 	}
+}
+
+// GrpcMethodCounterName turns a gRPC method name into a counter name for statsd
+// This turns a string such as "/protos.External/GetSchema" into "grpc_method_external_get_schema_total"
+func GrpcMethodCounterName(method string) string {
+	parts := strings.Split(method, "/")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	which := "external"
+	if parts[1] == "protos.Internal" {
+		which = "internal"
+	}
+
+	// Loop over each character in the method name and replace upper case characters with an underscore
+	// and the lowercase version
+	var op string
+	for _, c := range parts[2] {
+		if c >= 'A' && c <= 'Z' {
+			op += fmt.Sprintf("_%c", c+32)
+		} else {
+			op += string(c)
+		}
+	}
+
+	// Trim leading underscore since all gRPC methods start with a capital letter
+	op = strings.TrimPrefix(op, "_")
+
+	return fmt.Sprintf("grpc_method_%s_%s_total", which, op)
+}
+
+// GenerateNodeID will generate a uuid node ID from the given install ID and node name
+// This ensures that the node ID is deterministic and consistent across restarts since
+// we have no local storage.
+func GenerateNodeID(installID, nodeName string) string {
+	hash := sha256.Sum256([]byte(installID + nodeName))
+
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		return GenerateUUID()
+	}
+
+	return id.String()
+}
+
+// GetStepType transforms a protobuf enum of a step type into a string for use with telemetry
+func GetStepType(step *protos.PipelineStep) string {
+	switch {
+	case step.GetDetective() != nil:
+		return "detective"
+	case step.GetTransform() != nil:
+		return "transform"
+	case step.GetKv() != nil:
+		return "kv"
+	case step.GetHttpRequest() != nil:
+		return "http"
+	case step.GetEncode() != nil:
+		return "encode"
+	case step.GetDecode() != nil:
+		return "decode"
+	case step.GetValidJson() != nil:
+		return "valid_json"
+	default:
+		return "unknown"
+	}
+}
+
+// GetStepSubType transforms a protobuf enum into a string for use with telemetry
+// This is used for detective, transform, and KV steps.
+func GetStepSubType(step *protos.PipelineStep) string {
+	var st string
+	switch {
+	case step.GetDetective() != nil:
+		st = strings.Replace(step.GetDetective().Type.String(), "DETECTIVE_TYPE_", "", -1)
+	case step.GetTransform() != nil:
+		st = strings.Replace(step.GetTransform().Type.String(), "TRANSFORM_TYPE_", "", -1)
+	case step.GetKv() != nil:
+		st = strings.Replace(step.GetKv().Action.String(), "KVAction_KV_ACTION_", "", -1)
+	default:
+		st = ""
+	}
+
+	return strings.ToLower(st)
 }

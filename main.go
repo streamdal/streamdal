@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
@@ -51,9 +51,19 @@ func main() {
 		log.WithError(err).Fatal("could not setup dependencies")
 	}
 
+	logrus.Debugf("Install ID: '%s'", d.Config.InstallID)
+	logrus.Debugf("Node ID: '%s'", d.Config.NodeID)
+
+	// Clean up telemetry on shutdown
+	defer func(Telemetry statsd.Statter) {
+		if err := Telemetry.Close(); err != nil {
+			logrus.Error(err)
+		}
+	}(d.Telemetry)
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, syscall.SIGTERM)
+	signal.Notify(c, os.Kill)
 
 	go func() {
 		sig := <-c
@@ -84,6 +94,9 @@ func run(d *deps.Dependencies) error {
 			MetricsService:  d.MetricsService,
 			KVService:       d.KVService,
 			DemoMode:        d.Config.DemoMode,
+			Telemetry:       d.Telemetry,
+			InstallID:       d.Config.InstallID,
+			NodeID:          d.Config.NodeID,
 		})
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API setup")
@@ -134,18 +147,7 @@ func run(d *deps.Dependencies) error {
 
 	displayInfo(d)
 
-	if d.Config.SeedDummyData {
-		if err := d.Seed(d.ShutdownContext); err != nil {
-			return errors.Wrap(err, "error during seed")
-		}
-	}
-
-	clusterID, err := d.StoreService.GetStreamdalID(d.ShutdownContext)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	logrus.Debugf("Cluster ID '%s'", clusterID)
+	go d.RunUptimeTelemetry()
 
 	// If shutting down, no need to listen for errCh
 	select {
@@ -153,7 +155,7 @@ func run(d *deps.Dependencies) error {
 		fmt.Println("received an error on errChan in run(): ", err)
 		return err
 	case <-d.ShutdownContext.Done():
-		// Give components a moment to shutdown
+		// Give components a moment to shut down
 		time.Sleep(5 * time.Second)
 		logrus.Info("Shutting down...")
 		return nil

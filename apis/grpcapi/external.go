@@ -3,12 +3,14 @@ package grpcapi
 import (
 	"bytes"
 	"context"
+	"crypto/sha1"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
@@ -155,7 +157,7 @@ MAIN:
 			}()
 		case <-keepaliveTicker.C:
 			if err := server.Send(&protos.GetAllResponse{
-				XKeepalive: util.BoolPtr(true),
+				XKeepalive: util.Pointer(true),
 			}); err != nil {
 				s.log.Errorf("GetAllStream(): unable to send keepalive message: %v", err)
 			}
@@ -332,6 +334,23 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
+	// Send telemetry
+	telTags := []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "detached"},
+	}
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
+
+	for _, step := range req.Pipeline.Steps {
+		stepTags := []statsd.Tag{
+			{"install_id", s.Options.InstallID},
+			{"pipeline_id", req.Pipeline.Id},
+			{"step_type", util.GetStepType(step)},
+		}
+
+		_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumSteps, 1, 1.0, stepTags...)
+	}
+
 	return &protos.CreatePipelineResponse{
 		Message:    "Pipeline created successfully",
 		PipelineId: req.Pipeline.Id,
@@ -348,8 +367,9 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Is this a known pipeline?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.Pipeline.Id); err != nil {
-		if err == store.ErrPipelineNotFound {
+	originalPipeline, err := s.Options.StoreService.GetPipeline(ctx, req.Pipeline.Id)
+	if err != nil {
+		if errors.Is(err, store.ErrPipelineNotFound) {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
@@ -366,6 +386,9 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// Send telemetry
+	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
+
 	// Pipeline exists - broadcast it as there might be servers that have
 	// a client that has an active registration using this pipeline (and it should
 	// get updated)
@@ -380,6 +403,56 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}, nil
 }
 
+// sendStepDeltaTelemetry sends telemetry for the delta between the original and updated pipeline steps
+// We use a simple sha1 hash of the step in order to account for any modifications to the step. For example
+// if a step type changes from detective to transform, we still want to count it as a step deletion and addition
+// since we have the step type as a tag. Otherwise we might be incrementing/decrementing with the wrong tags.
+func (s *ExternalServer) sendStepDeltaTelemetry(original, updated *protos.Pipeline) {
+	originalSteps := make(map[string]*protos.PipelineStep)
+	for _, step := range original.Steps {
+		hash := fmt.Sprintf("%x", sha1.Sum([]byte(step.String())))
+		originalSteps[hash] = step
+	}
+
+	updatedSteps := make(map[string]*protos.PipelineStep)
+	for _, step := range updated.Steps {
+		hash := fmt.Sprintf("%x", sha1.Sum([]byte(step.String())))
+		updatedSteps[hash] = step
+	}
+
+	// Perform delta on steps in originalPipeline vs updateSteps
+	for _, step := range original.Steps {
+		// Step not included in updated steps, means it was deleted or type modified
+		if _, ok := updatedSteps[step.String()]; !ok {
+			// Step was deleted
+			stepTags := []statsd.Tag{
+				{"install_id", s.Options.InstallID},
+				{"pipeline_id", original.Id},
+				{"step_type", util.GetStepType(step)},
+			}
+
+			_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumSteps, -1, 1.0, stepTags...)
+			continue
+		}
+	}
+
+	for _, step := range updated.Steps {
+		// Step not included in original steps, means it was added or type modified
+		if _, ok := originalSteps[step.String()]; !ok {
+			// Step was added
+			stepTags := []statsd.Tag{
+				{"install_id", s.Options.InstallID},
+				{"pipeline_id", original.Id},
+				{"step_type", util.GetStepType(step)},
+				{"step_subtype", util.GetStepSubType(step)},
+			}
+
+			_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumSteps, 1, 1.0, stepTags...)
+			continue
+		}
+	}
+}
+
 func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeletePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -391,7 +464,7 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
+		if errors.Is(err, store.ErrPipelineNotFound) {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
@@ -402,6 +475,23 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	if err := s.Options.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
+
+	// Send telemetry
+	status := "detached"
+	if s.Options.StoreService.IsPipelineAttachedAny(ctx, req.PipelineId) {
+		status = "attached"
+	}
+
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", status},
+	}...)
+
+	// Zero out step gauge for this pipeline
+	s.Options.Telemetry.Gauge(types.GaugeUsageNumSteps, 0, 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"pipeline_id", req.PipelineId},
+	}...)
 
 	// Now broadcast delete
 	if err := s.Options.BusService.BroadcastDeletePipeline(ctx, req); err != nil {
@@ -426,7 +516,7 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
+		if errors.Is(err, store.ErrPipelineNotFound) {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
@@ -436,6 +526,16 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 	if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
+
+	// Send telemetry
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "attached"},
+	}...)
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "detached"},
+	}...)
 
 	// Pipeline exists, broadcast attach
 	if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
@@ -514,6 +614,13 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 	if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
 		s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
 	}
+
+	// Send telemetry
+	telTags := []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "attached"},
+	}
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
@@ -600,7 +707,7 @@ func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.Cre
 		return demoResponse(ctx)
 	}
 
-	req.Notification.Id = util.StringPtr(util.GenerateUUID())
+	req.Notification.Id = util.Pointer(util.GenerateUUID())
 
 	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
@@ -852,7 +959,7 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 
 		deleteReq := &protos.DeleteAudienceRequest{
 			Audience: audience,
-			Force:    util.BoolPtr(true),
+			Force:    util.Pointer(true),
 		}
 
 		if err := s.Options.StoreService.DeleteAudience(ctx, deleteReq); err != nil {
@@ -966,7 +1073,7 @@ func (s *ExternalServer) Tail(req *protos.TailRequest, server protos.External_Ta
 			}
 		case <-keepaliveTicker.C:
 			if err := server.Send(&protos.TailResponse{
-				XKeepalive: util.BoolPtr(true),
+				XKeepalive: util.Pointer(true),
 			}); err != nil {
 				s.log.Errorf("Tail(): error sending keepalive message: %s", err)
 			}
@@ -1046,7 +1153,7 @@ func (s *ExternalServer) GetMetrics(_ *protos.GetMetricsRequest, server protos.E
 			}
 		case <-keepaliveTicker.C:
 			if err := server.Send(&protos.GetMetricsResponse{
-				XKeepalive: util.BoolPtr(true),
+				XKeepalive: util.Pointer(true),
 			}); err != nil {
 				s.log.Errorf("GetMetrics(): error sending keepalive message: %s", err)
 			}
@@ -1087,7 +1194,7 @@ func (s *ExternalServer) GetAudienceRates(_ *protos.GetAudienceRatesRequest, ser
 			}
 		case <-keepaliveTicker.C:
 			if err := server.Send(&protos.GetAudienceRatesResponse{
-				XKeepalive: util.BoolPtr(true),
+				XKeepalive: util.Pointer(true),
 			}); err != nil {
 				s.log.Errorf("GetAudienceRates(): error sending keepalive message: %s", err)
 			}
@@ -1138,7 +1245,7 @@ func (s *ExternalServer) AppRegistrationStatus(_ context.Context, req *protos.Ap
 }
 
 func (s *ExternalServer) AppRegister(ctx context.Context, req *protos.AppRegistrationRequest) (*protos.StandardResponse, error) {
-	clusterID, err := s.Options.StoreService.GetStreamdalID(ctx)
+	clusterID, err := s.Options.StoreService.GetInstallID(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get streamdal ID")
 	}
@@ -1153,7 +1260,7 @@ func (s *ExternalServer) AppVerifyRegistration(_ context.Context, req *protos.Ap
 }
 
 func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppRegisterRejectRequest) (*protos.StandardResponse, error) {
-	clusterID, err := s.Options.StoreService.GetStreamdalID(ctx)
+	clusterID, err := s.Options.StoreService.GetInstallID(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get streamdal ID")
 	}

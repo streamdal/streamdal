@@ -11,25 +11,9 @@ import (
 	"github.com/streamdal/protos/build/go/protos"
 )
 
-const (
-	RateBytes     RateCounterType = "bytes"
-	RateProcessed RateCounterType = "processed"
-)
-
 type RateCounter struct {
 	Bytes     *ratecounter.RateCounter `json:"bytes"`
 	Processed *ratecounter.RateCounter `json:"processed"`
-}
-
-type RateCounterType string
-
-func (m *Metrics) IncreaseRate(ctx context.Context, t RateCounterType, aud *protos.Audience, value int64) {
-	counter := m.GetRateCounter(ctx, aud)
-	if t == RateBytes {
-		counter.Bytes.Incr(value)
-	} else {
-		counter.Processed.Incr(value)
-	}
 }
 
 func (m *Metrics) GetRateCounter(_ context.Context, aud *protos.Audience) *RateCounter {
@@ -59,7 +43,12 @@ func (m *Metrics) GetAllRateCounters(_ context.Context) map[string]*RateCounter 
 	m.rateCountersMtx.RLock()
 	defer m.rateCountersMtx.RUnlock()
 
-	return m.rateCounters
+	ret := make(map[string]*RateCounter)
+	for k, v := range m.rateCounters {
+		ret[k] = v
+	}
+
+	return ret
 }
 
 // groupAudienceToStr returns a string representation of an audience, but without the audience's operation name
