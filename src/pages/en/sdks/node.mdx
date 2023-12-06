@@ -21,24 +21,24 @@ most recent.
 <br />
 <br />
 
-Welcome to the Node Client Guide for Streamdal! If you're harnessing the power 
-of Node.js and aim to supercharge your data operations, you're on the right 
-track. Integrating Streamdal into your Node applications is both efficient and 
+Welcome to the Node Client Guide for Streamdal! If you're harnessing the power
+of Node.js and aim to supercharge your data operations, you're on the right
+track. Integrating Streamdal into your Node applications is both efficient and
 straightforward with our Node SDK.
 
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>For detailed information on the SDK and its functionalities, refer to 
+    <p>For detailed information on the SDK and its functionalities, refer to
     the [SDK README](https://github.com/streamdal/go-sdk).</p>
   </div>
 </Notification>
 
 ## Instrumentation
 
-Start with the [instrumentation guide](../../guides/instrumentation) if you 
-haven't already. It will walk you through the process of setting up Streamdal 
-and its components. 
+Start with the [instrumentation guide](../../guides/instrumentation) if you
+haven't already. It will walk you through the process of setting up Streamdal
+and its components.
 
 ## Integrate the SDK:
 
@@ -51,7 +51,7 @@ npm install @streamdal/node-sdk
 Here's a basic example to help you get started with Streamdal Node SDK:
 
 ```bash
-import { Streamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk/streamdal.js";
+import { Streamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk";
 
 const config: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",
@@ -79,7 +79,7 @@ export const example = async () => {
   console.log("Streamdal Response:");
   console.dir(result, {depth: 20});
 };
-``` 
+```
 This example demonstrates how to initialize a new instance of the Streamdal SDK, and how to process data through a pipeline. You simply need to create a configuration object, an audience object, and then call the processPipeline method on a new Streamdal instance. The result will be logged to the console.
 
 ## Wasm Execution
@@ -88,9 +88,9 @@ This example demonstrates how to initialize a new instance of the Streamdal SDK,
   <img src={info} alt="Information" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
     <p>
-    To run pipelines with minimal overhead, the Streamdal Node SDK ships and executes pipeline rules as 
-    <span class="yhighlight">Wasm</span>. If you are using a Node version lower than 
-    <span class="yhighlight">20.*</span>, you'll need to enable Wasm functionality in your Node app by 
+    To run pipelines with minimal overhead, the Streamdal Node SDK ships and executes pipeline rules as
+    <span class="yhighlight">Wasm</span>. If you are using a Node version lower than
+    <span class="yhighlight">20.*</span>, you'll need to enable Wasm functionality in your Node app by
     supplying the flag as shown below:
     </p>
   </div>
