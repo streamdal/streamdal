@@ -8,7 +8,7 @@ To use the sdk in your node app:
 
 `npm install @streamdal/node-sdk`
 
-Then construct an instance of `"@streamdal/node-sdk/streamdal.js"` and use that
+Then construct an instance of `Streamdal` from `"@streamdal/node-sdk"` and use that
 to process your data:
 
 ```typescript

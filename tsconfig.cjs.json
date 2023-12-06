@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./build/cjs",
-    "module": "commonjs",
-  },
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
-}

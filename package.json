@@ -13,17 +13,14 @@
   ],
   "type": "module",
   "exports": {
-    "./*": {
-      "types": "./types/*.d.ts",
-      "require": "./cjs/*.js",
-      "import": "./esm/*.js",
-      "default": "./esm/*.js"
-    }
+    "require": "./cjs/streamdal.js",
+    "import": "./esm/streamdal.js"
   },
+  "main": "cjs/streamdal.js",
   "scripts": {
-    "build": "npm run clean && npm run build:main && ./generatePackages.sh",
-    "build:main": "npx tsc -p tsconfig.types.json && npx tsc -p tsconfig.esm.json && npx tsc -p tsconfig.cjs.json",
-    "copy:package": "mkdir -p ./build && cp package.json ./build/package.json",
+    "build": "npm run clean && npm run build:esm && npm run build:commonjs && ./generatePackages.sh",
+    "build:esm": "npx tsc --module commonjs --outDir build/cjs/",
+    "build:commonjs": "npx tsc --module es2022 --outDir build/esm/",
     "clean": "rimraf build",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",

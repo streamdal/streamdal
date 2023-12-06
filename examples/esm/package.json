@@ -12,7 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@streamdal/node-sdk": "^0.1.12",
+    "@streamdal/node-sdk": "^0.1.18",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.1.6"
   }

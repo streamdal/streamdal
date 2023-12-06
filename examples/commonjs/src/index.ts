@@ -2,7 +2,7 @@ const {
   OperationType,
   Streamdal,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require("@streamdal/node-sdk/streamdal");
+} = require("@streamdal/node-sdk");
 
 const exampleData = {
   boolean_t: true,

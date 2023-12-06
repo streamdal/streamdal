@@ -4,7 +4,7 @@ import {
   Streamdal,
   StreamdalConfigs,
   StreamdalResponse,
-} from "@streamdal/node-sdk/streamdal";
+} from "@streamdal/node-sdk";
 
 const exampleData = {
   boolean_t: true,
