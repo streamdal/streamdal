@@ -90,6 +90,9 @@ ul:not(details > ul, .nav-groups) {
 }
 
 /* Typography */
+.main-content {
+  letter-spacing: initial;
+}
 h1,
 h2,
 h3,
@@ -136,7 +139,7 @@ h5 {
 }
 
 .content ul {
-  line-height: 1.1em;
+  line-height: 150%;
 }
 
 p,
