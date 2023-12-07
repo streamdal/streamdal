@@ -9,6 +9,7 @@ pub mod sp_internal;
 pub mod sp_kv;
 pub mod sp_notify;
 pub mod sp_pipeline;
+pub mod sp_sdk;
 pub mod sp_shared;
 pub mod sp_steps_custom;
 pub mod sp_steps_decode;

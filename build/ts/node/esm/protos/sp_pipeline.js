@@ -26,13 +26,23 @@ export var PipelineStepCondition;
      */
     PipelineStepCondition[PipelineStepCondition["UNSET"] = 0] = "UNSET";
     /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT = 1;
+     * Abort executing the current pipeline AND continue executing any other pipelines
+     *
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
      */
-    PipelineStepCondition[PipelineStepCondition["ABORT"] = 1] = "ABORT";
+    PipelineStepCondition[PipelineStepCondition["ABORT_CURRENT"] = 1] = "ABORT_CURRENT";
     /**
+     * Notify the server about the step condition
+     *
      * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_NOTIFY = 2;
      */
     PipelineStepCondition[PipelineStepCondition["NOTIFY"] = 2] = "NOTIFY";
+    /**
+     * Abort executing ALL pipelines
+     *
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
+     */
+    PipelineStepCondition[PipelineStepCondition["ABORT_ALL"] = 3] = "ABORT_ALL";
 })(PipelineStepCondition || (PipelineStepCondition = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Pipeline$Type extends MessageType {
