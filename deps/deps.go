@@ -204,11 +204,15 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		d.Telemetry = &telemetry.DummyTelemetry{}
 	}
 
-	//encryptionService, err := encryption.New(cfg.AesKey)
-	//if err != nil {
-	//	return errors.Wrap(err, "unable to create new encryption service")
-	//}
-	//d.EncryptionService = encryptionService
+	if cfg.AesKey == "" {
+		d.EncryptionService = encryption.NewPlainText()
+	} else {
+		e, err := encryption.New(cfg.AesKey)
+		if err != nil {
+			return errors.Wrap(err, "unable to create new encryption service")
+		}
+		d.EncryptionService = e
+	}
 
 	c, err := cmd.New()
 	if err != nil {
@@ -235,6 +239,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		NodeName:     cfg.NodeName,
 		SessionTTL:   cfg.SessionTTL,
 		Telemetry:    d.Telemetry,
+		Encryption:   d.EncryptionService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
