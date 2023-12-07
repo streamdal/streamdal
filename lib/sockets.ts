@@ -98,13 +98,16 @@ export const tailSocket = (path: string, audience: Audience) => {
       tailDroppingSignal.value = !!(tailBufferSignal.value &&
         tailBufferSignal.value.length > MAX_TAIL_SIZE);
 
-      tailBufferSignal.value = [
+      const n = [
         ...(tailBufferSignal.value || []).slice(-MAX_TAIL_SIZE),
         {
           timestamp: new Date(parsedTail.timestamp),
           data: parsedTail.data,
+          originalData: parsedTail.originalData,
         },
       ];
+
+      tailBufferSignal.value = n;
     } catch (e) {
       console.error("error parsing tail data", e);
     }

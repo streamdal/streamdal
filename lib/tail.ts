@@ -45,13 +45,13 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
   sampling: number;
 }) => {
   const sendResponse = (response: TailResponse) => {
-    const data = response.newData && response.newData.length > 0
-      ? response.newData
-      : response.originalData;
     socket.send(
       JSON.stringify({
         timestamp: parseDate(response.timestampNs),
-        data: formatData(new TextDecoder().decode(data)),
+        data: formatData(new TextDecoder().decode(response.newData)),
+        originalData: formatData(
+          new TextDecoder().decode(response.originalData),
+        ),
       }),
     );
   };
