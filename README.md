@@ -149,7 +149,7 @@ res = client.process(
 
 **[Node.js](https://github.com/streamdal/node-sdk)**
 ```typescript
-import { OperationType, Streamdal } from "@streamdal/node-sdk/streamdal";
+import { OperationType, Streamdal } from "@streamdal/node-sdk";
 
 export const example = async () => {
   const streamdal = new Streamdal({
