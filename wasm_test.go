@@ -214,5 +214,44 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
 		})
+
+		It("can scan the whole payload", func() {
+			req.InputPayload = []byte(`{"object": {"type": "streamdal", "cc_num": "4111111111111111"}}`)
+
+			det := req.Step.GetDetective()
+			det.Path = stringPtr("")
+			det.Args = []string{""}
+			det.Type = steps.DetectiveType_DETECTIVE_TYPE_PII_CREDIT_CARD
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+
+			// Check that we don' find it
+			req.InputPayload = []byte(`{"object": {"type": "streamdal", "cc_num": "1234"}}`)
+
+			data, err = proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err = f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp = &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+		})
+
 	})
 })
