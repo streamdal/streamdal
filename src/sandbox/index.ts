@@ -3,6 +3,8 @@ import { Audience } from "@streamdal/protos/protos/sp_common";
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
 import { billingExample } from "./billing.js";
 
+export const QUIET = false;
+
 const exampleData = {
   boolean_t: true,
   boolean_f: false,
@@ -99,35 +101,37 @@ const audienceCProducer: Audience = {
 };
 
 const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
-  console.log("--------------------------------");
-  console.log("pipeline request start", new Date());
-  console.log(
+  if (QUIET) {
+    console.debug = () => null;
+    console.dir = () => null;
+  }
+  console.debug("--------------------------------");
+  console.debug("pipeline request start", new Date());
+  console.debug(
     `sending pipeline request for ${audience.serviceName} - ${OperationType[
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, message, data } = await streamdal.processPipeline({
+  const { error, errorMessage, data } = await streamdal.process({
     audience: audience,
     data: new TextEncoder().encode(JSON.stringify(input)),
   });
   //
   // no active pipeline messages are technically errors
   // but more informational
-  error &&
-    !message?.startsWith("no active pipeline") &&
-    console.log("result error", error);
-  console.log("result message", message);
-  console.log("result data:");
+  console.debug("result error", error);
+  error && console.debug("error message", errorMessage);
+  console.debug("result data:");
   try {
     data && data.length > 0
       ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
-      : console.log("no data returned");
+      : console.debug("no data returned");
   } catch (e) {
     console.error("could not parse data", e);
   }
-  console.log("pipeline request done", new Date());
-  console.log("--------------------------------");
-  console.log("\n");
+  console.debug("pipeline request done", new Date());
+  console.debug("--------------------------------");
+  console.debug("\n");
 };
 
 export const runPipeline = (

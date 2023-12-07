@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { Audience } from "@streamdal/protos/protos/sp_common";
 
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
-import { runPipeline } from "./index.js";
+import { QUIET, runPipeline } from "./index.js";
 
 const serviceBillingConfig: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",
@@ -79,7 +79,6 @@ const parseJson = (d: string, i: number): any => {
     return d ? JSON.parse(d) : null;
   } catch (e) {
     console.error("error parsing sample data to json", e);
-    console.log("error line", i);
   }
   return null;
 };

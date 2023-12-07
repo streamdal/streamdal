@@ -1,8 +1,13 @@
 import { PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
-import { WASMRequest, WASMResponse } from "@streamdal/protos/protos/sp_wsm";
+import {
+  WASMExitCode,
+  WASMRequest,
+  WASMResponse,
+} from "@streamdal/protos/protos/sp_wsm";
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 
+import { MAX_PAYLOAD_SIZE } from "./process.js";
 import { internal } from "./register.js";
 
 const [nodeVersionMajor] = process.versions.node.split(".");
@@ -30,10 +35,8 @@ export const instantiateWasm = async (
 
   const wasm = await WebAssembly.compile(wasmBytes);
   const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
-  internal.wasmModules.set(
-    wasmId,
-    await WebAssembly.instantiate(wasm, importObject)
-  );
+  const instantiated = await WebAssembly.instantiate(wasm, importObject);
+  internal.wasmModules.set(wasmId, instantiated);
 };
 
 export const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
@@ -49,11 +52,20 @@ export const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
 
 export const runWasm = ({
   step,
-  data,
+  originalData,
 }: {
   step: PipelineStep;
-  data: Uint8Array;
+  originalData: Uint8Array;
 }) => {
+  if (originalData.length > MAX_PAYLOAD_SIZE) {
+    return {
+      outputStep: null,
+      outputPayload: new Uint8Array(),
+      exitCode: WASMExitCode.WASM_EXIT_CODE_INTERNAL_ERROR,
+      exitMsg: "Payload exceeds maximum size",
+    };
+  }
+
   const request = WASMRequest.create({
     step: {
       name: step.name,
@@ -61,7 +73,7 @@ export const runWasm = ({
       onFailure: step.onFailure,
       step: step.step,
     },
-    inputPayload: data,
+    inputPayload: originalData,
   });
 
   const { exports } = internal.wasmModules.get(step.WasmId!);

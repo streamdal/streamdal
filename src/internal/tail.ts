@@ -6,6 +6,7 @@ import {
 } from "@streamdal/protos/protos/sp_common";
 
 import { PipelineConfigs, TailRequest } from "./process.js";
+import { audienceKey, internal } from "./register.js";
 
 let tailStream: ClientStreamingCall<TailResponse, StandardResponse> | null =
   null;
@@ -23,11 +24,13 @@ export const openTailStream = (configs: PipelineConfigs) => {
 
 export const sendTail = ({
   configs,
-  tails,
   audience,
   originalData,
   newData,
 }: TailRequest) => {
+  const key = audienceKey(audience);
+  const tails = internal.audiences.get(key)?.tails;
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   tails?.forEach(async (tailStatus, tailRequestId) => {
     if (!tailStatus.tail) {

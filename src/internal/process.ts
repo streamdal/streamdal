@@ -4,31 +4,22 @@ import {
   PipelineStep,
   PipelineStepCondition,
 } from "@streamdal/protos/protos/sp_pipeline";
+import {
+  AbortStatus,
+  PipelineStatus,
+  SDKResponse,
+  StepStatus,
+} from "@streamdal/protos/protos/sp_sdk";
 import { WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
-import { Configs, StreamdalRequest, StreamdalResponse } from "../streamdal.js";
+import { Configs, StreamdalRequest } from "../streamdal.js";
 import { addAudience } from "./audience.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
-import { EnhancedStep, initPipelines, InternalPipeline } from "./pipeline.js";
+import { initPipelines, InternalPipeline } from "./pipeline.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 import { sendSchema } from "./schema.js";
 import { sendTail } from "./tail.js";
 import { runWasm } from "./wasm.js";
-
-export interface StepStatus {
-  stepName: string;
-  pipelineId: string;
-  pipelineName: string;
-  error: boolean;
-  message?: string;
-  abort: boolean;
-  schema: any;
-}
-
-export interface PipelinesStatus {
-  data: Uint8Array;
-  stepStatuses: StepStatus[];
-}
 
 export interface PipelineConfigs {
   grpcClient: IInternalClient;
@@ -45,31 +36,21 @@ export interface TailRequest {
   newData?: Uint8Array;
 }
 
-const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1 megabyte
+export const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1 megabyte
 const MAX_PIPELINE_RETRIES = 10;
 const PIPELINE_RETRY_INTERVAL = 1000;
 
-//
-// add pipeline information to the steps so we can log/notify
-// appropriately as we go
-const mapAllSteps = (pipeline: InternalPipeline): EnhancedStep[] =>
-  pipeline.steps.map((s: PipelineStep) => ({
-    ...s,
-    pipelineId: pipeline.id,
-    pipelineName: pipeline.name,
-  })) as EnhancedStep[];
-
-export const retryProcessPipeline = async ({
+export const retryProcessPipelines = async ({
   configs,
   audience,
   data,
 }: {
   configs: Configs;
-} & StreamdalRequest): Promise<StreamdalResponse> => {
+} & StreamdalRequest): Promise<SDKResponse> => {
   let retries = 1;
   try {
     if (internal.registered) {
-      return processPipeline({
+      return processPipelines({
         configs,
         audience,
         data,
@@ -91,7 +72,7 @@ export const retryProcessPipeline = async ({
           console.debug(`retrying process pipeline...`);
           clearInterval(intervalId);
           return resolve(
-            processPipeline({
+            processPipelines({
               configs,
               audience,
               data,
@@ -108,117 +89,140 @@ export const retryProcessPipeline = async ({
   } catch (e) {
     console.error("Error running process pipeline", e);
   }
-  const message =
+  const errorMessage =
     "Node SDK not registered with the server, skipping pipeline. Is the server running?";
-  console.error(message);
+  console.error(errorMessage);
   return Promise.resolve({
     data,
+    pipelineStatus: [],
     error: true,
-    message,
+    errorMessage,
   });
 };
 
-export const processPipeline = async ({
-  configs,
+export const processPipeline = ({
+  originalData,
   audience,
-  data,
+  configs,
+  pipeline,
 }: {
+  originalData: Uint8Array;
+  audience: Audience;
   configs: Configs;
-} & StreamdalRequest): Promise<StreamdalResponse> => {
-  if (!internal.pipelineInitialized) {
-    await initPipelines(configs);
-  }
-
-  await addAudience({ configs: configs, audience });
-
-  const key = audienceKey(audience);
-  const pipeline = internal.pipelines.get(key);
-  const tails = internal.audiences.get(key)?.tails;
-
-  void audienceMetrics(audience, data.length);
-
-  if (!pipeline || pipeline.paused) {
-    const message =
-      "no active pipeline found for this audience, returning data";
-    console.debug(message);
-
-    sendTail({
-      configs,
-      tails,
-      audience,
-      originalData: data,
-    });
-
-    return { data, error: true, message };
-  }
-
-  //
-  // hold for tail
-  const originalData = data;
-  const allSteps = mapAllSteps(pipeline);
-
-  //
-  // wrapping data up in a status object so we can track
-  // statuses pass along updated data from step to step
-  let pipelineStatus: PipelinesStatus = {
-    data,
-    stepStatuses: [],
+  pipeline: InternalPipeline;
+}): { pipelineStatus: PipelineStatus; data: Uint8Array } => {
+  const pipelineStatus: PipelineStatus = {
+    id: pipeline.id,
+    name: pipeline.name,
+    stepStatus: [],
   };
+  let data = originalData;
 
-  for (const step of allSteps) {
+  for (const step of pipeline.steps) {
     if (configs.dryRun) {
       console.debug(
-        `Dry run set. Found pipeline step ${step.pipelineName} - ${step.name}...not running.`
+        `Dry run set. Found pipeline: ${pipeline.name}, step: ${step.name}...not running.`
       );
       continue;
     }
 
-    console.debug(
-      `running pipeline step ${step.pipelineName} - ${step.name}...`
-    );
+    console.debug(`running pipeline: ${pipeline.name}, step: ${step.name}...`);
 
-    pipelineStatus = runStep({
+    const { data: newData, stepStatus } = runStep({
+      originalData,
       audience,
       configs,
       step,
-      pipeline: pipelineStatus,
+      pipeline,
+    });
+    data = newData;
+    pipelineStatus.stepStatus = [...pipelineStatus.stepStatus, stepStatus];
+
+    if (
+      [AbortStatus.CURRENT, AbortStatus.ALL].includes(stepStatus.abortStatus)
+    ) {
+      break;
+    }
+  }
+  return { data, pipelineStatus };
+};
+
+export const processPipelines = async ({
+  configs,
+  audience,
+  data,
+}: { configs: Configs } & StreamdalRequest): Promise<SDKResponse> => {
+  await initPipelines(configs);
+  await addAudience({ configs: configs, audience });
+
+  const key = audienceKey(audience);
+  const pipelines = internal.pipelines.get(key);
+
+  void audienceMetrics(audience, data.length);
+
+  if (!pipelines) {
+    const errorMessage =
+      "no active pipelines found for this audience, returning data";
+    console.debug(errorMessage);
+
+    sendTail({
+      configs,
+      audience,
+      originalData: data,
     });
 
-    void sendSchema({ configs, audience, pipelineStatus });
+    return { data, error: true, errorMessage, pipelineStatus: [] };
+  }
 
-    console.debug(`pipeline step ${step.pipelineName} - ${step.name} complete`);
+  const response: SDKResponse = {
+    data,
+    pipelineStatus: [],
+    error: false,
+    errorMessage: "",
+  };
 
-    if (pipelineStatus.stepStatuses.at(-1)?.abort) {
+  for (const pipeline of pipelines.values()) {
+    const { data, pipelineStatus } = processPipeline({
+      originalData: response.data,
+      audience,
+      configs,
+      pipeline,
+    });
+    response.data = data;
+    response.pipelineStatus = [...response.pipelineStatus, pipelineStatus];
+
+    if (pipelineStatus.stepStatus.at(-1)?.abortStatus === AbortStatus.ALL) {
       break;
     }
   }
 
   sendTail({
     configs,
-    tails,
     audience,
-    originalData,
-    newData: data,
+    originalData: data,
+    newData: response.data,
   });
 
-  //
-  // For now top level response status is synonymous with the last step status
-  const finalStatus = pipelineStatus.stepStatuses.at(-1);
+  const finalStatus = response.pipelineStatus.at(-1)?.stepStatus.at(-1);
 
-  return {
-    ...pipelineStatus,
+  return Promise.resolve({
+    ...response,
     error: !!finalStatus?.error,
-    message: finalStatus?.message ?? "Success",
-  };
+    errorMessage: finalStatus?.errorMessage ?? "",
+  });
 };
 
-const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
-  console.debug("notifying error step", step);
+const notifyStep = async (
+  configs: PipelineConfigs,
+  step: PipelineStep,
+  pipeline: InternalPipeline
+) => {
+  console.debug("notifying error step", step.name);
   try {
     await configs.grpcClient.notify(
       {
-        pipelineId: step.pipelineId,
-        stepName: step.stepName,
+        pipelineId: pipeline.id,
+        stepName: step.name,
         occurredAtUnixTsUtc: Date.now().toString(),
       },
       { meta: { "auth-token": configs.streamdalToken } }
@@ -228,77 +232,76 @@ const notifyStep = async (configs: PipelineConfigs, step: StepStatus) => {
   }
 };
 
-export const resultCondition = (
-  configs: PipelineConfigs,
-  conditions: PipelineStepCondition[],
-  stepStatus: StepStatus
-) => {
-  if (conditions.includes(PipelineStepCondition.NOTIFY)) {
-    void notifyStep(configs, stepStatus);
-  }
+export const resultCondition = ({
+  configs,
+  step,
+  pipeline,
+  stepStatus,
+}: {
+  configs: PipelineConfigs;
+  step: PipelineStep;
+  pipeline: InternalPipeline;
+  stepStatus: StepStatus;
+}) => {
+  const conditions = stepStatus.error ? step.onFailure : step.onSuccess;
 
-  if (conditions.includes(PipelineStepCondition.ABORT)) {
-    stepStatus.abort = true;
-  }
+  conditions.includes(PipelineStepCondition.NOTIFY) &&
+    void notifyStep(configs, step, pipeline);
+
+  stepStatus.abortStatus = conditions.includes(PipelineStepCondition.ABORT_ALL)
+    ? AbortStatus.ALL
+    : conditions.includes(PipelineStepCondition.ABORT_CURRENT)
+    ? AbortStatus.CURRENT
+    : AbortStatus.UNSET;
 };
 
 export const runStep = ({
+  originalData,
   audience,
   configs,
   step,
   pipeline,
 }: {
+  originalData: Uint8Array;
   audience: Audience;
   configs: PipelineConfigs;
-  step: EnhancedStep;
-  pipeline: PipelinesStatus;
-}): PipelinesStatus => {
+  step: PipelineStep;
+  pipeline: InternalPipeline;
+}): { stepStatus: StepStatus; data: Uint8Array } => {
   const stepStatus: StepStatus = {
-    stepName: step.name,
-    pipelineId: step.pipelineId,
-    pipelineName: step.pipelineName,
+    name: step.name,
     error: false,
-    abort: false,
-    schema: null,
+    errorMessage: "",
+    abortStatus: AbortStatus.UNSET,
   };
 
-  let data = pipeline.data;
-  const payloadSize = data.length;
+  const payloadSize = originalData.length;
+  let data = originalData;
 
   try {
-    const { outputPayload, outputStep, exitCode, exitMsg } =
-      payloadSize < MAX_PAYLOAD_SIZE
-        ? runWasm({
-            step,
-            data,
-          })
-        : {
-            outputStep: null,
-            outputPayload: new Uint8Array(),
-            exitCode: WASMExitCode.WASM_EXIT_CODE_FAILURE,
-            exitMsg: "Payload exceeds maximum size",
-          };
+    const { outputPayload, outputStep, exitCode, exitMsg } = runWasm({
+      step,
+      originalData,
+    });
 
     //
     // output gets passed back as data for the next function
-    data =
-      exitCode === WASMExitCode.WASM_EXIT_CODE_SUCCESS ? outputPayload : data;
-    stepStatus.error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
-    stepStatus.message = exitMsg;
-    stepStatus.schema = outputStep;
+    const error = exitCode !== WASMExitCode.WASM_EXIT_CODE_SUCCESS;
+    data = error ? originalData : outputPayload;
+    stepStatus.error = error;
+    stepStatus.errorMessage = error ? exitMsg : "";
+
+    !error &&
+      step.name === "Infer Schema" &&
+      void sendSchema({ configs, audience, schema: outputStep });
   } catch (error: any) {
     console.error(`error running pipeline step - ${step.name}`, error);
     stepStatus.error = true;
-    stepStatus.message = error.toString();
-    stepStatus.abort = true;
+    stepStatus.errorMessage = error.toString();
   }
 
-  resultCondition(
-    configs,
-    stepStatus.error ? step.onFailure : step.onSuccess,
-    stepStatus
-  );
-  void stepMetrics(audience, stepStatus, payloadSize);
+  resultCondition({ configs, step, pipeline, stepStatus });
+  void stepMetrics({ audience, stepStatus, pipeline, payloadSize });
 
-  return { data, stepStatuses: [...pipeline.stepStatuses, stepStatus] };
+  return { data, stepStatus };
 };

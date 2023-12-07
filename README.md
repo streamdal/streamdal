@@ -31,7 +31,7 @@ const audience: Audience = {
 
 export const example = async () => {
   const streamdal = new Streamdal(config);
-  const result = await streamdal.processPipeline({
+  const result = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

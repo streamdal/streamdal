@@ -11,13 +11,12 @@ export type InternalPipeline = Pipeline & {
   paused?: boolean;
 };
 
-export type EnhancedStep = PipelineStep & {
-  pipelineId: string;
-  pipelineName: string;
-};
-
 export const initPipelines = async (configs: Configs) => {
   try {
+    if (internal.pipelineInitialized) {
+      return;
+    }
+
     console.debug("initializing pipelines");
     const { response }: { response: GetAttachCommandsByServiceResponse } =
       await configs.grpcClient.getAttachCommandsByService(
@@ -27,12 +26,12 @@ export const initPipelines = async (configs: Configs) => {
         { meta: { "auth-token": configs.streamdalToken } }
       );
 
-    for (const [k, v] of Object.entries(response.wasmModules)) {
-      void instantiateWasm(k, v.bytes);
+    for await (const [k, v] of Object.entries(response.wasmModules)) {
+      await instantiateWasm(k, v.bytes);
     }
 
-    for (const command of response.active) {
-      processResponse(command);
+    for await (const command of response.active) {
+      await processResponse(command);
     }
     internal.pipelineInitialized = true;
   } catch (e) {
@@ -40,7 +39,7 @@ export const initPipelines = async (configs: Configs) => {
   }
 };
 
-export const processResponse = (response: Command) => {
+export const processResponse = async (response: Command) => {
   if (!response.audience) {
     response.command.oneofKind !== "keepAlive" &&
       console.debug("command response has no audience, ignoring");
@@ -50,10 +49,10 @@ export const processResponse = (response: Command) => {
   switch (response.command.oneofKind) {
     case "attachPipeline":
       response.command.attachPipeline.pipeline &&
-        attachPipeline(
+        (await attachPipeline(
           response.audience,
           response.command.attachPipeline.pipeline
-        );
+        ));
       break;
     case "detachPipeline":
       detachPipeline(
@@ -81,31 +80,38 @@ export const processResponse = (response: Command) => {
   }
 };
 
-export const buildPipeline = (pipeline: Pipeline): Pipeline => {
+export const buildPipeline = async (pipeline: Pipeline): Promise<Pipeline> => {
   return {
     ...pipeline,
-    steps: pipeline.steps.map((step: PipelineStep) => {
-      void instantiateWasm(step.WasmId, step.WasmBytes);
-      return {
-        ...step,
-        WasmBytes: undefined,
-      };
-    }),
+    steps: await Promise.all(
+      pipeline.steps.map(async (step: PipelineStep) => {
+        await instantiateWasm(step.WasmId, step.WasmBytes);
+        return {
+          ...step,
+          WasmBytes: undefined,
+        };
+      })
+    ),
   };
 };
 
-export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
-  internal.pipelines.set(audienceKey(audience), {
-    ...buildPipeline(pipeline),
-    paused: false,
-  });
+export const attachPipeline = async (
+  audience: Audience,
+  pipeline: Pipeline
+) => {
+  const key = audienceKey(audience);
+  const existing = internal.pipelines.get(key);
+  const built = await buildPipeline(pipeline);
+  internal.pipelines.set(
+    key,
+    existing
+      ? existing.set(pipeline.id, built)
+      : new Map([[pipeline.id, built]])
+  );
 };
 
-export const detachPipeline = (audience: Audience, pipelineId: string) => {
-  const key = audienceKey(audience);
-  const p = internal.pipelines.get(key);
-  pipelineId === p?.id && internal.pipelines.delete(key);
-};
+export const detachPipeline = (audience: Audience, pipelineId: string) =>
+  internal.pipelines.get(audienceKey(audience))?.delete(pipelineId);
 
 export const togglePausePipeline = (
   audience: Audience,
@@ -113,8 +119,11 @@ export const togglePausePipeline = (
   paused: boolean
 ) => {
   const key = audienceKey(audience);
-  const p = internal.pipelines.get(key);
-  pipelineId === p?.id && internal.pipelines.set(key, { ...p, paused });
+  const existing = internal.pipelines.get(key);
+  const p = existing?.get(pipelineId);
+  existing &&
+    p &&
+    internal.pipelines.set(key, existing.set(p.id, { ...p, paused }));
 };
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {

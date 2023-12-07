@@ -1,3 +1,5 @@
+import { SDKResponse } from "@streamdal/node-sdk";
+
 const {
   OperationType,
   Streamdal,
@@ -48,16 +50,16 @@ const audience = {
 
 export const example = async () => {
   const streamdal = new Streamdal(config);
-  const result = await streamdal.processPipeline({
+  const result: SDKResponse = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });
 
   if (result.error) {
-    console.error("Pipeline error", result.message);
+    console.error("Pipeline error", result.errorMessage);
     //
     // Optionally explore more detailed step status information
-    console.dir(result.stepStatuses);
+    console.dir(result.pipelineStatus);
   } else {
     console.info("Pipeline success!");
     //

@@ -1,15 +1,16 @@
 import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
+import { SDKResponse } from "@streamdal/protos/protos/sp_sdk";
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudiences } from "./internal/audience.js";
 import { client } from "./internal/grpc.js";
 import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
 import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
-import { retryProcessPipeline, StepStatus } from "./internal/process.js";
+import { retryProcessPipelines } from "./internal/process.js";
 import { register } from "./internal/register.js";
 
-export { Audience, OperationType };
+export { Audience, OperationType, SDKResponse };
 
 export interface StreamdalConfigs {
   streamdalUrl?: string;
@@ -19,6 +20,7 @@ export interface StreamdalConfigs {
   stepTimeout?: string;
   dryRun?: boolean;
   audiences?: Audience[];
+  quiet?: boolean;
 }
 
 export interface Configs {
@@ -38,13 +40,6 @@ export interface StreamdalRequest {
   data: Uint8Array;
 }
 
-export interface StreamdalResponse {
-  data: Uint8Array;
-  error: boolean;
-  message?: string;
-  stepStatuses?: StepStatus[];
-}
-
 export class Streamdal {
   private configs: Configs;
 
@@ -56,8 +51,9 @@ export class Streamdal {
     stepTimeout,
     dryRun,
     audiences,
+    quiet,
   }: StreamdalConfigs) {
-    if (process.env.NODE_ENV === "production") {
+    if (quiet || process.env.NODE_ENV === "production") {
       console.debug = () => null;
     }
 
@@ -99,10 +95,7 @@ export class Streamdal {
     void register(this.configs);
   }
 
-  async processPipeline({
-    audience,
-    data,
-  }: StreamdalRequest): Promise<StreamdalResponse> {
-    return retryProcessPipeline({ configs: this.configs, audience, data });
+  async process({ audience, data }: StreamdalRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({ configs: this.configs, audience, data });
   }
 }

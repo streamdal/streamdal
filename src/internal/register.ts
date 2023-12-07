@@ -27,7 +27,7 @@ export const internal = {
   // in the streamdal constructor
   registered: false,
   pipelineInitialized: false,
-  pipelines: new Map<string, InternalPipeline>(),
+  pipelines: new Map<string, Map<string, InternalPipeline>>(),
   audiences: new Map<
     string,
     { audience: Audience; tails: Map<string, TailStatus> }
@@ -87,8 +87,7 @@ export const register = async (configs: Configs) => {
 
     for await (const response of call.responses) {
       if (response.command.oneofKind !== "keepAlive") {
-        console.debug("processing register command", response);
-        processResponse(response);
+        await processResponse(response);
       }
     }
   } catch (error) {

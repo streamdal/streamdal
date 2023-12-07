@@ -4,9 +4,10 @@ import {
   OperationType,
 } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
+import { StepStatus } from "@streamdal/protos/protos/sp_sdk";
 import ReadWriteLock from "rwlock";
 
-import { StepStatus } from "./process.js";
+import { InternalPipeline } from "./pipeline.js";
 
 export const METRIC_INTERVAL = 1000;
 
@@ -18,25 +19,34 @@ export interface MetricsConfigs {
   streamdalToken: string;
 }
 
-export const getStepLabels = (audience: Audience, stepStatus: StepStatus) => ({
+export const getStepLabels = (
+  audience: Audience,
+  pipeline: InternalPipeline
+) => ({
   service: audience.serviceName,
   component: audience.componentName,
   operation: audience.operationName,
-  pipeline_id: stepStatus.pipelineId,
-  pipeline_name: stepStatus.pipelineName,
+  pipeline_id: pipeline.id,
+  pipeline_name: pipeline.name,
 });
 
-export const stepMetrics = async (
-  audience: Audience,
-  stepStatus: StepStatus,
-  payloadSize: number
+export const stepMetrics = async ({
+  audience,
+  stepStatus,
+  pipeline,
+  payloadSize,
+}: {
+  audience: Audience;
+  stepStatus: StepStatus;
+  pipeline: InternalPipeline;
+  payloadSize: number;
   // eslint-disable-next-line @typescript-eslint/require-await
-) => {
+}) => {
   lock.writeLock((release) => {
     const opName =
       audience.operationType === OperationType.CONSUMER ? "consume" : "produce";
 
-    const labels = getStepLabels(audience, stepStatus);
+    const labels = getStepLabels(audience, pipeline);
     const stepErrorKey = `counter_${opName}_errors`;
     const stepProcessedKey = `counter_${opName}_processed`;
     const stepBytesKey = `counter_${opName}_bytes`;

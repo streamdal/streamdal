@@ -97,6 +97,7 @@ const testAttachCommandByServiceResponse = {
 };
 
 describe("pipeline tests", () => {
+  const key = audienceKey(testAudience);
   it("initPipelines should add a given pipeline to internal store and set pipelineInitialized ", async () => {
     sinon
       .stub(testConfigs.grpcClient, "getAttachCommandsByService")
@@ -104,47 +105,47 @@ describe("pipeline tests", () => {
 
     await initPipelines(testConfigs);
 
-    expect(internal.pipelines.has(audienceKey(testAudience))).toEqual(true);
+    expect(internal.pipelines.has(key)).toEqual(true);
     expect(internal.pipelineInitialized).toEqual(true);
   });
 
   describe("processResponse", () => {
-    it("attach command should add pipeline to internal store", () => {
-      processResponse(testAttachCommand);
+    it("attach command should add pipeline to internal store", async () => {
+      await processResponse(testAttachCommand);
+      expect(internal.pipelines.has(key)).toEqual(true);
 
-      expect(internal.pipelines.has(audienceKey(testAudience))).toEqual(true);
+      const pipelines = internal.pipelines.get(key);
+      expect(pipelines?.has(testPipeline.id)).toEqual(true);
     });
 
-    it("detach command should remove pipeline from internal store", () => {
-      internal.pipelines.set(audienceKey(testAudience), {
-        ...testPipeline,
-        paused: false,
-      });
-      processResponse(testDetachCommand);
+    it("detach command should remove pipeline from internal store", async () => {
+      internal.pipelines.set(key, new Map([[testPipeline.id, testPipeline]]));
+      await processResponse(testDetachCommand);
 
-      expect(internal.pipelines.has(audienceKey(testAudience))).toEqual(false);
+      expect(internal.pipelines.get(key)?.has(testPipeline.id)).toEqual(false);
     });
 
-    it("pause command should flag pipeline as paused in internal store", () => {
-      internal.pipelines.set(audienceKey(testAudience), {
-        ...testPipeline,
-        paused: false,
-      });
-      processResponse(testPauseCommand);
+    it("pause command should flag pipeline as paused in internal store", async () => {
+      internal.pipelines.set(
+        key,
+        new Map([[testPipeline.id, { ...testPipeline, paused: false }]])
+      );
 
-      expect(internal.pipelines.get(audienceKey(testAudience))?.paused).toEqual(
+      await processResponse(testPauseCommand);
+
+      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.paused).toEqual(
         true
       );
     });
 
-    it("resume command should flag pipeline as not paused in internal store", () => {
-      internal.pipelines.set(audienceKey(testAudience), {
-        ...testPipeline,
-        paused: false,
-      });
-      processResponse(testResumeCommand);
+    it("resume command should flag pipeline as not paused in internal store", async () => {
+      internal.pipelines.set(
+        key,
+        new Map([[testPipeline.id, { ...testPipeline, paused: true }]])
+      );
+      await processResponse(testResumeCommand);
 
-      expect(internal.pipelines.get(audienceKey(testAudience))?.paused).toEqual(
+      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.paused).toEqual(
         false
       );
     });
