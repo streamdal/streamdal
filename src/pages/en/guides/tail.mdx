@@ -9,6 +9,7 @@ import consoleTail from '../../../images/guides/ConsoleTail.png';
 import selectTail from '../../../images/guides/SelectandTail.png';
 import tailFlow from '../../../images/guides/TailFlow.png';
 import information from "@images/icons/information.png";
+import ExpandableImage from "@components/Misc/ExpandableImage.astro";
 
 <div class="addl-wrapper">
 <div class="addl">
@@ -42,7 +43,8 @@ Here's a step-by-step walkthrough of the user experience:
     - You'll notice the “Tail” link in the context menu; go ahead and click it.
     - An L modal will pop up, presenting a non-editable large text box. Initially, it will display “Tail initializing...” 
 
-    <img src={selectTail} alt="Select Tail" />
+    {/* <img src={selectTail} alt="Select Tail" /> */}
+    <ExpandableImage src={selectTail} alt="Select Tail" />
 
 2. **Observing the Data**:
     - Once the tail starts, you will witness new data streaming into the console.

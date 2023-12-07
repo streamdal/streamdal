@@ -1,0 +1,82 @@
+.modal {
+    background-color: rgba(0, 0, 0, 0.750);
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.modal.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    margin-top: 0;
+}
+
+.expwrapper {
+    position: relative;
+    max-width: 80vw;
+    max-height: 80vh;
+    overflow: auto;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    overflow-x: auto;
+    overflow-y: auto;
+    scrollbar-width: thin
+}
+
+.expwrapper::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+  
+.expwrapper::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: var(--color-purple-500);
+}
+  
+.expwrapper::-webkit-scrollbar-track {
+    background: var(--color-purple-700);
+}
+
+.expwrapper::-webkit-scrollbar-corner {
+    background: var(--color-purple-700);
+}
+
+.expwrapper img {
+    display: block;
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: auto;
+}
+
+
+.image-container img {
+    cursor: pointer;
+    z-index: 1015;
+    box-shadow: 0px 0px 0px 4px var(--color-purple-700);
+}
+
+.link-container {
+    align-self: flex-start;
+    width: 80vw;
+    margin-left: 10vw;
+    margin-top: 10px;
+}
+
+.larrow {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+  

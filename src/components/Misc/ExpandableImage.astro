@@ -1,0 +1,59 @@
+---
+import "./exp_styles.css";
+---
+
+<div class="image-container">
+  <img src={Astro.props.src} alt={Astro.props.alt} />
+</div>
+
+<div class="modal">
+  <div class="expwrapper">
+    <img src={Astro.props.src} alt={Astro.props.alt} />
+  </div>
+  <div class="link-container">
+    <a href={Astro.props.src} target="_blank"
+      >Open in new tab <span class="larrow">⇱</span></a
+    >
+  </div>
+</div>
+
+<script type="module">
+  const body = document.body;
+  let scrollPosition = 0;
+
+  const imageContainer = document.querySelector(".image-container img");
+  const modal = document.querySelector(".modal");
+
+  imageContainer.addEventListener("click", (event) => {
+    scrollPosition = window.scrollY || document.documentElement.scrollTop;
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollPosition}px`;
+    body.style.width = "100%";
+
+    modal.classList.add("active");
+  });
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal();
+    }
+  });
+
+  function closeModal() {
+    modal.classList.remove("active");
+    setTimeout(() => {
+      body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.width = "";
+      window.scrollTo(0, scrollPosition);
+    }, 200);
+  }
+</script>
