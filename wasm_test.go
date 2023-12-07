@@ -147,10 +147,10 @@ var _ = Describe("WASM Modules", func() {
 		var req *protos.WASMRequest
 		var f *function
 
-		wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
-		Expect(err).ToNot(HaveOccurred())
-
 		BeforeEach(func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
 			req = &protos.WASMRequest{
 				Step: &protos.PipelineStep{
 					Step: &protos.PipelineStep_Detective{
