@@ -45,7 +45,10 @@ res = client.process(
     )
 )
 
-pprint.pprint(res)
+if res.error:
+    print(res.error_)
+else:
+    pprint.pprint(res.data)
 ```
 
 ### Metrics
