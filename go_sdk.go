@@ -677,6 +677,11 @@ PIPELINE:
 				continue // Step
 			}
 
+			// Only update working payload if one is returned
+			if len(wasmResp.OutputPayload) > 0 {
+				data = wasmResp.OutputPayload
+			}
+
 			// Check on success and on-failures
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
@@ -741,11 +746,6 @@ PIPELINE:
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
-			}
-
-			// Only update working payload if one is returned
-			if len(wasmResp.OutputPayload) > 0 {
-				data = wasmResp.OutputPayload
 			}
 
 			stepTimeoutCxl()
