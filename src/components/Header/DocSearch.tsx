@@ -61,7 +61,7 @@ export default function Search({ lang = "en", labels }: Props) {
       onClose={onClose}
       appId={import.meta.env.PUBLIC_ALGOLIA_APP_ID}
       apiKey={import.meta.env.PUBLIC_ALGOLIA_API_KEY}
-      indexName="streamdal"
+      indexName="prod_docs"
       getMissingResultsUrl={({ query }) =>
         `https://github.com/withastro/docs/issues/new?title=Missing+results+for+query+%22${encodeURIComponent(
           query
