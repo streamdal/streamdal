@@ -68,6 +68,11 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 		return nil, errors.Wrap(err, "unable to read memory")
 	}
 
+	// Dealloc response memory
+	if _, err := f.dealloc.Call(ctx, uint64(resultPtr), uint64(resultSize)); err != nil {
+		return nil, errors.Wrap(err, "unable to deallocate memory")
+	}
+
 	return resBytes, nil
 }
 
