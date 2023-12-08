@@ -46,7 +46,7 @@ res = client.process(
 )
 
 if res.error:
-    print(res.error_)
+    print(res.error_message)
 else:
     pprint.pprint(res.data)
 ```
