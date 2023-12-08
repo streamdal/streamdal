@@ -45,8 +45,8 @@ func main() {
 	})
 
 	if resp.Error != nil {
-        fmt.Println(resp.ErrorMessage)
-        return
+		fmt.Println(resp.ErrorMessage)
+		return
     }
 	
 	println(string(resp.Data))
