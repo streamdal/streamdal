@@ -19,8 +19,8 @@
   "main": "cjs/streamdal.js",
   "scripts": {
     "build": "npm run clean && npm run build:esm && npm run build:commonjs && ./generatePackages.sh",
-    "build:esm": "npx tsc --module commonjs --outDir build/cjs/",
-    "build:commonjs": "npx tsc --module es2022 --outDir build/esm/",
+    "build:commonjs": "npx tsc --module commonjs --outDir build/cjs/",
+    "build:esm": "npx tsc --module es2022 --outDir build/esm/",
     "clean": "rimraf build",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
