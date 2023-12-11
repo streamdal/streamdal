@@ -37,8 +37,3 @@ jobs:
         with:
           packages-dir: dist
           password: ${{ secrets.PYPI_API_TOKEN }}
-      - name: Create tag
-        uses: mathieudutour/github-tag-action@v6.1
-        id: create_tag
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
