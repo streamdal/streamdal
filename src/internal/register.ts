@@ -28,6 +28,7 @@ export const internal = {
   registered: false,
   pipelineInitialized: false,
   pipelines: new Map<string, Map<string, InternalPipeline>>(),
+  kv: new Map<string, Uint8Array>(),
   audiences: new Map<
     string,
     { audience: Audience; tails: Map<string, TailStatus> }

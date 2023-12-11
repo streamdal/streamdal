@@ -7,6 +7,7 @@ import {
 // eslint-disable-next-line import/no-unresolved
 import { WASI } from "wasi";
 
+import { kvExists } from "./kv.js";
 import { MAX_PAYLOAD_SIZE } from "./process.js";
 import { internal } from "./register.js";
 
@@ -34,8 +35,25 @@ export const instantiateWasm = async (
   }
 
   const wasm = await WebAssembly.compile(wasmBytes);
-  const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
-  const instantiated = await WebAssembly.instantiate(wasm, importObject);
+  const instantiated = await WebAssembly.instantiate(wasm, {
+    wasi_snapshot_preview1: wasi.wasiImport,
+    env: {
+      kvExists: (pointer: number, length: number): number => {
+        const result = instantiated.exports.memory
+          ? kvExists(
+              instantiated.exports.memory as WebAssembly.Memory,
+              pointer,
+              length
+            )
+          : false;
+        //
+        // Wasm function expects a bigint but our runtime type expects a number
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        return BigInt(result ? 1 : 0);
+      },
+    },
+  });
   internal.wasmModules.set(wasmId, instantiated);
 };
 

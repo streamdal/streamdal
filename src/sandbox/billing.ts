@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { Audience } from "@streamdal/protos/protos/sp_common";
 
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
-import { QUIET, runPipeline } from "./index.js";
+import { runPipeline } from "./index.js";
 
 const serviceBillingConfig: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",

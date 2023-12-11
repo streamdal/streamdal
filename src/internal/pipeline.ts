@@ -4,6 +4,7 @@ import { GetAttachCommandsByServiceResponse } from "@streamdal/protos/protos/sp_
 import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
 import { Configs } from "../streamdal.js";
+import { kvCommand } from "./kv.js";
 import { audienceKey, internal, TailStatus } from "./register.js";
 import { instantiateWasm } from "./wasm.js";
 
@@ -40,6 +41,11 @@ export const initPipelines = async (configs: Configs) => {
 };
 
 export const processResponse = async (response: Command) => {
+  if (response.command.oneofKind === "kv") {
+    kvCommand(response.command.kv);
+    return;
+  }
+
   if (!response.audience) {
     response.command.oneofKind !== "keepAlive" &&
       console.debug("command response has no audience, ignoring");
