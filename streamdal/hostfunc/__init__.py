@@ -37,19 +37,7 @@ class HostFunc:
             headers=headers,
         )
 
-        # TODO: return HostFunc.write_to_memory(caller, res)
-        resp = res.SerializeToString()
-
-        # Allocate memory for response
-        alloc = caller.get("alloc")
-        resp_ptr = alloc(caller, len(resp) + 64)
-
-        # Write response to memory
-        memory.write(caller, resp, resp_ptr)
-
-        resp_ptr = resp_ptr << 32 | len(resp)
-
-        return resp_ptr
+        return HostFunc.write_to_memory(caller, res)
 
     def __http_request_perform(
         self, req: protos.steps.HttpRequest

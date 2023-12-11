@@ -18,6 +18,7 @@ from grpclib.client import Channel
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
 from streamdal.kv import KV
+from streamdal_protos.protos import SdkResponse as ProcessResponse
 from threading import Thread, Event
 from wasmtime import (
     Config,
@@ -53,13 +54,6 @@ class ProcessRequest:
     operation_name: str
     component_name: str
     data: bytes
-
-
-@dataclass(frozen=True)
-class ProcessResponse:
-    data: bytes
-    error: bool
-    message: str
 
 
 @dataclass(frozen=True)
@@ -281,6 +275,13 @@ class StreamdalClient:
         if req is None:
             raise ValueError("req is required")
 
+        resp = protos.SdkResponse(
+            data=copy(req.data),
+            error=False,
+            error_message="",
+            pipeline_status=[],
+        )
+
         payload_size = len(req.data)  # No need to compute this multiple times
 
         aud = protos.Audience(
@@ -321,7 +322,7 @@ class StreamdalClient:
                     aud=aud,
                 )
             )
-            return ProcessResponse(data=req.data, error=False, message="")
+            return resp
 
         # Get rules based on operation and component
         pipelines = self._get_pipelines(aud)
@@ -333,22 +334,25 @@ class StreamdalClient:
                 req.data,
                 req.data,
             )
-            return ProcessResponse(data=req.data, error=False, message="")
+            return resp
 
         self.metrics.incr(CounterEntry(name=rate_bytes, value=1.0, labels={}, aud=aud))
         self.metrics.incr(
             CounterEntry(name=rate_processed, value=1.0, labels={}, aud=aud)
         )
 
-        # Ensure no side effects are propagated to outside the library
-        data = copy(req.data)
-
         # Needed for send_tail()
-        original_data = data
+        original_data = copy(req.data)
 
         pipes = pipelines.copy()
 
         for _, cmd in pipes.items():
+            pipeline_status = protos.PipelineStatus(
+                id=cmd.attach_pipeline.pipeline.id,
+                name=cmd.attach_pipeline.pipeline.name,
+                step_status=[],
+            )
+
             pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
@@ -366,14 +370,21 @@ class StreamdalClient:
             )
 
             for step in pipeline.steps:
+                step_status = protos.StepStatus(
+                    name=step.name,
+                    error=False,
+                    error_message="",
+                    abort_status=protos.AbortStatus.ABORT_STATUS_UNSET,
+                )
+
                 # Exec wasm
-                wasm_resp = self._call_wasm(step, data)
+                wasm_resp = self._call_wasm(step, resp.data)
 
                 if self.cfg.dry_run:
                     self.log.debug(f"Running step '{step.name}' in dry-run mode")
 
                 if len(wasm_resp.output_payload) > 0:
-                    data = wasm_resp.output_payload
+                    resp.data = wasm_resp.output_payload
 
                 self._handle_schema(aud, step, wasm_resp)
 
@@ -385,38 +396,65 @@ class StreamdalClient:
                         )
                         continue
 
-                    should_continue = self._handle_condition(
+                    continue_pipeline, continue_process = self._handle_condition(
                         step.on_failure, pipeline, step, cmd.audience
                     )
-
-                    if should_continue is False:
+                    if not continue_process:
+                        # Exit function early
+                        step_status.abort_status = protos.AbortStatus.ABORT_STATUS_ALL
+                        pipeline_status.step_status.append(step_status)
+                        resp.pipeline_status.append(pipeline_status)
+                        return resp
+                    if not continue_pipeline:
                         # Continue outer pipeline loop if there are additional pipelines
+                        step_status.abort_status = (
+                            protos.AbortStatus.ABORT_STATUS_CURRENT
+                        )
+                        pipeline_status.step_status.append(step_status)
+                        resp.pipeline_status.append(pipeline_status)
                         break
 
-                    continue
+                    continue  # Continue to next step as default
 
                 # Failure conditions
                 self.metrics.incr(
                     CounterEntry(name=errors_counter, value=1.0, labels=labels, aud=aud)
                 )
 
-                should_continue = self._handle_condition(
+                continue_pipeline, continue_process = self._handle_condition(
                     step.on_failure, pipeline, step, cmd.audience
                 )
 
-                # Not continuing, exit function early
-                if should_continue is False:
+                step_status.error = True
+                step_status.error_message = "Step failed: " + wasm_resp.exit_msg
+
+                if not continue_process:
+                    # Exit function early
+                    resp.error = True
+                    resp.error_message = step_status.error_message
+                    step_status.abort_status = protos.AbortStatus.ABORT_STATUS_ALL
+                    pipeline_status.step_status.append(step_status)
+                    resp.pipeline_status.append(pipeline_status)
+                    return resp
+                if not continue_pipeline:
                     # Continue outer pipeline loop if there are additional pipelines
+                    step_status.abort_status = protos.AbortStatus.ABORT_STATUS_CURRENT
+                    pipeline_status.step_status.append(step_status)
+                    resp.pipeline_status.append(pipeline_status)
                     break
 
-        self._send_tail(aud, "", original_data, data)
+                pipeline_status.step_status.append(step_status)
+
+            resp.pipeline_status.append(pipeline_status)
+
+        self._send_tail(aud, "", original_data, resp.data)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
         if self.cfg.dry_run:
-            data = req.data
+            resp.data = copy(req.data)
 
-        return ProcessResponse(data=data, error=False, message="")
+        return resp
 
     def _notify_condition(
         self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience
@@ -461,22 +499,33 @@ class StreamdalClient:
         pipeline: protos.Pipeline,
         step: protos.PipelineStep,
         aud: protos.Audience,
-    ) -> bool:
-        should_continue = True
+    ) -> (bool, bool):
+        continue_pipeline = True
+        continue_process = True
+
         for cond in conditions:
             if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
                 self._notify_condition(pipeline, step, aud)
                 self.log.debug(f"Step '{step.name}' failed, notifying")
-            elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT:
-                should_continue = False
+            elif (
+                cond
+                == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT
+            ):
+                continue_pipeline = False
                 self.log.debug(
                     f"Step '{step.name}' failed, aborting further pipeline steps"
+                )
+            elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_ALL:
+                continue_pipeline = False
+                continue_process = False
+                self.log.debug(
+                    f"Step '{step.name}' failed, aborting further pipelines and steps"
                 )
             else:
                 # We still need to continue to remaining steps after other conditions have been processed
                 self.log.debug(f"Step '{step.name}' failed, continuing to next step")
 
-        return should_continue
+        return continue_pipeline, continue_process
 
     def _get_pipelines(self, aud: protos.Audience) -> dict:
         """
@@ -799,7 +848,6 @@ class StreamdalClient:
         for i in cmd.kv.instructions:
             validation.kv_instruction(i)
 
-            # TODO: validate instruction
             if i.action == protos.shared.KvAction.KV_ACTION_CREATE:
                 self.kv.set(i.object.key, cmd.kv.request.value)
             elif i.action == protos.shared.KvAction.KV_ACTION_UPDATE:

@@ -112,7 +112,7 @@ class TestStreamdalClient:
                                 protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_UNSET
                             ],
                             on_failure=[
-                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
+                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT
                             ],
                             detective=protos.steps.DetectiveStep(
                                 path="object.type",
@@ -138,10 +138,10 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.error is False
-        assert resp.message == ""
+        assert resp.error_message == ""
         assert resp.data == b'{"object": {"type": "streamdal"}}'
 
-    def test_process_failure(self):
+    def test_process_failure_and_abort(self):
         fake_stub = mock.AsyncMock()
 
         client = self.client
@@ -170,7 +170,7 @@ class TestStreamdalClient:
                             name="test",
                             on_success=[],
                             on_failure=[
-                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT,
+                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_ALL,
                                 protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY,
                             ],
                             detective=protos.steps.DetectiveStep(
@@ -178,7 +178,20 @@ class TestStreamdalClient:
                                 args=["batch"],
                                 type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
                             ),
-                        )
+                        ),
+                        protos.PipelineStep(
+                            name="test",
+                            on_success=[],
+                            on_failure=[
+                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT,
+                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY,
+                            ],
+                            detective=protos.steps.DetectiveStep(
+                                path="object.type",
+                                args=["should not execute"],
+                                type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                            ),
+                        ),
                     ],
                 )
             ),
@@ -197,11 +210,20 @@ class TestStreamdalClient:
 
         assert resp is not None
         fake_stub.notify.assert_called_once()
-
-        # TODO: how to handle errors with multiple pipelines?
-        # assert resp.error is True
-        # assert resp.message == "field not found"
-        # assert resp.data == b"{}"
+        assert resp.error is True
+        assert resp.error_message == "Step failed: field not found"
+        assert resp.data == b"{}"
+        assert len(resp.pipeline_status) == 1
+        assert len(resp.pipeline_status[0].step_status) == 1
+        assert (
+            resp.pipeline_status[0].step_status[0].abort_status
+            == protos.AbortStatus.ABORT_STATUS_ALL
+        )
+        assert resp.pipeline_status[0].step_status[0].error is True
+        assert (
+            resp.pipeline_status[0].step_status[0].error_message
+            == "Step failed: field not found"
+        )
 
     def test_process_failure_dry_run(self):
         client = self.client
@@ -229,7 +251,7 @@ class TestStreamdalClient:
                             name="test",
                             on_success=[],
                             on_failure=[
-                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT
+                                protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT
                             ],
                             detective=protos.steps.DetectiveStep(
                                 path="object.type",
@@ -255,7 +277,7 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.error is False
-        assert resp.message == ""
+        assert resp.error_message == ""
         assert resp.data == b'{"object": {"type": "streamdal"}}'
 
     def test_tail_request_start(self, mocker):
