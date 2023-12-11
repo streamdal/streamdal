@@ -70,3 +70,36 @@ export const optionsFromEnum = (optionsEnum: any) =>
         label={v as string}
       />
     ));
+
+export const kvActionFromEnum = (optionsEnum: any) =>
+  Object.entries(optionsEnum).filter((
+    [k, _],
+  ) => isNumeric(k) && k > 0)
+    .map(([
+      k,
+      v,
+    ], i) => (
+      <option
+        key={`option-type-key-${i}-${k}`}
+        value={k}
+        disabled={v !== "KV_ACTION_EXISTS"}
+        label={`${v.replace("KV_ACTION_", "")}${
+          v !== "KV_ACTION_EXISTS" ? " - coming soon" : ""
+        }`}
+      />
+    ));
+
+export const kvModeFromEnum = (optionsEnum: any) =>
+  Object.entries(optionsEnum).filter((
+    [k, _],
+  ) => isNumeric(k) && k > 0)
+    .map(([
+      k,
+      v,
+    ], i) => (
+      <option
+        key={`option-type-key-${i}-${k}`}
+        value={k}
+        label={v.replace("KV_MODE_", "")}
+      />
+    ));

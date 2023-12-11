@@ -20,7 +20,12 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { ErrorType, validate } from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
+import {
+  FormSelect,
+  kvActionFromEnum,
+  kvModeFromEnum,
+  optionsFromEnum,
+} from "../components/form/formSelect.tsx";
 import { isNumeric, titleCase } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
@@ -33,6 +38,8 @@ import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { useEffect } from "preact/hooks";
+import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
+import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -65,14 +72,16 @@ export const newPipeline: Pipeline = {
 const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
 const TransformTypeEnum = z.nativeEnum(TransformType);
+const KVActionTypeEnum = z.nativeEnum(KVAction);
+const KVModeTypeEnum = z.nativeEnum(KVMode);
 
-const kinds = ["detective", "transform"];
+const kinds = ["detective", "transform", "kv"];
 
 const stepKindSchema = z.discriminatedUnion("oneofKind", [
   z.object({
     oneofKind: z.literal("detective"),
     detective: z.object({
-      path: z.string().min(1, { message: "Required" }),
+      path: z.string(),
       args: zfd.repeatable(z.array(z.string()).default([])),
       type: zfd.numeric(DetectiveTypeEnum),
       negate: z.boolean().default(false),
@@ -142,6 +151,14 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
 
         return z.never;
       }
+    }),
+  }),
+  z.object({
+    oneofKind: z.literal("kv"),
+    kv: z.object({
+      action: zfd.numeric(KVActionTypeEnum),
+      mode: zfd.numeric(KVModeTypeEnum),
+      key: z.string(),
     }),
   }),
   z.object({
@@ -408,7 +425,7 @@ const PipelineDetail = (
                       <option
                         key={`step-kind-key-${i}`}
                         value={k}
-                        label={titleCase(k)}
+                        label={k === "kv" ? "Key/Value" : titleCase(k)}
                       />
                     ))}
                   />
@@ -419,7 +436,7 @@ const PipelineDetail = (
                         data={data}
                         setData={setData}
                         label="Path"
-                        placeHolder="ex: object.field"
+                        placeHolder="an empty path with search entire payload"
                         errors={errors}
                       />
                       <div className="flex flex-col">
@@ -476,6 +493,35 @@ const PipelineDetail = (
                         setData={setData}
                         label="Value"
                         placeHolder="Only required if replacing value"
+                        errors={errors}
+                      />
+                    </>
+                  )}
+                  {"kv" === step.step.oneofKind && (
+                    <>
+                      <FormSelect
+                        name={`steps.${i}.step.kv.action`}
+                        label="Type"
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        inputClass="w-64"
+                        children={kvActionFromEnum(KVAction)}
+                      />
+                      <FormSelect
+                        name={`steps.${i}.step.kv.mode`}
+                        label="Mode"
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        inputClass="w-64"
+                        children={kvModeFromEnum(KVMode)}
+                      />
+                      <FormInput
+                        name={`steps.${i}.step.kv.key`}
+                        data={data}
+                        setData={setData}
+                        label="Key"
                         errors={errors}
                       />
                     </>
