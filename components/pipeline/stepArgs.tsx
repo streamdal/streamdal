@@ -5,6 +5,9 @@ import { useState } from "preact/hooks";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
+import { FormSelect, optionsFromEnum } from "../form/formSelect.tsx";
+import { NotificationType } from "streamdal-protos/protos/sp_notify.ts";
+import { titleCase } from "../../lib/utils.ts";
 
 export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "STRING_EQUAL",
@@ -20,6 +23,7 @@ export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "NUMERIC_LESS_EQUAL",
   "NUMERIC_MIN",
   "NUMERIC_MAX",
+  "IS_TYPE",
 ];
 
 export const nArgTypes: (keyof typeof DetectiveType)[] = [
@@ -64,14 +68,34 @@ export const StepArgs = (
 ) => {
   //
   // Peek into step to see how many args there are so we
-  // can tell the ui how many args to render initiallly
+  // can tell the ui how many args to render initially
   const length = data?.steps[stepIndex]
-    ?.step[data?.steps[stepIndex]?.step?.oneofKind]?.args?.length || 0;
+    ?.step[data?.steps[stepIndex]?.step?.oneofKind]?.args?.length || 1;
+
   const [args, setArgs] = useState(Array.from({ length }, (v, k) => k));
 
-  return oneArgTypes.filter((a: string) =>
-      !["STRING_CONTAINS_ANY", "STRING_CONTAINS_ALL"]
-    ).includes(type)
+  return type === "IS_TYPE"
+    ? (
+      <FormSelect
+        name={`steps.0.step.detective.args.0`}
+        data={data}
+        setData={setData}
+        label="Type"
+        errors={errors}
+        inputClass="w-36"
+        children={["string", "number", "boolean", "array", "object", "null"]
+          .map((s, i) => (
+            <option
+              key={`is-type-arg-key-${i}`}
+              value={s}
+              label={titleCase(s)}
+            />
+          ))}
+      />
+    )
+    : oneArgTypes.filter((a: string) =>
+        !["STRING_CONTAINS_ANY", "STRING_CONTAINS_ALL"].includes(a)
+      ).includes(type)
     ? (
       <StepArg
         stepIndex={stepIndex}

@@ -87,6 +87,20 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       negate: z.boolean().default(false),
     }).superRefine((detective, ctx) => {
       if (
+        ["HAS_FIELD", "IS_TYPE"].includes(DetectiveType[detective.type]) &&
+        detective.path === ""
+      ) {
+        ctx.addIssue({
+          path: ["path"],
+          code: z.ZodIssueCode.custom,
+          message: "Required",
+          fatal: true,
+        });
+
+        return z.never;
+      }
+
+      if (
         oneArgTypes.includes(DetectiveType[detective.type]) &&
         detective.args.filter((a) => a.trim() !== "")?.length === 0
       ) {
@@ -436,7 +450,13 @@ const PipelineDetail = (
                         data={data}
                         setData={setData}
                         label="Path"
-                        placeHolder="an empty path with search entire payload"
+                        placeHolder={["HAS_FIELD", "IS_TYPE"].includes(
+                            DetectiveType[
+                              data.steps[i].step.detective?.type
+                            ],
+                          )
+                          ? "json.path"
+                          : "an empty path will search entire json payload"}
                         errors={errors}
                       />
                       <div className="flex flex-col">
