@@ -73,7 +73,7 @@ export default function Search({ lang = "en", labels }: Props) {
           // work better on localhost, preview URLS.
           const a = document.createElement("a");
           a.href = item.url;
-          const hash = a.hash === "#overview" ? "" : a.hash;
+          const hash = a.hash === "#what-is-streamdal" ? "" : a.hash;
           return {
             ...item,
             url: `${a.pathname}${hash}`,
