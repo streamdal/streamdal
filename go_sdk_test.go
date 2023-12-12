@@ -423,10 +423,10 @@ var _ = Describe("Streamdal", func() {
 
 			pipeline := &protos.Pipeline{
 				Id:   uuid.New().String(),
-				Name: "Test Pipeline",
+				Name: "Multithreaded Test Pipeline",
 				Steps: []*protos.PipelineStep{
 					{
-						Name:          "Detective Step",
+						Name:          "Multithreaded - Detective Step",
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    wasmDetective,
 						XWasmFunction: stringPtr("f"),
@@ -442,7 +442,7 @@ var _ = Describe("Streamdal", func() {
 						},
 					},
 					{
-						Name:          "Transform Step",
+						Name:          "Multithreaded - Transform Step",
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    transformDetective,
 						XWasmFunction: stringPtr("f"),
@@ -470,7 +470,7 @@ var _ = Describe("Streamdal", func() {
 					ServiceName:     "mysvc1",
 					Logger:          &logger.TinyLogger{},
 					StepTimeout:     time.Millisecond * 100,
-					PipelineTimeout: time.Second * 10,
+					PipelineTimeout: time.Minute, // Due to mutex, this should be longer than the entire test will take under CI
 					DryRun:          false,
 				},
 				metrics:      &metricsfakes.FakeIMetrics{},
