@@ -21,7 +21,7 @@ setup/darwin:
 	rustup target add wasm32-wasi
 
 	# Install WASM optimizer
-	cargo install wasm-opt
+	cargo install wasm-opt sccache
 
 .PHONY: build
 build: description = Build all targets
