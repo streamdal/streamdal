@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"runtime"
 
+	"github.com/gofrs/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
@@ -22,10 +24,21 @@ func main() {
 	// create stream
 	client := protos.NewInternalClient(conn)
 
+	session_id, _ := uuid.NewV4()
+
 	// Generate register request
 	in := &protos.RegisterRequest{
 		ServiceName: "TestService",
 		DryRun:      false,
+		SessionId:   session_id.String(),
+		ClientInfo: &protos.ClientInfo{
+			ClientType:     2,
+			LibraryName:    "demo-client",
+			LibraryVersion: "1.0",
+			Language:       "go",
+			Arch:           runtime.GOARCH,
+			Os:             runtime.GOOS,
+		},
 	}
 
 	md := metadata.New(map[string]string{"auth-token": "1234"})
