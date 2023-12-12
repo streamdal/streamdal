@@ -24,9 +24,6 @@ type function struct {
 }
 
 func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
-	f.mtx.Lock()
-	defer f.mtx.Unlock()
-
 	ptrLen := uint64(len(req))
 
 	inputPtr, err := f.alloc.Call(ctx, ptrLen)
@@ -65,6 +62,10 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	// Read memory starting from result ptr
 	resBytes, err := f.readMemory(resultPtr, resultSize)
 	if err != nil {
+		// Dealloc response memory
+		if _, err := f.dealloc.Call(ctx, uint64(resultPtr), uint64(resultSize)); err != nil {
+			return nil, errors.Wrap(err, "unable to deallocate memory")
+		}
 		return nil, errors.Wrap(err, "unable to read memory")
 	}
 
@@ -153,8 +154,11 @@ func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 		"httpRequest": s.hf.HTTPRequest,
 	}
 
+	rCfg := wazero.NewRuntimeConfig().
+		WithMemoryLimitPages(1000) // 64MB (default is 1MB)
+
 	ctx := context.Background()
-	r := wazero.NewRuntime(ctx)
+	r := wazero.NewRuntimeWithConfig(ctx, rCfg)
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
 
