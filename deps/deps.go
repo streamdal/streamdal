@@ -7,17 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/streamdal/server/util"
-
 	"github.com/InVisionApp/go-health/v2"
 	gllogrus "github.com/InVisionApp/go-logger/shims/logrus"
 	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
-
-	"github.com/streamdal/server/types"
+	"github.com/sirupsen/logrus"
 
 	"github.com/streamdal/server/backends/cache"
 	"github.com/streamdal/server/config"
@@ -30,6 +25,8 @@ import (
 	"github.com/streamdal/server/services/pubsub"
 	"github.com/streamdal/server/services/store"
 	"github.com/streamdal/server/services/telemetry"
+	"github.com/streamdal/server/types"
+	"github.com/streamdal/server/util"
 	"github.com/streamdal/server/wasm"
 )
 
@@ -199,7 +196,6 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 			return errors.Wrap(err, "unable to create new statsd client")
 		}
 		d.Telemetry = t
-		fmt.Printf("\n\nConnected to telemetry: %s\n\n", cfg.TelemetryAddress)
 	} else {
 		d.Telemetry = &telemetry.DummyTelemetry{}
 	}
@@ -324,9 +320,8 @@ func (d *Dependencies) RunUptimeTelemetry() {
 	defer ticker.Stop()
 
 	tags := []statsd.Tag{
-		//{"install_id", d.Config.InstallID},
-		//{"node_id", d.Config.NodeID},
-		{"sample_tag", "mark"},
+		{"install_id", d.Config.InstallID},
+		{"node_id", d.Config.NodeID},
 	}
 
 	// Send started telemetry
