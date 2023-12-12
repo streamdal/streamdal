@@ -148,12 +148,12 @@ type Options struct {
 	NodeName     string
 	SessionTTL   time.Duration
 	Telemetry    statsd.Statter
+	InstallID    string
 }
 
 type Store struct {
-	options   *Options
-	log       *logrus.Entry
-	InstallID string
+	options *Options
+	log     *logrus.Entry
 }
 
 func New(opts *Options) (*Store, error) {
@@ -500,22 +500,22 @@ func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience,
 	serviceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":"+aud.ServiceName+":*").Val()
 	if len(serviceKeys) == 0 {
 		// Completely new audience, send telemetry
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumServices, val, 1.0, statsd.Tag{"install_id", s.options.InstallID})
 	}
 
 	dataSourceKeys := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+"*:*:*:"+aud.ComponentName+":*").Val()
 	if len(dataSourceKeys) == 0 {
 		// Completely new data source, send telemetry
-		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+		_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumDataSources, val, 1.0, statsd.Tag{"install_id", s.options.InstallID})
 	}
 
 	audExists := s.options.RedisBackend.Exists(ctx, RedisTelemetryAudience(aud)).Val() == 1
 
 	if audExists && val < 0 || !audExists && val > 0 {
 		if aud.OperationType == protos.OperationType_OPERATION_TYPE_PRODUCER {
-			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumProducers, val, 1.0, statsd.Tag{"install_id", s.options.InstallID})
 		} else if aud.OperationType == protos.OperationType_OPERATION_TYPE_CONSUMER {
-			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, statsd.Tag{"install_id", s.InstallID})
+			_ = s.options.Telemetry.GaugeDelta(telTypes.GaugeUsageNumConsumers, val, 1.0, statsd.Tag{"install_id", s.options.InstallID})
 		}
 	}
 }
@@ -959,6 +959,10 @@ func (o *Options) validate() error {
 		return errors.New("session TTL must be between 1 second and 1 minute")
 	}
 
+	if o.InstallID == "" {
+		return errors.New("install ID cannot be empty")
+	}
+
 	return nil
 }
 
@@ -1252,8 +1256,8 @@ func (s *Store) GetAudiencesBySessionID(ctx context.Context, sessionID string) (
 
 func (s *Store) GetInstallID(ctx context.Context) (string, error) {
 	// Check cache first
-	if s.InstallID != "" {
-		return s.InstallID, nil
+	if s.options.InstallID != "" {
+		return s.options.InstallID, nil
 	}
 
 	v, err := s.options.RedisBackend.Get(ctx, InstallIDKey).Result()
@@ -1276,7 +1280,7 @@ func (s *Store) setStreamdalID(ctx context.Context) (string, error) {
 		// Create new ID
 		id := util.GenerateUUID()
 
-		s.InstallID = id
+		s.options.InstallID = id
 
 		err := s.options.RedisBackend.Set(ctx, InstallIDKey, id, 0).Err()
 		if err != nil {

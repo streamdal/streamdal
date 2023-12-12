@@ -92,17 +92,16 @@ func New(cfg *config.Config) (*Dependencies, error) {
 		return nil, errors.Wrap(err, "unable to setup backends")
 	}
 
-	if err := d.setupServices(cfg); err != nil {
-		return nil, errors.Wrap(err, "unable to setup services")
-	}
-
-	// StoreService now available, get/generate install ID
-	installID, err := d.StoreService.GetInstallID(d.ShutdownContext)
+	installID, err := d.getInstallID(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get install ID")
 	}
-	d.Config.InstallID = installID
-	d.Config.NodeID = util.GenerateNodeID(installID, d.Config.NodeName)
+	cfg.InstallID = installID
+	cfg.NodeID = util.GenerateNodeID(installID, cfg.NodeName)
+
+	if err := d.setupServices(cfg); err != nil {
+		return nil, errors.Wrap(err, "unable to setup services")
+	}
 
 	return d, nil
 }
@@ -236,6 +235,7 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 		SessionTTL:   cfg.SessionTTL,
 		Telemetry:    d.Telemetry,
 		Encryption:   d.EncryptionService,
+		InstallID:    cfg.InstallID,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new store service")
@@ -355,6 +355,44 @@ func (d *Dependencies) RunUptimeTelemetry() {
 			return
 		}
 	}
+}
+
+func (d *Dependencies) getInstallID(ctx context.Context) (string, error) {
+	v := d.RedisBackend.Get(ctx, store.InstallIDKey).Val()
+
+	if v == "" {
+		id, setErr := d.setStreamdalID(ctx)
+		if setErr != nil {
+			return "", setErr
+		}
+
+		return id, nil
+	}
+
+	return v, nil
+}
+
+func (d *Dependencies) setStreamdalID(ctx context.Context) (string, error) {
+	id, err := d.RedisBackend.Get(ctx, store.InstallIDKey).Result()
+	if errors.Is(err, redis.Nil) {
+		// Create new ID
+		newID := util.GenerateUUID()
+
+		d.Config.InstallID = newID
+
+		err := d.RedisBackend.Set(ctx, store.InstallIDKey, newID, 0).Err()
+		if err != nil {
+			return "", errors.Wrap(err, "unable to set cluster ID")
+		}
+
+		logrus.Debugf("Set cluster ID '%s'", newID)
+		return newID, nil
+	} else if err != nil {
+		return "", errors.Wrap(err, "unable to query cluster ID")
+	}
+
+	// Streamdal cluster ID already set
+	return id, nil
 }
 
 // Status satisfies the go-health.ICheckable interface
