@@ -41,6 +41,8 @@ const (
 	External_DeleteService_FullMethodName         = "/protos.External/DeleteService"
 	External_GetMetrics_FullMethodName            = "/protos.External/GetMetrics"
 	External_Tail_FullMethodName                  = "/protos.External/Tail"
+	External_PauseTail_FullMethodName             = "/protos.External/PauseTail"
+	External_ResumeTail_FullMethodName            = "/protos.External/ResumeTail"
 	External_GetAudienceRates_FullMethodName      = "/protos.External/GetAudienceRates"
 	External_GetSchema_FullMethodName             = "/protos.External/GetSchema"
 	External_AppRegistrationStatus_FullMethodName = "/protos.External/AppRegistrationStatus"
@@ -97,6 +99,8 @@ type ExternalClient interface {
 	// Returns all metric counters
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (External_GetMetricsClient, error)
 	Tail(ctx context.Context, in *TailRequest, opts ...grpc.CallOption) (External_TailClient, error)
+	PauseTail(ctx context.Context, in *PauseTailRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	ResumeTail(ctx context.Context, in *ResumeTailRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error)
 	GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*GetSchemaResponse, error)
 	AppRegistrationStatus(ctx context.Context, in *AppRegistrationStatusRequest, opts ...grpc.CallOption) (*AppRegistrationStatusResponse, error)
@@ -382,6 +386,24 @@ func (x *externalTailClient) Recv() (*TailResponse, error) {
 	return m, nil
 }
 
+func (c *externalClient) PauseTail(ctx context.Context, in *PauseTailRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_PauseTail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) ResumeTail(ctx context.Context, in *ResumeTailRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_ResumeTail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) GetAudienceRates(ctx context.Context, in *GetAudienceRatesRequest, opts ...grpc.CallOption) (External_GetAudienceRatesClient, error) {
 	stream, err := c.cc.NewStream(ctx, &External_ServiceDesc.Streams[3], External_GetAudienceRates_FullMethodName, opts...)
 	if err != nil {
@@ -515,6 +537,8 @@ type ExternalServer interface {
 	// Returns all metric counters
 	GetMetrics(*GetMetricsRequest, External_GetMetricsServer) error
 	Tail(*TailRequest, External_TailServer) error
+	PauseTail(context.Context, *PauseTailRequest) (*StandardResponse, error)
+	ResumeTail(context.Context, *ResumeTailRequest) (*StandardResponse, error)
 	GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error
 	GetSchema(context.Context, *GetSchemaRequest) (*GetSchemaResponse, error)
 	AppRegistrationStatus(context.Context, *AppRegistrationStatusRequest) (*AppRegistrationStatusResponse, error)
@@ -595,6 +619,12 @@ func (UnimplementedExternalServer) GetMetrics(*GetMetricsRequest, External_GetMe
 }
 func (UnimplementedExternalServer) Tail(*TailRequest, External_TailServer) error {
 	return status.Errorf(codes.Unimplemented, "method Tail not implemented")
+}
+func (UnimplementedExternalServer) PauseTail(context.Context, *PauseTailRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PauseTail not implemented")
+}
+func (UnimplementedExternalServer) ResumeTail(context.Context, *ResumeTailRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResumeTail not implemented")
 }
 func (UnimplementedExternalServer) GetAudienceRates(*GetAudienceRatesRequest, External_GetAudienceRatesServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAudienceRates not implemented")
@@ -1035,6 +1065,42 @@ func (x *externalTailServer) Send(m *TailResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _External_PauseTail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PauseTailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).PauseTail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_PauseTail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).PauseTail(ctx, req.(*PauseTailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_ResumeTail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResumeTailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).ResumeTail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_ResumeTail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).ResumeTail(ctx, req.(*ResumeTailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_GetAudienceRates_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GetAudienceRatesRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -1246,6 +1312,14 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteService",
 			Handler:    _External_DeleteService_Handler,
+		},
+		{
+			MethodName: "PauseTail",
+			Handler:    _External_PauseTail_Handler,
+		},
+		{
+			MethodName: "ResumeTail",
+			Handler:    _External_ResumeTail_Handler,
 		},
 		{
 			MethodName: "GetSchema",
