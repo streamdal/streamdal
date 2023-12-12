@@ -9,11 +9,11 @@ The server component in the Streamdal ecosystem.
 
 The server exposes 3 APIs:
 
-1. gRPC API on port `9090`
+1. gRPC API on port `8082`
    1. Used by SDKs
-2. gRPC-Web API on port `9091`
+2. gRPC-Web API on port `8083`
    1. Used by the UI component
-3. REST API on port `8080`
+3. REST API on port `8081`
    1. Exposes metrics, prometheus and health-check endpoints
 
 ## Development
