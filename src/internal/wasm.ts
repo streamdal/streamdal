@@ -38,20 +38,8 @@ export const instantiateWasm = async (
   const instantiated = await WebAssembly.instantiate(wasm, {
     wasi_snapshot_preview1: wasi.wasiImport,
     env: {
-      kvExists: (pointer: number, length: number): number => {
-        const result = instantiated.exports.memory
-          ? kvExists(
-              instantiated.exports.memory as WebAssembly.Memory,
-              pointer,
-              length
-            )
-          : false;
-        //
-        // Wasm function expects a bigint but our runtime type expects a number
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        return BigInt(result ? 1 : 0);
-      },
+      kvExists: (pointer: number, length: number): bigint =>
+        kvExists(instantiated.exports, pointer, length),
     },
   });
   internal.wasmModules.set(wasmId, instantiated);
@@ -66,6 +54,16 @@ export const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
   // Bitwise AND operation with 0xFFFFFFFF to get the length
   const length = Number(pointer & BigInt(0xffffffff));
   return buffer.slice(start, start + length);
+};
+
+export const writeResponse = (pointer: number, length: number): bigint => {
+  //
+  // Left shift the pointer value by 32 bits
+  const start = BigInt(pointer) << BigInt(32);
+
+  //
+  // Combine the shifted start and length using bitwise OR
+  return start | BigInt(length);
 };
 
 export const runWasm = ({

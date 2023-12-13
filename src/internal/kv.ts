@@ -1,8 +1,14 @@
 import { KVAction } from "@streamdal/protos/protos/shared/sp_shared";
 import { KVCommand } from "@streamdal/protos/protos/sp_command";
 import { KVInstruction } from "@streamdal/protos/protos/sp_kv";
+import {
+  KVStatus,
+  KVStep,
+  KVStepResponse,
+} from "@streamdal/protos/protos/steps/sp_steps_kv";
 
 import { internal } from "./register.js";
+import { writeResponse } from "./wasm.js";
 
 export const kvInstruction = (instruction: KVInstruction) => {
   switch (instruction.action) {
@@ -36,11 +42,29 @@ export const kvCommand = (command: KVCommand) => {
 };
 
 export const kvExists = (
-  memory: WebAssembly.Memory,
-  pointer: number,
-  length: number
-): boolean => {
-  const bytes = new Uint8Array(memory.buffer, pointer, length);
-  const key = new TextDecoder().decode(bytes);
-  return internal.kv.has(key);
+  exports: any,
+  keyPointer: number,
+  keyLength: number
+): bigint => {
+  const kvStep = KVStep.fromBinary(
+    new Uint8Array(exports.memory.buffer, keyPointer, keyLength)
+  );
+  const resultBytes = KVStepResponse.toBinary(
+    KVStepResponse.create({
+      status: internal.kv.has(kvStep.key)
+        ? KVStatus.KV_STATUS_SUCCESS
+        : KVStatus.KV_STATUS_FAILURE,
+    })
+  );
+
+  const resultPointer = exports.alloc(resultBytes.length);
+  const mem = new Uint8Array(
+    exports.memory.buffer,
+    resultPointer,
+    resultBytes.length
+  );
+  mem.set(resultBytes);
+  const response = writeResponse(resultPointer, resultBytes.length);
+
+  return response;
 };

@@ -83,7 +83,7 @@ const parseJson = (d: string, i: number): any => {
   return null;
 };
 
-const loadData = (path: string): any[] => {
+export const loadData = (path: string): any[] => {
   try {
     const data = readFileSync(path).toString();
 

@@ -112,10 +112,12 @@ const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, errorMessage, data } = await streamdal.process({
-    audience: audience,
-    data: new TextEncoder().encode(JSON.stringify(input)),
-  });
+  const { error, errorMessage, data, pipelineStatus } = await streamdal.process(
+    {
+      audience: audience,
+      data: new TextEncoder().encode(JSON.stringify(input)),
+    }
+  );
   //
   // no active pipeline messages are technically errors
   // but more informational
@@ -129,6 +131,8 @@ const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
   } catch (e) {
     console.error("could not parse data", e);
   }
+  console.debug("pipeline status:");
+  console.dir(pipelineStatus, { depth: 20 });
   console.debug("pipeline request done", new Date());
   console.debug("--------------------------------");
   console.debug("\n");
