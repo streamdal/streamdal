@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.28.0
 	github.com/pkg/errors v0.9.1
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
-	github.com/streamdal/protos v0.0.124
+	github.com/streamdal/protos v0.0.125
 	github.com/tetratelabs/wazero v1.5.0
 	golang.org/x/time v0.5.0
 	google.golang.org/grpc v1.59.0

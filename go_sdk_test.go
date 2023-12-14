@@ -10,12 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/protos/build/go/protos"
@@ -214,25 +213,26 @@ var _ = Describe("Streamdal", func() {
 		It("handles notify condition", func() {
 			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
 
-			got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(got).To(BeTrue())
+			continuePipeline, _ := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(continuePipeline).To(BeTrue())
 			Expect(fakeClient.NotifyCallCount()).To(Equal(1))
 		})
 
 		It("handles abort condition", func() {
-			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT}
+			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT}
 
-			got := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(got).To(BeFalse())
+			continuePipeline, _ := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(continuePipeline).To(BeFalse())
 		})
 	})
 
 	Context("Process", func() {
 		It("return error when process request is nil", func() {
 			s := &Streamdal{}
-			_, err := s.Process(context.Background(), nil)
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(ErrEmptyProcessRequest.Error()))
+			resp := s.Process(context.Background(), nil)
+			Expect(resp.Error).To(BeTrue())
+			Expect(resp.ErrorMessage).To(ContainSubstring(ErrEmptyProcessRequest.Error()))
+			Expect(len(resp.PipelineStatus)).To(Equal(0))
 		})
 
 		It("processes successfully", func() {
@@ -256,7 +256,7 @@ var _ = Describe("Streamdal", func() {
 						XWasmBytes:    wasmData,
 						XWasmFunction: stringPtr("f"),
 						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -299,95 +299,19 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			_, err = s.Process(context.Background(), &ProcessRequest{
+			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
 				OperationType: OperationType(aud.OperationType),
 				OperationName: aud.OperationName,
 				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
 			})
-			Expect(err).ToNot(HaveOccurred())
+			Expect(resp.Error).To(BeFalse())
+			Expect(resp.ErrorMessage).To(Equal(""))
+			Expect(len(resp.PipelineStatus)).To(Equal(1))
+			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 		})
 
-		// TODO: how to test with multipipeline
-		//It("fails on a detective match and aborts", func() {
-		//	aud := &protos.Audience{
-		//		ServiceName:   "mysvc1",
-		//		ComponentName: "kafka",
-		//		OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-		//		OperationName: "mytopic",
-		//	}
-		//
-		//	wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
-		//	Expect(err).ToNot(HaveOccurred())
-		//
-		//	pipeline := &protos.Pipeline{
-		//		Id:   uuid.New().String(),
-		//		Name: "Test Pipeline",
-		//		Steps: []*protos.PipelineStep{
-		//			{
-		//				Name:          "Step 1",
-		//				XWasmId:       stringPtr(uuid.New().String()),
-		//				XWasmBytes:    wasmData,
-		//				XWasmFunction: stringPtr("f"),
-		//				OnSuccess:     make([]protos.PipelineStepCondition, 0),
-		//				OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
-		//				Step: &protos.PipelineStep_Detective{
-		//					Detective: &steps.DetectiveStep{
-		//						Path:   stringPtr("object.payload"),
-		//						Args:   []string{"gmail.com"},
-		//						Negate: boolPtr(false),
-		//						Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
-		//					},
-		//				},
-		//			},
-		//		},
-		//	}
-		//
-		//	s := &Streamdal{
-		//		serverClient: &serverfakes.FakeIServerClient{},
-		//		functionsMtx: &sync.RWMutex{},
-		//		functions:    map[string]*function{},
-		//		audiencesMtx: &sync.RWMutex{},
-		//		audiences:    map[string]struct{}{},
-		//		config: &Config{
-		//			ServiceName:     "mysvc1",
-		//			Logger:          &logger.TinyLogger{},
-		//			StepTimeout:     time.Millisecond * 10,
-		//			PipelineTimeout: time.Millisecond * 100,
-		//		},
-		//		metrics:      &metricsfakes.FakeIMetrics{},
-		//		tails:        map[string]map[string]*Tail{},
-		//		tailsMtx:     &sync.RWMutex{},
-		//		pipelinesMtx: &sync.RWMutex{},
-		//		pipelines: map[string]map[string]*protos.Command{
-		//			audToStr(aud): {
-		//				pipeline.Id: {
-		//					Audience: aud,
-		//					Command: &protos.Command_AttachPipeline{
-		//						AttachPipeline: &protos.AttachPipelineCommand{
-		//							Pipeline: pipeline,
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
-		//	}
-		//
-		//	resp, err := s.Process(context.Background(), &ProcessRequest{
-		//		ComponentName: aud.ComponentName,
-		//		OperationType: OperationType(aud.OperationType),
-		//		OperationName: aud.OperationName,
-		//		Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}`),
-		//	})
-		//	Expect(err).ToNot(HaveOccurred())
-		//	Expect(resp.Error).To(BeTrue())
-		//	Expect(resp.Message).To(ContainSubstring("step failed"))
-		//})
-	})
-
-	Context("Multithreaded test", func() {
-		It("succeeds with multiple threads", func() {
-
+		It("fails on a detective match and aborts entire pipeline", func() {
 			aud := &protos.Audience{
 				ServiceName:   "mysvc1",
 				ComponentName: "kafka",
@@ -408,7 +332,23 @@ var _ = Describe("Streamdal", func() {
 						XWasmBytes:    wasmData,
 						XWasmFunction: stringPtr("f"),
 						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT},
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+					{
+						Name:          "Step 2",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnSuccess:     make([]protos.PipelineStepCondition, 0),
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -427,13 +367,111 @@ var _ = Describe("Streamdal", func() {
 				functions:    map[string]*function{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
 				config: &Config{
 					ServiceName:     "mysvc1",
 					Logger:          &logger.TinyLogger{},
 					StepTimeout:     time.Millisecond * 10,
 					PipelineTimeout: time.Millisecond * 100,
+				},
+				metrics:      &metricsfakes.FakeIMetrics{},
+				tails:        map[string]map[string]*Tail{},
+				tailsMtx:     &sync.RWMutex{},
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines: map[string]map[string]*protos.Command{
+					audToStr(aud): {
+						pipeline.Id: {
+							Audience: aud,
+							Command: &protos.Command_AttachPipeline{
+								AttachPipeline: &protos.AttachPipelineCommand{
+									Pipeline: pipeline,
+								},
+							},
+						},
+					},
+				},
+			}
+
+			resp := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}}`),
+			})
+			Expect(resp.Error).To(BeTrue())
+			Expect(resp.ErrorMessage).To(ContainSubstring("Step failed"))
+			Expect(len(resp.PipelineStatus)).To(Equal(1))
+			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
+			Expect(resp.PipelineStatus[0].StepStatus[0].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_ALL))
+		})
+	})
+
+	Context("Multithreaded test", func() {
+		It("succeeds with multiple threads", func() {
+
+			aud := &protos.Audience{
+				ServiceName:   "mysvc1",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "mytopic",
+			}
+
+			wasmDetective, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			transformDetective, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Multithreaded Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Multithreaded - Detective Step",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmDetective,
+						XWasmFunction: stringPtr("f"),
+						OnSuccess:     make([]protos.PipelineStepCondition, 0),
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{".com"},
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+					{
+						Name:          "Multithreaded - Transform Step",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    transformDetective,
+						XWasmFunction: stringPtr("f"),
+						OnSuccess:     make([]protos.PipelineStepCondition, 0),
+						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						Step: &protos.PipelineStep_Transform{
+							Transform: &steps.TransformStep{
+								Path: "object.payload",
+								Type: steps.TransformType_TRANSFORM_TYPE_MASK_VALUE,
+							},
+						},
+					},
+				},
+			}
+
+			s := &Streamdal{
+				serverClient: &serverfakes.FakeIServerClient{},
+				functionsMtx: &sync.RWMutex{},
+				functions:    map[string]*function{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+				tails:        map[string]map[string]*Tail{},
+				tailsMtx:     &sync.RWMutex{},
+				config: &Config{
+					ServiceName:     "mysvc1",
+					Logger:          &logger.TinyLogger{},
+					StepTimeout:     time.Millisecond * 100,
+					PipelineTimeout: time.Minute, // Due to mutex, this should be longer than the entire test will take under CI
+					DryRun:          false,
 				},
 				metrics:      &metricsfakes.FakeIMetrics{},
 				pipelinesMtx: &sync.RWMutex{},
@@ -451,24 +489,31 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			payload := []byte(`{"object":{"payload":"streamdal@gmail.com"}`)
+			payload := []byte(`{"object":{"payload":"streamdal@gmail.com"}}`)
 
-			// Run 1000 requests in parallel
+			// Run 100 requests in parallel
 			wg := &sync.WaitGroup{}
 			for i := 0; i < 100; i++ {
 				wg.Add(1)
 				go func() {
 					defer GinkgoRecover()
 					defer wg.Done()
-					resp, err := s.Process(context.Background(), &ProcessRequest{
+					resp := s.Process(context.Background(), &ProcessRequest{
 						ComponentName: aud.ComponentName,
 						OperationType: OperationType(aud.OperationType),
 						OperationName: aud.OperationName,
 						Data:          payload,
 					})
-					Expect(err).ToNot(HaveOccurred())
+
+					Expect(resp.Error).To(BeFalse())
 					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{}))
-					Expect(string(resp.Data)).To(Equal(string(payload)))
+					Expect(len(resp.PipelineStatus)).To(Equal(1))
+					Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(2))
+					Expect(resp.PipelineStatus[0].StepStatus[0].Error).To(BeFalse())
+					Expect(resp.PipelineStatus[0].StepStatus[1].Error).To(BeFalse())
+					Expect(resp.PipelineStatus[0].StepStatus[0].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_UNSET))
+					Expect(resp.PipelineStatus[0].StepStatus[1].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_UNSET))
+					Expect(string(resp.Data)).To(Equal(`{"object":{"payload":"stre***************"}}`))
 				}()
 			}
 
