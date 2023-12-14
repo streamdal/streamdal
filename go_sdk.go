@@ -192,7 +192,7 @@ func New(cfg *Config) (*Streamdal, error) {
 		return nil, errors.Wrap(err, "unable to validate config")
 	}
 
-	// We instantiate this library based on whether or not we have a Client URL+token
+	// We instantiate this library based on whether we have a Client URL+token or not.
 	// If these are not provided, the wrapper library will not perform rule checks and
 	// will act as normal
 	if cfg.ServerURL == "" || cfg.ServerToken == "" {
@@ -470,6 +470,9 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
 
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+
 	// Don't need this anymore, and don't want to send it to the wasm function
 	step.XWasmBytes = nil
 
@@ -557,8 +560,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 		PipelineStatus: make([]*protos.PipelineStatus, 0),
 	}
 
-	data := req.Data
-	payloadSize := int64(len(data))
+	payloadSize := int64(len(resp.Data))
 
 	aud := &protos.Audience{
 		ServiceName:   s.config.ServiceName,
@@ -588,7 +590,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	pipelines := s.getPipelines(ctx, aud)
 	if len(pipelines) == 0 {
 		// Send tail if there is any. Tails do not require a pipeline to operate
-		s.sendTail(aud, "", data, data)
+		s.sendTail(aud, "", resp.Data, resp.Data)
 
 		// No pipelines for this mode, nothing to do
 		return resp
@@ -602,8 +604,6 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 
 		return resp
 	}
-
-	originalData := data // Used for tail request
 
 PIPELINE:
 	for _, p := range pipelines {
@@ -644,7 +644,7 @@ PIPELINE:
 				// NOOP
 			}
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, data)
+			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data)
 			if err != nil {
 				stepTimeoutCxl()
 
@@ -679,7 +679,7 @@ PIPELINE:
 
 			// Only update working payload if one is returned
 			if len(wasmResp.OutputPayload) > 0 {
-				data = wasmResp.OutputPayload
+				resp.Data = wasmResp.OutputPayload
 			}
 
 			// Check on success and on-failures
@@ -718,7 +718,8 @@ PIPELINE:
 				stepStatus.Error = true
 				stepStatus.ErrorMessage = "Step failed: " + wasmResp.ExitMsg
 
-				s.config.Logger.Errorf("Step '%s' returned exit code '%s'", step.Name, wasmResp.ExitCode.String())
+				s.config.Logger.Errorf("Step '%s' returned exit code '%s': %s", step.Name, wasmResp.ExitCode.String(), wasmResp.ExitMsg)
+				s.config.Logger.Errorf("Data: %s", string(resp.Data))
 
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 
@@ -757,12 +758,12 @@ PIPELINE:
 	}
 
 	// Perform tail if necessary
-	s.sendTail(aud, "", originalData, data)
+	s.sendTail(aud, "", req.Data, resp.Data)
 
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly
 	if s.config.DryRun {
-		data = req.Data
+		resp.Data = req.Data
 	}
 
 	return resp
