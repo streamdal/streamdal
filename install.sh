@@ -67,3 +67,4 @@ if [ $? -eq 0 ]; then
 else
   fatal "Installation failed. Submit an issue at https://github.com/streamdal/cli/issues/new"
 fi
+
