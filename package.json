@@ -16,7 +16,7 @@
     "require": "./cjs/streamdal.js",
     "import": "./esm/streamdal.js"
   },
-  "main": "cjs/streamdal.js",
+  "main": "esm/streamdal.js",
   "scripts": {
     "build": "npm run clean && npm run build:esm && npm run build:commonjs && ./generatePackages.sh",
     "build:commonjs": "npx tsc --module commonjs --outDir build/cjs/",

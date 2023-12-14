@@ -45,7 +45,7 @@ export const instantiateWasm = async (
   internal.wasmModules.set(wasmId, instantiated);
 };
 
-export const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
+const readResponse = (pointer: bigint, buffer: Uint8Array): any => {
   //
   // Shift right by 32 bits to get the start value
   const start = Number(pointer >> BigInt(32));
