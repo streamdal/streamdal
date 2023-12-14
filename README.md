@@ -81,4 +81,4 @@ change merged. Verify that new version is available by running
 
 ## Community
 
-Like what you're seeing? Join our [community](https://docs.streamdal.com/community)!
+Like what you're seeing? Join our [Discord community](https://discord.gg/streamdal)!
