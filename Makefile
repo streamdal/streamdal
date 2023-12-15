@@ -34,6 +34,7 @@ help:
 .PHONY: setup/darwin
 setup/darwin: description = Setup for darwin
 setup/darwin:
+	mv env.example .env
 	brew install go
 	brew install curl
 	brew install grpcurl
