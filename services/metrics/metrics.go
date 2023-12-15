@@ -197,6 +197,10 @@ func validateConfig(cfg *Config) error {
 		cfg.PrometheusURL = defaultPrometheusURL
 	}
 
+	if cfg.InstallID == "" {
+		return errors.New("install id is required")
+	}
+
 	return nil
 }
 
