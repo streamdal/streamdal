@@ -9,7 +9,7 @@ services:
       - STREAMDAL_SERVER_AUTH_TOKEN=1234
       - STREAMDAL_SERVER_REDIS_URL=redis:6379
       - STREAMDAL_SERVER_DEBUG=true
-      - STREAMDAL_SERVER_TELEMETRY_ADDRESS=graphite:8125
+      - STREAMDAL_SERVER_TELEMETRY_DISABLE=true
     container_name: streamdal-server
     ports:
       - "8081:8081"
