@@ -1,5 +1,13 @@
-name: "Protobuf lint & test compile"
-on: pull_request
+name: Protos - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'libs/protos/**'
+
+defaults:
+  run:
+    working-directory: ./libs/protos
 
 jobs:
   pr-check:
@@ -9,7 +17,7 @@ jobs:
       - name: Protobuf Linting
         uses: plexsystems/protolint-action@v0.4.0
         with:
-          configDirectory: ./
+          configDirectory: ./libs/protos
 
       - name: Compile protos
         run: |

@@ -1,8 +1,16 @@
-name: Release
+name: Protos - Release
+
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*.*.*-protos*'
+
+defaults:
+  run:
+    working-directory: ./libs/protos
+
 jobs:
   build:
     runs-on: ubuntu-latest
