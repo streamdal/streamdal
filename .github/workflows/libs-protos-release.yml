@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*.*.*-protos*'
+    paths:
+      - 'libs/protos/**'
 
 defaults:
   run:
@@ -14,8 +14,6 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      new_tag: ${{ steps.create_tag.outputs.new_tag }}
     environment:
       name: pypi
       url: https://pypi.org/p/streamdal-protos
@@ -27,6 +25,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
+          tag_prefix: "protos/v"
       - name: Update Cargo.toml version
         run: |
           pwd
@@ -41,11 +40,13 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "protos/v"
       - name: Release on crates.io
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --manifest-path build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --locked
+          # need full path because "working-directory" is used only for "run" steps
+          args: --manifest-path libs/protos/build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --locked
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
@@ -65,5 +66,5 @@ jobs:
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: build/python/dist
+          packages-dir: libs/protos/build/python/dist
           password: ${{ secrets.PYPI_API_TOKEN }}
