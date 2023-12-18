@@ -1,4 +1,4 @@
-module github.com/streamdal/mono/libs/protos/build/go
+module github.com/streamdal/mono/libs/protos
 
 go 1.20
 
