@@ -1,0 +1,108 @@
+---
+title: "Node Client Support for Streamdal"
+metaTitle: "Elevate Your Node.js Applications with Streamdal"
+description: "Easily incorporate Streamdal into your Node applications to enhance your data processing."
+layout: ../../../layouts/MainLayout.astro
+---
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import info from "@images/icons/info.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<br />
+<br />
+
+Welcome to the Node Client Guide for Streamdal! If you're harnessing the power
+of Node.js and aim to supercharge your data operations, you're on the right
+track. Integrating Streamdal into your Node applications is both efficient and
+straightforward with our Node SDK.
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>For detailed information on the SDK and its functionalities, refer to
+    the [SDK README](https://github.com/streamdal/go-sdk).</p>
+  </div>
+</Notification>
+
+## Instrumentation
+
+Start with the [instrumentation guide](../../guides/instrumentation) if you
+haven't already. It will walk you through the process of setting up Streamdal
+and its components.
+
+## Integrate the SDK:
+
+1. Install the SDK package:
+```bash
+npm install @streamdal/node-sdk
+```
+
+## Dive Into an Example
+Here's a basic example to help you get started with Streamdal Node SDK:
+
+```bash
+import { Streamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk";
+
+const config: StreamdalConfigs = {
+  streamdalUrl: "localhost:8082",
+  streamdalToken: "1234",
+  serviceName: "test-service-name",
+  pipelineTimeout: "100",
+  stepTimeout: "10",
+  dryRun: "false",
+};
+
+const audience: Audience = {
+  serviceName: "test-service-name",
+  componentName: "kafka",
+  operationType: OperationType.CONSUMER,
+  operationName: "test-kafka-consumer",
+};
+
+export const example = async () => {
+  const streamdal = new Streamdal(config);
+  const result = await streamdal.processPipeline({
+    audience,
+    data: new TextEncoder().encode(JSON.stringify(exampleData)),
+  });
+
+  console.log("Streamdal Response:");
+  console.dir(result, {depth: 20});
+};
+```
+This example demonstrates how to initialize a new instance of the Streamdal SDK, and how to process data through a pipeline. You simply need to create a configuration object, an audience object, and then call the processPipeline method on a new Streamdal instance. The result will be logged to the console.
+
+## Wasm Execution
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    To run pipelines with minimal overhead, the Streamdal Node SDK ships and executes pipeline rules as
+    <span class="yhighlight">Wasm</span>. If you are using a Node version lower than
+    <span class="yhighlight">20.*</span>, you'll need to enable Wasm functionality in your Node app by
+    supplying the flag as shown below:
+    </p>
+  </div>
+</Notification>
+
+```bash
+node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js
+```
+
+## More In-depth Examples
+
+Examples with docker-compose files are available for the following:
+
+ - **[Node with Kafa](https://github.com/streamdal/streamdal-examples/tree/main/kafka/node)**
+ - **[Node with Rabbitmq](https://github.com/streamdal/streamdal-examples/tree/main/rabbit/node)**

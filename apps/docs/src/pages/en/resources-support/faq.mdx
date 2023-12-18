@@ -1,0 +1,582 @@
+---
+title: Frequently Asked Questions
+metaTitle: "Streamdal | F.A.Q."
+description: Streamdal frequently asked questions
+layout: ../../../layouts/MainLayout.astro
+---
+
+import Accordion from "@components/Accordion/Accordion.astro";
+import edge from "@images/core-components/edge.png";
+import producer_icon from "@images/icons/producer_icon.png";
+import consumer_icon from "@images/icons/consumer_icon.png";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+Get clarification or answers for the most common questions we receive about 
+Streamdal. Can't find what you're looking for, or need more details? Get in 
+touch with us.
+
+<br />
+<br />
+
+<ol class="accordion-list">
+### <span class="hiddenh">1. What is Streamdal?</span>
+<li>
+<Accordion 
+title="What is Streamdal?">
+<p>
+Streamdal is an open source <a href="/en/resources-support/glossary/#observability" class="pkeyword">observability</a> tool. 
+<br />
+It's comprised of a 
+[server](/en/core-components/server/), a UI, and a bunch of <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a>-powered 
+[SDKs](/en/core-components/sdk/). By using our SDK and deploying it’s server, 
+you’ll get a dynamic [graph](/en/core-components/console-ui#data-graph) of your 
+<a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> 
+and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> 
+as they scale up and down, with the ability to tap in and view all the 
+real-time data flowing through them with [Tail](/en/guides/tail/). 
+</p>
+<br />
+<p>
+You can use Tail from the [Console UI](/en/core-components/console-ui/). Or, 
+for those who prefer a terminal, you can use the 
+[CLI](/en/what-is-streamdal/#-cli).
+</p>
+<br />
+<p>
+The stuff you can use to modify your "in-flight" data such as stripping PII, 
+masking, obfuscating, or validating data is of a certain format or structure, 
+etc is done with <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a>. 
+Currently, rules and the 
+preventive/[data governance](/en/data-governance/overview/) features are in 
+beta. 
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">2. How do I use Streamdal, and where is it deployed?</span>
+
+<li>
+<Accordion 
+title="How do I use Streamdal, and where is it deployed?">
+<p>
+1. Import our SDK for your language.
+2. Weave the `Process()` method into the fabric of your code where 
+data production or consumption takes place.
+3. Deploy the Streamdal server where the services using the Streamdal SDK are 
+running.
+</p>
+<br />
+<p>
+Check out the [quickstart guide](/en/getting-started/quickstart/).
+</p>
+<br />
+<p> 
+You can find more details in our guides on 
+[instrumentation](/en/guides/instrumentation/) and 
+[deployment](/en/guides/deployment/).
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">3. What language SDKs do you support?</span>
+
+<li>
+<Accordion 
+title="What language SDKs do you support?">
+<p>
+Currently we support: 
+<br />
+<ul>
+<li>[Go](/en/language-support/go/)</li>
+<li>[Node](/en/language-support/node/)</li>
+<li>[Python](/en/language-support/python/)</li>
+</ul>
+</p>
+<br />
+<p>
+We plan on adding more language support in the future, along with 
+libraries/[shims](/en/resources-support/glossary/#shim) for easier 
+instrumentation. Check out the 
+[roadmap](/en/resources-support/roadmap/) for more details.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">4. What data sources and destinations are supported?</span>
+<li>
+<Accordion 
+title="What data sources and destinations are supported?">
+<p>
+Any <a href="/en/resources-support/glossary/#source" class="pkeyword">source</a>, and any <a href="/en/resources-support/glossary/#destination" class="pkeyword">destination</a>. 
+<br />
+The way Streamdal is instrumented, there isn't 
+a need for connectors or interfacing with various API's. The [SDK](/en/core-components/sdk/) uses a 
+`Process()` method that is wrapped around the parts of your code where data 
+production and consumption take place.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">5. Will this cause HTTP bottlenecks, or impact my app performance in any way?</span>
+
+<li>
+<Accordion 
+title="Will this cause HTTP bottlenecks, or impact my app performance in any 
+way?">
+<p>
+The work all happens <span class="yhighlight">locally</span> in the SDK, 
+and on the client. The server component is just there to configure things on 
+the client by shipping down <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> created in the Console UI. 
+
+<br />
+
+This happens with only a negligible resource hit to the client (usally \<0.1ms, 
+thanks to 
+<a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a>). 
+There is no sending data, or shipping logs, metrics, or traces anywhere.
+
+<br />
+
+Check out our 
+[benchmark tests](https://github.com/streamdal/snitch-detective/blob/main/src/test_bench.rs) 
+on GitHub.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">6. Why aren't my services, producers, or consumers showing up on the data graph?</span>
+
+<li>
+<Accordion 
+title="Why aren't my services, producers, or consumers showing up on the data 
+graph?">
+<p>
+In order for the data graph to visually populate services:
+</p>
+<br />
+<p>
+1. The [SDK](/en/core-components/sdk/) should be imported and properly 
+instrumented for your language. See the 
+[Golang example](/en/core-components/sdk/#golang-sdk-example) on importing the 
+SDK.
+2. The [server](/en/core-components/server/) needs to be accessible by the SDK. 
+If you have confirmed the containers are up, try running 
+`curl <streamdal-server>:<endpoints>`. Check out the various 
+[endpoints exposed](/en/core-components/server#server-high-level-architecture) 
+by the server components for further testing. 
+   - The `STREAMDAL_URL` default 
+  [environment variable](/en/core-components/sdk/#environment-variables-configuring-the-sdk) 
+  value is 
+  `localhost:9090`. If you are running the server somewhere other than where 
+  your instrumented services live _(which is generally not recommended)_, you 
+  will need to update this value to the correct address.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">7. I see Rules in the Console UI, but they are listed as `Beta.` Can I use this feature?</span>
+
+<li>
+<Accordion 
+title="I see Rules in the Console UI, but they are listed as `Beta.` Can I use 
+this feature?">
+<p>
+<a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">Rules</a> 
+are currently in beta along with the other 
+[data governance](/en/data-governance/overview/) features of Streamdal.
+
+<br />
+
+They are being tested by a select group of contributors, companies, and design 
+partners. 
+
+<br />
+
+_These features aren't production-ready!_ But, if you would like 
+to get test access or become a design partner, 
+[contact us](mailto:support@streamdal.com) or hit us up in our  
+[community](/en/resources-support/community/).
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">8. What is open source, what is free, and what is paid? Will this change in the future?</span>
+
+
+<li>
+<Accordion 
+title="What is open source, what is free, and what is paid? Will this change in 
+the future?">
+<p>
+The <a href="/en/resources-support/glossary/#observability" class="pkeyword">observability</a> 
+aspects and features of Streamdal, including [Tail](/en/guides/tail/), will 
+always be free and [open source](/en/resources-support/open-source/) using the 
+Apache License v2.0. 
+
+<br />
+
+Currently, the data governance features are in beta, but once they are fully 
+fleshed out and production-ready, they _may_ be a paid feature. We haven't 
+decided which parts of the governance features might need to be paid. 
+
+<br />
+
+Regardless of how that decision pans out, we will not be rug-pulling anything 
+we put out as open source.
+
+<br />
+
+Check out our 
+[launch manifesto](https://streamdal.com/manifesto/) for details on this design 
+decision.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">9. When will you support `<this-feature-language-or-library>`?</span>
+
+<li>
+<Accordion 
+title="When will you support <this-feature-language-or-library>?">
+<p>
+Our [roadmap](https://github.com/orgs/streamdal/projects/1) is publicly 
+available on GitHub.
+
+<br />
+
+Don't see your library, or think a feature timeline should be shifted? Join our 
+[community](/en/resources-support/community/) and let us know!
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">10. How do I maintain the Data Graph?</span>
+
+<li>
+<Accordion 
+title="How do I maintain the Data Graph?">
+<p>
+The [Data Graph](/en/core-components/console-ui#data-graph) is _real-time_ and _dynamic_. 
+
+<br />
+What that means is so long as the 
+[server component](/en/core-components/server/)
+is running, and new <a href="/en/resources-support/glossary/#service" class="pkeyword">services</a> are instrumented with the 
+[SDK](/en/core-components/sdk/), _the Data Graph will not require maintenance_. 
+
+<br />
+
+The view you 
+get will always be an accurate representation of data flowing through your 
+systems regardless of scale.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">11. How do I manage schemas?</span>
+
+<li>
+<Accordion 
+title="How do I manage schemas?">
+<p>
+Currently, there is no need to manage schemas. Once you have instrumented the 
+[SDK](/en/core-components/sdk/), you will be able to view the active schemas of 
+data throughout your systems. 
+
+<br />
+
+When you weave the `Process()` method throughout your code, behind the scenes 
+the SDK will infer and decode schemas, and present them in a human-readable 
+format via the [console UI](en/core-components/console-ui/).
+
+<br />
+
+We have big plans to expand schemas in the future. This could include tools, 
+management capabilities, or functionality such as history and diff views.
+
+<br />
+
+Reference the [roadmap](https://github.com/orgs/streamdal/projects/1/views/9) 
+for more information.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">12. What is Tail?</span>
+
+<li>
+<Accordion 
+title="What is Tail?">
+<p>
+Tail gets its name from the Unix command and argument `tail -f`. 
+
+<br />
+
+It is a feature that can be used via the 
+[Console UI](/en/core-components/console-ui/) (or 
+[CLI](/en/what-is-streamdal/#-cli)) which will allow you to tap into any of 
+your <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> 
+or <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> 
+and view the real-time data flowing through them.
+
+<br />
+
+Because schemas are inferred and decoded, you'll be able to observe your data 
+in a human-readable format.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">13. What are Shims?</span>
+
+<li>
+<Accordion 
+title="What are Shims?">
+<p>
+A <a href="/en/resources-support/glossary/#shim" class="pkeyword">Shim</a> is a 
+'wrapper library' for popular libraries that incorporate the usage of our SDK 
+to simplify the integration and adoption of Streamdal. 
+
+<br />
+
+Our primary focus has been on the SDKs, and shims will land sometime in the 
+future. Check the 
+roadmap](https://github.com/orgs/streamdal/projects/1/views/9) to see when they 
+could be added.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">14. What is Observability?</span>
+
+<li>
+<Accordion 
+title="What is Observability?">
+<p>
+<span class="pkeyword">Observability</span> can be a really loaded term, which 
+is why we also define it in our [glossary](/en/resources-support/glossary#observability) and 
+have [a whole section dedicated](/en/engineering/observability/) to it. 
+Depending on what you're working with or who you're speaking to, it can mean 
+many different things. 
+</p>
+<br />
+<p>
+When we say observability, we mean:  
+> _The ability to simply see the actual real-time data, its schema, and the 
+services generating data or interacting with it._
+</p>
+<br />
+<p>
+DORA (DevOps Research and Assessment) also has a good definition on 
+[observability](https://dora.dev/devops-capabilities/technical/monitoring-and-observability/#:~:text=Observability%20is%20tooling%20or%20a%20technical%20solution%20that%20allows%20teams%20to%20actively%20debug%20their%20system.%20Observability%20is%20based%20on%20exploring%20properties%20and%20patterns%20not%20defined%20in%20advance.) 
+within this context, which defines it as:  
+  
+> _...tooling or a technical solution that allows teams to actively debug their 
+system. Observability is based on exploring properties and patterns not defined 
+in advance._
+</p>
+<br />
+<p>
+We see [Tail](/en/guides/tail/) as a crucial part of this, and the primary 
+function enabling data observability with Streamdal. Here are the following 
+features we consider as "observability" features:
+</p>
+<br />
+<p>
+- [Tail](/en/guides/tail/)
+- [Data Graph](/en/core-components/console-ui#data-graph)
+- [Console UI](/en/core-components/console-ui/)
+- [Schemas](/en/core-components/overview/#console-ui-the-observability-command-center)
+
+<br />
+
+👆That list is subject to additions over time, _and not subtractions_. Check 
+out our [manifesto](https://streamdal.com/manifesto/) for more information on this design choice.
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">15. What is Wasm?</span>
+
+<li>
+<Accordion 
+title="What is Wasm?">
+<p>
+<a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a> is [WebAssembly](https://webassembly.org/).
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">16. What role does Wasm play in Streamdal?</span>
+
+<li>
+<Accordion 
+title="What role does Wasm play in Streamdal?">
+<p>
+We make significant use of <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>.
+
+<br />
+
+Rules are supported by Wasm 100%. Schema inference, rules, and any sort of 
+business logic is going to be executed by Wasm in the SDK.
+
+<br />
+
+The reason we're able to have such a low impact on any given client's resources, 
+usually less than 0.1ms, is because it's being executed via Wasm. It's 
+[open source](/en/resources-support/open-source/#wasm). 
+
+<br />
+
+Get more information on 
+how we use it in our [Wasm repo](https://github.com/streamdal/wasm), and read 
+about this design choice in our [manifesto](https://streamdal.com/manifesto/).
+</p>
+</Accordion>
+</li>
+
+### <span class="hiddenh">17. How do I contribute or become a design partner?</span>
+
+<li>
+<Accordion 
+title="How do I contribute or become a design partner?">
+<p>
+Streamdal is open-source using the Apache License v2.0.  
+
+<br />
+
+Review our [contributing guidelines](/en/resources-support/contributing/) for 
+more information.
+</p>
+</Accordion>
+</li>
+
+
+### <span class="hiddenh">18. Does Streamdal support Protobuf or other binary encoding formats?</span>
+
+<li>
+<Accordion 
+title="Does Streamdal support Protobuf or other binary encoding formats?">
+<p>
+We are unabashed fans of and **experts with Protobuf**. It's used in the primary 
+API - we use it everywhere. We have even released previous open source tools 
+like [plumber](https://github.com/streamdal/plumber) which has extensive 
+protobuf support.
+
+<br />
+
+Right now **Streamdal will only work with JSON or non-binary data**, but we have 
+plans to add support in the near future. 
+
+<br />
+
+Check out our [roadmap](https://github.com/orgs/streamdal/projects/1/views/9) 
+for updates.
+</p>
+</Accordion>
+</li>
+
+
+### <span class="hiddenh">19. What are the numbers on the lines between my services and backends?</span>
+
+<li>
+<Accordion 
+title="What are the numbers on the lines between my services and backends?">
+<p>
+Those numbers are throughput details for the edges in those particular groups of 
+components. 
+
+<br />
+
+In the screenshot below, the arrows are pointing to the 
+<a href="/en/resources-support/glossary/#producer" class="pkeyword">producer</a> 
+throughput details of the `welcome-service` <a href="/en/resources-support/glossary/#service" class="pkeyword">service</a>:
+
+<br />
+
+<center><img src={edge} alt="Streamdal producer edge details" /></center>
+</p>
+</Accordion>
+</li>
+
+
+### <span class="hiddenh">20. What is live/real-time in the app?</span>
+
+<li>
+<Accordion 
+title="What is live/real-time in the app?">
+<p>
+Nearly everything.
+
+<br />
+
+The app is always connected to the backend and the [server](/en/core-components/server/). It will receive and 
+react to every update that happens on the server:
+<br />
+- Throughput information
+- the [Data Graph](/en/core-components/console-ui#data-graph) (i.e. when a new SDK is instrumented and the `Process()` is called, it will start showing up on the data graph)
+- [Tail](/en/guides/tail/)
+- Schemas
+</p>
+</Accordion>
+</li>
+
+
+### <span class="hiddenh">21. I see direction indicators on the lines. What are those for?</span>
+
+<li>
+<Accordion 
+title="I see direction indicators on the lines. What are those for?">
+<p>
+These are very important. They show the direction of the flow of data.
+
+<br />
+
+- Going up means it's a read, and is a <img src={consumer_icon} class="inlineimg" /> <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumer</a>
+- Going down means it's a write, and is a <img src={producer_icon} class="inlineimg" /> <a href="/en/resources-support/glossary/#producer" class="pkeyword">producer</a>
+</p>
+</Accordion>
+</li>
+
+
+### <span class="hiddenh">22. I saw that I must pass a ServiceName, ComponentName, OperationType, and OperationName in the SDK - what are those?</span>
+
+<li>
+<Accordion 
+title="I saw that I must pass a ServiceName, ComponentName, OperationType, and OperationName in the SDK - what are those?">
+<p>
+We refer to these as the 
+<a href="/en/resources-support/glossary#audience" class="pkeyword">audience</a>, 
+which identifies a specific service + operation type 
+(<a href="/en/resources-support/glossary#consumer" class="pkeyword">consume</a> or <a href="/en/resources-support/glossary#producer" class="pkeyword">producer</a>), 
+and name for the operation type and component.
+
+<br />
+You will always see these. There is an envar for some of them, but these are 
+declared when the [SDK](/en/core-components/sdk/) is 
+[instrumented](/en/guides/instrumentation/).
+
+</p>
+</Accordion>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+---
+title: TDPSA Data Compliance with Streamdal
+metaTitle: "Ensure TDPSA Data Compliance with Streamdal"
+description: How Streamdal helps with TDPSA compliance
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The <a href="https://capitol.texas.gov/BillLookup/History.aspx?LegSess=88R&Bill=HB4" target="_blank">Texas Data Privacy and Security Act</a> 
+_(TDPSA)_ is a Texas law that will go into effect on July 1, 2024. It regulates 
+the collection, processing, and use of sensitive data.
+
+Streamdal can help keep your data in compliance with this regulation.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+**Data Minimization:** The Streamdal [SDK](/en/core-components/sdk/) can enforce <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> on <a href="/en/resources-support/glossary/#producer" class="pkeyword">consumers</a> and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">producers</a> to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization.
+
+**De-identifying and Masking Data:** From the [Console UI](/en/core-components/console-ui/), you can establish rules and attach them to your producers and consumers as <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> that data must adhere to in order to proceed through your systems. You can have the SDK filter and alert for PII, and obfuscate sensitive fields to ensure only pseudonymous data is used in appropriate systems.
+
+
+> **Coming Soon**: A visual guide on setting up TDPSA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more sections could be applicable, below are two taken from the 
+_TDPSA[^1]_ along with how Streamdal can help with data compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| Sec. 541.101 Controller Duties; Transparency. | The Streamdal [SDK](/en/core-components/sdk/) allows you to create [rules](/en/resources-support/glossary/#rule-or-step) ensuring only necessary data is collected and moves through your systems. <br /><br /> For example, you could ensure fields like `social security number`, `IP address`, or `credit card number` are never transferred into storage or critical environments, or are obfuscated/masked. |
+| Sec. 541.106 Deidentified or Pseudonymous Data.| Similar to ensuring data minimization, you can establish [rules](/en/resources-support/glossary/#rule-or-step) to ensure data is deidentified or made pseudonymous before it reaches your analytical systems. <br /><br /> Fields like `name`, `address`, `e-mail`, and much more can all be masked or turned into pseudonymous data in real time. |
+
+___
+
+[^1]: Texas Legislature. (2023). _Business & Commerce Code: Title 11, Subtitle C. Consumer Data Protection, Chapter 541. Consumer Data Protection, Subchapter A. General Provisions, Texas Data Privacy and Security Act (TDPSA). [Sec. 541.101 Controller Duties; Transparency; Sec. 541.106 Deidentified or Pseudonymous Data]._ https://capitol.texas.gov/tlodocs/88R/billtext/pdf/HB00004I.pdf

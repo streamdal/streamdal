@@ -1,0 +1,129 @@
+---
+title: (Beta) Data Governance
+metaTitle: Enforcing Data Governance with Streamdal
+description: Streamdal Data Governance Overview
+layout: ../../../layouts/MainLayout.astro
+---
+
+
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Warning" />
+  <p style="font-weight: lighter;">The data governance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The data governance features of Streamdal will essentially give anyone the 
+ability to control what data is produced or consumed by applications. It will 
+greatly simplify debugging, data validation efforts, enforcement of data 
+content requirements, and effectively automate PII data protection. All without 
+affecting CI/CD, and eliminating time-consuming re-compiling of services that 
+can follow debugging efforts or incident resolutions.
+
+Whether you’re ensuring [data quality](/en/data-governance/data-quality) 
+or getting started with [data contracts](/en/data-governance/data-quality), 
+acquiring new or fortifying existing 
+[compliance certifications](/en/data-governance/overview/#data-compliance--certifications), 
+or enforcing [internal data governance](/en/data-governance/data-quality#internal-data-governance) 
+policies across your organization, Streamdal will drive consistency, 
+enforcement, and protection wherever data moves. 
+
+### Data Compliance & Certifications
+
+The lists below represent the relevant data laws and regulations that Streamdal 
+can greatly assist in achieving compliance with. These lists may continue to 
+grow in scope as more use cases surface and case studies are completed.
+
+_Don't see your regulation below? 
+[Let us know](/en/resources-support/get-support/) so we can clarify 
+applicability._
+
+<div class="pc-tabx w-full max-w-2xl m-0">
+  <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
+  <label
+    for="tab1"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab1:border-b-4 peer-checked/tab1:border-purple-bright peer-checked/tab1:font-bold"
+  >
+    Europe
+  </label>
+  <input id="tab2" type="radio" name="pct" class="hidden peer/tab2" />
+  <label
+    for="tab2"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab2:border-b-4 peer-checked/tab2:border-purple-bright peer-checked/tab2:font-bold"
+  >
+    International
+  </label>
+  <input id="tab3" type="radio" name="pct" class="hidden peer/tab3" />
+  <label
+    for="tab3"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab3:border-b-4 peer-checked/tab3:border-purple-bright peer-checked/tab3:font-bold"
+  >
+    Global
+  </label>
+  <input id="tab4" type="radio" name="pct" class="hidden peer/tab4" />
+  <label
+    for="tab4"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab4:border-b-4 peer-checked/tab4:border-purple-bright peer-checked/tab4:font-bold"
+  >
+    United States
+  </label>
+{/* Tab 1: EU */}
+  <div class="hidden peer-checked/tab1:block clear-both p-5 w-full">
+<p>
+- [GDPR](/en/data-governance/compliance/gdpr)
+</p>
+  </div>
+{/* Tab 2: International */}
+  <div class="hidden peer-checked/tab2:block clear-both p-5 w-full">
+<p>
+- [PIPEDA](/en/data-governance/compliance/pipeda) (Canada)
+</p>
+  </div>
+{/* Tab 3: Global */}
+  <div class="hidden peer-checked/tab3:block clear-both p-5 w-full">
+<p>
+- [ISC/IEC](/en/data-governance/compliance/isc-iec) 
+  (International Organization for Standardization)
+- [SOCII](/en/data-governance/compliance/socii) 
+  (Service Organization Control Type 2)
+</p>
+  </div>
+{/* Tab 4: United States */}
+    <div class="hidden peer-checked/tab4:block clear-both p-5 w-full">
+<p>
+- [CCPA/CPRA](/en/data-governance/compliance/ccpa-cpra) (California)
+- [CDPA](/en/data-governance/compliance/cdpa) (Virginia)
+- [FED RAMP](/en/data-governance/compliance/fed-ramp) (Federal)
+- [GBLA](/en/data-governance/compliance/gbla) (Federal)
+- [HIPAA](/en/data-governance/compliance/hipaa) (Federal)
+- [S.H.I.E.L.D.](/en/data-governance/compliance/ny-state-shield) (New York)
+- [NYCRR 500](/en/data-governance/compliance/nycrr-500) (New)
+- [TDPSA](/en/data-governance/compliance/tdpsa) (Texas)
+</p>
+  </div>
+</div>
+
+---
+
+Be sure to periodically check out our 
+[roadmap](/en/resources-support/roadmap) for updates on 
+development.
+
+In the meantime, join our [Discord](https://discord.gg/streamdal) to read and 
+participate in all the discussions about the data governance features!

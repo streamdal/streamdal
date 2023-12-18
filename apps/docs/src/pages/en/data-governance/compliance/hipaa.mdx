@@ -1,0 +1,88 @@
+---
+title: HIPAA Data Compliance with Streamdal
+metaTitle: "Ensure HIPAA Data Compliance with Streamdal"
+description: How Streamdal helps with HIPAA compliance
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The <a href="https://www.cdc.gov/phlp/publications/topic/hipaa.html" target="_blank">Health Insurance Portability and Accountability Act of 1996</a> 
+_(HIPAA)_ is a U.S. federal regulation that mandates national guidelines to 
+safeguard confidential patient health data from unauthorized disclosure 
+without the patient's awareness or approval. Streamdal can help keep data in
+compliance with HIPAA requirements.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+**PHI Data Integrity:** Streamdal can help ensure only expected and valid data reaches a <a href="/en/resources-support/glossary/#destination" class="pkeyword">destination</a>, and will quarantine "bad data" for repair. You can set up <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to ensure consistent data and alerts on violations, regardless of where it is produced or consumed. 
+
+**De-identifying PHI:** Almost all of the sensitive PHI fields can be found in the default rule selections, such as `social security number`, `IP address`, `telephone number`, etc which can be filtered for. 
+
+With these rules, you can create reusable <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> in the [Console UI](/en/core-components/console-ui/) for ensuring PHI is always properly de-identified in real time.
+
+**Ensuring Real-time Safeguards:** With the combination of rules and reusable pipelines, you can ensure that PHI is not introduced into environments where it should not be. You can control which <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> or <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> can interact with PHI, and effectively enforce data boundaries in real time.
+
+> **Coming Soon**: A visual guide on setting up HIPAA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more sections could be applicable, below are a few taken from the 
+_HIPAA Administrative Simplification Regulation Text[^1]_ along with how 
+Streamdal can help with data compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 164.312 (c)(1)(e)(2)(i) Standard: Integrity, Implementation specifications, & Integrity controls (Addressable).| Streamdal allows you to monitor and protect PHI by enforcing [rules](/en/resources-support/glossary/#rule-or-step) on [services](/en/resources-support/glossary/#service) that interact with this sensitive data in real time. You can enforce quality standards to ensure information is not improperly altered or destroyed in flight, as well as restrict access to specific [producers](/en/resources-support/glossary/#producer) and [consumers](/en/resources-support/glossary/#consumer). |
+| § 164.514 Other requirements relating to uses and disclosures of protected health information. | Almost all of the sensitive fields listed in this HIPAA section on the parameters of creating de-identified data sets are default value [rules](/en/resources-support/glossary/#rule-or-step) you can select and obfuscate/de-identify with Streamdal. You can effectively enforce the quality standards for _all_ your de-identified data sets, as well as ensure this data is HIPAA compliant before it reaches a [destination](/en/resources-support/glossary/#destination). |
+| § 164.530 Administrative requirements (c)(1) Standard: Safeguards. | While Streamdal does not encrypt data, the combination of [rules](/en/resources-support/glossary/#rule-or-step) and functions that can be created in the [Console UI](/en/core-components/console-ui/) can help ensure your data is protected in-flight, <u>before it reaches rest.</u> You can block certain producers and consumers from interacting with data, thus creating boundaries for data to ensure PHI is not accidentally introduced into unauthorized locations. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_
+    
+    _The HIPAA Privacy Rule doesn't dictate how long medical records should be 
+    kept; this is typically determined by State laws. However, it does mandate 
+    that entities covered by HIPAA protect the privacy of medical records and 
+    other PHI for as long as they hold that information, including during its 
+    disposal[^2]._
+    </p>
+  </div>
+</Notification>
+
+___
+
+[^1]: U.S. Department of Health & Human Services. (2013). _HIPAA Administrative Simplification [§ 164.312 (c)(1) Standard: Integrity; § 164.312 (e)(2) Implementation specifications; § 164.312 (i) Integrity controls (Addressable); § 164.514 Other requirements relating to uses and disclosures of protected health information; § 164.530 (c)(1) Standard: Safeguards]_. https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/administrative/combined/hipaa-simplification-201303.pdf <br /><br /> _This is an unofficial version that presents all the regulatory standards in one document._
+[^2]: U.S. Department of Health and Human Services. (2013, July 26). _Does the HIPAA Privacy Rule require covered entities to keep patients’ medical records for any period of time?_ https://www.hhs.gov/hipaa/for-professionals/faq/580/does-hipaa-require-covered-entities-to-keep-medical-records-for-any-period/index.html

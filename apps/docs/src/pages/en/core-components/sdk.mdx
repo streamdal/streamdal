@@ -1,0 +1,51 @@
+---
+title: The Streamdal SDK
+metaTitle: "Unpacking the Power and Simplicity of the Streamdal SDK"
+description: Dive into Streamdal's SDK, driving real-time data operations with minimal codebase disruptions.
+layout: ../../../layouts/MainLayout.astro
+---
+
+import sdkDiagram from '../../../images/core-components/StreamdalSdk.png';
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<br />
+<br />
+Designed with efficiency in mind, the SDK handles metrics reporting, pipeline processing, and validations using WebAssembly (Wasm). This approach guarantees sub-millisecond overhead, high scalability, and compatibility across various languages.
+
+## Key Features
+
+- **Lightweight Design**: The SDK is crafted to be lean, ensuring efficient runtime without adding bulk.
+- **Real-time Rule Processing**: Utilizing WebAssembly (Wasm), the [SDK boasts sub-millisecond overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md) for rule application.
+- **Console UI-Defined Rules**: Rules are defined directly through the console UI, and pulled down via the SDK for processing .
+
+## Integrating the SDK into your Application
+
+The SDK is designed to be integraterd into your application as a library. Please see our [instrumentation guide](../../guides/instrumentation).  
+
+## Multi-Language Support
+
+The SDK is currently available in the following languages:
+
+- **[Go](https://github.com/streamdal/go-sdk)**
+- **[Node](https://github.com/streamdal/node-sdk)**
+- **[Python](https://github.com/streamdal/python-sdk)**
+
+
+## SDK High Level Architecture
+
+The SDK 
+<img src={sdkDiagram} alt="Streamdal SDK Arch" />
+
+
+
+

@@ -1,0 +1,216 @@
+---
+title: Example components
+description: Example components
+layout: ../../layouts/MainLayout.astro
+---
+
+import { Error, Info, Warning } from "../../icons/icons.js";
+import note from "@images/icons/note.png";
+import checked from "@images/icons/checked.png";
+import info from "@images/icons/info.png";
+import warning from "@images/icons/warning.png";
+import tip from "@images/icons/tip.png";
+
+import { Notification } from "accessible-astro-components";
+import Accordion from "@components/Accordion/Accordion.astro";
+import "../../styles/index.scss";
+
+## Headings
+
+<div>
+  ``` # Big heading ## Medium heading ### Small heading #### Smaller heading ```
+</div>
+
+## Lists
+
+Numbered:
+
+1. One
+1. Two
+   - Sub point
+1. Three
+
+```
+1. One
+1. Two
+    * Sub point
+1. Three
+```
+
+## Code blocks
+
+Inline `code blurb` with backticks.
+
+```
+Inline `code blurb` with backticks.
+```
+
+Multiline code with triple backticks:
+
+```bash
+$ some-multi-line-cmd --with-arg foo \
+    --another-arg bar
+```
+
+## Callouts
+
+Requires you to specify to add the following statements at the top of the mdx 
+file:
+
+```javascript
+import { Notification } from 'accessible-astro-components';
+```
+
+<Notification type="checked">
+  <img src={checked} alt="checkmark" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>This brings us a checked status</p>
+  </div>
+</Notification>
+
+<Notification type="note">
+  <img src={note} alt="Note" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>This adds a note in the content</p>
+  </div>
+</Notification>
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>This draws attention to important information</p>
+  </div>
+</Notification>
+
+<Notification type="warn">
+  <img src={warning} alt="Warning" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>This raises a warning to watch out for</p>
+  </div>
+</Notification>
+
+<Notification type="tip">
+  <img src={tip} alt="tip" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>This suggests a helpful tip</p>
+  </div>
+</Notification>
+
+## Accordions
+
+Requires you to specify to add the following statements at the top of the mdx 
+file:
+
+```javascript
+import Accordion from "@components/Accordion/Accordion.astro";
+```
+<Accordion 
+title="This is your header title">
+<p>This is your accordion content</p>
+</Accordion>
+<Accordion 
+title="This is your subsequent header. It can be quite as long as you need it 
+to be, or as short as you want it to be. Utilize <br /> for line breaks inside 
+of <Accordion>.">
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+culpa qui officia deserunt mollit anim id est laborum.
+</p> 
+<br />
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+culpa qui officia deserunt mollit anim id est laborum.
+</p>
+</Accordion>
+
+## Horizontal line
+
+```
+---
+```
+
+## Tabs
+
+<div class="pc-tabx w-full max-w-2xl m-0">
+  <input checked id="tab1" type="radio" name="pct" class="hidden peer/tab1" />
+  <label
+    for="tab1"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab1:border-b-4 peer-checked/tab1:border-purple-bright peer-checked/tab1:font-bold"
+  >
+    Tab1
+  </label>
+  <input id="tab2" type="radio" name="pct" class="hidden peer/tab2" />
+  <label
+    for="tab2"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab2:border-b-4 peer-checked/tab2:border-purple-bright peer-checked/tab2:font-bold"
+  >
+    Tab 2
+  </label>
+  <input id="tab3" type="radio" name="pct" class="hidden peer/tab3" />
+  <label
+    for="tab3"
+    class="font-medium text-sm leading-7 float-left py-4 px-6 border-b-2 border-purple-divider mb--4 text-white peer-checked/tab3:border-b-4 peer-checked/tab3:border-purple-bright peer-checked/tab3:font-bold"
+  >
+    Tab 3
+  </label>
+  <div class="hidden peer-checked/tab1:block clear-both p-5 w-full">
+    <p>Tab 1 contents</p>
+  </div>
+  <div class="hidden peer-checked/tab2:block clear-both p-5 w-full">
+    <p>Tab 2 contents</p>
+  </div>
+  <div class="hidden peer-checked/tab3:block clear-both p-5 w-full">
+    <p>Tab 3 contents</p>
+  </div>
+</div>
+
+## Keyword Highlighting
+
+Keyword highlighting is for glossary terms. This is accomplished through 
+assigning classes:
+
+```json
+pkeyword
+ykeyword
+yhighlight
+phighlight
+```
+
+- <span class="pkeyword">Class: pkeyword without the hoverstate is achieved with a span</span>
+{/* */}
+- <a href="#" class="pkeyword">Keyword links have a special hoverstate</a>
+
+  ...but require `<a href>` and will not work with `[markdown](syntax)` for links.
+
+- <span class="ykeyword">Class: ykeyword. No hover state, just for extra 
+highlighting for statements or special titles</span>
+  - **<span class="ykeyword">Here is the same highlighting, but in bold</span>**
+
+- **<span class="yhighlight">Text box highlighting yellow</span>**
+- bullet text between
+- **<span class="phighlight">Text box highlighting purple</span>**
+- No bold text 👇
+- <span class="yhighlight">Text box highlighting yellow</span>
+- bullet text between
+- <span class="phighlight">Text box highlighting purple</span>
+- Italics 👇
+- _<span class="yhighlight">Text box highlighting yellow</span>_
+- bullet text between
+- _<span class="phighlight">Text box highlighting purple</span>_
+
+**<span class="yhighlight">Text box highlighting yellow</span>**
+👈 bold text 👉
+**<span class="phighlight">Text box highlighting purple</span>**
+regular text 👉
+<span class="yhighlight">Text box highlighting yellow</span>
+👉
+<span class="phighlight">Text box highlighting purple</span>
+

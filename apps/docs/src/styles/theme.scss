@@ -1,0 +1,168 @@
+/*
+	Define common sizes and spacings
+*/
+:root {
+  --theme-navbar-height: 6rem;
+  --theme-mobile-toc-height: 4rem;
+  --theme-left-sidebar-width: 18rem;
+  --theme-right-sidebar-width: 18rem;
+  /*
+		Minimum visual horizontal spacing from the edges of the viewport,
+		and between vertically arranged elements
+	*/
+  --min-spacing-inline: 1rem;
+  /* Vertical spacing around the article content and the right sidebar */
+  --doc-padding-block: 0.5rem;
+  --max-width: 100%;
+  --cur-viewport-height: 100vh;
+  /* Font sizes */
+  --theme-text-base: 1rem;
+  --theme-text-sm: 0.9375rem;
+  --theme-text-xs: 0.875rem;
+  --theme-bg-gradient: linear-gradient(
+    178.95deg,
+    #d7c7fe -3.07%,
+    #ffffff 58.34%
+  );
+}
+
+:root {
+  --font-fallback: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  --font-body: "Inter";
+  --font-mono: "IBM Plex Mono", Consolas, "Andale Mono WT", "Andale Mono",
+    "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono",
+    "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco,
+    "Courier New", Courier, monospace;
+
+  /*
+   * Variables with --color-base prefix define
+   * the hue, and saturation values to be used for
+   * hsla colors.
+   *
+   * ex:
+   *
+   * --color-base-{color}: {hue}, {saturation};
+   *
+   */
+
+  --color-base-white: 0, 0%;
+  --color-base-black: 240, 100%;
+  --color-base-gray: 215, 14%;
+  --color-base-blue: 212, 100%;
+  --color-base-blue-dark: 212, 72%;
+  --color-base-green: 158, 79%;
+  --color-base-orange: 22, 100%;
+  --color-base-purple: 269, 79%;
+  --color-base-red: 351, 100%;
+  --color-base-yellow: 41, 100%;
+
+  /*
+   * Color palettes are made using --color-base 
+   * variables, along with a lightness value to
+   * define different variants.
+   *
+   */
+
+  --color-gray-5: var(--color-base-gray), 5%;
+  --color-gray-10: var(--color-base-gray), 10%;
+  --color-gray-20: var(--color-base-gray), 20%;
+  --color-gray-30: var(--color-base-gray), 30%;
+  --color-gray-40: var(--color-base-gray), 40%;
+  --color-gray-50: var(--color-base-gray), 50%;
+  --color-gray-60: var(--color-base-gray), 60%;
+  --color-gray-70: var(--color-base-gray), 70%;
+  --color-gray-80: var(--color-base-gray), 80%;
+  --color-gray-90: var(--color-base-gray), 90%;
+  --color-gray-95: var(--color-base-gray), 95%;
+
+  --color-blue: var(--color-base-blue), 61%;
+  --color-blue-dark: var(--color-base-blue-dark), 39%;
+  --color-green: var(--color-base-green), 42%;
+  --color-orange: var(--color-base-orange), 50%;
+  --color-purple: var(--color-base-purple), 54%;
+  --color-purple-light: var(--color-base-purple), 83%;
+  --color-purple-bright: var(--color-base-purple), 68%;
+  --color-red: var(--color-base-red), 54%;
+  --color-yellow: var(--color-base-yellow), 59%;
+  --color-orange-code: orange;
+  --color-purple-code: #382e57c6;
+  --color-purple-300: #EEE9FF;
+  --color-purple-500: #C1AAFD;
+  --color-purple-600: #956CFF;
+  --color-purple-700: #372D56;
+  --color-purple-900: #28203F;
+  --color-purple-1000: #161223;
+  --color-yellow-500: #FFD260;
+
+  /* default dark theme */
+  color-scheme: dark;
+  --theme-accent-opacity: 0.15;
+  --theme-web: hsla(255, 31%, 26%, 1);
+  --theme-accent: hsla(var(--color-purple-bright), 1);
+  --theme-text-accent: hsla(var(--color-blue), 1);
+  --theme-divider: hsla(257, 95%, 83%, 0.3);
+  --theme-text: hsla(var(--color-base-white), 1);
+  --theme-text-light: hsla(var(--color-base-white), 1);
+  --theme-hypertext: hsla(var(--color-purple-light), 1);
+
+  /* @@@: not used anywhere */
+  --theme-text-lighter: hsla(var(--color-gray-90), 1);
+  --theme-bg: hsla(215, 28%, 17%, 1);
+  --theme-bg-hover: hsla(var(--color-gray-40), 1);
+  --theme-bg-offset: hsla(var(--color-gray-5), 1);
+  --theme-code-inline-bg: hsla(var(--color-gray-10), 1);
+  --theme-code-inline-text: hsla(var(--color-base-white), 100%, 1);
+  --theme-code-bg: hsla(var(--color-gray-5), 1);
+  --theme-code-text: hsla(var(--color-base-white), 100%, 1);
+  --theme-navbar-bg: hsla(255, 32%, 19%, 1);
+  --theme-selection-color: hsla(var(--color-base-white), 100%, 1);
+  --theme-selection-bg: hsla(var(--color-purple-bright), 0.5);
+
+  /* DocSearch [Algolia] */
+  --docsearch-modal-background: var(--theme-bg);
+  --docsearch-searchbox-focus-background: var(--theme-divider);
+  --docsearch-footer-background: var(--theme-divider);
+  --docsearch-text-color: var(--theme-text);
+  --docsearch-hit-background: var(--theme-divider);
+  --docsearch-hit-shadow: none;
+  --docsearch-hit-color: var(--theme-text);
+  --docsearch-footer-shadow: inset 0 2px 10px #000;
+  --docsearch-modal-shadow: inset 0 0 8px #000;
+  --theme-bg-gradient: linear-gradient(180deg, #282140 6.62%, #372d56 66.88%);
+
+  #lg-header-logo {
+    path.dark-logo {
+      fill: white;
+    }
+  }
+  #sm-header-logo {
+    path.dark-logo {
+      fill: white;
+    }
+  }
+}
+
+::selection {
+  color: var(--theme-selection-color);
+  background-color: var(--theme-selection-bg);
+}
+
+@media (min-width: 50em) {
+  :root {
+    --doc-padding-block: 1rem;
+  }
+}
+
+@media (min-width: 72em) {
+  :root {
+    --doc-padding-block: 2rem;
+  }
+}
+
+/* Use dynamic viewport height if the unit is supported by the browser */
+@supports (height: 100dvh) {
+  :root {
+    --cur-viewport-height: 100dvh;
+  }
+}

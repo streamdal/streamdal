@@ -1,0 +1,93 @@
+---
+title: PCI/DSS Data Compliance with Streamdal
+metaTitle: "Ensure PCI/DSS Data Compliance with Streamdal"
+description: How Streamdal helps with PCI/DSS data standards
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The <a href="https://www.pcisecuritystandards.org/" target="_blank">Payment Card Industry Data Security Standard</a> 
+_(PCI DSS)_, initially introduced in 2004, is a global set of security 
+standards designed to ensure that all companies that accept, process, store, or 
+transmit credit card information maintain a secure environment.
+
+Streamdal can help keep your PCI data in compliance.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+**Data Flow Diagram:** An integral part of the [Console UI](/en/core-components/console-ui/) is the [Data Graph](/en/core-components/console-ui#data-graph). It will show the flow of data throughout your entire system in a single view, and give you instant compliance with this requirement of PCI DSS.
+
+<u>No maintenance on the Data Graph is required</u> because of how the Streamdal SDK works. The view it provides in the Console UI) is dynamic, and so long as new and existing services are instrumented with the SDK, the Data Graph will always give an up-to-date representation of data flow. 
+
+**Enforcing Data Policies:** You can physically apply your requirements to <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a> of cardholder data by creating <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> in the Console UI. From there (or the Streamdal [CLI](/en/guides/tail#cli)), you can periodically audit real-time data with [Tail](/en/guides/tail/) to ensure data is flowing within the necessary compliance parameters.
+
+**Data Minimization & PII Protection:** Rules can be created into a matrix of <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> that data must validate through in order to continue flowing through your systems. 
+
+**For example**: you could set up rules to obfuscate or block cardholder data, and restrict access by `IP address` or `time` fields to ensure data minimization and more scrutiny over hours of use
+
+> **Coming Soon**: A visual guide on setting up PCI DSS-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more PCI requirements could be applicable, below are some _(abbreviated)_ 
+sections taken from various requirements established in the 
+_PCI DSS v4.0[^1]_ along with how Streamdal can help with data compliance:
+
+| PCI Requirements | How Streamdal helps comply |
+|-|-|
+| 1.2.4 An accurate data-flow diagram(s) is maintained that meets the following:<br /><br />• Shows all account data flows across systems and networks.<br /><br />• Updated as needed upon changes to the environment. | Once the Streamdal [core components](/en/core-components/overview/) have been fully instrumented, the [Data Graph](/en/core-components/console-ui#data-graph) will ensure all services that handle account data are in a single view. <br /><br />Since the [Data Graph](/en/core-components/console-ui#data-graph) is dynamic, it will not require maintenance like many contemporary solutions, and will always be accurate <u>so long as new services instrument the [SDK](/en/core-components/sdk/)</u> or utilize our [Shims](/en/core-components/libraries-shims/). |
+| 2.1.1 All security policies and operational procedures that are identified in Requirement 2 are: <br /><br />• In use. | You can ensure your data policies are <u>in use</u> by adding them to [rules](/en/resources-support/glossary/#rule-or-step) in the [Console UI](/en/core-components/console-ui) and then attaching those [rules](/en/resources-support/glossary/#rule-or-step) as [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) to any service that requires it.<br /><br /> For example, you can set up [rules](/en/resources-support/glossary/#rule-or-step) to reject data that might populate too much card data in one environment or storage [destination](/en/resources-support/glossary/#destination), causing potential security and compliance issues. [Pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) can be attached and detached in real time to help with easier policy adjustments. |
+| 3.2.1 Account data storage is kept to a minimum through implementation of data retention and disposal policies, procedures, and processes... | The Streamdal [SDK](/en/core-components/sdk/) can filter for cardholder data, and ensure only the minimum amount of data required is being transmitted.<br /><br />[Rules](/en/resources-support/glossary/#rule-or-step) can also be set up to approve/reject data based on time fields to prevent data past its retention period from being accidentally reintroduced into critical environments. |
+| 3.3.1.1 The full contents of any track are not retained upon completion of the authorization process. | [Rules](/en/resources-support/glossary/#rule-or-step) can be set up to enforce data content requirements, and the [SDK](/en/core-components/sdk/) can block data transmission that would result in potentially retaining more information than necessary. |
+| 7.2.5 All application and system accounts and related access privileges are assigned and managed... | You can set up rules on the movement of data for applications, such as only accepting data during certain windows of `time` throughout the day (week, month, etc). [Rules](/en/resources-support/glossary/#rule-or-step) also allow you to restrict access and movement of data to specific `IP addresses`. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_ 
+    
+    _Among the good practices outlined for ensuring 
+    your software is developed securely, PCI DSS states that "...understanding 
+    how sensitive data is handled by the application—including when stored, 
+    transmitted and in memory—can help identify where data needs to be 
+    protected[^2]."_ 
+    </p>
+  </div>
+</Notification>
+
+___
+
+[^1]: PCI Security Standards Council. (2022). _PCI DSS Requirements and Testing Procedures Version 4.0 [Requirement sections: 1.2.4, 2.1.1, 3.2.1, 3.3.1.1, 7.2.5]._ https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0.pdf
+[^2]: PCI Security Standards Council. (2022). _PCI DSS Requirements and Testing Procedures Version 4.0 [6.2 Bespoke and custom software are developed securely: Good Practice, p. 127]._ https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0.pdf

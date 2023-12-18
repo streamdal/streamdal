@@ -1,0 +1,146 @@
+---
+import { getLanguageFromURL, KNOWN_LANGUAGE_CODES } from "../../languages";
+import * as CONFIG from "../../config";
+import StreamdalLogoLG from "./StreamdalLogoLG.astro";
+import StreamdalLogo from "./StreamdalLogo.astro";
+import SkipToContent from "./SkipToContent.astro";
+import SidebarToggle from "./SidebarToggle";
+import LanguageSelect from "./LanguageSelect";
+import Search from "./Search.astro";
+
+type Props = {
+  currentPage: string;
+};
+
+const { currentPage } = Astro.props as Props;
+const lang = getLanguageFromURL(currentPage);
+const docProps = {
+  button: "Search",
+  placeholder: "Search docs",
+  shortcutLabel: "Press / to search",
+  modal: {},
+};
+---
+
+<header class="bg-purple-background-light">
+  <SkipToContent />
+  <nav class="nav-wrapper" title="Top Navigation">
+    <div class="menu-toggle">
+      <SidebarToggle client:idle />
+    </div>
+    <div class="logo flex">
+      <a href="/">
+        <StreamdalLogoLG size={50} />
+        <StreamdalLogo size={40} />
+      </a>
+    </div>
+    <div style="flex-grow: 1;"></div>
+    {
+      KNOWN_LANGUAGE_CODES.length > 1 && (
+        <LanguageSelect lang={lang} client:idle />
+      )
+    }
+    <div class="absolute w-fit grow z-10">
+      <Search labels={docProps} />
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: var(--theme-navbar-height);
+    z-index: 11;
+    padding: 2rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    overflow: hidden;
+  }
+
+  .logo {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    height: 80px;
+    font-size: 2rem;
+    flex-shrink: 0;
+    font-weight: 600;
+    line-height: 1;
+    color: hsla(var(--color-base-white), 100%, 1);
+    gap: 0.25em;
+    z-index: -1;
+  }
+
+  .logo a {
+    display: flex;
+    padding: 0.5em 0.25em;
+    margin: -0.5em -0.25em;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .logo a {
+    transition: color 100ms ease-out;
+    color: var(--theme-text);
+  }
+
+  .logo h1 {
+    display: none;
+    font: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  .nav-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-inline: var(--min-spacing-inline);
+  }
+  .menu-toggle {
+    order: 3;
+  }
+  @media (min-width: 50em) {
+    header {
+      padding: 2rem 0rem;
+    }
+
+    .logo {
+      width: auto;
+      margin: 0;
+      z-index: 0;
+    }
+
+    .logo h1 {
+      display: initial;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+  }
+
+  /** Style Algolia */
+  :root {
+    --docsearch-primary-color: var(--theme-accent);
+    --docsearch-logo-color: var(--theme-text);
+  }
+
+  @media (min-width: 50em) {
+    .search-item {
+      max-width: 400px;
+      padding-right: 0.7rem;
+    }
+  }
+</style>
+
+<style is:global>
+  .search-item > * {
+    flex-grow: 1;
+  }
+</style>

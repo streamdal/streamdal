@@ -1,0 +1,99 @@
+---
+title: Managing ISO/IEC 27001 Data Standards with Streamdal
+metaTitle: "Ensure ISO/IEC Data Compliance with Streamdal"
+description: How Streamdal helps with ISO/IEC data standards
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The <a href="https://www.iso.org/" target="_blank">International Organization for Standardization</a> 
+_(ISO)_ and the International Electrotechnical Commission (IEC) collaborate to 
+establish a unified global system for standards. ISO/IEC 27001 sets forth 
+guidelines for organizations on managing risks related to information security, 
+encompassing directives, processes, and employee education.
+
+Streamdal can enforce data handling policies, and help ensure data is in 
+compliance with this international standard.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+**Data Protection:** The Streamdal [SDK](/en/core-components/sdk/) can ensure that only data that strictly adheres to required forms ends up in restful locations. You can set up <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> and <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> from the [Console UI](/en/core-components/console-ui/) that data must pass - _in real-time_ - in order to continue through your systems.
+
+**Data Threat Intelligence & Data Vulnerability Management:** The [Data Graph](/en/core-components/console-ui#data-graph) can serve as an overview for understanding and collecting information on anomalous activity in your data. 
+
+You can respond to data threats in real-time by hot swapping more rigorous pipelines and alerting or rejecting data that does not meet standards, such as PII handling or cryptographic requirements.
+
+**Data Masking and Data Policy Enforcement:** Because the [SDK](/en/core-components/sdk/) executes your rules and pipelines before data can be <a href="/en/resources-support/glossary/#producer" class="pkeyword">produced</a> or <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumed</a>, you will be able to mask, obfuscate, and otherwise enforce PII handling policies before it moves through your system - and every step afterward as needed.   
+
+> **Coming Soon**: A visual guide on setting up ISO/IEC 27001-specific rules in 
+the [Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more sections could be applicable, below are _many_ sections taken from 
+the Annex A of _ISO 27001:2022[^1]_ along with how Streamdal can help with 
+data standards:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| 5.36 Compliance with policies, rules and standards for information security | Along with [rules](/en/resources-support/glossary/#rule-or-step) and [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) that can be created in the [Console UI](/en/core-components/console-ui/), custom functions can be written to enforce policies on data for the utmost granular and "topic-specific" security policies. |
+| 5.7 Threat intelligence | The [Data Graph](/en/core-components/console-ui#data-graph) can serve as an overview of all your data operations in real time. You'll be able to monitor the flow of real-time data, gaining a greater understanding of vulnerabilities and where to attach stricter [rules](/en/resources-support/glossary/#pipeline-or-ruleset) to data. |
+| 5.8 Information security in project management | By requiring the Streamdal [SDK](/en/core-components/sdk/) to be instrumented for new products and services, you'll always have an up-to-date [Data Graph](/en/core-components/console-ui#data-graph) to enforce your data security policies. <br /><br />[Instrumentation](/en/guides/instrumentation/) should become exponentially easier once there are Streamdal [libraries/shims](/en/core-components/libraries-shims/) available. |
+| 5.9 Inventory of information and other associated assets | The [Data Graph](/en/core-components/console-ui#data-graph) in the [Console UI](/en/core-components/console-ui) provides always up-to-date view of all your data handling assets. <br /><br />Ensuring the `Process()` method is weaved into code where data production or consumption takes place guarantees no maintenance is required for the [Data Graph](/en/core-components/console-ui#data-graph) view. |
+| 5.10 Acceptable use of information and other associated assets | [Rules](/en/resources-support/glossary/#rule-or-step) can be established and attached to any service that handles data. Streamdal [rules](/en/resources-support/glossary/#rule-or-step) and [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) can be a part of the required documentation, and the defacto data policy enforcement mechanism. |
+| 5.14 Information transfer | If it moves, Streamdal will govern it. Regardless of the [sources](/en/resources-support/glossary/#source) and [destinations](/en/resources-support/glossary/#destination) of data, establishing [rules](/en/resources-support/glossary/#rule-or-step) and [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) for data will ensure consistency, quality, and policy adherence. |
+| 5.28 Collection of evidence | Along with the ability to monitor and alert on anomalous activity, the [Data Graph](/en/core-components/console-ui/) will provide a new window into the flow of data to help collect evidence. Using [Tail](/en/guides/tail/), you can tap directly into real-time data to understand what is happening with data in your code. |
+| 5.33 Protection of records | Streamdal is like a [firewall for your data](/en/resources-support/glossary/#firewall-for-data). The combination of establishing [rules](/en/resources-support/glossary/#rule-or-step), using [Tail](/en/guides/tail/) to verify data is valid and that policies are enforced, and monitoring for anomalous activity will help protect your data and minimize your risks in the event of a breach. |
+| 5.34 Privacy and protection of personal identifiable information (PII) | The Streamdal [SDK](/en/core-components/sdk/) will add rich PII handling capabilities to the flow of your data. With [rules](/en/resources-support/glossary/#rule-or-step), you can ensure PII is handled and protected in real-time before it reaches it's [destination](/en/resources-support/glossary/#destination). |
+| 5.36 Compliance with policies, rules, and standards for information security | Once [rules](/en/resources-support/glossary/#rule-or-step) and [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset) are established in the [Console UI](/en/core-components/console-ui/), they can be reused indefinitely and attached to any [producer](/en/resources-support/glossary/#producer) or [consumer](/en/resources-support/glossary/#consumer) to ensure compliance with policies. |
+| 8.6 Capacity management | The metrics available on the data graph and exposed [Prometheus metrics](/en/engineering/metrics/) will provide greater and more granular information for capacity management. |
+| 8.8 Management of technical vulnerabilities | The combination of the [Data Graph](/en/core-components/console-ui/) and using [Tail](/en/guides/tail/) will ensure there are no blind spots in the flow of your data. [Tail](/en/guides/tail/) lets you tap into real-time data to give [observability](/en/engineering/observability/) and help refine the data policies you enforce through [rules](/en/resources-support/glossary/#rule-or-step) and [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset). These two tools will help detect and mitigate data vulnerabilities. |
+| 8.10 Information deletion | While Streamdal cannot ensure data is deleted, [rules](/en/resources-support/glossary/#rule-or-step) can be established on time-series or other specific fields of data to ensure it is not re-introduced into critical environments. |
+| 8.11 Data masking | There are many default [rules](/en/resources-support/glossary/#rule-or-step) to select from in the [Console UI](/en/core-components/console-ui) to create data masking [pipelines](/en/resources-support/glossary/#pipeline-or-ruleset). The Streamdal [SDK](/en/core-components/sdk/) will ensure data is handled and masked as it is produced and consumed. |
+| 8.16 Monitoring activities | From the [Console UI](/en/core-components/console-ui), you can set up monitors and alerts of anomalous activity. |
+| 8.24 Use of cryptography | Streamdal does not encrypt data. However, if you have data that is expected to be encrypted, [rules](/en/resources-support/glossary/#rule-or-step) can be set up to alert on or reject data that does not meet cryptographic requirements. |
+___
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_ 
+
+    _ISO/IEC 27001 requirements on monitoring also dictate 
+    <u>applications</u> to be monitored for anomalous behavior?_
+    </p>
+  </div>
+</Notification>
+
+[^1]: International Organization for Standardization. (2022). ISO/IEC 27001:2022, Information security, cybersecurity and privacy protection - Information security management systems - Requirements [Annex A, Information security controls reference: 5.36, 5.7, 5.8, 5.9, 5.10, 5.14, 5.28, 5.33, 5.34, 5.36, 8.6, 8.8, 8.10, 8.11, 8.16, 8.24]. https://www.iso.org/standard/27001 <br /><br /> _The link in the above reference does not provide direct access to the full document due to copyright restrictions. You may find it more useful to explore the referenced sections from the Annex A tables at [isms.online](https://www.isms.online/iso-27001/)._

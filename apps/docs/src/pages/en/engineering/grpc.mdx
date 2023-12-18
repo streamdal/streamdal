@@ -1,0 +1,58 @@
+---
+title: Understanding gRPC in Streamdal
+metaTitle: "gRPC vs. HTTP: Delving into Streamdal's API Design Choice"
+description: Explore the reasons why Streamdal utilizes gRPC for its API infrastructure and how it compares to traditional HTTP.
+layout: ../../../layouts/MainLayout.astro
+---
+
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+## Introduction to gRPC
+
+gRPC is a high-performance, open-source, and universal RPC (Remote Procedure Call) framework initially developed by Google. It relies on Protocol Buffers, Google's matured language-neutral, platform-neutral serialization format. While it can operate over the same ports as HTTP and HTTP/2, gRPC offers numerous advantages that make it stand out.
+
+### How gRPC Differs from HTTP
+
+1. **Communication**: 
+   - **gRPC**: Uses HTTP/2 as its transfer protocol, offering advantages like smaller header sizes and full-duplex communication.
+   - **HTTP**: Mostly reliant on HTTP/1.1 which can be less efficient due to its textual nature and half-duplex communication.
+
+2. **Serialization**:
+   - **gRPC**: Utilizes Protocol Buffers, which is both simpler and more efficient than JSON or XML. 
+   - **HTTP**: Typically uses JSON or XML for data serialization.
+
+3. **API Design**:
+   - **gRPC**: Has built-in code generation for multiple languages, enabling you to define your service methods and message types all in one place.
+   - **HTTP**: API interfaces often defined using other tools or specifications such as OpenAPI.
+
+4. **Streaming**:
+   - **gRPC**: Supports bidirectional streaming, enabling both the client and server to send a sequence of messages using a single TCP connection.
+   - **HTTP**: Typically limited to request-response style communication.
+
+## Why gRPC is the Choice for Streamdal's API
+
+Given its capabilities, gRPC offers various advantages that resonated with Streamdal's design and performance goals:
+
+1. **Performance**: With Protocol Buffers, gRPC allows for efficient serialization, reducing the payload size and speeding up both the network transmission and serialization processes.
+
+2. **Language-Agnostic**: gRPC's support for numerous languages enables Streamdal to interact seamlessly with diverse systems and applications.
+
+3. **Streaming Capabilities**: gRPC's bidirectional streaming ensures real-time communication, ideal for our use-cases where timely data exchange is crucial.
+
+4. **Deadlines/Timeouts**: gRPC allows clients to specify how long they're willing to wait for an RPC to complete. The server can check this and decide whether to complete the operation or abort if it will likely take too long.
+
+5. **Pluggable**: gRPC is designed to support pluggable authentication, load balancing, retries, etc., giving us flexibility in how we architect our solutions.
+
+## Conclusion
+
+gRPC's performance, efficiency, and versatility make it a compelling choice for modern API-driven applications. For Streamdal, the benefits of adopting gRPC were clear, ensuring efficient communication, scalability, and robustness in our system interactions.

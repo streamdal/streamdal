@@ -1,0 +1,53 @@
+---
+title: The Streamdal Console UI 
+metaTitle: "An Inside Look into Streamdal's Console User Interface"
+description: Exploring the Console UI's design and functionality, driving Streamdal's data operations.
+layout: ../../../layouts/MainLayout.astro
+---
+
+import consoleDashboard from '../../../images/core-components/console-dashboard.png';
+import consolePipeline from '../../../images/core-components/console-pipeline.png';
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+
+<br />
+<br />
+
+The Console UI of Streamdal is more than just a user interface; it's the cockpit from which the complexities of data operations are orchestrated with grace and precision. Built atop a powerful GRPC framework, it offers a seamless communication channel with the Console Server, providing users with a visual playground to create, manage, and monitor their data rules and pipelines.
+
+## Dashboard View: Your Real-time Data Flow
+
+The Dashboard View remains the nerve center of the Console UI, offering:
+
+- <span id="data-graph">**Data Graph**</span>: A graphic layout showcasing the relationship between consumers, producers, and topics in each pipeline.
+- **Real-time Stats**: Gain insights into performance, consumption, and production rates of each entity.
+- **Tail View**: Observe your pipeline data in real-time, ensuring immediate feedback on operations.
+- **Schema Discovery**: Explore and define schemas, generated based on events that flow across your schemas 
+
+<img src={consoleDashboard} alt="Streamdal Console Dashboard" />
+
+## Pipeline View: The Rule Crafting Studio
+
+Dive into the Pipeline View to engage in Streamdal's rule-crafting domain:
+
+- **Detective (PII) Rules**: Establish guidelines for managing Personal Identifiable Information (PII).
+- **Encode & Decode Rules**: Determine data encoding before transmission and decoding upon reception (TBA).
+- **Transformation Rules**: Set real-time data transformation parameters, catering to dynamic requirements.
+
+<img src={consolePipeline} alt="Streamdal Console Dashboard" />
+
+---
+
+The Streamdal Console UI translates intricate data mechanics into intuitive visual narratives. It's where users not only visualize their data's journey but actively shape its trajectory. Delve deeper into each feature to unlock its full potential and guide your data's narrative with precision.```
+
+Remember to incorporate images for the Service View, Tail View, and Schema Discovery as you mentioned.

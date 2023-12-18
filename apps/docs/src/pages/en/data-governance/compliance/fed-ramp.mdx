@@ -1,0 +1,97 @@
+---
+title: "FedRAMP Data Compliance with Streamdal"
+metaTitle: "Ensure FedRAMP Data Compliance with Streamdal"
+description: "Guide to use Streamdal for strict adherence to FedRAMP standards."
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+<a href="https://www.fedramp.gov/" target="_blank">Federal Risk and Authorization Management Program</a> 
+_(FedRAMP)_ mandates cloud services to meet consistent security and quality 
+standards. Achieving and maintaining this certification can be complex, but 
+Streamdal can help simplify the process.
+
+## Streamdal's Approach
+
+Leverage Streamdal for:
+
+**Data Protection**: You can implement rules on data to consistently govern 
+how federal information is processed. The SDK can help prevent accidental 
+transmission or unauthorized access by disallowing data from leaving its 
+defined boundaries. 
+
+By creating <a href="/en/resources-support/glossary/#step-or-rule" class="pkeyword">rules</a> and attaching <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> to <a href="/en/resources-support/glossary/#producer" class="pkeyword">producers</a> and <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumers</a>, you can 
+ensure development environments are not processing, storing, or transmitting federal information.
+
+**Incident Response**: Streamline your response to security incidents by 
+setting up automated workflows that aid your team in rapidly addressing threats.
+
+**Continuous Monitoring**: Implement rules to consistently monitor cloud 
+environments, detecting and alerting on any unauthorized access or anomalous 
+activities that might signify a potential security threat.
+
+> **Coming Soon**: A visual guide on setting up FedRAMP-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more key concepts should be applicable, below are two taken from the 
+_FedRAMP CSO's Impact Levels[^1]_ along with how Streamdal can help with data 
+compliance:
+
+| Key Concepts | How Streamdal helps comply |
+|-|-|
+| #1 (All Impact levels): Defining Your Authorization Boundary in the Cloud | Streamdal can play a key part in defining and protecting data boundaries for the authorizing officials operating in your systems. You can write [rules](/en/resources-support/glossary/#rule-or-step) for controlling access to data, and [rules](/en/resources-support/glossary/#rule-or-step) to protect the flow of all federal information and metadata from leaving its boundaries. |
+| #4 (FR-High): Interconnections in the Cloud | Streamdal will significantly uncomplicate the disclosing process to the AO (Agency of Authorizing Authority). Without necessarily defining [rules](/en/resources-support/glossary/#rule-or-step), simply using the [observability](/en/resources-support/glossary/#observability) Streamdal offers will surface all of the data handling portions of your systems. |
+
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_ 
+    
+    _An <u>API that calls data from an external source</u>, 
+    <u>IaaS that a PaaS or SaaS resides upon</u>, or external systems that 
+    provide <u>audit logging</u>, <u>vulnerability scanning</u>, or 
+    <u>ticketing systems</u> are all examples of external services that could 
+    impact the CIA (confidentiality, integrity, or availability) of federal 
+    information._
+    </p>
+  </div>
+</Notification>
+
+Navigate cloud security effortlessly and remain FedRAMP compliant with 
+Streamdal.
+
+---
+
+[^1]: Federal Risk and Authorization Management Program (FedRAMP). (n.d.). _Understanding Baselines and Impact Levels for FedRAMP® Authorizations._ https://www.fedramp.gov/baselines/ <br /> <br /> _Federal Information Processing Standard (FIPS) 199 provides the standards for the security categorization of federal information and information systems. A system’s category is dependent on the potential impact on an agency’s assets and operations should their information and information systems be compromised through unauthorized access, use, disclosure, disruption, modification, or destruction. These are the standards Cloud Service Providers (CSPs) must employ to ensure their services meet the minimum security requirements for the data processed, stored, and transmitted._

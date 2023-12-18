@@ -1,0 +1,68 @@
+---
+title: How Streamdal Works
+metaTitle: "Seamlessly Integrating Streamdal's Components"
+description: Unraveling the collaborative dance of Streamdal's core components.
+layout: ../../../layouts/MainLayout.astro
+---
+
+import mermaidFlow from '@images/guides/mermaidflow.png'
+import deployflow from '@images/guides/deployFlow.png'
+import sdkFlow from '@images/guides/MermaidSdktoServer.png'
+import deploymentArch from '@images/guides/HA-Deployment.png'
+import consoleUi from '@images/core-components/dashboard-manage.png'
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+import Workflow from "@components/Misc/Workflow.astro";
+
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<br>
+</br>
+
+Streamdal operates by integrating our 
+[open-source](/en/resources-support/open-source/) SDK into your code. The SDK 
+then communicates with our server and can be managed through our Console UI.
+
+## Typical Workflow
+To start using Streamdal, you'll typically do the following:
+
+<Workflow />
+
+## Server and SDK: A Closer Look
+
+You don't need to go really deep to use Streamdal. But, understanding the 
+interplay between our server and SDK can be _very_ helpful:
+
+1. **Registration**: Post integration, the [SDK](/en/core-components/sdk/) registers with the Streamdal [server](/en/core-components/server/), affirming its status and its readiness to exchange data.
+2. **Communication via gRPC**: The SDK and server converse over gRPC, ensuring efficient bidirectional streaming and reliable data transmission.
+3. **Metrics Reporting**: After registration, the SDK sends [metrics](/en/engineering/metrics/) to the server. These insights reveal data flow patterns, potential bottlenecks, and other key metrics.
+4. <img src={beta} alt="Beta" style="display: inline" /> **Fetching Rules**: The SDK retrieves the latest <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>-compiled rules from the server. These <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">rules</a>, vital for data processing, ensure immediate reflection of any changes in data logic within the SDK.
+
+<img src={sdkFlow} alt="SDK flow" />
+
+
+##  Access the Console UI
+Once the SDK and Server are connected you will manage your data via the [Console UI](../../core-components/console-ui)
+
+1. **Discover Schemas**: View and edit schemas.
+2. **[Tail](/en/guides/tail/)**: View Data flow in real-time.
+3. **View Metrics**: View metrics and data flow patterns.
+4. <img src={beta} alt="Beta" style="display: inline" /> **Manage Pipelines**: Create, edit, attach, and delete <a href="/en/resources-support/glossary#pipeline-or-ruleset" class="pkeyword">pipelines</a>.
+
+<img src={consoleUi} style="border-radius: 5px;" alt="Console UI" />
+
+
+## How It All Works Together
+
+This is a high-level overview of how Streamdal's components all work together. 
+
+<img src={mermaidFlow} alt="Mermaid flow" />

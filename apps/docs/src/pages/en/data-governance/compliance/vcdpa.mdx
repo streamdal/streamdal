@@ -1,0 +1,83 @@
+---
+title: "Virginia CDPA Data Compliance with Streamdal"
+metaTitle: "Ensure VCDPA Data Compliance with Streamdal"
+description: "Utilize Streamdal to ensure consistent adherence to VCDPA data standards."
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+The <a href="https://law.lis.virginia.gov/vacodefull/title59.1/chapter53/" target="_blank">Consumer Data Protection Act of Virginia</a> 
+_(VCDPA)_ necessitates rigorous data protection standards, prioritizing 
+consumer rights to access, correct, and delete personal data. With Streamdal, 
+ensuring compliance is streamlined and transparent.
+
+## Streamdal's Approach
+
+With Streamdal's data compliance features, you can enable:
+
+**Data Minimization:** Establish robust 
+<a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> to ensure data processing is in 
+line with VCDPA requirements.
+
+**Timely Response to Requests:** The combination of the [open source](/en/resources-support/open-source/) and 
+[data governance](/en/data-governance/overview/) Streamdal components will 
+enable you to easily comply with customer data requests by helping automate 
+inquiries.
+
+
+> **Coming Soon**: A visual guide on setting up VCDPA-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more sections could be applicable, below are two sections taken from the 
+_VCDPA[^1]_ text with how Streamdal can help with data compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 59.1-578: <br /> Data controller responsibilities; transparency. | The Streamdal SDK can enforce [rules](/en/resources-support/glossary/#rule-or-step) on [consumers](/en/resources-support/glossary/#consumer) and [producers](/en/resources-support/glossary/#producer) to reject or alert on data if it contains more personal data than what is necessary, ensuring data minimization. |
+| § 59.1-580: <br /> Data protection assessments. | From the [Console UI](/en/core-components/console-ui/), you can make [rules](/en/resources-support/glossary/#rule-or-step) to ensure that wherever PII moves and is processed throughout your systems, it is documented for record-keeping and assessment requirements. Streamdal can effectively automate consumer inquiries on personal data. |
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>_Did you know: VCDPA requirements on the timeliness for 
+    responding to requests to delete, requests to correct, and requests to know 
+    are <u>no later than 45 business days?</u>_</p>
+  </div>
+</Notification>
+
+Ensure consumer data rights and maintain VCDPA compliance effectively with 
+Streamdal.
+
+---
+
+[^1]: Virginia. (2023). Consumer Data Protection Act. In Title 59.1. Trade and Commerce, Chapter 53 (Va. Code Ann. § 59.1-578, § 59.1-580). https://law.lis.virginia.gov/vacodefull/title59.1/chapter53/ <br /> <br /> _The Virginia Consumer Data Protection Act (“VCDPA”) went into effect on January 1, 2023. This new law provides Virginia residents certain rights for personal data collected by businesses under conditions outlined in the law._

@@ -1,0 +1,52 @@
+---
+title: (Beta) Data Quality
+metaTitle: Enforcing Data Quality with Streamdal
+description: Data Quality with Streamdal
+layout: ../../../layouts/MainLayout.astro
+---
+
+import warning from "@images/icons/warning.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data quality features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+As briefly mentioned in the [Data Governance](/en/data-governance/overview) 
+overview, Streamdal can also be used to ensure data quality projects, teams or 
+across any organization _with breathtaking swiftness_. 
+
+> **Coming Soon**: A visual guide on setting up Data Quality-specific rules in 
+the [Console UI](/en/core-components/console-ui/).
+
+Once we are out of beta, this section will detail how 
+you can use [rules](/en/resources-support/glossary/#step--rule), 
+[pipelines](/en/resources-support/glossary/#pipeline), and 
+[functions](/en/resources-support/glossary/#wasm) to ensure data quality, 
+design data contracts, and streamline data validation.
+
+---
+
+Be sure to periodically check out our 
+[roadmap](/en/resources-support/roadmap) for updates on 
+development.
+
+In the meantime, join our [Discord](https://discord.gg/streamdal) to read and 
+participate in all the discussions about the data governance features!

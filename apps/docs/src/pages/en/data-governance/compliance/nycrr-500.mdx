@@ -1,0 +1,100 @@
+---
+title: Title 23 NYCRR Part 500 Data Compliance with Streamdal
+metaTitle: "Ensure NYCRR0500 Data Compliance with Streamdal"
+description: How Streamdal helps with NYCRR-500 compliance
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import info from "@images/icons/info.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import beta from "@images/beta.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<Notification type="checked">
+  <img src={beta} alt="Beta" />
+  <p style="font-weight: lighter;">The data compliance features of Streamdal 
+  are currently in beta, and being tested with a select group of contributors, 
+  companies, and design partners. If you would like to participate in the beta, 
+  please 
+  [reach out to us](/en/resources-support/get-support/).</p>
+</Notification>
+
+In 2017, facing growing cybersecurity threats, New York's Department of 
+Financial Services introduced <a href="https://www.dfs.ny.gov/industry_guidance/cybersecurity" target="_blank">Title 23 NYCRR 500: Cybersecurity Requirements for Financial Services Companies</a> 
+_(NYCRR-500)_. This regulation targets financial entities operating in the 
+state, ensuring the protection of customer data and IT systems of institutions 
+like state-chartered banks, mortgage brokers, and insurers.
+
+Streamdal will strengthen compliance with this regulation, and enable anyone to 
+enforce data policies on real-time data.
+
+## Streamdal's Approach
+
+You can leverage Streamdal for:
+
+**Protecting Data:** You can establish specific <a href="/en/resources-support/glossary/#rule-or-step" class="pkeyword">rules</a> and <a href="/en/resources-support/glossary/#pipeline-or-ruleset" class="pkeyword">pipelines</a> for data 
+that obfuscate or redact PII, and check for plaintext passwords or other 
+sensitive information. Data that is past its retention period can be blocked 
+from accidentally being introduced or reintroduced into critical environments. 
+
+**Enforcing Data Policies:** From the [Console UI](/en/core-components/console-ui/), you can create rules that 
+data must pass in order to continue flowing through your systems. You can tap 
+into real-time data with [Tail](/en/guides/tail/) to follow the flow of data through your system 
+and ensure compliance.
+
+**Continuous Monitoring:** The [SDK](/en/core-components/sdk/) can also notify you on anomalous data 
+activity, such as unexpected increases or decreases in flow, or a sudden influx 
+of violations. 
+
+The [observability](/en/resources-support/glossary/#observability) the [Data Graph](/en/core-components/console-ui/#data-graph) and [Tail](/en/guides/tail/) provide can also help security and 
+operational teams understand how code handles data in real time. This 
+drives better communication with data handling processes and faster response 
+to threats in real time.
+
+> **Coming Soon**: A visual guide on setting up NYCRR-500-specific rules in the 
+[Console UI](/en/core-components/console-ui/).
+
+## Regulatory Insights
+
+We wanted to make researching the relevant data regulations easier and give a 
+better idea of where Streamdal could be the most impactful for your 
+organization. In most cases, the combination of the observability and data 
+governance capabilities will ensure successful compliance. 
+
+While more sections could be applicable, below are two taken from the 
+_Title 23 NYCRR Part 500[^1]_ along with how Streamdal can help with data 
+compliance:
+
+| § Sections | How Streamdal helps comply |
+|-|-|
+| § 500.3 Cybersecurity Policy | The Streamdal [SDK](/en/core-components/sdk/) can ensure that data in motion complies with your organization's data security policies by filtering, alerting, or rejecting data based on content [rules](/en/resources-support/glossary/#rule-or-step). For example, you can implement [rules](/en/resources-support/glossary/#rule-or-step) to alert on and reject data that contain plaintext passwords or other sensitive information, and monitor for potential violation. |
+| § 500.13  Limitations on Data Retention | Streamdal can assist with limitations on data retention through the creation of [rules](/en/resources-support/glossary/#rule-or-step) in the [Console UI](/en/core-components/console-ui/). You can get notified when producers and consumers are handling PI that is past its retention period (time fields), or completely block non-compliant data from being reintroduced into critical environments. <br /><br />[Rules](/en/resources-support/glossary/#rule-or-step) can also be set up to strip, restrict, obfuscate, and mask data helping enforce data policies around retention.
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>
+    _Did you know:_ 
+    
+    _The NY DFS (Department of Financial Services) states that 
+    "non-continuous monitoring of Information Systems, such as through periodic 
+    manual review of logs and firewall configurations, would not be considered 
+    to constitute "effective continuous monitoring" for purposes of 23 NYCRR 
+    500.05[^1]."_
+    </p>
+  </div>
+</Notification>
+
+___
+
+[^1]: New York State Department of Financial Services. (2017). _Title 23 NYCRR Part 500: Cybersecurity Requirements for Financial Services Companies [§ 500.3 Cybersecurity Policy; § 500.13 Limitations on Data Retention]._ https://www.dfs.ny.gov/system/files/documents/2023/03/23NYCRR500_0.pdf

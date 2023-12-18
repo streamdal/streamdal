@@ -1,0 +1,59 @@
+---
+title: Java Client Support (TBA)
+metaTitle: "Elevate Your Java Applications with Streamdal"
+description: Streamdal Java support
+layout: ../../../layouts/MainLayout.astro
+---
+
+import tip from "@images/icons/tip.png";
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+Support for Java is currently not available, but we're planning to add it.
+
+*However, we could use your input!*
+
+## Version
+
+What version of Java should we add support for first?
+
+## Libraries
+Along with additional language support, we plan forking specific libraries that 
+would be impactful to have the Streamdal functionality. Read more about our 
+[Libraries/Shims](/en/core-components/libraries-shims).
+
+Below are some additions we are considering based on feedback from our design 
+partners and current users:
+
+
+|  <u>Messaging Systems</u> |  <u>Database</u> |
+|---|---|
+|spring-kafka|spring|
+|rabbitmq-java|mybatis|
+|jms|jbdi|
+|httpclient|mongo-java|
+|okhttp|msql-connector-java|
+
+<Notification type="tip">
+  <img src={tip} alt="tip" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>Think we should consider or prioritize other libraries?</p>
+  </div>
+</Notification>
+
+Join our [discord](https://discord.gg/streamdal) and participate in the polls! 
+The discussions and feedback our users and the open source community brings 
+will be incredibly value to feature development.
+
+For more information on the progress for Java support, check out our 
+[roadmap](/en/resources-support/roadmap)

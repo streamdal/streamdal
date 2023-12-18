@@ -1,0 +1,87 @@
+---
+title: "Python Client Support for Streamdal"
+metaTitle: "Elevate Your Python Applications with Streamdal"
+description: "Easily incorporate Streamdal into your Python applications to enhance your data processing."
+layout: ../../../layouts/MainLayout.astro
+---
+import { Notification } from "accessible-astro-components";
+import information from "@images/icons/information.png";
+import info from "@images/icons/info.png";
+
+<div class="addl-wrapper">
+<div class="addl">
+<img src={information} class="uimage" />
+<div class="addlcontent">
+We're updating our documentation, so the presented info might not be the
+most recent.
+</div>
+</div>
+</div>
+
+<br />
+<br />
+
+Welcome to the Python Client Guide for Streamdal! If you're leveraging the 
+power of Python and aim to enhance your data operations, you're on the right t
+rack. Integrating Streamdal into your Python applications is both efficient and 
+straightforward with our Python SDK.
+
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>For detailed information on the SDK and its functionalities, refer to the [SDK README](https://github.com/streamdal/python-sdk#readme).</p>
+  </div>
+</Notification>
+
+## Instrumentation
+
+Start with the [instrumentation guide](../../guides/instrumentation) if you 
+haven't already. It will walk you through the process of setting up Streamdal 
+and its components. 
+
+## Getting Started
+
+1. Install the SDK package:
+
+```bash
+python -m pip install streamdal
+```
+
+### Prerequisites
+
+Ensure you have Python 3.8 or later installed on your system.
+
+### Example
+
+Here's a basic example to help you get started with Streamdal Python SDK:
+
+```bash
+import pprint
+from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+
+client = StreamdalClient(
+    cfg=StreamdalConfig(
+        service_name="order-ingest",
+        streamdal_url="streamdal-server.svc.cluster.local:8082",
+        streamdal_token="1234",
+    )
+)
+
+res = client.process(
+    ProcessRequest(
+        operation_type=OPERATION_TYPE_CONSUMER,
+        operation_name="new-order-topic",
+        component_name="kafka",
+        data=b'{"object": {"field": true}}',
+    )
+)
+
+pprint.pprint(res)
+```
+
+This example demonstrates how to initialize a new instance of the Streamdal 
+SDK, and how to process data through a method call. 
+
+You simply need to create a configuration object and a process request object, 
+and then call the process method on a new Streamdal instance. The result will 
+be printed to the console.
