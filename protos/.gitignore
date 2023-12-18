@@ -1,8 +1,0 @@
-!.keep
-.idea/
-.DS_Store
-.vscode/*
-build/python/*.egg-info
-build/python/dist/*
-
-node_modules/
