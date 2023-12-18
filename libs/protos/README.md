@@ -2,18 +2,33 @@
 [![Build Status](https://github.com/streamdal/protos/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/protos/actions/workflows/release.yml)
 <a href="https://crates.io/crates/streamdal-protos/"><img src="https://img.shields.io/crates/v/streamdal-protos.svg"></a>
 
-This repo contains the common protobuf definitions for all of the streamdal server+SDK related
+This repo contains the common protobuf definitions for all of the streamdal
 components.
 
-All protobuf is generated via `make`. Use `make help` to see all possible targets.
+## Release
+
+1. `git clone git@github.com:streamdal/mono`
+2. `cd mono/libs/protos`
+3. `git checkout -b your-branch`
+4. Make your changes (such as updating or adding .proto files)
+5. `make setup`
+6. `make generate`
+7. `git add . && git commit -m "your message" && git push origin head`
+
+## Release Tags
+`streamdal/mono/libs/protos` uses `libs/protos/vX.Y.Z` format tags.
+
+This is done primarily for Go, as it has a very specific way it handles modules
+that [exist in subdirs](https://go.dev/wiki/Modules#faqs--multi-module-repositories).
 
 ## Usage
-1. Git clone
-2. `git checkout -b your-branch`
-3. Make your changes
-4. `make setup`
-5. `make generate`
-6. `git add . && git commit -m "your message" && git push origin head`
+To fetch this module, you will have to use the following cmd:
+
+`go get github.com/streamdal/mono/libs/protos@vX.Y.Z`
+
+To use the protos pkg in your code, the import will look like this:
+
+`import "github.com/streamdal/mono/libs/protos/build/go/protos"`
 
 ## gRPC API
 The protos expose two gRPC APIs: `external_api.proto` and `internal_api.proto`.
@@ -32,4 +47,3 @@ All gRPC requests allow you to insert your own `request-id` into the
 context/metadata. This `request-id` can be used to correlate requests, 
 responses, logs, etc. If a `request-id` is not specified, `streamdal/server` will
 generate one automatically.
-

@@ -4,10 +4,9 @@
 // 	protoc        v3.21.12
 // source: sp_bus.proto
 
-package _go
+package protos
 
 import (
-	protos "github.com/streamdal/mono/libs/protos/build/go/protos"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -112,105 +111,105 @@ func (m *BusEvent) GetEvent() isBusEvent_Event {
 	return nil
 }
 
-func (x *BusEvent) GetRegisterRequest() *protos.RegisterRequest {
+func (x *BusEvent) GetRegisterRequest() *RegisterRequest {
 	if x, ok := x.GetEvent().(*BusEvent_RegisterRequest); ok {
 		return x.RegisterRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetDeregisterRequest() *protos.DeregisterRequest {
+func (x *BusEvent) GetDeregisterRequest() *DeregisterRequest {
 	if x, ok := x.GetEvent().(*BusEvent_DeregisterRequest); ok {
 		return x.DeregisterRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetCreatePipelineRequest() *protos.CreatePipelineRequest {
+func (x *BusEvent) GetCreatePipelineRequest() *CreatePipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_CreatePipelineRequest); ok {
 		return x.CreatePipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetDeletePipelineRequest() *protos.DeletePipelineRequest {
+func (x *BusEvent) GetDeletePipelineRequest() *DeletePipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_DeletePipelineRequest); ok {
 		return x.DeletePipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetUpdatePipelineRequest() *protos.UpdatePipelineRequest {
+func (x *BusEvent) GetUpdatePipelineRequest() *UpdatePipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_UpdatePipelineRequest); ok {
 		return x.UpdatePipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetAttachPipelineRequest() *protos.AttachPipelineRequest {
+func (x *BusEvent) GetAttachPipelineRequest() *AttachPipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_AttachPipelineRequest); ok {
 		return x.AttachPipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetDetachPipelineRequest() *protos.DetachPipelineRequest {
+func (x *BusEvent) GetDetachPipelineRequest() *DetachPipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_DetachPipelineRequest); ok {
 		return x.DetachPipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetPausePipelineRequest() *protos.PausePipelineRequest {
+func (x *BusEvent) GetPausePipelineRequest() *PausePipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_PausePipelineRequest); ok {
 		return x.PausePipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetResumePipelineRequest() *protos.ResumePipelineRequest {
+func (x *BusEvent) GetResumePipelineRequest() *ResumePipelineRequest {
 	if x, ok := x.GetEvent().(*BusEvent_ResumePipelineRequest); ok {
 		return x.ResumePipelineRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetMetricsRequest() *protos.MetricsRequest {
+func (x *BusEvent) GetMetricsRequest() *MetricsRequest {
 	if x, ok := x.GetEvent().(*BusEvent_MetricsRequest); ok {
 		return x.MetricsRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetKvRequest() *protos.KVRequest {
+func (x *BusEvent) GetKvRequest() *KVRequest {
 	if x, ok := x.GetEvent().(*BusEvent_KvRequest); ok {
 		return x.KvRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetDeleteAudienceRequest() *protos.DeleteAudienceRequest {
+func (x *BusEvent) GetDeleteAudienceRequest() *DeleteAudienceRequest {
 	if x, ok := x.GetEvent().(*BusEvent_DeleteAudienceRequest); ok {
 		return x.DeleteAudienceRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetNewAudienceRequest() *protos.NewAudienceRequest {
+func (x *BusEvent) GetNewAudienceRequest() *NewAudienceRequest {
 	if x, ok := x.GetEvent().(*BusEvent_NewAudienceRequest); ok {
 		return x.NewAudienceRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetTailRequest() *protos.TailRequest {
+func (x *BusEvent) GetTailRequest() *TailRequest {
 	if x, ok := x.GetEvent().(*BusEvent_TailRequest); ok {
 		return x.TailRequest
 	}
 	return nil
 }
 
-func (x *BusEvent) GetTailResponse() *protos.TailResponse {
+func (x *BusEvent) GetTailResponse() *TailResponse {
 	if x, ok := x.GetEvent().(*BusEvent_TailResponse); ok {
 		return x.TailResponse
 	}
@@ -229,63 +228,63 @@ type isBusEvent_Event interface {
 }
 
 type BusEvent_RegisterRequest struct {
-	RegisterRequest *protos.RegisterRequest `protobuf:"bytes,100,opt,name=register_request,json=registerRequest,proto3,oneof"`
+	RegisterRequest *RegisterRequest `protobuf:"bytes,100,opt,name=register_request,json=registerRequest,proto3,oneof"`
 }
 
 type BusEvent_DeregisterRequest struct {
-	DeregisterRequest *protos.DeregisterRequest `protobuf:"bytes,101,opt,name=deregister_request,json=deregisterRequest,proto3,oneof"`
+	DeregisterRequest *DeregisterRequest `protobuf:"bytes,101,opt,name=deregister_request,json=deregisterRequest,proto3,oneof"`
 }
 
 type BusEvent_CreatePipelineRequest struct {
-	CreatePipelineRequest *protos.CreatePipelineRequest `protobuf:"bytes,102,opt,name=create_pipeline_request,json=createPipelineRequest,proto3,oneof"`
+	CreatePipelineRequest *CreatePipelineRequest `protobuf:"bytes,102,opt,name=create_pipeline_request,json=createPipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_DeletePipelineRequest struct {
-	DeletePipelineRequest *protos.DeletePipelineRequest `protobuf:"bytes,103,opt,name=delete_pipeline_request,json=deletePipelineRequest,proto3,oneof"`
+	DeletePipelineRequest *DeletePipelineRequest `protobuf:"bytes,103,opt,name=delete_pipeline_request,json=deletePipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_UpdatePipelineRequest struct {
-	UpdatePipelineRequest *protos.UpdatePipelineRequest `protobuf:"bytes,104,opt,name=update_pipeline_request,json=updatePipelineRequest,proto3,oneof"`
+	UpdatePipelineRequest *UpdatePipelineRequest `protobuf:"bytes,104,opt,name=update_pipeline_request,json=updatePipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_AttachPipelineRequest struct {
-	AttachPipelineRequest *protos.AttachPipelineRequest `protobuf:"bytes,105,opt,name=attach_pipeline_request,json=attachPipelineRequest,proto3,oneof"`
+	AttachPipelineRequest *AttachPipelineRequest `protobuf:"bytes,105,opt,name=attach_pipeline_request,json=attachPipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_DetachPipelineRequest struct {
-	DetachPipelineRequest *protos.DetachPipelineRequest `protobuf:"bytes,106,opt,name=detach_pipeline_request,json=detachPipelineRequest,proto3,oneof"`
+	DetachPipelineRequest *DetachPipelineRequest `protobuf:"bytes,106,opt,name=detach_pipeline_request,json=detachPipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_PausePipelineRequest struct {
-	PausePipelineRequest *protos.PausePipelineRequest `protobuf:"bytes,107,opt,name=pause_pipeline_request,json=pausePipelineRequest,proto3,oneof"`
+	PausePipelineRequest *PausePipelineRequest `protobuf:"bytes,107,opt,name=pause_pipeline_request,json=pausePipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_ResumePipelineRequest struct {
-	ResumePipelineRequest *protos.ResumePipelineRequest `protobuf:"bytes,108,opt,name=resume_pipeline_request,json=resumePipelineRequest,proto3,oneof"`
+	ResumePipelineRequest *ResumePipelineRequest `protobuf:"bytes,108,opt,name=resume_pipeline_request,json=resumePipelineRequest,proto3,oneof"`
 }
 
 type BusEvent_MetricsRequest struct {
-	MetricsRequest *protos.MetricsRequest `protobuf:"bytes,109,opt,name=metrics_request,json=metricsRequest,proto3,oneof"`
+	MetricsRequest *MetricsRequest `protobuf:"bytes,109,opt,name=metrics_request,json=metricsRequest,proto3,oneof"`
 }
 
 type BusEvent_KvRequest struct {
-	KvRequest *protos.KVRequest `protobuf:"bytes,110,opt,name=kv_request,json=kvRequest,proto3,oneof"`
+	KvRequest *KVRequest `protobuf:"bytes,110,opt,name=kv_request,json=kvRequest,proto3,oneof"`
 }
 
 type BusEvent_DeleteAudienceRequest struct {
-	DeleteAudienceRequest *protos.DeleteAudienceRequest `protobuf:"bytes,111,opt,name=delete_audience_request,json=deleteAudienceRequest,proto3,oneof"`
+	DeleteAudienceRequest *DeleteAudienceRequest `protobuf:"bytes,111,opt,name=delete_audience_request,json=deleteAudienceRequest,proto3,oneof"`
 }
 
 type BusEvent_NewAudienceRequest struct {
-	NewAudienceRequest *protos.NewAudienceRequest `protobuf:"bytes,112,opt,name=new_audience_request,json=newAudienceRequest,proto3,oneof"`
+	NewAudienceRequest *NewAudienceRequest `protobuf:"bytes,112,opt,name=new_audience_request,json=newAudienceRequest,proto3,oneof"`
 }
 
 type BusEvent_TailRequest struct {
-	TailRequest *protos.TailRequest `protobuf:"bytes,113,opt,name=tail_request,json=tailRequest,proto3,oneof"`
+	TailRequest *TailRequest `protobuf:"bytes,113,opt,name=tail_request,json=tailRequest,proto3,oneof"`
 }
 
 type BusEvent_TailResponse struct {
-	TailResponse *protos.TailResponse `protobuf:"bytes,114,opt,name=tail_response,json=tailResponse,proto3,oneof"`
+	TailResponse *TailResponse `protobuf:"bytes,114,opt,name=tail_response,json=tailResponse,proto3,oneof"`
 }
 
 func (*BusEvent_RegisterRequest) isBusEvent_Event() {}
@@ -410,11 +409,11 @@ var file_sp_bus_proto_rawDesc = []byte{
 	0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42,
-	0x07, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x30, 0x5a, 0x2e, 0x67, 0x69, 0x74, 0x68,
+	0x07, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x37, 0x5a, 0x35, 0x67, 0x69, 0x74, 0x68,
 	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c,
 	0x2f, 0x6d, 0x6f, 0x6e, 0x6f, 0x2f, 0x6c, 0x69, 0x62, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -431,23 +430,23 @@ func file_sp_bus_proto_rawDescGZIP() []byte {
 
 var file_sp_bus_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_sp_bus_proto_goTypes = []interface{}{
-	(*BusEvent)(nil),                     // 0: protos.BusEvent
-	nil,                                  // 1: protos.BusEvent.MetadataEntry
-	(*protos.RegisterRequest)(nil),       // 2: protos.RegisterRequest
-	(*protos.DeregisterRequest)(nil),     // 3: protos.DeregisterRequest
-	(*protos.CreatePipelineRequest)(nil), // 4: protos.CreatePipelineRequest
-	(*protos.DeletePipelineRequest)(nil), // 5: protos.DeletePipelineRequest
-	(*protos.UpdatePipelineRequest)(nil), // 6: protos.UpdatePipelineRequest
-	(*protos.AttachPipelineRequest)(nil), // 7: protos.AttachPipelineRequest
-	(*protos.DetachPipelineRequest)(nil), // 8: protos.DetachPipelineRequest
-	(*protos.PausePipelineRequest)(nil),  // 9: protos.PausePipelineRequest
-	(*protos.ResumePipelineRequest)(nil), // 10: protos.ResumePipelineRequest
-	(*protos.MetricsRequest)(nil),        // 11: protos.MetricsRequest
-	(*protos.KVRequest)(nil),             // 12: protos.KVRequest
-	(*protos.DeleteAudienceRequest)(nil), // 13: protos.DeleteAudienceRequest
-	(*protos.NewAudienceRequest)(nil),    // 14: protos.NewAudienceRequest
-	(*protos.TailRequest)(nil),           // 15: protos.TailRequest
-	(*protos.TailResponse)(nil),          // 16: protos.TailResponse
+	(*BusEvent)(nil),              // 0: protos.BusEvent
+	nil,                           // 1: protos.BusEvent.MetadataEntry
+	(*RegisterRequest)(nil),       // 2: protos.RegisterRequest
+	(*DeregisterRequest)(nil),     // 3: protos.DeregisterRequest
+	(*CreatePipelineRequest)(nil), // 4: protos.CreatePipelineRequest
+	(*DeletePipelineRequest)(nil), // 5: protos.DeletePipelineRequest
+	(*UpdatePipelineRequest)(nil), // 6: protos.UpdatePipelineRequest
+	(*AttachPipelineRequest)(nil), // 7: protos.AttachPipelineRequest
+	(*DetachPipelineRequest)(nil), // 8: protos.DetachPipelineRequest
+	(*PausePipelineRequest)(nil),  // 9: protos.PausePipelineRequest
+	(*ResumePipelineRequest)(nil), // 10: protos.ResumePipelineRequest
+	(*MetricsRequest)(nil),        // 11: protos.MetricsRequest
+	(*KVRequest)(nil),             // 12: protos.KVRequest
+	(*DeleteAudienceRequest)(nil), // 13: protos.DeleteAudienceRequest
+	(*NewAudienceRequest)(nil),    // 14: protos.NewAudienceRequest
+	(*TailRequest)(nil),           // 15: protos.TailRequest
+	(*TailResponse)(nil),          // 16: protos.TailResponse
 }
 var file_sp_bus_proto_depIdxs = []int32{
 	2,  // 0: protos.BusEvent.register_request:type_name -> protos.RegisterRequest
@@ -478,6 +477,10 @@ func file_sp_bus_proto_init() {
 	if File_sp_bus_proto != nil {
 		return
 	}
+	file_sp_common_proto_init()
+	file_sp_external_proto_init()
+	file_sp_internal_proto_init()
+	file_sp_kv_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_sp_bus_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BusEvent); i {

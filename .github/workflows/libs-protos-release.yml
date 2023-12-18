@@ -31,7 +31,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
-          tag_prefix: "protos/v"
+          tag_prefix: "libs/protos/v"
 
       - name: Update Cargo.toml version
         run: |
@@ -51,7 +51,7 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_prefix: "protos/v"
+          tag_prefix: "libs/protos/v"
 
       - name: Release on crates.io
         uses: actions-rs/cargo@v1
