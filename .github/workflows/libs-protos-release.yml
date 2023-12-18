@@ -19,6 +19,11 @@ jobs:
       url: https://pypi.org/p/streamdal-protos
     steps:
       - uses: actions/checkout@main
+
+      # This is *dry_run* because we only want to generate/learn about the new
+      # version so we can update Cargo.toml. If it's not dry_run, the action
+      # would create and push a tag against a commit that doesn't have the new
+      # version in Cargo.toml.
       - name: Generate new tag (dry run)
         uses: mathieudutour/github-tag-action@v6.1
         id: get_new_version
@@ -26,38 +31,47 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
           tag_prefix: "protos/v"
+
       - name: Update Cargo.toml version
         run: |
           pwd
           ls -l
           sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
           grep version build/rust/protos/Cargo.toml
+
+      # Commit the updated Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bumped Cargo.toml version to ${{ steps.get_new_version.outputs.new_version }}
+
+      # .. and now create the actual tag (will be the same as the dry run)
       - name: Create tag
         uses: mathieudutour/github-tag-action@v6.1
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag_prefix: "protos/v"
+
       - name: Release on crates.io
         uses: actions-rs/cargo@v1
         with:
           command: publish
           # need full path because "working-directory" is used only for "run" steps
           args: --manifest-path libs/protos/build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --locked
+
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
+
       - name: Release on npm
-        working-directory: ./build/ts/node
         run: |
+          cd build/ts/node
           npm version ${{ steps.get_new_version.outputs.new_version }}
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Build python dist
         run: |
           cd build/python
