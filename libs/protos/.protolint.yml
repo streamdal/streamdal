@@ -1,0 +1,6 @@
+lint:
+  rules:
+    remove:
+      - MAX_LINE_LENGTH
+      - ENUM_FIELD_NAMES_ZERO_VALUE_END_WITH
+      - REPEATED_FIELD_NAMES_PLURALIZED

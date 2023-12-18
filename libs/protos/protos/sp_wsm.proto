@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package protos;
+
+import "sp_pipeline.proto";
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+
+// Included in WASM response; the SDK should use the WASMExitCode to determine
+// what to do next - should it execute next step, should it notify or should it
+// stop executing/abort the rest of the steps in the pipeline.
+//
+// Example:
+//
+// a. WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
+// conditions to determine what to do next.
+//
+// b. WASM func returns WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success
+// conditions to determine what to do next.
+//
+// .. and so on.
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+enum WASMExitCode {
+  WASM_EXIT_CODE_UNSET = 0;
+  WASM_EXIT_CODE_SUCCESS = 1;
+  WASM_EXIT_CODE_FAILURE = 2; // Probably need better names for these as FAILURE is too harsh
+  WASM_EXIT_CODE_INTERNAL_ERROR = 3;
+}
+
+// SDK generates a WASM request and passes this to the WASM func
+message WASMRequest {
+  // The actual step that the WASM func will operate on. This is the same step
+  // that is declared in protos.Pipeline.
+  protos.PipelineStep step = 1;
+
+  // Payload data that WASM func will operate on
+  bytes input_payload = 2;
+
+  // Potentially filled out result from previous step. If this is first step in
+  // the pipeline, it will be empty.
+  optional bytes input_step = 3;
+}
+
+// Returned by all WASM functions
+message WASMResponse {
+  // Potentially modified input payload. Concept: All WASM funcs accept an
+  // input_payload in WASMRequest, WASM func reads input payload, modifies it
+  // and writes the modified output to output_payload.
+  bytes output_payload = 1;
+
+  // Exit code that the WASM func exited with; more info in WASMExitCode's comment
+  WASMExitCode exit_code = 2;
+
+  // Additional info about the reason a specific exit code was returned
+  string exit_msg = 3;
+
+  // Potential additional step output - ie. if a WASM func is an HTTPGet,
+  // output_step would contain the HTTP response body; if the WASM func is a
+  // KVGet, the output_step would be the value of the fetched key.
+  optional bytes output_step = 4;
+}

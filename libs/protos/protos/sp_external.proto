@@ -1,0 +1,325 @@
+syntax = "proto3";
+
+package protos;
+
+import "sp_common.proto";
+import "sp_info.proto";
+import "sp_notify.proto";
+import "sp_pipeline.proto";
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+
+service External {
+  // Should return everything that is needed to build the initial view in the console
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+
+  // Temporary method to test gRPC-Web streaming
+  rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
+
+  // Returns pipelines (_wasm_bytes field is stripped)
+  rpc GetPipelines(GetPipelinesRequest) returns (GetPipelinesResponse);
+
+  // Returns a single pipeline (_wasm_bytes field is stripped)
+  rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse);
+
+  // Create a new pipeline; id must be left empty on create
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse);
+
+  // Update an existing pipeline; id must be set
+  rpc UpdatePipeline(UpdatePipelineRequest) returns (protos.StandardResponse);
+
+  // Delete a pipeline
+  rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
+
+  // Attach a pipeline to an audience
+  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse);
+
+  // Detach a pipeline from an audience
+  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse);
+
+  // Pause a pipeline; noop if pipeline is already paused
+  rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
+
+  // Resume a pipeline; noop if pipeline is not paused
+  rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
+
+  // Create a new notification config
+  rpc CreateNotification(CreateNotificationRequest) returns (protos.StandardResponse);
+
+  // Update an existing notification config
+  rpc UpdateNotification(UpdateNotificationRequest) returns (protos.StandardResponse);
+
+  // Delete a notification config
+  rpc DeleteNotification(DeleteNotificationRequest) returns (protos.StandardResponse);
+
+  // Returns all notification configs
+  rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
+
+  // Returns a single notification config
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+
+  // Attach a notification config to a pipeline
+  rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
+
+  // Detach a notification config from a pipeline
+  rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
+
+  // Delete an audience
+  rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
+
+  // Delete a service and all associated audiences
+  rpc DeleteService(DeleteServiceRequest) returns (protos.StandardResponse);
+
+  // Returns all metric counters
+  rpc GetMetrics(GetMetricsRequest) returns (stream GetMetricsResponse);
+
+  rpc Tail(TailRequest) returns (stream TailResponse);
+
+  rpc PauseTail(PauseTailRequest) returns (protos.StandardResponse);
+
+  rpc ResumeTail(ResumeTailRequest) returns (protos.StandardResponse);
+
+  rpc GetAudienceRates(GetAudienceRatesRequest) returns (stream GetAudienceRatesResponse);
+
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+
+  rpc AppRegistrationStatus(AppRegistrationStatusRequest) returns (AppRegistrationStatusResponse);
+
+  rpc AppRegister(AppRegistrationRequest) returns (StandardResponse);
+
+  rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
+
+  rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
+
+  // Test method
+  rpc Test(TestRequest) returns (TestResponse);
+}
+
+message GetAllRequest {
+  // Don't think there is anything to pass in (yet)?
+}
+
+message GetAllResponse {
+  // Clients currently connected to the server
+  repeated protos.LiveInfo live = 1;
+
+  // All of the audiences that are known to the server
+  repeated protos.Audience audiences = 2;
+
+  // All of the pipelines known to the server + pipeline <-> audience mappings
+  // key == pipeline_id; if "Audience" is not filled out - pipeline is not attached
+  // to any audience.
+  map <string, protos.PipelineInfo> pipelines = 3;
+
+  // Audience to pipeline ID config/mapping.
+  // key == $audience_as_string, value = $pipeline_id
+  map <string, GetAllResponsePipelines> config = 4;
+
+  // When was this response generated. This is useful for determining what is
+  // the latest update when using GetAllStream().
+  int64 generated_at_unix_ts_ns_utc = 100;
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message GetAllResponsePipelines {
+  // List of pipeline IDs that are attached to this audience
+  repeated string pipeline_ids = 1;
+}
+
+message GetPipelinesRequest {
+  // Don't think we need anything here
+}
+
+message GetPipelinesResponse {
+  repeated protos.Pipeline pipelines = 1;
+}
+
+message GetPipelineRequest {
+  string pipeline_id = 1;
+}
+
+message GetPipelineResponse {
+  protos.Pipeline pipeline = 1;
+}
+
+message CreatePipelineRequest {
+  protos.Pipeline pipeline = 1;
+}
+
+message CreatePipelineResponse {
+  string message = 1;
+  string pipeline_id = 2;
+}
+
+message UpdatePipelineRequest {
+  protos.Pipeline pipeline = 1;
+}
+
+message DeletePipelineRequest {
+  string pipeline_id = 1;
+}
+
+message AttachPipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+}
+
+message DetachPipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+
+  // Filled out by detach gRPC handler so that broadcast handlers can avoid
+  // performing a lookup in NATS.
+  repeated string _session_ids = 3; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message PausePipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+}
+
+message ResumePipelineRequest {
+  string pipeline_id = 1;
+  protos.Audience audience = 2;
+}
+
+// Notifications
+message CreateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message UpdateNotificationRequest {
+  protos.NotificationConfig notification = 1;
+}
+
+message DeleteNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationsRequest {
+  // Don't think we need anything here
+}
+
+message GetNotificationsResponse {
+  // Key == id of the notification config
+  map<string,protos.NotificationConfig> notifications = 1;
+}
+
+message GetNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationResponse {
+  protos.NotificationConfig notification = 1;
+}
+
+message AttachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
+}
+
+message DetachNotificationRequest {
+  string notification_id = 1;
+  string pipeline_id = 2;
+}
+
+message DeleteAudienceRequest {
+  protos.Audience audience = 1;
+
+  // If true, will also detach all pipelines from the audience (if it has any)
+  optional bool force = 2;
+}
+
+message DeleteServiceRequest {
+  string service_name = 1;
+
+  optional bool force = 2;
+}
+
+message GetMetricsRequest {
+  // Nothing needed here, we return all metrics currently
+}
+
+message GetMetricsResponse {
+  map<string,protos.Metric> metrics = 1;
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message GetAudienceRatesRequest {
+  // Nothing needed here, we return all rates
+}
+
+message GetAudienceRatesResponse {
+  map<string,AudienceRate> rates = 1; // Key is an audience string
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message GetSchemaRequest {
+  protos.Audience audience = 1;
+}
+
+message GetSchemaResponse {
+  Schema schema = 1;
+}
+
+message AppRegistrationStatusRequest {
+  string email = 1;
+}
+
+message AppRegistrationStatusResponse {
+  enum Status {
+    STATUS_UNSET = 0;
+
+    // Submit means the user is not registered yet
+    STATUS_SUBMIT = 1;
+
+    // Verify means the user is registered but not verified yet
+    STATUS_VERIFY = 2;
+
+    // Done means the user is registered and verified
+    STATUS_DONE = 3;
+  }
+
+  Status status = 1;
+}
+
+message AppRegistrationRequest {
+  string email = 1;
+
+  string cluster_id = 2;
+
+  // Used for storage on ui-bff backend
+  string _code = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message AppVerifyRegistrationRequest {
+  string email = 1;
+
+  string code = 2;
+}
+
+message AppRegisterRejectRequest {
+  string cluster_id = 1;
+}
+
+message PauseTailRequest {
+  string tail_id = 1;
+}
+
+message ResumeTailRequest {
+  string tail_id = 1;
+}
+
+message TestRequest {
+  string input = 1;
+}
+
+message TestResponse {
+  string output = 2;
+}

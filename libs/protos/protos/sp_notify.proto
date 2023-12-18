@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSET = 0;
+  NOTIFICATION_TYPE_SLACK = 1;
+  NOTIFICATION_TYPE_EMAIL = 2;
+  NOTIFICATION_TYPE_PAGERDUTY = 3;
+}
+
+message NotificationConfig {
+  optional string id = 1;
+
+  string name = 2;
+
+  NotificationType type = 3;
+
+  oneof config {
+    NotificationSlack slack = 1000;
+    NotificationEmail email = 1001;
+    NotificationPagerDuty pagerduty = 1002;
+  }
+}
+
+message NotificationSlack {
+  string bot_token = 1;
+  string channel = 2;
+}
+
+message NotificationEmail {
+  enum Type {
+    TYPE_UNSET = 0;
+    TYPE_SMTP = 1;
+    TYPE_SES = 2;
+  }
+
+  Type type = 1;
+
+  repeated string recipients = 2;
+
+  string from_address = 3;
+
+  oneof config {
+    NotificationEmailSMTP smtp = 1000;
+    NotificationEmailSES ses = 1001;
+  }
+}
+
+message NotificationEmailSMTP {
+  string host = 1;
+  int32 port = 2;
+  string user = 3;
+  string password = 4;
+  bool use_tls = 5;
+}
+
+message NotificationEmailSES {
+  string ses_region = 1;
+  string ses_access_key_id = 2;
+  string ses_secret_access_key = 3;
+}
+
+message NotificationPagerDuty {
+  enum Urgency {
+    URGENCY_UNSET = 0;
+    URGENCY_LOW = 1;
+    URGENCY_HIGH = 2;
+  }
+
+  // Auth token
+  string token = 1;
+
+  // Must be a valid email for a PagerDuty user
+  string email = 2;
+
+  // Must be a valid PagerDuty service
+  string service_id = 3;
+
+  Urgency urgency = 4;
+}

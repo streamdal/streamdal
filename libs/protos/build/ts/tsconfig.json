@@ -1,0 +1,14 @@
+{
+  "include": [
+    "./protos/**/*.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2016",
+    "moduleResolution": "node",
+    "outDir": "./node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}

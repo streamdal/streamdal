@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package protos;
+
+import "sp_common.proto";
+import "sp_kv.proto";
+import "sp_pipeline.proto";
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+
+// Command is used by streamdal server for sending commands to SDKs
+message Command {
+  // Who is this command intended for?
+  // NOTE: Some commands (such as KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
+  protos.Audience audience = 1;
+
+  oneof command {
+    AttachPipelineCommand attach_pipeline = 100;
+    DetachPipelineCommand detach_pipeline = 101;
+    PausePipelineCommand pause_pipeline = 102;
+    ResumePipelineCommand resume_pipeline = 103;
+    KeepAliveCommand keep_alive = 104;
+
+    // Server will emit this when a user makes changes to the KV store
+    // via the KV HTTP API.
+    KVCommand kv = 105;
+
+    // Emitted by server when a user makes a Tail() call
+    // Consumed by all server instances and by SDKs
+    TailCommand tail = 106;
+  }
+}
+
+message AttachPipelineCommand {
+  protos.Pipeline pipeline = 1;
+}
+
+message DetachPipelineCommand {
+  string pipeline_id = 1;
+}
+
+message PausePipelineCommand {
+  string pipeline_id = 1;
+}
+
+message ResumePipelineCommand {
+  string pipeline_id = 1;
+}
+
+message KeepAliveCommand {
+  // Nothing needed in here, just a ping from server to SDK
+}
+
+// Sent by server on Register channel(s) to live SDKs
+message KVCommand {
+  repeated protos.KVInstruction instructions = 1;
+
+  // Create & Update specific setting that will cause the Create or Update to
+  // work as an upsert.
+  bool overwrite = 2;
+}
+
+message TailCommand {
+  TailRequest request = 2;
+}

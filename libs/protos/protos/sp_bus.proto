@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package protos;
+
+import "sp_common.proto";
+import "sp_external.proto";
+import "sp_internal.proto";
+import "sp_kv.proto";
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go";
+
+// Type used by `server` for broadcasting events to other nodes
+message BusEvent {
+  string source = 1;
+
+  // This _should_ contain request messages - each server can determine
+  // how to interpret and handle the message.
+  //
+  // NOTE: The bus _should not_ be used for transmitting commands to SDKs. The
+  // consumer in each SDK should receive a request and potentially craft a new
+  // command to send to the appropriate SDK(s).
+  oneof event {
+    protos.RegisterRequest register_request = 100;
+    protos.DeregisterRequest deregister_request = 101;
+    protos.CreatePipelineRequest create_pipeline_request = 102;
+    protos.DeletePipelineRequest delete_pipeline_request = 103;
+    protos.UpdatePipelineRequest update_pipeline_request = 104;
+    protos.AttachPipelineRequest attach_pipeline_request = 105;
+    protos.DetachPipelineRequest detach_pipeline_request = 106;
+    protos.PausePipelineRequest pause_pipeline_request = 107;
+    protos.ResumePipelineRequest resume_pipeline_request = 108;
+    protos.MetricsRequest metrics_request = 109;
+    protos.KVRequest kv_request = 110;
+    protos.DeleteAudienceRequest delete_audience_request = 111;
+    protos.NewAudienceRequest new_audience_request = 112;
+    protos.TailRequest tail_request = 113;
+    protos.TailResponse tail_response = 114;
+  }
+
+  // All gRPC metadata is stored in ctx; when request goes outside of gRPC
+  // bounds, we will translate ctx metadata into this field.
+  //
+  // Example:
+  // 1. Request comes into server via external gRPC to set new pipeline
+  // 2. server has to send SetPipeline cmd to SDK via gRPC - it passes
+  //    on original metadata in request.
+  // 3. server has to broadcast SetPipeline cmd to other services via bus
+  // 4. Since this is not a gRPC call, server translates ctx metadata to
+  //    this field and includes it in the bus event.
+  map <string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}

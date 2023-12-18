@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+
+// Common response message for many gRPC methods
+message StandardResponse {
+  // Co-relation ID for the request / response
+  string id = 1;
+  ResponseCode code = 2;
+  string message = 3;
+}
+
+// Common status codes used in gRPC method responses
+enum ResponseCode {
+  RESPONSE_CODE_UNSET= 0;
+  RESPONSE_CODE_OK = 1;
+  RESPONSE_CODE_BAD_REQUEST = 2;
+  RESPONSE_CODE_NOT_FOUND = 3;
+  RESPONSE_CODE_INTERNAL_SERVER_ERROR = 4;
+  RESPONSE_CODE_GENERIC_ERROR = 5;
+}
+
+// Each SDK client is a $service + $component + $operation_type
+enum OperationType {
+  OPERATION_TYPE_UNSET = 0;
+  OPERATION_TYPE_CONSUMER = 1;
+  OPERATION_TYPE_PRODUCER = 2;
+}
+
+// Used to indicate who a command is intended for
+message Audience {
+  // Name of the service -- let's include the service name on all calls, we can
+  // optimize later ~DS
+  string service_name = 1;
+
+  // Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+  string component_name = 2;
+
+  // Consumer or Producer
+  OperationType operation_type = 3;
+
+  // Name for the consumer or producer
+  string operation_name = 4;
+}
+
+message Metric {
+  string name = 1;
+  map<string, string> labels = 2;
+  double value = 3;
+  Audience audience = 4;
+}
+
+message TailRequest {
+  TailRequestType type = 1;
+  string id = 2;
+  Audience audience = 3;
+  optional string pipeline_id = 4 [deprecated = true];
+  SampleOptions sample_options = 5;
+  map<string, string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+enum TailResponseType {
+  TAIL_RESPONSE_TYPE_UNSET = 0;
+  TAIL_RESPONSE_TYPE_PAYLOAD = 1;
+  TAIL_RESPONSE_TYPE_ERROR = 2;
+}
+
+enum TailRequestType {
+  TAIL_REQUEST_TYPE_UNSET = 0;
+  TAIL_REQUEST_TYPE_START = 1;
+  TAIL_REQUEST_TYPE_STOP = 2;
+  TAIL_REQUEST_TYPE_PAUSE = 3;
+  TAIL_REQUEST_TYPE_RESUME = 4;
+}
+
+// TailResponse originates in the SDK and then is sent to streamdal servers where
+// it is forwarded to the correct frontend streaming gRPC connection
+message TailResponse {
+  TailResponseType type = 1;
+
+  string tail_request_id = 2;
+
+  Audience audience = 3;
+
+  string pipeline_id = 4;
+
+  string session_id = 5;
+
+  // Timestamp in nanoseconds
+  int64 timestamp_ns = 6;
+
+  // Payload data. For errors, this will be the error message
+  // For payloads, this will be JSON of the payload data, post processing
+  bytes original_data = 7;
+
+  // For payloads, this will be the new data, post processing
+  bytes new_data = 8;
+
+  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Set by server to indicate that the response is a keepalive message
+  optional bool _keepalive = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message AudienceRate {
+  double bytes = 1;
+  double processed = 2;
+}
+
+message Schema {
+  bytes json_schema = 1;
+
+  int32 _version = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  map<string,string> _metadata = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+
+message SampleOptions {
+  uint32 sample_rate = 1;
+
+  uint32 sample_interval_seconds = 2;
+}
