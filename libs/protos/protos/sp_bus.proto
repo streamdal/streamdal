@@ -7,7 +7,7 @@ import "sp_external.proto";
 import "sp_internal.proto";
 import "sp_kv.proto";
 
-option go_package = "github.com/streamdal/protos/build/go/protos";
+option go_package = "github.com/streamdal/mono/libs/protos/build/go";
 
 // Type used by `server` for broadcasting events to other nodes
 message BusEvent {

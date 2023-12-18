@@ -6,7 +6,7 @@ import "sp_command.proto";
 import "sp_common.proto";
 import "sp_info.proto";
 
-option go_package = "github.com/streamdal/protos/build/go/protos";
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
 
 service Internal {
   // Initial method that an SDK should call to register itself with the server.

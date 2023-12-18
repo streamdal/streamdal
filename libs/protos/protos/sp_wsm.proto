@@ -4,7 +4,7 @@ package protos;
 
 import "sp_pipeline.proto";
 
-option go_package = "github.com/streamdal/protos/build/go/protos";
+option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
 
 // Included in WASM response; the SDK should use the WASMExitCode to determine
 // what to do next - should it execute next step, should it notify or should it
