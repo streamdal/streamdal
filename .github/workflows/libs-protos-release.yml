@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*.*.*-protos*'
+    paths:
+      - 'libs/protos/**'
 
 defaults:
   run:
@@ -14,8 +14,6 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      new_tag: ${{ steps.create_tag.outputs.new_tag }}
     environment:
       name: pypi
       url: https://pypi.org/p/streamdal-protos
@@ -27,15 +25,12 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
-      - name: Generate and save version with protos build metadata suffix
-        run: |
-          echo "WITH_SUFFIX=${{ steps.get_new_version.outputs.new_version }}+protos" >> $GITHUB_OUTPUT
-        id: full_version
+          tag_prefix: "protos/v"
       - name: Update Cargo.toml version
         run: |
           pwd
           ls -l
-          sed -i "s/version = \".*\"/version = \"${{ steps.full_version.outputs.FULL_VERSION }}\"/" build/rust/protos/Cargo.toml
+          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
           grep version build/rust/protos/Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -45,10 +40,12 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "protos/v"
       - name: Release on crates.io
         uses: actions-rs/cargo@v1
         with:
           command: publish
+          # need full path because "working-directory" is used only for "run" steps
           args: --manifest-path libs/protos/build/rust/protos/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --locked
       - uses: actions/setup-node@v3
         with:
@@ -69,5 +66,5 @@ jobs:
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: build/python/dist
+          packages-dir: libs/protos/build/python/dist
           password: ${{ secrets.PYPI_API_TOKEN }}
