@@ -217,6 +217,37 @@ addresses"_ and so on).
 > For a more in-depth explanation of the flow and the various components, visit 
 > our [docs](https://docs.streamdal.com/en/getting-started/how-streamdal-works/).
 
+# Repo Layout
+
+This repo is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that has the
+following structure:
+
+```plaintext
+# ┌── assets
+# │   └── img
+# ├── apps
+# │   ├── cli
+# │   ├── console
+# │   ├── docs 
+# │   └── server
+# ├── examples
+# │   ├── install
+# │	  │	  ├── docker
+# │   │	  └── helm
+# │   ├── instrument
+# |   └── quickstart
+# ├── libs
+# │   ├── protos
+# │   ├── wasm
+# │   ├── wasm-detective
+# │   └── wasm-transformer
+# ├── scripts
+# │	  └── install
+# ├── LICENSE
+# ├── Makefile
+# └── README.md
+```
+
 # Community
 
 We're building Streamdal in the open and we'd love for you to join us!
