@@ -161,7 +161,7 @@ test: description = Run Go tests (make sure to bring up deps first; tests are ra
 test: GOFLAGS=
 test:
 	@echo "Make sure to bring up deps first via 'make run/dev'"
-	cd assets/wasm && sh download-wasm.sh && cd - && \
+	cd assets/wasm && bash ./download-wasm.sh && cd - && \
 	TEST=true $(GO) test ./apis/grpcapi/... -v -count=1
 
 ### Docker
