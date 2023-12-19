@@ -12,7 +12,7 @@
     "build": "astro build",
     "preview": "wrangler pages dev ./dist",
     "astro": "astro",
-    "prepare": "husky install"
+    "prepare": "cd ../../ && husky install ./apps/docs"
   },
   "dependencies": {
     "@algolia/client-search": "^4.13.1",
