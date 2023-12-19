@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'libs/protos/**'
+      - '.github/workflows/libs-protos-pr.yml'
 
 defaults:
   run:

@@ -1,0 +1,19 @@
+[package]
+name = "validjson"
+version = "0.0.120"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+protobuf = "3.2.0"
+streamdal-protos = "0.0.120"
+common = { path = "../common" }
+streamdal-gjson = "0.8.1-with-set-rename"
+
+[profile.release]
+lto = true
+

@@ -1,0 +1,72 @@
+name: Wasm - Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'libs/wasm/**'
+      - '.github/workflows/libs-wasm-release.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      RUSTC_WRAPPER: "sccache"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          #components: rustfmt, clippy
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+      - name: build
+        run: |
+          rustup target add wasm32-wasi
+          cargo install wasm-opt
+          make build
+      - name: Compress directory
+        run: zip -j release.zip build/*.wasm
+
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release_artifact
+          path: release.zip
+
+      - name: Create tag
+        uses: mathieudutour/github-tag-action@v6.1
+        id: create_tag
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "libs/wasm/v"
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.new_tag }}
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release.zip
+          asset_name: release.zip
+          asset_content_type: application/zip

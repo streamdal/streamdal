@@ -1,0 +1,66 @@
+# For more information about other checkfile options, see the documentation at https://dev.dylib.so/docs/modsurfer/cli#checkfile
+validate:
+  allow_wasi: true
+  imports:
+    include:
+    - namespace: wasi_snapshot_preview1
+      name: environ_get
+      params:
+      - I32
+      - I32
+      results:
+      - I32
+    - namespace: wasi_snapshot_preview1
+      name: environ_sizes_get
+      params:
+      - I32
+      - I32
+      results:
+      - I32
+    - namespace: wasi_snapshot_preview1
+      name: fd_write
+      params:
+      - I32
+      - I32
+      - I32
+      - I32
+      results:
+      - I32
+    - namespace: wasi_snapshot_preview1
+      name: proc_exit
+      params:
+      - I32
+      results: []
+    - namespace: wasi_snapshot_preview1
+      name: random_get
+      params:
+      - I32
+      - I32
+      results:
+      - I32
+    namespace:
+      include:
+      - wasi_snapshot_preview1
+  exports:
+    include:
+    - name: alloc
+      params:
+      - I32
+      results:
+      - I32
+    - name: dealloc
+      params:
+      - I32
+      - I32
+      results: []
+    - name: f
+      params:
+      - I32
+      - I32
+      results:
+      - I64
+    max: 3
+  size:
+    max: 3.0 MiB
+  complexity:
+    max_risk: medium

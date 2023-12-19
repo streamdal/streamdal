@@ -1,0 +1,43 @@
+name: Wasm - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'libs/wasm/**'
+      - '.github/workflows/libs-wasm-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm
+
+jobs:
+  test:
+    name: Test build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        funcs: ["detective", "httprequest", "inferschema", "kv", "transform", "validjson"]
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      RUSTC_WRAPPER: "sccache"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          components: clippy
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+      - name: build
+        run: |
+          rustup target add wasm32-wasi
+          cargo install wasm-opt
+          make build/${{ matrix.funcs }}
+
+      - name: modsurfer validate
+        uses: dylibso/modsurfer-validate-action@main
+        with:
+            path: libs/wasm/build/${{ matrix.funcs }}.wasm
+            check: libs/wasm/validation/${{ matrix.funcs }}.wasm.mod.yaml
