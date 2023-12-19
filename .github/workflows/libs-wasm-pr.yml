@@ -1,5 +1,15 @@
-on: pull_request
-name: Pull Request
+name: Wasm - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'libs/wasm/**'
+      - '.github/workflows/libs-wasm-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm
+
 jobs:
   test:
     name: Test build
@@ -29,5 +39,5 @@ jobs:
       - name: modsurfer validate
         uses: dylibso/modsurfer-validate-action@main
         with:
-            path: build/${{ matrix.funcs }}.wasm
-            check: validation/${{ matrix.funcs }}.wasm.mod.yaml
+            path: libs/wasm/build/${{ matrix.funcs }}.wasm
+            check: libs/wasm/validation/${{ matrix.funcs }}.wasm.mod.yaml

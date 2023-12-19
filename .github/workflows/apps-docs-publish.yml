@@ -1,4 +1,4 @@
-name: Protos - Pull Request
+name: Docs - Publish
 
 on:
   push:
