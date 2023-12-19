@@ -1,0 +1,48 @@
+name: Wasm-Transform - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'libs/wasm-transform/**'
+      - '.github/workflows/libs-wasm-transform-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm-transform
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path libs/wasm-transform/Cargo.toml
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - run: rustup component add clippy
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path libs/wasm-transform/Cargo.toml -- -D warnings
