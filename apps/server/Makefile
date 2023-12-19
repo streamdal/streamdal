@@ -1,6 +1,5 @@
-SERVICE = server
+SERVICE := server
 ARCH = $(shell uname -m)
-VERSION_SCRIPT = ./assets/scripts/get-version.sh
 LOCAL_VERSION = v0.0.0+local
 LOCAL_SHORT_SHA = $(shell git rev-parse --short HEAD)
 
@@ -8,22 +7,22 @@ ifeq ($(GITHUB_VERSION),)
 GITHUB_VERSION := v0.0.0+unknown
 endif
 
-ifeq ($(GITHUB_TAG),)
-GITHUB_TAG := apps/server/v0.0.0+unknown
-endif
-
 ifeq ($(GITHUB_SHORT_SHA),)
 GITHUB_SHORT_SHA := 00000000
+endif
+
+ifeq ($(GITHUB_TAG),)
+GITHUB_TAG := $(GITHUB_VERSION)-$(GITHUB_SHORT_SHA)
 endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
 
-# If github env var is present, use github env vars for version
+# If github env var is NOT present, use local vars
 ifeq ($(GITHUB_ENV),)
-GO_BUILD_FLAGS = -ldflags "-X main.version=${GITHUB_VERSION}-${GITHUB_SHORT_SHA}"
-else
 GO_BUILD_FLAGS = -ldflags "-X main.version=${LOCAL_VERSION}-${LOCAL_SHORT_SHA}"
+else
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GITHUB_VERSION}-${GITHUB_SHORT_SHA}"
 endif
 
 # Utility functions
@@ -65,8 +64,8 @@ run/dev:
     docker rm -f "/streamdal-redis" || true && \
     docker rm -f "/streamdal-envoy" || true && \
 	docker-compose -f docker-compose.dev.yaml pull --quiet && \
-	docker-compose -f docker-compose.dev.yaml up --always-recreate-deps --force-recreate -d
-	@bash $(VERSION_SCRIPT)
+	docker-compose -f docker-compose.dev.yaml up --always-recreate-deps --force-recreate -d && \
+	echo "Running stramdal/server version `curl -s http://localhost:8081/version`"
 
 .PHONY: run/dev/build
 run/dev/build: description = Build streamdal/server img and run it + all its deps
@@ -78,45 +77,43 @@ run/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml up -d && \
 	echo "Running streamdal/server version `curl -s http://localhost:8081/version`"
 
-.PHONY: get/version
-get/version: description = Get streamdal/server version + how far behind it is from remote
-get/version:
-	@bash $(VERSION_SCRIPT)
-
 .PHONY: testvars
+testvars: description = Debug stuff
 testvars:
 	@echo $(GITHUB_VERSION)
 	@echo $(GITHUB_SHORT_SHA)
 	@echo $(GITHUB_TAG)
+	@echo $(GITHUB_ENV)
+	@echo $(GO_BUILD_FLAGS)
 
 ### Build
 
 .PHONY: build
-build: description = Build $(SERVICE)
+build: description = Build ${SERVICE}
 build: clean build/linux-$(ARCH) build/darwin-$(ARCH)
 
 .PHONY: build/linux-amd64
-build/linux-amd64: description = Build $(SERVICE) for linux
+build/linux-amd64: description = Build server for linux (amd64)
 build/linux-amd64: clean
 	GOOS=linux GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-linux-amd64
 
 .PHONY: build/linux-x86_64
-build/linux-x86_64: description = Build $(SERVICE) for linux
+build/linux-x86_64: description = Build server for linux (x86_64)
 build/linux-x86_64: clean
 	GOOS=linux GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-linux-amd64
 
 .PHONY: build/linux-arm64
-build/linux-arm64: description = Build $(SERVICE) for linux
+build/linux-arm64: description = Build server for linux (arm64)
 build/linux-arm64: clean
 	GOOS=linux GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-linux-arm64
 
 .PHONY: build/darwin-amd64
-build/darwin-amd64: description = Build $(SERVICE) for darwin
+build/darwin-amd64: description = Build server for darwin (amd64)
 build/darwin-amd64: clean
 	GOOS=darwin GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-darwin-amd64
 
 .PHONY: build/darwin-arm64
-build/darwin-arm64: description = Build $(SERVICE) for darwin
+build/darwin-arm64: description = Build server for darwin (arm64)
 build/darwin-arm64: clean
 	GOOS=darwin GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-darwin-arm64
 
@@ -129,7 +126,7 @@ clean:
 # commands even if they fail
 
 .PHONY: reset
-reset: description = Full reset that will remove all streamdal server related docker containers, images, volumes, etc.
+reset: description = Full reset (will remove all streamdal components - containers, images, volumes, etc.)
 reset:
 	echo "flushall" | nc localhost 6379 || true
 	docker ps | grep -i -e streamdal -e redis | awk {'print $$1'} | xargs docker rm -f || true
@@ -167,5 +164,5 @@ docker/build/local:
 .PHONY: docker/push/local
 docker/push: description = Push local docker image
 docker/push:
-	docker push streamdal/$(SERVICE):$(LOCAL_VERSION) && \
+	docker push streamdal/$(SERVICE):$(LOCAL_VERSION)-$(LOCAL_SHORT_SHA) && \
 	docker push streamdal/$(SERVICE):latest
