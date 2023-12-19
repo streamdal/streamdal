@@ -20,6 +20,7 @@ import { DecodeStep } from "./steps/sp_steps_decode.js";
 import { EncodeStep } from "./steps/sp_steps_encode.js";
 import { TransformStep } from "./steps/sp_steps_transform.js";
 import { DetectiveStep } from "./steps/sp_steps_detective.js";
+import { NotificationConfig } from "./sp_notify.js";
 /**
  * Pipeline is a structure that holds one or more pipeline steps. This structure
  * is intended to be immutable; clients are expected to generate WASMRequest's
@@ -47,6 +48,13 @@ export interface Pipeline {
      * @generated from protobuf field: repeated protos.PipelineStep steps = 3;
      */
     steps: PipelineStep[];
+    /**
+     * Notification configs for this pipeline. Only filled out
+     * in external API responses
+     *
+     * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4;
+     */
+    NotificationConfigs: NotificationConfig[]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * A pipeline step is a single step in a pipeline.
@@ -188,11 +196,12 @@ class Pipeline$Type extends MessageType<Pipeline> {
         super("protos.Pipeline", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep }
+            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
+            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig }
         ]);
     }
     create(value?: PartialMessage<Pipeline>): Pipeline {
-        const message = { id: "", name: "", steps: [] };
+        const message = { id: "", name: "", steps: [], NotificationConfigs: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Pipeline>(this, message, value);
@@ -211,6 +220,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
                     break;
                 case /* repeated protos.PipelineStep steps */ 3:
                     message.steps.push(PipelineStep.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.NotificationConfig _notification_configs */ 4:
+                    message.NotificationConfigs.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -233,6 +245,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
         /* repeated protos.PipelineStep steps = 3; */
         for (let i = 0; i < message.steps.length; i++)
             PipelineStep.internalBinaryWrite(message.steps[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.NotificationConfig _notification_configs = 4; */
+        for (let i = 0; i < message.NotificationConfigs.length; i++)
+            NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

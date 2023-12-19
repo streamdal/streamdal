@@ -1,3 +1,4 @@
+import sp_notify_pb2 as _sp_notify_pb2
 from steps import sp_steps_custom_pb2 as _sp_steps_custom_pb2
 from steps import sp_steps_decode_pb2 as _sp_steps_decode_pb2
 from steps import sp_steps_detective_pb2 as _sp_steps_detective_pb2
@@ -20,14 +21,16 @@ PIPELINE_STEP_CONDITION_NOTIFY: PipelineStepCondition
 PIPELINE_STEP_CONDITION_UNSET: PipelineStepCondition
 
 class Pipeline(_message.Message):
-    __slots__ = ["id", "name", "steps"]
+    __slots__ = ["_notification_configs", "id", "name", "steps"]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STEPS_FIELD_NUMBER: _ClassVar[int]
+    _NOTIFICATION_CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    _notification_configs: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
     id: str
     name: str
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "encode", "http_request", "infer_schema", "kv", "name", "on_failure", "on_success", "transform", "valid_json"]

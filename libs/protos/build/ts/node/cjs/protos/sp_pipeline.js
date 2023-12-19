@@ -15,6 +15,7 @@ const sp_steps_decode_1 = require("./steps/sp_steps_decode");
 const sp_steps_encode_1 = require("./steps/sp_steps_encode");
 const sp_steps_transform_1 = require("./steps/sp_steps_transform");
 const sp_steps_detective_1 = require("./steps/sp_steps_detective");
+const sp_notify_1 = require("./sp_notify");
 /**
  * A condition defines how the SDK should handle a step response -- should it
  * continue executing the pipeline, should it abort, should it notify the server?
@@ -53,11 +54,12 @@ class Pipeline$Type extends runtime_5.MessageType {
         super("protos.Pipeline", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineStep }
+            { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineStep },
+            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_notify_1.NotificationConfig }
         ]);
     }
     create(value) {
-        const message = { id: "", name: "", steps: [] };
+        const message = { id: "", name: "", steps: [], NotificationConfigs: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -76,6 +78,9 @@ class Pipeline$Type extends runtime_5.MessageType {
                     break;
                 case /* repeated protos.PipelineStep steps */ 3:
                     message.steps.push(exports.PipelineStep.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.NotificationConfig _notification_configs */ 4:
+                    message.NotificationConfigs.push(sp_notify_1.NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -98,6 +103,9 @@ class Pipeline$Type extends runtime_5.MessageType {
         /* repeated protos.PipelineStep steps = 3; */
         for (let i = 0; i < message.steps.length; i++)
             exports.PipelineStep.internalBinaryWrite(message.steps[i], writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.NotificationConfig _notification_configs = 4; */
+        for (let i = 0; i < message.NotificationConfigs.length; i++)
+            sp_notify_1.NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
