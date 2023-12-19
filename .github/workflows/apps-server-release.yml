@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'libs/protos/**'
+      - '.github/workflows/libs-protos-apps-server-release.yml'
+
+defaults:
+  run:
+    working-directory: ./apps/server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - uses: actions/checkout@master
+
+      - name: Create tag
+        uses: mathieudutour/github-tag-action@v6.1
+        id: create_tag
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "apps/server/v"
+
+      - name: Set version vars
+        id: set-version-vars
+        run: |
+          echo "GITHUB_ENV=true" >> $GITHUB_ENV # Needed so that 'make' can inject the correct version ldd flags
+          echo "GITHUB_VERSION=${{ steps.create_tag.outputs.new_version }}" >> $GITHUB_ENV
+          echo "GITHUB_TAG=${{ steps.create_tag.outputs.new_tag }}" >> $GITHUB_ENV
+          echo "GITHUB_SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
+
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Run build & push (no need to manually push - buildx does it auto)
+        run: |
+          make docker/build

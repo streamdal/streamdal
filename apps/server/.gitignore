@@ -1,0 +1,6 @@
+.env
+.idea
+c.out
+backend-data
+assets/grafana-data/grafana.db
+assets/wasm/*.wasm

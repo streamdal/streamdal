@@ -1,0 +1,79 @@
+version: "3"
+services:
+  streamdal-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    environment:
+      - STREAMDAL_SERVER_NODE_NAME=node1
+      - STREAMDAL_SERVER_AUTH_TOKEN=1234
+      - STREAMDAL_SERVER_REDIS_URL=redis:6379
+      - STREAMDAL_SERVER_TELEMETRY_DISABLE=true
+      - STREAMDAL_SERVER_DEBUG=true
+    container_name: streamdal-server
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    networks:
+      - streamdal-network
+
+  redis:
+    container_name: streamdal-redis
+    image: redis:latest
+    command: redis-server --appendonly yes # This enables AOF persistence
+    volumes:
+      - redis-data:/data # Persist redis data to this volume
+    ports:
+      - "6379:6379"
+    networks:
+      - streamdal-network
+
+  envoy:
+    image: envoyproxy/envoy:tools-v1.28.0
+    container_name: streamdal-envoy
+    ports:
+      - "8083:8083"
+    volumes:
+      - ${PWD}/assets/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      - streamdal-network
+
+## Uncomment to run local telemetry stack
+#  graphite:
+#    image: graphiteapp/graphite-statsd
+#    container_name: streamdal-graphite
+#    ports:
+#      - "8080:8080"       # Graphite web interface
+#      - "2003-2004:2003-2004"   # Carbon line receiver ports
+#      - "2023-2024:2023-2024"   # Carbon aggregator ports
+#      - "8125:8125/udp" # StatsD UDP port
+#      - "8126:8126"     # StatsD management port
+#    environment:
+#      STATSD_INTERFACE: udp
+#    volumes:
+#      - graphite-data:/opt/graphite/storage
+#    networks:
+#      - streamdal-network
+#
+#  grafana:
+#    image: grafana/grafana
+#    container_name: streamdal-grafana
+#    ports:
+#      - "8084:3000"
+#    depends_on:
+#      - graphite
+#    volumes:
+#      - ${PWD}/assets/grafana-provisioning:/etc/grafana/provisioning
+#    environment:
+#      GF_SECURITY_ADMIN_PASSWORD: admin  # Set your admin password
+#    networks:
+#      - streamdal-network
+
+volumes:
+  redis-data:
+#  graphite-data: # Uncomment to run local telemetry stack
+
+networks:
+  streamdal-network:
