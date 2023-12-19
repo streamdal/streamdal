@@ -3,6 +3,19 @@ ARCH = $(shell uname -m)
 LOCAL_VERSION = v0.0.0+local
 LOCAL_SHORT_SHA = $(shell git rev-parse --short HEAD)
 
+define WELCOME_MESSAGE
+     _                                _       _
+ ___| |_ _ __ ___  __ _ _ __ ___   __| | __ _| |
+/ __| __| '__/ _ \/ _` | '_ ` _ \ / _` |/ _` | |
+\__ \ |_| | |  __/ (_| | | | | | | (_| | (_| | |
+|___/\__|_|  \___|\__,_|_| |_| |_|\__,_|\__,_|_|
+================================================
+    	  Code-Native Data Pipelines
+
+endef
+
+export WELCOME_MESSAGE
+
 ifeq ($(GITHUB_VERSION),)
 GITHUB_VERSION := v0.0.0+unknown
 endif
@@ -43,6 +56,7 @@ help: HELP_SCRIPT = \
 
 .PHONY: help
 help:
+	@echo "$$WELCOME_MESSAGE"
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
 
 ### Setup
@@ -80,6 +94,16 @@ run/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml build && \
 	docker-compose -f docker-compose.dev.build.yaml up -d && \
 	echo "Running streamdal/server version `curl -s http://localhost:8081/version`"
+
+.PHONY: stop/dev
+stop/dev: description = Stop streamdal/server img and all its deps
+stop/dev:
+	docker-compose -f docker-compose.dev.yaml down
+
+.PHONY: stop/dev/build
+stop/dev/build: description = Stop streamdal/server img and all its deps
+stop/dev/build:
+	docker-compose -f docker-compose.dev.build.yaml down
 
 .PHONY: testvars
 testvars: description = Debug stuff
