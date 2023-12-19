@@ -8,6 +8,10 @@ on:
       - 'libs/wasm-transform/**'
       - '.github/workflows/libs-wasm-transform-release.yml'
 
+defaults:
+  run:
+    working-directory: ./libs/wasm-transform
+
 jobs:
   build:
     runs-on: ubuntu-latest
