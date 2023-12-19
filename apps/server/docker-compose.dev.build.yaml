@@ -31,7 +31,7 @@ services:
       - streamdal-network
 
   envoy:
-    image: envoyproxy/envoy:tools-v1.28.0 
+    image: envoyproxy/envoy:tools-v1.28.0
     container_name: streamdal-envoy
     ports:
       - "8083:8083"
@@ -40,37 +40,40 @@ services:
     networks:
       - streamdal-network
 
-  graphite:
-    image: graphiteapp/graphite-statsd
-    ports:
-      - "8080:8080"       # Graphite web interface
-      - "2003-2004:2003-2004"   # Carbon line receiver ports
-      - "2023-2024:2023-2024"   # Carbon aggregator ports
-      - "8125:8125/udp" # StatsD UDP port
-      - "8126:8126"     # StatsD management port
-    environment:
-      STATSD_INTERFACE: udp
-    volumes:
-      - graphite-data:/opt/graphite/storage
-    networks:
-      - streamdal-network
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "5000:3000"
-    depends_on:
-      - graphite
-    volumes:
-      - ${PWD}/assets/grafana-provisioning:/etc/grafana/provisioning
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin  # Set your admin password
-    networks:
-      - streamdal-network
+## Uncomment to run local telemetry stack
+#  graphite:
+#    image: graphiteapp/graphite-statsd
+#    container_name: streamdal-graphite
+#    ports:
+#      - "8080:8080"       # Graphite web interface
+#      - "2003-2004:2003-2004"   # Carbon line receiver ports
+#      - "2023-2024:2023-2024"   # Carbon aggregator ports
+#      - "8125:8125/udp" # StatsD UDP port
+#      - "8126:8126"     # StatsD management port
+#    environment:
+#      STATSD_INTERFACE: udp
+#    volumes:
+#      - graphite-data:/opt/graphite/storage
+#    networks:
+#      - streamdal-network
+#
+#  grafana:
+#    image: grafana/grafana
+#    container_name: streamdal-grafana
+#    ports:
+#      - "8084:3000"
+#    depends_on:
+#      - graphite
+#    volumes:
+#      - ${PWD}/assets/grafana-provisioning:/etc/grafana/provisioning
+#    environment:
+#      GF_SECURITY_ADMIN_PASSWORD: admin  # Set your admin password
+#    networks:
+#      - streamdal-network
 
 volumes:
-  redis-data: 
-  graphite-data:
+  redis-data:
+#  graphite-data: # Uncomment to run local telemetry stack
 
 networks:
   streamdal-network:
