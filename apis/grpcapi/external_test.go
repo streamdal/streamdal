@@ -16,8 +16,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/steps"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/server/config"
 	"github.com/streamdal/server/deps"
@@ -870,7 +870,7 @@ func newPipeline() *protos.Pipeline {
 					protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY,
 				},
 				OnFailure: []protos.PipelineStepCondition{
-					protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT,
+					protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT,
 				},
 				Step: &protos.PipelineStep_Detective{
 					Detective: &steps.DetectiveStep{

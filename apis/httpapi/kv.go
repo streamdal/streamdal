@@ -12,7 +12,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/validate"
 )

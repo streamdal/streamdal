@@ -19,7 +19,7 @@ import (
 	"github.com/relistan/go-director"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/types"
 )

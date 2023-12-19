@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/services/encryption"
 	"github.com/streamdal/server/services/store/types"
@@ -270,7 +270,7 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	llog := s.log.WithField("method", "GetPipelines")
 	llog.Debug("received request to get pipelines")
 
-	pipelineIds, err := s.options.RedisBackend.Keys(ctx, RedisPipelinePrefix+":*").Result()
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisPipelinePrefix+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching pipeline keys from store")
 	}
@@ -278,20 +278,26 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	// k == pipelineId
 	pipelines := make(map[string]*protos.Pipeline)
 
-	for _, pipelineId := range pipelineIds {
-		pipelineData, err := s.options.RedisBackend.Get(ctx, pipelineId).Result()
+	for _, key := range keys {
+		pipelineData, err := s.options.RedisBackend.Get(ctx, key).Result()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching pipeline '%s' from store", pipelineId)
+			return nil, errors.Wrapf(err, "error fetching pipeline '%s' from store", key)
 		}
 
 		pipeline := &protos.Pipeline{}
 
 		if err := proto.Unmarshal([]byte(pipelineData), pipeline); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", pipelineId)
+			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", key)
 		}
 
-		pipelineId = strings.TrimPrefix(pipelineId, RedisPipelinePrefix+":")
-		pipelines[pipelineId] = pipeline
+		// Get any associated notification configs
+		nCfgs, err := s.GetNotificationConfigsByPipeline(ctx, pipeline.Id)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching notification configs for pipeline '%s'", pipeline.Id)
+		}
+		pipeline.XNotificationConfigs = nCfgs
+
+		pipelines[pipeline.Id] = pipeline
 	}
 
 	return pipelines, nil
@@ -899,26 +905,20 @@ func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID
 	cfgs := make([]*protos.NotificationConfig, 0)
 
 	// Fetch all notify config keys from store
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisNotificationAssocPrefix).Result()
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisNotificationAssocPrefix+":"+pipelineID+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching notify config keys from store")
 	}
 
 	for _, key := range keys {
-		if !strings.HasPrefix(key, pipelineID+":") {
-			continue
-		}
-
-		parts := strings.Split(strings.Trim(RedisNotificationAssocPrefix+":", key), ":")
-		if len(parts) != 2 {
-			return nil, errors.Errorf("invalid notify config key '%s'", key)
-		}
-
-		configID := parts[1]
+		configID := strings.TrimPrefix(key, RedisNotificationAssocPrefix+":"+pipelineID+":")
 
 		// Fetch key so we get the notify config
 		data, err := s.options.RedisBackend.Get(ctx, RedisNotificationConfigKey(configID)).Result()
 		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				continue
+			}
 			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from store", configID)
 		}
 
