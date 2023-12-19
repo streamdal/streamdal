@@ -31,7 +31,7 @@ jobs:
       - name: Set version vars
         id: set-version-vars
         run: |
-          echo "GITHUB_ENV=true" >> $GITHUB_ENV # Needed so that make can inject the correct version ldd flags
+          echo "GITHUB_ENV=true" >> $GITHUB_ENV # Needed so that 'make' can inject the correct version ldd flags
           echo "GITHUB_VERSION=${{ steps.create_tag.outputs.new_version }}" >> $GITHUB_ENV
           echo "GITHUB_TAG=${{ steps.create_tag.outputs.new_tag }}" >> $GITHUB_ENV
           echo "GITHUB_SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
