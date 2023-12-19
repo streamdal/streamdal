@@ -1,0 +1,5 @@
+❯ netstat -aln | grep 9090
+tcp6       0      0  ::1.9090                                      ::1.53414                                     ESTABLISHED
+tcp6       0      0  ::1.53414                                     ::1.9090                                      ESTABLISHED
+tcp46      0      0  *.9090                                        *.*                                           LISTEN
+

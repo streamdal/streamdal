@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-client-deployment
+  labels:
+    app: demo-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-client
+  template:
+    metadata:
+      labels:
+        app: demo-client
+    spec:
+      containers:
+      - name: demo-client-container
+        image: streamdal/demo-client:e074107
+        imagePullPolicy: Always
+        env:
+      imagePullSecrets:
+      - name: regcredv2
+
