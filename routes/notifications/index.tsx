@@ -1,23 +1,40 @@
-import { NotificationConfigModal } from "../../components/modals/notificationConfigModal.tsx";
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { SuccessRoute, SuccessType } from "../_middleware.ts";
+import { SuccessType } from "../_middleware.ts";
+import { getNotifications } from "../../lib/fetch.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { Notifications } from "../../islands/notifications.tsx";
+import { Partial } from "$fresh/src/runtime/Partial.tsx";
 
-export type NotificationsRoute = {
+export type NotificationsType = {
+  notifications?: NotificationConfig[];
   success?: SuccessType;
 };
 
-export const handler: Handlers<SuccessRoute> = {
-  async POST(req, ctx) {
-    const { session } = ctx.state;
-    const success = session.flash("success");
+export const handler: Handlers<NotificationsType> = {
+  async GET(_req, ctx) {
     return ctx.render({
-      success,
+      notifications: await getNotifications(),
+    });
+  },
+
+  async POST(_req, ctx) {
+    return ctx.render({
+      notifications: await getNotifications(),
     });
   },
 };
 
-export default function configNotificationsRoute(
-  props: PageProps<NotificationsRoute>,
-) {
-  return <NotificationConfigModal success={props?.data?.success} />;
-}
+export const NotificationsRoute = (
+  props: PageProps<NotificationsType>,
+) => {
+  return (
+    <Partial name="main-content">
+      <Notifications
+        notifications={props?.data?.notifications}
+        success={props?.data?.success}
+      />
+    </Partial>
+  );
+};
+
+export default NotificationsRoute;

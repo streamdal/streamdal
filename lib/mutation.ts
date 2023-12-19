@@ -15,6 +15,7 @@ import {
   DetachPipelineRequest,
   PausePipelineRequest,
   ResumePipelineRequest,
+  UpdateNotificationRequest,
 } from "streamdal-protos/protos/sp_external.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
@@ -102,17 +103,34 @@ export const detachPipeline = async (
   }
 };
 
-export const createNotification = async (
+export const deleteNotification = async (
+  notificationId: string,
+): Promise<StandardResponse> => {
+  const { response }: { response: StandardResponse } = await client
+    .deleteNotification(
+      { notificationId },
+      meta,
+    );
+
+  return response;
+};
+
+export const upsertNotification = async (
   notificationConfig: NotificationConfig,
 ) => {
   try {
-    const request: CreateNotificationRequest = {
-      notification: notificationConfig,
-    };
-    const { response } = await client.createNotification(
-      request,
-      meta,
-    );
+    const request = notificationConfig.id
+      ? UpdateNotificationRequest.create({ notification: notificationConfig })
+      : CreateNotificationRequest.create({
+        notification: notificationConfig,
+      });
+
+    const { response } = notificationConfig.id
+      ? await client.updateNotification(request, meta)
+      : await client.createNotification(request, meta);
+
+    console.log("shit response", response);
+
     return response;
   } catch (error) {
     console.error("error configuring notifications", error);

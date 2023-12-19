@@ -1,40 +1,10 @@
-import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { SuccessType } from "../../_middleware.ts";
-import { getPipelines } from "../../../lib/fetch.ts";
-import Pipelines from "../../../islands/pipelines.tsx";
-import { Partial } from "$fresh/runtime.ts";
+import { Handlers } from "$fresh/src/server/types.ts";
+import {
+  handler as pipelineHandler,
+  PipelineRoute,
+  PipelinesRoute,
+} from "../../pipelines/index.tsx";
 
-export type PipelineRoute = {
-  pipelines?: Pipeline[];
-  success?: SuccessType;
-};
+export const handler: Handlers<PipelineRoute> = pipelineHandler;
 
-export const handler: Handlers<PipelineRoute> = {
-  async GET(_req, ctx) {
-    return ctx.render({
-      pipelines: await getPipelines(),
-    });
-  },
-
-  async POST(_req, ctx) {
-    return ctx.render({
-      pipelines: await getPipelines(),
-    });
-  },
-};
-
-export default function PipelinesRoute(
-  props: PageProps<
-    PipelineRoute
-  >,
-) {
-  return (
-    <Partial name="main-content">
-      <Pipelines
-        pipelines={props?.data?.pipelines}
-        success={props?.data?.success}
-      />
-    </Partial>
-  );
-}
+export default PipelinesRoute;

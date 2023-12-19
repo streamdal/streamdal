@@ -36,10 +36,16 @@ export const getPipeline = async (pipelineId: string) => {
   return response?.pipeline;
 };
 
+export const getNotification = async (notificationId: string) => {
+  const { response } = await client.getNotification({ notificationId }, meta);
+  return response?.notification;
+};
+
 export const getNotifications = async () => {
   const { response } = await client.getNotifications({}, meta);
-
-  return response.notifications;
+  return Object.values(response.notifications)?.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 };
 
 export const getSchema = async (audience: Audience) => {

@@ -1,14 +1,15 @@
 import { SuccessType } from "../_middleware.ts";
 import { Handlers } from "$fresh/src/server/types.ts";
 import { ErrorType, validate } from "../../components/form/validate.ts";
-import { NotificationSchema } from "../../islands/notifications.tsx";
-import { createNotification } from "../../lib/mutation.ts";
+import { upsertNotification } from "../../lib/mutation.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
+import { NotificationSchema } from "../../islands/notification.tsx";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const notificationData = await req.formData();
+    console.log("shit notification", notificationData);
     const { data: notification, errors }: {
       notification: NotificationConfig;
       errors: ErrorType;
@@ -20,7 +21,6 @@ export const handler: Handlers<SuccessType> = {
     const { session } = ctx.state;
 
     if (errors) {
-      console.error(errors);
       session.flash("success", {
         status: false,
         message: "Validation failed",
@@ -30,12 +30,16 @@ export const handler: Handlers<SuccessType> = {
         "",
         {
           status: 307,
-          headers: { Location: `/` },
+          headers: {
+            Location: `/notifications/${
+              notification.id ? notification.id : ""
+            }`,
+          },
         },
       );
     }
 
-    const response = await createNotification(notification);
+    const response = await upsertNotification(notification);
 
     session.flash("success", {
       status: response.code === ResponseCode.OK,
@@ -52,13 +56,13 @@ export const handler: Handlers<SuccessType> = {
       {
         status: 307,
         headers: {
-          Location: "/",
+          Location: `/notifications/${notification.id ? notification.id : ""}`,
         },
       },
     );
   },
 };
 
-export default function NotificationConfigureRoute() {
+export default function NotificationSaveRoute() {
   return null;
 }

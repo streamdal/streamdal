@@ -2,7 +2,6 @@ import { LayoutContext } from "$fresh/server.ts";
 import ServiceMapComponent from "../islands/serviceMap.tsx";
 import { NavBar } from "../islands/nav.tsx";
 import { ReactFlowProvider } from "reactflow";
-import Operation from "../islands/drawer/operation.tsx";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { initAllServices } from "../lib/fetch.ts";
 import { GRPC_TOKEN } from "../lib/configs.ts";

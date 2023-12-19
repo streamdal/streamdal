@@ -3,6 +3,7 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import Pipelines from "../../islands/pipelines.tsx";
 import { getPipelines } from "../../lib/fetch.ts";
 import { SuccessType } from "../_middleware.ts";
+import { Partial } from "$fresh/src/runtime/Partial.tsx";
 
 export type PipelineRoute = {
   pipelines?: Pipeline[];
@@ -23,15 +24,19 @@ export const handler: Handlers<PipelineRoute> = {
   },
 };
 
-export default function PipelinesRoute(
+export const PipelinesRoute = (
   props: PageProps<
     PipelineRoute
   >,
-) {
+) => {
   return (
-    <Pipelines
-      pipelines={props?.data?.pipelines}
-      success={props?.data?.success}
-    />
+    <Partial name="main-content">
+      <Pipelines
+        pipelines={props?.data?.pipelines}
+        success={props?.data?.success}
+      />
+    </Partial>
   );
-}
+};
+
+export default PipelinesRoute;

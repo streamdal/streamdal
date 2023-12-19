@@ -64,6 +64,7 @@ export const NavBar = () => {
         <li>
           <a
             href="/notifications"
+            f-partial="/partials/notifications"
             className="flex items-center p-2 text-gray-500 hover:bg-sunset group"
           >
             <IconBell class="w-6 h-6" />
@@ -71,9 +72,9 @@ export const NavBar = () => {
           </a>
         </li>
         <li className="cursor-not-allowed">
-          <div className="flex items-center p-2 text-gray-900 hover:bg-sunset group ">
+          <div className="flex items-center p-2 text-gray-400 hover:bg-sunset group ">
             <svg
-              className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75"
+              className="flex-shrink-0 w-5 h-5 text-gray-400 transition duration-75"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
