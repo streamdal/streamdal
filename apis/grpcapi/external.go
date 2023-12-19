@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/services/store"
 	"github.com/streamdal/server/types"
@@ -304,6 +304,13 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 
 	// Strip WASM fields (to save on b/w)
 	util.StripWASMFields(pipeline)
+
+	// Get any associated notification configs
+	nCfgs, err := s.Options.StoreService.GetNotificationConfigsByPipeline(ctx, req.PipelineId)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get notification configs")
+	}
+	pipeline.XNotificationConfigs = nCfgs
 
 	return &protos.GetPipelineResponse{
 		Pipeline: pipeline,

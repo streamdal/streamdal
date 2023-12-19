@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	_ "google.golang.org/grpc/reflection"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/config"
 	"github.com/streamdal/server/services/bus"

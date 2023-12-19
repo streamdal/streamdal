@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/shared"
+	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/mono/libs/protos/build/go/protos/shared"
 
 	"github.com/streamdal/server/util"
 )
