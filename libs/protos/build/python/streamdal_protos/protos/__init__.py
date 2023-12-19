@@ -65,6 +65,25 @@ class TailRequestType(betterproto.Enum):
     TAIL_REQUEST_TYPE_RESUME = 4
 
 
+class NotificationType(betterproto.Enum):
+    NOTIFICATION_TYPE_UNSET = 0
+    NOTIFICATION_TYPE_SLACK = 1
+    NOTIFICATION_TYPE_EMAIL = 2
+    NOTIFICATION_TYPE_PAGERDUTY = 3
+
+
+class NotificationEmailType(betterproto.Enum):
+    TYPE_UNSET = 0
+    TYPE_SMTP = 1
+    TYPE_SES = 2
+
+
+class NotificationPagerDutyUrgency(betterproto.Enum):
+    URGENCY_UNSET = 0
+    URGENCY_LOW = 1
+    URGENCY_HIGH = 2
+
+
 class PipelineStepCondition(betterproto.Enum):
     """
     A condition defines how the SDK should handle a step response -- should it
@@ -90,25 +109,6 @@ class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
     CLIENT_TYPE_SDK = 1
     CLIENT_TYPE_SHIM = 2
-
-
-class NotificationType(betterproto.Enum):
-    NOTIFICATION_TYPE_UNSET = 0
-    NOTIFICATION_TYPE_SLACK = 1
-    NOTIFICATION_TYPE_EMAIL = 2
-    NOTIFICATION_TYPE_PAGERDUTY = 3
-
-
-class NotificationEmailType(betterproto.Enum):
-    TYPE_UNSET = 0
-    TYPE_SMTP = 1
-    TYPE_SES = 2
-
-
-class NotificationPagerDutyUrgency(betterproto.Enum):
-    URGENCY_UNSET = 0
-    URGENCY_LOW = 1
-    URGENCY_HIGH = 2
 
 
 class AppRegistrationStatusResponseStatus(betterproto.Enum):
@@ -264,6 +264,61 @@ class SampleOptions(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class NotificationConfig(betterproto.Message):
+    id: Optional[str] = betterproto.string_field(1, optional=True, group="_id")
+    name: str = betterproto.string_field(2)
+    type: "NotificationType" = betterproto.enum_field(3)
+    slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
+    email: "NotificationEmail" = betterproto.message_field(1001, group="config")
+    pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")
+
+
+@dataclass(eq=False, repr=False)
+class NotificationSlack(betterproto.Message):
+    bot_token: str = betterproto.string_field(1)
+    channel: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class NotificationEmail(betterproto.Message):
+    type: "NotificationEmailType" = betterproto.enum_field(1)
+    recipients: List[str] = betterproto.string_field(2)
+    from_address: str = betterproto.string_field(3)
+    smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
+    ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
+
+
+@dataclass(eq=False, repr=False)
+class NotificationEmailSmtp(betterproto.Message):
+    host: str = betterproto.string_field(1)
+    port: int = betterproto.int32_field(2)
+    user: str = betterproto.string_field(3)
+    password: str = betterproto.string_field(4)
+    use_tls: bool = betterproto.bool_field(5)
+
+
+@dataclass(eq=False, repr=False)
+class NotificationEmailSes(betterproto.Message):
+    ses_region: str = betterproto.string_field(1)
+    ses_access_key_id: str = betterproto.string_field(2)
+    ses_secret_access_key: str = betterproto.string_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class NotificationPagerDuty(betterproto.Message):
+    token: str = betterproto.string_field(1)
+    """Auth token"""
+
+    email: str = betterproto.string_field(2)
+    """Must be a valid email for a PagerDuty user"""
+
+    service_id: str = betterproto.string_field(3)
+    """Must be a valid PagerDuty service"""
+
+    urgency: "NotificationPagerDutyUrgency" = betterproto.enum_field(4)
+
+
+@dataclass(eq=False, repr=False)
 class Pipeline(betterproto.Message):
     """
     Pipeline is a structure that holds one or more pipeline steps. This
@@ -282,6 +337,12 @@ class Pipeline(betterproto.Message):
 
     steps: List["PipelineStep"] = betterproto.message_field(3)
     """One or more steps to execute"""
+
+    notification_configs: List["NotificationConfig"] = betterproto.message_field(4)
+    """
+    Notification configs for this pipeline. Only filled out in external API
+    responses
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -376,61 +437,6 @@ class ClientInfo(betterproto.Message):
     node_name: Optional[str] = betterproto.string_field(
         9, optional=True, group="X_node_name"
     )
-
-
-@dataclass(eq=False, repr=False)
-class NotificationConfig(betterproto.Message):
-    id: Optional[str] = betterproto.string_field(1, optional=True, group="_id")
-    name: str = betterproto.string_field(2)
-    type: "NotificationType" = betterproto.enum_field(3)
-    slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
-    email: "NotificationEmail" = betterproto.message_field(1001, group="config")
-    pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")
-
-
-@dataclass(eq=False, repr=False)
-class NotificationSlack(betterproto.Message):
-    bot_token: str = betterproto.string_field(1)
-    channel: str = betterproto.string_field(2)
-
-
-@dataclass(eq=False, repr=False)
-class NotificationEmail(betterproto.Message):
-    type: "NotificationEmailType" = betterproto.enum_field(1)
-    recipients: List[str] = betterproto.string_field(2)
-    from_address: str = betterproto.string_field(3)
-    smtp: "NotificationEmailSmtp" = betterproto.message_field(1000, group="config")
-    ses: "NotificationEmailSes" = betterproto.message_field(1001, group="config")
-
-
-@dataclass(eq=False, repr=False)
-class NotificationEmailSmtp(betterproto.Message):
-    host: str = betterproto.string_field(1)
-    port: int = betterproto.int32_field(2)
-    user: str = betterproto.string_field(3)
-    password: str = betterproto.string_field(4)
-    use_tls: bool = betterproto.bool_field(5)
-
-
-@dataclass(eq=False, repr=False)
-class NotificationEmailSes(betterproto.Message):
-    ses_region: str = betterproto.string_field(1)
-    ses_access_key_id: str = betterproto.string_field(2)
-    ses_secret_access_key: str = betterproto.string_field(3)
-
-
-@dataclass(eq=False, repr=False)
-class NotificationPagerDuty(betterproto.Message):
-    token: str = betterproto.string_field(1)
-    """Auth token"""
-
-    email: str = betterproto.string_field(2)
-    """Must be a valid email for a PagerDuty user"""
-
-    service_id: str = betterproto.string_field(3)
-    """Must be a valid PagerDuty service"""
-
-    urgency: "NotificationPagerDutyUrgency" = betterproto.enum_field(4)
 
 
 @dataclass(eq=False, repr=False)

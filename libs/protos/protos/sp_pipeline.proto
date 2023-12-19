@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "sp_notify.proto";
 import "steps/sp_steps_custom.proto";
 import "steps/sp_steps_decode.proto";
 import "steps/sp_steps_detective.proto";
@@ -27,6 +28,10 @@ message Pipeline {
 
   // One or more steps to execute
   repeated PipelineStep steps = 3;
+
+  // Notification configs for this pipeline. Only filled out
+  // in external API responses
+  repeated protos.NotificationConfig _notification_configs = 4; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // A condition defines how the SDK should handle a step response -- should it

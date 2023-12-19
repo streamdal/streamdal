@@ -13,6 +13,7 @@ import { DecodeStep } from "./steps/sp_steps_decode.js";
 import { EncodeStep } from "./steps/sp_steps_encode.js";
 import { TransformStep } from "./steps/sp_steps_transform.js";
 import { DetectiveStep } from "./steps/sp_steps_detective.js";
+import { NotificationConfig } from "./sp_notify.js";
 /**
  * Pipeline is a structure that holds one or more pipeline steps. This structure
  * is intended to be immutable; clients are expected to generate WASMRequest's
@@ -40,6 +41,13 @@ export interface Pipeline {
      * @generated from protobuf field: repeated protos.PipelineStep steps = 3;
      */
     steps: PipelineStep[];
+    /**
+     * Notification configs for this pipeline. Only filled out
+     * in external API responses
+     *
+     * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4;
+     */
+    NotificationConfigs: NotificationConfig[];
 }
 /**
  * A pipeline step is a single step in a pipeline.
