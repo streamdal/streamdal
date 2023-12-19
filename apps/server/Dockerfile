@@ -8,11 +8,20 @@ ARG TARGETOS
 # Install necessary build tools
 RUN apk --update add make bash curl git
 
-# Switch workdir, otherwise we end up in /go (default)
+# Switch to root dir (default for go is /go)
 WORKDIR /
 
 # Copy everything into build container
 COPY . .
+
+# Switch to assets/wasm
+WORKDIR /assets/wasm
+
+# Download wasm release specified in 'version' file
+RUN sh ./download-wasm.sh
+
+# Switch back to root dir
+WORKDIR /
 
 # Build the application
 RUN make build/$TARGETOS-$TARGETARCH

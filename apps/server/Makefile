@@ -1,6 +1,6 @@
 SERVICE := server
 ARCH = $(shell uname -m)
-LOCAL_VERSION = v0.0.0+local
+LOCAL_VERSION = v0.0.0-local
 LOCAL_SHORT_SHA = $(shell git rev-parse --short HEAD)
 
 define WELCOME_MESSAGE
@@ -17,11 +17,11 @@ endef
 export WELCOME_MESSAGE
 
 ifeq ($(GITHUB_VERSION),)
-GITHUB_VERSION := v0.0.0+unknown
+GITHUB_VERSION := v0.0.0-github
 endif
 
 ifeq ($(GITHUB_SHORT_SHA),)
-GITHUB_SHORT_SHA := 00000000
+GITHUB_SHORT_SHA := ffffffff
 endif
 
 ifeq ($(GITHUB_TAG),)
@@ -185,7 +185,7 @@ docker/build:
 .PHONY: docker/build/local
 docker/build/local: description = Build docker image locally (needed for M1+)
 docker/build/local:
-	docker build --load --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
+	docker build --progress=plain --no-cache --load --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
 	-t streamdal/$(SERVICE):$(LOCAL_VERSION)-$(LOCAL_SHORT_SHA) \
 	-t streamdal/$(SERVICE):latest \
 	-f ./Dockerfile .
