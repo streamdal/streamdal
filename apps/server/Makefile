@@ -105,15 +105,6 @@ stop/dev/build: description = Stop streamdal/server img and all its deps
 stop/dev/build:
 	docker-compose -f docker-compose.dev.build.yaml down
 
-.PHONY: testvars
-testvars: description = Debug stuff
-testvars:
-	@echo $(GITHUB_VERSION)
-	@echo $(GITHUB_SHORT_SHA)
-	@echo $(GITHUB_TAG)
-	@echo $(GITHUB_ENV)
-	@echo $(GO_BUILD_FLAGS)
-
 ### Build
 
 .PHONY: build
@@ -170,6 +161,7 @@ test: description = Run Go tests (make sure to bring up deps first; tests are ra
 test: GOFLAGS=
 test:
 	@echo "Make sure to bring up deps first via 'make run/dev'"
+	cd assets/wasm && sh download-wasm.sh && cd - && \
 	TEST=true $(GO) test ./apis/grpcapi/... -v -count=1
 
 ### Docker
