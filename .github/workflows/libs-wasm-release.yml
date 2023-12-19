@@ -21,19 +21,23 @@ jobs:
       RUSTC_WRAPPER: "sccache"
     steps:
       - uses: actions/checkout@v2
+
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
           #components: rustfmt, clippy
+
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
+
       - name: build
         run: |
           rustup target add wasm32-wasi
           cargo install wasm-opt
           make build
+
       - name: Compress directory
         run: zip -j release.zip build/*.wasm
 
@@ -41,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: release_artifact
-          path: release.zip
+          path: ./libs/wasm/release.zip
 
       - name: Create tag
         uses: mathieudutour/github-tag-action@v6.1
@@ -67,6 +71,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release.zip
+          asset_path: libs/wasm/release.zip
           asset_name: release.zip
           asset_content_type: application/zip
