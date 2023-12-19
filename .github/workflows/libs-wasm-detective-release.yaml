@@ -1,8 +1,17 @@
-name: Release
+name: Wasm-Detective - Release
+
 on:
   push:
     branches:
       - main
+    paths:
+      - 'libs/wasm-detective/**'
+      - '.github/workflows/libs-wasm-detective-release.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm-detective
+
 jobs:
   build:
     runs-on: ubuntu-latest
