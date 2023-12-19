@@ -1,12 +1,12 @@
-name: Release
+name: Server - Release
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'libs/protos/**'
-      - '.github/workflows/libs-protos-apps-server-release.yml'
+      - 'apps/server/**'
+      - '.github/workflows/apps-server-release.yml'
 
 defaults:
   run:
