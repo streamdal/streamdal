@@ -1,0 +1,65 @@
+name: Wasm-Detective - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'libs/wasm-detective/**'
+      - '.github/workflows/libs-wasm-detective-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./libs/wasm-detective
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path libs/wasm-detective/Cargo.toml
+
+  bench:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: bench
+          args: --manifest-path libs/wasm-detective/Cargo.toml
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - run: rustup component add clippy
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --manifest-path libs/wasm-detective/Cargo.toml -- -D warnings
