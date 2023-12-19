@@ -1,13 +1,30 @@
 SERVICE = server
-ARCH ?= $(shell uname -m)
+ARCH = $(shell uname -m)
 VERSION_SCRIPT = ./assets/scripts/get-version.sh
-VERSION ?= $(shell git rev-parse --short HEAD)
-SHORT_SHA ?= $(shell git rev-parse --short HEAD)
-GIT_TAG ?= $(shell git describe --tags --abbrev=0)
+LOCAL_VERSION = v0.0.0+local
+LOCAL_SHORT_SHA = $(shell git rev-parse --short HEAD)
+
+ifeq ($(GITHUB_VERSION),)
+GITHUB_VERSION := v0.0.0+unknown
+endif
+
+ifeq ($(GITHUB_TAG),)
+GITHUB_TAG := apps/server/v0.0.0+unknown
+endif
+
+ifeq ($(GITHUB_SHORT_SHA),)
+GITHUB_SHORT_SHA := 00000000
+endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
-GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION}"
+
+# If github env var is present, use github env vars for version
+ifeq ($(GITHUB_ENV),)
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GITHUB_VERSION}-${GITHUB_SHORT_SHA}"
+else
+GO_BUILD_FLAGS = -ldflags "-X main.version=${LOCAL_VERSION}-${LOCAL_SHORT_SHA}"
+endif
 
 # Utility functions
 check_defined = \
@@ -65,6 +82,12 @@ run/dev/build:
 get/version: description = Get streamdal/server version + how far behind it is from remote
 get/version:
 	@bash $(VERSION_SCRIPT)
+
+.PHONY: testvars
+testvars:
+	@echo $(GITHUB_VERSION)
+	@echo $(GITHUB_SHORT_SHA)
+	@echo $(GITHUB_TAG)
 
 ### Build
 
@@ -125,25 +148,24 @@ test:
 
 ### Docker
 
+.PHONY: docker/build
+docker/build: description = Build docker image (intended to be ran by Github Actions)
+docker/build:
+	docker buildx build --push --platform=linux/amd64,linux/arm64 \
+	-t streamdal/$(SERVICE):$(GITHUB_VERSION)-$(GITHUB_SHORT_SHA) \
+	-t streamdal/$(SERVICE):latest \
+	-f ./Dockerfile .
+
 .PHONY: docker/build/local
 docker/build/local: description = Build docker image locally (needed for M1+)
 docker/build/local:
 	docker build --load --build-arg TARGETOS=linux --build-arg TARGETARCH=arm64 \
-	-t streamdal/$(SERVICE):$(VERSION) \
+	-t streamdal/$(SERVICE):$(LOCAL_VERSION)-$(LOCAL_SHORT_SHA) \
 	-t streamdal/$(SERVICE):latest \
 	-f ./Dockerfile .
 
-.PHONY: docker/build
-docker/build: description = Build docker image
-docker/build:
-	docker buildx build --push --platform=linux/amd64,linux/arm64 \
-	-t streamdal/$(SERVICE):$(VERSION) \
-	-t streamdal/$(SERVICE):$(GIT_TAG)-$(SHORT_SHA) \
-	-t streamdal/$(SERVICE):latest \
-	-f ./Dockerfile .
-
-.PHONY: docker/push
+.PHONY: docker/push/local
 docker/push: description = Push local docker image
 docker/push:
-	docker push streamdal/$(SERVICE):$(VERSION) && \
+	docker push streamdal/$(SERVICE):$(LOCAL_VERSION) && \
 	docker push streamdal/$(SERVICE):latest
