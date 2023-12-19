@@ -40,6 +40,9 @@ import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { useEffect } from "preact/hooks";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import IconX from "tabler-icons/tsx/x.tsx";
+import { PipelineNotifications } from "../components/pipeline/notifications.tsx";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -219,6 +222,7 @@ export type StepType = z.infer<typeof stepSchema>;
 export const pipelineSchema = zfd.formData({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
+  notifications: zfd.repeatable(z.array(z.string())),
   steps: zfd.repeatable(
     z
       .array(stepSchema)
@@ -226,11 +230,10 @@ export const pipelineSchema = zfd.formData({
   ),
 });
 
-export type PipelineType = z.infer<typeof pipelineSchema>;
-
 const PipelineDetail = (
-  { pipeline }: {
+  { pipeline, notifications }: {
     pipeline: Pipeline;
+    notifications: NotificationConfig[];
   },
 ) => {
   const [open, setOpen] = useState([0]);
@@ -336,7 +339,41 @@ const PipelineDetail = (
             </a>
           </div>
         </div>
-        <div class="p-6 flex flex-col">
+        <div class="px-6 flex flex-col">
+          <div class="flex flex-row items-center justify-between mb-2">
+            <div class="flex flex-row items-center">
+              <div class="text-[16px] font-semibold mr-2">
+                Notifications
+              </div>
+              <div class="text-[14px] font-medium text-stormCloud">
+                - used by the notify step settings below
+              </div>
+            </div>
+          </div>
+          <div class={`flex flex-col`}>
+            <div class="flex flex-col p-2 rounded-sm border border-twilight">
+              {notifications?.length
+                ? (
+                  <PipelineNotifications
+                    notifications={notifications}
+                    data={data}
+                    setData={setData}
+                  />
+                )
+                : (
+                  <div class="flex flex-row justify-start items-center text-sm font-medium text-stormCloud">
+                    <a
+                      href="/notifications"
+                      class="flex flex-row justify-start items-center text-underline"
+                    >
+                      <IconPlus class={"w-3 h-3 mr-2"} /> add notifications
+                    </a>
+                  </div>
+                )}
+            </div>
+          </div>
+        </div>
+        <div class="pt-6 px-6 flex flex-col">
           <div class="flex flex-row items-center justify-between mb-6">
             <div class="flex flex-row items-center">
               <div class="text-[16px] font-semibold mr-2">

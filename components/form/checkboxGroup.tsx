@@ -46,7 +46,7 @@ export const CheckboxGroup = ({
             <FormCheckbox
               path={path}
               value={k}
-              display={titleCase(v)}
+              display={titleCase(v).replace("_", " ")}
               defaultChecked={Array.isArray(selected) &&
                 selected.includes(Number(k))}
             />

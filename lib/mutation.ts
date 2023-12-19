@@ -22,6 +22,32 @@ import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;
 };
+
+export const updatePipelineNotifications = async (
+  notificationIds: string[],
+  pipeline: Pipeline,
+) => {
+  const attach = notificationIds;
+  //
+  // TODO build detach once notifications land on pipelines
+  const detach = [];
+
+  for await (const id of attach) {
+    client.attachNotification(
+      { notificationId: id, pipelineId: pipeline.id },
+      meta,
+    );
+  }
+
+  for await (const id of detach) {
+    client.detachNotification(
+      { notificationId: id, pipelineId: pipeline.id },
+      meta,
+    );
+  }
+  return;
+};
+
 export const upsertPipeline = async (
   pipeline: Pipeline,
 ): Promise<PatchedPipelineResponse> => {
@@ -128,8 +154,6 @@ export const upsertNotification = async (
     const { response } = notificationConfig.id
       ? await client.updateNotification(request, meta)
       : await client.createNotification(request, meta);
-
-    console.log("shit response", response);
 
     return response;
   } catch (error) {

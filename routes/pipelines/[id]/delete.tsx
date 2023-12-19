@@ -1,10 +1,15 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { getPipeline, getPipelines } from "../../../lib/fetch.ts";
+import {
+  getNotifications,
+  getPipeline,
+  getPipelines,
+} from "../../../lib/fetch.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";
+import notification from "../../../islands/notification.tsx";
 
 export type DeletePipeline = {
   pipeline: Pipeline;
@@ -20,6 +25,7 @@ export const handler: Handlers<DeletePipeline> = {
     return ctx.render({
       pipeline,
       pipelines: await getPipelines(),
+      notifications: await getNotifications(),
     });
   },
   async POST(req, ctx) {
@@ -49,7 +55,10 @@ export default function DeletePipelineRoute(
         entityName={props?.data?.pipeline?.name}
         redirect={`/pipelines/${props?.params?.id}`}
       />
-      <Pipelines pipelines={props?.data?.pipelines} />
+      <Pipelines
+        notifications={props?.data?.notifications}
+        pipelines={props?.data?.pipelines}
+      />
     </>
   );
 }

@@ -16,6 +16,8 @@ import { InlineInput } from "../components/form/inlineInput.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import { logFormData } from "../lib/utils.ts";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
+import { initFlowbite } from "flowbite";
+import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
 
 const NotificationTypeEnum = z.nativeEnum(NotificationType);
 const EmailNotificationTypeEnum = z.nativeEnum(NotificationEmail_Type);
@@ -93,6 +95,13 @@ const NotificationDetail = (
   const [errors, setErrors] = useState({});
   const [data, setData] = useState(notification);
 
+  useEffect(() => {
+    initFlowbite();
+    setData({
+      ...notification,
+    });
+  }, [notification]);
+
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
     logFormData(notificationFormData);
@@ -153,7 +162,7 @@ const NotificationDetail = (
           </div>
           <div>
             <a href="/" f-partial="/partials">
-              <IconX class="w-6 h-6" />
+              <img src="/images/x.svg" className="w-[14px]" />
             </a>
           </div>
         </div>
@@ -231,10 +240,7 @@ const NotificationDetail = (
                     onClick={addRecipient}
                   >
                     Add a new recipient
-                    <IconPlus
-                      data-tooltip-target="step-add"
-                      class="w-5 h-5 cursor-pointer"
-                    />
+                    <IconPlus class="w-5 h-5 cursor-pointer" />
                   </div>
 
                   {data?.config?.email?.recipients?.length

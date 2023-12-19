@@ -9,7 +9,6 @@ import { NotificationSchema } from "../../islands/notification.tsx";
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const notificationData = await req.formData();
-    console.log("shit notification", notificationData);
     const { data: notification, errors }: {
       notification: NotificationConfig;
       errors: ErrorType;

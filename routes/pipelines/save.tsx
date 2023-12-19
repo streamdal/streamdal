@@ -3,7 +3,10 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ErrorType, validate } from "../../components/form/validate.ts";
 import { pipelineSchema } from "../../islands/pipeline.tsx";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { upsertPipeline } from "../../lib/mutation.ts";
+import {
+  updatePipelineNotifications,
+  upsertPipeline,
+} from "../../lib/mutation.ts";
 import { SuccessType } from "../_middleware.ts";
 
 export const handler: Handlers<SuccessType> = {
@@ -35,6 +38,7 @@ export const handler: Handlers<SuccessType> = {
       );
     }
 
+    await updatePipelineNotifications(pipeline.notifications, pipeline);
     const response = await upsertPipeline(pipeline);
 
     session.flash("success", {

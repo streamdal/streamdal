@@ -25,7 +25,7 @@ const newNotificationConfig = {
 export const Notifications = (
   { id, notifications, success, add = false }: {
     id?: string;
-    notifications?: Pipeline[];
+    notifications?: NotificationConfig[];
     success: SuccessType;
     add?: boolean;
   },

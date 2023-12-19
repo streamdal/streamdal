@@ -7,11 +7,13 @@ import PipelineDetail, { newPipeline } from "./pipeline.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 const Pipelines = (
-  { id, pipelines, success, add = false }: {
+  { id, pipelines, notifications, success, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
+    notifications?: NotificationConfig[];
     success: SuccessType;
     add?: boolean;
   },
@@ -72,9 +74,10 @@ const Pipelines = (
                 </a>
               ))}
             </div>
-            <div class="w-full max-h-[80vh] overflow-y-auto">
+            <div class="w-full max-h-[88vh] overflow-y-auto">
               <PipelineDetail
                 pipeline={wrapper[selected]}
+                notifications={notifications}
                 success={success}
               />
             </div>
