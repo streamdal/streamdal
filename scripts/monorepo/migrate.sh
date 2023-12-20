@@ -43,13 +43,13 @@ FILES="LICENSE README.md Makefile"
 
 # Repos we will migrate during this run; you'll want to change these between
 # runs as diff repos will need to go into a diff monorepo subdir.
-REPOS="wasm-detective"
+REPOS="cli"
 
 # Name of the target mono repo dir
 MONO_DIR="mono"
 
 # Which subdir will we migrate $REPOS into
-SUB_DIR="libs"
+SUB_DIR="apps"
 
 info() {
     printf "\x1b[48;5;%sm» ${1}\e[0m\n" "99"

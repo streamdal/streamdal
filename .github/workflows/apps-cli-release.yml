@@ -1,0 +1,52 @@
+name: Server - Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/cli/**'
+      - '.github/workflows/apps-cli-release.yml'
+
+defaults:
+  run:
+    working-directory: ./apps/server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.18'
+
+      - name: Test
+        run: |
+          make test
+
+      - name: Create tag
+        uses: mathieudutour/github-tag-action@v6.1
+        id: create_tag
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "apps/cli/v"
+
+      - name: Set version vars
+        id: set-version-vars
+        run: |
+          echo "GITHUB_VERSION=${{ steps.create_tag.outputs.new_version }}" >> $GITHUB_ENV
+
+      - name: Build
+        run: |
+          make build
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            apps/cli/build/streamdal*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

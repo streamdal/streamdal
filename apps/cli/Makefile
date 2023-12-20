@@ -1,8 +1,26 @@
-SHORT_SHA ?= $(shell git rev-parse --short HEAD)
-GIT_TAG ?= $(shell git describe --tags --abbrev=0 || echo "v0.0.0")
-VERSION ?= $(GIT_TAG)-$(SHORT_SHA)
 BINARY   = streamdal
 ARCH ?= $(shell uname -m)
+LOCAL_VERSION = v0.0.0-local
+
+define WELCOME_MESSAGE
+     _                                _       _
+ ___| |_ _ __ ___  __ _ _ __ ___   __| | __ _| |
+/ __| __| '__/ _ \/ _` | '_ ` _ \ / _` |/ _` | |
+\__ \ |_| | |  __/ (_| | | | | | | (_| | (_| | |
+|___/\__|_|  \___|\__,_|_| |_| |_|\__,_|\__,_|_|
+================================================
+    	  Code-Native Data Pipelines
+
+endef
+
+export WELCOME_MESSAGE
+
+# If not set, use local var
+ifeq ($(GITHUB_VERSION),)
+VERSION := $(LOCAL_VERSION)
+else
+VERSION := $(GITHUB_VERSION)
+endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GONOPROXY=github.com/streamdal GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
@@ -19,11 +37,8 @@ help: HELP_SCRIPT = \
 
 .PHONY: help
 help:
+	@echo "$$WELCOME_MESSAGE"
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
-
-.PHONY: foo
-foo:
-	$(info FULL=$(FULL_VERSION))
 
 ### Dev
 
