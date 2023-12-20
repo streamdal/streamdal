@@ -48,5 +48,6 @@ jobs:
         with:
           files: |
             apps/cli/build/streamdal*
+          tag_name: ${{ steps.create_tag.outputs.new_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
