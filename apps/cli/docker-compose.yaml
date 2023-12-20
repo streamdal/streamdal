@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  streamdal-server:
+    image: streamdal/server:latest
+    depends_on:
+      - redis
+    environment:
+      - STREAMDAL_SERVER_NODE_NAME=node1
+      - STREAMDAL_SERVER_AUTH_TOKEN=1234
+      - STREAMDAL_SERVER_REDIS_URL=redis:6379
+      - STREAMDAL_SERVER_DEBUG=true
+    container_name: streamdal-server
+    ports:
+      - "8081:8081" # HTTP API
+      - "8082:8082" # gRPC API
+    networks:
+      - streamdal-network
+
+  redis:
+    container_name: streamdal-redis
+    image: redis:latest
+    command: redis-server --appendonly yes # This enables AOF persistence
+    volumes:
+      - redis-data:/data # Persist redis data to this volume
+    ports:
+      - "6379:6379"
+    networks:
+      - streamdal-network
+
+volumes:
+  redis-data: # Define the volume for redis data
+
+networks:
+  streamdal-network:
