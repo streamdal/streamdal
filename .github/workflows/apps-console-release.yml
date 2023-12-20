@@ -1,14 +1,30 @@
-name: Publish Docker image
+name: Console - Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/console/**'
+      - '.github/workflows/apps-console-release.yml'
+
+defaults:
+  run:
+    working-directory: ./apps/console
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+  release:
+    name: Test, build and push Docker image
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Test
+        run: deno task test
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -34,8 +50,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./apps/console
+          file: ./apps/console/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
