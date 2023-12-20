@@ -13,24 +13,28 @@
 # Our desired monorepo structure:
 #
 # ┌── assets
-# │   └── img
+# │   ├── img
+# │   └── ...
 # ├── apps
 # │   ├── cli
 # │   ├── console
 # │   ├── docs
-# │   └── server
+# │   ├── server
+# │   └── ...
 # ├── examples
-# │   ├── install
-# │	  │	  ├── docker/*
-# │   │	  └── helm/*
-# │   └── quickstart
+# │   ├── docker
+# │	  ├── ecs
+# |   └── ...
 # ├── libs
 # │   ├── protos
 # │   ├── wasm
 # │   ├── wasm-detective
-# │   └── wasm-transformer
+# │   ├── wasm-transformer
+# │   └── ...
 # ├── scripts
-# │	  └── install.sh
+# │   ├── install
+# │   │	  └── streamdal.sh
+# │   └── ...
 # ├── LICENSE
 # ├── Makefile
 # └── README.md

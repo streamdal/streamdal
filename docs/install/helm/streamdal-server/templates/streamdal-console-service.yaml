@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamdal-console
+  {{- if .Values.consoleService.loadBalancer.enabled }}
+  annotations:
+    {{- range $key, $value := .Values.consoleService.loadBalancer.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: {{ if .Values.consoleService.loadBalancer.enabled }}LoadBalancer{{ else }}ClusterIP{{ end }}
+  selector:
+    app.kubernetes.io/name: {{ include "streamdal.name" . }}-console
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+  {{- if .Values.consoleService.loadBalancer.enabled }}
+  - name: {{ .Values.consoleService.loadBalancer.name }}
+    port: {{ .Values.consoleService.loadBalancer.port }}
+    targetPort: {{ .Values.consoleService.loadBalancer.targetPort }}
+  {{- else }}
+  - name: http
+    port: 8080
+    targetPort: 8080
+  {{- end }}

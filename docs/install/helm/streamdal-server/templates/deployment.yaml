@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "streamdal.fullname" . }}
+  labels:
+    {{- include "streamdal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "streamdal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "streamdal.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: {{ include "streamdal.fullname" . }}-envoy
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+            - name: grpc
+              containerPort: 8082
+              protocol: TCP
+          env: 
+            - name: STREAMDAL_SERVER_REDIS_URL
+              value: "{{ .Release.Name }}-redis-master:6379"
+            - name: STREAMDAL_SERVER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: STREAMDAL_SERVER_AES_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: streamdal-server-aes-key
+                  key: STREAMDAL_SERVER_AES_KEY
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: envoy
+          image: envoyproxy/envoy:v1.22.0
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy
+          command: ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml"]
+          ports:
+            - name: envoy
+              containerPort: 8083
+              protocol: TCP
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

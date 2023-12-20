@@ -104,7 +104,7 @@ Once done:
 You should be presented with a _beautiful_ (but empty) UI! To populate it,
 we will need to instrument some code. _Onto the next section!_
 
-<sub>_For alternative installation methods, check the [install](./install) dir._</sub>
+<sub>_For alternative installation methods, check the [docs](./docs) dir._</sub>
 
 ### Instrument
 
@@ -112,8 +112,8 @@ Once you've installed the server and console, you can instrument your code using
 one of our [SDKs](#sdks).
 
 > To see an example of a _complete_ instrumentation, take a look at the
-[Go demo client](https://github.com/streamdal/server/tree/main/test-utils/demo-client) 
-> that is bundled with the [server](https://github.com/streamdal/server).
+[Go demo client](./apps/server/test-utils/demo-client/) 
+> that is bundled with the [./apps/server](./apps/server/test-utils/demo-client/).
 
 **[Go](https://github.com/streamdal/go-sdk)**
 ```go
@@ -219,32 +219,34 @@ addresses"_ and so on).
 
 # Repo Layout
 
-This repo is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that has the
-following structure:
+This repo is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that has the following layout and usage:
 
 ```plaintext
-# ┌── assets
-# │   └── img
+# ┌── assets                 <--- Static assets 
+# │   ├── img
+# │   └── ...
 # ├── apps
-# │   ├── cli
-# │   ├── console
-# │   ├── docs 
-# │   └── server
+# │   ├── cli                <--- CLI UI 
+# │   ├── console            <--- Web-based UI
+# │   ├── docs               <--- https://docs.streamdal.com 
+# │   ├── server             <--- Server component
+# │   └── ...
 # ├── examples
-# │   ├── install
-# │	  │	  ├── docker
-# │   │	  └── helm
-# │   ├── instrument
-# |   └── quickstart
+# │   ├── docker
+# │	  ├── ecs
+# |   └── ...
 # ├── libs
-# │   ├── protos
-# │   ├── wasm
-# │   ├── wasm-detective
-# │   └── wasm-transformer
-# ├── scripts
-# │	  └── install
+# │   ├── protos             <--- Common protobuf schemas
+# │   ├── wasm               <--- Wasm funcs used in pipeline steps
+# │   ├── wasm-detective     <--- Wasm lib used for data parsing and validation 
+# │   ├── wasm-transformer   <--- Wasm lib used for data transformation
+# │   └── ...
+# ├── scripts                   
+# │   ├── install
+# │   │	  └── install.sh     <--- Install script for installing Streamdal
+# │   └── ...
 # ├── LICENSE
-# ├── Makefile
+# ├── Makefile               <--- Makefile with common tasks; run `make help` for more info
 # └── README.md
 ```
 
