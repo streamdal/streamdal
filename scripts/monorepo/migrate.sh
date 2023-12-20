@@ -43,7 +43,7 @@ FILES="LICENSE README.md Makefile"
 
 # Repos we will migrate during this run; you'll want to change these between
 # runs as diff repos will need to go into a diff monorepo subdir.
-REPOS="cli"
+REPOS="console"
 
 # Name of the target mono repo dir
 MONO_DIR="mono"
