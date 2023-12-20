@@ -10,7 +10,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./apps/server
+    working-directory: ./apps/cli
 
 jobs:
   build:
