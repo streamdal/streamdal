@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: console-container
+    image: streamdal/console:latest
+    environment:
+      - STREAMDAL_CONSOLE_GRPC_WEB_URL=http://host.docker.internal:8083
+      - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN
+      - STREAMDAL_CONSOLE_PRODUCTION=true
+      - STREAMDAL_CONSOLE_DEMO=false
+      - STREAMDAL_CONSOLE_SESSION_KEY
+      - STREAMDAL_CONSOLE_PORT=8080
+    ports:
+      - "8080:8080"

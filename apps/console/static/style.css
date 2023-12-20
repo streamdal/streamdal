@@ -1,0 +1,45 @@
+select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAMAAACtdX32AAAAdVBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhMdQaAAAAJ3RSTlMAAAECAwQGBwsOFBwkJTg5RUZ4eYCHkJefpaytrsXGy8zW3+Do8vNn0bsyAAAAYElEQVR42tXROwJDQAAA0Ymw1p9kiT+L5P5HVEi3qJn2lcPjtIuzUIJ/rhIGy762N3XaThqMN1ZPALsZPEzG1x8LrFL77DHBnEMxBewz0fJ6LyFHTPL7xhwzWYrJ9z22AqmQBV757MHfAAAAAElFTkSuQmCC);
+  background-position: 100%;
+  background-repeat: no-repeat;
+}
+
+.hljs-string {
+  color: #21C4C7 !important;
+  font-size: 12px;
+}
+.hljs-number {
+  color: #FFCC55 !important;
+  font-size: 12px;
+}
+
+.hljs-punctuation {
+  color: #C1AAFD;
+  font-size: 12px;
+}
+
+.hljs-attr {
+  color: #9D87D7 !important;
+  font-size: 12px;
+}
+
+/*
+  Make scrollbars less intrusive for those
+  who have scrollbars set to always show in OSX
+*/
+.dark-scrollbar::-webkit-scrollbar {
+  background-color: #000;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 0.375rem;
+}
+
+input[type='checkbox'].checkmark-streamdal:checked:after {
+  content: '\2713';
+  color:white;
+}
+
