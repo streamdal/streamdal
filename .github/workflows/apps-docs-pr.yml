@@ -1,10 +1,10 @@
-name: Docs - Publish
+name: Docs - Pull Request
 
 on:
-  push:
+  pull_request:
     paths:
       - 'apps/docs/**'
-      - '.github/workflows/apps-docs-publish.yml'
+      - '.github/workflows/apps-docs-pr.yml'
 
 defaults:
   run:
@@ -12,11 +12,11 @@ defaults:
 
 jobs:
   publish:
+    name: Publish to Cloudflare Pages
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
-    name: Publish to Cloudflare Pages
     steps:
       - name: Checkout
         uses: actions/checkout@v3
