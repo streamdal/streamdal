@@ -1,4 +1,4 @@
-name: Server - Release
+name: CLI - Release
 
 on:
   push:
