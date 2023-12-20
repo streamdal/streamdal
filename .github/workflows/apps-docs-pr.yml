@@ -28,7 +28,7 @@ jobs:
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: 4513abd52428f30b0e17d15e40a978fb
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: streamdal-docs
           directory: ./dist
           # Optional: Enable this if you want to have GitHub Deployments triggered
