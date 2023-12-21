@@ -71,4 +71,3 @@ volumes:
 
 networks:
   streamdal-network:
-    external: true
