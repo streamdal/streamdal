@@ -13,7 +13,7 @@ This Helm chart deploys the Streamdal Server
 ### Add repo
 
 ```bash
-helm repo add streamdal https://streamdal.github.io/streamdal/install/packages
+helm repo add streamdal https://streamdal.github.io/helm-packages
 ```
 
 ### Update repos
