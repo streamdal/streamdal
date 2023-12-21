@@ -9,8 +9,8 @@
 STREAMDAL_BIN_DIR=~/.streamdal/bin
 STREAMDAL_CLI_BIN="streamdal-cli"
 STREAMDAL_CLI_BIN_FULL="${STREAMDAL_BIN_DIR}/${STREAMDAL_CLI_BIN}"
-GITHUB_LATEST_API_URL="https://api.github.com/repos/streamdal/mono/releases/latest"
-GITHUB_DOWNLOAD_URL="https://github.com/streamdal/mono/releases/download/apps/cli"
+GITHUB_LATEST_API_URL="https://api.github.com/repos/streamdal/streamdal/releases/latest"
+GITHUB_DOWNLOAD_URL="https://github.com/streamdal/streamdal/releases/download/apps/cli"
 CANNOT_INSTALL_ERR="Cannot install via install script - check https://docs.streamdal.com/cli/install for manual installation instructions"
 
 fatal() {

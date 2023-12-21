@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos;
 
-option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
 // Common response message for many gRPC methods
 message StandardResponse {

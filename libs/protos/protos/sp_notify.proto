@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package protos;
 
-option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
 enum NotificationType {
   NOTIFICATION_TYPE_UNSET = 0;
