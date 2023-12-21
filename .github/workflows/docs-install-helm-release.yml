@@ -1,5 +1,4 @@
-```yaml
-name: Publish Helm Chart
+name: Helm - Release
 
 on:
   push:
@@ -23,7 +22,7 @@ jobs:
 
     - name: Ensure packages directory exists
       run: |
-        mkdir -p install/packages
+        mkdir -p docs/install/helm-packages
 
     - name: Install Helm
       run: |
@@ -33,16 +32,16 @@ jobs:
 
     - name: Package Helm Chart
       run: |
-        helm package install/helm/streamdal-server -d install/packages
+        helm package docs/install/helm/streamdal-server -d docs/install/helm-packages
+
 
     - name: Update Helm repo index
       run: |
-        helm repo index install/packages --url https://streamdal.github.io/streamdal/install/packages
-        git add install/packages/index.yaml
-        git add install/packages/*.tgz
+        helm repo index docs/install/helm-packages --url https://streamdal.github.io/streamdal/install/packages
+        git add docs/install/helm-packages/index.yaml
+        git add docs/install/helm-packages/*.tgz
 
     - name: Push changes
       run: |
-        git commit -m "Update Helm chart"
+        git commit -m "norelease: Update Helm chart"
         git push
-```
