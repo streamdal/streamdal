@@ -808,6 +808,7 @@
     "https://deno.land/x/streamdal_protos@v0.0.125/protos/steps/sp_steps_kv.ts": "e096d14d5412dbaf78ce735e061035e6f38df5b2050ac201cfb3bacab75485b0",
     "https://deno.land/x/streamdal_protos@v0.0.125/protos/steps/sp_steps_transform.ts": "36c47e4cd336063f5c759d7dae302741b7f32ec18eadc15589a59a0ab111c060",
     "https://deno.land/x/streamdal_protos@v0.0.125/protos/steps/sp_steps_valid_json.ts": "e28d149c56384ccc8694efd24237b26692be1d3ed1754f4634478ef441a6f26b",
+    "https://deno.land/x/streamdal_protos@v0.0.126/protos/sp_common.ts": "73133070437078ddfb6bb0d932351ad5fd5dc3f14db4c65ffc3acdf17f2deebd",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/adjustments-horizontal.tsx": "5970351d91df4222c11ec2e4b1e0288a6cf5e4834d442c2ba9332262fae4d694",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/bell.tsx": "1e0611da345cf34134590f24a0624278927fae1b20b259b065b0d6b589037382",
     "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/brand-stripe.tsx": "4b57c2579bb4685c99f775d561cc0c66e7264abfe4459cdbdb84c65cb3ae3d9a",

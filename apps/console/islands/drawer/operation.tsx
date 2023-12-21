@@ -13,13 +13,9 @@ import { isNumeric } from "../../lib/utils.ts";
 import { useSignalEffect } from "@preact/signals";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Toggle } from "../../components/form/switch.tsx";
 import { Schema } from "./schema.tsx";
-import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
-import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
@@ -47,66 +43,44 @@ export default function Operation(
             : <ProducerIcon />}
           <div class="flex flex-col">
             <h3 class="text-lg text-cloud mx-2">
-              {opModal.value.audience.operationName}
+              {opModal.value?.audience.operationName}
             </h3>
           </div>
         </div>
       </div>
-      <div class="px-4 py-4 rounded-md mx-2">
-        <div class="mb-2 flex items-center pr-2">
-          <h3 class="text-web font-bold text-sm">
-            Pipelines
-          </h3>
-          <BetaTag class={"ml-2"} />
-        </div>
-        {!pipelines?.length
-          ? (
-            <a href={"/pipelines"}>
-              <button class="text-streamdalPurple border border-purple-600 bg-purple-50 font-semibold rounded-lg w-full flex justify-center text-sm px-2 py-1 text-center inline-flex items-center">
-                <IconPlus class="w-4 h-4 mr-1" />
-                Create a new pipeline
-              </button>
-            </a>
-          )
-          : (
-            <button
-              id="attach-pipeline"
-              className="text-web font-semibold bg-purple-50 border border-purple-600 hover:border-[#8E84AD] font-medium rounded-md w-full flex justify-between text-sm px-2 text-xs py-1 text-center inline-flex items-center focus:ring-1 focus:outline-none focus:ring-purple-600 active:ring-1 active:outline-none active:ring-purple-600"
-              type="button"
-              onClick={() => setManagePipelines(!managePipelines)}
+      <div
+        data-accordion="open"
+        data-active-classes="bg-sunset text-blue-600"
+      >
+        <h3 id="collapse-heading-1">
+          <button
+            className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+            onClick={() => setManagePipelines(!managePipelines)}
+            data-accordion-target="#collapse-body-1"
+            aria-expanded="true"
+            aria-controls="collapse-body-1"
+          >
+            <h3
+              className={"text-web text-sm font-semibold ml-3"}
             >
               Pipelines
-              {managePipelines
-                ? (
-                  <IconChevronUp
-                    class="w-4"
-                    data-tooltip-target="pipeline-manage"
-                  />
-                )
-                : (
-                  <IconChevronDown
-                    class="w-4"
-                    data-tooltip-target="pipeline-manage"
-                  />
-                )}
-              <Tooltip
-                targetId="pipeline-manage"
-                message={"Attach/detach and pause/unpause pipelines"}
-              />
-            </button>
-          )}
-        {managePipelines && <ManageOpPipelines pipelines={pipelines} />}
-      </div>
-      <div
-        id="pipeline-attach-detach"
-        data-accordion="open"
-        data-active-classes="bg-blue-100 text-blue-600"
-        class="py-2"
-      >
+            </h3>
+            <BetaTag class={"ml-2"} />
+          </button>
+        </h3>
+        <div
+          id="collapse-body-1"
+          class={`px-4 py-2 border-b border-purple-100 ${
+            managePipelines ? "" : "hidden"
+          }`}
+          aria-labelledby="collapse-heading-1"
+        >
+          <ManageOpPipelines pipelines={pipelines} />
+        </div>
         <h3 id="collapse-heading-2">
           <button
             type="button"
-            className={`flex items-center w-full px-5 border-y border-purple-100 py-3 font-medium text-left text-web `}
+            className={`flex items-center w-full border-y border-purple-100 py-3 font-medium text-left text-web`}
             data-accordion-target="#collapse-body-2"
             aria-expanded="true"
             aria-controls="collapse-body-2"
@@ -119,7 +93,7 @@ export default function Operation(
         </h3>
         <div
           id="collapse-body-2"
-          class={`border-b border-purple-100 pl-7 ${
+          class={`px-4 border-b border-purple-100 ${
             tailNavOpen ? "" : "hidden"
           }`}
           aria-labelledby="collapse-heading-2"
@@ -178,7 +152,7 @@ export default function Operation(
         </div>
         <h3 id="collapse-heading-3">
           <button
-            className="flex items-center border-b border-purple-100 w-full px-5 py-3 font-medium text-left text-gray-500 focus:ring-2"
+            className="flex items-center border-b border-purple-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
             data-accordion-target="#collapse-body-3"
             aria-expanded="false"
             aria-controls="collapse-body-3"
@@ -202,7 +176,7 @@ export default function Operation(
         </div>
         <h3 id="collapse-heading-4">
           <button
-            className="flex items-center w-full px-5 border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+            className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
             data-accordion-target="#collapse-body-4"
             aria-expanded="false"
             aria-controls="collapse-body-4"
@@ -224,8 +198,11 @@ export default function Operation(
         </div>
         <h3 id="collapse-heading-5">
           <button
-            className={`flex items-center w-full px-5 border-purple-100 py-3 font-medium text-left text-web`}
+            className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
             onClick={() => setSchemaNavOpen(!schemaNavOpen)}
+            data-accordion-target="#collapse-body-5"
+            aria-expanded="true"
+            aria-controls="collapse-body-5"
           >
             <h3
               className={"text-web text-sm font-semibold ml-3"}
@@ -239,7 +216,7 @@ export default function Operation(
           <div
             id="collapse-body-5"
             aria-labelledby="collapse-heading-5"
-            class={"flex flex-col items-center justify-center p-4"}
+            class={"flex flex-col items-center justify-center px-4 pt-2"}
           >
             <Schema audience={audience} />
           </div>
