@@ -13,13 +13,9 @@ import { isNumeric } from "../../lib/utils.ts";
 import { useSignalEffect } from "@preact/signals";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Toggle } from "../../components/form/switch.tsx";
 import { Schema } from "./schema.tsx";
-import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
-import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
