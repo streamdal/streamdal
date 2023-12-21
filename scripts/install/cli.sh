@@ -88,6 +88,6 @@ fi
 if [ $? -eq 0 ]; then
   info "🎉Streamdal CLI ${LATEST_VERSION} (${OS}/${ARCH}) installed successfully to ${STREAMDAL_CLI_BIN_FULL} 🎉"
 else
-  fatal "Installation failed. Submit an issue at https://github.com/streamdal/cli/issues/new"
+  fatal "Installation failed. Submit an issue at https://github.com/streamdal/streamdal/issues/new"
 fi
 
