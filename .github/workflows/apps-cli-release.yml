@@ -14,6 +14,8 @@ defaults:
 
 jobs:
   build:
+    # Only perform release if commit message does not contain 'norelease'
+    if: ${{ !contains(github.event.head_commit.message, 'norelease') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
