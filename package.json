@@ -43,7 +43,7 @@
     "@grpc/proto-loader": "0.7.7",
     "@protobuf-ts/grpc-transport": "2.9.0",
     "@protobuf-ts/runtime-rpc": "2.9.0",
-    "@streamdal/protos": "^0.0.125",
+    "@streamdal/protos": "^0.1.2",
     "@types/rwlock": "^5.0.3",
     "@types/sinon": "^10.0.16",
     "dotenv": "^16.3.1",
