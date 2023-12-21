@@ -13,7 +13,7 @@ export const ManageOpPipelines = (
 
   return (
     <div>
-      <div class="w-full bg-purple-50 divide-gray-100 max-h-[400px] overflow-auto rounded mt-2">
+      <div class="w-full bg-purple-50 divide-gray-100 max-h-[400px] overflow-auto rounded">
         <ul
           class="text-sm text-gray-700 divide-y"
           aria-labelledby="dropdownDefaultButton"

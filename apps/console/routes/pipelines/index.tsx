@@ -3,7 +3,6 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import Pipelines from "../../islands/pipelines.tsx";
 import { getNotifications, getPipelines } from "../../lib/fetch.ts";
 import { SuccessType } from "../_middleware.ts";
-import { Partial } from "$fresh/src/runtime/Partial.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export type PipelineRoute = {
@@ -37,13 +36,11 @@ export const PipelinesRoute = (
   >,
 ) => {
   return (
-    <Partial name="main-content">
-      <Pipelines
-        pipelines={props?.data?.pipelines}
-        notifications={props?.data?.notifications}
-        success={props?.data?.success}
-      />
-    </Partial>
+    <Pipelines
+      pipelines={props?.data?.pipelines}
+      notifications={props?.data?.notifications}
+      success={props?.data?.success}
+    />
   );
 };
 
