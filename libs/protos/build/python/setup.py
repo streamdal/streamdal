@@ -11,7 +11,7 @@ setup(
     description='Protobuf python package for Streamdal.com server and SDKs',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/streamdal/protos',
+    url='https://github.com/streamdal/streamdal/tree/main/libs/protos',
     author='Streamdal.com',
     author_email='engineering@streamdal.com',
     license='MIT',
