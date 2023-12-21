@@ -1,7 +1,7 @@
 # Console
 
-[![Pull Request](https://github.com/streamdal/console/actions/workflows/pr.yml/badge.svg)](https://github.com/streamdal/console/actions/workflows/pr.yml)
-[![Publish Docker](https://github.com/streamdal/console/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/console/actions/workflows/release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-console-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-console-pr.yml)
+[![Publish Docker](https://github.com/streamdal/streamdal/actions/workflows/apps-console-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-console-release.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 Streamdal's console allows you visualize interact with your services, build and
@@ -42,20 +42,20 @@ gets confused, you can force update the Deno lib cache with
 ### Server
 
 This console needs a streamdal-server to run against. See
-[streamdal/server](https://github.com/streamdal/server) for instructions on
-running it locally.
+[streamdal/server](https://github.com/streamdal/streamdal/blob/main/apps/server/README.md)
+for instructions on running it locally.
 
 ### Running (non-development)
 
 If you just want to run the console and the server together for non-development
-purposes, you can bring them both up with docker, see:
-https://github.com/streamdal/streamdal/tree/main/docker/local
+purposes, you can use the install to bring them both up, see:
+https://github.com/streamdal/streamdal#getting-started
 
 ### Dependencies
 
 The console depends on the following dependencies (direct and indirect):
 
-- [streamdal/server](https://github.com/streamdal/server)
+- [streamdal/server](https://github.com/streamdal/streamdal/tree/main/apps/server)
 - Envoy (used by Console for gRPC-Web)
 - Redis (used by `streamdal/server`)
 
@@ -68,5 +68,3 @@ generate a release:
    `deno install -n version -r -A https://deno.land/x/version/index.ts`
 2. Bump the release number: `version [major|minor|patch]`
 3. git push the generated version tag: `git push origin <tag_name>`
-4. Generate a release from the tag with user-friendly release notes:
-   https://github.com/streamdal/console/releases
