@@ -13,7 +13,7 @@ import "steps/sp_steps_kv.proto";
 import "steps/sp_steps_transform.proto";
 import "steps/sp_steps_valid_json.proto";
 
-option go_package = "github.com/streamdal/mono/libs/protos/build/go/protos";
+option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
 // Pipeline is a structure that holds one or more pipeline steps. This structure
 // is intended to be immutable; clients are expected to generate WASMRequest's
