@@ -18,7 +18,7 @@
 
 INSTALL_DIR=~/streamdal
 INSTALL_DIR_DOCKER="$INSTALL_DIR/docs/install/docker"
-STREAMDAL_REPO="https://github.com/streamdal/mono.git"
+STREAMDAL_REPO="https://github.com/streamdal/streamdal.git"
 DEFAULT_UI_URL="http://localhost:8080"
 
 fatal() {
