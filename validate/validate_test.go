@@ -4,8 +4,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 )
 
 var _ = Describe("Validate", func() {

@@ -3,7 +3,7 @@
 // method is Process() which is used to run pipelines against data.
 //
 // Use of this package requires a running instance of a streamdal server©.
-// The server can be downloaded at https://github.com/streamdal/server
+// The server can be downloaded at https://github.com/streamdal/streamdal/tree/main/apps/server
 //
 // The following environment variables must be set:
 // - STREAMDAL_URL: The address of the Client server
@@ -27,7 +27,7 @@ import (
 	"github.com/relistan/go-director"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/go-sdk/hostfunc"
 	"github.com/streamdal/go-sdk/kv"

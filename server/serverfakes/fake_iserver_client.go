@@ -7,7 +7,7 @@ import (
 
 	"github.com/streamdal/go-sdk/server"
 	"github.com/streamdal/go-sdk/types"
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 type FakeIServerClient struct {

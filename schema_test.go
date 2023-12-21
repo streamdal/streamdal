@@ -10,8 +10,8 @@ import (
 
 	"github.com/streamdal/go-sdk/logger/loggerfakes"
 	"github.com/streamdal/go-sdk/server/serverfakes"
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
 var _ = Describe("Schema", func() {

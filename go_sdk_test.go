@@ -17,9 +17,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/shared"
-	"github.com/streamdal/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/go-sdk/hostfunc"
 	"github.com/streamdal/go-sdk/kv"

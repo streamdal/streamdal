@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
