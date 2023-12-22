@@ -16,8 +16,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
-	"github.com/streamdal/mono/libs/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/server/config"
 	"github.com/streamdal/server/deps"

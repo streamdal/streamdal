@@ -33,7 +33,7 @@ CGO_ENABLED ?= 0
 
 # If github env var is NOT present, use local vars
 ifeq ($(GITHUB_ENV),)
-GO_BUILD_FLAGS = -ldflags "-X main.version=${LOCAL_VERSION}-${LOCAL_SHORT_SHA}"
+GO_BUILD_FLAGS = -ldflags "-X main.version=${LOCAL_VERSION}"
 else
 GO_BUILD_FLAGS = -ldflags "-X main.version=${GITHUB_VERSION}-${GITHUB_SHORT_SHA}"
 endif

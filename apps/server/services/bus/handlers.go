@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/services/store"
 	"github.com/streamdal/server/types"
