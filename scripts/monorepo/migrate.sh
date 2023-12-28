@@ -17,37 +17,40 @@
 # │   └── ...
 # ├── apps
 # │   ├── cli
-# │   ├── console
+# │   ├── console                
 # │   ├── docs
 # │   ├── server
 # │   └── ...
-# ├── examples
-# │   ├── docker
-# │	  ├── ecs
-# |   └── ...
+# ├── docs
+# │   ├── install
+# │   │	  ├── docker
+# │   │   └── ...
+# │	  ├── instrument
+# │   └── ...
 # ├── libs
 # │   ├── protos
 # │   ├── wasm
 # │   ├── wasm-detective
-# │   ├── wasm-transformer
+# │   ├── wasm-transform
 # │   └── ...
 # ├── scripts
 # │   ├── install
-# │   │	  └── streamdal.sh
+# │   │	  ├── streamdal.sh
+# │   │   └── ...
 # │   └── ...
 # ├── LICENSE
 # ├── Makefile
 # └── README.md
 
 # Dirs we should pre-create and add a .gitkeep (to allow empty dirs to be added to git)
-BASE_DIRS="assets/img apps docs/deploy docs/install docs/quickstart libs scripts"
+BASE_DIRS="assets/img apps docs/install docs/instrument libs scripts"
 
 # What files to pre-create/touch -- this is purely for aesthetics :)
 FILES="LICENSE README.md Makefile"
 
 # Repos we will migrate during this run; you'll want to change these between
 # runs as diff repos will need to go into a diff monorepo subdir.
-REPOS="console"
+REPOS="server"
 
 # Name of the target mono repo dir
 MONO_DIR="mono"
