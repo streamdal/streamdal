@@ -28,4 +28,4 @@ try {
 
 ```
 
-For a more complete example, see the [console](https://github.com/streamdal/console)
+For a more complete example, see the [console](https://github.com/streamdal/streamdal/tree/main/apps/console)
