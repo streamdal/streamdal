@@ -231,9 +231,12 @@ This repo is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that has the f
 # │   ├── docs               <--- https://docs.streamdal.com 
 # │   ├── server             <--- Server component
 # │   └── ...
-# ├── examples
-# │   ├── docker
-# │	  ├── ecs
+# ├── docs
+# │   ├── install
+# │	│    ├── bare-metal
+# │	│    ├── docker
+# │	│    └── ...
+# |   ├── instrument
 # |   └── ...
 # ├── libs
 # │   ├── protos             <--- Common protobuf schemas
