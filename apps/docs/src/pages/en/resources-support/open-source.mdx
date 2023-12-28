@@ -8,23 +8,12 @@ layout: ../../../layouts/MainLayout.astro
 import opensource from "@images/raven/octocat_raven.png";
 import tip from "@images/icons/tip.png";
 import { Notification } from "accessible-astro-components";
-import information from "@images/icons/information.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
-
+<Changes />
 
 <center>_<span class="yhighlight" style="border-radius: 5px; padding: 4px 8px 4px 8px; font-size: 24px;">Streamdal</span> <span style="color: red;">❤️</span>'s <span class="phighlight" style="border-radius: 5px; padding: 4px 8px 4px 8px; font-size: 24px;">Open Source</span>_</center>
 <center><img src={opensource} alt="Github Octocat and Streamdal Raven" style="border-radius: 5px;" /></center>
-
-
 
 We make significant use of open source across many of the Streamdal 
 [components](/en/core-components/overview/). Here is a non-exhaustive list of 
@@ -54,7 +43,7 @@ some of the stuff we use in our projects:
 - [Go](https://go.dev/): This is what the server is written in
     
 - [gRPC](https://pkg.go.dev/google.golang.org/grpc): Nearly all Streamdal [components](/en/core-components/overview/) use gRPC for communication. We use both `unary` and `streaming` functionality for communicating with [SDKs](/en/core-components/sdk/), communicating with other cluster nodes, and talking with the [Console UI](/en/core-components/console-ui/)
-- [Protocol Buffers](https://protobuf.dev/): Our protos are open source and you can find them on [GitHub](https://github.com/streamdal/protos). As with gRPC, Protobuf is a crucial part of the Streamdal ecosystem
+- [Protocol Buffers](https://protobuf.dev/): Our protos are open source and you can find them on [GitHub](https://github.com/streamdal/streamdal/tree/main/libs/protos). As with gRPC, Protobuf is a crucial part of the Streamdal ecosystem
 
     It's used for:
     - Defining internal and external APIs
@@ -162,12 +151,13 @@ The
 functionality of Streamdal uses 
 <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> 
 extensively under the hood. Most of our Wasm modules are 
-[open source](https://github.com/streamdal/wasm).
+[open source](https://github.com/streamdal/streamdal/tree/main/libs/wasm).
 
 - [Rust](https://www.rust-lang.org/) — The language most of the modules are written in
 - [Serde](https://serde.rs/) — For working with JSON
 - [Protobuf](https://protobuf.dev/) - Used for facilitating communication between the executor ([SDKs](/en/core-components/sdk/)) and the Wasm modules themselves. In other words, we encode requests in Protobuf, pass them to Wasm, and the modules return Protobuf-encoded responses
 
-## Website
+## Website & Other Tools
 - [Astro](https://astro.build/) - Used for the documentation
 - [Algolia](https://www.algolia.com/) - Used for indexing and search for the docs
+- [Excalidraw](https://excalidraw.com/) - For technical diagrams and whiteboarding

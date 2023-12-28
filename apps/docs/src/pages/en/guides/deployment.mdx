@@ -5,17 +5,10 @@ description: A detailed guide to deploying Streamdal on Docker, Kubernetes (Helm
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import information from "@images/icons/information.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
+
 <br />
 <br />
 
@@ -83,7 +76,7 @@ repositories.
       2. Navigate to the docker directory:
           <br />
             ```bash
-            cd streamdal/install/docker
+            cd streamdal/docs/install/docker
             ```
           <br />
       3. Run Docker Compose:
@@ -139,7 +132,7 @@ repositories.
       3. Launch your ECS stack
           <br />
             ```bash
-            aws cloudformation create-stack --stack-name snitch-stack --template-body file://ecs.yml --capabilities CAPABILITY_NAMED_IAM
+            aws cloudformation create-stack --stack-name streamdal-stack --template-body file://ecs.yml --capabilities CAPABILITY_NAMED_IAM
             ```
           <br />
             [↪Detailed Cloud Deployment Guide](https://github.com/streamdal/streamdal/tree/main/install/ecs)

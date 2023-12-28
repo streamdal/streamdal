@@ -7,28 +7,56 @@ layout: ../../../layouts/MainLayout.astro
 
 import checked from "@images/icons/checked.png";
 import tip from "@images/icons/tip.png";
-import information from "@images/icons/information.png";
 import console_version from "@images/arch/console_version_example.png";
 import { Notification } from "accessible-astro-components";
 import Accordion from "@components/Accordion/Accordion.astro";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
 
 Streamdal is an open-source project using the 
-[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-## General Guidelines
-
+[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). 
 Feature proposals and general contributions are cherished and highly 
-encouraged! 
+encouraged! Most of the components can be found in the 
+[monorepo](https://github.com/streamdal/streamdal). 
+
+Here is the repo structure:
+```
+# ├── apps
+# │   ├── cli                <--- CLI UI 
+# │   ├── console            <--- Web-based UI
+# │   ├── docs               <--- https://docs.streamdal.com 
+# │   ├── server             <--- Server component
+# │   └── ...
+# ┌── assets                 <--- Static assets 
+# │   ├── img
+# │   └── ...
+# ├── docs
+# │   ├── install             <--- different methods of deploying/installing Streamdal
+# │   ├── instrument          <--- instrumenting Streamdal in various languages
+# |   └── ...
+# ├── libs
+# │   ├── protos             <--- Common protobuf schemas
+# │   ├── wasm               <--- Wasm funcs used in pipeline steps
+# │   ├── wasm-detective     <--- Wasm lib used for data parsing and validation 
+# │   ├── wasm-transformer   <--- Wasm lib used for data transformation
+# │   └── ...
+# ├── scripts                   
+# │   ├── install
+# │   │	  └── install.sh     <--- Install script for installing Streamdal
+# │   └── ...
+# ├── LICENSE
+# ├── Makefile               <--- Makefile with common tasks; run `make help` for more info
+# └── README.md
+```
+
+To maintain proper versioning, the current and future SDKs will have separate 
+repos:
+- [Node](https://github.com/streamdal/node-sdk)
+- [Go](https://github.com/streamdal/go-sdk)
+- [Python](https://github.com/streamdal/python-sdk)
+
+## General Guidelines & References
 
 <Notification type="tip">
   <img src={tip} alt="tip" width="30px" height="30px" />
@@ -36,21 +64,17 @@ encouraged!
     <p>
     New to open source? 
     
-    <span style="font-weight: normal;">There should be some [good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) 
-    added periodically. Check out the Streamdal main 
-    [README](https://github.com/streamdal/streamdal/blob/main/README.md) for a 
-    list of component repositories, or search through our 
-    [public](http://github.com/streamdal) ones to find more of these.</span>
+    <span style="font-weight: normal;">Be sure to check for some [good first issues](https://github.com/streamdal/streamdal/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) 
+    periodically.</span>
     </p>
   </div>
 </Notification>
 
-Here are some simple guidelines to help determine where your efforts could 
-provide the most benefit, and ensure contributions go smoothly:
+Here are some references and simple guidelines you should go over to help 
+ensure contributions go smoothly:
 
-1. Review our [code of conduct](#code-of-conduct)
-2. Take a look at our technology stack:
-
+1. The [Code of Conduct](#code-of-conduct)
+2. Streamdal technology stack:
     - Wasm
     - Protobuf
     - gRPC + gRPC-web
@@ -66,58 +90,63 @@ provide the most benefit, and ensure contributions go smoothly:
       Check out our [open source](/en/resources-support/open-source/) 
       page to learn more about what other technologies are used with Streamdal.
 
-3. Take a quick glance at our [manifesto](https://streamdal.com/manifesto) - 
+3. The Streamdal [manifesto](https://streamdal.com/manifesto) - 
 this should help you gauge where our mindset is focused when it comes to future 
 development
-4. Reference the public [roadmap](https://github.com/orgs/streamdal/projects/1) 
-on GitHub
-
-## Adding an Issue
+4. Public [roadmap](https://github.com/orgs/streamdal/projects/1) 
 
 <Notification type="checked">
   <img src={checked} alt="checked" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
   <p>
-    Getting support: <span style="font-weight: normal;">We primarily provide 
-    support for issues through the [main repo](https://github.com/streamdal/Streamdal/issues).</span>
+    Getting support: <br /><span style="font-weight: normal;">We primarily provide 
+    support for issues through the main 
+    [monorepo](https://github.com/streamdal/Streamdal/issues).
+    To bring more visibility to your issue, or for quick questions, ask in the 
+    community [discord](https://discord.gg/streamdal). </span>
   </p>
   </div>
 </Notification>
 
-For adding issues you should:
+## Adding an Issue
+
+Before adding issues, you should:
 
 1. Be familiar with the [core components](/en/core-components/overview/)
-2. Search for existing `issues` in their respective repositories before opening up 
-a new one:
+2. Search for existing issues
 
-    - [Streamdal/Streamdal](https://github.com/streamdal/Streamdal/issues)
-    - [Streamdal/Console](https://github.com/streamdal/console/issues)
-    - [Streamdal/Server](https://github.com/streamdal/server/issues)
-
-_Everything else, including language-specific shims or client SDKs, should be 
-listed on the main repo [README](https://github.com/streamdal/streamdal/blob/main/README.md) 
-or can be found by searching through the 
-[Streamdal public repositories](https://github.com/streamdal/)._
+_Issues for components outside of the monorepo, like language-specific shims or 
+client SDKs, should be made in those specific repositories. You can find these 
+listed [above](/en/resources-support/contributing/#overview), on the monorepo 
+[README.md](https://github.com/streamdal/streamdal/blob/main/README.md), or by 
+searching through the [Streamdal public repositories](https://github.com/streamdal/)._
 
 ### Formatting
 
-1. Format your issue name with one of the four types:
-	- <u>Issue/Bug:</u> You've found a bug with the code, and want to report it, 
-  or create an issue to track the bug.
-	- <u>Issue/Discussion:</u> You have something on your mind, which requires 
-  input from others in a discussion. This could pertain to niche deployments, 
-  edge use cases not well documented, or anything else that might be relevant. 
-	- <u>Issue/Proposal:</u> Used for items that propose a new idea, 
-  functionality or feature. This allows feedback from others before writing 
-  code. _(This is sometimes marked as_ `feat` _or_ `chore`_)_
-	- <u>Issue/Question:</u> Use this issue type if you need help or have a 
-  question.
+We utilize 
+[conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) to 
+structure issues.
+
+You should format the name of your issue as close as possible to the following 
+examples:
+	- **feat: \<description\>** -- The type feat introduces a new feature to the 
+  codebase. Use this for proposals as well. _(This can be/is sometimes marked 
+  as _`chore`_)_
+	- **fix: \<description\>** -- You've found a bug with the code and want to 
+  report it, or create an issue to track the bug.
+	- **discussion: \<description\>** -- You have something on your mind, which 
+  requires input from others in a discussion. This could pertain to niche 
+  deployments, edge use cases not well documented, or anything else that might 
+  be relevant. Use this for questions as well.
   <br />
 
-2. List the version of everything you are using.
+### Component Versions
 
-    Outside of referencing the versions pulled in your `docker-compose.yml`, 
-    you can do the following for each component:
+Issues should always list (where applicable) the **version of everything you 
+are using.**
+
+If you're using docker-compose, you can check the `docker-compose.yml` for 
+versions, else you can do the following for each component:
 <ul>
   - **Server:**
   
@@ -161,14 +190,14 @@ unnoticed, you are also permitted to cross-post issues to the
 All contributions come through pull requests. Follow these guidelines when 
 contributing code or docs to Streamdal:
 
-1. Make sure there's an issue (bug or proposal) raised, which sets the 
+1. Make sure there's an issue (`fix` or `feat`) raised, which sets the 
 expectations for the contribution you are about to make
 2. Clone relevant repo and create a new branch
 3. Create your change
 -- Code changes require tests, and make sure to run linters to check and format 
 the code
 4. Update relevant documentation for the change - Please check the 
-doc's [README](https://github.com/streamdal/docs#adding-to-docs) 
+doc's [README](https://github.com/streamdal/streamdal/blob/main/apps/docs/README.md#adding-to-docs) 
 for helpful information on contributing to docs
 5. Commit with [DCO](#developer-certificate-of-origin-signing-your-work) 
 sign-off and open a PR
@@ -261,8 +290,6 @@ git push --force-with-lease <remote-name> <branch-name>
 
 ## <span class="hiddenh">Code of Conduct</span>
 
-
-
 <Accordion 
 title="Code of Conduct">
 <p>
@@ -334,9 +361,9 @@ reported to the community leaders responsible for enforcement:
 
 <br />
 
-- [Alina](malto:alina@streamdal.com) -> @alinak6598 on Discord
-- [Jon](mailto:jon@streamdal.com) -> @dosplatos on Discord
-- @founders, @mods, or anyone with the @staff role on Discord
+- [Alina](malto:alina@streamdal.com) -> [@alinak6598](https://discordapp.com/users/1047947575287885854)
+- [Jon](mailto:jon@streamdal.com) -> [@dosplatos](https://discordapp.com/users/168529640590278656)
+- Or, anyone with the @founders, @mods, or @staff role on Discord
 
 <br />
 

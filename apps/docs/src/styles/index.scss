@@ -234,40 +234,6 @@ strong {
 
 /* Supporting Content */
 
-.addl {
-  background-color: var(--color-purple-1000);
-  border-radius: 15px;
-  font-style: italic;
-  padding: 20px;
-  display: inline-flex;
-}
-
-.addlcontent {
-  margin: auto;
-  padding: auto;
-  @media (max-width: 700px) {
-    margin-left: 25px;
-  }
-}
-
-.addl-wrapper {
-  background: linear-gradient(250deg, #956CFF, #FFD260);
-  border-radius: 17px;  
-  padding: 2px;  
-  display: inline-flex;
-}
-
-.uimage {
-  display: block;
-  width: 47.18px;
-  height: auto;
-  margin: 0px 20px 0px 20px;
-
-  @media (max-width: 700px) {
-    margin: auto;
-  }
-}
-
 .discord-link {
   display: flex;
   justify-content: center;

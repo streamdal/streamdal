@@ -5,18 +5,10 @@ description: A comprehensive exploration of Streamdal's main components and thei
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import information from "@images/icons/information.png";
 import beta from "@images/beta.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
 
 ## 1. Streamdal SDK
 
@@ -30,7 +22,7 @@ The SDK, designed for efficiency, tackles metrics reporting, pipeline processing
 <li style="padding: 5px 0px 5px 0px;">**Console UI-Defined Rules**: <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">Rules</a> are directly defined via the [Console UI](/en/core-components/console-ui/) and fetched by the [SDK](/en/core-components/sdk/) for processing.</li>
 </ul>
 
-For detailed insights, explore the [Streamdal SDK documentation](../sdk).
+For detailed insights, explore the [Streamdal SDK documentation](/en/core-components/sdk/).
 
 ## 2. Streamdal Server
 
@@ -42,7 +34,7 @@ Acting as the pivotal hub in Streamdal's framework, the Server ensures fluent tr
 - **High Availability**: Crafted for uninterrupted and consistent data operations.
 - **Multi-Component Communication**: Vital in interfacing between different components for smooth data operations.
 
-For a deep dive, refer to the [Streamdal Server documentation](../server).
+For a deep dive, refer to the [Streamdal Server documentation](/en/core-components/server/).
 
 ## 3. Streamdal Console UI 
 
@@ -50,12 +42,12 @@ The Console UI stands as the orchestrator, steering the intricate nuances of dat
 
 ### Dashboard View
 
-<ul>
-<li style="padding: 5px 0px 5px 0px;">**<a href="/en/resources-support/glossary#data-graph" class="pkeyword">Data Graph</a>**: Visual representation of consumers, producers, and topics relationships.</li>
-<li style="padding: 5px 0px 5px 0px;">**Real-time Stats**: Insights into performance [metrics](/en/engineering/metrics/) and data flow rates.</li>
-<li style="padding: 5px 0px 5px 0px;">**[Tail](/en/guides/tail/) View**: Live observation of pipeline data, granting immediate operational feedback.</li>
-<li style="padding: 5px 0px 5px 0px;">**Schema Discovery**: Explore, define, and manage schemas generated from your data events.</li>
-</ul>
+
+- **<a href="/en/resources-support/glossary#data-graph" class="pkeyword">Data Graph</a>**: Visual representation of consumers, producers, and topics relationships.
+- **Real-time Stats**: Insights into performance [metrics](/en/engineering/metrics/) and data flow rates.
+- **[Tail](/en/guides/tail/) View**: Live observation of pipeline data, granting immediate operational feedback.
+- **Schema Discovery**: Explore, define, and manage schemas generated from your data events.
+
 
 ### <img src={beta} alt="Beta" style="display: inline" /> Pipeline View
 
