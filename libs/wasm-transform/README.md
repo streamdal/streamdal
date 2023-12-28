@@ -46,4 +46,3 @@ string, then make sure to include quotes in the payload ( Ie. `"123"`)
    2. Works ONLY on strings
    3. Will replace 100% of the characters with a sha256 hash
 
-## Use as-is - has not been tested in production :)
