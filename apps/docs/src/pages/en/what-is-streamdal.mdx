@@ -9,17 +9,10 @@ import note from "@images/icons/note.png";
 import { Notification } from "accessible-astro-components";
 import cliTail from "@images/guides/CliTail.png";
 import consoleUi from "@images/core-components/console-dashboard.png";
-import information from "@images/icons/information.png";
 import beta from "@images/beta.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our docs - some stuff might be outdated/broken - sorry!
-</div>
-</div>
-</div>
+<Changes />
 
 <br />
 <br />
@@ -35,7 +28,8 @@ We're updating our docs - some stuff might be outdated/broken - sorry!
 Streamdal is an open-source data observability graph and rule-based management
 tool that helps you take action. It's built on a collection of several
 open-source components - a server, an SDK, and a console UI - designed to
-integrate seamlessly into your code.
+integrate seamlessly into your code. We call this method of handling data 
+Code-Native Data Pipelines.
 
 # <center>_Why_ Streamdal?</center>
 
@@ -86,7 +80,7 @@ schema views, and a <a class="pkeyword" href="/en/resources-support/glossary/#da
 ## CLI
 It's a must-have tool for developers seeking a streamlined experience, or for
 those who just prefer a terminal. Check out the
-[CLI README](https://github.com/streamdal/cli#readme) to quickly get up and
+[CLI README](https://github.com/streamdal/streamdal/blob/main/apps/cli/README.md) to quickly get up and
 running with this.
  <img src={cliTail} alt="Information" style="border-radius: 5px;" />
 

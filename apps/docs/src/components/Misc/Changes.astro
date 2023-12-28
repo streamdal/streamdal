@@ -1,0 +1,53 @@
+---
+import information from "@images/icons/information.png";
+---
+
+<style>
+.addl {
+  background-color: var(--color-purple-1000);
+  border-radius: 15px;
+  font-style: italic;
+  padding: 20px;
+  display: inline-flex;
+}
+
+.addlcontent {
+  margin: auto;
+  padding: auto;
+}
+
+.addl-wrapper {
+  background: linear-gradient(250deg, #956CFF, #FFD260);
+  border-radius: 17px;  
+  padding: 2px;  
+  display: inline-flex;
+}
+
+.uimage {
+  display: block;
+  width: 47.18px;
+  height: auto;
+  margin: 0px 20px 0px 20px;
+
+}
+
+@media (max-width: 700px) {
+  .addlcontent {
+    margin-left: 25px;
+  }
+  
+  .uimage {
+    margin: auto;
+  }
+}
+</style>
+
+<div class="addl-wrapper">
+    <div class="addl">
+    <img src={information} class="uimage" />
+        <div class="addlcontent">
+        We're updating our documentation, so the presented info might not be the
+        most recent.
+        </div>
+    </div>
+</div>

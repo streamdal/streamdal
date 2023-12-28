@@ -9,17 +9,9 @@ import Accordion from "@components/Accordion/Accordion.astro";
 import edge from "@images/core-components/edge.png";
 import producer_icon from "@images/icons/producer_icon.png";
 import consumer_icon from "@images/icons/consumer_icon.png";
-import information from "@images/icons/information.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
 
 Get clarification or answers for the most common questions we receive about 
 Streamdal. Can't find what you're looking for, or need more details? Get in 
@@ -148,7 +140,7 @@ There is no sending data, or shipping logs, metrics, or traces anywhere.
 <br />
 
 Check out our 
-[benchmark tests](https://github.com/streamdal/snitch-detective/blob/main/src/test_bench.rs) 
+[benchmark tests](https://github.com/streamdal/streamdal/blob/main/libs/wasm-detective/src/test_bench.rs) 
 on GitHub.
 </p>
 </Accordion>
@@ -204,8 +196,8 @@ partners.
 
 _These features aren't production-ready!_ But, if you would like 
 to get test access or become a design partner, 
-[contact us](mailto:support@streamdal.com) or hit us up in our  
-[community](/en/resources-support/community/).
+[contact us](mailto:support@streamdal.com) or hit us up on  
+[discord](https://discord.gg/streamdal).
 </p>
 </Accordion>
 </li>
@@ -297,7 +289,7 @@ data throughout your systems.
 
 When you weave the `Process()` method throughout your code, behind the scenes 
 the SDK will infer and decode schemas, and present them in a human-readable 
-format via the [console UI](en/core-components/console-ui/).
+format via the [Console UI](en/core-components/console-ui/).
 
 <br />
 
@@ -306,7 +298,7 @@ management capabilities, or functionality such as history and diff views.
 
 <br />
 
-Reference the [roadmap](https://github.com/orgs/streamdal/projects/1/views/9) 
+Reference the [roadmap](https://github.com/orgs/streamdal/projects/1) 
 for more information.
 </p>
 </Accordion>
@@ -351,7 +343,7 @@ to simplify the integration and adoption of Streamdal.
 
 Our primary focus has been on the SDKs, and shims will land sometime in the 
 future. Check the 
-roadmap](https://github.com/orgs/streamdal/projects/1/views/9) to see when they 
+[roadmap](https://github.com/orgs/streamdal/projects/1) to see when they 
 could be added.
 </p>
 </Accordion>
@@ -438,9 +430,10 @@ usually less than 0.1ms, is because it's being executed via Wasm. It's
 
 <br />
 
-Get more information on 
-how we use it in our [Wasm repo](https://github.com/streamdal/wasm), and read 
-about this design choice in our [manifesto](https://streamdal.com/manifesto/).
+Get more information on how we use it in the 
+[Wasm section](https://github.com/streamdal/streamdal/tree/main/libs) of the 
+[monorepo](https://github.com/streamdal/streamdal/), or read about this design 
+choice in our [manifesto](https://streamdal.com/manifesto/).
 </p>
 </Accordion>
 </li>
@@ -480,7 +473,7 @@ plans to add support in the near future.
 
 <br />
 
-Check out our [roadmap](https://github.com/orgs/streamdal/projects/1/views/9) 
+Check out our [roadmap](https://github.com/orgs/streamdal/projects/1) 
 for updates.
 </p>
 </Accordion>

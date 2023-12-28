@@ -6,18 +6,10 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import discord from "@images/discord.png"
-import information from "@images/icons/information.png";
 import community from "@images/community.png"
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
 
 <img src={community} alt="Streamdal Community Banner" style="border-radius: 5px; hoover" />
 <a href="https://discord.gg/streamdal" class="discord-link">

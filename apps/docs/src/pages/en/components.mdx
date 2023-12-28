@@ -10,6 +10,7 @@ import checked from "@images/icons/checked.png";
 import info from "@images/icons/info.png";
 import warning from "@images/icons/warning.png";
 import tip from "@images/icons/tip.png";
+import Changes from "@components/Misc/Changes.astro";
 
 import { Notification } from "accessible-astro-components";
 import Accordion from "@components/Accordion/Accordion.astro";
@@ -52,7 +53,20 @@ $ some-multi-line-cmd --with-arg foo \
     --another-arg bar
 ```
 
+
 ## Callouts
+
+### Changes to docs
+
+```
+import Changes from "@components/Misc/Changes.astro";
+
+<Changes />
+```
+
+<Changes />
+
+## Misc Callouts
 
 Requires you to specify to add the following statements at the top of the mdx 
 file:

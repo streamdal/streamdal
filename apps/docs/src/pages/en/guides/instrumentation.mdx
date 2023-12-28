@@ -6,17 +6,9 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import dataGraph from "@images/core-components/DataGraphSdk.png";
-import information from "@images/icons/information.png";
+import Changes from "@components/Misc/Changes.astro";
 
-<div class="addl-wrapper">
-<div class="addl">
-<img src={information} class="uimage" />
-<div class="addlcontent">
-We're updating our documentation, so the presented info might not be the
-most recent.
-</div>
-</div>
-</div>
+<Changes />
 
 The [SDK](/en/core-components/sdk/) should initiliazed in your application 
 where data consumption or production takes place. The SDK is responsible for 
@@ -33,7 +25,7 @@ processes it and returns a response.
 When initializing the Streamdal client with `streamdal.New()`, you pass a configuration object to customize its behavior. Here's a breakdown of the parameters in that configuration:
 
 | Parameter | Description | Type | Example |
-|-----------|-------------|------|---------|
+|-|-|-|-|
 | **StreamdalURL** | The URL of the Streamdal server instance. | String | `"localhost:8082"` |
 | **StreamdalToken** | The authentication token for the Streamdal server. | String | `"streamdal"` |
 | **StepTimeout** | Sets the maximum duration for Wasm execution in each step. | Duration | `time.Millisecond * 10` |
@@ -48,7 +40,7 @@ When initializing the Streamdal client with `streamdal.New()`, you pass a config
 Let's delve into the specifics of the `Process()` method:
 
 | Attribute | Description | Type | Required? |
-|-----------|-------------|------|-----------|
+|-|-|-|-|
 | **Name** | A descriptive name related to the producer or consumer in focus. For instance: `billing-processor`, `db-flusher`, or `doc-handler`. | String | ✅ Yes |
 | **Operation** | Specifies the nature of the operation, whether it's a consumer or producer. | Enum | ✅ Yes |
 | **Component** | Represents the data source or destination. Examples include `main-kafka`, `slow-db`, or `salesforce-api`. | String | ✅ Yes |
