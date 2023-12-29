@@ -66,12 +66,6 @@ jobs:
           username: ${{ secrets.STREAMDAL_DOCKERHUB_USERNAME }}
           password: ${{ secrets.STREAMDAL_DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: streamdal/console
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -79,5 +73,6 @@ jobs:
           file: ./apps/console/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            streamdal/console:latest
+            streamdal/console:${{ steps.get_new_version.outputs.new_version }}
