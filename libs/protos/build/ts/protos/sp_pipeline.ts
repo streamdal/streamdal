@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { SchemaValidationStep } from "./steps/sp_steps_schema_validation.js";
 import { ValidJSONStep } from "./steps/sp_steps_valid_json.js";
 import { InferSchemaStep } from "./steps/sp_steps_inferschema.js";
 import { KVStep } from "./steps/sp_steps_kv.js";
@@ -138,6 +139,12 @@ export interface PipelineStep {
          */
         validJson: ValidJSONStep;
     } | {
+        oneofKind: "schemaValidation";
+        /**
+         * @generated from protobuf field: protos.steps.SchemaValidationStep schema_validation = 1009;
+         */
+        schemaValidation: SchemaValidationStep;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -188,7 +195,11 @@ export enum PipelineStepCondition {
      *
      * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
      */
-    ABORT_ALL = 3
+    ABORT_ALL = 3,
+    /**
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4;
+     */
+    DISCARD_MESSAGE = 4
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Pipeline$Type extends MessageType<Pipeline> {
@@ -274,6 +285,7 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
             { no: 1006, name: "kv", kind: "message", oneof: "step", T: () => KVStep },
             { no: 1007, name: "infer_schema", kind: "message", oneof: "step", T: () => InferSchemaStep },
             { no: 1008, name: "valid_json", kind: "message", oneof: "step", T: () => ValidJSONStep },
+            { no: 1009, name: "schema_validation", kind: "message", oneof: "step", T: () => SchemaValidationStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
             { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
@@ -362,6 +374,12 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
                         validJson: ValidJSONStep.internalBinaryRead(reader, reader.uint32(), options, (message.step as any).validJson)
                     };
                     break;
+                case /* protos.steps.SchemaValidationStep schema_validation */ 1009:
+                    message.step = {
+                        oneofKind: "schemaValidation",
+                        schemaValidation: SchemaValidationStep.internalBinaryRead(reader, reader.uint32(), options, (message.step as any).schemaValidation)
+                    };
+                    break;
                 case /* optional string _wasm_id */ 10000:
                     message.WasmId = reader.string();
                     break;
@@ -427,6 +445,9 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
         /* protos.steps.ValidJSONStep valid_json = 1008; */
         if (message.step.oneofKind === "validJson")
             ValidJSONStep.internalBinaryWrite(message.step.validJson, writer.tag(1008, WireType.LengthDelimited).fork(), options).join();
+        /* protos.steps.SchemaValidationStep schema_validation = 1009; */
+        if (message.step.oneofKind === "schemaValidation")
+            SchemaValidationStep.internalBinaryWrite(message.step.schemaValidation, writer.tag(1009, WireType.LengthDelimited).fork(), options).join();
         /* optional string _wasm_id = 10000; */
         if (message.WasmId !== undefined)
             writer.tag(10000, WireType.LengthDelimited).string(message.WasmId);

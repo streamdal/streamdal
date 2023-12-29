@@ -104,6 +104,8 @@ class PipelineStepCondition(betterproto.Enum):
     PIPELINE_STEP_CONDITION_ABORT_ALL = 3
     """Abort executing ALL pipelines"""
 
+    PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4
+
 
 class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
@@ -377,6 +379,9 @@ class PipelineStep(betterproto.Message):
         1007, group="step"
     )
     valid_json: "steps.ValidJsonStep" = betterproto.message_field(1008, group="step")
+    schema_validation: "steps.SchemaValidationStep" = betterproto.message_field(
+        1009, group="step"
+    )
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )

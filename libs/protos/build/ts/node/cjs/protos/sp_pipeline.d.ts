@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { SchemaValidationStep } from "./steps/sp_steps_schema_validation";
 import { ValidJSONStep } from "./steps/sp_steps_valid_json";
 import { InferSchemaStep } from "./steps/sp_steps_inferschema";
 import { KVStep } from "./steps/sp_steps_kv";
@@ -131,6 +132,12 @@ export interface PipelineStep {
          */
         validJson: ValidJSONStep;
     } | {
+        oneofKind: "schemaValidation";
+        /**
+         * @generated from protobuf field: protos.steps.SchemaValidationStep schema_validation = 1009;
+         */
+        schemaValidation: SchemaValidationStep;
+    } | {
         oneofKind: undefined;
     };
     /**
@@ -181,7 +188,11 @@ export declare enum PipelineStepCondition {
      *
      * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
      */
-    ABORT_ALL = 3
+    ABORT_ALL = 3,
+    /**
+     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4;
+     */
+    DISCARD_MESSAGE = 4
 }
 declare class Pipeline$Type extends MessageType<Pipeline> {
     constructor();

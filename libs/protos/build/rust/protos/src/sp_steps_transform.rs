@@ -35,6 +35,8 @@ pub struct TransformStep {
     pub value: ::std::string::String,
     // @@protoc_insertion_point(field:protos.steps.TransformStep.type)
     pub type_: ::protobuf::EnumOrUnknown<TransformType>,
+    // message oneof groups
+    pub options: ::std::option::Option<transform_step::Options>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.TransformStep.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -51,9 +53,254 @@ impl TransformStep {
         ::std::default::Default::default()
     }
 
+    // .protos.steps.TransformReplaceValueStep replace_value_options = 101;
+
+    pub fn replace_value_options(&self) -> &TransformReplaceValueStep {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(ref v)) => v,
+            _ => <TransformReplaceValueStep as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_replace_value_options(&mut self) {
+        self.options = ::std::option::Option::None;
+    }
+
+    pub fn has_replace_value_options(&self) -> bool {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_replace_value_options(&mut self, v: TransformReplaceValueStep) {
+        self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_replace_value_options(&mut self) -> &mut TransformReplaceValueStep {
+        if let ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(_)) = self.options {
+        } else {
+            self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(TransformReplaceValueStep::new()));
+        }
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_replace_value_options(&mut self) -> TransformReplaceValueStep {
+        if self.has_replace_value_options() {
+            match self.options.take() {
+                ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TransformReplaceValueStep::new()
+        }
+    }
+
+    // .protos.steps.TransformDeleteFieldStep delete_field_options = 102;
+
+    pub fn delete_field_options(&self) -> &TransformDeleteFieldStep {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(ref v)) => v,
+            _ => <TransformDeleteFieldStep as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_delete_field_options(&mut self) {
+        self.options = ::std::option::Option::None;
+    }
+
+    pub fn has_delete_field_options(&self) -> bool {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_delete_field_options(&mut self, v: TransformDeleteFieldStep) {
+        self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_delete_field_options(&mut self) -> &mut TransformDeleteFieldStep {
+        if let ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(_)) = self.options {
+        } else {
+            self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(TransformDeleteFieldStep::new()));
+        }
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_delete_field_options(&mut self) -> TransformDeleteFieldStep {
+        if self.has_delete_field_options() {
+            match self.options.take() {
+                ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TransformDeleteFieldStep::new()
+        }
+    }
+
+    // .protos.steps.TransformObfuscateOptions obfuscate_options = 103;
+
+    pub fn obfuscate_options(&self) -> &TransformObfuscateOptions {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(ref v)) => v,
+            _ => <TransformObfuscateOptions as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_obfuscate_options(&mut self) {
+        self.options = ::std::option::Option::None;
+    }
+
+    pub fn has_obfuscate_options(&self) -> bool {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_obfuscate_options(&mut self, v: TransformObfuscateOptions) {
+        self.options = ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_obfuscate_options(&mut self) -> &mut TransformObfuscateOptions {
+        if let ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(_)) = self.options {
+        } else {
+            self.options = ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(TransformObfuscateOptions::new()));
+        }
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_obfuscate_options(&mut self) -> TransformObfuscateOptions {
+        if self.has_obfuscate_options() {
+            match self.options.take() {
+                ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TransformObfuscateOptions::new()
+        }
+    }
+
+    // .protos.steps.TransformMaskOptions mask_options = 104;
+
+    pub fn mask_options(&self) -> &TransformMaskOptions {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::MaskOptions(ref v)) => v,
+            _ => <TransformMaskOptions as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_mask_options(&mut self) {
+        self.options = ::std::option::Option::None;
+    }
+
+    pub fn has_mask_options(&self) -> bool {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::MaskOptions(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_mask_options(&mut self, v: TransformMaskOptions) {
+        self.options = ::std::option::Option::Some(transform_step::Options::MaskOptions(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_mask_options(&mut self) -> &mut TransformMaskOptions {
+        if let ::std::option::Option::Some(transform_step::Options::MaskOptions(_)) = self.options {
+        } else {
+            self.options = ::std::option::Option::Some(transform_step::Options::MaskOptions(TransformMaskOptions::new()));
+        }
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::MaskOptions(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_mask_options(&mut self) -> TransformMaskOptions {
+        if self.has_mask_options() {
+            match self.options.take() {
+                ::std::option::Option::Some(transform_step::Options::MaskOptions(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TransformMaskOptions::new()
+        }
+    }
+
+    // .protos.steps.TransformTruncateOptions truncate_options = 105;
+
+    pub fn truncate_options(&self) -> &TransformTruncateOptions {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::TruncateOptions(ref v)) => v,
+            _ => <TransformTruncateOptions as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_truncate_options(&mut self) {
+        self.options = ::std::option::Option::None;
+    }
+
+    pub fn has_truncate_options(&self) -> bool {
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::TruncateOptions(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_truncate_options(&mut self, v: TransformTruncateOptions) {
+        self.options = ::std::option::Option::Some(transform_step::Options::TruncateOptions(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_truncate_options(&mut self) -> &mut TransformTruncateOptions {
+        if let ::std::option::Option::Some(transform_step::Options::TruncateOptions(_)) = self.options {
+        } else {
+            self.options = ::std::option::Option::Some(transform_step::Options::TruncateOptions(TransformTruncateOptions::new()));
+        }
+        match self.options {
+            ::std::option::Option::Some(transform_step::Options::TruncateOptions(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_truncate_options(&mut self) -> TransformTruncateOptions {
+        if self.has_truncate_options() {
+            match self.options.take() {
+                ::std::option::Option::Some(transform_step::Options::TruncateOptions(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            TransformTruncateOptions::new()
+        }
+    }
+
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        let mut fields = ::std::vec::Vec::with_capacity(8);
+        let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
             |m: &TransformStep| { &m.path },
@@ -69,6 +316,42 @@ impl TransformStep {
             |m: &TransformStep| { &m.type_ },
             |m: &mut TransformStep| { &mut m.type_ },
         ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformReplaceValueStep>(
+            "replace_value_options",
+            TransformStep::has_replace_value_options,
+            TransformStep::replace_value_options,
+            TransformStep::mut_replace_value_options,
+            TransformStep::set_replace_value_options,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformDeleteFieldStep>(
+            "delete_field_options",
+            TransformStep::has_delete_field_options,
+            TransformStep::delete_field_options,
+            TransformStep::mut_delete_field_options,
+            TransformStep::set_delete_field_options,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformObfuscateOptions>(
+            "obfuscate_options",
+            TransformStep::has_obfuscate_options,
+            TransformStep::obfuscate_options,
+            TransformStep::mut_obfuscate_options,
+            TransformStep::set_obfuscate_options,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformMaskOptions>(
+            "mask_options",
+            TransformStep::has_mask_options,
+            TransformStep::mask_options,
+            TransformStep::mut_mask_options,
+            TransformStep::set_mask_options,
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformTruncateOptions>(
+            "truncate_options",
+            TransformStep::has_truncate_options,
+            TransformStep::truncate_options,
+            TransformStep::mut_truncate_options,
+            TransformStep::set_truncate_options,
+        ));
+        oneofs.push(transform_step::Options::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformStep>(
             "TransformStep",
             fields,
@@ -96,6 +379,21 @@ impl ::protobuf::Message for TransformStep {
                 24 => {
                     self.type_ = is.read_enum_or_unknown()?;
                 },
+                810 => {
+                    self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(is.read_message()?));
+                },
+                818 => {
+                    self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(is.read_message()?));
+                },
+                826 => {
+                    self.options = ::std::option::Option::Some(transform_step::Options::ObfuscateOptions(is.read_message()?));
+                },
+                834 => {
+                    self.options = ::std::option::Option::Some(transform_step::Options::MaskOptions(is.read_message()?));
+                },
+                842 => {
+                    self.options = ::std::option::Option::Some(transform_step::Options::TruncateOptions(is.read_message()?));
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -117,6 +415,30 @@ impl ::protobuf::Message for TransformStep {
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
             my_size += ::protobuf::rt::int32_size(3, self.type_.value());
         }
+        if let ::std::option::Option::Some(ref v) = self.options {
+            match v {
+                &transform_step::Options::ReplaceValueOptions(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &transform_step::Options::DeleteFieldOptions(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &transform_step::Options::ObfuscateOptions(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &transform_step::Options::MaskOptions(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+                &transform_step::Options::TruncateOptions(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+            };
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -131,6 +453,25 @@ impl ::protobuf::Message for TransformStep {
         }
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN) {
             os.write_enum(3, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+        }
+        if let ::std::option::Option::Some(ref v) = self.options {
+            match v {
+                &transform_step::Options::ReplaceValueOptions(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(101, v, os)?;
+                },
+                &transform_step::Options::DeleteFieldOptions(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(102, v, os)?;
+                },
+                &transform_step::Options::ObfuscateOptions(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
+                },
+                &transform_step::Options::MaskOptions(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
+                },
+                &transform_step::Options::TruncateOptions(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
+                },
+            };
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -152,6 +493,11 @@ impl ::protobuf::Message for TransformStep {
         self.path.clear();
         self.value.clear();
         self.type_ = ::protobuf::EnumOrUnknown::new(TransformType::TRANSFORM_TYPE_UNKNOWN);
+        self.options = ::std::option::Option::None;
+        self.options = ::std::option::Option::None;
+        self.options = ::std::option::Option::None;
+        self.options = ::std::option::Option::None;
+        self.options = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
@@ -160,6 +506,7 @@ impl ::protobuf::Message for TransformStep {
             path: ::std::string::String::new(),
             value: ::std::string::String::new(),
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
+            options: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -183,6 +530,743 @@ impl ::protobuf::reflect::ProtobufValue for TransformStep {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+/// Nested message and enums of message `TransformStep`
+pub mod transform_step {
+
+    #[derive(Clone,PartialEq,Debug)]
+    #[non_exhaustive]
+    // @@protoc_insertion_point(oneof:protos.steps.TransformStep.options)
+    pub enum Options {
+        // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.replace_value_options)
+        ReplaceValueOptions(super::TransformReplaceValueStep),
+        // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.delete_field_options)
+        DeleteFieldOptions(super::TransformDeleteFieldStep),
+        // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.obfuscate_options)
+        ObfuscateOptions(super::TransformObfuscateOptions),
+        // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.mask_options)
+        MaskOptions(super::TransformMaskOptions),
+        // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.truncate_options)
+        TruncateOptions(super::TransformTruncateOptions),
+    }
+
+    impl ::protobuf::Oneof for Options {
+    }
+
+    impl ::protobuf::OneofFull for Options {
+        fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
+            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
+            descriptor.get(|| <super::TransformStep as ::protobuf::MessageFull>::descriptor().oneof_by_name("options").unwrap()).clone()
+        }
+    }
+
+    impl Options {
+        pub(in super) fn generated_oneof_descriptor_data() -> ::protobuf::reflect::GeneratedOneofDescriptorData {
+            ::protobuf::reflect::GeneratedOneofDescriptorData::new::<Options>("options")
+        }
+    }
+}
+
+// @@protoc_insertion_point(message:protos.steps.TransformTruncateOptions)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct TransformTruncateOptions {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.TransformTruncateOptions.type)
+    pub type_: ::protobuf::EnumOrUnknown<TransformTruncateType>,
+    ///  Truncate after this many bytes or this percentage of the original value
+    // @@protoc_insertion_point(field:protos.steps.TransformTruncateOptions.value)
+    pub value: i32,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.TransformTruncateOptions.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TransformTruncateOptions {
+    fn default() -> &'a TransformTruncateOptions {
+        <TransformTruncateOptions as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TransformTruncateOptions {
+    pub fn new() -> TransformTruncateOptions {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "type",
+            |m: &TransformTruncateOptions| { &m.type_ },
+            |m: &mut TransformTruncateOptions| { &mut m.type_ },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "value",
+            |m: &TransformTruncateOptions| { &m.value },
+            |m: &mut TransformTruncateOptions| { &mut m.value },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformTruncateOptions>(
+            "TransformTruncateOptions",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TransformTruncateOptions {
+    const NAME: &'static str = "TransformTruncateOptions";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                8 => {
+                    self.type_ = is.read_enum_or_unknown()?;
+                },
+                16 => {
+                    self.value = is.read_int32()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN) {
+            my_size += ::protobuf::rt::int32_size(1, self.type_.value());
+        }
+        if self.value != 0 {
+            my_size += ::protobuf::rt::int32_size(2, self.value);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if self.type_ != ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
+        }
+        if self.value != 0 {
+            os.write_int32(2, self.value)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TransformTruncateOptions {
+        TransformTruncateOptions::new()
+    }
+
+    fn clear(&mut self) {
+        self.type_ = ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN);
+        self.value = 0;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TransformTruncateOptions {
+        static instance: TransformTruncateOptions = TransformTruncateOptions {
+            type_: ::protobuf::EnumOrUnknown::from_i32(0),
+            value: 0,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TransformTruncateOptions {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformTruncateOptions").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TransformTruncateOptions {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TransformTruncateOptions {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.steps.TransformDeleteFieldStep)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct TransformDeleteFieldStep {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.TransformDeleteFieldStep.path)
+    pub path: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.TransformDeleteFieldStep.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TransformDeleteFieldStep {
+    fn default() -> &'a TransformDeleteFieldStep {
+        <TransformDeleteFieldStep as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TransformDeleteFieldStep {
+    pub fn new() -> TransformDeleteFieldStep {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "path",
+            |m: &TransformDeleteFieldStep| { &m.path },
+            |m: &mut TransformDeleteFieldStep| { &mut m.path },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformDeleteFieldStep>(
+            "TransformDeleteFieldStep",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TransformDeleteFieldStep {
+    const NAME: &'static str = "TransformDeleteFieldStep";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.path = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.path.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.path);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.path.is_empty() {
+            os.write_string(1, &self.path)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TransformDeleteFieldStep {
+        TransformDeleteFieldStep::new()
+    }
+
+    fn clear(&mut self) {
+        self.path.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TransformDeleteFieldStep {
+        static instance: TransformDeleteFieldStep = TransformDeleteFieldStep {
+            path: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TransformDeleteFieldStep {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformDeleteFieldStep").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TransformDeleteFieldStep {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TransformDeleteFieldStep {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.steps.TransformReplaceValueStep)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct TransformReplaceValueStep {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueStep.path)
+    pub path: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueStep.value)
+    pub value: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.TransformReplaceValueStep.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TransformReplaceValueStep {
+    fn default() -> &'a TransformReplaceValueStep {
+        <TransformReplaceValueStep as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TransformReplaceValueStep {
+    pub fn new() -> TransformReplaceValueStep {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "path",
+            |m: &TransformReplaceValueStep| { &m.path },
+            |m: &mut TransformReplaceValueStep| { &mut m.path },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "value",
+            |m: &TransformReplaceValueStep| { &m.value },
+            |m: &mut TransformReplaceValueStep| { &mut m.value },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformReplaceValueStep>(
+            "TransformReplaceValueStep",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TransformReplaceValueStep {
+    const NAME: &'static str = "TransformReplaceValueStep";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.path = is.read_string()?;
+                },
+                18 => {
+                    self.value = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.path.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.path);
+        }
+        if !self.value.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.value);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.path.is_empty() {
+            os.write_string(1, &self.path)?;
+        }
+        if !self.value.is_empty() {
+            os.write_string(2, &self.value)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TransformReplaceValueStep {
+        TransformReplaceValueStep::new()
+    }
+
+    fn clear(&mut self) {
+        self.path.clear();
+        self.value.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TransformReplaceValueStep {
+        static instance: TransformReplaceValueStep = TransformReplaceValueStep {
+            path: ::std::string::String::new(),
+            value: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TransformReplaceValueStep {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformReplaceValueStep").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TransformReplaceValueStep {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TransformReplaceValueStep {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.steps.TransformObfuscateOptions)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct TransformObfuscateOptions {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.TransformObfuscateOptions.path)
+    pub path: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.steps.TransformObfuscateOptions.value)
+    pub value: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.TransformObfuscateOptions.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TransformObfuscateOptions {
+    fn default() -> &'a TransformObfuscateOptions {
+        <TransformObfuscateOptions as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TransformObfuscateOptions {
+    pub fn new() -> TransformObfuscateOptions {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "path",
+            |m: &TransformObfuscateOptions| { &m.path },
+            |m: &mut TransformObfuscateOptions| { &mut m.path },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "value",
+            |m: &TransformObfuscateOptions| { &m.value },
+            |m: &mut TransformObfuscateOptions| { &mut m.value },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformObfuscateOptions>(
+            "TransformObfuscateOptions",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TransformObfuscateOptions {
+    const NAME: &'static str = "TransformObfuscateOptions";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.path = is.read_string()?;
+                },
+                18 => {
+                    self.value = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.path.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.path);
+        }
+        if !self.value.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.value);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.path.is_empty() {
+            os.write_string(1, &self.path)?;
+        }
+        if !self.value.is_empty() {
+            os.write_string(2, &self.value)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TransformObfuscateOptions {
+        TransformObfuscateOptions::new()
+    }
+
+    fn clear(&mut self) {
+        self.path.clear();
+        self.value.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TransformObfuscateOptions {
+        static instance: TransformObfuscateOptions = TransformObfuscateOptions {
+            path: ::std::string::String::new(),
+            value: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TransformObfuscateOptions {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformObfuscateOptions").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TransformObfuscateOptions {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TransformObfuscateOptions {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.steps.TransformMaskOptions)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct TransformMaskOptions {
+    // message fields
+    // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.path)
+    pub path: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.value)
+    pub value: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.mask)
+    pub mask: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.steps.TransformMaskOptions.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a TransformMaskOptions {
+    fn default() -> &'a TransformMaskOptions {
+        <TransformMaskOptions as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl TransformMaskOptions {
+    pub fn new() -> TransformMaskOptions {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "path",
+            |m: &TransformMaskOptions| { &m.path },
+            |m: &mut TransformMaskOptions| { &mut m.path },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "value",
+            |m: &TransformMaskOptions| { &m.value },
+            |m: &mut TransformMaskOptions| { &mut m.value },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "mask",
+            |m: &TransformMaskOptions| { &m.mask },
+            |m: &mut TransformMaskOptions| { &mut m.mask },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformMaskOptions>(
+            "TransformMaskOptions",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for TransformMaskOptions {
+    const NAME: &'static str = "TransformMaskOptions";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.path = is.read_string()?;
+                },
+                18 => {
+                    self.value = is.read_string()?;
+                },
+                26 => {
+                    self.mask = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.path.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.path);
+        }
+        if !self.value.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.value);
+        }
+        if !self.mask.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.mask);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.path.is_empty() {
+            os.write_string(1, &self.path)?;
+        }
+        if !self.value.is_empty() {
+            os.write_string(2, &self.value)?;
+        }
+        if !self.mask.is_empty() {
+            os.write_string(3, &self.mask)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> TransformMaskOptions {
+        TransformMaskOptions::new()
+    }
+
+    fn clear(&mut self) {
+        self.path.clear();
+        self.value.clear();
+        self.mask.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static TransformMaskOptions {
+        static instance: TransformMaskOptions = TransformMaskOptions {
+            path: ::std::string::String::new(),
+            value: ::std::string::String::new(),
+            mask: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for TransformMaskOptions {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformMaskOptions").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for TransformMaskOptions {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for TransformMaskOptions {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.steps.TransformType)
 pub enum TransformType {
@@ -196,6 +1280,8 @@ pub enum TransformType {
     TRANSFORM_TYPE_OBFUSCATE_VALUE = 3,
     // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_MASK_VALUE)
     TRANSFORM_TYPE_MASK_VALUE = 4,
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformType.TRANSFORM_TYPE_TRUNCATE_VALUE)
+    TRANSFORM_TYPE_TRUNCATE_VALUE = 5,
 }
 
 impl ::protobuf::Enum for TransformType {
@@ -212,6 +1298,7 @@ impl ::protobuf::Enum for TransformType {
             2 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_DELETE_FIELD),
             3 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE),
             4 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_MASK_VALUE),
+            5 => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE),
             _ => ::std::option::Option::None
         }
     }
@@ -223,6 +1310,7 @@ impl ::protobuf::Enum for TransformType {
             "TRANSFORM_TYPE_DELETE_FIELD" => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_DELETE_FIELD),
             "TRANSFORM_TYPE_OBFUSCATE_VALUE" => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE),
             "TRANSFORM_TYPE_MASK_VALUE" => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_MASK_VALUE),
+            "TRANSFORM_TYPE_TRUNCATE_VALUE" => ::std::option::Option::Some(TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE),
             _ => ::std::option::Option::None
         }
     }
@@ -233,6 +1321,7 @@ impl ::protobuf::Enum for TransformType {
         TransformType::TRANSFORM_TYPE_DELETE_FIELD,
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE,
         TransformType::TRANSFORM_TYPE_MASK_VALUE,
+        TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE,
     ];
 }
 
@@ -260,39 +1349,187 @@ impl TransformType {
     }
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.steps.TransformTruncateType)
+pub enum TransformTruncateType {
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformTruncateType.TRANSFORM_TRUNCATE_TYPE_UNKNOWN)
+    TRANSFORM_TRUNCATE_TYPE_UNKNOWN = 0,
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformTruncateType.TRANSFORM_TRUNCATE_TYPE_LENGTH)
+    TRANSFORM_TRUNCATE_TYPE_LENGTH = 1,
+    // @@protoc_insertion_point(enum_value:protos.steps.TransformTruncateType.TRANSFORM_TRUNCATE_TYPE_PERCENTAGE)
+    TRANSFORM_TRUNCATE_TYPE_PERCENTAGE = 2,
+}
+
+impl ::protobuf::Enum for TransformTruncateType {
+    const NAME: &'static str = "TransformTruncateType";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<TransformTruncateType> {
+        match value {
+            0 => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN),
+            1 => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_LENGTH),
+            2 => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn from_str(str: &str) -> ::std::option::Option<TransformTruncateType> {
+        match str {
+            "TRANSFORM_TRUNCATE_TYPE_UNKNOWN" => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN),
+            "TRANSFORM_TRUNCATE_TYPE_LENGTH" => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_LENGTH),
+            "TRANSFORM_TRUNCATE_TYPE_PERCENTAGE" => ::std::option::Option::Some(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [TransformTruncateType] = &[
+        TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN,
+        TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_LENGTH,
+        TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE,
+    ];
+}
+
+impl ::protobuf::EnumFull for TransformTruncateType {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("TransformTruncateType").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for TransformTruncateType {
+    fn default() -> Self {
+        TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN
+    }
+}
+
+impl TransformTruncateType {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<TransformTruncateType>("TransformTruncateType")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x1esteps/sp_steps_transform.proto\x12\x0cprotos.steps\"j\n\rTransform\
-    Step\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x14\n\x05value\
-    \x18\x02\x20\x01(\tR\x05value\x12/\n\x04type\x18\x03\x20\x01(\x0e2\x1b.p\
-    rotos.steps.TransformTypeR\x04type*\xb1\x01\n\rTransformType\x12\x1a\n\
-    \x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VAL\
-    UE\x10\x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eT\
-    RANSFORM_TYPE_OBFUSCATE_VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_V\
-    ALUE\x10\x04BBZ@github.com/streamdal/streamdal/libs/protos/build/go/prot\
-    os/stepsJ\xf0\x03\n\x06\x12\x04\0\0\x12\x01\n\x08\n\x01\x0c\x12\x03\0\0\
-    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\
-    \t\n\x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\x0c\x01\n\
-    \n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\
-    \x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\x0c\n\x05\
-    \x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\
-    \x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\
-    \x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\x05\x05\0\
-    \x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02%\n\
-    \x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\0\x02\x03\
-    \x02\x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\n\x0c\n\
-    \x05\x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x04\x02\
-    \x12\x03\x0b\x1e\x1f\n\n\n\x02\x04\0\x12\x04\x0e\0\x12\x01\n\n\n\x03\x04\
-    \0\x01\x12\x03\x0e\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\x0f\x02\x12\n\
-    \x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0f\x02\x08\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\x0f\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0f\x10\x11\n(\
-    \n\x04\x04\0\x02\x01\x12\x03\x10\x02\x13\"\x1b\x20Should\x20this\x20be\
-    \x20bytes?\x20~DS\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x10\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x10\t\x0e\n\x0c\n\x05\x04\0\x02\x01\
-    \x03\x12\x03\x10\x11\x12\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x11\x02\x19\n\
-    \x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x11\x02\x0f\n\x0c\n\x05\x04\0\x02\
-    \x02\x01\x12\x03\x11\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x11\
-    \x17\x18b\x06proto3\
+    \n\x1esteps/sp_steps_transform.proto\x12\x0cprotos.steps\"\xae\x04\n\rTr\
+    ansformStep\x12\x16\n\x04path\x18\x01\x20\x01(\tR\x04pathB\x02\x18\x01\
+    \x12\x18\n\x05value\x18\x02\x20\x01(\tR\x05valueB\x02\x18\x01\x12/\n\x04\
+    type\x18\x03\x20\x01(\x0e2\x1b.protos.steps.TransformTypeR\x04type\x12]\
+    \n\x15replace_value_options\x18e\x20\x01(\x0b2'.protos.steps.TransformRe\
+    placeValueStepH\0R\x13replaceValueOptions\x12Z\n\x14delete_field_options\
+    \x18f\x20\x01(\x0b2&.protos.steps.TransformDeleteFieldStepH\0R\x12delete\
+    FieldOptions\x12V\n\x11obfuscate_options\x18g\x20\x01(\x0b2'.protos.step\
+    s.TransformObfuscateOptionsH\0R\x10obfuscateOptions\x12G\n\x0cmask_optio\
+    ns\x18h\x20\x01(\x0b2\".protos.steps.TransformMaskOptionsH\0R\x0bmaskOpt\
+    ions\x12S\n\x10truncate_options\x18i\x20\x01(\x0b2&.protos.steps.Transfo\
+    rmTruncateOptionsH\0R\x0ftruncateOptionsB\t\n\x07options\"i\n\x18Transfo\
+    rmTruncateOptions\x127\n\x04type\x18\x01\x20\x01(\x0e2#.protos.steps.Tra\
+    nsformTruncateTypeR\x04type\x12\x14\n\x05value\x18\x02\x20\x01(\x05R\x05\
+    value\".\n\x18TransformDeleteFieldStep\x12\x12\n\x04path\x18\x01\x20\x01\
+    (\tR\x04path\"E\n\x19TransformReplaceValueStep\x12\x12\n\x04path\x18\x01\
+    \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"E\
+    \n\x19TransformObfuscateOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\
+    \x04path\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"T\n\x14Transfo\
+    rmMaskOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x14\n\
+    \x05value\x18\x02\x20\x01(\tR\x05value\x12\x12\n\x04mask\x18\x03\x20\x01\
+    (\tR\x04mask*\xd4\x01\n\rTransformType\x12\x1a\n\x16TRANSFORM_TYPE_UNKNO\
+    WN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VALUE\x10\x01\x12\x1f\n\x1b\
+    TRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_\
+    VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_VALUE\x10\x04\x12!\n\x1dT\
+    RANSFORM_TYPE_TRUNCATE_VALUE\x10\x05*\x88\x01\n\x15TransformTruncateType\
+    \x12#\n\x1fTRANSFORM_TRUNCATE_TYPE_UNKNOWN\x10\0\x12\"\n\x1eTRANSFORM_TR\
+    UNCATE_TYPE_LENGTH\x10\x01\x12&\n\"TRANSFORM_TRUNCATE_TYPE_PERCENTAGE\
+    \x10\x02BBZ@github.com/streamdal/streamdal/libs/protos/build/go/protos/s\
+    tepsJ\xb6\x0e\n\x06\x12\x04\0\0=\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
+    \x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\
+    \x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\x0e\x01\n\n\n\
+    \x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\
+    \x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\
+    \x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\
+    \0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\x02\"\
+    \n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\
+    \x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\
+    \x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\
+    \x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\n\x0c\n\x05\
+    \x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x04\x02\x12\
+    \x03\x0b\x1e\x1f\nC\n\x04\x05\0\x02\x05\x12\x03\x0c\x02$\"6\x20TODO:\x20\
+    type\x20for\x20delete\x20all\x20keys\x20except\x20specified\x20ones\n\n\
+    \x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x0c\x02\x1f\n\x0c\n\x05\x05\0\x02\
+    \x05\x02\x12\x03\x0c\"#\n\n\n\x02\x04\0\x12\x04\x10\0\x1c\x01\n\n\n\x03\
+    \x04\0\x01\x12\x03\x10\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\x11\x02$\
+    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\x02\x08\n\x0c\n\x05\x04\0\x02\0\
+    \x01\x12\x03\x11\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x11\x10\x11\n\
+    \x0c\n\x05\x04\0\x02\0\x08\x12\x03\x11\x12#\n\r\n\x06\x04\0\x02\0\x08\
+    \x03\x12\x03\x11\x13\"\n(\n\x04\x04\0\x02\x01\x12\x03\x12\x02%\"\x1b\x20\
+    Should\x20this\x20be\x20bytes?\x20~DS\n\n\x0c\n\x05\x04\0\x02\x01\x05\
+    \x12\x03\x12\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x12\t\x0e\n\
+    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12\x11\x12\n\x0c\n\x05\x04\0\x02\
+    \x01\x08\x12\x03\x12\x13$\n\r\n\x06\x04\0\x02\x01\x08\x03\x12\x03\x12\
+    \x14#\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x13\x02\x19\n\x0c\n\x05\x04\0\
+    \x02\x02\x06\x12\x03\x13\x02\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    \x13\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x13\x17\x18\n\x0c\n\
+    \x04\x04\0\x08\0\x12\x04\x15\x02\x1b\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\
+    \x03\x15\x08\x0f\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\x04:\n\x0c\n\x05\
+    \x04\0\x02\x03\x06\x12\x03\x16\x04\x1d\n\x0c\n\x05\x04\0\x02\x03\x01\x12\
+    \x03\x16\x1e3\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1669\n\x0b\n\x04\
+    \x04\0\x02\x04\x12\x03\x17\x048\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\
+    \x17\x04\x1c\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17\x1d1\n\x0c\n\x05\
+    \x04\0\x02\x04\x03\x12\x03\x1747\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x18\
+    \x046\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x1d\n\x0c\n\x05\x04\
+    \0\x02\x05\x01\x12\x03\x18\x1e/\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\
+    \x1825\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x19\x04,\n\x0c\n\x05\x04\0\x02\
+    \x06\x06\x12\x03\x19\x04\x18\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\
+    \x19%\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x19(+\n\x0b\n\x04\x04\0\x02\
+    \x07\x12\x03\x1a\x044\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1a\x04\x1c\
+    \n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1a\x1d-\n\x0c\n\x05\x04\0\x02\
+    \x07\x03\x12\x03\x1a03\n\n\n\x02\x05\x01\x12\x04\x1e\0\"\x01\n\n\n\x03\
+    \x05\x01\x01\x12\x03\x1e\x05\x1a\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1f\
+    \x02&\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1f\x02!\n\x0c\n\x05\x05\x01\
+    \x02\0\x02\x12\x03\x1f$%\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x20\x02%\n\
+    \x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x20\x02\x20\n\x0c\n\x05\x05\x01\
+    \x02\x01\x02\x12\x03\x20#$\n\x0b\n\x04\x05\x01\x02\x02\x12\x03!\x02)\n\
+    \x0c\n\x05\x05\x01\x02\x02\x01\x12\x03!\x02$\n\x0c\n\x05\x05\x01\x02\x02\
+    \x02\x12\x03!'(\n\n\n\x02\x04\x01\x12\x04$\0)\x01\n\n\n\x03\x04\x01\x01\
+    \x12\x03$\x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03%\x02!\n\x0c\n\x05\
+    \x04\x01\x02\0\x06\x12\x03%\x02\x17\n\x0c\n\x05\x04\x01\x02\0\x01\x12\
+    \x03%\x18\x1c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x1f\x20\nV\n\x04\
+    \x04\x01\x02\x01\x12\x03(\x02\x12\x1aI\x20Truncate\x20after\x20this\x20m\
+    any\x20bytes\x20or\x20this\x20percentage\x20of\x20the\x20original\x20val\
+    ue\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03(\x02\x07\n\x0c\n\x05\x04\
+    \x01\x02\x01\x01\x12\x03(\x08\r\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03(\
+    \x10\x11\n\n\n\x02\x04\x02\x12\x04+\0-\x01\n\n\n\x03\x04\x02\x01\x12\x03\
+    +\x08\x20\n\x0b\n\x04\x04\x02\x02\0\x12\x03,\x02\x12\n\x0c\n\x05\x04\x02\
+    \x02\0\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03,\t\r\n\
+    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03,\x10\x11\n\n\n\x02\x04\x03\x12\x04/\
+    \02\x01\n\n\n\x03\x04\x03\x01\x12\x03/\x08!\n\x0b\n\x04\x04\x03\x02\0\
+    \x12\x030\x02\x12\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x030\x02\x08\n\x0c\n\
+    \x05\x04\x03\x02\0\x01\x12\x030\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\
+    \x030\x10\x11\n\x0b\n\x04\x04\x03\x02\x01\x12\x031\x02\x13\n\x0c\n\x05\
+    \x04\x03\x02\x01\x05\x12\x031\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\
+    \x12\x031\t\x0e\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x031\x11\x12\n\n\n\
+    \x02\x04\x04\x12\x044\07\x01\n\n\n\x03\x04\x04\x01\x12\x034\x08!\n\x0b\n\
+    \x04\x04\x04\x02\0\x12\x035\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x05\x12\
+    \x035\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x035\t\r\n\x0c\n\x05\x04\
+    \x04\x02\0\x03\x12\x035\x10\x11\n\x0b\n\x04\x04\x04\x02\x01\x12\x036\x02\
+    \x13\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x036\x02\x08\n\x0c\n\x05\x04\
+    \x04\x02\x01\x01\x12\x036\t\x0e\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x036\
+    \x11\x12\n\n\n\x02\x04\x05\x12\x049\0=\x01\n\n\n\x03\x04\x05\x01\x12\x03\
+    9\x08\x1c\n\x0b\n\x04\x04\x05\x02\0\x12\x03:\x02\x12\n\x0c\n\x05\x04\x05\
+    \x02\0\x05\x12\x03:\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03:\t\r\n\
+    \x0c\n\x05\x04\x05\x02\0\x03\x12\x03:\x10\x11\n\x0b\n\x04\x04\x05\x02\
+    \x01\x12\x03;\x02\x13\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03;\x02\x08\n\
+    \x0c\n\x05\x04\x05\x02\x01\x01\x12\x03;\t\x0e\n\x0c\n\x05\x04\x05\x02\
+    \x01\x03\x12\x03;\x11\x12\n\x0b\n\x04\x04\x05\x02\x02\x12\x03<\x02\x12\n\
+    \x0c\n\x05\x04\x05\x02\x02\x05\x12\x03<\x02\x08\n\x0c\n\x05\x04\x05\x02\
+    \x02\x01\x12\x03<\t\r\n\x0c\n\x05\x04\x05\x02\x02\x03\x12\x03<\x10\x11b\
+    \x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -310,10 +1547,16 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(1);
+            let mut messages = ::std::vec::Vec::with_capacity(6);
             messages.push(TransformStep::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(1);
+            messages.push(TransformTruncateOptions::generated_message_descriptor_data());
+            messages.push(TransformDeleteFieldStep::generated_message_descriptor_data());
+            messages.push(TransformReplaceValueStep::generated_message_descriptor_data());
+            messages.push(TransformObfuscateOptions::generated_message_descriptor_data());
+            messages.push(TransformMaskOptions::generated_message_descriptor_data());
+            let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(TransformType::generated_enum_descriptor_data());
+            enums.push(TransformTruncateType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

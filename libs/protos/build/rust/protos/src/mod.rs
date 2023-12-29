@@ -18,6 +18,7 @@ pub mod sp_steps_encode;
 pub mod sp_steps_httprequest;
 pub mod sp_steps_inferschema;
 pub mod sp_steps_kv;
+pub mod sp_steps_schema_validation;
 pub mod sp_steps_transform;
 pub mod sp_steps_valid_json;
 pub mod sp_wsm;

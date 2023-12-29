@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package protos.steps;
+
+option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
+
+// TODO: expand for protobuf, avro, etc.
+enum SchemaValidationType {
+  SCHEMA_VALIDATION_TYPE_UNKNOWN = 0;
+  SCHEMA_VALIDATION_TYPE_JSONSCHEMA = 1;
+}
+
+enum SchemaValidationCondition {
+  SCHEMA_VALIDATION_CONDITION_UNKNOWN = 0;
+  SCHEMA_VALIDATION_CONDITION_MATCH = 1;
+  SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
+  // TODO: backwards compat, evolve, etc.
+
+}
+
+message SchemaValidationStep {
+  SchemaValidationType type = 1;
+
+  oneof options {
+    SchemaValidationJSONSchema json_schema = 101;
+  }
+}
+
+message SchemaValidationJSONSchema {
+  bytes json_schema = 1;
+}
