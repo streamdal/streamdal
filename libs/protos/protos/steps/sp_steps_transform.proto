@@ -10,10 +10,53 @@ enum TransformType {
   TRANSFORM_TYPE_DELETE_FIELD = 2;
   TRANSFORM_TYPE_OBFUSCATE_VALUE = 3;
   TRANSFORM_TYPE_MASK_VALUE = 4;
+  TRANSFORM_TYPE_TRUNCATE_VALUE = 5;
+  // TODO: type for delete all keys except specified ones
 }
 
 message TransformStep {
-  string path = 1;
-  string value = 2; // Should this be bytes? ~DS
+  string path = 1 [deprecated=true];
+  string value = 2 [deprecated=true]; // Should this be bytes? ~DS
   TransformType type = 3;
+
+  oneof options {
+    TransformReplaceValueStep replace_value_options = 101;
+    TransformDeleteFieldStep delete_field_options = 102;
+    TransformObfuscateOptions obfuscate_options = 103;
+    TransformMaskOptions mask_options = 104;
+    TransformTruncateOptions truncate_options = 105;
+  }
+}
+
+enum TransformTruncateType {
+  TRANSFORM_TRUNCATE_TYPE_UNKNOWN = 0;
+  TRANSFORM_TRUNCATE_TYPE_LENGTH = 1;
+  TRANSFORM_TRUNCATE_TYPE_PERCENTAGE = 2;
+}
+
+message TransformTruncateOptions {
+  TransformTruncateType type = 1;
+
+  // Truncate after this many bytes or this percentage of the original value
+  int32 value = 2;
+}
+
+message TransformDeleteFieldStep {
+  string path = 1;
+}
+
+message TransformReplaceValueStep {
+  string path = 1;
+  string value = 2;
+}
+
+message TransformObfuscateOptions {
+  string path = 1;
+  string value = 2;
+}
+
+message TransformMaskOptions {
+  string path = 1;
+  string value = 2;
+  string mask = 3;
 }
