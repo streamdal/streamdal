@@ -3,8 +3,24 @@ use crate::detective::Request;
 use crate::error::CustomError;
 use idna::domain_to_ascii_strict;
 
-pub fn any(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+pub fn any(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let matchers = vec![
+        credit_card,
+        ssn,
+        email,
+    ];
+
+    for matcher in matchers {
+        // TODO: is there a better way to avoid a borrow? We can't clone gjson::Value
+        let v = gjson::parse(field.json());
+
+        match matcher(_request, v) {
+            Ok(true) => return Ok(true),
+            _ => continue,
+        }
+    }
+
+    Ok(false)
 }
 
 pub fn credit_card(_request: &Request, field: Value) -> Result<bool, CustomError> {
@@ -45,13 +61,44 @@ pub fn credit_card(_request: &Request, field: Value) -> Result<bool, CustomError
     Ok(res)
 }
 
-pub fn ssn(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+pub fn ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    // This method does not guarantee that the SSN is valid,
+    // only that it matches the format of one.
+    let ssn = field.str().trim();
+
+    if ssn.len() != 11 {
+        return Ok(false);
+    }
+
+    // Check that the first three characters are digits
+    if !ssn[0..3].chars().all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    // Check that the fourth character is a dash
+    if ssn.chars().nth(3).unwrap() != '-' {
+        return Ok(false);
+    }
+
+    // Check that the fifth and sixth characters are digits
+    if !ssn[4..6].chars().all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    // Check that the seventh character is a dash
+    if ssn.chars().nth(6).unwrap() != '-' {
+        return Ok(false);
+    }
+
+    // Check that the eighth, ninth, tenth and eleventh characters are digits
+    if !ssn[7..11].chars().all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    Ok(true)
 }
 
 pub fn email(_request: &Request, email: Value) -> Result<bool, CustomError> {
-
-
     // Split the email address into local part and domain part
     let parts: Vec<&str> = email.str().trim().split('@').collect();
 

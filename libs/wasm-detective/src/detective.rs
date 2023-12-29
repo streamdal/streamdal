@@ -78,6 +78,34 @@ impl Detective {
 
         let f = Detective::get_matcher_func(request)?;
 
+        // Don't iterate over these types
+        let ignore_array: Vec<DetectiveType> = vec![
+            DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
+            DetectiveType::DETECTIVE_TYPE_IS_EMPTY,
+            DetectiveType::DETECTIVE_TYPE_IS_TYPE,
+        ];
+        if ignore_array.contains(&request.match_type) {
+            return f(request, field);
+        }
+
+        // We've received multiple results, probably from a wildcard query
+        // so we need to iterate over each one and check if any of them match
+        if field.kind() == gjson::Kind::Array {
+            let mut found: bool = false;
+
+            field.each(|_, value| {
+                if let Ok(res) = f(request, value) {
+                    if res {
+                        found = true;
+                        return false // Don't need to iterate further
+                    }
+                }
+                true
+            });
+
+            return Ok(found);
+        }
+
         f(request, field)
     }
 
