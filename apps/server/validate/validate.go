@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"regexp"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 var (

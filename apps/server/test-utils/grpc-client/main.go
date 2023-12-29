@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 func main() {

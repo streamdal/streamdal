@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 type LiveEntry struct {
