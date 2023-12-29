@@ -61,10 +61,7 @@ The console depends on the following dependencies (direct and indirect):
 
 ### Releasing
 
-We use https://deno.land/x/version@v1.1.1 to help set our release version. To
-generate a release:
-
-1. Install `version` if you don't already have it:
-   `deno install -n version -r -A https://deno.land/x/version/index.ts`
-2. Bump the release number: `version [major|minor|patch]`
-3. git push the generated version tag: `git push origin <tag_name>`
+Any push or merge to main with changes on `/apps/console` will automatically tag
+and release a new console version with `apps/console/vX.Y.Z`. The VERSION file
+will also be bumped for display in the console. If you'd like to skip release on
+the push/merge to main, include "norelease" anywhere in the commit message.
