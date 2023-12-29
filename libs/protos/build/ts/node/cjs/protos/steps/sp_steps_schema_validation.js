@@ -47,11 +47,12 @@ class SchemaValidationStep$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.steps.SchemaValidationStep", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.SchemaValidationType", SchemaValidationType, "SCHEMA_VALIDATION_TYPE_"] },
+            { no: 2, name: "condition", kind: "enum", T: () => ["protos.steps.SchemaValidationCondition", SchemaValidationCondition, "SCHEMA_VALIDATION_CONDITION_"] },
             { no: 101, name: "json_schema", kind: "message", oneof: "options", T: () => exports.SchemaValidationJSONSchema }
         ]);
     }
     create(value) {
-        const message = { type: 0, options: { oneofKind: undefined } };
+        const message = { type: 0, condition: 0, options: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -64,6 +65,9 @@ class SchemaValidationStep$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* protos.steps.SchemaValidationType type */ 1:
                     message.type = reader.int32();
+                    break;
+                case /* protos.steps.SchemaValidationCondition condition */ 2:
+                    message.condition = reader.int32();
                     break;
                 case /* protos.steps.SchemaValidationJSONSchema json_schema */ 101:
                     message.options = {
@@ -86,6 +90,9 @@ class SchemaValidationStep$Type extends runtime_5.MessageType {
         /* protos.steps.SchemaValidationType type = 1; */
         if (message.type !== 0)
             writer.tag(1, runtime_1.WireType.Varint).int32(message.type);
+        /* protos.steps.SchemaValidationCondition condition = 2; */
+        if (message.condition !== 0)
+            writer.tag(2, runtime_1.WireType.Varint).int32(message.condition);
         /* protos.steps.SchemaValidationJSONSchema json_schema = 101; */
         if (message.options.oneofKind === "jsonSchema")
             exports.SchemaValidationJSONSchema.internalBinaryWrite(message.options.jsonSchema, writer.tag(101, runtime_1.WireType.LengthDelimited).fork(), options).join();

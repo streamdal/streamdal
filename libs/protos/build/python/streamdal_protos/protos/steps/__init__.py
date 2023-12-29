@@ -310,6 +310,7 @@ class KvStep(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class SchemaValidationStep(betterproto.Message):
     type: "SchemaValidationType" = betterproto.enum_field(1)
+    condition: "SchemaValidationCondition" = betterproto.enum_field(2)
     json_schema: "SchemaValidationJsonSchema" = betterproto.message_field(
         101, group="options"
     )

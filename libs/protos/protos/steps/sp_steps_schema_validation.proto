@@ -21,6 +21,8 @@ enum SchemaValidationCondition {
 message SchemaValidationStep {
   SchemaValidationType type = 1;
 
+  SchemaValidationCondition condition = 2;
+
   oneof options {
     SchemaValidationJSONSchema json_schema = 101;
   }

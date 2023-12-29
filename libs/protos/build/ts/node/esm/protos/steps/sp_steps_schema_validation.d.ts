@@ -13,6 +13,10 @@ export interface SchemaValidationStep {
      */
     type: SchemaValidationType;
     /**
+     * @generated from protobuf field: protos.steps.SchemaValidationCondition condition = 2;
+     */
+    condition: SchemaValidationCondition;
+    /**
      * @generated from protobuf oneof: options
      */
     options: {
