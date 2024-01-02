@@ -300,37 +300,37 @@ mod tests {
         assert!(mask(&req).is_err());
     }
 
-    // #[test]
-    // fn test_truncate_chars() {
-    //     let mut req = Request {
-    //         data: TEST_DATA.as_bytes().to_vec(),
-    //         path: "baz.qux".to_string(),
-    //         value: "".to_string(), // needs a default
-    //         truncate_options: Some(TruncateOptions{
-    //             length: 2,
-    //             truncate_type: TruncateType::Chars,
-    //         }),
-    //     };
-    //
-    //     let result = truncate(&req).unwrap();
-    //
-    //     assert!(gjson::valid(TEST_DATA));
-    //     assert!(gjson::valid(&result));
-    //
-    //     let v = gjson::get(TEST_DATA, "baz.qux");
-    //     assert_eq!(v.str(), "quux");
-    //
-    //     let v = gjson::get(result.as_str(), "baz.qux");
-    //     assert_eq!(v.str(), "qu");
-    //
-    //     // path does not exist
-    //     req.path = "does-not-exist".to_string();
-    //     assert!(truncate(&req).is_err());
-    //
-    //     // path not a string
-    //     req.path = "bool".to_string();
-    //     assert!(truncate(&req).is_err());
-    // }
+    #[test]
+    fn test_truncate_chars() {
+        let mut req = Request {
+            data: TEST_DATA.as_bytes().to_vec(),
+            path: "baz.qux".to_string(),
+            value: "".to_string(), // needs a default
+            truncate_options: Some(TruncateOptions{
+                length: 2,
+                truncate_type: TruncateType::Chars,
+            }),
+        };
+
+        let result = truncate(&req).unwrap();
+
+        assert!(gjson::valid(TEST_DATA));
+        assert!(gjson::valid(&result));
+
+        let v = gjson::get(TEST_DATA, "baz.qux");
+        assert_eq!(v.str(), "quux");
+
+        let v = gjson::get(result.as_str(), "baz.qux");
+        assert_eq!(v.str(), "qu");
+
+        // path does not exist
+        req.path = "does-not-exist".to_string();
+        assert!(truncate(&req).is_err());
+
+        // path not a string
+        req.path = "bool".to_string();
+        assert!(truncate(&req).is_err());
+    }
 
     #[test]
     fn test_truncate_percent() {
