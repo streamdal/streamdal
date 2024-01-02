@@ -53,6 +53,7 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
     let value = gjson::get(data_as_str, req.path.as_str());
 
     let truncate_length = match &truncate_options.truncate_type {
+        #[allow(clippy::clone_on_copy)]
         TruncateType::Chars => truncate_options.length.clone(),
         TruncateType::Percent => {
             let strlen = gjson::get(data_as_str, req.path.as_str()).to_string().len();
@@ -71,6 +72,7 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
     }
 }
 
+#[allow(clippy::to_string_in_format_args)]
 fn _truncate(data: &str, path: &str, len: &usize) -> Result<String, TransformError> {
     let contents = gjson::get(data, path);
 
@@ -143,7 +145,7 @@ pub fn mask(req: &Request) -> Result<String, TransformError> {
 fn _mask(data: &str, path: &str, mask_char: char, quote: bool) -> Result<String, TransformError> {
     let contents = gjson::get(data, path);
     let num_chars_to_mask = (0.8 * contents.str().len() as f64).round() as usize;
-    let num_chars_to_skip = contents.str().len() - &num_chars_to_mask;
+    let num_chars_to_skip = contents.str().len() - num_chars_to_mask;
 
     let mut masked = contents.str()[0..num_chars_to_skip].to_string()
         + mask_char.to_string().repeat(num_chars_to_mask).as_str();
