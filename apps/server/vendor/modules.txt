@@ -245,11 +245,11 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/mono/libs/protos v0.0.137
+# github.com/streamdal/streamdal/libs/protos v0.1.2
 ## explicit; go 1.20
-github.com/streamdal/mono/libs/protos/build/go/protos
-github.com/streamdal/mono/libs/protos/build/go/protos/shared
-github.com/streamdal/mono/libs/protos/build/go/protos/steps
+github.com/streamdal/streamdal/libs/protos/build/go/protos
+github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
+github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
 # github.com/stretchr/testify v1.8.2
 ## explicit; go 1.13
 # github.com/tinylib/msgp v1.1.2

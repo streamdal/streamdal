@@ -55,7 +55,19 @@ pub const SAMPLE_JSON: &str = r#"{
                 "valid": "6200000000000005",
                 "invalid": "6200000000000006",
             }
-        }
+        },
+        "ssn_valid": "111-22-3456",
+        "ssn_invalid": "111-222-3456",
+        "arrays": [
+            {
+                "name": "User1",
+                "email": "user1@streamdal.com"
+            },
+            {
+                "name": "User2",
+                "email": "user2@streamdal.com"
+            }
+        ]
     },
     "array": [
         "value1",

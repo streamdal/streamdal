@@ -80,6 +80,18 @@ fn test_email() {
             text: "equal email_unicode_local_invalid".to_string(),
             should_error: false,
         },
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
+                data: sample_json,
+                path: "object.arrays.#.email".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "handles objects inside arrays".to_string(),
+            should_error: false,
+        },
     ];
 
     crate::test_utils::run_tests(&test_cases);
@@ -246,6 +258,41 @@ fn test_credit_card() {
 }
 
 #[test]
+fn test_ssn() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        // Visa
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_SSN,
+                data: sample_json,
+                path: "object.ssn_valid".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "equal ssn_valid".to_string(),
+            should_error: false,
+        },
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_SSN,
+                data: sample_json,
+                path: "object.ssn_invalid".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: false,
+            text: "equal ssn_invalid".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}
+
+#[test]
 fn test_payload_search() {
     let json_with_field = r#"{
         "object": {
@@ -283,6 +330,50 @@ fn test_payload_search() {
             },
             expected: false,
             text: "".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn test_any() {
+    let json_with_field = r#"{
+        "object": {
+            "email": "user1@streamdal.com"
+        }
+    }"#.as_bytes().to_vec();
+
+    let json_without_field = r#"{
+        "object": {
+            "email": "foo"
+        }
+    }"#.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+                data: &json_with_field,
+                path: "".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: true,
+            text: "find PII in payload".to_string(),
+            should_error: false,
+        },
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+                data: &json_without_field,
+                path: "".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected: false,
+            text: "don't find PII in payload".to_string(),
             should_error: false,
         },
     ];

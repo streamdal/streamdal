@@ -12,9 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
-	"github.com/streamdal/mono/libs/protos/build/go/protos/shared"
-	"github.com/streamdal/mono/libs/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/server/wasm"
 )

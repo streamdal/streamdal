@@ -21,7 +21,7 @@ import (
 	"github.com/slack-go/slack"
 	gomail "gopkg.in/mail.v2"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/server/services/store"
 )

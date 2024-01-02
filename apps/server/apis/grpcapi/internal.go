@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
-	"github.com/streamdal/mono/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
 	"github.com/streamdal/server/types"
 	"github.com/streamdal/server/util"
