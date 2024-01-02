@@ -41,7 +41,6 @@ import { useEffect } from "preact/hooks";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import IconX from "tabler-icons/tsx/x.tsx";
 import { PipelineNotifications } from "../components/pipeline/notifications.tsx";
 
 const detective = {
@@ -216,8 +215,6 @@ const stepSchema = z.object({
   ).transform((val) => val.filter((v) => v)),
   step: stepKindSchema,
 });
-
-export type StepType = z.infer<typeof stepSchema>;
 
 export const pipelineSchema = zfd.formData({
   id: z.string().optional(),

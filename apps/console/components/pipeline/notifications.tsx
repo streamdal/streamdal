@@ -14,21 +14,30 @@ const NotificationCheck = (
     setData: (data: any) => void;
   },
 ) => {
-  const [checked, setChecked] = useState(data?.notifications?.includes(id));
+  const attached = data?.NotificationConfigs?.some((n: NotificationConfig) =>
+    n.id === notification.id
+  );
+  const [checked, setChecked] = useState(attached);
 
   useEffect(() => {
-    return checked
-      ? setData({
+    if (checked) {
+      setData({
         ...data,
         notifications: [...data?.notifications || [], notification.id],
-      })
-      : setData({
+      });
+    } else {
+      setData({
         ...data,
         notifications: data?.notifications?.filter((n) =>
           n.id !== notification.id
         ),
       });
+    }
   }, [checked]);
+
+  useEffect(() => {
+    setChecked(attached);
+  }, [attached]);
 
   return (
     <div class="flex flex-row items-center">
