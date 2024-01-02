@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"regexp"
 
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
-
 	"github.com/pkg/errors"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
 var (
@@ -228,6 +228,19 @@ func PipelineStep(s *protos.PipelineStep) error {
 
 	if s.GetStep() == nil {
 		return errors.New(".Step cannot be nil")
+	}
+
+	if det := s.GetDetective(); det != nil {
+		switch det.Type {
+		case steps.DetectiveType_DETECTIVE_TYPE_HAS_FIELD:
+			fallthrough
+		case steps.DetectiveType_DETECTIVE_TYPE_IS_TYPE:
+			fallthrough
+		case steps.DetectiveType_DETECTIVE_TYPE_IS_EMPTY:
+			if det.GetPath() == "" {
+				return ErrEmptyField("Detective.Path")
+			}
+		}
 	}
 
 	// OK if OnSuccess and OnFailure are nil/empty; nil/empty == implicit continue
