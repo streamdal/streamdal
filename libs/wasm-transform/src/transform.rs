@@ -57,7 +57,7 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
         TruncateType::Chars => truncate_options.length.clone(),
         TruncateType::Percent => {
             let strlen = gjson::get(data_as_str, req.path.as_str()).to_string().len();
-            let my_usize_reference = 100.0 - &truncate_options.length.value_as::<f64>().unwrap();
+            let my_usize_reference = 100.0 - &truncate_options.length.value_as::<f64>().unwrap_or(0.0);
             let num_chars_to_keep: f64 = strlen as f64 * (my_usize_reference / 100.0);
             num_chars_to_keep.round() as usize
         },
