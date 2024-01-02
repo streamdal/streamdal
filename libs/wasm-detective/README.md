@@ -64,6 +64,10 @@ To run benches using nightly: `cargo +nightly bench`
 
 <sub>You can also set nightly as default using `rustup default nightly`.</sub>
 
+## Releasing
+
+Any changes made under libs/wasm-detective will be automatically released to crates.io with a version bump
+
 ## Benchmarks
 
 Valid as of 2023-11-14
