@@ -1,9 +1,19 @@
 import { Handlers } from "$fresh/src/server/types.ts";
-import PipelinesRoute, {
-  handler as pipelineHandler,
-  PipelineRoute,
-} from "./index.tsx";
+import { handler as pipelineHandler, PipelineRoute } from "./index.tsx";
+import Pipelines from "../../islands/pipelines.tsx";
 
 export const handler: Handlers<PipelineRoute> = pipelineHandler;
 
-export default PipelinesRoute;
+export default function PipelineAddRoute(
+  props: PageProps<
+    PipelineRoute
+  >,
+) {
+  return (
+    <Pipelines
+      pipelines={props?.data?.pipelines}
+      notifications={props?.data?.notifications}
+      add={true}
+    />
+  );
+}

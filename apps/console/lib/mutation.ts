@@ -10,14 +10,17 @@ import {
   AppRegistrationRequest,
   AttachPipelineRequest,
   CreateNotificationRequest,
+  CreatePipelineRequest,
   DeleteAudienceRequest,
   DeleteServiceRequest,
   DetachPipelineRequest,
   PausePipelineRequest,
   ResumePipelineRequest,
   UpdateNotificationRequest,
+  UpdatePipelineRequest,
 } from "streamdal-protos/protos/sp_external.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { getPipeline } from "./fetch.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;
@@ -27,24 +30,24 @@ export const updatePipelineNotifications = async (
   notificationIds: string[],
   pipeline: Pipeline,
 ) => {
-  const attach = notificationIds;
-  //
-  // TODO build detach once notifications land on pipelines
-  const detach = [];
+  if (pipeline.id) {
+    const existing = await getPipeline(pipeline.id);
 
-  for await (const id of attach) {
+    for await (const notification of existing.NotificationConfigs) {
+      client.detachNotification(
+        { notificationId: notification.id, pipelineId: pipeline.id },
+        meta,
+      );
+    }
+  }
+
+  for await (const id of notificationIds) {
     client.attachNotification(
       { notificationId: id, pipelineId: pipeline.id },
       meta,
     );
   }
 
-  for await (const id of detach) {
-    client.detachNotification(
-      { notificationId: id, pipelineId: pipeline.id },
-      meta,
-    );
-  }
   return;
 };
 
@@ -54,14 +57,17 @@ export const upsertPipeline = async (
   if (pipeline.id) {
     const { response: updateResponse } = await client
       .updatePipeline(
-        { pipeline },
+        UpdatePipelineRequest.create({ pipeline }),
         meta,
       );
     return { ...updateResponse, pipelineId: pipeline.id };
   }
 
   const { response: createResponse } = await client
-    .createPipeline({ pipeline }, meta);
+    .createPipeline(
+      CreatePipelineRequest.create({ pipeline }),
+      meta,
+    );
 
   //
   // Create pipeline returns a non-standard response with no code so

@@ -40,7 +40,7 @@ export const TailRow = (
   { row }: { row: TailData },
 ) => {
   return (
-    <div className="bg-black text-white py-2 px-4 text-sm flex flex-col justify-start dark-scrollbar">
+    <div className="bg-black text-white py-2 px-4 text-sm flex flex-col justify-start dark-scrollbar border-b border-stormCloud">
       <div className="text-stormCloud w-full">
         {row.timestamp?.toLocaleDateString(
           "en-us",
@@ -72,7 +72,8 @@ export const TailRow = (
             <div className="text-stormCloud text-sm">
               Before:
             </div>
-            <pre>
+            <div class="opacity-50">
+              <pre>
                 <code>
                   <div
                     dangerouslySetInnerHTML={{
@@ -81,7 +82,8 @@ export const TailRow = (
                   >
                   </div>
                 </code>
-            </pre>
+              </pre>
+            </div>
           </div>
         )}
       </div>
