@@ -9,9 +9,6 @@ streamdal-transform
 
 Library used by [streamdal/wasm](https://github.com/streamdal/wasm) to 
 perform transformations on JSON payloads.
-
-Currently only has support for `overwrite`, `mask` and `obfuscate`.
-
 ## Usage
 
 ```rust
@@ -45,4 +42,8 @@ string, then make sure to include quotes in the payload ( Ie. `"123"`)
 1. `obfuscate()`
    2. Works ONLY on strings
    3. Will replace 100% of the characters with a sha256 hash
-
+1. `delete_path()`
+   2. Does not work on array elements yet
+1. `truncate()` 
+   2. Works on strings
+   3. For strings, it will truncate the string to the specified length
