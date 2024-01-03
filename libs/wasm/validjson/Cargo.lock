@@ -62,9 +62,9 @@ checksum = "bc51bbdb843478589c7bb3229b680fbd406daae398c4edd44ba5662688f5eb2c"
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b12ea831e2424648a310338d97608060b6797816c6fe0110931067779b4ac2c"
+checksum = "e0aa81c4b59868eff75688a51b87c7c4e4dda51dd367e6becab5be5a9e5d2161"
 dependencies = [
  "protobuf",
 ]

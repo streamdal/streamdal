@@ -93,7 +93,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "streamdal-protos 0.1.7",
+ "streamdal-protos 0.1.8",
 ]
 
 [[package]]
@@ -211,7 +211,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "protobuf",
- "streamdal-protos 0.1.7",
+ "streamdal-protos 0.1.8",
  "streamdal-wasm-detective",
 ]
 
@@ -380,9 +380,9 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b12ea831e2424648a310338d97608060b6797816c6fe0110931067779b4ac2c"
+checksum = "e0aa81c4b59868eff75688a51b87c7c4e4dda51dd367e6becab5be5a9e5d2161"
 dependencies = [
  "protobuf",
 ]

@@ -371,18 +371,18 @@ checksum = "4dccd0940a2dcdf68d092b8cbab7dc0ad8fa938bf95787e1b916b0e3d0e8e970"
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b12ea831e2424648a310338d97608060b6797816c6fe0110931067779b4ac2c"
+checksum = "e0aa81c4b59868eff75688a51b87c7c4e4dda51dd367e6becab5be5a9e5d2161"
 dependencies = [
  "protobuf",
 ]
 
 [[package]]
 name = "streamdal-wasm-detective"
-version = "0.0.37"
+version = "0.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d76465d3bb54ff1cb73dc4ca25b14c8931e2ff2ba557c7416aa19aa4181910e"
+checksum = "d3855a7f97357138aafb177d440ecbac193e1992eb76341485a46fd6cd86802a"
 dependencies = [
  "ajson",
  "bencher",

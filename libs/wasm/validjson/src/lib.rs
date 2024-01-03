@@ -29,7 +29,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     let orig_payload = wasm_request.input_payload.as_slice();
 
 
-    let str_json = match String::from_utf8(orig_payload.clone().to_vec()) {
+    let str_json = match String::from_utf8(orig_payload.to_vec()) {
         Ok(v) => v,
         Err(e) => {
             return common::write_response(
