@@ -5,9 +5,10 @@ import * as z from "zod/index.ts";
 import { validate } from "../components/form/validate.ts";
 
 export const EmailSchema = zfd.formData({
-  email: z.string().email({ message: "Must be a valid email." }).optional().or(
-    z.literal(""),
-  ),
+  email: z.string().min(1, { message: "Required" }).email({
+    message: "Must be a valid email.",
+  }),
+  decline: z.boolean().default(false),
 });
 export const EmailCollectionForm = () => {
   const [errors, setErrors] = useState<string>("");
@@ -67,9 +68,15 @@ export const EmailCollectionForm = () => {
               Submit
             </button>
           </div>
+        </form>
+        <form
+          method="post"
+          className={"flex flex-col items-center w-full"}
+        >
+          <input type="hidden" value="true" name="decline" />
           <button
             type="submit"
-            class={"btn-secondary text-web w-[350px] font-bold"}
+            className={"btn-secondary text-web w-[350px] font-bold"}
           >
             No thanks
           </button>
