@@ -53,12 +53,12 @@ impl TransformStep {
         ::std::default::Default::default()
     }
 
-    // .protos.steps.TransformReplaceValueStep replace_value_options = 101;
+    // .protos.steps.TransformReplaceValueOptions replace_value_options = 101;
 
-    pub fn replace_value_options(&self) -> &TransformReplaceValueStep {
+    pub fn replace_value_options(&self) -> &TransformReplaceValueOptions {
         match self.options {
             ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(ref v)) => v,
-            _ => <TransformReplaceValueStep as ::protobuf::Message>::default_instance(),
+            _ => <TransformReplaceValueOptions as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -74,15 +74,15 @@ impl TransformStep {
     }
 
     // Param is passed by value, moved
-    pub fn set_replace_value_options(&mut self, v: TransformReplaceValueStep) {
+    pub fn set_replace_value_options(&mut self, v: TransformReplaceValueOptions) {
         self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_replace_value_options(&mut self) -> &mut TransformReplaceValueStep {
+    pub fn mut_replace_value_options(&mut self) -> &mut TransformReplaceValueOptions {
         if let ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(_)) = self.options {
         } else {
-            self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(TransformReplaceValueStep::new()));
+            self.options = ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(TransformReplaceValueOptions::new()));
         }
         match self.options {
             ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(ref mut v)) => v,
@@ -91,23 +91,23 @@ impl TransformStep {
     }
 
     // Take field
-    pub fn take_replace_value_options(&mut self) -> TransformReplaceValueStep {
+    pub fn take_replace_value_options(&mut self) -> TransformReplaceValueOptions {
         if self.has_replace_value_options() {
             match self.options.take() {
                 ::std::option::Option::Some(transform_step::Options::ReplaceValueOptions(v)) => v,
                 _ => panic!(),
             }
         } else {
-            TransformReplaceValueStep::new()
+            TransformReplaceValueOptions::new()
         }
     }
 
-    // .protos.steps.TransformDeleteFieldStep delete_field_options = 102;
+    // .protos.steps.TransformDeleteFieldOptions delete_field_options = 102;
 
-    pub fn delete_field_options(&self) -> &TransformDeleteFieldStep {
+    pub fn delete_field_options(&self) -> &TransformDeleteFieldOptions {
         match self.options {
             ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(ref v)) => v,
-            _ => <TransformDeleteFieldStep as ::protobuf::Message>::default_instance(),
+            _ => <TransformDeleteFieldOptions as ::protobuf::Message>::default_instance(),
         }
     }
 
@@ -123,15 +123,15 @@ impl TransformStep {
     }
 
     // Param is passed by value, moved
-    pub fn set_delete_field_options(&mut self, v: TransformDeleteFieldStep) {
+    pub fn set_delete_field_options(&mut self, v: TransformDeleteFieldOptions) {
         self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_delete_field_options(&mut self) -> &mut TransformDeleteFieldStep {
+    pub fn mut_delete_field_options(&mut self) -> &mut TransformDeleteFieldOptions {
         if let ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(_)) = self.options {
         } else {
-            self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(TransformDeleteFieldStep::new()));
+            self.options = ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(TransformDeleteFieldOptions::new()));
         }
         match self.options {
             ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(ref mut v)) => v,
@@ -140,14 +140,14 @@ impl TransformStep {
     }
 
     // Take field
-    pub fn take_delete_field_options(&mut self) -> TransformDeleteFieldStep {
+    pub fn take_delete_field_options(&mut self) -> TransformDeleteFieldOptions {
         if self.has_delete_field_options() {
             match self.options.take() {
                 ::std::option::Option::Some(transform_step::Options::DeleteFieldOptions(v)) => v,
                 _ => panic!(),
             }
         } else {
-            TransformDeleteFieldStep::new()
+            TransformDeleteFieldOptions::new()
         }
     }
 
@@ -316,14 +316,14 @@ impl TransformStep {
             |m: &TransformStep| { &m.type_ },
             |m: &mut TransformStep| { &mut m.type_ },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformReplaceValueStep>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformReplaceValueOptions>(
             "replace_value_options",
             TransformStep::has_replace_value_options,
             TransformStep::replace_value_options,
             TransformStep::mut_replace_value_options,
             TransformStep::set_replace_value_options,
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformDeleteFieldStep>(
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, TransformDeleteFieldOptions>(
             "delete_field_options",
             TransformStep::has_delete_field_options,
             TransformStep::delete_field_options,
@@ -538,9 +538,9 @@ pub mod transform_step {
     // @@protoc_insertion_point(oneof:protos.steps.TransformStep.options)
     pub enum Options {
         // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.replace_value_options)
-        ReplaceValueOptions(super::TransformReplaceValueStep),
+        ReplaceValueOptions(super::TransformReplaceValueOptions),
         // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.delete_field_options)
-        DeleteFieldOptions(super::TransformDeleteFieldStep),
+        DeleteFieldOptions(super::TransformDeleteFieldOptions),
         // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.obfuscate_options)
         ObfuscateOptions(super::TransformObfuscateOptions),
         // @@protoc_insertion_point(oneof_field:protos.steps.TransformStep.mask_options)
@@ -725,25 +725,25 @@ impl ::protobuf::reflect::ProtobufValue for TransformTruncateOptions {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-// @@protoc_insertion_point(message:protos.steps.TransformDeleteFieldStep)
+// @@protoc_insertion_point(message:protos.steps.TransformDeleteFieldOptions)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct TransformDeleteFieldStep {
+pub struct TransformDeleteFieldOptions {
     // message fields
-    // @@protoc_insertion_point(field:protos.steps.TransformDeleteFieldStep.path)
+    // @@protoc_insertion_point(field:protos.steps.TransformDeleteFieldOptions.path)
     pub path: ::std::string::String,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.steps.TransformDeleteFieldStep.special_fields)
+    // @@protoc_insertion_point(special_field:protos.steps.TransformDeleteFieldOptions.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a TransformDeleteFieldStep {
-    fn default() -> &'a TransformDeleteFieldStep {
-        <TransformDeleteFieldStep as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a TransformDeleteFieldOptions {
+    fn default() -> &'a TransformDeleteFieldOptions {
+        <TransformDeleteFieldOptions as ::protobuf::Message>::default_instance()
     }
 }
 
-impl TransformDeleteFieldStep {
-    pub fn new() -> TransformDeleteFieldStep {
+impl TransformDeleteFieldOptions {
+    pub fn new() -> TransformDeleteFieldOptions {
         ::std::default::Default::default()
     }
 
@@ -752,19 +752,19 @@ impl TransformDeleteFieldStep {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
-            |m: &TransformDeleteFieldStep| { &m.path },
-            |m: &mut TransformDeleteFieldStep| { &mut m.path },
+            |m: &TransformDeleteFieldOptions| { &m.path },
+            |m: &mut TransformDeleteFieldOptions| { &mut m.path },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformDeleteFieldStep>(
-            "TransformDeleteFieldStep",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformDeleteFieldOptions>(
+            "TransformDeleteFieldOptions",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for TransformDeleteFieldStep {
-    const NAME: &'static str = "TransformDeleteFieldStep";
+impl ::protobuf::Message for TransformDeleteFieldOptions {
+    const NAME: &'static str = "TransformDeleteFieldOptions";
 
     fn is_initialized(&self) -> bool {
         true
@@ -812,8 +812,8 @@ impl ::protobuf::Message for TransformDeleteFieldStep {
         &mut self.special_fields
     }
 
-    fn new() -> TransformDeleteFieldStep {
-        TransformDeleteFieldStep::new()
+    fn new() -> TransformDeleteFieldOptions {
+        TransformDeleteFieldOptions::new()
     }
 
     fn clear(&mut self) {
@@ -821,8 +821,8 @@ impl ::protobuf::Message for TransformDeleteFieldStep {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static TransformDeleteFieldStep {
-        static instance: TransformDeleteFieldStep = TransformDeleteFieldStep {
+    fn default_instance() -> &'static TransformDeleteFieldOptions {
+        static instance: TransformDeleteFieldOptions = TransformDeleteFieldOptions {
             path: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -830,44 +830,44 @@ impl ::protobuf::Message for TransformDeleteFieldStep {
     }
 }
 
-impl ::protobuf::MessageFull for TransformDeleteFieldStep {
+impl ::protobuf::MessageFull for TransformDeleteFieldOptions {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformDeleteFieldStep").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformDeleteFieldOptions").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for TransformDeleteFieldStep {
+impl ::std::fmt::Display for TransformDeleteFieldOptions {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for TransformDeleteFieldStep {
+impl ::protobuf::reflect::ProtobufValue for TransformDeleteFieldOptions {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-// @@protoc_insertion_point(message:protos.steps.TransformReplaceValueStep)
+// @@protoc_insertion_point(message:protos.steps.TransformReplaceValueOptions)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct TransformReplaceValueStep {
+pub struct TransformReplaceValueOptions {
     // message fields
-    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueStep.path)
+    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueOptions.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueStep.value)
+    // @@protoc_insertion_point(field:protos.steps.TransformReplaceValueOptions.value)
     pub value: ::std::string::String,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.steps.TransformReplaceValueStep.special_fields)
+    // @@protoc_insertion_point(special_field:protos.steps.TransformReplaceValueOptions.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a TransformReplaceValueStep {
-    fn default() -> &'a TransformReplaceValueStep {
-        <TransformReplaceValueStep as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a TransformReplaceValueOptions {
+    fn default() -> &'a TransformReplaceValueOptions {
+        <TransformReplaceValueOptions as ::protobuf::Message>::default_instance()
     }
 }
 
-impl TransformReplaceValueStep {
-    pub fn new() -> TransformReplaceValueStep {
+impl TransformReplaceValueOptions {
+    pub fn new() -> TransformReplaceValueOptions {
         ::std::default::Default::default()
     }
 
@@ -876,24 +876,24 @@ impl TransformReplaceValueStep {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
-            |m: &TransformReplaceValueStep| { &m.path },
-            |m: &mut TransformReplaceValueStep| { &mut m.path },
+            |m: &TransformReplaceValueOptions| { &m.path },
+            |m: &mut TransformReplaceValueOptions| { &mut m.path },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "value",
-            |m: &TransformReplaceValueStep| { &m.value },
-            |m: &mut TransformReplaceValueStep| { &mut m.value },
+            |m: &TransformReplaceValueOptions| { &m.value },
+            |m: &mut TransformReplaceValueOptions| { &mut m.value },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformReplaceValueStep>(
-            "TransformReplaceValueStep",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformReplaceValueOptions>(
+            "TransformReplaceValueOptions",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for TransformReplaceValueStep {
-    const NAME: &'static str = "TransformReplaceValueStep";
+impl ::protobuf::Message for TransformReplaceValueOptions {
+    const NAME: &'static str = "TransformReplaceValueOptions";
 
     fn is_initialized(&self) -> bool {
         true
@@ -950,8 +950,8 @@ impl ::protobuf::Message for TransformReplaceValueStep {
         &mut self.special_fields
     }
 
-    fn new() -> TransformReplaceValueStep {
-        TransformReplaceValueStep::new()
+    fn new() -> TransformReplaceValueOptions {
+        TransformReplaceValueOptions::new()
     }
 
     fn clear(&mut self) {
@@ -960,8 +960,8 @@ impl ::protobuf::Message for TransformReplaceValueStep {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static TransformReplaceValueStep {
-        static instance: TransformReplaceValueStep = TransformReplaceValueStep {
+    fn default_instance() -> &'static TransformReplaceValueOptions {
+        static instance: TransformReplaceValueOptions = TransformReplaceValueOptions {
             path: ::std::string::String::new(),
             value: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
@@ -970,20 +970,20 @@ impl ::protobuf::Message for TransformReplaceValueStep {
     }
 }
 
-impl ::protobuf::MessageFull for TransformReplaceValueStep {
+impl ::protobuf::MessageFull for TransformReplaceValueOptions {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformReplaceValueStep").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("TransformReplaceValueOptions").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for TransformReplaceValueStep {
+impl ::std::fmt::Display for TransformReplaceValueOptions {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for TransformReplaceValueStep {
+impl ::protobuf::reflect::ProtobufValue for TransformReplaceValueOptions {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -1399,115 +1399,115 @@ impl TransformTruncateType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x1esteps/sp_steps_transform.proto\x12\x0cprotos.steps\"\xae\x04\n\rTr\
+    \n\x1esteps/sp_steps_transform.proto\x12\x0cprotos.steps\"\xb4\x04\n\rTr\
     ansformStep\x12\x16\n\x04path\x18\x01\x20\x01(\tR\x04pathB\x02\x18\x01\
     \x12\x18\n\x05value\x18\x02\x20\x01(\tR\x05valueB\x02\x18\x01\x12/\n\x04\
-    type\x18\x03\x20\x01(\x0e2\x1b.protos.steps.TransformTypeR\x04type\x12]\
-    \n\x15replace_value_options\x18e\x20\x01(\x0b2'.protos.steps.TransformRe\
-    placeValueStepH\0R\x13replaceValueOptions\x12Z\n\x14delete_field_options\
-    \x18f\x20\x01(\x0b2&.protos.steps.TransformDeleteFieldStepH\0R\x12delete\
-    FieldOptions\x12V\n\x11obfuscate_options\x18g\x20\x01(\x0b2'.protos.step\
-    s.TransformObfuscateOptionsH\0R\x10obfuscateOptions\x12G\n\x0cmask_optio\
-    ns\x18h\x20\x01(\x0b2\".protos.steps.TransformMaskOptionsH\0R\x0bmaskOpt\
-    ions\x12S\n\x10truncate_options\x18i\x20\x01(\x0b2&.protos.steps.Transfo\
-    rmTruncateOptionsH\0R\x0ftruncateOptionsB\t\n\x07options\"}\n\x18Transfo\
-    rmTruncateOptions\x127\n\x04type\x18\x01\x20\x01(\x0e2#.protos.steps.Tra\
-    nsformTruncateTypeR\x04type\x12\x12\n\x04path\x18\x02\x20\x01(\tR\x04pat\
-    h\x12\x14\n\x05value\x18\x03\x20\x01(\x05R\x05value\".\n\x18TransformDel\
-    eteFieldStep\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\"E\n\x19Trans\
-    formReplaceValueStep\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\
-    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"/\n\x19TransformObfuscateO\
-    ptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\">\n\x14TransformMa\
-    skOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x12\n\x04mas\
-    k\x18\x02\x20\x01(\tR\x04mask*\xd4\x01\n\rTransformType\x12\x1a\n\x16TRA\
-    NSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VALUE\x10\
-    \x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eTRANSFO\
-    RM_TYPE_OBFUSCATE_VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_VALUE\
-    \x10\x04\x12!\n\x1dTRANSFORM_TYPE_TRUNCATE_VALUE\x10\x05*\x88\x01\n\x15T\
-    ransformTruncateType\x12#\n\x1fTRANSFORM_TRUNCATE_TYPE_UNKNOWN\x10\0\x12\
-    \"\n\x1eTRANSFORM_TRUNCATE_TYPE_LENGTH\x10\x01\x12&\n\"TRANSFORM_TRUNCAT\
-    E_TYPE_PERCENTAGE\x10\x02BBZ@github.com/streamdal/streamdal/libs/protos/\
-    build/go/protos/stepsJ\xff\r\n\x06\x12\x04\0\0=\x01\n\x08\n\x01\x0c\x12\
-    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\
-    \x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\
-    \x0e\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\
-    \x12\x03\x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\
-    \x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\
-    \x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\
-    \x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\
-    \x12\x03\t\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\
-    \n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\
-    \0\x02\x03\x02\x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\
-    \n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\
-    \x04\x02\x12\x03\x0b\x1e\x1f\nC\n\x04\x05\0\x02\x05\x12\x03\x0c\x02$\"6\
-    \x20TODO:\x20type\x20for\x20delete\x20all\x20keys\x20except\x20specified\
-    \x20ones\n\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x0c\x02\x1f\n\x0c\n\x05\
-    \x05\0\x02\x05\x02\x12\x03\x0c\"#\n\n\n\x02\x04\0\x12\x04\x10\0\x1c\x01\
-    \n\n\n\x03\x04\0\x01\x12\x03\x10\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\
-    \x11\x02$\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\x02\x08\n\x0c\n\x05\
-    \x04\0\x02\0\x01\x12\x03\x11\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x11\
-    \x10\x11\n\x0c\n\x05\x04\0\x02\0\x08\x12\x03\x11\x12#\n\r\n\x06\x04\0\
-    \x02\0\x08\x03\x12\x03\x11\x13\"\n(\n\x04\x04\0\x02\x01\x12\x03\x12\x02%\
-    \"\x1b\x20Should\x20this\x20be\x20bytes?\x20~DS\n\n\x0c\n\x05\x04\0\x02\
-    \x01\x05\x12\x03\x12\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x12\t\
-    \x0e\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12\x11\x12\n\x0c\n\x05\x04\0\
-    \x02\x01\x08\x12\x03\x12\x13$\n\r\n\x06\x04\0\x02\x01\x08\x03\x12\x03\
-    \x12\x14#\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x13\x02\x19\n\x0c\n\x05\x04\
-    \0\x02\x02\x06\x12\x03\x13\x02\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
-    \x13\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x13\x17\x18\n\x0c\n\
-    \x04\x04\0\x08\0\x12\x04\x15\x02\x1b\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\
-    \x03\x15\x08\x0f\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\x04:\n\x0c\n\x05\
-    \x04\0\x02\x03\x06\x12\x03\x16\x04\x1d\n\x0c\n\x05\x04\0\x02\x03\x01\x12\
-    \x03\x16\x1e3\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1669\n\x0b\n\x04\
-    \x04\0\x02\x04\x12\x03\x17\x048\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\
-    \x17\x04\x1c\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17\x1d1\n\x0c\n\x05\
-    \x04\0\x02\x04\x03\x12\x03\x1747\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x18\
-    \x046\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x1d\n\x0c\n\x05\x04\
-    \0\x02\x05\x01\x12\x03\x18\x1e/\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\
-    \x1825\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x19\x04,\n\x0c\n\x05\x04\0\x02\
-    \x06\x06\x12\x03\x19\x04\x18\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\
-    \x19%\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x19(+\n\x0b\n\x04\x04\0\x02\
-    \x07\x12\x03\x1a\x044\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1a\x04\x1c\
-    \n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1a\x1d-\n\x0c\n\x05\x04\0\x02\
-    \x07\x03\x12\x03\x1a03\n\n\n\x02\x05\x01\x12\x04\x1e\0\"\x01\n\n\n\x03\
-    \x05\x01\x01\x12\x03\x1e\x05\x1a\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x1f\
-    \x02&\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1f\x02!\n\x0c\n\x05\x05\x01\
-    \x02\0\x02\x12\x03\x1f$%\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x20\x02%\n\
-    \x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x20\x02\x20\n\x0c\n\x05\x05\x01\
-    \x02\x01\x02\x12\x03\x20#$\n\x0b\n\x04\x05\x01\x02\x02\x12\x03!\x02)\n\
-    \x0c\n\x05\x05\x01\x02\x02\x01\x12\x03!\x02$\n\x0c\n\x05\x05\x01\x02\x02\
-    \x02\x12\x03!'(\n\n\n\x02\x04\x01\x12\x04$\0+\x01\n\n\n\x03\x04\x01\x01\
-    \x12\x03$\x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03%\x02!\n\x0c\n\x05\
-    \x04\x01\x02\0\x06\x12\x03%\x02\x17\n\x0c\n\x05\x04\x01\x02\0\x01\x12\
-    \x03%\x18\x1c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x1f\x20\n\x0b\n\x04\
-    \x04\x01\x02\x01\x12\x03'\x02\x12\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
-    \x03'\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03'\t\r\n\x0c\n\x05\
-    \x04\x01\x02\x01\x03\x12\x03'\x10\x11\nV\n\x04\x04\x01\x02\x02\x12\x03*\
-    \x02\x12\x1aI\x20Truncate\x20after\x20this\x20many\x20bytes\x20or\x20thi\
-    s\x20percentage\x20of\x20the\x20original\x20value\n\n\x0c\n\x05\x04\x01\
-    \x02\x02\x05\x12\x03*\x02\x07\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03*\
-    \x08\r\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03*\x10\x11\n\n\n\x02\x04\
-    \x02\x12\x04-\0/\x01\n\n\n\x03\x04\x02\x01\x12\x03-\x08\x20\n\x0b\n\x04\
-    \x04\x02\x02\0\x12\x03.\x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03.\
-    \x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03.\t\r\n\x0c\n\x05\x04\x02\
-    \x02\0\x03\x12\x03.\x10\x11\n\n\n\x02\x04\x03\x12\x041\04\x01\n\n\n\x03\
-    \x04\x03\x01\x12\x031\x08!\n\x0b\n\x04\x04\x03\x02\0\x12\x032\x02\x12\n\
-    \x0c\n\x05\x04\x03\x02\0\x05\x12\x032\x02\x08\n\x0c\n\x05\x04\x03\x02\0\
-    \x01\x12\x032\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x032\x10\x11\n\x0b\n\
-    \x04\x04\x03\x02\x01\x12\x033\x02\x13\n\x0c\n\x05\x04\x03\x02\x01\x05\
-    \x12\x033\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x033\t\x0e\n\x0c\n\
-    \x05\x04\x03\x02\x01\x03\x12\x033\x11\x12\n\n\n\x02\x04\x04\x12\x046\08\
-    \x01\n\n\n\x03\x04\x04\x01\x12\x036\x08!\n\x0b\n\x04\x04\x04\x02\0\x12\
-    \x037\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x037\x02\x08\n\x0c\n\x05\
-    \x04\x04\x02\0\x01\x12\x037\t\r\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x037\
-    \x10\x11\n\n\n\x02\x04\x05\x12\x04:\0=\x01\n\n\n\x03\x04\x05\x01\x12\x03\
-    :\x08\x1c\n\x0b\n\x04\x04\x05\x02\0\x12\x03;\x02\x12\n\x0c\n\x05\x04\x05\
-    \x02\0\x05\x12\x03;\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03;\t\r\n\
-    \x0c\n\x05\x04\x05\x02\0\x03\x12\x03;\x10\x11\n\x0b\n\x04\x04\x05\x02\
-    \x01\x12\x03<\x02\x12\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03<\x02\x08\n\
-    \x0c\n\x05\x04\x05\x02\x01\x01\x12\x03<\t\r\n\x0c\n\x05\x04\x05\x02\x01\
-    \x03\x12\x03<\x10\x11b\x06proto3\
+    type\x18\x03\x20\x01(\x0e2\x1b.protos.steps.TransformTypeR\x04type\x12`\
+    \n\x15replace_value_options\x18e\x20\x01(\x0b2*.protos.steps.TransformRe\
+    placeValueOptionsH\0R\x13replaceValueOptions\x12]\n\x14delete_field_opti\
+    ons\x18f\x20\x01(\x0b2).protos.steps.TransformDeleteFieldOptionsH\0R\x12\
+    deleteFieldOptions\x12V\n\x11obfuscate_options\x18g\x20\x01(\x0b2'.proto\
+    s.steps.TransformObfuscateOptionsH\0R\x10obfuscateOptions\x12G\n\x0cmask\
+    _options\x18h\x20\x01(\x0b2\".protos.steps.TransformMaskOptionsH\0R\x0bm\
+    askOptions\x12S\n\x10truncate_options\x18i\x20\x01(\x0b2&.protos.steps.T\
+    ransformTruncateOptionsH\0R\x0ftruncateOptionsB\t\n\x07options\"}\n\x18T\
+    ransformTruncateOptions\x127\n\x04type\x18\x01\x20\x01(\x0e2#.protos.ste\
+    ps.TransformTruncateTypeR\x04type\x12\x12\n\x04path\x18\x02\x20\x01(\tR\
+    \x04path\x12\x14\n\x05value\x18\x03\x20\x01(\x05R\x05value\"1\n\x1bTrans\
+    formDeleteFieldOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\"H\
+    \n\x1cTransformReplaceValueOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\
+    \x04path\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"/\n\x19Transfo\
+    rmObfuscateOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\">\n\
+    \x14TransformMaskOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\
+    \x12\x12\n\x04mask\x18\x02\x20\x01(\tR\x04mask*\xd4\x01\n\rTransformType\
+    \x12\x1a\n\x16TRANSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_R\
+    EPLACE_VALUE\x10\x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\
+    \x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_VALUE\x10\x03\x12\x1d\n\x19TRANSFOR\
+    M_TYPE_MASK_VALUE\x10\x04\x12!\n\x1dTRANSFORM_TYPE_TRUNCATE_VALUE\x10\
+    \x05*\x88\x01\n\x15TransformTruncateType\x12#\n\x1fTRANSFORM_TRUNCATE_TY\
+    PE_UNKNOWN\x10\0\x12\"\n\x1eTRANSFORM_TRUNCATE_TYPE_LENGTH\x10\x01\x12&\
+    \n\"TRANSFORM_TRUNCATE_TYPE_PERCENTAGE\x10\x02BBZ@github.com/streamdal/s\
+    treamdal/libs/protos/build/go/protos/stepsJ\xff\r\n\x06\x12\x04\0\0=\x01\
+    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\
+    \n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\
+    \0\x12\x04\x06\0\x0e\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\
+    \x04\x05\0\x02\0\x12\x03\x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\
+    \x07\x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\
+    \x05\0\x02\x01\x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\
+    \x08\x02\x1e\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\
+    \x05\0\x02\x02\x12\x03\t\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\
+    \x02\x1d\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\
+    \x02\x03\x12\x03\n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\
+    \n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\
+    \x03\x0b\x02\x20\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\
+    \n\x05\x05\0\x02\x04\x02\x12\x03\x0b\x1e\x1f\nC\n\x04\x05\0\x02\x05\x12\
+    \x03\x0c\x02$\"6\x20TODO:\x20type\x20for\x20delete\x20all\x20keys\x20exc\
+    ept\x20specified\x20ones\n\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x0c\x02\
+    \x1f\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\x0c\"#\n\n\n\x02\x04\0\x12\
+    \x04\x10\0\x1c\x01\n\n\n\x03\x04\0\x01\x12\x03\x10\x08\x15\n\x0b\n\x04\
+    \x04\0\x02\0\x12\x03\x11\x02$\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\
+    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x11\t\r\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x11\x10\x11\n\x0c\n\x05\x04\0\x02\0\x08\x12\x03\x11\
+    \x12#\n\r\n\x06\x04\0\x02\0\x08\x03\x12\x03\x11\x13\"\n(\n\x04\x04\0\x02\
+    \x01\x12\x03\x12\x02%\"\x1b\x20Should\x20this\x20be\x20bytes?\x20~DS\n\n\
+    \x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x12\x02\x08\n\x0c\n\x05\x04\0\x02\
+    \x01\x01\x12\x03\x12\t\x0e\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12\x11\
+    \x12\n\x0c\n\x05\x04\0\x02\x01\x08\x12\x03\x12\x13$\n\r\n\x06\x04\0\x02\
+    \x01\x08\x03\x12\x03\x12\x14#\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x13\x02\
+    \x19\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x13\x02\x0f\n\x0c\n\x05\x04\0\
+    \x02\x02\x01\x12\x03\x13\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\
+    \x13\x17\x18\n\x0c\n\x04\x04\0\x08\0\x12\x04\x15\x02\x1b\x03\n\x0c\n\x05\
+    \x04\0\x08\0\x01\x12\x03\x15\x08\x0f\n\x0b\n\x04\x04\0\x02\x03\x12\x03\
+    \x16\x04=\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x16\x04\x20\n\x0c\n\x05\
+    \x04\0\x02\x03\x01\x12\x03\x16!6\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\
+    \x169<\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x17\x04;\n\x0c\n\x05\x04\0\x02\
+    \x04\x06\x12\x03\x17\x04\x1f\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x17\
+    \x204\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x177:\n\x0b\n\x04\x04\0\x02\
+    \x05\x12\x03\x18\x046\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x18\x04\x1d\
+    \n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x18\x1e/\n\x0c\n\x05\x04\0\x02\
+    \x05\x03\x12\x03\x1825\n\x0b\n\x04\x04\0\x02\x06\x12\x03\x19\x04,\n\x0c\
+    \n\x05\x04\0\x02\x06\x06\x12\x03\x19\x04\x18\n\x0c\n\x05\x04\0\x02\x06\
+    \x01\x12\x03\x19\x19%\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x19(+\n\x0b\
+    \n\x04\x04\0\x02\x07\x12\x03\x1a\x044\n\x0c\n\x05\x04\0\x02\x07\x06\x12\
+    \x03\x1a\x04\x1c\n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1a\x1d-\n\x0c\n\
+    \x05\x04\0\x02\x07\x03\x12\x03\x1a03\n\n\n\x02\x05\x01\x12\x04\x1e\0\"\
+    \x01\n\n\n\x03\x05\x01\x01\x12\x03\x1e\x05\x1a\n\x0b\n\x04\x05\x01\x02\0\
+    \x12\x03\x1f\x02&\n\x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x1f\x02!\n\x0c\n\
+    \x05\x05\x01\x02\0\x02\x12\x03\x1f$%\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\
+    \x20\x02%\n\x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x20\x02\x20\n\x0c\n\
+    \x05\x05\x01\x02\x01\x02\x12\x03\x20#$\n\x0b\n\x04\x05\x01\x02\x02\x12\
+    \x03!\x02)\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03!\x02$\n\x0c\n\x05\x05\
+    \x01\x02\x02\x02\x12\x03!'(\n\n\n\x02\x04\x01\x12\x04$\0+\x01\n\n\n\x03\
+    \x04\x01\x01\x12\x03$\x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03%\x02!\n\
+    \x0c\n\x05\x04\x01\x02\0\x06\x12\x03%\x02\x17\n\x0c\n\x05\x04\x01\x02\0\
+    \x01\x12\x03%\x18\x1c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x1f\x20\n\
+    \x0b\n\x04\x04\x01\x02\x01\x12\x03'\x02\x12\n\x0c\n\x05\x04\x01\x02\x01\
+    \x05\x12\x03'\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03'\t\r\n\x0c\
+    \n\x05\x04\x01\x02\x01\x03\x12\x03'\x10\x11\nV\n\x04\x04\x01\x02\x02\x12\
+    \x03*\x02\x12\x1aI\x20Truncate\x20after\x20this\x20many\x20bytes\x20or\
+    \x20this\x20percentage\x20of\x20the\x20original\x20value\n\n\x0c\n\x05\
+    \x04\x01\x02\x02\x05\x12\x03*\x02\x07\n\x0c\n\x05\x04\x01\x02\x02\x01\
+    \x12\x03*\x08\r\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03*\x10\x11\n\n\n\
+    \x02\x04\x02\x12\x04-\0/\x01\n\n\n\x03\x04\x02\x01\x12\x03-\x08#\n\x0b\n\
+    \x04\x04\x02\x02\0\x12\x03.\x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\
+    \x03.\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03.\t\r\n\x0c\n\x05\x04\
+    \x02\x02\0\x03\x12\x03.\x10\x11\n\n\n\x02\x04\x03\x12\x041\04\x01\n\n\n\
+    \x03\x04\x03\x01\x12\x031\x08$\n\x0b\n\x04\x04\x03\x02\0\x12\x032\x02\
+    \x12\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x032\x02\x08\n\x0c\n\x05\x04\x03\
+    \x02\0\x01\x12\x032\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x032\x10\x11\n\
+    \x0b\n\x04\x04\x03\x02\x01\x12\x033\x02\x13\n\x0c\n\x05\x04\x03\x02\x01\
+    \x05\x12\x033\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x033\t\x0e\n\
+    \x0c\n\x05\x04\x03\x02\x01\x03\x12\x033\x11\x12\n\n\n\x02\x04\x04\x12\
+    \x046\08\x01\n\n\n\x03\x04\x04\x01\x12\x036\x08!\n\x0b\n\x04\x04\x04\x02\
+    \0\x12\x037\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x037\x02\x08\n\x0c\
+    \n\x05\x04\x04\x02\0\x01\x12\x037\t\r\n\x0c\n\x05\x04\x04\x02\0\x03\x12\
+    \x037\x10\x11\n\n\n\x02\x04\x05\x12\x04:\0=\x01\n\n\n\x03\x04\x05\x01\
+    \x12\x03:\x08\x1c\n\x0b\n\x04\x04\x05\x02\0\x12\x03;\x02\x12\n\x0c\n\x05\
+    \x04\x05\x02\0\x05\x12\x03;\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\
+    \x03;\t\r\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03;\x10\x11\n\x0b\n\x04\x04\
+    \x05\x02\x01\x12\x03<\x02\x12\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03<\
+    \x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03<\t\r\n\x0c\n\x05\x04\
+    \x05\x02\x01\x03\x12\x03<\x10\x11b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1528,8 +1528,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut messages = ::std::vec::Vec::with_capacity(6);
             messages.push(TransformStep::generated_message_descriptor_data());
             messages.push(TransformTruncateOptions::generated_message_descriptor_data());
-            messages.push(TransformDeleteFieldStep::generated_message_descriptor_data());
-            messages.push(TransformReplaceValueStep::generated_message_descriptor_data());
+            messages.push(TransformDeleteFieldOptions::generated_message_descriptor_data());
+            messages.push(TransformReplaceValueOptions::generated_message_descriptor_data());
             messages.push(TransformObfuscateOptions::generated_message_descriptor_data());
             messages.push(TransformMaskOptions::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(2);

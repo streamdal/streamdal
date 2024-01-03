@@ -28,15 +28,15 @@ export interface TransformStep {
     options: {
         oneofKind: "replaceValueOptions";
         /**
-         * @generated from protobuf field: protos.steps.TransformReplaceValueStep replace_value_options = 101;
+         * @generated from protobuf field: protos.steps.TransformReplaceValueOptions replace_value_options = 101;
          */
-        replaceValueOptions: TransformReplaceValueStep;
+        replaceValueOptions: TransformReplaceValueOptions;
     } | {
         oneofKind: "deleteFieldOptions";
         /**
-         * @generated from protobuf field: protos.steps.TransformDeleteFieldStep delete_field_options = 102;
+         * @generated from protobuf field: protos.steps.TransformDeleteFieldOptions delete_field_options = 102;
          */
-        deleteFieldOptions: TransformDeleteFieldStep;
+        deleteFieldOptions: TransformDeleteFieldOptions;
     } | {
         oneofKind: "obfuscateOptions";
         /**
@@ -79,18 +79,18 @@ export interface TransformTruncateOptions {
     value: number;
 }
 /**
- * @generated from protobuf message protos.steps.TransformDeleteFieldStep
+ * @generated from protobuf message protos.steps.TransformDeleteFieldOptions
  */
-export interface TransformDeleteFieldStep {
+export interface TransformDeleteFieldOptions {
     /**
      * @generated from protobuf field: string path = 1;
      */
     path: string;
 }
 /**
- * @generated from protobuf message protos.steps.TransformReplaceValueStep
+ * @generated from protobuf message protos.steps.TransformReplaceValueOptions
  */
-export interface TransformReplaceValueStep {
+export interface TransformReplaceValueOptions {
     /**
      * @generated from protobuf field: string path = 1;
      */
@@ -190,26 +190,26 @@ declare class TransformTruncateOptions$Type extends MessageType<TransformTruncat
  * @generated MessageType for protobuf message protos.steps.TransformTruncateOptions
  */
 export declare const TransformTruncateOptions: TransformTruncateOptions$Type;
-declare class TransformDeleteFieldStep$Type extends MessageType<TransformDeleteFieldStep> {
+declare class TransformDeleteFieldOptions$Type extends MessageType<TransformDeleteFieldOptions> {
     constructor();
-    create(value?: PartialMessage<TransformDeleteFieldStep>): TransformDeleteFieldStep;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformDeleteFieldStep): TransformDeleteFieldStep;
-    internalBinaryWrite(message: TransformDeleteFieldStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<TransformDeleteFieldOptions>): TransformDeleteFieldOptions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformDeleteFieldOptions): TransformDeleteFieldOptions;
+    internalBinaryWrite(message: TransformDeleteFieldOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.steps.TransformDeleteFieldStep
+ * @generated MessageType for protobuf message protos.steps.TransformDeleteFieldOptions
  */
-export declare const TransformDeleteFieldStep: TransformDeleteFieldStep$Type;
-declare class TransformReplaceValueStep$Type extends MessageType<TransformReplaceValueStep> {
+export declare const TransformDeleteFieldOptions: TransformDeleteFieldOptions$Type;
+declare class TransformReplaceValueOptions$Type extends MessageType<TransformReplaceValueOptions> {
     constructor();
-    create(value?: PartialMessage<TransformReplaceValueStep>): TransformReplaceValueStep;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformReplaceValueStep): TransformReplaceValueStep;
-    internalBinaryWrite(message: TransformReplaceValueStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<TransformReplaceValueOptions>): TransformReplaceValueOptions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformReplaceValueOptions): TransformReplaceValueOptions;
+    internalBinaryWrite(message: TransformReplaceValueOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.steps.TransformReplaceValueStep
+ * @generated MessageType for protobuf message protos.steps.TransformReplaceValueOptions
  */
-export declare const TransformReplaceValueStep: TransformReplaceValueStep$Type;
+export declare const TransformReplaceValueOptions: TransformReplaceValueOptions$Type;
 declare class TransformObfuscateOptions$Type extends MessageType<TransformObfuscateOptions> {
     constructor();
     create(value?: PartialMessage<TransformObfuscateOptions>): TransformObfuscateOptions;
