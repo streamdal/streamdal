@@ -35,15 +35,15 @@ export interface TransformStep {
     options: {
         oneofKind: "replaceValueOptions";
         /**
-         * @generated from protobuf field: protos.steps.TransformReplaceValueStep replace_value_options = 101;
+         * @generated from protobuf field: protos.steps.TransformReplaceValueOptions replace_value_options = 101;
          */
-        replaceValueOptions: TransformReplaceValueStep;
+        replaceValueOptions: TransformReplaceValueOptions;
     } | {
         oneofKind: "deleteFieldOptions";
         /**
-         * @generated from protobuf field: protos.steps.TransformDeleteFieldStep delete_field_options = 102;
+         * @generated from protobuf field: protos.steps.TransformDeleteFieldOptions delete_field_options = 102;
          */
-        deleteFieldOptions: TransformDeleteFieldStep;
+        deleteFieldOptions: TransformDeleteFieldOptions;
     } | {
         oneofKind: "obfuscateOptions";
         /**
@@ -86,18 +86,18 @@ export interface TransformTruncateOptions {
     value: number;
 }
 /**
- * @generated from protobuf message protos.steps.TransformDeleteFieldStep
+ * @generated from protobuf message protos.steps.TransformDeleteFieldOptions
  */
-export interface TransformDeleteFieldStep {
+export interface TransformDeleteFieldOptions {
     /**
      * @generated from protobuf field: string path = 1;
      */
     path: string;
 }
 /**
- * @generated from protobuf message protos.steps.TransformReplaceValueStep
+ * @generated from protobuf message protos.steps.TransformReplaceValueOptions
  */
-export interface TransformReplaceValueStep {
+export interface TransformReplaceValueOptions {
     /**
      * @generated from protobuf field: string path = 1;
      */
@@ -184,8 +184,8 @@ class TransformStep$Type extends MessageType<TransformStep> {
             { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "value", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "type", kind: "enum", T: () => ["protos.steps.TransformType", TransformType, "TRANSFORM_TYPE_"] },
-            { no: 101, name: "replace_value_options", kind: "message", oneof: "options", T: () => TransformReplaceValueStep },
-            { no: 102, name: "delete_field_options", kind: "message", oneof: "options", T: () => TransformDeleteFieldStep },
+            { no: 101, name: "replace_value_options", kind: "message", oneof: "options", T: () => TransformReplaceValueOptions },
+            { no: 102, name: "delete_field_options", kind: "message", oneof: "options", T: () => TransformDeleteFieldOptions },
             { no: 103, name: "obfuscate_options", kind: "message", oneof: "options", T: () => TransformObfuscateOptions },
             { no: 104, name: "mask_options", kind: "message", oneof: "options", T: () => TransformMaskOptions },
             { no: 105, name: "truncate_options", kind: "message", oneof: "options", T: () => TransformTruncateOptions }
@@ -212,16 +212,16 @@ class TransformStep$Type extends MessageType<TransformStep> {
                 case /* protos.steps.TransformType type */ 3:
                     message.type = reader.int32();
                     break;
-                case /* protos.steps.TransformReplaceValueStep replace_value_options */ 101:
+                case /* protos.steps.TransformReplaceValueOptions replace_value_options */ 101:
                     message.options = {
                         oneofKind: "replaceValueOptions",
-                        replaceValueOptions: TransformReplaceValueStep.internalBinaryRead(reader, reader.uint32(), options, (message.options as any).replaceValueOptions)
+                        replaceValueOptions: TransformReplaceValueOptions.internalBinaryRead(reader, reader.uint32(), options, (message.options as any).replaceValueOptions)
                     };
                     break;
-                case /* protos.steps.TransformDeleteFieldStep delete_field_options */ 102:
+                case /* protos.steps.TransformDeleteFieldOptions delete_field_options */ 102:
                     message.options = {
                         oneofKind: "deleteFieldOptions",
-                        deleteFieldOptions: TransformDeleteFieldStep.internalBinaryRead(reader, reader.uint32(), options, (message.options as any).deleteFieldOptions)
+                        deleteFieldOptions: TransformDeleteFieldOptions.internalBinaryRead(reader, reader.uint32(), options, (message.options as any).deleteFieldOptions)
                     };
                     break;
                 case /* protos.steps.TransformObfuscateOptions obfuscate_options */ 103:
@@ -263,12 +263,12 @@ class TransformStep$Type extends MessageType<TransformStep> {
         /* protos.steps.TransformType type = 3; */
         if (message.type !== 0)
             writer.tag(3, WireType.Varint).int32(message.type);
-        /* protos.steps.TransformReplaceValueStep replace_value_options = 101; */
+        /* protos.steps.TransformReplaceValueOptions replace_value_options = 101; */
         if (message.options.oneofKind === "replaceValueOptions")
-            TransformReplaceValueStep.internalBinaryWrite(message.options.replaceValueOptions, writer.tag(101, WireType.LengthDelimited).fork(), options).join();
-        /* protos.steps.TransformDeleteFieldStep delete_field_options = 102; */
+            TransformReplaceValueOptions.internalBinaryWrite(message.options.replaceValueOptions, writer.tag(101, WireType.LengthDelimited).fork(), options).join();
+        /* protos.steps.TransformDeleteFieldOptions delete_field_options = 102; */
         if (message.options.oneofKind === "deleteFieldOptions")
-            TransformDeleteFieldStep.internalBinaryWrite(message.options.deleteFieldOptions, writer.tag(102, WireType.LengthDelimited).fork(), options).join();
+            TransformDeleteFieldOptions.internalBinaryWrite(message.options.deleteFieldOptions, writer.tag(102, WireType.LengthDelimited).fork(), options).join();
         /* protos.steps.TransformObfuscateOptions obfuscate_options = 103; */
         if (message.options.oneofKind === "obfuscateOptions")
             TransformObfuscateOptions.internalBinaryWrite(message.options.obfuscateOptions, writer.tag(103, WireType.LengthDelimited).fork(), options).join();
@@ -350,20 +350,20 @@ class TransformTruncateOptions$Type extends MessageType<TransformTruncateOptions
  */
 export const TransformTruncateOptions = new TransformTruncateOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class TransformDeleteFieldStep$Type extends MessageType<TransformDeleteFieldStep> {
+class TransformDeleteFieldOptions$Type extends MessageType<TransformDeleteFieldOptions> {
     constructor() {
-        super("protos.steps.TransformDeleteFieldStep", [
+        super("protos.steps.TransformDeleteFieldOptions", [
             { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
-    create(value?: PartialMessage<TransformDeleteFieldStep>): TransformDeleteFieldStep {
+    create(value?: PartialMessage<TransformDeleteFieldOptions>): TransformDeleteFieldOptions {
         const message = { path: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<TransformDeleteFieldStep>(this, message, value);
+            reflectionMergePartial<TransformDeleteFieldOptions>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformDeleteFieldStep): TransformDeleteFieldStep {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformDeleteFieldOptions): TransformDeleteFieldOptions {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -382,7 +382,7 @@ class TransformDeleteFieldStep$Type extends MessageType<TransformDeleteFieldStep
         }
         return message;
     }
-    internalBinaryWrite(message: TransformDeleteFieldStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: TransformDeleteFieldOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string path = 1; */
         if (message.path !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.path);
@@ -393,25 +393,25 @@ class TransformDeleteFieldStep$Type extends MessageType<TransformDeleteFieldStep
     }
 }
 /**
- * @generated MessageType for protobuf message protos.steps.TransformDeleteFieldStep
+ * @generated MessageType for protobuf message protos.steps.TransformDeleteFieldOptions
  */
-export const TransformDeleteFieldStep = new TransformDeleteFieldStep$Type();
+export const TransformDeleteFieldOptions = new TransformDeleteFieldOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class TransformReplaceValueStep$Type extends MessageType<TransformReplaceValueStep> {
+class TransformReplaceValueOptions$Type extends MessageType<TransformReplaceValueOptions> {
     constructor() {
-        super("protos.steps.TransformReplaceValueStep", [
+        super("protos.steps.TransformReplaceValueOptions", [
             { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "value", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
-    create(value?: PartialMessage<TransformReplaceValueStep>): TransformReplaceValueStep {
+    create(value?: PartialMessage<TransformReplaceValueOptions>): TransformReplaceValueOptions {
         const message = { path: "", value: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<TransformReplaceValueStep>(this, message, value);
+            reflectionMergePartial<TransformReplaceValueOptions>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformReplaceValueStep): TransformReplaceValueStep {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformReplaceValueOptions): TransformReplaceValueOptions {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -433,7 +433,7 @@ class TransformReplaceValueStep$Type extends MessageType<TransformReplaceValueSt
         }
         return message;
     }
-    internalBinaryWrite(message: TransformReplaceValueStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: TransformReplaceValueOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string path = 1; */
         if (message.path !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.path);
@@ -447,9 +447,9 @@ class TransformReplaceValueStep$Type extends MessageType<TransformReplaceValueSt
     }
 }
 /**
- * @generated MessageType for protobuf message protos.steps.TransformReplaceValueStep
+ * @generated MessageType for protobuf message protos.steps.TransformReplaceValueOptions
  */
-export const TransformReplaceValueStep = new TransformReplaceValueStep$Type();
+export const TransformReplaceValueOptions = new TransformReplaceValueOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class TransformObfuscateOptions$Type extends MessageType<TransformObfuscateOptions> {
     constructor() {

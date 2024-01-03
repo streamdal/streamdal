@@ -20,8 +20,8 @@ message TransformStep {
   TransformType type = 3;
 
   oneof options {
-    TransformReplaceValueStep replace_value_options = 101;
-    TransformDeleteFieldStep delete_field_options = 102;
+    TransformReplaceValueOptions replace_value_options = 101;
+    TransformDeleteFieldOptions delete_field_options = 102;
     TransformObfuscateOptions obfuscate_options = 103;
     TransformMaskOptions mask_options = 104;
     TransformTruncateOptions truncate_options = 105;
@@ -43,11 +43,11 @@ message TransformTruncateOptions {
   int32 value = 3;
 }
 
-message TransformDeleteFieldStep {
+message TransformDeleteFieldOptions {
   string path = 1;
 }
 
-message TransformReplaceValueStep {
+message TransformReplaceValueOptions {
   string path = 1;
   string value = 2;
 }

@@ -326,10 +326,10 @@ class TransformStep(betterproto.Message):
     path: str = betterproto.string_field(1)
     value: str = betterproto.string_field(2)
     type: "TransformType" = betterproto.enum_field(3)
-    replace_value_options: "TransformReplaceValueStep" = betterproto.message_field(
+    replace_value_options: "TransformReplaceValueOptions" = betterproto.message_field(
         101, group="options"
     )
-    delete_field_options: "TransformDeleteFieldStep" = betterproto.message_field(
+    delete_field_options: "TransformDeleteFieldOptions" = betterproto.message_field(
         102, group="options"
     )
     obfuscate_options: "TransformObfuscateOptions" = betterproto.message_field(
@@ -361,12 +361,12 @@ class TransformTruncateOptions(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class TransformDeleteFieldStep(betterproto.Message):
+class TransformDeleteFieldOptions(betterproto.Message):
     path: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class TransformReplaceValueStep(betterproto.Message):
+class TransformReplaceValueOptions(betterproto.Message):
     path: str = betterproto.string_field(1)
     value: str = betterproto.string_field(2)
 
