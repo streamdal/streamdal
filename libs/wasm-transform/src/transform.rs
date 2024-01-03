@@ -53,15 +53,23 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
     let value = gjson::get(data_as_str, req.path.as_str());
     let length_of_field = gjson::get(data_as_str, req.path.as_str()).to_string().len();
 
-    let truncate_length = match &truncate_options.truncate_type {
+    let mut truncate_length = match &truncate_options.truncate_type {
         #[allow(clippy::clone_on_copy)]
-        TruncateType::Chars => length_of_field - truncate_options.length.clone(),
+        TruncateType::Chars => {
+            if truncate_options.length > length_of_field {
+                length_of_field
+            } else {
+                length_of_field - truncate_options.length.clone()
+            }
+        },
         TruncateType::Percent => {
             let my_usize_reference = 100.0 - &truncate_options.length.value_as::<f64>().unwrap_or(0.0);
             let num_chars_to_keep: f64 = length_of_field as f64 * (my_usize_reference / 100.0);
             num_chars_to_keep.round() as usize
         },
     };
+
+    truncate_length = truncate_length.clamp(0, length_of_field);
 
     match value.kind() {
         gjson::Kind::String => _truncate(data_as_str, req.path.as_str(), &truncate_length),
@@ -322,6 +330,30 @@ mod tests {
         // path not a string
         req.path = "bool".to_string();
         assert!(truncate(&req).is_err());
+    }
+
+    #[test]
+    fn test_truncate_chars_over_length() {
+        let req = Request {
+            data: TEST_DATA.as_bytes().to_vec(),
+            path: "baz.qux".to_string(),
+            value: "".to_string(), // needs a default
+            truncate_options: Some(TruncateOptions{
+                length: 5,
+                truncate_type: TruncateType::Chars,
+            }),
+        };
+
+        let result = truncate(&req).unwrap();
+
+        assert!(gjson::valid(TEST_DATA));
+        assert!(gjson::valid(&result));
+
+        let v = gjson::get(TEST_DATA, "baz.qux");
+        assert_eq!(v.str(), "quux");
+
+        let v = gjson::get(result.as_str(), "baz.qux");
+        assert_eq!(v.str(), "");
     }
 
     #[test]
