@@ -2,6 +2,7 @@ package streamdal
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"sync"
 
@@ -236,7 +237,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
 
-			// Check that we don' find it
+			// Check that we don't find it
 			req.InputPayload = []byte(`{"object": {"type": "streamdal", "cc_num": "1234"}}`)
 
 			data, err = proto.Marshal(req)
@@ -252,6 +253,147 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
 		})
+	})
 
+	Context("transform", func() {
+		var req *protos.WASMRequest
+		var s *Streamdal
+
+		BeforeEach(func() {
+			s = &Streamdal{
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines:    map[string]map[string]*protos.Command{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+			}
+
+			req = &protos.WASMRequest{
+				Step: &protos.PipelineStep{
+					Step:          nil,
+					XWasmId:       stringPtr(uuid.New().String()),
+					XWasmFunction: stringPtr("f"),
+					XWasmBytes:    nil,
+				},
+				InputPayload: []byte(`{"object": {"type": "streamdal", "cc_num": "1234"}}`),
+			}
+		})
+
+		It("modifies a field value", func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = wasmData
+
+			req.Step.Step = &protos.PipelineStep_Transform{
+				Transform: &steps.TransformStep{
+					Type: steps.TransformType_TRANSFORM_TYPE_REPLACE_VALUE,
+					Options: &steps.TransformStep_ReplaceValueOptions{
+						ReplaceValueOptions: &steps.TransformReplaceValueStep{
+							Path:  "object.type",
+							Value: "\"testing\"",
+						},
+					},
+				},
+			}
+
+			f, err := s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+
+			resultJSON := map[string]interface{}{}
+			err = json.Unmarshal(wasmResp.OutputPayload, &resultJSON)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resultJSON["object"].(map[string]interface{})["type"]).To(Equal("testing"))
+		})
+
+		It("deletes a field", func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = wasmData
+
+			req.Step.Step = &protos.PipelineStep_Transform{
+				Transform: &steps.TransformStep{
+					Type: steps.TransformType_TRANSFORM_TYPE_DELETE_FIELD,
+					Options: &steps.TransformStep_DeleteFieldOptions{
+						DeleteFieldOptions: &steps.TransformDeleteFieldStep{
+							Path: "object.type",
+						},
+					},
+				},
+			}
+
+			f, err := s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"cc_num": "1234"}}`))
+		})
+
+		It("truncates a field by total length", func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = wasmData
+
+			req.Step.Step = &protos.PipelineStep_Transform{
+				Transform: &steps.TransformStep{
+					Type: steps.TransformType_TRANSFORM_TYPE_TRUNCATE_VALUE,
+					Options: &steps.TransformStep_TruncateOptions{
+						TruncateOptions: &steps.TransformTruncateOptions{
+							Path:  "object.type",
+							Type:  steps.TransformTruncateType_TRANSFORM_TRUNCATE_TYPE_LENGTH,
+							Value: 3,
+						},
+					},
+				},
+			}
+
+			f, err := s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
+		})
 	})
 })
