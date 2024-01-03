@@ -572,6 +572,8 @@ pub struct TransformTruncateOptions {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.TransformTruncateOptions.type)
     pub type_: ::protobuf::EnumOrUnknown<TransformTruncateType>,
+    // @@protoc_insertion_point(field:protos.steps.TransformTruncateOptions.path)
+    pub path: ::std::string::String,
     ///  Truncate after this many bytes or this percentage of the original value
     // @@protoc_insertion_point(field:protos.steps.TransformTruncateOptions.value)
     pub value: i32,
@@ -592,12 +594,17 @@ impl TransformTruncateOptions {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
             |m: &TransformTruncateOptions| { &m.type_ },
             |m: &mut TransformTruncateOptions| { &mut m.type_ },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "path",
+            |m: &TransformTruncateOptions| { &m.path },
+            |m: &mut TransformTruncateOptions| { &mut m.path },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "value",
@@ -625,7 +632,10 @@ impl ::protobuf::Message for TransformTruncateOptions {
                 8 => {
                     self.type_ = is.read_enum_or_unknown()?;
                 },
-                16 => {
+                18 => {
+                    self.path = is.read_string()?;
+                },
+                24 => {
                     self.value = is.read_int32()?;
                 },
                 tag => {
@@ -643,8 +653,11 @@ impl ::protobuf::Message for TransformTruncateOptions {
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN) {
             my_size += ::protobuf::rt::int32_size(1, self.type_.value());
         }
+        if !self.path.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.path);
+        }
         if self.value != 0 {
-            my_size += ::protobuf::rt::int32_size(2, self.value);
+            my_size += ::protobuf::rt::int32_size(3, self.value);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -655,8 +668,11 @@ impl ::protobuf::Message for TransformTruncateOptions {
         if self.type_ != ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN) {
             os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.type_))?;
         }
+        if !self.path.is_empty() {
+            os.write_string(2, &self.path)?;
+        }
         if self.value != 0 {
-            os.write_int32(2, self.value)?;
+            os.write_int32(3, self.value)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -676,6 +692,7 @@ impl ::protobuf::Message for TransformTruncateOptions {
 
     fn clear(&mut self) {
         self.type_ = ::protobuf::EnumOrUnknown::new(TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_UNKNOWN);
+        self.path.clear();
         self.value = 0;
         self.special_fields.clear();
     }
@@ -683,6 +700,7 @@ impl ::protobuf::Message for TransformTruncateOptions {
     fn default_instance() -> &'static TransformTruncateOptions {
         static instance: TransformTruncateOptions = TransformTruncateOptions {
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
+            path: ::std::string::String::new(),
             value: 0,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -975,8 +993,6 @@ pub struct TransformObfuscateOptions {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.TransformObfuscateOptions.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.steps.TransformObfuscateOptions.value)
-    pub value: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.TransformObfuscateOptions.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -994,17 +1010,12 @@ impl TransformObfuscateOptions {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
             |m: &TransformObfuscateOptions| { &m.path },
             |m: &mut TransformObfuscateOptions| { &mut m.path },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "value",
-            |m: &TransformObfuscateOptions| { &m.value },
-            |m: &mut TransformObfuscateOptions| { &mut m.value },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<TransformObfuscateOptions>(
             "TransformObfuscateOptions",
@@ -1027,9 +1038,6 @@ impl ::protobuf::Message for TransformObfuscateOptions {
                 10 => {
                     self.path = is.read_string()?;
                 },
-                18 => {
-                    self.value = is.read_string()?;
-                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -1045,9 +1053,6 @@ impl ::protobuf::Message for TransformObfuscateOptions {
         if !self.path.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.path);
         }
-        if !self.value.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.value);
-        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -1056,9 +1061,6 @@ impl ::protobuf::Message for TransformObfuscateOptions {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if !self.path.is_empty() {
             os.write_string(1, &self.path)?;
-        }
-        if !self.value.is_empty() {
-            os.write_string(2, &self.value)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1078,14 +1080,12 @@ impl ::protobuf::Message for TransformObfuscateOptions {
 
     fn clear(&mut self) {
         self.path.clear();
-        self.value.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static TransformObfuscateOptions {
         static instance: TransformObfuscateOptions = TransformObfuscateOptions {
             path: ::std::string::String::new(),
-            value: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1115,8 +1115,6 @@ pub struct TransformMaskOptions {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.path)
     pub path: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.value)
-    pub value: ::std::string::String,
     // @@protoc_insertion_point(field:protos.steps.TransformMaskOptions.mask)
     pub mask: ::std::string::String,
     // special fields
@@ -1136,17 +1134,12 @@ impl TransformMaskOptions {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "path",
             |m: &TransformMaskOptions| { &m.path },
             |m: &mut TransformMaskOptions| { &mut m.path },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "value",
-            |m: &TransformMaskOptions| { &m.value },
-            |m: &mut TransformMaskOptions| { &mut m.value },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "mask",
@@ -1175,9 +1168,6 @@ impl ::protobuf::Message for TransformMaskOptions {
                     self.path = is.read_string()?;
                 },
                 18 => {
-                    self.value = is.read_string()?;
-                },
-                26 => {
                     self.mask = is.read_string()?;
                 },
                 tag => {
@@ -1195,11 +1185,8 @@ impl ::protobuf::Message for TransformMaskOptions {
         if !self.path.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.path);
         }
-        if !self.value.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.value);
-        }
         if !self.mask.is_empty() {
-            my_size += ::protobuf::rt::string_size(3, &self.mask);
+            my_size += ::protobuf::rt::string_size(2, &self.mask);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -1210,11 +1197,8 @@ impl ::protobuf::Message for TransformMaskOptions {
         if !self.path.is_empty() {
             os.write_string(1, &self.path)?;
         }
-        if !self.value.is_empty() {
-            os.write_string(2, &self.value)?;
-        }
         if !self.mask.is_empty() {
-            os.write_string(3, &self.mask)?;
+            os.write_string(2, &self.mask)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1234,7 +1218,6 @@ impl ::protobuf::Message for TransformMaskOptions {
 
     fn clear(&mut self) {
         self.path.clear();
-        self.value.clear();
         self.mask.clear();
         self.special_fields.clear();
     }
@@ -1242,7 +1225,6 @@ impl ::protobuf::Message for TransformMaskOptions {
     fn default_instance() -> &'static TransformMaskOptions {
         static instance: TransformMaskOptions = TransformMaskOptions {
             path: ::std::string::String::new(),
-            value: ::std::string::String::new(),
             mask: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -1428,52 +1410,51 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     s.TransformObfuscateOptionsH\0R\x10obfuscateOptions\x12G\n\x0cmask_optio\
     ns\x18h\x20\x01(\x0b2\".protos.steps.TransformMaskOptionsH\0R\x0bmaskOpt\
     ions\x12S\n\x10truncate_options\x18i\x20\x01(\x0b2&.protos.steps.Transfo\
-    rmTruncateOptionsH\0R\x0ftruncateOptionsB\t\n\x07options\"i\n\x18Transfo\
+    rmTruncateOptionsH\0R\x0ftruncateOptionsB\t\n\x07options\"}\n\x18Transfo\
     rmTruncateOptions\x127\n\x04type\x18\x01\x20\x01(\x0e2#.protos.steps.Tra\
-    nsformTruncateTypeR\x04type\x12\x14\n\x05value\x18\x02\x20\x01(\x05R\x05\
-    value\".\n\x18TransformDeleteFieldStep\x12\x12\n\x04path\x18\x01\x20\x01\
-    (\tR\x04path\"E\n\x19TransformReplaceValueStep\x12\x12\n\x04path\x18\x01\
-    \x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"E\
-    \n\x19TransformObfuscateOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\
-    \x04path\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"T\n\x14Transfo\
-    rmMaskOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x14\n\
-    \x05value\x18\x02\x20\x01(\tR\x05value\x12\x12\n\x04mask\x18\x03\x20\x01\
-    (\tR\x04mask*\xd4\x01\n\rTransformType\x12\x1a\n\x16TRANSFORM_TYPE_UNKNO\
-    WN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VALUE\x10\x01\x12\x1f\n\x1b\
-    TRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eTRANSFORM_TYPE_OBFUSCATE_\
-    VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_VALUE\x10\x04\x12!\n\x1dT\
-    RANSFORM_TYPE_TRUNCATE_VALUE\x10\x05*\x88\x01\n\x15TransformTruncateType\
-    \x12#\n\x1fTRANSFORM_TRUNCATE_TYPE_UNKNOWN\x10\0\x12\"\n\x1eTRANSFORM_TR\
-    UNCATE_TYPE_LENGTH\x10\x01\x12&\n\"TRANSFORM_TRUNCATE_TYPE_PERCENTAGE\
-    \x10\x02BBZ@github.com/streamdal/streamdal/libs/protos/build/go/protos/s\
-    tepsJ\xb6\x0e\n\x06\x12\x04\0\0=\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
-    \x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\
-    \x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\x0e\x01\n\n\n\
-    \x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\
-    \x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\
-    \x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\x0c\n\x05\x05\
-    \0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\x12\x03\t\x02\"\
-    \n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\
-    \x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\x02%\n\x0c\n\
-    \x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\0\x02\x03\x02\
-    \x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\n\x0c\n\x05\
-    \x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\x04\x02\x12\
-    \x03\x0b\x1e\x1f\nC\n\x04\x05\0\x02\x05\x12\x03\x0c\x02$\"6\x20TODO:\x20\
-    type\x20for\x20delete\x20all\x20keys\x20except\x20specified\x20ones\n\n\
-    \x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x0c\x02\x1f\n\x0c\n\x05\x05\0\x02\
-    \x05\x02\x12\x03\x0c\"#\n\n\n\x02\x04\0\x12\x04\x10\0\x1c\x01\n\n\n\x03\
-    \x04\0\x01\x12\x03\x10\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\x11\x02$\
-    \n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\x02\x08\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\x11\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x11\x10\x11\n\
-    \x0c\n\x05\x04\0\x02\0\x08\x12\x03\x11\x12#\n\r\n\x06\x04\0\x02\0\x08\
-    \x03\x12\x03\x11\x13\"\n(\n\x04\x04\0\x02\x01\x12\x03\x12\x02%\"\x1b\x20\
-    Should\x20this\x20be\x20bytes?\x20~DS\n\n\x0c\n\x05\x04\0\x02\x01\x05\
-    \x12\x03\x12\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x12\t\x0e\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12\x11\x12\n\x0c\n\x05\x04\0\x02\
-    \x01\x08\x12\x03\x12\x13$\n\r\n\x06\x04\0\x02\x01\x08\x03\x12\x03\x12\
-    \x14#\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x13\x02\x19\n\x0c\n\x05\x04\0\
-    \x02\x02\x06\x12\x03\x13\x02\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    nsformTruncateTypeR\x04type\x12\x12\n\x04path\x18\x02\x20\x01(\tR\x04pat\
+    h\x12\x14\n\x05value\x18\x03\x20\x01(\x05R\x05value\".\n\x18TransformDel\
+    eteFieldStep\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\"E\n\x19Trans\
+    formReplaceValueStep\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\
+    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value\"/\n\x19TransformObfuscateO\
+    ptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\">\n\x14TransformMa\
+    skOptions\x12\x12\n\x04path\x18\x01\x20\x01(\tR\x04path\x12\x12\n\x04mas\
+    k\x18\x02\x20\x01(\tR\x04mask*\xd4\x01\n\rTransformType\x12\x1a\n\x16TRA\
+    NSFORM_TYPE_UNKNOWN\x10\0\x12\x20\n\x1cTRANSFORM_TYPE_REPLACE_VALUE\x10\
+    \x01\x12\x1f\n\x1bTRANSFORM_TYPE_DELETE_FIELD\x10\x02\x12\"\n\x1eTRANSFO\
+    RM_TYPE_OBFUSCATE_VALUE\x10\x03\x12\x1d\n\x19TRANSFORM_TYPE_MASK_VALUE\
+    \x10\x04\x12!\n\x1dTRANSFORM_TYPE_TRUNCATE_VALUE\x10\x05*\x88\x01\n\x15T\
+    ransformTruncateType\x12#\n\x1fTRANSFORM_TRUNCATE_TYPE_UNKNOWN\x10\0\x12\
+    \"\n\x1eTRANSFORM_TRUNCATE_TYPE_LENGTH\x10\x01\x12&\n\"TRANSFORM_TRUNCAT\
+    E_TYPE_PERCENTAGE\x10\x02BBZ@github.com/streamdal/streamdal/libs/protos/\
+    build/go/protos/stepsJ\xff\r\n\x06\x12\x04\0\0=\x01\n\x08\n\x01\x0c\x12\
+    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\
+    \x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\
+    \x0e\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\x04\x05\0\x02\0\
+    \x12\x03\x07\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x18\n\
+    \x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x1b\x1c\n\x0b\n\x04\x05\0\x02\x01\
+    \x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x1e\n\
+    \x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08!\"\n\x0b\n\x04\x05\0\x02\x02\
+    \x12\x03\t\x02\"\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x1d\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03\t\x20!\n\x0b\n\x04\x05\0\x02\x03\x12\x03\
+    \n\x02%\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x20\n\x0c\n\x05\x05\
+    \0\x02\x03\x02\x12\x03\n#$\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0b\x02\x20\
+    \n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x0b\x02\x1b\n\x0c\n\x05\x05\0\x02\
+    \x04\x02\x12\x03\x0b\x1e\x1f\nC\n\x04\x05\0\x02\x05\x12\x03\x0c\x02$\"6\
+    \x20TODO:\x20type\x20for\x20delete\x20all\x20keys\x20except\x20specified\
+    \x20ones\n\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x0c\x02\x1f\n\x0c\n\x05\
+    \x05\0\x02\x05\x02\x12\x03\x0c\"#\n\n\n\x02\x04\0\x12\x04\x10\0\x1c\x01\
+    \n\n\n\x03\x04\0\x01\x12\x03\x10\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03\
+    \x11\x02$\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x11\x02\x08\n\x0c\n\x05\
+    \x04\0\x02\0\x01\x12\x03\x11\t\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x11\
+    \x10\x11\n\x0c\n\x05\x04\0\x02\0\x08\x12\x03\x11\x12#\n\r\n\x06\x04\0\
+    \x02\0\x08\x03\x12\x03\x11\x13\"\n(\n\x04\x04\0\x02\x01\x12\x03\x12\x02%\
+    \"\x1b\x20Should\x20this\x20be\x20bytes?\x20~DS\n\n\x0c\n\x05\x04\0\x02\
+    \x01\x05\x12\x03\x12\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x12\t\
+    \x0e\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12\x11\x12\n\x0c\n\x05\x04\0\
+    \x02\x01\x08\x12\x03\x12\x13$\n\r\n\x06\x04\0\x02\x01\x08\x03\x12\x03\
+    \x12\x14#\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x13\x02\x19\n\x0c\n\x05\x04\
+    \0\x02\x02\x06\x12\x03\x13\x02\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
     \x13\x10\x14\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x13\x17\x18\n\x0c\n\
     \x04\x04\0\x08\0\x12\x04\x15\x02\x1b\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\
     \x03\x15\x08\x0f\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\x04:\n\x0c\n\x05\
@@ -1496,40 +1477,37 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x0c\n\x05\x05\x01\x02\x01\x01\x12\x03\x20\x02\x20\n\x0c\n\x05\x05\x01\
     \x02\x01\x02\x12\x03\x20#$\n\x0b\n\x04\x05\x01\x02\x02\x12\x03!\x02)\n\
     \x0c\n\x05\x05\x01\x02\x02\x01\x12\x03!\x02$\n\x0c\n\x05\x05\x01\x02\x02\
-    \x02\x12\x03!'(\n\n\n\x02\x04\x01\x12\x04$\0)\x01\n\n\n\x03\x04\x01\x01\
+    \x02\x12\x03!'(\n\n\n\x02\x04\x01\x12\x04$\0+\x01\n\n\n\x03\x04\x01\x01\
     \x12\x03$\x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03%\x02!\n\x0c\n\x05\
     \x04\x01\x02\0\x06\x12\x03%\x02\x17\n\x0c\n\x05\x04\x01\x02\0\x01\x12\
-    \x03%\x18\x1c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x1f\x20\nV\n\x04\
-    \x04\x01\x02\x01\x12\x03(\x02\x12\x1aI\x20Truncate\x20after\x20this\x20m\
-    any\x20bytes\x20or\x20this\x20percentage\x20of\x20the\x20original\x20val\
-    ue\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03(\x02\x07\n\x0c\n\x05\x04\
-    \x01\x02\x01\x01\x12\x03(\x08\r\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03(\
-    \x10\x11\n\n\n\x02\x04\x02\x12\x04+\0-\x01\n\n\n\x03\x04\x02\x01\x12\x03\
-    +\x08\x20\n\x0b\n\x04\x04\x02\x02\0\x12\x03,\x02\x12\n\x0c\n\x05\x04\x02\
-    \x02\0\x05\x12\x03,\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03,\t\r\n\
-    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03,\x10\x11\n\n\n\x02\x04\x03\x12\x04/\
-    \02\x01\n\n\n\x03\x04\x03\x01\x12\x03/\x08!\n\x0b\n\x04\x04\x03\x02\0\
-    \x12\x030\x02\x12\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x030\x02\x08\n\x0c\n\
-    \x05\x04\x03\x02\0\x01\x12\x030\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\
-    \x030\x10\x11\n\x0b\n\x04\x04\x03\x02\x01\x12\x031\x02\x13\n\x0c\n\x05\
-    \x04\x03\x02\x01\x05\x12\x031\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\
-    \x12\x031\t\x0e\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x031\x11\x12\n\n\n\
-    \x02\x04\x04\x12\x044\07\x01\n\n\n\x03\x04\x04\x01\x12\x034\x08!\n\x0b\n\
-    \x04\x04\x04\x02\0\x12\x035\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x05\x12\
-    \x035\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x035\t\r\n\x0c\n\x05\x04\
-    \x04\x02\0\x03\x12\x035\x10\x11\n\x0b\n\x04\x04\x04\x02\x01\x12\x036\x02\
-    \x13\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x036\x02\x08\n\x0c\n\x05\x04\
-    \x04\x02\x01\x01\x12\x036\t\x0e\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x036\
-    \x11\x12\n\n\n\x02\x04\x05\x12\x049\0=\x01\n\n\n\x03\x04\x05\x01\x12\x03\
-    9\x08\x1c\n\x0b\n\x04\x04\x05\x02\0\x12\x03:\x02\x12\n\x0c\n\x05\x04\x05\
-    \x02\0\x05\x12\x03:\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03:\t\r\n\
-    \x0c\n\x05\x04\x05\x02\0\x03\x12\x03:\x10\x11\n\x0b\n\x04\x04\x05\x02\
-    \x01\x12\x03;\x02\x13\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03;\x02\x08\n\
-    \x0c\n\x05\x04\x05\x02\x01\x01\x12\x03;\t\x0e\n\x0c\n\x05\x04\x05\x02\
-    \x01\x03\x12\x03;\x11\x12\n\x0b\n\x04\x04\x05\x02\x02\x12\x03<\x02\x12\n\
-    \x0c\n\x05\x04\x05\x02\x02\x05\x12\x03<\x02\x08\n\x0c\n\x05\x04\x05\x02\
-    \x02\x01\x12\x03<\t\r\n\x0c\n\x05\x04\x05\x02\x02\x03\x12\x03<\x10\x11b\
-    \x06proto3\
+    \x03%\x18\x1c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03%\x1f\x20\n\x0b\n\x04\
+    \x04\x01\x02\x01\x12\x03'\x02\x12\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\
+    \x03'\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03'\t\r\n\x0c\n\x05\
+    \x04\x01\x02\x01\x03\x12\x03'\x10\x11\nV\n\x04\x04\x01\x02\x02\x12\x03*\
+    \x02\x12\x1aI\x20Truncate\x20after\x20this\x20many\x20bytes\x20or\x20thi\
+    s\x20percentage\x20of\x20the\x20original\x20value\n\n\x0c\n\x05\x04\x01\
+    \x02\x02\x05\x12\x03*\x02\x07\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03*\
+    \x08\r\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03*\x10\x11\n\n\n\x02\x04\
+    \x02\x12\x04-\0/\x01\n\n\n\x03\x04\x02\x01\x12\x03-\x08\x20\n\x0b\n\x04\
+    \x04\x02\x02\0\x12\x03.\x02\x12\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03.\
+    \x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03.\t\r\n\x0c\n\x05\x04\x02\
+    \x02\0\x03\x12\x03.\x10\x11\n\n\n\x02\x04\x03\x12\x041\04\x01\n\n\n\x03\
+    \x04\x03\x01\x12\x031\x08!\n\x0b\n\x04\x04\x03\x02\0\x12\x032\x02\x12\n\
+    \x0c\n\x05\x04\x03\x02\0\x05\x12\x032\x02\x08\n\x0c\n\x05\x04\x03\x02\0\
+    \x01\x12\x032\t\r\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x032\x10\x11\n\x0b\n\
+    \x04\x04\x03\x02\x01\x12\x033\x02\x13\n\x0c\n\x05\x04\x03\x02\x01\x05\
+    \x12\x033\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x033\t\x0e\n\x0c\n\
+    \x05\x04\x03\x02\x01\x03\x12\x033\x11\x12\n\n\n\x02\x04\x04\x12\x046\08\
+    \x01\n\n\n\x03\x04\x04\x01\x12\x036\x08!\n\x0b\n\x04\x04\x04\x02\0\x12\
+    \x037\x02\x12\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x037\x02\x08\n\x0c\n\x05\
+    \x04\x04\x02\0\x01\x12\x037\t\r\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x037\
+    \x10\x11\n\n\n\x02\x04\x05\x12\x04:\0=\x01\n\n\n\x03\x04\x05\x01\x12\x03\
+    :\x08\x1c\n\x0b\n\x04\x04\x05\x02\0\x12\x03;\x02\x12\n\x0c\n\x05\x04\x05\
+    \x02\0\x05\x12\x03;\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03;\t\r\n\
+    \x0c\n\x05\x04\x05\x02\0\x03\x12\x03;\x10\x11\n\x0b\n\x04\x04\x05\x02\
+    \x01\x12\x03<\x02\x12\n\x0c\n\x05\x04\x05\x02\x01\x05\x12\x03<\x02\x08\n\
+    \x0c\n\x05\x04\x05\x02\x01\x01\x12\x03<\t\r\n\x0c\n\x05\x04\x05\x02\x01\
+    \x03\x12\x03<\x10\x11b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

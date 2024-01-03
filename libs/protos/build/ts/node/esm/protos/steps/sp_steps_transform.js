@@ -169,11 +169,12 @@ class TransformTruncateOptions$Type extends MessageType {
     constructor() {
         super("protos.steps.TransformTruncateOptions", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.TransformTruncateType", TransformTruncateType, "TRANSFORM_TRUNCATE_TYPE_"] },
-            { no: 2, name: "value", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "value", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0, value: 0 };
+        const message = { type: 0, path: "", value: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -187,7 +188,10 @@ class TransformTruncateOptions$Type extends MessageType {
                 case /* protos.steps.TransformTruncateType type */ 1:
                     message.type = reader.int32();
                     break;
-                case /* int32 value */ 2:
+                case /* string path */ 2:
+                    message.path = reader.string();
+                    break;
+                case /* int32 value */ 3:
                     message.value = reader.int32();
                     break;
                 default:
@@ -205,9 +209,12 @@ class TransformTruncateOptions$Type extends MessageType {
         /* protos.steps.TransformTruncateType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
-        /* int32 value = 2; */
+        /* string path = 2; */
+        if (message.path !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.path);
+        /* int32 value = 3; */
         if (message.value !== 0)
-            writer.tag(2, WireType.Varint).int32(message.value);
+            writer.tag(3, WireType.Varint).int32(message.value);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -323,12 +330,11 @@ export const TransformReplaceValueStep = new TransformReplaceValueStep$Type();
 class TransformObfuscateOptions$Type extends MessageType {
     constructor() {
         super("protos.steps.TransformObfuscateOptions", [
-            { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "value", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { path: "", value: "" };
+        const message = { path: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -341,9 +347,6 @@ class TransformObfuscateOptions$Type extends MessageType {
             switch (fieldNo) {
                 case /* string path */ 1:
                     message.path = reader.string();
-                    break;
-                case /* string value */ 2:
-                    message.value = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -360,9 +363,6 @@ class TransformObfuscateOptions$Type extends MessageType {
         /* string path = 1; */
         if (message.path !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.path);
-        /* string value = 2; */
-        if (message.value !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.value);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -378,12 +378,11 @@ class TransformMaskOptions$Type extends MessageType {
     constructor() {
         super("protos.steps.TransformMaskOptions", [
             { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "value", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "mask", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "mask", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { path: "", value: "", mask: "" };
+        const message = { path: "", mask: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -397,10 +396,7 @@ class TransformMaskOptions$Type extends MessageType {
                 case /* string path */ 1:
                     message.path = reader.string();
                     break;
-                case /* string value */ 2:
-                    message.value = reader.string();
-                    break;
-                case /* string mask */ 3:
+                case /* string mask */ 2:
                     message.mask = reader.string();
                     break;
                 default:
@@ -418,12 +414,9 @@ class TransformMaskOptions$Type extends MessageType {
         /* string path = 1; */
         if (message.path !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.path);
-        /* string value = 2; */
-        if (message.value !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.value);
-        /* string mask = 3; */
+        /* string mask = 2; */
         if (message.mask !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.mask);
+            writer.tag(2, WireType.LengthDelimited).string(message.mask);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

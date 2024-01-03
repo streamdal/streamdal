@@ -68,9 +68,13 @@ export interface TransformTruncateOptions {
      */
     type: TransformTruncateType;
     /**
+     * @generated from protobuf field: string path = 2;
+     */
+    path: string;
+    /**
      * Truncate after this many bytes or this percentage of the original value
      *
-     * @generated from protobuf field: int32 value = 2;
+     * @generated from protobuf field: int32 value = 3;
      */
     value: number;
 }
@@ -104,10 +108,6 @@ export interface TransformObfuscateOptions {
      * @generated from protobuf field: string path = 1;
      */
     path: string;
-    /**
-     * @generated from protobuf field: string value = 2;
-     */
-    value: string;
 }
 /**
  * @generated from protobuf message protos.steps.TransformMaskOptions
@@ -118,11 +118,7 @@ export interface TransformMaskOptions {
      */
     path: string;
     /**
-     * @generated from protobuf field: string value = 2;
-     */
-    value: string;
-    /**
-     * @generated from protobuf field: string mask = 3;
+     * @generated from protobuf field: string mask = 2;
      */
     mask: string;
 }
