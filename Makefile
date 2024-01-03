@@ -32,6 +32,4 @@ test:
 .PHONY: test/wasm
 test/wasm: description = Pull latest release of wasm
 test/wasm:
-	curl -L https://github.com/streamdal/wasm/releases/latest/download/release.zip -o release.zip
-	unzip -o -q release.zip -d assets/test/
-	rm release.zip
+	bash ./init_wasm.sh
