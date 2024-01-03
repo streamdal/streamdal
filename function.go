@@ -11,7 +11,7 @@ import (
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 type function struct {

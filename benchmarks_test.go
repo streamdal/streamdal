@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/streamdal/protos/build/go/protos"
-	"github.com/streamdal/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
 var jsonFiles = []string{"test-assets/json-examples/small.json", "test-assets/json-examples/medium.json", "test-assets/json-examples/large.json"}

@@ -10,7 +10,7 @@ import (
 	"github.com/relistan/go-director"
 	"golang.org/x/time/rate"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/go-sdk/logger"
 	"github.com/streamdal/go-sdk/metrics"

@@ -3,7 +3,7 @@ package streamdal
 import (
 	"context"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 func (s *Streamdal) getSchema(_ context.Context, aud *protos.Audience) []byte {
