@@ -1,28 +1,55 @@
-use protos::sp_steps_transform::TransformType;
+use protos::sp_steps_transform::{TransformType};
+use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use streamdal_wasm_transform::transform;
+use streamdal_wasm_transform::transform::TruncateOptions;
+use streamdal_wasm_transform::transform::TruncateType::{Chars, Percent};
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Read request
     let wasm_request = match common::read_request(ptr, length) {
         Ok(req) => req,
-        Err(e) => panic!("unable to read request: {}", e), // TODO: Should write response here
+        Err(e) => {
+            return common::write_response(
+                None,
+                None,
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to read request: {}", e),
+            );
+        }
     };
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        panic!("invalid step: {}", err) // TODO: Should write response here
+        common::write_response(
+            None,
+            None,
+            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            format!("step validation failed: {}", err),
+        );
     }
 
     // Generate transform request
-    let transform_request = generate_transform_request(&wasm_request);
+    let transform_request = match generate_transform_request(&wasm_request) {
+        Ok(req) => req,
+        Err(e) => {
+            return common::write_response(
+                None,
+                None,
+                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                format!("unable to generate transform request: {}", e),
+            );
+        }
+    };
 
     // Run request against transform
     let result = match wasm_request.step.transform().type_.unwrap() {
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE => transform::overwrite(&transform_request),
         TransformType::TRANSFORM_TYPE_MASK_VALUE => transform::mask(&transform_request),
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => transform::obfuscate(&transform_request),
+        TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => transform::truncate(&transform_request),
+        TransformType::TRANSFORM_TYPE_DELETE_FIELD => transform::delete(&transform_request),
         _ => {
             return common::write_response(
                 None,
@@ -50,12 +77,98 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     }
 }
 
-fn generate_transform_request(wasm_request: &WASMRequest) -> transform::Request {
-    transform::Request {
-        data: wasm_request.input_payload.clone(),
-        path: wasm_request.step.transform().path.clone(),
-        value: wasm_request.step.transform().value.clone(),
-    }
+fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::Request, String> {
+    let t = wasm_request.step.transform();
+
+    let req = match t.type_.unwrap() { // unwrap is safe as validation occurs before this
+        TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => {
+            // Never had deprecated options, no need to handle here
+
+            let tt = match t.truncate_options().type_.enum_value().unwrap() {
+                TRANSFORM_TRUNCATE_TYPE_PERCENTAGE => Percent,
+                _ => Chars,
+            };
+
+           transform::Request {
+                data: wasm_request.input_payload.clone(),
+                path: t.truncate_options().path.clone(),
+                value: "".to_string(),
+                truncate_options: Some(TruncateOptions{
+                    length: t.truncate_options().value as usize,
+                    truncate_type : tt,
+                }),
+            }
+        },
+        TransformType::TRANSFORM_TYPE_DELETE_FIELD => {
+            // Never had deprecated options, no need to handle here
+
+            transform::Request {
+                data: wasm_request.input_payload.clone(),
+                path: wasm_request.step.transform().delete_field_options().path.clone(),
+                value: "".to_string(),
+                truncate_options: None,
+            }
+        },
+        TransformType::TRANSFORM_TYPE_MASK_VALUE => {
+            // Handle deprecated options
+            if !t.has_mask_options() {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().path.clone(),
+                    value: wasm_request.step.transform().value.clone(),
+                    truncate_options: None,
+                }
+            } else {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().mask_options().path.clone(),
+                    value: "".to_string(),
+                    truncate_options: None,
+                }
+            }
+        },
+        TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => {
+            // Handle deprecated options
+            if !t.has_obfuscate_options() {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().path.clone(),
+                    value: wasm_request.step.transform().value.clone(),
+                    truncate_options: None,
+                }
+            } else {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().obfuscate_options().path.clone(),
+                    value: "".to_string(),
+                    truncate_options: None,
+                }
+            }
+        },
+        TransformType::TRANSFORM_TYPE_REPLACE_VALUE => {
+            // Handle deprecated options
+            if !t.has_replace_value_options() {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().path.clone(),
+                    value: wasm_request.step.transform().value.clone(),
+                    truncate_options: None,
+                }
+            } else {
+                transform::Request {
+                    data: wasm_request.input_payload.clone(),
+                    path: wasm_request.step.transform().replace_value_options().path.clone(),
+                    value: wasm_request.step.transform().replace_value_options().value.clone(),
+                    truncate_options: None,
+                }
+            }
+        },
+        _ => {
+            return Err("unknown transform type".to_string());
+        }
+    };
+
+    Ok(req)
 }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
@@ -71,10 +184,6 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
 
     if transform_type == TransformType::TRANSFORM_TYPE_UNKNOWN {
         return Err("transform type cannot be unknown".to_string());
-    }
-
-    if req.step.transform().path.is_empty() {
-        return Err("transform path cannot be empty".to_string());
     }
 
     Ok(())
