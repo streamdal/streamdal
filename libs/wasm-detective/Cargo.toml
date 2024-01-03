@@ -1,6 +1,6 @@
 [package]
 name = "streamdal-wasm-detective"
-version = "0.0.37"
+version = "0.0.38"
 edition = "2021"
 license = "MIT"
 description = "Data matcher library used by Streamdal WASM functions"
