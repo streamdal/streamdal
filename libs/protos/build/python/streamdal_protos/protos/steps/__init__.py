@@ -353,7 +353,8 @@ class TransformStep(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TransformTruncateOptions(betterproto.Message):
     type: "TransformTruncateType" = betterproto.enum_field(1)
-    value: int = betterproto.int32_field(2)
+    path: str = betterproto.string_field(2)
+    value: int = betterproto.int32_field(3)
     """
     Truncate after this many bytes or this percentage of the original value
     """
@@ -373,14 +374,12 @@ class TransformReplaceValueStep(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TransformObfuscateOptions(betterproto.Message):
     path: str = betterproto.string_field(1)
-    value: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)
 class TransformMaskOptions(betterproto.Message):
     path: str = betterproto.string_field(1)
-    value: str = betterproto.string_field(2)
-    mask: str = betterproto.string_field(3)
+    mask: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)

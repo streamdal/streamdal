@@ -37,8 +37,10 @@ enum TransformTruncateType {
 message TransformTruncateOptions {
   TransformTruncateType type = 1;
 
+  string path = 2;
+
   // Truncate after this many bytes or this percentage of the original value
-  int32 value = 2;
+  int32 value = 3;
 }
 
 message TransformDeleteFieldStep {
@@ -52,11 +54,9 @@ message TransformReplaceValueStep {
 
 message TransformObfuscateOptions {
   string path = 1;
-  string value = 2;
 }
 
 message TransformMaskOptions {
   string path = 1;
-  string value = 2;
-  string mask = 3;
+  string mask = 2;
 }
