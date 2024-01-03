@@ -51,14 +51,14 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
 
     let data_as_str = convert_bytes_to_string(&req.data)?;
     let value = gjson::get(data_as_str, req.path.as_str());
+    let length_of_field = gjson::get(data_as_str, req.path.as_str()).to_string().len();
 
     let truncate_length = match &truncate_options.truncate_type {
         #[allow(clippy::clone_on_copy)]
-        TruncateType::Chars => truncate_options.length.clone(),
+        TruncateType::Chars => length_of_field - truncate_options.length.clone(),
         TruncateType::Percent => {
-            let strlen = gjson::get(data_as_str, req.path.as_str()).to_string().len();
             let my_usize_reference = 100.0 - &truncate_options.length.value_as::<f64>().unwrap_or(0.0);
-            let num_chars_to_keep: f64 = strlen as f64 * (my_usize_reference / 100.0);
+            let num_chars_to_keep: f64 = length_of_field as f64 * (my_usize_reference / 100.0);
             num_chars_to_keep.round() as usize
         },
     };
@@ -158,17 +158,9 @@ fn _mask(data: &str, path: &str, mask_char: char, quote: bool) -> Result<String,
         .map_err(|e| TransformError::Generic(format!("unable to mask data: {}", e)))
 }
 
-fn validate_request(req: &Request, value_check: bool) -> Result<(), TransformError> {
-    if req.path.is_empty() {
-        return Err(TransformError::Generic("path cannot be empty".to_string()));
-    }
-
+fn validate_request(req: &Request, _value_check: bool) -> Result<(), TransformError> {
     if req.data.is_empty() {
         return Err(TransformError::Generic("data cannot be empty".to_string()));
-    }
-
-    if value_check && req.value.is_empty() {
-        return Err(TransformError::Generic("value cannot be empty".to_string()));
     }
 
     // Is this valid JSON?
@@ -307,7 +299,7 @@ mod tests {
             path: "baz.qux".to_string(),
             value: "".to_string(), // needs a default
             truncate_options: Some(TruncateOptions{
-                length: 2,
+                length: 1,
                 truncate_type: TruncateType::Chars,
             }),
         };
@@ -321,7 +313,7 @@ mod tests {
         assert_eq!(v.str(), "quux");
 
         let v = gjson::get(result.as_str(), "baz.qux");
-        assert_eq!(v.str(), "qu");
+        assert_eq!(v.str(), "q");
 
         // path does not exist
         req.path = "does-not-exist".to_string();
