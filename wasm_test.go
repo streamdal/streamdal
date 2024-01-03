@@ -288,7 +288,7 @@ var _ = Describe("WASM Modules", func() {
 				Transform: &steps.TransformStep{
 					Type: steps.TransformType_TRANSFORM_TYPE_REPLACE_VALUE,
 					Options: &steps.TransformStep_ReplaceValueOptions{
-						ReplaceValueOptions: &steps.TransformReplaceValueStep{
+						ReplaceValueOptions: &steps.TransformReplaceValueOptions{
 							Path:  "object.type",
 							Value: "\"testing\"",
 						},
@@ -330,7 +330,7 @@ var _ = Describe("WASM Modules", func() {
 				Transform: &steps.TransformStep{
 					Type: steps.TransformType_TRANSFORM_TYPE_DELETE_FIELD,
 					Options: &steps.TransformStep_DeleteFieldOptions{
-						DeleteFieldOptions: &steps.TransformDeleteFieldStep{
+						DeleteFieldOptions: &steps.TransformDeleteFieldOptions{
 							Path: "object.type",
 						},
 					},
@@ -355,6 +355,45 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"cc_num": "1234"}}`))
+		})
+
+		It("truncates a field by total length", func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = wasmData
+
+			req.Step.Step = &protos.PipelineStep_Transform{
+				Transform: &steps.TransformStep{
+					Type: steps.TransformType_TRANSFORM_TYPE_TRUNCATE_VALUE,
+					Options: &steps.TransformStep_TruncateOptions{
+						TruncateOptions: &steps.TransformTruncateOptions{
+							Path:  "object.type",
+							Type:  steps.TransformTruncateType_TRANSFORM_TRUNCATE_TYPE_LENGTH,
+							Value: 3,
+						},
+					},
+				},
+			}
+
+			f, err := s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
 		})
 
 		It("truncates a field by total length", func() {
