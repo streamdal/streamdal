@@ -7,6 +7,7 @@ layout: ../../../layouts/MainLayout.astro
 
 import streamdal_metrics from "@images/arch/streamdal-metrics.png"
 import Changes from "@components/Misc/Changes.astro";
+import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
@@ -49,7 +50,7 @@ Operational Awareness: Knowing how rules are executed and the associated metrics
 Trend Analysis: Over time, observing these metrics can provide trends, helping in capacity planning, rules optimization, and understanding data flow patterns.
 
 ## Diagram of metrics flow
-<img src={streamdal_metrics} alt="streamdal-metrics" />
+<RichImg src={streamdal_metrics} alt="streamdal-metrics" />
 
 ## Conclusion
 The Prometheus metrics format is more than just a structured way of representing data. It's a gateway to understanding the behaviors, performance, and health of Streamdal. By integrating this standardized metrics format, Streamdal ensures consistent observability, actionable insights, and enhanced operational excellence.

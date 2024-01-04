@@ -13,19 +13,20 @@ const currentPageMatch = currentPage.slice(1);
 const langCode = getLanguageFromURL(currentPage);
 const sidebar = SIDEBAR[langCode];
 
-const getActiveTab = (
-  currentPage: string,
-  menu: MenuItem[]
-): MenuItem | undefined =>
-  menu.find(
-    (item: MenuItem) =>
-      "children" in item &&
-      item?.children.some((item: MenuItem) =>
-        "link" in item
-          ? currentPage.includes(item.link)
-          : getActiveTab(currentPage, item.children)
-      )
-  );
+const getActiveTab = (currentPage: string, menu: MenuItem[]): string | undefined => {
+  for (const item of menu) {
+    if (item.link && currentPage.includes(item.link)) {
+      return item.link;
+    }
+    if (item.children && item.children.length > 0) {
+      const childActiveTab = getActiveTab(currentPage, item.children);
+      if (childActiveTab) {
+        return childActiveTab;
+      }
+    }
+  }
+  return undefined;
+};
 
 const activeTab: "learn" | "api" = getActiveTab(
   currentPageMatch,

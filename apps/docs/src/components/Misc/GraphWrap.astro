@@ -1,0 +1,21 @@
+<style>
+.graphWrap {
+    display: flex;
+}
+.graphWrapItems {
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    padding: 15px 0px 15px 0px;
+    background-color: #EEE9FF;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+</style>
+
+<div class=".graphWrap">
+    <div class="graphWrapItems">
+        <img src={Astro.props.src} alt={Astro.props.alt} />
+    </div>
+</div>

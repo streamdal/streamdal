@@ -6,9 +6,10 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import consoleTail from '@images/guides/ConsoleTail.png';
-import selectTail from '@images/guides/SelectandTail.png';
 import tailFlow from '@images/guides/TailFlow.png';
 import Changes from "@components/Misc/Changes.astro";
+import quickTail from '@images/guides/quickTail.png'
+import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
@@ -35,7 +36,7 @@ Here's a step-by-step walkthrough of the user experience:
     - You'll notice the “Tail” link in the context menu; go ahead and click it.
     - An L modal will pop up, presenting a non-editable large text box. Initially, it will display “Tail initializing...” 
 
-    <img src={selectTail} alt="Select Tail" />
+    <RichImg src={quickTail} alt="Select Tail" />
 
 2. **Observing the Data**:
     - Once the tail starts, you will witness new data streaming into the console.
@@ -44,7 +45,7 @@ Here's a step-by-step walkthrough of the user experience:
     - Each entry you observe is timestamped, allowing you to track the flow of data chronologically.
 
 
-    <img src={consoleTail} alt="Console Tail" />
+    <RichImg src={consoleTail} alt="Console Tail" />
 
 3. **Ending the Session**:
     - You can end the tailing session whenever you wish. Once the session is closed, the real-time data monitoring will cease.
@@ -57,7 +58,7 @@ While it's not crucial to grasp the underlying mechanics, here’s a glimpse int
 - This directive prompts the backend to commence data streaming towards the front-end.
 - The server continually channels data to the front-end, providing a live feed until the session is either closed by you or terminated due to other conditions.
 
-  <img src={tailFlow} alt="Streamdal Tail Arch" />
+  <RichImg src={tailFlow} alt="Streamdal Tail Arch" />
 
 By combining an intuitive interface with robust backend mechanisms, Streamdal Tail ensures you have a seamless experience, helping you keep a pulse on your data as it flows.
 

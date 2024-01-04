@@ -5,8 +5,9 @@ description: An engineering dive into the core mechanics of Streamdal.
 layout: ../../layouts/MainLayout.astro
 ---
 
+import Notification  from "@components/Callouts/Notification.astro";
+import RichImg from "@components/Misc/RichImg.astro";
 import note from "@images/icons/note.png";
-import { Notification } from "accessible-astro-components";
 import cliTail from "@images/guides/CliTail.png";
 import consoleUi from "@images/core-components/console-dashboard.png";
 import beta from "@images/beta.png";
@@ -75,14 +76,16 @@ time.
 ## Console UI
 Dive into the [Console UI](/en/core-components/console-ui) to explore metrics,
 schema views, and a <a class="pkeyword" href="/en/resources-support/glossary/#data-graph">Data Graph</a> of your services.
-<img src={consoleUi} alt="Streamdal Console Dashboard" style="border-radius: 5px;" />
+
+<RichImg src={consoleUi} alt="Streamdal Console Dashboard" />
 
 ## CLI
 It's a must-have tool for developers seeking a streamlined experience, or for
 those who just prefer a terminal. Check out the
 [CLI README](https://github.com/streamdal/streamdal/blob/main/apps/cli/README.md) to quickly get up and
 running with this.
- <img src={cliTail} alt="Information" style="border-radius: 5px;" />
+
+<RichImg src={cliTail} alt="Streamdal Tail CLI" />
 
 ## SDK
 Connect your applications up to Streamdal via the
