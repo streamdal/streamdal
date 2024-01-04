@@ -47,6 +47,7 @@ const testPipeline: Pipeline = {
       },
     },
   ],
+  NotificationConfigs: [],
 };
 const testAttachCommand: Command = {
   command: {
