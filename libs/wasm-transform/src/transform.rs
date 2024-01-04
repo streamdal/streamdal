@@ -1,5 +1,6 @@
 use streamdal_gjson as gjson;
 use conv::prelude::*;
+use serde_json::{Map, Value};
 
 #[derive(Debug)]
 pub enum TransformError {
@@ -16,6 +17,11 @@ pub struct TruncateOptions {
     pub truncate_type: TruncateType,
 }
 
+pub struct ExtractOptions {
+    pub flatten: bool,
+    pub paths: Vec<String>,
+}
+
 pub struct Request {
     pub data: Vec<u8>,
     pub path: String,
@@ -24,6 +30,88 @@ pub struct Request {
     // TODO: we'll eventually have to pass protos directly to those functions
     // TODO: but let's keep changes simple for now ~MG 2024-01-02
     pub truncate_options: Option<TruncateOptions>,
+    pub extract_options: Option<ExtractOptions>,
+}
+
+pub fn extract(req: &Request) -> Result<String, TransformError> {
+    validate_extract_request(req)?;
+
+    let extract_options = match &req.extract_options {
+        Some(options) => options,
+        None => {
+            return Err(TransformError::Generic("unable to extract data: options not provided".to_string()))
+        },
+    };
+
+    let data_as_str = convert_bytes_to_string(&req.data)?;
+
+    // For each path in extract_options.paths, get the value and add it to a map
+    let mut extracted_data = Map::new();
+    for path in &extract_options.paths {
+        let value = gjson::get(data_as_str, path.as_str());
+        if !value.exists() {
+            continue;
+        }
+        // Split path by ".". If we're flattening it, just get last element and insert into hashmap
+        // Otherwise, we need to recursively create sub-hashmaps for each element in the path before
+        // inserting the value.
+        let path_elements: Vec<&str> = path.split('.').collect();
+
+        if extract_options.flatten {
+            extracted_data.insert(path_elements.last().unwrap().to_string(), Value::String(value.to_string()));
+        } else {
+            let mut current_map = &mut extracted_data;
+            for (i, path_element) in path_elements.iter().enumerate() {
+                // Check if we're in the last element of the path, if so, we're inserting the value
+                if i == path_elements.len() - 1 {
+                    current_map.insert(path_element.to_string(), Value::String(value.to_string()));
+                    continue;
+                }
+
+                // We're not at the last element, so we need to insert a new map for this element
+                // Get the key if it exists, otherwise create the key and set it's value to serde_json::Map::new()
+                // On subsequent iterations, we'll get the key and set current_map to the value of that key
+                if current_map.contains_key(*path_element) {
+                    let current_map_value = match current_map.get_mut(*path_element) {
+                        Some(value) => value,
+                        None => {
+                            return Err(TransformError::Generic("unable to extract data: unable to get current map value".to_string()))
+                        },
+                    };
+
+                    current_map = match current_map_value.as_object_mut() {
+                        Some(value) => value,
+                        None => {
+                            return Err(TransformError::Generic("unable to extract data: unable to get current map as object".to_string()))
+                        },
+                    };
+                }
+
+                current_map.insert(path_element.to_string(), Value::Object(Map::new()));
+
+                let current_map_value = match current_map.get_mut(*path_element) {
+                    Some(value) => value,
+                    None => {
+                        return Err(TransformError::Generic("unable to extract data: unable to get current map value".to_string()))
+                    },
+                };
+
+                current_map = match current_map_value.as_object_mut() {
+                    Some(value) => value,
+                    None => {
+                        return Err(TransformError::Generic("unable to extract data: unable to get current map as object".to_string()))
+                    },
+                };
+            }
+        }
+    }
+
+    // Convert serde map to json string
+    if let Ok(res) =  serde_json::to_string(&extracted_data) {
+        Ok(res)
+    } else {
+        Err(TransformError::Generic("unable to extract data: unable to serialize data".to_string()))
+    }
 }
 
 
@@ -190,6 +278,30 @@ fn validate_request(req: &Request, _value_check: bool) -> Result<(), TransformEr
     Ok(())
 }
 
+fn validate_extract_request(req: &Request) -> Result<(), TransformError> {
+    if req.data.is_empty() {
+        return Err(TransformError::Generic("data cannot be empty".to_string()));
+    }
+
+    // Is this valid JSON?
+    if !gjson::valid(convert_bytes_to_string(&req.data)?) {
+        return Err(TransformError::Generic(
+            "data is not valid JSON".to_string(),
+        ));
+    }
+
+    if req.extract_options.is_none() {
+        return Err(TransformError::Generic("extract options not provided".to_string()));
+    }
+
+    let extract_options = req.extract_options.as_ref().unwrap();
+    if extract_options.paths.is_empty() {
+        return Err(TransformError::Generic("extract paths cannot be empty".to_string()));
+    }
+
+    Ok(())
+}
+
 fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
     Ok(std::str::from_utf8(bytes.as_slice())
         .map_err(|e| TransformError::Generic(format!("unable to parse data as UTF-8: {}", e))))?
@@ -214,6 +326,7 @@ mod tests {
             path: "baz.qux".to_string(),
             value: "\"test\"".to_string(),
             truncate_options: None,
+            extract_options: None,
         };
 
         let result = overwrite(&req).unwrap();
@@ -249,6 +362,7 @@ mod tests {
             path: "baz.qux".to_string(),
             value: "".to_string(), // needs a default
             truncate_options: None,
+            extract_options: None,
         };
 
         let result = obfuscate(&req).unwrap();
@@ -279,6 +393,7 @@ mod tests {
             path: "baz.qux".to_string(),
             value: "".to_string(), // needs a default
             truncate_options: None,
+            extract_options: None,
         };
 
         let result = mask(&req).unwrap();
@@ -311,6 +426,7 @@ mod tests {
                 length: 1,
                 truncate_type: TruncateType::Chars,
             }),
+            extract_options: None,
         };
 
         let result = truncate(&req).unwrap();
@@ -343,6 +459,7 @@ mod tests {
                 length: 5,
                 truncate_type: TruncateType::Chars,
             }),
+            extract_options: None,
         };
 
         let result = truncate(&req).unwrap();
@@ -367,6 +484,7 @@ mod tests {
                 length: 25,
                 truncate_type: TruncateType::Percent,
             }),
+            extract_options: None,
         };
 
         let result = truncate(&req).unwrap();
@@ -388,6 +506,7 @@ mod tests {
             path: "baz.qux".to_string(),
             value: "".to_string(), // needs a default
             truncate_options: None,
+            extract_options: None,
         };
 
         let result = delete(&req).unwrap();
@@ -400,5 +519,45 @@ mod tests {
 
         let v = gjson::get(result.as_str(), "baz.qux");
         assert_eq!(v.exists(), false);
+    }
+
+    #[test]
+    fn test_extract_flatten() {
+        let req = Request {
+            data: TEST_DATA.as_bytes().to_vec(),
+            path: "".to_string(),
+            value: "".to_string(),
+            truncate_options: None,
+            extract_options: Some(ExtractOptions{
+                flatten: true,
+                paths: vec!["foo".to_string(), "baz.qux".to_string()],
+            }),
+        };
+
+        let result = extract(&req).unwrap();
+
+        println!("result: {}", result);
+        assert!(gjson::valid(result.as_str()));
+        assert_eq!(result, r#"{"foo":"bar","qux":"quux"}"#);
+    }
+
+    #[test]
+    fn test_extract_no_flatten() {
+        let req = Request {
+            data: TEST_DATA.as_bytes().to_vec(),
+            path: "".to_string(),
+            value: "".to_string(),
+            truncate_options: None,
+            extract_options: Some(ExtractOptions{
+                flatten: false,
+                paths: vec!["foo".to_string(), "baz.qux".to_string()],
+            }),
+        };
+
+        let result = extract(&req).unwrap();
+
+        println!("result: {}", result);
+        assert!(gjson::valid(result.as_str()));
+        assert_eq!(result, r#"{"baz":{"qux":"quux"},"foo":"bar"}"#);
     }
 }

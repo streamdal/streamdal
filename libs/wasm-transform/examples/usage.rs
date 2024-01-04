@@ -29,6 +29,7 @@ fn overwrite() {
         path: "hello".to_string(),
         value: r#""baz""#.to_string(),
         truncate_options: None,
+        extract_options: None,
     };
 
     let updated_json = transform::overwrite(&req).unwrap();
@@ -47,6 +48,7 @@ fn mask_string() {
         path: "hello".to_string(),
         value: "".to_string(),
         truncate_options: None,
+        extract_options: None,
     };
 
     let updated_json = transform::mask(&req).unwrap();
@@ -65,6 +67,7 @@ fn mask_number() {
         data: sample_json.into(),
         value: "".to_string(), // default
         truncate_options: None,
+        extract_options: None,
     };
 
     let updated_json = transform::mask(&req).unwrap();
@@ -83,6 +86,7 @@ fn obfuscate_string() {
         data: sample_json.into(),
         value: "".to_string(), // default
         truncate_options: None,
+        extract_options: None,
     };
 
     let updated_json = transform::obfuscate(&req).unwrap();
@@ -104,6 +108,7 @@ fn truncate_string() {
             length: 3,
             truncate_type: TruncateType::Chars,
         }),
+        extract_options: None,
     };
 
     let updated_json = transform::truncate(&req).unwrap();
@@ -122,6 +127,7 @@ fn delete_field() {
         data: sample_json.into(),
         value: "".to_string(), // default
         truncate_options: None,
+        extract_options: None,
     };
 
     let updated_json = transform::delete(&req).unwrap();
