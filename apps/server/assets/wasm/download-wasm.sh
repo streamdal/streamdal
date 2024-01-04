@@ -18,7 +18,7 @@ fi
 
 # Get the version from the version file
 version=$(cat version)
-download_url="https://github.com/streamdal/mono/releases/download/libs%2Fwasm%2F${version}/release.zip"
+download_url="https://github.com/streamdal/streamdal/releases/download/libs%2Fwasm%2F${version}/release.zip"
 
 # Remove previous release.zip (if exists)
 rm -f release.zip

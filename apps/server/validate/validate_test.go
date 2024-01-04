@@ -3,9 +3,9 @@ package validate
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/streamdal/mono/libs/protos/build/go/protos"
-	"github.com/streamdal/mono/libs/protos/build/go/protos/steps"
 	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
 var _ = Describe("Validate", func() {
