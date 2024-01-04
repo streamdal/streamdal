@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransformMaskOptions = exports.TransformObfuscateOptions = exports.TransformReplaceValueOptions = exports.TransformDeleteFieldOptions = exports.TransformTruncateOptions = exports.TransformStep = exports.TransformTruncateType = exports.TransformType = void 0;
+exports.TransformExtractOptions = exports.TransformMaskOptions = exports.TransformObfuscateOptions = exports.TransformReplaceValueOptions = exports.TransformDeleteFieldOptions = exports.TransformTruncateOptions = exports.TransformStep = exports.TransformTruncateType = exports.TransformType = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -32,11 +32,13 @@ var TransformType;
      */
     TransformType[TransformType["MASK_VALUE"] = 4] = "MASK_VALUE";
     /**
-     * TODO: type for delete all keys except specified ones
-     *
      * @generated from protobuf enum value: TRANSFORM_TYPE_TRUNCATE_VALUE = 5;
      */
     TransformType[TransformType["TRUNCATE_VALUE"] = 5] = "TRUNCATE_VALUE";
+    /**
+     * @generated from protobuf enum value: TRANSFORM_TYPE_EXTRACT = 6;
+     */
+    TransformType[TransformType["EXTRACT"] = 6] = "EXTRACT";
 })(TransformType || (exports.TransformType = TransformType = {}));
 /**
  * @generated from protobuf enum protos.steps.TransformTruncateType
@@ -67,7 +69,8 @@ class TransformStep$Type extends runtime_5.MessageType {
             { no: 102, name: "delete_field_options", kind: "message", oneof: "options", T: () => exports.TransformDeleteFieldOptions },
             { no: 103, name: "obfuscate_options", kind: "message", oneof: "options", T: () => exports.TransformObfuscateOptions },
             { no: 104, name: "mask_options", kind: "message", oneof: "options", T: () => exports.TransformMaskOptions },
-            { no: 105, name: "truncate_options", kind: "message", oneof: "options", T: () => exports.TransformTruncateOptions }
+            { no: 105, name: "truncate_options", kind: "message", oneof: "options", T: () => exports.TransformTruncateOptions },
+            { no: 106, name: "extract_options", kind: "message", oneof: "options", T: () => exports.TransformExtractOptions }
         ]);
     }
     create(value) {
@@ -121,6 +124,12 @@ class TransformStep$Type extends runtime_5.MessageType {
                         truncateOptions: exports.TransformTruncateOptions.internalBinaryRead(reader, reader.uint32(), options, message.options.truncateOptions)
                     };
                     break;
+                case /* protos.steps.TransformExtractOptions extract_options */ 106:
+                    message.options = {
+                        oneofKind: "extractOptions",
+                        extractOptions: exports.TransformExtractOptions.internalBinaryRead(reader, reader.uint32(), options, message.options.extractOptions)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -157,6 +166,9 @@ class TransformStep$Type extends runtime_5.MessageType {
         /* protos.steps.TransformTruncateOptions truncate_options = 105; */
         if (message.options.oneofKind === "truncateOptions")
             exports.TransformTruncateOptions.internalBinaryWrite(message.options.truncateOptions, writer.tag(105, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.steps.TransformExtractOptions extract_options = 106; */
+        if (message.options.oneofKind === "extractOptions")
+            exports.TransformExtractOptions.internalBinaryWrite(message.options.extractOptions, writer.tag(106, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -430,3 +442,57 @@ class TransformMaskOptions$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.steps.TransformMaskOptions
  */
 exports.TransformMaskOptions = new TransformMaskOptions$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TransformExtractOptions$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.steps.TransformExtractOptions", [
+            { no: 1, name: "paths", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "flatten", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { paths: [], flatten: false };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated string paths */ 1:
+                    message.paths.push(reader.string());
+                    break;
+                case /* bool flatten */ 2:
+                    message.flatten = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated string paths = 1; */
+        for (let i = 0; i < message.paths.length; i++)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.paths[i]);
+        /* bool flatten = 2; */
+        if (message.flatten !== false)
+            writer.tag(2, runtime_1.WireType.Varint).bool(message.flatten);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.TransformExtractOptions
+ */
+exports.TransformExtractOptions = new TransformExtractOptions$Type();

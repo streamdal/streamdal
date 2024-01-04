@@ -189,6 +189,7 @@ class TransformType(betterproto.Enum):
     TRANSFORM_TYPE_OBFUSCATE_VALUE = 3
     TRANSFORM_TYPE_MASK_VALUE = 4
     TRANSFORM_TYPE_TRUNCATE_VALUE = 5
+    TRANSFORM_TYPE_EXTRACT = 6
 
 
 class TransformTruncateType(betterproto.Enum):
@@ -329,18 +330,35 @@ class TransformStep(betterproto.Message):
     replace_value_options: "TransformReplaceValueOptions" = betterproto.message_field(
         101, group="options"
     )
+    """Replace the value of a field with a new value"""
+
     delete_field_options: "TransformDeleteFieldOptions" = betterproto.message_field(
         102, group="options"
     )
+    """Delete a field from a JSON payload"""
+
     obfuscate_options: "TransformObfuscateOptions" = betterproto.message_field(
         103, group="options"
     )
+    """Obfuscate hashes the value of a field with sha256"""
+
     mask_options: "TransformMaskOptions" = betterproto.message_field(
         104, group="options"
     )
+    """Mask part of a field's value with the given character"""
+
     truncate_options: "TransformTruncateOptions" = betterproto.message_field(
         105, group="options"
     )
+    """
+    Truncate the value of a field to a maximum number of characters, or to a
+    percentage of characters based on the field length
+    """
+
+    extract_options: "TransformExtractOptions" = betterproto.message_field(
+        106, group="options"
+    )
+    """Extract one or multiple values from a payload"""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -380,6 +398,12 @@ class TransformObfuscateOptions(betterproto.Message):
 class TransformMaskOptions(betterproto.Message):
     path: str = betterproto.string_field(1)
     mask: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class TransformExtractOptions(betterproto.Message):
+    paths: List[str] = betterproto.string_field(1)
+    flatten: bool = betterproto.bool_field(2)
 
 
 @dataclass(eq=False, repr=False)

@@ -28,33 +28,52 @@ export interface TransformStep {
     options: {
         oneofKind: "replaceValueOptions";
         /**
+         * Replace the value of a field with a new value
+         *
          * @generated from protobuf field: protos.steps.TransformReplaceValueOptions replace_value_options = 101;
          */
         replaceValueOptions: TransformReplaceValueOptions;
     } | {
         oneofKind: "deleteFieldOptions";
         /**
+         * Delete a field from a JSON payload
+         *
          * @generated from protobuf field: protos.steps.TransformDeleteFieldOptions delete_field_options = 102;
          */
         deleteFieldOptions: TransformDeleteFieldOptions;
     } | {
         oneofKind: "obfuscateOptions";
         /**
+         * Obfuscate hashes the value of a field with sha256
+         *
          * @generated from protobuf field: protos.steps.TransformObfuscateOptions obfuscate_options = 103;
          */
         obfuscateOptions: TransformObfuscateOptions;
     } | {
         oneofKind: "maskOptions";
         /**
+         * Mask part of a field's value with the given character
+         *
          * @generated from protobuf field: protos.steps.TransformMaskOptions mask_options = 104;
          */
         maskOptions: TransformMaskOptions;
     } | {
         oneofKind: "truncateOptions";
         /**
+         * Truncate the value of a field to a maximum number of characters,
+         * or to a percentage of characters based on the field length
+         *
          * @generated from protobuf field: protos.steps.TransformTruncateOptions truncate_options = 105;
          */
         truncateOptions: TransformTruncateOptions;
+    } | {
+        oneofKind: "extractOptions";
+        /**
+         * Extract one or multiple values from a payload
+         *
+         * @generated from protobuf field: protos.steps.TransformExtractOptions extract_options = 106;
+         */
+        extractOptions: TransformExtractOptions;
     } | {
         oneofKind: undefined;
     };
@@ -123,6 +142,19 @@ export interface TransformMaskOptions {
     mask: string;
 }
 /**
+ * @generated from protobuf message protos.steps.TransformExtractOptions
+ */
+export interface TransformExtractOptions {
+    /**
+     * @generated from protobuf field: repeated string paths = 1;
+     */
+    paths: string[];
+    /**
+     * @generated from protobuf field: bool flatten = 2;
+     */
+    flatten: boolean;
+}
+/**
  * @generated from protobuf enum protos.steps.TransformType
  */
 export declare enum TransformType {
@@ -147,11 +179,13 @@ export declare enum TransformType {
      */
     MASK_VALUE = 4,
     /**
-     * TODO: type for delete all keys except specified ones
-     *
      * @generated from protobuf enum value: TRANSFORM_TYPE_TRUNCATE_VALUE = 5;
      */
-    TRUNCATE_VALUE = 5
+    TRUNCATE_VALUE = 5,
+    /**
+     * @generated from protobuf enum value: TRANSFORM_TYPE_EXTRACT = 6;
+     */
+    EXTRACT = 6
 }
 /**
  * @generated from protobuf enum protos.steps.TransformTruncateType
@@ -230,4 +264,14 @@ declare class TransformMaskOptions$Type extends MessageType<TransformMaskOptions
  * @generated MessageType for protobuf message protos.steps.TransformMaskOptions
  */
 export declare const TransformMaskOptions: TransformMaskOptions$Type;
+declare class TransformExtractOptions$Type extends MessageType<TransformExtractOptions> {
+    constructor();
+    create(value?: PartialMessage<TransformExtractOptions>): TransformExtractOptions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TransformExtractOptions): TransformExtractOptions;
+    internalBinaryWrite(message: TransformExtractOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.TransformExtractOptions
+ */
+export declare const TransformExtractOptions: TransformExtractOptions$Type;
 export {};
