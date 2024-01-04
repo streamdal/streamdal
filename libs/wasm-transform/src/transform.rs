@@ -85,19 +85,7 @@ fn extract_number(json_str: &str) -> Result<serde_json::Value, TransformError> {
         Ok(value) => {
             // Check if the parsed value is a number
             if value.is_number() {
-                // Determine the number type
-                if value.is_i64() {
-                    Ok(Value::Number(value.as_i64().unwrap().into()))
-                } else if value.is_u64() {
-                    Ok(Value::Number(value.as_u64().unwrap().into()))
-                } else if value.is_f64() {
-                    Ok(value)
-                } else {
-                    // This branch should not be reached if the value is a valid JSON number
-                    Err(TransformError::Generic(
-                        "unable to extract data: unknown number type".to_string(),
-                    ))
-                }
+                Ok(value)
             } else {
                 Err(TransformError::Generic(
                     "unable to extract data: path is not a valid number".to_string(),
@@ -764,27 +752,29 @@ mod tests {
         assert_eq!(result, expected);
     }
 
-    // #[test]
-    // fn test_extract_array_object_field() {
-    //     let req = Request {
-    //         data: r#"{"users": [
-    //             {"name": "Alice", "age": 30},
-    //             {"name": "Bob", "age": 31}
-    //         ]}"#.as_bytes().to_vec(),
-    //         path: "".to_string(),
-    //         value: "".to_string(),
-    //         truncate_options: None,
-    //         extract_options: Some(ExtractOptions{
-    //             flatten: false,
-    //             paths: vec!["users.#.name".to_string()],
-    //         }),
-    //     };
-    //
-    //     let result = extract(&req).unwrap();
-    //
-    //     let expected = r#"{"users":[{"age":30,"name":"Alice"},{"age":31,"name":"Bob"}]}"#;
-    //
-    //     assert!(gjson::valid(result.as_str()));
-    //     assert_eq!(result, expected);
-    // }
+    #[test]
+    fn test_extract_array_object_field() {
+        let req = Request {
+            data: r#"{"users": [
+                {"name": "Alice", "age": 30},
+                {"name": "Bob", "age": 31}
+            ]}"#
+            .as_bytes()
+            .to_vec(),
+            path: "".to_string(),
+            value: "".to_string(),
+            truncate_options: None,
+            extract_options: Some(ExtractOptions {
+                flatten: false,
+                paths: vec!["users.#.name".to_string()],
+            }),
+        };
+
+        let result = extract(&req).unwrap();
+
+        let expected = r#"{"users":{"name":["Alice","Bob"]}}"#;
+
+        assert!(gjson::valid(result.as_str()));
+        assert_eq!(result, expected);
+    }
 }
