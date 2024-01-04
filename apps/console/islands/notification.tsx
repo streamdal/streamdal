@@ -104,7 +104,6 @@ const NotificationDetail = (
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
-    logFormData(notificationFormData);
     const { errors } = validate(NotificationSchema, notificationFormData);
     setErrors(errors || {});
 

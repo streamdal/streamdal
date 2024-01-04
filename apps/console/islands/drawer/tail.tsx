@@ -5,7 +5,6 @@ import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
-import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
@@ -16,23 +15,25 @@ import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { initFlowbite } from "flowbite";
 
-export const MAX_TAIL_SIZE = 100;
-export const TAIL_BUFFER_INTERVAL = 333;
+export const MAX_TAIL_SIZE = 200;
+
+export type TailSampleRate = {
+  rate: number;
+  intervalSeconds: number;
+};
 
 export const tailSignal = signal<TailData[] | null>(
   null,
 );
 
-export const tailBufferSignal = signal<TailData[] | null>(
-  null,
-);
-
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
-export const tailSamplingSignal = signal<boolean>(false);
+export const defaultTailSampleRate = {
+  rate: 100,
+  intervalSeconds: 1,
+};
+export const tailSamplingSignal = signal<TailSampleRate>(defaultTailSampleRate);
 export const tailDiffSignal = signal<boolean>(false);
-export const tailSamplingRateSignal = signal<number>(1);
-export const tailDroppingSignal = signal<boolean>(false);
 
 export type TailData = { timestamp: Date; data: string; originalData: string };
 
@@ -103,16 +104,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
   useEffect(() => {
     start();
-    const bufferInterval = setInterval(() => {
-      if (!tailPausedSignal.value && tailBufferSignal.value?.length) {
-        tailSignal.value = [
-          ...(tailSignal.value || []).slice(
-            -(MAX_TAIL_SIZE - tailBufferSignal.value.length),
-          ),
-          ...tailBufferSignal.value.splice(0),
-        ];
-      }
-    }, TAIL_BUFFER_INTERVAL);
 
     const togglePause = () => {
       tailPausedSignal.value = document.visibilityState !== "visible";
@@ -121,7 +112,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
     return () => {
       stop();
-      clearInterval(bufferInterval);
       document.removeEventListener("visibilitychange", togglePause);
     };
   }, []);
@@ -135,13 +125,13 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   });
 
   useEffect(() => {
-    tailPausedSignal.value == false && scrollBottom.current &&
+    scrollBottom.current &&
       scrollBottom.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
         inline: "start",
       });
-  }, [tailSignal.value, tailPausedSignal.value]);
+  }, [tailSignal.value]);
 
   useEffect(() => {
     initFlowbite();
@@ -169,15 +159,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
           <div class="flex flex-row justify-start items-center">
             <span class="mr-1">Tail</span>
             <span class="text-streamdalPurple">{audience.operationName}</span>
-            {tailDroppingSignal.value &&
-              (
-                <div class="mt-1 flex flex-row items-center">
-                  <IconInfoCircle class="ml-2 text-stream w-4 h-4" />
-                  <span class="ml-1 text-stream text-base">
-                    High rate, showing limited messages
-                  </span>
-                </div>
-              )}
           </div>
 
           <div class="flex flex-row justify-end items-center">

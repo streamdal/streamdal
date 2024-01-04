@@ -9,7 +9,10 @@ import hljs from "../static/vendor/highlight@11.8.0.min.js";
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
 import { GRPC_TOKEN } from "./configs.ts";
-import { tailSignal } from "../islands/drawer/tail.tsx";
+import {
+  defaultTailSampleRate,
+  TailSampleRate,
+} from "../islands/drawer/tail.tsx";
 
 export const tailAbortSignal = signal<boolean>(false);
 
@@ -39,11 +42,13 @@ export const formatData = (data: string) => highlightData(parseData(data));
 
 //
 // sampling is a value in seconds
-export const tail = async ({ audience, socket, sampling = 0 }: {
-  audience: Audience;
-  socket: WebSocket;
-  sampling: number;
-}) => {
+export const tail = async (
+  { audience, socket, sampling = defaultTailSampleRate }: {
+    audience: Audience;
+    socket: WebSocket;
+    sampling: TailSampleRate;
+  },
+) => {
   const sendResponse = (response: TailResponse) => {
     socket.send(
       JSON.stringify({
@@ -69,6 +74,10 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
       id: crypto.randomUUID(),
       audience: audience,
       type: TailRequestType.START,
+      sampleOptions: {
+        sampleRate: sampling.rate,
+        sampleIntervalSeconds: sampling.intervalSeconds,
+      },
     });
 
     const tailCall: any = client.tail(
@@ -79,35 +88,17 @@ export const tail = async ({ audience, socket, sampling = 0 }: {
       },
     );
 
-    let lastDate = null;
-
     for await (const response of tailCall?.responses) {
       if (response?.Keepalive) {
         continue;
       }
 
-      const currentDate = parseDate(response.timestampNs);
-
-      if (sampling === 0) {
-        sendResponse(response);
-        lastDate = currentDate;
-        continue;
-      }
-
-      if (
-        !currentDate || !lastDate ||
-        ((currentDate.getTime() - lastDate.getTime()) / 1000 >
-          sampling)
-      ) {
-        sendResponse(response);
-        lastDate = currentDate;
-      }
+      sendResponse(response);
     }
 
     const { status } = await tailCall;
     status && console.info("grpc tail status", status);
   } catch (e) {
-    tailSignal.value = [];
     //
     // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {
