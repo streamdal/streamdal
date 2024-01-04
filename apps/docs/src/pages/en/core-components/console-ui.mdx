@@ -8,6 +8,7 @@ layout: ../../../layouts/MainLayout.astro
 import consoleDashboard from '../../../images/core-components/console-dashboard.png';
 import consolePipeline from '../../../images/core-components/console-pipeline.png';
 import Changes from "@components/Misc/Changes.astro";
+import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
@@ -25,7 +26,7 @@ The Dashboard View remains the nerve center of the Console UI, offering:
 - **Tail View**: Observe your pipeline data in real-time, ensuring immediate feedback on operations.
 - **Schema Discovery**: Explore and define schemas, generated based on events that flow across your schemas 
 
-<img src={consoleDashboard} alt="Streamdal Console Dashboard" />
+<RichImg src={consoleDashboard} alt="Streamdal Console Dashboard" />
 
 ## Pipeline View: The Rule Crafting Studio
 
@@ -35,7 +36,7 @@ Dive into the Pipeline View to engage in Streamdal's rule-crafting domain:
 - **Encode & Decode Rules**: Determine data encoding before transmission and decoding upon reception (TBA).
 - **Transformation Rules**: Set real-time data transformation parameters, catering to dynamic requirements.
 
-<img src={consolePipeline} alt="Streamdal Console Dashboard" />
+<RichImg src={consolePipeline} alt="Streamdal Console Dashboard" />
 
 ---
 

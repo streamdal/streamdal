@@ -12,7 +12,7 @@ import warning from "@images/icons/warning.png";
 import tip from "@images/icons/tip.png";
 import Changes from "@components/Misc/Changes.astro";
 
-import { Notification } from "accessible-astro-components";
+import Notification  from "@components/Callouts/Notification.astro";
 import Accordion from "@components/Accordion/Accordion.astro";
 import "../../styles/index.scss";
 
@@ -53,6 +53,22 @@ $ some-multi-line-cmd --with-arg foo \
     --another-arg bar
 ```
 
+## Adding click-to-zoom to Images
+
+Be sure you properly import the image you are wanting to wrap. This is only to 
+be used for screenshots or diagrams (nothing small like icons). It also 
+requires you to add the following statements at the top of the mdx file:
+
+```javascript
+import RichImg from "@components/Misc/RichImg.astro";
+```
+
+Then, call the component like:
+
+```javascript
+<RichImg src={yourImage} alt="yourImage information" />
+```
+
 
 ## Callouts
 
@@ -72,7 +88,7 @@ Requires you to specify to add the following statements at the top of the mdx
 file:
 
 ```javascript
-import { Notification } from 'accessible-astro-components';
+import Notification  from "@components/Callouts/Notification.astro";
 ```
 
 <Notification type="checked">

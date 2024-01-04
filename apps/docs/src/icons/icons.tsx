@@ -1,4 +1,5 @@
-//
+// I don't think anything is using these, but leaving here for now
+// TODO: Replace simple .pngs with svgs in @images
 // See: https://icon-sets.iconify.design/
 
 export const Info = (props: any) => {

@@ -5,19 +5,17 @@ description: Unraveling the collaborative dance of Streamdal's core components.
 layout: ../../../layouts/MainLayout.astro
 ---
 
-import mermaidFlow from '@images/guides/mermaidflow.png'
-import deployflow from '@images/guides/deployFlow.png'
-import sdkFlow from '@images/guides/MermaidSdktoServer.png'
-import deploymentArch from '@images/guides/HA-Deployment.png'
+import RichImg from "@components/Misc/RichImg.astro";
+import GraphWrap from "@components/Misc/GraphWrap.astro";
 import consoleUi from '@images/core-components/dashboard-manage.png'
 import beta from "@images/beta.png";
-import Workflow from "@components/Misc/Workflow.astro";
 import Changes from "@components/Misc/Changes.astro";
+import streamdalWorkflow from "@images/core-components/streamdalWorkflow.png";
+import sdkFlow from '@images/guides/sdkflow.png'
+import streamdalLogic from "@images/guides/streamdalLogic.png";
+
 
 <Changes />
-
-<br />
-<br />
 
 Streamdal operates by integrating our 
 [open-source](/en/resources-support/open-source/) SDK into your code. The SDK 
@@ -26,7 +24,7 @@ then communicates with our server and can be managed through our Console UI.
 ## Typical Workflow
 To start using Streamdal, you'll typically do the following:
 
-<Workflow />
+<GraphWrap src={streamdalWorkflow} alt="Streamdal workflow" />
 
 ## Server and SDK: A Closer Look
 
@@ -38,22 +36,26 @@ interplay between our server and SDK can be _very_ helpful:
 3. **Metrics Reporting**: After registration, the SDK sends [metrics](/en/engineering/metrics/) to the server. These insights reveal data flow patterns, potential bottlenecks, and other key metrics.
 4. <img src={beta} alt="Beta" style="display: inline" /> **Fetching Rules**: The SDK retrieves the latest <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>-compiled rules from the server. These <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">rules</a>, vital for data processing, ensure immediate reflection of any changes in data logic within the SDK.
 
-<img src={sdkFlow} alt="SDK flow" />
-
+<GraphWrap src={sdkFlow} alt="SDK flow" />
 
 ##  Access the Console UI
 Once the SDK and Server are connected you will manage your data via the [Console UI](../../core-components/console-ui)
 
-1. **Discover Schemas**: View and edit schemas.
-2. **[Tail](/en/guides/tail/)**: View Data flow in real-time.
-3. **View Metrics**: View metrics and data flow patterns.
-4. <img src={beta} alt="Beta" style="display: inline" /> **Manage Pipelines**: Create, edit, attach, and delete <a href="/en/resources-support/glossary#pipeline-or-ruleset" class="pkeyword">pipelines</a>.
+<ol>
+  <li><img src={beta} alt="Beta" style="display: inline" /> **Manage Pipelines**: Create, edit, and delete <a href="/en/resources-support/glossary#pipeline-or-ruleset" class="pkeyword">pipelines</a>.</li>
+  <ol class="sol">
+    <li>You can attach/remove as many pipelines as needed</li>
+  </ol>
+<li>**View Metrics**: View metrics and data flow patterns.</li>
+<li>**[Tail](/en/guides/tail/)**: View Data flow in real-time.</li>
+<li>**Discover Schemas**: View and edit schemas.</li>
+</ol>
 
-<img src={consoleUi} style="border-radius: 5px;" alt="Console UI" />
+<RichImg src={consoleUi} alt="Console UI" />
 
 
 ## How It All Works Together
 
 This is a high-level overview of how Streamdal's components all work together. 
 
-<img src={mermaidFlow} alt="Mermaid flow" />
+<GraphWrap src={streamdalLogic} alt="How It all Works Together Diagram" />

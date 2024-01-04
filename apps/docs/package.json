@@ -45,7 +45,6 @@
     "@iconify/react": "^4.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "accessible-astro-components": "^1.6.6",
     "eslint": "^8.38.0",
     "eslint-plugin-astro": "^0.26.1",
     "eslint-plugin-mdx": "^2.0.5",
