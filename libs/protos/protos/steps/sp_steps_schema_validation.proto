@@ -15,12 +15,14 @@ enum SchemaValidationCondition {
   SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
 }
 
-// protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+
 enum JSONSchemaDraft {
-  JSON_SCHEMA_DRAFT_UNKNOWN = 0;
-  JSON_SCHEMA_DRAFT_04 = 1;
-  JSON_SCHEMA_DRAFT_06 = 2;
-  JSON_SCHEMA_DRAFT_07 = 3;
+  // protolint:disable ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+  // protolint:disable ENUM_FIELD_NAMES_PREFIX
+  JSONSCHEMA_DRAFT_UNKNOWN = 0;
+  JSONSCHEMA_DRAFT_04 = 1;
+  JSONSCHEMA_DRAFT_06 = 2;
+  JSONSCHEMA_DRAFT_07 = 3;
 }
 
 message SchemaValidationStep {
