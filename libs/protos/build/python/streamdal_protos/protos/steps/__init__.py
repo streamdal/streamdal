@@ -170,8 +170,6 @@ class KvStatus(betterproto.Enum):
 
 
 class SchemaValidationType(betterproto.Enum):
-    """TODO: expand for protobuf, avro, etc."""
-
     SCHEMA_VALIDATION_TYPE_UNKNOWN = 0
     SCHEMA_VALIDATION_TYPE_JSONSCHEMA = 1
 
@@ -183,6 +181,8 @@ class SchemaValidationCondition(betterproto.Enum):
 
 
 class JsonSchemaDraft(betterproto.Enum):
+    """protolint:disable:this ENUM_FIELD_NAMES_PREFIX"""
+
     JSON_SCHEMA_DRAFT_UNKNOWN = 0
     JSON_SCHEMA_DRAFT_04 = 1
     JSON_SCHEMA_DRAFT_06 = 2

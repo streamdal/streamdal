@@ -7,8 +7,6 @@ const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
 /**
- * TODO: expand for protobuf, avro, etc.
- *
  * @generated from protobuf enum protos.steps.SchemaValidationType
  */
 var SchemaValidationType;
@@ -36,8 +34,6 @@ var SchemaValidationCondition;
      */
     SchemaValidationCondition[SchemaValidationCondition["MATCH"] = 1] = "MATCH";
     /**
-     * TODO: backwards compat, evolve, etc.
-     *
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     SchemaValidationCondition[SchemaValidationCondition["NOT_MATCH"] = 2] = "NOT_MATCH";

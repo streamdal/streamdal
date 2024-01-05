@@ -4,8 +4,6 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * TODO: expand for protobuf, avro, etc.
- *
  * @generated from protobuf enum protos.steps.SchemaValidationType
  */
 export var SchemaValidationType;
@@ -33,8 +31,6 @@ export var SchemaValidationCondition;
      */
     SchemaValidationCondition[SchemaValidationCondition["MATCH"] = 1] = "MATCH";
     /**
-     * TODO: backwards compat, evolve, etc.
-     *
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     SchemaValidationCondition[SchemaValidationCondition["NOT_MATCH"] = 2] = "NOT_MATCH";

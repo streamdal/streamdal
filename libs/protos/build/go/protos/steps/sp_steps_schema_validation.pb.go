@@ -20,7 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// TODO: expand for protobuf, avro, etc.
 type SchemaValidationType int32
 
 const (
@@ -72,7 +71,7 @@ type SchemaValidationCondition int32
 const (
 	SchemaValidationCondition_SCHEMA_VALIDATION_CONDITION_UNKNOWN   SchemaValidationCondition = 0
 	SchemaValidationCondition_SCHEMA_VALIDATION_CONDITION_MATCH     SchemaValidationCondition = 1
-	SchemaValidationCondition_SCHEMA_VALIDATION_CONDITION_NOT_MATCH SchemaValidationCondition = 2 // TODO: backwards compat, evolve, etc.
+	SchemaValidationCondition_SCHEMA_VALIDATION_CONDITION_NOT_MATCH SchemaValidationCondition = 2
 )
 
 // Enum value maps for SchemaValidationCondition.

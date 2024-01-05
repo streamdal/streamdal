@@ -43,8 +43,6 @@ export interface SchemaValidationJSONSchema {
     draft: JSONSchemaDraft;
 }
 /**
- * TODO: expand for protobuf, avro, etc.
- *
  * @generated from protobuf enum protos.steps.SchemaValidationType
  */
 export declare enum SchemaValidationType {
@@ -70,8 +68,6 @@ export declare enum SchemaValidationCondition {
      */
     MATCH = 1,
     /**
-     * TODO: backwards compat, evolve, etc.
-     *
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     NOT_MATCH = 2

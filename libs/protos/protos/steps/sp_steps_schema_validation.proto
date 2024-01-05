@@ -4,7 +4,6 @@ package protos.steps;
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
 
-// TODO: expand for protobuf, avro, etc.
 enum SchemaValidationType {
   SCHEMA_VALIDATION_TYPE_UNKNOWN = 0;
   SCHEMA_VALIDATION_TYPE_JSONSCHEMA = 1;
@@ -14,9 +13,9 @@ enum SchemaValidationCondition {
   SCHEMA_VALIDATION_CONDITION_UNKNOWN = 0;
   SCHEMA_VALIDATION_CONDITION_MATCH = 1;
   SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
-  // TODO: backwards compat, evolve, etc.
 }
 
+// protolint:disable:this ENUM_FIELD_NAMES_PREFIX
 enum JSONSchemaDraft {
   JSON_SCHEMA_DRAFT_UNKNOWN = 0;
   JSON_SCHEMA_DRAFT_04 = 1;
