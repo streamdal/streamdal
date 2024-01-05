@@ -15,7 +15,13 @@ enum SchemaValidationCondition {
   SCHEMA_VALIDATION_CONDITION_MATCH = 1;
   SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
   // TODO: backwards compat, evolve, etc.
+}
 
+enum JSONSchemaDraft {
+  JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+  JSON_SCHEMA_DRAFT_04 = 1;
+  JSON_SCHEMA_DRAFT_06 = 2;
+  JSON_SCHEMA_DRAFT_07 = 3;
 }
 
 message SchemaValidationStep {
@@ -30,4 +36,6 @@ message SchemaValidationStep {
 
 message SchemaValidationJSONSchema {
   bytes json_schema = 1;
+
+  JSONSchemaDraft draft = 2;
 }

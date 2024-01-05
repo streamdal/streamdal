@@ -182,6 +182,13 @@ class SchemaValidationCondition(betterproto.Enum):
     SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2
 
 
+class JsonSchemaDraft(betterproto.Enum):
+    JSON_SCHEMA_DRAFT_UNKNOWN = 0
+    JSON_SCHEMA_DRAFT_04 = 1
+    JSON_SCHEMA_DRAFT_06 = 2
+    JSON_SCHEMA_DRAFT_07 = 3
+
+
 class TransformType(betterproto.Enum):
     TRANSFORM_TYPE_UNKNOWN = 0
     TRANSFORM_TYPE_REPLACE_VALUE = 1
@@ -320,6 +327,7 @@ class SchemaValidationStep(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class SchemaValidationJsonSchema(betterproto.Message):
     json_schema: bytes = betterproto.bytes_field(1)
+    draft: "JsonSchemaDraft" = betterproto.enum_field(2)
 
 
 @dataclass(eq=False, repr=False)

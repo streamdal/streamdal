@@ -37,6 +37,10 @@ export interface SchemaValidationJSONSchema {
      * @generated from protobuf field: bytes json_schema = 1;
      */
     jsonSchema: Uint8Array;
+    /**
+     * @generated from protobuf field: protos.steps.JSONSchemaDraft draft = 2;
+     */
+    draft: JSONSchemaDraft;
 }
 /**
  * TODO: expand for protobuf, avro, etc.
@@ -71,6 +75,27 @@ export declare enum SchemaValidationCondition {
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     NOT_MATCH = 2
+}
+/**
+ * @generated from protobuf enum protos.steps.JSONSchemaDraft
+ */
+export declare enum JSONSchemaDraft {
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+     */
+    JSON_SCHEMA_DRAFT_UNKNOWN = 0,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_04 = 1;
+     */
+    JSON_SCHEMA_DRAFT_04 = 1,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_06 = 2;
+     */
+    JSON_SCHEMA_DRAFT_06 = 2,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_07 = 3;
+     */
+    JSON_SCHEMA_DRAFT_07 = 3
 }
 declare class SchemaValidationStep$Type extends MessageType<SchemaValidationStep> {
     constructor();
