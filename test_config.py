@@ -1,5 +1,5 @@
 import pytest
-from streamdal import StreamdalClient, StreamdalConfig
+from streamdal import StreamdalConfig
 
 
 class TestStreamdalConfig:
