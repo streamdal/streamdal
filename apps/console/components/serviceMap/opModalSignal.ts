@@ -12,6 +12,7 @@ export type OpModalType = {
   deletePipeline?: Pipeline | null;
   schemaModal?: boolean;
   deleteService?: boolean;
+  tailRateModal?: boolean;
 };
 
 export const OP_MODAL_KEY = "OP_MODAL_VALUE";

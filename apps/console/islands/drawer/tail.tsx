@@ -5,34 +5,35 @@ import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
-import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { batch, signal, useSignalEffect } from "@preact/signals";
+import { signal, useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { initFlowbite } from "flowbite";
 
-export const MAX_TAIL_SIZE = 100;
-export const TAIL_BUFFER_INTERVAL = 333;
+export const MAX_TAIL_SIZE = 200;
+
+export type TailSampleRate = {
+  rate: number;
+  intervalSeconds: number;
+};
 
 export const tailSignal = signal<TailData[] | null>(
   null,
 );
-
-export const tailBufferSignal = signal<TailData[] | null>(
-  null,
-);
-
+export const tailSocketSignal = signal<Websocket | null>(null);
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
-export const tailSamplingSignal = signal<boolean>(false);
+export const defaultTailSampleRate = {
+  rate: 25,
+  intervalSeconds: 1,
+};
+export const tailSamplingSignal = signal<TailSampleRate>(defaultTailSampleRate);
 export const tailDiffSignal = signal<boolean>(false);
-export const tailSamplingRateSignal = signal<number>(1);
-export const tailDroppingSignal = signal<boolean>(false);
 
 export type TailData = { timestamp: Date; data: string; originalData: string };
 
@@ -94,26 +95,23 @@ export const TailRow = (
 export const Tail = ({ audience }: { audience: Audience }) => {
   const scrollBottom = useRef();
   const [fullScreen, setFullScreen] = useState(false);
-  const [socket, setSocket] = useState(null);
 
-  const start = () => setSocket(tailSocket("/ws/tail", audience));
+  const start = () => {
+    if (
+      tailSocketSignal.value == null ||
+      tailSocketSignal.value?.readyState === WebSocket.CLOSED
+    ) {
+      tailSocketSignal.value = tailSocket("/ws/tail", audience);
+    }
+  };
+
   const stop = () => {
-    socket?.close();
+    tailSocketSignal.value?.close();
   };
 
   useEffect(() => {
-    start();
-    const bufferInterval = setInterval(() => {
-      if (!tailPausedSignal.value && tailBufferSignal.value?.length) {
-        tailSignal.value = [
-          ...(tailSignal.value || []).slice(
-            -(MAX_TAIL_SIZE - tailBufferSignal.value.length),
-          ),
-          ...tailBufferSignal.value.splice(0),
-        ];
-      }
-    }, TAIL_BUFFER_INTERVAL);
-
+    tailSignal.value = [];
+    tailPausedSignal.value = false;
     const togglePause = () => {
       tailPausedSignal.value = document.visibilityState !== "visible";
     };
@@ -121,27 +119,27 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
     return () => {
       stop();
-      clearInterval(bufferInterval);
+      tailSignal.value = [];
       document.removeEventListener("visibilitychange", togglePause);
     };
   }, []);
 
   useSignalEffect(() => {
-    if (!tailEnabledSignal.value || tailPausedSignal.value) {
+    if (tailPausedSignal.value) {
       stop();
     } else {
-      socket?.readyState !== WebSocket.OPEN && start();
+      start();
     }
   });
 
   useEffect(() => {
-    tailPausedSignal.value == false && scrollBottom.current &&
+    scrollBottom.current &&
       scrollBottom.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
         inline: "start",
       });
-  }, [tailSignal.value, tailPausedSignal.value]);
+  }, [tailSignal.value]);
 
   useEffect(() => {
     initFlowbite();
@@ -169,24 +167,13 @@ export const Tail = ({ audience }: { audience: Audience }) => {
           <div class="flex flex-row justify-start items-center">
             <span class="mr-1">Tail</span>
             <span class="text-streamdalPurple">{audience.operationName}</span>
-            {tailDroppingSignal.value &&
-              (
-                <div class="mt-1 flex flex-row items-center">
-                  <IconInfoCircle class="ml-2 text-stream w-4 h-4" />
-                  <span class="ml-1 text-stream text-base">
-                    High rate, showing limited messages
-                  </span>
-                </div>
-              )}
           </div>
 
           <div class="flex flex-row justify-end items-center">
             <div
               class="flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
               data-tooltip-target="tail-pause-play"
-              onClick={() => {
-                tailPausedSignal.value = !tailPausedSignal.value;
-              }}
+              onClick={() => tailPausedSignal.value = !tailPausedSignal.value}
             >
               {tailPausedSignal.value
                 ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
@@ -229,12 +216,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
               data-tooltip-target="tail-close"
-              onClick={() => {
-                batch(() => {
-                  tailPausedSignal.value = false;
-                  tailEnabledSignal.value = false;
-                });
-              }}
+              onClick={() => tailEnabledSignal.value = false}
             >
               <IconX class="w-6 h-6 text-white" />
               <Tooltip

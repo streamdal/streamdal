@@ -9,6 +9,7 @@ import { CustomError } from "../components/error/custom.tsx";
 import { Partial } from "$fresh/runtime.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { Sockets } from "../islands/sockets.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
 
 const tokenError = () => (
   <CustomError
@@ -63,9 +64,21 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
           />
         </ReactFlowProvider>
 
-        <div class="absolute bottom-0 left-0 text-web ml-2 mb-1 flex justify-center items-center text-xs">
-          <a className={"mr-2"} href={"https://github.com/streamdal/streamdal"}>
-            <img src={"/images/github-logo.svg"} />
+        <div class="absolute bottom-0 left-0 text-web ml-2 mb-2 flex justify-center items-center text-xs">
+          <a
+            className={"mr-2 cursor-pointer"}
+            href={"https://discord.com/channels/1121896696801132636"}
+          >
+            <img
+              className="w-5"
+              src={"/images/discord-mark-black.png"}
+            />
+          </a>
+          <a
+            className={"mr-2 cursor-pointer"}
+            href={"https://github.com/streamdal/streamdal"}
+          >
+            <img className="w-5" src={"/images/github-logo.svg"} />
           </a>
           {await Deno.readTextFile("VERSION")}
         </div>

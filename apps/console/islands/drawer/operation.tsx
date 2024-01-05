@@ -3,36 +3,24 @@ import { ProducerIcon } from "../../components/icons/producer.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { useState } from "preact/hooks";
-import {
-  tailEnabledSignal,
-  tailSamplingRateSignal,
-  tailSamplingSignal,
-  tailSignal,
-} from "./tail.tsx";
-import { isNumeric } from "../../lib/utils.ts";
-import { useSignalEffect } from "@preact/signals";
+import { tailEnabledSignal, tailSamplingSignal } from "./tail.tsx";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
-import { Toggle } from "../../components/form/switch.tsx";
 import { Schema } from "./schema.tsx";
+import IconEdit from "tabler-icons/tsx/edit.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
 ) {
   const [managePipelines, setManagePipelines] = useState(true);
-  const [tailNavOpen, setTailNavOpen] = useState(false);
+  const [tailNavOpen, setTailNavOpen] = useState(true);
   const [schemaNavOpen, setSchemaNavOpen] = useState(true);
   const pipelines = Object.values(serviceMap?.pipelines);
 
   const audience = opModal.value?.audience;
   const clients = opModal.value?.clients;
-
-  useSignalEffect(() => {
-    if (tailEnabledSignal.value === false) {
-      tailSignal.value = [];
-    }
-  });
 
   return (
     <>
@@ -105,45 +93,31 @@ export default function Operation(
           </div>
           {clients && (
             <div class="flex flex-col">
-              <div class="flex flex-row justify-start items-center mb-3">
-                <Toggle
-                  label="Sampling"
-                  value={tailSamplingSignal.value}
-                  setValue={(value) => tailSamplingSignal.value = value}
+              <div className="flex flex-row justify-start items-center mb-2 text-[12px] font-[500] text-cobweb">
+                Sampling at
+                <span class="mx-1 font-bold">
+                  {tailSamplingSignal.value.rate}
+                </span>
+                messages per
+                <span class="mx-1 font-bold">
+                  {tailSamplingSignal.value.intervalSeconds}
+                </span>
+                second{tailSamplingSignal.value.intervalSeconds > 1 ? "s" : ""}
+                <IconEdit
+                  class="ml-1 w-5 h-5 text-cobweb cursor-pointer"
+                  data-tooltip-target="sample-rate"
+                  onClick={() =>
+                    opModal.value = { ...opModal.value, tailRateModal: true }}
                 />
-                {tailSamplingSignal.value &&
-                  (
-                    <label className="relative inline-flex items-center cursor-pointer ml-2">
-                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                        Sample Setting
-                      </span>
-
-                      <input
-                        class={`w-[${
-                          (String(
-                            tailSamplingRateSignal.value,
-                          )
-                            .length) * 12
-                        }px] mr-2`}
-                        value={tailSamplingRateSignal
-                          .value}
-                        onChange={(e) => {
-                          if (isNumeric(e.target.value)) {
-                            tailSamplingRateSignal.value = e.target.value;
-                          }
-                        }}
-                      />
-                      <span className="mr-3 text-[12px] font-[500] leading-[20px] text-cobweb">
-                        /s
-                      </span>
-                    </label>
-                  )}
+                <Tooltip
+                  targetId="sample-rate"
+                  message={"Change sample rate."}
+                />
               </div>
               <button
+                className={`mt-2 text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
                 onClick={() =>
-                  tailEnabledSignal.value = !tailEnabledSignal
-                    .value}
-                className={`text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
+                  tailEnabledSignal.value = !tailEnabledSignal.value}
               >
                 {tailEnabledSignal.value ? "Stop Tail" : "Start Tail"}
               </button>
