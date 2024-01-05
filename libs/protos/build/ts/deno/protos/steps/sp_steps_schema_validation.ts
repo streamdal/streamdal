@@ -44,10 +44,12 @@ export interface SchemaValidationJSONSchema {
      * @generated from protobuf field: bytes json_schema = 1;
      */
     jsonSchema: Uint8Array;
+    /**
+     * @generated from protobuf field: protos.steps.JSONSchemaDraft draft = 2;
+     */
+    draft: JSONSchemaDraft;
 }
 /**
- * TODO: expand for protobuf, avro, etc.
- *
  * @generated from protobuf enum protos.steps.SchemaValidationType
  */
 export enum SchemaValidationType {
@@ -73,11 +75,32 @@ export enum SchemaValidationCondition {
      */
     MATCH = 1,
     /**
-     * TODO: backwards compat, evolve, etc.
-     *
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     NOT_MATCH = 2
+}
+/**
+ * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+ *
+ * @generated from protobuf enum protos.steps.JSONSchemaDraft
+ */
+export enum JSONSchemaDraft {
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+     */
+    JSON_SCHEMA_DRAFT_UNKNOWN = 0,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_04 = 1;
+     */
+    JSON_SCHEMA_DRAFT_04 = 1,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_06 = 2;
+     */
+    JSON_SCHEMA_DRAFT_06 = 2,
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_07 = 3;
+     */
+    JSON_SCHEMA_DRAFT_07 = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SchemaValidationStep$Type extends MessageType<SchemaValidationStep> {
@@ -147,11 +170,12 @@ export const SchemaValidationStep = new SchemaValidationStep$Type();
 class SchemaValidationJSONSchema$Type extends MessageType<SchemaValidationJSONSchema> {
     constructor() {
         super("protos.steps.SchemaValidationJSONSchema", [
-            { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "draft", kind: "enum", T: () => ["protos.steps.JSONSchemaDraft", JSONSchemaDraft] }
         ]);
     }
     create(value?: PartialMessage<SchemaValidationJSONSchema>): SchemaValidationJSONSchema {
-        const message = { jsonSchema: new Uint8Array(0) };
+        const message = { jsonSchema: new Uint8Array(0), draft: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<SchemaValidationJSONSchema>(this, message, value);
@@ -164,6 +188,9 @@ class SchemaValidationJSONSchema$Type extends MessageType<SchemaValidationJSONSc
             switch (fieldNo) {
                 case /* bytes json_schema */ 1:
                     message.jsonSchema = reader.bytes();
+                    break;
+                case /* protos.steps.JSONSchemaDraft draft */ 2:
+                    message.draft = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -180,6 +207,9 @@ class SchemaValidationJSONSchema$Type extends MessageType<SchemaValidationJSONSc
         /* bytes json_schema = 1; */
         if (message.jsonSchema.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.jsonSchema);
+        /* protos.steps.JSONSchemaDraft draft = 2; */
+        if (message.draft !== 0)
+            writer.tag(2, WireType.Varint).int32(message.draft);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

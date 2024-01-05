@@ -1,14 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SchemaValidationJSONSchema = exports.SchemaValidationStep = exports.SchemaValidationCondition = exports.SchemaValidationType = void 0;
+exports.SchemaValidationJSONSchema = exports.SchemaValidationStep = exports.JSONSchemaDraft = exports.SchemaValidationCondition = exports.SchemaValidationType = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
 /**
- * TODO: expand for protobuf, avro, etc.
- *
  * @generated from protobuf enum protos.steps.SchemaValidationType
  */
 var SchemaValidationType;
@@ -36,12 +34,34 @@ var SchemaValidationCondition;
      */
     SchemaValidationCondition[SchemaValidationCondition["MATCH"] = 1] = "MATCH";
     /**
-     * TODO: backwards compat, evolve, etc.
-     *
      * @generated from protobuf enum value: SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2;
      */
     SchemaValidationCondition[SchemaValidationCondition["NOT_MATCH"] = 2] = "NOT_MATCH";
 })(SchemaValidationCondition || (exports.SchemaValidationCondition = SchemaValidationCondition = {}));
+/**
+ * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+ *
+ * @generated from protobuf enum protos.steps.JSONSchemaDraft
+ */
+var JSONSchemaDraft;
+(function (JSONSchemaDraft) {
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+     */
+    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_UNKNOWN"] = 0] = "JSON_SCHEMA_DRAFT_UNKNOWN";
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_04 = 1;
+     */
+    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_04"] = 1] = "JSON_SCHEMA_DRAFT_04";
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_06 = 2;
+     */
+    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_06"] = 2] = "JSON_SCHEMA_DRAFT_06";
+    /**
+     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_07 = 3;
+     */
+    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_07"] = 3] = "JSON_SCHEMA_DRAFT_07";
+})(JSONSchemaDraft || (exports.JSONSchemaDraft = JSONSchemaDraft = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SchemaValidationStep$Type extends runtime_5.MessageType {
     constructor() {
@@ -110,11 +130,12 @@ exports.SchemaValidationStep = new SchemaValidationStep$Type();
 class SchemaValidationJSONSchema$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.steps.SchemaValidationJSONSchema", [
-            { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "json_schema", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "draft", kind: "enum", T: () => ["protos.steps.JSONSchemaDraft", JSONSchemaDraft] }
         ]);
     }
     create(value) {
-        const message = { jsonSchema: new Uint8Array(0) };
+        const message = { jsonSchema: new Uint8Array(0), draft: 0 };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -127,6 +148,9 @@ class SchemaValidationJSONSchema$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* bytes json_schema */ 1:
                     message.jsonSchema = reader.bytes();
+                    break;
+                case /* protos.steps.JSONSchemaDraft draft */ 2:
+                    message.draft = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -143,6 +167,9 @@ class SchemaValidationJSONSchema$Type extends runtime_5.MessageType {
         /* bytes json_schema = 1; */
         if (message.jsonSchema.length)
             writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.jsonSchema);
+        /* protos.steps.JSONSchemaDraft draft = 2; */
+        if (message.draft !== 0)
+            writer.tag(2, runtime_1.WireType.Varint).int32(message.draft);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

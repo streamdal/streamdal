@@ -278,6 +278,8 @@ pub struct SchemaValidationJSONSchema {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.SchemaValidationJSONSchema.json_schema)
     pub json_schema: ::std::vec::Vec<u8>,
+    // @@protoc_insertion_point(field:protos.steps.SchemaValidationJSONSchema.draft)
+    pub draft: ::protobuf::EnumOrUnknown<JSONSchemaDraft>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.SchemaValidationJSONSchema.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -295,12 +297,17 @@ impl SchemaValidationJSONSchema {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "json_schema",
             |m: &SchemaValidationJSONSchema| { &m.json_schema },
             |m: &mut SchemaValidationJSONSchema| { &mut m.json_schema },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "draft",
+            |m: &SchemaValidationJSONSchema| { &m.draft },
+            |m: &mut SchemaValidationJSONSchema| { &mut m.draft },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SchemaValidationJSONSchema>(
             "SchemaValidationJSONSchema",
@@ -323,6 +330,9 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
                 10 => {
                     self.json_schema = is.read_bytes()?;
                 },
+                16 => {
+                    self.draft = is.read_enum_or_unknown()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -338,6 +348,9 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
         if !self.json_schema.is_empty() {
             my_size += ::protobuf::rt::bytes_size(1, &self.json_schema);
         }
+        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN) {
+            my_size += ::protobuf::rt::int32_size(2, self.draft.value());
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -346,6 +359,9 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if !self.json_schema.is_empty() {
             os.write_bytes(1, &self.json_schema)?;
+        }
+        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN) {
+            os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.draft))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -365,12 +381,14 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
 
     fn clear(&mut self) {
         self.json_schema.clear();
+        self.draft = ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN);
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static SchemaValidationJSONSchema {
         static instance: SchemaValidationJSONSchema = SchemaValidationJSONSchema {
             json_schema: ::std::vec::Vec::new(),
+            draft: ::protobuf::EnumOrUnknown::from_i32(0),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -394,7 +412,6 @@ impl ::protobuf::reflect::ProtobufValue for SchemaValidationJSONSchema {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  TODO: expand for protobuf, avro, etc.
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.steps.SchemaValidationType)
 pub enum SchemaValidationType {
@@ -524,50 +541,138 @@ impl SchemaValidationCondition {
     }
 }
 
+///  protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.steps.JSONSchemaDraft)
+pub enum JSONSchemaDraft {
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_UNKNOWN)
+    JSON_SCHEMA_DRAFT_UNKNOWN = 0,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_04)
+    JSON_SCHEMA_DRAFT_04 = 1,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_06)
+    JSON_SCHEMA_DRAFT_06 = 2,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_07)
+    JSON_SCHEMA_DRAFT_07 = 3,
+}
+
+impl ::protobuf::Enum for JSONSchemaDraft {
+    const NAME: &'static str = "JSONSchemaDraft";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<JSONSchemaDraft> {
+        match value {
+            0 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN),
+            1 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_04),
+            2 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_06),
+            3 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_07),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn from_str(str: &str) -> ::std::option::Option<JSONSchemaDraft> {
+        match str {
+            "JSON_SCHEMA_DRAFT_UNKNOWN" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN),
+            "JSON_SCHEMA_DRAFT_04" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_04),
+            "JSON_SCHEMA_DRAFT_06" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_06),
+            "JSON_SCHEMA_DRAFT_07" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_07),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [JSONSchemaDraft] = &[
+        JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN,
+        JSONSchemaDraft::JSON_SCHEMA_DRAFT_04,
+        JSONSchemaDraft::JSON_SCHEMA_DRAFT_06,
+        JSONSchemaDraft::JSON_SCHEMA_DRAFT_07,
+    ];
+}
+
+impl ::protobuf::EnumFull for JSONSchemaDraft {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("JSONSchemaDraft").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for JSONSchemaDraft {
+    fn default() -> Self {
+        JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN
+    }
+}
+
+impl JSONSchemaDraft {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<JSONSchemaDraft>("JSONSchemaDraft")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n&steps/sp_steps_schema_validation.proto\x12\x0cprotos.steps\"\xed\x01\
     \n\x14SchemaValidationStep\x126\n\x04type\x18\x01\x20\x01(\x0e2\".protos\
     .steps.SchemaValidationTypeR\x04type\x12E\n\tcondition\x18\x02\x20\x01(\
     \x0e2'.protos.steps.SchemaValidationConditionR\tcondition\x12K\n\x0bjson\
     _schema\x18e\x20\x01(\x0b2(.protos.steps.SchemaValidationJSONSchemaH\0R\
-    \njsonSchemaB\t\n\x07options\"=\n\x1aSchemaValidationJSONSchema\x12\x1f\
-    \n\x0bjson_schema\x18\x01\x20\x01(\x0cR\njsonSchema*a\n\x14SchemaValidat\
-    ionType\x12\"\n\x1eSCHEMA_VALIDATION_TYPE_UNKNOWN\x10\0\x12%\n!SCHEMA_VA\
-    LIDATION_TYPE_JSONSCHEMA\x10\x01*\x96\x01\n\x19SchemaValidationCondition\
-    \x12'\n#SCHEMA_VALIDATION_CONDITION_UNKNOWN\x10\0\x12%\n!SCHEMA_VALIDATI\
-    ON_CONDITION_MATCH\x10\x01\x12)\n%SCHEMA_VALIDATION_CONDITION_NOT_MATCH\
-    \x10\x02BBZ@github.com/streamdal/streamdal/libs/protos/build/go/protos/s\
-    tepsJ\xa7\x05\n\x06\x12\x04\0\0\x20\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\
-    \n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\
-    \x02\x08\x0b\x12\x03\x04\0W\n3\n\x02\x05\0\x12\x04\x07\0\n\x01\x1a'\x20T\
-    ODO:\x20expand\x20for\x20protobuf,\x20avro,\x20etc.\n\n\n\n\x03\x05\0\
-    \x01\x12\x03\x07\x05\x19\n\x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02%\n\x0c\
-    \n\x05\x05\0\x02\0\x01\x12\x03\x08\x02\x20\n\x0c\n\x05\x05\0\x02\0\x02\
-    \x12\x03\x08#$\n\x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02(\n\x0c\n\x05\x05\
-    \0\x02\x01\x01\x12\x03\t\x02#\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t&'\
-    \n\n\n\x02\x05\x01\x12\x04\x0c\0\x12\x01\n\n\n\x03\x05\x01\x01\x12\x03\
-    \x0c\x05\x1e\n\x0b\n\x04\x05\x01\x02\0\x12\x03\r\x02*\n\x0c\n\x05\x05\
-    \x01\x02\0\x01\x12\x03\r\x02%\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\r()\
-    \n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x0e\x02(\n\x0c\n\x05\x05\x01\x02\
-    \x01\x01\x12\x03\x0e\x02#\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\x0e&'\
-    \n3\n\x04\x05\x01\x02\x02\x12\x03\x0f\x02,\"&\x20TODO:\x20backwards\x20c\
-    ompat,\x20evolve,\x20etc.\n\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\x03\x0f\
-    \x02'\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x0f*+\n\n\n\x02\x04\0\x12\
-    \x04\x14\0\x1c\x01\n\n\n\x03\x04\0\x01\x12\x03\x14\x08\x1c\n\x0b\n\x04\
-    \x04\0\x02\0\x12\x03\x15\x02\x20\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x15\
-    \x02\x16\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x15\x17\x1b\n\x0c\n\x05\x04\
-    \0\x02\0\x03\x12\x03\x15\x1e\x1f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x17\
-    \x02*\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x17\x02\x1b\n\x0c\n\x05\x04\
-    \0\x02\x01\x01\x12\x03\x17\x1c%\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\
-    \x17()\n\x0c\n\x04\x04\0\x08\0\x12\x04\x19\x02\x1b\x03\n\x0c\n\x05\x04\0\
-    \x08\0\x01\x12\x03\x19\x08\x0f\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x1a\x04\
-    1\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x1a\x04\x1e\n\x0c\n\x05\x04\0\
-    \x02\x02\x01\x12\x03\x1a\x1f*\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1a-\
-    0\n\n\n\x02\x04\x01\x12\x04\x1e\0\x20\x01\n\n\n\x03\x04\x01\x01\x12\x03\
-    \x1e\x08\"\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1f\x02\x18\n\x0c\n\x05\x04\
-    \x01\x02\0\x05\x12\x03\x1f\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\
-    \x1f\x08\x13\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1f\x16\x17b\x06proto\
-    3\
+    \njsonSchemaB\t\n\x07options\"r\n\x1aSchemaValidationJSONSchema\x12\x1f\
+    \n\x0bjson_schema\x18\x01\x20\x01(\x0cR\njsonSchema\x123\n\x05draft\x18\
+    \x02\x20\x01(\x0e2\x1d.protos.steps.JSONSchemaDraftR\x05draft*a\n\x14Sch\
+    emaValidationType\x12\"\n\x1eSCHEMA_VALIDATION_TYPE_UNKNOWN\x10\0\x12%\n\
+    !SCHEMA_VALIDATION_TYPE_JSONSCHEMA\x10\x01*\x96\x01\n\x19SchemaValidatio\
+    nCondition\x12'\n#SCHEMA_VALIDATION_CONDITION_UNKNOWN\x10\0\x12%\n!SCHEM\
+    A_VALIDATION_CONDITION_MATCH\x10\x01\x12)\n%SCHEMA_VALIDATION_CONDITION_\
+    NOT_MATCH\x10\x02*~\n\x0fJSONSchemaDraft\x12\x1d\n\x19JSON_SCHEMA_DRAFT_\
+    UNKNOWN\x10\0\x12\x18\n\x14JSON_SCHEMA_DRAFT_04\x10\x01\x12\x18\n\x14JSO\
+    N_SCHEMA_DRAFT_06\x10\x02\x12\x18\n\x14JSON_SCHEMA_DRAFT_07\x10\x03BBZ@g\
+    ithub.com/streamdal/streamdal/libs/protos/build/go/protos/stepsJ\x85\x07\
+    \n\x06\x12\x04\0\0'\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    \x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\
+    \x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\t\x01\n\n\n\x03\x05\0\x01\x12\
+    \x03\x06\x05\x19\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02%\n\x0c\n\x05\
+    \x05\0\x02\0\x01\x12\x03\x07\x02\x20\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\
+    \x07#$\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\x02(\n\x0c\n\x05\x05\0\x02\
+    \x01\x01\x12\x03\x08\x02#\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08&'\n\
+    \n\n\x02\x05\x01\x12\x04\x0b\0\x0f\x01\n\n\n\x03\x05\x01\x01\x12\x03\x0b\
+    \x05\x1e\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x0c\x02*\n\x0c\n\x05\x05\x01\
+    \x02\0\x01\x12\x03\x0c\x02%\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\x0c()\
+    \n\x0b\n\x04\x05\x01\x02\x01\x12\x03\r\x02(\n\x0c\n\x05\x05\x01\x02\x01\
+    \x01\x12\x03\r\x02#\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\r&'\n\x0b\n\
+    \x04\x05\x01\x02\x02\x12\x03\x0e\x02,\n\x0c\n\x05\x05\x01\x02\x02\x01\
+    \x12\x03\x0e\x02'\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x0e*+\nF\n\x02\
+    \x05\x02\x12\x04\x12\0\x17\x01\x1a:\x20protolint:disable:next\x20ENUM_FI\
+    ELD_NAMES_UPPER_SNAKE_CASE\n\n\n\n\x03\x05\x02\x01\x12\x03\x12\x05\x14\n\
+    \x0b\n\x04\x05\x02\x02\0\x12\x03\x13\x02\x20\n\x0c\n\x05\x05\x02\x02\0\
+    \x01\x12\x03\x13\x02\x1b\n\x0c\n\x05\x05\x02\x02\0\x02\x12\x03\x13\x1e\
+    \x1f\n\x0b\n\x04\x05\x02\x02\x01\x12\x03\x14\x02\x1b\n\x0c\n\x05\x05\x02\
+    \x02\x01\x01\x12\x03\x14\x02\x16\n\x0c\n\x05\x05\x02\x02\x01\x02\x12\x03\
+    \x14\x19\x1a\n\x0b\n\x04\x05\x02\x02\x02\x12\x03\x15\x02\x1b\n\x0c\n\x05\
+    \x05\x02\x02\x02\x01\x12\x03\x15\x02\x16\n\x0c\n\x05\x05\x02\x02\x02\x02\
+    \x12\x03\x15\x19\x1a\n\x0b\n\x04\x05\x02\x02\x03\x12\x03\x16\x02\x1b\n\
+    \x0c\n\x05\x05\x02\x02\x03\x01\x12\x03\x16\x02\x16\n\x0c\n\x05\x05\x02\
+    \x02\x03\x02\x12\x03\x16\x19\x1a\n\n\n\x02\x04\0\x12\x04\x19\0!\x01\n\n\
+    \n\x03\x04\0\x01\x12\x03\x19\x08\x1c\n\x0b\n\x04\x04\0\x02\0\x12\x03\x1a\
+    \x02\x20\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x1a\x02\x16\n\x0c\n\x05\x04\
+    \0\x02\0\x01\x12\x03\x1a\x17\x1b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1a\
+    \x1e\x1f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x1c\x02*\n\x0c\n\x05\x04\0\
+    \x02\x01\x06\x12\x03\x1c\x02\x1b\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\
+    \x1c\x1c%\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1c()\n\x0c\n\x04\x04\0\
+    \x08\0\x12\x04\x1e\x02\x20\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x1e\
+    \x08\x0f\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x1f\x041\n\x0c\n\x05\x04\0\
+    \x02\x02\x06\x12\x03\x1f\x04\x1e\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    \x1f\x1f*\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1f-0\n\n\n\x02\x04\x01\
+    \x12\x04#\0'\x01\n\n\n\x03\x04\x01\x01\x12\x03#\x08\"\n\x0b\n\x04\x04\
+    \x01\x02\0\x12\x03$\x02\x18\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03$\x02\
+    \x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03$\x08\x13\n\x0c\n\x05\x04\x01\
+    \x02\0\x03\x12\x03$\x16\x17\n\x0b\n\x04\x04\x01\x02\x01\x12\x03&\x02\x1c\
+    \n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03&\x02\x11\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x03&\x12\x17\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03&\
+    \x1a\x1bb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -588,9 +693,10 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut messages = ::std::vec::Vec::with_capacity(2);
             messages.push(SchemaValidationStep::generated_message_descriptor_data());
             messages.push(SchemaValidationJSONSchema::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(2);
+            let mut enums = ::std::vec::Vec::with_capacity(3);
             enums.push(SchemaValidationType::generated_enum_descriptor_data());
             enums.push(SchemaValidationCondition::generated_enum_descriptor_data());
+            enums.push(JSONSchemaDraft::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

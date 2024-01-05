@@ -170,8 +170,6 @@ class KvStatus(betterproto.Enum):
 
 
 class SchemaValidationType(betterproto.Enum):
-    """TODO: expand for protobuf, avro, etc."""
-
     SCHEMA_VALIDATION_TYPE_UNKNOWN = 0
     SCHEMA_VALIDATION_TYPE_JSONSCHEMA = 1
 
@@ -180,6 +178,15 @@ class SchemaValidationCondition(betterproto.Enum):
     SCHEMA_VALIDATION_CONDITION_UNKNOWN = 0
     SCHEMA_VALIDATION_CONDITION_MATCH = 1
     SCHEMA_VALIDATION_CONDITION_NOT_MATCH = 2
+
+
+class JsonSchemaDraft(betterproto.Enum):
+    """protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE"""
+
+    JSON_SCHEMA_DRAFT_UNKNOWN = 0
+    JSON_SCHEMA_DRAFT_04 = 1
+    JSON_SCHEMA_DRAFT_06 = 2
+    JSON_SCHEMA_DRAFT_07 = 3
 
 
 class TransformType(betterproto.Enum):
@@ -320,6 +327,7 @@ class SchemaValidationStep(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class SchemaValidationJsonSchema(betterproto.Message):
     json_schema: bytes = betterproto.bytes_field(1)
+    draft: "JsonSchemaDraft" = betterproto.enum_field(2)
 
 
 @dataclass(eq=False, repr=False)
