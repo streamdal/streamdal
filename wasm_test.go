@@ -435,4 +435,188 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
 		})
 	})
+
+	Context("Schema validation", func() {
+		var s *Streamdal
+		var req *protos.WASMRequest
+		var f *function
+
+		BeforeEach(func() {
+
+			schema := []byte(`{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "age": {
+      "type": "number"
+    },
+    "foo": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key"
+      ]
+    }
+  },
+  "required": [
+  ]
+}`)
+
+			wasmData, err := os.ReadFile("test-assets/wasm/schemavalidation.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req = &protos.WASMRequest{
+				Step: &protos.PipelineStep{
+					Step: &protos.PipelineStep_SchemaValidation{
+						SchemaValidation: &steps.SchemaValidationStep{
+							Type:      steps.SchemaValidationType_SCHEMA_VALIDATION_TYPE_JSONSCHEMA,
+							Condition: steps.SchemaValidationCondition_SCHEMA_VALIDATION_CONDITION_MATCH,
+							Options: &steps.SchemaValidationStep_JsonSchema{
+								JsonSchema: &steps.SchemaValidationJSONSchema{
+									JsonSchema: schema,
+									Draft:      steps.JSONSchemaDraft_JSON_SCHEMA_DRAFT_07,
+								},
+							},
+						},
+					},
+					XWasmId:       stringPtr(uuid.New().String()),
+					XWasmFunction: stringPtr("f"),
+					XWasmBytes:    wasmData,
+				},
+				InputPayload: nil,
+			}
+
+			s = &Streamdal{
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines:    map[string]map[string]*protos.Command{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+			}
+
+			f, err = s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+		})
+
+		It("Fails validation", func() {
+			req.InputPayload = []byte(`{
+  "name": "Bob",
+  "age": "str",
+  "foo": {"key": "value"}
+}`)
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitMsg).To(Equal("payload does not match schema, invalid fields: age: expected type=number; got value=\"str\""))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+		})
+
+		It("Passes validation", func() {
+			req.InputPayload = []byte(`{
+  "name": "Bob",
+  "age": 30,
+  "foo": {"key": "value"}
+}`)
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(wasmResp.ExitMsg).To(Equal("payload matches schema"))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+		})
+	})
+
+	Context("Transform", func() {
+		var s *Streamdal
+		var req *protos.WASMRequest
+		var f *function
+
+		BeforeEach(func() {
+			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			req = &protos.WASMRequest{
+				Step: &protos.PipelineStep{
+					Step: &protos.PipelineStep_Transform{
+						Transform: &steps.TransformStep{
+							Type: steps.TransformType_TRANSFORM_TYPE_EXTRACT,
+							Options: &steps.TransformStep_ExtractOptions{
+								ExtractOptions: &steps.TransformExtractOptions{},
+							},
+						},
+					},
+					XWasmId:       stringPtr(uuid.New().String()),
+					XWasmFunction: stringPtr("f"),
+					XWasmBytes:    wasmData,
+				},
+				InputPayload: nil,
+			}
+
+			s = &Streamdal{
+				pipelinesMtx: &sync.RWMutex{},
+				pipelines:    map[string]map[string]*protos.Command{},
+				audiencesMtx: &sync.RWMutex{},
+				audiences:    map[string]struct{}{},
+			}
+
+			f, err = s.createFunction(req.Step)
+			Expect(err).ToNot(HaveOccurred())
+
+			req.Step.XWasmBytes = nil
+		})
+
+		It("extracts a nested field", func() {
+			eo := req.Step.GetTransform().GetExtractOptions()
+			eo.Paths = []string{"foo.key"}
+			eo.Flatten = false
+
+			req.InputPayload = []byte(`{
+  "name": "Bob",
+  "age": "str",
+  "foo": {"key": "value"}
+}`)
+
+			data, err := proto.Marshal(req)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := f.Exec(context.Background(), data)
+			Expect(err).ToNot(HaveOccurred())
+
+			wasmResp := &protos.WASMResponse{}
+
+			err = proto.Unmarshal(res, wasmResp)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(wasmResp).ToNot(BeNil())
+			Expect(string(wasmResp.OutputPayload)).To(Equal(`{"foo":{"key":"value"}}`))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+		})
+
+		// TODO: additional tests for each transform type
+	})
 })
