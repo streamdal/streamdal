@@ -115,6 +115,7 @@ func (SchemaValidationCondition) EnumDescriptor() ([]byte, []int) {
 	return file_steps_sp_steps_schema_validation_proto_rawDescGZIP(), []int{1}
 }
 
+// protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 type JSONSchemaDraft int32
 
 const (

@@ -36,6 +36,8 @@ export var SchemaValidationCondition;
     SchemaValidationCondition[SchemaValidationCondition["NOT_MATCH"] = 2] = "NOT_MATCH";
 })(SchemaValidationCondition || (SchemaValidationCondition = {}));
 /**
+ * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+ *
  * @generated from protobuf enum protos.steps.JSONSchemaDraft
  */
 export var JSONSchemaDraft;

@@ -181,7 +181,7 @@ class SchemaValidationCondition(betterproto.Enum):
 
 
 class JsonSchemaDraft(betterproto.Enum):
-    """protolint:disable:this ENUM_FIELD_NAMES_PREFIX"""
+    """protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE"""
 
     JSON_SCHEMA_DRAFT_UNKNOWN = 0
     JSON_SCHEMA_DRAFT_04 = 1

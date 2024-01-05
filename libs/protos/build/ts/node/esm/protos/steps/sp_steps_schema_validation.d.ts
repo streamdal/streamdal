@@ -73,6 +73,8 @@ export declare enum SchemaValidationCondition {
     NOT_MATCH = 2
 }
 /**
+ * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+ *
  * @generated from protobuf enum protos.steps.JSONSchemaDraft
  */
 export declare enum JSONSchemaDraft {
