@@ -21,7 +21,7 @@ services:
 
   # UI component that talks to server
   streamdal-console:
-    image: streamdal/console:0.0.4
+    image: streamdal/console:0.0.6
     container_name: streamdal-console
     depends_on:
       - envoy
