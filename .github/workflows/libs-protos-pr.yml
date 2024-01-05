@@ -18,7 +18,7 @@ jobs:
       - name: Protobuf Linting
         uses: plexsystems/protolint-action@v0.4.0
         with:
-          configDirectory: ./
+          configDirectory: ./libs/protos
 
       - name: Compile protos
         run: |
