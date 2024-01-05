@@ -25,7 +25,7 @@ setup/darwin:
 
 .PHONY: build
 build: description = Build all targets
-build: clean build/detective build/transform build/httprequest build/kv build/inferschema  build/validjson
+build: clean build/detective build/transform build/httprequest build/kv build/inferschema build/validjson build/schemavalidation
 
 .PHONY: build/detective
 build/detective: description = Build WASM target for detective
@@ -99,9 +99,21 @@ clean/validjson: description = Remove validjson WASM artifacts
 clean/validjson:
 	rm -rf validjson/target build/validjson.wasm
 
+.PHONY: build/schemavalidation
+build/schemavalidation: description = Build WASM target for schemavalidation
+build/schemavalidation: clean/schemavalidation
+	cd schemavalidation && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/schemavalidation.wasm target/wasm32-wasi/release/schemavalidation.wasm
+
+.PHONY: clean/schemavalidation
+clean/schemavalidation: description = Remove schemavalidation WASM artifacts
+clean/schemavalidation:
+	rm -rf schemavalidation/target build/schemavalidation.wasm
+
 .PHONY: clean
 clean: description = Remove all build artifacts
-clean: clean/detective clean/transform clean/httprequest clean/kv clean/inferschema clean/validjson
+clean: clean/detective clean/transform clean/httprequest clean/kv clean/inferschema clean/validjson clean/schemavalidation
 
 .PHONY: test
 test: description = Run tests
