@@ -40,7 +40,7 @@ jobs:
 
       - name: Update console VERSION file
         run: |
-          echo ${{ steps.create_tag.outputs.new_version }} > VERSION
+          echo ${{ steps.get_new_version.outputs.new_version }} > VERSION
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
