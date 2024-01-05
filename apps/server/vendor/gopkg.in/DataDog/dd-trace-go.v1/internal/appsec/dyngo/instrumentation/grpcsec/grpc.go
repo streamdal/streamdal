@@ -10,11 +10,13 @@
 package grpcsec
 
 import (
-	"encoding/json"
+	"context"
 	"reflect"
-	"sync"
 
 	"gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo"
+	"gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo/instrumentation"
+
+	"github.com/DataDog/appsec-internal-go/netip"
 )
 
 // Abstract gRPC server handler operation definitions. It is based on two
@@ -37,15 +39,16 @@ type (
 	// to the operation using its AddSecurityEvent() method.
 	HandlerOperation struct {
 		dyngo.Operation
-
-		events []json.RawMessage
-		mu     sync.Mutex
+		instrumentation.TagsHolder
+		instrumentation.SecurityEventsHolder
+		Error error
 	}
 	// HandlerOperationArgs is the grpc handler arguments.
 	HandlerOperationArgs struct {
 		// Message received by the gRPC handler.
 		// Corresponds to the address `grpc.server.request.metadata`.
 		Metadata map[string][]string
+		ClientIP netip.Addr
 	}
 	// HandlerOperationRes is the grpc handler results. Empty as of today.
 	HandlerOperationRes struct{}
@@ -65,7 +68,32 @@ type (
 		// Corresponds to the address `grpc.server.request.message`.
 		Message interface{}
 	}
+
+	// MonitoringError is used to vehicle a gRPC error that also embeds a request status code
+	MonitoringError struct {
+		msg    string
+		status uint32
+	}
 )
+
+// NewMonitoringError creates and returns a new gRPC monitoring error, wrapped under
+// sharedesec.MonitoringError
+func NewMonitoringError(msg string, code uint32) error {
+	return &MonitoringError{
+		msg:    msg,
+		status: code,
+	}
+}
+
+// GRPCStatus returns the gRPC status code embedded in the error
+func (e *MonitoringError) GRPCStatus() uint32 {
+	return e.status
+}
+
+// Error implements the error interface
+func (e *MonitoringError) Error() string {
+	return e.msg
+}
 
 // TODO(Julio-Guerra): create a go-generate tool to generate the types, vars and methods below
 
@@ -73,25 +101,24 @@ type (
 // given arguments and parent operation, and emits a start event up in the
 // operation stack. When parent is nil, the operation is linked to the global
 // root operation.
-func StartHandlerOperation(args HandlerOperationArgs, parent dyngo.Operation) *HandlerOperation {
-	op := &HandlerOperation{Operation: dyngo.NewOperation(parent)}
+func StartHandlerOperation(ctx context.Context, args HandlerOperationArgs, parent dyngo.Operation, listeners ...dyngo.DataListener) (context.Context, *HandlerOperation) {
+	op := &HandlerOperation{
+		Operation:  dyngo.NewOperation(parent),
+		TagsHolder: instrumentation.NewTagsHolder(),
+	}
+	for _, l := range listeners {
+		op.OnData(l)
+	}
+	newCtx := context.WithValue(ctx, instrumentation.ContextKey{}, op)
 	dyngo.StartOperation(op, args)
-	return op
+	return newCtx, op
 }
 
 // Finish the gRPC handler operation, along with the given results, and emit a
 // finish event up in the operation stack.
-func (op *HandlerOperation) Finish(res HandlerOperationRes) []json.RawMessage {
+func (op *HandlerOperation) Finish(res HandlerOperationRes) []any {
 	dyngo.FinishOperation(op, res)
-	return op.events
-}
-
-// AddSecurityEvent adds the security event to the list of events observed
-// during the operation lifetime.
-func (op *HandlerOperation) AddSecurityEvent(events []json.RawMessage) {
-	op.mu.Lock()
-	defer op.mu.Unlock()
-	op.events = append(op.events, events...)
+	return op.Events()
 }
 
 // gRPC handler operation's start and finish event callback function types.
