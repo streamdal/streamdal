@@ -11,7 +11,7 @@ enum TransformType {
   TRANSFORM_TYPE_OBFUSCATE_VALUE = 3;
   TRANSFORM_TYPE_MASK_VALUE = 4;
   TRANSFORM_TYPE_TRUNCATE_VALUE = 5;
-  // TODO: type for delete all keys except specified ones
+  TRANSFORM_TYPE_EXTRACT = 6;
 }
 
 message TransformStep {
@@ -20,11 +20,24 @@ message TransformStep {
   TransformType type = 3;
 
   oneof options {
+    // Replace the value of a field with a new value
     TransformReplaceValueOptions replace_value_options = 101;
+
+    // Delete a field from a JSON payload
     TransformDeleteFieldOptions delete_field_options = 102;
+
+    // Obfuscate hashes the value of a field with sha256
     TransformObfuscateOptions obfuscate_options = 103;
+
+    // Mask part of a field's value with the given character
     TransformMaskOptions mask_options = 104;
+
+    // Truncate the value of a field to a maximum number of characters,
+    // or to a percentage of characters based on the field length
     TransformTruncateOptions truncate_options = 105;
+
+    // Extract one or multiple values from a payload
+    TransformExtractOptions extract_options = 106;
   }
 }
 
@@ -59,4 +72,9 @@ message TransformObfuscateOptions {
 message TransformMaskOptions {
   string path = 1;
   string mask = 2;
+}
+
+message TransformExtractOptions {
+  repeated string paths = 1;
+  bool flatten = 2;
 }
