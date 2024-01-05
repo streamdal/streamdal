@@ -50,6 +50,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => transform::obfuscate(&transform_request),
         TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => transform::truncate(&transform_request),
         TransformType::TRANSFORM_TYPE_DELETE_FIELD => transform::delete(&transform_request),
+        TransformType::TRANSFORM_TYPE_EXTRACT => transform::extract(&transform_request),
         _ => {
             return common::write_response(
                 None,
@@ -173,23 +174,29 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                     extract_options: None,
                 }
             } else {
+                let ro = wasm_request.step.transform().replace_value_options();
+
                 transform::Request {
                     data: wasm_request.input_payload.clone(),
-                    path: wasm_request
-                        .step
-                        .transform()
-                        .replace_value_options()
-                        .path
-                        .clone(),
-                    value: wasm_request
-                        .step
-                        .transform()
-                        .replace_value_options()
-                        .value
-                        .clone(),
+                    path: ro.path.clone(),
+                    value: ro.value.clone(),
                     truncate_options: None,
                     extract_options: None,
                 }
+            }
+        }
+        TransformType::TRANSFORM_TYPE_EXTRACT => {
+            let eo = wasm_request.step.transform().extract_options();
+
+            transform::Request {
+                data: wasm_request.input_payload.clone(),
+                path: "".to_string(),
+                value: "".to_string(),
+                truncate_options: None,
+                extract_options: Some(transform::ExtractOptions {
+                    flatten: eo.clone().flatten,
+                    paths: eo.paths.clone(),
+                }),
             }
         }
         _ => {
