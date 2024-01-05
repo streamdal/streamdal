@@ -25,6 +25,8 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.set_output.outputs.sha }}
 
     steps:
     - name: Checkout repository
@@ -60,6 +62,10 @@ jobs:
         git commit -m "norelease: Update Helm chart"
         git push
 
+    - name: Set Output
+      id: set_output
+      run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+
   pages:
     needs: release
     environment:
@@ -69,6 +75,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.sha }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
