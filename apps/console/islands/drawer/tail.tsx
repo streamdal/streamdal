@@ -9,7 +9,7 @@ import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { batch, signal, useSignalEffect } from "@preact/signals";
+import { signal, useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
@@ -25,11 +25,11 @@ export type TailSampleRate = {
 export const tailSignal = signal<TailData[] | null>(
   null,
 );
-
+export const tailSocketSignal = signal<Websocket | null>(null);
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
 export const defaultTailSampleRate = {
-  rate: 100,
+  rate: 25,
   intervalSeconds: 1,
 };
 export const tailSamplingSignal = signal<TailSampleRate>(defaultTailSampleRate);
@@ -95,16 +95,23 @@ export const TailRow = (
 export const Tail = ({ audience }: { audience: Audience }) => {
   const scrollBottom = useRef();
   const [fullScreen, setFullScreen] = useState(false);
-  const [socket, setSocket] = useState(null);
 
-  const start = () => setSocket(tailSocket("/ws/tail", audience));
+  const start = () => {
+    if (
+      tailSocketSignal.value == null ||
+      tailSocketSignal.value?.readyState === WebSocket.CLOSED
+    ) {
+      tailSocketSignal.value = tailSocket("/ws/tail", audience);
+    }
+  };
+
   const stop = () => {
-    socket?.close();
+    tailSocketSignal.value?.close();
   };
 
   useEffect(() => {
-    start();
-
+    tailSignal.value = [];
+    tailPausedSignal.value = false;
     const togglePause = () => {
       tailPausedSignal.value = document.visibilityState !== "visible";
     };
@@ -112,15 +119,16 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
     return () => {
       stop();
+      tailSignal.value = [];
       document.removeEventListener("visibilitychange", togglePause);
     };
   }, []);
 
   useSignalEffect(() => {
-    if (!tailEnabledSignal.value || tailPausedSignal.value) {
+    if (tailPausedSignal.value) {
       stop();
     } else {
-      socket?.readyState !== WebSocket.OPEN && start();
+      start();
     }
   });
 
@@ -165,9 +173,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               class="flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
               data-tooltip-target="tail-pause-play"
-              onClick={() => {
-                tailPausedSignal.value = !tailPausedSignal.value;
-              }}
+              onClick={() => tailPausedSignal.value = !tailPausedSignal.value}
             >
               {tailPausedSignal.value
                 ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
@@ -210,12 +216,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
               data-tooltip-target="tail-close"
-              onClick={() => {
-                batch(() => {
-                  tailPausedSignal.value = false;
-                  tailEnabledSignal.value = false;
-                });
-              }}
+              onClick={() => tailEnabledSignal.value = false}
             >
               <IconX class="w-6 h-6 text-white" />
               <Tooltip

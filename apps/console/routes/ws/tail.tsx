@@ -9,7 +9,6 @@ export const config: RouteConfig = {
 
 export const handler: Handlers<{ tail: TailResponse }> = {
   async GET(req, ctx) {
-    let clientConnected = false;
     if (req.headers.get("upgrade") != "websocket") {
       return new Response(null, { status: 501 });
     }
@@ -31,13 +30,11 @@ export const handler: Handlers<{ tail: TailResponse }> = {
     });
 
     socket.addEventListener("open", () => {
-      clientConnected = true;
       tailAbortSignal.value = false;
       console.info("tail socket client connected!");
     });
 
     socket.addEventListener("close", () => {
-      clientConnected = false;
       tailAbortSignal.value = true;
       console.info("tail socket client closed!");
     });

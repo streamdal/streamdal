@@ -92,7 +92,6 @@ export const tail = async (
       if (response?.Keepalive) {
         continue;
       }
-
       sendResponse(response);
     }
 
@@ -100,7 +99,7 @@ export const tail = async (
     status && console.info("grpc tail status", status);
   } catch (e) {
     //
-    // User generated abort signals present as cancelled exceptions, don't reconnect
+    // User generated abort signals present as cancelled exceptions, don't log
     if (e?.code === "CANCELLED") {
       return;
     }

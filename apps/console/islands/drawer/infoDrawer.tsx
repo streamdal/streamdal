@@ -14,6 +14,7 @@ import { Tail, tailEnabledSignal } from "./tail.tsx";
 import { ResumePipelineModal } from "../../components/modals/resumePipelineModal.tsx";
 import { AttachPipelineModal } from "../../components/modals/attachPipelineModal.tsx";
 import { Audience } from "https://deno.land/x/streamdal_protos@v0.0.126/protos/sp_common.ts";
+import { TailRateModal } from "../../components/modals/tailRateModal.tsx";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -71,6 +72,7 @@ export const Modals = ({ audience }: { audience?: Audience }) => {
           <DeleteServiceModal audience={audience} />
         )}
         {tailEnabledSignal.value && <Tail audience={audience} />}
+        {opModal.value?.tailRateModal && <TailRateModal />}
       </>
     )
     : null;
