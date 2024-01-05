@@ -42,11 +42,12 @@ export const TailRateModal = () => {
     tailSamplingSignal.value.intervalSeconds = Number(
       data.get("intervalSeconds"),
     );
+
     //
     // restart tail if it's running
     if (tailEnabledSignal.value && !tailPausedSignal.value) {
       tailPausedSignal.value = true;
-      tailPausedSignal.value = false;
+      setTimeout(() => tailPausedSignal.value = false, 1000);
     }
     opModal.value = { ...opModal.value, tailRateModal: false };
   };
