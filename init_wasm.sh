@@ -7,17 +7,17 @@ latest_release=$(curl -s https://api.github.com/repos/streamdal/streamdal/releas
 download_url=$(echo "$latest_release" | grep -o 'https://.*\.zip')
 
 # Step 3: Add debug info
-mkdir -p assets/wasm
+mkdir -p assets/test
 version=$(echo $download_url | cut -d / -f10)
-echo "WASM artifact version: ${version}" > assets/wasm/version.txt
-echo "Last updated: $(date)" >> assets/wasm/version.txt
+echo "WASM artifact version: ${version}" > assets/test/version.txt
+echo "Last updated: $(date)" >> assets/test/version.txt
 
 # Step 4: Curl the download URL and save as release.zip
 curl -L "$download_url" -o release.zip
 
-# Step 5: Unzip release.zip into the assets/wasm/ directory
-unzip -o release.zip -d assets/wasm/
+# Step 5: Unzip release.zip into the assets/test/ directory
+unzip -o release.zip -d assets/test/
 
 # Step 6: Clean up & info
 rm release.zip
-cat assets/wasm/version.txt
+cat assets/test/version.txt
