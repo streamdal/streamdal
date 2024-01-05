@@ -2,8 +2,6 @@ module github.com/streamdal/server
 
 go 1.21
 
-toolchain go1.21.5
-
 require (
 	github.com/InVisionApp/go-health/v2 v2.1.4
 	github.com/InVisionApp/go-logger v1.0.1
