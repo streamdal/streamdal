@@ -452,6 +452,12 @@ var _ = Describe("Streamdal", func() {
 							Transform: &steps.TransformStep{
 								Path: "object.payload",
 								Type: steps.TransformType_TRANSFORM_TYPE_MASK_VALUE,
+								Options: &steps.TransformStep_MaskOptions{
+									MaskOptions: &steps.TransformMaskOptions{
+										Path: "object.payload",
+										Mask: "*",
+									},
+								},
 							},
 						},
 					},
