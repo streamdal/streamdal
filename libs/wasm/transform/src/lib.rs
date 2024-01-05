@@ -1,5 +1,5 @@
-use protos::sp_steps_transform::{TransformType};
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
+use protos::sp_steps_transform::TransformType;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use streamdal_wasm_transform::transform;
 use streamdal_wasm_transform::transform::TruncateOptions;
@@ -80,7 +80,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::Request, String> {
     let t = wasm_request.step.transform();
 
-    let req = match t.type_.unwrap() { // unwrap is safe as validation occurs before this
+    let req = match t.type_.unwrap() {
+        // unwrap is safe as validation occurs before this
         TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => {
             // Never had deprecated options, no need to handle here
 
@@ -89,26 +90,33 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                 _ => Chars,
             };
 
-           transform::Request {
+            transform::Request {
                 data: wasm_request.input_payload.clone(),
                 path: t.truncate_options().path.clone(),
                 value: "".to_string(),
-                truncate_options: Some(TruncateOptions{
-                    length: t.truncate_options().value as usize,
-                    truncate_type : tt,
+                truncate_options: Some(TruncateOptions {
+                    length: t.truncate_options().clone().value as usize,
+                    truncate_type: tt,
                 }),
+                extract_options: None,
             }
-        },
+        }
         TransformType::TRANSFORM_TYPE_DELETE_FIELD => {
             // Never had deprecated options, no need to handle here
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: wasm_request.step.transform().delete_field_options().path.clone(),
+                path: wasm_request
+                    .step
+                    .transform()
+                    .delete_field_options()
+                    .path
+                    .clone(),
                 value: "".to_string(),
                 truncate_options: None,
+                extract_options: None,
             }
-        },
+        }
         TransformType::TRANSFORM_TYPE_MASK_VALUE => {
             // Handle deprecated options
             if !t.has_mask_options() {
@@ -117,6 +125,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                     path: wasm_request.step.transform().path.clone(),
                     value: wasm_request.step.transform().value.clone(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             } else {
                 transform::Request {
@@ -124,9 +133,10 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                     path: wasm_request.step.transform().mask_options().path.clone(),
                     value: "".to_string(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             }
-        },
+        }
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => {
             // Handle deprecated options
             if !t.has_obfuscate_options() {
@@ -135,16 +145,23 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                     path: wasm_request.step.transform().path.clone(),
                     value: wasm_request.step.transform().value.clone(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             } else {
                 transform::Request {
                     data: wasm_request.input_payload.clone(),
-                    path: wasm_request.step.transform().obfuscate_options().path.clone(),
+                    path: wasm_request
+                        .step
+                        .transform()
+                        .obfuscate_options()
+                        .path
+                        .clone(),
                     value: "".to_string(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             }
-        },
+        }
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE => {
             // Handle deprecated options
             if !t.has_replace_value_options() {
@@ -153,16 +170,28 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                     path: wasm_request.step.transform().path.clone(),
                     value: wasm_request.step.transform().value.clone(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             } else {
                 transform::Request {
                     data: wasm_request.input_payload.clone(),
-                    path: wasm_request.step.transform().replace_value_options().path.clone(),
-                    value: wasm_request.step.transform().replace_value_options().value.clone(),
+                    path: wasm_request
+                        .step
+                        .transform()
+                        .replace_value_options()
+                        .path
+                        .clone(),
+                    value: wasm_request
+                        .step
+                        .transform()
+                        .replace_value_options()
+                        .value
+                        .clone(),
                     truncate_options: None,
+                    extract_options: None,
                 }
             }
-        },
+        }
         _ => {
             return Err("unknown transform type".to_string());
         }
