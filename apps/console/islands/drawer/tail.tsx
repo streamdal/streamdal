@@ -25,7 +25,7 @@ export type TailSampleRate = {
 export const tailSignal = signal<TailData[] | null>(
   null,
 );
-export const tailSocketSignal = signal<Websocket | null>(null);
+export const tailSocketSignal = signal<WebSocket | null>(null);
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
 export const defaultTailSampleRate = {
@@ -93,7 +93,7 @@ export const TailRow = (
 };
 
 export const Tail = ({ audience }: { audience: Audience }) => {
-  const scrollBottom = useRef();
+  const scrollBottom = useRef<HTMLDivElement | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
 
   const start = () => {

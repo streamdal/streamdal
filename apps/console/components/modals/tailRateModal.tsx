@@ -5,7 +5,7 @@ import {
   tailPausedSignal,
   tailSamplingSignal,
 } from "../../islands/drawer/tail.tsx";
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { zfd } from "zod-form-data";
 import * as z from "zod/index.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
@@ -15,9 +15,10 @@ export const SampleRateSchema = zfd.formData({
   rate: zfd.numeric(z.number().min(1)),
   intervalSeconds: zfd.numeric(z.number().min(1)),
 }).refine(
-  (data) =>
-    data.rate / data.intervalSeconds <=
-      defaultTailSampleRate.rate,
+  (data) => {
+    return data.rate / data.intervalSeconds <=
+      defaultTailSampleRate.rate;
+  },
   {
     message: "Max rate is 25/second",
     path: ["rate"],
@@ -25,6 +26,23 @@ export const SampleRateSchema = zfd.formData({
 );
 
 export const TailRateModal = () => {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const clickAway = (event) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target)
+      ) {
+        opModal.value = { ...opModal.value, tailRateModal: false };
+      }
+    };
+    document.addEventListener("mousedown", clickAway);
+    return () => {
+      document.removeEventListener("mousedown", clickAway);
+    };
+  }, [modalRef]);
+
   const [sampleErrors, setSampleErrors] = useState({});
 
   const submitSampleRate = async (e: any) => {
@@ -53,7 +71,10 @@ export const TailRateModal = () => {
   };
 
   return (
-    <div class="absolute top-[8%] left-[30%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-w-md max-h-full">
+    <div
+      ref={modalRef}
+      class="absolute top-[8%] left-[30%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-w-md max-h-full"
+    >
       <div class="relative bg-white rounded-lg border border-burnt shadow-2xl shadow-burnt flex flex-col">
         <div class="h-[20px]">
           <a href="/">
