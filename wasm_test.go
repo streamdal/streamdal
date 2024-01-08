@@ -482,7 +482,7 @@ var _ = Describe("WASM Modules", func() {
 							Options: &steps.SchemaValidationStep_JsonSchema{
 								JsonSchema: &steps.SchemaValidationJSONSchema{
 									JsonSchema: schema,
-									Draft:      steps.JSONSchemaDraft_JSON_SCHEMA_DRAFT_07,
+									Draft:      steps.JSONSchemaDraft_JSONSCHEMA_DRAFT_07,
 								},
 							},
 						},

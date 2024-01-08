@@ -213,16 +213,16 @@ var _ = Describe("Streamdal", func() {
 		It("handles notify condition", func() {
 			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
 
-			continuePipeline, _ := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(continuePipeline).To(BeTrue())
+			cond := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(cond.continuePipeline).To(BeTrue())
 			Expect(fakeClient.NotifyCallCount()).To(Equal(1))
 		})
 
 		It("handles abort condition", func() {
 			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT}
 
-			continuePipeline, _ := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(continuePipeline).To(BeFalse())
+			cond := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
+			Expect(cond.continuePipeline).To(BeFalse())
 		})
 	})
 
