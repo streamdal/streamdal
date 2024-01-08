@@ -342,6 +342,7 @@ func (n *Notify) getEmailBody(ctx context.Context, event *Notification, template
 	data := map[string]string{
 		"pipeline_name": event.Pipeline.Name,
 		"step_name":     event.Req.StepName,
+		"payload_data":  "", // TODO: implement
 	}
 
 	if err := tmpl.Execute(&body, data); err != nil {
