@@ -33,6 +33,46 @@ export interface DetectiveStep {
     type: DetectiveType;
 }
 /**
+ * @generated from protobuf message protos.steps.DetectiveStepResultMatch
+ */
+export interface DetectiveStepResultMatch {
+    /**
+     * @generated from protobuf field: protos.steps.DetectiveType type = 1;
+     */
+    type: DetectiveType;
+    /**
+     * For JSON payloads, the path to the match
+     *
+     * @generated from protobuf field: string path = 2;
+     */
+    path: string;
+    /**
+     * For string payloads, the start and end characters of the match
+     *
+     * @generated from protobuf field: int32 char_index_start = 3;
+     */
+    charIndexStart: number;
+    /**
+     * @generated from protobuf field: int32 char_index_end = 4;
+     */
+    charIndexEnd: number;
+    /**
+     * Value of the match
+     *
+     * @generated from protobuf field: bytes value = 5;
+     */
+    value: Uint8Array;
+}
+/**
+ * @generated from protobuf message protos.steps.DetectiveStepResult
+ */
+export interface DetectiveStepResult {
+    /**
+     * @generated from protobuf field: repeated protos.steps.DetectiveStepResultMatch matches = 1;
+     */
+    matches: DetectiveStepResultMatch[];
+}
+/**
  * 1000-1999 reserved for core match types
  *
  * @generated from protobuf enum protos.steps.DetectiveType
@@ -333,3 +373,125 @@ class DetectiveStep$Type extends MessageType<DetectiveStep> {
  * @generated MessageType for protobuf message protos.steps.DetectiveStep
  */
 export const DetectiveStep = new DetectiveStep$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch> {
+    constructor() {
+        super("protos.steps.DetectiveStepResultMatch", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
+            { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "char_index_start", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "char_index_end", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<DetectiveStepResultMatch>): DetectiveStepResultMatch {
+        const message = { type: 0, path: "", charIndexStart: 0, charIndexEnd: 0, value: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<DetectiveStepResultMatch>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetectiveStepResultMatch): DetectiveStepResultMatch {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.steps.DetectiveType type */ 1:
+                    message.type = reader.int32();
+                    break;
+                case /* string path */ 2:
+                    message.path = reader.string();
+                    break;
+                case /* int32 char_index_start */ 3:
+                    message.charIndexStart = reader.int32();
+                    break;
+                case /* int32 char_index_end */ 4:
+                    message.charIndexEnd = reader.int32();
+                    break;
+                case /* bytes value */ 5:
+                    message.value = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DetectiveStepResultMatch, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.steps.DetectiveType type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, WireType.Varint).int32(message.type);
+        /* string path = 2; */
+        if (message.path !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.path);
+        /* int32 char_index_start = 3; */
+        if (message.charIndexStart !== 0)
+            writer.tag(3, WireType.Varint).int32(message.charIndexStart);
+        /* int32 char_index_end = 4; */
+        if (message.charIndexEnd !== 0)
+            writer.tag(4, WireType.Varint).int32(message.charIndexEnd);
+        /* bytes value = 5; */
+        if (message.value.length)
+            writer.tag(5, WireType.LengthDelimited).bytes(message.value);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResultMatch
+ */
+export const DetectiveStepResultMatch = new DetectiveStepResultMatch$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DetectiveStepResult$Type extends MessageType<DetectiveStepResult> {
+    constructor() {
+        super("protos.steps.DetectiveStepResult", [
+            { no: 1, name: "matches", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => DetectiveStepResultMatch }
+        ]);
+    }
+    create(value?: PartialMessage<DetectiveStepResult>): DetectiveStepResult {
+        const message = { matches: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<DetectiveStepResult>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetectiveStepResult): DetectiveStepResult {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.steps.DetectiveStepResultMatch matches */ 1:
+                    message.matches.push(DetectiveStepResultMatch.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DetectiveStepResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.steps.DetectiveStepResultMatch matches = 1; */
+        for (let i = 0; i < message.matches.length; i++)
+            DetectiveStepResultMatch.internalBinaryWrite(message.matches[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResult
+ */
+export const DetectiveStepResult = new DetectiveStepResult$Type();

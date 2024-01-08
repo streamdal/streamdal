@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DetectiveStep = exports.DetectiveType = void 0;
+exports.DetectiveStepResult = exports.DetectiveStepResultMatch = exports.DetectiveStep = exports.DetectiveType = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -308,3 +308,125 @@ class DetectiveStep$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.steps.DetectiveStep
  */
 exports.DetectiveStep = new DetectiveStep$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DetectiveStepResultMatch$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.steps.DetectiveStepResultMatch", [
+            { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
+            { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "char_index_start", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "char_index_end", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value) {
+        const message = { type: 0, path: "", charIndexStart: 0, charIndexEnd: 0, value: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.steps.DetectiveType type */ 1:
+                    message.type = reader.int32();
+                    break;
+                case /* string path */ 2:
+                    message.path = reader.string();
+                    break;
+                case /* int32 char_index_start */ 3:
+                    message.charIndexStart = reader.int32();
+                    break;
+                case /* int32 char_index_end */ 4:
+                    message.charIndexEnd = reader.int32();
+                    break;
+                case /* bytes value */ 5:
+                    message.value = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.steps.DetectiveType type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, runtime_1.WireType.Varint).int32(message.type);
+        /* string path = 2; */
+        if (message.path !== "")
+            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.path);
+        /* int32 char_index_start = 3; */
+        if (message.charIndexStart !== 0)
+            writer.tag(3, runtime_1.WireType.Varint).int32(message.charIndexStart);
+        /* int32 char_index_end = 4; */
+        if (message.charIndexEnd !== 0)
+            writer.tag(4, runtime_1.WireType.Varint).int32(message.charIndexEnd);
+        /* bytes value = 5; */
+        if (message.value.length)
+            writer.tag(5, runtime_1.WireType.LengthDelimited).bytes(message.value);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResultMatch
+ */
+exports.DetectiveStepResultMatch = new DetectiveStepResultMatch$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DetectiveStepResult$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.steps.DetectiveStepResult", [
+            { no: 1, name: "matches", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.DetectiveStepResultMatch }
+        ]);
+    }
+    create(value) {
+        const message = { matches: [] };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.steps.DetectiveStepResultMatch matches */ 1:
+                    message.matches.push(exports.DetectiveStepResultMatch.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.steps.DetectiveStepResultMatch matches = 1; */
+        for (let i = 0; i < message.matches.length; i++)
+            exports.DetectiveStepResultMatch.internalBinaryWrite(message.matches[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResult
+ */
+exports.DetectiveStepResult = new DetectiveStepResult$Type();

@@ -231,6 +231,25 @@ class DetectiveStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class DetectiveStepResultMatch(betterproto.Message):
+    type: "DetectiveType" = betterproto.enum_field(1)
+    path: str = betterproto.string_field(2)
+    """For JSON payloads, the path to the match"""
+
+    char_index_start: int = betterproto.int32_field(3)
+    """For string payloads, the start and end characters of the match"""
+
+    char_index_end: int = betterproto.int32_field(4)
+    value: bytes = betterproto.bytes_field(5)
+    """Value of the match"""
+
+
+@dataclass(eq=False, repr=False)
+class DetectiveStepResult(betterproto.Message):
+    matches: List["DetectiveStepResultMatch"] = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class EncodeStep(betterproto.Message):
     """WIP"""
 
