@@ -1085,6 +1085,14 @@ class SdkResponse(betterproto.Message):
     An array of pipelines that the SDK executed and the status of each step
     """
 
+    drop_message: bool = betterproto.bool_field(5)
+    """
+    Indicates that the message should be dropped by the service using the SDK
+    This should only be set as the result of a success/failure condition.
+    Errors should not set this, so we can let the end user decide how to handle
+    errors.
+    """
+
 
 @dataclass(eq=False, repr=False)
 class PipelineStatus(betterproto.Message):

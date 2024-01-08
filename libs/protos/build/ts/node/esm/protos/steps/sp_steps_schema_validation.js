@@ -36,28 +36,29 @@ export var SchemaValidationCondition;
     SchemaValidationCondition[SchemaValidationCondition["NOT_MATCH"] = 2] = "NOT_MATCH";
 })(SchemaValidationCondition || (SchemaValidationCondition = {}));
 /**
- * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
- *
  * @generated from protobuf enum protos.steps.JSONSchemaDraft
  */
 export var JSONSchemaDraft;
 (function (JSONSchemaDraft) {
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+     * protolint:disable ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+     * protolint:disable ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_UNKNOWN = 0;
      */
-    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_UNKNOWN"] = 0] = "JSON_SCHEMA_DRAFT_UNKNOWN";
+    JSONSchemaDraft[JSONSchemaDraft["JSONSCHEMA_DRAFT_UNKNOWN"] = 0] = "JSONSCHEMA_DRAFT_UNKNOWN";
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_04 = 1;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_04 = 1;
      */
-    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_04"] = 1] = "JSON_SCHEMA_DRAFT_04";
+    JSONSchemaDraft[JSONSchemaDraft["JSONSCHEMA_DRAFT_04"] = 1] = "JSONSCHEMA_DRAFT_04";
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_06 = 2;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_06 = 2;
      */
-    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_06"] = 2] = "JSON_SCHEMA_DRAFT_06";
+    JSONSchemaDraft[JSONSchemaDraft["JSONSCHEMA_DRAFT_06"] = 2] = "JSONSCHEMA_DRAFT_06";
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_07 = 3;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_07 = 3;
      */
-    JSONSchemaDraft[JSONSchemaDraft["JSON_SCHEMA_DRAFT_07"] = 3] = "JSON_SCHEMA_DRAFT_07";
+    JSONSchemaDraft[JSONSchemaDraft["JSONSCHEMA_DRAFT_07"] = 3] = "JSONSCHEMA_DRAFT_07";
 })(JSONSchemaDraft || (JSONSchemaDraft = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SchemaValidationStep$Type extends MessageType {
