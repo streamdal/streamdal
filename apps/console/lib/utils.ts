@@ -212,7 +212,7 @@ export const longDateFormat = {
   hour: "numeric" as const,
   hour12: true,
   minute: "numeric" as const,
-  fractionalSecondDigits: 3,
+  fractionalSecondDigits: 3 as const,
 };
 
 export const humanDateFormat = {
