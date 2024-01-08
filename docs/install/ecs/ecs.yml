@@ -17,26 +17,121 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: snitch-stack
+      ClusterName: streamdal-stack
+
   ServiceDiscoveryNamespace:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
-    Properties: 
+    Properties:
       Description: "Namespace for ECS services"
       Name: "local"
       Vpc: !Ref VpcID
 
-  NatsjsServiceDiscovery:
-      Type: 'AWS::ServiceDiscovery::Service'
-      Properties:
-        Description: Service discovery for Natsjs
-        DnsConfig:
-          DnsRecords:
-            - Type: A
-              TTL: 60
-          RoutingPolicy: WEIGHTED
-        Name: natsjs
-        NamespaceId: !Ref ServiceDiscoveryNamespace
+  # Redis Task Definition
+  RedisTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: redis-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: redis-container
+          Image: redis:latest
+          Command: ["redis-server", "--appendonly", "yes"]
+          PortMappings:
+            - ContainerPort: 6379
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
 
+  # Redis Service
+  RedisService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: redis-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref RedisTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # Updated Streamdal Server Task Definition
+  StreamdalServerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: streamdal-server-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: streamdal-server-container
+          Image: streamdal/server:0.0.4-4e4bdb8
+          EntryPoint: ["/bin/bash", "/entrypoint.sh"]
+          Environment:
+            - Name: STREAMDAL_SERVER_AUTH_TOKEN
+              Value: 1234
+            - Name: STREAMDAL_SERVER_REDIS_URL
+              Value: redis.local:6379
+          PortMappings:
+            - ContainerPort: 8081
+            - ContainerPort: 8082
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Streamdal Server Service
+  StreamdalServerService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: streamdal-server-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref StreamdalServerTaskDefinition
+      DesiredCount: 3
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # Updated Streamdal Console Task Definition
+  StreamdalConsoleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: streamdal-console-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: streamdal-console-container
+          Image: streamdal/console:0.0.6
+          Environment:
+            - Name: STREAMDAL_CONSOLE_GRPC_WEB_URL
+              Value: http://envoy.local:8083
+            - Name: STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN
+              Value: 1234
+            - Name: STREAMDAL_CONSOLE_PORT
+              Value: 8080
+            - Name: STREAMDAL_CONSOLE_PRODUCTION
+              Value: "true"
+          PortMappings:
+            - ContainerPort: 8080
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Envoy Service Discovery
   EnvoyServiceDiscovery:
     Type: 'AWS::ServiceDiscovery::Service'
     Properties:
@@ -48,84 +143,82 @@ Resources:
         RoutingPolicy: WEIGHTED
       Name: envoy
       NamespaceId: !Ref ServiceDiscoveryNamespace
-   
-  EFSTaskExecutionPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: "Policy to allow ECS tasks to mount and write to EFS"
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Action:
-              - "elasticfilesystem:DescribeFileSystems"
-              - "elasticfilesystem:DescribeAccessPoints"
-              - "elasticfilesystem:ClientMount"
-              - "elasticfilesystem:ClientWrite"
-            Resource: "*"
 
-  ExecutionRole:
-    Type: AWS::IAM::Role
+  # Envoy Task Definition
+  EnvoyTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      RoleName: deployment-example-role
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-        - !Ref EFSTaskExecutionPolicy
+      Family: envoy-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: envoy-container
+          Image: envoyproxy/envoy:tools-v1.28.0
+          PortMappings:
+            - ContainerPort: 8083
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Envoy Service
+  EnvoyService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: envoy-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref EnvoyTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # Container Security Group
   ContainerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref VpcID
-      GroupName: ContainerSecurityGroup
-      GroupDescription: Security group for NGINX container
+      GroupName: StreamdalSecurityGroup
+      GroupDescription: Security group for Streamdal containers
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 4222
-          ToPort: 4222
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 6222
-          ToPort: 6222
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8222
-          ToPort: 8222
-          CidrIp: 0.0.0.0/0
-        # snitch-server specific rules
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
-          FromPort: 9090
-          ToPort: 9090
-          CidrIp: 0.0.0.0/0
-        # envoy specific rules
-        - IpProtocol: tcp
-          FromPort: 9091
-          ToPort: 9091
+          FromPort: 6379
+          ToPort: 6379
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
-          FromPort: 3000
-          ToPort: 3000
+          FromPort: 8081
+          ToPort: 8081
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8082
+          ToPort: 8082
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8083
+          ToPort: 8083
+          CidrIp: 0.0.0.0/0
+
+  # EFS FileSystem
   EFSFileSystem:
-      Type: AWS::EFS::FileSystem
-      Properties:
-        PerformanceMode: generalPurpose
-        Encrypted: true
-        LifecyclePolicies:
-          - TransitionToIA: AFTER_7_DAYS
-        ThroughputMode: bursting
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      Encrypted: true
+      LifecyclePolicies:
+        - TransitionToIA: AFTER_7_DAYS
+      ThroughputMode: bursting
+
+  # EFS Security Group
   EFSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -136,6 +229,8 @@ Resources:
           FromPort: '2049'
           ToPort: '2049'
           SourceSecurityGroupId: !GetAtt ContainerSecurityGroup.GroupId
+
+  # EFS Mount Target
   EFSMountTarget:
     Type: "AWS::EFS::MountTarget"
     Properties:
@@ -144,132 +239,13 @@ Resources:
       SecurityGroups:
         - !Ref EFSSecurityGroup
 
-    # Task definition for natsjs
-  NatsjsTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: natsjs-task
-      Cpu: 256
-      Memory: 512
-      NetworkMode: awsvpc
-      ExecutionRoleArn: !Ref ExecutionRole
-      Volumes: 
-        - Name: jetstream-data
-          EfsVolumeConfiguration:
-            FileSystemId: !Ref EFSFileSystem
-            RootDirectory: /
-      ContainerDefinitions:
-        - Name: natsjs-container
-          Image: nats:2.9.20-alpine3.18
-          Command:
-            - "-js"
-            - "-sd"
-            - "/data/jetstream"
-            - "-m"
-            - "8222"
-          PortMappings:
-            - ContainerPort: 4222
-            - ContainerPort: 6222
-            - ContainerPort: 8222
-          MountPoints:
-            - ContainerPath: /data/jetstream
-              SourceVolume: jetstream-data
-      RequiresCompatibilities:
-        - EC2
-        - FARGATE
-
-  # Task definition for snitch-server-1
-  SnitchServerTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: snitch-server-task
-      Cpu: 256
-      Memory: 512
-      NetworkMode: awsvpc
-      ExecutionRoleArn: !Ref ExecutionRole
-      ContainerDefinitions:
-        - Name: snitch-server-container
-          Image: streamdal/snitch-server:latest
-          Environment:
-            - Name: SNITCH_SERVER_NODE_NAME
-              Value: node1
-            - Name: SNITCH_SERVER_AUTH_TOKEN
-              Value: 1234
-            - Name: SNITCH_SERVER_NATSURL
-              Value: natsjs.local:4222
-          PortMappings:
-            - ContainerPort: 8080
-            - ContainerPort: 9090
-        - Name: envoy-sidecar
-          Image: streamdal/envoy-side-car
-          PortMappings:
-            - ContainerPort: 9091
-      RequiresCompatibilities:
-        - EC2
-        - FARGATE
-
-  # ECS Service for natsjs
-  NatsjsService:
+  # Streamdal Console Service
+  StreamdalConsoleService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: natsjs-service
+      ServiceName: streamdal-console-service
       Cluster: !Ref Cluster
-      TaskDefinition: !Ref NatsjsTaskDefinition
-      DesiredCount: 1
-      LaunchType: FARGATE
-      ServiceRegistries:
-        - RegistryArn: !GetAtt NatsjsServiceDiscovery.Arn
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          Subnets:
-            - !Ref SubnetID
-          SecurityGroups:
-            - !GetAtt ContainerSecurityGroup.GroupId
-
-  # ECS Service for snitch-server-1
-  SnitchServerService:
-    Type: AWS::ECS::Service
-    Properties:
-      ServiceName: snitch-server-service
-      Cluster: !Ref Cluster
-      TaskDefinition: !Ref SnitchServerTaskDefinition
-      DesiredCount: 3
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          Subnets:
-            - !Ref SubnetID
-          SecurityGroups:
-            - !GetAtt ContainerSecurityGroup.GroupId
-
-  SnitchConsoleTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: snitch-console-task
-      Cpu: 256
-      Memory: 512
-      NetworkMode: awsvpc
-      ExecutionRoleArn: !Ref ExecutionRole
-      ContainerDefinitions:
-        - Name: snitch-console-container
-          Image: streamdal/snitch-console:latest
-          Environment:
-            - Name: SNITCH_GRPC_WEB_URL
-              Value: http://envoy.local:9091
-          PortMappings:
-            - ContainerPort: 3000
-      RequiresCompatibilities:
-        - EC2
-        - FARGATE
-
-  SnitchConsoleService:
-    Type: AWS::ECS::Service
-    Properties:
-      ServiceName: snitch-console-service
-      Cluster: !Ref Cluster
-      TaskDefinition: !Ref SnitchConsoleTaskDefinition
+      TaskDefinition: !Ref StreamdalConsoleTaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
@@ -279,3 +255,19 @@ Resources:
             - !Ref SubnetID
           SecurityGroups:
             - !GetAtt ContainerSecurityGroup.GroupId
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ECSExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ["sts:AssumeRole"]
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
