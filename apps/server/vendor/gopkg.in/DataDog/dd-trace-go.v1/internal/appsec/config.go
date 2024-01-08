@@ -7,61 +7,96 @@ package appsec
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 	"unicode"
 	"unicode/utf8"
 
 	"gopkg.in/DataDog/dd-trace-go.v1/internal/log"
+	"gopkg.in/DataDog/dd-trace-go.v1/internal/remoteconfig"
+
+	rules "github.com/DataDog/appsec-internal-go/appsec"
 )
 
 const (
-	enabledEnvVar        = "DD_APPSEC_ENABLED"
-	rulesEnvVar          = "DD_APPSEC_RULES"
-	wafTimeoutEnvVar     = "DD_APPSEC_WAF_TIMEOUT"
-	traceRateLimitEnvVar = "DD_APPSEC_TRACE_RATE_LIMIT"
+	enabledEnvVar         = "DD_APPSEC_ENABLED"
+	rulesEnvVar           = "DD_APPSEC_RULES"
+	wafTimeoutEnvVar      = "DD_APPSEC_WAF_TIMEOUT"
+	traceRateLimitEnvVar  = "DD_APPSEC_TRACE_RATE_LIMIT"
+	obfuscatorKeyEnvVar   = "DD_APPSEC_OBFUSCATION_PARAMETER_KEY_REGEXP"
+	obfuscatorValueEnvVar = "DD_APPSEC_OBFUSCATION_PARAMETER_VALUE_REGEXP"
 )
 
 const (
-	defaultWAFTimeout      = 4 * time.Millisecond
-	defaultTraceRate  uint = 100 // up to 100 appsec traces/s
+	defaultWAFTimeout           = 4 * time.Millisecond
+	defaultTraceRate            = 100 // up to 100 appsec traces/s
+	defaultObfuscatorKeyRegex   = `(?i)(?:p(?:ass)?w(?:or)?d|pass(?:_?phrase)?|secret|(?:api_?|private_?|public_?)key)|token|consumer_?(?:id|key|secret)|sign(?:ed|ature)|bearer|authorization`
+	defaultObfuscatorValueRegex = `(?i)(?:p(?:ass)?w(?:or)?d|pass(?:_?phrase)?|secret|(?:api_?|private_?|public_?|access_?|secret_?)key(?:_?id)?|token|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)(?:\s*=[^;]|"\s*:\s*"[^"]+")|bearer\s+[a-z0-9\._\-]+|token:[a-z0-9]{13}|gh[opsu]_[0-9a-zA-Z]{36}|ey[I-L][\w=-]+\.ey[I-L][\w=-]+(?:\.[\w.+\/=-]+)?|[\-]{5}BEGIN[a-z\s]+PRIVATE\sKEY[\-]{5}[^\-]+[\-]{5}END[a-z\s]+PRIVATE\sKEY|ssh-rsa\s*[a-z0-9\/\.+]{100,}`
 )
 
-// config is the AppSec configuration.
-type config struct {
-	// rules loaded via the env var DD_APPSEC_RULES. When not set, the builtin rules will be used.
-	rules []byte
+// StartOption is used to customize the AppSec configuration when invoked with appsec.Start()
+type StartOption func(c *Config)
+
+// Config is the AppSec configuration.
+type Config struct {
+	// rules loaded via the env var DD_APPSEC_RULES. When not set, the builtin rules will be used
+	// and live-updated with remote configuration.
+	rulesManager *rulesManager
 	// Maximum WAF execution time
 	wafTimeout time.Duration
 	// AppSec trace rate limit (traces per second).
 	traceRateLimit uint
+	// Obfuscator configuration parameters
+	obfuscator ObfuscatorConfig
+	// rc is the remote configuration client used to receive product configuration updates. Nil if rc is disabled (default)
+	rc *remoteconfig.ClientConfig
+}
+
+// WithRCConfig sets the AppSec remote config client configuration to the specified cfg
+func WithRCConfig(cfg remoteconfig.ClientConfig) StartOption {
+	return func(c *Config) {
+		c.rc = &cfg
+	}
+}
+
+// ObfuscatorConfig wraps the key and value regexp to be passed to the WAF to perform obfuscation.
+type ObfuscatorConfig struct {
+	KeyRegex   string
+	ValueRegex string
 }
 
 // isEnabled returns true when appsec is enabled when the environment variable
 // DD_APPSEC_ENABLED is set to true.
-func isEnabled() (bool, error) {
-	enabledStr := os.Getenv(enabledEnvVar)
+// It also returns whether the env var is actually set in the env or not.
+func isEnabled() (enabled bool, set bool, err error) {
+	enabledStr, set := os.LookupEnv(enabledEnvVar)
 	if enabledStr == "" {
-		return false, nil
+		return false, set, nil
+	} else if enabled, err = strconv.ParseBool(enabledStr); err != nil {
+		return false, set, fmt.Errorf("could not parse %s value `%s` as a boolean value", enabledEnvVar, enabledStr)
 	}
-	enabled, err := strconv.ParseBool(enabledStr)
-	if err != nil {
-		return false, fmt.Errorf("could not parse %s value `%s` as a boolean value", enabledEnvVar, enabledStr)
-	}
-	return enabled, nil
+
+	return enabled, set, nil
 }
 
-func newConfig() (*config, error) {
+func newConfig() (*Config, error) {
 	rules, err := readRulesConfig()
 	if err != nil {
 		return nil, err
 	}
-	return &config{
-		rules:          rules,
+
+	r, err := newRulesManager(rules)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Config{
+		rulesManager:   r,
 		wafTimeout:     readWAFTimeoutConfig(),
 		traceRateLimit: readRateLimitConfig(),
+		obfuscator:     readObfuscatorConfig(),
 	}, nil
 }
 
@@ -109,21 +144,40 @@ func readRateLimitConfig() (rate uint) {
 	return uint(parsed)
 }
 
-func readRulesConfig() (rules []byte, err error) {
-	rules = []byte(staticRecommendedRule)
+func readObfuscatorConfig() ObfuscatorConfig {
+	keyRE := readObfuscatorConfigRegexp(obfuscatorKeyEnvVar, defaultObfuscatorKeyRegex)
+	valueRE := readObfuscatorConfigRegexp(obfuscatorValueEnvVar, defaultObfuscatorValueRegex)
+	return ObfuscatorConfig{KeyRegex: keyRE, ValueRegex: valueRE}
+}
+
+func readObfuscatorConfigRegexp(name, defaultValue string) string {
+	val, present := os.LookupEnv(name)
+	if !present {
+		log.Debug("appsec: %s not defined, starting with the default obfuscator regular expression", name)
+		return defaultValue
+	}
+	if _, err := regexp.Compile(val); err != nil {
+		log.Error("appsec: could not compile the configured obfuscator regular expression `%s=%s`. Using the default value instead", name, val)
+		return defaultValue
+	}
+	log.Debug("appsec: starting with the configured obfuscator regular expression %s", name)
+	return val
+}
+
+func readRulesConfig() ([]byte, error) {
 	filepath := os.Getenv(rulesEnvVar)
 	if filepath == "" {
-		log.Info("appsec: starting with the default recommended security rules")
-		return rules, nil
+		log.Debug("appsec: using the default built-in recommended security rules")
+		return []byte(rules.StaticRecommendedRules), nil
 	}
-	buf, err := ioutil.ReadFile(filepath)
+	buf, err := os.ReadFile(filepath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Error("appsec: could not find the rules file in path %s: %v.", filepath, err)
 		}
 		return nil, err
 	}
-	log.Info("appsec: starting with the security rules from file %s", filepath)
+	log.Debug("appsec: using the security rules from file %s", filepath)
 	return buf, nil
 }
 

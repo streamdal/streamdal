@@ -1,7 +1,7 @@
 // Unless explicitly stated otherwise all files in this repository are licensed
 // under the Apache License 2.0.
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
-// Copyright 2020 Datadog, Inc.
+// Copyright 2021 Datadog, Inc.
 
 package mapping
 
@@ -26,8 +26,8 @@ func getSignificandPlusOne(float64Bits uint64) float64 {
 	return math.Float64frombits((float64Bits & significandMask) | oneMask)
 }
 
-// @param exponent should be >= -1022 and <= 1023
-// @param significandPlusOne should be >= 1 and < 2
+// exponent should be >= -1022 and <= 1023
+// significandPlusOne should be >= 1 and < 2
 func buildFloat64(exponent int, significandPlusOne float64) float64 {
 	return math.Float64frombits(
 		(uint64((exponent+exponentBias)<<exponentShift) & exponentMask) | (math.Float64bits(significandPlusOne) & significandMask),

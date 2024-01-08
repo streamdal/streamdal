@@ -9,6 +9,10 @@ package http // import "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
 import (
 	"net/http"
 
+	"gopkg.in/DataDog/dd-trace-go.v1/contrib/internal/httptrace"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"gopkg.in/DataDog/dd-trace-go.v1/internal/log"
 )
 
@@ -26,6 +30,8 @@ func NewServeMux(opts ...Option) *ServeMux {
 	for _, fn := range opts {
 		fn(cfg)
 	}
+	cfg.spanOpts = append(cfg.spanOpts, tracer.Tag(ext.SpanKind, ext.SpanKindServer))
+	cfg.spanOpts = append(cfg.spanOpts, tracer.Tag(ext.Component, componentName))
 	log.Debug("contrib/net/http: Configuring ServeMux: %#v", cfg)
 	return &ServeMux{
 		ServeMux: http.NewServeMux(),
@@ -44,32 +50,49 @@ func (mux *ServeMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// get the resource associated to this request
 	_, route := mux.Handler(r)
-	resource := r.Method + " " + route
+	resource := mux.cfg.resourceNamer(r)
+	if resource == "" {
+		resource = r.Method + " " + route
+	}
+	so := make([]ddtrace.StartSpanOption, len(mux.cfg.spanOpts), len(mux.cfg.spanOpts)+1)
+	copy(so, mux.cfg.spanOpts)
+	so = append(so, httptrace.HeaderTagsFromRequest(r, mux.cfg.headerTags))
 	TraceAndServe(mux.ServeMux, w, r, &ServeConfig{
 		Service:  mux.cfg.serviceName,
 		Resource: resource,
-		SpanOpts: mux.cfg.spanOpts,
+		SpanOpts: so,
+		Route:    route,
 	})
 }
 
 // WrapHandler wraps an http.Handler with tracing using the given service and resource.
+// If the WithResourceNamer option is provided as part of opts, it will take precedence over the resource argument.
 func WrapHandler(h http.Handler, service, resource string, opts ...Option) http.Handler {
 	cfg := new(config)
 	defaults(cfg)
 	for _, fn := range opts {
 		fn(cfg)
 	}
+	cfg.spanOpts = append(cfg.spanOpts, tracer.Tag(ext.SpanKind, ext.SpanKindServer))
+	cfg.spanOpts = append(cfg.spanOpts, tracer.Tag(ext.Component, componentName))
 	log.Debug("contrib/net/http: Wrapping Handler: Service: %s, Resource: %s, %#v", service, resource, cfg)
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if cfg.ignoreRequest(req) {
 			h.ServeHTTP(w, req)
 			return
 		}
+		resc := resource
+		if r := cfg.resourceNamer(req); r != "" {
+			resc = r
+		}
+		so := make([]ddtrace.StartSpanOption, len(cfg.spanOpts), len(cfg.spanOpts)+1)
+		copy(so, cfg.spanOpts)
+		so = append(so, httptrace.HeaderTagsFromRequest(req, cfg.headerTags))
 		TraceAndServe(h, w, req, &ServeConfig{
 			Service:    service,
-			Resource:   resource,
+			Resource:   resc,
 			FinishOpts: cfg.finishOpts,
-			SpanOpts:   cfg.spanOpts,
+			SpanOpts:   so,
 		})
 	})
 }

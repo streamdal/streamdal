@@ -1,11 +1,15 @@
 // Unless explicitly stated otherwise all files in this repository are licensed
 // under the Apache License 2.0.
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
-// Copyright 2020 Datadog, Inc.
+// Copyright 2021 Datadog, Inc.
 
 package store
 
-import "math"
+import (
+	"math"
+
+	enc "github.com/DataDog/sketches-go/ddsketch/encoding"
+)
 
 type CollapsingHighestDenseStore struct {
 	DenseStore
@@ -69,7 +73,7 @@ func (s *CollapsingHighestDenseStore) extendRange(newMinIndex, newMaxIndex int) 
 	newMaxIndex = max(newMaxIndex, s.maxIndex)
 	if s.IsEmpty() {
 		initialLength := s.getNewLength(newMinIndex, newMaxIndex)
-		s.bins = make([]float64, initialLength)
+		s.bins = append(s.bins, make([]float64, initialLength)...)
 		s.offset = newMinIndex
 		s.minIndex = newMinIndex
 		s.maxIndex = newMaxIndex
@@ -82,9 +86,7 @@ func (s *CollapsingHighestDenseStore) extendRange(newMinIndex, newMaxIndex int) 
 		// we may grow it before we actually reach the capacity.
 		newLength := s.getNewLength(newMinIndex, newMaxIndex)
 		if newLength > len(s.bins) {
-			tmpBins := make([]float64, newLength)
-			copy(tmpBins, s.bins)
-			s.bins = tmpBins
+			s.bins = append(s.bins, make([]float64, newLength-len(s.bins))...)
 		}
 		s.adjust(newMinIndex, newMaxIndex)
 	}
@@ -134,9 +136,10 @@ func (s *CollapsingHighestDenseStore) MergeWith(other Store) {
 	}
 	o, ok := other.(*CollapsingHighestDenseStore)
 	if !ok {
-		for bin := range other.Bins() {
-			s.AddBin(bin)
-		}
+		other.ForEach(func(index int, count float64) (stop bool) {
+			s.AddWithCount(index, count)
+			return false
+		})
 		return
 	}
 	if o.minIndex < s.minIndex || o.maxIndex > s.maxIndex {
@@ -172,3 +175,14 @@ func (s *CollapsingHighestDenseStore) Copy() Store {
 		isCollapsed: s.isCollapsed,
 	}
 }
+
+func (s *CollapsingHighestDenseStore) Clear() {
+	s.DenseStore.Clear()
+	s.isCollapsed = false
+}
+
+func (s *CollapsingHighestDenseStore) DecodeAndMergeWith(r *[]byte, encodingMode enc.SubFlag) error {
+	return DecodeAndMergeWith(s, r, encodingMode)
+}
+
+var _ Store = (*CollapsingHighestDenseStore)(nil)
