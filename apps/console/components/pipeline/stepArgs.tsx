@@ -5,8 +5,7 @@ import { useState } from "preact/hooks";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
-import { FormSelect, optionsFromEnum } from "../form/formSelect.tsx";
-import { NotificationType } from "streamdal-protos/protos/sp_notify.ts";
+import { FormSelect } from "../form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
 
 export const oneArgTypes: (keyof typeof DetectiveType)[] = [
