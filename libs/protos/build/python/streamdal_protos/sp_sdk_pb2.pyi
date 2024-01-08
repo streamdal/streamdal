@@ -20,16 +20,18 @@ class PipelineStatus(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., step_status: _Optional[_Iterable[_Union[StepStatus, _Mapping]]] = ...) -> None: ...
 
 class SDKResponse(_message.Message):
-    __slots__ = ["data", "error", "error_message", "pipeline_status"]
+    __slots__ = ["data", "drop_message", "error", "error_message", "pipeline_status"]
     DATA_FIELD_NUMBER: _ClassVar[int]
+    DROP_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     ERROR_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_STATUS_FIELD_NUMBER: _ClassVar[int]
     data: bytes
+    drop_message: bool
     error: bool
     error_message: str
     pipeline_status: _containers.RepeatedCompositeFieldContainer[PipelineStatus]
-    def __init__(self, data: _Optional[bytes] = ..., error: bool = ..., error_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ...) -> None: ...
+    def __init__(self, data: _Optional[bytes] = ..., error: bool = ..., error_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., drop_message: bool = ...) -> None: ...
 
 class StepStatus(_message.Message):
     __slots__ = ["abort_status", "error", "error_message", "name"]

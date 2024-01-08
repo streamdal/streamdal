@@ -80,27 +80,28 @@ export enum SchemaValidationCondition {
     NOT_MATCH = 2
 }
 /**
- * protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
- *
  * @generated from protobuf enum protos.steps.JSONSchemaDraft
  */
 export enum JSONSchemaDraft {
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_UNKNOWN = 0;
+     * protolint:disable ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+     * protolint:disable ENUM_FIELD_NAMES_PREFIX
+     *
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_UNKNOWN = 0;
      */
-    JSON_SCHEMA_DRAFT_UNKNOWN = 0,
+    JSONSCHEMA_DRAFT_UNKNOWN = 0,
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_04 = 1;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_04 = 1;
      */
-    JSON_SCHEMA_DRAFT_04 = 1,
+    JSONSCHEMA_DRAFT_04 = 1,
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_06 = 2;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_06 = 2;
      */
-    JSON_SCHEMA_DRAFT_06 = 2,
+    JSONSCHEMA_DRAFT_06 = 2,
     /**
-     * @generated from protobuf enum value: JSON_SCHEMA_DRAFT_07 = 3;
+     * @generated from protobuf enum value: JSONSCHEMA_DRAFT_07 = 3;
      */
-    JSON_SCHEMA_DRAFT_07 = 3
+    JSONSCHEMA_DRAFT_07 = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SchemaValidationStep$Type extends MessageType<SchemaValidationStep> {

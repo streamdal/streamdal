@@ -28,11 +28,12 @@ class SDKResponse$Type extends MessageType {
             { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus }
+            { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
+            { no: 5, name: "drop_message", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [] };
+        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], dropMessage: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -54,6 +55,9 @@ class SDKResponse$Type extends MessageType {
                     break;
                 case /* repeated protos.PipelineStatus pipeline_status */ 4:
                     message.pipelineStatus.push(PipelineStatus.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* bool drop_message */ 5:
+                    message.dropMessage = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -79,6 +83,9 @@ class SDKResponse$Type extends MessageType {
         /* repeated protos.PipelineStatus pipeline_status = 4; */
         for (let i = 0; i < message.pipelineStatus.length; i++)
             PipelineStatus.internalBinaryWrite(message.pipelineStatus[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* bool drop_message = 5; */
+        if (message.dropMessage !== false)
+            writer.tag(5, WireType.Varint).bool(message.dropMessage);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
