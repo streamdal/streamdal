@@ -94,8 +94,9 @@ message DetectiveStepResultMatch {
   string path = 2;
 
   // For string payloads, the start and end characters of the match
-  int32 char_index_start = 3;
-  int32 char_index_end = 4;
+  // Placeholder for now, will implement in the future
+  //int32 char_index_start = 3;
+  //int32 char_index_end = 4;
 
   // Value of the match
   bytes value = 5;
