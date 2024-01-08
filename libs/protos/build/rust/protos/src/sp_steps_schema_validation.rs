@@ -348,7 +348,7 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
         if !self.json_schema.is_empty() {
             my_size += ::protobuf::rt::bytes_size(1, &self.json_schema);
         }
-        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN) {
+        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN) {
             my_size += ::protobuf::rt::int32_size(2, self.draft.value());
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -360,7 +360,7 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
         if !self.json_schema.is_empty() {
             os.write_bytes(1, &self.json_schema)?;
         }
-        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN) {
+        if self.draft != ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN) {
             os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.draft))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -381,7 +381,7 @@ impl ::protobuf::Message for SchemaValidationJSONSchema {
 
     fn clear(&mut self) {
         self.json_schema.clear();
-        self.draft = ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN);
+        self.draft = ::protobuf::EnumOrUnknown::new(JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN);
         self.special_fields.clear();
     }
 
@@ -541,18 +541,17 @@ impl SchemaValidationCondition {
     }
 }
 
-///  protolint:disable:next ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.steps.JSONSchemaDraft)
 pub enum JSONSchemaDraft {
-    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_UNKNOWN)
-    JSON_SCHEMA_DRAFT_UNKNOWN = 0,
-    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_04)
-    JSON_SCHEMA_DRAFT_04 = 1,
-    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_06)
-    JSON_SCHEMA_DRAFT_06 = 2,
-    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSON_SCHEMA_DRAFT_07)
-    JSON_SCHEMA_DRAFT_07 = 3,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSONSCHEMA_DRAFT_UNKNOWN)
+    JSONSCHEMA_DRAFT_UNKNOWN = 0,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSONSCHEMA_DRAFT_04)
+    JSONSCHEMA_DRAFT_04 = 1,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSONSCHEMA_DRAFT_06)
+    JSONSCHEMA_DRAFT_06 = 2,
+    // @@protoc_insertion_point(enum_value:protos.steps.JSONSchemaDraft.JSONSCHEMA_DRAFT_07)
+    JSONSCHEMA_DRAFT_07 = 3,
 }
 
 impl ::protobuf::Enum for JSONSchemaDraft {
@@ -564,29 +563,29 @@ impl ::protobuf::Enum for JSONSchemaDraft {
 
     fn from_i32(value: i32) -> ::std::option::Option<JSONSchemaDraft> {
         match value {
-            0 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN),
-            1 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_04),
-            2 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_06),
-            3 => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_07),
+            0 => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN),
+            1 => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_04),
+            2 => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_06),
+            3 => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_07),
             _ => ::std::option::Option::None
         }
     }
 
     fn from_str(str: &str) -> ::std::option::Option<JSONSchemaDraft> {
         match str {
-            "JSON_SCHEMA_DRAFT_UNKNOWN" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN),
-            "JSON_SCHEMA_DRAFT_04" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_04),
-            "JSON_SCHEMA_DRAFT_06" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_06),
-            "JSON_SCHEMA_DRAFT_07" => ::std::option::Option::Some(JSONSchemaDraft::JSON_SCHEMA_DRAFT_07),
+            "JSONSCHEMA_DRAFT_UNKNOWN" => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN),
+            "JSONSCHEMA_DRAFT_04" => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_04),
+            "JSONSCHEMA_DRAFT_06" => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_06),
+            "JSONSCHEMA_DRAFT_07" => ::std::option::Option::Some(JSONSchemaDraft::JSONSCHEMA_DRAFT_07),
             _ => ::std::option::Option::None
         }
     }
 
     const VALUES: &'static [JSONSchemaDraft] = &[
-        JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN,
-        JSONSchemaDraft::JSON_SCHEMA_DRAFT_04,
-        JSONSchemaDraft::JSON_SCHEMA_DRAFT_06,
-        JSONSchemaDraft::JSON_SCHEMA_DRAFT_07,
+        JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN,
+        JSONSchemaDraft::JSONSCHEMA_DRAFT_04,
+        JSONSchemaDraft::JSONSCHEMA_DRAFT_06,
+        JSONSchemaDraft::JSONSCHEMA_DRAFT_07,
     ];
 }
 
@@ -604,7 +603,7 @@ impl ::protobuf::EnumFull for JSONSchemaDraft {
 
 impl ::std::default::Default for JSONSchemaDraft {
     fn default() -> Self {
-        JSONSchemaDraft::JSON_SCHEMA_DRAFT_UNKNOWN
+        JSONSchemaDraft::JSONSCHEMA_DRAFT_UNKNOWN
     }
 }
 
@@ -627,11 +626,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     !SCHEMA_VALIDATION_TYPE_JSONSCHEMA\x10\x01*\x96\x01\n\x19SchemaValidatio\
     nCondition\x12'\n#SCHEMA_VALIDATION_CONDITION_UNKNOWN\x10\0\x12%\n!SCHEM\
     A_VALIDATION_CONDITION_MATCH\x10\x01\x12)\n%SCHEMA_VALIDATION_CONDITION_\
-    NOT_MATCH\x10\x02*~\n\x0fJSONSchemaDraft\x12\x1d\n\x19JSON_SCHEMA_DRAFT_\
-    UNKNOWN\x10\0\x12\x18\n\x14JSON_SCHEMA_DRAFT_04\x10\x01\x12\x18\n\x14JSO\
-    N_SCHEMA_DRAFT_06\x10\x02\x12\x18\n\x14JSON_SCHEMA_DRAFT_07\x10\x03BBZ@g\
-    ithub.com/streamdal/streamdal/libs/protos/build/go/protos/stepsJ\x85\x07\
-    \n\x06\x12\x04\0\0'\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    NOT_MATCH\x10\x02*z\n\x0fJSONSchemaDraft\x12\x1c\n\x18JSONSCHEMA_DRAFT_U\
+    NKNOWN\x10\0\x12\x17\n\x13JSONSCHEMA_DRAFT_04\x10\x01\x12\x17\n\x13JSONS\
+    CHEMA_DRAFT_06\x10\x02\x12\x17\n\x13JSONSCHEMA_DRAFT_07\x10\x03BBZ@githu\
+    b.com/streamdal/streamdal/libs/protos/build/go/protos/stepsJ\xab\x07\n\
+    \x06\x12\x04\0\0)\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
     \x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\
     \x03\x04\0W\n\n\n\x02\x05\0\x12\x04\x06\0\t\x01\n\n\n\x03\x05\0\x01\x12\
     \x03\x06\x05\x19\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\x02%\n\x0c\n\x05\
@@ -644,35 +643,35 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0b\n\x04\x05\x01\x02\x01\x12\x03\r\x02(\n\x0c\n\x05\x05\x01\x02\x01\
     \x01\x12\x03\r\x02#\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03\r&'\n\x0b\n\
     \x04\x05\x01\x02\x02\x12\x03\x0e\x02,\n\x0c\n\x05\x05\x01\x02\x02\x01\
-    \x12\x03\x0e\x02'\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x0e*+\nF\n\x02\
-    \x05\x02\x12\x04\x12\0\x17\x01\x1a:\x20protolint:disable:next\x20ENUM_FI\
-    ELD_NAMES_UPPER_SNAKE_CASE\n\n\n\n\x03\x05\x02\x01\x12\x03\x12\x05\x14\n\
-    \x0b\n\x04\x05\x02\x02\0\x12\x03\x13\x02\x20\n\x0c\n\x05\x05\x02\x02\0\
-    \x01\x12\x03\x13\x02\x1b\n\x0c\n\x05\x05\x02\x02\0\x02\x12\x03\x13\x1e\
-    \x1f\n\x0b\n\x04\x05\x02\x02\x01\x12\x03\x14\x02\x1b\n\x0c\n\x05\x05\x02\
-    \x02\x01\x01\x12\x03\x14\x02\x16\n\x0c\n\x05\x05\x02\x02\x01\x02\x12\x03\
-    \x14\x19\x1a\n\x0b\n\x04\x05\x02\x02\x02\x12\x03\x15\x02\x1b\n\x0c\n\x05\
-    \x05\x02\x02\x02\x01\x12\x03\x15\x02\x16\n\x0c\n\x05\x05\x02\x02\x02\x02\
-    \x12\x03\x15\x19\x1a\n\x0b\n\x04\x05\x02\x02\x03\x12\x03\x16\x02\x1b\n\
-    \x0c\n\x05\x05\x02\x02\x03\x01\x12\x03\x16\x02\x16\n\x0c\n\x05\x05\x02\
-    \x02\x03\x02\x12\x03\x16\x19\x1a\n\n\n\x02\x04\0\x12\x04\x19\0!\x01\n\n\
-    \n\x03\x04\0\x01\x12\x03\x19\x08\x1c\n\x0b\n\x04\x04\0\x02\0\x12\x03\x1a\
-    \x02\x20\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x1a\x02\x16\n\x0c\n\x05\x04\
-    \0\x02\0\x01\x12\x03\x1a\x17\x1b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1a\
-    \x1e\x1f\n\x0b\n\x04\x04\0\x02\x01\x12\x03\x1c\x02*\n\x0c\n\x05\x04\0\
-    \x02\x01\x06\x12\x03\x1c\x02\x1b\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\
-    \x1c\x1c%\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1c()\n\x0c\n\x04\x04\0\
-    \x08\0\x12\x04\x1e\x02\x20\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x1e\
-    \x08\x0f\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x1f\x041\n\x0c\n\x05\x04\0\
-    \x02\x02\x06\x12\x03\x1f\x04\x1e\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
-    \x1f\x1f*\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1f-0\n\n\n\x02\x04\x01\
-    \x12\x04#\0'\x01\n\n\n\x03\x04\x01\x01\x12\x03#\x08\"\n\x0b\n\x04\x04\
-    \x01\x02\0\x12\x03$\x02\x18\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03$\x02\
-    \x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03$\x08\x13\n\x0c\n\x05\x04\x01\
-    \x02\0\x03\x12\x03$\x16\x17\n\x0b\n\x04\x04\x01\x02\x01\x12\x03&\x02\x1c\
-    \n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03&\x02\x11\n\x0c\n\x05\x04\x01\
-    \x02\x01\x01\x12\x03&\x12\x17\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03&\
-    \x1a\x1bb\x06proto3\
+    \x12\x03\x0e\x02'\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03\x0e*+\n\n\n\
+    \x02\x05\x02\x12\x04\x12\0\x19\x01\n\n\n\x03\x05\x02\x01\x12\x03\x12\x05\
+    \x14\nm\n\x04\x05\x02\x02\0\x12\x03\x15\x02\x1f\x1a`\x20protolint:disabl\
+    e\x20ENUM_FIELD_NAMES_UPPER_SNAKE_CASE\n\x20protolint:disable\x20ENUM_FI\
+    ELD_NAMES_PREFIX\n\n\x0c\n\x05\x05\x02\x02\0\x01\x12\x03\x15\x02\x1a\n\
+    \x0c\n\x05\x05\x02\x02\0\x02\x12\x03\x15\x1d\x1e\n\x0b\n\x04\x05\x02\x02\
+    \x01\x12\x03\x16\x02\x1a\n\x0c\n\x05\x05\x02\x02\x01\x01\x12\x03\x16\x02\
+    \x15\n\x0c\n\x05\x05\x02\x02\x01\x02\x12\x03\x16\x18\x19\n\x0b\n\x04\x05\
+    \x02\x02\x02\x12\x03\x17\x02\x1a\n\x0c\n\x05\x05\x02\x02\x02\x01\x12\x03\
+    \x17\x02\x15\n\x0c\n\x05\x05\x02\x02\x02\x02\x12\x03\x17\x18\x19\n\x0b\n\
+    \x04\x05\x02\x02\x03\x12\x03\x18\x02\x1a\n\x0c\n\x05\x05\x02\x02\x03\x01\
+    \x12\x03\x18\x02\x15\n\x0c\n\x05\x05\x02\x02\x03\x02\x12\x03\x18\x18\x19\
+    \n\n\n\x02\x04\0\x12\x04\x1b\0#\x01\n\n\n\x03\x04\0\x01\x12\x03\x1b\x08\
+    \x1c\n\x0b\n\x04\x04\0\x02\0\x12\x03\x1c\x02\x20\n\x0c\n\x05\x04\0\x02\0\
+    \x06\x12\x03\x1c\x02\x16\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1c\x17\x1b\
+    \n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1c\x1e\x1f\n\x0b\n\x04\x04\0\x02\
+    \x01\x12\x03\x1e\x02*\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x1e\x02\x1b\
+    \n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1e\x1c%\n\x0c\n\x05\x04\0\x02\
+    \x01\x03\x12\x03\x1e()\n\x0c\n\x04\x04\0\x08\0\x12\x04\x20\x02\"\x03\n\
+    \x0c\n\x05\x04\0\x08\0\x01\x12\x03\x20\x08\x0f\n\x0b\n\x04\x04\0\x02\x02\
+    \x12\x03!\x041\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03!\x04\x1e\n\x0c\n\
+    \x05\x04\0\x02\x02\x01\x12\x03!\x1f*\n\x0c\n\x05\x04\0\x02\x02\x03\x12\
+    \x03!-0\n\n\n\x02\x04\x01\x12\x04%\0)\x01\n\n\n\x03\x04\x01\x01\x12\x03%\
+    \x08\"\n\x0b\n\x04\x04\x01\x02\0\x12\x03&\x02\x18\n\x0c\n\x05\x04\x01\
+    \x02\0\x05\x12\x03&\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03&\x08\
+    \x13\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03&\x16\x17\n\x0b\n\x04\x04\x01\
+    \x02\x01\x12\x03(\x02\x1c\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03(\x02\
+    \x11\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03(\x12\x17\n\x0c\n\x05\x04\
+    \x01\x02\x01\x03\x12\x03(\x1a\x1bb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

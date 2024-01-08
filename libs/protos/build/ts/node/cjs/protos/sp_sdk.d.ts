@@ -34,6 +34,14 @@ export interface SDKResponse {
      * @generated from protobuf field: repeated protos.PipelineStatus pipeline_status = 4;
      */
     pipelineStatus: PipelineStatus[];
+    /**
+     * Indicates that the message should be dropped by the service using the SDK
+     * This should only be set as the result of a success/failure condition. Errors
+     * should not set this, so we can let the end user decide how to handle errors.
+     *
+     * @generated from protobuf field: bool drop_message = 5;
+     */
+    dropMessage: boolean;
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
