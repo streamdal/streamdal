@@ -7,4 +7,4 @@ NODE_NAME="node-$(hostname)"
 export STREAMDAL_SERVER_NODE_NAME=$NODE_NAME
 
 # Execute the original Docker entry point
-exec "$@"
+exec /streamdal-server --debug
