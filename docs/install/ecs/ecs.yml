@@ -87,13 +87,13 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: streamdal-server-task
-      Cpu: 1024
-      Memory: 1024
+      Cpu: "512"
+      Memory: "1024"
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-server-container
-          Image: streamdal/server:0.0.6-1b764ac
+          Image: streamdal/server:0.0.11-6c7cdad
           EntryPoint: ["/bin/bash", "/entrypoint.sh"]
           Environment:
             - Name: STREAMDAL_SERVER_AUTH_TOKEN
