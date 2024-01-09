@@ -42,6 +42,10 @@ var (
 			Filename: "validjson.wasm",
 			FuncName: "f",
 		},
+		"schemavalidation": {
+			Filename: "schemavalidation.wasm",
+			FuncName: "f",
+		},
 	}
 )
 
