@@ -23,7 +23,7 @@ static_resources:
                     routes:
                       - match: { prefix: "/" }
                         route:
-                          cluster: snitch
+                          cluster: streamdal
                           timeout: 0s
                           max_stream_duration:
                             grpc_timeout_header_max: 0s
@@ -31,9 +31,9 @@ static_resources:
                       allow_origin_string_match:
                         - prefix: "*"
                       allow_methods: GET, PUT, DELETE, POST, OPTIONS
-                      allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,custom-header-1,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
+                      allow_headers: auth-token,keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,custom-header-1,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
                       max_age: "1728000"
-                      expose_headers: custom-header-1,grpc-status,grpc-message
+                      expose_headers: custom-header-1,grpc-status,grpc-message,grpc-encoding
               http_filters:
                 - name: envoy.filters.http.grpc_web
                   typed_config:
@@ -45,17 +45,17 @@ static_resources:
                   typed_config:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: snitch
+    - name: streamdal
       connect_timeout: 0.25s
-      type: static
-      lb_policy: round_robin
+      type: logical_dns
       http2_protocol_options: {}
+      lb_policy: round_robin
       load_assignment:
-        cluster_name: snitch
+        cluster_name: streamdal
         endpoints:
           - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: 127.0.0.1
-                      port_value: 8082
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 8082

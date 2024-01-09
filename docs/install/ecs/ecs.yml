@@ -181,7 +181,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: envoy-container
-          Image: envoyproxy/envoy:tools-v1.28.0
+          Image: streamdal/envoy-side-car:latest
           PortMappings:
             - ContainerPort: 8083
       RequiresCompatibilities:
@@ -232,6 +232,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 8083
           ToPort: 8083
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8084
+          ToPort: 8084
           CidrIp: 0.0.0.0/0
 
   # EFS FileSystem
