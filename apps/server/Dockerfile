@@ -40,6 +40,12 @@ COPY --from=builder /assets/wasm/* /assets/wasm/
 
 RUN chmod +x /streamdal-server
 
+# Copy the entry script into the image
+COPY entrypoint.sh /entrypoint.sh
+
+# Make the entry script executable
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 8081
 EXPOSE 8082
 
