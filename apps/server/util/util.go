@@ -157,7 +157,7 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 		case *protos.PipelineStep_InferSchema:
 			mapping, err = wasm.Load("inferschema", prefix)
 		case *protos.PipelineStep_SchemaValidation:
-			mapping, err = wasm.Load("schemavalidation")
+			mapping, err = wasm.Load("schemavalidation", prefix)
 		default:
 			return errors.Errorf("unknown pipeline step type: %T", s.Step)
 		}
