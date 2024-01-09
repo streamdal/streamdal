@@ -46,6 +46,12 @@ import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { PipelineNotifications } from "../components/pipeline/notifications.tsx";
 import { PipelineTransform } from "./pipelineTransform.tsx";
+import {
+  JSONSchemaDraft,
+  SchemaValidationCondition,
+  SchemaValidationType,
+} from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
+import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -79,10 +85,18 @@ const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
 const TransformTypeEnum = z.nativeEnum(TransformType);
 const TransformTruncateTypeEnum = z.nativeEnum(TransformTruncateType);
+const SchemaValidationTypeEnum = z.nativeEnum(SchemaValidationType);
+const SchemaValidationConditionEnum = z.nativeEnum(SchemaValidationCondition);
+const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
 const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
 
-const kinds = ["detective", "transform", "kv"];
+const kinds = [
+  { label: "Detective", value: "detective" },
+  { label: "Transform", value: "transform" },
+  { label: "Key/Value", value: "kv" },
+  { label: "Schema Validation", value: "schemaValidation" },
+];
 
 const transformOptions = z.discriminatedUnion("oneofKind", [
   z.object({
@@ -124,6 +138,24 @@ const transformOptions = z.discriminatedUnion("oneofKind", [
     extractOptions: z.object({
       flatten: z.preprocess((v) => v === "true", z.boolean()),
       paths: zfd.repeatable(z.array(zfd.text()).min(1)),
+    }),
+  }),
+]);
+
+const schemaValidationOptions = z.discriminatedUnion("oneofKind", [
+  z.object({
+    oneofKind: z.literal("jsonSchema"),
+    jsonSchema: z.object({
+      jsonSchema: z.string().min(1, { message: "Required" })
+        .refine((json) => {
+          try {
+            JSON.parse(json);
+            return true;
+          } catch {
+            return false;
+          }
+        }, "Schema is invalid.").transform((v) => new TextEncoder().encode(v)),
+      draft: zfd.numeric(JSONSchemaDraftEnum),
     }),
   }),
 ]);
@@ -208,6 +240,16 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       action: zfd.numeric(KVActionTypeEnum),
       mode: zfd.numeric(KVModeTypeEnum),
       key: z.string(),
+    }),
+  }),
+  z.object({
+    oneofKind: z.literal("schemaValidation"),
+    schemaValidation: z.object({
+      type: zfd.numeric(SchemaValidationTypeEnum),
+      condition: zfd.numeric(SchemaValidationConditionEnum).default(
+        SchemaValidationCondition.MATCH,
+      ),
+      options: schemaValidationOptions,
     }),
   }),
   z.object({
@@ -502,12 +544,12 @@ const PipelineDetail = (
                     setData={setData}
                     label="Step Type"
                     errors={errors}
-                    inputClass="w-36"
-                    children={kinds.map((k, i) => (
+                    inputClass="w-64"
+                    children={kinds.map((kind, i) => (
                       <option
                         key={`step-kind-key-${i}`}
-                        value={k}
-                        label={k === "kv" ? "Key/Value" : titleCase(k)}
+                        value={kind.value}
+                        label={kind.label}
                       />
                     ))}
                   />
@@ -558,6 +600,15 @@ const PipelineDetail = (
                   )}
                   {"transform" === step.step.oneofKind && (
                     <PipelineTransform
+                      stepNumber={i}
+                      step={step}
+                      data={data}
+                      setData={setData}
+                      errors={errors}
+                    />
+                  )}
+                  {"schemaValidation" === step.step.oneofKind && (
+                    <PipelineSchemaValidation
                       stepNumber={i}
                       step={step}
                       data={data}
