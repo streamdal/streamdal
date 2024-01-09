@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { DetectiveStepResult } from "./steps/sp_steps_detective.ts";
 import { PipelineStep } from "./sp_pipeline.ts";
 /**
  * SDK generates a WASM request and passes this to the WASM func
@@ -38,6 +39,18 @@ export interface WASMRequest {
      * @generated from protobuf field: optional bytes input_step = 3;
      */
     inputStep?: Uint8Array;
+    /**
+     * @generated from protobuf oneof: input_from
+     */
+    inputFrom: {
+        oneofKind: "detectiveResult";
+        /**
+         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 100;
+         */
+        detectiveResult: DetectiveStepResult;
+    } | {
+        oneofKind: undefined;
+    };
 }
 /**
  * Returned by all WASM functions
@@ -118,11 +131,12 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 100, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
         ]);
     }
     create(value?: PartialMessage<WASMRequest>): WASMRequest {
-        const message = { inputPayload: new Uint8Array(0) };
+        const message = { inputPayload: new Uint8Array(0), inputFrom: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<WASMRequest>(this, message, value);
@@ -141,6 +155,12 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
                     break;
                 case /* optional bytes input_step */ 3:
                     message.inputStep = reader.bytes();
+                    break;
+                case /* protos.steps.DetectiveStepResult detective_result */ 100:
+                    message.inputFrom = {
+                        oneofKind: "detectiveResult",
+                        detectiveResult: DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, (message.inputFrom as any).detectiveResult)
+                    };
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -163,6 +183,9 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
         /* optional bytes input_step = 3; */
         if (message.inputStep !== undefined)
             writer.tag(3, WireType.LengthDelimited).bytes(message.inputStep);
+        /* protos.steps.DetectiveStepResult detective_result = 100; */
+        if (message.inputFrom.oneofKind === "detectiveResult")
+            DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

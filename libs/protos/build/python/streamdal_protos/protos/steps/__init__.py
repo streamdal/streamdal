@@ -236,10 +236,6 @@ class DetectiveStepResultMatch(betterproto.Message):
     path: str = betterproto.string_field(2)
     """For JSON payloads, the path to the match"""
 
-    char_index_start: int = betterproto.int32_field(3)
-    """For string payloads, the start and end characters of the match"""
-
-    char_index_end: int = betterproto.int32_field(4)
     value: bytes = betterproto.bytes_field(5)
     """Value of the match"""
 

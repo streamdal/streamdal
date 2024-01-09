@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { DetectiveStepResult } from "./steps/sp_steps_detective.js";
 import { PipelineStep } from "./sp_pipeline.js";
 /**
  * SDK generates a WASM request and passes this to the WASM func
@@ -31,6 +32,18 @@ export interface WASMRequest {
      * @generated from protobuf field: optional bytes input_step = 3;
      */
     inputStep?: Uint8Array;
+    /**
+     * @generated from protobuf oneof: input_from
+     */
+    inputFrom: {
+        oneofKind: "detectiveResult";
+        /**
+         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 100;
+         */
+        detectiveResult: DetectiveStepResult;
+    } | {
+        oneofKind: undefined;
+    };
 }
 /**
  * Returned by all WASM functions

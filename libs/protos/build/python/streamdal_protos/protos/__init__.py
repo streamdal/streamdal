@@ -1145,6 +1145,10 @@ class WasmRequest(betterproto.Message):
     the pipeline, it will be empty.
     """
 
+    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
+        100, group="input_from"
+    )
+
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):

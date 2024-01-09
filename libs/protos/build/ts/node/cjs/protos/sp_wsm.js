@@ -6,6 +6,7 @@ const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_steps_detective_1 = require("./steps/sp_steps_detective");
 const sp_pipeline_1 = require("./sp_pipeline");
 /**
  * Included in WASM response; the SDK should use the WASMExitCode to determine
@@ -52,11 +53,12 @@ class WASMRequest$Type extends runtime_5.MessageType {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => sp_pipeline_1.PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 100, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => sp_steps_detective_1.DetectiveStepResult }
         ]);
     }
     create(value) {
-        const message = { inputPayload: new Uint8Array(0) };
+        const message = { inputPayload: new Uint8Array(0), inputFrom: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -75,6 +77,12 @@ class WASMRequest$Type extends runtime_5.MessageType {
                     break;
                 case /* optional bytes input_step */ 3:
                     message.inputStep = reader.bytes();
+                    break;
+                case /* protos.steps.DetectiveStepResult detective_result */ 100:
+                    message.inputFrom = {
+                        oneofKind: "detectiveResult",
+                        detectiveResult: sp_steps_detective_1.DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
+                    };
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -97,6 +105,9 @@ class WASMRequest$Type extends runtime_5.MessageType {
         /* optional bytes input_step = 3; */
         if (message.inputStep !== undefined)
             writer.tag(3, runtime_1.WireType.LengthDelimited).bytes(message.inputStep);
+        /* protos.steps.DetectiveStepResult detective_result = 100; */
+        if (message.inputFrom.oneofKind === "detectiveResult")
+            sp_steps_detective_1.DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(100, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

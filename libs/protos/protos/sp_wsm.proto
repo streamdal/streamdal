@@ -3,6 +3,7 @@ syntax = "proto3";
 package protos;
 
 import "sp_pipeline.proto";
+import "steps/sp_steps_detective.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
@@ -39,6 +40,10 @@ message WASMRequest {
   // Potentially filled out result from previous step. If this is first step in
   // the pipeline, it will be empty.
   optional bytes input_step = 3;
+
+  oneof input_from {
+    steps.DetectiveStepResult detective_result = 100;
+  }
 }
 
 // Returned by all WASM functions

@@ -210,11 +210,6 @@ pub struct DetectiveStepResultMatch {
     ///  For JSON payloads, the path to the match
     // @@protoc_insertion_point(field:protos.steps.DetectiveStepResultMatch.path)
     pub path: ::std::string::String,
-    ///  For string payloads, the start and end characters of the match
-    // @@protoc_insertion_point(field:protos.steps.DetectiveStepResultMatch.char_index_start)
-    pub char_index_start: i32,
-    // @@protoc_insertion_point(field:protos.steps.DetectiveStepResultMatch.char_index_end)
-    pub char_index_end: i32,
     ///  Value of the match
     // @@protoc_insertion_point(field:protos.steps.DetectiveStepResultMatch.value)
     pub value: ::std::vec::Vec<u8>,
@@ -235,7 +230,7 @@ impl DetectiveStepResultMatch {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(5);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "type",
@@ -246,16 +241,6 @@ impl DetectiveStepResultMatch {
             "path",
             |m: &DetectiveStepResultMatch| { &m.path },
             |m: &mut DetectiveStepResultMatch| { &mut m.path },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "char_index_start",
-            |m: &DetectiveStepResultMatch| { &m.char_index_start },
-            |m: &mut DetectiveStepResultMatch| { &mut m.char_index_start },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "char_index_end",
-            |m: &DetectiveStepResultMatch| { &m.char_index_end },
-            |m: &mut DetectiveStepResultMatch| { &mut m.char_index_end },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "value",
@@ -286,12 +271,6 @@ impl ::protobuf::Message for DetectiveStepResultMatch {
                 18 => {
                     self.path = is.read_string()?;
                 },
-                24 => {
-                    self.char_index_start = is.read_int32()?;
-                },
-                32 => {
-                    self.char_index_end = is.read_int32()?;
-                },
                 42 => {
                     self.value = is.read_bytes()?;
                 },
@@ -313,12 +292,6 @@ impl ::protobuf::Message for DetectiveStepResultMatch {
         if !self.path.is_empty() {
             my_size += ::protobuf::rt::string_size(2, &self.path);
         }
-        if self.char_index_start != 0 {
-            my_size += ::protobuf::rt::int32_size(3, self.char_index_start);
-        }
-        if self.char_index_end != 0 {
-            my_size += ::protobuf::rt::int32_size(4, self.char_index_end);
-        }
         if !self.value.is_empty() {
             my_size += ::protobuf::rt::bytes_size(5, &self.value);
         }
@@ -333,12 +306,6 @@ impl ::protobuf::Message for DetectiveStepResultMatch {
         }
         if !self.path.is_empty() {
             os.write_string(2, &self.path)?;
-        }
-        if self.char_index_start != 0 {
-            os.write_int32(3, self.char_index_start)?;
-        }
-        if self.char_index_end != 0 {
-            os.write_int32(4, self.char_index_end)?;
         }
         if !self.value.is_empty() {
             os.write_bytes(5, &self.value)?;
@@ -362,8 +329,6 @@ impl ::protobuf::Message for DetectiveStepResultMatch {
     fn clear(&mut self) {
         self.type_ = ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_UNKNOWN);
         self.path.clear();
-        self.char_index_start = 0;
-        self.char_index_end = 0;
         self.value.clear();
         self.special_fields.clear();
     }
@@ -372,8 +337,6 @@ impl ::protobuf::Message for DetectiveStepResultMatch {
         static instance: DetectiveStepResultMatch = DetectiveStepResultMatch {
             type_: ::protobuf::EnumOrUnknown::from_i32(0),
             path: ::std::string::String::new(),
-            char_index_start: 0,
-            char_index_end: 0,
             value: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -868,15 +831,13 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x12\n\x04args\x18\x02\x20\x03(\tR\x04args\x12\x1b\n\x06negate\x18\
     \x03\x20\x01(\x08H\x01R\x06negate\x88\x01\x01\x12/\n\x04type\x18\x04\x20\
     \x01(\x0e2\x1b.protos.steps.DetectiveTypeR\x04typeB\x07\n\x05_pathB\t\n\
-    \x07_negate\"\xc5\x01\n\x18DetectiveStepResultMatch\x12/\n\x04type\x18\
-    \x01\x20\x01(\x0e2\x1b.protos.steps.DetectiveTypeR\x04type\x12\x12\n\x04\
-    path\x18\x02\x20\x01(\tR\x04path\x12(\n\x10char_index_start\x18\x03\x20\
-    \x01(\x05R\x0echarIndexStart\x12$\n\x0echar_index_end\x18\x04\x20\x01(\
-    \x05R\x0ccharIndexEnd\x12\x14\n\x05value\x18\x05\x20\x01(\x0cR\x05value\
-    \"W\n\x13DetectiveStepResult\x12@\n\x07matches\x18\x01\x20\x03(\x0b2&.pr\
-    otos.steps.DetectiveStepResultMatchR\x07matches*\x8d\r\n\rDetectiveType\
-    \x12\x1a\n\x16DETECTIVE_TYPE_UNKNOWN\x10\0\x12\x1c\n\x17DETECTIVE_TYPE_I\
-    S_EMPTY\x10\xe8\x07\x12\x1d\n\x18DETECTIVE_TYPE_HAS_FIELD\x10\xe9\x07\
+    \x07_negate\"u\n\x18DetectiveStepResultMatch\x12/\n\x04type\x18\x01\x20\
+    \x01(\x0e2\x1b.protos.steps.DetectiveTypeR\x04type\x12\x12\n\x04path\x18\
+    \x02\x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x05\x20\x01(\x0cR\x05val\
+    ue\"W\n\x13DetectiveStepResult\x12@\n\x07matches\x18\x01\x20\x03(\x0b2&.\
+    protos.steps.DetectiveStepResultMatchR\x07matches*\x8d\r\n\rDetectiveTyp\
+    e\x12\x1a\n\x16DETECTIVE_TYPE_UNKNOWN\x10\0\x12\x1c\n\x17DETECTIVE_TYPE_\
+    IS_EMPTY\x10\xe8\x07\x12\x1d\n\x18DETECTIVE_TYPE_HAS_FIELD\x10\xe9\x07\
     \x12\x1b\n\x16DETECTIVE_TYPE_IS_TYPE\x10\xea\x07\x12'\n\"DETECTIVE_TYPE_\
     STRING_CONTAINS_ANY\x10\xeb\x07\x12'\n\"DETECTIVE_TYPE_STRING_CONTAINS_A\
     LL\x10\xec\x07\x12\x20\n\x1bDETECTIVE_TYPE_STRING_EQUAL\x10\xed\x07\x12\
@@ -910,7 +871,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     _TYPE_NUMERIC_LESS_EQUAL\x10\xbc\x17\x12!\n\x1cDETECTIVE_TYPE_NUMERIC_RA\
     NGE\x10\xbd\x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MIN\x10\xbe\x17\x12\
     \x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MAX\x10\xbf\x17BBZ@github.com/streamdal\
-    /streamdal/libs/protos/build/go/protos/stepsJ\xda!\n\x06\x12\x04\0\0i\
+    /streamdal/libs/protos/build/go/protos/stepsJ\xd7!\n\x06\x12\x04\0\0j\
     \x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\
     \x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n5\n\x02\
     \x05\0\x12\x04\x06\0P\x01\")\x201000-1999\x20reserved\x20for\x20core\x20\
@@ -1045,28 +1006,25 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\0\x02\x02\x03\x12\x03U\x19\x1a\n\x0b\n\x04\x04\0\x02\x03\x12\x03V\
     \x02\x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03V\x02\x0f\n\x0c\n\x05\x04\
     \0\x02\x03\x01\x12\x03V\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03V\
-    \x17\x18\n\n\n\x02\x04\x01\x12\x04Y\0e\x01\n\n\n\x03\x04\x01\x01\x12\x03\
+    \x17\x18\n\n\n\x02\x04\x01\x12\x04Y\0f\x01\n\n\n\x03\x04\x01\x01\x12\x03\
     Y\x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03Z\x02\x19\n\x0c\n\x05\x04\x01\
     \x02\0\x06\x12\x03Z\x02\x0f\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03Z\x10\
     \x14\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03Z\x17\x18\n7\n\x04\x04\x01\x02\
     \x01\x12\x03]\x02\x12\x1a*\x20For\x20JSON\x20payloads,\x20the\x20path\
     \x20to\x20the\x20match\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03]\x02\
     \x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03]\t\r\n\x0c\n\x05\x04\x01\
-    \x02\x01\x03\x12\x03]\x10\x11\nM\n\x04\x04\x01\x02\x02\x12\x03`\x02\x1d\
-    \x1a@\x20For\x20string\x20payloads,\x20the\x20start\x20and\x20end\x20cha\
-    racters\x20of\x20the\x20match\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03`\
-    \x02\x07\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03`\x08\x18\n\x0c\n\x05\
-    \x04\x01\x02\x02\x03\x12\x03`\x1b\x1c\n\x0b\n\x04\x04\x01\x02\x03\x12\
-    \x03a\x02\x1b\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03a\x02\x07\n\x0c\n\
-    \x05\x04\x01\x02\x03\x01\x12\x03a\x08\x16\n\x0c\n\x05\x04\x01\x02\x03\
-    \x03\x12\x03a\x19\x1a\n!\n\x04\x04\x01\x02\x04\x12\x03d\x02\x12\x1a\x14\
-    \x20Value\x20of\x20the\x20match\n\n\x0c\n\x05\x04\x01\x02\x04\x05\x12\
-    \x03d\x02\x07\n\x0c\n\x05\x04\x01\x02\x04\x01\x12\x03d\x08\r\n\x0c\n\x05\
-    \x04\x01\x02\x04\x03\x12\x03d\x10\x11\n\n\n\x02\x04\x02\x12\x04g\0i\x01\
-    \n\n\n\x03\x04\x02\x01\x12\x03g\x08\x1b\n\x0b\n\x04\x04\x02\x02\0\x12\
-    \x03h\x020\n\x0c\n\x05\x04\x02\x02\0\x04\x12\x03h\x02\n\n\x0c\n\x05\x04\
-    \x02\x02\0\x06\x12\x03h\x0b#\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03h$+\n\
-    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03h./b\x06proto3\
+    \x02\x01\x03\x12\x03]\x10\x11\n\xcd\x01\n\x04\x04\x01\x02\x02\x12\x03e\
+    \x02\x12\x1a\x14\x20Value\x20of\x20the\x20match\n2\xa9\x01\x20For\x20str\
+    ing\x20payloads,\x20the\x20start\x20and\x20end\x20characters\x20of\x20th\
+    e\x20match\n\x20Placeholder\x20for\x20now,\x20will\x20implement\x20in\
+    \x20the\x20future\nint32\x20char_index_start\x20=\x203;\nint32\x20char_i\
+    ndex_end\x20=\x204;\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03e\x02\x07\n\
+    \x0c\n\x05\x04\x01\x02\x02\x01\x12\x03e\x08\r\n\x0c\n\x05\x04\x01\x02\
+    \x02\x03\x12\x03e\x10\x11\n\n\n\x02\x04\x02\x12\x04h\0j\x01\n\n\n\x03\
+    \x04\x02\x01\x12\x03h\x08\x1b\n\x0b\n\x04\x04\x02\x02\0\x12\x03i\x020\n\
+    \x0c\n\x05\x04\x02\x02\0\x04\x12\x03i\x02\n\n\x0c\n\x05\x04\x02\x02\0\
+    \x06\x12\x03i\x0b#\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03i$+\n\x0c\n\x05\
+    \x04\x02\x02\0\x03\x12\x03i./b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
