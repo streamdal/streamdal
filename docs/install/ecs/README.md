@@ -6,31 +6,52 @@ This repository contains CloudFormation templates and related assets for deployi
 
 The deployment sets up the following components:
 
-1. **ECS Cluster** named `snitch-stack`.
-2. **EFS FileSystem** used for persisting data across container restarts.
+1. **ECS Cluster** named `streamdal-server-deployment`.
+2. **EFS FileSystem** used for persisting redis data across container restarts.
 3. **Service Discovery** with a `.local` namespace.
-4. **NATS** container with JetStream enabled.
-5. **Snitch Server** with `envoy-sidecar` for gRPC to HTTP translation.
+4. **Redis** container.
+5. **Streamdal Server** with `envoy-sidecar` for gRPC to HTTP translation.
 
 ## Requirements
 
 - AWS CLI installed and configured with the necessary permissions.
 - Docker for building and pushing container images.
 - Appropriate VPC, Subnet, and Security Group configurations if the defaults are not suitable.
+- A subnet in the VPC with outbound internet connection 
 
 ## Deployment
 
 1. Clone this repository:
     ```bash
-    git clone streamdal/snitch
-    cd snitch/ecs
+    git clone streamdal/streamdal
+    cd stramdal/docs/install/ecs
     ```
 
+2. Edit ecs-private.yml update the parameters to match your AWS VPC 
 
-2. Deploy the CloudFormation stack:
+3. Deploy the CloudFormation stack:
     ```bash
-    aws cloudformation create-stack --stack-name snitch-stack --template-body file://ecs.yml --capabilities CAPABILITY_NAMED_IAM
+     ./deploy.sh
     ```
+4. Test from inside the vpc 
+
+```
+  docker run -d \
+  --name signup-service-verifier \
+  streamdal/demo-client:3ddcff71 \
+  -d \
+  --message-rate=10,20 \
+  --service-name=signup-service \
+  --server-address=streamdal-server.local:8082 \
+  --operation-type=2 \
+  --operation-name=verifier \
+  --component-name=postgresql \
+  --data-source-type=file \
+  --data-source-file=/assets/sample-signup-producer.json
+```
+
+5. Navigate to  console in a browser  on port 8080 using the IP assigned via ECS
+
 
 ## Configuration for New Environments
 
@@ -42,16 +63,12 @@ If you are deploying in a new environment, ensure you update the following in th
 
 3. **Container Images**: Update the container image paths if you're using different registries or image names.
 
-4. **Environment Variables**: Adjust any environment-specific variables such as `SNITCH_SERVER_NATSURL` for the `snitch-server-container`.
-
-5. **Public IP**: By default, the template assigns public IPs to services. If this isn't desired, update the `AssignPublicIp` attribute to `DISABLED`.
-
-6. **Scaling**: The number of task replicas for each service can be adjusted using the `DesiredCount` property in the respective service definitions.
+4. **Scaling**: The number of task replicas for each service can be adjusted using the `DesiredCount` property in the respective service definitions.
 
 ## Cleanup
 
 To delete the stack and all associated resources:
 
 ```bash
-aws cloudformation delete-stack --stack-name snitch-stack
+aws cloudformation delete-stack --stack-name streamdal-server-deployment
 ```
