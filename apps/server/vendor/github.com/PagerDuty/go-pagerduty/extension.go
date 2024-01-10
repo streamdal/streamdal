@@ -67,7 +67,7 @@ func (c *Client) ListExtensionsWithContext(ctx context.Context, o ListExtensionO
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/extensions?"+v.Encode())
+	resp, err := c.get(ctx, "/extensions?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *Client) GetExtension(id string) (*Extension, error) {
 
 // GetExtensionWithContext gets an extension by its ID.
 func (c *Client) GetExtensionWithContext(ctx context.Context, id string) (*Extension, error) {
-	resp, err := c.get(ctx, "/extensions/"+id)
+	resp, err := c.get(ctx, "/extensions/"+id, nil)
 	return getExtensionFromResponse(c, resp, err)
 }
 

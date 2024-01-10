@@ -78,25 +78,32 @@ type ServiceRuleActions struct {
 // Service represents something you monitor (like a web service, email service, or database service).
 type Service struct {
 	APIObject
-	Name                    string                   `json:"name,omitempty"`
-	Description             string                   `json:"description,omitempty"`
-	AutoResolveTimeout      *uint                    `json:"auto_resolve_timeout,omitempty"`
-	AcknowledgementTimeout  *uint                    `json:"acknowledgement_timeout,omitempty"`
-	CreateAt                string                   `json:"created_at,omitempty"`
-	Status                  string                   `json:"status,omitempty"`
-	LastIncidentTimestamp   string                   `json:"last_incident_timestamp,omitempty"`
-	Integrations            []Integration            `json:"integrations,omitempty"`
-	EscalationPolicy        EscalationPolicy         `json:"escalation_policy,omitempty"`
-	Teams                   []Team                   `json:"teams,omitempty"`
-	IncidentUrgencyRule     *IncidentUrgencyRule     `json:"incident_urgency_rule,omitempty"`
-	SupportHours            *SupportHours            `json:"support_hours,omitempty"`
-	ScheduledActions        []ScheduledAction        `json:"scheduled_actions,omitempty"`
-	AlertCreation           string                   `json:"alert_creation,omitempty"`
-	AlertGrouping           string                   `json:"alert_grouping,omitempty"`
-	AlertGroupingTimeout    *uint                    `json:"alert_grouping_timeout,omitempty"`
-	AlertGroupingParameters *AlertGroupingParameters `json:"alert_grouping_parameters,omitempty"`
-	ResponsePlay            *APIObject               `json:"response_play,omitempty"`
-	Addons                  []Addon                  `json:"addons,omitempty"`
+	Name                             string                            `json:"name,omitempty"`
+	Description                      string                            `json:"description,omitempty"`
+	AutoResolveTimeout               *uint                             `json:"auto_resolve_timeout,omitempty"`
+	AcknowledgementTimeout           *uint                             `json:"acknowledgement_timeout,omitempty"`
+	CreateAt                         string                            `json:"created_at,omitempty"`
+	Status                           string                            `json:"status,omitempty"`
+	LastIncidentTimestamp            string                            `json:"last_incident_timestamp,omitempty"`
+	Integrations                     []Integration                     `json:"integrations,omitempty"`
+	EscalationPolicy                 EscalationPolicy                  `json:"escalation_policy,omitempty"`
+	Teams                            []Team                            `json:"teams,omitempty"`
+	IncidentUrgencyRule              *IncidentUrgencyRule              `json:"incident_urgency_rule,omitempty"`
+	SupportHours                     *SupportHours                     `json:"support_hours,omitempty"`
+	ScheduledActions                 []ScheduledAction                 `json:"scheduled_actions,omitempty"`
+	AlertCreation                    string                            `json:"alert_creation,omitempty"`
+	AlertGrouping                    string                            `json:"alert_grouping,omitempty"`
+	AlertGroupingTimeout             *uint                             `json:"alert_grouping_timeout,omitempty"`
+	AlertGroupingParameters          *AlertGroupingParameters          `json:"alert_grouping_parameters,omitempty"`
+	ResponsePlay                     *APIObject                        `json:"response_play,omitempty"`
+	Addons                           []Addon                           `json:"addons,omitempty"`
+	AutoPauseNotificationsParameters *AutoPauseNotificationsParameters `json:"auto_pause_notifications_parameters,omitempty"`
+}
+
+// AutoPauseNotificationsParameters defines how alerts on the service will be automatically paused
+type AutoPauseNotificationsParameters struct {
+	Enabled bool `json:"enabled"`
+	Timeout uint `json:"timeout,omitempty"`
 }
 
 // AlertGroupingParameters defines how alerts on the service will be automatically grouped into incidents
@@ -160,7 +167,7 @@ func (c *Client) ListServicesWithContext(ctx context.Context, o ListServiceOptio
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services?"+v.Encode())
+	resp, err := c.get(ctx, "/services?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +230,7 @@ func (c *Client) GetServiceWithContext(ctx context.Context, id string, o *GetSer
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/services/"+id+"?"+v.Encode(), nil)
 	return getServiceFromResponse(c, resp, err)
 }
 
@@ -308,7 +315,7 @@ func (c *Client) ListServiceRulesPaginated(ctx context.Context, serviceID string
 
 // GetServiceRule gets a service rule.
 func (c *Client) GetServiceRule(ctx context.Context, serviceID, ruleID string) (ServiceRule, error) {
-	resp, err := c.get(ctx, "/services/"+serviceID+"/rules/"+ruleID)
+	resp, err := c.get(ctx, "/services/"+serviceID+"/rules/"+ruleID, nil)
 	return getServiceRuleFromResponse(c, resp, err)
 }
 

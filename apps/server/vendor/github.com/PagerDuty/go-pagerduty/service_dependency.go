@@ -32,7 +32,7 @@ func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*Lis
 
 // ListBusinessServiceDependenciesWithContext lists dependencies of a business service.
 func (c *Client) ListBusinessServiceDependenciesWithContext(ctx context.Context, businessServiceID string) (*ListServiceDependencies, error) {
-	resp, err := c.get(ctx, "/service_dependencies/business_services/"+businessServiceID)
+	resp, err := c.get(ctx, "/service_dependencies/business_services/"+businessServiceID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServic
 
 // ListTechnicalServiceDependenciesWithContext lists dependencies of a technical service.
 func (c *Client) ListTechnicalServiceDependenciesWithContext(ctx context.Context, serviceID string) (*ListServiceDependencies, error) {
-	resp, err := c.get(ctx, "/service_dependencies/technical_services/"+serviceID)
+	resp, err := c.get(ctx, "/service_dependencies/technical_services/"+serviceID, nil)
 	if err != nil {
 		return nil, err
 	}

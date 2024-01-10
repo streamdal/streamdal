@@ -91,7 +91,7 @@ func (c *Client) ListEscalationPoliciesWithContext(ctx context.Context, o ListEs
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, escPath+"?"+v.Encode())
+	resp, err := c.get(ctx, escPath+"?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (c *Client) GetEscalationPolicyWithContext(ctx context.Context, id string, 
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, escPath+"/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, escPath+"/"+id+"?"+v.Encode(), nil)
 	return getEscalationPolicyFromResponse(c, resp, err)
 }
 
@@ -209,7 +209,7 @@ func (c *Client) GetEscalationRuleWithContext(ctx context.Context, escID string,
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, escPath+"/"+escID+"/escalation_rules/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, escPath+"/"+escID+"/escalation_rules/"+id+"?"+v.Encode(), nil)
 	return getEscalationRuleFromResponse(c, resp, err)
 }
 
@@ -253,7 +253,7 @@ func (c *Client) ListEscalationRules(escID string) (*ListEscalationRulesResponse
 
 // ListEscalationRulesWithContext lists all of the escalation rules for an existing escalation policy.
 func (c *Client) ListEscalationRulesWithContext(ctx context.Context, escID string) (*ListEscalationRulesResponse, error) {
-	resp, err := c.get(ctx, escPath+"/"+escID+"/escalation_rules")
+	resp, err := c.get(ctx, escPath+"/"+escID+"/escalation_rules", nil)
 	if err != nil {
 		return nil, err
 	}

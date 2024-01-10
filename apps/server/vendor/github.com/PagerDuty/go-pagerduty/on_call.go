@@ -67,7 +67,7 @@ func (c *Client) ListOnCallsWithContext(ctx context.Context, o ListOnCallOptions
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/oncalls?"+v.Encode())
+	resp, err := c.get(ctx, "/oncalls?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

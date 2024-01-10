@@ -16,7 +16,7 @@ func (c *Client) ListAbilities() (*ListAbilityResponse, error) {
 
 // ListAbilitiesWithContext lists all abilities on your account.
 func (c *Client) ListAbilitiesWithContext(ctx context.Context) (*ListAbilityResponse, error) {
-	resp, err := c.get(ctx, "/abilities")
+	resp, err := c.get(ctx, "/abilities", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +38,6 @@ func (c *Client) TestAbility(ability string) error {
 
 // TestAbilityWithContext checks if your account has the given ability.
 func (c *Client) TestAbilityWithContext(ctx context.Context, ability string) error {
-	_, err := c.get(ctx, "/abilities/"+ability)
+	_, err := c.get(ctx, "/abilities/"+ability, nil)
 	return err
 }

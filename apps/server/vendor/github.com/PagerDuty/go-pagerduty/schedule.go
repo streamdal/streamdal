@@ -101,7 +101,7 @@ func (c *Client) ListSchedulesWithContext(ctx context.Context, o ListSchedulesOp
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/schedules?"+v.Encode())
+	resp, err := c.get(ctx, "/schedules?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (c *Client) GetScheduleWithContext(ctx context.Context, id string, o GetSch
 		return nil, fmt.Errorf("Could not parse values for query: %v", err)
 	}
 
-	resp, err := c.get(ctx, "/schedules/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/schedules/"+id+"?"+v.Encode(), nil)
 	return getScheduleFromResponse(c, resp, err)
 }
 
@@ -265,7 +265,7 @@ func (c *Client) ListOverridesWithContext(ctx context.Context, id string, o List
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/schedules/"+id+"/overrides?"+v.Encode())
+	resp, err := c.get(ctx, "/schedules/"+id+"/overrides?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -336,7 +336,7 @@ func (c *Client) ListOnCallUsersWithContext(ctx context.Context, id string, o Li
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/schedules/"+id+"/users?"+v.Encode())
+	resp, err := c.get(ctx, "/schedules/"+id+"/users?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

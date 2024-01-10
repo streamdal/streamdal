@@ -1,11 +1,41 @@
 # Changelog
 
-## What's Changed
+## [v1.8.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.8.0) (2024-01-09)
+### What's Changed
+* Adds resolved_at and updated_at fields to Incident by @surik in https://github.com/PagerDuty/go-pagerduty/pull/482
+* Adds support for auto_pause_notifications_parameters by @darrendao in https://github.com/PagerDuty/go-pagerduty/pull/490
+* Fixes ResponderRequest unmarshalling of IncidentResponders by @allyjweir in https://github.com/PagerDuty/go-pagerduty/pull/493
+* Adds support for license and licenses allocated based operations #480 by @gerardocorea in https://github.com/PagerDuty/go-pagerduty/pull/494
+* Refactors nil *string initialization by @typeid in https://github.com/PagerDuty/go-pagerduty/pull/488
+* [CSGI-1827] Add Standards support by @imjaroiswebdev in https://github.com/PagerDuty/go-pagerduty/pull/499
+* Updated README.md replacing deprecated calls with corresponding new ones by @oleksiypavlenko in https://github.com/PagerDuty/go-pagerduty/pull/498
+* [CSGI-1984] Add `From` field to `ListResponsePlays` method options by @imjaroiswebdev in https://github.com/PagerDuty/go-pagerduty/pull/502
+* Handle invalid ChangeEvent APIErrorObject response by @icholy in https://github.com/PagerDuty/go-pagerduty/pull/479
+* [CSGI-2365] Add client User Agent overwrite capability by @imjaroiswebdev in https://github.com/PagerDuty/go-pagerduty/pull/503
+* Updates go to 1.19 and a few dependencies by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/504
+* Bump golang.org/x/crypto from 0.16.0 to 0.17.0 by @dependabot in https://github.com/PagerDuty/go-pagerduty/pull/505
+
+### New Contributors
+* @surik made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/482
+* @darrendao made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/490
+* @allyjweir made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/493
+* @gerardocorea made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/494
+* @typeid made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/488
+* @imjaroiswebdev made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/499
+* @oleksiypavlenko made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/498
+* @icholy made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/479
+* @dependabot made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/505
+
+**Full Changelog**: https://github.com/PagerDuty/go-pagerduty/compare/v1.7.0...v1.8.0
+
+## [v1.7.0](https://github.com/PagerDuty/go-pagerduty/tree/v1.7.0) (2023-05-17)
+
+### What's Changed
 * Upgades Go and dependencies by @ChuckCrawford in https://github.com/PagerDuty/go-pagerduty/pull/466
 * Add Incident Notification Subscribers by @caveman280 in https://github.com/PagerDuty/go-pagerduty/pull/461
 * Implement Event Orchestrations API by @EronWright in https://github.com/PagerDuty/go-pagerduty/pull/450
 
-## New Contributors
+### New Contributors
 * @caveman280 made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/461
 * @EronWright made their first contribution in https://github.com/PagerDuty/go-pagerduty/pull/450
 

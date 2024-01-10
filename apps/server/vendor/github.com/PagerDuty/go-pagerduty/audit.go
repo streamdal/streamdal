@@ -109,7 +109,7 @@ func (c *Client) ListAuditRecords(ctx context.Context, o ListAuditRecordsOptions
 	}
 
 	u := fmt.Sprintf("%s?%s", auditBaseURL, v.Encode())
-	resp, err := c.get(ctx, u)
+	resp, err := c.get(ctx, u, nil)
 	if err != nil {
 		return ListAuditRecordsResponse{}, err
 	}

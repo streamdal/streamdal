@@ -241,7 +241,7 @@ func (c *Client) GetRuleset(id string) (*Ruleset, error) {
 
 // GetRulesetWithContext gets details about a ruleset.
 func (c *Client) GetRulesetWithContext(ctx context.Context, id string) (*Ruleset, error) {
-	resp, err := c.get(ctx, "/rulesets/"+id)
+	resp, err := c.get(ctx, "/rulesets/"+id, nil)
 	return getRulesetFromResponse(c, resp, err)
 }
 
@@ -335,7 +335,7 @@ func (c *Client) GetRulesetRule(rulesetID, ruleID string) (*RulesetRule, error) 
 
 // GetRulesetRuleWithContext gets an event rule
 func (c *Client) GetRulesetRuleWithContext(ctx context.Context, rulesetID, ruleID string) (*RulesetRule, error) {
-	resp, err := c.get(ctx, "/rulesets/"+rulesetID+"/rules/"+ruleID)
+	resp, err := c.get(ctx, "/rulesets/"+rulesetID+"/rules/"+ruleID, nil)
 	return getRuleFromResponse(c, resp, err)
 }
 
