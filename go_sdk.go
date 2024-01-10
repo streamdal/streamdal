@@ -696,7 +696,7 @@ PIPELINE:
 
 					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
 						"condition failed, aborting further pipelines", step.Name)
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
+					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
 					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
 					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
 					resp.DropMessage = true
@@ -737,7 +737,7 @@ PIPELINE:
 				if cond.dropMessage {
 					pipelineTimeoutCxl()
 
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
+					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
 					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
 					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
 					resp.DropMessage = true
