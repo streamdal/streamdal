@@ -654,8 +654,10 @@ PIPELINE:
 				stepStatus.Error = true
 				stepStatus.ErrorMessage = err.Error()
 
-				continuePipeline, continueProcess := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
-				if !continueProcess {
+				cond := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
+				// Do not drop message on a WASM execution error, excluding that logic from here
+
+				if !cond.continueProcess {
 					pipelineTimeoutCxl()
 					s.config.Logger.Debugf("Step '%s' failed to run, aborting pipeline", step.Name)
 
@@ -663,7 +665,7 @@ PIPELINE:
 					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
 					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
 					return resp
-				} else if !continuePipeline {
+				} else if !cond.continuePipeline {
 					pipelineTimeoutCxl()
 
 					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_CURRENT
@@ -688,22 +690,30 @@ PIPELINE:
 				stepTimeoutCxl()
 				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
 
-				continuePipeline, continueProcess := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
-				if !continueProcess {
+				cond := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
+				if cond.dropMessage {
 					pipelineTimeoutCxl()
 
 					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
 						"condition failed, aborting further pipelines", step.Name)
-
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
+					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
 					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
 					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+					resp.DropMessage = true
 					return resp
-				} else if !continuePipeline {
+				}
+
+				if !cond.continueProcess {
 					pipelineTimeoutCxl()
 
 					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
 						"condition failed, aborting step and continuing pipelines", step.Name)
+					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
+					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
+					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+					return resp
+				} else if !cond.continuePipeline {
+					pipelineTimeoutCxl()
 
 					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_CURRENT
 					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
@@ -723,8 +733,18 @@ PIPELINE:
 
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 
-				continuePipeline, continueProcess := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
-				if !continueProcess {
+				cond := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
+				if cond.dropMessage {
+					pipelineTimeoutCxl()
+
+					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
+					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
+					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+					resp.DropMessage = true
+					return resp
+				}
+
+				if !cond.continueProcess {
 					pipelineTimeoutCxl()
 					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
 						"condition failed, aborting pipeline", step.Name)
@@ -735,7 +755,7 @@ PIPELINE:
 					resp.Error = true
 					resp.ErrorMessage = stepStatus.ErrorMessage
 					return resp
-				} else if !continuePipeline {
+				} else if !cond.continuePipeline {
 					pipelineTimeoutCxl()
 
 					s.config.Logger.Debugf("Step '%s' returned exit code failure, aborting pipeline", step.Name)
@@ -769,6 +789,13 @@ PIPELINE:
 	return resp
 }
 
+type condition struct {
+	continuePipeline bool
+	continueProcess  bool
+	dropMessage      bool
+}
+
+// TODO: clean up the logic in this function and surrounding logic
 func (s *Streamdal) handleConditions(
 	ctx context.Context,
 	conditions []protos.PipelineStepCondition,
@@ -776,41 +803,52 @@ func (s *Streamdal) handleConditions(
 	step *protos.PipelineStep,
 	aud *protos.Audience,
 	req *ProcessRequest,
-) (bool, bool) {
-	shouldContinuePipeline := true
-	shouldContinueProcess := true
+) *condition {
+	ret := &condition{
+		continuePipeline: true,
+		continueProcess:  true,
+		dropMessage:      false,
+	}
+
 	for _, condition := range conditions {
 		switch condition {
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
 			s.config.Logger.Debugf("Step '%s' condition triggered, notifying", step.Name)
-			if !s.config.DryRun {
-				if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
-					s.config.Logger.Errorf("failed to notify condition: %v", err)
-				}
 
-				labels := map[string]string{
-					"service":       s.config.ServiceName,
-					"component":     req.ComponentName,
-					"operation":     req.OperationName,
-					"pipeline_name": pipeline.Name,
-					"pipeline_id":   pipeline.Id,
-				}
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1, Audience: aud})
+			if s.config.DryRun {
+				continue
 			}
+
+			if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
+				s.config.Logger.Errorf("failed to notify condition: %s", err)
+			}
+
+			labels := map[string]string{
+				"service":       s.config.ServiceName,
+				"component":     req.ComponentName,
+				"operation":     req.OperationName,
+				"pipeline_name": pipeline.Name,
+				"pipeline_id":   pipeline.Id,
+			}
+			_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1, Audience: aud})
+
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT:
 			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
-			shouldContinuePipeline = false
+			ret.continuePipeline = false
 		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL:
 			s.config.Logger.Debugf("Step '%s' failed, aborting all pipelines", step.Name)
-			shouldContinuePipeline = false
-			shouldContinueProcess = false
+			ret.continuePipeline = false
+			ret.continueProcess = false
+		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_DISCARD_MESSAGE:
+			s.config.Logger.Debugf("Step '%s' failed, discarding message", step.Name)
+			ret.dropMessage = true
 		default:
 			// Assume continue
 			s.config.Logger.Debugf("Step '%s' failed, continuing to next step", step.Name)
 		}
 	}
 
-	return shouldContinuePipeline, shouldContinueProcess
+	return ret
 }
 
 func (a *Audience) toProto(serviceName string) *protos.Audience {
