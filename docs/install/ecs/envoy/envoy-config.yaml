@@ -49,13 +49,13 @@ static_resources:
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
-      lb_policy: round_robin
+      lb_policy: ROUND_ROBIN
       load_assignment:
         cluster_name: streamdal
         endpoints:
           - lb_endpoints:
-            - endpoint:
-                address:
-                  socket_address:
-                    address: 127.0.0.1
-                    port_value: 8082
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 8082
