@@ -24,7 +24,7 @@ The deployment sets up the following components:
 1. Clone this repository:
     ```bash
     git clone streamdal/streamdal
-    cd stramdal/docs/install/ecs
+    cd streamdal/docs/install/ecs
     ```
 
 2. Edit ecs-private.yml update the parameters to match your AWS VPC 
