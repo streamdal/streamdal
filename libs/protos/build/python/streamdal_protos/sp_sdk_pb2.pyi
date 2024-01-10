@@ -6,6 +6,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 ABORT_STATUS_ALL: AbortStatus
 ABORT_STATUS_CURRENT: AbortStatus
+ABORT_STATUS_DROP_MESSAGE: AbortStatus
 ABORT_STATUS_UNSET: AbortStatus
 DESCRIPTOR: _descriptor.FileDescriptor
 

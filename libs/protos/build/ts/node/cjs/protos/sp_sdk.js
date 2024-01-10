@@ -23,6 +23,10 @@ var AbortStatus;
      * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
      */
     AbortStatus[AbortStatus["ALL"] = 2] = "ALL";
+    /**
+     * @generated from protobuf enum value: ABORT_STATUS_DROP_MESSAGE = 3;
+     */
+    AbortStatus[AbortStatus["DROP_MESSAGE"] = 3] = "DROP_MESSAGE";
 })(AbortStatus || (exports.AbortStatus = AbortStatus = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends runtime_5.MessageType {
