@@ -94,6 +94,7 @@ export const retryProcessPipelines = async ({
   console.error(errorMessage);
   return Promise.resolve({
     data,
+    dropMessage: false,
     pipelineStatus: [],
     error: true,
     errorMessage,
@@ -139,7 +140,9 @@ export const processPipeline = ({
     pipelineStatus.stepStatus = [...pipelineStatus.stepStatus, stepStatus];
 
     if (
-      [AbortStatus.CURRENT, AbortStatus.ALL].includes(stepStatus.abortStatus)
+      [AbortStatus.CURRENT, AbortStatus.ALL, AbortStatus.DROP_MESSAGE].includes(
+        stepStatus.abortStatus
+      )
     ) {
       break;
     }
@@ -171,13 +174,20 @@ export const processPipelines = async ({
       originalData: data,
     });
 
-    return { data, error: true, errorMessage, pipelineStatus: [] };
+    return {
+      data,
+      error: true,
+      dropMessage: false,
+      errorMessage,
+      pipelineStatus: [],
+    };
   }
 
   const response: SDKResponse = {
     data,
     pipelineStatus: [],
     error: false,
+    dropMessage: false,
     errorMessage: "",
   };
 
@@ -191,7 +201,11 @@ export const processPipelines = async ({
     response.data = data;
     response.pipelineStatus = [...response.pipelineStatus, pipelineStatus];
 
-    if (pipelineStatus.stepStatus.at(-1)?.abortStatus === AbortStatus.ALL) {
+    const lastStatus = pipelineStatus.stepStatus.at(-1)?.abortStatus;
+    if (
+      lastStatus &&
+      [AbortStatus.ALL, AbortStatus.DROP_MESSAGE].includes(lastStatus)
+    ) {
       break;
     }
   }
@@ -207,6 +221,7 @@ export const processPipelines = async ({
 
   return Promise.resolve({
     ...response,
+    dropMessage: finalStatus?.abortStatus === AbortStatus.DROP_MESSAGE,
     error: !!finalStatus?.error,
     errorMessage: finalStatus?.errorMessage ?? "",
   });
@@ -232,6 +247,19 @@ const notifyStep = async (
   }
 };
 
+/**
+ * DROP_MESSAGE is the same as ABORT_ALL, but sets a flag on the final response,
+ * and overrides the other settings. ABORT_ALL overrides ABORT_CURRENT,
+ */
+const getStepStatus = (resultConditions: PipelineStepCondition[]): any =>
+  resultConditions.includes(PipelineStepCondition.DISCARD_MESSAGE)
+    ? AbortStatus.DROP_MESSAGE
+    : resultConditions.includes(PipelineStepCondition.ABORT_ALL)
+    ? AbortStatus.ALL
+    : resultConditions.includes(PipelineStepCondition.ABORT_CURRENT)
+    ? AbortStatus.CURRENT
+    : AbortStatus.UNSET;
+
 export const resultCondition = ({
   configs,
   step,
@@ -248,11 +276,7 @@ export const resultCondition = ({
   conditions.includes(PipelineStepCondition.NOTIFY) &&
     void notifyStep(configs, step, pipeline);
 
-  stepStatus.abortStatus = conditions.includes(PipelineStepCondition.ABORT_ALL)
-    ? AbortStatus.ALL
-    : conditions.includes(PipelineStepCondition.ABORT_CURRENT)
-    ? AbortStatus.CURRENT
-    : AbortStatus.UNSET;
+  stepStatus.abortStatus = getStepStatus(conditions);
 };
 
 export const runStep = ({

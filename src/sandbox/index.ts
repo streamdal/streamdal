@@ -112,12 +112,12 @@ const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, errorMessage, data, pipelineStatus } = await streamdal.process(
-    {
+  const { error, errorMessage, dropMessage, data, pipelineStatus } =
+    await streamdal.process({
       audience: audience,
       data: new TextEncoder().encode(JSON.stringify(input)),
-    }
-  );
+    });
+  console.debug("dropMessage:", dropMessage);
   //
   // no active pipeline messages are technically errors
   // but more informational
