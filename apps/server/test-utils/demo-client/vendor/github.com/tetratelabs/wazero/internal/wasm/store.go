@@ -138,9 +138,16 @@ type (
 	GlobalInstance struct {
 		Type GlobalType
 		// Val holds a 64-bit representation of the actual value.
+		// If me is non-nil, the value will not be updated and the current value is stored in the module engine.
 		Val uint64
 		// ValHi is only used for vector type globals, and holds the higher bits of the vector.
+		// If me is non-nil, the value will not be updated and the current value is stored in the module engine.
 		ValHi uint64
+		// Me is the module engine that owns this global instance.
+		// The .Val and .ValHi fields are only valid when me is nil.
+		// If me is non-nil, the value is stored in the module engine.
+		Me    ModuleEngine
+		Index Index
 	}
 
 	// FunctionTypeID is a uniquely assigned integer for a function type.
@@ -164,18 +171,17 @@ func (m *ModuleInstance) GetFunctionTypeID(t *FunctionType) FunctionTypeID {
 }
 
 func (m *ModuleInstance) buildElementInstances(elements []ElementSegment) {
-	m.ElementInstances = make([]ElementInstance, len(elements))
+	m.ElementInstances = make([][]Reference, len(elements))
 	for i, elm := range elements {
 		if elm.Type == RefTypeFuncref && elm.Mode == ElementModePassive {
 			// Only passive elements can be access as element instances.
 			// See https://www.w3.org/TR/2022/WD-wasm-core-2-20220419/syntax/modules.html#element-segments
 			inits := elm.Init
-			elemInst := &m.ElementInstances[i]
-			elemInst.References = make([]Reference, len(inits))
-			elemInst.Type = RefTypeFuncref
+			inst := make([]Reference, len(inits))
+			m.ElementInstances[i] = inst
 			for j, idx := range inits {
 				if idx != ElementInitNullReference {
-					elemInst.References[j] = m.Engine.FunctionInstanceReference(idx)
+					inst[j] = m.Engine.FunctionInstanceReference(idx)
 				}
 			}
 		}
@@ -375,6 +381,8 @@ func (s *Store) instantiate(
 
 	m.applyElements(module.ElementSection)
 
+	m.Engine.DoneInstantiation()
+
 	// Execute the start function.
 	if module.StartSection != nil {
 		funcIdx := *module.StartSection
@@ -386,8 +394,6 @@ func (s *Store) instantiate(
 			return nil, fmt.Errorf("start %s failed: %w", module.funcDesc(SectionIDFunction, funcIdx), err)
 		}
 	}
-
-	m.Engine.DoneInstantiation()
 	return
 }
 
@@ -571,6 +577,13 @@ func (g *GlobalInstance) String() string {
 	default:
 		panic(fmt.Errorf("BUG: unknown value type %X", g.Type.ValType))
 	}
+}
+
+func (g *GlobalInstance) Value() (uint64, uint64) {
+	if g.Me != nil {
+		return g.Me.GetGlobalValue(g.Index)
+	}
+	return g.Val, g.ValHi
 }
 
 func (s *Store) GetFunctionTypeIDs(ts []FunctionType) ([]FunctionTypeID, error) {
