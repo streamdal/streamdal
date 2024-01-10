@@ -97,7 +97,7 @@ func (c *Client) ListLogEntriesWithContext(ctx context.Context, o ListLogEntries
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/log_entries?"+v.Encode())
+	resp, err := c.get(ctx, "/log_entries?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *Client) GetLogEntryWithContext(ctx context.Context, id string, o GetLog
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/log_entries/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/log_entries/"+id+"?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

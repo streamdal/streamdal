@@ -62,7 +62,7 @@ func (c *Client) ListAddonsWithContext(ctx context.Context, o ListAddonOptions) 
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/addons?"+v.Encode())
+	resp, err := c.get(ctx, "/addons?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *Client) GetAddon(id string) (*Addon, error) {
 
 // GetAddonWithContext gets details about an existing add-on.
 func (c *Client) GetAddonWithContext(ctx context.Context, id string) (*Addon, error) {
-	resp, err := c.get(ctx, "/addons/"+id)
+	resp, err := c.get(ctx, "/addons/"+id, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -37,13 +37,18 @@ func main() {
 		ShutdownCtx:     context.Background(),
 	})
 	
-	resp, _ := sc.Process(context.Background(), &streamdal.ProcessRequest{
+	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
 		Data:          []byte(`{"object": {"field": true}}`),
 	})
 
+	if resp.Error != nil {
+		fmt.Println(resp.ErrorMessage)
+		return
+    }
+	
 	println(string(resp.Data))
 }
 

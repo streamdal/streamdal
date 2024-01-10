@@ -68,7 +68,7 @@ func (c *Client) ListExtensionSchemasWithContext(ctx context.Context, o ListExte
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/extension_schemas?"+v.Encode())
+	resp, err := c.get(ctx, "/extension_schemas?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (c *Client) GetExtensionSchema(id string) (*ExtensionSchema, error) {
 
 // GetExtensionSchemaWithContext gets a single extension schema.
 func (c *Client) GetExtensionSchemaWithContext(ctx context.Context, id string) (*ExtensionSchema, error) {
-	resp, err := c.get(ctx, "/extension_schemas/"+id)
+	resp, err := c.get(ctx, "/extension_schemas/"+id, nil)
 	return getExtensionSchemaFromResponse(c, resp, err)
 }
 

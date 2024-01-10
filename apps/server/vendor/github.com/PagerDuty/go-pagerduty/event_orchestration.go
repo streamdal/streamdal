@@ -76,7 +76,7 @@ func (c *Client) ListOrchestrationsWithContext(ctx context.Context, o ListOrches
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, eoPath+"?"+v.Encode())
+	resp, err := c.get(ctx, eoPath+"?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Client) GetOrchestrationWithContext(ctx context.Context, id string, o *
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, eoPath+"/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, eoPath+"/"+id+"?"+v.Encode(), nil)
 	return getOrchestrationFromResponse(c, resp, err)
 }
 
@@ -201,7 +201,7 @@ func (c *Client) GetOrchestrationRouterWithContext(ctx context.Context, id strin
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, eoPath+"/"+id+"/router"+"?"+v.Encode())
+	resp, err := c.get(ctx, eoPath+"/"+id+"/router"+"?"+v.Encode(), nil)
 	return getOrchestrationRouterFromResponse(c, resp, err)
 }
 
@@ -300,7 +300,7 @@ func (c *Client) GetServiceOrchestrationWithContext(ctx context.Context, id stri
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, eoPath+"/services/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, eoPath+"/services/"+id+"?"+v.Encode(), nil)
 	return getServiceOrchestrationFromResponse(c, resp, err)
 }
 
@@ -316,7 +316,7 @@ func (c *Client) UpdateServiceOrchestrationWithContext(ctx context.Context, id s
 
 // GetServiceOrchestrationActiveWithContext gets a service orchestration's active status.
 func (c *Client) GetServiceOrchestrationActiveWithContext(ctx context.Context, id string) (*ServiceOrchestrationActive, error) {
-	resp, err := c.get(ctx, eoPath+"/services/"+id+"/active")
+	resp, err := c.get(ctx, eoPath+"/services/"+id+"/active", nil)
 	return getServiceOrchestrationActiveFromResponse(c, resp, err)
 }
 
@@ -413,7 +413,7 @@ func (c *Client) GetOrchestrationUnroutedWithContext(ctx context.Context, id str
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, eoPath+"/"+id+"/unrouted"+"?"+v.Encode())
+	resp, err := c.get(ctx, eoPath+"/"+id+"/unrouted"+"?"+v.Encode(), nil)
 	return getOrchestrationUnroutedFromResponse(c, resp, err)
 }
 

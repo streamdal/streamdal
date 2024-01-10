@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/streamdal/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 func (s *Streamdal) addAudience(ctx context.Context, aud *protos.Audience) {

@@ -404,7 +404,7 @@ const (
 	dataInstanceStructSize = 24
 
 	// Consts for wasm.ElementInstance.
-	elementInstanceStructSize = 32
+	elementInstanceStructSize = 24
 
 	// pointerSizeLog2 satisfies: 1 << pointerSizeLog2 = sizeOf(uintptr)
 	pointerSizeLog2 = 3
@@ -655,6 +655,14 @@ func (e *moduleEngine) ResolveImportedFunction(index, indexInImportedModule wasm
 	// Copies the content from the import target moduleEngine.
 	e.functions[index] = imported.functions[indexInImportedModule]
 }
+
+// GetGlobalValue implements the same method as documented on wasm.ModuleEngine.
+func (e *moduleEngine) GetGlobalValue(wasm.Index) (lo, hi uint64) {
+	panic("BUG: GetGlobalValue should never be called on compiler mode")
+}
+
+// OwnsGlobals implements the same method as documented on wasm.ModuleEngine.
+func (e *moduleEngine) OwnsGlobals() bool { return false }
 
 // ResolveImportedMemory implements wasm.ModuleEngine.
 func (e *moduleEngine) ResolveImportedMemory(wasm.ModuleEngine) {}
@@ -1193,11 +1201,6 @@ func (si *stackIterator) ProgramCounter() experimental.ProgramCounter {
 // Function implements the same method as documented on experimental.StackIterator.
 func (si *stackIterator) Function() experimental.InternalFunction {
 	return internalFunction{si.fn}
-}
-
-// Parameters implements the same method as documented on experimental.StackIterator.
-func (si *stackIterator) Parameters() []uint64 {
-	return si.stack[si.base : si.base+si.fn.funcType.ParamNumInUint64]
 }
 
 // internalFunction implements experimental.InternalFunction.

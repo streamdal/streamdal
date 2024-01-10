@@ -19,12 +19,30 @@ Resources:
     Properties:
       ClusterName: streamdal-stack
 
+  StreamdalLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: "/ecs/streamdal"
+      RetentionInDays: 5  # Set the retention as needed
+
   ServiceDiscoveryNamespace:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
     Properties:
       Description: "Namespace for ECS services"
       Name: "local"
       Vpc: !Ref VpcID
+
+  RedisServiceDiscovery:
+    Type: 'AWS::ServiceDiscovery::Service'
+    Properties:
+      Description: Service discovery for Redis
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        RoutingPolicy: WEIGHTED
+      Name: redis
+      NamespaceId: !Ref ServiceDiscoveryNamespace
 
   # Redis Task Definition
   RedisTaskDefinition:
@@ -51,6 +69,8 @@ Resources:
     Properties:
       ServiceName: redis-service
       Cluster: !Ref Cluster
+      ServiceRegistries:
+        - RegistryArn: !GetAtt RedisServiceDiscovery.Arn
       TaskDefinition: !Ref RedisTaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE
@@ -67,13 +87,13 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: streamdal-server-task
-      Cpu: 256
-      Memory: 512
+      Cpu: "512"
+      Memory: "1024"
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-server-container
-          Image: streamdal/server:0.0.4-4e4bdb8
+          Image: streamdal/server:0.0.11-6c7cdad
           EntryPoint: ["/bin/bash", "/entrypoint.sh"]
           Environment:
             - Name: STREAMDAL_SERVER_AUTH_TOKEN
@@ -83,6 +103,12 @@ Resources:
           PortMappings:
             - ContainerPort: 8081
             - ContainerPort: 8082
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref StreamdalLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: streamdal-server
       RequiresCompatibilities:
         - EC2
         - FARGATE
@@ -155,7 +181,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: envoy-container
-          Image: envoyproxy/envoy:tools-v1.28.0
+          Image: streamdal/envoy-side-car:latest
           PortMappings:
             - ContainerPort: 8083
       RequiresCompatibilities:
@@ -206,6 +232,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 8083
           ToPort: 8083
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8084
+          ToPort: 8084
           CidrIp: 0.0.0.0/0
 
   # EFS FileSystem

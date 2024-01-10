@@ -213,12 +213,17 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
-		resp, err := sc.Process(context.Background(), &streamdal.ProcessRequest{
+		resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 			ComponentName: r.config.ComponentName,
 			OperationType: streamdal.OperationType(r.config.OperationType),
 			OperationName: operationName,
 			Data:          input,
 		})
+
+		if resp.DropMessage {
+			r.log.Warn("dropping message per step condition")
+			continue
+		}
 
 		r.display(input, resp, err)
 	}

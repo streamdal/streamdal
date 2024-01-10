@@ -123,7 +123,7 @@ func (c *Client) ListUsersWithContext(ctx context.Context, o ListUsersOptions) (
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/users?"+v.Encode())
+	resp, err := c.get(ctx, "/users?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (c *Client) GetUserWithContext(ctx context.Context, id string, o GetUserOpt
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/users/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/users/"+id+"?"+v.Encode(), nil)
 	return getUserFromResponse(c, resp, err)
 }
 
@@ -217,7 +217,7 @@ func (c *Client) GetCurrentUserWithContext(ctx context.Context, o GetCurrentUser
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/users/me?"+v.Encode())
+	resp, err := c.get(ctx, "/users/me?"+v.Encode(), nil)
 	return getUserFromResponse(c, resp, err)
 }
 
@@ -250,7 +250,7 @@ func (c *Client) ListUserContactMethods(userID string) (*ListContactMethodsRespo
 
 // ListUserContactMethodsWithContext fetches contact methods of the existing user.
 func (c *Client) ListUserContactMethodsWithContext(ctx context.Context, userID string) (*ListContactMethodsResponse, error) {
-	resp, err := c.get(ctx, "/users/"+userID+"/contact_methods")
+	resp, err := c.get(ctx, "/users/"+userID+"/contact_methods", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (c *Client) GetUserContactMethod(userID, contactMethodID string) (*ContactM
 
 // GetUserContactMethodWithContext gets details about a contact method.
 func (c *Client) GetUserContactMethodWithContext(ctx context.Context, userID, contactMethodID string) (*ContactMethod, error) {
-	resp, err := c.get(ctx, "/users/"+userID+"/contact_methods/"+contactMethodID)
+	resp, err := c.get(ctx, "/users/"+userID+"/contact_methods/"+contactMethodID, nil)
 	return getContactMethodFromResponse(c, resp, err)
 }
 
@@ -351,7 +351,7 @@ func (c *Client) GetUserNotificationRule(userID, ruleID string) (*NotificationRu
 
 // GetUserNotificationRuleWithContext gets details about a notification rule.
 func (c *Client) GetUserNotificationRuleWithContext(ctx context.Context, userID, ruleID string) (*NotificationRule, error) {
-	resp, err := c.get(ctx, "/users/"+userID+"/notification_rules/"+ruleID)
+	resp, err := c.get(ctx, "/users/"+userID+"/notification_rules/"+ruleID, nil)
 	return getUserNotificationRuleFromResponse(c, resp, err)
 }
 
@@ -411,7 +411,7 @@ func (c *Client) ListUserNotificationRules(userID string) (*ListUserNotification
 
 // ListUserNotificationRulesWithContext fetches notification rules of the existing user.
 func (c *Client) ListUserNotificationRulesWithContext(ctx context.Context, userID string) (*ListUserNotificationRulesResponse, error) {
-	resp, err := c.get(ctx, "/users/"+userID+"/notification_rules")
+	resp, err := c.get(ctx, "/users/"+userID+"/notification_rules", nil)
 	if err != nil {
 		return nil, err
 	}
