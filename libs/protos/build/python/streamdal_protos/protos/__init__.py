@@ -129,6 +129,7 @@ class AbortStatus(betterproto.Enum):
     ABORT_STATUS_UNSET = 0
     ABORT_STATUS_CURRENT = 1
     ABORT_STATUS_ALL = 2
+    ABORT_STATUS_DROP_MESSAGE = 3
 
 
 class WasmExitCode(betterproto.Enum):

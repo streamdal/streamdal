@@ -111,7 +111,11 @@ export declare enum AbortStatus {
     /**
      * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
      */
-    ALL = 2
+    ALL = 2,
+    /**
+     * @generated from protobuf enum value: ABORT_STATUS_DROP_MESSAGE = 3;
+     */
+    DROP_MESSAGE = 3
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();
