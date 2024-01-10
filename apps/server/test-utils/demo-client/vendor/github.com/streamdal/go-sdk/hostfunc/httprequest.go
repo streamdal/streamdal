@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tetratelabs/wazero/api"
 
-	"github.com/streamdal/protos/build/go/protos/steps"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/go-sdk/helper"
 )

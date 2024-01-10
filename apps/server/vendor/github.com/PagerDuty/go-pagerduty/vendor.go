@@ -67,7 +67,7 @@ func (c *Client) ListVendorsWithContext(ctx context.Context, o ListVendorOptions
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/vendors?"+v.Encode())
+	resp, err := c.get(ctx, "/vendors?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Client) GetVendor(id string) (*Vendor, error) {
 
 // GetVendorWithContext gets details about an existing vendor.
 func (c *Client) GetVendorWithContext(ctx context.Context, id string) (*Vendor, error) {
-	resp, err := c.get(ctx, "/vendors/"+id)
+	resp, err := c.get(ctx, "/vendors/"+id, nil)
 	return getVendorFromResponse(c, resp, err)
 }
 

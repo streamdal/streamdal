@@ -7,7 +7,7 @@ go-pagerduty is a CLI and [go](https://golang.org/) client library for the [Page
 
 To add the latest stable version to your project:
 ```cli
-go get github.com/PagerDuty/go-pagerduty@v1.7
+go get github.com/PagerDuty/go-pagerduty@v1.8
 ```
 
 If you instead wish to work with the latest code from main:
@@ -70,9 +70,11 @@ import (
 var	authtoken = "" // Set your auth token here
 
 func main() {
-	var opts pagerduty.ListEscalationPoliciesOptions
+	ctx := context.Background()
 	client := pagerduty.NewClient(authtoken)
-	eps, err := client.ListEscalationPolicies(opts)
+
+	var opts pagerduty.ListEscalationPoliciesOptions
+	eps, err := client.ListEscalationPoliciesWithContext(ctx, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -105,8 +107,9 @@ import (
 var	authtoken = "" // Set your auth token here
 
 func main() {
+	ctx := context.Background()
 	client := pagerduty.NewClient(authtoken)
-	user, err := client.GetUser("NOTREAL", pagerduty.GetUserOptions{})
+	user, err := client.GetUserWithContext(ctx, "NOTREAL", pagerduty.GetUserOptions{})
 	if err != nil {
 		var aerr pagerduty.APIError
 

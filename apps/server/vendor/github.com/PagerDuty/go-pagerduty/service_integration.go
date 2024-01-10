@@ -241,27 +241,25 @@ func (i *IntegrationEmailFilterRule) UnmarshalJSON(b []byte) error {
 
 	// if the *string is nil, set it to a *string with value ""
 	if ief.SubjectRegex == nil {
-		i.SubjectRegex = strPtr("")
+		i.SubjectRegex = new(string)
 	} else {
 		i.SubjectRegex = ief.SubjectRegex
 	}
 
 	if ief.BodyRegex == nil {
-		i.BodyRegex = strPtr("")
+		i.BodyRegex = new(string)
 	} else {
 		i.BodyRegex = ief.BodyRegex
 	}
 
 	if ief.FromEmailRegex == nil {
-		i.FromEmailRegex = strPtr("")
+		i.FromEmailRegex = new(string)
 	} else {
 		i.FromEmailRegex = ief.FromEmailRegex
 	}
 
 	return nil
 }
-
-func strPtr(s string) *string { return &s }
 
 type integrationEmailFilterRule struct {
 	SubjectMode    IntegrationEmailFilterRuleMode `json:"subject_mode"`
@@ -323,7 +321,7 @@ func (c *Client) GetIntegrationWithContext(ctx context.Context, serviceID, integ
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode())
+	resp, err := c.get(ctx, "/services/"+serviceID+"/integrations/"+integrationID+"?"+v.Encode(), nil)
 	return getIntegrationFromResponse(c, resp, err)
 }
 

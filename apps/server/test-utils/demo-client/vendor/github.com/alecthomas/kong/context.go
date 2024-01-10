@@ -201,7 +201,7 @@ func (c *Context) Validate() error { // nolint: gocyclo
 
 		case *Application:
 			value = node.Target
-			desc = node.Name
+			desc = ""
 
 		case *Node:
 			value = node.Target
@@ -209,7 +209,10 @@ func (c *Context) Validate() error { // nolint: gocyclo
 		}
 		if validate := isValidatable(value); validate != nil {
 			if err := validate.Validate(); err != nil {
-				return fmt.Errorf("%s: %w", desc, err)
+				if desc != "" {
+					return fmt.Errorf("%s: %w", desc, err)
+				}
+				return err
 			}
 		}
 	}
@@ -759,7 +762,7 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 	}
 
 	for _, method := range methods {
-		if err = callMethod("Run", method.node.Target, method.method, method.binds); err != nil {
+		if err = callFunction(method.method, method.binds); err != nil {
 			return err
 		}
 	}

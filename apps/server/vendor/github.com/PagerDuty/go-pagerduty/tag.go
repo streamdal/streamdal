@@ -139,7 +139,7 @@ func (c *Client) GetTag(id string) (*Tag, error) {
 
 // GetTagWithContext gets details about an existing tag.
 func (c *Client) GetTagWithContext(ctx context.Context, id string) (*Tag, error) {
-	resp, err := c.get(ctx, "/tags/"+id)
+	resp, err := c.get(ctx, "/tags/"+id, nil)
 	return getTagFromResponse(c, resp, err)
 }
 

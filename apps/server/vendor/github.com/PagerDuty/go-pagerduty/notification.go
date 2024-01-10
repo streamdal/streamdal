@@ -69,7 +69,7 @@ func (c *Client) ListNotificationsWithContext(ctx context.Context, o ListNotific
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/notifications?"+v.Encode())
+	resp, err := c.get(ctx, "/notifications?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

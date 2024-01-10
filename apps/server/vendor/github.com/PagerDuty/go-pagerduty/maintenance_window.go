@@ -72,7 +72,7 @@ func (c *Client) ListMaintenanceWindowsWithContext(ctx context.Context, o ListMa
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/maintenance_windows?"+v.Encode())
+	resp, err := c.get(ctx, "/maintenance_windows?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (c *Client) GetMaintenanceWindowWithContext(ctx context.Context, id string,
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/maintenance_windows/"+id+"?"+v.Encode())
+	resp, err := c.get(ctx, "/maintenance_windows/"+id+"?"+v.Encode(), nil)
 	return getMaintenanceWindowFromResponse(c, resp, err)
 }
 

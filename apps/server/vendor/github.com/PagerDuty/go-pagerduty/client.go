@@ -25,7 +25,7 @@ import (
 )
 
 // Version is current version of this client.
-const Version = "1.8.0-alpha"
+const Version = "1.8.0"
 
 const (
 	apiEndpoint         = "https://api.pagerduty.com"
@@ -83,14 +83,37 @@ type APIErrorObject struct {
 	Errors  []string `json:"errors,omitempty"`
 }
 
-// fallbackAPIErrorObject is a shim to solve this issue:
-// https://github.com/PagerDuty/go-pagerduty/issues/339
-//
-// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
-type fallbackAPIErrorObject struct {
-	Code    int    `json:"code,omitempty"`
-	Message string `json:"message,omitempty"`
-	Errors  string `json:"errors,omitempty"`
+func unmarshalApiErrorObject(data []byte) (APIErrorObject, error) {
+	var aeo APIErrorObject
+	err := json.Unmarshal(data, &aeo)
+	if err == nil {
+		return aeo, nil
+	}
+	if _, ok := err.(*json.UnmarshalTypeError); !ok {
+		return aeo, nil
+	}
+	// See - https://github.com/PagerDuty/go-pagerduty/issues/339
+	// TODO: remove when PagerDuty engineering confirms bugfix to the REST API
+	var fallback1 struct {
+		Code    int    `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
+		Errors  string `json:"errors,omitempty"`
+	}
+	if json.Unmarshal(data, &fallback1) == nil {
+		aeo.Code = fallback1.Code
+		aeo.Message = fallback1.Message
+		aeo.Errors = []string{fallback1.Errors}
+		return aeo, nil
+	}
+	// See - https://github.com/PagerDuty/go-pagerduty/issues/478
+	var fallback2 []string
+	if json.Unmarshal(data, &fallback2) == nil {
+		aeo.Message = "none"
+		aeo.Errors = fallback2
+		return aeo, nil
+	}
+	// still failed, so return the original error
+	return aeo, err
 }
 
 // NullAPIErrorObject is a wrapper around the APIErrorObject type. If the Valid
@@ -111,28 +134,9 @@ var _ json.Unmarshaler = (*NullAPIErrorObject)(nil) // assert that it satisfies 
 
 // UnmarshalJSON satisfies encoding/json.Unmarshaler
 func (n *NullAPIErrorObject) UnmarshalJSON(data []byte) error {
-	var aeo APIErrorObject
-
-	err := json.Unmarshal(data, &aeo)
+	aeo, err := unmarshalApiErrorObject(data)
 	if err != nil {
-		terr, ok := err.(*json.UnmarshalTypeError)
-		if !ok {
-			return err
-		}
-
-		//
-		// see https://github.com/PagerDuty/go-pagerduty/issues/339
-		//
-		var faeo fallbackAPIErrorObject
-
-		if err := json.Unmarshal(data, &faeo); err != nil {
-			// still failed, so return the original error
-			return terr
-		}
-
-		aeo.Code = faeo.Code
-		aeo.Message = faeo.Message
-		aeo.Errors = []string{faeo.Errors}
+		return err
 	}
 
 	n.ErrorObject = aeo
@@ -281,6 +285,8 @@ type Client struct {
 	// PagerDuty API. You can use either *http.Client here, or your own
 	// implementation.
 	HTTPClient HTTPClient
+
+	userAgent string
 }
 
 // NewClient creates an API client using an account/user API token
@@ -315,6 +321,14 @@ type ClientOptions func(*Client)
 func WithAPIEndpoint(endpoint string) ClientOptions {
 	return func(c *Client) {
 		c.apiEndpoint = endpoint
+	}
+}
+
+// WithTerraformProvider configures the client to be used as the PagerDuty
+// Terraform provider
+func WithTerraformProvider(version string) ClientOptions {
+	return func(c *Client) {
+		c.userAgent = fmt.Sprintf("(%s %s) Terraform/%s", runtime.GOOS, runtime.GOARCH, version)
 	}
 }
 
@@ -468,8 +482,8 @@ func (c *Client) post(ctx context.Context, path string, payload interface{}, hea
 	return c.do(ctx, http.MethodPost, path, bytes.NewBuffer(data), headers)
 }
 
-func (c *Client) get(ctx context.Context, path string) (*http.Response, error) {
-	return c.do(ctx, http.MethodGet, path, nil, nil)
+func (c *Client) get(ctx context.Context, path string, headers map[string]string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, path, nil, headers)
 }
 
 const (
@@ -494,7 +508,13 @@ func (c *Client) prepRequest(req *http.Request, authRequired bool, headers map[s
 		}
 	}
 
-	req.Header.Set("User-Agent", userAgentHeader)
+	var userAgent string
+	if c.userAgent != "" {
+		userAgent = c.userAgent
+	} else {
+		userAgent = userAgentHeader
+	}
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", contentTypeHeader)
 }
 

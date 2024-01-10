@@ -62,7 +62,7 @@ func (c *Client) ListPrioritiesWithContext(ctx context.Context, o ListPriorities
 		return nil, err
 	}
 
-	resp, err := c.get(ctx, "/priorities?"+v.Encode())
+	resp, err := c.get(ctx, "/priorities?"+v.Encode(), nil)
 	if err != nil {
 		return nil, err
 	}

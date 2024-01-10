@@ -87,6 +87,14 @@ type moduleEngine struct {
 	parentEngine *engine
 }
 
+// GetGlobalValue implements the same method as documented on wasm.ModuleEngine.
+func (e *moduleEngine) GetGlobalValue(wasm.Index) (lo, hi uint64) {
+	panic("BUG: GetGlobalValue should never be called on interpreter mode")
+}
+
+// OwnsGlobals implements the same method as documented on wasm.ModuleEngine.
+func (e *moduleEngine) OwnsGlobals() bool { return false }
+
 // callEngine holds context per moduleEngine.Call, and shared across all the
 // function calls originating from the same moduleEngine.Call execution.
 //
@@ -269,14 +277,6 @@ func (si *stackIterator) Function() experimental.InternalFunction {
 // experimental.StackIterator.
 func (si *stackIterator) ProgramCounter() experimental.ProgramCounter {
 	return experimental.ProgramCounter(si.pc)
-}
-
-// Parameters implements the same method as documented on
-// experimental.StackIterator.
-func (si *stackIterator) Parameters() []uint64 {
-	paramsCount := si.fn.funcType.ParamNumInUint64
-	top := len(si.stack)
-	return si.stack[top-paramsCount:]
 }
 
 // internalFunction implements experimental.InternalFunction.
@@ -1661,15 +1661,15 @@ func (ce *callEngine) callNativeFunc(ctx context.Context, m *wasm.ModuleInstance
 			inElementOffset := ce.popValue()
 			inTableOffset := ce.popValue()
 			table := tables[op.U2]
-			if inElementOffset+copySize > uint64(len(elementInstance.References)) ||
+			if inElementOffset+copySize > uint64(len(elementInstance)) ||
 				inTableOffset+copySize > uint64(len(table.References)) {
 				panic(wasmruntime.ErrRuntimeInvalidTableAccess)
 			} else if copySize != 0 {
-				copy(table.References[inTableOffset:inTableOffset+copySize], elementInstance.References[inElementOffset:])
+				copy(table.References[inTableOffset:inTableOffset+copySize], elementInstance[inElementOffset:])
 			}
 			frame.pc++
 		case wazeroir.OperationKindElemDrop:
-			elementInstances[op.U1].References = nil
+			elementInstances[op.U1] = nil
 			frame.pc++
 		case wazeroir.OperationKindTableCopy:
 			srcTable, dstTable := tables[op.U1].References, tables[op.U2].References
@@ -4104,10 +4104,10 @@ func (ce *callEngine) callNativeFuncWithListener(ctx context.Context, m *wasm.Mo
 	def, typ := f.definition(), f.funcType
 
 	ce.stackIterator.reset(ce.stack, ce.frames, f)
-	fnl.Before(ctx, m, def, ce.peekValues(len(typ.Params)), &ce.stackIterator)
+	fnl.Before(ctx, m, def, ce.peekValues(typ.ParamNumInUint64), &ce.stackIterator)
 	ce.stackIterator.clear()
 	ce.callNativeFunc(ctx, m, f)
-	fnl.After(ctx, m, def, ce.peekValues(len(typ.Results)))
+	fnl.After(ctx, m, def, ce.peekValues(typ.ResultNumInUint64))
 	return ctx
 }
 

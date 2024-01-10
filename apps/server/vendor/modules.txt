@@ -2,6 +2,7 @@
 ## explicit; go 1.18
 github.com/DataDog/appsec-internal-go/appsec
 github.com/DataDog/appsec-internal-go/httpsec
+github.com/DataDog/appsec-internal-go/limiter
 github.com/DataDog/appsec-internal-go/log
 github.com/DataDog/appsec-internal-go/netip
 # github.com/DataDog/datadog-agent/pkg/obfuscate v0.50.2
@@ -53,13 +54,13 @@ github.com/Microsoft/go-winio/internal/fs
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/internal/stringbuffer
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/PagerDuty/go-pagerduty v1.7.0
-## explicit; go 1.17
+# github.com/PagerDuty/go-pagerduty v1.8.0
+## explicit; go 1.19
 github.com/PagerDuty/go-pagerduty
 # github.com/alecthomas/kong v0.8.1
 ## explicit; go 1.18
 github.com/alecthomas/kong
-# github.com/aws/aws-sdk-go v1.49.15
+# github.com/aws/aws-sdk-go v1.49.17
 ## explicit; go 1.19
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/auth/bearer
@@ -252,7 +253,7 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
-# github.com/redis/go-redis/v9 v9.3.1
+# github.com/redis/go-redis/v9 v9.4.0
 ## explicit; go 1.18
 github.com/redis/go-redis/v9
 github.com/redis/go-redis/v9/internal
@@ -282,7 +283,7 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/streamdal/libs/protos v0.1.10
+# github.com/streamdal/streamdal/libs/protos v0.1.12
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
@@ -299,13 +300,13 @@ go4.org/intern
 # go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6
 ## explicit; go 1.11
 go4.org/unsafe/assume-no-moving-gc
-# golang.org/x/crypto v0.17.0
+# golang.org/x/crypto v0.18.0
 ## explicit; go 1.18
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.14.0
 ## explicit; go 1.18
 golang.org/x/mod/semver
-# golang.org/x/net v0.19.0
+# golang.org/x/net v0.20.0
 ## explicit; go 1.18
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -376,7 +377,7 @@ golang.org/x/tools/internal/versions
 ## explicit; go 1.18
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1
 ## explicit; go 1.19
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.60.1
@@ -469,7 +470,7 @@ google.golang.org/protobuf/types/descriptorpb
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
-# gopkg.in/DataDog/dd-trace-go.v1 v1.58.1
+# gopkg.in/DataDog/dd-trace-go.v1 v1.59.0
 ## explicit; go 1.19
 gopkg.in/DataDog/dd-trace-go.v1/contrib/internal/httptrace
 gopkg.in/DataDog/dd-trace-go.v1/contrib/internal/options
@@ -483,10 +484,15 @@ gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer
 gopkg.in/DataDog/dd-trace-go.v1/internal
 gopkg.in/DataDog/dd-trace-go.v1/internal/appsec
 gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo
-gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo/instrumentation
-gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo/instrumentation/grpcsec
-gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo/instrumentation/httpsec
-gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/dyngo/instrumentation/sharedsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/emitter/grpcsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/emitter/httpsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/emitter/sharedsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/listener
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/listener/grpcsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/listener/httpsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/listener/sharedsec
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/trace
+gopkg.in/DataDog/dd-trace-go.v1/internal/appsec/trace/httptrace
 gopkg.in/DataDog/dd-trace-go.v1/internal/datastreams
 gopkg.in/DataDog/dd-trace-go.v1/internal/globalconfig
 gopkg.in/DataDog/dd-trace-go.v1/internal/hostname

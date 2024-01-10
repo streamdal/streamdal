@@ -142,7 +142,7 @@ func (c *Client) GetBusinessService(id string) (*BusinessService, error) {
 
 // GetBusinessServiceWithContext gets details about a business service.
 func (c *Client) GetBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, error) {
-	resp, err := c.get(ctx, "/business_services/"+id)
+	resp, err := c.get(ctx, "/business_services/"+id, nil)
 	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
