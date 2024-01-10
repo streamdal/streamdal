@@ -27,9 +27,6 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Build
-        run: npm run build
-
       - name: Generate new tag (dry run)
         uses: mathieudutour/github-tag-action@v6.1
         id: get_new_version
@@ -50,6 +47,9 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: npm run build
 
       - name: Release to npm
         working-directory: ./build
