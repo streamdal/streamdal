@@ -367,6 +367,12 @@ class PipelineStep(betterproto.Message):
     next
     """
 
+    dynamic: bool = betterproto.bool_field(4)
+    """
+    Indicates whether to use the results from a previous step as input to this
+    step
+    """
+
     detective: "steps.DetectiveStep" = betterproto.message_field(1000, group="step")
     transform: "steps.TransformStep" = betterproto.message_field(1001, group="step")
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")

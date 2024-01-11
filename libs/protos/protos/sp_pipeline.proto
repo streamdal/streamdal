@@ -64,6 +64,9 @@ message PipelineStep {
   // SDKs should read this when WASM returns failure to determine what to do next
   repeated  PipelineStepCondition on_failure = 3;
 
+  // Indicates whether to use the results from a previous step as input to this step
+  bool dynamic = 4;
+
   oneof step {
     steps.DetectiveStep detective = 1000;
     steps.TransformStep transform = 1001;

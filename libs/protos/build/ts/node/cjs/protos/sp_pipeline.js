@@ -128,6 +128,7 @@ class PipelineStep$Type extends runtime_5.MessageType {
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "on_success", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
             { no: 3, name: "on_failure", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
+            { no: 4, name: "dynamic", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 1000, name: "detective", kind: "message", oneof: "step", T: () => sp_steps_detective_1.DetectiveStep },
             { no: 1001, name: "transform", kind: "message", oneof: "step", T: () => sp_steps_transform_1.TransformStep },
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => sp_steps_encode_1.EncodeStep },
@@ -144,7 +145,7 @@ class PipelineStep$Type extends runtime_5.MessageType {
         ]);
     }
     create(value) {
-        const message = { name: "", onSuccess: [], onFailure: [], step: { oneofKind: undefined } };
+        const message = { name: "", onSuccess: [], onFailure: [], dynamic: false, step: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -171,6 +172,9 @@ class PipelineStep$Type extends runtime_5.MessageType {
                             message.onFailure.push(reader.int32());
                     else
                         message.onFailure.push(reader.int32());
+                    break;
+                case /* bool dynamic */ 4:
+                    message.dynamic = reader.bool();
                     break;
                 case /* protos.steps.DetectiveStep detective */ 1000:
                     message.step = {
@@ -270,6 +274,9 @@ class PipelineStep$Type extends runtime_5.MessageType {
                 writer.int32(message.onFailure[i]);
             writer.join();
         }
+        /* bool dynamic = 4; */
+        if (message.dynamic !== false)
+            writer.tag(4, runtime_1.WireType.Varint).bool(message.dynamic);
         /* protos.steps.DetectiveStep detective = 1000; */
         if (message.step.oneofKind === "detective")
             sp_steps_detective_1.DetectiveStep.internalBinaryWrite(message.step.detective, writer.tag(1000, runtime_1.WireType.LengthDelimited).fork(), options).join();
