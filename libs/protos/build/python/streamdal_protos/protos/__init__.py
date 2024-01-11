@@ -1146,6 +1146,10 @@ class WasmRequest(betterproto.Message):
     the pipeline, it will be empty.
     """
 
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        4, optional=True, group="_inter_step_result"
+    )
+
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):
@@ -1176,6 +1180,10 @@ class WasmResponse(betterproto.Message):
     KVGet, the output_step would be the value of the fetched key.
     """
 
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        5, optional=True, group="_inter_step_result"
+    )
+
 
 @dataclass(eq=False, repr=False)
 class InterStepResult(betterproto.Message):
@@ -1185,7 +1193,7 @@ class InterStepResult(betterproto.Message):
     """
 
     detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
-        100, group="input_from"
+        1, group="input_from"
     )
 
 

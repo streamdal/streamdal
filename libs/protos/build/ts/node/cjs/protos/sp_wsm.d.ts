@@ -32,6 +32,10 @@ export interface WASMRequest {
      * @generated from protobuf field: optional bytes input_step = 3;
      */
     inputStep?: Uint8Array;
+    /**
+     * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 4;
+     */
+    interStepResult?: InterStepResult;
 }
 /**
  * Returned by all WASM functions
@@ -67,6 +71,10 @@ export interface WASMResponse {
      * @generated from protobuf field: optional bytes output_step = 4;
      */
     outputStep?: Uint8Array;
+    /**
+     * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 5;
+     */
+    interStepResult?: InterStepResult;
 }
 /**
  * Intended for communicating wasm results between steps.
@@ -81,7 +89,7 @@ export interface InterStepResult {
     inputFrom: {
         oneofKind: "detectiveResult";
         /**
-         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 100;
+         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 1;
          */
         detectiveResult: DetectiveStepResult;
     } | {

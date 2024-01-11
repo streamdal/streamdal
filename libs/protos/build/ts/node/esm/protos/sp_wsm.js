@@ -50,7 +50,8 @@ class WASMRequest$Type extends MessageType {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 4, name: "inter_step_result", kind: "message", T: () => InterStepResult }
         ]);
     }
     create(value) {
@@ -74,6 +75,9 @@ class WASMRequest$Type extends MessageType {
                 case /* optional bytes input_step */ 3:
                     message.inputStep = reader.bytes();
                     break;
+                case /* optional protos.InterStepResult inter_step_result */ 4:
+                    message.interStepResult = InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -95,6 +99,9 @@ class WASMRequest$Type extends MessageType {
         /* optional bytes input_step = 3; */
         if (message.inputStep !== undefined)
             writer.tag(3, WireType.LengthDelimited).bytes(message.inputStep);
+        /* optional protos.InterStepResult inter_step_result = 4; */
+        if (message.interStepResult)
+            InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -112,7 +119,8 @@ class WASMResponse$Type extends MessageType {
             { no: 1, name: "output_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
             { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 5, name: "inter_step_result", kind: "message", T: () => InterStepResult }
         ]);
     }
     create(value) {
@@ -139,6 +147,9 @@ class WASMResponse$Type extends MessageType {
                 case /* optional bytes output_step */ 4:
                     message.outputStep = reader.bytes();
                     break;
+                case /* optional protos.InterStepResult inter_step_result */ 5:
+                    message.interStepResult = InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -163,6 +174,9 @@ class WASMResponse$Type extends MessageType {
         /* optional bytes output_step = 4; */
         if (message.outputStep !== undefined)
             writer.tag(4, WireType.LengthDelimited).bytes(message.outputStep);
+        /* optional protos.InterStepResult inter_step_result = 5; */
+        if (message.interStepResult)
+            InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -177,7 +191,7 @@ export const WASMResponse = new WASMResponse$Type();
 class InterStepResult$Type extends MessageType {
     constructor() {
         super("protos.InterStepResult", [
-            { no: 100, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
+            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
         ]);
     }
     create(value) {
@@ -192,7 +206,7 @@ class InterStepResult$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.steps.DetectiveStepResult detective_result */ 100:
+                case /* protos.steps.DetectiveStepResult detective_result */ 1:
                     message.inputFrom = {
                         oneofKind: "detectiveResult",
                         detectiveResult: DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
@@ -210,9 +224,9 @@ class InterStepResult$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.steps.DetectiveStepResult detective_result = 100; */
+        /* protos.steps.DetectiveStepResult detective_result = 1; */
         if (message.inputFrom.oneofKind === "detectiveResult")
-            DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
+            DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
