@@ -53,12 +53,21 @@ Resources:
       Memory: 512
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref ExecutionRole
+      Volumes:
+        - Name: redis-data
+          EfsVolumeConfiguration:
+            FileSystemId: !Ref EFSFileSystem
+            RootDirectory: "/"
+            TransitEncryption: "ENABLED"
       ContainerDefinitions:
         - Name: redis-container
           Image: redis:latest
           Command: ["redis-server", "--appendonly", "yes"]
           PortMappings:
             - ContainerPort: 6379
+          MountPoints:
+            - ContainerPath: "/data"
+              SourceVolume: redis-data
       RequiresCompatibilities:
         - EC2
         - FARGATE
@@ -82,6 +91,19 @@ Resources:
           SecurityGroups:
             - !GetAtt ContainerSecurityGroup.GroupId
 
+  # Streamdal Server Service Discovery
+  StreamdalServerServiceDiscovery:
+    Type: 'AWS::ServiceDiscovery::Service'
+    Properties:
+      Description: Service discovery for Streamdal Server
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        RoutingPolicy: WEIGHTED
+      Name: streamdal-server
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+
   # Updated Streamdal Server Task Definition
   StreamdalServerTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -93,7 +115,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-server-container
-          Image: streamdal/server:0.0.11-6c7cdad
+          Image: streamdal/server:0.0.12-06a0874
           EntryPoint: ["/bin/bash", "/entrypoint.sh"]
           Environment:
             - Name: STREAMDAL_SERVER_AUTH_TOKEN
@@ -109,6 +131,18 @@ Resources:
               awslogs-group: !Ref StreamdalLogGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: streamdal-server
+        - Name: envoy-sidecar
+          Image: streamdal/envoy-side-car:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8083 # Port that Envoy listens on
+            - ContainerPort: 8084 # Admin port for Envoy
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref StreamdalLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: envoy
       RequiresCompatibilities:
         - EC2
         - FARGATE
@@ -122,6 +156,8 @@ Resources:
       TaskDefinition: !Ref StreamdalServerTaskDefinition
       DesiredCount: 3
       LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt StreamdalServerServiceDiscovery.Arn
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -141,10 +177,10 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-console-container
-          Image: streamdal/console:0.0.6
+          Image: streamdal/console:0.0.10
           Environment:
             - Name: STREAMDAL_CONSOLE_GRPC_WEB_URL
-              Value: http://envoy.local:8083
+              Value: http://streamdal-server.local:8083
             - Name: STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN
               Value: 1234
             - Name: STREAMDAL_CONSOLE_PORT
@@ -157,53 +193,6 @@ Resources:
         - EC2
         - FARGATE
 
-  # Envoy Service Discovery
-  EnvoyServiceDiscovery:
-    Type: 'AWS::ServiceDiscovery::Service'
-    Properties:
-      Description: Service discovery for Envoy
-      DnsConfig:
-        DnsRecords:
-          - Type: A
-            TTL: 60
-        RoutingPolicy: WEIGHTED
-      Name: envoy
-      NamespaceId: !Ref ServiceDiscoveryNamespace
-
-  # Envoy Task Definition
-  EnvoyTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: envoy-task
-      Cpu: 256
-      Memory: 512
-      NetworkMode: awsvpc
-      ExecutionRoleArn: !Ref ExecutionRole
-      ContainerDefinitions:
-        - Name: envoy-container
-          Image: streamdal/envoy-side-car:latest
-          PortMappings:
-            - ContainerPort: 8083
-      RequiresCompatibilities:
-        - EC2
-        - FARGATE
-
-  # Envoy Service
-  EnvoyService:
-    Type: AWS::ECS::Service
-    Properties:
-      ServiceName: envoy-service
-      Cluster: !Ref Cluster
-      TaskDefinition: !Ref EnvoyTaskDefinition
-      DesiredCount: 1
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          Subnets:
-            - !Ref SubnetID
-          SecurityGroups:
-            - !GetAtt ContainerSecurityGroup.GroupId
 
   # Container Security Group
   ContainerSecurityGroup:
@@ -238,14 +227,41 @@ Resources:
           ToPort: 8084
           CidrIp: 0.0.0.0/0
 
+  EFSTaskExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Policy to allow ECS tasks to mount and write to EFS"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "elasticfilesystem:DescribeFileSystems"
+              - "elasticfilesystem:DescribeAccessPoints"
+              - "elasticfilesystem:ClientMount"
+              - "elasticfilesystem:ClientWrite"
+            Resource: "*"
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: streamdal-deployment-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Ref EFSTaskExecutionPolicy
+
   # EFS FileSystem
   EFSFileSystem:
     Type: AWS::EFS::FileSystem
     Properties:
       PerformanceMode: generalPurpose
       Encrypted: true
-      LifecyclePolicies:
-        - TransitionToIA: AFTER_7_DAYS
       ThroughputMode: bursting
 
   # EFS Security Group

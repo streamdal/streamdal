@@ -41,6 +41,10 @@ message WASMRequest {
   // the pipeline, it will be empty.
   optional bytes input_step = 3;
 
+  // Potential input from a previous step if `Step.Dynamic == true`
+  // This is used for communicating data between steps.
+  // For example, when trying to find email addresses in a payload and
+  // then passing on the results to a transform step to obfuscate them
   optional InterStepResult inter_step_result = 4;
 }
 
@@ -62,6 +66,10 @@ message WASMResponse {
   // KVGet, the output_step would be the value of the fetched key.
   optional bytes output_step = 4;
 
+  // If `Step.Dynamic == true`, this field should be filled out by the WASM module
+  // This is used for communicating data between steps.
+  // For example, when trying to find email addresses in a payload and
+  // then passing on the results to a transform step to obfuscate them
   optional InterStepResult inter_step_result = 5;
 }
 

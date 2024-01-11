@@ -33,6 +33,11 @@ export interface WASMRequest {
      */
     inputStep?: Uint8Array;
     /**
+     * Potential input from a previous step if `Step.Dynamic == true`
+     * This is used for communicating data between steps.
+     * For example, when trying to find email addresses in a payload and
+     * then passing on the results to a transform step to obfuscate them
+     *
      * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 4;
      */
     interStepResult?: InterStepResult;
@@ -72,6 +77,11 @@ export interface WASMResponse {
      */
     outputStep?: Uint8Array;
     /**
+     * If `Step.Dynamic == true`, this field should be filled out by the WASM module
+     * This is used for communicating data between steps.
+     * For example, when trying to find email addresses in a payload and
+     * then passing on the results to a transform step to obfuscate them
+     *
      * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 5;
      */
     interStepResult?: InterStepResult;

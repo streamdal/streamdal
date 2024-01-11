@@ -5,6 +5,7 @@ import {
   TailResponse,
 } from "streamdal-protos/protos/sp_common.ts";
 import hljs from "../static/vendor/highlight@11.8.0.min.js";
+import * as uuid from "$std/uuid/mod.ts";
 
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
@@ -71,7 +72,7 @@ export const tail = async (
 
   try {
     const tailRequest = TailRequest.create({
-      id: crypto.randomUUID(),
+      id: uuid.v1.generate(),
       audience: audience,
       type: TailRequestType.START,
       sampleOptions: {

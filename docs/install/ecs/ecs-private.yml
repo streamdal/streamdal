@@ -1,0 +1,319 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "The template used to create an ECS Service from the ECS Console."
+Parameters:
+  SecurityGroupIDs:
+    Type: CommaDelimitedList
+    Default: sg-096852034e19ad0d4
+  SubnetID:
+    Type: String
+    Default: subnet-0edc757ec44d698b6
+  VpcID:
+    Type: String
+    Default: vpc-09f9d790ed1b0cc9e
+  LoadBalancerName:
+    Type: String
+    Default: ""
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: streamdal-stack
+
+  StreamdalLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: "/ecs/streamdal"
+      RetentionInDays: 5  # Set the retention as needed
+
+  ServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Description: "Namespace for ECS services"
+      Name: "local"
+      Vpc: !Ref VpcID
+
+  RedisServiceDiscovery:
+    Type: 'AWS::ServiceDiscovery::Service'
+    Properties:
+      Description: Service discovery for Redis
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        RoutingPolicy: WEIGHTED
+      Name: redis
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+
+  # Redis Task Definition
+  RedisTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: redis-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      Volumes:
+        - Name: redis-data
+          EfsVolumeConfiguration:
+            FileSystemId: !Ref EFSFileSystem
+            RootDirectory: "/"
+            TransitEncryption: "ENABLED"
+      ContainerDefinitions:
+        - Name: redis-container
+          Image: redis:latest
+          Command: ["redis-server", "--appendonly", "yes"]
+          PortMappings:
+            - ContainerPort: 6379
+          MountPoints:
+            - ContainerPath: "/data"
+              SourceVolume: redis-data
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Redis Service
+  RedisService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: redis-service
+      Cluster: !Ref Cluster
+      ServiceRegistries:
+        - RegistryArn: !GetAtt RedisServiceDiscovery.Arn
+      TaskDefinition: !Ref RedisTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # Streamdal Server Service Discovery
+  StreamdalServerServiceDiscovery:
+    Type: 'AWS::ServiceDiscovery::Service'
+    Properties:
+      Description: Service discovery for Streamdal Server
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        RoutingPolicy: WEIGHTED
+      Name: streamdal-server
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+
+  # Updated Streamdal Server Task Definition
+  StreamdalServerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: streamdal-server-task
+      Cpu: "512"
+      Memory: "1024"
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: streamdal-server-container
+          Image: streamdal/server:0.0.12-06a0874
+          EntryPoint: ["/bin/bash", "/entrypoint.sh"]
+          Environment:
+            - Name: STREAMDAL_SERVER_AUTH_TOKEN
+              Value: 1234
+            - Name: STREAMDAL_SERVER_REDIS_URL
+              Value: redis.local:6379
+          PortMappings:
+            - ContainerPort: 8081
+            - ContainerPort: 8082
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref StreamdalLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: streamdal-server
+        - Name: envoy-sidecar
+          Image: streamdal/envoy-side-car:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8083 # Port that Envoy listens on
+            - ContainerPort: 8084 # Admin port for Envoy
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref StreamdalLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: envoy
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+  # Streamdal Server Service
+  StreamdalServerService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: streamdal-server-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref StreamdalServerTaskDefinition
+      DesiredCount: 3
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt StreamdalServerServiceDiscovery.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  # Updated Streamdal Console Task Definition
+  StreamdalConsoleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: streamdal-console-task
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: streamdal-console-container
+          Image: streamdal/console:0.0.10
+          Environment:
+            - Name: STREAMDAL_CONSOLE_GRPC_WEB_URL
+              Value: http://streamdal-server.local:8083
+            - Name: STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN
+              Value: 1234
+            - Name: STREAMDAL_CONSOLE_PORT
+              Value: 8080
+            - Name: STREAMDAL_CONSOLE_PRODUCTION
+              Value: "true"
+          PortMappings:
+            - ContainerPort: 8080
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+
+
+  # Container Security Group
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcID
+      GroupName: StreamdalSecurityGroup
+      GroupDescription: Security group for Streamdal containers
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8081
+          ToPort: 8081
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8082
+          ToPort: 8082
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8083
+          ToPort: 8083
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8084
+          ToPort: 8084
+          CidrIp: 0.0.0.0/0
+
+  EFSTaskExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Policy to allow ECS tasks to mount and write to EFS"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "elasticfilesystem:DescribeFileSystems"
+              - "elasticfilesystem:DescribeAccessPoints"
+              - "elasticfilesystem:ClientMount"
+              - "elasticfilesystem:ClientWrite"
+            Resource: "*"
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: streamdal-deployment-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Ref EFSTaskExecutionPolicy
+
+  # EFS FileSystem
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      Encrypted: true
+      ThroughputMode: bursting
+
+  # EFS Security Group
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS Security Group
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '2049'
+          ToPort: '2049'
+          SourceSecurityGroupId: !GetAtt ContainerSecurityGroup.GroupId
+
+  # EFS Mount Target
+  EFSMountTarget:
+    Type: "AWS::EFS::MountTarget"
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref SubnetID
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  # Streamdal Console Service
+  StreamdalConsoleService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: streamdal-console-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref StreamdalConsoleTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref SubnetID
+          SecurityGroups:
+            - !GetAtt ContainerSecurityGroup.GroupId
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ECSExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ["sts:AssumeRole"]
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
