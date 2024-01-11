@@ -100,6 +100,19 @@ fn string_tests() {
             text: "string should NOT contain any".to_string(),
             should_error: false,
         },
+        // Returns multiple matches
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "".to_string(),
+                args: vec!["example".to_string()],
+                negate: false,
+            },
+            expected_matches: 6,
+            text: "find multiple string matches".to_string(),
+            should_error: false,
+        },
     ];
 
     test_utils::run_tests(&test_cases);

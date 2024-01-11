@@ -51,19 +51,20 @@ impl Detective {
 
         let obj = gjson::parse(data_as_str);
 
-        let mut matches = Vec::<DetectiveStepResultMatch>::new();
+        let mut res = Vec::<DetectiveStepResultMatch>::new();
 
         let f = Detective::get_matcher_func(request)?;
 
         obj.each(|_, value| {
-            // TODO: can this return multiple?
-            if let Some(res) = recurse_field(request, value, f) {
-                matches.push(res);
+            let matches = recurse_field(request, value, f);
+            if !matches.is_empty() {
+                res.extend(matches);
             }
+
             true
         });
 
-        Ok(matches)
+        Ok(res)
     }
 
     pub fn matches_path(
@@ -267,8 +268,8 @@ fn recurse_field(
     request: &Request,
     val: gjson::Value,
     f: MatcherFunc,
-) -> Option<DetectiveStepResultMatch> {
-    let mut res: Option<DetectiveStepResultMatch> = None;
+) -> Vec<DetectiveStepResultMatch> {
+    let mut res: Vec<DetectiveStepResultMatch> = Vec::new();
 
     match val.kind() {
         gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
@@ -284,11 +285,9 @@ fn recurse_field(
                         special_fields: Default::default(),
                     };
 
-                    return Some(result);
+                    res.push(result);
                 }
             }
-
-            return None;
         }
 
         gjson::Kind::Object => {
@@ -302,22 +301,20 @@ fn recurse_field(
                             special_fields: Default::default(),
                         };
 
-                        res = Some(result);
-                        return false; // no need to continue loop
+                        res.push(result);
                     }
                 }
 
                 true
             });
-
-            return res;
         }
         gjson::Kind::Array => {
             val.each(|_, value| {
-                if let Some(sub_res) = recurse_field(request, value, f) {
-                    res = Some(sub_res);
-                    return false;
+                let matches = recurse_field(request, value, f);
+                if !matches.is_empty() {
+                    res.extend(matches);
                 }
+
                 true
             });
 
