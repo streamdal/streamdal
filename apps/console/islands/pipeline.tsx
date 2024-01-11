@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -29,7 +29,7 @@ import {
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric, logFormData, titleCase } from "../lib/utils.ts";
+import { isNumeric, logFormData } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -40,7 +40,6 @@ import {
 import { StepConditions } from "../components/pipeline/stepCondition.tsx";
 import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
-import { useEffect } from "preact/hooks";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
@@ -52,6 +51,7 @@ import {
   SchemaValidationType,
 } from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
 import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
+import * as uuid from "$std/uuid/mod.ts";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -324,7 +324,7 @@ const PipelineDetail = (
       ...pipeline,
       steps: pipeline.steps.map((s: PipelineStep, i) => ({
         ...s,
-        dragId: crypto.randomUUID(),
+        dragId: uuid.v1.generate(),
         dragOrder: i,
       })),
     });
@@ -338,7 +338,7 @@ const PipelineDetail = (
       ...data,
       steps: [...data.steps, ...[{
         ...newStep,
-        dragId: crypto.randomUUID(),
+        dragId: uuid.v1.generate(),
         dragOrder: data.steps.length,
       }]],
     });
