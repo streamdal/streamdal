@@ -55,8 +55,12 @@ impl Detective {
 
         let f = Detective::get_matcher_func(request)?;
 
-        obj.each(|_, value| {
-            let matches = recurse_field(request, value, f);
+        obj.each(|key, value| {
+            // Since we're recursing through the whole payload, we need to keep track of where we are
+            // This value should be cloned for each recursive call.
+            let cur_path = vec![key.to_string()];
+
+            let matches = recurse_field(request, value, f, cur_path);
             if !matches.is_empty() {
                 res.extend(matches);
             }
@@ -140,7 +144,6 @@ impl Detective {
         let v = gjson::parse(field.json());
 
         match f(request, v) {
-            // TODO: can this return multiple?
             Ok(found) => {
                 if found {
                     let result = DetectiveStepResultMatch {
@@ -268,6 +271,7 @@ fn recurse_field(
     request: &Request,
     val: gjson::Value,
     f: MatcherFunc,
+    path: Vec<String>,
 ) -> Vec<DetectiveStepResultMatch> {
     let mut res: Vec<DetectiveStepResultMatch> = Vec::new();
 
@@ -280,7 +284,7 @@ fn recurse_field(
                 if found {
                     let result = DetectiveStepResultMatch {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
-                        path: request.path.clone(), // TODO: figure out actual path
+                        path: path.join("."),
                         value: val.str().to_owned().into_bytes(),
                         special_fields: Default::default(),
                     };
@@ -291,26 +295,23 @@ fn recurse_field(
         }
 
         gjson::Kind::Object => {
-            val.each(|_, value| {
-                if let Ok(found) = f(request, value) {
-                    if found {
-                        let result = DetectiveStepResultMatch {
-                            type_: ::protobuf::EnumOrUnknown::new(request.match_type),
-                            path: request.path.clone(), // TODO: figure out actual path
-                            value: val.str().to_owned().into_bytes(),
-                            special_fields: Default::default(),
-                        };
+            val.each(|key, value| {
+                let mut cur_path = path.clone();
+                cur_path.push(key.to_string());
 
-                        res.push(result);
-                    }
+                let matches = recurse_field(request, value, f, cur_path.clone());
+                if !matches.is_empty() {
+                    res.extend(matches);
                 }
-
                 true
             });
         }
         gjson::Kind::Array => {
+            let mut cur_path = path.clone();
+            cur_path.push("#".to_string());
+
             val.each(|_, value| {
-                let matches = recurse_field(request, value, f);
+                let matches = recurse_field(request, value, f, cur_path.clone());
                 if !matches.is_empty() {
                     res.extend(matches);
                 }

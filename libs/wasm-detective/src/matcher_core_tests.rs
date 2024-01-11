@@ -949,3 +949,39 @@ fn hostname() {
 
     test_utils::run_tests(&test_cases);
 }
+
+#[test]
+fn recursive_path_tracking_object() {
+    let request = Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+        data: &test_utils::SAMPLE_JSON_BYTES,
+        path: "".to_string(),
+        args: vec!["4111111111111112".to_string()],
+        negate: false,
+    };
+
+    let result = crate::detective::Detective::new().matches(&request);
+
+    assert_eq!(
+        result.unwrap().last().unwrap().path,
+        "object.credit_card.visa.invalid".to_string()
+    );
+}
+
+#[test]
+fn recursive_path_tracking_arrays() {
+    let request = Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+        data: &test_utils::SAMPLE_JSON_BYTES,
+        path: "".to_string(),
+        args: vec!["user1@streamdal.com".to_string()],
+        negate: false,
+    };
+
+    let result = crate::detective::Detective::new().matches(&request);
+
+    assert_eq!(
+        result.unwrap().last().unwrap().path,
+        "object.arrays.#.email".to_string()
+    );
+}
