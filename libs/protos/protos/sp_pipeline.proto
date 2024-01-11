@@ -37,21 +37,23 @@ message Pipeline {
 
 // A condition defines how the SDK should handle a step response -- should it
 // continue executing the pipeline, should it abort, should it notify the server?
-// Each step can have multiple conditions.
-enum PipelineStepCondition {
-  PIPELINE_STEP_CONDITION_UNSET = 0;
-
-  // Abort executing the current pipeline AND continue executing any other pipelines
-  PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
-
-  // Notify the server about the step condition
-  PIPELINE_STEP_CONDITION_NOTIFY = 2;
-
-  // Abort executing ALL pipelines
-  PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
-
-  PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4;
+enum AbortCondition {
+  ABORT_CONDITION_UNSET = 0;
+  ABORT_CONDITION_ABORT_CURRENT = 1;
+  ABORT_CONDITION_ABORT_ALL = 2;
 }
+
+message PipelineStepConditions {
+  // Should we abort execution?
+  AbortCondition abort = 1;
+
+  // Should we trigger a notification?
+  bool notify = 2;
+
+  // Should we include additional metadata that SDK should pass back to user?
+  map<string, string> metadata = 3;
+}
+
 
 // A pipeline step is a single step in a pipeline.
 message PipelineStep {
@@ -59,10 +61,13 @@ message PipelineStep {
   string name = 1;
 
   // SDKs should read this when WASM returns success to determine what to do next
-  repeated PipelineStepCondition on_success = 2;
+  PipelineStepConditions on_success = 2;
 
   // SDKs should read this when WASM returns failure to determine what to do next
-  repeated  PipelineStepCondition on_failure = 3;
+  PipelineStepConditions on_failure = 3;
+
+  // SDKs should read this when WASM returns error to determine what to do next
+  PipelineStepConditions on_error = 4;
 
   oneof step {
     steps.DetectiveStep detective = 1000;

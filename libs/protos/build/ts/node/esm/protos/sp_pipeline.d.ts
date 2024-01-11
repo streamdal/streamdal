@@ -51,6 +51,31 @@ export interface Pipeline {
     NotificationConfigs: NotificationConfig[];
 }
 /**
+ * @generated from protobuf message protos.PipelineStepConditions
+ */
+export interface PipelineStepConditions {
+    /**
+     * Should we abort execution?
+     *
+     * @generated from protobuf field: protos.AbortCondition abort = 1;
+     */
+    abort: AbortCondition;
+    /**
+     * Should we trigger a notification?
+     *
+     * @generated from protobuf field: bool notify = 2;
+     */
+    notify: boolean;
+    /**
+     * Should we include additional metadata that SDK should pass back to user?
+     *
+     * @generated from protobuf field: map<string, string> metadata = 3;
+     */
+    metadata: {
+        [key: string]: string;
+    };
+}
+/**
  * A pipeline step is a single step in a pipeline.
  *
  * @generated from protobuf message protos.PipelineStep
@@ -65,15 +90,21 @@ export interface PipelineStep {
     /**
      * SDKs should read this when WASM returns success to determine what to do next
      *
-     * @generated from protobuf field: repeated protos.PipelineStepCondition on_success = 2;
+     * @generated from protobuf field: protos.PipelineStepConditions on_success = 2;
      */
-    onSuccess: PipelineStepCondition[];
+    onSuccess?: PipelineStepConditions;
     /**
      * SDKs should read this when WASM returns failure to determine what to do next
      *
-     * @generated from protobuf field: repeated protos.PipelineStepCondition on_failure = 3;
+     * @generated from protobuf field: protos.PipelineStepConditions on_failure = 3;
      */
-    onFailure: PipelineStepCondition[];
+    onFailure?: PipelineStepConditions;
+    /**
+     * SDKs should read this when WASM returns error to determine what to do next
+     *
+     * @generated from protobuf field: protos.PipelineStepConditions on_error = 4;
+     */
+    onError?: PipelineStepConditions;
     /**
      * @generated from protobuf oneof: step
      */
@@ -162,37 +193,22 @@ export interface PipelineStep {
 /**
  * A condition defines how the SDK should handle a step response -- should it
  * continue executing the pipeline, should it abort, should it notify the server?
- * Each step can have multiple conditions.
  *
- * @generated from protobuf enum protos.PipelineStepCondition
+ * @generated from protobuf enum protos.AbortCondition
  */
-export declare enum PipelineStepCondition {
+export declare enum AbortCondition {
     /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_UNSET = 0;
+     * @generated from protobuf enum value: ABORT_CONDITION_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * Abort executing the current pipeline AND continue executing any other pipelines
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
+     * @generated from protobuf enum value: ABORT_CONDITION_ABORT_CURRENT = 1;
      */
     ABORT_CURRENT = 1,
     /**
-     * Notify the server about the step condition
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_NOTIFY = 2;
+     * @generated from protobuf enum value: ABORT_CONDITION_ABORT_ALL = 2;
      */
-    NOTIFY = 2,
-    /**
-     * Abort executing ALL pipelines
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
-     */
-    ABORT_ALL = 3,
-    /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4;
-     */
-    DISCARD_MESSAGE = 4
+    ABORT_ALL = 2
 }
 declare class Pipeline$Type extends MessageType<Pipeline> {
     constructor();
@@ -204,6 +220,17 @@ declare class Pipeline$Type extends MessageType<Pipeline> {
  * @generated MessageType for protobuf message protos.Pipeline
  */
 export declare const Pipeline: Pipeline$Type;
+declare class PipelineStepConditions$Type extends MessageType<PipelineStepConditions> {
+    constructor();
+    create(value?: PartialMessage<PipelineStepConditions>): PipelineStepConditions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineStepConditions): PipelineStepConditions;
+    private binaryReadMap3;
+    internalBinaryWrite(message: PipelineStepConditions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineStepConditions
+ */
+export declare const PipelineStepConditions: PipelineStepConditions$Type;
 declare class PipelineStep$Type extends MessageType<PipelineStep> {
     constructor();
     create(value?: PartialMessage<PipelineStep>): PipelineStep;

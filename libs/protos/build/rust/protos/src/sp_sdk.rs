@@ -42,11 +42,16 @@ pub struct SDKResponse {
     ///  An array of pipelines that the SDK executed and the status of each step
     // @@protoc_insertion_point(field:protos.SDKResponse.pipeline_status)
     pub pipeline_status: ::std::vec::Vec<PipelineStatus>,
-    ///  Indicates that the message should be dropped by the service using the SDK
-    ///  This should only be set as the result of a success/failure condition. Errors
-    ///  should not set this, so we can let the end user decide how to handle errors.
-    // @@protoc_insertion_point(field:protos.SDKResponse.drop_message)
-    pub drop_message: bool,
+    ///  Includes any metadata that the step(s) may want to pass back to the user.
+    ///
+    ///  NOTE: Metadata is aggregated across all steps in the pipeline, so if two
+    ///  steps both set a key "foo" to different values, the value of "foo" in the
+    ///  response will be the value set by the last step in the pipeline.
+    ///
+    ///  To learn more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error
+    ///  Behavior" section.
+    // @@protoc_insertion_point(field:protos.SDKResponse.metadata)
+    pub metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.SDKResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -86,10 +91,10 @@ impl SDKResponse {
             |m: &SDKResponse| { &m.pipeline_status },
             |m: &mut SDKResponse| { &mut m.pipeline_status },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "drop_message",
-            |m: &SDKResponse| { &m.drop_message },
-            |m: &mut SDKResponse| { &mut m.drop_message },
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "metadata",
+            |m: &SDKResponse| { &m.metadata },
+            |m: &mut SDKResponse| { &mut m.metadata },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKResponse>(
             "SDKResponse",
@@ -121,8 +126,20 @@ impl ::protobuf::Message for SDKResponse {
                 34 => {
                     self.pipeline_status.push(is.read_message()?);
                 },
-                40 => {
-                    self.drop_message = is.read_bool()?;
+                42 => {
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self.metadata.insert(key, value);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -149,9 +166,12 @@ impl ::protobuf::Message for SDKResponse {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         };
-        if self.drop_message != false {
-            my_size += 1 + 1;
-        }
+        for (k, v) in &self.metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -170,9 +190,15 @@ impl ::protobuf::Message for SDKResponse {
         for v in &self.pipeline_status {
             ::protobuf::rt::write_message_field_with_cached_size(4, v, os)?;
         };
-        if self.drop_message != false {
-            os.write_bool(5, self.drop_message)?;
-        }
+        for (k, v) in &self.metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(42)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -194,20 +220,13 @@ impl ::protobuf::Message for SDKResponse {
         self.error = false;
         self.error_message.clear();
         self.pipeline_status.clear();
-        self.drop_message = false;
+        self.metadata.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static SDKResponse {
-        static instance: SDKResponse = SDKResponse {
-            data: ::std::vec::Vec::new(),
-            error: false,
-            error_message: ::std::string::String::new(),
-            pipeline_status: ::std::vec::Vec::new(),
-            drop_message: false,
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
+        static instance: ::protobuf::rt::Lazy<SDKResponse> = ::protobuf::rt::Lazy::new();
+        instance.get(SDKResponse::new)
     }
 }
 
@@ -403,8 +422,9 @@ pub struct StepStatus {
     ///  If error == true, this will contain a human-readable error message
     // @@protoc_insertion_point(field:protos.StepStatus.error_message)
     pub error_message: ::std::string::String,
-    ///  If error == true, this will indicate whether current or upcoming pipeline
-    ///  execution was aborted.
+    ///  Indicates if current or upcoming pipeline has been aborted. Err does NOT
+    ///  mean that the pipeline was aborted - on_error conditions have to be defined
+    ///  explicitly for each step.
     // @@protoc_insertion_point(field:protos.StepStatus.abort_status)
     pub abort_status: ::protobuf::EnumOrUnknown<AbortStatus>,
     // special fields
@@ -580,8 +600,6 @@ pub enum AbortStatus {
     ABORT_STATUS_CURRENT = 1,
     // @@protoc_insertion_point(enum_value:protos.AbortStatus.ABORT_STATUS_ALL)
     ABORT_STATUS_ALL = 2,
-    // @@protoc_insertion_point(enum_value:protos.AbortStatus.ABORT_STATUS_DROP_MESSAGE)
-    ABORT_STATUS_DROP_MESSAGE = 3,
 }
 
 impl ::protobuf::Enum for AbortStatus {
@@ -596,7 +614,6 @@ impl ::protobuf::Enum for AbortStatus {
             0 => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_UNSET),
             1 => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_CURRENT),
             2 => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_ALL),
-            3 => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_DROP_MESSAGE),
             _ => ::std::option::Option::None
         }
     }
@@ -606,7 +623,6 @@ impl ::protobuf::Enum for AbortStatus {
             "ABORT_STATUS_UNSET" => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_UNSET),
             "ABORT_STATUS_CURRENT" => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_CURRENT),
             "ABORT_STATUS_ALL" => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_ALL),
-            "ABORT_STATUS_DROP_MESSAGE" => ::std::option::Option::Some(AbortStatus::ABORT_STATUS_DROP_MESSAGE),
             _ => ::std::option::Option::None
         }
     }
@@ -615,7 +631,6 @@ impl ::protobuf::Enum for AbortStatus {
         AbortStatus::ABORT_STATUS_UNSET,
         AbortStatus::ABORT_STATUS_CURRENT,
         AbortStatus::ABORT_STATUS_ALL,
-        AbortStatus::ABORT_STATUS_DROP_MESSAGE,
     ];
 }
 
@@ -644,89 +659,93 @@ impl AbortStatus {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0csp_sdk.proto\x12\x06protos\"\xc0\x01\n\x0bSDKResponse\x12\x12\n\
+    \n\x0csp_sdk.proto\x12\x06protos\"\x99\x02\n\x0bSDKResponse\x12\x12\n\
     \x04data\x18\x01\x20\x01(\x0cR\x04data\x12\x14\n\x05error\x18\x02\x20\
     \x01(\x08R\x05error\x12#\n\rerror_message\x18\x03\x20\x01(\tR\x0cerrorMe\
     ssage\x12?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.protos.Pipelin\
-    eStatusR\x0epipelineStatus\x12!\n\x0cdrop_message\x18\x05\x20\x01(\x08R\
-    \x0bdropMessage\"i\n\x0ePipelineStatus\x12\x0e\n\x02id\x18\x01\x20\x01(\
-    \tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x123\n\x0bstep_s\
-    tatus\x18\x03\x20\x03(\x0b2\x12.protos.StepStatusR\nstepStatus\"\x93\x01\
-    \n\nStepStatus\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x12\x14\n\
-    \x05error\x18\x02\x20\x01(\x08R\x05error\x12#\n\rerror_message\x18\x03\
-    \x20\x01(\tR\x0cerrorMessage\x126\n\x0cabort_status\x18\x04\x20\x01(\x0e\
-    2\x13.protos.AbortStatusR\x0babortStatus*t\n\x0bAbortStatus\x12\x16\n\
-    \x12ABORT_STATUS_UNSET\x10\0\x12\x18\n\x14ABORT_STATUS_CURRENT\x10\x01\
-    \x12\x14\n\x10ABORT_STATUS_ALL\x10\x02\x12\x1d\n\x19ABORT_STATUS_DROP_ME\
-    SSAGE\x10\x03B<Z:github.com/streamdal/streamdal/libs/protos/build/go/pro\
-    tosJ\xd4\x0e\n\x06\x12\x04\0\09\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
-    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\x08\x12\x03\x04\0Q\n\t\n\
-    \x02\x08\x0b\x12\x03\x04\0Q\n\n\n\x02\x05\0\x12\x04\x06\0\x0b\x01\n\n\n\
-    \x03\x05\0\x01\x12\x03\x06\x05\x10\n\x0b\n\x04\x05\0\x02\0\x12\x03\x07\
-    \x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\x14\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x07\x17\x18\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x08\
-    \x02\x1b\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\x02\x16\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x08\x19\x1a\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
-    \t\x02\x17\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\x02\x12\n\x0c\n\x05\
-    \x05\0\x02\x02\x02\x12\x03\t\x15\x16\n\x0b\n\x04\x05\0\x02\x03\x12\x03\n\
-    \x02\x20\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\n\x02\x1b\n\x0c\n\x05\x05\
-    \0\x02\x03\x02\x12\x03\n\x1e\x1f\n5\n\x02\x04\0\x12\x04\x0e\0\x1f\x01\
-    \x1a)\x20Common\x20return\x20response\x20used\x20by\x20all\x20SDKs\n\n\n\
-    \n\x03\x04\0\x01\x12\x03\x0e\x08\x13\n9\n\x04\x04\0\x02\0\x12\x03\x10\
-    \x02\x11\x1a,\x20Contains\x20(potentially)\x20modified\x20input\x20data\
-    \n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x10\x02\x07\n\x0c\n\x05\x04\0\x02\
-    \0\x01\x12\x03\x10\x08\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x10\x0f\
-    \x10\n[\n\x04\x04\0\x02\x01\x12\x03\x13\x02\x11\x1aN\x20Indicates\x20if\
-    \x20.Process()\x20was\x20successful;\x20check\x20error_message\x20for\
-    \x20more\x20details\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x13\x02\x06\
-    \n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x13\x07\x0c\n\x0c\n\x05\x04\0\x02\
-    \x01\x03\x12\x03\x13\x0f\x10\nT\n\x04\x04\0\x02\x02\x12\x03\x16\x02\x1b\
-    \x1aG\x20If\x20an\x20error\x20==\x20true,\x20this\x20will\x20contain\x20\
-    a\x20human-readable\x20error\x20message\n\n\x0c\n\x05\x04\0\x02\x02\x05\
-    \x12\x03\x16\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x16\t\x16\n\
-    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x16\x19\x1a\nV\n\x04\x04\0\x02\x03\
-    \x12\x03\x19\x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20that\x20the\
-    \x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\x20step\n\n\
-    \x0c\n\x05\x04\0\x02\x03\x04\x12\x03\x19\x02\n\n\x0c\n\x05\x04\0\x02\x03\
-    \x06\x12\x03\x19\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x19\x1a)\
-    \n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x19,-\n\xf5\x01\n\x04\x04\0\x02\
-    \x04\x12\x03\x1e\x02\x18\x1a\xe7\x01\x20Indicates\x20that\x20the\x20mess\
-    age\x20should\x20be\x20dropped\x20by\x20the\x20service\x20using\x20the\
-    \x20SDK\n\x20This\x20should\x20only\x20be\x20set\x20as\x20the\x20result\
-    \x20of\x20a\x20success/failure\x20condition.\x20Errors\n\x20should\x20no\
-    t\x20set\x20this,\x20so\x20we\x20can\x20let\x20the\x20end\x20user\x20dec\
-    ide\x20how\x20to\x20handle\x20errors.\n\n\x0c\n\x05\x04\0\x02\x04\x05\
-    \x12\x03\x1e\x02\x06\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x1e\x07\x13\n\
-    \x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x1e\x16\x17\n\n\n\x02\x04\x01\x12\
-    \x04!\0*\x01\n\n\n\x03\x04\x01\x01\x12\x03!\x08\x16\n!\n\x04\x04\x01\x02\
-    \0\x12\x03#\x02\x10\x1a\x14\x20ID\x20of\x20the\x20pipeline\n\n\x0c\n\x05\
-    \x04\x01\x02\0\x05\x12\x03#\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\
-    \x03#\t\x0b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03#\x0e\x0f\n'\n\x04\x04\
-    \x01\x02\x01\x12\x03&\x02\x12\x1a\x1a\x20The\x20name\x20of\x20the\x20pip\
-    eline\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03&\x02\x08\n\x0c\n\x05\x04\
-    \x01\x02\x01\x01\x12\x03&\t\r\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03&\
-    \x10\x11\n6\n\x04\x04\x01\x02\x02\x12\x03)\x02&\x1a)\x20The\x20status\
-    \x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\
-    \x02\x02\x04\x12\x03)\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03)\x0b\
-    \x15\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03)\x16!\n\x0c\n\x05\x04\x01\
-    \x02\x02\x03\x12\x03)$%\n\n\n\x02\x04\x02\x12\x04,\09\x01\n\n\n\x03\x04\
-    \x02\x01\x12\x03,\x08\x12\n#\n\x04\x04\x02\x02\0\x12\x03.\x02\x12\x1a\
-    \x16\x20The\x20name\x20of\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\0\x05\
-    \x12\x03.\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03.\t\r\n\x0c\n\x05\
-    \x04\x02\x02\0\x03\x12\x03.\x10\x11\n2\n\x04\x04\x02\x02\x01\x12\x031\
-    \x02\x11\x1a%\x20Did\x20an\x20error\x20occur\x20during\x20the\x20step?\n\
-    \n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x031\x02\x06\n\x0c\n\x05\x04\x02\
-    \x02\x01\x01\x12\x031\x07\x0c\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x031\
-    \x0f\x10\nQ\n\x04\x04\x02\x02\x02\x12\x034\x02\x1b\x1aD\x20If\x20error\
-    \x20==\x20true,\x20this\x20will\x20contain\x20a\x20human-readable\x20err\
-    or\x20message\n\n\x0c\n\x05\x04\x02\x02\x02\x05\x12\x034\x02\x08\n\x0c\n\
-    \x05\x04\x02\x02\x02\x01\x12\x034\t\x16\n\x0c\n\x05\x04\x02\x02\x02\x03\
-    \x12\x034\x19\x1a\np\n\x04\x04\x02\x02\x03\x12\x038\x02\x1f\x1ac\x20If\
-    \x20error\x20==\x20true,\x20this\x20will\x20indicate\x20whether\x20curre\
-    nt\x20or\x20upcoming\x20pipeline\n\x20execution\x20was\x20aborted.\n\n\
-    \x0c\n\x05\x04\x02\x02\x03\x06\x12\x038\x02\r\n\x0c\n\x05\x04\x02\x02\
-    \x03\x01\x12\x038\x0e\x1a\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\x038\x1d\
-    \x1eb\x06proto3\
+    eStatusR\x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03(\x0b2!.pro\
+    tos.SDKResponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\x10\
+    \n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\
+    \tR\x05value:\x028\x01\"i\n\x0ePipelineStatus\x12\x0e\n\x02id\x18\x01\
+    \x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x123\n\
+    \x0bstep_status\x18\x03\x20\x03(\x0b2\x12.protos.StepStatusR\nstepStatus\
+    \"\x93\x01\n\nStepStatus\x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\
+    \x12\x14\n\x05error\x18\x02\x20\x01(\x08R\x05error\x12#\n\rerror_message\
+    \x18\x03\x20\x01(\tR\x0cerrorMessage\x126\n\x0cabort_status\x18\x04\x20\
+    \x01(\x0e2\x13.protos.AbortStatusR\x0babortStatus*U\n\x0bAbortStatus\x12\
+    \x16\n\x12ABORT_STATUS_UNSET\x10\0\x12\x18\n\x14ABORT_STATUS_CURRENT\x10\
+    \x01\x12\x14\n\x10ABORT_STATUS_ALL\x10\x02B<Z:github.com/streamdal/strea\
+    mdal/libs/protos/build/go/protosJ\x99\x10\n\x06\x12\x04\0\0>\x01\n\x08\n\
+    \x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\x08\n\x01\
+    \x08\x12\x03\x04\0Q\n\t\n\x02\x08\x0b\x12\x03\x04\0Q\n\n\n\x02\x05\0\x12\
+    \x04\x06\0\n\x01\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x10\n\x0b\n\x04\x05\
+    \0\x02\0\x12\x03\x07\x02\x19\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x07\x02\
+    \x14\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x07\x17\x18\n\x0b\n\x04\x05\0\
+    \x02\x01\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x08\
+    \x02\x16\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x08\x19\x1a\n\x0b\n\x04\
+    \x05\0\x02\x02\x12\x03\t\x02\x17\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\t\
+    \x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\t\x15\x16\n5\n\x02\x04\0\
+    \x12\x04\r\0#\x01\x1a)\x20Common\x20return\x20response\x20used\x20by\x20\
+    all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x13\n9\n\x04\x04\0\x02\0\
+    \x12\x03\x0f\x02\x11\x1a,\x20Contains\x20(potentially)\x20modified\x20in\
+    put\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x0f\x02\x07\n\x0c\n\
+    \x05\x04\0\x02\0\x01\x12\x03\x0f\x08\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\
+    \x03\x0f\x0f\x10\n[\n\x04\x04\0\x02\x01\x12\x03\x12\x02\x11\x1aN\x20Indi\
+    cates\x20if\x20.Process()\x20was\x20successful;\x20check\x20error_messag\
+    e\x20for\x20more\x20details\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x12\
+    \x02\x06\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x12\x07\x0c\n\x0c\n\x05\
+    \x04\0\x02\x01\x03\x12\x03\x12\x0f\x10\nT\n\x04\x04\0\x02\x02\x12\x03\
+    \x15\x02\x1b\x1aG\x20If\x20an\x20error\x20==\x20true,\x20this\x20will\
+    \x20contain\x20a\x20human-readable\x20error\x20message\n\n\x0c\n\x05\x04\
+    \0\x02\x02\x05\x12\x03\x15\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\
+    \x15\t\x16\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x15\x19\x1a\nV\n\x04\
+    \x04\0\x02\x03\x12\x03\x18\x02.\x1aI\x20An\x20array\x20of\x20pipelines\
+    \x20that\x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\
+    \x20step\n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03\x18\x02\n\n\x0c\n\x05\
+    \x04\0\x02\x03\x06\x12\x03\x18\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\
+    \x03\x18\x1a)\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x18,-\n\x92\x03\n\
+    \x04\x04\0\x02\x04\x12\x03\"\x02#\x1a\x84\x03\x20Includes\x20any\x20meta\
+    data\x20that\x20the\x20step(s)\x20may\x20want\x20to\x20pass\x20back\x20t\
+    o\x20the\x20user.\n\n\x20NOTE:\x20Metadata\x20is\x20aggregated\x20across\
+    \x20all\x20steps\x20in\x20the\x20pipeline,\x20so\x20if\x20two\n\x20steps\
+    \x20both\x20set\x20a\x20key\x20\"foo\"\x20to\x20different\x20values,\x20\
+    the\x20value\x20of\x20\"foo\"\x20in\x20the\n\x20response\x20will\x20be\
+    \x20the\x20value\x20set\x20by\x20the\x20last\x20step\x20in\x20the\x20pip\
+    eline.\n\n\x20To\x20learn\x20more\x20about\x20\"metadata\",\x20see\x20SD\
+    K\x20Spec\x20V2\x20doc\x20\"Pipeline\x20Step\x20&\x20Error\n\x20Behavior\
+    \"\x20section.\n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\"\x02\x15\n\x0c\n\
+    \x05\x04\0\x02\x04\x01\x12\x03\"\x16\x1e\n\x0c\n\x05\x04\0\x02\x04\x03\
+    \x12\x03\"!\"\n\n\n\x02\x04\x01\x12\x04%\0.\x01\n\n\n\x03\x04\x01\x01\
+    \x12\x03%\x08\x16\n!\n\x04\x04\x01\x02\0\x12\x03'\x02\x10\x1a\x14\x20ID\
+    \x20of\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03'\x02\
+    \x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03'\t\x0b\n\x0c\n\x05\x04\x01\
+    \x02\0\x03\x12\x03'\x0e\x0f\n'\n\x04\x04\x01\x02\x01\x12\x03*\x02\x12\
+    \x1a\x1a\x20The\x20name\x20of\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\
+    \x02\x01\x05\x12\x03*\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03*\t\
+    \r\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03*\x10\x11\n6\n\x04\x04\x01\x02\
+    \x02\x12\x03-\x02&\x1a)\x20The\x20status\x20of\x20each\x20step\x20in\x20\
+    the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\x02\x04\x12\x03-\x02\n\n\x0c\n\
+    \x05\x04\x01\x02\x02\x06\x12\x03-\x0b\x15\n\x0c\n\x05\x04\x01\x02\x02\
+    \x01\x12\x03-\x16!\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03-$%\n\n\n\x02\
+    \x04\x02\x12\x040\0>\x01\n\n\n\x03\x04\x02\x01\x12\x030\x08\x12\n#\n\x04\
+    \x04\x02\x02\0\x12\x032\x02\x12\x1a\x16\x20The\x20name\x20of\x20the\x20s\
+    tep\n\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x032\x02\x08\n\x0c\n\x05\x04\x02\
+    \x02\0\x01\x12\x032\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x032\x10\x11\n\
+    2\n\x04\x04\x02\x02\x01\x12\x035\x02\x11\x1a%\x20Did\x20an\x20error\x20o\
+    ccur\x20during\x20the\x20step?\n\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03\
+    5\x02\x06\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x035\x07\x0c\n\x0c\n\x05\
+    \x04\x02\x02\x01\x03\x12\x035\x0f\x10\nQ\n\x04\x04\x02\x02\x02\x12\x038\
+    \x02\x1b\x1aD\x20If\x20error\x20==\x20true,\x20this\x20will\x20contain\
+    \x20a\x20human-readable\x20error\x20message\n\n\x0c\n\x05\x04\x02\x02\
+    \x02\x05\x12\x038\x02\x08\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x038\t\x16\
+    \n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x038\x19\x1a\n\xc0\x01\n\x04\x04\
+    \x02\x02\x03\x12\x03=\x02\x1f\x1a\xb2\x01\x20Indicates\x20if\x20current\
+    \x20or\x20upcoming\x20pipeline\x20has\x20been\x20aborted.\x20Err\x20does\
+    \x20NOT\n\x20mean\x20that\x20the\x20pipeline\x20was\x20aborted\x20-\x20o\
+    n_error\x20conditions\x20have\x20to\x20be\x20defined\n\x20explicitly\x20\
+    for\x20each\x20step.\n\n\x0c\n\x05\x04\x02\x02\x03\x06\x12\x03=\x02\r\n\
+    \x0c\n\x05\x04\x02\x02\x03\x01\x12\x03=\x0e\x1a\n\x0c\n\x05\x04\x02\x02\
+    \x03\x03\x12\x03=\x1d\x1eb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

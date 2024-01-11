@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PipelineStep = exports.Pipeline = exports.PipelineStepCondition = void 0;
+exports.PipelineStep = exports.PipelineStepConditions = exports.Pipeline = exports.AbortCondition = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -20,39 +20,24 @@ const sp_notify_1 = require("./sp_notify");
 /**
  * A condition defines how the SDK should handle a step response -- should it
  * continue executing the pipeline, should it abort, should it notify the server?
- * Each step can have multiple conditions.
  *
- * @generated from protobuf enum protos.PipelineStepCondition
+ * @generated from protobuf enum protos.AbortCondition
  */
-var PipelineStepCondition;
-(function (PipelineStepCondition) {
+var AbortCondition;
+(function (AbortCondition) {
     /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_UNSET = 0;
+     * @generated from protobuf enum value: ABORT_CONDITION_UNSET = 0;
      */
-    PipelineStepCondition[PipelineStepCondition["UNSET"] = 0] = "UNSET";
+    AbortCondition[AbortCondition["UNSET"] = 0] = "UNSET";
     /**
-     * Abort executing the current pipeline AND continue executing any other pipelines
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1;
+     * @generated from protobuf enum value: ABORT_CONDITION_ABORT_CURRENT = 1;
      */
-    PipelineStepCondition[PipelineStepCondition["ABORT_CURRENT"] = 1] = "ABORT_CURRENT";
+    AbortCondition[AbortCondition["ABORT_CURRENT"] = 1] = "ABORT_CURRENT";
     /**
-     * Notify the server about the step condition
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_NOTIFY = 2;
+     * @generated from protobuf enum value: ABORT_CONDITION_ABORT_ALL = 2;
      */
-    PipelineStepCondition[PipelineStepCondition["NOTIFY"] = 2] = "NOTIFY";
-    /**
-     * Abort executing ALL pipelines
-     *
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_ABORT_ALL = 3;
-     */
-    PipelineStepCondition[PipelineStepCondition["ABORT_ALL"] = 3] = "ABORT_ALL";
-    /**
-     * @generated from protobuf enum value: PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4;
-     */
-    PipelineStepCondition[PipelineStepCondition["DISCARD_MESSAGE"] = 4] = "DISCARD_MESSAGE";
-})(PipelineStepCondition || (exports.PipelineStepCondition = PipelineStepCondition = {}));
+    AbortCondition[AbortCondition["ABORT_ALL"] = 2] = "ABORT_ALL";
+})(AbortCondition || (exports.AbortCondition = AbortCondition = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Pipeline$Type extends runtime_5.MessageType {
     constructor() {
@@ -122,12 +107,90 @@ class Pipeline$Type extends runtime_5.MessageType {
  */
 exports.Pipeline = new Pipeline$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class PipelineStepConditions$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.PipelineStepConditions", [
+            { no: 1, name: "abort", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] },
+            { no: 2, name: "notify", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+    create(value) {
+        const message = { abort: 0, notify: false, metadata: {} };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.AbortCondition abort */ 1:
+                    message.abort = reader.int32();
+                    break;
+                case /* bool notify */ 2:
+                    message.notify = reader.bool();
+                    break;
+                case /* map<string, string> metadata */ 3:
+                    this.binaryReadMap3(message.metadata, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    binaryReadMap3(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.PipelineStepConditions.metadata");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : "";
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.AbortCondition abort = 1; */
+        if (message.abort !== 0)
+            writer.tag(1, runtime_1.WireType.Varint).int32(message.abort);
+        /* bool notify = 2; */
+        if (message.notify !== false)
+            writer.tag(2, runtime_1.WireType.Varint).bool(message.notify);
+        /* map<string, string> metadata = 3; */
+        for (let k of Object.keys(message.metadata))
+            writer.tag(3, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k).tag(2, runtime_1.WireType.LengthDelimited).string(message.metadata[k]).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineStepConditions
+ */
+exports.PipelineStepConditions = new PipelineStepConditions$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class PipelineStep$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.PipelineStep", [
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "on_success", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
-            { no: 3, name: "on_failure", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["protos.PipelineStepCondition", PipelineStepCondition, "PIPELINE_STEP_CONDITION_"] },
+            { no: 2, name: "on_success", kind: "message", T: () => exports.PipelineStepConditions },
+            { no: 3, name: "on_failure", kind: "message", T: () => exports.PipelineStepConditions },
+            { no: 4, name: "on_error", kind: "message", T: () => exports.PipelineStepConditions },
             { no: 1000, name: "detective", kind: "message", oneof: "step", T: () => sp_steps_detective_1.DetectiveStep },
             { no: 1001, name: "transform", kind: "message", oneof: "step", T: () => sp_steps_transform_1.TransformStep },
             { no: 1002, name: "encode", kind: "message", oneof: "step", T: () => sp_steps_encode_1.EncodeStep },
@@ -144,7 +207,7 @@ class PipelineStep$Type extends runtime_5.MessageType {
         ]);
     }
     create(value) {
-        const message = { name: "", onSuccess: [], onFailure: [], step: { oneofKind: undefined } };
+        const message = { name: "", step: { oneofKind: undefined } };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -158,19 +221,14 @@ class PipelineStep$Type extends runtime_5.MessageType {
                 case /* string name */ 1:
                     message.name = reader.string();
                     break;
-                case /* repeated protos.PipelineStepCondition on_success */ 2:
-                    if (wireType === runtime_1.WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.onSuccess.push(reader.int32());
-                    else
-                        message.onSuccess.push(reader.int32());
+                case /* protos.PipelineStepConditions on_success */ 2:
+                    message.onSuccess = exports.PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onSuccess);
                     break;
-                case /* repeated protos.PipelineStepCondition on_failure */ 3:
-                    if (wireType === runtime_1.WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.onFailure.push(reader.int32());
-                    else
-                        message.onFailure.push(reader.int32());
+                case /* protos.PipelineStepConditions on_failure */ 3:
+                    message.onFailure = exports.PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onFailure);
+                    break;
+                case /* protos.PipelineStepConditions on_error */ 4:
+                    message.onError = exports.PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onError);
                     break;
                 case /* protos.steps.DetectiveStep detective */ 1000:
                     message.step = {
@@ -256,20 +314,15 @@ class PipelineStep$Type extends runtime_5.MessageType {
         /* string name = 1; */
         if (message.name !== "")
             writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.name);
-        /* repeated protos.PipelineStepCondition on_success = 2; */
-        if (message.onSuccess.length) {
-            writer.tag(2, runtime_1.WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.onSuccess.length; i++)
-                writer.int32(message.onSuccess[i]);
-            writer.join();
-        }
-        /* repeated protos.PipelineStepCondition on_failure = 3; */
-        if (message.onFailure.length) {
-            writer.tag(3, runtime_1.WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.onFailure.length; i++)
-                writer.int32(message.onFailure[i]);
-            writer.join();
-        }
+        /* protos.PipelineStepConditions on_success = 2; */
+        if (message.onSuccess)
+            exports.PipelineStepConditions.internalBinaryWrite(message.onSuccess, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepConditions on_failure = 3; */
+        if (message.onFailure)
+            exports.PipelineStepConditions.internalBinaryWrite(message.onFailure, writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepConditions on_error = 4; */
+        if (message.onError)
+            exports.PipelineStepConditions.internalBinaryWrite(message.onError, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.steps.DetectiveStep detective = 1000; */
         if (message.step.oneofKind === "detective")
             sp_steps_detective_1.DetectiveStep.internalBinaryWrite(message.step.detective, writer.tag(1000, runtime_1.WireType.LengthDelimited).fork(), options).join();

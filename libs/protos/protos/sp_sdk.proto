@@ -8,7 +8,6 @@ enum AbortStatus {
   ABORT_STATUS_UNSET = 0;
   ABORT_STATUS_CURRENT = 1;
   ABORT_STATUS_ALL = 2;
-  ABORT_STATUS_DROP_MESSAGE = 3;
 }
 
 // Common return response used by all SDKs
@@ -25,10 +24,15 @@ message SDKResponse {
   // An array of pipelines that the SDK executed and the status of each step
   repeated PipelineStatus pipeline_status = 4;
 
-  // Indicates that the message should be dropped by the service using the SDK
-  // This should only be set as the result of a success/failure condition. Errors
-  // should not set this, so we can let the end user decide how to handle errors.
-  bool drop_message = 5;
+  // Includes any metadata that the step(s) may want to pass back to the user.
+  //
+  // NOTE: Metadata is aggregated across all steps in the pipeline, so if two
+  // steps both set a key "foo" to different values, the value of "foo" in the
+  // response will be the value set by the last step in the pipeline.
+  //
+  // To learn more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error
+  // Behavior" section.
+  map<string, string> metadata = 5;
 }
 
 message PipelineStatus {
@@ -52,7 +56,8 @@ message StepStatus {
   // If error == true, this will contain a human-readable error message
   string error_message = 3;
 
-  // If error == true, this will indicate whether current or upcoming pipeline
-  // execution was aborted.
+  // Indicates if current or upcoming pipeline has been aborted. Err does NOT
+  // mean that the pipeline was aborted - on_error conditions have to be defined
+  // explicitly for each step.
   AbortStatus abort_status = 4;
 }

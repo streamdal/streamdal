@@ -42,13 +42,20 @@ export interface SDKResponse {
      */
     pipelineStatus: PipelineStatus[];
     /**
-     * Indicates that the message should be dropped by the service using the SDK
-     * This should only be set as the result of a success/failure condition. Errors
-     * should not set this, so we can let the end user decide how to handle errors.
+     * Includes any metadata that the step(s) may want to pass back to the user.
      *
-     * @generated from protobuf field: bool drop_message = 5;
+     * NOTE: Metadata is aggregated across all steps in the pipeline, so if two
+     * steps both set a key "foo" to different values, the value of "foo" in the
+     * response will be the value set by the last step in the pipeline.
+     *
+     * To learn more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error
+     * Behavior" section.
+     *
+     * @generated from protobuf field: map<string, string> metadata = 5;
      */
-    dropMessage: boolean;
+    metadata: {
+        [key: string]: string;
+    };
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
@@ -96,8 +103,9 @@ export interface StepStatus {
      */
     errorMessage: string;
     /**
-     * If error == true, this will indicate whether current or upcoming pipeline
-     * execution was aborted.
+     * Indicates if current or upcoming pipeline has been aborted. Err does NOT
+     * mean that the pipeline was aborted - on_error conditions have to be defined
+     * explicitly for each step.
      *
      * @generated from protobuf field: protos.AbortStatus abort_status = 4;
      */
@@ -118,11 +126,7 @@ export enum AbortStatus {
     /**
      * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
      */
-    ALL = 2,
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_DROP_MESSAGE = 3;
-     */
-    DROP_MESSAGE = 3
+    ALL = 2
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
@@ -132,11 +136,11 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
             { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
-            { no: 5, name: "drop_message", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<SDKResponse>): SDKResponse {
-        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], dropMessage: false };
+        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<SDKResponse>(this, message, value);
@@ -159,8 +163,8 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
                 case /* repeated protos.PipelineStatus pipeline_status */ 4:
                     message.pipelineStatus.push(PipelineStatus.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* bool drop_message */ 5:
-                    message.dropMessage = reader.bool();
+                case /* map<string, string> metadata */ 5:
+                    this.binaryReadMap5(message.metadata, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -172,6 +176,22 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
             }
         }
         return message;
+    }
+    private binaryReadMap5(map: SDKResponse["metadata"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof SDKResponse["metadata"] | undefined, val: SDKResponse["metadata"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.SDKResponse.metadata");
+            }
+        }
+        map[key ?? ""] = val ?? "";
     }
     internalBinaryWrite(message: SDKResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* bytes data = 1; */
@@ -186,9 +206,9 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         /* repeated protos.PipelineStatus pipeline_status = 4; */
         for (let i = 0; i < message.pipelineStatus.length; i++)
             PipelineStatus.internalBinaryWrite(message.pipelineStatus[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* bool drop_message = 5; */
-        if (message.dropMessage !== false)
-            writer.tag(5, WireType.Varint).bool(message.dropMessage);
+        /* map<string, string> metadata = 5; */
+        for (let k of Object.keys(message.metadata))
+            writer.tag(5, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

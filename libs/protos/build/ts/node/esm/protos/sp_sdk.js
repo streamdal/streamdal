@@ -20,10 +20,6 @@ export var AbortStatus;
      * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
      */
     AbortStatus[AbortStatus["ALL"] = 2] = "ALL";
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_DROP_MESSAGE = 3;
-     */
-    AbortStatus[AbortStatus["DROP_MESSAGE"] = 3] = "DROP_MESSAGE";
 })(AbortStatus || (AbortStatus = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType {
@@ -33,11 +29,11 @@ class SDKResponse$Type extends MessageType {
             { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
-            { no: 5, name: "drop_message", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value) {
-        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], dropMessage: false };
+        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -60,8 +56,8 @@ class SDKResponse$Type extends MessageType {
                 case /* repeated protos.PipelineStatus pipeline_status */ 4:
                     message.pipelineStatus.push(PipelineStatus.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* bool drop_message */ 5:
-                    message.dropMessage = reader.bool();
+                case /* map<string, string> metadata */ 5:
+                    this.binaryReadMap5(message.metadata, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -73,6 +69,22 @@ class SDKResponse$Type extends MessageType {
             }
         }
         return message;
+    }
+    binaryReadMap5(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.string();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.SDKResponse.metadata");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : "";
     }
     internalBinaryWrite(message, writer, options) {
         /* bytes data = 1; */
@@ -87,9 +99,9 @@ class SDKResponse$Type extends MessageType {
         /* repeated protos.PipelineStatus pipeline_status = 4; */
         for (let i = 0; i < message.pipelineStatus.length; i++)
             PipelineStatus.internalBinaryWrite(message.pipelineStatus[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* bool drop_message = 5; */
-        if (message.dropMessage !== false)
-            writer.tag(5, WireType.Varint).bool(message.dropMessage);
+        /* map<string, string> metadata = 5; */
+        for (let k of Object.keys(message.metadata))
+            writer.tag(5, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.metadata[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
