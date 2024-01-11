@@ -41,8 +41,6 @@ pub struct WASMRequest {
     ///  the pipeline, it will be empty.
     // @@protoc_insertion_point(field:protos.WASMRequest.input_step)
     pub input_step: ::std::option::Option<::std::vec::Vec<u8>>,
-    // message oneof groups
-    pub input_from: ::std::option::Option<wasmrequest::Input_from>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.WASMRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -59,58 +57,9 @@ impl WASMRequest {
         ::std::default::Default::default()
     }
 
-    // .protos.steps.DetectiveStepResult detective_result = 100;
-
-    pub fn detective_result(&self) -> &super::sp_steps_detective::DetectiveStepResult {
-        match self.input_from {
-            ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(ref v)) => v,
-            _ => <super::sp_steps_detective::DetectiveStepResult as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_detective_result(&mut self) {
-        self.input_from = ::std::option::Option::None;
-    }
-
-    pub fn has_detective_result(&self) -> bool {
-        match self.input_from {
-            ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_detective_result(&mut self, v: super::sp_steps_detective::DetectiveStepResult) {
-        self.input_from = ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_detective_result(&mut self) -> &mut super::sp_steps_detective::DetectiveStepResult {
-        if let ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(_)) = self.input_from {
-        } else {
-            self.input_from = ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(super::sp_steps_detective::DetectiveStepResult::new()));
-        }
-        match self.input_from {
-            ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_detective_result(&mut self) -> super::sp_steps_detective::DetectiveStepResult {
-        if self.has_detective_result() {
-            match self.input_from.take() {
-                ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            super::sp_steps_detective::DetectiveStepResult::new()
-        }
-    }
-
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(4);
-        let mut oneofs = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::PipelineStep>(
             "step",
             |m: &WASMRequest| { &m.step },
@@ -126,14 +75,6 @@ impl WASMRequest {
             |m: &WASMRequest| { &m.input_step },
             |m: &mut WASMRequest| { &mut m.input_step },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_steps_detective::DetectiveStepResult>(
-            "detective_result",
-            WASMRequest::has_detective_result,
-            WASMRequest::detective_result,
-            WASMRequest::mut_detective_result,
-            WASMRequest::set_detective_result,
-        ));
-        oneofs.push(wasmrequest::Input_from::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WASMRequest>(
             "WASMRequest",
             fields,
@@ -161,9 +102,6 @@ impl ::protobuf::Message for WASMRequest {
                 26 => {
                     self.input_step = ::std::option::Option::Some(is.read_bytes()?);
                 },
-                802 => {
-                    self.input_from = ::std::option::Option::Some(wasmrequest::Input_from::DetectiveResult(is.read_message()?));
-                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -186,14 +124,6 @@ impl ::protobuf::Message for WASMRequest {
         if let Some(v) = self.input_step.as_ref() {
             my_size += ::protobuf::rt::bytes_size(3, &v);
         }
-        if let ::std::option::Option::Some(ref v) = self.input_from {
-            match v {
-                &wasmrequest::Input_from::DetectiveResult(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-            };
-        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -208,13 +138,6 @@ impl ::protobuf::Message for WASMRequest {
         }
         if let Some(v) = self.input_step.as_ref() {
             os.write_bytes(3, v)?;
-        }
-        if let ::std::option::Option::Some(ref v) = self.input_from {
-            match v {
-                &wasmrequest::Input_from::DetectiveResult(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
-                },
-            };
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -236,7 +159,6 @@ impl ::protobuf::Message for WASMRequest {
         self.step.clear();
         self.input_payload.clear();
         self.input_step = ::std::option::Option::None;
-        self.input_from = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
@@ -245,7 +167,6 @@ impl ::protobuf::Message for WASMRequest {
             step: ::protobuf::MessageField::none(),
             input_payload: ::std::vec::Vec::new(),
             input_step: ::std::option::Option::None,
-            input_from: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -267,34 +188,6 @@ impl ::std::fmt::Display for WASMRequest {
 
 impl ::protobuf::reflect::ProtobufValue for WASMRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-/// Nested message and enums of message `WASMRequest`
-pub mod wasmrequest {
-
-    #[derive(Clone,PartialEq,Debug)]
-    #[non_exhaustive]
-    // @@protoc_insertion_point(oneof:protos.WASMRequest.input_from)
-    pub enum Input_from {
-        // @@protoc_insertion_point(oneof_field:protos.WASMRequest.detective_result)
-        DetectiveResult(super::super::sp_steps_detective::DetectiveStepResult),
-    }
-
-    impl ::protobuf::Oneof for Input_from {
-    }
-
-    impl ::protobuf::OneofFull for Input_from {
-        fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
-            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
-            descriptor.get(|| <super::WASMRequest as ::protobuf::MessageFull>::descriptor().oneof_by_name("input_from").unwrap()).clone()
-        }
-    }
-
-    impl Input_from {
-        pub(in super) fn generated_oneof_descriptor_data() -> ::protobuf::reflect::GeneratedOneofDescriptorData {
-            ::protobuf::reflect::GeneratedOneofDescriptorData::new::<Input_from>("input_from")
-        }
-    }
 }
 
 ///  Returned by all WASM functions
@@ -482,6 +375,218 @@ impl ::protobuf::reflect::ProtobufValue for WASMResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+///  Intended for communicating wasm results between steps.
+///  Currently only used for passing results from a Detective Step to a Transform step
+// @@protoc_insertion_point(message:protos.InterStepResult)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct InterStepResult {
+    // message oneof groups
+    pub input_from: ::std::option::Option<inter_step_result::Input_from>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.InterStepResult.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a InterStepResult {
+    fn default() -> &'a InterStepResult {
+        <InterStepResult as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl InterStepResult {
+    pub fn new() -> InterStepResult {
+        ::std::default::Default::default()
+    }
+
+    // .protos.steps.DetectiveStepResult detective_result = 100;
+
+    pub fn detective_result(&self) -> &super::sp_steps_detective::DetectiveStepResult {
+        match self.input_from {
+            ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(ref v)) => v,
+            _ => <super::sp_steps_detective::DetectiveStepResult as ::protobuf::Message>::default_instance(),
+        }
+    }
+
+    pub fn clear_detective_result(&mut self) {
+        self.input_from = ::std::option::Option::None;
+    }
+
+    pub fn has_detective_result(&self) -> bool {
+        match self.input_from {
+            ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_detective_result(&mut self, v: super::sp_steps_detective::DetectiveStepResult) {
+        self.input_from = ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_detective_result(&mut self) -> &mut super::sp_steps_detective::DetectiveStepResult {
+        if let ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(_)) = self.input_from {
+        } else {
+            self.input_from = ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(super::sp_steps_detective::DetectiveStepResult::new()));
+        }
+        match self.input_from {
+            ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_detective_result(&mut self) -> super::sp_steps_detective::DetectiveStepResult {
+        if self.has_detective_result() {
+            match self.input_from.take() {
+                ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            super::sp_steps_detective::DetectiveStepResult::new()
+        }
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(1);
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_steps_detective::DetectiveStepResult>(
+            "detective_result",
+            InterStepResult::has_detective_result,
+            InterStepResult::detective_result,
+            InterStepResult::mut_detective_result,
+            InterStepResult::set_detective_result,
+        ));
+        oneofs.push(inter_step_result::Input_from::generated_oneof_descriptor_data());
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<InterStepResult>(
+            "InterStepResult",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for InterStepResult {
+    const NAME: &'static str = "InterStepResult";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                802 => {
+                    self.input_from = ::std::option::Option::Some(inter_step_result::Input_from::DetectiveResult(is.read_message()?));
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let ::std::option::Option::Some(ref v) = self.input_from {
+            match v {
+                &inter_step_result::Input_from::DetectiveResult(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+                },
+            };
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let ::std::option::Option::Some(ref v) = self.input_from {
+            match v {
+                &inter_step_result::Input_from::DetectiveResult(ref v) => {
+                    ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
+                },
+            };
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> InterStepResult {
+        InterStepResult::new()
+    }
+
+    fn clear(&mut self) {
+        self.input_from = ::std::option::Option::None;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static InterStepResult {
+        static instance: InterStepResult = InterStepResult {
+            input_from: ::std::option::Option::None,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for InterStepResult {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("InterStepResult").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for InterStepResult {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for InterStepResult {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+/// Nested message and enums of message `InterStepResult`
+pub mod inter_step_result {
+
+    #[derive(Clone,PartialEq,Debug)]
+    #[non_exhaustive]
+    // @@protoc_insertion_point(oneof:protos.InterStepResult.input_from)
+    pub enum Input_from {
+        // @@protoc_insertion_point(oneof_field:protos.InterStepResult.detective_result)
+        DetectiveResult(super::super::sp_steps_detective::DetectiveStepResult),
+    }
+
+    impl ::protobuf::Oneof for Input_from {
+    }
+
+    impl ::protobuf::OneofFull for Input_from {
+        fn descriptor() -> ::protobuf::reflect::OneofDescriptor {
+            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::OneofDescriptor> = ::protobuf::rt::Lazy::new();
+            descriptor.get(|| <super::InterStepResult as ::protobuf::MessageFull>::descriptor().oneof_by_name("input_from").unwrap()).clone()
+        }
+    }
+
+    impl Input_from {
+        pub(in super) fn generated_oneof_descriptor_data() -> ::protobuf::reflect::GeneratedOneofDescriptorData {
+            ::protobuf::reflect::GeneratedOneofDescriptorData::new::<Input_from>("input_from")
+        }
+    }
+}
+
 ///  Included in WASM response; the SDK should use the WASMExitCode to determine
 ///  what to do next - should it execute next step, should it notify or should it
 ///  stop executing/abort the rest of the steps in the pipeline.
@@ -570,91 +675,95 @@ impl WASMExitCode {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0csp_wsm.proto\x12\x06protos\x1a\x11sp_pipeline.proto\x1a\x1esteps/s\
-    p_steps_detective.proto\"\xed\x01\n\x0bWASMRequest\x12(\n\x04step\x18\
+    p_steps_detective.proto\"\x8f\x01\n\x0bWASMRequest\x12(\n\x04step\x18\
     \x01\x20\x01(\x0b2\x14.protos.PipelineStepR\x04step\x12#\n\rinput_payloa\
     d\x18\x02\x20\x01(\x0cR\x0cinputPayload\x12\"\n\ninput_step\x18\x03\x20\
-    \x01(\x0cH\x01R\tinputStep\x88\x01\x01\x12N\n\x10detective_result\x18d\
-    \x20\x01(\x0b2!.protos.steps.DetectiveStepResultH\0R\x0fdetectiveResultB\
-    \x0c\n\ninput_fromB\r\n\x0b_input_step\"\xb9\x01\n\x0cWASMResponse\x12%\
-    \n\x0eoutput_payload\x18\x01\x20\x01(\x0cR\routputPayload\x121\n\texit_c\
-    ode\x18\x02\x20\x01(\x0e2\x14.protos.WASMExitCodeR\x08exitCode\x12\x19\n\
-    \x08exit_msg\x18\x03\x20\x01(\tR\x07exitMsg\x12$\n\x0boutput_step\x18\
-    \x04\x20\x01(\x0cH\0R\noutputStep\x88\x01\x01B\x0e\n\x0c_output_step*\
-    \x83\x01\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\
-    \x1a\n\x16WASM_EXIT_CODE_SUCCESS\x10\x01\x12\x1a\n\x16WASM_EXIT_CODE_FAI\
-    LURE\x10\x02\x12!\n\x1dWASM_EXIT_CODE_INTERNAL_ERROR\x10\x03B<Z:github.c\
-    om/streamdal/streamdal/libs/protos/build/go/protosJ\x9d\x12\n\x06\x12\
-    \x04\0\0A\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\x03\
-    \x05\0(\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\x0b\x12\x03\x07\0Q\
-    \n\x9e\x04\n\x02\x05\0\x12\x04\x17\0\x1c\x01\x1a\x91\x04\x20Included\x20\
-    in\x20WASM\x20response;\x20the\x20SDK\x20should\x20use\x20the\x20WASMExi\
-    tCode\x20to\x20determine\n\x20what\x20to\x20do\x20next\x20-\x20should\
-    \x20it\x20execute\x20next\x20step,\x20should\x20it\x20notify\x20or\x20sh\
-    ould\x20it\n\x20stop\x20executing/abort\x20the\x20rest\x20of\x20the\x20s\
-    teps\x20in\x20the\x20pipeline.\n\n\x20Example:\n\n\x20a.\x20WASM\x20func\
-    \x20returns\x20WASM_EXIT_CODE_FAILURE\x20-\x20read\x20PipelineStep.on_fa\
-    ilure\n\x20conditions\x20to\x20determine\x20what\x20to\x20do\x20next.\n\
-    \n\x20b.\x20WASM\x20func\x20returns\x20WASM_EXIT_CODE_SUCCESS\x20-\x20re\
-    ad\x20PipelineStep.on_success\n\x20conditions\x20to\x20determine\x20what\
-    \x20to\x20do\x20next.\n\n\x20..\x20and\x20so\x20on.\n\x20protolint:disab\
-    le:next\x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\x03\x17\x05\
-    \x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x18\x02\x1b\n\x0c\n\x05\x05\0\x02\0\
-    \x01\x12\x03\x18\x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x18\x19\x1a\
-    \n\x0b\n\x04\x05\0\x02\x01\x12\x03\x19\x02\x1d\n\x0c\n\x05\x05\0\x02\x01\
-    \x01\x12\x03\x19\x02\x18\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x19\x1b\
-    \x1c\nK\n\x04\x05\0\x02\x02\x12\x03\x1a\x02\x1d\">\x20Probably\x20need\
-    \x20better\x20names\x20for\x20these\x20as\x20FAILURE\x20is\x20too\x20har\
-    sh\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x1a\x02\x18\n\x0c\n\x05\x05\0\
-    \x02\x02\x02\x12\x03\x1a\x1b\x1c\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x1b\
-    \x02$\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x1b\x02\x1f\n\x0c\n\x05\x05\
-    \0\x02\x03\x02\x12\x03\x1b\"#\nK\n\x02\x04\0\x12\x04\x1f\0.\x01\x1a?\x20\
-    SDK\x20generates\x20a\x20WASM\x20request\x20and\x20passes\x20this\x20to\
-    \x20the\x20WASM\x20func\n\n\n\n\x03\x04\0\x01\x12\x03\x1f\x08\x13\n~\n\
-    \x04\x04\0\x02\0\x12\x03\"\x02\x1f\x1aq\x20The\x20actual\x20step\x20that\
-    \x20the\x20WASM\x20func\x20will\x20operate\x20on.\x20This\x20is\x20the\
-    \x20same\x20step\n\x20that\x20is\x20declared\x20in\x20protos.Pipeline.\n\
-    \n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\"\x02\x15\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\"\x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\"\x1d\x1e\n:\
-    \n\x04\x04\0\x02\x01\x12\x03%\x02\x1a\x1a-\x20Payload\x20data\x20that\
-    \x20WASM\x20func\x20will\x20operate\x20on\n\n\x0c\n\x05\x04\0\x02\x01\
-    \x05\x12\x03%\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03%\x08\x15\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03%\x18\x19\nz\n\x04\x04\0\x02\x02\x12\
-    \x03)\x02\x20\x1am\x20Potentially\x20filled\x20out\x20result\x20from\x20\
-    previous\x20step.\x20If\x20this\x20is\x20first\x20step\x20in\n\x20the\
-    \x20pipeline,\x20it\x20will\x20be\x20empty.\n\n\x0c\n\x05\x04\0\x02\x02\
+    \x01(\x0cH\0R\tinputStep\x88\x01\x01B\r\n\x0b_input_step\"\xb9\x01\n\x0c\
+    WASMResponse\x12%\n\x0eoutput_payload\x18\x01\x20\x01(\x0cR\routputPaylo\
+    ad\x121\n\texit_code\x18\x02\x20\x01(\x0e2\x14.protos.WASMExitCodeR\x08e\
+    xitCode\x12\x19\n\x08exit_msg\x18\x03\x20\x01(\tR\x07exitMsg\x12$\n\x0bo\
+    utput_step\x18\x04\x20\x01(\x0cH\0R\noutputStep\x88\x01\x01B\x0e\n\x0c_o\
+    utput_step\"o\n\x0fInterStepResult\x12N\n\x10detective_result\x18d\x20\
+    \x01(\x0b2!.protos.steps.DetectiveStepResultH\0R\x0fdetectiveResultB\x0c\
+    \n\ninput_from*\x83\x01\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_UN\
+    SET\x10\0\x12\x1a\n\x16WASM_EXIT_CODE_SUCCESS\x10\x01\x12\x1a\n\x16WASM_\
+    EXIT_CODE_FAILURE\x10\x02\x12!\n\x1dWASM_EXIT_CODE_INTERNAL_ERROR\x10\
+    \x03B<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xc4\
+    \x13\n\x06\x12\x04\0\0E\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\
+    \x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\
+    \x01\x12\x03\x05\0(\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\x0b\x12\
+    \x03\x07\0Q\n\x9e\x04\n\x02\x05\0\x12\x04\x17\0\x1c\x01\x1a\x91\x04\x20I\
+    ncluded\x20in\x20WASM\x20response;\x20the\x20SDK\x20should\x20use\x20the\
+    \x20WASMExitCode\x20to\x20determine\n\x20what\x20to\x20do\x20next\x20-\
+    \x20should\x20it\x20execute\x20next\x20step,\x20should\x20it\x20notify\
+    \x20or\x20should\x20it\n\x20stop\x20executing/abort\x20the\x20rest\x20of\
+    \x20the\x20steps\x20in\x20the\x20pipeline.\n\n\x20Example:\n\n\x20a.\x20\
+    WASM\x20func\x20returns\x20WASM_EXIT_CODE_FAILURE\x20-\x20read\x20Pipeli\
+    neStep.on_failure\n\x20conditions\x20to\x20determine\x20what\x20to\x20do\
+    \x20next.\n\n\x20b.\x20WASM\x20func\x20returns\x20WASM_EXIT_CODE_SUCCESS\
+    \x20-\x20read\x20PipelineStep.on_success\n\x20conditions\x20to\x20determ\
+    ine\x20what\x20to\x20do\x20next.\n\n\x20..\x20and\x20so\x20on.\n\x20prot\
+    olint:disable:next\x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\
+    \x03\x17\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\x03\x18\x02\x1b\n\x0c\n\x05\
+    \x05\0\x02\0\x01\x12\x03\x18\x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\
+    \x18\x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x19\x02\x1d\n\x0c\n\x05\
+    \x05\0\x02\x01\x01\x12\x03\x19\x02\x18\n\x0c\n\x05\x05\0\x02\x01\x02\x12\
+    \x03\x19\x1b\x1c\nK\n\x04\x05\0\x02\x02\x12\x03\x1a\x02\x1d\">\x20Probab\
+    ly\x20need\x20better\x20names\x20for\x20these\x20as\x20FAILURE\x20is\x20\
+    too\x20harsh\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x1a\x02\x18\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03\x1a\x1b\x1c\n\x0b\n\x04\x05\0\x02\x03\x12\
+    \x03\x1b\x02$\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x1b\x02\x1f\n\x0c\n\
+    \x05\x05\0\x02\x03\x02\x12\x03\x1b\"#\nK\n\x02\x04\0\x12\x04\x1f\0*\x01\
+    \x1a?\x20SDK\x20generates\x20a\x20WASM\x20request\x20and\x20passes\x20th\
+    is\x20to\x20the\x20WASM\x20func\n\n\n\n\x03\x04\0\x01\x12\x03\x1f\x08\
+    \x13\n~\n\x04\x04\0\x02\0\x12\x03\"\x02\x1f\x1aq\x20The\x20actual\x20ste\
+    p\x20that\x20the\x20WASM\x20func\x20will\x20operate\x20on.\x20This\x20is\
+    \x20the\x20same\x20step\n\x20that\x20is\x20declared\x20in\x20protos.Pipe\
+    line.\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\"\x02\x15\n\x0c\n\x05\x04\0\
+    \x02\0\x01\x12\x03\"\x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\"\x1d\
+    \x1e\n:\n\x04\x04\0\x02\x01\x12\x03%\x02\x1a\x1a-\x20Payload\x20data\x20\
+    that\x20WASM\x20func\x20will\x20operate\x20on\n\n\x0c\n\x05\x04\0\x02\
+    \x01\x05\x12\x03%\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03%\x08\x15\
+    \n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03%\x18\x19\nz\n\x04\x04\0\x02\x02\
+    \x12\x03)\x02\x20\x1am\x20Potentially\x20filled\x20out\x20result\x20from\
+    \x20previous\x20step.\x20If\x20this\x20is\x20first\x20step\x20in\n\x20th\
+    e\x20pipeline,\x20it\x20will\x20be\x20empty.\n\n\x0c\n\x05\x04\0\x02\x02\
     \x04\x12\x03)\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03)\x0b\x10\n\x0c\
     \n\x05\x04\0\x02\x02\x01\x12\x03)\x11\x1b\n\x0c\n\x05\x04\0\x02\x02\x03\
-    \x12\x03)\x1e\x1f\n\x0c\n\x04\x04\0\x08\0\x12\x04+\x02-\x03\n\x0c\n\x05\
-    \x04\0\x08\0\x01\x12\x03+\x08\x12\n\x0b\n\x04\x04\0\x02\x03\x12\x03,\x04\
-    5\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03,\x04\x1d\n\x0c\n\x05\x04\0\x02\
-    \x03\x01\x12\x03,\x1e.\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03,14\n,\n\x02\
-    \x04\x01\x12\x041\0A\x01\x1a\x20\x20Returned\x20by\x20all\x20WASM\x20fun\
-    ctions\n\n\n\n\x03\x04\x01\x01\x12\x031\x08\x14\n\xd2\x01\n\x04\x04\x01\
-    \x02\0\x12\x035\x02\x1b\x1a\xc4\x01\x20Potentially\x20modified\x20input\
-    \x20payload.\x20Concept:\x20All\x20WASM\x20funcs\x20accept\x20an\n\x20in\
-    put_payload\x20in\x20WASMRequest,\x20WASM\x20func\x20reads\x20input\x20p\
-    ayload,\x20modifies\x20it\n\x20and\x20writes\x20the\x20modified\x20outpu\
-    t\x20to\x20output_payload.\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x035\x02\
-    \x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x035\x08\x16\n\x0c\n\x05\x04\x01\
-    \x02\0\x03\x12\x035\x19\x1a\n\\\n\x04\x04\x01\x02\x01\x12\x038\x02\x1d\
-    \x1aO\x20Exit\x20code\x20that\x20the\x20WASM\x20func\x20exited\x20with;\
-    \x20more\x20info\x20in\x20WASMExitCode's\x20comment\n\n\x0c\n\x05\x04\
-    \x01\x02\x01\x06\x12\x038\x02\x0e\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\
-    \x038\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x038\x1b\x1c\nQ\n\x04\
-    \x04\x01\x02\x02\x12\x03;\x02\x16\x1aD\x20Additional\x20info\x20about\
-    \x20the\x20reason\x20a\x20specific\x20exit\x20code\x20was\x20returned\n\
-    \n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03;\x02\x08\n\x0c\n\x05\x04\x01\
-    \x02\x02\x01\x12\x03;\t\x11\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03;\x14\
-    \x15\n\xdc\x01\n\x04\x04\x01\x02\x03\x12\x03@\x02!\x1a\xce\x01\x20Potent\
-    ial\x20additional\x20step\x20output\x20-\x20ie.\x20if\x20a\x20WASM\x20fu\
-    nc\x20is\x20an\x20HTTPGet,\n\x20output_step\x20would\x20contain\x20the\
-    \x20HTTP\x20response\x20body;\x20if\x20the\x20WASM\x20func\x20is\x20a\n\
-    \x20KVGet,\x20the\x20output_step\x20would\x20be\x20the\x20value\x20of\
-    \x20the\x20fetched\x20key.\n\n\x0c\n\x05\x04\x01\x02\x03\x04\x12\x03@\
-    \x02\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03@\x0b\x10\n\x0c\n\x05\x04\
-    \x01\x02\x03\x01\x12\x03@\x11\x1c\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\
-    \x03@\x1f\x20b\x06proto3\
+    \x12\x03)\x1e\x1f\n,\n\x02\x04\x01\x12\x04-\0=\x01\x1a\x20\x20Returned\
+    \x20by\x20all\x20WASM\x20functions\n\n\n\n\x03\x04\x01\x01\x12\x03-\x08\
+    \x14\n\xd2\x01\n\x04\x04\x01\x02\0\x12\x031\x02\x1b\x1a\xc4\x01\x20Poten\
+    tially\x20modified\x20input\x20payload.\x20Concept:\x20All\x20WASM\x20fu\
+    ncs\x20accept\x20an\n\x20input_payload\x20in\x20WASMRequest,\x20WASM\x20\
+    func\x20reads\x20input\x20payload,\x20modifies\x20it\n\x20and\x20writes\
+    \x20the\x20modified\x20output\x20to\x20output_payload.\n\n\x0c\n\x05\x04\
+    \x01\x02\0\x05\x12\x031\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x031\
+    \x08\x16\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x031\x19\x1a\n\\\n\x04\x04\
+    \x01\x02\x01\x12\x034\x02\x1d\x1aO\x20Exit\x20code\x20that\x20the\x20WAS\
+    M\x20func\x20exited\x20with;\x20more\x20info\x20in\x20WASMExitCode's\x20\
+    comment\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x034\x02\x0e\n\x0c\n\x05\
+    \x04\x01\x02\x01\x01\x12\x034\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\
+    \x12\x034\x1b\x1c\nQ\n\x04\x04\x01\x02\x02\x12\x037\x02\x16\x1aD\x20Addi\
+    tional\x20info\x20about\x20the\x20reason\x20a\x20specific\x20exit\x20cod\
+    e\x20was\x20returned\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x037\x02\x08\
+    \n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x037\t\x11\n\x0c\n\x05\x04\x01\x02\
+    \x02\x03\x12\x037\x14\x15\n\xdc\x01\n\x04\x04\x01\x02\x03\x12\x03<\x02!\
+    \x1a\xce\x01\x20Potential\x20additional\x20step\x20output\x20-\x20ie.\
+    \x20if\x20a\x20WASM\x20func\x20is\x20an\x20HTTPGet,\n\x20output_step\x20\
+    would\x20contain\x20the\x20HTTP\x20response\x20body;\x20if\x20the\x20WAS\
+    M\x20func\x20is\x20a\n\x20KVGet,\x20the\x20output_step\x20would\x20be\
+    \x20the\x20value\x20of\x20the\x20fetched\x20key.\n\n\x0c\n\x05\x04\x01\
+    \x02\x03\x04\x12\x03<\x02\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03<\x0b\
+    \x10\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03<\x11\x1c\n\x0c\n\x05\x04\
+    \x01\x02\x03\x03\x12\x03<\x1f\x20\n\x98\x01\n\x02\x04\x02\x12\x04A\0E\
+    \x01\x1a\x8b\x01\x20Intended\x20for\x20communicating\x20wasm\x20results\
+    \x20between\x20steps.\n\x20Currently\x20only\x20used\x20for\x20passing\
+    \x20results\x20from\x20a\x20Detective\x20Step\x20to\x20a\x20Transform\
+    \x20step\n\n\n\n\x03\x04\x02\x01\x12\x03A\x08\x17\n\x0c\n\x04\x04\x02\
+    \x08\0\x12\x04B\x02D\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\x03B\x08\x12\
+    \n\x0b\n\x04\x04\x02\x02\0\x12\x03C\x045\n\x0c\n\x05\x04\x02\x02\0\x06\
+    \x12\x03C\x04\x1d\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03C\x1e.\n\x0c\n\
+    \x05\x04\x02\x02\0\x03\x12\x03C14b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -674,9 +783,10 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut deps = ::std::vec::Vec::with_capacity(2);
             deps.push(super::sp_pipeline::file_descriptor().clone());
             deps.push(super::sp_steps_detective::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(2);
+            let mut messages = ::std::vec::Vec::with_capacity(3);
             messages.push(WASMRequest::generated_message_descriptor_data());
             messages.push(WASMResponse::generated_message_descriptor_data());
+            messages.push(InterStepResult::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(WASMExitCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

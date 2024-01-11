@@ -40,10 +40,6 @@ message WASMRequest {
   // Potentially filled out result from previous step. If this is first step in
   // the pipeline, it will be empty.
   optional bytes input_step = 3;
-
-  oneof input_from {
-    steps.DetectiveStepResult detective_result = 100;
-  }
 }
 
 // Returned by all WASM functions
@@ -63,4 +59,12 @@ message WASMResponse {
   // output_step would contain the HTTP response body; if the WASM func is a
   // KVGet, the output_step would be the value of the fetched key.
   optional bytes output_step = 4;
+}
+
+// Intended for communicating wasm results between steps.
+// Currently only used for passing results from a Detective Step to a Transform step
+message InterStepResult {
+  oneof input_from {
+    steps.DetectiveStepResult detective_result = 100;
+  }
 }

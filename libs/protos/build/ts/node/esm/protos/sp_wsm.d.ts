@@ -32,18 +32,6 @@ export interface WASMRequest {
      * @generated from protobuf field: optional bytes input_step = 3;
      */
     inputStep?: Uint8Array;
-    /**
-     * @generated from protobuf oneof: input_from
-     */
-    inputFrom: {
-        oneofKind: "detectiveResult";
-        /**
-         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 100;
-         */
-        detectiveResult: DetectiveStepResult;
-    } | {
-        oneofKind: undefined;
-    };
 }
 /**
  * Returned by all WASM functions
@@ -79,6 +67,26 @@ export interface WASMResponse {
      * @generated from protobuf field: optional bytes output_step = 4;
      */
     outputStep?: Uint8Array;
+}
+/**
+ * Intended for communicating wasm results between steps.
+ * Currently only used for passing results from a Detective Step to a Transform step
+ *
+ * @generated from protobuf message protos.InterStepResult
+ */
+export interface InterStepResult {
+    /**
+     * @generated from protobuf oneof: input_from
+     */
+    inputFrom: {
+        oneofKind: "detectiveResult";
+        /**
+         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 100;
+         */
+        detectiveResult: DetectiveStepResult;
+    } | {
+        oneofKind: undefined;
+    };
 }
 /**
  * Included in WASM response; the SDK should use the WASMExitCode to determine
@@ -138,4 +146,14 @@ declare class WASMResponse$Type extends MessageType<WASMResponse> {
  * @generated MessageType for protobuf message protos.WASMResponse
  */
 export declare const WASMResponse: WASMResponse$Type;
+declare class InterStepResult$Type extends MessageType<InterStepResult> {
+    constructor();
+    create(value?: PartialMessage<InterStepResult>): InterStepResult;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: InterStepResult): InterStepResult;
+    internalBinaryWrite(message: InterStepResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.InterStepResult
+ */
+export declare const InterStepResult: InterStepResult$Type;
 export {};

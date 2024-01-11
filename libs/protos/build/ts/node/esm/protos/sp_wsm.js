@@ -50,12 +50,11 @@ class WASMRequest$Type extends MessageType {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
-            { no: 100, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
-        const message = { inputPayload: new Uint8Array(0), inputFrom: { oneofKind: undefined } };
+        const message = { inputPayload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -74,12 +73,6 @@ class WASMRequest$Type extends MessageType {
                     break;
                 case /* optional bytes input_step */ 3:
                     message.inputStep = reader.bytes();
-                    break;
-                case /* protos.steps.DetectiveStepResult detective_result */ 100:
-                    message.inputFrom = {
-                        oneofKind: "detectiveResult",
-                        detectiveResult: DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
-                    };
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -102,9 +95,6 @@ class WASMRequest$Type extends MessageType {
         /* optional bytes input_step = 3; */
         if (message.inputStep !== undefined)
             writer.tag(3, WireType.LengthDelimited).bytes(message.inputStep);
-        /* protos.steps.DetectiveStepResult detective_result = 100; */
-        if (message.inputFrom.oneofKind === "detectiveResult")
-            DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -183,3 +173,53 @@ class WASMResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.WASMResponse
  */
 export const WASMResponse = new WASMResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class InterStepResult$Type extends MessageType {
+    constructor() {
+        super("protos.InterStepResult", [
+            { no: 100, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
+        ]);
+    }
+    create(value) {
+        const message = { inputFrom: { oneofKind: undefined } };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.steps.DetectiveStepResult detective_result */ 100:
+                    message.inputFrom = {
+                        oneofKind: "detectiveResult",
+                        detectiveResult: DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
+                    };
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.steps.DetectiveStepResult detective_result = 100; */
+        if (message.inputFrom.oneofKind === "detectiveResult")
+            DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.InterStepResult
+ */
+export const InterStepResult = new InterStepResult$Type();

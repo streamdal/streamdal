@@ -1146,10 +1146,6 @@ class WasmRequest(betterproto.Message):
     the pipeline, it will be empty.
     """
 
-    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
-        100, group="input_from"
-    )
-
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):
@@ -1179,6 +1175,18 @@ class WasmResponse(betterproto.Message):
     output_step would contain the HTTP response body; if the WASM func is a
     KVGet, the output_step would be the value of the fetched key.
     """
+
+
+@dataclass(eq=False, repr=False)
+class InterStepResult(betterproto.Message):
+    """
+    Intended for communicating wasm results between steps. Currently only used
+    for passing results from a Detective Step to a Transform step
+    """
+
+    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
+        100, group="input_from"
+    )
 
 
 class ExternalStub(betterproto.ServiceStub):
