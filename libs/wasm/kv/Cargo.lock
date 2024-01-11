@@ -93,7 +93,7 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "protobuf",
- "streamdal-protos 0.1.10",
+ "streamdal-protos",
 ]
 
 [[package]]
@@ -211,7 +211,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "protobuf",
- "streamdal-protos 0.1.10",
+ "streamdal-protos",
  "streamdal-wasm-detective",
 ]
 
@@ -223,9 +223,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.151"
+version = "0.2.152"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "302d7ab3130588088d277783b1e2d2e10c9e9e4a16dd9050e6ec93fb3e7048f4"
+checksum = "13e3bf6590cbc649f4d1a3eefc9d5d6eb746f5200ffb04e5e142700b8faa56e7"
 
 [[package]]
 name = "linux-raw-sys"
@@ -268,9 +268,9 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.75"
+version = "1.0.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "907a61bd0f64c2f29cd1cf1dc34d05176426a3f504a78010f08416ddb7b13708"
+checksum = "95fc56cda0b5c3325f5fbbd7ff9fda9e02bb00bb3dac51252d2f1bfa1cb8cc8c"
 dependencies = [
  "unicode-ident",
 ]
@@ -371,42 +371,31 @@ checksum = "4dccd0940a2dcdf68d092b8cbab7dc0ad8fa938bf95787e1b916b0e3d0e8e970"
 
 [[package]]
 name = "streamdal-protos"
-version = "0.0.115"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6ce9e3939000b052909572ffefbc30376998ed0222ce532edd76581aad8504b"
-dependencies = [
- "protobuf",
-]
-
-[[package]]
-name = "streamdal-protos"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b14ae37d559edc3dfe89ca83dc0558aee1eedaf0b5f4fa5f05168e240dc795b9"
+version = "0.1.13"
 dependencies = [
  "protobuf",
 ]
 
 [[package]]
 name = "streamdal-wasm-detective"
-version = "0.0.30"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a742df4f2167b83fc153abbae56d0044969bbaed47a37c6b0d272b6692e64573"
+version = "0.0.39"
 dependencies = [
  "ajson",
  "bencher",
  "chrono",
  "env_logger",
  "gjson",
+ "idna",
  "lazy_static",
  "log",
  "protobuf",
  "protobuf-json-mapping",
  "regex",
  "semver",
- "streamdal-protos 0.0.115",
+ "streamdal-protos",
  "thiserror",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -422,9 +411,9 @@ dependencies = [
 
 [[package]]
 name = "termcolor"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff1bc3d3f05aff0403e8ac0d92ced918ec05b666a43f83297ccef5bea8a3d449"
+checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
 ]
@@ -495,6 +484,12 @@ dependencies = [
  "idna",
  "percent-encoding",
 ]
+
+[[package]]
+name = "uuid"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e395fcf16a7a3d8127ec99782007af141946b4795001f876d54fb0d55978560"
 
 [[package]]
 name = "wasm-bindgen"

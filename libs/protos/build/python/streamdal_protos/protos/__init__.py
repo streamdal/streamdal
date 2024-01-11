@@ -1155,6 +1155,12 @@ class WasmRequest(betterproto.Message):
     inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
         4, optional=True, group="_inter_step_result"
     )
+    """
+    Potential input from a previous step if `Step.Dynamic == true` This is used
+    for communicating data between steps. For example, when trying to find
+    email addresses in a payload and then passing on the results to a transform
+    step to obfuscate them
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -1189,6 +1195,12 @@ class WasmResponse(betterproto.Message):
     inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
         5, optional=True, group="_inter_step_result"
     )
+    """
+    If `Step.Dynamic == true`, this field should be filled out by the WASM
+    module This is used for communicating data between steps. For example, when
+    trying to find email addresses in a payload and then passing on the results
+    to a transform step to obfuscate them
+    """
 
 
 @dataclass(eq=False, repr=False)

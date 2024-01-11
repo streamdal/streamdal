@@ -100,7 +100,11 @@ type WASMRequest struct {
 	InputPayload []byte `protobuf:"bytes,2,opt,name=input_payload,json=inputPayload,proto3" json:"input_payload,omitempty"`
 	// Potentially filled out result from previous step. If this is first step in
 	// the pipeline, it will be empty.
-	InputStep       []byte           `protobuf:"bytes,3,opt,name=input_step,json=inputStep,proto3,oneof" json:"input_step,omitempty"`
+	InputStep []byte `protobuf:"bytes,3,opt,name=input_step,json=inputStep,proto3,oneof" json:"input_step,omitempty"`
+	// Potential input from a previous step if `Step.Dynamic == true`
+	// This is used for communicating data between steps.
+	// For example, when trying to find email addresses in a payload and
+	// then passing on the results to a transform step to obfuscate them
 	InterStepResult *InterStepResult `protobuf:"bytes,4,opt,name=inter_step_result,json=interStepResult,proto3,oneof" json:"inter_step_result,omitempty"`
 }
 
@@ -181,7 +185,11 @@ type WASMResponse struct {
 	// Potential additional step output - ie. if a WASM func is an HTTPGet,
 	// output_step would contain the HTTP response body; if the WASM func is a
 	// KVGet, the output_step would be the value of the fetched key.
-	OutputStep      []byte           `protobuf:"bytes,4,opt,name=output_step,json=outputStep,proto3,oneof" json:"output_step,omitempty"`
+	OutputStep []byte `protobuf:"bytes,4,opt,name=output_step,json=outputStep,proto3,oneof" json:"output_step,omitempty"`
+	// If `Step.Dynamic == true`, this field should be filled out by the WASM module
+	// This is used for communicating data between steps.
+	// For example, when trying to find email addresses in a payload and
+	// then passing on the results to a transform step to obfuscate them
 	InterStepResult *InterStepResult `protobuf:"bytes,5,opt,name=inter_step_result,json=interStepResult,proto3,oneof" json:"inter_step_result,omitempty"`
 }
 

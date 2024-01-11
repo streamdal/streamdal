@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 protobuf = "3.2.0"
-streamdal-protos = "0.1.10"
+streamdal-protos = { path="../../protos/build/rust/protos" }

@@ -7,6 +7,10 @@
 streamdal-transform
 ==================
 
+> [!CAUTION]
+> There are no longer releases for this library. It is now included directly into wasm modules via Cargo.toml path
+
+
 Library used by [streamdal/wasm](https://github.com/streamdal/wasm) to 
 perform transformations on JSON payloads.
 ## Usage

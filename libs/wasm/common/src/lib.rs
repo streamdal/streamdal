@@ -1,5 +1,5 @@
 use protobuf;
-use protos::sp_wsm::{WASMExitCode, WASMRequest, WASMResponse};
+use protos::sp_wsm::{InterStepResult, WASMExitCode, WASMRequest, WASMResponse};
 use std::mem;
 
 /// Read memory at ptr for N length bytes, attempt to deserialize as WASMRequest.
@@ -25,6 +25,7 @@ pub fn write_response(
     output_step: Option<&[u8]>,
     exit_code: WASMExitCode,
     exit_msg: String,
+    interstep: Option<InterStepResult>,
 ) -> u64 {
     let mut response = WASMResponse::new();
 
@@ -40,22 +41,21 @@ pub fn write_response(
 
     response.exit_code = protobuf::EnumOrUnknown::from(exit_code);
     response.exit_msg = exit_msg;
+    response.inter_step_result = interstep;
 
     let mut bytes = match protobuf::Message::write_to_bytes(&response) {
         Ok(bytes) => bytes,
-        Err(_) => {
-            Vec::new()
-        }
+        Err(_) => Vec::new(),
     };
 
     let ptr = ((bytes.as_mut_ptr() as u64) << 32) | bytes.len() as u64;
     mem::forget(bytes);
-    return ptr
+    return ptr;
 }
 
 /// Small helper for write_response
 pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> u64 {
-    write_response(None, None, wasm_exit_code, error)
+    write_response(None, None, wasm_exit_code, error, None)
 }
 
 /// Allocate number of bytes in memory. This function should be used by client
