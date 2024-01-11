@@ -88,7 +88,7 @@ lazy_static! {
 
 pub struct TestCase<'a> {
     pub request: Request<'a>,
-    pub expected: bool,
+    pub expected_matches: usize,
     pub should_error: bool,
     pub text: String,
 }
@@ -98,9 +98,14 @@ pub fn run_tests(test_cases: &Vec<TestCase>) {
         let result = crate::detective::Detective::new().matches(&case.request);
 
         if case.should_error {
-            assert_eq!(result.is_err(), true, "{}", case.text);
+            assert!(result.is_err(), "{}", case.text);
         } else {
-            assert_eq!(result.unwrap(), case.expected, "{}", case.text);
+            assert_eq!(
+                result.unwrap().len(),
+                case.expected_matches,
+                "{}",
+                case.text
+            );
         }
     }
 }
