@@ -70,7 +70,7 @@ enum DetectiveType {
 
   // Numeric matchers (3000-3999)
 
-  DETECTIVE_TYPE_NUMERIC_EQUAL_TO= 3000;
+  DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
   DETECTIVE_TYPE_NUMERIC_GREATER_THAN = 3001;
   DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL = 3002;
   DETECTIVE_TYPE_NUMERIC_LESS_THAN = 3003;
@@ -85,4 +85,23 @@ message DetectiveStep {
   repeated string args = 2; // args determined by match_type
   optional bool negate = 3;
   DetectiveType type = 4;
+}
+
+message DetectiveStepResultMatch {
+  DetectiveType type = 1;
+
+  // For JSON payloads, the path to the match
+  string path = 2;
+
+  // For string payloads, the start and end characters of the match
+  // Placeholder for now, will implement in the future
+  //int32 char_index_start = 3;
+  //int32 char_index_end = 4;
+
+  // Value of the match
+  bytes value = 5;
+}
+
+message DetectiveStepResult {
+  repeated DetectiveStepResultMatch matches = 1;
 }

@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { DetectiveStepResult } from "./steps/sp_steps_detective.js";
 import { PipelineStep } from "./sp_pipeline.js";
 /**
  * SDK generates a WASM request and passes this to the WASM func
@@ -31,6 +32,15 @@ export interface WASMRequest {
      * @generated from protobuf field: optional bytes input_step = 3;
      */
     inputStep?: Uint8Array;
+    /**
+     * Potential input from a previous step if `Step.Dynamic == true`
+     * This is used for communicating data between steps.
+     * For example, when trying to find email addresses in a payload and
+     * then passing on the results to a transform step to obfuscate them
+     *
+     * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 4;
+     */
+    interStepResult?: InterStepResult;
 }
 /**
  * Returned by all WASM functions
@@ -66,6 +76,35 @@ export interface WASMResponse {
      * @generated from protobuf field: optional bytes output_step = 4;
      */
     outputStep?: Uint8Array;
+    /**
+     * If `Step.Dynamic == true`, this field should be filled out by the WASM module
+     * This is used for communicating data between steps.
+     * For example, when trying to find email addresses in a payload and
+     * then passing on the results to a transform step to obfuscate them
+     *
+     * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 5;
+     */
+    interStepResult?: InterStepResult;
+}
+/**
+ * Intended for communicating wasm results between steps.
+ * Currently only used for passing results from a Detective Step to a Transform step
+ *
+ * @generated from protobuf message protos.InterStepResult
+ */
+export interface InterStepResult {
+    /**
+     * @generated from protobuf oneof: input_from
+     */
+    inputFrom: {
+        oneofKind: "detectiveResult";
+        /**
+         * @generated from protobuf field: protos.steps.DetectiveStepResult detective_result = 1;
+         */
+        detectiveResult: DetectiveStepResult;
+    } | {
+        oneofKind: undefined;
+    };
 }
 /**
  * Included in WASM response; the SDK should use the WASMExitCode to determine
@@ -125,4 +164,14 @@ declare class WASMResponse$Type extends MessageType<WASMResponse> {
  * @generated MessageType for protobuf message protos.WASMResponse
  */
 export declare const WASMResponse: WASMResponse$Type;
+declare class InterStepResult$Type extends MessageType<InterStepResult> {
+    constructor();
+    create(value?: PartialMessage<InterStepResult>): InterStepResult;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: InterStepResult): InterStepResult;
+    internalBinaryWrite(message: InterStepResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.InterStepResult
+ */
+export declare const InterStepResult: InterStepResult$Type;
 export {};

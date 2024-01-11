@@ -26,6 +26,36 @@ export interface DetectiveStep {
     type: DetectiveType;
 }
 /**
+ * @generated from protobuf message protos.steps.DetectiveStepResultMatch
+ */
+export interface DetectiveStepResultMatch {
+    /**
+     * @generated from protobuf field: protos.steps.DetectiveType type = 1;
+     */
+    type: DetectiveType;
+    /**
+     * For JSON payloads, the path to the match
+     *
+     * @generated from protobuf field: string path = 2;
+     */
+    path: string;
+    /**
+     * Value of the match
+     *
+     * @generated from protobuf field: bytes value = 5;
+     */
+    value: Uint8Array;
+}
+/**
+ * @generated from protobuf message protos.steps.DetectiveStepResult
+ */
+export interface DetectiveStepResult {
+    /**
+     * @generated from protobuf field: repeated protos.steps.DetectiveStepResultMatch matches = 1;
+     */
+    matches: DetectiveStepResultMatch[];
+}
+/**
  * 1000-1999 reserved for core match types
  *
  * @generated from protobuf enum protos.steps.DetectiveType
@@ -268,4 +298,24 @@ declare class DetectiveStep$Type extends MessageType<DetectiveStep> {
  * @generated MessageType for protobuf message protos.steps.DetectiveStep
  */
 export declare const DetectiveStep: DetectiveStep$Type;
+declare class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch> {
+    constructor();
+    create(value?: PartialMessage<DetectiveStepResultMatch>): DetectiveStepResultMatch;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetectiveStepResultMatch): DetectiveStepResultMatch;
+    internalBinaryWrite(message: DetectiveStepResultMatch, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResultMatch
+ */
+export declare const DetectiveStepResultMatch: DetectiveStepResultMatch$Type;
+declare class DetectiveStepResult$Type extends MessageType<DetectiveStepResult> {
+    constructor();
+    create(value?: PartialMessage<DetectiveStepResult>): DetectiveStepResult;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetectiveStepResult): DetectiveStepResult;
+    internalBinaryWrite(message: DetectiveStepResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.steps.DetectiveStepResult
+ */
+export declare const DetectiveStepResult: DetectiveStepResult$Type;
 export {};

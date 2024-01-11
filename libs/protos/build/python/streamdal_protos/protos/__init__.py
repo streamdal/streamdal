@@ -367,6 +367,12 @@ class PipelineStep(betterproto.Message):
     next
     """
 
+    dynamic: bool = betterproto.bool_field(4)
+    """
+    Indicates whether to use the results from a previous step as input to this
+    step
+    """
+
     detective: "steps.DetectiveStep" = betterproto.message_field(1000, group="step")
     transform: "steps.TransformStep" = betterproto.message_field(1001, group="step")
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
@@ -1146,6 +1152,10 @@ class WasmRequest(betterproto.Message):
     the pipeline, it will be empty.
     """
 
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        4, optional=True, group="_inter_step_result"
+    )
+
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):
@@ -1175,6 +1185,22 @@ class WasmResponse(betterproto.Message):
     output_step would contain the HTTP response body; if the WASM func is a
     KVGet, the output_step would be the value of the fetched key.
     """
+
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        5, optional=True, group="_inter_step_result"
+    )
+
+
+@dataclass(eq=False, repr=False)
+class InterStepResult(betterproto.Message):
+    """
+    Intended for communicating wasm results between steps. Currently only used
+    for passing results from a Detective Step to a Transform step
+    """
+
+    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
+        1, group="input_from"
+    )
 
 
 class ExternalStub(betterproto.ServiceStub):

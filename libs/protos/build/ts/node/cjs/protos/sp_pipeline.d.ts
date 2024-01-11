@@ -75,6 +75,12 @@ export interface PipelineStep {
      */
     onFailure: PipelineStepCondition[];
     /**
+     * Indicates whether to use the results from a previous step as input to this step
+     *
+     * @generated from protobuf field: bool dynamic = 4;
+     */
+    dynamic: boolean;
+    /**
      * @generated from protobuf oneof: step
      */
     step: {

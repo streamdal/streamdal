@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WASMResponse = exports.WASMRequest = exports.WASMExitCode = void 0;
+exports.InterStepResult = exports.WASMResponse = exports.WASMRequest = exports.WASMExitCode = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_steps_detective_1 = require("./steps/sp_steps_detective");
 const sp_pipeline_1 = require("./sp_pipeline");
 /**
  * Included in WASM response; the SDK should use the WASMExitCode to determine
@@ -52,7 +53,8 @@ class WASMRequest$Type extends runtime_5.MessageType {
         super("protos.WASMRequest", [
             { no: 1, name: "step", kind: "message", T: () => sp_pipeline_1.PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 4, name: "inter_step_result", kind: "message", T: () => exports.InterStepResult }
         ]);
     }
     create(value) {
@@ -76,6 +78,9 @@ class WASMRequest$Type extends runtime_5.MessageType {
                 case /* optional bytes input_step */ 3:
                     message.inputStep = reader.bytes();
                     break;
+                case /* optional protos.InterStepResult inter_step_result */ 4:
+                    message.interStepResult = exports.InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -97,6 +102,9 @@ class WASMRequest$Type extends runtime_5.MessageType {
         /* optional bytes input_step = 3; */
         if (message.inputStep !== undefined)
             writer.tag(3, runtime_1.WireType.LengthDelimited).bytes(message.inputStep);
+        /* optional protos.InterStepResult inter_step_result = 4; */
+        if (message.interStepResult)
+            exports.InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -114,7 +122,8 @@ class WASMResponse$Type extends runtime_5.MessageType {
             { no: 1, name: "output_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "exit_code", kind: "enum", T: () => ["protos.WASMExitCode", WASMExitCode] },
             { no: 3, name: "exit_msg", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 4, name: "output_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
+            { no: 5, name: "inter_step_result", kind: "message", T: () => exports.InterStepResult }
         ]);
     }
     create(value) {
@@ -141,6 +150,9 @@ class WASMResponse$Type extends runtime_5.MessageType {
                 case /* optional bytes output_step */ 4:
                     message.outputStep = reader.bytes();
                     break;
+                case /* optional protos.InterStepResult inter_step_result */ 5:
+                    message.interStepResult = exports.InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -165,6 +177,9 @@ class WASMResponse$Type extends runtime_5.MessageType {
         /* optional bytes output_step = 4; */
         if (message.outputStep !== undefined)
             writer.tag(4, runtime_1.WireType.LengthDelimited).bytes(message.outputStep);
+        /* optional protos.InterStepResult inter_step_result = 5; */
+        if (message.interStepResult)
+            exports.InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(5, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -175,3 +190,53 @@ class WASMResponse$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.WASMResponse
  */
 exports.WASMResponse = new WASMResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class InterStepResult$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.InterStepResult", [
+            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => sp_steps_detective_1.DetectiveStepResult }
+        ]);
+    }
+    create(value) {
+        const message = { inputFrom: { oneofKind: undefined } };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.steps.DetectiveStepResult detective_result */ 1:
+                    message.inputFrom = {
+                        oneofKind: "detectiveResult",
+                        detectiveResult: sp_steps_detective_1.DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
+                    };
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.steps.DetectiveStepResult detective_result = 1; */
+        if (message.inputFrom.oneofKind === "detectiveResult")
+            sp_steps_detective_1.DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.InterStepResult
+ */
+exports.InterStepResult = new InterStepResult$Type();
