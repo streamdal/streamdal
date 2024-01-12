@@ -84,27 +84,10 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_HIGH = 2
 
 
-class PipelineStepCondition(betterproto.Enum):
-    """
-    A condition defines how the SDK should handle a step response -- should it
-    continue executing the pipeline, should it abort, should it notify the
-    server? Each step can have multiple conditions.
-    """
-
-    PIPELINE_STEP_CONDITION_UNSET = 0
-    PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1
-    """
-    Abort executing the current pipeline AND continue executing any other
-    pipelines
-    """
-
-    PIPELINE_STEP_CONDITION_NOTIFY = 2
-    """Notify the server about the step condition"""
-
-    PIPELINE_STEP_CONDITION_ABORT_ALL = 3
-    """Abort executing ALL pipelines"""
-
-    PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4
+class AbortCondition(betterproto.Enum):
+    ABORT_CONDITION_UNSET = 0
+    ABORT_CONDITION_ABORT_CURRENT = 1
+    ABORT_CONDITION_ABORT_ALL = 2
 
 
 class ClientType(betterproto.Enum):
@@ -129,7 +112,6 @@ class AbortStatus(betterproto.Enum):
     ABORT_STATUS_UNSET = 0
     ABORT_STATUS_CURRENT = 1
     ABORT_STATUS_ALL = 2
-    ABORT_STATUS_DROP_MESSAGE = 3
 
 
 class WasmExitCode(betterproto.Enum):
@@ -349,19 +331,42 @@ class Pipeline(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class PipelineStepConditions(betterproto.Message):
+    """
+    Conditions define how the SDK should handle a Wasm response in a step.
+    Should it continue executing the pipeline, should it abort, should it
+    notify the server? Each step can have exactly one of these for on_success,
+    on_failure and on_error.
+    """
+
+    abort: "AbortCondition" = betterproto.enum_field(1)
+    """Should we abort execution?"""
+
+    notify: bool = betterproto.bool_field(2)
+    """Should we trigger a notification?"""
+
+    metadata: Dict[str, str] = betterproto.map_field(
+        3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+    """
+    Should we include additional metadata that SDK should pass back to user?
+    """
+
+
+@dataclass(eq=False, repr=False)
 class PipelineStep(betterproto.Message):
     """A pipeline step is a single step in a pipeline."""
 
     name: str = betterproto.string_field(1)
     """Friendly name for the step"""
 
-    on_success: List["PipelineStepCondition"] = betterproto.enum_field(2)
+    on_success: "PipelineStepConditions" = betterproto.message_field(2)
     """
     SDKs should read this when WASM returns success to determine what to do
     next
     """
 
-    on_failure: List["PipelineStepCondition"] = betterproto.enum_field(3)
+    on_failure: "PipelineStepConditions" = betterproto.message_field(3)
     """
     SDKs should read this when WASM returns failure to determine what to do
     next
@@ -371,6 +376,11 @@ class PipelineStep(betterproto.Message):
     """
     Indicates whether to use the results from a previous step as input to this
     step
+    """
+
+    on_error: "PipelineStepConditions" = betterproto.message_field(5)
+    """
+    SDKs should read this when WASM returns error to determine what to do next
     """
 
     detective: "steps.DetectiveStep" = betterproto.message_field(1000, group="step")
@@ -1092,12 +1102,16 @@ class SdkResponse(betterproto.Message):
     An array of pipelines that the SDK executed and the status of each step
     """
 
-    drop_message: bool = betterproto.bool_field(5)
+    metadata: Dict[str, str] = betterproto.map_field(
+        5, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
     """
-    Indicates that the message should be dropped by the service using the SDK
-    This should only be set as the result of a success/failure condition.
-    Errors should not set this, so we can let the end user decide how to handle
-    errors.
+    Includes any metadata that the step(s) may want to pass back to the user.
+    NOTE: Metadata is aggregated across all steps in the pipeline, so if two
+    steps both set a key "foo" to different values, the value of "foo" in the
+    response will be the value set by the last step in the pipeline. To learn
+    more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error Behavior"
+    section.
     """
 
 
@@ -1126,8 +1140,9 @@ class StepStatus(betterproto.Message):
 
     abort_status: "AbortStatus" = betterproto.enum_field(4)
     """
-    If error == true, this will indicate whether current or upcoming pipeline
-    execution was aborted.
+    Indicates if current or upcoming pipeline has been aborted. Err does NOT
+    mean that the pipeline was aborted - on_error conditions have to be defined
+    explicitly for each step.
     """
 
 

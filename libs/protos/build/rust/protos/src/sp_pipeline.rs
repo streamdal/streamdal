@@ -212,6 +212,187 @@ impl ::protobuf::reflect::ProtobufValue for Pipeline {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+///  Conditions define how the SDK should handle a Wasm response in a step.
+///  Should it continue executing the pipeline, should it abort, should it notify
+///  the server? Each step can have exactly one of these for on_success, on_failure
+///  and on_error.
+// @@protoc_insertion_point(message:protos.PipelineStepConditions)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct PipelineStepConditions {
+    // message fields
+    ///  Should we abort execution?
+    // @@protoc_insertion_point(field:protos.PipelineStepConditions.abort)
+    pub abort: ::protobuf::EnumOrUnknown<AbortCondition>,
+    ///  Should we trigger a notification?
+    // @@protoc_insertion_point(field:protos.PipelineStepConditions.notify)
+    pub notify: bool,
+    ///  Should we include additional metadata that SDK should pass back to user?
+    // @@protoc_insertion_point(field:protos.PipelineStepConditions.metadata)
+    pub metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.PipelineStepConditions.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a PipelineStepConditions {
+    fn default() -> &'a PipelineStepConditions {
+        <PipelineStepConditions as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl PipelineStepConditions {
+    pub fn new() -> PipelineStepConditions {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "abort",
+            |m: &PipelineStepConditions| { &m.abort },
+            |m: &mut PipelineStepConditions| { &mut m.abort },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "notify",
+            |m: &PipelineStepConditions| { &m.notify },
+            |m: &mut PipelineStepConditions| { &mut m.notify },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "metadata",
+            |m: &PipelineStepConditions| { &m.metadata },
+            |m: &mut PipelineStepConditions| { &mut m.metadata },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PipelineStepConditions>(
+            "PipelineStepConditions",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for PipelineStepConditions {
+    const NAME: &'static str = "PipelineStepConditions";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                8 => {
+                    self.abort = is.read_enum_or_unknown()?;
+                },
+                16 => {
+                    self.notify = is.read_bool()?;
+                },
+                26 => {
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self.metadata.insert(key, value);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if self.abort != ::protobuf::EnumOrUnknown::new(AbortCondition::ABORT_CONDITION_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.abort.value());
+        }
+        if self.notify != false {
+            my_size += 1 + 1;
+        }
+        for (k, v) in &self.metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if self.abort != ::protobuf::EnumOrUnknown::new(AbortCondition::ABORT_CONDITION_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.abort))?;
+        }
+        if self.notify != false {
+            os.write_bool(2, self.notify)?;
+        }
+        for (k, v) in &self.metadata {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(26)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> PipelineStepConditions {
+        PipelineStepConditions::new()
+    }
+
+    fn clear(&mut self) {
+        self.abort = ::protobuf::EnumOrUnknown::new(AbortCondition::ABORT_CONDITION_UNSET);
+        self.notify = false;
+        self.metadata.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static PipelineStepConditions {
+        static instance: ::protobuf::rt::Lazy<PipelineStepConditions> = ::protobuf::rt::Lazy::new();
+        instance.get(PipelineStepConditions::new)
+    }
+}
+
+impl ::protobuf::MessageFull for PipelineStepConditions {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("PipelineStepConditions").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for PipelineStepConditions {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for PipelineStepConditions {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  A pipeline step is a single step in a pipeline.
 // @@protoc_insertion_point(message:protos.PipelineStep)
 #[derive(PartialEq,Clone,Default,Debug)]
@@ -222,13 +403,16 @@ pub struct PipelineStep {
     pub name: ::std::string::String,
     ///  SDKs should read this when WASM returns success to determine what to do next
     // @@protoc_insertion_point(field:protos.PipelineStep.on_success)
-    pub on_success: ::std::vec::Vec<::protobuf::EnumOrUnknown<PipelineStepCondition>>,
+    pub on_success: ::protobuf::MessageField<PipelineStepConditions>,
     ///  SDKs should read this when WASM returns failure to determine what to do next
     // @@protoc_insertion_point(field:protos.PipelineStep.on_failure)
-    pub on_failure: ::std::vec::Vec<::protobuf::EnumOrUnknown<PipelineStepCondition>>,
+    pub on_failure: ::protobuf::MessageField<PipelineStepConditions>,
     ///  Indicates whether to use the results from a previous step as input to this step
     // @@protoc_insertion_point(field:protos.PipelineStep.dynamic)
     pub dynamic: bool,
+    ///  SDKs should read this when WASM returns error to determine what to do next
+    // @@protoc_insertion_point(field:protos.PipelineStep.on_error)
+    pub on_error: ::protobuf::MessageField<PipelineStepConditions>,
     ///  ID is a uuid(sha256(_wasm_bytes)) that is set by server
     // @@protoc_insertion_point(field:protos.PipelineStep._wasm_id)
     pub _wasm_id: ::std::option::Option<::std::string::String>,
@@ -747,19 +931,19 @@ impl PipelineStep {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(17);
+        let mut fields = ::std::vec::Vec::with_capacity(18);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "name",
             |m: &PipelineStep| { &m.name },
             |m: &mut PipelineStep| { &mut m.name },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, PipelineStepConditions>(
             "on_success",
             |m: &PipelineStep| { &m.on_success },
             |m: &mut PipelineStep| { &mut m.on_success },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, PipelineStepConditions>(
             "on_failure",
             |m: &PipelineStep| { &m.on_failure },
             |m: &mut PipelineStep| { &mut m.on_failure },
@@ -768,6 +952,11 @@ impl PipelineStep {
             "dynamic",
             |m: &PipelineStep| { &m.dynamic },
             |m: &mut PipelineStep| { &mut m.dynamic },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, PipelineStepConditions>(
+            "on_error",
+            |m: &PipelineStep| { &m.on_error },
+            |m: &mut PipelineStep| { &mut m.on_error },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, super::sp_steps_detective::DetectiveStep>(
             "detective",
@@ -876,20 +1065,17 @@ impl ::protobuf::Message for PipelineStep {
                 10 => {
                     self.name = is.read_string()?;
                 },
-                16 => {
-                    self.on_success.push(is.read_enum_or_unknown()?);
-                },
                 18 => {
-                    ::protobuf::rt::read_repeated_packed_enum_or_unknown_into(is, &mut self.on_success)?
-                },
-                24 => {
-                    self.on_failure.push(is.read_enum_or_unknown()?);
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.on_success)?;
                 },
                 26 => {
-                    ::protobuf::rt::read_repeated_packed_enum_or_unknown_into(is, &mut self.on_failure)?
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.on_failure)?;
                 },
                 32 => {
                     self.dynamic = is.read_bool()?;
+                },
+                42 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.on_error)?;
                 },
                 8002 => {
                     self.step = ::std::option::Option::Some(pipeline_step::Step::Detective(is.read_message()?));
@@ -945,14 +1131,20 @@ impl ::protobuf::Message for PipelineStep {
         if !self.name.is_empty() {
             my_size += ::protobuf::rt::string_size(1, &self.name);
         }
-        for value in &self.on_success {
-            my_size += ::protobuf::rt::int32_size(2, value.value());
-        };
-        for value in &self.on_failure {
-            my_size += ::protobuf::rt::int32_size(3, value.value());
-        };
+        if let Some(v) = self.on_success.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        if let Some(v) = self.on_failure.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
         if self.dynamic != false {
             my_size += 1 + 1;
+        }
+        if let Some(v) = self.on_error.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
         if let Some(v) = self._wasm_id.as_ref() {
             my_size += ::protobuf::rt::string_size(10000, &v);
@@ -1016,14 +1208,17 @@ impl ::protobuf::Message for PipelineStep {
         if !self.name.is_empty() {
             os.write_string(1, &self.name)?;
         }
-        for v in &self.on_success {
-            os.write_enum(2, ::protobuf::EnumOrUnknown::value(v))?;
-        };
-        for v in &self.on_failure {
-            os.write_enum(3, ::protobuf::EnumOrUnknown::value(v))?;
-        };
+        if let Some(v) = self.on_success.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        }
+        if let Some(v) = self.on_failure.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
+        }
         if self.dynamic != false {
             os.write_bool(4, self.dynamic)?;
+        }
+        if let Some(v) = self.on_error.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(5, v, os)?;
         }
         if let Some(v) = self._wasm_id.as_ref() {
             os.write_string(10000, v)?;
@@ -1089,6 +1284,7 @@ impl ::protobuf::Message for PipelineStep {
         self.on_success.clear();
         self.on_failure.clear();
         self.dynamic = false;
+        self.on_error.clear();
         self.step = ::std::option::Option::None;
         self.step = ::std::option::Option::None;
         self.step = ::std::option::Option::None;
@@ -1108,9 +1304,10 @@ impl ::protobuf::Message for PipelineStep {
     fn default_instance() -> &'static PipelineStep {
         static instance: PipelineStep = PipelineStep {
             name: ::std::string::String::new(),
-            on_success: ::std::vec::Vec::new(),
-            on_failure: ::std::vec::Vec::new(),
+            on_success: ::protobuf::MessageField::none(),
+            on_failure: ::protobuf::MessageField::none(),
             dynamic: false,
+            on_error: ::protobuf::MessageField::none(),
             _wasm_id: ::std::option::Option::None,
             _wasm_bytes: ::std::option::Option::None,
             _wasm_function: ::std::option::Option::None,
@@ -1184,66 +1381,53 @@ pub mod pipeline_step {
     }
 }
 
-///  A condition defines how the SDK should handle a step response -- should it
-///  continue executing the pipeline, should it abort, should it notify the server?
-///  Each step can have multiple conditions.
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.PipelineStepCondition)
-pub enum PipelineStepCondition {
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_UNSET)
-    PIPELINE_STEP_CONDITION_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT)
-    PIPELINE_STEP_CONDITION_ABORT_CURRENT = 1,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY)
-    PIPELINE_STEP_CONDITION_NOTIFY = 2,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_ALL)
-    PIPELINE_STEP_CONDITION_ABORT_ALL = 3,
-    // @@protoc_insertion_point(enum_value:protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_DISCARD_MESSAGE)
-    PIPELINE_STEP_CONDITION_DISCARD_MESSAGE = 4,
+// @@protoc_insertion_point(enum:protos.AbortCondition)
+pub enum AbortCondition {
+    // @@protoc_insertion_point(enum_value:protos.AbortCondition.ABORT_CONDITION_UNSET)
+    ABORT_CONDITION_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT)
+    ABORT_CONDITION_ABORT_CURRENT = 1,
+    // @@protoc_insertion_point(enum_value:protos.AbortCondition.ABORT_CONDITION_ABORT_ALL)
+    ABORT_CONDITION_ABORT_ALL = 2,
 }
 
-impl ::protobuf::Enum for PipelineStepCondition {
-    const NAME: &'static str = "PipelineStepCondition";
+impl ::protobuf::Enum for AbortCondition {
+    const NAME: &'static str = "AbortCondition";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<PipelineStepCondition> {
+    fn from_i32(value: i32) -> ::std::option::Option<AbortCondition> {
         match value {
-            0 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET),
-            1 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_CURRENT),
-            2 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_NOTIFY),
-            3 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_ALL),
-            4 => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_DISCARD_MESSAGE),
+            0 => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_UNSET),
+            1 => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_ABORT_CURRENT),
+            2 => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_ABORT_ALL),
             _ => ::std::option::Option::None
         }
     }
 
-    fn from_str(str: &str) -> ::std::option::Option<PipelineStepCondition> {
+    fn from_str(str: &str) -> ::std::option::Option<AbortCondition> {
         match str {
-            "PIPELINE_STEP_CONDITION_UNSET" => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET),
-            "PIPELINE_STEP_CONDITION_ABORT_CURRENT" => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_CURRENT),
-            "PIPELINE_STEP_CONDITION_NOTIFY" => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_NOTIFY),
-            "PIPELINE_STEP_CONDITION_ABORT_ALL" => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_ALL),
-            "PIPELINE_STEP_CONDITION_DISCARD_MESSAGE" => ::std::option::Option::Some(PipelineStepCondition::PIPELINE_STEP_CONDITION_DISCARD_MESSAGE),
+            "ABORT_CONDITION_UNSET" => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_UNSET),
+            "ABORT_CONDITION_ABORT_CURRENT" => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_ABORT_CURRENT),
+            "ABORT_CONDITION_ABORT_ALL" => ::std::option::Option::Some(AbortCondition::ABORT_CONDITION_ABORT_ALL),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [PipelineStepCondition] = &[
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET,
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_CURRENT,
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_NOTIFY,
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_ABORT_ALL,
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_DISCARD_MESSAGE,
+    const VALUES: &'static [AbortCondition] = &[
+        AbortCondition::ABORT_CONDITION_UNSET,
+        AbortCondition::ABORT_CONDITION_ABORT_CURRENT,
+        AbortCondition::ABORT_CONDITION_ABORT_ALL,
     ];
 }
 
-impl ::protobuf::EnumFull for PipelineStepCondition {
+impl ::protobuf::EnumFull for AbortCondition {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("PipelineStepCondition").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("AbortCondition").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -1252,15 +1436,15 @@ impl ::protobuf::EnumFull for PipelineStepCondition {
     }
 }
 
-impl ::std::default::Default for PipelineStepCondition {
+impl ::std::default::Default for AbortCondition {
     fn default() -> Self {
-        PipelineStepCondition::PIPELINE_STEP_CONDITION_UNSET
+        AbortCondition::ABORT_CONDITION_UNSET
     }
 }
 
-impl PipelineStepCondition {
+impl AbortCondition {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<PipelineStepCondition>("PipelineStepCondition")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<AbortCondition>("AbortCondition")
     }
 }
 
@@ -1275,145 +1459,159 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12*\n\x05steps\x18\x03\
     \x20\x03(\x0b2\x14.protos.PipelineStepR\x05steps\x12N\n\x15_notification\
     _configs\x18\x04\x20\x03(\x0b2\x1a.protos.NotificationConfigR\x13Notific\
-    ationConfigs\"\xc3\x07\n\x0cPipelineStep\x12\x12\n\x04name\x18\x01\x20\
-    \x01(\tR\x04name\x12<\n\non_success\x18\x02\x20\x03(\x0e2\x1d.protos.Pip\
-    elineStepConditionR\tonSuccess\x12<\n\non_failure\x18\x03\x20\x03(\x0e2\
-    \x1d.protos.PipelineStepConditionR\tonFailure\x12\x18\n\x07dynamic\x18\
-    \x04\x20\x01(\x08R\x07dynamic\x12<\n\tdetective\x18\xe8\x07\x20\x01(\x0b\
-    2\x1b.protos.steps.DetectiveStepH\0R\tdetective\x12<\n\ttransform\x18\
-    \xe9\x07\x20\x01(\x0b2\x1b.protos.steps.TransformStepH\0R\ttransform\x12\
-    3\n\x06encode\x18\xea\x07\x20\x01(\x0b2\x18.protos.steps.EncodeStepH\0R\
-    \x06encode\x123\n\x06decode\x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.D\
-    ecodeStepH\0R\x06decode\x123\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.p\
-    rotos.steps.CustomStepH\0R\x06custom\x12C\n\x0chttp_request\x18\xed\x07\
-    \x20\x01(\x0b2\x1d.protos.steps.HttpRequestStepH\0R\x0bhttpRequest\x12'\
-    \n\x02kv\x18\xee\x07\x20\x01(\x0b2\x14.protos.steps.KVStepH\0R\x02kv\x12\
-    C\n\x0cinfer_schema\x18\xef\x07\x20\x01(\x0b2\x1d.protos.steps.InferSche\
-    maStepH\0R\x0binferSchema\x12=\n\nvalid_json\x18\xf0\x07\x20\x01(\x0b2\
-    \x1b.protos.steps.ValidJSONStepH\0R\tvalidJson\x12R\n\x11schema_validati\
-    on\x18\xf1\x07\x20\x01(\x0b2\".protos.steps.SchemaValidationStepH\0R\x10\
-    schemaValidation\x12\x1e\n\x08_wasm_id\x18\x90N\x20\x01(\tH\x01R\x06Wasm\
-    Id\x88\x01\x01\x12$\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBy\
-    tes\x88\x01\x01\x12*\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWa\
-    smFunction\x88\x01\x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm\
-    _bytesB\x11\n\x0fX_wasm_function*\xdd\x01\n\x15PipelineStepCondition\x12\
-    !\n\x1dPIPELINE_STEP_CONDITION_UNSET\x10\0\x12)\n%PIPELINE_STEP_CONDITIO\
-    N_ABORT_CURRENT\x10\x01\x12\"\n\x1ePIPELINE_STEP_CONDITION_NOTIFY\x10\
-    \x02\x12%\n!PIPELINE_STEP_CONDITION_ABORT_ALL\x10\x03\x12+\n'PIPELINE_ST\
-    EP_CONDITION_DISCARD_MESSAGE\x10\x04B<Z:github.com/streamdal/streamdal/l\
-    ibs/protos/build/go/protosJ\xc9\x19\n\x06\x12\x04\0\0Z\x01\n\x08\n\x01\
-    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
-    \x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\n\x02\x03\x02\
-    \x12\x03\x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\x03\x04\x12\
-    \x03\x08\0%\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\x12\x03\n\0\
-    *\n\t\n\x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\x0c\00\n\t\
-    \n\x02\x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\x08\n\x01\x08\
-    \x12\x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\n\x02\x04\0\
-    \x12\x04\x15\0#\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20structure\x20t\
-    hat\x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20This\x20struc\
-    ture\n\x20is\x20intended\x20to\x20be\x20immutable;\x20clients\x20are\x20\
-    expected\x20to\x20generate\x20WASMRequest's\n\x20that\x20contain\x20a\
-    \x20pipeline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\n\x9f\
-    \x01\n\x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20should\
-    \x20NOT\x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20Create\
-    PipelineRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_does_\
-    \x20need\x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\
-    \x05\x04\0\x02\0\x05\x12\x03\x18\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
-    \x03\x18\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x18\x0e\x0f\n-\n\x04\
-    \x04\0\x02\x01\x12\x03\x1b\x02\x12\x1a\x20\x20Friendly\x20name\x20for\
-    \x20the\x20pipeline\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x1b\x02\x08\
-    \n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1b\t\r\n\x0c\n\x05\x04\0\x02\x01\
-    \x03\x12\x03\x1b\x10\x11\n+\n\x04\x04\0\x02\x02\x12\x03\x1e\x02\"\x1a\
-    \x1e\x20One\x20or\x20more\x20steps\x20to\x20execute\n\n\x0c\n\x05\x04\0\
-    \x02\x02\x04\x12\x03\x1e\x02\n\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x1e\
-    \x0b\x17\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x1e\x18\x1d\n\x0c\n\x05\
-    \x04\0\x02\x02\x03\x12\x03\x1e\x20!\n\x98\x01\n\x04\x04\0\x02\x03\x12\
-    \x03\"\x02?\x1aT\x20Notification\x20configs\x20for\x20this\x20pipeline.\
-    \x20Only\x20filled\x20out\n\x20in\x20external\x20API\x20responses\n\"5\
-    \x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\
-    \x04\0\x02\x03\x04\x12\x03\"\x02\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
-    \"\x0b$\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\"%:\n\x0c\n\x05\x04\0\x02\
-    \x03\x03\x12\x03\"=>\n\xd2\x01\n\x02\x05\0\x12\x04(\05\x01\x1a\xc5\x01\
-    \x20A\x20condition\x20defines\x20how\x20the\x20SDK\x20should\x20handle\
-    \x20a\x20step\x20response\x20--\x20should\x20it\n\x20continue\x20executi\
-    ng\x20the\x20pipeline,\x20should\x20it\x20abort,\x20should\x20it\x20noti\
-    fy\x20the\x20server?\n\x20Each\x20step\x20can\x20have\x20multiple\x20con\
-    ditions.\n\n\n\n\x03\x05\0\x01\x12\x03(\x05\x1a\n\x0b\n\x04\x05\0\x02\0\
-    \x12\x03)\x02$\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03)\x02\x1f\n\x0c\n\x05\
-    \x05\0\x02\0\x02\x12\x03)\"#\n^\n\x04\x05\0\x02\x01\x12\x03,\x02,\x1aQ\
-    \x20Abort\x20executing\x20the\x20current\x20pipeline\x20AND\x20continue\
-    \x20executing\x20any\x20other\x20pipelines\n\n\x0c\n\x05\x05\0\x02\x01\
-    \x01\x12\x03,\x02'\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03,*+\n9\n\x04\x05\
-    \0\x02\x02\x12\x03/\x02%\x1a,\x20Notify\x20the\x20server\x20about\x20the\
-    \x20step\x20condition\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03/\x02\x20\n\
-    \x0c\n\x05\x05\0\x02\x02\x02\x12\x03/#$\n,\n\x04\x05\0\x02\x03\x12\x032\
-    \x02(\x1a\x1f\x20Abort\x20executing\x20ALL\x20pipelines\n\n\x0c\n\x05\
-    \x05\0\x02\x03\x01\x12\x032\x02#\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x032&\
-    '\n\x0b\n\x04\x05\0\x02\x04\x12\x034\x02.\n\x0c\n\x05\x05\0\x02\x04\x01\
-    \x12\x034\x02)\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x034,-\n=\n\x02\x04\x01\
-    \x12\x048\0Z\x01\x1a1\x20A\x20pipeline\x20step\x20is\x20a\x20single\x20s\
-    tep\x20in\x20a\x20pipeline.\n\n\n\n\x03\x04\x01\x01\x12\x038\x08\x14\n)\
-    \n\x04\x04\x01\x02\0\x12\x03:\x02\x12\x1a\x1c\x20Friendly\x20name\x20for\
-    \x20the\x20step\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03:\x02\x08\n\x0c\n\
-    \x05\x04\x01\x02\0\x01\x12\x03:\t\r\n\x0c\n\x05\x04\x01\x02\0\x03\x12\
-    \x03:\x10\x11\n[\n\x04\x04\x01\x02\x01\x12\x03=\x020\x1aN\x20SDKs\x20sho\
-    uld\x20read\x20this\x20when\x20WASM\x20returns\x20success\x20to\x20deter\
-    mine\x20what\x20to\x20do\x20next\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\
-    \x03=\x02\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03=\x0b\x20\n\x0c\n\x05\
-    \x04\x01\x02\x01\x01\x12\x03=!+\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03=\
-    ./\n[\n\x04\x04\x01\x02\x02\x12\x03@\x021\x1aN\x20SDKs\x20should\x20read\
-    \x20this\x20when\x20WASM\x20returns\x20failure\x20to\x20determine\x20wha\
-    t\x20to\x20do\x20next\n\n\x0c\n\x05\x04\x01\x02\x02\x04\x12\x03@\x02\n\n\
-    \x0c\n\x05\x04\x01\x02\x02\x06\x12\x03@\x0c!\n\x0c\n\x05\x04\x01\x02\x02\
-    \x01\x12\x03@\",\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03@/0\n^\n\x04\x04\
-    \x01\x02\x03\x12\x03C\x02\x13\x1aQ\x20Indicates\x20whether\x20to\x20use\
-    \x20the\x20results\x20from\x20a\x20previous\x20step\x20as\x20input\x20to\
-    \x20this\x20step\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03C\x02\x06\n\
-    \x0c\n\x05\x04\x01\x02\x03\x01\x12\x03C\x07\x0e\n\x0c\n\x05\x04\x01\x02\
-    \x03\x03\x12\x03C\x11\x12\n\x0c\n\x04\x04\x01\x08\0\x12\x04E\x02P\x03\n\
-    \x0c\n\x05\x04\x01\x08\0\x01\x12\x03E\x08\x0c\n\x0b\n\x04\x04\x01\x02\
-    \x04\x12\x03F\x04)\n\x0c\n\x05\x04\x01\x02\x04\x06\x12\x03F\x04\x17\n\
-    \x0c\n\x05\x04\x01\x02\x04\x01\x12\x03F\x18!\n\x0c\n\x05\x04\x01\x02\x04\
-    \x03\x12\x03F$(\n\x0b\n\x04\x04\x01\x02\x05\x12\x03G\x04)\n\x0c\n\x05\
-    \x04\x01\x02\x05\x06\x12\x03G\x04\x17\n\x0c\n\x05\x04\x01\x02\x05\x01\
-    \x12\x03G\x18!\n\x0c\n\x05\x04\x01\x02\x05\x03\x12\x03G$(\n\x0b\n\x04\
-    \x04\x01\x02\x06\x12\x03H\x04#\n\x0c\n\x05\x04\x01\x02\x06\x06\x12\x03H\
-    \x04\x14\n\x0c\n\x05\x04\x01\x02\x06\x01\x12\x03H\x15\x1b\n\x0c\n\x05\
-    \x04\x01\x02\x06\x03\x12\x03H\x1e\"\n\x0b\n\x04\x04\x01\x02\x07\x12\x03I\
-    \x04#\n\x0c\n\x05\x04\x01\x02\x07\x06\x12\x03I\x04\x14\n\x0c\n\x05\x04\
-    \x01\x02\x07\x01\x12\x03I\x15\x1b\n\x0c\n\x05\x04\x01\x02\x07\x03\x12\
-    \x03I\x1e\"\n\x0b\n\x04\x04\x01\x02\x08\x12\x03J\x04#\n\x0c\n\x05\x04\
-    \x01\x02\x08\x06\x12\x03J\x04\x14\n\x0c\n\x05\x04\x01\x02\x08\x01\x12\
-    \x03J\x15\x1b\n\x0c\n\x05\x04\x01\x02\x08\x03\x12\x03J\x1e\"\n\x0b\n\x04\
-    \x04\x01\x02\t\x12\x03K\x04.\n\x0c\n\x05\x04\x01\x02\t\x06\x12\x03K\x04\
-    \x19\n\x0c\n\x05\x04\x01\x02\t\x01\x12\x03K\x1a&\n\x0c\n\x05\x04\x01\x02\
-    \t\x03\x12\x03K)-\n\x0b\n\x04\x04\x01\x02\n\x12\x03L\x04\x1b\n\x0c\n\x05\
-    \x04\x01\x02\n\x06\x12\x03L\x04\x10\n\x0c\n\x05\x04\x01\x02\n\x01\x12\
-    \x03L\x11\x13\n\x0c\n\x05\x04\x01\x02\n\x03\x12\x03L\x16\x1a\n\x0b\n\x04\
-    \x04\x01\x02\x0b\x12\x03M\x04.\n\x0c\n\x05\x04\x01\x02\x0b\x06\x12\x03M\
-    \x04\x19\n\x0c\n\x05\x04\x01\x02\x0b\x01\x12\x03M\x1a&\n\x0c\n\x05\x04\
-    \x01\x02\x0b\x03\x12\x03M)-\n\x0b\n\x04\x04\x01\x02\x0c\x12\x03N\x04*\n\
-    \x0c\n\x05\x04\x01\x02\x0c\x06\x12\x03N\x04\x17\n\x0c\n\x05\x04\x01\x02\
-    \x0c\x01\x12\x03N\x18\"\n\x0c\n\x05\x04\x01\x02\x0c\x03\x12\x03N%)\n\x0b\
-    \n\x04\x04\x01\x02\r\x12\x03O\x048\n\x0c\n\x05\x04\x01\x02\r\x06\x12\x03\
-    O\x04\x1e\n\x0c\n\x05\x04\x01\x02\r\x01\x12\x03O\x1f0\n\x0c\n\x05\x04\
-    \x01\x02\r\x03\x12\x03O37\n}\n\x04\x04\x01\x02\x0e\x12\x03S\x02#\x1a9\
-    \x20ID\x20is\x20a\x20uuid(sha256(_wasm_bytes))\x20that\x20is\x20set\x20b\
-    y\x20server\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CA\
-    SE\n\n\x0c\n\x05\x04\x01\x02\x0e\x04\x12\x03S\x02\n\n\x0c\n\x05\x04\x01\
-    \x02\x0e\x05\x12\x03S\x0b\x11\n\x0c\n\x05\x04\x01\x02\x0e\x01\x12\x03S\
-    \x12\x1a\n\x0c\n\x05\x04\x01\x02\x0e\x03\x12\x03S\x1d\"\ng\n\x04\x04\x01\
-    \x02\x0f\x12\x03V\x02%\x1a#\x20WASM\x20module\x20bytes\x20(set\x20by\x20\
-    server)\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\
-    \n\x0c\n\x05\x04\x01\x02\x0f\x04\x12\x03V\x02\n\n\x0c\n\x05\x04\x01\x02\
-    \x0f\x05\x12\x03V\x0b\x10\n\x0c\n\x05\x04\x01\x02\x0f\x01\x12\x03V\x11\
-    \x1c\n\x0c\n\x05\x04\x01\x02\x0f\x03\x12\x03V\x1f$\ns\n\x04\x04\x01\x02\
-    \x10\x12\x03Y\x02)\x1a/\x20WASM\x20function\x20name\x20to\x20execute\x20\
-    (set\x20by\x20server)\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWE\
-    R_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\x10\x04\x12\x03Y\x02\n\n\x0c\n\
-    \x05\x04\x01\x02\x10\x05\x12\x03Y\x0b\x11\n\x0c\n\x05\x04\x01\x02\x10\
-    \x01\x12\x03Y\x12\x20\n\x0c\n\x05\x04\x01\x02\x10\x03\x12\x03Y#(b\x06pro\
-    to3\
+    ationConfigs\"\xe5\x01\n\x16PipelineStepConditions\x12,\n\x05abort\x18\
+    \x01\x20\x01(\x0e2\x16.protos.AbortConditionR\x05abort\x12\x16\n\x06noti\
+    fy\x18\x02\x20\x01(\x08R\x06notify\x12H\n\x08metadata\x18\x03\x20\x03(\
+    \x0b2,.protos.PipelineStepConditions.MetadataEntryR\x08metadata\x1a;\n\r\
+    MetadataEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05v\
+    alue\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\x80\x08\n\x0cPipelineStep\
+    \x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x12=\n\non_success\x18\
+    \x02\x20\x01(\x0b2\x1e.protos.PipelineStepConditionsR\tonSuccess\x12=\n\
+    \non_failure\x18\x03\x20\x01(\x0b2\x1e.protos.PipelineStepConditionsR\to\
+    nFailure\x12\x18\n\x07dynamic\x18\x04\x20\x01(\x08R\x07dynamic\x129\n\
+    \x08on_error\x18\x05\x20\x01(\x0b2\x1e.protos.PipelineStepConditionsR\
+    \x07onError\x12<\n\tdetective\x18\xe8\x07\x20\x01(\x0b2\x1b.protos.steps\
+    .DetectiveStepH\0R\tdetective\x12<\n\ttransform\x18\xe9\x07\x20\x01(\x0b\
+    2\x1b.protos.steps.TransformStepH\0R\ttransform\x123\n\x06encode\x18\xea\
+    \x07\x20\x01(\x0b2\x18.protos.steps.EncodeStepH\0R\x06encode\x123\n\x06d\
+    ecode\x18\xeb\x07\x20\x01(\x0b2\x18.protos.steps.DecodeStepH\0R\x06decod\
+    e\x123\n\x06custom\x18\xec\x07\x20\x01(\x0b2\x18.protos.steps.CustomStep\
+    H\0R\x06custom\x12C\n\x0chttp_request\x18\xed\x07\x20\x01(\x0b2\x1d.prot\
+    os.steps.HttpRequestStepH\0R\x0bhttpRequest\x12'\n\x02kv\x18\xee\x07\x20\
+    \x01(\x0b2\x14.protos.steps.KVStepH\0R\x02kv\x12C\n\x0cinfer_schema\x18\
+    \xef\x07\x20\x01(\x0b2\x1d.protos.steps.InferSchemaStepH\0R\x0binferSche\
+    ma\x12=\n\nvalid_json\x18\xf0\x07\x20\x01(\x0b2\x1b.protos.steps.ValidJS\
+    ONStepH\0R\tvalidJson\x12R\n\x11schema_validation\x18\xf1\x07\x20\x01(\
+    \x0b2\".protos.steps.SchemaValidationStepH\0R\x10schemaValidation\x12\
+    \x1e\n\x08_wasm_id\x18\x90N\x20\x01(\tH\x01R\x06WasmId\x88\x01\x01\x12$\
+    \n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBytes\x88\x01\x01\x12\
+    *\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWasmFunction\x88\x01\
+    \x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm_bytesB\x11\n\x0fX\
+    _wasm_function*m\n\x0eAbortCondition\x12\x19\n\x15ABORT_CONDITION_UNSET\
+    \x10\0\x12!\n\x1dABORT_CONDITION_ABORT_CURRENT\x10\x01\x12\x1d\n\x19ABOR\
+    T_CONDITION_ABORT_ALL\x10\x02B<Z:github.com/streamdal/streamdal/libs/pro\
+    tos/build/go/protosJ\xba\x1b\n\x06\x12\x04\0\0`\x01\n\x08\n\x01\x0c\x12\
+    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\
+    \x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\n\x02\x03\x02\x12\x03\
+    \x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\x03\x04\x12\x03\x08\0\
+    %\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\x12\x03\n\0*\n\t\n\
+    \x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\x0c\00\n\t\n\x02\
+    \x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\x08\n\x01\x08\x12\
+    \x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\n\x02\x04\0\x12\
+    \x04\x15\0#\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20structure\x20that\
+    \x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20This\x20structur\
+    e\n\x20is\x20intended\x20to\x20be\x20immutable;\x20clients\x20are\x20exp\
+    ected\x20to\x20generate\x20WASMRequest's\n\x20that\x20contain\x20a\x20pi\
+    peline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\n\x9f\x01\n\
+    \x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20should\x20NOT\
+    \x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20CreatePipelin\
+    eRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_does_\x20need\
+    \x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\x05\x04\0\
+    \x02\0\x05\x12\x03\x18\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x18\t\
+    \x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x18\x0e\x0f\n-\n\x04\x04\0\x02\
+    \x01\x12\x03\x1b\x02\x12\x1a\x20\x20Friendly\x20name\x20for\x20the\x20pi\
+    peline\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x1b\x02\x08\n\x0c\n\x05\
+    \x04\0\x02\x01\x01\x12\x03\x1b\t\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\
+    \x1b\x10\x11\n+\n\x04\x04\0\x02\x02\x12\x03\x1e\x02\"\x1a\x1e\x20One\x20\
+    or\x20more\x20steps\x20to\x20execute\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\
+    \x03\x1e\x02\n\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x1e\x0b\x17\n\x0c\n\
+    \x05\x04\0\x02\x02\x01\x12\x03\x1e\x18\x1d\n\x0c\n\x05\x04\0\x02\x02\x03\
+    \x12\x03\x1e\x20!\n\x98\x01\n\x04\x04\0\x02\x03\x12\x03\"\x02?\x1aT\x20N\
+    otification\x20configs\x20for\x20this\x20pipeline.\x20Only\x20filled\x20\
+    out\n\x20in\x20external\x20API\x20responses\n\"5\x20protolint:disable:th\
+    is\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\
+    \x03\"\x02\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\"\x0b$\n\x0c\n\x05\
+    \x04\0\x02\x03\x01\x12\x03\"%:\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\"=>\
+    \n\n\n\x02\x05\0\x12\x04%\0)\x01\n\n\n\x03\x05\0\x01\x12\x03%\x05\x13\n\
+    \x0b\n\x04\x05\0\x02\0\x12\x03&\x02\x1c\n\x0c\n\x05\x05\0\x02\0\x01\x12\
+    \x03&\x02\x17\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03&\x1a\x1b\n\x0b\n\x04\
+    \x05\0\x02\x01\x12\x03'\x02$\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03'\x02\
+    \x1f\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03'\"#\n\x0b\n\x04\x05\0\x02\x02\
+    \x12\x03(\x02\x20\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03(\x02\x1b\n\x0c\n\
+    \x05\x05\0\x02\x02\x02\x12\x03(\x1e\x1f\n\x82\x02\n\x02\x04\x01\x12\x04/\
+    \08\x01\x1a\xf5\x01\x20Conditions\x20define\x20how\x20the\x20SDK\x20shou\
+    ld\x20handle\x20a\x20Wasm\x20response\x20in\x20a\x20step.\n\x20Should\
+    \x20it\x20continue\x20executing\x20the\x20pipeline,\x20should\x20it\x20a\
+    bort,\x20should\x20it\x20notify\n\x20the\x20server?\x20Each\x20step\x20c\
+    an\x20have\x20exactly\x20one\x20of\x20these\x20for\x20on_success,\x20on_\
+    failure\n\x20and\x20on_error.\n\n\n\n\x03\x04\x01\x01\x12\x03/\x08\x1e\n\
+    )\n\x04\x04\x01\x02\0\x12\x031\x02\x1b\x1a\x1c\x20Should\x20we\x20abort\
+    \x20execution?\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x031\x02\x10\n\x0c\n\
+    \x05\x04\x01\x02\0\x01\x12\x031\x11\x16\n\x0c\n\x05\x04\x01\x02\0\x03\
+    \x12\x031\x19\x1a\n0\n\x04\x04\x01\x02\x01\x12\x034\x02\x12\x1a#\x20Shou\
+    ld\x20we\x20trigger\x20a\x20notification?\n\n\x0c\n\x05\x04\x01\x02\x01\
+    \x05\x12\x034\x02\x06\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x034\x07\r\n\
+    \x0c\n\x05\x04\x01\x02\x01\x03\x12\x034\x10\x11\nW\n\x04\x04\x01\x02\x02\
+    \x12\x037\x02#\x1aJ\x20Should\x20we\x20include\x20additional\x20metadata\
+    \x20that\x20SDK\x20should\x20pass\x20back\x20to\x20user?\n\n\x0c\n\x05\
+    \x04\x01\x02\x02\x06\x12\x037\x02\x15\n\x0c\n\x05\x04\x01\x02\x02\x01\
+    \x12\x037\x16\x1e\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x037!\"\n=\n\x02\
+    \x04\x02\x12\x04;\0`\x01\x1a1\x20A\x20pipeline\x20step\x20is\x20a\x20sin\
+    gle\x20step\x20in\x20a\x20pipeline.\n\n\n\n\x03\x04\x02\x01\x12\x03;\x08\
+    \x14\n)\n\x04\x04\x02\x02\0\x12\x03=\x02\x12\x1a\x1c\x20Friendly\x20name\
+    \x20for\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03=\x02\x08\
+    \n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03=\t\r\n\x0c\n\x05\x04\x02\x02\0\
+    \x03\x12\x03=\x10\x11\n[\n\x04\x04\x02\x02\x01\x12\x03@\x02(\x1aN\x20SDK\
+    s\x20should\x20read\x20this\x20when\x20WASM\x20returns\x20success\x20to\
+    \x20determine\x20what\x20to\x20do\x20next\n\n\x0c\n\x05\x04\x02\x02\x01\
+    \x06\x12\x03@\x02\x18\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x03@\x19#\n\
+    \x0c\n\x05\x04\x02\x02\x01\x03\x12\x03@&'\n[\n\x04\x04\x02\x02\x02\x12\
+    \x03C\x02(\x1aN\x20SDKs\x20should\x20read\x20this\x20when\x20WASM\x20ret\
+    urns\x20failure\x20to\x20determine\x20what\x20to\x20do\x20next\n\n\x0c\n\
+    \x05\x04\x02\x02\x02\x06\x12\x03C\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\
+    \x01\x12\x03C\x19#\n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x03C&'\n^\n\x04\
+    \x04\x02\x02\x03\x12\x03F\x02\x13\x1aQ\x20Indicates\x20whether\x20to\x20\
+    use\x20the\x20results\x20from\x20a\x20previous\x20step\x20as\x20input\
+    \x20to\x20this\x20step\n\n\x0c\n\x05\x04\x02\x02\x03\x05\x12\x03F\x02\
+    \x06\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\x03F\x07\x0e\n\x0c\n\x05\x04\
+    \x02\x02\x03\x03\x12\x03F\x11\x12\nY\n\x04\x04\x02\x02\x04\x12\x03I\x02&\
+    \x1aL\x20SDKs\x20should\x20read\x20this\x20when\x20WASM\x20returns\x20er\
+    ror\x20to\x20determine\x20what\x20to\x20do\x20next\n\n\x0c\n\x05\x04\x02\
+    \x02\x04\x06\x12\x03I\x02\x18\n\x0c\n\x05\x04\x02\x02\x04\x01\x12\x03I\
+    \x19!\n\x0c\n\x05\x04\x02\x02\x04\x03\x12\x03I$%\n\x0c\n\x04\x04\x02\x08\
+    \0\x12\x04K\x02V\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\x03K\x08\x0c\n\
+    \x0b\n\x04\x04\x02\x02\x05\x12\x03L\x04)\n\x0c\n\x05\x04\x02\x02\x05\x06\
+    \x12\x03L\x04\x17\n\x0c\n\x05\x04\x02\x02\x05\x01\x12\x03L\x18!\n\x0c\n\
+    \x05\x04\x02\x02\x05\x03\x12\x03L$(\n\x0b\n\x04\x04\x02\x02\x06\x12\x03M\
+    \x04)\n\x0c\n\x05\x04\x02\x02\x06\x06\x12\x03M\x04\x17\n\x0c\n\x05\x04\
+    \x02\x02\x06\x01\x12\x03M\x18!\n\x0c\n\x05\x04\x02\x02\x06\x03\x12\x03M$\
+    (\n\x0b\n\x04\x04\x02\x02\x07\x12\x03N\x04#\n\x0c\n\x05\x04\x02\x02\x07\
+    \x06\x12\x03N\x04\x14\n\x0c\n\x05\x04\x02\x02\x07\x01\x12\x03N\x15\x1b\n\
+    \x0c\n\x05\x04\x02\x02\x07\x03\x12\x03N\x1e\"\n\x0b\n\x04\x04\x02\x02\
+    \x08\x12\x03O\x04#\n\x0c\n\x05\x04\x02\x02\x08\x06\x12\x03O\x04\x14\n\
+    \x0c\n\x05\x04\x02\x02\x08\x01\x12\x03O\x15\x1b\n\x0c\n\x05\x04\x02\x02\
+    \x08\x03\x12\x03O\x1e\"\n\x0b\n\x04\x04\x02\x02\t\x12\x03P\x04#\n\x0c\n\
+    \x05\x04\x02\x02\t\x06\x12\x03P\x04\x14\n\x0c\n\x05\x04\x02\x02\t\x01\
+    \x12\x03P\x15\x1b\n\x0c\n\x05\x04\x02\x02\t\x03\x12\x03P\x1e\"\n\x0b\n\
+    \x04\x04\x02\x02\n\x12\x03Q\x04.\n\x0c\n\x05\x04\x02\x02\n\x06\x12\x03Q\
+    \x04\x19\n\x0c\n\x05\x04\x02\x02\n\x01\x12\x03Q\x1a&\n\x0c\n\x05\x04\x02\
+    \x02\n\x03\x12\x03Q)-\n\x0b\n\x04\x04\x02\x02\x0b\x12\x03R\x04\x1b\n\x0c\
+    \n\x05\x04\x02\x02\x0b\x06\x12\x03R\x04\x10\n\x0c\n\x05\x04\x02\x02\x0b\
+    \x01\x12\x03R\x11\x13\n\x0c\n\x05\x04\x02\x02\x0b\x03\x12\x03R\x16\x1a\n\
+    \x0b\n\x04\x04\x02\x02\x0c\x12\x03S\x04.\n\x0c\n\x05\x04\x02\x02\x0c\x06\
+    \x12\x03S\x04\x19\n\x0c\n\x05\x04\x02\x02\x0c\x01\x12\x03S\x1a&\n\x0c\n\
+    \x05\x04\x02\x02\x0c\x03\x12\x03S)-\n\x0b\n\x04\x04\x02\x02\r\x12\x03T\
+    \x04*\n\x0c\n\x05\x04\x02\x02\r\x06\x12\x03T\x04\x17\n\x0c\n\x05\x04\x02\
+    \x02\r\x01\x12\x03T\x18\"\n\x0c\n\x05\x04\x02\x02\r\x03\x12\x03T%)\n\x0b\
+    \n\x04\x04\x02\x02\x0e\x12\x03U\x048\n\x0c\n\x05\x04\x02\x02\x0e\x06\x12\
+    \x03U\x04\x1e\n\x0c\n\x05\x04\x02\x02\x0e\x01\x12\x03U\x1f0\n\x0c\n\x05\
+    \x04\x02\x02\x0e\x03\x12\x03U37\n}\n\x04\x04\x02\x02\x0f\x12\x03Y\x02#\
+    \x1a9\x20ID\x20is\x20a\x20uuid(sha256(_wasm_bytes))\x20that\x20is\x20set\
+    \x20by\x20server\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNA\
+    KE_CASE\n\n\x0c\n\x05\x04\x02\x02\x0f\x04\x12\x03Y\x02\n\n\x0c\n\x05\x04\
+    \x02\x02\x0f\x05\x12\x03Y\x0b\x11\n\x0c\n\x05\x04\x02\x02\x0f\x01\x12\
+    \x03Y\x12\x1a\n\x0c\n\x05\x04\x02\x02\x0f\x03\x12\x03Y\x1d\"\ng\n\x04\
+    \x04\x02\x02\x10\x12\x03\\\x02%\x1a#\x20WASM\x20module\x20bytes\x20(set\
+    \x20by\x20server)\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SN\
+    AKE_CASE\n\n\x0c\n\x05\x04\x02\x02\x10\x04\x12\x03\\\x02\n\n\x0c\n\x05\
+    \x04\x02\x02\x10\x05\x12\x03\\\x0b\x10\n\x0c\n\x05\x04\x02\x02\x10\x01\
+    \x12\x03\\\x11\x1c\n\x0c\n\x05\x04\x02\x02\x10\x03\x12\x03\\\x1f$\ns\n\
+    \x04\x04\x02\x02\x11\x12\x03_\x02)\x1a/\x20WASM\x20function\x20name\x20t\
+    o\x20execute\x20(set\x20by\x20server)\n\"5\x20protolint:disable:this\x20\
+    FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x02\x02\x11\x04\x12\x03_\
+    \x02\n\n\x0c\n\x05\x04\x02\x02\x11\x05\x12\x03_\x0b\x11\n\x0c\n\x05\x04\
+    \x02\x02\x11\x01\x12\x03_\x12\x20\n\x0c\n\x05\x04\x02\x02\x11\x03\x12\
+    \x03_#(b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1442,11 +1640,12 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::sp_steps_schema_validation::file_descriptor().clone());
             deps.push(super::sp_steps_transform::file_descriptor().clone());
             deps.push(super::sp_steps_valid_json::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(2);
+            let mut messages = ::std::vec::Vec::with_capacity(3);
             messages.push(Pipeline::generated_message_descriptor_data());
+            messages.push(PipelineStepConditions::generated_message_descriptor_data());
             messages.push(PipelineStep::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
-            enums.push(PipelineStepCondition::generated_enum_descriptor_data());
+            enums.push(AbortCondition::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
