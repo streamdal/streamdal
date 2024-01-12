@@ -1,6 +1,5 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import {
-  defaultTailSampleRate,
   tailEnabledSignal,
   tailPausedSignal,
   tailSamplingSignal,
@@ -11,6 +10,11 @@ import * as z from "zod/index.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { validate } from "../form/validate.ts";
 
+export const defaultTailSampleRate = {
+  rate: 25,
+  intervalSeconds: 1,
+};
+
 export const SampleRateSchema = zfd.formData({
   rate: zfd.numeric(z.number().min(1)),
   intervalSeconds: zfd.numeric(z.number().min(1)),
@@ -20,7 +24,7 @@ export const SampleRateSchema = zfd.formData({
       defaultTailSampleRate.rate;
   },
   {
-    message: "Max rate is 25/second",
+    message: `Max rate is ${defaultTailSampleRate.rate}/second`,
     path: ["rate"],
   },
 );

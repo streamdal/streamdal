@@ -10,10 +10,8 @@ import * as uuid from "$std/uuid/mod.ts";
 import { effect, signal } from "@preact/signals";
 import { client } from "./grpc.ts";
 import { GRPC_TOKEN } from "./configs.ts";
-import {
-  defaultTailSampleRate,
-  TailSampleRate,
-} from "../islands/drawer/tail.tsx";
+import { TailSampleRate } from "../islands/drawer/tail.tsx";
+import { defaultTailSampleRate } from "../components/modals/tailRateModal.tsx";
 
 export const tailAbortSignal = signal<boolean>(false);
 

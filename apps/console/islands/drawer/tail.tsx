@@ -14,6 +14,7 @@ import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { initFlowbite } from "flowbite";
+import { defaultTailSampleRate } from "../../components/modals/tailRateModal.tsx";
 
 export const MAX_TAIL_SIZE = 200;
 
@@ -28,11 +29,10 @@ export const tailSignal = signal<TailData[] | null>(
 export const tailSocketSignal = signal<WebSocket | null>(null);
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
-export const defaultTailSampleRate = {
-  rate: 25,
-  intervalSeconds: 1,
-};
-export const tailSamplingSignal = signal<TailSampleRate>(defaultTailSampleRate);
+export const tailSamplingSignal = signal<TailSampleRate>({
+  rate: defaultTailSampleRate.rate,
+  intervalSeconds: defaultTailSampleRate.intervalSeconds,
+});
 export const tailDiffSignal = signal<boolean>(false);
 
 export type TailData = { timestamp: Date; data: string; originalData: string };
