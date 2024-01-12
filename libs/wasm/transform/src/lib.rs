@@ -15,6 +15,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 None,
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 format!("unable to read request: {}", e),
             );
@@ -24,6 +25,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         common::write_response(
+            None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
@@ -36,6 +38,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(req) => req,
         Err(e) => {
             return common::write_response(
+                None,
                 None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
@@ -56,6 +59,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 None,
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 "Unknown transform type".to_string(),
             )
@@ -67,10 +71,12 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(data) => common::write_response(
             Some(&data.into_bytes()),
             None,
+            None,
             WASMExitCode::WASM_EXIT_CODE_SUCCESS,
             "Successfully transformed payload".to_string(),
         ),
         Err(err) => common::write_response(
+            None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,

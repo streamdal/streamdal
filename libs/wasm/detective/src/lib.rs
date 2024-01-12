@@ -1,6 +1,7 @@
 use protobuf::EnumOrUnknown;
 use protos::sp_steps_detective::DetectiveType;
-use protos::sp_wsm::{WASMExitCode, WASMRequest};
+use protos::sp_wsm::inter_step_result::Input_from;
+use protos::sp_wsm::{InterStepResult, WASMExitCode, WASMRequest};
 use streamdal_wasm_detective::detective::{Detective, Request};
 
 #[no_mangle]
@@ -12,6 +13,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 None,
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 format!("unable to read request: {}", e),
             );
@@ -21,6 +23,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         common::write_response(
+            None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
@@ -36,19 +39,31 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(match_result) => {
             let mut exit_code = WASMExitCode::WASM_EXIT_CODE_FAILURE;
 
-            if match_result {
+            if !match_result.is_empty() {
                 exit_code = WASMExitCode::WASM_EXIT_CODE_SUCCESS;
             }
+
+            let isr = InterStepResult {
+                input_from: Some(Input_from::DetectiveResult(
+                    protos::sp_steps_detective::DetectiveStepResult {
+                        matches: match_result,
+                        special_fields: Default::default(),
+                    },
+                )),
+                special_fields: Default::default(),
+            };
 
             common::write_response(
                 Some(&req.data),
                 None,
+                Some(isr),
                 exit_code,
                 "completed detective run".to_string(),
             )
         }
         Err(e) => common::write_response(
             Some(&req.data),
+            None,
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
             e.to_string(),
@@ -57,11 +72,12 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 }
 
 fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
-    let path = match wasm_request.step.detective().path.clone() {
-        Some(p) => p,
-        None => "".to_string(),
-    };
-
+    let path = wasm_request
+        .step
+        .detective()
+        .path
+        .clone()
+        .unwrap_or_else(|| "".to_string());
 
     Request {
         match_type: wasm_request.step.detective().type_.clone().unwrap(),

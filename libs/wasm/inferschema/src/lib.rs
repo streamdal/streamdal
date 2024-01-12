@@ -1,6 +1,6 @@
-use std::str::from_utf8;
-use protos::sp_wsm::{WASMExitCode, WASMRequest};
 use infers_jsonschema::infer;
+use protos::sp_wsm::{WASMExitCode, WASMRequest};
+use std::str::from_utf8;
 
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
@@ -9,6 +9,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(req) => req,
         Err(e) => {
             return common::write_response(
+                None,
                 None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
@@ -22,6 +23,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         return common::write_response(
             Some(wasm_request.input_payload.as_slice()),
             None,
+            None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
             format!("invalid step: {}", err.to_string()),
         );
@@ -32,6 +34,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Err(err) => {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
+                None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 format!("invalid payload json: {}", err.to_string()),
@@ -44,6 +47,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Err(err) => {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
+                None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 format!("invalid payload json: {}", err.to_string()),
@@ -58,28 +62,35 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         return common::write_response(
             Some(wasm_request.input_payload.as_slice()),
             Some(payload_schema.clone().to_string().as_bytes()),
+            None,
             WASMExitCode::WASM_EXIT_CODE_SUCCESS,
             "inferred fresh schema".to_string(),
         );
     }
 
-    let current_schema_data = match from_utf8(wasm_request.step.infer_schema().current_schema.as_slice()) {
-        Ok(json) => json,
-        Err(err) => {
-            return common::write_response(
-                Some(wasm_request.input_payload.as_slice()),
-                None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("unable to parse current schema into string: {}", err.to_string()),
-            );
-        }
-    };
+    let current_schema_data =
+        match from_utf8(wasm_request.step.infer_schema().current_schema.as_slice()) {
+            Ok(json) => json,
+            Err(err) => {
+                return common::write_response(
+                    Some(wasm_request.input_payload.as_slice()),
+                    None,
+                    None,
+                    WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                    format!(
+                        "unable to parse current schema into string: {}",
+                        err.to_string()
+                    ),
+                );
+            }
+        };
 
     let current_schema = match serde_json::from_str(current_schema_data) {
         Ok(json) => json,
         Err(err) => {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
+                None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 format!("unable to parse current schema json: {}", err.to_string()),
@@ -88,26 +99,25 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     };
 
     // Perform diff
-    let diff = serde_json_diff::values(
-        payload_schema.clone(),
-        current_schema,
-    );
+    let diff = serde_json_diff::values(payload_schema.clone(), current_schema);
 
     if diff.is_some() {
         return common::write_response(
             Some(wasm_request.input_payload.as_slice()),
             Some(payload_schema.clone().to_string().as_bytes()),
+            None,
             WASMExitCode::WASM_EXIT_CODE_SUCCESS,
             "schema has changed".to_string(),
-        )
+        );
     }
 
     return common::write_response(
         Some(wasm_request.input_payload.as_slice()),
         None,
+        None,
         WASMExitCode::WASM_EXIT_CODE_SUCCESS,
         "schema has not changed".to_string(),
-    )
+    );
 }
 
 fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
