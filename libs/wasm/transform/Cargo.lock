@@ -216,9 +216,7 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b14ae37d559edc3dfe89ca83dc0558aee1eedaf0b5f4fa5f05168e240dc795b9"
+version = "0.1.13"
 dependencies = [
  "protobuf",
 ]
@@ -226,8 +224,6 @@ dependencies = [
 [[package]]
 name = "streamdal-wasm-transform"
 version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68a483d62df607e831f0fc5c6bdc9a63809cfb6743bce5e85a300778296f9e9b"
 dependencies = [
  "conv",
  "serde_json",

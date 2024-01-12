@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 protobuf = "3.2.0"
-streamdal-protos = "0.1.10"
-streamdal-wasm-transform = "0.1.5"
+streamdal-protos = { path="../../protos/build/rust/protos" }
+streamdal-wasm-transform = { path="../../wasm-transform" }
 common = { path = "../common" }
 
 [profile.release]

@@ -1,12 +1,12 @@
 use crate::error::CustomError;
+use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
-use crate::{matcher_core as core};
 
-use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType};
 use std::str;
 
-type MatcherFunc = fn (&Request, gjson::Value) -> Result<bool, CustomError>;
+type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
 
@@ -30,7 +30,7 @@ impl Detective {
         // env_logger::init();
         Detective {}
     }
-    pub fn matches(&self, request: &Request) -> Result<bool, CustomError> {
+    pub fn matches(&self, request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         validate_request(request)?;
 
         if !request.path.is_empty() {
@@ -42,32 +42,39 @@ impl Detective {
         }
     }
 
-    pub fn matches_payload(&self, request: &Request) -> Result<bool, CustomError> {
+    pub fn matches_payload(
+        &self,
+        request: &Request,
+    ) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         let data_as_str = str::from_utf8(request.data)
             .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
         let obj = gjson::parse(data_as_str);
 
-        let mut found: bool = false;
+        let mut res = Vec::<DetectiveStepResultMatch>::new();
 
         let f = Detective::get_matcher_func(request)?;
 
-        obj.each(|_, value| {
-            let res = recurse_field(request, value, f);
-            if res {
-                found = true;
+        obj.each(|key, value| {
+            // Since we're recursing through the whole payload, we need to keep track of where we are
+            // This value should be cloned for each recursive call.
+            let cur_path = vec![key.to_string()];
+
+            let matches = recurse_field(request, value, f, cur_path);
+            if !matches.is_empty() {
+                res.extend(matches);
             }
+
             true
         });
 
-        if found {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
+        Ok(res)
     }
 
-    pub fn matches_path(&self, request: &Request) -> Result<bool, CustomError> {
+    pub fn matches_path(
+        &self,
+        request: &Request,
+    ) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         // parse_field() will return an error if the path is not found
         // but for this single check, we don't want to error out
         let field: gjson::Value = if request.match_type == DetectiveType::DETECTIVE_TYPE_HAS_FIELD {
@@ -85,28 +92,74 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_IS_TYPE,
         ];
         if ignore_array.contains(&request.match_type) {
-            return f(request, field);
+            // Avoiding borrow, gjson::Value does not support cloning
+            let v = gjson::parse(field.json());
+
+            match f(request, v) {
+                Ok(found) => {
+                    if found {
+                        let result = DetectiveStepResultMatch {
+                            type_: ::protobuf::EnumOrUnknown::new(request.match_type),
+                            path: request.path.clone(),
+                            value: field.str().to_owned().into_bytes(),
+                            special_fields: Default::default(),
+                        };
+
+                        return Ok(vec![result]);
+                    }
+                }
+                Err(e) => return Err(e),
+            }
+
+            return Ok(Vec::new());
         }
 
         // We've received multiple results, probably from a wildcard query
         // so we need to iterate over each one and check if any of them match
         if field.kind() == gjson::Kind::Array {
-            let mut found: bool = false;
+            let mut results = Vec::<DetectiveStepResultMatch>::new();
 
             field.each(|_, value| {
-                if let Ok(res) = f(request, value) {
-                    if res {
-                        found = true;
-                        return false // Don't need to iterate further
+                if let Ok(found) = f(request, value) {
+                    if found {
+                        let result = DetectiveStepResultMatch {
+                            type_: ::protobuf::EnumOrUnknown::new(request.match_type),
+                            path: request.path.clone(),
+                            value: field.str().to_owned().into_bytes(),
+                            special_fields: Default::default(),
+                        };
+
+                        results.push(result);
+
+                        return false; // Don't need to iterate further
                     }
                 }
                 true
             });
 
-            return Ok(found);
+            return Ok(results);
         }
 
-        f(request, field)
+        // Avoiding borrow, gjson::Value does not support cloning
+        let v = gjson::parse(field.json());
+
+        match f(request, v) {
+            Ok(found) => {
+                if found {
+                    let result = DetectiveStepResultMatch {
+                        type_: ::protobuf::EnumOrUnknown::new(request.match_type),
+                        path: request.path.clone(),
+                        value: field.str().to_owned().into_bytes(),
+                        special_fields: Default::default(),
+                    };
+
+                    return Ok(vec![result]);
+                }
+
+                Ok(Vec::new())
+            }
+            Err(e) => Err(e),
+        }
     }
 
     fn get_matcher_func(request: &Request) -> Result<MatcherFunc, CustomError> {
@@ -167,17 +220,14 @@ impl Detective {
                 return Err(CustomError::Error(
                     "match type cannot be unknown".to_string(),
                 ))
-            },
+            }
         };
 
         Ok(f)
     }
 }
 
-pub fn parse_field<'a>(
-    data: &'a [u8],
-    path: &'a String,
-) -> Result<gjson::Value<'a>, CustomError> {
+pub fn parse_field<'a>(data: &'a [u8], path: &'a String) -> Result<gjson::Value<'a>, CustomError> {
     let data_as_str = str::from_utf8(data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
@@ -217,42 +267,64 @@ fn validate_request(request: &Request) -> Result<(), CustomError> {
 
     Ok(())
 }
-fn recurse_field(request: &Request, val: gjson::Value, f: MatcherFunc) -> bool {
+fn recurse_field(
+    request: &Request,
+    val: gjson::Value,
+    f: MatcherFunc,
+    path: Vec<String>,
+) -> Vec<DetectiveStepResultMatch> {
+    let mut res: Vec<DetectiveStepResultMatch> = Vec::new();
+
     match val.kind() {
         gjson::Kind::String | gjson::Kind::Number | gjson::Kind::True | gjson::Kind::False => {
-            if let Ok(res) = f(request, val) {
-                return res;
+            // Avoiding borrow, gjson::Value does not support cloning
+            let v = gjson::parse(val.json());
+
+            if let Ok(found) = f(request, v) {
+                if found {
+                    let result = DetectiveStepResultMatch {
+                        type_: ::protobuf::EnumOrUnknown::new(request.match_type),
+                        path: path.join("."),
+                        value: val.str().to_owned().into_bytes(),
+                        special_fields: Default::default(),
+                    };
+
+                    res.push(result);
+                }
             }
         }
 
         gjson::Kind::Object => {
-            let mut found: bool = false;
-            val.each(|_, value| {
-                if recurse_field(request, value, f) {
-                    found = true;
+            val.each(|key, value| {
+                let mut cur_path = path.clone();
+                cur_path.push(key.to_string());
+
+                let matches = recurse_field(request, value, f, cur_path.clone());
+                if !matches.is_empty() {
+                    res.extend(matches);
                 }
                 true
             });
-
-            if found {
-                return true;
-            }
         }
         gjson::Kind::Array => {
-            let mut found: bool = false;
+            let mut idx = 0;
             val.each(|_, value| {
-                if recurse_field(request,value, f) {
-                    found = true;
+                let mut cur_path = path.clone();
+                cur_path.push(idx.to_string());
+                let matches = recurse_field(request, value, f, cur_path.clone());
+                if !matches.is_empty() {
+                    res.extend(matches);
                 }
+
+                idx += 1;
+
                 true
             });
 
-            if found {
-                return true;
-            }
+            return res;
         }
         _ => {} // Don't care about nulls
     }
 
-    false
+    res
 }

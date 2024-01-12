@@ -13,6 +13,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 None,
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 e.to_string(),
             );
@@ -23,6 +24,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_response(
             Some(wasm_request.input_payload.as_slice()),
+            None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
             format!("invalid step: {}", err.to_string()),
@@ -40,6 +42,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 "schema type is required".to_string(),
             );
@@ -53,8 +56,9 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("invalid payload json: {}", err.to_string()),
+                format!("invalid payload json: {}", err),
             );
         }
     };
@@ -68,8 +72,9 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
-                format!("invalid json schema: {}", err.to_string()),
+                format!("invalid json schema: {}", err),
             );
         }
     };
@@ -79,6 +84,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
         Err(err) => {
             return common::write_response(
                 Some(wasm_request.input_payload.as_slice()),
+                None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FAILURE,
                 format!("invalid json schema: {}", err),
@@ -116,12 +122,14 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
                     None,
+                    None,
                     WASMExitCode::WASM_EXIT_CODE_SUCCESS,
                     "payload matches schema".to_string(),
                 )
             } else {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
+                    None,
                     None,
                     WASMExitCode::WASM_EXIT_CODE_FAILURE,
                     format!(
@@ -136,12 +144,14 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
                     None,
+                    None,
                     WASMExitCode::WASM_EXIT_CODE_FAILURE,
                     "payload matches schema".to_string(),
                 )
             } else {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
+                    None,
                     None,
                     WASMExitCode::WASM_EXIT_CODE_SUCCESS,
                     format!(
@@ -153,6 +163,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
         }
         SCHEMA_VALIDATION_CONDITION_UNKNOWN => common::write_response(
             Some(wasm_request.input_payload.as_slice()),
+            None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
             "schema validation condition is required".to_string(),
@@ -187,7 +198,7 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
                 .json_schema()
                 .draft
                 .enum_value_or_default()
-                == JSON_SCHEMA_DRAFT_UNKNOWN
+                == JSONSCHEMA_DRAFT_UNKNOWN
             {
                 return Err("json_schema draft is required".to_string());
             }
@@ -202,9 +213,9 @@ fn draft_from_proto(
     draft: protos::sp_steps_schema_validation::JSONSchemaDraft,
 ) -> jsonschema_valid::schemas::Draft {
     match draft {
-        JSON_SCHEMA_DRAFT_04 => Draft4,
-        JSON_SCHEMA_DRAFT_06 => Draft6,
-        JSON_SCHEMA_DRAFT_07 => Draft7,
+        JSONSCHEMA_DRAFT_04 => Draft4,
+        JSONSCHEMA_DRAFT_06 => Draft6,
+        JSONSCHEMA_DRAFT_07 => Draft7,
         _ => Draft7,
     }
 }

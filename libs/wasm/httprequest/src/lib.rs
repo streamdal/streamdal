@@ -16,6 +16,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             return common::write_response(
                 None,
                 None,
+                None,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
                 e.to_string(),
             );
@@ -25,6 +26,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_response(
+            None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
@@ -37,6 +39,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(bytes) => bytes,
         Err(e) => {
             return common::write_response(
+                None,
                 None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
@@ -70,6 +73,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
                     Some(&res.body),
+                    None,
                     WASMExitCode::WASM_EXIT_CODE_FAILURE,
                     format!("Request returned non-200 response code: {}", res.code),
                 )
@@ -77,12 +81,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 common::write_response(
                     Some(wasm_request.input_payload.as_slice()),
                     Some(&res.body),
+                    None,
                     WASMExitCode::WASM_EXIT_CODE_SUCCESS,
                     "completed http request".to_string(),
                 )
             }
         }
         Err(e) => common::write_response(
+            None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,

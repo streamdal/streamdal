@@ -47,7 +47,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     if wasm_request.step.kv().mode == EnumOrUnknown::from(KVMode::KV_MODE_DYNAMIC) {
         // Lookup what the actual key will be by looking at the value in the JSON path
         match detective::parse_field(wasm_request.input_payload.as_slice(), &step.key) {
-            Ok(key_contents) => step.key = key_contents,
+            Ok(key_contents) => step.key = key_contents.to_string(),
             Err(err) => {
                 return common::write_error_response(
                     WASMExitCode::WASM_EXIT_CODE_FAILURE, // TODO: This should be exit code from parse call
@@ -81,7 +81,6 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     let host_res_ptr = (host_res >> 32) as *mut u8;
     let host_res_len = host_res as u32;
     let kv_resp_bytes = common::read_memory_with_length(host_res_ptr, host_res_len as usize);
-
 
     // Deallocate request memory
     unsafe {
@@ -124,12 +123,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         common::write_response(
             Some(wasm_request.input_payload.as_slice()),
             Some(kv_step_response.value.unwrap().as_slice()),
+            None,
             wasm_exit_code,
             format!("kv step response: {:?}", kv_step_response.message),
         )
     } else {
         common::write_response(
             Some(wasm_request.input_payload.as_slice()),
+            None,
             None,
             wasm_exit_code,
             format!("kv step response: {:?}", kv_step_response.message),

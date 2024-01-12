@@ -20,7 +20,7 @@ fn string_tests() {
                 args: vec!["value".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "string should equal".to_string(),
             should_error: false,
         },
@@ -32,7 +32,7 @@ fn string_tests() {
                 args: vec!["should not match".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "string should not equals".to_string(),
             should_error: false,
         },
@@ -44,7 +44,7 @@ fn string_tests() {
                 args: vec!["foo".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "bad path should error".to_string(),
             should_error: true,
         },
@@ -59,7 +59,7 @@ fn string_tests() {
                 args: vec!["va".to_string(), "lue".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "string should contain all".to_string(),
             should_error: false,
         },
@@ -71,7 +71,7 @@ fn string_tests() {
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "string should NOT contain all".to_string(),
             should_error: false,
         },
@@ -84,7 +84,7 @@ fn string_tests() {
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "string should contain any".to_string(),
             should_error: false,
         },
@@ -96,8 +96,21 @@ fn string_tests() {
                 args: vec!["vvvva".to_string().to_string(), "lueeeeeeee".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "string should NOT contain any".to_string(),
+            should_error: false,
+        },
+        // Returns multiple matches
+        test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+                data: &test_utils::SAMPLE_JSON_BYTES,
+                path: "".to_string(),
+                args: vec!["example".to_string()],
+                negate: false,
+            },
+            expected_matches: 6,
+            text: "find multiple string matches".to_string(),
             should_error: false,
         },
     ];
@@ -117,7 +130,7 @@ fn is_empty() {
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "empty string should be empty".to_string(),
             should_error: false,
         },
@@ -129,7 +142,7 @@ fn is_empty() {
                 args: vec![],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "null field should be considered empty".to_string(),
             should_error: false,
         },
@@ -141,7 +154,7 @@ fn is_empty() {
                 args: vec![],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "empty array should be considered empty".to_string(),
             should_error: false,
         },
@@ -153,7 +166,7 @@ fn is_empty() {
                 args: vec![],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "non-existent path should error".to_string(),
             should_error: true,
         },
@@ -165,7 +178,7 @@ fn is_empty() {
                 args: vec![],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "Non-empty string should be false".to_string(),
             should_error: false,
         },
@@ -177,7 +190,7 @@ fn is_empty() {
                 args: vec![],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "Non-empty array should be false".to_string(),
             should_error: false,
         },
@@ -197,7 +210,7 @@ fn has_field() {
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field exists, should return true".to_string(),
             should_error: false,
         },
@@ -209,7 +222,7 @@ fn has_field() {
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field does not exist - should return false".to_string(),
             should_error: false,
         },
@@ -229,7 +242,7 @@ fn is_type() {
                 args: vec!["string".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should be of string type".to_string(),
             should_error: false,
         },
@@ -241,7 +254,7 @@ fn is_type() {
                 args: vec!["bool".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should be of boolean type".to_string(),
             should_error: false,
         },
@@ -253,7 +266,7 @@ fn is_type() {
                 args: vec!["array".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should be of array type".to_string(),
             should_error: false,
         },
@@ -265,7 +278,7 @@ fn is_type() {
                 args: vec!["object".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should be of object type".to_string(),
             should_error: false,
         },
@@ -277,7 +290,7 @@ fn is_type() {
                 args: vec!["number".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should be of number type".to_string(),
             should_error: false,
         },
@@ -289,7 +302,7 @@ fn is_type() {
                 args: vec!["bool".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field should NOT be of boolean type".to_string(),
             should_error: false,
         },
@@ -301,7 +314,7 @@ fn is_type() {
                 args: vec!["bool".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "non-existent field should error".to_string(),
             should_error: true,
         },
@@ -321,7 +334,7 @@ fn ipv4_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should contain an IPv4 address".to_string(),
             should_error: false,
         },
@@ -333,7 +346,7 @@ fn ipv4_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field does not exist should cause an error".to_string(),
             should_error: true,
         },
@@ -345,7 +358,7 @@ fn ipv4_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field exists but does not contain an IP address".to_string(),
             should_error: false,
         },
@@ -365,7 +378,7 @@ fn ipv6_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field is an ipv6 address".to_string(),
             should_error: false,
         },
@@ -377,7 +390,7 @@ fn ipv6_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field is not an ipv6 address".to_string(),
             should_error: false,
         },
@@ -389,7 +402,7 @@ fn ipv6_address() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field does not exist".to_string(),
             should_error: true,
         },
@@ -409,7 +422,7 @@ fn boolean() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field has a bool true".to_string(),
             should_error: false,
         },
@@ -421,7 +434,7 @@ fn boolean() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field has a bool false".to_string(),
             should_error: false,
         },
@@ -433,7 +446,7 @@ fn boolean() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "incorrect bool check".to_string(),
             should_error: false,
         },
@@ -445,7 +458,7 @@ fn boolean() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "bool check should error on incorrect type".to_string(),
             should_error: true,
         },
@@ -457,7 +470,7 @@ fn boolean() {
                 args: vec![], // No need for args
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "bool check should error on non-existent field".to_string(),
             should_error: true,
         },
@@ -477,7 +490,7 @@ fn regex() {
                 args: vec![r#"^[a-zA-Z0-9]+$"#.to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match word".to_string(),
             should_error: false,
         },
@@ -489,7 +502,7 @@ fn regex() {
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match number".to_string(),
             should_error: false,
         },
@@ -501,7 +514,7 @@ fn regex() {
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should not match number".to_string(),
             should_error: false,
         },
@@ -513,7 +526,7 @@ fn regex() {
                 args: vec![r#"\d+++]["#.to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "bad regex should error".to_string(),
             should_error: true,
         },
@@ -533,7 +546,7 @@ fn mac_address() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match mac address".to_string(),
             should_error: false,
         },
@@ -545,7 +558,7 @@ fn mac_address() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should NOT match mac address".to_string(),
             should_error: false,
         },
@@ -557,7 +570,7 @@ fn mac_address() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "mac_address should error for non-existing field".to_string(),
             should_error: true,
         },
@@ -577,7 +590,7 @@ fn uuid() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match uuid with dashes".to_string(),
             should_error: false,
         },
@@ -589,7 +602,7 @@ fn uuid() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match uuid with colons".to_string(),
             should_error: false,
         },
@@ -601,7 +614,7 @@ fn uuid() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match uuid with no separators".to_string(),
             should_error: false,
         },
@@ -613,7 +626,7 @@ fn uuid() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should NOT match uuid".to_string(),
             should_error: false,
         },
@@ -625,7 +638,7 @@ fn uuid() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should error when field does not exist".to_string(),
             should_error: true,
         },
@@ -645,7 +658,7 @@ fn timestamp_unix() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "timestamp str should be true".to_string(),
             should_error: false,
         },
@@ -657,7 +670,7 @@ fn timestamp_unix() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "timestamp num should be true".to_string(),
             should_error: false,
         },
@@ -669,7 +682,7 @@ fn timestamp_unix() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "non-ts field should be false".to_string(),
             should_error: false,
         },
@@ -681,7 +694,7 @@ fn timestamp_unix() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "bad ts field should throw error".to_string(),
             should_error: true,
         },
@@ -701,7 +714,7 @@ fn timestamp_unix_nano() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match nano ts str".to_string(),
             should_error: false,
         },
@@ -713,7 +726,7 @@ fn timestamp_unix_nano() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match nano ts num".to_string(),
             should_error: false,
         },
@@ -725,7 +738,7 @@ fn timestamp_unix_nano() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should not error on non-ts value".to_string(),
             should_error: false,
         },
@@ -737,7 +750,7 @@ fn timestamp_unix_nano() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should error with unknown field".to_string(),
             should_error: true,
         },
@@ -757,7 +770,7 @@ fn timestamp_rfc3339() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "should match rfc3339 ts".to_string(),
             should_error: false,
         },
@@ -769,7 +782,7 @@ fn timestamp_rfc3339() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "should not match non-rfc3339 ts".to_string(),
             should_error: false,
         },
@@ -781,7 +794,7 @@ fn timestamp_rfc3339() {
                 args: vec![], // no args needed
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "unknown field should error".to_string(),
             should_error: true,
         },
@@ -801,7 +814,7 @@ fn string_length() {
                 args: vec!["10".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "string should be <10 length".to_string(),
             should_error: false,
         },
@@ -813,7 +826,7 @@ fn string_length() {
                 args: vec!["5".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "string should NOT be <5".to_string(),
             should_error: false,
         },
@@ -825,7 +838,7 @@ fn string_length() {
                 args: vec!["1".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field should contain more than 1 char and cause match to return true"
                 .to_string(),
             should_error: false,
@@ -838,7 +851,7 @@ fn string_length() {
                 args: vec!["10".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field should contain less than 10 chars and cause match to return false"
                 .to_string(),
             should_error: false,
@@ -851,7 +864,7 @@ fn string_length() {
                 args: vec!["5".to_string(), "10".to_string()],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "field contains less than 10 chars so 5-10 range should return true".to_string(),
             should_error: false,
         },
@@ -863,7 +876,7 @@ fn string_length() {
                 args: vec!["99".to_string(), "100".to_string()],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "field contains less than 10 chars so 99-100 range should return false"
                 .to_string(),
             should_error: false,
@@ -884,7 +897,7 @@ fn semver() {
                 args: vec![],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "valid semver".to_string(),
             should_error: false,
         },
@@ -896,7 +909,7 @@ fn semver() {
                 args: vec![],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "invalid semver".to_string(),
             should_error: false,
         },
@@ -916,7 +929,7 @@ fn hostname() {
                 args: vec![],
                 negate: false,
             },
-            expected: true,
+            expected_matches: 1,
             text: "valid hostname".to_string(),
             should_error: false,
         },
@@ -928,11 +941,47 @@ fn hostname() {
                 args: vec![],
                 negate: false,
             },
-            expected: false,
+            expected_matches: 0,
             text: "invalid semver".to_string(),
             should_error: false,
         },
     ];
 
     test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn recursive_path_tracking_object() {
+    let request = Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+        data: &test_utils::SAMPLE_JSON_BYTES,
+        path: "".to_string(),
+        args: vec!["4111111111111112".to_string()],
+        negate: false,
+    };
+
+    let result = crate::detective::Detective::new().matches(&request);
+
+    assert_eq!(
+        result.unwrap().last().unwrap().path,
+        "object.credit_card.visa.invalid".to_string()
+    );
+}
+
+#[test]
+fn recursive_path_tracking_arrays() {
+    let request = Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_STRING_CONTAINS_ALL,
+        data: &test_utils::SAMPLE_JSON_BYTES,
+        path: "".to_string(),
+        args: vec!["user1@streamdal.com".to_string()],
+        negate: false,
+    };
+
+    let result = crate::detective::Detective::new().matches(&request);
+
+    assert_eq!(
+        result.unwrap().last().unwrap().path,
+        "object.arrays.0.email".to_string()
+    );
 }
