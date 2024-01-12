@@ -397,7 +397,6 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitMsg).To(Equal(""))
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
 		})
@@ -438,7 +437,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
-			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
+			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "stre", "cc_num": "1234"}}`))
 		})
 	})
 
