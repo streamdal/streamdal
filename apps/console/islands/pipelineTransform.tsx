@@ -8,6 +8,7 @@ import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { FormNInput } from "../components/form/formNInput.tsx";
+import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 
 export type PipelineTransformType = {
   stepNumber: number;
@@ -162,7 +163,7 @@ export const TransformOptions = (
           />
           <FormBoolean
             name={`steps.${stepNumber}.step.transform.options.extractOptions.flatten`}
-            display="Flatten"
+            display="Flatten result object"
             defaultChecked={step?.step?.transform?.options
               ?.extractOptions?.flatten}
           />
@@ -184,15 +185,26 @@ export const PipelineTransform = (
 ) => {
   return (
     <>
-      <FormSelect
-        name={`steps.${stepNumber}.step.transform.type`}
-        label="Transform Type"
-        data={data}
-        setData={setData}
-        errors={errors}
-        inputClass="w-64"
-        children={optionsFromEnum(TransformType)}
-      />
+      <div class="flex flex-row justify-start items-center">
+        <FormSelect
+          name={`steps.${stepNumber}.step.transform.type`}
+          label="Transform Type"
+          data={data}
+          setData={setData}
+          errors={errors}
+          inputClass="w-64"
+          children={optionsFromEnum(TransformType)}
+        />
+
+        {Number(step?.step?.transform?.type) === TransformType.EXTRACT
+          ? (
+            <div class="h-[47px] mt-3 ml-2 flex flex-row items-center text-stormCloud text-sm">
+              <IconInfoCircle class="w-5 h-5 mr-1" />
+              Take only selected paths, drop all others
+            </div>
+          )
+          : ""}
+      </div>
       <TransformOptions
         stepNumber={stepNumber}
         step={step}
