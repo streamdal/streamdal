@@ -777,4 +777,30 @@ mod tests {
         assert!(gjson::valid(result.as_str()));
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn test_transform_array_subobject() {
+        let req = Request {
+            data: r#"{"users": [
+                {"name": "Alice", "age": 30},
+                {"name": "Bob", "age": 31}
+            ]}"#
+            .as_bytes()
+            .to_vec(),
+            path: "users.0.name".to_string(),
+            value: "\"REDACTED\"".to_string(),
+            truncate_options: None,
+            extract_options: None,
+        };
+
+        let result = overwrite(&req).unwrap();
+
+        let expected = r#"{"users": [
+                {"name": "REDACTED", "age": 30},
+                {"name": "Bob", "age": 31}
+            ]}"#;
+
+        assert!(gjson::valid(result.as_str()));
+        assert_eq!(result, expected);
+    }
 }
