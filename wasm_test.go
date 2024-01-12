@@ -627,7 +627,7 @@ var _ = Describe("WASM Modules", func() {
 	})
 
 	Context("inter step result", func() {
-		FIt("finds and transforms PII in a payload without a path", func() {
+		It("finds and transforms PII in a payload without a path", func() {
 			// TODO: update this test when we can support multiple transforms in a single step
 			payload := []byte(`{
 	"users": [ 
