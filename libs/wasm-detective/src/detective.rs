@@ -307,14 +307,16 @@ fn recurse_field(
             });
         }
         gjson::Kind::Array => {
-            let mut cur_path = path.clone();
-            cur_path.push("#".to_string());
-
+            let mut idx = 0;
             val.each(|_, value| {
+                let mut cur_path = path.clone();
+                cur_path.push(idx.to_string());
                 let matches = recurse_field(request, value, f, cur_path.clone());
                 if !matches.is_empty() {
                     res.extend(matches);
                 }
+
+                idx += 1;
 
                 true
             });

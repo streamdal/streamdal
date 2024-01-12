@@ -84,7 +84,7 @@ fn test_email() {
             request: Request {
                 match_type: DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
                 data: sample_json,
-                path: "object.arrays.#.email".to_string(),
+                path: "object.arrays.0.email".to_string(),
                 args: vec![],
                 negate: false,
             },

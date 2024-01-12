@@ -982,6 +982,6 @@ fn recursive_path_tracking_arrays() {
 
     assert_eq!(
         result.unwrap().last().unwrap().path,
-        "object.arrays.#.email".to_string()
+        "object.arrays.0.email".to_string()
     );
 }
