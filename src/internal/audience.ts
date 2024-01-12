@@ -1,7 +1,7 @@
 import { Audience, ResponseCode } from "@streamdal/protos/protos/sp_common";
 
 import { Configs } from "../streamdal.js";
-import { audienceKey, internal, TailStatus } from "./register.js";
+import { audienceKey, internal, Tail } from "./register.js";
 
 export interface AddAudience {
   configs: Configs;
@@ -34,7 +34,7 @@ export const addAudience = async ({ configs, audience }: AddAudience) => {
     if (response.code === ResponseCode.OK) {
       internal.audiences.set(audienceKey(audience), {
         audience,
-        tails: new Map<string, TailStatus>(),
+        tails: new Map<string, Tail>(),
       });
     } else {
       console.error("error adding audience", response.message);

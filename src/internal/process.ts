@@ -16,7 +16,7 @@ import { Configs, StreamdalRequest } from "../streamdal.js";
 import { addAudience } from "./audience.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { initPipelines, InternalPipeline } from "./pipeline.js";
-import { audienceKey, internal, TailStatus } from "./register.js";
+import { audienceKey, internal, Tail } from "./register.js";
 import { sendSchema } from "./schema.js";
 import { sendTail } from "./tail.js";
 import { runWasm } from "./wasm.js";
@@ -30,7 +30,7 @@ export interface PipelineConfigs {
 
 export interface TailRequest {
   configs: PipelineConfigs;
-  tails?: Map<string, TailStatus>;
+  tails?: Map<string, Tail>;
   audience: Audience;
   originalData: Uint8Array;
   newData?: Uint8Array;

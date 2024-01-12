@@ -6,6 +6,7 @@ import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
 import { Configs } from "../streamdal.js";
 import { InternalPipeline, processResponse } from "./pipeline.js";
+import { TokenBucket } from "./utils/tokenBucket.js";
 
 const REGISTRATION_RETRY_INTERVAL = 5000;
 
@@ -17,9 +18,10 @@ export interface RegisterConfigs {
   dryRun: boolean;
 }
 
-export interface TailStatus {
+export interface Tail {
   tail?: boolean;
   tailRequestId?: string;
+  sampleBucket: TokenBucket;
 }
 
 export const internal = {
@@ -31,7 +33,7 @@ export const internal = {
   kv: new Map<string, Uint8Array>(),
   audiences: new Map<
     string,
-    { audience: Audience; tails: Map<string, TailStatus> }
+    { audience: Audience; tails: Map<string, Tail> }
   >(),
   wasmModules: new Map<string, any>(),
   schemas: new Map<string, any>(),

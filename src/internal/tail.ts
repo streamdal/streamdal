@@ -37,10 +37,16 @@ export const sendTail = ({
       return;
     }
     try {
+      if (!tailStatus.sampleBucket.consume()) {
+        console.debug("sample rate exceeded, discarding tail");
+        return;
+      }
+
       if (tailStream == null) {
         console.info("tail stream is closed, reopening...");
         tailStream = openTailStream(configs);
       }
+
       const tailResponse = TailResponse.create({
         timestampNs: (BigInt(new Date().getTime()) * BigInt(1e6)).toString(),
         type: TailResponseType.PAYLOAD,

@@ -5,7 +5,8 @@ import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
 import { Configs } from "../streamdal.js";
 import { kvCommand } from "./kv.js";
-import { audienceKey, internal, TailStatus } from "./register.js";
+import { audienceKey, internal, Tail } from "./register.js";
+import { TokenBucket } from "./utils/tokenBucket.js";
 import { instantiateWasm } from "./wasm.js";
 
 export type InternalPipeline = Pipeline & {
@@ -149,7 +150,7 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
       if (!internal.audiences.has(audienceKey(audience))) {
         internal.audiences.set(audienceKey(audience), {
           audience,
-          tails: new Map<string, TailStatus>(),
+          tails: new Map<string, Tail>(),
         });
       }
       // Add entry (@JH, OK if overwritten?)
@@ -157,6 +158,10 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         internal.audiences.get(audienceKey(audience))?.tails.set(request.id, {
           tail: request.type === TailRequestType.START,
           tailRequestId: request.id,
+          sampleBucket: new TokenBucket(
+            request.sampleOptions?.sampleRate,
+            request.sampleOptions?.sampleIntervalSeconds
+          ),
         });
       break;
     }
