@@ -9,6 +9,7 @@ export type FormInputProps = {
   errors: ErrorType;
   inputClass?: string;
   wrapperClass?: string;
+  value?: string;
   rows?: number;
 };
 
@@ -21,9 +22,10 @@ export const FormTextArea = ({
   placeHolder,
   inputClass,
   wrapperClass,
+  value,
   rows = 5,
 }: FormInputProps) => {
-  const value = resolveValue(data, name);
+  const v = value || resolveValue(data, name);
 
   return (
     <div class={`flex flex-col my-2 ${wrapperClass}`}>
@@ -44,7 +46,7 @@ export const FormTextArea = ({
         }px] border-${
           errors[name] ? "streamdalRed" : "border-twilight"
         } ${inputClass}`}
-        value={value}
+        value={v}
         onChange={(e) =>
           updateData(
             data,

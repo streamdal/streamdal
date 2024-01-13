@@ -1,13 +1,6 @@
 import { ErrorType } from "../components/form/validate.ts";
 import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import {
-  TransformTruncateType,
-  TransformType,
-} from "streamdal-protos/protos/steps/sp_steps_transform.ts";
 import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
-import { FormInput } from "../components/form/formInput.tsx";
-import { FormBoolean } from "../components/form/formBoolean.tsx";
-import { FormNInput } from "../components/form/formNInput.tsx";
 import {
   JSONSchemaDraft,
   SchemaValidationType,
@@ -28,6 +21,17 @@ export const SchemaValidationOptions = (
   const type = step.step?.schemaValidation?.type ||
     SchemaValidationType.JSONSCHEMA;
 
+  //
+  // Backend sends us the schema as Uint8Array
+  // so we decode it on the fly for display
+  const value =
+    step.step?.schemaValidation?.options?.jsonSchema?.jsonSchema instanceof
+        Uint8Array
+      ? new TextDecoder().decode(
+        step.step?.schemaValidation?.options?.jsonSchema?.jsonSchema,
+      )
+      : step.step?.schemaValidation?.options?.jsonSchema?.jsonSchema;
+
   switch (Number(type)) {
     case SchemaValidationType.JSONSCHEMA:
       return (
@@ -44,6 +48,7 @@ export const SchemaValidationOptions = (
             label="Schema"
             placeHolder="paste your schema here"
             errors={errors}
+            value={value}
           />
           <FormSelect
             name={`steps.${stepNumber}.step.schemaValidation.options.jsonSchema.draft`}
