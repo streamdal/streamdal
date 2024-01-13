@@ -1,7 +1,10 @@
+import asyncio
 import pytest
+import streamdal
 import streamdal_protos.protos as protos
+import unittest.mock as mock
 import uuid
-from streamdal import StreamdalClient, hostfunc, kv
+from streamdal import StreamdalClient, StreamdalConfig, hostfunc, kv
 
 
 class TestStreamdalWasm:
@@ -10,9 +13,22 @@ class TestStreamdalWasm:
     @pytest.fixture(autouse=True)
     def before_each(self):
         client = object.__new__(StreamdalClient)
+        client.cfg = StreamdalConfig(service_name="testing")
         client.functions = {}
         client.kv = kv.KV()
         client.host_func = hostfunc.HostFunc(kv=client.kv)
+        client.paused_pipelines = {}
+        client.pipelines = {}
+        client.audiences = {}
+        client.tails = {}
+        client.paused_tails = {}
+        client.schemas = {}
+        client.log = mock.Mock()
+        client.metrics = mock.Mock()
+        client.grpc_stub = mock.AsyncMock()
+        client.register_stub = mock.AsyncMock()
+        client.grpc_loop = asyncio.get_event_loop()
+        client.register_loop = asyncio.get_event_loop()
         self.client = client
 
     def test_call_wasm_failure(self, mocker):
@@ -24,7 +40,7 @@ class TestStreamdalWasm:
 
         step = protos.PipelineStep()
 
-        res = client._call_wasm(step=step, data=b"")
+        res = client._call_wasm(step=step, data=b"", isr=None)
 
         assert res is not None
         assert res.exit_code == 3
@@ -51,7 +67,7 @@ class TestStreamdalWasm:
         )
 
         res = self.client._call_wasm(
-            step=step, data=b'{"object":  {"field": "streamdal@gmail.com"}}'
+            step=step, data=b'{"object":  {"field": "streamdal@gmail.com"}}', isr=None
         )
 
         assert res is not None
@@ -59,7 +75,7 @@ class TestStreamdalWasm:
         assert res.output_payload == b'{"object":  {"field": "streamdal@gmail.com"}}'
 
         res2 = self.client._call_wasm(
-            step=step, data=b'{"object":  {"field": "mark@gmail.com"}}'
+            step=step, data=b'{"object":  {"field": "mark@gmail.com"}}', isr=None
         )
 
         assert res2 is not None
@@ -86,7 +102,7 @@ class TestStreamdalWasm:
             ),
         )
 
-        res = self.client._call_wasm(step=step, data=b"")
+        res = self.client._call_wasm(step=step, data=b"", isr=None)
 
         assert res is not None
         assert res.exit_code == 2
@@ -108,7 +124,9 @@ class TestStreamdalWasm:
             infer_schema=protos.steps.InferSchemaStep(current_schema=b""),
         )
 
-        res = self.client._call_wasm(step=step, data=b'{"object": {"payload": "test"}}')
+        res = self.client._call_wasm(
+            step=step, data=b'{"object": {"payload": "test"}}', isr=None
+        )
 
         assert res is not None
         assert res.exit_code == 1
@@ -146,7 +164,7 @@ class TestStreamdalWasm:
         )
 
         res = self.client._call_wasm(
-            step=step, data=b'{"object": {"payload": "old val"}}'
+            step=step, data=b'{"object": {"payload": "old val"}}', isr=None
         )
 
         assert res is not None
@@ -178,7 +196,7 @@ class TestStreamdalWasm:
         )
 
         res = self.client._call_wasm(
-            step=step, data=b'{"object": {"payload": "old val"}}'
+            step=step, data=b'{"object": {"payload": "old val"}}', isr=None
         )
 
         assert res is not None
@@ -201,7 +219,7 @@ class TestStreamdalWasm:
 
         # valid json
         res = self.client._call_wasm(
-            step=step, data=b'{"object": {"payload": "old val"}}'
+            step=step, data=b'{"object": {"payload": "old val"}}', isr=None
         )
 
         assert res is not None
@@ -210,7 +228,7 @@ class TestStreamdalWasm:
 
         # invalid json
         res = self.client._call_wasm(
-            step=step, data=b'{"object": {"payload": "old val}}'
+            step=step, data=b'{"object": {"payload": "old val}}', isr=None
         )
 
         assert res is not None
@@ -239,8 +257,79 @@ class TestStreamdalWasm:
             ),
         )
 
-        res = self.client._call_wasm(step=step, data=b"")
+        res = self.client._call_wasm(step=step, data=b"", isr=None)
 
         assert res is not None
         assert res.exit_code == 1
         assert res.exit_msg == "kv step response: \"Key 'test' exists\""
+
+    def test_dynamic_transform(self):
+        """Test that we can pass detective results to a transform step"""
+
+        with open("./assets/test/detective.wasm", "rb") as file:
+            detective_wasm_bytes = file.read()
+
+        with open("./assets/test/transform.wasm", "rb") as file:
+            transform_wasm_bytes = file.read()
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="kafka",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+                operation_name="test",
+            ),
+            attach_pipeline=protos.AttachPipelineCommand(
+                pipeline=protos.Pipeline(
+                    id=uuid.uuid4().__str__(),
+                    steps=[
+                        protos.PipelineStep(
+                            name="detective",
+                            on_success=[],
+                            on_failure=[],
+                            wasm_bytes=detective_wasm_bytes,
+                            wasm_id=uuid.uuid4().__str__(),
+                            wasm_function="f",
+                            detective=protos.steps.DetectiveStep(
+                                path="",  # No path, we're searching the entire payload
+                                args=[""],
+                                negate=False,
+                                type=protos.steps.DetectiveType.DETECTIVE_TYPE_PII_EMAIL,
+                            ),
+                        ),
+                        protos.PipelineStep(
+                            dynamic=True,
+                            name="transform",
+                            on_success=[],
+                            on_failure=[],
+                            wasm_bytes=transform_wasm_bytes,
+                            wasm_id=uuid.uuid4().__str__(),
+                            wasm_function="f",
+                            transform=protos.steps.TransformStep(
+                                type=protos.steps.TransformType.TRANSFORM_TYPE_REPLACE_VALUE,
+                                replace_value_options=protos.steps.TransformReplaceValueOptions(
+                                    path="",  # No path, we're getting the result from the detective step
+                                    value='"REDACTED"',
+                                ),
+                            ),
+                        ),
+                    ],
+                )
+            ),
+        )
+
+        self.client._attach_pipeline(cmd)
+        payload = b'{"users":[{"name": "Bob","email": "bob@streamdal.com"}]}'
+
+        res = self.client.process(
+            streamdal.ProcessRequest(
+                data=payload,
+                operation_name="test",
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
+                component_name="kafka",
+            )
+        )
+
+        assert res is not None
+        assert res.error is False
+        assert res.data == b'{"users":[{"name": "Bob","email": "REDACTED"}]}'

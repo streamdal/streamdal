@@ -346,6 +346,9 @@ class StreamdalClient:
 
         pipes = pipelines.copy()
 
+        # Used for passing data between steps
+        isr = None
+
         for _, cmd in pipes.items():
             pipeline_status = protos.PipelineStatus(
                 id=cmd.attach_pipeline.pipeline.id,
@@ -378,7 +381,7 @@ class StreamdalClient:
                 )
 
                 # Exec wasm
-                wasm_resp = self._call_wasm(step, resp.data)
+                wasm_resp = self._call_wasm(step, resp.data, isr)
 
                 if self.cfg.dry_run:
                     self.log.debug(f"Running step '{step.name}' in dry-run mode")
@@ -390,6 +393,9 @@ class StreamdalClient:
 
                 # If successful, continue to next step, don't need to check conditions
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+                    # Grab inter-step result and pass to next step
+                    isr = wasm_resp.inter_step_result
+
                     if self.cfg.dry_run:
                         self.log.debug(
                             f"Step '{step.name}' succeeded, continuing to next step"
@@ -868,11 +874,14 @@ class StreamdalClient:
 
         return self.paused_pipelines[aud_str].get(pipeline_id) is not None
 
-    def _call_wasm(self, step: protos.PipelineStep, data: bytes) -> protos.WasmResponse:
+    def _call_wasm(
+        self, step: protos.PipelineStep, data: bytes, isr: protos.InterStepResult
+    ) -> protos.WasmResponse:
         try:
             req = protos.WasmRequest()
             req.input_payload = copy(data)
             req.step = copy(step)
+            req.inter_step_result = copy(isr)
 
             response_bytes = self._exec_wasm(req)
 
