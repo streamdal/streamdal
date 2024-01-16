@@ -326,7 +326,7 @@ fn get_truncate_length(truncate_options: &TruncateOptions, length_of_field: usiz
         }
     };
 
-    return truncate_length.clamp(0, length_of_field);
+    truncate_length.clamp(0, length_of_field)
 }
 
 #[allow(clippy::to_string_in_format_args)]
