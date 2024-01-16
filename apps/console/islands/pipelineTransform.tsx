@@ -102,14 +102,6 @@ export const TransformOptions = (
             placeHolder="ex: object.field"
             errors={errors}
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.maskOptions.mask`}
-            data={data}
-            setData={setData}
-            label="Mask"
-            placeHolder="value to use as a mask"
-            errors={errors}
-          />
         </>
       );
     case TransformType.TRUNCATE_VALUE:
