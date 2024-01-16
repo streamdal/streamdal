@@ -1,3 +1,6 @@
+use protobuf::EnumOrUnknown;
+use protos::sp_steps_detective::DetectiveStepResultMatch;
+use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_steps_transform::TransformType;
 use protos::sp_wsm::inter_step_result::Input_from::DetectiveResult;
@@ -88,7 +91,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::Request, String> {
     let t = wasm_request.step.transform();
 
-    let mut path: String = String::from("");
+    let mut paths = Vec::<DetectiveStepResultMatch>::new();
 
     // TODO: how to collapse this if statement? rust complains about borrow
     // TODO: but if you reference dynamic, rust complains about &bool
@@ -99,20 +102,22 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if let Some(DetectiveResult(detective_result)) =
                 &wasm_request.inter_step_result.input_from
             {
-                // TODO: Handle multiple matches. For now, just grab the first match
-                let res = detective_result.matches.first().unwrap();
-                path = res.path.clone();
+                paths = detective_result.matches.clone();
             }
         }
+    } else {
+        // Accept path directly from WASM request
+        paths.push(DetectiveStepResultMatch {
+            path: t.path.clone(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        })
     }
 
     let req = match t.type_.unwrap() {
         // unwrap is safe as validation occurs before this
         TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => {
-            if path.is_empty() {
-                path = t.truncate_options().path.clone();
-            }
-
             let tt = match t.truncate_options().type_.enum_value().unwrap() {
                 TRANSFORM_TRUNCATE_TYPE_PERCENTAGE => Percent,
                 _ => Chars,
@@ -120,8 +125,8 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
                 value: "".to_string(),
+                paths: paths,
                 truncate_options: Some(TruncateOptions {
                     length: t.truncate_options().clone().value as usize,
                     truncate_type: tt,
@@ -129,57 +134,33 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                 extract_options: None,
             }
         }
-        TransformType::TRANSFORM_TYPE_DELETE_FIELD => {
-            // Never had deprecated options, no need to handle here
-
-            if path.is_empty() {
-                path = t.delete_field_options().path.clone();
-            }
-
-            transform::Request {
-                data: wasm_request.input_payload.clone(),
-                path: path,
-                value: "".to_string(),
-                truncate_options: None,
-                extract_options: None,
-            }
-        }
-        TransformType::TRANSFORM_TYPE_MASK_VALUE => {
-            if path.is_empty() {
-                path = t.mask_options().path.clone();
-            }
-
-            transform::Request {
-                data: wasm_request.input_payload.clone(),
-                path: path,
-                value: "".to_string(),
-                truncate_options: None,
-                extract_options: None,
-            }
-        }
-        TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => {
-            if path.is_empty() {
-                path = t.obfuscate_options().path.clone();
-            }
-
-            transform::Request {
-                data: wasm_request.input_payload.clone(),
-                path: path,
-                value: "".to_string(),
-                truncate_options: None,
-                extract_options: None,
-            }
-        }
+        TransformType::TRANSFORM_TYPE_DELETE_FIELD => transform::Request {
+            data: wasm_request.input_payload.clone(),
+            value: "".to_string(),
+            paths: paths,
+            truncate_options: None,
+            extract_options: None,
+        },
+        TransformType::TRANSFORM_TYPE_MASK_VALUE => transform::Request {
+            data: wasm_request.input_payload.clone(),
+            paths: paths,
+            value: t.mask_options().mask.clone(),
+            truncate_options: None,
+            extract_options: None,
+        },
+        TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => transform::Request {
+            data: wasm_request.input_payload.clone(),
+            paths: paths,
+            value: "".to_string(),
+            truncate_options: None,
+            extract_options: None,
+        },
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE => {
-            if path.is_empty() {
-                path = t.replace_value_options().path.clone();
-            }
-
             let ro = wasm_request.step.transform().replace_value_options();
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
+                paths: paths,
                 value: ro.value.clone(),
                 truncate_options: None,
                 extract_options: None,
@@ -192,12 +173,11 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: "".to_string(),
+                paths: Vec::<DetectiveStepResultMatch>::new(),
                 value: "".to_string(),
                 truncate_options: None,
                 extract_options: Some(transform::ExtractOptions {
                     flatten: eo.clone().flatten,
-                    paths: eo.paths.clone(),
                 }),
             }
         }

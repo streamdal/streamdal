@@ -226,6 +226,7 @@ name = "streamdal-wasm-transform"
 version = "0.1.6"
 dependencies = [
  "conv",
+ "protobuf",
  "serde_json",
  "sha256",
  "streamdal-gjson",

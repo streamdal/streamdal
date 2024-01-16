@@ -1,4 +1,5 @@
 use conv::prelude::*;
+use protos::sp_steps_detective::DetectiveStepResultMatch;
 use serde_json::{Map, Number, Value};
 use streamdal_gjson as gjson;
 use streamdal_gjson::Kind;
@@ -20,13 +21,12 @@ pub struct TruncateOptions {
 
 pub struct ExtractOptions {
     pub flatten: bool,
-    pub paths: Vec<String>,
 }
 
 pub struct Request {
     pub data: Vec<u8>,
-    pub path: String,
     pub value: String,
+    pub paths: Vec<DetectiveStepResultMatch>,
 
     // TODO: we'll eventually have to pass protos directly to those functions
     // TODO: but let's keep changes simple for now ~MG 2024-01-02
@@ -137,8 +137,9 @@ pub fn extract(req: &Request) -> Result<String, TransformError> {
 
     // For each path in extract_options.paths, get the value and add it to a map
     let mut extracted_data = Map::new();
-    for path in &extract_options.paths {
-        let value = gjson::get(data_as_str, path.as_str());
+
+    for dr in &req.paths {
+        let value = gjson::get(data_as_str, dr.path.as_str());
         if !value.exists() {
             continue;
         }
@@ -146,7 +147,7 @@ pub fn extract(req: &Request) -> Result<String, TransformError> {
         // Split path by ".". If we're flattening it, just get last element and insert into hashmap
         // Otherwise, we need to recursively create sub-hashmaps for each element in the path before
         // inserting the value.
-        let path_elements: Vec<&str> = path.split('.').collect();
+        let path_elements: Vec<&str> = dr.path.split('.').collect();
 
         if extract_options.flatten {
             let parsed_value = match extract_key(&value) {
@@ -237,14 +238,32 @@ pub fn extract(req: &Request) -> Result<String, TransformError> {
 pub fn overwrite(req: &Request) -> Result<String, TransformError> {
     validate_request(req, true)?;
 
-    let data = gjson::set_overwrite(
-        convert_bytes_to_string(&req.data)?,
-        req.path.as_str(),
-        req.value.as_str(),
-    )
-    .map_err(|e| TransformError::Generic(format!("unable to overwrite data: {}", e)))?;
+    let mut data = req.data.clone();
 
-    Ok(data)
+    for dr in &req.paths {
+        let value = gjson::get(convert_bytes_to_string(&data)?, dr.path.as_str());
+        if !value.exists() {
+            continue;
+        }
+
+        let overwrite_with = req.value.clone();
+
+        match gjson::set_overwrite(
+            convert_bytes_to_string(&data)?,
+            dr.path.as_str(),
+            overwrite_with.as_str(),
+        ) {
+            Ok(d) => data = d.into_bytes(),
+            Err(e) => {
+                return Err(TransformError::Generic(format!(
+                    "unable to overwrite data: {}",
+                    e
+                )))
+            }
+        }
+    }
+
+    String::from_utf8(data).map_err(|e| TransformError::Generic(e.to_string()))
 }
 
 pub fn truncate(req: &Request) -> Result<String, TransformError> {
@@ -259,11 +278,38 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
         }
     };
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
-    let value = gjson::get(data_as_str, req.path.as_str());
-    let length_of_field = gjson::get(data_as_str, req.path.as_str()).to_string().len();
+    let mut data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
+        TransformError::Generic(format!("unable to convert bytes to string: {}", e))
+    })?;
 
-    let mut truncate_length = match &truncate_options.truncate_type {
+    for dr in &req.paths {
+        let data_as_str = data_as_string.as_str();
+        let value = gjson::get(data_as_str, dr.path.as_str());
+        let length_of_field = gjson::get(data_as_str, dr.path.as_str()).to_string().len();
+
+        let truncate_length = get_truncate_length(truncate_options, length_of_field);
+
+        match value.kind() {
+            gjson::Kind::String => {
+                match _truncate(data_as_str, dr.path.as_str(), &truncate_length) {
+                    Ok(new_data) => data_as_string = new_data,
+                    Err(e) => return Err(e),
+                }
+            }
+            _ => {
+                return Err(TransformError::Generic(format!(
+                    "unable to truncate data: path '{}' is not a string",
+                    dr.path.as_str(),
+                )))
+            }
+        }
+    }
+
+    Ok(data_as_string)
+}
+
+fn get_truncate_length(truncate_options: &TruncateOptions, length_of_field: usize) -> usize {
+    let truncate_length = match &truncate_options.truncate_type {
         #[allow(clippy::clone_on_copy)]
         TruncateType::Chars => {
             if truncate_options.length > length_of_field {
@@ -280,15 +326,7 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
         }
     };
 
-    truncate_length = truncate_length.clamp(0, length_of_field);
-
-    match value.kind() {
-        gjson::Kind::String => _truncate(data_as_str, req.path.as_str(), &truncate_length),
-        _ => Err(TransformError::Generic(format!(
-            "unable to truncate data: path '{}' is not a string",
-            req.path
-        ))),
-    }
+    return truncate_length.clamp(0, length_of_field);
 }
 
 #[allow(clippy::to_string_in_format_args)]
@@ -308,9 +346,19 @@ fn _truncate(data: &str, path: &str, len: &usize) -> Result<String, TransformErr
 pub fn delete(req: &Request) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
+    let mut data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
+        TransformError::Generic(format!("unable to convert bytes to string: {}", e))
+    })?;
 
-    _delete(data_as_str, req.path.as_str())
+    for dr in &req.paths {
+        let data_as_str = data_as_string.as_str();
+        match _delete(data_as_str, dr.path.as_str()) {
+            Ok(new_data) => data_as_string = new_data,
+            Err(e) => return Err(e),
+        }
+    }
+
+    Ok(data_as_string)
 }
 
 fn _delete(data: &str, path: &str) -> Result<String, TransformError> {
@@ -323,16 +371,29 @@ fn _delete(data: &str, path: &str) -> Result<String, TransformError> {
 pub fn obfuscate(req: &Request) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
-    let value = gjson::get(data_as_str, req.path.as_str());
+    let mut data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
+        TransformError::Generic(format!("unable to convert bytes to string: {}", e))
+    })?;
 
-    match value.kind() {
-        gjson::Kind::String => _obfuscate(data_as_str, req.path.as_str()),
-        _ => Err(TransformError::Generic(format!(
-            "unable to mask data: path '{}' is not a string or number",
-            req.path
-        ))),
+    for dr in &req.paths {
+        let data_as_str = data_as_string.as_str();
+        let value = gjson::get(data_as_str, dr.path.as_str());
+
+        match value.kind() {
+            gjson::Kind::String => match _obfuscate(data_as_str, dr.path.as_str()) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            },
+            _ => {
+                return Err(TransformError::Generic(format!(
+                    "unable to mask data: path '{}' is not a string or number",
+                    dr.path.as_str()
+                )))
+            }
+        }
     }
+
+    Ok(data_as_string)
 }
 
 fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
@@ -348,17 +409,33 @@ fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
 pub fn mask(req: &Request) -> Result<String, TransformError> {
     validate_request(req, false)?;
 
-    let data_as_str = convert_bytes_to_string(&req.data)?;
-    let value = gjson::get(data_as_str, req.path.as_str());
+    let mut data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
+        TransformError::Generic(format!("unable to convert bytes to string: {}", e))
+    })?;
 
-    match value.kind() {
-        gjson::Kind::String => _mask(data_as_str, req.path.as_str(), '*', true),
-        gjson::Kind::Number => _mask(data_as_str, req.path.as_str(), '0', false),
-        _ => Err(TransformError::Generic(format!(
-            "unable to mask data: path '{}' is not a string or number",
-            req.path
-        ))),
+    for dr in &req.paths {
+        let data_as_str = data_as_string.as_str();
+        let value = gjson::get(data_as_str, dr.path.as_str());
+
+        match value.kind() {
+            gjson::Kind::String => match _mask(data_as_str, dr.path.as_str(), '*', true) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            },
+            gjson::Kind::Number => match _mask(data_as_str, dr.path.as_str(), '0', false) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            },
+            _ => {
+                return Err(TransformError::Generic(format!(
+                    "unable to mask data: path '{}' is not a string or number",
+                    dr.path.clone()
+                )))
+            }
+        }
     }
+
+    Ok(data_as_string)
 }
 
 fn _mask(data: &str, path: &str, mask_char: char, quote: bool) -> Result<String, TransformError> {
@@ -389,14 +466,17 @@ fn validate_request(req: &Request, _value_check: bool) -> Result<(), TransformEr
         ));
     }
 
-    // Valid path?
-    if !gjson::get(convert_bytes_to_string(&req.data)?, req.path.as_str()).exists() {
-        return Err(TransformError::Generic(format!(
-            "path '{}' not found in data",
-            req.path
-        )));
-    }
+    let data = convert_bytes_to_string(&req.data)?;
 
+    // Valid path?
+    for dr in &req.paths {
+        if !gjson::get(data, dr.path.as_str()).exists() {
+            return Err(TransformError::Generic(format!(
+                "path '{}' not found in data",
+                dr.path
+            )));
+        }
+    }
     Ok(())
 }
 
@@ -418,13 +498,6 @@ fn validate_extract_request(req: &Request) -> Result<(), TransformError> {
         ));
     }
 
-    let extract_options = req.extract_options.as_ref().unwrap();
-    if extract_options.paths.is_empty() {
-        return Err(TransformError::Generic(
-            "extract paths cannot be empty".to_string(),
-        ));
-    }
-
     Ok(())
 }
 
@@ -436,6 +509,8 @@ fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use protobuf::EnumOrUnknown;
+    use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 
     const TEST_DATA: &str = r#"{
     "foo": "bar",
@@ -449,7 +524,12 @@ mod tests {
     fn test_overwrite() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             value: "\"test\"".to_string(),
             truncate_options: None,
             extract_options: None,
@@ -457,7 +537,7 @@ mod tests {
 
         let result = overwrite(&req).unwrap();
 
-        assert!(gjson::valid(&TEST_DATA));
+        assert!(gjson::valid(TEST_DATA));
         assert!(gjson::valid(&result));
         assert_eq!(result, TEST_DATA.replace("quux", "test"));
 
@@ -467,14 +547,24 @@ mod tests {
         let v = gjson::get(result.as_str(), "baz.qux");
         assert_eq!(v.str(), "test");
 
-        req.path = "does-not-exist".to_string();
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "does-not-exist".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(
             overwrite(&req).is_err(),
             "should error when path does not exist"
         );
 
         // Can overwrite anything
-        req.path = "bool".to_string();
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "bool".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(
             overwrite(&req).is_ok(),
             "should be able to replace any value, regardless of type"
@@ -485,8 +575,13 @@ mod tests {
     fn test_obfuscate() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
+            value: "*".to_string(),
             truncate_options: None,
             extract_options: None,
         };
@@ -494,7 +589,7 @@ mod tests {
         let result = obfuscate(&req).unwrap();
         let hashed_value = sha256::digest("quux".as_bytes());
 
-        assert!(gjson::valid(&TEST_DATA));
+        assert!(gjson::valid(TEST_DATA));
         assert!(gjson::valid(&result));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
@@ -504,20 +599,35 @@ mod tests {
         assert_eq!(v.str(), format!("sha256:{}", hashed_value));
 
         // path does not exist
-        req.path = "does-not-exist".to_string();
-        assert!(mask(&req).is_err());
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "does-not-exist".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
+        assert!(obfuscate(&req).is_err());
 
         // path not a string
-        req.path = "bool".to_string();
-        assert!(mask(&req).is_err());
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "bool".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
+        assert!(obfuscate(&req).is_err());
     }
 
     #[test]
     fn test_mask() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            value: "*".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: None,
             extract_options: None,
         };
@@ -525,6 +635,7 @@ mod tests {
         let result = mask(&req).unwrap();
 
         assert!(gjson::valid(TEST_DATA));
+        println!("{}", result);
         assert!(gjson::valid(&result));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
@@ -534,11 +645,21 @@ mod tests {
         assert_eq!(v.str(), "q***");
 
         // path does not exist
-        req.path = "does-not-exist".to_string();
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "does-not-exist".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(mask(&req).is_err());
 
         // path not a string
-        req.path = "bool".to_string();
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "bool".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(mask(&req).is_err());
     }
 
@@ -546,8 +667,13 @@ mod tests {
     fn test_truncate_chars() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: Some(TruncateOptions {
                 length: 1,
                 truncate_type: TruncateType::Chars,
@@ -567,11 +693,22 @@ mod tests {
         assert_eq!(v.str(), "q");
 
         // path does not exist
-        req.path = "does-not-exist".to_string();
+        // path does not exist
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "does-not-exist".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(truncate(&req).is_err());
 
         // path not a string
-        req.path = "bool".to_string();
+        req.paths = vec![DetectiveStepResultMatch {
+            path: "bool".to_string(),
+            value: "\"test\"".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }];
         assert!(truncate(&req).is_err());
     }
 
@@ -579,8 +716,13 @@ mod tests {
     fn test_truncate_chars_over_length() {
         let req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: Some(TruncateOptions {
                 length: 5,
                 truncate_type: TruncateType::Chars,
@@ -604,8 +746,13 @@ mod tests {
     fn test_truncate_percent() {
         let req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: Some(TruncateOptions {
                 length: 25,
                 truncate_type: TruncateType::Percent,
@@ -629,8 +776,13 @@ mod tests {
     fn test_delete() {
         let req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "baz.qux".to_string(),
-            value: "".to_string(), // needs a default
+            value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "baz.qux".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: None,
             extract_options: None,
         };
@@ -651,12 +803,25 @@ mod tests {
     fn test_extract_flatten() {
         let req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "".to_string(),
             value: "".to_string(),
+            paths: vec![
+                DetectiveStepResultMatch {
+                    path: "foo".to_string(),
+                    value: "".to_string().into_bytes(),
+                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                    special_fields: Default::default(),
+                },
+                DetectiveStepResultMatch {
+                    path: "baz.qux".to_string(),
+                    value: "".to_string().into_bytes(),
+                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                    special_fields: Default::default(),
+                },
+            ],
             truncate_options: None,
             extract_options: Some(ExtractOptions {
                 flatten: true,
-                paths: vec!["foo".to_string(), "baz.qux".to_string()],
+                //paths: vec!["foo".to_string(), "baz.qux".to_string()],
             }),
         };
 
@@ -670,13 +835,23 @@ mod tests {
     fn test_extract_no_flatten() {
         let req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            path: "".to_string(),
             value: "".to_string(),
+            paths: vec![
+                DetectiveStepResultMatch {
+                    path: "foo".to_string(),
+                    value: "".to_string().into_bytes(),
+                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                    special_fields: Default::default(),
+                },
+                DetectiveStepResultMatch {
+                    path: "baz.qux".to_string(),
+                    value: "".to_string().into_bytes(),
+                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                    special_fields: Default::default(),
+                },
+            ],
             truncate_options: None,
-            extract_options: Some(ExtractOptions {
-                flatten: false,
-                paths: vec!["foo".to_string(), "baz.qux".to_string()],
-            }),
+            extract_options: Some(ExtractOptions { flatten: false }),
         };
 
         let result = extract(&req).unwrap();
@@ -687,7 +862,7 @@ mod tests {
 
     #[test]
     fn test_extract_scalar_types() {
-        let req = Request {
+        let mut req = Request {
             data: r#"{
                 "string": "bar",
                 "number": 1,
@@ -699,22 +874,30 @@ mod tests {
             }"#
             .as_bytes()
             .to_vec(),
-            path: "".to_string(),
             value: "".to_string(),
+            paths: Vec::<DetectiveStepResultMatch>::new(),
             truncate_options: None,
-            extract_options: Some(ExtractOptions {
-                flatten: true,
-                paths: vec![
-                    "string".to_string(),
-                    "number".to_string(),
-                    "bool".to_string(),
-                    "null".to_string(),
-                    "float".to_string(),
-                    "bigint".to_string(),
-                    "signed_int".to_string(),
-                ],
-            }),
+            extract_options: Some(ExtractOptions { flatten: true }),
         };
+
+        let paths = vec![
+            "string".to_string(),
+            "number".to_string(),
+            "bool".to_string(),
+            "null".to_string(),
+            "float".to_string(),
+            "bigint".to_string(),
+            "signed_int".to_string(),
+        ];
+
+        for p in paths {
+            req.paths.push(DetectiveStepResultMatch {
+                path: p,
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            });
+        }
 
         let result = extract(&req).unwrap();
 
@@ -735,13 +918,15 @@ mod tests {
             ]}"#
             .as_bytes()
             .to_vec(),
-            path: "".to_string(),
             value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "users".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: None,
-            extract_options: Some(ExtractOptions {
-                flatten: false,
-                paths: vec!["users".to_string()],
-            }),
+            extract_options: Some(ExtractOptions { flatten: false }),
         };
 
         let result = extract(&req).unwrap();
@@ -761,13 +946,15 @@ mod tests {
             ]}"#
             .as_bytes()
             .to_vec(),
-            path: "".to_string(),
             value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "users.#.name".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: None,
-            extract_options: Some(ExtractOptions {
-                flatten: false,
-                paths: vec!["users.#.name".to_string()],
-            }),
+            extract_options: Some(ExtractOptions { flatten: false }),
         };
 
         let result = extract(&req).unwrap();
@@ -787,13 +974,19 @@ mod tests {
             ]}"#
             .as_bytes()
             .to_vec(),
-            path: "users.0.name".to_string(),
             value: "\"REDACTED\"".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "users.0.name".to_string(),
+                value: "".to_string().into_bytes(),
+                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+                special_fields: Default::default(),
+            }],
             truncate_options: None,
             extract_options: None,
         };
 
         let result = overwrite(&req).unwrap();
+        println!("result: {}", result);
 
         let expected = r#"{"users": [
                 {"name": "REDACTED", "age": 30},

@@ -1,3 +1,6 @@
+use protobuf::EnumOrUnknown;
+use protos::sp_steps_detective::DetectiveStepResultMatch;
+use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 use streamdal_wasm_transform::transform;
 use streamdal_wasm_transform::transform::{TruncateOptions, TruncateType};
 
@@ -26,8 +29,13 @@ fn overwrite() {
 
     let req = transform::Request {
         data: sample_json.into(),
-        path: "hello".to_string(),
         value: r#""baz""#.to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: None,
         extract_options: None,
     };
@@ -45,8 +53,13 @@ fn mask_string() {
 
     let req = transform::Request {
         data: sample_json.into(),
-        path: "hello".to_string(),
-        value: "".to_string(),
+        value: "*".to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: None,
         extract_options: None,
     };
@@ -63,9 +76,14 @@ fn mask_number() {
     let sample_json = r#"{"hello": 329328102938}"#;
 
     let req = transform::Request {
-        path: "hello".to_string(),
         data: sample_json.into(),
-        value: "".to_string(), // default
+        value: "0".to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: None,
         extract_options: None,
     };
@@ -82,9 +100,14 @@ fn obfuscate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
-        path: "hello".to_string(),
         data: sample_json.into(),
-        value: "".to_string(), // default
+        value: "".to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: None,
         extract_options: None,
     };
@@ -101,9 +124,14 @@ fn truncate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
-        path: "hello".to_string(),
         data: sample_json.into(),
-        value: "".to_string(), // default
+        value: "".to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: Some(TruncateOptions {
             length: 3,
             truncate_type: TruncateType::Chars,
@@ -123,9 +151,14 @@ fn delete_field() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
-        path: "hello".to_string(),
         data: sample_json.into(),
-        value: "".to_string(), // default
+        value: "".to_string(),
+        paths: vec![DetectiveStepResultMatch {
+            path: "hello".to_string(),
+            value: "".to_string().into_bytes(),
+            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
+            special_fields: Default::default(),
+        }],
         truncate_options: None,
         extract_options: None,
     };
