@@ -3,7 +3,7 @@ import { Audience } from "@streamdal/protos/protos/sp_common";
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
 import { billingExample } from "./billing.js";
 
-export const QUIET = false;
+export const QUIET = true;
 
 const exampleData = {
   boolean_t: true,
@@ -100,7 +100,11 @@ const audienceCProducer: Audience = {
   operationName: "kafka-consumer",
 };
 
-const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
+const logPipeline = async (
+  streamdal: Streamdal,
+  audience: Audience,
+  input: any
+) => {
   if (QUIET) {
     console.debug = () => null;
     console.dir = () => null;
@@ -139,7 +143,7 @@ const logPipeline = async (streamdal: any, audience: Audience, input: any) => {
 };
 
 export const runPipeline = (
-  streamdal: any,
+  streamdal: Streamdal,
   audience: Audience,
   input: any,
   interval = 0
@@ -151,7 +155,7 @@ export const runPipeline = (
     : void logPipeline(streamdal, audience, input);
 
 export const randomPipeline = (
-  streamdal: any,
+  streamdal: Streamdal,
   audience: Audience,
   input: any
 ) => {
@@ -389,4 +393,6 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup = () => {
   runPipeline(streamdalC, audienceCProducer, exampleData, 2000);
 };
 
+//
+// kv();
 billingExample();

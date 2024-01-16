@@ -74,7 +74,7 @@ const welcomeProducer: Audience = {
   operationName: "emailer",
 };
 
-const parseJson = (d: string, i: number): any => {
+const parseJson = (d: string): any => {
   try {
     return d ? JSON.parse(d) : null;
   } catch (e) {
@@ -89,7 +89,7 @@ export const loadData = (path: string): any[] => {
 
     const parsed = data
       .split(/\r?\n/)
-      .map((d, i): any => parseJson(d, i))
+      .map((d): any => parseJson(d))
       .filter((d) => d);
     return parsed;
   } catch (e) {
@@ -99,7 +99,7 @@ export const loadData = (path: string): any[] => {
 };
 
 export const randomPipelineAndData = (
-  streamdal: any,
+  streamdal: Streamdal,
   audience: Audience,
   input: any[]
 ) => {
