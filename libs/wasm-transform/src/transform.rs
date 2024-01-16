@@ -635,7 +635,6 @@ mod tests {
         let result = mask(&req).unwrap();
 
         assert!(gjson::valid(TEST_DATA));
-        println!("{}", result);
         assert!(gjson::valid(&result));
 
         let v = gjson::get(TEST_DATA, "baz.qux");
@@ -901,7 +900,6 @@ mod tests {
 
         let result = extract(&req).unwrap();
 
-        println!("result: {}", result);
         assert!(gjson::valid(result.as_str()));
         assert_eq!(
             result,
@@ -986,7 +984,6 @@ mod tests {
         };
 
         let result = overwrite(&req).unwrap();
-        println!("result: {}", result);
 
         let expected = r#"{"users": [
                 {"name": "REDACTED", "age": 30},

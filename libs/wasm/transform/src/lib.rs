@@ -243,7 +243,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                paths: Vec::<DetectiveStepResultMatch>::new(),
+                paths: paths,
                 value: "".to_string(),
                 truncate_options: None,
                 extract_options: Some(transform::ExtractOptions {
