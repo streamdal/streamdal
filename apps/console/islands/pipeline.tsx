@@ -122,7 +122,6 @@ const transformOptions = z.discriminatedUnion("oneofKind", [
     oneofKind: z.literal("maskOptions"),
     maskOptions: z.object({
       path: z.string().min(1, { message: "Required" }),
-      mask: z.string().min(1, { message: "Required" }),
     }),
   }),
   z.object({

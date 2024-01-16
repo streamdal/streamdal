@@ -29,36 +29,6 @@ export const Schema = (
 
   return (
     <>
-      <div
-        class={"flex w-full items-center justify-start mb-5 "}
-      >
-        <p class="text-left text-gray-400 mr-2 text-sm">
-          Display
-        </p>
-        <button
-          id="dropdownCheckboxButton"
-          className="text-web font-medium text-sm text-center inline-flex items-center"
-          type="button"
-        >
-          JSON
-          <svg
-            class="w-2.5 h-2.5 ml-2.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="m1 1 4 4 4-4"
-            />
-          </svg>
-        </button>
-      </div>
-
       <div className="w-full rounded flex overflow-x-scroll bg-black text-white pt-2 pb-6 px-4 text-sm flex flex-col justify-start">
         <div class={"w-full flex justify-end"}>
           <button

@@ -49,25 +49,6 @@ export const TailRow = (
         )}
       </div>
       <div class="flex flex-row justify-between item-center w-full">
-        <div
-          class={`${tailDiffSignal.value && "w-[49%]"} overflow-x-scroll`}
-        >
-          {tailDiffSignal.value && (
-            <div className="text-stormCloud text-sm">
-              After:
-            </div>
-          )}
-          <pre>
-              <code>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: row.data,
-                  }}
-                >
-                </div>
-              </code>
-          </pre>
-        </div>
         {tailDiffSignal.value && (
           <div class="w-[49%] overflow-x-scroll">
             <div className="text-stormCloud text-sm">
@@ -87,6 +68,25 @@ export const TailRow = (
             </div>
           </div>
         )}
+        <div
+          class={`${tailDiffSignal.value && "w-[49%]"} overflow-x-scroll`}
+        >
+          {tailDiffSignal.value && (
+            <div className="text-stormCloud text-sm">
+              After:
+            </div>
+          )}
+          <pre>
+              <code>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: row.data,
+                  }}
+                >
+                </div>
+              </code>
+          </pre>
+        </div>
       </div>
     </div>
   );
