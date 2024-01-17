@@ -627,12 +627,15 @@ var _ = Describe("WASM Modules", func() {
 
 	Context("inter step result", func() {
 		It("finds and transforms PII in a payload without a path", func() {
-			// TODO: update this test when we can support multiple transforms in a single step
 			payload := []byte(`{
 	"users": [ 
 		{
 			"name": "Bob",
 			"email": "bob@streamdal.com"
+		},
+		{
+			"name": "Mary",
+			"email": "mary@streamdal.com"
 		}
 	]
 }`)
@@ -729,7 +732,7 @@ var _ = Describe("WASM Modules", func() {
 
 			Expect(resp.Error).To(BeFalse())
 			Expect(resp.ErrorMessage).To(Equal(""))
-			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"}]}`))
+			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
 		})
 
 	})
