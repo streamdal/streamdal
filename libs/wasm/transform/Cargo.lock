@@ -216,7 +216,7 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.13"
+version = "0.1.14"
 dependencies = [
  "protobuf",
 ]
@@ -226,6 +226,7 @@ name = "streamdal-wasm-transform"
 version = "0.1.6"
 dependencies = [
  "conv",
+ "protobuf",
  "serde_json",
  "sha256",
  "streamdal-gjson",

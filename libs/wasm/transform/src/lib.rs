@@ -1,3 +1,4 @@
+use protos::sp_steps_detective::DetectiveStepResultMatch;
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_steps_transform::TransformType;
 use protos::sp_wsm::inter_step_result::Input_from::DetectiveResult;
@@ -80,7 +81,11 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FAILURE,
-            format!("Unable to transform payload: {:?}", err),
+            format!(
+                "Unable to transform payload: {:?}: {}",
+                err,
+                transform_request.paths.len(),
+            ),
         ),
     }
 }
@@ -88,7 +93,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::Request, String> {
     let t = wasm_request.step.transform();
 
-    let mut path: String = String::from("");
+    let mut paths = Vec::<DetectiveStepResultMatch>::new();
 
     // TODO: how to collapse this if statement? rust complains about borrow
     // TODO: but if you reference dynamic, rust complains about &bool
@@ -99,9 +104,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if let Some(DetectiveResult(detective_result)) =
                 &wasm_request.inter_step_result.input_from
             {
-                // TODO: Handle multiple matches. For now, just grab the first match
-                let res = detective_result.matches.first().unwrap();
-                path = res.path.clone();
+                paths = detective_result.matches.clone();
             }
         }
     }
@@ -109,19 +112,25 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
     let req = match t.type_.unwrap() {
         // unwrap is safe as validation occurs before this
         TransformType::TRANSFORM_TYPE_TRUNCATE_VALUE => {
-            if path.is_empty() {
-                path = t.truncate_options().path.clone();
+            let opts = t.truncate_options();
+
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                paths.push(DetectiveStepResultMatch {
+                    path: opts.path.clone(),
+                    ..Default::default()
+                })
             }
 
-            let tt = match t.truncate_options().type_.enum_value().unwrap() {
+            let tt = match opts.type_.enum_value().unwrap() {
                 TRANSFORM_TRUNCATE_TYPE_PERCENTAGE => Percent,
                 _ => Chars,
             };
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
                 value: "".to_string(),
+                paths: paths,
                 truncate_options: Some(TruncateOptions {
                     length: t.truncate_options().clone().value as usize,
                     truncate_type: tt,
@@ -130,74 +139,101 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
         }
         TransformType::TRANSFORM_TYPE_DELETE_FIELD => {
-            // Never had deprecated options, no need to handle here
+            let opts = t.delete_field_options();
 
-            if path.is_empty() {
-                path = t.delete_field_options().path.clone();
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                paths.push(DetectiveStepResultMatch {
+                    path: opts.path.clone(),
+                    ..Default::default()
+                })
             }
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
                 value: "".to_string(),
+                paths: paths,
                 truncate_options: None,
                 extract_options: None,
             }
         }
         TransformType::TRANSFORM_TYPE_MASK_VALUE => {
-            if path.is_empty() {
-                path = t.mask_options().path.clone();
+            let opts = t.mask_options();
+
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                paths.push(DetectiveStepResultMatch {
+                    path: opts.path.clone(),
+                    ..Default::default()
+                })
             }
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
-                value: "".to_string(),
+                paths: paths,
+                value: opts.mask.clone(),
                 truncate_options: None,
                 extract_options: None,
             }
         }
         TransformType::TRANSFORM_TYPE_OBFUSCATE_VALUE => {
-            if path.is_empty() {
-                path = t.obfuscate_options().path.clone();
+            let opts = t.obfuscate_options();
+
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                paths.push(DetectiveStepResultMatch {
+                    path: opts.path.clone(),
+                    ..Default::default()
+                })
             }
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
+                paths: paths,
                 value: "".to_string(),
                 truncate_options: None,
                 extract_options: None,
             }
         }
         TransformType::TRANSFORM_TYPE_REPLACE_VALUE => {
-            if path.is_empty() {
-                path = t.replace_value_options().path.clone();
-            }
+            let opts = t.replace_value_options();
 
-            let ro = wasm_request.step.transform().replace_value_options();
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                paths.push(DetectiveStepResultMatch {
+                    path: opts.path.clone(),
+                    ..Default::default()
+                })
+            }
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: path,
-                value: ro.value.clone(),
+                paths: paths,
+                value: opts.value.clone(),
                 truncate_options: None,
                 extract_options: None,
             }
         }
         TransformType::TRANSFORM_TYPE_EXTRACT => {
-            // TODO: does this need to handle detective match? I don't think so at the moment
+            let opts = wasm_request.step.transform().extract_options();
 
-            let eo = wasm_request.step.transform().extract_options();
+            // No inter-step result, pull path from request
+            if paths.is_empty() {
+                for path in &opts.paths {
+                    paths.push(DetectiveStepResultMatch {
+                        path: path.clone(),
+                        ..Default::default()
+                    })
+                }
+            }
 
             transform::Request {
                 data: wasm_request.input_payload.clone(),
-                path: "".to_string(),
+                paths: paths,
                 value: "".to_string(),
                 truncate_options: None,
                 extract_options: Some(transform::ExtractOptions {
-                    flatten: eo.clone().flatten,
-                    paths: eo.paths.clone(),
+                    flatten: opts.clone().flatten,
                 }),
             }
         }
