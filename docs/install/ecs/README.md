@@ -67,7 +67,7 @@ If you are deploying in a new environment, ensure you update the following in th
 
 ## Connect to Streamdal Server via SDK 
 
-From within your AWS VPC, you should be able to connect to the Streamdal server via the service discovery URL streamdal-server.local:8082. It can take as long as 30 minutes for this URL to propagate out to your AWS services.
+From within your AWS VPC, you should be able to connect to the Streamdal server via the service discovery URL ```streamdal-server.local:8082```. It can take as long as 30 minutes for this URL to propagate out to your AWS services.
 
 ## Cleanup
 
