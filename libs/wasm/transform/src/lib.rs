@@ -1,6 +1,4 @@
-use protobuf::EnumOrUnknown;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
-use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_steps_transform::TransformType;
 use protos::sp_wsm::inter_step_result::Input_from::DetectiveResult;
@@ -120,9 +118,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if paths.is_empty() {
                 paths.push(DetectiveStepResultMatch {
                     path: opts.path.clone(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 })
             }
 
@@ -149,9 +145,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if paths.is_empty() {
                 paths.push(DetectiveStepResultMatch {
                     path: opts.path.clone(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 })
             }
 
@@ -170,9 +164,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if paths.is_empty() {
                 paths.push(DetectiveStepResultMatch {
                     path: opts.path.clone(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 })
             }
 
@@ -191,9 +183,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if paths.is_empty() {
                 paths.push(DetectiveStepResultMatch {
                     path: opts.path.clone(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 })
             }
 
@@ -212,9 +202,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             if paths.is_empty() {
                 paths.push(DetectiveStepResultMatch {
                     path: opts.path.clone(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 })
             }
 
@@ -234,9 +222,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
                 for path in &opts.paths {
                     paths.push(DetectiveStepResultMatch {
                         path: path.clone(),
-                        value: "".to_string().into_bytes(),
-                        type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                        special_fields: Default::default(),
+                        ..Default::default()
                     })
                 }
             }

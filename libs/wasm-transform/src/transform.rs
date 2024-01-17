@@ -509,8 +509,6 @@ fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use protobuf::EnumOrUnknown;
-    use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 
     const TEST_DATA: &str = r#"{
     "foo": "bar",
@@ -526,9 +524,7 @@ mod tests {
             data: TEST_DATA.as_bytes().to_vec(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             value: "\"test\"".to_string(),
             truncate_options: None,
@@ -550,8 +546,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "does-not-exist".to_string(),
             value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(
             overwrite(&req).is_err(),
@@ -559,11 +554,11 @@ mod tests {
         );
 
         // Can overwrite anything
+        req.paths = vec![];
         req.paths = vec![DetectiveStepResultMatch {
             path: "bool".to_string(),
             value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(
             overwrite(&req).is_ok(),
@@ -577,9 +572,7 @@ mod tests {
             data: TEST_DATA.as_bytes().to_vec(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             value: "*".to_string(),
             truncate_options: None,
@@ -602,8 +595,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "does-not-exist".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(obfuscate(&req).is_err());
 
@@ -611,8 +603,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "bool".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(obfuscate(&req).is_err());
     }
@@ -624,9 +615,7 @@ mod tests {
             value: "*".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: None,
             extract_options: None,
@@ -647,8 +636,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "does-not-exist".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(mask(&req).is_err());
 
@@ -656,8 +644,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "bool".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(mask(&req).is_err());
     }
@@ -669,9 +656,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: Some(TruncateOptions {
                 length: 1,
@@ -696,8 +681,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "does-not-exist".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(truncate(&req).is_err());
 
@@ -705,8 +689,7 @@ mod tests {
         req.paths = vec![DetectiveStepResultMatch {
             path: "bool".to_string(),
             value: "\"test\"".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }];
         assert!(truncate(&req).is_err());
     }
@@ -718,9 +701,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: Some(TruncateOptions {
                 length: 5,
@@ -748,9 +729,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: Some(TruncateOptions {
                 length: 25,
@@ -778,9 +757,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: None,
             extract_options: None,
@@ -806,15 +783,11 @@ mod tests {
             paths: vec![
                 DetectiveStepResultMatch {
                     path: "foo".to_string(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 },
                 DetectiveStepResultMatch {
                     path: "baz.qux".to_string(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 },
             ],
             truncate_options: None,
@@ -838,15 +811,11 @@ mod tests {
             paths: vec![
                 DetectiveStepResultMatch {
                     path: "foo".to_string(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 },
                 DetectiveStepResultMatch {
                     path: "baz.qux".to_string(),
-                    value: "".to_string().into_bytes(),
-                    type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 },
             ],
             truncate_options: None,
@@ -892,9 +861,7 @@ mod tests {
         for p in paths {
             req.paths.push(DetectiveStepResultMatch {
                 path: p,
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             });
         }
 
@@ -919,9 +886,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "users".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: None,
             extract_options: Some(ExtractOptions { flatten: false }),
@@ -947,9 +912,7 @@ mod tests {
             value: "".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "users.#.name".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: None,
             extract_options: Some(ExtractOptions { flatten: false }),
@@ -975,9 +938,7 @@ mod tests {
             value: "\"REDACTED\"".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "users.0.name".to_string(),
-                value: "".to_string().into_bytes(),
-                type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-                special_fields: Default::default(),
+                ..Default::default()
             }],
             truncate_options: None,
             extract_options: None,

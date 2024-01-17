@@ -1,6 +1,4 @@
-use protobuf::EnumOrUnknown;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
-use protos::sp_steps_detective::DetectiveType::DETECTIVE_TYPE_UNKNOWN;
 use streamdal_wasm_transform::transform;
 use streamdal_wasm_transform::transform::{TruncateOptions, TruncateType};
 
@@ -32,9 +30,7 @@ fn overwrite() {
         value: r#""baz""#.to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: None,
         extract_options: None,
@@ -56,9 +52,7 @@ fn mask_string() {
         value: "*".to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: None,
         extract_options: None,
@@ -80,9 +74,7 @@ fn mask_number() {
         value: "0".to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: None,
         extract_options: None,
@@ -104,9 +96,7 @@ fn obfuscate_string() {
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: None,
         extract_options: None,
@@ -128,9 +118,7 @@ fn truncate_string() {
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: Some(TruncateOptions {
             length: 3,
@@ -155,9 +143,7 @@ fn delete_field() {
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {
             path: "hello".to_string(),
-            value: "".to_string().into_bytes(),
-            type_: EnumOrUnknown::new(DETECTIVE_TYPE_UNKNOWN),
-            special_fields: Default::default(),
+            ..Default::default()
         }],
         truncate_options: None,
         extract_options: None,
