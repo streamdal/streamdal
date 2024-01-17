@@ -1,4 +1,4 @@
-# Snitch Stack Deployment
+# Streamdal Stack Deployment
 
 This repository contains CloudFormation templates and related assets for deploying the `snitch-stack` on Amazon ECS using the Fargate launch type.
 
@@ -64,6 +64,10 @@ If you are deploying in a new environment, ensure you update the following in th
 3. **Container Images**: Update the container image paths if you're using different registries or image names.
 
 4. **Scaling**: The number of task replicas for each service can be adjusted using the `DesiredCount` property in the respective service definitions.
+
+## Connect to Streamdal Server via SDK 
+
+From within your AWS VPC, you should be able to connect to the Streamdal server via the service discovery URL streamdal-server.local:8082. It can take as long as 30 minutes for this URL to propagate out to your AWS services.
 
 ## Cleanup
 
