@@ -5,8 +5,10 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"strings"
 	"time"
 
 	"github.com/PagerDuty/go-pagerduty"
@@ -19,6 +21,7 @@ import (
 	"github.com/relistan/go-director"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
+	"github.com/tidwall/gjson"
 	gomail "gopkg.in/mail.v2"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -325,7 +328,15 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *
 	return nil
 }
 
-func (n *Notify) getEmailBody(ctx context.Context, event *Notification, templateName string) (string, error) {
+func (n *Notify) getEmailBody(_ context.Context, event *Notification, templateName string) (string, error) {
+	if event == nil {
+		return "", errors.New("event is nil")
+	}
+
+	if templateName == "" {
+		return "", errors.New("templateName is empty")
+	}
+
 	// Access individual files by their paths.
 	contents, err := templates.ReadFile(fmt.Sprintf("templates/%s.html", templateName))
 	if err != nil {
@@ -350,4 +361,62 @@ func (n *Notify) getEmailBody(ctx context.Context, event *Notification, template
 	}
 
 	return body.String(), nil
+}
+
+// extractPayloadPaths will extract the requested paths from the payload and return them as a JSON object
+// If flatten is true, the result will be flattened to a single level, otherwise keys/values will be
+// nested as they were in the original JSON payload
+func extractPayloadPaths(payload []byte, paths []string, flatten ...bool) ([]byte, error) {
+	if payload == nil {
+		return nil, errors.New("payload is nil")
+	}
+
+	if len(paths) == 0 {
+		return nil, errors.New("paths is empty")
+	}
+
+	extracted := make(map[string]interface{})
+
+	for _, path := range paths {
+		res := gjson.GetBytes(payload, path)
+		if !res.Exists() {
+			// Path not found, nothing to do
+			continue
+		}
+
+		pathElements := strings.Split(path, ".")
+
+		// Flattened result
+		if len(flatten) > 0 && flatten[0] == true {
+			last := pathElements[len(pathElements)-1]
+			extracted[last] = gjson.GetBytes(payload, path).Value()
+			continue
+		}
+
+		// Nested result
+		currentMap := extracted
+		for i, pathElement := range pathElements {
+			if i == len(pathElements)-1 {
+				// Last element, set value
+				currentMap[pathElement] = res.Value()
+				continue
+			}
+
+			// Create sub key if it doesn't exist
+			if _, ok := currentMap[pathElement]; !ok {
+				currentMap[pathElement] = make(map[string]interface{})
+			}
+
+			// Set current map to next level
+			currentMap = currentMap[pathElement].(map[string]interface{})
+		}
+
+	}
+
+	data, err := json.Marshal(extracted)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to marshal extracted data to JSON")
+	}
+
+	return data, nil
 }
