@@ -461,7 +461,7 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 	})
 }
 
-func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte) (*protos.WASMResponse, error) {
+func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
@@ -477,8 +477,9 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
-		InputPayload: data,
-		Step:         step,
+		InputPayload:    data,
+		Step:            step,
+		InterStepResult: isr,
 	}
 
 	reqBytes, err := proto.Marshal(req)
@@ -607,6 +608,8 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 
 PIPELINE:
 	for _, p := range pipelines {
+		var isr *protos.InterStepResult
+
 		pipelineTimeoutCtx, pipelineTimeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
 
 		pipelineStatus := &protos.PipelineStatus{
@@ -644,7 +647,7 @@ PIPELINE:
 				// NOOP
 			}
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data)
+			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
 			if err != nil {
 				stepTimeoutCxl()
 
@@ -683,6 +686,8 @@ PIPELINE:
 			if len(wasmResp.OutputPayload) > 0 {
 				resp.Data = wasmResp.OutputPayload
 			}
+
+			isr = wasmResp.InterStepResult // Pass inter-step result to next step
 
 			// Check on success and on-failures
 			switch wasmResp.ExitCode {

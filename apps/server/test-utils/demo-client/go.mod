@@ -6,11 +6,11 @@ require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/fatih/color v1.16.0
 	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f
-	github.com/jedib0t/go-pretty/v6 v6.5.2
+	github.com/jedib0t/go-pretty/v6 v6.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/go-sdk v0.0.81
+	github.com/streamdal/go-sdk v0.0.82
 )
 
 require (
@@ -21,13 +21,13 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/streamdal/streamdal/libs/protos v0.1.12 // indirect
+	github.com/streamdal/streamdal/libs/protos v0.1.14 // indirect
 	github.com/tetratelabs/wazero v1.6.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240116215550-a9fa1716bcac // indirect
 	google.golang.org/grpc v1.60.1 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 )
