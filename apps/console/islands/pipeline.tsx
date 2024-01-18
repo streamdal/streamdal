@@ -29,7 +29,7 @@ import {
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric, logFormData } from "../lib/utils.ts";
+import { isNumeric } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -352,7 +352,6 @@ const PipelineDetail = (
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
-    logFormData(formData);
     const { errors } = validate(pipelineSchema, formData);
     setErrors(errors || {});
 

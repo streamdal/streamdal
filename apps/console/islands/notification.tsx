@@ -13,11 +13,8 @@ import {
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
-import IconX from "tabler-icons/tsx/x.tsx";
-import { logFormData } from "../lib/utils.ts";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
 import { initFlowbite } from "flowbite";
-import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
 
 const NotificationTypeEnum = z.nativeEnum(NotificationType);
 const EmailNotificationTypeEnum = z.nativeEnum(NotificationEmail_Type);
