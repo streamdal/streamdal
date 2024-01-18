@@ -85,6 +85,8 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
 
 
 class AbortCondition(betterproto.Enum):
+    """Defines the ways in which a pipeline can be aborted"""
+
     ABORT_CONDITION_UNSET = 0
     ABORT_CONDITION_ABORT_CURRENT = 1
     ABORT_CONDITION_ABORT_ALL = 2
@@ -106,12 +108,6 @@ class AppRegistrationStatusResponseStatus(betterproto.Enum):
 
     STATUS_DONE = 3
     """Done means the user is registered and verified"""
-
-
-class AbortStatus(betterproto.Enum):
-    ABORT_STATUS_UNSET = 0
-    ABORT_STATUS_CURRENT = 1
-    ABORT_STATUS_ALL = 2
 
 
 class WasmExitCode(betterproto.Enum):
@@ -1138,11 +1134,11 @@ class StepStatus(betterproto.Message):
     error_message: str = betterproto.string_field(3)
     """If error == true, this will contain a human-readable error message"""
 
-    abort_status: "AbortStatus" = betterproto.enum_field(4)
+    abort_condition: "AbortCondition" = betterproto.enum_field(4)
     """
-    Indicates if current or upcoming pipeline has been aborted. Err does NOT
-    mean that the pipeline was aborted - on_error conditions have to be defined
-    explicitly for each step.
+    Indicates if current or all future pipelines were aborted. IMPORTANT: Err
+    does NOT mean that the pipeline was aborted - the user has to explicitly
+    define an abort condition for on_error.
     """
 
 

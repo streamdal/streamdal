@@ -21,6 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Defines the ways in which a pipeline can be aborted
 type AbortCondition int32
 
 const (

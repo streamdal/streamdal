@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AbortCondition } from "./sp_pipeline";
 /**
  * Common return response used by all SDKs
  *
@@ -96,30 +97,14 @@ export interface StepStatus {
      */
     errorMessage: string;
     /**
-     * Indicates if current or upcoming pipeline has been aborted. Err does NOT
-     * mean that the pipeline was aborted - on_error conditions have to be defined
-     * explicitly for each step.
+     * Indicates if current or all future pipelines were aborted.
      *
-     * @generated from protobuf field: protos.AbortStatus abort_status = 4;
+     * IMPORTANT: Err does NOT mean that the pipeline was aborted - the user has
+     * to explicitly define an abort condition for on_error.
+     *
+     * @generated from protobuf field: protos.AbortCondition abort_condition = 4;
      */
-    abortStatus: AbortStatus;
-}
-/**
- * @generated from protobuf enum protos.AbortStatus
- */
-export declare enum AbortStatus {
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_UNSET = 0;
-     */
-    UNSET = 0,
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_CURRENT = 1;
-     */
-    CURRENT = 1,
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
-     */
-    ALL = 2
+    abortCondition: AbortCondition;
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();

@@ -15,6 +15,8 @@ import { TransformStep } from "./steps/sp_steps_transform.js";
 import { DetectiveStep } from "./steps/sp_steps_detective.js";
 import { NotificationConfig } from "./sp_notify.js";
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 export var AbortCondition;

@@ -18,6 +18,8 @@ const sp_steps_transform_1 = require("./steps/sp_steps_transform");
 const sp_steps_detective_1 = require("./steps/sp_steps_detective");
 const sp_notify_1 = require("./sp_notify");
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 var AbortCondition;

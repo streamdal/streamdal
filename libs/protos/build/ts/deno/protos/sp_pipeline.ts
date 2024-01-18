@@ -209,6 +209,8 @@ export interface PipelineStep {
     WasmFunction?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 export enum AbortCondition {

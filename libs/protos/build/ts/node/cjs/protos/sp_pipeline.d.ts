@@ -202,6 +202,8 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 export declare enum AbortCondition {

@@ -35,6 +35,7 @@ message Pipeline {
   repeated protos.NotificationConfig _notification_configs = 4; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
+// Defines the ways in which a pipeline can be aborted
 enum AbortCondition {
   ABORT_CONDITION_UNSET = 0;
   ABORT_CONDITION_ABORT_CURRENT = 1;

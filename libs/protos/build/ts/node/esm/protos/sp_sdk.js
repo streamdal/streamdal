@@ -3,24 +3,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-/**
- * @generated from protobuf enum protos.AbortStatus
- */
-export var AbortStatus;
-(function (AbortStatus) {
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_UNSET = 0;
-     */
-    AbortStatus[AbortStatus["UNSET"] = 0] = "UNSET";
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_CURRENT = 1;
-     */
-    AbortStatus[AbortStatus["CURRENT"] = 1] = "CURRENT";
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
-     */
-    AbortStatus[AbortStatus["ALL"] = 2] = "ALL";
-})(AbortStatus || (AbortStatus = {}));
+import { AbortCondition } from "./sp_pipeline.js";
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType {
     constructor() {
@@ -180,11 +163,11 @@ class StepStatus$Type extends MessageType {
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "abort_status", kind: "enum", T: () => ["protos.AbortStatus", AbortStatus, "ABORT_STATUS_"] }
+            { no: 4, name: "abort_condition", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] }
         ]);
     }
     create(value) {
-        const message = { name: "", error: false, errorMessage: "", abortStatus: 0 };
+        const message = { name: "", error: false, errorMessage: "", abortCondition: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -204,8 +187,8 @@ class StepStatus$Type extends MessageType {
                 case /* string error_message */ 3:
                     message.errorMessage = reader.string();
                     break;
-                case /* protos.AbortStatus abort_status */ 4:
-                    message.abortStatus = reader.int32();
+                case /* protos.AbortCondition abort_condition */ 4:
+                    message.abortCondition = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -228,9 +211,9 @@ class StepStatus$Type extends MessageType {
         /* string error_message = 3; */
         if (message.errorMessage !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
-        /* protos.AbortStatus abort_status = 4; */
-        if (message.abortStatus !== 0)
-            writer.tag(4, WireType.Varint).int32(message.abortStatus);
+        /* protos.AbortCondition abort_condition = 4; */
+        if (message.abortCondition !== 0)
+            writer.tag(4, WireType.Varint).int32(message.abortCondition);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

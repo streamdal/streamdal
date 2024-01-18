@@ -1,12 +1,9 @@
+import sp_pipeline_pb2 as _sp_pipeline_pb2
 from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
-ABORT_STATUS_ALL: AbortStatus
-ABORT_STATUS_CURRENT: AbortStatus
-ABORT_STATUS_UNSET: AbortStatus
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class PipelineStatus(_message.Message):
@@ -41,16 +38,13 @@ class SDKResponse(_message.Message):
     def __init__(self, data: _Optional[bytes] = ..., error: bool = ..., error_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class StepStatus(_message.Message):
-    __slots__ = ["abort_status", "error", "error_message", "name"]
-    ABORT_STATUS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["abort_condition", "error", "error_message", "name"]
+    ABORT_CONDITION_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     ERROR_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    abort_status: AbortStatus
+    abort_condition: _sp_pipeline_pb2.AbortCondition
     error: bool
     error_message: str
     name: str
-    def __init__(self, name: _Optional[str] = ..., error: bool = ..., error_message: _Optional[str] = ..., abort_status: _Optional[_Union[AbortStatus, str]] = ...) -> None: ...
-
-class AbortStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    def __init__(self, name: _Optional[str] = ..., error: bool = ..., error_message: _Optional[str] = ..., abort_condition: _Optional[_Union[_sp_pipeline_pb2.AbortCondition, str]] = ...) -> None: ...

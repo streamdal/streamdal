@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AbortCondition } from "./sp_pipeline.js";
 /**
  * Common return response used by all SDKs
  *
@@ -103,30 +104,14 @@ export interface StepStatus {
      */
     errorMessage: string;
     /**
-     * Indicates if current or upcoming pipeline has been aborted. Err does NOT
-     * mean that the pipeline was aborted - on_error conditions have to be defined
-     * explicitly for each step.
+     * Indicates if current or all future pipelines were aborted.
      *
-     * @generated from protobuf field: protos.AbortStatus abort_status = 4;
+     * IMPORTANT: Err does NOT mean that the pipeline was aborted - the user has
+     * to explicitly define an abort condition for on_error.
+     *
+     * @generated from protobuf field: protos.AbortCondition abort_condition = 4;
      */
-    abortStatus: AbortStatus;
-}
-/**
- * @generated from protobuf enum protos.AbortStatus
- */
-export enum AbortStatus {
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_UNSET = 0;
-     */
-    UNSET = 0,
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_CURRENT = 1;
-     */
-    CURRENT = 1,
-    /**
-     * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
-     */
-    ALL = 2
+    abortCondition: AbortCondition;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
@@ -287,11 +272,11 @@ class StepStatus$Type extends MessageType<StepStatus> {
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "abort_status", kind: "enum", T: () => ["protos.AbortStatus", AbortStatus, "ABORT_STATUS_"] }
+            { no: 4, name: "abort_condition", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] }
         ]);
     }
     create(value?: PartialMessage<StepStatus>): StepStatus {
-        const message = { name: "", error: false, errorMessage: "", abortStatus: 0 };
+        const message = { name: "", error: false, errorMessage: "", abortCondition: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<StepStatus>(this, message, value);
@@ -311,8 +296,8 @@ class StepStatus$Type extends MessageType<StepStatus> {
                 case /* string error_message */ 3:
                     message.errorMessage = reader.string();
                     break;
-                case /* protos.AbortStatus abort_status */ 4:
-                    message.abortStatus = reader.int32();
+                case /* protos.AbortCondition abort_condition */ 4:
+                    message.abortCondition = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -335,9 +320,9 @@ class StepStatus$Type extends MessageType<StepStatus> {
         /* string error_message = 3; */
         if (message.errorMessage !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
-        /* protos.AbortStatus abort_status = 4; */
-        if (message.abortStatus !== 0)
-            writer.tag(4, WireType.Varint).int32(message.abortStatus);
+        /* protos.AbortCondition abort_condition = 4; */
+        if (message.abortCondition !== 0)
+            writer.tag(4, WireType.Varint).int32(message.abortCondition);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
