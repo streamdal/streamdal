@@ -616,7 +616,7 @@ class StreamdalClient:
         return protos.ClientInfo(
             client_type=protos.ClientType(self.cfg.client_type),
             library_name="python-sdk",
-            library_version="0.0.43",
+            library_version="0.0.44",
             language="python",
             arch=platform.processor(),
             os=platform.system(),
