@@ -17,16 +17,11 @@ export default async function App(
     <html lang="en">
       <Head>
         <title>
-          {DEMO === "true"
-            ? "Streamdal: Open Source Data Observability That Drives Action"
-            : "Streamdal Console"}
+          {"Streamdal: the open source code-native data pipeline platform"}
         </title>
         <meta
           charSet="UTF-8"
-          content={DEMO === "true"
-            ? "Detect and resolve data incidents faster by peeking into data flowing through your systems" +
-              " and act on it in real-time with Streamdal"
-            : "Streamdal's Console"}
+          content={"Use Streamdal to build code-native data pipelines that detect and mask PII"}
           name="description"
         />
         {DEMO === "true" &&
