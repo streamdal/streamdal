@@ -59,10 +59,14 @@ service External {
   rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
 
   // Attach a notification config to a pipeline
-  rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse);
+  rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  }
 
   // Detach a notification config from a pipeline
-  rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse);
+  rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  }
 
   // Delete an audience
   rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
@@ -216,11 +220,13 @@ message GetNotificationResponse {
 }
 
 message AttachNotificationRequest {
+  option deprecated = true;
   string notification_id = 1;
   string pipeline_id = 2;
 }
 
 message DetachNotificationRequest {
+  option deprecated = true;
   string notification_id = 1;
   string pipeline_id = 2;
 }

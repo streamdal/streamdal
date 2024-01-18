@@ -291,6 +291,7 @@ export interface GetNotificationResponse {
     notification?: NotificationConfig;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.AttachNotificationRequest
  */
 export interface AttachNotificationRequest {
@@ -304,6 +305,7 @@ export interface AttachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.DetachNotificationRequest
  */
 export interface DetachNotificationRequest {
@@ -1691,6 +1693,7 @@ class AttachNotificationRequest$Type extends MessageType<AttachNotificationReque
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
  */
 export const AttachNotificationRequest = new AttachNotificationRequest$Type();
@@ -1745,6 +1748,7 @@ class DetachNotificationRequest$Type extends MessageType<DetachNotificationReque
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 export const DetachNotificationRequest = new DetachNotificationRequest$Type();

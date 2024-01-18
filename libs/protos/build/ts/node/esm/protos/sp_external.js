@@ -1205,6 +1205,7 @@ class AttachNotificationRequest$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
  */
 export const AttachNotificationRequest = new AttachNotificationRequest$Type();
@@ -1259,6 +1260,7 @@ class DetachNotificationRequest$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 export const DetachNotificationRequest = new DetachNotificationRequest$Type();

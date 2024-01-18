@@ -1208,6 +1208,7 @@ class AttachNotificationRequest$Type extends runtime_5.MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
  */
 exports.AttachNotificationRequest = new AttachNotificationRequest$Type();
@@ -1262,6 +1263,7 @@ class DetachNotificationRequest$Type extends runtime_5.MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 exports.DetachNotificationRequest = new DetachNotificationRequest$Type();

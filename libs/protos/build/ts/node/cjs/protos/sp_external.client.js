@@ -160,6 +160,7 @@ class ExternalClient {
     /**
      * Attach a notification config to a pipeline
      *
+     * @deprecated
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input, options) {
@@ -169,6 +170,7 @@ class ExternalClient {
     /**
      * Detach a notification config from a pipeline
      *
+     * @deprecated
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input, options) {
