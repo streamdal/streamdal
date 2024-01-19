@@ -102,33 +102,33 @@ const transformOptions = z.discriminatedUnion("oneofKind", [
   z.object({
     oneofKind: z.literal("replaceValueOptions"),
     replaceValueOptions: z.object({
-      path: z.string().min(1, { message: "Required" }),
+      path: z.string().optional(),
       value: z.string().min(1, { message: "Required" }),
     }),
   }),
   z.object({
     oneofKind: z.literal("deleteFieldOptions"),
     deleteFieldOptions: z.object({
-      path: z.string().min(1, { message: "Required" }),
-    }),
+      path: z.string().optional(),
+    }).default({}),
   }),
   z.object({
     oneofKind: z.literal("obfuscateOptions"),
     obfuscateOptions: z.object({
-      path: z.string().min(1, { message: "Required" }),
-    }),
+      path: z.string().optional(),
+    }).default({}),
   }),
   z.object({
     oneofKind: z.literal("maskOptions"),
     maskOptions: z.object({
-      path: z.string().min(1, { message: "Required" }),
-    }),
+      path: z.string().optional(),
+    }).default({}),
   }),
   z.object({
     oneofKind: z.literal("truncateOptions"),
     truncateOptions: z.object({
       type: zfd.numeric(TransformTruncateTypeEnum),
-      path: z.string().min(1, { message: "Required" }),
+      path: z.string().optional(),
       value: zfd.numeric(z.number().int().min(1)),
     }),
   }),
@@ -277,6 +277,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
 const stepSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
+  dynamic: z.preprocess((v) => v === "true", z.boolean()),
   onSuccess: zfd.repeatable(
     z.array(zfd.numeric(StepConditionEnum).optional()).default(
       [],
@@ -288,6 +289,25 @@ const stepSchema = z.object({
     ),
   ).transform((val) => val.filter((v) => v)),
   step: stepKindSchema,
+}).superRefine((step, ctx) => {
+  //
+  // If this is non-dynamic transform step, path is required
+  if (
+    step?.step?.oneofKind === "transform" && !step.dynamic &&
+    !step?.step?.transform
+      ?.options[step?.step?.transform?.options?.oneofKind]?.path
+  ) {
+    ctx.addIssue({
+      path: [
+        `step.transform.options.${step?.step?.transform?.options?.oneofKind}.path`,
+      ],
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      fatal: true,
+    });
+
+    return z.never;
+  }
 });
 
 export const pipelineSchema = zfd.formData({
