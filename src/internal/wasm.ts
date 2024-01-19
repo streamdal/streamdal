@@ -1,5 +1,6 @@
 import { PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 import {
+  InterStepResult,
   WASMExitCode,
   WASMRequest,
   WASMResponse,
@@ -69,9 +70,11 @@ export const writeResponse = (pointer: number, length: number): bigint => {
 export const runWasm = ({
   step,
   originalData,
+  interStepResult,
 }: {
   step: PipelineStep;
   originalData: Uint8Array;
+  interStepResult?: InterStepResult;
 }) => {
   if (originalData.length > MAX_PAYLOAD_SIZE) {
     return {
@@ -79,6 +82,7 @@ export const runWasm = ({
       outputPayload: new Uint8Array(),
       exitCode: WASMExitCode.WASM_EXIT_CODE_INTERNAL_ERROR,
       exitMsg: "Payload exceeds maximum size",
+      interStepResult: undefined,
     };
   }
 
@@ -88,8 +92,10 @@ export const runWasm = ({
       onSuccess: step.onSuccess,
       onFailure: step.onFailure,
       step: step.step,
+      dynamic: step.dynamic,
     },
     inputPayload: originalData,
+    interStepResult,
   });
 
   const { exports } = internal.wasmModules.get(step.WasmId!);
