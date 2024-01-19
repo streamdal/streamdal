@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'libs/wasm/**'
+      - 'libs/wasm-detective/**'
+      - 'libs/wasm-transform/**'
       - '.github/workflows/libs-wasm-release.yml'
 
 defaults:

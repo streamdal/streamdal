@@ -418,14 +418,24 @@ pub fn mask(req: &Request) -> Result<String, TransformError> {
         let value = gjson::get(data_as_str, dr.path.as_str());
 
         match value.kind() {
-            gjson::Kind::String => match _mask(data_as_str, dr.path.as_str(), '*', true) {
-                Ok(new_data) => data_as_string = new_data,
-                Err(e) => return Err(e),
-            },
-            gjson::Kind::Number => match _mask(data_as_str, dr.path.as_str(), '0', false) {
-                Ok(new_data) => data_as_string = new_data,
-                Err(e) => return Err(e),
-            },
+            gjson::Kind::String => {
+                let mask_char = req.value.chars().next().unwrap_or('*');
+                match _mask(data_as_str, dr.path.as_str(), mask_char, true) {
+                    Ok(new_data) => data_as_string = new_data,
+                    Err(e) => return Err(e),
+                }
+            }
+            gjson::Kind::Number => {
+                let mut mask_char = req.value.chars().next().unwrap_or('0');
+                if mask_char.is_ascii_alphabetic() {
+                    mask_char = '0';
+                }
+
+                match _mask(data_as_str, dr.path.as_str(), mask_char, false) {
+                    Ok(new_data) => data_as_string = new_data,
+                    Err(e) => return Err(e),
+                }
+            }
             _ => {
                 return Err(TransformError::Generic(format!(
                     "unable to mask data: path '{}' is not a string or number",
@@ -612,7 +622,7 @@ mod tests {
     fn test_mask() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
-            value: "*".to_string(),
+            value: "#".to_string(),
             paths: vec![DetectiveStepResultMatch {
                 path: "baz.qux".to_string(),
                 ..Default::default()
@@ -630,7 +640,7 @@ mod tests {
         assert_eq!(v.str(), "quux");
 
         let v = gjson::get(result.as_str(), "baz.qux");
-        assert_eq!(v.str(), "q***");
+        assert_eq!(v.str(), "q###");
 
         // path does not exist
         req.paths = vec![DetectiveStepResultMatch {
