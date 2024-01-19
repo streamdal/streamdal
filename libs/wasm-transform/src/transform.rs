@@ -427,7 +427,7 @@ pub fn mask(req: &Request) -> Result<String, TransformError> {
             }
             gjson::Kind::Number => {
                 let mut mask_char = req.value.chars().next().unwrap_or('0');
-                if mask_char.is_ascii_alphabetic() {
+                if !mask_char.is_ascii_digit() {
                     mask_char = '0';
                 }
 
