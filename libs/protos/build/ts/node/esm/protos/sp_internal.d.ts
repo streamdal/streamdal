@@ -8,6 +8,8 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
 import { Metric } from "./sp_common.js";
+import { PipelineStepNotification } from "./sp_pipeline.js";
+import { PipelineStep } from "./sp_pipeline.js";
 import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 /**
@@ -69,7 +71,8 @@ export interface NotifyRequest {
      */
     pipelineId: string;
     /**
-     * @generated from protobuf field: string step_name = 2;
+     * @deprecated
+     * @generated from protobuf field: string step_name = 2 [deprecated = true];
      */
     stepName: string;
     /**
@@ -80,6 +83,18 @@ export interface NotifyRequest {
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: string;
+    /**
+     * @generated from protobuf field: bytes payload = 5;
+     */
+    payload: Uint8Array;
+    /**
+     * @generated from protobuf field: protos.PipelineStep step = 6;
+     */
+    step?: PipelineStep;
+    /**
+     * @generated from protobuf field: protos.PipelineStepNotification notification = 7;
+     */
+    notification?: PipelineStepNotification;
 }
 /**
  * @generated from protobuf message protos.MetricsRequest

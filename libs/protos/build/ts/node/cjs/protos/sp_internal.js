@@ -15,6 +15,8 @@ const runtime_5 = require("@protobuf-ts/runtime");
 const sp_common_3 = require("./sp_common");
 const sp_command_1 = require("./sp_command");
 const sp_common_4 = require("./sp_common");
+const sp_pipeline_1 = require("./sp_pipeline");
+const sp_pipeline_2 = require("./sp_pipeline");
 const sp_info_1 = require("./sp_info");
 const sp_common_5 = require("./sp_common");
 // @generated message type with reflection information, may provide speed optimized methods
@@ -146,11 +148,14 @@ class NotifyRequest$Type extends runtime_5.MessageType {
             { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "step_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => sp_common_5.Audience },
-            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+            { no: 5, name: "payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 6, name: "step", kind: "message", T: () => sp_pipeline_2.PipelineStep },
+            { no: 7, name: "notification", kind: "message", T: () => sp_pipeline_1.PipelineStepNotification }
         ]);
     }
     create(value) {
-        const message = { pipelineId: "", stepName: "", occurredAtUnixTsUtc: "0" };
+        const message = { pipelineId: "", stepName: "", occurredAtUnixTsUtc: "0", payload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -164,7 +169,7 @@ class NotifyRequest$Type extends runtime_5.MessageType {
                 case /* string pipeline_id */ 1:
                     message.pipelineId = reader.string();
                     break;
-                case /* string step_name */ 2:
+                case /* string step_name = 2 [deprecated = true];*/ 2:
                     message.stepName = reader.string();
                     break;
                 case /* protos.Audience audience */ 3:
@@ -172,6 +177,15 @@ class NotifyRequest$Type extends runtime_5.MessageType {
                     break;
                 case /* int64 occurred_at_unix_ts_utc */ 4:
                     message.occurredAtUnixTsUtc = reader.int64().toString();
+                    break;
+                case /* bytes payload */ 5:
+                    message.payload = reader.bytes();
+                    break;
+                case /* protos.PipelineStep step */ 6:
+                    message.step = sp_pipeline_2.PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
+                    break;
+                case /* protos.PipelineStepNotification notification */ 7:
+                    message.notification = sp_pipeline_1.PipelineStepNotification.internalBinaryRead(reader, reader.uint32(), options, message.notification);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -188,7 +202,7 @@ class NotifyRequest$Type extends runtime_5.MessageType {
         /* string pipeline_id = 1; */
         if (message.pipelineId !== "")
             writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.pipelineId);
-        /* string step_name = 2; */
+        /* string step_name = 2 [deprecated = true]; */
         if (message.stepName !== "")
             writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.stepName);
         /* protos.Audience audience = 3; */
@@ -197,6 +211,15 @@ class NotifyRequest$Type extends runtime_5.MessageType {
         /* int64 occurred_at_unix_ts_utc = 4; */
         if (message.occurredAtUnixTsUtc !== "0")
             writer.tag(4, runtime_1.WireType.Varint).int64(message.occurredAtUnixTsUtc);
+        /* bytes payload = 5; */
+        if (message.payload.length)
+            writer.tag(5, runtime_1.WireType.LengthDelimited).bytes(message.payload);
+        /* protos.PipelineStep step = 6; */
+        if (message.step)
+            sp_pipeline_2.PipelineStep.internalBinaryWrite(message.step, writer.tag(6, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepNotification notification = 7; */
+        if (message.notification)
+            sp_pipeline_1.PipelineStepNotification.internalBinaryWrite(message.notification, writer.tag(7, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
