@@ -18,17 +18,17 @@ export interface SDKResponse {
      */
     data: Uint8Array;
     /**
-     * Indicates if .Process() was successful; check error_message for more details
+     * Execution status of the last step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If an error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status for the last step
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
      * An array of pipelines that the SDK executed and the status of each step
      *
@@ -85,17 +85,17 @@ export interface StepStatus {
      */
     name: string;
     /**
-     * Did an error occur during the step?
+     * Execution outcome status of the step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
      * Indicates if current or all future pipelines were aborted.
      *
@@ -105,6 +105,38 @@ export interface StepStatus {
      * @generated from protobuf field: protos.AbortCondition abort_condition = 4;
      */
     abortCondition: AbortCondition;
+}
+/**
+ * @generated from protobuf enum protos.ExecStatus
+ */
+export declare enum ExecStatus {
+    /**
+     * Unset status. This should never be returned by the SDK. If it does, it is
+     * probably a bug (and you should file an issue)
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * Indicates that the step execution evaluated to "true"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_TRUE = 1;
+     */
+    TRUE = 1,
+    /**
+     * Indicates that the step execution evaluated to "false"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_FALSE = 2;
+     */
+    FALSE = 2,
+    /**
+     * Indicates that the SDK encountered an error while trying to process the
+     * request. Example error cases: SDK can't find the appropriate Wasm module,
+     * Wasm function cannot alloc or dealloc memory, etc.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
+     */
+    ERROR = 3
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();

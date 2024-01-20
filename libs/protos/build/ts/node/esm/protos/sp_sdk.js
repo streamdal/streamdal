@@ -4,19 +4,52 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { AbortCondition } from "./sp_pipeline.js";
+/**
+ * @generated from protobuf enum protos.ExecStatus
+ */
+export var ExecStatus;
+(function (ExecStatus) {
+    /**
+     * Unset status. This should never be returned by the SDK. If it does, it is
+     * probably a bug (and you should file an issue)
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_UNSET = 0;
+     */
+    ExecStatus[ExecStatus["UNSET"] = 0] = "UNSET";
+    /**
+     * Indicates that the step execution evaluated to "true"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_TRUE = 1;
+     */
+    ExecStatus[ExecStatus["TRUE"] = 1] = "TRUE";
+    /**
+     * Indicates that the step execution evaluated to "false"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_FALSE = 2;
+     */
+    ExecStatus[ExecStatus["FALSE"] = 2] = "FALSE";
+    /**
+     * Indicates that the SDK encountered an error while trying to process the
+     * request. Example error cases: SDK can't find the appropriate Wasm module,
+     * Wasm function cannot alloc or dealloc memory, etc.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
+     */
+    ExecStatus[ExecStatus["ERROR"] = 3] = "ERROR";
+})(ExecStatus || (ExecStatus = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType {
     constructor() {
         super("protos.SDKResponse", [
             { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
+            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
             { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value) {
-        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], metadata: {} };
+        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -30,11 +63,11 @@ class SDKResponse$Type extends MessageType {
                 case /* bytes data */ 1:
                     message.data = reader.bytes();
                     break;
-                case /* bool error */ 2:
-                    message.error = reader.bool();
+                case /* protos.ExecStatus status */ 2:
+                    message.status = reader.int32();
                     break;
-                case /* string error_message */ 3:
-                    message.errorMessage = reader.string();
+                case /* optional string status_message */ 3:
+                    message.statusMessage = reader.string();
                     break;
                 case /* repeated protos.PipelineStatus pipeline_status */ 4:
                     message.pipelineStatus.push(PipelineStatus.internalBinaryRead(reader, reader.uint32(), options));
@@ -73,12 +106,12 @@ class SDKResponse$Type extends MessageType {
         /* bytes data = 1; */
         if (message.data.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.data);
-        /* bool error = 2; */
-        if (message.error !== false)
-            writer.tag(2, WireType.Varint).bool(message.error);
-        /* string error_message = 3; */
-        if (message.errorMessage !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
+        /* protos.ExecStatus status = 2; */
+        if (message.status !== 0)
+            writer.tag(2, WireType.Varint).int32(message.status);
+        /* optional string status_message = 3; */
+        if (message.statusMessage !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.statusMessage);
         /* repeated protos.PipelineStatus pipeline_status = 4; */
         for (let i = 0; i < message.pipelineStatus.length; i++)
             PipelineStatus.internalBinaryWrite(message.pipelineStatus[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
@@ -161,13 +194,13 @@ class StepStatus$Type extends MessageType {
     constructor() {
         super("protos.StepStatus", [
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
+            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "abort_condition", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] }
         ]);
     }
     create(value) {
-        const message = { name: "", error: false, errorMessage: "", abortCondition: 0 };
+        const message = { name: "", status: 0, abortCondition: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -181,11 +214,11 @@ class StepStatus$Type extends MessageType {
                 case /* string name */ 1:
                     message.name = reader.string();
                     break;
-                case /* bool error */ 2:
-                    message.error = reader.bool();
+                case /* protos.ExecStatus status */ 2:
+                    message.status = reader.int32();
                     break;
-                case /* string error_message */ 3:
-                    message.errorMessage = reader.string();
+                case /* optional string status_message */ 3:
+                    message.statusMessage = reader.string();
                     break;
                 case /* protos.AbortCondition abort_condition */ 4:
                     message.abortCondition = reader.int32();
@@ -205,12 +238,12 @@ class StepStatus$Type extends MessageType {
         /* string name = 1; */
         if (message.name !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* bool error = 2; */
-        if (message.error !== false)
-            writer.tag(2, WireType.Varint).bool(message.error);
-        /* string error_message = 3; */
-        if (message.errorMessage !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
+        /* protos.ExecStatus status = 2; */
+        if (message.status !== 0)
+            writer.tag(2, WireType.Varint).int32(message.status);
+        /* optional string status_message = 3; */
+        if (message.statusMessage !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.statusMessage);
         /* protos.AbortCondition abort_condition = 4; */
         if (message.abortCondition !== 0)
             writer.tag(4, WireType.Varint).int32(message.abortCondition);

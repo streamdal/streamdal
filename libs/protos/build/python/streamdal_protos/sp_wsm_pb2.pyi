@@ -6,9 +6,9 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
-WASM_EXIT_CODE_FAILURE: WASMExitCode
-WASM_EXIT_CODE_INTERNAL_ERROR: WASMExitCode
-WASM_EXIT_CODE_SUCCESS: WASMExitCode
+WASM_EXIT_CODE_ERROR: WASMExitCode
+WASM_EXIT_CODE_FALSE: WASMExitCode
+WASM_EXIT_CODE_TRUE: WASMExitCode
 WASM_EXIT_CODE_UNSET: WASMExitCode
 
 class InterStepResult(_message.Message):
