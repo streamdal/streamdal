@@ -250,8 +250,9 @@ type StepStatus struct {
 	StatusMessage *string `protobuf:"bytes,3,opt,name=status_message,json=statusMessage,proto3,oneof" json:"status_message,omitempty"`
 	// Indicates if current or all future pipelines were aborted.
 	//
-	// IMPORTANT: Err does NOT mean that the pipeline was aborted - the user has
-	// to explicitly define an abort condition for on_error.
+	// IMPORTANT: The SDK running into an error does not automatically abort
+	// current or all future pipelines - the user must define the abort conditions
+	// for "on_error".
 	AbortCondition AbortCondition `protobuf:"varint,4,opt,name=abort_condition,json=abortCondition,proto3,enum=protos.AbortCondition" json:"abort_condition,omitempty"`
 }
 

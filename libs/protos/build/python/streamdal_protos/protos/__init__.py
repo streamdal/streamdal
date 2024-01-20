@@ -1157,9 +1157,10 @@ class StepStatus(betterproto.Message):
 
     abort_condition: "AbortCondition" = betterproto.enum_field(4)
     """
-    Indicates if current or all future pipelines were aborted. IMPORTANT: Err
-    does NOT mean that the pipeline was aborted - the user has to explicitly
-    define an abort condition for on_error.
+    Indicates if current or all future pipelines were aborted. IMPORTANT: The
+    SDK running into an error does not automatically abort current or all
+    future pipelines - the user must define the abort conditions for
+    "on_error".
     """
 
 
