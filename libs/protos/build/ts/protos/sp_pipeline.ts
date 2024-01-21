@@ -60,7 +60,6 @@ export interface Pipeline {
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
  * Should it continue executing the pipeline, should it abort, should it notify
- * the server? Each step can have exactly one of these for on_success, on_failure
  * and on_error.
  *
  * @generated from protobuf message protos.PipelineStepConditions
@@ -100,17 +99,17 @@ export interface PipelineStep {
      */
     name: string;
     /**
-     * SDKs should read this when WASM returns success to determine what to do next
+     * SDKs should read this when Wasm returns 'true' to determine what to do next.
      *
-     * @generated from protobuf field: protos.PipelineStepConditions on_success = 2;
+     * @generated from protobuf field: protos.PipelineStepConditions on_true = 2;
      */
-    onSuccess?: PipelineStepConditions;
+    onTrue?: PipelineStepConditions;
     /**
-     * SDKs should read this when WASM returns failure to determine what to do next
+     * SDKs should read this when Wasm returns 'false' to determine what to do next.
      *
-     * @generated from protobuf field: protos.PipelineStepConditions on_failure = 3;
+     * @generated from protobuf field: protos.PipelineStepConditions on_false = 3;
      */
-    onFailure?: PipelineStepConditions;
+    onFalse?: PipelineStepConditions;
     /**
      * Indicates whether to use the results from a previous step as input to this step
      *
@@ -118,7 +117,7 @@ export interface PipelineStep {
      */
     dynamic: boolean;
     /**
-     * SDKs should read this when WASM returns error to determine what to do next
+     * SDKs should read this when Wasm returns 'error' to determine what to do next.
      *
      * @generated from protobuf field: protos.PipelineStepConditions on_error = 5;
      */
@@ -209,6 +208,8 @@ export interface PipelineStep {
     WasmFunction?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 export enum AbortCondition {
@@ -375,8 +376,8 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
     constructor() {
         super("protos.PipelineStep", [
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "on_success", kind: "message", T: () => PipelineStepConditions },
-            { no: 3, name: "on_failure", kind: "message", T: () => PipelineStepConditions },
+            { no: 2, name: "on_true", kind: "message", T: () => PipelineStepConditions },
+            { no: 3, name: "on_false", kind: "message", T: () => PipelineStepConditions },
             { no: 4, name: "dynamic", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "on_error", kind: "message", T: () => PipelineStepConditions },
             { no: 1000, name: "detective", kind: "message", oneof: "step", T: () => DetectiveStep },
@@ -409,11 +410,11 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
                 case /* string name */ 1:
                     message.name = reader.string();
                     break;
-                case /* protos.PipelineStepConditions on_success */ 2:
-                    message.onSuccess = PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onSuccess);
+                case /* protos.PipelineStepConditions on_true */ 2:
+                    message.onTrue = PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onTrue);
                     break;
-                case /* protos.PipelineStepConditions on_failure */ 3:
-                    message.onFailure = PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onFailure);
+                case /* protos.PipelineStepConditions on_false */ 3:
+                    message.onFalse = PipelineStepConditions.internalBinaryRead(reader, reader.uint32(), options, message.onFalse);
                     break;
                 case /* bool dynamic */ 4:
                     message.dynamic = reader.bool();
@@ -505,12 +506,12 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
         /* string name = 1; */
         if (message.name !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* protos.PipelineStepConditions on_success = 2; */
-        if (message.onSuccess)
-            PipelineStepConditions.internalBinaryWrite(message.onSuccess, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* protos.PipelineStepConditions on_failure = 3; */
-        if (message.onFailure)
-            PipelineStepConditions.internalBinaryWrite(message.onFailure, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepConditions on_true = 2; */
+        if (message.onTrue)
+            PipelineStepConditions.internalBinaryWrite(message.onTrue, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepConditions on_false = 3; */
+        if (message.onFalse)
+            PipelineStepConditions.internalBinaryWrite(message.onFalse, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* bool dynamic = 4; */
         if (message.dynamic !== false)
             writer.tag(4, WireType.Varint).bool(message.dynamic);

@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AbortCondition } from "./sp_pipeline.ts";
 /**
  * Common return response used by all SDKs
  *
@@ -24,17 +25,17 @@ export interface SDKResponse {
      */
     data: Uint8Array;
     /**
-     * Indicates if .Process() was successful; check error_message for more details
+     * Execution status of the last step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If an error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status for the last step
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
      * An array of pipelines that the SDK executed and the status of each step
      *
@@ -91,56 +92,73 @@ export interface StepStatus {
      */
     name: string;
     /**
-     * Did an error occur during the step?
+     * Execution outcome status of the step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
-     * Indicates if current or upcoming pipeline has been aborted. Err does NOT
-     * mean that the pipeline was aborted - on_error conditions have to be defined
-     * explicitly for each step.
+     * Indicates if current or all future pipelines were aborted.
      *
-     * @generated from protobuf field: protos.AbortStatus abort_status = 4;
+     * IMPORTANT: The SDK running into an error does not automatically abort
+     * current or all future pipelines - the user must define the abort conditions
+     * for "on_error".
+     *
+     * @generated from protobuf field: protos.AbortCondition abort_condition = 4;
      */
-    abortStatus: AbortStatus;
+    abortCondition: AbortCondition;
 }
 /**
- * @generated from protobuf enum protos.AbortStatus
+ * @generated from protobuf enum protos.ExecStatus
  */
-export enum AbortStatus {
+export enum ExecStatus {
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_UNSET = 0;
+     * Unset status. This should never be returned by the SDK. If it does, it is
+     * probably a bug (and you should file an issue)
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_CURRENT = 1;
+     * Indicates that the step execution evaluated to "true"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_TRUE = 1;
      */
-    CURRENT = 1,
+    TRUE = 1,
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
+     * Indicates that the step execution evaluated to "false"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_FALSE = 2;
      */
-    ALL = 2
+    FALSE = 2,
+    /**
+     * Indicates that the SDK encountered an error while trying to process the
+     * request. Example error cases: SDK can't find the appropriate Wasm module,
+     * Wasm function cannot alloc or dealloc memory, etc.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
+     */
+    ERROR = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor() {
         super("protos.SDKResponse", [
             { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
+            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
             { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<SDKResponse>): SDKResponse {
-        const message = { data: new Uint8Array(0), error: false, errorMessage: "", pipelineStatus: [], metadata: {} };
+        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<SDKResponse>(this, message, value);
@@ -154,11 +172,11 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
                 case /* bytes data */ 1:
                     message.data = reader.bytes();
                     break;
-                case /* bool error */ 2:
-                    message.error = reader.bool();
+                case /* protos.ExecStatus status */ 2:
+                    message.status = reader.int32();
                     break;
-                case /* string error_message */ 3:
-                    message.errorMessage = reader.string();
+                case /* optional string status_message */ 3:
+                    message.statusMessage = reader.string();
                     break;
                 case /* repeated protos.PipelineStatus pipeline_status */ 4:
                     message.pipelineStatus.push(PipelineStatus.internalBinaryRead(reader, reader.uint32(), options));
@@ -197,12 +215,12 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         /* bytes data = 1; */
         if (message.data.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.data);
-        /* bool error = 2; */
-        if (message.error !== false)
-            writer.tag(2, WireType.Varint).bool(message.error);
-        /* string error_message = 3; */
-        if (message.errorMessage !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
+        /* protos.ExecStatus status = 2; */
+        if (message.status !== 0)
+            writer.tag(2, WireType.Varint).int32(message.status);
+        /* optional string status_message = 3; */
+        if (message.statusMessage !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.statusMessage);
         /* repeated protos.PipelineStatus pipeline_status = 4; */
         for (let i = 0; i < message.pipelineStatus.length; i++)
             PipelineStatus.internalBinaryWrite(message.pipelineStatus[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
@@ -285,13 +303,13 @@ class StepStatus$Type extends MessageType<StepStatus> {
     constructor() {
         super("protos.StepStatus", [
             { no: 1, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "error", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "error_message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "abort_status", kind: "enum", T: () => ["protos.AbortStatus", AbortStatus, "ABORT_STATUS_"] }
+            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
+            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "abort_condition", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] }
         ]);
     }
     create(value?: PartialMessage<StepStatus>): StepStatus {
-        const message = { name: "", error: false, errorMessage: "", abortStatus: 0 };
+        const message = { name: "", status: 0, abortCondition: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<StepStatus>(this, message, value);
@@ -305,14 +323,14 @@ class StepStatus$Type extends MessageType<StepStatus> {
                 case /* string name */ 1:
                     message.name = reader.string();
                     break;
-                case /* bool error */ 2:
-                    message.error = reader.bool();
+                case /* protos.ExecStatus status */ 2:
+                    message.status = reader.int32();
                     break;
-                case /* string error_message */ 3:
-                    message.errorMessage = reader.string();
+                case /* optional string status_message */ 3:
+                    message.statusMessage = reader.string();
                     break;
-                case /* protos.AbortStatus abort_status */ 4:
-                    message.abortStatus = reader.int32();
+                case /* protos.AbortCondition abort_condition */ 4:
+                    message.abortCondition = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -329,15 +347,15 @@ class StepStatus$Type extends MessageType<StepStatus> {
         /* string name = 1; */
         if (message.name !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.name);
-        /* bool error = 2; */
-        if (message.error !== false)
-            writer.tag(2, WireType.Varint).bool(message.error);
-        /* string error_message = 3; */
-        if (message.errorMessage !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.errorMessage);
-        /* protos.AbortStatus abort_status = 4; */
-        if (message.abortStatus !== 0)
-            writer.tag(4, WireType.Varint).int32(message.abortStatus);
+        /* protos.ExecStatus status = 2; */
+        if (message.status !== 0)
+            writer.tag(2, WireType.Varint).int32(message.status);
+        /* optional string status_message = 3; */
+        if (message.statusMessage !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.statusMessage);
+        /* protos.AbortCondition abort_condition = 4; */
+        if (message.abortCondition !== 0)
+            writer.tag(4, WireType.Varint).int32(message.abortCondition);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -2,12 +2,25 @@ syntax = "proto3";
 
 package protos;
 
+import "sp_pipeline.proto";
+
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
-enum AbortStatus {
-  ABORT_STATUS_UNSET = 0;
-  ABORT_STATUS_CURRENT = 1;
-  ABORT_STATUS_ALL = 2;
+enum ExecStatus {
+  // Unset status. This should never be returned by the SDK. If it does, it is
+  // probably a bug (and you should file an issue)
+  EXEC_STATUS_UNSET = 0;
+
+  // Indicates that the step execution evaluated to "true"
+  EXEC_STATUS_TRUE = 1;
+
+  // Indicates that the step execution evaluated to "false"
+  EXEC_STATUS_FALSE = 2;
+
+  // Indicates that the SDK encountered an error while trying to process the
+  // request. Example error cases: SDK can't find the appropriate Wasm module,
+  // Wasm function cannot alloc or dealloc memory, etc.
+  EXEC_STATUS_ERROR = 3;
 }
 
 // Common return response used by all SDKs
@@ -15,11 +28,11 @@ message SDKResponse {
   // Contains (potentially) modified input data
   bytes data = 1;
 
-  // Indicates if .Process() was successful; check error_message for more details
-  bool error = 2;
+  // Execution status of the last step
+  ExecStatus status = 2;
 
-  // If an error == true, this will contain a human-readable error message
-  string error_message = 3;
+  // Optional message accompanying the exec status for the last step
+  optional string status_message = 3;
 
   // An array of pipelines that the SDK executed and the status of each step
   repeated PipelineStatus pipeline_status = 4;
@@ -50,14 +63,16 @@ message StepStatus {
   // The name of the step
   string name = 1;
 
-  // Did an error occur during the step?
-  bool error = 2;
+  // Execution outcome status of the step
+  ExecStatus status = 2;
 
-  // If error == true, this will contain a human-readable error message
-  string error_message = 3;
+  // Optional message accompanying the exec status
+  optional string status_message = 3;
 
-  // Indicates if current or upcoming pipeline has been aborted. Err does NOT
-  // mean that the pipeline was aborted - on_error conditions have to be defined
-  // explicitly for each step.
-  AbortStatus abort_status = 4;
+  // Indicates if current or all future pipelines were aborted.
+  //
+  // IMPORTANT: The SDK running into an error does not automatically abort
+  // current or all future pipelines - the user must define the abort conditions
+  // for "on_error".
+  AbortCondition abort_condition = 4;
 }
