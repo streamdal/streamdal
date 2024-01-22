@@ -9,6 +9,7 @@ import { FormInput } from "../components/form/formInput.tsx";
 import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { FormNInput } from "../components/form/formNInput.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
+import { useState } from "preact/hooks";
 
 export type PipelineTransformType = {
   stepNumber: number;
@@ -16,6 +17,52 @@ export type PipelineTransformType = {
   data: any;
   setData: (data: any) => void;
   errors: ErrorType;
+};
+
+export type PipelineTransformPath =
+  & PipelineTransformType
+  & { optionPath: string };
+
+const TransformPath = (
+  { optionPath, stepNumber, data, setData, errors }: PipelineTransformPath,
+) => {
+  const [dynamic, setDynamic] = useState(data?.steps[stepNumber]?.dynamic);
+
+  const dynamicAvailable = stepNumber > 0 &&
+    data?.steps[stepNumber - 1]?.step?.oneofKind === "detective";
+
+  return (
+    <>
+      {dynamicAvailable &&
+        (
+          <div class="flex flex-row items-center mb-2">
+            <input
+              type="checkbox"
+              id={`steps.${stepNumber}.dynamic`}
+              name={`steps.${stepNumber}.dynamic`}
+              className={`w-4 h-4 rounded border mr-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2`}
+              value={dynamic}
+              checked={dynamic}
+              onChange={() => setDynamic(!dynamic)}
+            />
+            <label className="text-web font-medium text-[14px] mt-1">
+              Use output of previous detective step as Path
+            </label>
+          </div>
+        )}
+      {!dynamic &&
+        (
+          <FormInput
+            name={`steps.${stepNumber}.step.transform.options.${optionPath}.path`}
+            data={data}
+            setData={setData}
+            label="Path"
+            placeHolder="ex: object.field"
+            errors={errors}
+          />
+        )}
+    </>
+  );
 };
 
 export const TransformOptions = (
@@ -32,14 +79,14 @@ export const TransformOptions = (
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="replaceValueOptions"
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.replaceValueOptions.path`}
+          <TransformPath
+            stepNumber={stepNumber}
             data={data}
             setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
             errors={errors}
+            optionPath={"replaceValueOptions"}
           />
+
           <FormInput
             name={`steps.${stepNumber}.step.transform.options.replaceValueOptions.value`}
             data={data}
@@ -58,13 +105,12 @@ export const TransformOptions = (
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="deleteFieldOptions"
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.deleteFieldOptions.path`}
+          <TransformPath
+            stepNumber={stepNumber}
             data={data}
             setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
             errors={errors}
+            optionPath={"deleteFieldOptions"}
           />
         </>
       );
@@ -76,13 +122,12 @@ export const TransformOptions = (
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="obfuscateOptions"
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.obfuscateOptions.path`}
+          <TransformPath
+            stepNumber={stepNumber}
             data={data}
             setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
             errors={errors}
+            optionPath={"obfuscateOptions"}
           />
         </>
       );
@@ -94,13 +139,12 @@ export const TransformOptions = (
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="maskOptions"
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.maskOptions.path`}
+          <TransformPath
+            stepNumber={stepNumber}
             data={data}
             setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
             errors={errors}
+            optionPath={"maskOptions"}
           />
         </>
       );
@@ -121,13 +165,12 @@ export const TransformOptions = (
             inputClass="w-64"
             children={optionsFromEnum(TransformTruncateType)}
           />
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.truncateOptions.path`}
+          <TransformPath
+            stepNumber={stepNumber}
             data={data}
             setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
             errors={errors}
+            optionPath={"truncateOptions"}
           />
           <FormInput
             name={`steps.${stepNumber}.step.transform.options.truncateOptions.value`}

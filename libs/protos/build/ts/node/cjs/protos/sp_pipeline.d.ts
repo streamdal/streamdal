@@ -54,7 +54,6 @@ export interface Pipeline {
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
  * Should it continue executing the pipeline, should it abort, should it notify
- * the server? Each step can have exactly one of these for on_success, on_failure
  * and on_error.
  * TODO: de-pluralize this name
  *
@@ -152,17 +151,17 @@ export interface PipelineStep {
      */
     name: string;
     /**
-     * SDKs should read this when WASM returns success to determine what to do next
+     * SDKs should read this when Wasm returns 'true' to determine what to do next.
      *
-     * @generated from protobuf field: protos.PipelineStepConditions on_success = 2;
+     * @generated from protobuf field: protos.PipelineStepConditions on_true = 2;
      */
-    onSuccess?: PipelineStepConditions;
+    onTrue?: PipelineStepConditions;
     /**
-     * SDKs should read this when WASM returns failure to determine what to do next
+     * SDKs should read this when Wasm returns 'false' to determine what to do next.
      *
-     * @generated from protobuf field: protos.PipelineStepConditions on_failure = 3;
+     * @generated from protobuf field: protos.PipelineStepConditions on_false = 3;
      */
-    onFailure?: PipelineStepConditions;
+    onFalse?: PipelineStepConditions;
     /**
      * Indicates whether to use the results from a previous step as input to this step
      *
@@ -170,7 +169,7 @@ export interface PipelineStep {
      */
     dynamic: boolean;
     /**
-     * SDKs should read this when WASM returns error to determine what to do next
+     * SDKs should read this when Wasm returns 'error' to determine what to do next.
      *
      * @generated from protobuf field: protos.PipelineStepConditions on_error = 5;
      */
@@ -261,6 +260,8 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * Defines the ways in which a pipeline can be aborted
+ *
  * @generated from protobuf enum protos.AbortCondition
  */
 export declare enum AbortCondition {

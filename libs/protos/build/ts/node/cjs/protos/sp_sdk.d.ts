@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { AbortCondition } from "./sp_pipeline";
 /**
  * Common return response used by all SDKs
  *
@@ -17,17 +18,17 @@ export interface SDKResponse {
      */
     data: Uint8Array;
     /**
-     * Indicates if .Process() was successful; check error_message for more details
+     * Execution status of the last step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If an error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status for the last step
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
      * An array of pipelines that the SDK executed and the status of each step
      *
@@ -84,42 +85,59 @@ export interface StepStatus {
      */
     name: string;
     /**
-     * Did an error occur during the step?
+     * Execution outcome status of the step
      *
-     * @generated from protobuf field: bool error = 2;
+     * @generated from protobuf field: protos.ExecStatus status = 2;
      */
-    error: boolean;
+    status: ExecStatus;
     /**
-     * If error == true, this will contain a human-readable error message
+     * Optional message accompanying the exec status
      *
-     * @generated from protobuf field: string error_message = 3;
+     * @generated from protobuf field: optional string status_message = 3;
      */
-    errorMessage: string;
+    statusMessage?: string;
     /**
-     * Indicates if current or upcoming pipeline has been aborted. Err does NOT
-     * mean that the pipeline was aborted - on_error conditions have to be defined
-     * explicitly for each step.
+     * Indicates if current or all future pipelines were aborted.
      *
-     * @generated from protobuf field: protos.AbortStatus abort_status = 4;
+     * IMPORTANT: The SDK running into an error does not automatically abort
+     * current or all future pipelines - the user must define the abort conditions
+     * for "on_error".
+     *
+     * @generated from protobuf field: protos.AbortCondition abort_condition = 4;
      */
-    abortStatus: AbortStatus;
+    abortCondition: AbortCondition;
 }
 /**
- * @generated from protobuf enum protos.AbortStatus
+ * @generated from protobuf enum protos.ExecStatus
  */
-export declare enum AbortStatus {
+export declare enum ExecStatus {
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_UNSET = 0;
+     * Unset status. This should never be returned by the SDK. If it does, it is
+     * probably a bug (and you should file an issue)
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_UNSET = 0;
      */
     UNSET = 0,
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_CURRENT = 1;
+     * Indicates that the step execution evaluated to "true"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_TRUE = 1;
      */
-    CURRENT = 1,
+    TRUE = 1,
     /**
-     * @generated from protobuf enum value: ABORT_STATUS_ALL = 2;
+     * Indicates that the step execution evaluated to "false"
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_FALSE = 2;
      */
-    ALL = 2
+    FALSE = 2,
+    /**
+     * Indicates that the SDK encountered an error while trying to process the
+     * request. Example error cases: SDK can't find the appropriate Wasm module,
+     * Wasm function cannot alloc or dealloc memory, etc.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
+     */
+    ERROR = 3
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();

@@ -23,7 +23,7 @@ export const FormBoolean = ({
         checked={checked}
         onChange={() => setChecked(!checked)}
       />
-      <label class="text-web font-medium text-[14px]">
+      <label class="text-web font-medium text-[14px] mt-1">
         {display}
       </label>
     </div>

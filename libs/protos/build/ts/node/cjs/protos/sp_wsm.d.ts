@@ -107,19 +107,20 @@ export interface InterStepResult {
     };
 }
 /**
- * Included in WASM response; the SDK should use the WASMExitCode to determine
+ * Included in Wasm response; the SDK should use the WASMExitCode to determine
  * what to do next - should it execute next step, should it notify or should it
- * stop executing/abort the rest of the steps in the pipeline.
+ * stop execution/abort the rest of the steps in current or all pipelines.
  *
  * Example:
  *
- * a. WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
+ * a. Wasm func returns WASM_EXIT_CODE_FALSE - read PipelineStep.on_false
  * conditions to determine what to do next.
  *
- * b. WASM func returns WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success
+ * b. Wasm func returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true
  * conditions to determine what to do next.
  *
  * .. and so on.
+ * TODO: This might be a dupe - should Wasm use ExecStatus instead of this?
  * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
  *
  * @generated from protobuf enum protos.WASMExitCode
@@ -130,19 +131,17 @@ export declare enum WASMExitCode {
      */
     WASM_EXIT_CODE_UNSET = 0,
     /**
-     * @generated from protobuf enum value: WASM_EXIT_CODE_SUCCESS = 1;
+     * @generated from protobuf enum value: WASM_EXIT_CODE_TRUE = 1;
      */
-    WASM_EXIT_CODE_SUCCESS = 1,
+    WASM_EXIT_CODE_TRUE = 1,
     /**
-     * Probably need better names for these as FAILURE is too harsh
-     *
-     * @generated from protobuf enum value: WASM_EXIT_CODE_FAILURE = 2;
+     * @generated from protobuf enum value: WASM_EXIT_CODE_FALSE = 2;
      */
-    WASM_EXIT_CODE_FAILURE = 2,
+    WASM_EXIT_CODE_FALSE = 2,
     /**
-     * @generated from protobuf enum value: WASM_EXIT_CODE_INTERNAL_ERROR = 3;
+     * @generated from protobuf enum value: WASM_EXIT_CODE_ERROR = 3;
      */
-    WASM_EXIT_CODE_INTERNAL_ERROR = 3
+    WASM_EXIT_CODE_ERROR = 3
 }
 declare class WASMRequest$Type extends MessageType<WASMRequest> {
     constructor();

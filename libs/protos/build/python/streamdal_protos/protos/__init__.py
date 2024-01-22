@@ -85,6 +85,8 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
 
 
 class AbortCondition(betterproto.Enum):
+    """Defines the ways in which a pipeline can be aborted"""
+
     ABORT_CONDITION_UNSET = 0
     ABORT_CONDITION_ABORT_CURRENT = 1
     ABORT_CONDITION_ABORT_ALL = 2
@@ -125,28 +127,44 @@ class AppRegistrationStatusResponseStatus(betterproto.Enum):
     """Done means the user is registered and verified"""
 
 
-class AbortStatus(betterproto.Enum):
-    ABORT_STATUS_UNSET = 0
-    ABORT_STATUS_CURRENT = 1
-    ABORT_STATUS_ALL = 2
+class ExecStatus(betterproto.Enum):
+    EXEC_STATUS_UNSET = 0
+    """
+    Unset status. This should never be returned by the SDK. If it does, it is
+    probably a bug (and you should file an issue)
+    """
+
+    EXEC_STATUS_TRUE = 1
+    """Indicates that the step execution evaluated to "true"""
+
+    EXEC_STATUS_FALSE = 2
+    """Indicates that the step execution evaluated to "false"""
+
+    EXEC_STATUS_ERROR = 3
+    """
+    Indicates that the SDK encountered an error while trying to process the
+    request. Example error cases: SDK can't find the appropriate Wasm module,
+    Wasm function cannot alloc or dealloc memory, etc.
+    """
 
 
 class WasmExitCode(betterproto.Enum):
     """
-    Included in WASM response; the SDK should use the WASMExitCode to determine
+    Included in Wasm response; the SDK should use the WASMExitCode to determine
     what to do next - should it execute next step, should it notify or should
-    it stop executing/abort the rest of the steps in the pipeline. Example: a.
-    WASM func returns WASM_EXIT_CODE_FAILURE - read PipelineStep.on_failure
-    conditions to determine what to do next. b. WASM func returns
-    WASM_EXIT_CODE_SUCCESS - read PipelineStep.on_success conditions to
-    determine what to do next. .. and so on. protolint:disable:next
+    it stop execution/abort the rest of the steps in current or all pipelines.
+    Example: a. Wasm func returns WASM_EXIT_CODE_FALSE - read
+    PipelineStep.on_false conditions to determine what to do next. b. Wasm func
+    returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true conditions to
+    determine what to do next. .. and so on. TODO: This might be a dupe -
+    should Wasm use ExecStatus instead of this? protolint:disable:next
     ENUM_FIELD_NAMES_PREFIX
     """
 
     WASM_EXIT_CODE_UNSET = 0
-    WASM_EXIT_CODE_SUCCESS = 1
-    WASM_EXIT_CODE_FAILURE = 2
-    WASM_EXIT_CODE_INTERNAL_ERROR = 3
+    WASM_EXIT_CODE_TRUE = 1
+    WASM_EXIT_CODE_FALSE = 2
+    WASM_EXIT_CODE_ERROR = 3
 
 
 @dataclass(eq=False, repr=False)
@@ -359,8 +377,7 @@ class PipelineStepConditions(betterproto.Message):
     """
     Conditions define how the SDK should handle a Wasm response in a step.
     Should it continue executing the pipeline, should it abort, should it
-    notify the server? Each step can have exactly one of these for on_success,
-    on_failure and on_error. TODO: de-pluralize this name
+    notify and on_error. TODO: de-pluralize this name
     """
 
     abort: "AbortCondition" = betterproto.enum_field(1)
@@ -408,16 +425,16 @@ class PipelineStep(betterproto.Message):
     name: str = betterproto.string_field(1)
     """Friendly name for the step"""
 
-    on_success: "PipelineStepConditions" = betterproto.message_field(2)
+    on_true: "PipelineStepConditions" = betterproto.message_field(2)
     """
-    SDKs should read this when WASM returns success to determine what to do
-    next
+    SDKs should read this when Wasm returns 'true' to determine what to do
+    next.
     """
 
-    on_failure: "PipelineStepConditions" = betterproto.message_field(3)
+    on_false: "PipelineStepConditions" = betterproto.message_field(3)
     """
-    SDKs should read this when WASM returns failure to determine what to do
-    next
+    SDKs should read this when Wasm returns 'false' to determine what to do
+    next.
     """
 
     dynamic: bool = betterproto.bool_field(4)
@@ -428,7 +445,8 @@ class PipelineStep(betterproto.Message):
 
     on_error: "PipelineStepConditions" = betterproto.message_field(5)
     """
-    SDKs should read this when WASM returns error to determine what to do next
+    SDKs should read this when Wasm returns 'error' to determine what to do
+    next.
     """
 
     detective: "steps.DetectiveStep" = betterproto.message_field(1000, group="step")
@@ -1150,16 +1168,13 @@ class SdkResponse(betterproto.Message):
     data: bytes = betterproto.bytes_field(1)
     """Contains (potentially) modified input data"""
 
-    error: bool = betterproto.bool_field(2)
-    """
-    Indicates if .Process() was successful; check error_message for more
-    details
-    """
+    status: "ExecStatus" = betterproto.enum_field(2)
+    """Execution status of the last step"""
 
-    error_message: str = betterproto.string_field(3)
-    """
-    If an error == true, this will contain a human-readable error message
-    """
+    status_message: Optional[str] = betterproto.string_field(
+        3, optional=True, group="_status_message"
+    )
+    """Optional message accompanying the exec status for the last step"""
 
     pipeline_status: List["PipelineStatus"] = betterproto.message_field(4)
     """
@@ -1196,17 +1211,20 @@ class StepStatus(betterproto.Message):
     name: str = betterproto.string_field(1)
     """The name of the step"""
 
-    error: bool = betterproto.bool_field(2)
-    """Did an error occur during the step?"""
+    status: "ExecStatus" = betterproto.enum_field(2)
+    """Execution outcome status of the step"""
 
-    error_message: str = betterproto.string_field(3)
-    """If error == true, this will contain a human-readable error message"""
+    status_message: Optional[str] = betterproto.string_field(
+        3, optional=True, group="_status_message"
+    )
+    """Optional message accompanying the exec status"""
 
-    abort_status: "AbortStatus" = betterproto.enum_field(4)
+    abort_condition: "AbortCondition" = betterproto.enum_field(4)
     """
-    Indicates if current or upcoming pipeline has been aborted. Err does NOT
-    mean that the pipeline was aborted - on_error conditions have to be defined
-    explicitly for each step.
+    Indicates if current or all future pipelines were aborted. IMPORTANT: The
+    SDK running into an error does not automatically abort current or all
+    future pipelines - the user must define the abort conditions for
+    "on_error".
     """
 
 

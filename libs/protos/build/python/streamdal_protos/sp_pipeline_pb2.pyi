@@ -33,7 +33,7 @@ class Pipeline(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
-    __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_failure", "on_success", "schema_validation", "transform", "valid_json"]
+    __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]
     CUSTOM_FIELD_NUMBER: _ClassVar[int]
     DECODE_FIELD_NUMBER: _ClassVar[int]
     DETECTIVE_FIELD_NUMBER: _ClassVar[int]
@@ -44,8 +44,8 @@ class PipelineStep(_message.Message):
     KV_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     ON_ERROR_FIELD_NUMBER: _ClassVar[int]
-    ON_FAILURE_FIELD_NUMBER: _ClassVar[int]
-    ON_SUCCESS_FIELD_NUMBER: _ClassVar[int]
+    ON_FALSE_FIELD_NUMBER: _ClassVar[int]
+    ON_TRUE_FIELD_NUMBER: _ClassVar[int]
     SCHEMA_VALIDATION_FIELD_NUMBER: _ClassVar[int]
     TRANSFORM_FIELD_NUMBER: _ClassVar[int]
     VALID_JSON_FIELD_NUMBER: _ClassVar[int]
@@ -65,12 +65,12 @@ class PipelineStep(_message.Message):
     kv: _sp_steps_kv_pb2.KVStep
     name: str
     on_error: PipelineStepConditions
-    on_failure: PipelineStepConditions
-    on_success: PipelineStepConditions
+    on_false: PipelineStepConditions
+    on_true: PipelineStepConditions
     schema_validation: _sp_steps_schema_validation_pb2.SchemaValidationStep
     transform: _sp_steps_transform_pb2.TransformStep
     valid_json: _sp_steps_valid_json_pb2.ValidJSONStep
-    def __init__(self, name: _Optional[str] = ..., on_success: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., on_failure: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., dynamic: bool = ..., on_error: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., detective: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_sp_steps_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_sp_steps_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_sp_steps_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_sp_steps_custom_pb2.CustomStep, _Mapping]] = ..., http_request: _Optional[_Union[_sp_steps_httprequest_pb2.HttpRequestStep, _Mapping]] = ..., kv: _Optional[_Union[_sp_steps_kv_pb2.KVStep, _Mapping]] = ..., infer_schema: _Optional[_Union[_sp_steps_inferschema_pb2.InferSchemaStep, _Mapping]] = ..., valid_json: _Optional[_Union[_sp_steps_valid_json_pb2.ValidJSONStep, _Mapping]] = ..., schema_validation: _Optional[_Union[_sp_steps_schema_validation_pb2.SchemaValidationStep, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., on_true: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., on_false: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., dynamic: bool = ..., on_error: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., detective: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_sp_steps_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_sp_steps_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_sp_steps_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_sp_steps_custom_pb2.CustomStep, _Mapping]] = ..., http_request: _Optional[_Union[_sp_steps_httprequest_pb2.HttpRequestStep, _Mapping]] = ..., kv: _Optional[_Union[_sp_steps_kv_pb2.KVStep, _Mapping]] = ..., infer_schema: _Optional[_Union[_sp_steps_inferschema_pb2.InferSchemaStep, _Mapping]] = ..., valid_json: _Optional[_Union[_sp_steps_valid_json_pb2.ValidJSONStep, _Mapping]] = ..., schema_validation: _Optional[_Union[_sp_steps_schema_validation_pb2.SchemaValidationStep, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
 
 class PipelineStepConditions(_message.Message):
     __slots__ = ["abort", "metadata", "notification", "notify"]
