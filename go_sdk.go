@@ -714,102 +714,26 @@ PIPELINE:
 
 			isr = wasmResp.InterStepResult // Pass inter-step result to next step
 
+			var (
+				stepCondStr    string
+				stepConds      *protos.PipelineStepConditions
+				stepExecStatus protos.ExecStatus
+			)
+
 			// Execution worked - check wasm exit code
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_TRUE:
-				stepTimeoutCxl()
-				logMsg := fmt.Sprintf("Step '%s' returned 'true'", step.Name)
-
-				// Maybe notify, maybe include metadata
-				cond := s.handleCondition(ctx, req, resp, step.OnTrue, step, pipeline, aud)
-
-				// Update step status bits
-				stepStatus.Status = protos.ExecStatus_EXEC_STATUS_TRUE
-				stepStatus.StatusMessage = proto.String(wasmResp.ExitMsg)
-				stepStatus.AbortCondition = cond.abortCondition
-
-				// Populate pipeline and step statuses in resp
-				s.updateRespStatus(resp, pipelineStatus, stepStatus)
-
-				if cond.abortCurrent {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
-
-					continue PIPELINE
-				} else if cond.abortAll {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting ALL pipelines)")
-
-					return resp
-				}
-
-				s.config.Logger.Debug(logMsg + " (no abort condition defined - continuing execution)")
+				stepCondStr = "true"
+				stepConds = step.OnTrue
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_TRUE
 			case protos.WASMExitCode_WASM_EXIT_CODE_FALSE:
-				stepTimeoutCxl()
-				logMsg := fmt.Sprintf("Step '%s' returned 'false'", step.Name)
-
-				// Maybe notify, maybe include metadata
-				cond := s.handleCondition(ctx, req, resp, step.OnFalse, step, pipeline, aud)
-
-				// Update step status bits
-				stepStatus.Status = protos.ExecStatus_EXEC_STATUS_FALSE
-				stepStatus.StatusMessage = proto.String(wasmResp.ExitMsg)
-				stepStatus.AbortCondition = cond.abortCondition
-
-				// Populate pipeline and step statuses in resp
-				s.updateRespStatus(resp, pipelineStatus, stepStatus)
-
-				if cond.abortCurrent {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
-
-					continue PIPELINE
-				} else if cond.abortAll {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
-
-					return resp
-				}
-
-				s.config.Logger.Debug(logMsg + " (no abort condition defined - continuing execution)")
+				stepCondStr = "false"
+				stepConds = step.OnFalse
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
 			case protos.WASMExitCode_WASM_EXIT_CODE_ERROR:
-				stepTimeoutCxl()
-
-				logMsg := fmt.Sprintf("Step '%s' returned 'error': %s", step.Name, wasmResp.ExitMsg)
-
-				// Maybe notify, maybe include metadata
-				cond := s.handleCondition(ctx, req, resp, step.OnFalse, step, pipeline, aud)
-
-				// Update the abort condition before we populate statuses in resp
-				stepStatus.Status = protos.ExecStatus_EXEC_STATUS_ERROR
-				stepStatus.StatusMessage = proto.String(wasmResp.ExitMsg)
-				stepStatus.AbortCondition = cond.abortCondition
-
-				// Populate pipeline and step statuses in resp
-				s.updateRespStatus(resp, pipelineStatus, stepStatus)
-
-				// Increase error metrics
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
-
-				if cond.abortCurrent {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
-
-					continue PIPELINE
-				} else if cond.abortAll {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
-
-					return resp
-				}
-
-				s.config.Logger.Debug(logMsg + " (no abort condition defined - continuing execution)")
+				stepCondStr = "error"
+				stepConds = step.OnError
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
@@ -818,11 +742,42 @@ PIPELINE:
 			}
 
 			stepTimeoutCxl()
-			pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
+			logMsg := fmt.Sprintf("Step '%s' returned '%s'", step.Name, stepCondStr)
+
+			// Maybe notify, maybe include metadata
+			cond := s.handleCondition(ctx, req, resp, stepConds, step, pipeline, aud)
+
+			// Update step status bits
+			stepStatus.Status = stepExecStatus
+			stepStatus.StatusMessage = proto.String(wasmResp.ExitMsg)
+			stepStatus.AbortCondition = cond.abortCondition
+
+			// Populate pipeline and step statuses in resp
+			s.updateRespStatus(resp, pipelineStatus, stepStatus)
+
+			// Increase error metrics (if wasm returned err)
+			if stepExecStatus == protos.ExecStatus_EXEC_STATUS_ERROR {
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
+			}
+
+			if cond.abortCurrent {
+				pipelineTimeoutCxl()
+
+				s.config.Logger.Debug(logMsg + " (aborting CURRENT pipeline)")
+
+				continue PIPELINE
+			} else if cond.abortAll {
+				pipelineTimeoutCxl()
+
+				s.config.Logger.Debug(logMsg + " (aborting ALL pipelines)")
+
+				return resp
+			}
+
+			s.config.Logger.Debug(logMsg + " (no abort condition defined - continuing execution)")
 		}
 
 		pipelineTimeoutCxl()
-		resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
 	}
 
 	// Perform tail if necessary
