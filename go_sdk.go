@@ -651,8 +651,6 @@ PIPELINE:
 				// Populate pipeline and step statuses in resp
 				s.updateRespStatus(resp, pipelineStatus, stepStatus)
 
-				// TODO: Should resp have status filled out here?
-
 				if cond.abortCurrent {
 					s.config.Logger.Warnf("exceeded timeout for pipeline '%s' - aborting CURRENT pipeline", pipeline.Name)
 
@@ -742,6 +740,7 @@ PIPELINE:
 			}
 
 			stepTimeoutCxl()
+
 			logMsg := fmt.Sprintf("Step '%s' returned '%s'", step.Name, stepCondStr)
 
 			// Maybe notify, maybe include metadata
@@ -864,8 +863,7 @@ func (s *Streamdal) populateMetadata(resp *ProcessResponse, metadata map[string]
 	}
 }
 
-// updateRespStatus is a wrapper for updating the pipeline status + appending it to
-// the response
+// updateRespStatus is a wrapper for updating the pipeline status in response
 func (s *Streamdal) updateRespStatus(resp *ProcessResponse, pipelineStatus *protos.PipelineStatus, stepStatus *protos.StepStatus) {
 	if resp == nil {
 		s.config.Logger.Error("BUG: updateRespStatus() called with nil resp")
