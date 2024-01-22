@@ -14,7 +14,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to read request: {}", e),
             );
         }
@@ -26,7 +26,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
             format!("step validation failed: {}", err),
         );
     }
@@ -37,10 +37,10 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Run request against detective
     match Detective::new().matches(&req) {
         Ok(match_result) => {
-            let mut exit_code = WASMExitCode::WASM_EXIT_CODE_FAILURE;
+            let mut exit_code = WASMExitCode::WASM_EXIT_CODE_FALSE;
 
             if !match_result.is_empty() {
-                exit_code = WASMExitCode::WASM_EXIT_CODE_SUCCESS;
+                exit_code = WASMExitCode::WASM_EXIT_CODE_TRUE;
             }
 
             let isr = InterStepResult {
@@ -65,7 +65,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(&req.data),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
             e.to_string(),
         ),
     }
