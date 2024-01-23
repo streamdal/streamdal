@@ -558,21 +558,18 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
 	resp := &ProcessResponse{
-		// Always return data - we will update it if we have pipelines/steps
-		// that modify it.
-		Data:           req.Data,
 		PipelineStatus: make([]*protos.PipelineStatus, 0),
 		Metadata:       make(map[string]string),
 	}
 
 	if err := validateProcessRequest(req); err != nil {
-		if req != nil {
-			resp.Status = protos.ExecStatus_EXEC_STATUS_ERROR
-			resp.StatusMessage = proto.String(err.Error())
-		}
+		resp.Status = protos.ExecStatus_EXEC_STATUS_ERROR
+		resp.StatusMessage = proto.String(err.Error())
 
 		return resp
 	}
+
+	resp.Data = req.Data
 
 	payloadSize := int64(len(resp.Data))
 	aud := newAudience(req, s.config)
@@ -867,10 +864,16 @@ func (s *Streamdal) handleCondition(
 	// Should we abort current or ALL pipelines?
 	if stepCond.Abort == protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT {
 		s.config.Logger.Debugf("Abort condition set to 'current' for step '%s'", step.Name)
-		return condition{abortCurrent: true}
+		return condition{
+			abortCurrent:   true,
+			abortCondition: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+		}
 	} else if stepCond.Abort == protos.AbortCondition_ABORT_CONDITION_ABORT_ALL {
 		s.config.Logger.Debugf("Abort condition set to 'all' for step '%s'", step.Name)
-		return condition{abortAll: true}
+		return condition{
+			abortAll:       true,
+			abortCondition: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+		}
 	}
 
 	s.config.Logger.Debugf("No abort conditions set for step '%s'", step.Name)
