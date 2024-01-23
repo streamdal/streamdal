@@ -532,7 +532,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitMsg).To(Equal("payload does not match schema, invalid fields: age: expected type=number; got value=\"str\""))
 			// TODO: Why is Wasm returning "3" (ERROR) here?
-			//Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 
 		It("Passes validation", func() {

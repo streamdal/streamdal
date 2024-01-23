@@ -538,8 +538,7 @@ var _ = Describe("Streamdal", func() {
 
 					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{}))
 					Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
-					// TODO: Why are there two pipeline status entries? Bug?
-					// Expect(len(resp.PipelineStatus)).To(Equal(1))
+					Expect(len(resp.PipelineStatus)).To(Equal(1))
 					Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(2))
 					Expect(resp.PipelineStatus[0].StepStatus[0].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 					Expect(resp.PipelineStatus[0].StepStatus[1].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
