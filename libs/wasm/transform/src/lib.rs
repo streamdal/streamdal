@@ -29,7 +29,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!("step validation failed: {}", err),
         );
     }
@@ -42,7 +42,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("unable to generate transform request: {}", e),
             );
         }

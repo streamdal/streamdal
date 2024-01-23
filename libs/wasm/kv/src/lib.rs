@@ -24,7 +24,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_error_response(
-            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!("unable to validate wasm request: {}", err.to_string()),
         );
     }
@@ -34,7 +34,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         KVAction::KV_ACTION_EXISTS => kvExists,
         _ => {
             return common::write_error_response(
-                WASMExitCode::WASM_EXIT_CODE_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid action: {:?}", wasm_request.step.kv().action),
             );
         }
@@ -102,7 +102,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate KVResp
     if let Err(err) = validate_kv_step_response(&kv_step_response) {
         return common::write_error_response(
-            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!("unable to validate kv step response: {}", err.to_string()),
         );
     }
