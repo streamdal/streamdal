@@ -8,10 +8,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/go-sdk/logger/loggerfakes"
-	"github.com/streamdal/go-sdk/server/serverfakes"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
+
+	"github.com/streamdal/go-sdk/logger/loggerfakes"
+	"github.com/streamdal/go-sdk/server/serverfakes"
 )
 
 var _ = Describe("Schema", func() {
@@ -87,7 +88,7 @@ var _ = Describe("Schema", func() {
 			}
 
 			wasmResp := &protos.WASMResponse{
-				ExitCode: protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+				ExitCode: protos.WASMExitCode_WASM_EXIT_CODE_FALSE,
 			}
 
 			got := s.handleSchema(context.Background(), aud, step, wasmResp)
@@ -108,7 +109,7 @@ var _ = Describe("Schema", func() {
 			}
 
 			wasmResp := &protos.WASMResponse{
-				ExitCode:   protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS,
+				ExitCode:   protos.WASMExitCode_WASM_EXIT_CODE_TRUE,
 				OutputStep: []byte(`{"type": "string"}`),
 			}
 
