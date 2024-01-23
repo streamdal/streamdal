@@ -68,6 +68,10 @@ const (
 	// type of operation the Process() call is performing.
 	OperationTypeConsumer OperationType = 1
 	OperationTypeProducer OperationType = 2
+
+	AbortAllStr     = "aborted all pipelines"
+	AbortCurrentStr = "aborted current pipeline"
+	AbortNoneStr    = "no abort condition defined"
 )
 
 var (
@@ -554,6 +558,9 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
 	resp := &ProcessResponse{
+		// Always return data - we will update it if we have pipelines/steps
+		// that modify it.
+		Data:           req.Data,
 		PipelineStatus: make([]*protos.PipelineStatus, 0),
 		Metadata:       make(map[string]string),
 	}
@@ -562,7 +569,6 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 		if req != nil {
 			resp.Status = protos.ExecStatus_EXEC_STATUS_ERROR
 			resp.StatusMessage = proto.String(err.Error())
-			resp.Data = req.Data
 		}
 
 		return resp
@@ -592,11 +598,21 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 
 	pipelines := s.getPipelines(ctx, aud)
 
+	// WARNING: This case will (usually) only "hit" for the first <100ms of
+	// running the SDK - after that, the server will have sent us at least one,
+	// "hidden"  pipeline - "infer schema". All of this happens asynchronously
+	// (to prevent Register() from blocking).
+	//
+	// This means that setting resp.StatusMessage here means that it will only
+	// survive for the first few messages - after that, StatusMessage might get
+	// updated by the infer schema pipeline step.
 	if len(pipelines) == 0 {
 		// Send tail if there is any. Tails do not require a pipeline to operate
 		s.sendTail(aud, "", resp.Data, resp.Data)
 
 		// No pipelines for this mode, nothing to do
+		resp.Status = protos.ExecStatus_EXEC_STATUS_TRUE
+
 		return resp
 	}
 
@@ -721,17 +737,26 @@ PIPELINE:
 			// Execution worked - check wasm exit code
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_TRUE:
+				// Data was potentially modified
+				resp.Data = wasmResp.OutputPayload
+
 				stepCondStr = "true"
 				stepConds = step.OnTrue
 				stepExecStatus = protos.ExecStatus_EXEC_STATUS_TRUE
 			case protos.WASMExitCode_WASM_EXIT_CODE_FALSE:
+				// Data was potentially modified
+				resp.Data = wasmResp.OutputPayload
+
 				stepCondStr = "false"
 				stepConds = step.OnFalse
 				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
 			case protos.WASMExitCode_WASM_EXIT_CODE_ERROR:
+				// Ran into an error - return original data
+				resp.Data = req.Data
+
 				stepCondStr = "error"
 				stepConds = step.OnError
-				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_ERROR
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
@@ -748,7 +773,7 @@ PIPELINE:
 
 			// Update step status bits
 			stepStatus.Status = stepExecStatus
-			stepStatus.StatusMessage = proto.String(wasmResp.ExitMsg)
+
 			stepStatus.AbortCondition = cond.abortCondition
 
 			// Populate pipeline and step statuses in resp
@@ -810,6 +835,11 @@ func (s *Streamdal) handleCondition(
 	pipeline *protos.Pipeline,
 	aud *protos.Audience,
 ) condition {
+	// If no condition is set, we don't need to do anything
+	if stepCond == nil {
+		return condition{}
+	}
+
 	// Should we notify?
 	if stepCond.Notify && !s.config.DryRun {
 		s.config.Logger.Debugf("Performing 'notify' condition for step '%s'", step.Name)
@@ -881,9 +911,30 @@ func (s *Streamdal) updateRespStatus(resp *ProcessResponse, pipelineStatus *prot
 	// Add pipeline status to resp
 	resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
 
+	// Add a nicer "status message" to resp
+	var (
+		abortStatusStr string
+		fullStatusMsg  string
+	)
+
+	switch stepStatus.AbortCondition {
+	case protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT:
+		abortStatusStr = AbortCurrentStr
+	case protos.AbortCondition_ABORT_CONDITION_ABORT_ALL:
+		abortStatusStr = AbortAllStr
+	default:
+		abortStatusStr = AbortNoneStr
+	}
+
+	if stepStatus.StatusMessage != nil && *stepStatus.StatusMessage != "" {
+		fullStatusMsg = fmt.Sprintf("%s (%s)", *stepStatus.StatusMessage, abortStatusStr)
+	} else {
+		fullStatusMsg = abortStatusStr
+	}
+
 	// Response contains the last step status
 	resp.Status = stepStatus.Status
-	resp.StatusMessage = stepStatus.StatusMessage
+	resp.StatusMessage = &fullStatusMsg
 }
 
 func (a *Audience) toProto(serviceName string) *protos.Audience {
