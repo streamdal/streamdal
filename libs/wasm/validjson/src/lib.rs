@@ -24,7 +24,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_ERROR,
-            format!("step validation failed: {}", err),
+            format!("invalid wasm request: {}", err),
         );
     }
 

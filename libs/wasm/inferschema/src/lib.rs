@@ -21,11 +21,11 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_response(
-            Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FALSE,
-            format!("invalid step: {}", err.to_string()),
+            None,
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     };
 

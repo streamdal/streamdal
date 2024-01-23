@@ -26,8 +26,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FALSE,
-            format!("invalid step: {}", err.to_string()),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     };
 
@@ -43,7 +43,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FALSE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE, // DS: Should this be an error since it's a bad request?
                 "schema type is required".to_string(),
             );
         }
@@ -165,7 +165,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FALSE,
+            WASMExitCode::WASM_EXIT_CODE_FALSE, // DS: Should this be an error since it's a bad request?
             "schema validation condition is required".to_string(),
         ),
     };
