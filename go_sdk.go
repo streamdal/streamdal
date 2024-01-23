@@ -940,11 +940,6 @@ func (s *Streamdal) updateStatus(resp *ProcessResponse, pipelineStatus *protos.P
 		return
 	}
 
-	// If resp is not nil, there should not be a step status
-	if resp != nil && stepStatus != nil {
-		s.config.Logger.Warn("BUG: resp and step status cannot both be non-nil in updateStatus()")
-	}
-
 	if stepStatus != nil {
 		// When returning final response, we won't have a step status
 		pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
