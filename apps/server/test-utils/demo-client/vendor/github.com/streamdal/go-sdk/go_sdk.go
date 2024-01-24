@@ -68,6 +68,10 @@ const (
 	// type of operation the Process() call is performing.
 	OperationTypeConsumer OperationType = 1
 	OperationTypeProducer OperationType = 2
+
+	AbortAllStr     = "aborted all pipelines"
+	AbortCurrentStr = "aborted current pipeline"
+	AbortNoneStr    = "no abort condition"
 )
 
 var (
@@ -539,37 +543,38 @@ func (s *Streamdal) getCounterLabels(req *ProcessRequest, pipeline *protos.Pipel
 	return l
 }
 
-func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
-	if err := validateProcessRequest(req); err != nil {
-		resp := &ProcessResponse{
-			Error:          true,
-			ErrorMessage:   err.Error(),
-			PipelineStatus: make([]*protos.PipelineStatus, 0),
-		}
-
-		if req != nil {
-			resp.Data = req.Data
-		}
-
-		return resp
+func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
+	if req == nil || cfg == nil {
+		panic("BUG: newAudience() called with nil arguments")
 	}
 
-	resp := &ProcessResponse{
-		Data:           req.Data,
-		Error:          false,
-		ErrorMessage:   "",
-		PipelineStatus: make([]*protos.PipelineStatus, 0),
-	}
-
-	payloadSize := int64(len(resp.Data))
-
-	aud := &protos.Audience{
-		ServiceName:   s.config.ServiceName,
+	return &protos.Audience{
+		ServiceName:   cfg.ServiceName,
 		ComponentName: req.ComponentName,
 		OperationType: protos.OperationType(req.OperationType),
 		OperationName: req.OperationName,
 	}
+}
 
+func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
+	resp := &ProcessResponse{
+		PipelineStatus: make([]*protos.PipelineStatus, 0),
+		Metadata:       make(map[string]string),
+	}
+
+	if err := validateProcessRequest(req); err != nil {
+		resp.Status = protos.ExecStatus_EXEC_STATUS_ERROR
+		resp.StatusMessage = proto.String(err.Error())
+
+		return resp
+	}
+
+	resp.Data = req.Data
+
+	payloadSize := int64(len(resp.Data))
+	aud := newAudience(req, s.config)
+
+	// TODO: DRY this up
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
 	counterBytes := types.ConsumeBytes
@@ -589,26 +594,45 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: rateProcessed, Labels: map[string]string{}, Value: 1, Audience: aud})
 
 	pipelines := s.getPipelines(ctx, aud)
+
+	// WARNING: This case will (usually) only "hit" for the first <100ms of
+	// running the SDK - after that, the server will have sent us at least one,
+	// "hidden"  pipeline - "infer schema". All of this happens asynchronously
+	// (to prevent Register() from blocking).
+	//
+	// This means that setting resp.StatusMessage here means that it will only
+	// survive for the first few messages - after that, StatusMessage might get
+	// updated by the infer schema pipeline step.
 	if len(pipelines) == 0 {
 		// Send tail if there is any. Tails do not require a pipeline to operate
 		s.sendTail(aud, "", resp.Data, resp.Data)
 
 		// No pipelines for this mode, nothing to do
+		resp.Status = protos.ExecStatus_EXEC_STATUS_TRUE
+
 		return resp
 	}
 
 	if payloadSize > MaxWASMPayloadSize {
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, nil), Value: 1, Audience: aud})
 		s.config.Logger.Warn(ErrMaxPayloadSizeExceeded)
-		resp.Error = true
-		resp.ErrorMessage = ErrMaxPayloadSizeExceeded.Error()
+
+		resp.Status = protos.ExecStatus_EXEC_STATUS_ERROR
+		resp.StatusMessage = proto.String(ErrMaxPayloadSizeExceeded.Error())
 
 		return resp
 	}
 
+	totalPipelines := len(pipelines)
+	var (
+		pIndex int
+		sIndex int
+	)
+
 PIPELINE:
 	for _, p := range pipelines {
 		var isr *protos.InterStepResult
+		pIndex += 1
 
 		pipelineTimeoutCtx, pipelineTimeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
 
@@ -617,19 +641,21 @@ PIPELINE:
 			Name:       p.GetAttachPipeline().GetPipeline().Name,
 			StepStatus: make([]*protos.StepStatus, 0),
 		}
+
 		pipeline := p.GetAttachPipeline().GetPipeline()
 
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: s.getCounterLabels(req, pipeline), Value: payloadSize, Audience: aud})
 
+		totalSteps := len(pipeline.Steps)
+
 		for _, step := range pipeline.Steps {
+			sIndex += 1
+
 			stepTimeoutCtx, stepTimeoutCxl := context.WithTimeout(ctx, s.config.StepTimeout)
 
 			stepStatus := &protos.StepStatus{
-				Name:         step.Name,
-				Error:        false,
-				ErrorMessage: "",
-				AbortStatus:  protos.AbortStatus_ABORT_STATUS_UNSET,
+				Name: step.Name,
 			}
 
 			select {
@@ -637,49 +663,93 @@ PIPELINE:
 				pipelineTimeoutCxl()
 				stepTimeoutCxl()
 
-				s.config.Logger.Errorf("pipeline '%s' timeout exceeded", pipeline.Name)
-				stepStatus.Error = true
-				stepStatus.ErrorMessage = "Step timeout exceeded"
-				pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-				resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-				continue PIPELINE
+				stepStatus.Status = protos.ExecStatus_EXEC_STATUS_ERROR
+				stepStatus.StatusMessage = proto.String("Pipeline error: " + ErrPipelineTimeout.Error())
+
+				// Maybe notify, maybe include metadata
+				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud)
+
+				// Update the abort condition before we populate statuses in resp
+				stepStatus.AbortCondition = cond.abortCondition
+
+				if cond.abortCurrent {
+					// Aborting CURRENT, LOCAL step & pipeline status needs to be updated
+					if pIndex == totalPipelines {
+						s.updateStatus(resp, pipelineStatus, stepStatus)
+					} else {
+						s.updateStatus(nil, pipelineStatus, stepStatus)
+					}
+
+					s.config.Logger.Warnf("exceeded timeout for pipeline '%s' - aborting CURRENT pipeline", pipeline.Name)
+
+					continue PIPELINE
+				} else if cond.abortAll {
+					s.config.Logger.Warnf("exceeded timeout for pipeline '%s' - aborting ALL pipelines", pipeline.Name)
+
+					// Aborting ALL, RESP should have step & pipeline status updated
+					s.updateStatus(resp, pipelineStatus, stepStatus)
+
+					return resp
+				}
+
+				// NOT aborting, don't need to update step or pipeline status
+				s.config.Logger.Warnf("exceeded timeout for pipeline '%s' but no abort condition defined - continuing execution", step.Name)
 			default:
 				// NOOP
 			}
+
+			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
 			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
 			if err != nil {
 				stepTimeoutCxl()
 
-				err = fmt.Errorf("failed to run step '%s': %s", step.Name, err)
-				s.config.Logger.Error(err)
+				err = fmt.Errorf("wasm error during step '%s:%s': %s", pipeline.Name, step.Name, err)
 
-				stepStatus.Error = true
-				stepStatus.ErrorMessage = err.Error()
+				stepStatus.Status = protos.ExecStatus_EXEC_STATUS_ERROR
+				stepStatus.StatusMessage = proto.String("Wasm Error: " + err.Error())
 
-				cond := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
-				// Do not drop message on a WASM execution error, excluding that logic from here
+				// Maybe notify, maybe include metadata
+				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud)
 
-				if !cond.continueProcess {
-					pipelineTimeoutCxl()
-					s.config.Logger.Debugf("Step '%s' failed to run, aborting pipeline", step.Name)
+				// Update the abort condition before we populate statuses in resp
+				stepStatus.AbortCondition = cond.abortCondition
 
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					return resp
-				} else if !cond.continuePipeline {
+				if cond.abortCurrent {
 					pipelineTimeoutCxl()
 
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_CURRENT
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+					// Aborting CURRENT, update LOCAL step & pipeline status
+					//
+					// It is possible that resp won't have its status filled out IF the
+					// last pipeline AND last step has an abort condition. To get around
+					// that, all steps check to see if they are the last in line to exec
+					// and if they are, they will fill the response status.
+					if pIndex == totalPipelines && sIndex == totalSteps {
+						s.updateStatus(resp, pipelineStatus, stepStatus)
+					} else {
+						s.updateStatus(nil, pipelineStatus, stepStatus)
+					}
+
+					s.config.Logger.Errorf(err.Error() + " (aborting CURRENT pipeline)")
+
 					continue PIPELINE
+				} else if cond.abortAll {
+					pipelineTimeoutCxl()
+
+					// Aborting ALL, update RESP step & pipeline status
+					s.updateStatus(resp, pipelineStatus, stepStatus)
+
+					s.config.Logger.Errorf(err.Error() + " (aborting ALL pipelines)")
+
+					return resp
 				}
 
-				// wasmResp will be nil, so don't allow code below to execute
-				pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-				continue // Step
+				// NOT aborting, update LOCAL step & pipeline status
+				s.updateStatus(nil, pipelineStatus, stepStatus)
+
+				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution)", pipeline.Name, step.Name)
+
+				continue // Move on to the next step in the pipeline
 			}
 
 			// Only update working payload if one is returned
@@ -689,97 +759,103 @@ PIPELINE:
 
 			isr = wasmResp.InterStepResult // Pass inter-step result to next step
 
-			// Check on success and on-failures
+			var (
+				stepCondStr    string
+				stepConds      *protos.PipelineStepConditions
+				stepExecStatus protos.ExecStatus
+			)
+
+			// Execution worked - check wasm exit code
 			switch wasmResp.ExitCode {
-			case protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS:
-				stepTimeoutCxl()
-				s.config.Logger.Debugf("Step '%s' returned exit code success", step.Name)
+			case protos.WASMExitCode_WASM_EXIT_CODE_TRUE:
+				// Data was potentially modified
+				resp.Data = wasmResp.OutputPayload
 
-				cond := s.handleConditions(ctx, step.OnSuccess, pipeline, step, aud, req)
-				if cond.dropMessage {
-					pipelineTimeoutCxl()
+				stepCondStr = "true"
+				stepConds = step.OnTrue
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_TRUE
+			case protos.WASMExitCode_WASM_EXIT_CODE_FALSE:
+				// Data was potentially modified
+				resp.Data = wasmResp.OutputPayload
 
-					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
-						"condition failed, aborting further pipelines", step.Name)
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					resp.DropMessage = true
-					return resp
-				}
+				stepCondStr = "false"
+				stepConds = step.OnFalse
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
+			case protos.WASMExitCode_WASM_EXIT_CODE_ERROR:
+				// Ran into an error - return original data
+				resp.Data = req.Data
 
-				if !cond.continueProcess {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
-						"condition failed, aborting step and continuing pipelines", step.Name)
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					return resp
-				} else if !cond.continuePipeline {
-					pipelineTimeoutCxl()
-
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_CURRENT
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					continue PIPELINE
-				}
-			case protos.WASMExitCode_WASM_EXIT_CODE_FAILURE:
-				fallthrough
-			case protos.WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR:
-				stepTimeoutCxl()
-
-				stepStatus.Error = true
-				stepStatus.ErrorMessage = "Step failed: " + wasmResp.ExitMsg
-
-				s.config.Logger.Errorf("Step '%s' returned exit code '%s': %s", step.Name, wasmResp.ExitCode.String(), wasmResp.ExitMsg)
-				s.config.Logger.Errorf("Data: %s", string(resp.Data))
-
-				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
-
-				cond := s.handleConditions(ctx, step.OnFailure, pipeline, step, aud, req)
-				if cond.dropMessage {
-					pipelineTimeoutCxl()
-
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_DROP_MESSAGE
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					resp.DropMessage = true
-					return resp
-				}
-
-				if !cond.continueProcess {
-					pipelineTimeoutCxl()
-					s.config.Logger.Debugf("Step '%s' returned exit code success but step "+
-						"condition failed, aborting pipeline", step.Name)
-
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_ALL
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					resp.Error = true
-					resp.ErrorMessage = stepStatus.ErrorMessage
-					return resp
-				} else if !cond.continuePipeline {
-					pipelineTimeoutCxl()
-
-					s.config.Logger.Debugf("Step '%s' returned exit code failure, aborting pipeline", step.Name)
-					stepStatus.AbortStatus = protos.AbortStatus_ABORT_STATUS_CURRENT
-					pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
-					resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
-					continue PIPELINE
-				}
+				stepCondStr = "error"
+				stepConds = step.OnError
+				stepExecStatus = protos.ExecStatus_EXEC_STATUS_ERROR
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
-				s.config.Logger.Debugf("Step '%s' returned unknown exit code %d", step.Name, wasmResp.ExitCode)
+				s.config.Logger.Debugf("Step '%s:%s' returned unknown exit code %d", pipeline.Name, step.Name, wasmResp.ExitCode)
+
+				// TODO: Is an unknown exit code considered an error?
 			}
 
 			stepTimeoutCxl()
-			pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
+
+			statusMsg := fmt.Sprintf("step '%s:%s' returned %s: %s", pipeline.Name, step.Name, stepCondStr, wasmResp.ExitMsg)
+
+			// Maybe notify, maybe include metadata
+			cond := s.handleCondition(ctx, req, resp, stepConds, step, pipeline, aud)
+
+			// Update step status bits
+			stepStatus.Status = stepExecStatus
+			stepStatus.StatusMessage = proto.String(statusMsg)
+
+			stepStatus.AbortCondition = cond.abortCondition
+
+			// Increase error metrics (if wasm returned err)
+			if stepExecStatus == protos.ExecStatus_EXEC_STATUS_ERROR {
+				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
+			}
+
+			if cond.abortCurrent {
+				pipelineTimeoutCxl()
+
+				// Aborting CURRENT, update LOCAL step & pipeline status
+				//
+				// It is possible that resp won't have its status filled out IF the
+				// last pipeline AND last step has an abort condition. To get around
+				// that, all steps check to see if they are the last in line to exec
+				// and if they are, they will fill the response status.
+				if pIndex == totalPipelines && sIndex == totalSteps {
+					s.updateStatus(resp, pipelineStatus, stepStatus)
+				} else {
+					s.updateStatus(nil, pipelineStatus, stepStatus)
+				}
+
+				s.config.Logger.Debug(statusMsg + " (aborting CURRENT pipeline)")
+
+				continue PIPELINE
+			} else if cond.abortAll {
+				pipelineTimeoutCxl()
+
+				// Aborting ALL, update RESP step & pipeline status
+				s.updateStatus(resp, pipelineStatus, stepStatus)
+
+				s.config.Logger.Debug(statusMsg + " (aborting ALL pipelines)")
+
+				return resp
+			}
+
+			// NO abort condition, update LOCAL step & pipeline status
+			s.updateStatus(nil, pipelineStatus, stepStatus)
+
+			s.config.Logger.Debug(statusMsg + " (no abort condition defined - continuing execution)")
+
+			// END step loop
 		}
 
 		pipelineTimeoutCxl()
-		resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+
+		// Pipeline completed, update RESP pipeline status (step status already updated)
+		s.updateStatus(resp, pipelineStatus, nil)
+
+		// END pipeline loop
 	}
 
 	// Perform tail if necessary
@@ -795,65 +871,145 @@ PIPELINE:
 }
 
 type condition struct {
-	continuePipeline bool
-	continueProcess  bool
-	dropMessage      bool
+	abortCurrent bool
+	abortAll     bool
+
+	// This is here to make it easier to perform assignment in stepStatus
+	abortCondition protos.AbortCondition
 }
 
-// TODO: clean up the logic in this function and surrounding logic
-func (s *Streamdal) handleConditions(
+// handleCondition is a wrapper for inspecting the step condition and potentially
+// performing a notification and injecting metadata back into the response.
+func (s *Streamdal) handleCondition(
 	ctx context.Context,
-	conditions []protos.PipelineStepCondition,
-	pipeline *protos.Pipeline,
-	step *protos.PipelineStep,
-	aud *protos.Audience,
 	req *ProcessRequest,
-) *condition {
-	ret := &condition{
-		continuePipeline: true,
-		continueProcess:  true,
-		dropMessage:      false,
+	resp *ProcessResponse,
+	stepCond *protos.PipelineStepConditions,
+	step *protos.PipelineStep,
+	pipeline *protos.Pipeline,
+	aud *protos.Audience,
+) condition {
+	// If no condition is set, we don't need to do anything
+	if stepCond == nil {
+		return condition{}
 	}
 
-	for _, condition := range conditions {
-		switch condition {
-		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY:
-			s.config.Logger.Debugf("Step '%s' condition triggered, notifying", step.Name)
+	// Should we notify?
+	if stepCond.Notify && !s.config.DryRun {
+		s.config.Logger.Debugf("Performing 'notify' condition for step '%s'", step.Name)
 
-			if s.config.DryRun {
-				continue
-			}
+		if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
+			s.config.Logger.Errorf("failed to notify condition: %s", err)
+		}
 
-			if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
-				s.config.Logger.Errorf("failed to notify condition: %s", err)
-			}
+		labels := map[string]string{
+			"service":       s.config.ServiceName,
+			"component":     req.ComponentName,
+			"operation":     req.OperationName,
+			"pipeline_name": pipeline.Name,
+			"pipeline_id":   pipeline.Id,
+		}
+		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1, Audience: aud})
+	}
 
-			labels := map[string]string{
-				"service":       s.config.ServiceName,
-				"component":     req.ComponentName,
-				"operation":     req.OperationName,
-				"pipeline_name": pipeline.Name,
-				"pipeline_id":   pipeline.Id,
-			}
-			_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: types.NotifyCount, Labels: labels, Value: 1, Audience: aud})
+	// Should we pass back metadata?
+	if len(stepCond.Metadata) > 0 {
+		s.config.Logger.Debugf("Performing 'metadata' condition for step '%s'", step.Name)
+		s.populateMetadata(resp, stepCond.Metadata)
+	}
 
-		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT:
-			s.config.Logger.Debugf("Step '%s' failed, aborting further pipeline steps", step.Name)
-			ret.continuePipeline = false
-		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL:
-			s.config.Logger.Debugf("Step '%s' failed, aborting all pipelines", step.Name)
-			ret.continuePipeline = false
-			ret.continueProcess = false
-		case protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_DISCARD_MESSAGE:
-			s.config.Logger.Debugf("Step '%s' failed, discarding message", step.Name)
-			ret.dropMessage = true
-		default:
-			// Assume continue
-			s.config.Logger.Debugf("Step '%s' failed, continuing to next step", step.Name)
+	// Should we abort current or ALL pipelines?
+	if stepCond.Abort == protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT {
+		s.config.Logger.Debugf("Abort condition set to 'current' for step '%s'", step.Name)
+		return condition{
+			abortCurrent:   true,
+			abortCondition: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+		}
+	} else if stepCond.Abort == protos.AbortCondition_ABORT_CONDITION_ABORT_ALL {
+		s.config.Logger.Debugf("Abort condition set to 'all' for step '%s'", step.Name)
+		return condition{
+			abortAll:       true,
+			abortCondition: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
 		}
 	}
 
-	return ret
+	s.config.Logger.Debugf("No abort conditions set for step '%s'", step.Name)
+
+	// Don't abort anything - continue as-is
+	return condition{}
+}
+
+func (s *Streamdal) populateMetadata(resp *ProcessResponse, metadata map[string]string) {
+	if resp == nil || metadata == nil {
+		return
+	}
+
+	for k, v := range metadata {
+		if resp.Metadata == nil {
+			resp.Metadata = make(map[string]string)
+		}
+
+		resp.Metadata[k] = v
+	}
+}
+
+// updateStatus is a wrapper for updating step, pipeline and resp statuses.
+//
+// This method allows resp OR step status to be nil. This is because we are not
+// always returning a final response - we are still going through more pipelines
+// and steps.
+//
+// Similarly, step status can be nil because the FINAL response will only have
+// a pipeline status and no step status.
+func (s *Streamdal) updateStatus(resp *ProcessResponse, pipelineStatus *protos.PipelineStatus, stepStatus *protos.StepStatus) {
+	// Pipeline status is ALWAYS required
+	if pipelineStatus == nil {
+		s.config.Logger.Warn("BUG: pipelineStatus cannot be nil in updateStatus()")
+	}
+
+	// If resp is nil, there should ALWAYS be a step and pipeline status
+	if resp == nil && (stepStatus == nil || pipelineStatus == nil) {
+		s.config.Logger.Warn("BUG: stepStatus and pipelineStatus cannot be nil when resp is nil in updateStatus()")
+		return
+	}
+
+	if stepStatus != nil {
+		// When returning final response, we won't have a step status
+		pipelineStatus.StepStatus = append(pipelineStatus.StepStatus, stepStatus)
+
+		// Prettify status message with abort info
+		var abortStatusStr string
+
+		switch stepStatus.AbortCondition {
+		case protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT:
+			abortStatusStr = AbortCurrentStr
+		case protos.AbortCondition_ABORT_CONDITION_ABORT_ALL:
+			abortStatusStr = AbortAllStr
+		default:
+			abortStatusStr = AbortNoneStr
+		}
+
+		// StepStatusMessage can be nil because it is optional
+		if stepStatus.StatusMessage != nil {
+			// If the message is NOT empty, we want to append the append abort status
+			if *stepStatus.StatusMessage != "" {
+				stepStatus.StatusMessage = proto.String(fmt.Sprintf("%s (%s)", *stepStatus.StatusMessage, abortStatusStr))
+			} else {
+				// Otherwise, just display the abort status
+				stepStatus.StatusMessage = proto.String(abortStatusStr)
+			}
+		}
+	}
+
+	// Response could be nil if we are NOT aborting all pipelines; resp will NOT
+	// be nil if this is the LAST pipeline and LAST step.
+	if resp != nil {
+		resp.PipelineStatus = append(resp.PipelineStatus, pipelineStatus)
+
+		// Resp status should be the status of the LAST step
+		resp.Status = pipelineStatus.StepStatus[len(pipelineStatus.StepStatus)-1].Status
+		resp.StatusMessage = pipelineStatus.StepStatus[len(pipelineStatus.StepStatus)-1].StatusMessage
+	}
 }
 
 func (a *Audience) toProto(serviceName string) *protos.Audience {

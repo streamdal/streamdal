@@ -31,10 +31,14 @@ import (
 
 func main() {
 	sc, _ := streamdal.New(&streamdal.Config{
+		// Address of the streamdal server
 		ServerURL:       "streamdal-server.svc.cluster.local:8082",
+		
+		// Token used for authenticating with the streamdal server
 		ServerToken:     "1234",
+		
+		// Identify _this_ application/service (
 		ServiceName:     "billing-svc",
-		ShutdownCtx:     context.Background(),
 	})
 	
 	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
@@ -43,13 +47,20 @@ func main() {
 		ComponentName: "kafka",
 		Data:          []byte(`{"object": {"field": true}}`),
 	})
-
-	if resp.Error != nil {
-		fmt.Println(resp.ErrorMessage)
-		return
+	
+	// Check if the .Process() call completed
+	if resp.Status != streamdal.StatusError {
+		fmt.Println("Successfully processed payload")
     }
 	
-	println(string(resp.Data))
+	// Or you can inspect each individual pipeline & step result
+	for _, pipeline := resp.PipelineStatus {
+		fmt.Printf("Inspecting '%d' steps in pipeline '%s'...\n", len(resp.PipelineStatus), pipeline.Name)
+		
+		for _, step := range pipeline.StepStatus {
+			fmt.Printf("Step '%s' status: '%s'\n", step.Name, step.Status)
+		}
+    }
 }
 
 ```
