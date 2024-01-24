@@ -164,10 +164,10 @@ func benchmarkWASM(wasmFile, testPayloadFile string, step *protos.PipelineStep, 
 			b.Fatal("unable to unmarshal wasm response: " + err.Error())
 		}
 
-		//WASMExitCode_WASM_EXIT_CODE_UNSET          = 0
-		//WASMExitCode_WASM_EXIT_CODE_SUCCESS        = 1
-		//WASMExitCode_WASM_EXIT_CODE_FAILURE        = 2
-		//WASMExitCode_WASM_EXIT_CODE_INTERNAL_ERROR = 3
+		//WASMExitCode_WASM_EXIT_CODE_UNSET = 0
+		//WASMExitCode_WASM_EXIT_CODE_TRUE  = 1
+		//WASMExitCode_WASM_EXIT_CODE_FALSE = 2
+		//WASMExitCode_WASM_EXIT_CODE_ERROR = 3
 		// Some benchmarks will intentionally fail, so allow status codes 1 and 2
 		if wasmResp.ExitCode < 1 || wasmResp.ExitCode > 2 {
 			b.Errorf("expected ExitCode = 0, got = %d, message: %s", wasmResp.ExitCode, wasmResp.ExitMsg)

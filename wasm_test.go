@@ -14,10 +14,6 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
-	"github.com/streamdal/go-sdk/logger"
-	"github.com/streamdal/go-sdk/metrics/metricsfakes"
-	"github.com/streamdal/go-sdk/server/serverfakes"
 )
 
 var _ = Describe("WASM Modules", func() {
@@ -68,7 +64,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 		})
 
 		It("returns failure on invalid json", func() {
@@ -85,7 +81,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 	})
 
@@ -135,7 +131,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 		})
 	})
 
@@ -143,7 +139,7 @@ var _ = Describe("WASM Modules", func() {
 		It("infers a schema from the json payload", func() {
 			wasmResp, err := inferSchema("test-assets/json-examples/small.json")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 			Expect(wasmResp.ExitMsg).To(ContainSubstring("inferred fresh schema"))
 		})
 	})
@@ -201,7 +197,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 		})
 
 		It("returns failure on string contains any", func() {
@@ -218,7 +214,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 
 		It("can scan the whole payload", func() {
@@ -240,7 +236,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 
 			// Check that we don't find it
 			req.InputPayload = []byte(`{"object": {"type": "streamdal", "cc_num": "1234"}}`)
@@ -256,7 +252,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 	})
 
@@ -317,7 +313,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 
 			resultJSON := map[string]interface{}{}
 			err = json.Unmarshal(wasmResp.OutputPayload, &resultJSON)
@@ -358,7 +354,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"cc_num": "1234"}}`))
 		})
 
@@ -397,7 +393,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "str", "cc_num": "1234"}}`))
 		})
 
@@ -436,7 +432,7 @@ var _ = Describe("WASM Modules", func() {
 			err = proto.Unmarshal(res, wasmResp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"type": "stre", "cc_num": "1234"}}`))
 		})
 	})
@@ -531,7 +527,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitMsg).To(Equal("payload does not match schema, invalid fields: age: expected type=number; got value=\"str\""))
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FAILURE))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 
 		It("Passes validation", func() {
@@ -553,7 +549,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitMsg).To(Equal("payload matches schema"))
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 		})
 	})
 
@@ -619,7 +615,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(string(wasmResp.OutputPayload)).To(Equal(`{"foo":{"key":"value"}}`))
-			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS))
+			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
 		})
 
 		// TODO: additional tests for each transform type
@@ -628,17 +624,17 @@ var _ = Describe("WASM Modules", func() {
 	Context("inter step result", func() {
 		It("finds and transforms PII in a payload without a path", func() {
 			payload := []byte(`{
-	"users": [ 
-		{
-			"name": "Bob",
-			"email": "bob@streamdal.com"
-		},
-		{
-			"name": "Mary",
-			"email": "mary@streamdal.com"
-		}
-	]
-}`)
+		"users": [
+			{
+				"name": "Bob",
+				"email": "bob@streamdal.com"
+			},
+			{
+				"name": "Mary",
+				"email": "mary@streamdal.com"
+			}
+		]
+	}`)
 			detectiveWASM, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
 			transformWASM, err := os.ReadFile("test-assets/wasm/transform.wasm")
@@ -653,8 +649,9 @@ var _ = Describe("WASM Modules", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    detectiveWASM,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr(""), // No path, we're searching the entire payload
@@ -669,8 +666,9 @@ var _ = Describe("WASM Modules", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    transformWASM,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Transform{
 							Transform: &steps.TransformStep{
 								Type: steps.TransformType_TRANSFORM_TYPE_REPLACE_VALUE,
@@ -693,35 +691,9 @@ var _ = Describe("WASM Modules", func() {
 				OperationName: "mytopic",
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 1000,
-					PipelineTimeout: time.Millisecond * 1000,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			s.config.PipelineTimeout = time.Second
+			s.config.StepTimeout = time.Second
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -730,8 +702,8 @@ var _ = Describe("WASM Modules", func() {
 				Data:          payload,
 			})
 
-			Expect(resp.Error).To(BeFalse())
-			Expect(resp.ErrorMessage).To(Equal(""))
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Transform Email' returned true: Successfully transformed payload (no abort condition)"))
 			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
 		})
 

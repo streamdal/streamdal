@@ -51,6 +51,11 @@ func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Intern
 }
 
 var _ = Describe("Streamdal", func() {
+	// TODO: Implement
+	Context("updateStatus", func() {
+
+	})
+
 	Context("validateConfig", func() {
 		var cfg *Config
 
@@ -184,7 +189,7 @@ var _ = Describe("Streamdal", func() {
 		})
 	})
 
-	Context("handleConditions", func() {
+	Context("handleCondition", func() {
 		var fakeClient *serverfakes.FakeIServerClient
 		var s *Streamdal
 		var pipeline *protos.Pipeline
@@ -211,18 +216,26 @@ var _ = Describe("Streamdal", func() {
 		})
 
 		It("handles notify condition", func() {
-			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_NOTIFY}
+			condition := &protos.PipelineStepConditions{
+				Notify: true,
+			}
 
-			cond := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(cond.continuePipeline).To(BeTrue())
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud)
+
+			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
+			Expect(cond.abortCurrent).To(BeFalse())
+			Expect(cond.abortAll).To(BeFalse())
 			Expect(fakeClient.NotifyCallCount()).To(Equal(1))
 		})
 
 		It("handles abort condition", func() {
-			conditions := []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT}
+			condition := &protos.PipelineStepConditions{
+				Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+			}
 
-			cond := s.handleConditions(context.Background(), conditions, pipeline, step, aud, req)
-			Expect(cond.continuePipeline).To(BeFalse())
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud)
+			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT))
+			Expect(cond.abortCurrent).To(BeTrue())
 		})
 	})
 
@@ -230,18 +243,15 @@ var _ = Describe("Streamdal", func() {
 		It("return error when process request is nil", func() {
 			s := &Streamdal{}
 			resp := s.Process(context.Background(), nil)
-			Expect(resp.Error).To(BeTrue())
-			Expect(resp.ErrorMessage).To(ContainSubstring(ErrEmptyProcessRequest.Error()))
+
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_ERROR))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("process request cannot be empty"))
 			Expect(len(resp.PipelineStatus)).To(Equal(0))
 		})
 
 		It("processes successfully", func() {
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -255,8 +265,9 @@ var _ = Describe("Streamdal", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    wasmData,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_CURRENT},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+						},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -269,35 +280,7 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 10,
-					PipelineTimeout: time.Millisecond * 100,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -305,19 +288,23 @@ var _ = Describe("Streamdal", func() {
 				OperationName: aud.OperationName,
 				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
 			})
-			Expect(resp.Error).To(BeFalse())
-			Expect(resp.ErrorMessage).To(Equal(""))
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned true: completed detective run (no abort condition)"))
+
+			// Ensuring that pipeline status is populated (execution should've
+			// only contained one pipeline)
 			Expect(len(resp.PipelineStatus)).To(Equal(1))
+
+			// Ensuring that step status is populated (pipeline should've
+			// contained one step)
 			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 		})
 
 		It("fails on a detective match and aborts entire pipeline", func() {
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -331,8 +318,9 @@ var _ = Describe("Streamdal", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    wasmData,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -347,8 +335,9 @@ var _ = Describe("Streamdal", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    wasmData,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -361,35 +350,8 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 10,
-					PipelineTimeout: time.Millisecond * 100,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			Expect(s).ToNot(BeNil())
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -397,23 +359,77 @@ var _ = Describe("Streamdal", func() {
 				OperationName: aud.OperationName,
 				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}}`),
 			})
-			Expect(resp.Error).To(BeTrue())
-			Expect(resp.ErrorMessage).To(ContainSubstring("Step failed"))
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_FALSE))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned false: completed detective run (aborted all pipelines)"))
 			Expect(len(resp.PipelineStatus)).To(Equal(1))
 			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
-			Expect(resp.PipelineStatus[0].StepStatus[0].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_ALL))
+			Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_ABORT_ALL))
+		})
+
+		It("returns error when wasm errors", func() {
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
+
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Step 1",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+						},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+
+								// Intentionally commented out (will cause wasm validation err)
+								//
+								// Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+				},
+			}
+
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			Expect(s).ToNot(BeNil())
+
+			resp := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
+			})
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_ERROR))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned error: invalid wasm request: detective type cannot be unknown (no abort condition)"))
+
+			// Ensuring that pipeline status is populated (execution should've
+			// only contained one pipeline)
+			Expect(len(resp.PipelineStatus)).To(Equal(1))
+
+			// Ensuring that step status is populated (pipeline should've
+			// contained one step)
+			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 		})
 	})
 
 	Context("Multithreaded test", func() {
 		It("succeeds with multiple threads", func() {
-
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmDetective, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -430,8 +446,9 @@ var _ = Describe("Streamdal", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    wasmDetective,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Detective{
 							Detective: &steps.DetectiveStep{
 								Path:   stringPtr("object.payload"),
@@ -446,8 +463,9 @@ var _ = Describe("Streamdal", func() {
 						XWasmId:       stringPtr(uuid.New().String()),
 						XWasmBytes:    transformDetective,
 						XWasmFunction: stringPtr("f"),
-						OnSuccess:     make([]protos.PipelineStepCondition, 0),
-						OnFailure:     []protos.PipelineStepCondition{protos.PipelineStepCondition_PIPELINE_STEP_CONDITION_ABORT_ALL},
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
 						Step: &protos.PipelineStep_Transform{
 							Transform: &steps.TransformStep{
 								Path: "object.payload",
@@ -464,36 +482,9 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 100,
-					PipelineTimeout: time.Minute, // Due to mutex, this should be longer than the entire test will take under CI
-					DryRun:          false,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			s.config.StepTimeout = time.Millisecond * 100
+			s.config.PipelineTimeout = time.Minute // Due to mutex, this should be longer than the entire test will take under CI
 
 			payload := []byte(`{"object":{"payload":"streamdal@gmail.com"}}`)
 
@@ -511,14 +502,14 @@ var _ = Describe("Streamdal", func() {
 						Data:          payload,
 					})
 
-					Expect(resp.Error).To(BeFalse())
 					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{}))
+					Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 					Expect(len(resp.PipelineStatus)).To(Equal(1))
 					Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(2))
-					Expect(resp.PipelineStatus[0].StepStatus[0].Error).To(BeFalse())
-					Expect(resp.PipelineStatus[0].StepStatus[1].Error).To(BeFalse())
-					Expect(resp.PipelineStatus[0].StepStatus[0].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_UNSET))
-					Expect(resp.PipelineStatus[0].StepStatus[1].AbortStatus).To(Equal(protos.AbortStatus_ABORT_STATUS_UNSET))
+					Expect(resp.PipelineStatus[0].StepStatus[0].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+					Expect(resp.PipelineStatus[0].StepStatus[1].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+					Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
+					Expect(resp.PipelineStatus[0].StepStatus[1].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 					Expect(string(resp.Data)).To(Equal(`{"object":{"payload":"stre***************"}}`))
 				}()
 			}
@@ -527,6 +518,38 @@ var _ = Describe("Streamdal", func() {
 		})
 	})
 })
+
+func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipeline *protos.Pipeline) *Streamdal {
+	return &Streamdal{
+		serverClient: &serverfakes.FakeIServerClient{},
+		functionsMtx: &sync.RWMutex{},
+		functions:    map[string]*function{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+		config: &Config{
+			ServiceName:     serviceName,
+			Logger:          &logger.TinyLogger{},
+			StepTimeout:     time.Millisecond * 10,
+			PipelineTimeout: time.Millisecond * 100,
+		},
+		metrics:      &metricsfakes.FakeIMetrics{},
+		tails:        map[string]map[string]*Tail{},
+		tailsMtx:     &sync.RWMutex{},
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines: map[string]map[string]*protos.Command{
+			audToStr(aud): {
+				pipeline.Id: {
+					Audience: aud,
+					Command: &protos.Command_AttachPipeline{
+						AttachPipeline: &protos.AttachPipelineCommand{
+							Pipeline: pipeline,
+						},
+					},
+				},
+			},
+		},
+	}
+}
 
 func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 	kvClient, err := kv.New(&kv.Config{})
@@ -613,9 +636,9 @@ func TestKVRequestStaticModeKeyDoesNotExist(t *testing.T) {
 		t.Fatal("unable to unmarshal wasm response: " + err.Error())
 	}
 
-	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FAILURE {
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FALSE {
 		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
-			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			protos.WASMExitCode_WASM_EXIT_CODE_FALSE,
 			wasmResp.ExitCode,
 			wasmResp.ExitMsg,
 		)
@@ -672,9 +695,9 @@ func TestKVRequestDynamicModeKeyExists(t *testing.T) {
 		t.Fatal("unable to unmarshal wasm response: " + err.Error())
 	}
 
-	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_TRUE {
 		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
-			protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS,
+			protos.WASMExitCode_WASM_EXIT_CODE_TRUE,
 			wasmResp.ExitCode,
 			wasmResp.ExitMsg,
 		)
@@ -728,9 +751,9 @@ func TestKVRequestDynamicModeKeyDoesNotExist(t *testing.T) {
 		t.Fatal("unable to unmarshal wasm response: " + err.Error())
 	}
 
-	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FAILURE {
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_FALSE {
 		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
-			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			protos.WASMExitCode_WASM_EXIT_CODE_FALSE,
 			wasmResp.ExitCode,
 			wasmResp.ExitMsg,
 		)
@@ -785,9 +808,9 @@ func TestKVRequestStaticModeKeyExists(t *testing.T) {
 		t.Fatal("unable to unmarshal wasm response: " + err.Error())
 	}
 
-	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+	if wasmResp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_TRUE {
 		t.Errorf("expected ExitCode = %d, got = %d; exit_msg: %s",
-			protos.WASMExitCode_WASM_EXIT_CODE_FAILURE,
+			protos.WASMExitCode_WASM_EXIT_CODE_TRUE,
 			wasmResp.ExitCode,
 			wasmResp.ExitMsg,
 		)
@@ -806,4 +829,13 @@ func stringPtr(in string) *string {
 
 func boolPtr(in bool) *bool {
 	return &in
+}
+
+func createAudience(serviceName, componentName string, operationType protos.OperationType, operationName string) *protos.Audience {
+	return &protos.Audience{
+		ServiceName:   serviceName,
+		ComponentName: componentName,
+		OperationType: operationType,
+		OperationName: operationName,
+	}
 }

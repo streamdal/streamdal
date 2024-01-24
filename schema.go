@@ -35,9 +35,11 @@ func (s *Streamdal) handleSchema(ctx context.Context, aud *protos.Audience, step
 		// nothing to do
 		return false
 	}
-	if resp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_SUCCESS {
+
+	if resp.ExitCode != protos.WASMExitCode_WASM_EXIT_CODE_TRUE {
 		return false
 	}
+
 	// Get existing schema for audience
 	existingSchema := s.getSchema(ctx, aud)
 
