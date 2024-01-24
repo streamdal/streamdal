@@ -10,7 +10,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/go-sdk v0.0.83-0.20240122182217-7f1b1d05a56a
+	github.com/streamdal/go-sdk v0.0.84
+	github.com/streamdal/streamdal/libs/protos v0.1.16
 )
 
 require (
@@ -21,7 +22,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/streamdal/streamdal/libs/protos v0.1.16 // indirect
 	github.com/tetratelabs/wazero v1.6.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
