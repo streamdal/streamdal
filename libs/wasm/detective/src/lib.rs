@@ -16,19 +16,19 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to read request: {}", e),
-            );
+            )
         }
     };
 
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
-        common::write_response(
+        return common::write_response(
             None,
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_ERROR,
             format!("invalid wasm request: {}", err),
-        );
+        )
     }
 
     // Generate detective request
@@ -53,21 +53,21 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 special_fields: Default::default(),
             };
 
-            common::write_response(
+            return common::write_response(
                 Some(&req.data),
                 None,
                 Some(isr),
                 exit_code,
                 "completed detective run".to_string(),
             )
-        }
+        },
         Err(e) => common::write_response(
             Some(&req.data),
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FALSE,
             e.to_string(),
-        ),
+        )
     }
 }
 
