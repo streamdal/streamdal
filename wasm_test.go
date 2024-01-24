@@ -14,10 +14,6 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
-	"github.com/streamdal/go-sdk/logger"
-	"github.com/streamdal/go-sdk/metrics/metricsfakes"
-	"github.com/streamdal/go-sdk/server/serverfakes"
 )
 
 var _ = Describe("WASM Modules", func() {
@@ -531,7 +527,6 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitMsg).To(Equal("payload does not match schema, invalid fields: age: expected type=number; got value=\"str\""))
-			// TODO: Why is Wasm returning "3" (ERROR) here?
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_FALSE))
 		})
 
@@ -696,35 +691,9 @@ var _ = Describe("WASM Modules", func() {
 				OperationName: "mytopic",
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 1000,
-					PipelineTimeout: time.Millisecond * 1000,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			s.config.PipelineTimeout = time.Second
+			s.config.StepTimeout = time.Second
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -734,8 +703,7 @@ var _ = Describe("WASM Modules", func() {
 			})
 
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
-			// TODO: Need to improve status messages
-			//Expect(*resp.StatusMessage).To(Equal("boop"))
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Transform Email' returned true: Successfully transformed payload (no abort condition)"))
 			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
 		})
 

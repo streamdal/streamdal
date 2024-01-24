@@ -51,6 +51,11 @@ func (i *InternalServer) Register(req *protos.RegisterRequest, srv protos.Intern
 }
 
 var _ = Describe("Streamdal", func() {
+	// TODO: Implement
+	Context("updateStatus", func() {
+
+	})
+
 	Context("validateConfig", func() {
 		var cfg *Config
 
@@ -246,12 +251,7 @@ var _ = Describe("Streamdal", func() {
 		})
 
 		It("processes successfully", func() {
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -280,35 +280,7 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 10,
-					PipelineTimeout: time.Millisecond * 100,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -319,6 +291,8 @@ var _ = Describe("Streamdal", func() {
 
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned true: completed detective run (no abort condition)"))
 
 			// Ensuring that pipeline status is populated (execution should've
 			// only contained one pipeline)
@@ -330,12 +304,7 @@ var _ = Describe("Streamdal", func() {
 		})
 
 		It("fails on a detective match and aborts entire pipeline", func() {
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -381,35 +350,8 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 10,
-					PipelineTimeout: time.Millisecond * 100,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			Expect(s).ToNot(BeNil())
 
 			resp := s.Process(context.Background(), &ProcessRequest{
 				ComponentName: aud.ComponentName,
@@ -418,25 +360,76 @@ var _ = Describe("Streamdal", func() {
 				Data:          []byte(`{"object":{"payload":"streamdal@hotmail.com"}}`),
 			})
 
-			// TODO: Should update StatusMessage to be a bit more informative
-
 			Expect(resp).ToNot(BeNil())
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_FALSE))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned false: completed detective run (aborted all pipelines)"))
 			Expect(len(resp.PipelineStatus)).To(Equal(1))
 			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 			Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_ABORT_ALL))
+		})
+
+		It("returns error when wasm errors", func() {
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
+
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Step 1",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+						},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+
+								// Intentionally commented out (will cause wasm validation err)
+								//
+								// Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+				},
+			}
+
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			Expect(s).ToNot(BeNil())
+
+			resp := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal@gmail.com"}`),
+			})
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_ERROR))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned error: invalid wasm request: detective type cannot be unknown (no abort condition)"))
+
+			// Ensuring that pipeline status is populated (execution should've
+			// only contained one pipeline)
+			Expect(len(resp.PipelineStatus)).To(Equal(1))
+
+			// Ensuring that step status is populated (pipeline should've
+			// contained one step)
+			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 		})
 	})
 
 	Context("Multithreaded test", func() {
 		It("succeeds with multiple threads", func() {
-
-			aud := &protos.Audience{
-				ServiceName:   "mysvc1",
-				ComponentName: "kafka",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "mytopic",
-			}
+			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmDetective, err := os.ReadFile("test-assets/wasm/detective.wasm")
 			Expect(err).ToNot(HaveOccurred())
@@ -489,36 +482,9 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			s := &Streamdal{
-				serverClient: &serverfakes.FakeIServerClient{},
-				functionsMtx: &sync.RWMutex{},
-				functions:    map[string]*function{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				tails:        map[string]map[string]*Tail{},
-				tailsMtx:     &sync.RWMutex{},
-				config: &Config{
-					ServiceName:     "mysvc1",
-					Logger:          &logger.TinyLogger{},
-					StepTimeout:     time.Millisecond * 100,
-					PipelineTimeout: time.Minute, // Due to mutex, this should be longer than the entire test will take under CI
-					DryRun:          false,
-				},
-				metrics:      &metricsfakes.FakeIMetrics{},
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines: map[string]map[string]*protos.Command{
-					audToStr(aud): {
-						pipeline.Id: {
-							Audience: aud,
-							Command: &protos.Command_AttachPipeline{
-								AttachPipeline: &protos.AttachPipelineCommand{
-									Pipeline: pipeline,
-								},
-							},
-						},
-					},
-				},
-			}
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			s.config.StepTimeout = time.Millisecond * 100
+			s.config.PipelineTimeout = time.Minute // Due to mutex, this should be longer than the entire test will take under CI
 
 			payload := []byte(`{"object":{"payload":"streamdal@gmail.com"}}`)
 
@@ -552,6 +518,38 @@ var _ = Describe("Streamdal", func() {
 		})
 	})
 })
+
+func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipeline *protos.Pipeline) *Streamdal {
+	return &Streamdal{
+		serverClient: &serverfakes.FakeIServerClient{},
+		functionsMtx: &sync.RWMutex{},
+		functions:    map[string]*function{},
+		audiencesMtx: &sync.RWMutex{},
+		audiences:    map[string]struct{}{},
+		config: &Config{
+			ServiceName:     serviceName,
+			Logger:          &logger.TinyLogger{},
+			StepTimeout:     time.Millisecond * 10,
+			PipelineTimeout: time.Millisecond * 100,
+		},
+		metrics:      &metricsfakes.FakeIMetrics{},
+		tails:        map[string]map[string]*Tail{},
+		tailsMtx:     &sync.RWMutex{},
+		pipelinesMtx: &sync.RWMutex{},
+		pipelines: map[string]map[string]*protos.Command{
+			audToStr(aud): {
+				pipeline.Id: {
+					Audience: aud,
+					Command: &protos.Command_AttachPipeline{
+						AttachPipeline: &protos.AttachPipelineCommand{
+							Pipeline: pipeline,
+						},
+					},
+				},
+			},
+		},
+	}
+}
 
 func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 	kvClient, err := kv.New(&kv.Config{})
@@ -768,8 +766,6 @@ func TestKVRequestDynamicModeKeyDoesNotExist(t *testing.T) {
 	}
 }
 
-// WARNING: TODO: NEED TO ADD TESTS FOR ON_ERROR
-
 func TestKVRequestStaticModeKeyExists(t *testing.T) {
 	key := "existing-key"
 
@@ -833,4 +829,13 @@ func stringPtr(in string) *string {
 
 func boolPtr(in bool) *bool {
 	return &in
+}
+
+func createAudience(serviceName, componentName string, operationType protos.OperationType, operationName string) *protos.Audience {
+	return &protos.Audience{
+		ServiceName:   serviceName,
+		ComponentName: componentName,
+		OperationType: operationType,
+		OperationName: operationName,
+	}
 }

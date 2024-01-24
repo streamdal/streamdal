@@ -71,7 +71,7 @@ const (
 
 	AbortAllStr     = "aborted all pipelines"
 	AbortCurrentStr = "aborted current pipeline"
-	AbortNoneStr    = "no abort condition defined"
+	AbortNoneStr    = "no abort condition"
 )
 
 var (
@@ -623,9 +623,16 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 		return resp
 	}
 
+	totalPipelines := len(pipelines)
+	var (
+		pIndex int
+		sIndex int
+	)
+
 PIPELINE:
 	for _, p := range pipelines {
 		var isr *protos.InterStepResult
+		pIndex += 1
 
 		pipelineTimeoutCtx, pipelineTimeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
 
@@ -640,7 +647,11 @@ PIPELINE:
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: s.getCounterLabels(req, pipeline), Value: payloadSize, Audience: aud})
 
+		totalSteps := len(pipeline.Steps)
+
 		for _, step := range pipeline.Steps {
+			sIndex += 1
+
 			stepTimeoutCtx, stepTimeoutCxl := context.WithTimeout(ctx, s.config.StepTimeout)
 
 			stepStatus := &protos.StepStatus{
@@ -663,7 +674,11 @@ PIPELINE:
 
 				if cond.abortCurrent {
 					// Aborting CURRENT, LOCAL step & pipeline status needs to be updated
-					s.updateStatus(nil, pipelineStatus, stepStatus)
+					if pIndex == totalPipelines {
+						s.updateStatus(resp, pipelineStatus, stepStatus)
+					} else {
+						s.updateStatus(nil, pipelineStatus, stepStatus)
+					}
 
 					s.config.Logger.Warnf("exceeded timeout for pipeline '%s' - aborting CURRENT pipeline", pipeline.Name)
 
@@ -683,7 +698,7 @@ PIPELINE:
 				// NOOP
 			}
 
-			// Pipeline timeout either has not occurred or it occurred and execution was not aborted
+			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
 			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
 			if err != nil {
@@ -704,7 +719,16 @@ PIPELINE:
 					pipelineTimeoutCxl()
 
 					// Aborting CURRENT, update LOCAL step & pipeline status
-					s.updateStatus(nil, pipelineStatus, stepStatus)
+					//
+					// It is possible that resp won't have its status filled out IF the
+					// last pipeline AND last step has an abort condition. To get around
+					// that, all steps check to see if they are the last in line to exec
+					// and if they are, they will fill the response status.
+					if pIndex == totalPipelines && sIndex == totalSteps {
+						s.updateStatus(resp, pipelineStatus, stepStatus)
+					} else {
+						s.updateStatus(nil, pipelineStatus, stepStatus)
+					}
 
 					s.config.Logger.Errorf(err.Error() + " (aborting CURRENT pipeline)")
 
@@ -773,7 +797,7 @@ PIPELINE:
 
 			stepTimeoutCxl()
 
-			statusMsg := fmt.Sprintf("step '%s:%s' (returned '%s'): %s", pipeline.Name, step.Name, stepCondStr, wasmResp.ExitMsg)
+			statusMsg := fmt.Sprintf("step '%s:%s' returned %s: %s", pipeline.Name, step.Name, stepCondStr, wasmResp.ExitMsg)
 
 			// Maybe notify, maybe include metadata
 			cond := s.handleCondition(ctx, req, resp, stepConds, step, pipeline, aud)
@@ -793,7 +817,16 @@ PIPELINE:
 				pipelineTimeoutCxl()
 
 				// Aborting CURRENT, update LOCAL step & pipeline status
-				s.updateStatus(nil, pipelineStatus, stepStatus)
+				//
+				// It is possible that resp won't have its status filled out IF the
+				// last pipeline AND last step has an abort condition. To get around
+				// that, all steps check to see if they are the last in line to exec
+				// and if they are, they will fill the response status.
+				if pIndex == totalPipelines && sIndex == totalSteps {
+					s.updateStatus(resp, pipelineStatus, stepStatus)
+				} else {
+					s.updateStatus(nil, pipelineStatus, stepStatus)
+				}
 
 				s.config.Logger.Debug(statusMsg + " (aborting CURRENT pipeline)")
 
