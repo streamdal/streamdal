@@ -199,8 +199,6 @@ export const TransformOptions = (
           <FormBoolean
             name={`steps.${stepNumber}.step.transform.options.extractOptions.flatten`}
             display="Flatten result object"
-            defaultChecked={step?.step?.transform?.options
-              ?.extractOptions?.flatten}
           />
           <FormNInput
             name={`steps.${stepNumber}.step.transform.options.extractOptions.paths`}

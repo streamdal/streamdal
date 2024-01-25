@@ -5,9 +5,10 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 
 import {
+  AbortCondition,
   Pipeline,
   PipelineStep,
-  PipelineStepCondition,
+  PipelineStepConditions,
 } from "streamdal-protos/protos/sp_pipeline.ts";
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 import {
@@ -29,7 +30,7 @@ import {
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric } from "../lib/utils.ts";
+import { isNumeric, logFormData } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -37,7 +38,7 @@ import {
   oneArgTypes,
   StepArgs,
 } from "../components/pipeline/stepArgs.tsx";
-import { StepConditions } from "../components/pipeline/stepCondition.tsx";
+import { StepConditions } from "../components/pipeline/stepConditions.tsx";
 import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
@@ -81,7 +82,7 @@ export const newPipeline: Pipeline = {
   steps: [newStep as PipelineStep],
 };
 
-const StepConditionEnum = z.nativeEnum(PipelineStepCondition);
+const AbortConditionEnum = z.nativeEnum(AbortCondition);
 const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
 const TransformTypeEnum = z.nativeEnum(TransformType);
 const TransformTruncateTypeEnum = z.nativeEnum(TransformTruncateType);
@@ -274,20 +275,22 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
   }),
 ]);
 
+const resultConditionSchema = z.object({
+  abort: zfd.numeric(AbortConditionEnum).default(AbortCondition.UNSET),
+  notify: z.preprocess((v) => v === "true", z.boolean()),
+  metadata: z.record(
+    z.string().min(1, { message: "Required" }),
+    z.string().min(1, { message: "Required" }),
+  ).optional(),
+});
+
 const stepSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
   dynamic: z.preprocess((v) => v === "true", z.boolean()),
-  onSuccess: zfd.repeatable(
-    z.array(zfd.numeric(StepConditionEnum).optional()).default(
-      [],
-    ).transform((val) => val.filter((v) => v)),
-  ),
-  onFailure: zfd.repeatable(
-    z.array(zfd.numeric(StepConditionEnum).optional()).default(
-      [],
-    ),
-  ).transform((val) => val.filter((v) => v)),
+  onTrue: resultConditionSchema.optional(),
+  onFalse: resultConditionSchema.optional(),
+  onError: resultConditionSchema.optional(),
   step: stepKindSchema,
 }).superRefine((step, ctx) => {
   //
@@ -317,7 +320,7 @@ export const pipelineSchema = zfd.formData({
   steps: zfd.repeatable(
     z
       .array(stepSchema)
-      .min(1, { message: "At least one step  is required" }),
+      .min(1, { message: "At least one step is required" }),
   ),
 });
 
@@ -372,6 +375,7 @@ const PipelineDetail = (
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
+
     const { errors } = validate(pipelineSchema, formData);
     setErrors(errors || {});
 
@@ -666,7 +670,6 @@ const PipelineDetail = (
                   <StepConditions
                     stepIndex={i}
                     data={data}
-                    setData={setData}
                     errors={errors}
                   />
                 </div>

@@ -1,17 +1,20 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
+import { resolveValue } from "./validate.ts";
 
 export type FormCheckboxType = {
   name: string;
+  data: any;
   display: string;
-  defaultChecked: boolean;
 };
 
 export const FormBoolean = ({
   name,
+  data,
   display,
-  defaultChecked,
 }: FormCheckboxType) => {
-  const [checked, setChecked] = useState(defaultChecked);
+  const value = resolveValue(data, name);
+  const [checked, setChecked] = useState(value);
+
   return (
     <div class="flex flex-row items-center mb-2">
       <input
