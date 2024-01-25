@@ -375,7 +375,6 @@ const PipelineDetail = (
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
-    logFormData(formData);
 
     const { errors } = validate(pipelineSchema, formData);
     setErrors(errors || {});
