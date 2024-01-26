@@ -32,10 +32,16 @@ service External {
   rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
 
   // Attach a pipeline to an audience
-  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse);
+  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  }
 
   // Detach a pipeline from an audience
-  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse);
+  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  }
+
+  rpc SetPipelines(SetPipelineRequest) returns (protos.StandardResponse);
 
   // Pause a pipeline; noop if pipeline is already paused
   rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
@@ -322,4 +328,9 @@ message TestRequest {
 
 message TestResponse {
   string output = 2;
+}
+
+message SetPipelineRequest {
+  Audience aud = 1;
+  repeated string pipeline_ids = 2;
 }
