@@ -288,7 +288,7 @@ func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
 			AttachPipeline: &protos.AttachPipelineCommand{
 				Pipeline: &protos.Pipeline{
 					Id:   GenerateUUID(),
-					Name: "Schema Inference",
+					Name: "Schema Inference (Auto)",
 					Steps: []*protos.PipelineStep{
 						{
 							Name: "Infer Schema",

@@ -139,6 +139,9 @@ type IStore interface {
 
 	// GetTailRequestById returns a TailRequest by its ID
 	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
+
+	// GetSessionIDsByAudience returns all session IDs (active/live sessions) for a given audience
+	GetSessionIDsByAudience(ctx context.Context, audience *protos.Audience) ([]string, error)
 }
 
 type Options struct {
@@ -1482,4 +1485,27 @@ func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
 	}
 
 	return nil
+}
+
+func (s *Store) GetSessionIDsByAudience(ctx context.Context, audience *protos.Audience) ([]string, error) {
+	liveEntries, err := s.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching live entries")
+	}
+
+	sessionIdsMap := make(map[string]struct{})
+
+	for _, entry := range liveEntries {
+		if util.AudienceEquals(entry.Audience, audience) {
+			sessionIdsMap[entry.SessionID] = struct{}{}
+		}
+	}
+
+	sessionIds := make([]string, 0)
+
+	for k, _ := range sessionIdsMap {
+		sessionIds = append(sessionIds, k)
+	}
+
+	return sessionIds, nil
 }

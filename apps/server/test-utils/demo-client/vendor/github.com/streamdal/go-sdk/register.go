@@ -286,6 +286,8 @@ func (s *Streamdal) attachPipeline(_ context.Context, cmd *protos.Command) error
 		return ErrEmptyCommand
 	}
 
+	s.config.Logger.Warnf("Received attach pipeline command for audience '%s', pipeline name '%s'", audToStr(cmd.Audience), cmd.GetAttachPipeline().Pipeline.Name)
+
 	s.pipelinesMtx.Lock()
 	defer s.pipelinesMtx.Unlock()
 
@@ -308,7 +310,6 @@ func (s *Streamdal) attachPipeline(_ context.Context, cmd *protos.Command) error
 	if pipelineIndex == -1 {
 		// Pipeline does not exist, append it
 		s.config.Logger.Debugf("Attached new pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
-
 		s.pipelines[audToStr(cmd.Audience)] = append(s.pipelines[audToStr(cmd.Audience)], cmd)
 	} else {
 		// Avoid potential panic

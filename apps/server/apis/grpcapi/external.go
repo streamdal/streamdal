@@ -530,6 +530,26 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	// We need to know if this audience has any other pipelines already attached.
+	// If no, we will need to inject infer schema. If not, infer schema is probably
+	// already there.
+	//
+	// <<<<<<<PROBLEM>>>>>>>>
+	//
+	// TODO: We cannot send directly via channel - this will only work for one
+	// node. We need to broadcast to all nodes but broadcast expects
+	// AttachPipelineRequest which only specifies pipeline id.
+	// Meaning, to make sure this works properly, we need to create an "invisible"
+	// pipeline and announce it to everyone; then use the BroadcastAttachPipeline()
+	// which takes only a pipeline id.
+	//
+
+	//cfgs, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	//if err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+	//		fmt.Sprintf("unable to fetch existing attached pipelines: %s", err.Error())), nil
+	//}
+
 	if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -544,7 +564,25 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		{"status", "detached"},
 	}...)
 
-	// Pipeline exists, broadcast attach
+	//if len(cfgs) == 0 {
+	//	s.log.Debugf("attempting to attach inferschema pipeline to audience '%s' (before attaching pipeline id '%s')",
+	//		req.Audience, req.PipelineId)
+	//
+	//	inferSchemaCmd := util.GenInferSchemaPipeline(req.Audience)
+	//
+	//	// TODO: Get session ID's for this audience so we can get channels
+	//	sessionIds, err := s.Options.StoreService.GetSessionIDsByAudience(ctx, req.Audience)
+	//	if err != nil {
+	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+	//			fmt.Sprintf("unable to fetch session ID's for audience '%s': %s", req.Audience, err.Error())), nil
+	//	}
+	//
+	//	for _, sid := range sessionIds {
+	//		s.Options.BusService.RunBroadcastConsumer(cmdCh, attachCmd)
+	//	}
+	//	// TODO: Broadcast infer across any (non-new) channels
+	//}
+
 	if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -576,6 +614,7 @@ func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipeline
 	return sessionIDs, nil
 }
 
+// TODO: DS: Should DetachPipeline also detach the infer schema pipeline?
 func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DetachPipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
