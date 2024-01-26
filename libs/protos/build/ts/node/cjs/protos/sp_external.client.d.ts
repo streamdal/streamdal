@@ -30,6 +30,7 @@ import type { UpdateNotificationRequest } from "./sp_external";
 import type { CreateNotificationRequest } from "./sp_external";
 import type { ResumePipelineRequest } from "./sp_external";
 import type { PausePipelineRequest } from "./sp_external";
+import type { SetPipelineRequest } from "./sp_external";
 import type { DetachPipelineRequest } from "./sp_external";
 import type { AttachPipelineRequest } from "./sp_external";
 import type { DeletePipelineRequest } from "./sp_external";
@@ -95,15 +96,21 @@ export interface IExternalClient {
     /**
      * Attach a pipeline to an audience
      *
+     * @deprecated
      * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
      */
     attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse>;
     /**
      * Detach a pipeline from an audience
      *
+     * @deprecated
      * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     */
+    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *
@@ -275,15 +282,21 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
     /**
      * Attach a pipeline to an audience
      *
+     * @deprecated
      * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
      */
     attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse>;
     /**
      * Detach a pipeline from an audience
      *
+     * @deprecated
      * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     */
+    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *

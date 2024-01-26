@@ -522,6 +522,19 @@ export interface TestResponse {
      */
     output: string;
 }
+/**
+ * @generated from protobuf message protos.SetPipelineRequest
+ */
+export interface SetPipelineRequest {
+    /**
+     * @generated from protobuf field: protos.Audience aud = 1;
+     */
+    aud?: Audience;
+    /**
+     * @generated from protobuf field: repeated string pipeline_ids = 2;
+     */
+    pipelineIds: string[];
+}
 declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor();
     create(value?: PartialMessage<GetAllRequest>): GetAllRequest;
@@ -937,6 +950,16 @@ declare class TestResponse$Type extends MessageType<TestResponse> {
  * @generated MessageType for protobuf message protos.TestResponse
  */
 export declare const TestResponse: TestResponse$Type;
+declare class SetPipelineRequest$Type extends MessageType<SetPipelineRequest> {
+    constructor();
+    create(value?: PartialMessage<SetPipelineRequest>): SetPipelineRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelineRequest): SetPipelineRequest;
+    internalBinaryWrite(message: SetPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelineRequest
+ */
+export declare const SetPipelineRequest: SetPipelineRequest$Type;
 /**
  * @generated ServiceType for protobuf service protos.External
  */

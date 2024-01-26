@@ -532,6 +532,19 @@ export interface TestResponse {
      */
     output: string;
 }
+/**
+ * @generated from protobuf message protos.SetPipelineRequest
+ */
+export interface SetPipelineRequest {
+    /**
+     * @generated from protobuf field: protos.Audience aud = 1;
+     */
+    aud?: Audience;
+    /**
+     * @generated from protobuf field: repeated string pipeline_ids = 2;
+     */
+    pipelineIds: string[];
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor() {
@@ -2594,6 +2607,60 @@ class TestResponse$Type extends MessageType<TestResponse> {
  * @generated MessageType for protobuf message protos.TestResponse
  */
 export const TestResponse = new TestResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SetPipelineRequest$Type extends MessageType<SetPipelineRequest> {
+    constructor() {
+        super("protos.SetPipelineRequest", [
+            { no: 1, name: "aud", kind: "message", T: () => Audience },
+            { no: 2, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SetPipelineRequest>): SetPipelineRequest {
+        const message = { pipelineIds: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SetPipelineRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelineRequest): SetPipelineRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience aud */ 1:
+                    message.aud = Audience.internalBinaryRead(reader, reader.uint32(), options, message.aud);
+                    break;
+                case /* repeated string pipeline_ids */ 2:
+                    message.pipelineIds.push(reader.string());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SetPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.Audience aud = 1; */
+        if (message.aud)
+            Audience.internalBinaryWrite(message.aud, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated string pipeline_ids = 2; */
+        for (let i = 0; i < message.pipelineIds.length; i++)
+            writer.tag(2, WireType.LengthDelimited).string(message.pipelineIds[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelineRequest
+ */
+export const SetPipelineRequest = new SetPipelineRequest$Type();
 /**
  * @generated ServiceType for protobuf service protos.External
  */
@@ -2607,6 +2674,7 @@ export const External = new ServiceType("protos.External", [
     { name: "DeletePipeline", options: {}, I: DeletePipelineRequest, O: StandardResponse },
     { name: "AttachPipeline", options: {}, I: AttachPipelineRequest, O: StandardResponse },
     { name: "DetachPipeline", options: {}, I: DetachPipelineRequest, O: StandardResponse },
+    { name: "SetPipelines", options: {}, I: SetPipelineRequest, O: StandardResponse },
     { name: "PausePipeline", options: {}, I: PausePipelineRequest, O: StandardResponse },
     { name: "ResumePipeline", options: {}, I: ResumePipelineRequest, O: StandardResponse },
     { name: "CreateNotification", options: {}, I: CreateNotificationRequest, O: StandardResponse },

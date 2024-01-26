@@ -756,6 +756,12 @@ class TestResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class SetPipelineRequest(betterproto.Message):
+    aud: "Audience" = betterproto.message_field(1)
+    pipeline_ids: List[str] = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
 class KvObject(betterproto.Message):
     """
     KVObject represents a single KV object used in protos.KVInstruction; this
@@ -845,9 +851,13 @@ class Command(betterproto.Message):
     attach_pipeline: "AttachPipelineCommand" = betterproto.message_field(
         100, group="command"
     )
+    """Attaching has been superseded by PipelineList"""
+
     detach_pipeline: "DetachPipelineCommand" = betterproto.message_field(
         101, group="command"
     )
+    """Detaching has been superseded by PipelineList"""
+
     pause_pipeline: "PausePipelineCommand" = betterproto.message_field(
         102, group="command"
     )
@@ -866,6 +876,29 @@ class Command(betterproto.Message):
     Emitted by server when a user makes a Tail() call Consumed by all server
     instances and by SDKs
     """
+
+    pipeline_list: "PipelineList" = betterproto.message_field(107, group="command")
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("attach_pipeline"):
+            warnings.warn("Command.attach_pipeline is deprecated", DeprecationWarning)
+        if self.is_set("detach_pipeline"):
+            warnings.warn("Command.detach_pipeline is deprecated", DeprecationWarning)
+
+
+@dataclass(eq=False, repr=False)
+class PipelineList(betterproto.Message):
+    """
+    PipelineList is used to define a list of attached pipelines for an audience
+    The order and presence of pipeline IDs in this list is defined by the
+    caller of external.SetPipelines() a.k.a the frontend console. Server's will
+    receive this message via broadcast and send the correct pipelines to the
+    SDKs SDKs will receive this list and overwrite their current pipeline list
+    with this new one.
+    """
+
+    pipelines: List["Pipeline"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1397,6 +1430,23 @@ class ExternalStub(betterproto.ServiceStub):
         return await self._unary_unary(
             "/protos.External/DetachPipeline",
             detach_pipeline_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def set_pipelines(
+        self,
+        set_pipeline_request: "SetPipelineRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/SetPipelines",
+            set_pipeline_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
@@ -1968,6 +2018,11 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def set_pipelines(
+        self, set_pipeline_request: "SetPipelineRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def pause_pipeline(
         self, pause_pipeline_request: "PausePipelineRequest"
     ) -> "StandardResponse":
@@ -2142,6 +2197,13 @@ class ExternalBase(ServiceBase):
     ) -> None:
         request = await stream.recv_message()
         response = await self.detach_pipeline(request)
+        await stream.send_message(response)
+
+    async def __rpc_set_pipelines(
+        self, stream: "grpclib.server.Stream[SetPipelineRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.set_pipelines(request)
         await stream.send_message(response)
 
     async def __rpc_pause_pipeline(
@@ -2372,6 +2434,12 @@ class ExternalBase(ServiceBase):
                 self.__rpc_detach_pipeline,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 DetachPipelineRequest,
+                StandardResponse,
+            ),
+            "/protos.External/SetPipelines": grpclib.const.Handler(
+                self.__rpc_set_pipelines,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                SetPipelineRequest,
                 StandardResponse,
             ),
             "/protos.External/PausePipeline": grpclib.const.Handler(

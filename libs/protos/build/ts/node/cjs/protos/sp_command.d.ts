@@ -27,13 +27,19 @@ export interface Command {
     command: {
         oneofKind: "attachPipeline";
         /**
-         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100;
+         * Attaching has been superseded by PipelineList
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
          */
         attachPipeline: AttachPipelineCommand;
     } | {
         oneofKind: "detachPipeline";
         /**
-         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101;
+         * Detaching has been superseded by PipelineList
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
          */
         detachPipeline: DetachPipelineCommand;
     } | {
@@ -73,8 +79,29 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
+        oneofKind: "pipelineList";
+        /**
+         * @generated from protobuf field: protos.PipelineList pipeline_list = 107;
+         */
+        pipelineList: PipelineList;
+    } | {
         oneofKind: undefined;
     };
+}
+/**
+ * PipelineList is used to define a list of attached pipelines for an audience
+ * The order and presence of pipeline IDs in this list is defined by the caller
+ * of external.SetPipelines() a.k.a the frontend console.
+ * Server's will receive this message via broadcast and send the correct pipelines to the SDKs
+ * SDKs will receive this list and overwrite their current pipeline list with this new one.
+ *
+ * @generated from protobuf message protos.PipelineList
+ */
+export interface PipelineList {
+    /**
+     * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
+     */
+    pipelines: Pipeline[];
 }
 /**
  * @generated from protobuf message protos.AttachPipelineCommand
@@ -156,6 +183,16 @@ declare class Command$Type extends MessageType<Command> {
  * @generated MessageType for protobuf message protos.Command
  */
 export declare const Command: Command$Type;
+declare class PipelineList$Type extends MessageType<PipelineList> {
+    constructor();
+    create(value?: PartialMessage<PipelineList>): PipelineList;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineList): PipelineList;
+    internalBinaryWrite(message: PipelineList, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineList
+ */
+export declare const PipelineList: PipelineList$Type;
 declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor();
     create(value?: PartialMessage<AttachPipelineCommand>): AttachPipelineCommand;
