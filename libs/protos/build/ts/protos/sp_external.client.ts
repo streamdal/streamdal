@@ -34,7 +34,7 @@ import type { UpdateNotificationRequest } from "./sp_external.js";
 import type { CreateNotificationRequest } from "./sp_external.js";
 import type { ResumePipelineRequest } from "./sp_external.js";
 import type { PausePipelineRequest } from "./sp_external.js";
-import type { SetPipelineRequest } from "./sp_external.js";
+import type { SetPipelinesRequest } from "./sp_external.js";
 import type { DetachPipelineRequest } from "./sp_external.js";
 import type { AttachPipelineRequest } from "./sp_external.js";
 import type { DeletePipelineRequest } from "./sp_external.js";
@@ -113,9 +113,9 @@ export interface IExternalClient {
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
     /**
-     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse>;
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *
@@ -324,11 +324,11 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<DetachPipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse> {
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse> {
         const method = this.methods[9], opt = this._transport.mergeOptions(options);
-        return stackIntercept<SetPipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<SetPipelinesRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Pause a pipeline; noop if pipeline is already paused

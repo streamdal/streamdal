@@ -97,7 +97,7 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
     setPipelines(input, options) {
         const method = this.methods[9], opt = this._transport.mergeOptions(options);

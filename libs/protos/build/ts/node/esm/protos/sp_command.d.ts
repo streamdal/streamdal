@@ -79,31 +79,34 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
-        oneofKind: "pipelineList";
+        oneofKind: "setPipelines";
         /**
-         * @generated from protobuf field: protos.PipelineList pipeline_list = 107;
+         * Change to SetPipelinesCommand
+         *
+         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 107;
          */
-        pipelineList: PipelineList;
+        setPipelines: SetPipelinesCommand;
     } | {
         oneofKind: undefined;
     };
 }
 /**
- * PipelineList is used to define a list of attached pipelines for an audience
+ * SetPipelinesCommand is used to define a list of attached pipelines for an audience
  * The order and presence of pipeline IDs in this list is defined by the caller
  * of external.SetPipelines() a.k.a the frontend console.
  * Server's will receive this message via broadcast and send the correct pipelines to the SDKs
  * SDKs will receive this list and overwrite their current pipeline list with this new one.
  *
- * @generated from protobuf message protos.PipelineList
+ * @generated from protobuf message protos.SetPipelinesCommand
  */
-export interface PipelineList {
+export interface SetPipelinesCommand {
     /**
      * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
      */
     pipelines: Pipeline[];
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.AttachPipelineCommand
  */
 export interface AttachPipelineCommand {
@@ -113,6 +116,7 @@ export interface AttachPipelineCommand {
     pipeline?: Pipeline;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.DetachPipelineCommand
  */
 export interface DetachPipelineCommand {
@@ -183,16 +187,16 @@ declare class Command$Type extends MessageType<Command> {
  * @generated MessageType for protobuf message protos.Command
  */
 export declare const Command: Command$Type;
-declare class PipelineList$Type extends MessageType<PipelineList> {
+declare class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> {
     constructor();
-    create(value?: PartialMessage<PipelineList>): PipelineList;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineList): PipelineList;
-    internalBinaryWrite(message: PipelineList, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<SetPipelinesCommand>): SetPipelinesCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesCommand): SetPipelinesCommand;
+    internalBinaryWrite(message: SetPipelinesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineList
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
  */
-export declare const PipelineList: PipelineList$Type;
+export declare const SetPipelinesCommand: SetPipelinesCommand$Type;
 declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor();
     create(value?: PartialMessage<AttachPipelineCommand>): AttachPipelineCommand;
@@ -200,6 +204,7 @@ declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineComma
     internalBinaryWrite(message: AttachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 export declare const AttachPipelineCommand: AttachPipelineCommand$Type;
@@ -210,6 +215,7 @@ declare class DetachPipelineCommand$Type extends MessageType<DetachPipelineComma
     internalBinaryWrite(message: DetachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 export declare const DetachPipelineCommand: DetachPipelineCommand$Type;

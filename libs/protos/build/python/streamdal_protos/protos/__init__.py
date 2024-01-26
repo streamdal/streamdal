@@ -756,8 +756,8 @@ class TestResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class SetPipelineRequest(betterproto.Message):
-    aud: "Audience" = betterproto.message_field(1)
+class SetPipelinesRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
     pipeline_ids: List[str] = betterproto.string_field(2)
 
 
@@ -877,7 +877,10 @@ class Command(betterproto.Message):
     instances and by SDKs
     """
 
-    pipeline_list: "PipelineList" = betterproto.message_field(107, group="command")
+    set_pipelines: "SetPipelinesCommand" = betterproto.message_field(
+        107, group="command"
+    )
+    """Change to SetPipelinesCommand"""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -888,14 +891,14 @@ class Command(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class PipelineList(betterproto.Message):
+class SetPipelinesCommand(betterproto.Message):
     """
-    PipelineList is used to define a list of attached pipelines for an audience
-    The order and presence of pipeline IDs in this list is defined by the
-    caller of external.SetPipelines() a.k.a the frontend console. Server's will
-    receive this message via broadcast and send the correct pipelines to the
-    SDKs SDKs will receive this list and overwrite their current pipeline list
-    with this new one.
+    SetPipelinesCommand is used to define a list of attached pipelines for an
+    audience The order and presence of pipeline IDs in this list is defined by
+    the caller of external.SetPipelines() a.k.a the frontend console. Server's
+    will receive this message via broadcast and send the correct pipelines to
+    the SDKs SDKs will receive this list and overwrite their current pipeline
+    list with this new one.
     """
 
     pipelines: List["Pipeline"] = betterproto.message_field(1)
@@ -905,10 +908,18 @@ class PipelineList(betterproto.Message):
 class AttachPipelineCommand(betterproto.Message):
     pipeline: "Pipeline" = betterproto.message_field(1)
 
+    def __post_init__(self) -> None:
+        warnings.warn("AttachPipelineCommand is deprecated", DeprecationWarning)
+        super().__post_init__()
+
 
 @dataclass(eq=False, repr=False)
 class DetachPipelineCommand(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
+
+    def __post_init__(self) -> None:
+        warnings.warn("DetachPipelineCommand is deprecated", DeprecationWarning)
+        super().__post_init__()
 
 
 @dataclass(eq=False, repr=False)
@@ -1037,10 +1048,10 @@ class GetAttachCommandsByServiceRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetAttachCommandsByServiceResponse(betterproto.Message):
-    active: List["Command"] = betterproto.message_field(1)
+    active: List["Pipeline"] = betterproto.message_field(1)
     """AttachCommands for all active pipelines"""
 
-    paused: List["Command"] = betterproto.message_field(2)
+    paused: List["Pipeline"] = betterproto.message_field(2)
     """
     AttachCommands, but ones which are paused The SDK still needs to have these
     to support un-pausing
@@ -1438,7 +1449,7 @@ class ExternalStub(betterproto.ServiceStub):
 
     async def set_pipelines(
         self,
-        set_pipeline_request: "SetPipelineRequest",
+        set_pipelines_request: "SetPipelinesRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
@@ -1446,7 +1457,7 @@ class ExternalStub(betterproto.ServiceStub):
     ) -> "StandardResponse":
         return await self._unary_unary(
             "/protos.External/SetPipelines",
-            set_pipeline_request,
+            set_pipelines_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
@@ -2019,7 +2030,7 @@ class ExternalBase(ServiceBase):
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def set_pipelines(
-        self, set_pipeline_request: "SetPipelineRequest"
+        self, set_pipelines_request: "SetPipelinesRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -2200,7 +2211,7 @@ class ExternalBase(ServiceBase):
         await stream.send_message(response)
 
     async def __rpc_set_pipelines(
-        self, stream: "grpclib.server.Stream[SetPipelineRequest, StandardResponse]"
+        self, stream: "grpclib.server.Stream[SetPipelinesRequest, StandardResponse]"
     ) -> None:
         request = await stream.recv_message()
         response = await self.set_pipelines(request)
@@ -2439,7 +2450,7 @@ class ExternalBase(ServiceBase):
             "/protos.External/SetPipelines": grpclib.const.Handler(
                 self.__rpc_set_pipelines,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                SetPipelineRequest,
+                SetPipelinesRequest,
                 StandardResponse,
             ),
             "/protos.External/PausePipeline": grpclib.const.Handler(

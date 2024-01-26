@@ -19,7 +19,7 @@ class Command$Type extends MessageType {
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
             { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
             { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand },
-            { no: 107, name: "pipeline_list", kind: "message", oneof: "command", T: () => PipelineList }
+            { no: 107, name: "set_pipelines", kind: "message", oneof: "command", T: () => SetPipelinesCommand }
         ]);
     }
     create(value) {
@@ -79,10 +79,10 @@ class Command$Type extends MessageType {
                         tail: TailCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.tail)
                     };
                     break;
-                case /* protos.PipelineList pipeline_list */ 107:
+                case /* protos.SetPipelinesCommand set_pipelines */ 107:
                     message.command = {
-                        oneofKind: "pipelineList",
-                        pipelineList: PipelineList.internalBinaryRead(reader, reader.uint32(), options, message.command.pipelineList)
+                        oneofKind: "setPipelines",
+                        setPipelines: SetPipelinesCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.setPipelines)
                     };
                     break;
                 default:
@@ -121,9 +121,9 @@ class Command$Type extends MessageType {
         /* protos.TailCommand tail = 106; */
         if (message.command.oneofKind === "tail")
             TailCommand.internalBinaryWrite(message.command.tail, writer.tag(106, WireType.LengthDelimited).fork(), options).join();
-        /* protos.PipelineList pipeline_list = 107; */
-        if (message.command.oneofKind === "pipelineList")
-            PipelineList.internalBinaryWrite(message.command.pipelineList, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
+        /* protos.SetPipelinesCommand set_pipelines = 107; */
+        if (message.command.oneofKind === "setPipelines")
+            SetPipelinesCommand.internalBinaryWrite(message.command.setPipelines, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -135,9 +135,9 @@ class Command$Type extends MessageType {
  */
 export const Command = new Command$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineList$Type extends MessageType {
+class SetPipelinesCommand$Type extends MessageType {
     constructor() {
-        super("protos.PipelineList", [
+        super("protos.SetPipelinesCommand", [
             { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline }
         ]);
     }
@@ -178,9 +178,9 @@ class PipelineList$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineList
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
  */
-export const PipelineList = new PipelineList$Type();
+export const SetPipelinesCommand = new SetPipelinesCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AttachPipelineCommand$Type extends MessageType {
     constructor() {
@@ -225,6 +225,7 @@ class AttachPipelineCommand$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 export const AttachPipelineCommand = new AttachPipelineCommand$Type();
@@ -272,6 +273,7 @@ class DetachPipelineCommand$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 export const DetachPipelineCommand = new DetachPipelineCommand$Type();

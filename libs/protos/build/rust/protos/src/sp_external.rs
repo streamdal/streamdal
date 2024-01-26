@@ -5498,27 +5498,27 @@ impl ::protobuf::reflect::ProtobufValue for TestResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-// @@protoc_insertion_point(message:protos.SetPipelineRequest)
+// @@protoc_insertion_point(message:protos.SetPipelinesRequest)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct SetPipelineRequest {
+pub struct SetPipelinesRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.SetPipelineRequest.aud)
-    pub aud: ::protobuf::MessageField<super::sp_common::Audience>,
-    // @@protoc_insertion_point(field:protos.SetPipelineRequest.pipeline_ids)
+    // @@protoc_insertion_point(field:protos.SetPipelinesRequest.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
+    // @@protoc_insertion_point(field:protos.SetPipelinesRequest.pipeline_ids)
     pub pipeline_ids: ::std::vec::Vec<::std::string::String>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.SetPipelineRequest.special_fields)
+    // @@protoc_insertion_point(special_field:protos.SetPipelinesRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a SetPipelineRequest {
-    fn default() -> &'a SetPipelineRequest {
-        <SetPipelineRequest as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a SetPipelinesRequest {
+    fn default() -> &'a SetPipelinesRequest {
+        <SetPipelinesRequest as ::protobuf::Message>::default_instance()
     }
 }
 
-impl SetPipelineRequest {
-    pub fn new() -> SetPipelineRequest {
+impl SetPipelinesRequest {
+    pub fn new() -> SetPipelinesRequest {
         ::std::default::Default::default()
     }
 
@@ -5526,25 +5526,25 @@ impl SetPipelineRequest {
         let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
-            "aud",
-            |m: &SetPipelineRequest| { &m.aud },
-            |m: &mut SetPipelineRequest| { &mut m.aud },
+            "audience",
+            |m: &SetPipelinesRequest| { &m.audience },
+            |m: &mut SetPipelinesRequest| { &mut m.audience },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "pipeline_ids",
-            |m: &SetPipelineRequest| { &m.pipeline_ids },
-            |m: &mut SetPipelineRequest| { &mut m.pipeline_ids },
+            |m: &SetPipelinesRequest| { &m.pipeline_ids },
+            |m: &mut SetPipelinesRequest| { &mut m.pipeline_ids },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelineRequest>(
-            "SetPipelineRequest",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelinesRequest>(
+            "SetPipelinesRequest",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for SetPipelineRequest {
-    const NAME: &'static str = "SetPipelineRequest";
+impl ::protobuf::Message for SetPipelinesRequest {
+    const NAME: &'static str = "SetPipelinesRequest";
 
     fn is_initialized(&self) -> bool {
         true
@@ -5554,7 +5554,7 @@ impl ::protobuf::Message for SetPipelineRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.aud)?;
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
                 },
                 18 => {
                     self.pipeline_ids.push(is.read_string()?);
@@ -5571,7 +5571,7 @@ impl ::protobuf::Message for SetPipelineRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.aud.as_ref() {
+        if let Some(v) = self.audience.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
@@ -5584,7 +5584,7 @@ impl ::protobuf::Message for SetPipelineRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.aud.as_ref() {
+        if let Some(v) = self.audience.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
         }
         for v in &self.pipeline_ids {
@@ -5602,19 +5602,19 @@ impl ::protobuf::Message for SetPipelineRequest {
         &mut self.special_fields
     }
 
-    fn new() -> SetPipelineRequest {
-        SetPipelineRequest::new()
+    fn new() -> SetPipelinesRequest {
+        SetPipelinesRequest::new()
     }
 
     fn clear(&mut self) {
-        self.aud.clear();
+        self.audience.clear();
         self.pipeline_ids.clear();
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static SetPipelineRequest {
-        static instance: SetPipelineRequest = SetPipelineRequest {
-            aud: ::protobuf::MessageField::none(),
+    fn default_instance() -> &'static SetPipelinesRequest {
+        static instance: SetPipelinesRequest = SetPipelinesRequest {
+            audience: ::protobuf::MessageField::none(),
             pipeline_ids: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -5622,20 +5622,20 @@ impl ::protobuf::Message for SetPipelineRequest {
     }
 }
 
-impl ::protobuf::MessageFull for SetPipelineRequest {
+impl ::protobuf::MessageFull for SetPipelinesRequest {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("SetPipelineRequest").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SetPipelinesRequest").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for SetPipelineRequest {
+impl ::std::fmt::Display for SetPipelinesRequest {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for SetPipelineRequest {
+impl ::protobuf::reflect::ProtobufValue for SetPipelinesRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -5726,52 +5726,52 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     ailId\",\n\x11ResumeTailRequest\x12\x17\n\x07tail_id\x18\x01\x20\x01(\tR\
     \x06tailId\"#\n\x0bTestRequest\x12\x14\n\x05input\x18\x01\x20\x01(\tR\
     \x05input\"&\n\x0cTestResponse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\
-    \x06output\"[\n\x12SetPipelineRequest\x12\"\n\x03aud\x18\x01\x20\x01(\
-    \x0b2\x10.protos.AudienceR\x03aud\x12!\n\x0cpipeline_ids\x18\x02\x20\x03\
-    (\tR\x0bpipelineIds2\xfd\x12\n\x08External\x127\n\x06GetAll\x12\x15.prot\
-    os.GetAllRequest\x1a\x16.protos.GetAllResponse\x12?\n\x0cGetAllStream\
-    \x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse0\x01\x12I\n\
-    \x0cGetPipelines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.protos.GetPi\
-    pelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipelineRequest\
-    \x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eCreatePipeline\x12\x1d.pro\
-    tos.CreatePipelineRequest\x1a\x1e.protos.CreatePipelineResponse\x12I\n\
-    \x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRequest\x1a\x18.protos.S\
-    tandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.protos.DeletePipelineRe\
-    quest\x1a\x18.protos.StandardResponse\x12N\n\x0eAttachPipeline\x12\x1d.p\
-    rotos.AttachPipelineRequest\x1a\x18.protos.StandardResponse\"\x03\x88\
-    \x02\x01\x12N\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelineRequest\
-    \x1a\x18.protos.StandardResponse\"\x03\x88\x02\x01\x12D\n\x0cSetPipeline\
-    s\x12\x1a.protos.SetPipelineRequest\x1a\x18.protos.StandardResponse\x12G\
-    \n\rPausePipeline\x12\x1c.protos.PausePipelineRequest\x1a\x18.protos.Sta\
-    ndardResponse\x12I\n\x0eResumePipeline\x12\x1d.protos.ResumePipelineRequ\
-    est\x1a\x18.protos.StandardResponse\x12Q\n\x12CreateNotification\x12!.pr\
-    otos.CreateNotificationRequest\x1a\x18.protos.StandardResponse\x12Q\n\
-    \x12UpdateNotification\x12!.protos.UpdateNotificationRequest\x1a\x18.pro\
-    tos.StandardResponse\x12Q\n\x12DeleteNotification\x12!.protos.DeleteNoti\
-    ficationRequest\x1a\x18.protos.StandardResponse\x12U\n\x10GetNotificatio\
-    ns\x12\x1f.protos.GetNotificationsRequest\x1a\x20.protos.GetNotification\
-    sResponse\x12R\n\x0fGetNotification\x12\x1e.protos.GetNotificationReques\
-    t\x1a\x1f.protos.GetNotificationResponse\x12Q\n\x12AttachNotification\
-    \x12!.protos.AttachNotificationRequest\x1a\x18.protos.StandardResponse\
-    \x12Q\n\x12DetachNotification\x12!.protos.DetachNotificationRequest\x1a\
-    \x18.protos.StandardResponse\x12I\n\x0eDeleteAudience\x12\x1d.protos.Del\
-    eteAudienceRequest\x1a\x18.protos.StandardResponse\x12G\n\rDeleteService\
-    \x12\x1c.protos.DeleteServiceRequest\x1a\x18.protos.StandardResponse\x12\
-    E\n\nGetMetrics\x12\x19.protos.GetMetricsRequest\x1a\x1a.protos.GetMetri\
-    csResponse0\x01\x123\n\x04Tail\x12\x13.protos.TailRequest\x1a\x14.protos\
-    .TailResponse0\x01\x12?\n\tPauseTail\x12\x18.protos.PauseTailRequest\x1a\
-    \x18.protos.StandardResponse\x12A\n\nResumeTail\x12\x19.protos.ResumeTai\
-    lRequest\x1a\x18.protos.StandardResponse\x12W\n\x10GetAudienceRates\x12\
-    \x1f.protos.GetAudienceRatesRequest\x1a\x20.protos.GetAudienceRatesRespo\
-    nse0\x01\x12@\n\tGetSchema\x12\x18.protos.GetSchemaRequest\x1a\x19.proto\
-    s.GetSchemaResponse\x12d\n\x15AppRegistrationStatus\x12$.protos.AppRegis\
-    trationStatusRequest\x1a%.protos.AppRegistrationStatusResponse\x12G\n\
-    \x0bAppRegister\x12\x1e.protos.AppRegistrationRequest\x1a\x18.protos.Sta\
-    ndardResponse\x12W\n\x15AppVerifyRegistration\x12$.protos.AppVerifyRegis\
-    trationRequest\x1a\x18.protos.StandardResponse\x12O\n\x11AppRegisterReje\
-    ct\x12\x20.protos.AppRegisterRejectRequest\x1a\x18.protos.StandardRespon\
-    se\x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponse\
-    B<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xfcJ\n\
+    \x06output\"f\n\x13SetPipelinesRequest\x12,\n\x08audience\x18\x01\x20\
+    \x01(\x0b2\x10.protos.AudienceR\x08audience\x12!\n\x0cpipeline_ids\x18\
+    \x02\x20\x03(\tR\x0bpipelineIds2\xfe\x12\n\x08External\x127\n\x06GetAll\
+    \x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse\x12?\n\x0cGe\
+    tAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse0\
+    \x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.p\
+    rotos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipel\
+    ineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eCreatePipeline\
+    \x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.CreatePipelineRespo\
+    nse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRequest\x1a\
+    \x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.protos.Del\
+    etePipelineRequest\x1a\x18.protos.StandardResponse\x12N\n\x0eAttachPipel\
+    ine\x12\x1d.protos.AttachPipelineRequest\x1a\x18.protos.StandardResponse\
+    \"\x03\x88\x02\x01\x12N\n\x0eDetachPipeline\x12\x1d.protos.DetachPipelin\
+    eRequest\x1a\x18.protos.StandardResponse\"\x03\x88\x02\x01\x12E\n\x0cSet\
+    Pipelines\x12\x1b.protos.SetPipelinesRequest\x1a\x18.protos.StandardResp\
+    onse\x12G\n\rPausePipeline\x12\x1c.protos.PausePipelineRequest\x1a\x18.p\
+    rotos.StandardResponse\x12I\n\x0eResumePipeline\x12\x1d.protos.ResumePip\
+    elineRequest\x1a\x18.protos.StandardResponse\x12Q\n\x12CreateNotificatio\
+    n\x12!.protos.CreateNotificationRequest\x1a\x18.protos.StandardResponse\
+    \x12Q\n\x12UpdateNotification\x12!.protos.UpdateNotificationRequest\x1a\
+    \x18.protos.StandardResponse\x12Q\n\x12DeleteNotification\x12!.protos.De\
+    leteNotificationRequest\x1a\x18.protos.StandardResponse\x12U\n\x10GetNot\
+    ifications\x12\x1f.protos.GetNotificationsRequest\x1a\x20.protos.GetNoti\
+    ficationsResponse\x12R\n\x0fGetNotification\x12\x1e.protos.GetNotificati\
+    onRequest\x1a\x1f.protos.GetNotificationResponse\x12Q\n\x12AttachNotific\
+    ation\x12!.protos.AttachNotificationRequest\x1a\x18.protos.StandardRespo\
+    nse\x12Q\n\x12DetachNotification\x12!.protos.DetachNotificationRequest\
+    \x1a\x18.protos.StandardResponse\x12I\n\x0eDeleteAudience\x12\x1d.protos\
+    .DeleteAudienceRequest\x1a\x18.protos.StandardResponse\x12G\n\rDeleteSer\
+    vice\x12\x1c.protos.DeleteServiceRequest\x1a\x18.protos.StandardResponse\
+    \x12E\n\nGetMetrics\x12\x19.protos.GetMetricsRequest\x1a\x1a.protos.GetM\
+    etricsResponse0\x01\x123\n\x04Tail\x12\x13.protos.TailRequest\x1a\x14.pr\
+    otos.TailResponse0\x01\x12?\n\tPauseTail\x12\x18.protos.PauseTailRequest\
+    \x1a\x18.protos.StandardResponse\x12A\n\nResumeTail\x12\x19.protos.Resum\
+    eTailRequest\x1a\x18.protos.StandardResponse\x12W\n\x10GetAudienceRates\
+    \x12\x1f.protos.GetAudienceRatesRequest\x1a\x20.protos.GetAudienceRatesR\
+    esponse0\x01\x12@\n\tGetSchema\x12\x18.protos.GetSchemaRequest\x1a\x19.p\
+    rotos.GetSchemaResponse\x12d\n\x15AppRegistrationStatus\x12$.protos.AppR\
+    egistrationStatusRequest\x1a%.protos.AppRegistrationStatusResponse\x12G\
+    \n\x0bAppRegister\x12\x1e.protos.AppRegistrationRequest\x1a\x18.protos.S\
+    tandardResponse\x12W\n\x15AppVerifyRegistration\x12$.protos.AppVerifyReg\
+    istrationRequest\x1a\x18.protos.StandardResponse\x12O\n\x11AppRegisterRe\
+    ject\x12\x20.protos.AppRegisterRejectRequest\x1a\x18.protos.StandardResp\
+    onse\x121\n\x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestRespon\
+    seB<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xfcJ\n\
     \x07\x12\x05\0\0\xcf\x02\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\
     \x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\
     \x01\x12\x03\x05\0\x17\n\t\n\x02\x03\x02\x12\x03\x06\0\x19\n\t\n\x02\x03\
@@ -5813,9 +5813,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x12\x03'\x06\x14\n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03'\x15*\n\x0c\
     \n\x05\x06\0\x02\x08\x03\x12\x03'5L\n\x0c\n\x05\x06\0\x02\x08\x04\x12\
     \x03(\x04\x1d\n\r\n\x06\x06\0\x02\x08\x04!\x12\x03(\x04\x1d\n\x0b\n\x04\
-    \x06\0\x02\t\x12\x03+\x02I\n\x0c\n\x05\x06\0\x02\t\x01\x12\x03+\x06\x12\
-    \n\x0c\n\x05\x06\0\x02\t\x02\x12\x03+\x13%\n\x0c\n\x05\x06\0\x02\t\x03\
-    \x12\x03+0G\nC\n\x04\x06\0\x02\n\x12\x03.\x02L\x1a6\x20Pause\x20a\x20pip\
+    \x06\0\x02\t\x12\x03+\x02J\n\x0c\n\x05\x06\0\x02\t\x01\x12\x03+\x06\x12\
+    \n\x0c\n\x05\x06\0\x02\t\x02\x12\x03+\x13&\n\x0c\n\x05\x06\0\x02\t\x03\
+    \x12\x03+1H\nC\n\x04\x06\0\x02\n\x12\x03.\x02L\x1a6\x20Pause\x20a\x20pip\
     eline;\x20noop\x20if\x20pipeline\x20is\x20already\x20paused\n\n\x0c\n\
     \x05\x06\0\x02\n\x01\x12\x03.\x06\x13\n\x0c\n\x05\x06\0\x02\n\x02\x12\
     \x03.\x14(\n\x0c\n\x05\x06\0\x02\n\x03\x12\x03.3J\n@\n\x04\x06\0\x02\x0b\
@@ -6148,10 +6148,10 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x04\x04(\x02\0\x12\x04\xc9\x02\x02\x14\n\r\n\x05\x04(\x02\0\x05\x12\x04\
     \xc9\x02\x02\x08\n\r\n\x05\x04(\x02\0\x01\x12\x04\xc9\x02\t\x0f\n\r\n\
     \x05\x04(\x02\0\x03\x12\x04\xc9\x02\x12\x13\n\x0c\n\x02\x04)\x12\x06\xcc\
-    \x02\0\xcf\x02\x01\n\x0b\n\x03\x04)\x01\x12\x04\xcc\x02\x08\x1a\n\x0c\n\
-    \x04\x04)\x02\0\x12\x04\xcd\x02\x02\x13\n\r\n\x05\x04)\x02\0\x06\x12\x04\
-    \xcd\x02\x02\n\n\r\n\x05\x04)\x02\0\x01\x12\x04\xcd\x02\x0b\x0e\n\r\n\
-    \x05\x04)\x02\0\x03\x12\x04\xcd\x02\x11\x12\n\x0c\n\x04\x04)\x02\x01\x12\
+    \x02\0\xcf\x02\x01\n\x0b\n\x03\x04)\x01\x12\x04\xcc\x02\x08\x1b\n\x0c\n\
+    \x04\x04)\x02\0\x12\x04\xcd\x02\x02\x18\n\r\n\x05\x04)\x02\0\x06\x12\x04\
+    \xcd\x02\x02\n\n\r\n\x05\x04)\x02\0\x01\x12\x04\xcd\x02\x0b\x13\n\r\n\
+    \x05\x04)\x02\0\x03\x12\x04\xcd\x02\x16\x17\n\x0c\n\x04\x04)\x02\x01\x12\
     \x04\xce\x02\x02#\n\r\n\x05\x04)\x02\x01\x04\x12\x04\xce\x02\x02\n\n\r\n\
     \x05\x04)\x02\x01\x05\x12\x04\xce\x02\x0b\x11\n\r\n\x05\x04)\x02\x01\x01\
     \x12\x04\xce\x02\x12\x1e\n\r\n\x05\x04)\x02\x01\x03\x12\x04\xce\x02!\"b\
@@ -6219,7 +6219,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(ResumeTailRequest::generated_message_descriptor_data());
             messages.push(TestRequest::generated_message_descriptor_data());
             messages.push(TestResponse::generated_message_descriptor_data());
-            messages.push(SetPipelineRequest::generated_message_descriptor_data());
+            messages.push(SetPipelinesRequest::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(app_registration_status_response::Status::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

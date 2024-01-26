@@ -303,13 +303,13 @@ class ResumeTailRequest(_message.Message):
     tail_id: str
     def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
 
-class SetPipelineRequest(_message.Message):
-    __slots__ = ["aud", "pipeline_ids"]
-    AUD_FIELD_NUMBER: _ClassVar[int]
+class SetPipelinesRequest(_message.Message):
+    __slots__ = ["audience", "pipeline_ids"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
-    aud: _sp_common_pb2.Audience
+    audience: _sp_common_pb2.Audience
     pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, aud: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., pipeline_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., pipeline_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class TestRequest(_message.Message):
     __slots__ = ["input"]

@@ -30,7 +30,7 @@ import type { UpdateNotificationRequest } from "./sp_external";
 import type { CreateNotificationRequest } from "./sp_external";
 import type { ResumePipelineRequest } from "./sp_external";
 import type { PausePipelineRequest } from "./sp_external";
-import type { SetPipelineRequest } from "./sp_external";
+import type { SetPipelinesRequest } from "./sp_external";
 import type { DetachPipelineRequest } from "./sp_external";
 import type { AttachPipelineRequest } from "./sp_external";
 import type { DeletePipelineRequest } from "./sp_external";
@@ -108,9 +108,9 @@ export interface IExternalClient {
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
     /**
-     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse>;
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *
@@ -294,9 +294,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
     /**
-     * @generated from protobuf rpc: SetPipelines(protos.SetPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    setPipelines(input: SetPipelineRequest, options?: RpcOptions): UnaryCall<SetPipelineRequest, StandardResponse>;
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *

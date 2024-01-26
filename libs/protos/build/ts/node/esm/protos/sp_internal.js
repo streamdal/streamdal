@@ -3,6 +3,7 @@
 // tslint:disable
 import { TailResponse } from "./sp_common.js";
 import { StandardResponse } from "./sp_common.js";
+import { Command } from "./sp_command.js";
 import { ServiceType } from "@protobuf-ts/runtime-rpc";
 import { WireType } from "@protobuf-ts/runtime";
 import { UnknownFieldHandler } from "@protobuf-ts/runtime";
@@ -10,7 +11,7 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
-import { Command } from "./sp_command.js";
+import { Pipeline } from "./sp_pipeline.js";
 import { Metric } from "./sp_common.js";
 import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
@@ -431,8 +432,8 @@ export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceR
 class GetAttachCommandsByServiceResponse$Type extends MessageType {
     constructor() {
         super("protos.GetAttachCommandsByServiceResponse", [
-            { no: 1, name: "active", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
-            { no: 2, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
+            { no: 1, name: "active", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline },
+            { no: 2, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline },
             { no: 3, name: "wasm_modules", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => WasmModule } }
         ]);
     }
@@ -448,11 +449,11 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.Command active */ 1:
-                    message.active.push(Command.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Pipeline active */ 1:
+                    message.active.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated protos.Command paused */ 2:
-                    message.paused.push(Command.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Pipeline paused */ 2:
+                    message.paused.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* map<string, protos.WasmModule> wasm_modules */ 3:
                     this.binaryReadMap3(message.wasmModules, reader, options);
@@ -485,12 +486,12 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
         map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : WasmModule.create();
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.Command active = 1; */
+        /* repeated protos.Pipeline active = 1; */
         for (let i = 0; i < message.active.length; i++)
-            Command.internalBinaryWrite(message.active[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated protos.Command paused = 2; */
+            Pipeline.internalBinaryWrite(message.active[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Pipeline paused = 2; */
         for (let i = 0; i < message.paused.length; i++)
-            Command.internalBinaryWrite(message.paused[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            Pipeline.internalBinaryWrite(message.paused[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* map<string, protos.WasmModule> wasm_modules = 3; */
         for (let k of Object.keys(message.wasmModules)) {
             writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);

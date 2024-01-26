@@ -1,6 +1,7 @@
 import sp_command_pb2 as _sp_command_pb2
 import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
+import sp_pipeline_pb2 as _sp_pipeline_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -34,10 +35,10 @@ class GetAttachCommandsByServiceResponse(_message.Message):
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     PAUSED_FIELD_NUMBER: _ClassVar[int]
     WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
-    active: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
-    paused: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
+    active: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
+    paused: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
     wasm_modules: _containers.MessageMap[str, WasmModule]
-    def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
+    def __init__(self, active: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["audiences", "client_info", "service_name", "session_id"]

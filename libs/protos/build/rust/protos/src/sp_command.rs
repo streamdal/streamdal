@@ -395,52 +395,52 @@ impl Command {
         }
     }
 
-    // .protos.PipelineList pipeline_list = 107;
+    // .protos.SetPipelinesCommand set_pipelines = 107;
 
-    pub fn pipeline_list(&self) -> &PipelineList {
+    pub fn set_pipelines(&self) -> &SetPipelinesCommand {
         match self.command {
-            ::std::option::Option::Some(command::Command::PipelineList(ref v)) => v,
-            _ => <PipelineList as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(command::Command::SetPipelines(ref v)) => v,
+            _ => <SetPipelinesCommand as ::protobuf::Message>::default_instance(),
         }
     }
 
-    pub fn clear_pipeline_list(&mut self) {
+    pub fn clear_set_pipelines(&mut self) {
         self.command = ::std::option::Option::None;
     }
 
-    pub fn has_pipeline_list(&self) -> bool {
+    pub fn has_set_pipelines(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(command::Command::PipelineList(..)) => true,
+            ::std::option::Option::Some(command::Command::SetPipelines(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_pipeline_list(&mut self, v: PipelineList) {
-        self.command = ::std::option::Option::Some(command::Command::PipelineList(v))
+    pub fn set_set_pipelines(&mut self, v: SetPipelinesCommand) {
+        self.command = ::std::option::Option::Some(command::Command::SetPipelines(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_pipeline_list(&mut self) -> &mut PipelineList {
-        if let ::std::option::Option::Some(command::Command::PipelineList(_)) = self.command {
+    pub fn mut_set_pipelines(&mut self) -> &mut SetPipelinesCommand {
+        if let ::std::option::Option::Some(command::Command::SetPipelines(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(command::Command::PipelineList(PipelineList::new()));
+            self.command = ::std::option::Option::Some(command::Command::SetPipelines(SetPipelinesCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(command::Command::PipelineList(ref mut v)) => v,
+            ::std::option::Option::Some(command::Command::SetPipelines(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_pipeline_list(&mut self) -> PipelineList {
-        if self.has_pipeline_list() {
+    pub fn take_set_pipelines(&mut self) -> SetPipelinesCommand {
+        if self.has_set_pipelines() {
             match self.command.take() {
-                ::std::option::Option::Some(command::Command::PipelineList(v)) => v,
+                ::std::option::Option::Some(command::Command::SetPipelines(v)) => v,
                 _ => panic!(),
             }
         } else {
-            PipelineList::new()
+            SetPipelinesCommand::new()
         }
     }
 
@@ -501,12 +501,12 @@ impl Command {
             Command::mut_tail,
             Command::set_tail,
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, PipelineList>(
-            "pipeline_list",
-            Command::has_pipeline_list,
-            Command::pipeline_list,
-            Command::mut_pipeline_list,
-            Command::set_pipeline_list,
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, SetPipelinesCommand>(
+            "set_pipelines",
+            Command::has_set_pipelines,
+            Command::set_pipelines,
+            Command::mut_set_pipelines,
+            Command::set_set_pipelines,
         ));
         oneofs.push(command::Command::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Command>(
@@ -552,7 +552,7 @@ impl ::protobuf::Message for Command {
                     self.command = ::std::option::Option::Some(command::Command::Tail(is.read_message()?));
                 },
                 858 => {
-                    self.command = ::std::option::Option::Some(command::Command::PipelineList(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command::Command::SetPipelines(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -600,7 +600,7 @@ impl ::protobuf::Message for Command {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &command::Command::PipelineList(ref v) => {
+                &command::Command::SetPipelines(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -638,7 +638,7 @@ impl ::protobuf::Message for Command {
                 &command::Command::Tail(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(106, v, os)?;
                 },
-                &command::Command::PipelineList(ref v) => {
+                &command::Command::SetPipelines(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(107, v, os)?;
                 },
             };
@@ -720,8 +720,8 @@ pub mod command {
         Kv(super::KVCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.tail)
         Tail(super::TailCommand),
-        // @@protoc_insertion_point(oneof_field:protos.Command.pipeline_list)
-        PipelineList(super::PipelineList),
+        // @@protoc_insertion_point(oneof_field:protos.Command.set_pipelines)
+        SetPipelines(super::SetPipelinesCommand),
     }
 
     impl ::protobuf::Oneof for Command {
@@ -741,30 +741,30 @@ pub mod command {
     }
 }
 
-///  PipelineList is used to define a list of attached pipelines for an audience
+///  SetPipelinesCommand is used to define a list of attached pipelines for an audience
 ///  The order and presence of pipeline IDs in this list is defined by the caller
 ///  of external.SetPipelines() a.k.a the frontend console.
 ///  Server's will receive this message via broadcast and send the correct pipelines to the SDKs
 ///  SDKs will receive this list and overwrite their current pipeline list with this new one.
-// @@protoc_insertion_point(message:protos.PipelineList)
+// @@protoc_insertion_point(message:protos.SetPipelinesCommand)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct PipelineList {
+pub struct SetPipelinesCommand {
     // message fields
-    // @@protoc_insertion_point(field:protos.PipelineList.pipelines)
+    // @@protoc_insertion_point(field:protos.SetPipelinesCommand.pipelines)
     pub pipelines: ::std::vec::Vec<super::sp_pipeline::Pipeline>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.PipelineList.special_fields)
+    // @@protoc_insertion_point(special_field:protos.SetPipelinesCommand.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a PipelineList {
-    fn default() -> &'a PipelineList {
-        <PipelineList as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a SetPipelinesCommand {
+    fn default() -> &'a SetPipelinesCommand {
+        <SetPipelinesCommand as ::protobuf::Message>::default_instance()
     }
 }
 
-impl PipelineList {
-    pub fn new() -> PipelineList {
+impl SetPipelinesCommand {
+    pub fn new() -> SetPipelinesCommand {
         ::std::default::Default::default()
     }
 
@@ -773,19 +773,19 @@ impl PipelineList {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "pipelines",
-            |m: &PipelineList| { &m.pipelines },
-            |m: &mut PipelineList| { &mut m.pipelines },
+            |m: &SetPipelinesCommand| { &m.pipelines },
+            |m: &mut SetPipelinesCommand| { &mut m.pipelines },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PipelineList>(
-            "PipelineList",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelinesCommand>(
+            "SetPipelinesCommand",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for PipelineList {
-    const NAME: &'static str = "PipelineList";
+impl ::protobuf::Message for SetPipelinesCommand {
+    const NAME: &'static str = "SetPipelinesCommand";
 
     fn is_initialized(&self) -> bool {
         true
@@ -834,8 +834,8 @@ impl ::protobuf::Message for PipelineList {
         &mut self.special_fields
     }
 
-    fn new() -> PipelineList {
-        PipelineList::new()
+    fn new() -> SetPipelinesCommand {
+        SetPipelinesCommand::new()
     }
 
     fn clear(&mut self) {
@@ -843,8 +843,8 @@ impl ::protobuf::Message for PipelineList {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static PipelineList {
-        static instance: PipelineList = PipelineList {
+    fn default_instance() -> &'static SetPipelinesCommand {
+        static instance: SetPipelinesCommand = SetPipelinesCommand {
             pipelines: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -852,20 +852,20 @@ impl ::protobuf::Message for PipelineList {
     }
 }
 
-impl ::protobuf::MessageFull for PipelineList {
+impl ::protobuf::MessageFull for SetPipelinesCommand {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("PipelineList").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SetPipelinesCommand").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for PipelineList {
+impl ::std::fmt::Display for SetPipelinesCommand {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for PipelineList {
+impl ::protobuf::reflect::ProtobufValue for SetPipelinesCommand {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -1730,7 +1730,7 @@ impl ::protobuf::reflect::ProtobufValue for TailCommand {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x10sp_command.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\x0bsp_kv\
-    .proto\x1a\x11sp_pipeline.proto\"\xb7\x04\n\x07Command\x12,\n\x08audienc\
+    .proto\x1a\x11sp_pipeline.proto\"\xbe\x04\n\x07Command\x12,\n\x08audienc\
     e\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12L\n\x0fattac\
     h_pipeline\x18d\x20\x01(\x0b2\x1d.protos.AttachPipelineCommandH\0R\x0eat\
     tachPipelineB\x02\x18\x01\x12L\n\x0fdetach_pipeline\x18e\x20\x01(\x0b2\
@@ -1740,106 +1740,110 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     tos.ResumePipelineCommandH\0R\x0eresumePipeline\x129\n\nkeep_alive\x18h\
     \x20\x01(\x0b2\x18.protos.KeepAliveCommandH\0R\tkeepAlive\x12#\n\x02kv\
     \x18i\x20\x01(\x0b2\x11.protos.KVCommandH\0R\x02kv\x12)\n\x04tail\x18j\
-    \x20\x01(\x0b2\x13.protos.TailCommandH\0R\x04tail\x12;\n\rpipeline_list\
-    \x18k\x20\x01(\x0b2\x14.protos.PipelineListH\0R\x0cpipelineListB\t\n\x07\
-    command\">\n\x0cPipelineList\x12.\n\tpipelines\x18\x01\x20\x03(\x0b2\x10\
-    .protos.PipelineR\tpipelines\"E\n\x15AttachPipelineCommand\x12,\n\x08pip\
-    eline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15Det\
-    achPipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelin\
-    eId\"7\n\x14PausePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\
-    \x01(\tR\npipelineId\"8\n\x15ResumePipelineCommand\x12\x1f\n\x0bpipeline\
-    _id\x18\x01\x20\x01(\tR\npipelineId\"\x12\n\x10KeepAliveCommand\"d\n\tKV\
-    Command\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVInstru\
-    ctionR\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverw\
-    rite\"<\n\x0bTailCommand\x12-\n\x07request\x18\x02\x20\x01(\x0b2\x13.pro\
-    tos.TailRequestR\x07requestB<Z:github.com/streamdal/streamdal/libs/proto\
-    s/build/go/protosJ\x8c\x13\n\x06\x12\x04\0\0O\x01\n\x08\n\x01\x0c\x12\
-    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\
-    \x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x15\n\t\n\x02\x03\x02\x12\x03\
-    \x06\0\x1b\n\x08\n\x01\x08\x12\x03\x08\0Q\n\t\n\x02\x08\x0b\x12\x03\x08\
-    \0Q\nN\n\x02\x04\0\x12\x04\x0b\0%\x01\x1aB\x20Command\x20is\x20used\x20b\
-    y\x20streamdal\x20server\x20for\x20sending\x20commands\x20to\x20SDKs\n\n\
-    \n\n\x03\x04\0\x01\x12\x03\x0b\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\
-    \x03\x0e\x02\x1f\x1a\x85\x01\x20Who\x20is\x20this\x20command\x20intended\
-    \x20for?\n\x20NOTE:\x20Some\x20commands\x20(such\x20as\x20KeepAliveComma\
-    nd,\x20KVCommand)\x20do\x20NOT\x20use\x20audience\x20and\x20will\x20igno\
-    re\x20it\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x0e\x02\x11\n\x0c\n\x05\
-    \x04\0\x02\0\x01\x12\x03\x0e\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\
-    \x0e\x1d\x1e\n\x0c\n\x04\x04\0\x08\0\x12\x04\x10\x02$\x03\n\x0c\n\x05\
-    \x04\0\x08\0\x01\x12\x03\x10\x08\x0f\n<\n\x04\x04\0\x02\x01\x12\x03\x12\
-    \x04B\x1a/\x20Attaching\x20has\x20been\x20superseded\x20by\x20PipelineLi\
-    st\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x12\x04\x19\n\x0c\n\x05\x04\0\
-    \x02\x01\x01\x12\x03\x12\x1a)\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12,\
-    /\n\x0c\n\x05\x04\0\x02\x01\x08\x12\x03\x120A\n\r\n\x06\x04\0\x02\x01\
-    \x08\x03\x12\x03\x121@\n<\n\x04\x04\0\x02\x02\x12\x03\x15\x04B\x1a/\x20D\
-    etaching\x20has\x20been\x20superseded\x20by\x20PipelineList\n\n\x0c\n\
-    \x05\x04\0\x02\x02\x06\x12\x03\x15\x04\x19\n\x0c\n\x05\x04\0\x02\x02\x01\
-    \x12\x03\x15\x1a)\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x15,/\n\x0c\n\
-    \x05\x04\0\x02\x02\x08\x12\x03\x150A\n\r\n\x06\x04\0\x02\x02\x08\x03\x12\
-    \x03\x151@\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x17\x04.\n\x0c\n\x05\x04\0\
-    \x02\x03\x06\x12\x03\x17\x04\x18\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\
-    \x17\x19'\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x17*-\n\x0b\n\x04\x04\0\
-    \x02\x04\x12\x03\x18\x040\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x18\x04\
-    \x19\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\x18\x1a)\n\x0c\n\x05\x04\0\
-    \x02\x04\x03\x12\x03\x18,/\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x19\x04&\n\
-    \x0c\n\x05\x04\0\x02\x05\x06\x12\x03\x19\x04\x14\n\x0c\n\x05\x04\0\x02\
-    \x05\x01\x12\x03\x19\x15\x1f\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x19\"\
-    %\nd\n\x04\x04\0\x02\x06\x12\x03\x1d\x04\x17\x1aW\x20Server\x20will\x20e\
-    mit\x20this\x20when\x20a\x20user\x20makes\x20changes\x20to\x20the\x20KV\
-    \x20store\n\x20via\x20the\x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\
-    \x06\x06\x12\x03\x1d\x04\r\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x1d\x0e\
-    \x10\n\x0c\n\x05\x04\0\x02\x06\x03\x12\x03\x1d\x13\x16\nn\n\x04\x04\0\
-    \x02\x07\x12\x03!\x04\x1b\x1aa\x20Emitted\x20by\x20server\x20when\x20a\
-    \x20user\x20makes\x20a\x20Tail()\x20call\n\x20Consumed\x20by\x20all\x20s\
-    erver\x20instances\x20and\x20by\x20SDKs\n\n\x0c\n\x05\x04\0\x02\x07\x06\
-    \x12\x03!\x04\x0f\n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03!\x10\x14\n\x0c\n\
-    \x05\x04\0\x02\x07\x03\x12\x03!\x17\x1a\n\x0b\n\x04\x04\0\x02\x08\x12\
-    \x03#\x04%\n\x0c\n\x05\x04\0\x02\x08\x06\x12\x03#\x04\x10\n\x0c\n\x05\
-    \x04\0\x02\x08\x01\x12\x03#\x11\x1e\n\x0c\n\x05\x04\0\x02\x08\x03\x12\
-    \x03#!$\n\x97\x03\n\x02\x04\x01\x12\x04,\0.\x01\x1a\x8a\x03\x20PipelineL\
-    ist\x20is\x20used\x20to\x20define\x20a\x20list\x20of\x20attached\x20pipe\
-    lines\x20for\x20an\x20audience\n\x20The\x20order\x20and\x20presence\x20o\
-    f\x20pipeline\x20IDs\x20in\x20this\x20list\x20is\x20defined\x20by\x20the\
-    \x20caller\n\x20of\x20external.SetPipelines()\x20a.k.a\x20the\x20fronten\
-    d\x20console.\n\x20Server's\x20will\x20receive\x20this\x20message\x20via\
-    \x20broadcast\x20and\x20send\x20the\x20correct\x20pipelines\x20to\x20the\
-    \x20SDKs\n\x20SDKs\x20will\x20receive\x20this\x20list\x20and\x20overwrit\
-    e\x20their\x20current\x20pipeline\x20list\x20with\x20this\x20new\x20one.\
-    \n\n\n\n\x03\x04\x01\x01\x12\x03,\x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\
-    \x03-\x02)\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03-\x02\n\n\x0c\n\x05\x04\
-    \x01\x02\0\x06\x12\x03-\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03-\
-    \x1b$\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03-'(\n\n\n\x02\x04\x02\x12\x04\
-    0\02\x01\n\n\n\x03\x04\x02\x01\x12\x030\x08\x1d\n\x0b\n\x04\x04\x02\x02\
-    \0\x12\x031\x02\x1f\n\x0c\n\x05\x04\x02\x02\0\x06\x12\x031\x02\x11\n\x0c\
-    \n\x05\x04\x02\x02\0\x01\x12\x031\x12\x1a\n\x0c\n\x05\x04\x02\x02\0\x03\
-    \x12\x031\x1d\x1e\n\n\n\x02\x04\x03\x12\x044\06\x01\n\n\n\x03\x04\x03\
-    \x01\x12\x034\x08\x1d\n\x0b\n\x04\x04\x03\x02\0\x12\x035\x02\x19\n\x0c\n\
-    \x05\x04\x03\x02\0\x05\x12\x035\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\
-    \x12\x035\t\x14\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x035\x17\x18\n\n\n\x02\
-    \x04\x04\x12\x048\0:\x01\n\n\n\x03\x04\x04\x01\x12\x038\x08\x1c\n\x0b\n\
-    \x04\x04\x04\x02\0\x12\x039\x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\
-    \x039\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x039\t\x14\n\x0c\n\x05\
-    \x04\x04\x02\0\x03\x12\x039\x17\x18\n\n\n\x02\x04\x05\x12\x04<\0>\x01\n\
-    \n\n\x03\x04\x05\x01\x12\x03<\x08\x1d\n\x0b\n\x04\x04\x05\x02\0\x12\x03=\
-    \x02\x19\n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03=\x02\x08\n\x0c\n\x05\x04\
-    \x05\x02\0\x01\x12\x03=\t\x14\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03=\x17\
-    \x18\nD\n\x02\x04\x06\x12\x04@\0B\x01\"8\x20Nothing\x20needed\x20in\x20h\
-    ere,\x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\
-    \x06\x01\x12\x03@\x08\x18\n@\n\x02\x04\x07\x12\x04E\0K\x01\x1a4\x20Sent\
-    \x20by\x20server\x20on\x20Register\x20channel(s)\x20to\x20live\x20SDKs\n\
-    \n\n\n\x03\x04\x07\x01\x12\x03E\x08\x11\n\x0b\n\x04\x04\x07\x02\0\x12\
-    \x03F\x021\n\x0c\n\x05\x04\x07\x02\0\x04\x12\x03F\x02\n\n\x0c\n\x05\x04\
-    \x07\x02\0\x06\x12\x03F\x0b\x1f\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03F\
-    \x20,\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03F/0\nk\n\x04\x04\x07\x02\x01\
-    \x12\x03J\x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20setting\
-    \x20that\x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\x20wo\
-    rk\x20as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x07\x02\x01\x05\x12\x03J\x02\
-    \x06\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03J\x07\x10\n\x0c\n\x05\x04\
-    \x07\x02\x01\x03\x12\x03J\x13\x14\n\n\n\x02\x04\x08\x12\x04M\0O\x01\n\n\
-    \n\x03\x04\x08\x01\x12\x03M\x08\x13\n\x0b\n\x04\x04\x08\x02\0\x12\x03N\
-    \x02\x1a\n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03N\x02\r\n\x0c\n\x05\x04\
-    \x08\x02\0\x01\x12\x03N\x0e\x15\n\x0c\n\x05\x04\x08\x02\0\x03\x12\x03N\
-    \x18\x19b\x06proto3\
+    \x20\x01(\x0b2\x13.protos.TailCommandH\0R\x04tail\x12B\n\rset_pipelines\
+    \x18k\x20\x01(\x0b2\x1b.protos.SetPipelinesCommandH\0R\x0csetPipelinesB\
+    \t\n\x07command\"E\n\x13SetPipelinesCommand\x12.\n\tpipelines\x18\x01\
+    \x20\x03(\x0b2\x10.protos.PipelineR\tpipelines\"I\n\x15AttachPipelineCom\
+    mand\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pi\
+    peline:\x02\x18\x01\"<\n\x15DetachPipelineCommand\x12\x1f\n\x0bpipeline_\
+    id\x18\x01\x20\x01(\tR\npipelineId:\x02\x18\x01\"7\n\x14PausePipelineCom\
+    mand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"8\n\x15Re\
+    sumePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipeli\
+    neId\"\x12\n\x10KeepAliveCommand\"d\n\tKVCommand\x129\n\x0cinstructions\
+    \x18\x01\x20\x03(\x0b2\x15.protos.KVInstructionR\x0cinstructions\x12\x1c\
+    \n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"<\n\x0bTailCommand\x12-\
+    \n\x07request\x18\x02\x20\x01(\x0b2\x13.protos.TailRequestR\x07requestB<\
+    Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xe6\x13\n\
+    \x06\x12\x04\0\0R\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    \x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\
+    \x12\x03\x05\0\x15\n\t\n\x02\x03\x02\x12\x03\x06\0\x1b\n\x08\n\x01\x08\
+    \x12\x03\x08\0Q\n\t\n\x02\x08\x0b\x12\x03\x08\0Q\nN\n\x02\x04\0\x12\x04\
+    \x0b\0&\x01\x1aB\x20Command\x20is\x20used\x20by\x20streamdal\x20server\
+    \x20for\x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\
+    \x03\x0b\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\x03\x0e\x02\x1f\x1a\x85\
+    \x01\x20Who\x20is\x20this\x20command\x20intended\x20for?\n\x20NOTE:\x20S\
+    ome\x20commands\x20(such\x20as\x20KeepAliveCommand,\x20KVCommand)\x20do\
+    \x20NOT\x20use\x20audience\x20and\x20will\x20ignore\x20it\n\n\x0c\n\x05\
+    \x04\0\x02\0\x06\x12\x03\x0e\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
+    \x0e\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x0e\x1d\x1e\n\x0c\n\x04\
+    \x04\0\x08\0\x12\x04\x10\x02%\x03\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\
+    \x10\x08\x0f\n<\n\x04\x04\0\x02\x01\x12\x03\x12\x04B\x1a/\x20Attaching\
+    \x20has\x20been\x20superseded\x20by\x20PipelineList\n\n\x0c\n\x05\x04\0\
+    \x02\x01\x06\x12\x03\x12\x04\x19\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\
+    \x12\x1a)\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x12,/\n\x0c\n\x05\x04\0\
+    \x02\x01\x08\x12\x03\x120A\n\r\n\x06\x04\0\x02\x01\x08\x03\x12\x03\x121@\
+    \n<\n\x04\x04\0\x02\x02\x12\x03\x15\x04B\x1a/\x20Detaching\x20has\x20bee\
+    n\x20superseded\x20by\x20PipelineList\n\n\x0c\n\x05\x04\0\x02\x02\x06\
+    \x12\x03\x15\x04\x19\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x15\x1a)\n\
+    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x15,/\n\x0c\n\x05\x04\0\x02\x02\x08\
+    \x12\x03\x150A\n\r\n\x06\x04\0\x02\x02\x08\x03\x12\x03\x151@\n\x0b\n\x04\
+    \x04\0\x02\x03\x12\x03\x17\x04.\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
+    \x17\x04\x18\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x17\x19'\n\x0c\n\x05\
+    \x04\0\x02\x03\x03\x12\x03\x17*-\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x18\
+    \x040\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x18\x04\x19\n\x0c\n\x05\x04\
+    \0\x02\x04\x01\x12\x03\x18\x1a)\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\
+    \x18,/\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x19\x04&\n\x0c\n\x05\x04\0\x02\
+    \x05\x06\x12\x03\x19\x04\x14\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x19\
+    \x15\x1f\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x19\"%\nd\n\x04\x04\0\x02\
+    \x06\x12\x03\x1d\x04\x17\x1aW\x20Server\x20will\x20emit\x20this\x20when\
+    \x20a\x20user\x20makes\x20changes\x20to\x20the\x20KV\x20store\n\x20via\
+    \x20the\x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\
+    \x1d\x04\r\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x1d\x0e\x10\n\x0c\n\x05\
+    \x04\0\x02\x06\x03\x12\x03\x1d\x13\x16\nn\n\x04\x04\0\x02\x07\x12\x03!\
+    \x04\x1b\x1aa\x20Emitted\x20by\x20server\x20when\x20a\x20user\x20makes\
+    \x20a\x20Tail()\x20call\n\x20Consumed\x20by\x20all\x20server\x20instance\
+    s\x20and\x20by\x20SDKs\n\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03!\x04\x0f\
+    \n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03!\x10\x14\n\x0c\n\x05\x04\0\x02\
+    \x07\x03\x12\x03!\x17\x1a\n,\n\x04\x04\0\x02\x08\x12\x03$\x04,\x1a\x1f\
+    \x20Change\x20to\x20SetPipelinesCommand\n\n\x0c\n\x05\x04\0\x02\x08\x06\
+    \x12\x03$\x04\x17\n\x0c\n\x05\x04\0\x02\x08\x01\x12\x03$\x18%\n\x0c\n\
+    \x05\x04\0\x02\x08\x03\x12\x03$(+\n\x9e\x03\n\x02\x04\x01\x12\x04-\0/\
+    \x01\x1a\x91\x03\x20SetPipelinesCommand\x20is\x20used\x20to\x20define\
+    \x20a\x20list\x20of\x20attached\x20pipelines\x20for\x20an\x20audience\n\
+    \x20The\x20order\x20and\x20presence\x20of\x20pipeline\x20IDs\x20in\x20th\
+    is\x20list\x20is\x20defined\x20by\x20the\x20caller\n\x20of\x20external.S\
+    etPipelines()\x20a.k.a\x20the\x20frontend\x20console.\n\x20Server's\x20w\
+    ill\x20receive\x20this\x20message\x20via\x20broadcast\x20and\x20send\x20\
+    the\x20correct\x20pipelines\x20to\x20the\x20SDKs\n\x20SDKs\x20will\x20re\
+    ceive\x20this\x20list\x20and\x20overwrite\x20their\x20current\x20pipelin\
+    e\x20list\x20with\x20this\x20new\x20one.\n\n\n\n\x03\x04\x01\x01\x12\x03\
+    -\x08\x1b\n\x0b\n\x04\x04\x01\x02\0\x12\x03.\x02)\n\x0c\n\x05\x04\x01\
+    \x02\0\x04\x12\x03.\x02\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03.\x0b\x1a\
+    \n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03.\x1b$\n\x0c\n\x05\x04\x01\x02\0\
+    \x03\x12\x03.'(\n\n\n\x02\x04\x02\x12\x041\04\x01\n\n\n\x03\x04\x02\x01\
+    \x12\x031\x08\x1d\n\n\n\x03\x04\x02\x07\x12\x032\x02\x1b\n\x0b\n\x04\x04\
+    \x02\x07\x03\x12\x032\x02\x1b\n\x0b\n\x04\x04\x02\x02\0\x12\x033\x02\x1f\
+    \n\x0c\n\x05\x04\x02\x02\0\x06\x12\x033\x02\x11\n\x0c\n\x05\x04\x02\x02\
+    \0\x01\x12\x033\x12\x1a\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x033\x1d\x1e\n\
+    \n\n\x02\x04\x03\x12\x046\09\x01\n\n\n\x03\x04\x03\x01\x12\x036\x08\x1d\
+    \n\n\n\x03\x04\x03\x07\x12\x037\x02\x1b\n\x0b\n\x04\x04\x03\x07\x03\x12\
+    \x037\x02\x1b\n\x0b\n\x04\x04\x03\x02\0\x12\x038\x02\x19\n\x0c\n\x05\x04\
+    \x03\x02\0\x05\x12\x038\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x038\t\
+    \x14\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x038\x17\x18\n\n\n\x02\x04\x04\
+    \x12\x04;\0=\x01\n\n\n\x03\x04\x04\x01\x12\x03;\x08\x1c\n\x0b\n\x04\x04\
+    \x04\x02\0\x12\x03<\x02\x19\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03<\x02\
+    \x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03<\t\x14\n\x0c\n\x05\x04\x04\
+    \x02\0\x03\x12\x03<\x17\x18\n\n\n\x02\x04\x05\x12\x04?\0A\x01\n\n\n\x03\
+    \x04\x05\x01\x12\x03?\x08\x1d\n\x0b\n\x04\x04\x05\x02\0\x12\x03@\x02\x19\
+    \n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03@\x02\x08\n\x0c\n\x05\x04\x05\x02\
+    \0\x01\x12\x03@\t\x14\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03@\x17\x18\nD\
+    \n\x02\x04\x06\x12\x04C\0E\x01\"8\x20Nothing\x20needed\x20in\x20here,\
+    \x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\x06\
+    \x01\x12\x03C\x08\x18\n@\n\x02\x04\x07\x12\x04H\0N\x01\x1a4\x20Sent\x20b\
+    y\x20server\x20on\x20Register\x20channel(s)\x20to\x20live\x20SDKs\n\n\n\
+    \n\x03\x04\x07\x01\x12\x03H\x08\x11\n\x0b\n\x04\x04\x07\x02\0\x12\x03I\
+    \x021\n\x0c\n\x05\x04\x07\x02\0\x04\x12\x03I\x02\n\n\x0c\n\x05\x04\x07\
+    \x02\0\x06\x12\x03I\x0b\x1f\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03I\x20,\
+    \n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03I/0\nk\n\x04\x04\x07\x02\x01\x12\
+    \x03M\x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20setting\x20th\
+    at\x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\x20work\x20\
+    as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x07\x02\x01\x05\x12\x03M\x02\x06\n\
+    \x0c\n\x05\x04\x07\x02\x01\x01\x12\x03M\x07\x10\n\x0c\n\x05\x04\x07\x02\
+    \x01\x03\x12\x03M\x13\x14\n\n\n\x02\x04\x08\x12\x04P\0R\x01\n\n\n\x03\
+    \x04\x08\x01\x12\x03P\x08\x13\n\x0b\n\x04\x04\x08\x02\0\x12\x03Q\x02\x1a\
+    \n\x0c\n\x05\x04\x08\x02\0\x06\x12\x03Q\x02\r\n\x0c\n\x05\x04\x08\x02\0\
+    \x01\x12\x03Q\x0e\x15\n\x0c\n\x05\x04\x08\x02\0\x03\x12\x03Q\x18\x19b\
+    \x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1862,7 +1866,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::sp_pipeline::file_descriptor().clone());
             let mut messages = ::std::vec::Vec::with_capacity(9);
             messages.push(Command::generated_message_descriptor_data());
-            messages.push(PipelineList::generated_message_descriptor_data());
+            messages.push(SetPipelinesCommand::generated_message_descriptor_data());
             messages.push(AttachPipelineCommand::generated_message_descriptor_data());
             messages.push(DetachPipelineCommand::generated_message_descriptor_data());
             messages.push(PausePipelineCommand::generated_message_descriptor_data());

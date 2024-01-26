@@ -2109,10 +2109,10 @@ class TestResponse$Type extends MessageType {
  */
 export const TestResponse = new TestResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class SetPipelineRequest$Type extends MessageType {
+class SetPipelinesRequest$Type extends MessageType {
     constructor() {
-        super("protos.SetPipelineRequest", [
-            { no: 1, name: "aud", kind: "message", T: () => Audience },
+        super("protos.SetPipelinesRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
             { no: 2, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
@@ -2128,8 +2128,8 @@ class SetPipelineRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience aud */ 1:
-                    message.aud = Audience.internalBinaryRead(reader, reader.uint32(), options, message.aud);
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
                 case /* repeated string pipeline_ids */ 2:
                     message.pipelineIds.push(reader.string());
@@ -2146,9 +2146,9 @@ class SetPipelineRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.Audience aud = 1; */
-        if (message.aud)
-            Audience.internalBinaryWrite(message.aud, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* repeated string pipeline_ids = 2; */
         for (let i = 0; i < message.pipelineIds.length; i++)
             writer.tag(2, WireType.LengthDelimited).string(message.pipelineIds[i]);
@@ -2159,9 +2159,9 @@ class SetPipelineRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.SetPipelineRequest
+ * @generated MessageType for protobuf message protos.SetPipelinesRequest
  */
-export const SetPipelineRequest = new SetPipelineRequest$Type();
+export const SetPipelinesRequest = new SetPipelinesRequest$Type();
 /**
  * @generated ServiceType for protobuf service protos.External
  */
@@ -2175,7 +2175,7 @@ export const External = new ServiceType("protos.External", [
     { name: "DeletePipeline", options: {}, I: DeletePipelineRequest, O: StandardResponse },
     { name: "AttachPipeline", options: {}, I: AttachPipelineRequest, O: StandardResponse },
     { name: "DetachPipeline", options: {}, I: DetachPipelineRequest, O: StandardResponse },
-    { name: "SetPipelines", options: {}, I: SetPipelineRequest, O: StandardResponse },
+    { name: "SetPipelines", options: {}, I: SetPipelinesRequest, O: StandardResponse },
     { name: "PausePipeline", options: {}, I: PausePipelineRequest, O: StandardResponse },
     { name: "ResumePipeline", options: {}, I: ResumePipelineRequest, O: StandardResponse },
     { name: "CreateNotification", options: {}, I: CreateNotificationRequest, O: StandardResponse },

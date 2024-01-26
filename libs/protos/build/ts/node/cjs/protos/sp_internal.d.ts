@@ -6,7 +6,7 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common";
-import { Command } from "./sp_command";
+import { Pipeline } from "./sp_pipeline";
 import { Metric } from "./sp_common";
 import { ClientInfo } from "./sp_info";
 import { Audience } from "./sp_common";
@@ -162,16 +162,16 @@ export interface GetAttachCommandsByServiceResponse {
     /**
      * AttachCommands for all active pipelines
      *
-     * @generated from protobuf field: repeated protos.Command active = 1;
+     * @generated from protobuf field: repeated protos.Pipeline active = 1;
      */
-    active: Command[];
+    active: Pipeline[];
     /**
      * AttachCommands, but ones which are paused
      * The SDK still needs to have these to support un-pausing
      *
-     * @generated from protobuf field: repeated protos.Command paused = 2;
+     * @generated from protobuf field: repeated protos.Pipeline paused = 2;
      */
-    paused: Command[];
+    paused: Pipeline[];
     /**
      * ID = wasm ID
      *

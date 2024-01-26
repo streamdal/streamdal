@@ -86,31 +86,34 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
-        oneofKind: "pipelineList";
+        oneofKind: "setPipelines";
         /**
-         * @generated from protobuf field: protos.PipelineList pipeline_list = 107;
+         * Change to SetPipelinesCommand
+         *
+         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 107;
          */
-        pipelineList: PipelineList;
+        setPipelines: SetPipelinesCommand;
     } | {
         oneofKind: undefined;
     };
 }
 /**
- * PipelineList is used to define a list of attached pipelines for an audience
+ * SetPipelinesCommand is used to define a list of attached pipelines for an audience
  * The order and presence of pipeline IDs in this list is defined by the caller
  * of external.SetPipelines() a.k.a the frontend console.
  * Server's will receive this message via broadcast and send the correct pipelines to the SDKs
  * SDKs will receive this list and overwrite their current pipeline list with this new one.
  *
- * @generated from protobuf message protos.PipelineList
+ * @generated from protobuf message protos.SetPipelinesCommand
  */
-export interface PipelineList {
+export interface SetPipelinesCommand {
     /**
      * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
      */
     pipelines: Pipeline[];
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.AttachPipelineCommand
  */
 export interface AttachPipelineCommand {
@@ -120,6 +123,7 @@ export interface AttachPipelineCommand {
     pipeline?: Pipeline;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.DetachPipelineCommand
  */
 export interface DetachPipelineCommand {
@@ -192,7 +196,7 @@ class Command$Type extends MessageType<Command> {
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
             { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
             { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand },
-            { no: 107, name: "pipeline_list", kind: "message", oneof: "command", T: () => PipelineList }
+            { no: 107, name: "set_pipelines", kind: "message", oneof: "command", T: () => SetPipelinesCommand }
         ]);
     }
     create(value?: PartialMessage<Command>): Command {
@@ -252,10 +256,10 @@ class Command$Type extends MessageType<Command> {
                         tail: TailCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).tail)
                     };
                     break;
-                case /* protos.PipelineList pipeline_list */ 107:
+                case /* protos.SetPipelinesCommand set_pipelines */ 107:
                     message.command = {
-                        oneofKind: "pipelineList",
-                        pipelineList: PipelineList.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).pipelineList)
+                        oneofKind: "setPipelines",
+                        setPipelines: SetPipelinesCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).setPipelines)
                     };
                     break;
                 default:
@@ -294,9 +298,9 @@ class Command$Type extends MessageType<Command> {
         /* protos.TailCommand tail = 106; */
         if (message.command.oneofKind === "tail")
             TailCommand.internalBinaryWrite(message.command.tail, writer.tag(106, WireType.LengthDelimited).fork(), options).join();
-        /* protos.PipelineList pipeline_list = 107; */
-        if (message.command.oneofKind === "pipelineList")
-            PipelineList.internalBinaryWrite(message.command.pipelineList, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
+        /* protos.SetPipelinesCommand set_pipelines = 107; */
+        if (message.command.oneofKind === "setPipelines")
+            SetPipelinesCommand.internalBinaryWrite(message.command.setPipelines, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -308,20 +312,20 @@ class Command$Type extends MessageType<Command> {
  */
 export const Command = new Command$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineList$Type extends MessageType<PipelineList> {
+class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> {
     constructor() {
-        super("protos.PipelineList", [
+        super("protos.SetPipelinesCommand", [
             { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline }
         ]);
     }
-    create(value?: PartialMessage<PipelineList>): PipelineList {
+    create(value?: PartialMessage<SetPipelinesCommand>): SetPipelinesCommand {
         const message = { pipelines: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<PipelineList>(this, message, value);
+            reflectionMergePartial<SetPipelinesCommand>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineList): PipelineList {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesCommand): SetPipelinesCommand {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -340,7 +344,7 @@ class PipelineList$Type extends MessageType<PipelineList> {
         }
         return message;
     }
-    internalBinaryWrite(message: PipelineList, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: SetPipelinesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* repeated protos.Pipeline pipelines = 1; */
         for (let i = 0; i < message.pipelines.length; i++)
             Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
@@ -351,9 +355,9 @@ class PipelineList$Type extends MessageType<PipelineList> {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineList
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
  */
-export const PipelineList = new PipelineList$Type();
+export const SetPipelinesCommand = new SetPipelinesCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor() {
@@ -398,6 +402,7 @@ class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 export const AttachPipelineCommand = new AttachPipelineCommand$Type();
@@ -445,6 +450,7 @@ class DetachPipelineCommand$Type extends MessageType<DetachPipelineCommand> {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 export const DetachPipelineCommand = new DetachPipelineCommand$Type();
