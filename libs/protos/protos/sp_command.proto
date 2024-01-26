@@ -33,24 +33,27 @@ message Command {
     // Consumed by all server instances and by SDKs
     TailCommand tail = 106;
 
-    PipelineList pipeline_list = 107;
+    // Change to SetPipelinesCommand
+    SetPipelinesCommand set_pipelines = 107;
   }
 }
 
-// PipelineList is used to define a list of attached pipelines for an audience
+// SetPipelinesCommand is used to define a list of attached pipelines for an audience
 // The order and presence of pipeline IDs in this list is defined by the caller
 // of external.SetPipelines() a.k.a the frontend console.
 // Server's will receive this message via broadcast and send the correct pipelines to the SDKs
 // SDKs will receive this list and overwrite their current pipeline list with this new one.
-message PipelineList {
+message SetPipelinesCommand {
   repeated protos.Pipeline pipelines = 1;
 }
 
 message AttachPipelineCommand {
+  option deprecated = true;
   protos.Pipeline pipeline = 1;
 }
 
 message DetachPipelineCommand {
+  option deprecated = true;
   string pipeline_id = 1;
 }
 

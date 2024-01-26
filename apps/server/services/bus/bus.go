@@ -114,6 +114,8 @@ type IBus interface {
 
 	// BroadcastTailResponse broadcasts a TailResponse to all nodes in the cluster
 	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
+
+	BroadcastSetPipelines(ctx context.Context, req *protos.SetPipelineRequest) error
 }
 
 type Bus struct {

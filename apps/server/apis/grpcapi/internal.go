@@ -86,28 +86,6 @@ func (s *InternalServer) sendToClient(ch chan *protos.Command, cmd *protos.Comma
 	ch <- cmd
 }
 
-func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
-	// Get all audiences for this session
-	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
-	if err != nil {
-		s.log.Errorf("unable to get audiences by session id '%s': %v", sessionID, err)
-		return
-	}
-
-	for _, aud := range audiences {
-		// Create a new pipeline whose only step is an inferschema step
-		attachCmd := util.GenInferSchemaPipeline(aud)
-
-		// Inject WASM data
-		if err := util.PopulateWASMFields(attachCmd.GetAttachPipeline().Pipeline, s.Options.Config.WASMDir); err != nil {
-			s.log.Errorf("unable to populate WASM fields for inferschema: %v", err)
-			return
-		}
-
-		s.sendToClient(cmdCh, attachCmd)
-	}
-}
-
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
 	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
@@ -177,9 +155,6 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// Send all active tails. We are passing request here because we need access
 	// to the ServiceName (so we can get all active tails for that service)
 	go s.sendActiveTails(server.Context(), ch, request)
-
-	// Send ephemeral schema inference pipeline for each announced audience
-	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
 
 	// TODO: need to figure out GaugeUsageRegistrationsTotal
 	// TODO: we need to hash the tags and store in redis/memory
@@ -374,10 +349,6 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		s.log.Debugf("channel already exists for session id '%s'", req.SessionId)
 	}
 
-	// This is context.Background() because it's ran as a gouroutine and the request
-	// context may be finished by the time it eventually runs
-	go s.sendInferSchemaPipelines(context.Background(), cmdCh, req.SessionId)
-
 	// Broadcast audience creation so that we can notify UI GetAllStream clients
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
 		s.log.Errorf("unable to broadcast new audience: %s", err.Error())
@@ -393,7 +364,7 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 func (s *InternalServer) getActiveAttachPipelineCommands(
 	ctx context.Context,
 	serviceName string,
-) ([]*protos.Command, []*protos.Command, error) {
+) ([]*protos.Pipeline, []*protos.Pipeline, error) {
 	if serviceName == "" {
 		return nil, nil, errors.New("service name is required")
 	}

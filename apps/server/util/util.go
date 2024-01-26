@@ -281,23 +281,16 @@ func CounterName(name string, labels map[string]string) string {
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
 }
 
-func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
-	return &protos.Command{
-		Audience: aud,
-		Command: &protos.Command_AttachPipeline{
-			AttachPipeline: &protos.AttachPipelineCommand{
-				Pipeline: &protos.Pipeline{
-					Id:   GenerateUUID(),
-					Name: "Schema Inference",
-					Steps: []*protos.PipelineStep{
-						{
-							Name: "Infer Schema",
-							Step: &protos.PipelineStep_InferSchema{
-								InferSchema: &steps.InferSchemaStep{
-									CurrentSchema: make([]byte, 0), // TODO: get this from storage
-								},
-							},
-						},
+func GenInferSchemaPipeline() *protos.Pipeline {
+	return &protos.Pipeline{
+		Id:   GenerateUUID(),
+		Name: "Schema Inference",
+		Steps: []*protos.PipelineStep{
+			{
+				Name: "Infer Schema",
+				Step: &protos.PipelineStep_InferSchema{
+					InferSchema: &steps.InferSchemaStep{
+						CurrentSchema: make([]byte, 0), // TODO: get this from storage
 					},
 				},
 			},

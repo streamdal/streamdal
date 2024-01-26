@@ -41,7 +41,7 @@ service External {
     option deprecated = true;
   }
 
-  rpc SetPipelines(SetPipelineRequest) returns (protos.StandardResponse);
+  rpc SetPipelines(SetPipelinesRequest) returns (protos.StandardResponse);
 
   // Pause a pipeline; noop if pipeline is already paused
   rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
@@ -330,7 +330,7 @@ message TestResponse {
   string output = 2;
 }
 
-message SetPipelineRequest {
-  Audience aud = 1;
+message SetPipelinesRequest {
+  Audience audience = 1;
   repeated string pipeline_ids = 2;
 }

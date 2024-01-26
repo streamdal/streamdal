@@ -172,7 +172,9 @@ func (b *Bus) getSessionIDsByAudience(ctx context.Context, audience *protos.Audi
 // Pipeline was attached to an audience - check if this service has an active
 // registration with the provided audience. If it does, we need to send a
 // AttachPipeline cmd to the client.
+// TODO: remove, thisi s deprecated
 func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.AttachPipelineRequest) error {
+	return nil
 	b.log.Debugf("handling attach pipeline request bus event: %v", req)
 
 	if err := validate.AttachPipelineRequest(req); err != nil {
@@ -237,7 +239,10 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 // having to perform a store lookup in the broadcast handlers.
 // If this node doesn't have an active session for the provided session id, then
 // it won't have a channel for it and it'll move on to the next session id.
+// TODO: remove, this is deprecated
 func (b *Bus) handleDetachPipelineRequest(_ context.Context, req *protos.DetachPipelineRequest) error {
+	return nil
+
 	llog := b.log.WithField("method", "handleDetachPipelineRequest")
 
 	llog.Debugf("handling detach pipeline request bus event: %v", req)
@@ -613,6 +618,77 @@ func (b *Bus) handleTailResponse(_ context.Context, req *protos.TailResponse) er
 	}
 
 	b.options.PubSub.Publish(req.TailRequestId, req)
+
+	return nil
+}
+
+func (b *Bus) handleSetPipelines(ctx context.Context, req *protos.SetPipelineRequest) error {
+	// Make pipeline list
+	pipelines := make([]*protos.Pipeline, 0)
+
+	// Inject schema inference as element 0
+	schemaInferPipeline := util.GenInferSchemaPipeline()
+	if err := util.PopulateWASMFields(schemaInferPipeline, b.options.WASMDir); err != nil {
+		return errors.Wrap(err, "error populating wasm fields for schema inference pipeline")
+	}
+
+	pipelines = append(pipelines, schemaInferPipeline)
+
+	// Get pipelines and add to list
+	for _, pipelineId := range req.PipelineIds {
+		// Get pipeline data
+		pipeline, err := b.options.Store.GetPipeline(ctx, pipelineId)
+		if err != nil {
+			return errors.Wrapf(err, "error getting pipeline '%s' from store", pipelineId)
+		}
+
+		if err := util.PopulateWASMFields(pipeline, b.options.WASMDir); err != nil {
+			return errors.Wrapf(err, "error populating wasm fields for pipeline '%s'", pipelineId)
+		}
+		// Add to list
+		pipelines = append(pipelines, pipeline)
+	}
+
+	// Send down to all connected clients for req.Audience
+	sessionIDs, err := b.getSessionIDsByAudience(ctx, req.Aud)
+	if err != nil {
+		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Aud, err)
+		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Aud)
+	}
+
+	if len(sessionIDs) == 0 {
+		b.log.Debugf("no active sessions found for audience '%s' on node '%s' - skipping",
+			req.Aud, b.options.NodeName)
+		return nil
+	}
+
+	b.log.Debugf("found '%d' active session(s) for audience '%s' on node '%s'",
+		len(sessionIDs), req.Aud, b.options.NodeName)
+
+	attached := 0
+
+	// OK we have an active audience on this node - let's tell it to attach!
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		ch <- &protos.Command{
+			Audience: req.Aud,
+			Command: &protos.Command_PipelineList{
+				PipelineList: &protos.PipelineList{
+					Pipelines: pipelines,
+				},
+			},
+		}
+
+		attached += 1
+	}
+
+	b.log.Debugf("sent SetPipelines command to '%d' active session(s) "+
+		"for audience '%s'", attached, util.AudienceToStr(req.Aud))
 
 	return nil
 }

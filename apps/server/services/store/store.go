@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -139,6 +140,8 @@ type IStore interface {
 
 	// GetTailRequestById returns a TailRequest by its ID
 	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
+
+	SetPipelinesForAudience(ctx context.Context, audience *protos.Audience, pipelineIDs []string) error
 }
 
 type Options struct {
@@ -545,7 +548,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	if err := s.options.RedisBackend.Set(
 		ctx,
 		RedisAudienceKey(util.AudienceToStr(req.Audience)),
-		[]byte(``),
+		[]byte(`[]`),
 		0,
 	).Err(); err != nil {
 		return errors.Wrap(err, "error saving audience to store")
@@ -584,6 +587,8 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	return nil
 }
 
+// GetConfig is deprecated, we're not storing anything under streamdal_config:* anymore
+// TODO: remove after migration
 func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) {
 	cfgs := make(map[*protos.Audience][]string)
 
@@ -1479,6 +1484,22 @@ func (s *Store) GetCreationDate(ctx context.Context) (int64, error) {
 func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
 	if err := s.options.RedisBackend.Set(ctx, RedisCreationDateKey, ts, 0).Err(); err != nil {
 		return errors.Wrap(err, "unable to set creation date in store")
+	}
+
+	return nil
+}
+
+func (s *Store) SetPipelinesForAudience(ctx context.Context, audience *protos.Audience, pipelineIDs []string) error {
+	audStr := util.AudienceToStr(audience)
+
+	data, err := json.Marshal(pipelineIDs)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal pipeline IDs")
+	}
+
+	// Save to K/V
+	if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(audStr), data, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving pipelines for audience to store")
 	}
 
 	return nil

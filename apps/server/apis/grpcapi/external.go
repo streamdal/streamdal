@@ -512,7 +512,51 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	}, nil
 }
 
+func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipelineRequest) (*protos.StandardResponse, error) {
+	//	if err := validate.SetPipelinesRequest(req); err != nil {
+	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	//	}
+
+	if s.Options.DemoMode {
+		// TODO
+		return demoResponse(ctx)
+	}
+
+	// Verify pipeline IDs exist
+	for _, pipelineID := range req.PipelineIds {
+		if _, err := s.Options.StoreService.GetPipeline(ctx, pipelineID); err != nil {
+			if errors.Is(err, store.ErrPipelineNotFound) {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+			}
+
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		}
+	}
+
+	// Set in redis
+	if err := s.Options.StoreService.SetPipelinesForAudience(ctx, req.Aud, req.PipelineIds); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// Broadcast SetPipeline command
+	if err := s.Options.BusService.BroadcastSetPipelines(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "pipelines successfully updated",
+	}, nil
+}
+
 func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		Message: "AttachPipeline() is deprecated, use SetPipelines()",
+	}, nil
+
 	if err := validate.AttachPipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
@@ -577,6 +621,12 @@ func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipeline
 }
 
 func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		Message: "AttachPipeline() is deprecated, use SetPipelines()",
+	}, nil
+
 	if err := validate.DetachPipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
