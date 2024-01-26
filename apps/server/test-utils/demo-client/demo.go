@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -234,8 +235,9 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	underline := color.New(color.Underline).SprintFunc()
 
 	var (
-		status  string
-		message string
+		status   string
+		message  string
+		metadata string
 	)
 
 	switch post.Status {
@@ -283,6 +285,22 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	tw.AppendRow(gopretty.Row{bold("Date"), now})
 	tw.AppendRow(gopretty.Row{bold("Status"), status})
 	tw.AppendRow(gopretty.Row{bold("Message"), message})
+
+	// Cleaner metadata
+	metadata = fmt.Sprintf("Total: %d Contents: ", len(post.Metadata))
+
+	if len(post.Metadata) == 0 {
+		metadata = metadata + "none"
+	} else {
+		for k, v := range post.Metadata {
+			metadata = metadata + fmt.Sprintf("'%s' => '%s', ", k, v)
+		}
+
+		metadata = strings.TrimSuffix(metadata, ", ")
+		metadata = metadata + ""
+	}
+
+	tw.AppendRow(gopretty.Row{bold("Metadata"), metadata})
 
 	if !r.config.Quiet {
 		tw.AppendSeparator()

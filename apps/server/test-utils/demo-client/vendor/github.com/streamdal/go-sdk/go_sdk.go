@@ -100,8 +100,8 @@ type IStreamdal interface {
 type Streamdal struct {
 	config             *Config
 	functions          map[string]*function
-	pipelines          map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
-	pipelinesPaused    map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
+	pipelines          map[string][]*protos.Command // k1: audienceStr k2: pipelineID
+	pipelinesPaused    map[string][]*protos.Command // k1: audienceStr k2: pipelineID
 	functionsMtx       *sync.RWMutex
 	pipelinesMtx       *sync.RWMutex
 	pipelinesPausedMtx *sync.RWMutex
@@ -233,9 +233,9 @@ func New(cfg *Config) (*Streamdal, error) {
 		functions:          make(map[string]*function),
 		functionsMtx:       &sync.RWMutex{},
 		serverClient:       serverClient,
-		pipelines:          make(map[string]map[string]*protos.Command),
+		pipelines:          make(map[string][]*protos.Command),
 		pipelinesMtx:       &sync.RWMutex{},
-		pipelinesPaused:    make(map[string]map[string]*protos.Command),
+		pipelinesPaused:    make(map[string][]*protos.Command),
 		pipelinesPausedMtx: &sync.RWMutex{},
 		audiences:          map[string]struct{}{},
 		audiencesMtx:       &sync.RWMutex{},
@@ -416,12 +416,13 @@ func (s *Streamdal) pullInitialPipelines(ctx context.Context) error {
 	}
 
 	for _, cmd := range cmds.Paused {
-		s.config.Logger.Debugf("Pipeline '%s' is paused", cmd.GetAttachPipeline().Pipeline.Name)
+		s.config.Logger.Debugf("Pipeline '%s' is paused - skipping initial attach", cmd.GetAttachPipeline().Pipeline.Name)
+
 		if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
-			s.pipelinesPaused[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
+			s.pipelinesPaused[audToStr(cmd.Audience)] = make([]*protos.Command, 0)
 		}
 
-		s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
+		s.pipelinesPaused[audToStr(cmd.Audience)] = append(s.pipelinesPaused[audToStr(cmd.Audience)], cmd)
 	}
 
 	return nil
@@ -512,7 +513,7 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 	return resp, nil
 }
 
-func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
+func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) []*protos.Command {
 	s.pipelinesMtx.RLock()
 	defer s.pipelinesMtx.RUnlock()
 
@@ -520,7 +521,7 @@ func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[
 
 	pipelines, ok := s.pipelines[audToStr(aud)]
 	if !ok {
-		return make(map[string]*protos.Command)
+		return make([]*protos.Command, 0)
 	}
 
 	return pipelines
@@ -595,6 +596,10 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 
 	pipelines := s.getPipelines(ctx, aud)
 
+	for pIndex, p := range pipelines {
+		s.config.Logger.Warnf("pIndex %d, pipeline name '%s'", pIndex, p.GetAttachPipeline().GetPipeline().Name)
+	}
+
 	// WARNING: This case will (usually) only "hit" for the first <100ms of
 	// running the SDK - after that, the server will have sent us at least one,
 	// "hidden"  pipeline - "infer schema". All of this happens asynchronously
@@ -624,15 +629,10 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	}
 
 	totalPipelines := len(pipelines)
-	var (
-		pIndex int
-		sIndex int
-	)
 
 PIPELINE:
-	for _, p := range pipelines {
+	for pIndex, p := range pipelines {
 		var isr *protos.InterStepResult
-		pIndex += 1
 
 		pipelineTimeoutCtx, pipelineTimeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
 
@@ -649,9 +649,7 @@ PIPELINE:
 
 		totalSteps := len(pipeline.Steps)
 
-		for _, step := range pipeline.Steps {
-			sIndex += 1
-
+		for sIndex, step := range pipeline.Steps {
 			stepTimeoutCtx, stepTimeoutCxl := context.WithTimeout(ctx, s.config.StepTimeout)
 
 			stepStatus := &protos.StepStatus{

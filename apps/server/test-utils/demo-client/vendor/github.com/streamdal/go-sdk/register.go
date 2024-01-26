@@ -289,15 +289,53 @@ func (s *Streamdal) attachPipeline(_ context.Context, cmd *protos.Command) error
 	s.pipelinesMtx.Lock()
 	defer s.pipelinesMtx.Unlock()
 
+	// If first time seeing audience, create pipeline (command) slice
 	if _, ok := s.pipelines[audToStr(cmd.Audience)]; !ok {
-		s.pipelines[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
+		s.pipelines[audToStr(cmd.Audience)] = make([]*protos.Command, 0)
 	}
 
-	s.pipelines[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
+	// Only append pipeline if it doesn't already exist
+	pipelineIndex := getPipelineIndex(s.pipelines[audToStr(cmd.Audience)], cmd.GetAttachPipeline().Pipeline.Id)
 
-	s.config.Logger.Debugf("Attached pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
+	// Debugging indexes
+	//s.config.Logger.Warnf("pipelineIndex is %d for pipeline ID %s\n", pipelineIndex, cmd.GetAttachPipeline().Pipeline.Id)
+	//s.config.Logger.Warnf("known pipeline length: %d", len(s.pipelines[audToStr(cmd.Audience)]))
+	//
+	//for pIndex, p := range s.pipelines[audToStr(cmd.Audience)] {
+	//	s.config.Logger.Warnf("pIndex %d for pipeline %s\n", pIndex, p.GetAttachPipeline().Pipeline.Id)
+	//}
+
+	if pipelineIndex == -1 {
+		// Pipeline does not exist, append it
+		s.config.Logger.Debugf("Attached new pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
+
+		s.pipelines[audToStr(cmd.Audience)] = append(s.pipelines[audToStr(cmd.Audience)], cmd)
+	} else {
+		// Avoid potential panic
+		if pipelineIndex > len(s.pipelines[audToStr(cmd.Audience)])-1 { // len-1 because of 0-indexing
+			errMsg := fmt.Errorf("bug? invalid pipeline index: %d", pipelineIndex)
+			s.config.Logger.Error(errMsg)
+			return errors.New(errMsg.Error())
+		}
+
+		// Pipeline already exists, update it
+		s.config.Logger.Debugf("Updated attached pipeline %s (index %d)", cmd.GetAttachPipeline().Pipeline.Id, pipelineIndex)
+
+		s.pipelines[audToStr(cmd.Audience)][pipelineIndex] = cmd
+	}
 
 	return nil
+}
+
+// Looks for pipelineID in pipeline slice and returns index if found, -1 otherwise
+func getPipelineIndex(pipelines []*protos.Command, pipelineID string) int {
+	for i, p := range pipelines {
+		if p.GetAttachPipeline().Pipeline.Id == pipelineID {
+			return i
+		}
+	}
+
+	return -1
 }
 
 func (s *Streamdal) detachPipeline(_ context.Context, cmd *protos.Command) error {
@@ -311,57 +349,34 @@ func (s *Streamdal) detachPipeline(_ context.Context, cmd *protos.Command) error
 	audStr := audToStr(cmd.Audience)
 
 	if _, ok := s.pipelines[audStr]; !ok {
+		s.config.Logger.Debugf("Attempted to detach pipeline %s, but no pipelines exist for audience %s", cmd.GetDetachPipeline().PipelineId, audStr)
+
 		return nil
 	}
 
-	delete(s.pipelines[audStr], cmd.GetDetachPipeline().PipelineId)
+	if index := getPipelineIndex(s.pipelines[audStr], cmd.GetDetachPipeline().PipelineId); index != -1 {
+		s.config.Logger.Debugf("Detaching pipeline %s (index %d)", cmd.GetDetachPipeline().PipelineId, index)
+		s.pipelines[audStr] = append(s.pipelines[audStr][:index], s.pipelines[audStr][index+1:]...)
 
-	if len(s.pipelines[audStr]) == 0 {
-		delete(s.pipelines, audStr)
+		return nil
 	}
 
-	s.config.Logger.Debugf("Detached pipeline %s", cmd.GetDetachPipeline().PipelineId)
+	s.config.Logger.Debugf("Pipeline '%s' not attached for audience '%s' - nothing to do", cmd.GetDetachPipeline().PipelineId, audStr)
 
 	return nil
 }
 
+// TODO: Refactor to pause/unpause
 func (s *Streamdal) pausePipeline(_ context.Context, cmd *protos.Command) error {
-	if cmd == nil {
-		return ErrEmptyCommand
-	}
-
-	s.pipelinesMtx.Lock()
-	defer s.pipelinesMtx.Unlock()
-	s.pipelinesPausedMtx.Lock()
-	defer s.pipelinesPausedMtx.Unlock()
-
-	audStr := audToStr(cmd.Audience)
-
-	if _, ok := s.pipelines[audStr]; !ok {
-		return ErrPipelineNotActive
-	}
-
-	pipeline, ok := s.pipelines[audStr][cmd.GetPausePipeline().PipelineId]
-	if !ok {
-		return ErrPipelineNotActive
-	}
-
-	if _, ok := s.pipelinesPaused[audStr]; !ok {
-		s.pipelinesPaused[audStr] = make(map[string]*protos.Command)
-	}
-
-	s.pipelinesPaused[audStr][cmd.GetPausePipeline().PipelineId] = pipeline
-
-	delete(s.pipelines[audStr], cmd.GetPausePipeline().PipelineId)
-
-	if len(s.pipelines[audStr]) == 0 {
-		delete(s.pipelines, audStr)
-	}
-
-	return nil
+	return s.pauseResumePipeline(nil, cmd, true)
 }
 
 func (s *Streamdal) resumePipeline(_ context.Context, cmd *protos.Command) error {
+	return s.pauseResumePipeline(nil, cmd, false)
+}
+
+// Helper method that handles pause/unpause logic. Used by pausePipeline and resumePipeline
+func (s *Streamdal) pauseResumePipeline(_ context.Context, cmd *protos.Command, pause bool) error {
 	if cmd == nil {
 		return ErrEmptyCommand
 	}
@@ -371,28 +386,68 @@ func (s *Streamdal) resumePipeline(_ context.Context, cmd *protos.Command) error
 	s.pipelinesPausedMtx.Lock()
 	defer s.pipelinesPausedMtx.Unlock()
 
+	var (
+		action string
+		src map[string][]*protos.Command
+		dst map[string][]*protos.Command
+	)
+
+	if pause {
+		action = "pause"
+		src = s.pipelines
+		dst = s.pipelinesPaused
+	} else {
+		action = "resume"
+		src = s.pipelinesPaused
+		dst = s.pipelines
+	}
+
 	audStr := audToStr(cmd.Audience)
 
-	if _, ok := s.pipelinesPaused[audStr]; !ok {
-		return ErrPipelineNotPaused
-	}
-
-	pipeline, ok := s.pipelinesPaused[audStr][cmd.GetResumePipeline().PipelineId]
-	if !ok {
-		return ErrPipelineNotPaused
-	}
-
 	if _, ok := s.pipelines[audStr]; !ok {
-		s.pipelines[audStr] = make(map[string]*protos.Command)
+		return ErrPipelineNotActive
 	}
 
-	s.pipelines[audStr][cmd.GetResumePipeline().PipelineId] = pipeline
-
-	delete(s.pipelinesPaused[audStr], cmd.GetResumePipeline().PipelineId)
-
-	if len(s.pipelinesPaused[audStr]) == 0 {
-		delete(s.pipelinesPaused, audStr)
+	// Is this audience known?
+	if _, ok := src[audStr]; !ok {
+		s.config.Logger.Debugf("Attempted to %s pipeline %s for audience %s but no such audience known", action, cmd.GetPausePipeline().PipelineId, audStr)
+		return ErrPipelineNotActive
 	}
+
+	// Audience is known; is pipeline known?
+	srcPipelineIndex := getPipelineIndex(src[audStr], cmd.GetPausePipeline().PipelineId)
+
+	if srcPipelineIndex == -1 {
+		s.config.Logger.Debugf("Attempted to %s pipeline %s for audience %s but no such pipeline known", action, cmd.GetPausePipeline().PipelineId, audStr)
+		return ErrPipelineNotActive
+	}
+
+	// Audience and pipeline exist - if dst map does not contain audience, create pipeline slice
+	if _, ok := dst[audStr]; !ok {
+		dst[audStr] = make([]*protos.Command, 0)
+	}
+
+	dstPipelineIndex := getPipelineIndex(s.pipelinesPaused[audStr], cmd.GetPausePipeline().PipelineId)
+
+	if dstPipelineIndex != -1 {
+		// Pipeline already paused, nothing to do
+		s.config.Logger.Debugf("Attempted to %s pipeline %s for audience %s but pipeline already paused", action, cmd.GetPausePipeline().PipelineId, audStr)
+		return nil
+	}
+
+	// Pipeline not in dst map, add it
+	dst[audStr] = append(dst[audStr], src[audStr][srcPipelineIndex])
+
+	// Remove pipeline from src pipelines map
+	src[audStr] = append(src[audStr][:srcPipelineIndex], src[audStr][srcPipelineIndex+1:]...)
+
+	// If src has no pipelines for this audience, remove the audience
+	if len(src[audStr]) == 0 {
+		s.config.Logger.Debugf("No active pipelines left for audience %s during %s, removing audience", audStr, action)
+		delete(src, audStr)
+	}
+
+	s.config.Logger.Debugf("Successful %s for pipeline %s for audience %s", action, cmd.GetPausePipeline().PipelineId, audStr)
 
 	return nil
 }
