@@ -379,8 +379,8 @@ func (s *InternalServer) getActiveAttachPipelineCommands(
 		return nil, nil, errors.Wrap(err, "unable to get paused pipelines")
 	}
 
-	active := make([]*protos.Command, 0)
-	paused := make([]*protos.Command, 0)
+	active := make([]*protos.Pipeline, 0)
+	paused := make([]*protos.Pipeline, 0)
 
 	for _, a := range attaches {
 		if err := validate.AttachPipelineCommand(a.GetAttachPipeline()); err != nil {

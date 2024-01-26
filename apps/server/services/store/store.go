@@ -96,6 +96,8 @@ type IStore interface {
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
 	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
+
+	GetPipelinesByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
@@ -692,8 +694,70 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	return live, nil
 }
 
+// This returns ALL pipelines. Need to figure out somehow which are paused and which aren't before
+// we send these commands to the SDKS
+func (s *Store) GetPipelinesByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
+	commands := make([]*protos.Command, 0)
+
+	// Get audience key from redis
+	audiences, err := s.GetAudiencesByService(ctx, serviceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching audiences by service")
+	}
+
+	for _, aud := range audiences {
+		pipelines := make([]*protos.Pipeline, 0)
+
+		// Get audience key's value
+		audValue, err := s.options.RedisBackend.Get(ctx, RedisAudienceKey(util.AudienceToStr(aud))).Result()
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching audience '%s' from store", util.AudienceToStr(aud))
+		}
+
+		pipelineIDs := make([]string, 0)
+		if err := json.Unmarshal([]byte(audValue), &pipelineIDs); err != nil {
+			return nil, errors.Wrapf(err, "error unmarshaling stored pipelines for audience '%s'", util.AudienceToStr(aud))
+		}
+
+		// Inject schema inference as element 0
+		schemaInferPipeline := util.GenInferSchemaPipeline()
+		if err := util.PopulateWASMFields(schemaInferPipeline, "TODO: wasmdir needed"); err != nil {
+			return nil, errors.Wrap(err, "error populating wasm fields for schema inference pipeline")
+		}
+
+		pipelines = append(pipelines, schemaInferPipeline)
+
+		// Get pipelines and add to list
+		for _, pipelineID := range pipelineIDs {
+			// Get pipeline data
+			pipeline, err := s.GetPipeline(ctx, pipelineID)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error getting pipeline '%s' from store", pipelineID)
+			}
+
+			if err := util.PopulateWASMFields(pipeline, "TODO: wasmdir needed"); err != nil {
+				return nil, errors.Wrapf(err, "error populating wasm fields for pipeline '%s'", pipelineID)
+			}
+			// Add to list
+			pipelines = append(pipelines, pipeline)
+		}
+
+		commands = append(commands, &protos.Command{
+			Audience: aud,
+			Command: &protos.Command_SetPipelines{
+				SetPipelines: &protos.SetPipelinesCommand{
+					Pipelines: pipelines,
+				},
+			},
+		})
+	}
+
+	return commands, nil
+}
+
 func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
 	cmds := make([]*protos.Command, 0)
+	return cmds, nil
 
 	search := fmt.Sprintf("%s:%s:*", RedisConfigPrefix, serviceName)
 
