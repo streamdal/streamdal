@@ -34,13 +34,19 @@ export interface Command {
     command: {
         oneofKind: "attachPipeline";
         /**
-         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100;
+         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
          */
         attachPipeline: AttachPipelineCommand;
     } | {
         oneofKind: "detachPipeline";
         /**
-         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101;
+         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
          */
         detachPipeline: DetachPipelineCommand;
     } | {
@@ -80,10 +86,31 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
+        oneofKind: "setPipelines";
+        /**
+         * Emitted by server when a user makes an external.SetPipelines call.
+         * NOTE: This replaces attach/detach pipeline commands.
+         *
+         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 107;
+         */
+        setPipelines: SetPipelinesCommand;
+    } | {
         oneofKind: undefined;
     };
 }
 /**
+ * @generated from protobuf message protos.SetPipelinesCommand
+ */
+export interface SetPipelinesCommand {
+    /**
+     * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
+     */
+    pipelines: Pipeline[];
+}
+/**
+ * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.AttachPipelineCommand
  */
 export interface AttachPipelineCommand {
@@ -93,6 +120,9 @@ export interface AttachPipelineCommand {
     pipeline?: Pipeline;
 }
 /**
+ * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.DetachPipelineCommand
  */
 export interface DetachPipelineCommand {
@@ -164,7 +194,8 @@ class Command$Type extends MessageType<Command> {
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
             { no: 105, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
-            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand }
+            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => TailCommand },
+            { no: 107, name: "set_pipelines", kind: "message", oneof: "command", T: () => SetPipelinesCommand }
         ]);
     }
     create(value?: PartialMessage<Command>): Command {
@@ -182,13 +213,13 @@ class Command$Type extends MessageType<Command> {
                 case /* protos.Audience audience */ 1:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* protos.AttachPipelineCommand attach_pipeline */ 100:
+                case /* protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];*/ 100:
                     message.command = {
                         oneofKind: "attachPipeline",
                         attachPipeline: AttachPipelineCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).attachPipeline)
                     };
                     break;
-                case /* protos.DetachPipelineCommand detach_pipeline */ 101:
+                case /* protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];*/ 101:
                     message.command = {
                         oneofKind: "detachPipeline",
                         detachPipeline: DetachPipelineCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).detachPipeline)
@@ -224,6 +255,12 @@ class Command$Type extends MessageType<Command> {
                         tail: TailCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).tail)
                     };
                     break;
+                case /* protos.SetPipelinesCommand set_pipelines */ 107:
+                    message.command = {
+                        oneofKind: "setPipelines",
+                        setPipelines: SetPipelinesCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).setPipelines)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -239,10 +276,10 @@ class Command$Type extends MessageType<Command> {
         /* protos.Audience audience = 1; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* protos.AttachPipelineCommand attach_pipeline = 100; */
+        /* protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true]; */
         if (message.command.oneofKind === "attachPipeline")
             AttachPipelineCommand.internalBinaryWrite(message.command.attachPipeline, writer.tag(100, WireType.LengthDelimited).fork(), options).join();
-        /* protos.DetachPipelineCommand detach_pipeline = 101; */
+        /* protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true]; */
         if (message.command.oneofKind === "detachPipeline")
             DetachPipelineCommand.internalBinaryWrite(message.command.detachPipeline, writer.tag(101, WireType.LengthDelimited).fork(), options).join();
         /* protos.PausePipelineCommand pause_pipeline = 102; */
@@ -260,6 +297,9 @@ class Command$Type extends MessageType<Command> {
         /* protos.TailCommand tail = 106; */
         if (message.command.oneofKind === "tail")
             TailCommand.internalBinaryWrite(message.command.tail, writer.tag(106, WireType.LengthDelimited).fork(), options).join();
+        /* protos.SetPipelinesCommand set_pipelines = 107; */
+        if (message.command.oneofKind === "setPipelines")
+            SetPipelinesCommand.internalBinaryWrite(message.command.setPipelines, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -270,6 +310,53 @@ class Command$Type extends MessageType<Command> {
  * @generated MessageType for protobuf message protos.Command
  */
 export const Command = new Command$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> {
+    constructor() {
+        super("protos.SetPipelinesCommand", [
+            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline }
+        ]);
+    }
+    create(value?: PartialMessage<SetPipelinesCommand>): SetPipelinesCommand {
+        const message = { pipelines: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SetPipelinesCommand>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesCommand): SetPipelinesCommand {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Pipeline pipelines */ 1:
+                    message.pipelines.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SetPipelinesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.Pipeline pipelines = 1; */
+        for (let i = 0; i < message.pipelines.length; i++)
+            Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
+ */
+export const SetPipelinesCommand = new SetPipelinesCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor() {
@@ -314,6 +401,7 @@ class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 export const AttachPipelineCommand = new AttachPipelineCommand$Type();
@@ -361,6 +449,7 @@ class DetachPipelineCommand$Type extends MessageType<DetachPipelineCommand> {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 export const DetachPipelineCommand = new DetachPipelineCommand$Type();

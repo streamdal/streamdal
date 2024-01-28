@@ -303,6 +303,14 @@ class ResumeTailRequest(_message.Message):
     tail_id: str
     def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
 
+class SetPipelinesRequest(_message.Message):
+    __slots__ = ["audience", "pipeline_ids"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+
 class TestRequest(_message.Message):
     __slots__ = ["input"]
     INPUT_FIELD_NUMBER: _ClassVar[int]

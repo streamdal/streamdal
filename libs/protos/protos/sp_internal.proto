@@ -107,11 +107,35 @@ message DeregisterRequest {
   string session_id = 2;
 }
 
-message GetAttachCommandsByServiceRequest {
+// Method used by SDKs to fetch all SetPipelinesCommands for a given service name.
+// The SDK may not know of all audiences yet so this method returns ALL
+// SetPipelinesCommands that use the same same service name. SDKs should store
+// the commands (or pipelines) in memory tied to an audience, so that if/when a
+// .Process() call occurs with an audience - the SDK will already have the
+// pipeline config in memory.
+message GetSetPipelinesCommandsByServiceRequest {
   string service_name = 1;
 }
 
+message GetSetPipelinesCommandsByServiceResponse {
+  // SetPipelinesCommands for all active pipelines
+  repeated protos.Command set_pipeline_commands = 1;
+
+  // ID = wasm ID
+  map<string,WasmModule> wasm_modules = 3;
+}
+
+// DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceRequest instead
+message GetAttachCommandsByServiceRequest {
+  option deprecated = true;
+
+  string service_name = 1;
+}
+
+// DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceResponse instead
 message GetAttachCommandsByServiceResponse {
+  option deprecated = true;
+
   // AttachCommands for all active pipelines
   repeated protos.Command active = 1;
 

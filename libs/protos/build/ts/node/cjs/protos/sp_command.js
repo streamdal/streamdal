@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TailCommand = exports.KVCommand = exports.KeepAliveCommand = exports.ResumePipelineCommand = exports.PausePipelineCommand = exports.DetachPipelineCommand = exports.AttachPipelineCommand = exports.Command = void 0;
+exports.TailCommand = exports.KVCommand = exports.KeepAliveCommand = exports.ResumePipelineCommand = exports.PausePipelineCommand = exports.DetachPipelineCommand = exports.AttachPipelineCommand = exports.SetPipelinesCommand = exports.Command = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -21,7 +21,8 @@ class Command$Type extends runtime_5.MessageType {
             { no: 103, name: "resume_pipeline", kind: "message", oneof: "command", T: () => exports.ResumePipelineCommand },
             { no: 104, name: "keep_alive", kind: "message", oneof: "command", T: () => exports.KeepAliveCommand },
             { no: 105, name: "kv", kind: "message", oneof: "command", T: () => exports.KVCommand },
-            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => exports.TailCommand }
+            { no: 106, name: "tail", kind: "message", oneof: "command", T: () => exports.TailCommand },
+            { no: 107, name: "set_pipelines", kind: "message", oneof: "command", T: () => exports.SetPipelinesCommand }
         ]);
     }
     create(value) {
@@ -39,13 +40,13 @@ class Command$Type extends runtime_5.MessageType {
                 case /* protos.Audience audience */ 1:
                     message.audience = sp_common_2.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
-                case /* protos.AttachPipelineCommand attach_pipeline */ 100:
+                case /* protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];*/ 100:
                     message.command = {
                         oneofKind: "attachPipeline",
                         attachPipeline: exports.AttachPipelineCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.attachPipeline)
                     };
                     break;
-                case /* protos.DetachPipelineCommand detach_pipeline */ 101:
+                case /* protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];*/ 101:
                     message.command = {
                         oneofKind: "detachPipeline",
                         detachPipeline: exports.DetachPipelineCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.detachPipeline)
@@ -81,6 +82,12 @@ class Command$Type extends runtime_5.MessageType {
                         tail: exports.TailCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.tail)
                     };
                     break;
+                case /* protos.SetPipelinesCommand set_pipelines */ 107:
+                    message.command = {
+                        oneofKind: "setPipelines",
+                        setPipelines: exports.SetPipelinesCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.setPipelines)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -96,10 +103,10 @@ class Command$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 1; */
         if (message.audience)
             sp_common_2.Audience.internalBinaryWrite(message.audience, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.AttachPipelineCommand attach_pipeline = 100; */
+        /* protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true]; */
         if (message.command.oneofKind === "attachPipeline")
             exports.AttachPipelineCommand.internalBinaryWrite(message.command.attachPipeline, writer.tag(100, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.DetachPipelineCommand detach_pipeline = 101; */
+        /* protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true]; */
         if (message.command.oneofKind === "detachPipeline")
             exports.DetachPipelineCommand.internalBinaryWrite(message.command.detachPipeline, writer.tag(101, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.PausePipelineCommand pause_pipeline = 102; */
@@ -117,6 +124,9 @@ class Command$Type extends runtime_5.MessageType {
         /* protos.TailCommand tail = 106; */
         if (message.command.oneofKind === "tail")
             exports.TailCommand.internalBinaryWrite(message.command.tail, writer.tag(106, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.SetPipelinesCommand set_pipelines = 107; */
+        if (message.command.oneofKind === "setPipelines")
+            exports.SetPipelinesCommand.internalBinaryWrite(message.command.setPipelines, writer.tag(107, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -127,6 +137,53 @@ class Command$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message protos.Command
  */
 exports.Command = new Command$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SetPipelinesCommand$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.SetPipelinesCommand", [
+            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_1.Pipeline }
+        ]);
+    }
+    create(value) {
+        const message = { pipelines: [] };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Pipeline pipelines */ 1:
+                    message.pipelines.push(sp_pipeline_1.Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.Pipeline pipelines = 1; */
+        for (let i = 0; i < message.pipelines.length; i++)
+            sp_pipeline_1.Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
+ */
+exports.SetPipelinesCommand = new SetPipelinesCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AttachPipelineCommand$Type extends runtime_5.MessageType {
     constructor() {
@@ -171,6 +228,7 @@ class AttachPipelineCommand$Type extends runtime_5.MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 exports.AttachPipelineCommand = new AttachPipelineCommand$Type();
@@ -218,6 +276,7 @@ class DetachPipelineCommand$Type extends runtime_5.MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 exports.DetachPipelineCommand = new DetachPipelineCommand$Type();

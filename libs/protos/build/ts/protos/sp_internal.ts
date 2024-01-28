@@ -156,6 +156,44 @@ export interface DeregisterRequest {
     sessionId: string;
 }
 /**
+ * Method used by SDKs to fetch all SetPipelinesCommands for a given service name.
+ * The SDK may not know of all audiences yet so this method returns ALL
+ * SetPipelinesCommands that use the same same service name. SDKs should store
+ * the commands (or pipelines) in memory tied to an audience, so that if/when a
+ * .Process() call occurs with an audience - the SDK will already have the
+ * pipeline config in memory.
+ *
+ * @generated from protobuf message protos.GetSetPipelinesCommandsByServiceRequest
+ */
+export interface GetSetPipelinesCommandsByServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+}
+/**
+ * @generated from protobuf message protos.GetSetPipelinesCommandsByServiceResponse
+ */
+export interface GetSetPipelinesCommandsByServiceResponse {
+    /**
+     * SetPipelinesCommands for all active pipelines
+     *
+     * @generated from protobuf field: repeated protos.Command set_pipeline_commands = 1;
+     */
+    setPipelineCommands: Command[];
+    /**
+     * ID = wasm ID
+     *
+     * @generated from protobuf field: map<string, protos.WasmModule> wasm_modules = 3;
+     */
+    wasmModules: {
+        [key: string]: WasmModule;
+    };
+}
+/**
+ * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceRequest instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
  */
 export interface GetAttachCommandsByServiceRequest {
@@ -165,6 +203,9 @@ export interface GetAttachCommandsByServiceRequest {
     serviceName: string;
 }
 /**
+ * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceResponse instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export interface GetAttachCommandsByServiceResponse {
@@ -597,6 +638,127 @@ class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
  */
 export const DeregisterRequest = new DeregisterRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetSetPipelinesCommandsByServiceRequest$Type extends MessageType<GetSetPipelinesCommandsByServiceRequest> {
+    constructor() {
+        super("protos.GetSetPipelinesCommandsByServiceRequest", [
+            { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetSetPipelinesCommandsByServiceRequest>): GetSetPipelinesCommandsByServiceRequest {
+        const message = { serviceName: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetSetPipelinesCommandsByServiceRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSetPipelinesCommandsByServiceRequest): GetSetPipelinesCommandsByServiceRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string service_name */ 1:
+                    message.serviceName = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetSetPipelinesCommandsByServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string service_name = 1; */
+        if (message.serviceName !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serviceName);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceRequest
+ */
+export const GetSetPipelinesCommandsByServiceRequest = new GetSetPipelinesCommandsByServiceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetSetPipelinesCommandsByServiceResponse$Type extends MessageType<GetSetPipelinesCommandsByServiceResponse> {
+    constructor() {
+        super("protos.GetSetPipelinesCommandsByServiceResponse", [
+            { no: 1, name: "set_pipeline_commands", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
+            { no: 3, name: "wasm_modules", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => WasmModule } }
+        ]);
+    }
+    create(value?: PartialMessage<GetSetPipelinesCommandsByServiceResponse>): GetSetPipelinesCommandsByServiceResponse {
+        const message = { setPipelineCommands: [], wasmModules: {} };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetSetPipelinesCommandsByServiceResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSetPipelinesCommandsByServiceResponse): GetSetPipelinesCommandsByServiceResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Command set_pipeline_commands */ 1:
+                    message.setPipelineCommands.push(Command.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* map<string, protos.WasmModule> wasm_modules */ 3:
+                    this.binaryReadMap3(message.wasmModules, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    private binaryReadMap3(map: GetSetPipelinesCommandsByServiceResponse["wasmModules"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof GetSetPipelinesCommandsByServiceResponse["wasmModules"] | undefined, val: GetSetPipelinesCommandsByServiceResponse["wasmModules"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = WasmModule.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetSetPipelinesCommandsByServiceResponse.wasm_modules");
+            }
+        }
+        map[key ?? ""] = val ?? WasmModule.create();
+    }
+    internalBinaryWrite(message: GetSetPipelinesCommandsByServiceResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.Command set_pipeline_commands = 1; */
+        for (let i = 0; i < message.setPipelineCommands.length; i++)
+            Command.internalBinaryWrite(message.setPipelineCommands[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.WasmModule> wasm_modules = 3; */
+        for (let k of Object.keys(message.wasmModules)) {
+            writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            WasmModule.internalBinaryWrite(message.wasmModules[k], writer, options);
+            writer.join().join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceResponse
+ */
+export const GetSetPipelinesCommandsByServiceResponse = new GetSetPipelinesCommandsByServiceResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
     constructor() {
         super("protos.GetAttachCommandsByServiceRequest", [
@@ -640,6 +802,7 @@ class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachComman
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
  */
 export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceRequest$Type();
@@ -721,6 +884,7 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachComma
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();

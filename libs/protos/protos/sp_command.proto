@@ -15,8 +15,12 @@ message Command {
   protos.Audience audience = 1;
 
   oneof command {
-    AttachPipelineCommand attach_pipeline = 100;
-    DetachPipelineCommand detach_pipeline = 101;
+    // DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+    AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
+
+    // DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+    DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
+
     PausePipelineCommand pause_pipeline = 102;
     ResumePipelineCommand resume_pipeline = 103;
     KeepAliveCommand keep_alive = 104;
@@ -28,14 +32,28 @@ message Command {
     // Emitted by server when a user makes a Tail() call
     // Consumed by all server instances and by SDKs
     TailCommand tail = 106;
+
+    // Emitted by server when a user makes an external.SetPipelines call.
+    // NOTE: This replaces attach/detach pipeline commands.
+    SetPipelinesCommand set_pipelines = 107;
   }
 }
 
+message SetPipelinesCommand {
+  repeated protos.Pipeline pipelines = 1;
+}
+
+// DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
 message AttachPipelineCommand {
+  option deprecated = true;
+
   protos.Pipeline pipeline = 1;
 }
 
+// DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
 message DetachPipelineCommand {
+  option deprecated = true;
+
   string pipeline_id = 1;
 }
 

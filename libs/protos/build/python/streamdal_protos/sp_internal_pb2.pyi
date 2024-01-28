@@ -39,6 +39,27 @@ class GetAttachCommandsByServiceResponse(_message.Message):
     wasm_modules: _containers.MessageMap[str, WasmModule]
     def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
 
+class GetSetPipelinesCommandsByServiceRequest(_message.Message):
+    __slots__ = ["service_name"]
+    SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    service_name: str
+    def __init__(self, service_name: _Optional[str] = ...) -> None: ...
+
+class GetSetPipelinesCommandsByServiceResponse(_message.Message):
+    __slots__ = ["set_pipeline_commands", "wasm_modules"]
+    class WasmModulesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: WasmModule
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WasmModule, _Mapping]] = ...) -> None: ...
+    SET_PIPELINE_COMMANDS_FIELD_NUMBER: _ClassVar[int]
+    WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
+    set_pipeline_commands: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
+    wasm_modules: _containers.MessageMap[str, WasmModule]
+    def __init__(self, set_pipeline_commands: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
+
 class HeartbeatRequest(_message.Message):
     __slots__ = ["audiences", "client_info", "service_name", "session_id"]
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]

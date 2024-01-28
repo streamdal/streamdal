@@ -604,6 +604,60 @@ class DeletePipelineRequest$Type extends MessageType {
  */
 export const DeletePipelineRequest = new DeletePipelineRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class SetPipelinesRequest$Type extends MessageType {
+    constructor() {
+        super("protos.SetPipelinesRequest", [
+            { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value) {
+        const message = { pipelineIds: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated string pipeline_ids */ 1:
+                    message.pipelineIds.push(reader.string());
+                    break;
+                case /* protos.Audience audience */ 2:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated string pipeline_ids = 1; */
+        for (let i = 0; i < message.pipelineIds.length; i++)
+            writer.tag(1, WireType.LengthDelimited).string(message.pipelineIds[i]);
+        /* protos.Audience audience = 2; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelinesRequest
+ */
+export const SetPipelinesRequest = new SetPipelinesRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class AttachPipelineRequest$Type extends MessageType {
     constructor() {
         super("protos.AttachPipelineRequest", [
@@ -654,6 +708,7 @@ class AttachPipelineRequest$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineRequest
  */
 export const AttachPipelineRequest = new AttachPipelineRequest$Type();
@@ -715,6 +770,7 @@ class DetachPipelineRequest$Type extends MessageType {
     }
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineRequest
  */
 export const DetachPipelineRequest = new DetachPipelineRequest$Type();
@@ -2119,6 +2175,7 @@ export const External = new ServiceType("protos.External", [
     { name: "CreatePipeline", options: {}, I: CreatePipelineRequest, O: CreatePipelineResponse },
     { name: "UpdatePipeline", options: {}, I: UpdatePipelineRequest, O: StandardResponse },
     { name: "DeletePipeline", options: {}, I: DeletePipelineRequest, O: StandardResponse },
+    { name: "SetPipelines", options: {}, I: SetPipelinesRequest, O: StandardResponse },
     { name: "AttachPipeline", options: {}, I: AttachPipelineRequest, O: StandardResponse },
     { name: "DetachPipeline", options: {}, I: DetachPipelineRequest, O: StandardResponse },
     { name: "PausePipeline", options: {}, I: PausePipelineRequest, O: StandardResponse },

@@ -27,13 +27,19 @@ export interface Command {
     command: {
         oneofKind: "attachPipeline";
         /**
-         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100;
+         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
          */
         attachPipeline: AttachPipelineCommand;
     } | {
         oneofKind: "detachPipeline";
         /**
-         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101;
+         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
          */
         detachPipeline: DetachPipelineCommand;
     } | {
@@ -73,10 +79,31 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
+        oneofKind: "setPipelines";
+        /**
+         * Emitted by server when a user makes an external.SetPipelines call.
+         * NOTE: This replaces attach/detach pipeline commands.
+         *
+         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 107;
+         */
+        setPipelines: SetPipelinesCommand;
+    } | {
         oneofKind: undefined;
     };
 }
 /**
+ * @generated from protobuf message protos.SetPipelinesCommand
+ */
+export interface SetPipelinesCommand {
+    /**
+     * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
+     */
+    pipelines: Pipeline[];
+}
+/**
+ * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.AttachPipelineCommand
  */
 export interface AttachPipelineCommand {
@@ -86,6 +113,9 @@ export interface AttachPipelineCommand {
     pipeline?: Pipeline;
 }
 /**
+ * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.DetachPipelineCommand
  */
 export interface DetachPipelineCommand {
@@ -156,6 +186,16 @@ declare class Command$Type extends MessageType<Command> {
  * @generated MessageType for protobuf message protos.Command
  */
 export declare const Command: Command$Type;
+declare class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> {
+    constructor();
+    create(value?: PartialMessage<SetPipelinesCommand>): SetPipelinesCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesCommand): SetPipelinesCommand;
+    internalBinaryWrite(message: SetPipelinesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelinesCommand
+ */
+export declare const SetPipelinesCommand: SetPipelinesCommand$Type;
 declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
     constructor();
     create(value?: PartialMessage<AttachPipelineCommand>): AttachPipelineCommand;
@@ -163,6 +203,7 @@ declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineComma
     internalBinaryWrite(message: AttachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineCommand
  */
 export declare const AttachPipelineCommand: AttachPipelineCommand$Type;
@@ -173,6 +214,7 @@ declare class DetachPipelineCommand$Type extends MessageType<DetachPipelineComma
     internalBinaryWrite(message: DetachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineCommand
  */
 export declare const DetachPipelineCommand: DetachPipelineCommand$Type;

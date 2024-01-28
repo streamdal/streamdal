@@ -147,6 +147,44 @@ export interface DeregisterRequest {
     sessionId: string;
 }
 /**
+ * Method used by SDKs to fetch all SetPipelinesCommands for a given service name.
+ * The SDK may not know of all audiences yet so this method returns ALL
+ * SetPipelinesCommands that use the same same service name. SDKs should store
+ * the commands (or pipelines) in memory tied to an audience, so that if/when a
+ * .Process() call occurs with an audience - the SDK will already have the
+ * pipeline config in memory.
+ *
+ * @generated from protobuf message protos.GetSetPipelinesCommandsByServiceRequest
+ */
+export interface GetSetPipelinesCommandsByServiceRequest {
+    /**
+     * @generated from protobuf field: string service_name = 1;
+     */
+    serviceName: string;
+}
+/**
+ * @generated from protobuf message protos.GetSetPipelinesCommandsByServiceResponse
+ */
+export interface GetSetPipelinesCommandsByServiceResponse {
+    /**
+     * SetPipelinesCommands for all active pipelines
+     *
+     * @generated from protobuf field: repeated protos.Command set_pipeline_commands = 1;
+     */
+    setPipelineCommands: Command[];
+    /**
+     * ID = wasm ID
+     *
+     * @generated from protobuf field: map<string, protos.WasmModule> wasm_modules = 3;
+     */
+    wasmModules: {
+        [key: string]: WasmModule;
+    };
+}
+/**
+ * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceRequest instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
  */
 export interface GetAttachCommandsByServiceRequest {
@@ -156,6 +194,9 @@ export interface GetAttachCommandsByServiceRequest {
     serviceName: string;
 }
 /**
+ * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceResponse instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export interface GetAttachCommandsByServiceResponse {
@@ -281,6 +322,27 @@ declare class DeregisterRequest$Type extends MessageType<DeregisterRequest> {
  * @generated MessageType for protobuf message protos.DeregisterRequest
  */
 export declare const DeregisterRequest: DeregisterRequest$Type;
+declare class GetSetPipelinesCommandsByServiceRequest$Type extends MessageType<GetSetPipelinesCommandsByServiceRequest> {
+    constructor();
+    create(value?: PartialMessage<GetSetPipelinesCommandsByServiceRequest>): GetSetPipelinesCommandsByServiceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSetPipelinesCommandsByServiceRequest): GetSetPipelinesCommandsByServiceRequest;
+    internalBinaryWrite(message: GetSetPipelinesCommandsByServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceRequest
+ */
+export declare const GetSetPipelinesCommandsByServiceRequest: GetSetPipelinesCommandsByServiceRequest$Type;
+declare class GetSetPipelinesCommandsByServiceResponse$Type extends MessageType<GetSetPipelinesCommandsByServiceResponse> {
+    constructor();
+    create(value?: PartialMessage<GetSetPipelinesCommandsByServiceResponse>): GetSetPipelinesCommandsByServiceResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetSetPipelinesCommandsByServiceResponse): GetSetPipelinesCommandsByServiceResponse;
+    private binaryReadMap3;
+    internalBinaryWrite(message: GetSetPipelinesCommandsByServiceResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceResponse
+ */
+export declare const GetSetPipelinesCommandsByServiceResponse: GetSetPipelinesCommandsByServiceResponse$Type;
 declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
     constructor();
     create(value?: PartialMessage<GetAttachCommandsByServiceRequest>): GetAttachCommandsByServiceRequest;
@@ -288,6 +350,7 @@ declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAtta
     internalBinaryWrite(message: GetAttachCommandsByServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
  */
 export declare const GetAttachCommandsByServiceRequest: GetAttachCommandsByServiceRequest$Type;
@@ -299,6 +362,7 @@ declare class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAtt
     internalBinaryWrite(message: GetAttachCommandsByServiceResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
  */
 export declare const GetAttachCommandsByServiceResponse: GetAttachCommandsByServiceResponse$Type;

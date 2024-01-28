@@ -14,6 +14,7 @@ service External {
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
 
   // Temporary method to test gRPC-Web streaming
+  // DS: Is this temporary or are we using this exclusively? If so, can we remove GetAll()?
   rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
 
   // Returns pipelines (_wasm_bytes field is stripped)
@@ -31,11 +32,19 @@ service External {
   // Delete a pipeline
   rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
 
+  rpc SetPipelines(SetPipelinesRequest) returns (protos.StandardResponse);
+
   // Attach a pipeline to an audience
-  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse);
+  // DEPRECATED (01.27.2024): Use SetPipelines instead
+  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  };
 
   // Detach a pipeline from an audience
-  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse);
+  // DEPRECATED (01.27.2024): Use SetPipelines instead
+  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse) {
+    option deprecated = true;
+  };
 
   // Pause a pipeline; noop if pipeline is already paused
   rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
@@ -161,12 +170,23 @@ message DeletePipelineRequest {
   string pipeline_id = 1;
 }
 
+message SetPipelinesRequest {
+  repeated string pipeline_ids = 1;
+  protos.Audience audience = 2;
+}
+
+// DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
 message AttachPipelineRequest {
+  option deprecated = true;
+
   string pipeline_id = 1;
   protos.Audience audience = 2;
 }
 
+// DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
 message DetachPipelineRequest {
+  option deprecated = true;
+
   string pipeline_id = 1;
   protos.Audience audience = 2;
 

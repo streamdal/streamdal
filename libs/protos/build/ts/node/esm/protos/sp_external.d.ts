@@ -155,6 +155,22 @@ export interface DeletePipelineRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.SetPipelinesRequest
+ */
+export interface SetPipelinesRequest {
+    /**
+     * @generated from protobuf field: repeated string pipeline_ids = 1;
+     */
+    pipelineIds: string[];
+    /**
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+}
+/**
+ * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.AttachPipelineRequest
  */
 export interface AttachPipelineRequest {
@@ -168,6 +184,9 @@ export interface AttachPipelineRequest {
     audience?: Audience;
 }
 /**
+ * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+ *
+ * @deprecated
  * @generated from protobuf message protos.DetachPipelineRequest
  */
 export interface DetachPipelineRequest {
@@ -634,6 +653,16 @@ declare class DeletePipelineRequest$Type extends MessageType<DeletePipelineReque
  * @generated MessageType for protobuf message protos.DeletePipelineRequest
  */
 export declare const DeletePipelineRequest: DeletePipelineRequest$Type;
+declare class SetPipelinesRequest$Type extends MessageType<SetPipelinesRequest> {
+    constructor();
+    create(value?: PartialMessage<SetPipelinesRequest>): SetPipelinesRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesRequest): SetPipelinesRequest;
+    internalBinaryWrite(message: SetPipelinesRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SetPipelinesRequest
+ */
+export declare const SetPipelinesRequest: SetPipelinesRequest$Type;
 declare class AttachPipelineRequest$Type extends MessageType<AttachPipelineRequest> {
     constructor();
     create(value?: PartialMessage<AttachPipelineRequest>): AttachPipelineRequest;
@@ -641,6 +670,7 @@ declare class AttachPipelineRequest$Type extends MessageType<AttachPipelineReque
     internalBinaryWrite(message: AttachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachPipelineRequest
  */
 export declare const AttachPipelineRequest: AttachPipelineRequest$Type;
@@ -651,6 +681,7 @@ declare class DetachPipelineRequest$Type extends MessageType<DetachPipelineReque
     internalBinaryWrite(message: DetachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachPipelineRequest
  */
 export declare const DetachPipelineRequest: DetachPipelineRequest$Type;
