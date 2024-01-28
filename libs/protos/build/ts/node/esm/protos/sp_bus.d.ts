@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { SetPipelinesRequest } from "./sp_external.js";
 import { TailResponse } from "./sp_common.js";
 import { TailRequest } from "./sp_common.js";
 import { NewAudienceRequest } from "./sp_internal.js";
@@ -65,13 +66,19 @@ export interface BusEvent {
     } | {
         oneofKind: "attachPipelineRequest";
         /**
-         * @generated from protobuf field: protos.AttachPipelineRequest attach_pipeline_request = 105;
+         * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];
          */
         attachPipelineRequest: AttachPipelineRequest;
     } | {
         oneofKind: "detachPipelineRequest";
         /**
-         * @generated from protobuf field: protos.DetachPipelineRequest detach_pipeline_request = 106;
+         * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+         *
+         * @deprecated
+         * @generated from protobuf field: protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];
          */
         detachPipelineRequest: DetachPipelineRequest;
     } | {
@@ -122,6 +129,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.TailResponse tail_response = 114;
          */
         tailResponse: TailResponse;
+    } | {
+        oneofKind: "setPipelinesRequest";
+        /**
+         * @generated from protobuf field: protos.SetPipelinesRequest set_pipelines_request = 115;
+         */
+        setPipelinesRequest: SetPipelinesRequest;
     } | {
         oneofKind: undefined;
     };

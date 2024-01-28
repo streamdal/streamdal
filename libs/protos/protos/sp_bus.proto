@@ -25,8 +25,13 @@ message BusEvent {
     protos.CreatePipelineRequest create_pipeline_request = 102;
     protos.DeletePipelineRequest delete_pipeline_request = 103;
     protos.UpdatePipelineRequest update_pipeline_request = 104;
-    protos.AttachPipelineRequest attach_pipeline_request = 105;
-    protos.DetachPipelineRequest detach_pipeline_request = 106;
+
+    // DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+    protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];
+
+    // DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
+    protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];
+
     protos.PausePipelineRequest pause_pipeline_request = 107;
     protos.ResumePipelineRequest resume_pipeline_request = 108;
     protos.MetricsRequest metrics_request = 109;
@@ -35,6 +40,7 @@ message BusEvent {
     protos.NewAudienceRequest new_audience_request = 112;
     protos.TailRequest tail_request = 113;
     protos.TailResponse tail_response = 114;
+    protos.SetPipelinesRequest set_pipelines_request = 115;
   }
 
   // All gRPC metadata is stored in ctx; when request goes outside of gRPC

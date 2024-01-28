@@ -1172,9 +1172,13 @@ class BusEvent(betterproto.Message):
     attach_pipeline_request: "AttachPipelineRequest" = betterproto.message_field(
         105, group="event"
     )
+    """DEPRECATED (01.27.2024): Use SetPipelinesRequest instead"""
+
     detach_pipeline_request: "DetachPipelineRequest" = betterproto.message_field(
         106, group="event"
     )
+    """DEPRECATED (01.27.2024): Use SetPipelinesRequest instead"""
+
     pause_pipeline_request: "PausePipelineRequest" = betterproto.message_field(
         107, group="event"
     )
@@ -1191,6 +1195,9 @@ class BusEvent(betterproto.Message):
     )
     tail_request: "TailRequest" = betterproto.message_field(113, group="event")
     tail_response: "TailResponse" = betterproto.message_field(114, group="event")
+    set_pipelines_request: "SetPipelinesRequest" = betterproto.message_field(
+        115, group="event"
+    )
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
@@ -1203,6 +1210,17 @@ class BusEvent(betterproto.Message):
     bus 4. Since this is not a gRPC call, server translates ctx metadata to
     this field and includes it in the bus event.
     """
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("attach_pipeline_request"):
+            warnings.warn(
+                "BusEvent.attach_pipeline_request is deprecated", DeprecationWarning
+            )
+        if self.is_set("detach_pipeline_request"):
+            warnings.warn(
+                "BusEvent.detach_pipeline_request is deprecated", DeprecationWarning
+            )
 
 
 @dataclass(eq=False, repr=False)
