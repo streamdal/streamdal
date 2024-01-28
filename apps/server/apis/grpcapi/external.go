@@ -607,8 +607,6 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 
 	}
 
-	// Convert req t
-
 	// TODO: Store the new pipeline config
 	if err := s.Options.StoreService.SetPipelines(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,

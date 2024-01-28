@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -143,8 +144,8 @@ type IStore interface {
 	// GetPipelinesByAudience fetches pipelines assigned for a particular audience
 	GetPipelinesByAudience(ctx context.Context, audience *protos.Audience) ([]*protos.Pipeline, error)
 
-	// SetPipelines saves pipelines assigned to a particular audience
-	SetPipelines(ctx context.Context, audience *protos.Audience, pipelines []*protos.Pipeline) error
+	// SetPipelines saves pipelines as SetPipelinesConfig json to $audience key in store
+	SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error
 }
 
 type Options struct {
@@ -331,18 +332,42 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	return pipeline, nil
 }
 
+// TODO: Should probably be proto
+type SetPipelinesConfig struct {
+	PipelineID                string
+	Paused                    bool
+	CreatedAtUnixTimestampUTC int64
+}
+
 // TODO: Implement
-func (s *Store) SetPipelines(ctx context.Context, aud *protos.Audience, pipelines []*protos.Pipeline) error {
+func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error {
 	llog := s.log.WithField("method", "SetPipelines")
-	llog.Debugf("received request to save pipelines for audience '%s'", util.AudienceToStr(audience))
+	llog.Debugf("received request to save pipelines for audience '%s'", util.AudienceToStr(req.Audience))
+
+	// Validate req
+	if err := validate.SetPipelinesRequest(req); err != nil {
+		return errors.Wrap(err, "error validating request in store.SetPipelines()")
+	}
+
+	pipelineConfigs := make([]*SetPipelinesConfig, 0)
 
 	// Convert pipelines to cmd for storage
-	for _, p := range pipelines {
+	for _, p := range req.PipelineIds {
+		cfg := &SetPipelinesConfig{
+			PipelineID:                p,
+			CreatedAtUnixTimestampUTC: time.Now().UTC().Unix(),
+		}
 
+		pipelineConfigs = append(pipelineConfigs, cfg)
+	}
+
+	data, err := json.Marshal(pipelineConfigs)
+	if err != nil {
+		return errors.Wrap(err, "error serializing pipeline configs")
 	}
 
 	// Save to K/V
-	if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(aud)), pipelineData, 0).Err(); err != nil {
+	if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(req.Audience)), data, 0).Err(); err != nil {
 		return errors.Wrap(err, "error saving pipeline to store")
 	}
 
@@ -1506,4 +1531,10 @@ func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
 	}
 
 	return nil
+}
+
+// TODO: Implement (not used yet)
+func (s *Store) GetPipelinesByAudience(ctx context.Context, audience *protos.Audience) ([]*protos.Pipeline, error) {
+	//TODO implement me
+	panic("implement me")
 }
